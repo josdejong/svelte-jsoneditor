@@ -4,6 +4,10 @@ A web-based tool to view, edit, format, transform, and validate JSON
 
 The library is written with Svelte, but can be used in any framework (React, Angular, plain JavaScript).
 
+![JSONEditor screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_screenshot.png)
+
+<!-- TODO: describe features -->
+
 ## Install
 
 ```
