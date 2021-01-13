@@ -102,11 +102,11 @@ describe('search', () => {
   })
 
   it('should respect order of keys in document state in async search', () => {
-    return new Promise ((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const doc = {
         data: {
-          'text1': 'foo',
-          'text2': 'foo'
+          text1: 'foo',
+          text2: 'foo'
         }
       }
 
@@ -116,8 +116,8 @@ describe('search', () => {
       function onDone (results) {
         try {
           assert.deepStrictEqual(results, [
-            [ 'data', 'text2', STATE_SEARCH_VALUE ],
-            [ 'data', 'text1', STATE_SEARCH_VALUE ]
+            ['data', 'text2', STATE_SEARCH_VALUE],
+            ['data', 'text1', STATE_SEARCH_VALUE]
           ])
           resolve()
         } catch (err) {

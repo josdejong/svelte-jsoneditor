@@ -15,7 +15,7 @@
   const debug = createDebug('jsoneditor:Main')
 
   export let json = ''
-  export let text = undefined
+  export let text
   export let mode
   export let mainMenuBar
   export let validator

@@ -3,34 +3,34 @@ import json from '@rollup/plugin-json'
 import svelte from 'rollup-plugin-svelte'
 import resolve from '@rollup/plugin-node-resolve'
 import pkg from './package.json'
-import sveltePreprocess  from 'svelte-preprocess'
+import sveltePreprocess from 'svelte-preprocess'
 import { terser } from 'rollup-plugin-terser'
 
 const production = !process.env.ROLLUP_WATCH
 
 export default {
-	input: 'src/index.js',
-	output: [
-		{ file: pkg.module, 'format': 'es' },
-		{ file: pkg.main, 'format': 'umd', name: 'jsoneditor', sourcemap: true }
-	],
-	plugins: [
-		svelte({
-			// enable run-time checks when not in production
-			dev: !production,
+  input: 'src/index.js',
+  output: [
+    { file: pkg.module, format: 'es' },
+    { file: pkg.main, format: 'umd', name: 'jsoneditor', sourcemap: true }
+  ],
+  plugins: [
+    svelte({
+      // enable run-time checks when not in production
+      dev: !production,
 
-			preprocess: sveltePreprocess()
-		}),
+      preprocess: sveltePreprocess()
+    }),
 
-		resolve({
-			browser: true
-		}),
+    resolve({
+      browser: true
+    }),
 
-		commonjs(),
-		json(),
-		resolve(),
+    commonjs(),
+    json(),
+    resolve(),
 
-		// minify
-		production && terser()
-	]
+    // minify
+    production && terser()
+  ]
 }

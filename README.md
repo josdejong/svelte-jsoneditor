@@ -208,6 +208,18 @@ Build the library:
 npm run build
 ```
 
+Run unit tests:
+
+```
+npm test
+```
+
+Run linter:
+
+```
+npm run lint
+```
+
 ## License
 
 Released under the [ISC license](LICENSE.md).

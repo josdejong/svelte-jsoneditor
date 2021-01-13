@@ -89,16 +89,16 @@ export function repairPartialJson (partialJson) {
   partialJson = partialJson.replace(END_WITH_COMMA_AND_OPTIONAL_WHITESPACES_REGEX, '')
 
   try {
-    return simpleJsonRepair(partialJson)
+    return jsonrepair(partialJson)
   } catch (err) {}
 
   try {
-    const repaired = simpleJsonRepair('[' + partialJson + ']')
+    const repaired = jsonrepair('[' + partialJson + ']')
     return repaired.substring(1, repaired.length - 1) // remove the outer [...] again
   } catch (err) {}
 
   try {
-    const repaired = simpleJsonRepair('{' + partialJson + '}')
+    const repaired = jsonrepair('{' + partialJson + '}')
     return repaired.substring(1, repaired.length - 1) // remove the outer {...} again
   } catch (err) {}
 

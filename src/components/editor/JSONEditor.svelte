@@ -81,7 +81,7 @@
   let domHiddenInput
   let domJsonEditor
   let focus = false
-  let jump = createJump()
+  const jump = createJump()
 
   export let mode = MODE.EDIT
   export let externalDoc = {}
@@ -648,7 +648,7 @@
    * Find the DOM element of a given path.
    * Note that the path can only be found when the node is expanded.
    */
-  export function findElement(path) {
+  export function findElement (path) {
     return divContents.querySelector(`div[data-path="${compileJSONPointer(path)}"]`)
   }
 
