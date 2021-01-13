@@ -1,7 +1,7 @@
 {
   "name": "svelte-jsoneditor",
   "description": "A web-based tool to view, edit, format, transform, and validate JSON",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "svelte": "dist/jsoneditor.mjs",
   "module": "dist/jsoneditor.mjs",
   "main": "dist/jsoneditor.js",
@@ -18,7 +18,7 @@
     "test": "mocha src/**/*.test.js",
     "lint": "eslint --cache src/**/*.svelte src/**/*.js tools/**/*.js *.js --ignore-pattern src/generated --ignore-pattern examples",
     "prepare": "node tools/generateAjvDrafts.js",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run lint && npm test && npm run build"
   },
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^5.15.1",
@@ -60,7 +60,6 @@
     "svelte"
   ],
   "files": [
-    "src",
     "dist",
     "README.md"
   ]
