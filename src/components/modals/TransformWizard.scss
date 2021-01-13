@@ -1,0 +1,65 @@
+@import '../../styles';
+
+table.transform-wizard {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+
+  tr {
+    th {
+      font-weight: normal;
+      text-align: left;
+      width: 60px;
+    }
+
+    td {
+      .horizontal {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        margin-bottom: $padding/2;
+
+        :global(.selectContainer) {
+          &.filter-field {
+            flex: 4;
+            margin-right: $padding/2;
+          }
+
+          &.filter-relation {
+            flex: 1;
+            margin-right: $padding/2;
+          }
+
+          &.sort-field {
+            flex: 3;
+            margin-right: $padding/2;
+          }
+
+          &.sort-direction {
+            flex: 1;
+          }
+
+          &.pick-fields {
+            flex: 1;
+          }
+        }
+
+        :global(.selectContainer input) {
+          box-sizing: border-box;
+        }
+
+        .filter-value {
+          flex: 4;
+          padding: $padding;
+          border: 1px solid $border-gray;
+          border-radius: $border-radius;
+          outline: none;
+
+          &:focus {
+            border-color: $theme-color;
+          }
+        }
+      }
+    }
+  }
+}

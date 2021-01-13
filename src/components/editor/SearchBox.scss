@@ -1,0 +1,70 @@
+@import '../../styles';
+
+$search-size: 24px;
+$button-width: 20px;
+
+.search-box {
+  border: 2px solid $theme-color;
+  border-radius: $border-radius;
+  background: $white;
+  box-shadow: $box-shadow;
+
+  .search-form {
+    display: flex;
+    align-items: center;
+    padding: 0 5px;
+
+    button {
+      color: $light-gray;
+      display: block;
+      width: $search-size;
+      height: $search-size;
+      text-align: center;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    button {
+      width: $button-width;
+      cursor: pointer;
+
+      &:hover,
+      &:active {
+        color: $gray;
+
+        &.search-icon {
+          color: $light-gray;
+          cursor: inherit;
+        }
+      }
+    }
+
+    .search-input {
+      border: none;
+      height: $search-size;
+      padding: 0 $input-padding;
+      margin: 0;
+      flex: 1;
+      width: 100px;
+      outline: none;
+    }
+
+    .searching {
+      width: $button-width;
+      color: $light-gray;
+    }
+
+    .search-count {
+      color: $light-gray;
+      font-size: $font-size-small;
+      visibility: hidden;
+      padding: 0 $input-padding;
+
+      &.visible {
+        visibility: visible;
+      }
+    }
+  }
+}

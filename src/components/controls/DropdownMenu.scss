@@ -1,0 +1,46 @@
+@import '../../styles';
+
+.menu-dropdown {
+  position: relative;
+  overflow: visible;
+
+  ul {
+    margin: 0;
+    padding: 0;
+
+    li {
+      margin: 0;
+      padding: 0;
+      list-style-type : none;
+    }
+  }
+
+  .items {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    z-index: 4;
+    color: $black;
+    box-shadow: $box-shadow;
+
+    &.visible {
+      display: block;
+    }
+
+    button {
+      width: 100%;
+      text-align: left;
+
+      &:hover {
+        background: $background-gray;
+      }
+
+      &:disabled {
+        color: $gray;
+        background: unset;
+      }
+    }
+  }
+}

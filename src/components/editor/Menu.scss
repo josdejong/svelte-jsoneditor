@@ -1,0 +1,55 @@
+@import '../../styles';
+
+.menu {
+  font-family: $font-family;
+  font-size: $font-size;
+  background: $theme-color;
+  color: $white;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  position: relative;
+
+  // FIXME: should utilize the generic styling in styles.scss
+  .button {
+    width: $menu-button-size;
+    height: $menu-button-size;
+    border: none;
+    background: transparent;
+    color: white;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover,
+    &:focus {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    &:disabled {
+      color: rgba(255, 255, 255, 0.5);
+      background: transparent;
+    }
+  }
+
+  .space {
+    flex: 1;
+  }
+
+  .separator {
+    $margin: 3px;
+
+    background: rgba(255, 255, 255, 0.15);
+    box-sizing: border-box;
+    width: 1px;
+    height: $menu-button-size - 2 * $margin;
+    margin: $margin;
+  }
+
+  .search-box-container {
+    position: absolute;
+    top: 100%;
+    right: $search-box-offset + 20px; // keep space for scrollbar
+    margin-top: $search-box-offset;
+    z-index: 2;
+  }
+}

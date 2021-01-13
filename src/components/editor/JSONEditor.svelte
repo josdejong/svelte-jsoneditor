@@ -1,0 +1,1020 @@
+<svelte:options immutable={true} />
+
+<script>
+  import createDebug from 'debug'
+  import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
+  import { initial, isEmpty, isEqual, throttle, uniqueId } from 'lodash-es'
+  import { getContext, onDestroy, onMount, tick } from 'svelte'
+  import { createJump } from '../../assets/jump.js/src/jump.js'
+  import {
+    MAX_SEARCH_RESULTS,
+    MODE,
+    SCROLL_DURATION,
+    SEARCH_PROGRESS_THROTTLE,
+    SIMPLE_MODAL_OPTIONS,
+    STATE_EXPANDED
+  } from '../../constants.js'
+  import {
+    documentStatePatch,
+    expandPath,
+    expandSection,
+    syncState
+  } from '../../logic/documentState.js'
+  import { createHistory } from '../../logic/history.js'
+  import {
+    createNewValue,
+    createRemoveOperations,
+    duplicate,
+    insert
+  } from '../../logic/operations.js'
+  import {
+    searchAsync,
+    searchNext,
+    searchPrevious,
+    updateSearchResult
+  } from '../../logic/search.js'
+  import {
+    createSelection,
+    createSelectionFromOperations,
+    findRootPath,
+    getInitialSelection,
+    getSelectionDown,
+    getSelectionLeft,
+    getSelectionRight,
+    getSelectionUp,
+    isSelectionInsidePath,
+    removeEditModeFromSelection,
+    selectAll,
+    SELECTION_TYPE,
+    selectionToPartialJson
+  } from '../../logic/selection.js'
+  import { mapValidationErrors } from '../../logic/validation.js'
+  import {
+    activeElementIsChildOf,
+    getWindow,
+    isChildOfNodeName,
+    setCursorToEnd
+  } from '../../utils/domUtils.js'
+  import { getIn, setIn, updateIn } from '../../utils/immutabilityHelpers.js'
+  import {
+    compileJSONPointer,
+    parseJSONPointerWithArrayIndices
+  } from '../../utils/jsonPointer.js'
+  import { parsePartialJson, repairPartialJson } from '../../utils/jsonUtils.js'
+  import { keyComboFromEvent } from '../../utils/keyBindings.js'
+  import { isObject, isObjectOrArray, isUrl } from '../../utils/typeUtils.js'
+  import { createFocusTracker } from '../controls/createFocusTracker.js'
+  import JSONRepairModal from '../modals/JSONRepairModal.svelte'
+  import SortModal from '../modals/SortModal.svelte'
+  import TransformModal from '../modals/TransformModal.svelte'
+  import JSONNode from './JSONNode.svelte'
+  import Menu from './Menu.svelte'
+  import Welcome from './Welcome.svelte'
+
+  const debug = createDebug('jsoneditor:TreeMode')
+
+  const { open } = getContext('simple-modal')
+  const sortModalId = uniqueId()
+  const transformModalId = uniqueId()
+
+  let divContents
+  let domHiddenInput
+  let domJsonEditor
+  let focus = false
+  let jump = createJump()
+
+  export let mode = MODE.EDIT
+  export let externalDoc = {}
+  export let mainMenuBar = true
+  export let validator = null
+  export let visible = true
+  export let onChangeJson = () => {}
+
+  function noop () {}
+
+  /** @type {function (path: Path, value: *) : string} */
+  export let onClassName
+  export let onFocus
+  export let onBlur
+
+  createFocusTracker({
+    onMount,
+    onDestroy,
+    getWindow: () => getWindow(domJsonEditor),
+    hasFocus: () => activeElementIsChildOf(domJsonEditor),
+    onFocus: () => {
+      focus = true
+      if (onFocus) {
+        onFocus()
+      }
+    },
+    onBlur: () => {
+      focus = false
+      if (onBlur) {
+        onBlur()
+      }
+    }
+  })
+
+  let doc = externalDoc
+  let state = syncState(doc, undefined, [], defaultExpand)
+
+  let selection = null
+
+  function defaultExpand (path) {
+    return path.length < 1
+      ? true
+      : (path.length === 1 && path[0] === 0) // first item of an array?
+  }
+
+  $: readOnly = mode === MODE.VIEW
+  $: docIsEmpty = doc !== ''
+  $: validationErrorsList = validator ? validator(doc) : []
+  $: validationErrors = mapValidationErrors(validationErrorsList)
+
+  let showSearch = false
+  let searching = false
+  let searchText = ''
+  let searchResult
+  let searchHandler
+
+  function handleSearchProgress (results) {
+    searchResult = updateSearchResult(doc, results, searchResult)
+  }
+
+  const handleSearchProgressDebounced = throttle(handleSearchProgress, SEARCH_PROGRESS_THROTTLE)
+  
+  function handleSearchDone (results) {
+    searchResult = updateSearchResult(doc, results, searchResult)
+    searching = false
+    debug('finished search')
+  }
+
+  async function handleSearchText (text) {
+    searchText = text
+    await tick() // await for the search results to be updated
+    await focusActiveSearchResult(searchResult && searchResult.activeItem)
+  }
+
+  async function handleNextSearchResult () {
+    searchResult = searchNext(searchResult)
+    await focusActiveSearchResult(searchResult && searchResult.activeItem)
+  }
+
+  async function handlePreviousSearchResult () {
+    searchResult = searchPrevious(searchResult)
+    await focusActiveSearchResult(searchResult && searchResult.activeItem)
+  }
+
+  async function focusActiveSearchResult (activeItem) {
+    if (activeItem) {
+      const path = initial(activeItem)
+      state = expandPath(doc, state, path)
+      await tick()
+      scrollTo(path)
+    }
+  }
+
+  $: {
+    // cancel previous search when still running
+    if (searchHandler && searchHandler.cancel) {
+      debug('cancel previous search')
+      searchHandler.cancel()
+    }
+
+    debug('start search', searchText)
+    searching = true
+
+    searchHandler = searchAsync(searchText, doc, state, {
+      onProgress: handleSearchProgressDebounced,
+      onDone: handleSearchDone,
+      maxResults: MAX_SEARCH_RESULTS
+    })
+  }
+
+  const history = createHistory({
+    onChange: (state) => {
+      historyState = state
+    }
+  })
+  let historyState = history.getState()
+
+  export function expand (callback = () => true) {
+    state = syncState(doc, state, [], callback, true)
+  }
+
+  export function collapse (callback = () => false) {
+    state = syncState(doc, state, [], callback, true)
+  }
+
+  // two-way binding of externalDoc and doc (internal)
+  // when receiving an updated prop, we have to update state.
+  // when changing doc in the editor, the bound external property must be udpated
+  $: update(externalDoc)
+  $: externalDoc = doc
+
+  export function get () {
+    return doc
+  }
+
+  function update (updatedDocument = {}) {
+    // TODO: this is inefficient. Make an optional flag promising that the updates are immutable so we don't have to do a deep equality check? First do some profiling!
+    const changed = !isEqual(doc, updatedDocument)
+
+    debug('update', { changed })
+
+    if (!changed) {
+      // no actual change, don't do anything
+      return
+    }
+
+    const prevState = state
+    const prevDoc = doc
+
+    doc = updatedDocument
+    state = syncState(doc, state, [], defaultExpand)
+
+    history.add({
+      undo: [{ op: 'replace', path: '', value: prevDoc }],
+      redo: [{ op: 'replace', path: '', value: doc }],
+      prevState,
+      state,
+      prevSelection: removeEditModeFromSelection(selection),
+      selection: removeEditModeFromSelection(selection)
+    })
+  }
+
+  /**
+   * @param {JSONPatchDocument} operations
+   * @param {Selection} [newSelection]
+   */
+  export function patch (operations, newSelection) {
+    const prevState = state
+    const prevSelection = selection
+
+    debug('patch', operations, newSelection)
+
+    const undo = revertJSONPatch(doc, operations)
+    const update = documentStatePatch(doc, state, operations)
+    doc = update.doc
+    state = update.state
+
+    if (newSelection) {
+      selection = newSelection
+    }
+
+    history.add({
+      undo,
+      redo: operations,
+      prevState,
+      state,
+      prevSelection: removeEditModeFromSelection(prevSelection),
+      selection: removeEditModeFromSelection(newSelection || selection)
+    })
+
+    return {
+      doc,
+      undo,
+      redo: operations
+    }
+  }
+
+  // TODO: cleanup logging
+  $: debug('doc', doc)
+  $: debug('state', state)
+  $: debug('selection', selection)
+
+  async function handleCut () {
+    if (readOnly || !selection) {
+      return
+    }
+
+    const clipboard = selectionToPartialJson(doc, selection)
+    if (clipboard == null) {
+      return
+    }
+
+    debug('cut', { selection, clipboard })
+
+    try {
+      await navigator.clipboard.writeText(clipboard)
+    } catch (err) {
+      // TODO: report error to user -> onError callback
+      console.error(err)
+    }
+
+    const { operations, newSelection } = createRemoveOperations(doc, state, selection)
+    handlePatch(operations, newSelection)
+  }
+
+  async function handleCopy () {
+    const clipboard = selectionToPartialJson(doc, selection)
+    if (clipboard == null) {
+      return
+    }
+
+    debug('copy', { clipboard })
+
+    try {
+      await navigator.clipboard.writeText(clipboard)
+    } catch (err) {
+      // TODO: report error to user -> onError callback
+      console.error(err)
+    }
+  }
+
+  function handlePaste (event) {
+    event.preventDefault()
+
+    if (readOnly || !selection) {
+      return
+    }
+
+    const clipboardText = event.clipboardData.getData('text/plain')
+
+    try {
+      doPaste(clipboardText)
+    } catch (err) {
+      openRepairModal(clipboardText, (repairedText) => {
+        debug('repaired pasted text: ', repairedText)
+        doPaste(repairedText)
+      })
+    }
+  }
+
+  function doPaste (clipboardText) {
+    const operations = insert(doc, state, selection, clipboardText)
+
+    debug('paste', { clipboardText, operations, selection })
+
+    handlePatch(operations)
+
+    // expand newly inserted object/array
+    operations
+      .filter(operation => isObjectOrArray(operation.value))
+      .forEach(async operation => {
+        const path = parseJSONPointerWithArrayIndices(doc, operation.path)
+        handleExpand(path, true, false)
+      })
+  }
+
+  function openRepairModal (text, onApply) {
+    open(JSONRepairModal, {
+      text,
+      onParse: parsePartialJson,
+      onRepair: repairPartialJson,
+      onApply
+    }, {
+      ...SIMPLE_MODAL_OPTIONS,
+      styleWindow: {
+        ...SIMPLE_MODAL_OPTIONS.styleWindow,
+        width: '600px',
+        height: '500px'
+      },
+      styleContent: {
+        padding: 0,
+        height: '100%'
+      }
+    }, {
+      onClose: () => focusHiddenInput()
+    })
+  }
+
+  function handleRemove () {
+    if (readOnly || !selection) {
+      return
+    }
+
+    const { operations, newSelection } = createRemoveOperations(doc, state, selection)
+
+    debug('remove', { operations, selection, newSelection })
+
+    handlePatch(operations, newSelection)
+  }
+
+  function handleDuplicate () {
+    if (
+      readOnly ||
+      !selection ||
+      (selection.type !== SELECTION_TYPE.MULTI) ||
+      isEmpty(selection.focusPath) // root selected, cannot duplicate
+    ) {
+      return
+    }
+
+    debug('duplicate', { selection })
+
+    const operations = duplicate(doc, state, selection.paths)
+
+    handlePatch(operations)
+  }
+
+  /**
+   * @param {'value' | 'object' | 'array' | 'structure'} type
+   */
+  function handleInsert (type) {
+    if (readOnly || !selection) {
+      return
+    }
+
+    const newValue = createNewValue(doc, selection, type)
+    const data = JSON.stringify(newValue)
+    const operations = insert(doc, state, selection, data)
+    debug('handleInsert', { type, operations, newValue, data })
+
+    handlePatch(operations)
+
+    operations
+      .filter(operation => (operation.op === 'add' || operation.op === 'replace'))
+      .forEach(async operation => {
+        const path = parseJSONPointerWithArrayIndices(doc, operation.path)
+
+        if (isObjectOrArray(newValue)) {
+          // expand newly inserted object/array
+          handleExpand(path, true, true)
+          focusHiddenInput() // TODO: find a more robust way to keep focus than sprinkling focusHiddenInput() everywhere
+        }
+
+        if (newValue === '') {
+          // open the newly inserted value in edit mode
+          const parent = !isEmpty(path)
+            ? getIn(doc, initial(path))
+            : null
+
+          selection = createSelection(doc, state, {
+            type: isObject(parent) ? SELECTION_TYPE.KEY : SELECTION_TYPE.VALUE,
+            path,
+            edit: true
+          })
+
+          await tick()
+          setTimeout(() => replaceActiveElementContents(''))
+        }
+      })
+  }
+
+  function replaceActiveElementContents (char) {
+    const activeElement = getWindow(domJsonEditor).document.activeElement
+    if (activeElement.isContentEditable) {
+      activeElement.textContent = char
+      setCursorToEnd(activeElement)
+      // FIXME: should trigger an oninput, else the component will not update it's newKey/newValue variable
+    }
+  }
+
+  async function handleInsertCharacter (char) {
+    // a regular key like a, A, _, etc is entered.
+    // Replace selected contents with a new value having this first character as text
+    if (readOnly || !selection) {
+      return
+    }
+
+    if (selection.type === SELECTION_TYPE.KEY) {
+      selection = { ...selection, edit: true }
+      await tick()
+      setTimeout(() => replaceActiveElementContents(char))
+      return
+    }
+
+    if (char === '{') {
+      handleInsert('object')
+    } else if (char === '[') {
+      handleInsert('array')
+    } else {
+      if (
+        selection.type === SELECTION_TYPE.VALUE &&
+        !isObjectOrArray(getIn(doc, selection.focusPath))
+      ) {
+        selection = { ...selection, edit: true }
+        await tick()
+        setTimeout(() => replaceActiveElementContents(char))
+      } else {
+        await handleInsertValueWithCharacter(char)
+      }
+    }
+  }
+
+  async function handleInsertValueWithCharacter (char) {
+    if (readOnly || !selection) {
+      return
+    }
+
+    // first insert a new value
+    handleInsert('value')
+
+    // next, open the new value in edit mode and apply the current character
+    const path = selection.focusPath
+    const parent = getIn(doc, initial(path))
+    selection = createSelection(doc, state, {
+      type: (Array.isArray(parent) || selection.type === SELECTION_TYPE.VALUE)
+        ? SELECTION_TYPE.VALUE
+        : SELECTION_TYPE.KEY,
+      path,
+      edit: true
+    })
+
+    await tick()
+    setTimeout(() => replaceActiveElementContents(char))
+  }
+
+  function handleUndo () {
+    if (!history.getState().canUndo) {
+      return
+    }
+
+    const item = history.undo()
+    if (!item) {
+      return
+    }
+
+    doc = immutableJSONPatch(doc, item.undo)
+    state = item.prevState
+    selection = item.prevSelection
+
+    debug('undo', { item, doc, state, selection })
+
+    emitOnChange()
+
+    focusHiddenInput()
+  }
+
+  function handleRedo () {
+    if (!history.getState().canRedo) {
+      return
+    }
+
+    const item = history.redo()
+    if (!item) {
+      return
+    }
+
+    doc = immutableJSONPatch(doc, item.redo)
+    state = item.state
+    selection = item.selection
+
+    debug('redo', { item, doc, state, selection })
+
+    emitOnChange()
+
+    focusHiddenInput()
+  }
+
+  function handleSort () {
+    if (readOnly) {
+      return
+    }
+
+    const selectedPath = selection ? findRootPath(selection) : []
+
+    open(SortModal, {
+      id: sortModalId,
+      json: doc,
+      selectedPath,
+      onSort: async (operations) => {
+        debug('onSort', selectedPath, operations)
+        patch(operations, selection)
+
+        // expand the newly replaced array
+        handleExpand(selectedPath, true)
+        // FIXME: because we apply expand *after* the patch, when doing undo/redo, the expanded state is not restored
+      }
+    }, {
+      ...SIMPLE_MODAL_OPTIONS,
+      styleWindow: {
+        ...SIMPLE_MODAL_OPTIONS.styleWindow,
+        width: '400px'
+      }
+    }, {
+      onClose: () => focusHiddenInput()
+    })
+  }
+
+  function handleTransform () {
+    if (readOnly) {
+      return
+    }
+
+    const selectedPath = selection ? findRootPath(selection) : []
+
+    open(TransformModal, {
+      id: transformModalId,
+      json: doc,
+      selectedPath,
+      onTransform: async (operations) => {
+        debug('onTransform', selectedPath, operations)
+        patch(operations, selection)
+
+        // expand the newly replaced array
+        handleExpand(selectedPath, true)
+        // FIXME: because we apply expand *after* the patch, when doing undo/redo, the expanded state is not restored
+      }
+    }, {
+      ...SIMPLE_MODAL_OPTIONS,
+      styleWindow: {
+        ...SIMPLE_MODAL_OPTIONS.styleWindow,
+        width: '600px'
+      },
+      styleContent: {
+        overflow: 'auto', // TODO: would be more neat if the header is fixed instead of scrolls along
+        padding: 0
+      }
+    }, {
+      onClose: () => focusHiddenInput()
+    })
+  }
+
+  /**
+   * Scroll the window vertically to the node with given path
+   * @param {Path} path
+   */
+  export async function scrollTo (path) {
+    state = expandPath(doc, state, path)
+    await tick()
+
+    const elem = findElement(path)
+    const offset = -(divContents.getBoundingClientRect().height / 4)
+
+    if (elem) {
+      debug('scrollTo', { path, elem, divContents })
+      jump(elem, {
+        container: divContents,
+        offset,
+        duration: SCROLL_DURATION
+      })
+    }
+  }
+
+  /**
+   * Find the DOM element of a given path.
+   * Note that the path can only be found when the node is expanded.
+   */
+  export function findElement(path) {
+    return divContents.querySelector(`div[data-path="${compileJSONPointer(path)}"]`)
+  }
+
+  /**
+   * If given path is outside of the visible viewport, scroll up/down.
+   * When the path is already in view, nothing is done
+   * @param {Path} path
+   */
+  function scrollIntoView (path) {
+    const elem = divContents.querySelector(`div[data-path="${compileJSONPointer(path)}"]`)
+
+    if (elem) {
+      const viewPortRect = divContents.getBoundingClientRect()
+      const elemRect = elem.getBoundingClientRect()
+      const margin = 20
+      const elemHeight = isObjectOrArray(getIn(doc, path))
+        ? margin // do not use real height when array or object
+        : elemRect.height
+
+      if (elemRect.top < viewPortRect.top + margin) {
+        // scroll down
+        jump(elem, {
+          container: divContents,
+          offset: -margin,
+          duration: 0
+        })
+      } else if (elemRect.top + elemHeight > viewPortRect.bottom - margin) {
+        // scroll up
+        jump(elem, {
+          container: divContents,
+          offset: -(viewPortRect.height - elemHeight - margin),
+          duration: 0
+        })
+      }
+    }
+  }
+
+  function emitOnChange () {
+    // TODO: add more logic here to emit onChange, onChangeJson, onChangeText, etc.
+    onChangeJson(doc)
+  }
+
+  /**
+   * @param {JSONPatchDocument} operations
+   * @param {Selection} [newSelection] If no new selection is provided,
+   *                                   The new selection will be determined
+   *                                   based on the operations.
+   */
+  function handlePatch (
+    operations,
+    newSelection = createSelectionFromOperations(doc, operations)
+  ) {
+    if (readOnly) {
+      return
+    }
+
+    debug('handlePatch', operations, newSelection)
+
+    const patchResult = patch(operations, newSelection)
+
+    emitOnChange()
+
+    return patchResult
+  }
+
+  /**
+   * Toggle expanded state of a node
+   * @param {Path} path
+   * @param {boolean} expanded  True to expand, false to collapse
+   * @param {boolean} [recursive=false]  Only applicable when expanding
+   */
+  function handleExpand (path, expanded, recursive = false) {
+    // TODO: move this function into documentState.js
+    if (recursive) {
+      state = updateIn(state, path, (childState) => {
+        return syncState(getIn(doc, path), childState, [], () => expanded, true)
+      })
+    } else {
+      state = setIn(state, path.concat(STATE_EXPANDED), expanded, true)
+
+      state = updateIn(state, path, (childState) => {
+        return syncState(getIn(doc, path), childState, [], defaultExpand, false)
+      })
+    }
+
+    if (selection && !expanded) {
+      // check whether the selection is still visible and not collapsed
+      if (isSelectionInsidePath(selection, path)) {
+        // remove selection when not visible anymore
+        selection = null
+      }
+    }
+
+    // set focus to the hidden input, so we can capture quick keys like Ctrl+X, Ctrl+C, Ctrl+V
+    setTimeout(() => {
+      if (!activeElementIsChildOf(domJsonEditor)) {
+        focusHiddenInput()
+      }
+    })
+  }
+
+  /**
+   * @param {SelectionSchema} selectionSchema
+   */
+  function handleSelect (selectionSchema) {
+    if (selectionSchema) {
+      selection = createSelection(doc, state, selectionSchema)
+    } else {
+      selection = null
+    }
+
+    // set focus to the hidden input, so we can capture quick keys like Ctrl+X, Ctrl+C, Ctrl+V
+    focusHiddenInput()
+  }
+
+  function handleExpandSection (path, section) {
+    debug('handleExpandSection', path, section)
+
+    state = expandSection(doc, state, path, section)
+  }
+
+  function handleKeyDown (event) {
+    const combo = keyComboFromEvent(event)
+    const keepAnchorPath = event.shiftKey
+
+    if (combo === 'Ctrl+X' || combo === 'Command+X') {
+      event.preventDefault()
+      handleCut()
+    }
+    if (combo === 'Ctrl+C' || combo === 'Command+C') {
+      event.preventDefault()
+      handleCopy()
+    }
+    // Ctrl+V (paste) is handled by the on:paste event
+
+    if (combo === 'Ctrl+D' || combo === 'Command+D') {
+      event.preventDefault()
+      handleDuplicate()
+    }
+    if (combo === 'Delete') {
+      event.preventDefault()
+      handleRemove()
+    }
+    if (combo === 'Insert' || combo === 'Insert') {
+      event.preventDefault()
+      handleInsert('structure')
+    }
+    if (combo === 'Ctrl+A' || combo === 'Command+A') {
+      event.preventDefault()
+      selection = selectAll()
+    }
+
+    if (combo === 'Up' || combo === 'Shift+Up') {
+      event.preventDefault()
+      selection = selection
+        ? getSelectionUp(doc, state, selection, keepAnchorPath) || selection
+        : getInitialSelection(doc, state)
+
+      scrollIntoView(selection.focusPath)
+    }
+    if (combo === 'Down' || combo === 'Shift+Down') {
+      event.preventDefault()
+      selection = selection
+        ? getSelectionDown(doc, state, selection, keepAnchorPath) || selection
+        : getInitialSelection(doc, state)
+
+      scrollIntoView(selection.focusPath)
+    }
+    if (combo === 'Left' || combo === 'Shift+Left') {
+      event.preventDefault()
+      selection = selection
+        ? getSelectionLeft(doc, state, selection, keepAnchorPath) || selection
+        : getInitialSelection(doc, state)
+    }
+    if (combo === 'Right' || combo === 'Shift+Right') {
+      event.preventDefault()
+      selection = selection
+        ? getSelectionRight(doc, state, selection, keepAnchorPath) || selection
+        : getInitialSelection(doc, state)
+    }
+
+    if (combo === 'Enter' && selection && !readOnly) {
+      // when the selection consists of one Array item, change selection to editing its value
+      // TODO: this is a bit hacky
+      if (selection.type === SELECTION_TYPE.MULTI && selection.paths.length === 1) {
+        const path = selection.focusPath
+        const parent = getIn(doc, initial(path))
+        if (Array.isArray(parent)) {
+          // change into selection of the value
+          selection = createSelection(doc, state, { type: SELECTION_TYPE.VALUE, path })
+        }
+      }
+
+      if (selection.type === SELECTION_TYPE.KEY) {
+        // go to key edit mode
+        event.preventDefault()
+        selection = {
+          ...selection,
+          edit: true
+        }
+      }
+
+      if (selection.type === SELECTION_TYPE.VALUE) {
+        event.preventDefault()
+
+        const value = getIn(doc, selection.focusPath)
+        if (isObjectOrArray(value)) {
+          // expand object/array
+          handleExpand(selection.focusPath, true)
+        } else {
+          // go to value edit mode
+          selection = {
+            ...selection,
+            edit: true
+          }
+        }
+      }
+    }
+
+    if (event.key.length === 1 && !event.altKey && !event.ctrlKey && selection) {
+      // a regular key like a, A, _, etc is entered.
+      // Replace selected contents with a new value having this first character as text
+      event.preventDefault()
+      handleInsertCharacter(event.key)
+    }
+
+    if (combo === 'Enter' && (selection.type === SELECTION_TYPE.AFTER || selection.type === SELECTION_TYPE.INSIDE)) {
+      // Enter on an insert area -> open the area in edit mode
+      event.preventDefault()
+      handleInsertCharacter('')
+    }
+
+    if (combo === 'Ctrl+Enter' && selection && selection.type === SELECTION_TYPE.VALUE) {
+      const value = getIn(doc, selection.focusPath)
+
+      if (isUrl(value)) {
+        // open url in new page
+        window.open(value, '_blank')
+      }
+    }
+
+    if (combo === 'Escape' && selection) {
+      event.preventDefault()
+      selection = null
+    }
+
+    if (combo === 'Ctrl+F' || combo === 'Command+F') {
+      event.preventDefault()
+      showSearch = true
+    }
+
+    if (combo === 'Ctrl+Z' || combo === 'Command+Z') {
+      event.preventDefault()
+
+      // TODO: find a better way to restore focus
+      const activeElement = document.activeElement
+      if (activeElement && activeElement.blur && activeElement.focus) {
+        activeElement.blur()
+        setTimeout(() => {
+          handleUndo()
+          setTimeout(() => activeElement.select())
+        })
+      } else {
+        handleUndo()
+      }
+    }
+
+    if (combo === 'Ctrl+Shift+Z' || combo === 'Command+Shift+Z') {
+      event.preventDefault()
+
+      // TODO: find a better way to restore focus
+      const activeElement = document.activeElement
+      if (activeElement && activeElement.blur && activeElement.focus) {
+        activeElement.blur()
+        setTimeout(() => {
+          handleRedo()
+          setTimeout(() => activeElement.select())
+        })
+      } else {
+        handleRedo()
+      }
+    }
+  }
+
+  function handleMouseDown (event) {
+    // TODO: ugly to have to have two setTimeout here. Without it, hiddenInput will blur
+    setTimeout(() => {
+      setTimeout(() => {
+        if (!focus && !isChildOfNodeName(event.target, 'BUTTON')) {
+          // for example when clicking on the empty area in the main menu
+          focusHiddenInput()
+        }
+      })
+    })
+  }
+
+  function focusHiddenInput () {
+    // with just .focus(), sometimes the input doesn't react on onpaste events
+    // in Chrome when having a large document open and then doing cut/paste.
+    // Calling both .focus() and .select() did solve this issue.
+    domHiddenInput.focus()
+    domHiddenInput.select()
+  }
+</script>
+
+<div
+  class="jsoneditor"
+  class:visible
+  on:keydown={handleKeyDown}
+  on:mousedown={handleMouseDown}
+  bind:this={domJsonEditor}
+>
+  {#if mainMenuBar}
+    <Menu
+      readOnly={readOnly}
+      historyState={historyState}
+      searchText={searchText}
+      searching={searching}
+      searchResult={searchResult}
+      bind:showSearch
+
+      selection={selection}
+
+      onCut={handleCut}
+      onCopy={handleCopy}
+      onRemove={handleRemove}
+      onDuplicate={handleDuplicate}
+      onInsert={handleInsert}
+      onUndo={handleUndo}
+      onRedo={handleRedo}
+      onSort={handleSort}
+      onTransform={handleTransform}
+
+      onSearchText={handleSearchText}
+      onNextSearchResult={handleNextSearchResult}
+      onPreviousSearchResult={handlePreviousSearchResult}
+    />
+  {/if}
+  <label class="hidden-input-label">
+    <input
+      class="hidden-input"
+      tabindex="-1"
+      bind:this={domHiddenInput}
+      on:paste={handlePaste}
+    />
+  </label>
+  <div class="contents" bind:this={divContents}>
+    {#if !docIsEmpty}
+      <Welcome />
+    {/if}
+    <JSONNode
+      value={doc}
+      path={[]}
+      state={state}
+      readOnly={readOnly}
+      searchResult={searchResult && searchResult.itemsWithActive}
+      validationErrors={validationErrors}
+      onPatch={handlePatch}
+      onInsert={handleInsert}
+      onExpand={handleExpand}
+      onSelect={handleSelect}
+      onExpandSection={handleExpandSection}
+      onClassName={onClassName || noop}
+      selection={selection}
+    />
+  </div>
+</div>
+
+<style src="./JSONEditor.scss"></style>

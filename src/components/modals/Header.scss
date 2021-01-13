@@ -1,0 +1,21 @@
+@import '../../styles';
+
+.header {
+  display: flex;
+  background: $theme-color;
+  color: $white;
+
+  .title {
+    flex: 1;
+    padding: $input-padding;
+    vertical-align: middle;
+  }
+
+  button.close {
+    min-width: 32px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+}

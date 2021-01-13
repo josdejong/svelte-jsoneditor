@@ -1,0 +1,18 @@
+@import '../../styles';
+@import 'Modal';
+
+.jsoneditor-modal.copy-paste {
+  .shortcuts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin: 2*$padding 0;
+
+    .shortcut {
+      .key {
+        font-size: 200%;
+        color: $theme-color;
+      }
+    }
+  }
+}

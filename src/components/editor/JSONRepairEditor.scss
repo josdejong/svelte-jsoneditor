@@ -1,0 +1,65 @@
+@import '../../styles';
+@import 'Menu';
+
+.json-repair {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .menu {
+    .info {
+      padding: 0 $padding;
+    }
+  }
+
+  .json-repair-error,
+  .json-repair-valid {
+    font-family: $font-family-mono;
+    font-size: $font-size-mono;
+
+    padding: $padding;
+    display: flex;
+    gap: $padding;
+    flex-wrap: wrap;
+    align-items: center;
+
+    .message {
+      flex: 1;
+      min-width: 60%;
+    }
+  }
+
+  .json-repair-error {
+    background: $red;
+    color: $white;
+  }
+
+  .json-repair-valid {
+    background: $green;
+    color: $white;
+  }
+
+  button.action {
+    background: rgba(255, 255, 255, 0.2);
+    color: $white;
+
+    padding: $padding/2 $padding;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+
+  .json-text {
+    flex: 1;
+    border: none;
+    padding: $contents-padding;
+    font-family: $font-family-mono;
+    font-size: $font-size-mono;
+    color: $black;
+
+    resize: none;
+    outline: none;
+  }
+}

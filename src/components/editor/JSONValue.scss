@@ -1,0 +1,52 @@
+@import '../../styles';
+@import 'shared';
+
+.value {
+  &.string {
+    color: #008000;
+  }
+
+  &.object,
+  &.array {
+    min-width: 16px;
+    color: $meta-color;
+  }
+
+  &.number {
+    color: #ee422e;
+  }
+
+  &.boolean {
+    color: #ff8c00;
+  }
+
+  &.null {
+    color: #004ED0;
+  }
+
+  &.invalid {
+    color: #000000;
+  }
+
+  &.url {
+    color: green;
+    text-decoration: underline;
+  }
+
+  &:hover {
+    background: $hovered-background-transparent;
+  }
+
+  &.empty {
+    min-width: 4em;
+
+    &::after {
+      content: 'value';
+
+      &[contenteditable="true"] {
+        content: none;
+      }
+    }
+  }
+}
+

@@ -1,0 +1,225 @@
+@import '../../styles';
+@import 'json-node-selected-mixin';
+
+.json-node {
+  position: relative;
+  font-family: $font-family-mono;
+  font-size: $font-size-mono;
+  color: $black;
+
+  &.root {
+    min-height: 100%;
+    padding-bottom: $contents-padding;
+    box-sizing: border-box;
+
+    > .contents-outer > .contents {
+      padding-left: 0;
+    }
+  }
+
+  &.hovered {
+    > .header-outer > .header > .meta,
+    .props .header,
+    .items .header,
+    .props .contents,
+    .items .contents,
+    .footer {
+      background-color: $hovered-background-transparent;
+    }
+  }
+
+  $selector-height: 8px; // must be about half a line height
+
+  .props,
+  .items {
+    position: relative;
+  }
+
+  .header-outer,
+  .footer-outer {
+    display: flex;
+  }
+
+  .header {
+    position: relative;
+
+    .meta {
+      > .meta-inner {
+        display: flex;
+        justify-content: center;
+      }
+    }
+  }
+
+  .contents-outer {
+    display: flex;
+  }
+
+  .header,
+  .contents {
+    display: table;
+    flex-direction: row;
+
+    line-height: $line-height;
+
+    > :global(*) {
+      display: table-cell;
+    }
+  }
+
+  .contents {
+    min-height: $line-height;
+    padding-left: $line-height ; // must be the same as the width of the expand button
+  }
+
+  .footer {
+    display: inline-flex;
+    padding-left: $line-height + $input-padding; // must be the same as the width of the expand button
+  }
+
+  .insert-button-area {
+    visibility: hidden;
+    padding: 0 $padding / 2;
+    flex: 1; // must fill all left over space at the right side of the editor, so you can click there
+
+    &.inside {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    &.after {
+      display: flex;
+      align-items: end;
+      line-height: $line-height;
+    }
+  }
+
+  &:hover > .contents-outer .insert-button-area:not(.selected),
+  .header-outer:hover > .insert-button-area:not(.selected),
+  .footer-outer:hover .insert-button-area:not(.selected) {
+    visibility: visible;
+    z-index: 1;
+  }
+
+  .insert-area {
+    $height: 4px;
+
+    display: none;
+    position: relative;
+
+    max-width: 250px;
+    min-width: 100px;
+    height: 0;
+    margin-right: $padding/2;
+    outline: $height/2 solid; // color depends on hovered/selected/inactive+selected
+
+    &.hovered {
+      display: flex;
+      outline-color: $hovered-background-transparent;
+    }
+  }
+
+  &.selected,
+  &.selected-value {
+    .insert-area {
+      display: none;
+    }
+  }
+}
+
+.expand {
+  display: table-cell;
+  position: relative;
+  top: 2px;
+  width: $line-height;
+  height: $line-height;
+  padding: 0;
+  margin: 0;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: $gray-transparent;
+  font-size: $font-size-mono;
+  line-height: $line-height;
+
+  &:hover {
+    color: lighten($gray-transparent, 10%);
+  }
+}
+
+.meta,
+.separator,
+.index,
+.bracket {
+  vertical-align: top;
+  color: $meta-color;
+}
+
+.index {
+  padding: 0 $padding / 2;
+}
+
+.bracket {
+  padding: 0 2px;
+
+  &.expanded {
+    padding-right: $padding;
+  }
+}
+
+.tag,
+.insert-button {
+  border: none;
+  font-size: $font-size-small;
+  font-family: $font-family;
+  color: $white;
+  border-radius: 2px;
+  cursor: pointer;
+  position: relative;
+}
+
+.tag {
+  vertical-align: top;
+  padding: 0 4px 1px;
+  margin: 2px;
+
+  background: $light-gray-transparent;
+
+  &:hover {
+    background: lighten($light-gray-transparent, 15%);
+  }
+}
+
+.insert-button {
+  padding: 0 4px;
+  margin: 0;
+  line-height: $line-height;
+
+  // not transparent: not inside header or contents (which may be highlighted with a special background or so)
+  background: $hovered-background;
+
+  &:hover {
+    background: $light-gray;
+  }
+}
+
+.identifier {
+  vertical-align: top;
+}
+
+.json-node {
+  @include json-node-selected-mixin($selection-background, $selection-color);
+}
+
+:global(.jsoneditor-main:not(.focus)) {
+  .json-node {
+    @include json-node-selected-mixin($light-gray, $white);
+  }
+}
+
+:global(.bubble.dark) {
+  background: $dark-gray !important;
+  color: $white;
+  font-family: $font-family !important;
+  font-size: $font-size !important;
+}

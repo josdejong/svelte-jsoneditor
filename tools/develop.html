@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset='utf-8'>
+	<meta name='viewport' content='width=device-width,initial-scale=1'>
+
+	<title>JSON Editor (Svelte)</title>
+
+	<link rel='icon' type='image/png' href='favicon.png'>
+
+	<style>
+		html, body {
+			position: relative;
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			color: #333;
+			background: #f5f5f5;
+			margin: 0;
+			padding: 8px;
+			box-sizing: border-box;
+		}
+
+		button, input, body {
+			font-family: arial, Verdana, sans-serif;
+			font-size: 14px;
+		}
+
+		h1 {
+			color: purple;
+		}
+
+		#testEditorContainer {
+			width: 800px;
+			height: 500px;
+			max-width: 100%;
+		}
+
+		.json-node.custom-class-highlight {
+			background: greenyellow;
+		}
+
+		.json-node.custom-class-boolean .value {
+			background: pink;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="testEditorContainer"></div>
+	<p>
+		<button id="loadLargeJson">load large json</button>
+		<button id="clearJson">clear json</button>
+		<button id="patchJson">patch /string</button>
+		<button id="patchJson2">patch /object/nested/name</button>
+		<button id="moveJson">move json</button>
+		<input id="loadFile" type="file">
+	</p>
+	<p>
+		<button id="expandAll">expand all</button>
+		<button id="expand2">expand 2 levels</button>
+		<button id="collapseAll">collapse all</button>
+	</p>
+	<p>
+		<label for="mainMenuBar">
+			<input id="mainMenuBar" type="checkbox" checked /> Show menu
+		</label>
+		<label for="readOnly">
+			<input id="readOnly" type="checkbox" /> Read only
+		</label>
+		<label for="customClassNames">
+			<input id="customClassNames" type="checkbox" /> Custom class names
+		</label>
+	</p>
+	<p>
+		<button id="setTextValid">setText (valid)</button>
+		<button id="setTextRepairable">setText (repairable)</button>
+		<button id="setTextInvalid">setText (invalid)</button>
+	</p>
+	<p>
+		<button id="updateTextValid">updateText (valid)</button>
+		<button id="updateTextRepairable">updateText (repairable)</button>
+		<button id="updateTextInvalid">updateText (invalid)</button>
+	</p>
+	<p>
+		<button id="scrollToPath">scrollTo /object/nested/name</button>
+	</p>
+
+	<script type="module">
+		import { JSONEditor } from '../dist/jsoneditor.mjs'
+
+		const doc = {
+			'array': [1, 2, 3, {
+				name: 'Item ' + 2,
+				id: String(2),
+				index: 2,
+				time: new Date().toISOString(),
+				location: {
+					latitude: 1.23,
+					longitude: 23.44,
+					coordinates: [23.44, 1.23]
+				}
+			}],
+			'emptyArray': [],
+			'boolean': true,
+			'color': '#82b92c',
+			'null': null,
+			'number': 123,
+			'object': {
+				'a': 'b', 'c': 'd', nested: {
+					name: 'Item ' + 2,
+					id: String(2),
+					index: 2,
+					time: new Date().toISOString(),
+					location: {
+						latitude: 1.23,
+						longitude: 23.44,
+						coordinates: [23.44, 1.23]
+					}
+				}
+			},
+			'emptyObject': {},
+			'': '',
+			'string': 'Hello World',
+			"escaped_unicode": '\\u20b9',
+			"unicode": '\u{1F600},\uD83D\uDCA9',
+			'url': 'https://jsoneditoronline.org',
+			'Lorem Ipsum': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+			"<button onclick=alert('oopsie!!!')>test xss</button>": "xss?"
+		}
+
+		const target = document.getElementById('testEditorContainer')
+		const props = {
+			doc,
+			onChange: ({ json, text }) => console.log('onChange', { json, text }),
+			onChangeJson: doc => console.log('onChangeJson', doc),
+			// onChangeText: text => console.log('onChangeText', text),
+			onFocus: () => console.log('got focus...'),
+			onBlur: () => console.log('lost focus...'),
+			validator: doc => {
+				if (
+					doc && typeof doc === 'object' &&
+					doc.object && typeof doc.object === 'object' &&
+					doc.object.a === 'b') {
+					return [
+						{
+							path: ['object', 'a'],
+							message: '"a" should not be "b" ;)'
+						}
+					]
+				}
+
+				return []
+			}
+		}
+		const testEditor = new JSONEditor({ target, props })
+
+		window.testEditor = testEditor // expose to window for debugging
+
+		document.getElementById('loadLargeJson').onclick = function handleLoadLargeJson() {
+			const count = 455
+
+			console.log('create large json', {count})
+			console.time('create large json')
+			const largeJson = {}
+			largeJson.numbers = []
+			largeJson.randomNumbers = []
+			largeJson.array = []
+			for (let i = 0; i < count; i++) {
+				const longitude = 4 + i / count
+				const latitude = 51 + i / count
+
+				largeJson.numbers.push(i)
+				largeJson.randomNumbers.push(Math.round(Math.random() * 1000))
+				largeJson.array.push({
+					name: 'Item ' + i,
+					id: String(i),
+					index: i,
+					time: new Date().toISOString(),
+					location: {
+						latitude,
+						longitude,
+						coordinates: [longitude, latitude]
+					},
+					random: Math.random()
+				})
+			}
+			console.timeEnd('create large json')
+
+			// const stringifiedSize = JSON.stringify(largeJson).length
+			// console.log(`large json stringified size: ${filesize(stringifiedSize)}`)
+
+			testEditor.set(largeJson)
+			window.largeJson = largeJson // for debugging
+		}
+
+		document.getElementById('clearJson').onclick = function handleClearJson() {
+			testEditor.set({})
+		}
+
+		document.getElementById('patchJson').onclick = function handleClearJson() {
+			const operations = [{
+				op: 'replace',
+				path: '/string',
+				value: 'Hello world (updated!)'
+			}]
+
+			testEditor.patch(operations)
+		}
+
+		document.getElementById('patchJson2').onclick = function handleClearJson() {
+			const operations = [{
+				op: 'replace',
+				path: '/object/nested/name',
+				value: 'Item 2 (updated!)'
+			}]
+
+			testEditor.patch(operations)
+		}
+
+		document.getElementById('moveJson').onclick = function handleMoveJson() {
+			const operations = [{
+				op: 'move',
+				from: '/object/a',
+				path: '/a'
+			}]
+
+			testEditor.patch(operations)
+		}
+
+		document.getElementById('loadFile').onchange = function loadFile(event) {
+			console.log('loadFile', event.target.files)
+			console.time('load file')
+
+			const reader = new FileReader()
+			const file = event.target.files[0]
+			reader.onload = function (event) {
+				console.timeEnd('load file')
+				const text = event.target.result
+
+				console.time('parse JSON')
+				const json = JSON.parse(text)
+				console.timeEnd('parse JSON')
+
+				console.time('set JSON')
+				testEditor.set(json)
+				console.timeEnd('set JSON')
+			}
+			reader.readAsText(file)
+		}
+
+		document.getElementById('expandAll').onclick = function () {
+			testEditor.expand(() => true)
+		}
+
+		document.getElementById('expand2').onclick = function () {
+			testEditor.expand(path => path.length < 2)
+		}
+
+		document.getElementById('collapseAll').onclick = function () {
+			testEditor.collapse(() => false)
+		}
+
+		document.getElementById('mainMenuBar').onclick = function (event) {
+			testEditor.setMainMenuBar(event.target.checked)
+		}
+
+		document.getElementById('readOnly').onclick = function (event) {
+			testEditor.setMode(event.target.checked ? 'view' : 'edit')
+		}
+
+		function onClassName (path, value) {
+			if (
+				JSON.stringify(path) === '["object","c"]' ||
+				JSON.stringify(path) === '["string"]'
+			) {
+				return 'custom-class-highlight'
+			}
+
+			if (value === true || value === false) {
+				return 'custom-class-boolean'
+			}
+		}
+
+		document.getElementById('customClassNames').onclick = function (event) {
+			testEditor.$set({
+				onClassName: event.target.checked
+					? onClassName
+					: undefined
+			})
+		}
+
+		document.getElementById('setTextValid').onclick = () =>	testEditor.setText('[1,2,3]')
+		document.getElementById('updateTextValid').onclick = () =>	testEditor.updateText('[1,2,3,4]')
+
+		document.getElementById('setTextRepairable').onclick = () => {
+			const str = JSON.stringify(doc, null, 2)
+			const index = str.lastIndexOf(',')
+			const invalidStr = str.slice(0, index) + str.slice(index + 1)
+			testEditor.setText(invalidStr)
+		}
+
+		document.getElementById('updateTextRepairable').onclick = () => {
+			const updatedDoc = {
+				...doc,
+				updated: ':)'
+			}
+			const str = JSON.stringify(updatedDoc, null, 2)
+			const index = str.lastIndexOf(',')
+			const invalidStr = str.slice(0, index) + str.slice(index + 1)
+			testEditor.updateText(invalidStr)
+		}
+
+		document.getElementById('setTextInvalid').onclick = () =>	{
+			const str = JSON.stringify(doc, null, 2)
+			const index = str.lastIndexOf('}')
+			const invalidStr = str.slice(0, index) + ']' + str.slice(index + 1)
+			testEditor.setText(invalidStr)
+		}
+
+		document.getElementById('updateTextInvalid').onclick = () =>	{
+			const updatedDoc = {
+				...doc,
+				updated: ':)'
+			}
+			const str = JSON.stringify(updatedDoc, null, 2)
+			const index = str.lastIndexOf('}')
+			const invalidStr = str.slice(0, index) + ']' + str.slice(index + 1)
+			testEditor.updateText(invalidStr)
+		}
+
+		document.getElementById('scrollToPath').onclick = () => {
+			testEditor.scrollTo(['object', 'nested', 'name'])
+		}
+	</script>
+</body>
+</html>

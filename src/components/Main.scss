@@ -1,0 +1,12 @@
+@import '../styles';
+@import '../components/editor/json-node-selected-mixin.scss';
+
+.jsoneditor-main {
+  width: 100%;
+  height: 100%;
+  border: 1px solid $theme-color;
+
+  &.focus {
+    box-shadow: $outline-shadow;
+  }
+}

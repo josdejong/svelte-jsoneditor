@@ -1,0 +1,57 @@
+@import '../../styles';
+
+$color: $gray;
+$background-color: $background-gray;
+
+div.collapsed-items {
+  font-family: $font-family;
+  font-size: $font-size;
+  color: $color;
+
+  // https://sharkcoder.com/visual/borders
+  $size: 8px;
+  padding: $padding / 2;
+  border: $size solid transparent;
+  border-width: $size 0;
+  background-color: $background-color;
+  background-color: hsla(0, 0%, 0%, 0);
+  background-image:
+      linear-gradient($background-color, $background-color),
+      linear-gradient(to bottom right, transparent 50.5%, $background-color 50.5%),
+      linear-gradient(to bottom left, transparent 50.5%, $background-color 50.5%),
+      linear-gradient(to top right, transparent 50.5%, $background-color 50.5%),
+      linear-gradient(to top left, transparent 50.5%, $background-color 50.5%);
+  background-repeat: repeat, repeat-x, repeat-x, repeat-x, repeat-x;
+  background-position: 0 0, $size 0, $size 0, $size 100%,$size 100%;
+  background-size: auto auto, 2*$size 2*$size, 2*$size 2*$size, 2*$size 2*$size, 2*$size 2*$size;
+  background-clip: padding-box, border-box, border-box, border-box, border-box;
+  background-origin: padding-box, border-box, border-box, border-box, border-box;
+
+  display: flex;
+
+  div.text,
+  button.expand-items {
+    margin: 0 $padding / 2;
+  }
+
+  div.text {
+    display: inline;
+  }
+
+  button.expand-items {
+    font-family: $font-family;
+    font-size: $font-size;
+    color: $color;
+
+    background: none;
+    border: none;
+    padding: 0;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover,
+    &:focus {
+      color: $red;
+    }
+  }
+}
