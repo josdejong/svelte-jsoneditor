@@ -22,7 +22,7 @@ See the [/examples](/examples) section for some full examples.
 
 Create a JSONEditor with two-way binding `bind:json`:
 
-```sveltehtml
+```html
 <script>
   import { JSONEditor } from 'svelte-jsoneditor'
 
@@ -44,7 +44,7 @@ Create a JSONEditor with two-way binding `bind:json`:
 
 Or one-way binding:
 
-```sveltehtml
+```html
 <script>
   import { JSONEditor } from 'svelte-jsoneditor'
 
@@ -133,7 +133,7 @@ Or using UMD (exposed as `window.jsoneditor.JSONEditor`):
 
 Svelte component:
 
-```sveltehtml
+```html
 
 <script>
   import { JSONEditor } from 'svelte-jsoneditor'
