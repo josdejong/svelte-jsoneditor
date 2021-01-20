@@ -1,6 +1,6 @@
-import Main from './components/Main.svelte'
+import _JSONEditor from './components/JSONEditor.svelte'
 
-export const JSONEditor = Main
+export const JSONEditor = _JSONEditor
 
 // plugins
 export { createAjvValidator } from './plugins/createAjvValidator.js'

@@ -1016,4 +1016,4 @@
   </div>
 </div>
 
-<style src="./JSONEditor.scss"></style>
+<style src="./JSONEditorComponent.scss"></style>

@@ -8,8 +8,8 @@
   import jsonrepair from 'jsonrepair'
   import Modal from 'svelte-simple-modal'
   import { uniqueId } from '../utils/uniqueId.js'
-  import JSONEditor from './editor/JSONEditor.svelte'
-  import JSONRepairEditor from './editor/JSONRepairEditor.svelte'
+  import JSONEditorComponent from './editor/JSONEditorComponent.svelte'
+  import JSONRepairComponent from './editor/JSONRepairComponent.svelte'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
@@ -255,7 +255,7 @@
 <Modal>
   <div class="jsoneditor-main" class:focus>
     {#key instanceId}
-      <JSONEditor
+      <JSONEditorComponent
         bind:this={ref}
         bind:mode
         bind:externalDoc={json}
@@ -268,7 +268,7 @@
         visible={!repairing}
       />
       {#if repairing}
-        <JSONRepairEditor
+        <JSONRepairComponent
           bind:text={text}
           bind:mode
           onParse={JSON.parse}
@@ -284,4 +284,4 @@
   </div>
 </Modal>
 
-<style src="./Main.scss"></style>
+<style src="./JSONEditor.scss"></style>
