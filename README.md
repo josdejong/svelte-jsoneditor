@@ -188,6 +188,7 @@ const editor = new JSONEditor({
 - `update({ json?: JSON, text?: string })` Update the loaded JSON document, keeping the state of the editor (like expanded objects).
 - `patch(operations: JSONPatchDocument)` Apply a JSON patch document to update the contents of the JSON document.
 - `scrollTo(path: Array.<string|number>)` Scroll the editor vertically such that the specified path comes into view. The path will be expanded when needed.
+- `focus()`. Give the editor focus.
 - `destroy()`. Destroy the editor, remove it from the DOM.
 
 ## Develop

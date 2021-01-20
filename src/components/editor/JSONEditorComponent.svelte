@@ -80,7 +80,7 @@
   let divContents
   let domHiddenInput
   let domJsonEditor
-  let focus = false
+  let hasFocus = false
   const jump = createJump()
 
   export let mode = MODE.EDIT
@@ -103,13 +103,13 @@
     getWindow: () => getWindow(domJsonEditor),
     hasFocus: () => activeElementIsChildOf(domJsonEditor),
     onFocus: () => {
-      focus = true
+      hasFocus = true
       if (onFocus) {
         onFocus()
       }
     },
     onBlur: () => {
-      focus = false
+      hasFocus = false
       if (onBlur) {
         onBlur()
       }
@@ -376,7 +376,7 @@
         height: '100%'
       }
     }, {
-      onClose: () => focusHiddenInput()
+      onClose: () => focus()
     })
   }
 
@@ -432,7 +432,7 @@
         if (isObjectOrArray(newValue)) {
           // expand newly inserted object/array
           handleExpand(path, true, true)
-          focusHiddenInput() // TODO: find a more robust way to keep focus than sprinkling focusHiddenInput() everywhere
+          focus() // TODO: find a more robust way to keep focus than sprinkling focusHiddenInput() everywhere
         }
 
         if (newValue === '') {
@@ -535,7 +535,7 @@
 
     emitOnChange()
 
-    focusHiddenInput()
+    focus()
   }
 
   function handleRedo () {
@@ -556,7 +556,7 @@
 
     emitOnChange()
 
-    focusHiddenInput()
+    focus()
   }
 
   function handleSort () {
@@ -585,7 +585,7 @@
         width: '400px'
       }
     }, {
-      onClose: () => focusHiddenInput()
+      onClose: () => focus()
     })
   }
 
@@ -619,7 +619,7 @@
         padding: 0
       }
     }, {
-      onClose: () => focusHiddenInput()
+      onClose: () => focus()
     })
   }
 
@@ -744,7 +744,7 @@
     // set focus to the hidden input, so we can capture quick keys like Ctrl+X, Ctrl+C, Ctrl+V
     setTimeout(() => {
       if (!activeElementIsChildOf(domJsonEditor)) {
-        focusHiddenInput()
+        focus()
       }
     })
   }
@@ -761,7 +761,7 @@
 
     // set focus to the hidden input, so we can capture quick keys like Ctrl+X, Ctrl+C, Ctrl+V
     // we do this after a setTimeout in case the selection was made by clicking a button
-    setTimeout(() => focusHiddenInput())
+    setTimeout(() => focus())
   }
 
   function handleExpandSection (path, section) {
@@ -937,15 +937,15 @@
     // TODO: ugly to have to have two setTimeout here. Without it, hiddenInput will blur
     setTimeout(() => {
       setTimeout(() => {
-        if (!focus && !isChildOfNodeName(event.target, 'BUTTON')) {
+        if (!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) {
           // for example when clicking on the empty area in the main menu
-          focusHiddenInput()
+          focus()
         }
       })
     })
   }
 
-  function focusHiddenInput () {
+  export function focus () {
     // with just .focus(), sometimes the input doesn't react on onpaste events
     // in Chrome when having a large document open and then doing cut/paste.
     // Calling both .focus() and .select() did solve this issue.

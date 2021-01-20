@@ -28,7 +28,7 @@
   let instanceId = uniqueId()
   let createInstanceOnRepair = false
 
-  let focus = false
+  let hasFocus = false
   let repairing = (text !== undefined)
 
   let ref
@@ -177,6 +177,10 @@
     return mode
   }
 
+  export function focus () {
+    ref.focus()
+  }
+
   export function destroy () {
     this.$destroy()
   }
@@ -211,6 +215,8 @@
     if (json === undefined) {
       json = ''
     }
+
+    setTimeout(() => ref.focus())
   }
 
   function handleChangeText (updatedText) {
@@ -239,14 +245,14 @@
   }
 
   function handleFocus () {
-    focus = true
+    hasFocus = true
     if (onFocus) {
       onFocus()
     }
   }
 
   function handleBlur () {
-    focus = false
+    hasFocus = false
     if (onBlur) {
       onBlur()
     }
@@ -254,7 +260,7 @@
 </script>
 
 <Modal>
-  <div class="jsoneditor-main" class:focus>
+  <div class="jsoneditor-main" class:focus={hasFocus}>
     {#key instanceId}
       <JSONEditorComponent
         bind:this={ref}
