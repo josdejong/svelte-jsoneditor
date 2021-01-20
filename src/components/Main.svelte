@@ -49,6 +49,13 @@
     }
 
     if (typeof newContent.text === 'string') {
+      if (text === newContent.text) {
+        // do NOT apply the text again when there are no changes,
+        // this would switch the editor from repair mode to non-repair mode
+        // as soon as the text has become valid json
+        return
+      }
+
       try {
         const newJson = JSON.parse(newContent.text)
 
@@ -83,6 +90,13 @@
     }
 
     if (typeof updatedContent.text === 'string') {
+      if (text === updatedContent.text) {
+        // do NOT apply the text again when there are no changes,
+        // this would switch the editor from repair mode to non-repair mode
+        // as soon as the text has become valid json
+        return
+      }
+
       try {
         const updatedJson = JSON.parse(updatedContent.text)
         text = undefined
