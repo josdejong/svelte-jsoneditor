@@ -18,7 +18,9 @@
     background: transparent;
     color: white;
     cursor: pointer;
-    padding: 0;
+    padding: $padding / 2;
+    margin: 0;
+    border-radius: 0;
 
     &:hover,
     &:focus {

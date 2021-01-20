@@ -8,11 +8,11 @@
 
   /** @type {MenuDropdownItem[]} */
   export let items = []
-  
+
   export let title = null
   export let width = '120px'
   export let visible = false
-  
+
   function toggleShow (event) {
     event.stopPropagation()
     visible = !visible
@@ -34,7 +34,7 @@
     document.addEventListener('click', handleClick)
     document.addEventListener('keydown', handleKeyDown)
   })
-  
+
   onDestroy(() => {
     document.removeEventListener('click', handleClick)
     document.removeEventListener('keydown', handleKeyDown)
@@ -44,7 +44,7 @@
 <div class="menu-dropdown" title={title} on:click={handleClick}>
   <slot name="defaultItem"></slot>
 
-  <button on:click={toggleShow}>
+  <button class="open-dropdown" on:click={toggleShow}>
     <Icon data={faCaretDown} />
   </button>
 
@@ -52,8 +52,8 @@
     <ul>
       {#each items as item}
         <li>
-          <button 
-            on:click={() => item.onClick()} 
+          <button
+            on:click={() => item.onClick()}
             title={item.title}
             disabled={item.disabled}
           >

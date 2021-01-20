@@ -15,6 +15,12 @@
     }
   }
 
+  button.open-dropdown {
+    padding: $padding / 2;
+    margin: 0;
+    border-radius: 0;
+  }
+
   .items {
     display: none;
     position: absolute;
@@ -32,6 +38,8 @@
     button {
       width: 100%;
       text-align: left;
+      padding: $padding / 2;
+      margin: 0;
 
       &:hover {
         background: $background-gray;
