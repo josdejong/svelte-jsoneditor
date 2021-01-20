@@ -760,7 +760,8 @@
     }
 
     // set focus to the hidden input, so we can capture quick keys like Ctrl+X, Ctrl+C, Ctrl+V
-    focusHiddenInput()
+    // we do this after a setTimeout in case the selection was made by clicking a button
+    setTimeout(() => focusHiddenInput())
   }
 
   function handleExpandSection (path, section) {
