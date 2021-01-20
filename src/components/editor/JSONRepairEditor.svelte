@@ -9,11 +9,13 @@
   import createDebug from 'debug'
   import { onDestroy, onMount } from 'svelte'
   import Icon from 'svelte-awesome'
+  import { MODE } from '../../constants.js'
   import { activeElementIsChildOf, getWindow } from '../../utils/domUtils.js'
   import { normalizeJsonParseError } from '../../utils/jsonUtils.js'
   import { createFocusTracker } from '../controls/createFocusTracker.js'
 
   export let text = ''
+  export let mode = MODE.EDIT
   export let onParse
   export let onRepair
   export let onChange = null
@@ -45,6 +47,7 @@
   })
 
 
+  $: readOnly = mode === MODE.VIEW
   $: error = getErrorMessage(text)
   $: repairable = isRepairable(text)
 
@@ -146,6 +149,7 @@
             on:click={handleRepair}
             class="button primary action"
             title="Automatically repair JSON"
+            disabled={readOnly}
           >
             <Icon data={faWrench}/> Auto repair
           </button>
@@ -162,6 +166,7 @@
           on:click={handleApply}
           class="button primary action"
           title="Apply fixed JSON"
+          disabled={readOnly}
         >
           <Icon data={faCheck} /> Apply
         </button>
@@ -172,6 +177,7 @@
     bind:this={domTextArea}
     value={text}
     on:input={handleChange}
+    readonly={readOnly}
     class="json-text"
     autocomplete="off"
     autocapitalize="off"

@@ -256,6 +256,7 @@
       {#if repairing}
         <JSONRepairEditor
           bind:text={text}
+          bind:mode
           onParse={JSON.parse}
           onRepair={jsonrepair}
           onChange={handleChangeText}
