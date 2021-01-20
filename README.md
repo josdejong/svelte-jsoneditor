@@ -52,9 +52,9 @@ Or one-way binding:
     text: 'Hello World'
   }
   
-  function onChange(update) {
-    console.log('onChange: ', update)
-    json = update.json
+  function onChange(content) {
+    console.log('onChange: ', content)
+    json = content.json
   }
 </script>
 
@@ -88,8 +88,8 @@ Load as ES module:
       json: {
         text: 'Hello World'
       },
-      onChange: (update) => {
-        console.log('onChange', update)
+      onChange: (content) => {
+        console.log('onChange', content)
       }
     }
   })
@@ -117,8 +117,8 @@ Or using UMD (exposed as `window.jsoneditor.JSONEditor`):
       json: {
         text: 'Hello World'
       },
-      onChange: (update) => {
-        console.log('onChange', update)
+      onChange: (content) => {
+        console.log('onChange', content)
       }
     }
   })
@@ -153,8 +153,8 @@ const editor = new JSONEditor({
   target: document.getElementById('jsoneditor'),
   props: {
     json,
-    onChange: (update) => {
-      console.log('onChange', update)
+    onChange: (content) => {
+      console.log('onChange', content)
     }
   }
 })
@@ -183,9 +183,9 @@ const editor = new JSONEditor({
 
 ### methods
 
-- `get(): JSON` Get the current JSON document
-- `set(newJson: JSON)` Replace the current JSON document. Will reset the state of the editor.
-- `update(updatedJson: JSON)` Update the loaded JSON document, keeping the state of the editor (like expanded objects).
+- `get(): { json?: JSON, text?: string }` Get the current JSON document
+- `set({ json?: JSON, text?: string })` Replace the current JSON document. Will reset the state of the editor.
+- `update({ json?: JSON, text?: string })` Update the loaded JSON document, keeping the state of the editor (like expanded objects).
 - `patch(operations: JSONPatchDocument)` Apply a JSON patch document to update the contents of the JSON document.
 - `scrollTo(path: Array.<string|number>)` Scroll the editor vertically such that the specified path comes into view. The path will be expanded when needed.
 - `destroy()`. Destroy the editor, remove it from the DOM.

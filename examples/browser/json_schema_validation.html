@@ -130,7 +130,7 @@
     target: document.getElementById('jsoneditor'),
     props: {
       json,
-      onChangeJson: doc => console.log('onChangeJson', doc),
+      onChange: update => console.log('onChange', update),
       validator: createAjvValidator(schema, schemaRefs)
     }
   })

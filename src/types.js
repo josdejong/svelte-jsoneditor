@@ -6,6 +6,13 @@
 
 /**
  * @typedef {{
+ *   json: JSON?,
+ *   text: string?
+ * }} Content
+ */
+
+/**
+ * @typedef {{
  *   name: string?,
  *   history: boolean?,
  *   indentation: number | string?,

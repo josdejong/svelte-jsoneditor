@@ -143,7 +143,7 @@
   }
 
   const handleSearchProgressDebounced = throttle(handleSearchProgress, SEARCH_PROGRESS_THROTTLE)
-  
+
   function handleSearchDone (results) {
     searchResult = updateSearchResult(doc, results, searchResult)
     searching = false
@@ -687,7 +687,6 @@
   }
 
   function emitOnChange () {
-    // TODO: add more logic here to emit onChange, onChangeJson, onChangeText, etc.
     onChangeJson(doc)
   }
 
