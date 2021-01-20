@@ -9,7 +9,7 @@
     setCursorToEnd,
     setPlainText
   } from '../../utils/domUtils.js'
-  import { compileJSONPointer } from '../../utils/jsonPointer.js'
+  import { compileJSONPointer } from 'immutable-json-patch'
   import { isUrl, stringConvert, valueType } from '../../utils/typeUtils.js'
 
   export let path

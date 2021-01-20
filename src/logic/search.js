@@ -6,7 +6,7 @@ import {
   STATE_SEARCH_PROPERTY,
   STATE_SEARCH_VALUE
 } from '../constants.js'
-import { existsIn, getIn, setIn } from '../utils/immutabilityHelpers.js'
+import { existsIn, getIn, setIn } from 'immutable-json-patch'
 import { valueType } from '../utils/typeUtils.js'
 
 /**

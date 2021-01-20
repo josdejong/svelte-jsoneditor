@@ -1,6 +1,5 @@
 import { cloneDeepWith, first, initial, isEmpty, last } from 'lodash-es'
-import { getIn } from '../utils/immutabilityHelpers.js'
-import { compileJSONPointer } from '../utils/jsonPointer.js'
+import { compileJSONPointer, getIn } from 'immutable-json-patch'
 import {
   parseAndRepair,
   parseAndRepairOrUndefined,

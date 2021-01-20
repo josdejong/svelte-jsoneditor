@@ -8,7 +8,7 @@ import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
  * @return {function (json: JSON) : Array<Object>} Returns a valiation function
  */
 export function createAjvValidator (schema, schemaRefs) {
-  const ajv = new Ajv({
+  const ajv = new (Ajv.default || Ajv)({
     allErrors: true,
     verbose: true,
     $data: true

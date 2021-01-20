@@ -2,7 +2,14 @@
 
 <script>
   import createDebug from 'debug'
-  import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
+  import {
+    compileJSONPointer,
+    getIn,
+    immutableJSONPatch,
+    revertJSONPatch,
+    setIn,
+    updateIn
+  } from 'immutable-json-patch'
   import { initial, isEmpty, isEqual, throttle, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
   import { createJump } from '../../assets/jump.js/src/jump.js'
@@ -55,11 +62,7 @@
     isChildOfNodeName,
     setCursorToEnd
   } from '../../utils/domUtils.js'
-  import { getIn, setIn, updateIn } from '../../utils/immutabilityHelpers.js'
-  import {
-    compileJSONPointer,
-    parseJSONPointerWithArrayIndices
-  } from '../../utils/jsonPointer.js'
+  import { parseJSONPointerWithArrayIndices } from '../../utils/jsonPointer.js'
   import { parsePartialJson, repairPartialJson } from '../../utils/jsonUtils.js'
   import { keyComboFromEvent } from '../../utils/keyBindings.js'
   import { isObject, isObjectOrArray, isUrl } from '../../utils/typeUtils.js'

@@ -3,6 +3,7 @@
 <script>
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
+  import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
@@ -28,8 +29,6 @@
     isChildOfNodeName,
     isContentEditableDiv
   } from '../../utils/domUtils.js'
-  import { getIn } from '../../utils/immutabilityHelpers.js'
-  import { compileJSONPointer } from '../../utils/jsonPointer.js'
   import { valueType } from '../../utils/typeUtils.js'
   import CollapsedItems from './CollapsedItems.svelte'
   import JSONKey from './JSONKey.svelte'

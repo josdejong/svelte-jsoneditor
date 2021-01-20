@@ -1,11 +1,8 @@
 import diffSequencesExport from 'diff-sequences'
+import { compileJSONPointer, getIn, setIn } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import naturalCompare from 'natural-compare-lite'
-import { getIn, setIn } from '../utils/immutabilityHelpers.js'
-import {
-  compileJSONPointer,
-  parseJSONPointerWithArrayIndices
-} from '../utils/jsonPointer.js'
+import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
 
 const diffSequences = diffSequencesExport.default || diffSequencesExport
 

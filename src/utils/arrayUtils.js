@@ -1,5 +1,5 @@
 import { isObject } from './typeUtils.js'
-import { compileJSONPointer, parseJSONPointer } from './jsonPointer.js'
+import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 
 const MAX_ITEM_PATHS_COLLECTION = 10000
 const EMPTY_ARRAY = []

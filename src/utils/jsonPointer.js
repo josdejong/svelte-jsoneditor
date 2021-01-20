@@ -1,8 +1,4 @@
-// TODO: officially expose the json pointer functions in immutable-json-patch
-import { parseJSONPointer } from 'immutable-json-patch/lib/esm/jsonPointer.js'
-import { getIn } from './immutabilityHelpers.js'
-
-export * from 'immutable-json-patch/lib/esm/jsonPointer.js'
+import { parseJSONPointer, getIn } from 'immutable-json-patch'
 
 /**
  * Parse a JSONPointer, and turn array indices into numeric values.

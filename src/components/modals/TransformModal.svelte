@@ -7,8 +7,7 @@
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
   import { DEBOUNCE_DELAY, MAX_PREVIEW_CHARACTERS } from '../../constants.js'
-  import { getIn } from '../../utils/immutabilityHelpers.js'
-  import { compileJSONPointer } from '../../utils/jsonPointer.js'
+  import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { truncate } from '../../utils/stringUtils.js'
   import Header from './Header.svelte'
@@ -36,7 +35,7 @@
 
   // showWizard is not stored inside a stateId
   let showWizard = transformModalState.showWizard !== false
-  
+
   let filterField = state.filterField || null
   let filterRelation = state.filterRelation || null
   let filterValue = state.filterValue || null
@@ -129,7 +128,7 @@
       Enter a JavaScript function to filter, sort, or transform the data.
     </div>
     <div class='description'>
-      You can use <a href='https://lodash.com' target='_blank' rel='noopener noreferrer'>Lodash</a> 
+      You can use <a href='https://lodash.com' target='_blank' rel='noopener noreferrer'>Lodash</a>
       functions like <code>_.map</code>, <code>_.filter</code>,
       <code>_.orderBy</code>, <code>_.sortBy</code>, <code>_.groupBy</code>,
       <code>_.pick</code>, <code>_.uniq</code>, <code>_.get</code>, etcetera.
@@ -154,7 +153,7 @@
     </div>
     {#if showWizard}
       {#if Array.isArray(selectedJson)}
-        <TransformWizard 
+        <TransformWizard
           bind:filterField
           bind:filterRelation
           bind:filterValue
@@ -176,14 +175,14 @@
 
     <div class="label">Preview</div>
     <textarea
-      class="preview" 
+      class="preview"
       class:error={previewHasError}
-      bind:value={preview} 
-      readonly 
+      bind:value={preview}
+      readonly
     ></textarea>
 
     <div class="actions">
-      <button 
+      <button
         class="primary"
         on:click={handleTransform}
         use:focus

@@ -8,10 +8,9 @@
   import { getNestedPaths } from '../../utils/arrayUtils.js'
   import { isObject } from '../../utils/typeUtils.js'
   import { stringifyPath } from '../../utils/pathUtils.js'
-  import { getIn } from '../../utils/immutabilityHelpers.js'
   import { sortArray, sortObjectKeys } from '../../logic/sort.js'
   import { sortModalState } from './sortModalState.js'
-  import { compileJSONPointer } from '../../utils/jsonPointer.js'
+  import { compileJSONPointer, getIn } from 'immutable-json-patch'
 
   export let id
   export let json // the whole document
@@ -76,7 +75,7 @@
     } else if (isObject(selectedJson)) {
       const direction = selectedDirection.value
       const operations = sortObjectKeys(json, selectedPath, direction)
-  
+
       onSort(operations)
     } else {
       console.error('Cannot sort: no array or object')
@@ -103,9 +102,9 @@
         <tr>
           <th>Path</th>
           <td>
-            <input 
+            <input
               class="path"
-              type="text" 
+              type="text"
               readonly
               title="Selected path"
               value={!isEmpty(selectedPath) ? stringifyPath(selectedPath) : '(whole document)'}
@@ -116,7 +115,7 @@
           <tr>
             <th>Property</th>
             <td>
-              <Select 
+              <Select
                 items={properties}
                 bind:selectedValue={selectedProperty}
               />
@@ -126,20 +125,20 @@
         <tr>
           <th>Direction</th>
           <td>
-            <Select 
-              items={directions} 
+            <Select
+              items={directions}
               containerClasses='test-class'
-              bind:selectedValue={selectedDirection} 
+              bind:selectedValue={selectedDirection}
               isClearable={false}
             />
           </td>
         </tr>
       </tbody>
     </table>
-  
+
     <div class="actions">
-      <button 
-        class="primary" 
+      <button
+        class="primary"
         on:click={handleSort}
         use:focus
         disabled={jsonIsArray ? !selectedProperty : false}

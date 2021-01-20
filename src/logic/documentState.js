@@ -1,5 +1,12 @@
 import createDebug from 'debug'
-import { immutableJSONPatch } from 'immutable-json-patch'
+import {
+  compileJSONPointer,
+  existsIn,
+  getIn,
+  immutableJSONPatch,
+  setIn,
+  updateIn
+} from 'immutable-json-patch'
 import { initial, isEqual, last, uniqueId } from 'lodash-es'
 import {
   DEFAULT_VISIBLE_SECTIONS,
@@ -9,16 +16,7 @@ import {
   STATE_VISIBLE_SECTIONS
 } from '../constants.js'
 import { forEachIndex } from '../utils/arrayUtils.js'
-import {
-  existsIn,
-  getIn,
-  setIn,
-  updateIn
-} from '../utils/immutabilityHelpers.js'
-import {
-  compileJSONPointer,
-  parseJSONPointerWithArrayIndices
-} from '../utils/jsonPointer.js'
+import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
 import { isObject } from '../utils/typeUtils.js'
 import {
   currentRoundNumber,

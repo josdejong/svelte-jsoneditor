@@ -1,6 +1,6 @@
 import { initial } from 'lodash-es'
 import { VALIDATION_ERROR } from '../constants.js'
-import { existsIn, setIn } from '../utils/immutabilityHelpers.js'
+import { existsIn, setIn } from 'immutable-json-patch'
 
 /**
  * Create a nested map with validation errors,

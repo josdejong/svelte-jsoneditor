@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { compileJSONPointer, parseJSONPointer } from './jsonPointer.js'
+import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 
 describe('jsonPointer', () => {
   it('parseJSONPointer', () => {
