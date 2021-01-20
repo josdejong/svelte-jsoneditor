@@ -20,10 +20,10 @@ import { valueType } from '../utils/typeUtils.js'
  */
 
 // TODO: comment
-export function updateSearchResult (doc, flatResults, previousResult) {
+export function updateSearchResult (json, flatResults, previousResult) {
   const flatItems = flatResults
 
-  const items = createRecursiveSearchResults(doc, flatItems)
+  const items = createRecursiveSearchResults(json, flatItems)
 
   const activeItem = (previousResult && previousResult.activeItem &&
     existsIn(items, previousResult.activeItem))
@@ -47,14 +47,14 @@ export function updateSearchResult (doc, flatResults, previousResult) {
 }
 
 // TODO: comment
-export function createRecursiveSearchResults (referenceDoc, flatResults) {
+export function createRecursiveSearchResults (referenceJson, flatResults) {
   // TODO: smart update result based on previous results to make the results immutable when there is no actual change
   let result = {}
 
   flatResults.forEach(path => {
     const parentPath = initial(path)
     if (!existsIn(result, parentPath)) {
-      const item = getIn(referenceDoc, parentPath)
+      const item = getIn(referenceJson, parentPath)
       result = setIn(result, parentPath, Array.isArray(item) ? [] : {}, true)
     }
 
@@ -117,9 +117,9 @@ async function tick () {
 }
 
 // TODO: comment
-export function searchAsync (searchText, doc, state, { onProgress, onDone, maxResults = Infinity, yieldAfterItemCount = 10000 }) {
+export function searchAsync (searchText, json, state, { onProgress, onDone, maxResults = Infinity, yieldAfterItemCount = 10000 }) {
   // TODO: what is a good value for yieldAfterItemCount? (larger means faster results but also less responsive during search)
-  const search = searchGenerator(searchText, doc, state, yieldAfterItemCount)
+  const search = searchGenerator(searchText, json, state, yieldAfterItemCount)
 
   // TODO: implement pause after having found x results (like 999)?
 
@@ -176,7 +176,7 @@ export function searchAsync (searchText, doc, state, { onProgress, onDone, maxRe
 }
 
 // TODO: comment
-export function * searchGenerator (searchText, doc, state = undefined, yieldAfterItemCount = undefined) {
+export function * searchGenerator (searchText, json, state = undefined, yieldAfterItemCount = undefined) {
   let count = 0
 
   function * incrementCounter () {
@@ -187,17 +187,17 @@ export function * searchGenerator (searchText, doc, state = undefined, yieldAfte
     }
   }
 
-  function * searchRecursiveAsync (searchText, doc, state, path) {
-    const type = valueType(doc)
+  function * searchRecursiveAsync (searchText, json, state, path) {
+    const type = valueType(json)
 
     if (type === 'array') {
-      for (let i = 0; i < doc.length; i++) {
-        yield * searchRecursiveAsync(searchText, doc[i], state ? state[i] : undefined, path.concat([i]))
+      for (let i = 0; i < json.length; i++) {
+        yield * searchRecursiveAsync(searchText, json[i], state ? state[i] : undefined, path.concat([i]))
       }
     } else if (type === 'object') {
       const keys = state
         ? state[STATE_KEYS]
-        : Object.keys(doc)
+        : Object.keys(json)
 
       for (const key of keys) {
         if (typeof key === 'string' && containsCaseInsensitive(key, searchText)) {
@@ -205,17 +205,17 @@ export function * searchGenerator (searchText, doc, state = undefined, yieldAfte
         }
         yield * incrementCounter()
 
-        yield * searchRecursiveAsync(searchText, doc[key], state ? state[key] : undefined, path.concat([key]))
+        yield * searchRecursiveAsync(searchText, json[key], state ? state[key] : undefined, path.concat([key]))
       }
     } else { // type is a value
-      if (containsCaseInsensitive(doc, searchText)) {
+      if (containsCaseInsensitive(json, searchText)) {
         yield path.concat([STATE_SEARCH_VALUE])
       }
       yield * incrementCounter()
     }
   }
 
-  return yield * searchRecursiveAsync(searchText, doc, state, [])
+  return yield * searchRecursiveAsync(searchText, json, state, [])
 }
 
 /**

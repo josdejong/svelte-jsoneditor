@@ -10,7 +10,7 @@ import {
 
 describe('search', () => {
   it('should search with generator', () => {
-    const doc = {
+    const json = {
       b: { c: 'a' },
       a: [
         { a: 'b', c: 'a' },
@@ -19,7 +19,7 @@ describe('search', () => {
       ]
     }
 
-    const search = searchGenerator('a', doc, undefined)
+    const search = searchGenerator('a', json, undefined)
 
     assert.deepStrictEqual(search.next(), { done: false, value: ['b', 'c', STATE_SEARCH_VALUE] })
     assert.deepStrictEqual(search.next(), { done: false, value: ['a', STATE_SEARCH_PROPERTY] })
@@ -30,9 +30,9 @@ describe('search', () => {
   })
 
   it('should yield every x items during search', () => {
-    const doc = times(30, index => String(index))
+    const json = times(30, index => String(index))
 
-    const search = searchGenerator('4', doc, undefined, 10)
+    const search = searchGenerator('4', json, undefined, 10)
     assert.deepStrictEqual(search.next(), { done: false, value: [4, STATE_SEARCH_VALUE] })
     assert.deepStrictEqual(search.next(), { done: false, value: null }) // at 10
     assert.deepStrictEqual(search.next(), { done: false, value: [14, STATE_SEARCH_VALUE] })
@@ -43,7 +43,7 @@ describe('search', () => {
   })
 
   it('should search async', (done) => {
-    const doc = times(30, index => String(index))
+    const json = times(30, index => String(index))
 
     const callbacks = []
 
@@ -68,14 +68,14 @@ describe('search', () => {
     }
 
     const yieldAfterItemCount = 1
-    searchAsync('4', doc, undefined, { onProgress, onDone, yieldAfterItemCount })
+    searchAsync('4', json, undefined, { onProgress, onDone, yieldAfterItemCount })
 
     // should not have results right after creation, but only on the first next tick
     assert.deepStrictEqual(callbacks, [])
   })
 
   it('should cancel async search', (done) => {
-    const doc = times(30, index => String(index))
+    const json = times(30, index => String(index))
 
     const callbacks = []
 
@@ -88,7 +88,7 @@ describe('search', () => {
     }
 
     const yieldAfterItemCount = 1 // very low so we can see whether actually cancelled
-    const { cancel } = searchAsync('4', doc, undefined, { onProgress, onDone, yieldAfterItemCount })
+    const { cancel } = searchAsync('4', json, undefined, { onProgress, onDone, yieldAfterItemCount })
 
     setTimeout(() => {
       cancel()
@@ -103,14 +103,14 @@ describe('search', () => {
 
   it('should respect order of keys in document state in async search', () => {
     return new Promise((resolve, reject) => {
-      const doc = {
+      const json = {
         data: {
           text1: 'foo',
           text2: 'foo'
         }
       }
 
-      const state = syncState(doc, undefined, [], () => true)
+      const state = syncState(json, undefined, [], () => true)
       state.data[STATE_KEYS] = ['text2', 'text1'] // reverse the order of the keys
 
       function onDone (results) {
@@ -125,12 +125,12 @@ describe('search', () => {
         }
       }
 
-      searchAsync('foo', doc, state, { onDone })
+      searchAsync('foo', json, state, { onDone })
     })
   })
 
   it('should limit async search results', (done) => {
-    const doc = times(30, index => 'item ' + index)
+    const json = times(30, index => 'item ' + index)
 
     function onDone (results) {
       assert.strictEqual(results.length, 10)
@@ -138,12 +138,12 @@ describe('search', () => {
     }
 
     const maxResults = 10
-    searchAsync('item', doc, undefined, { onDone, maxResults })
+    searchAsync('item', json, undefined, { onDone, maxResults })
   })
 
   it('should generate recursive search results from flat results', () => {
     // Based on document:
-    const doc = {
+    const json = {
       b: { c: 'a' },
       a: [
         { a: 'b', c: 'a' },
@@ -161,7 +161,7 @@ describe('search', () => {
       ['a', 2, STATE_SEARCH_VALUE]
     ]
 
-    const actual = createRecursiveSearchResults(doc, flatResults)
+    const actual = createRecursiveSearchResults(json, flatResults)
     const expected = {}
 
     expected.b = {}

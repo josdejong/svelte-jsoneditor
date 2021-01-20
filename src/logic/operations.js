@@ -23,16 +23,16 @@ import {
  * a unique property name for the inserted node in case of duplicating
  * and object property
  *
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON} state
  * @param {Path} path
  * @param {ClipboardValues} values
  * @return {JSONPatchDocument}
  */
 // TODO: write tests
-export function insertBefore (doc, state, path, values) { // TODO: find a better name and define datastructure for values
+export function insertBefore (json, state, path, values) { // TODO: find a better name and define datastructure for values
   const parentPath = initial(path)
-  const parent = getIn(doc, parentPath)
+  const parent = getIn(json, parentPath)
 
   if (Array.isArray(parent)) {
     // the path is parsed from a JSONPatch operation,
@@ -135,16 +135,16 @@ export function rename (parentPath, keys, oldKey, newKey) {
  * a unique property name for the inserted node in case of duplicating
  * and object property
  *
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON} state
  * @param {Path[]} paths
  * @param {ClipboardValues} values
  * @return {JSONPatchDocument}
  */
-export function replace (doc, state, paths, values) { // TODO: find a better name and define datastructure for values
+export function replace (json, state, paths, values) { // TODO: find a better name and define datastructure for values
   const firstPath = first(paths)
   const parentPath = initial(firstPath)
-  const parent = getIn(doc, parentPath)
+  const parent = getIn(json, parentPath)
 
   if (Array.isArray(parent)) {
     const firstPath = first(paths)
@@ -200,12 +200,12 @@ export function replace (doc, state, paths, values) { // TODO: find a better nam
  * a unique property name for the duplicated node in case of duplicating
  * and object property
  *
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON} state
  * @param {Path[]} paths
  * @return {JSONPatchDocument}
  */
-export function duplicate (doc, state, paths) {
+export function duplicate (json, state, paths) {
   // FIXME: here we assume selection.paths is sorted correctly, that's a dangerous assumption
   const lastPath = last(paths)
 
@@ -215,7 +215,7 @@ export function duplicate (doc, state, paths) {
 
   const parentPath = initial(lastPath)
   const beforeKey = last(lastPath)
-  const parent = getIn(doc, parentPath)
+  const parent = getIn(json, parentPath)
 
   if (Array.isArray(parent)) {
     const lastPath = last(paths)
@@ -254,14 +254,14 @@ export function duplicate (doc, state, paths) {
 }
 
 /**
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON} state
  * @param {Selection} selection
  * @param {string} clipboardText
  * @return {JSONPatchDocument}
  */
 // TODO: write unit tests
-export function insert (doc, state, selection, clipboardText) {
+export function insert (json, state, selection, clipboardText) {
   if (selection.type === SELECTION_TYPE.KEY) {
     // rename key
     const clipboard = parseAndRepairOrUndefined(clipboardText)
@@ -303,31 +303,31 @@ export function insert (doc, state, selection, clipboardText) {
   if (selection.type === SELECTION_TYPE.MULTI) {
     const newValues = clipboardToValues(clipboardText)
 
-    return replace(doc, state, selection.paths, newValues)
+    return replace(json, state, selection.paths, newValues)
   }
 
   if (selection.type === SELECTION_TYPE.AFTER) {
     const newValues = clipboardToValues(clipboardText)
     const path = selection.focusPath
     const parentPath = initial(path)
-    const parent = getIn(doc, parentPath)
+    const parent = getIn(json, parentPath)
 
     if (Array.isArray(parent)) {
       const index = last(path)
       const nextItemPath = parentPath.concat([index + 1])
 
-      return insertBefore(doc, state, nextItemPath, newValues)
+      return insertBefore(json, state, nextItemPath, newValues)
     } else { // value is an Object
       const key = last(path)
       const keys = getKeys(state, parentPath)
       if (isEmpty(keys) || last(keys) === key) {
-        return append(doc, parentPath, newValues)
+        return append(json, parentPath, newValues)
       } else {
         const index = keys.indexOf(key)
         const nextKey = keys[index + 1]
         const nextKeyPath = parentPath.concat([nextKey])
 
-        return insertBefore(doc, state, nextKeyPath, newValues)
+        return insertBefore(json, state, nextKeyPath, newValues)
       }
     }
   }
@@ -335,20 +335,20 @@ export function insert (doc, state, selection, clipboardText) {
   if (selection.type === SELECTION_TYPE.INSIDE) {
     const newValues = clipboardToValues(clipboardText)
     const path = selection.focusPath
-    const value = getIn(doc, path)
+    const value = getIn(json, path)
 
     if (Array.isArray(value)) {
       const firstItemPath = path.concat([0])
-      return insertBefore(doc, state, firstItemPath, newValues)
+      return insertBefore(json, state, firstItemPath, newValues)
     } else { // value is an Object
       const keys = getKeys(state, path)
       if (isEmpty(keys)) {
-        return append(doc, path, newValues)
+        return append(json, path, newValues)
       } else {
         const firstKey = first(keys)
         const firstKeyPath = path.concat([firstKey])
 
-        return insertBefore(doc, state, firstKeyPath, newValues)
+        return insertBefore(json, state, firstKeyPath, newValues)
       }
     }
   }
@@ -357,7 +357,7 @@ export function insert (doc, state, selection, clipboardText) {
   throw new Error('Cannot insert: unsupported type of selection ' + JSON.stringify(selection))
 }
 
-export function createNewValue (doc, selection, type) {
+export function createNewValue (json, selection, type) {
   if (type === 'object') {
     return {}
   }
@@ -368,7 +368,7 @@ export function createNewValue (doc, selection, type) {
 
   if (type === 'structure') {
     const parentPath = getParentPath(selection)
-    const parent = getIn(doc, parentPath)
+    const parent = getIn(json, parentPath)
 
     if (Array.isArray(parent) && !isEmpty(parent)) {
       const jsonExample = first(parent)
@@ -464,13 +464,13 @@ export function clipboardToValues (clipboardText) {
 }
 
 /**
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON} state
  * @param {Selection} selection
  * @returns {{newSelection: Selection, operations: JSONPatchDocument}}
  */
 // TODO: write unit tests
-export function createRemoveOperations (doc, state, selection) {
+export function createRemoveOperations (json, state, selection) {
   if (selection.type === SELECTION_TYPE.KEY) {
     // FIXME: DOESN'T work yet
     const parentPath = initial(selection.focusPath)
@@ -479,7 +479,7 @@ export function createRemoveOperations (doc, state, selection) {
     const newKey = ''
 
     const operations = rename(parentPath, keys, oldKey, newKey)
-    const newSelection = createSelectionFromOperations(doc, operations)
+    const newSelection = createSelectionFromOperations(json, operations)
 
     return { operations, newSelection }
   }
@@ -502,7 +502,7 @@ export function createRemoveOperations (doc, state, selection) {
       // there is no parent, this is the root document
       const operations = [{ op: 'replace', path: '', value: '' }]
 
-      const newSelection = createSelection(doc, state, {
+      const newSelection = createSelection(json, state, {
         type: SELECTION_TYPE.VALUE,
         path: []
       })
@@ -511,17 +511,17 @@ export function createRemoveOperations (doc, state, selection) {
     }
 
     const parentPath = initial(lastPath)
-    const parent = getIn(doc, parentPath)
+    const parent = getIn(json, parentPath)
 
     if (Array.isArray(parent)) {
       const firstPath = first(selection.paths)
       const index = last(firstPath)
       const newSelection = index === 0
-        ? createSelection(doc, state, {
+        ? createSelection(json, state, {
             type: SELECTION_TYPE.INSIDE,
             path: parentPath
           })
-        : createSelection(doc, state, {
+        : createSelection(json, state, {
           type: SELECTION_TYPE.AFTER,
           path: parentPath.concat([index - 1])
         })
@@ -534,11 +534,11 @@ export function createRemoveOperations (doc, state, selection) {
       const index = keys.indexOf(key)
       const previousKey = keys[index - 1]
       const newSelection = index === 0
-        ? createSelection(doc, state, {
+        ? createSelection(json, state, {
             type: SELECTION_TYPE.INSIDE,
             path: parentPath
           })
-        : createSelection(doc, state, {
+        : createSelection(json, state, {
           type: SELECTION_TYPE.AFTER,
           path: parentPath.concat([previousKey])
         })

@@ -30,9 +30,9 @@ import {
 const debug = createDebug('jsoneditor:documentState')
 
 /**
- * Sync a state object with the doc it belongs to: update keys, limit, and expanded state
+ * Sync a state object with the json it belongs to: update keys, limit, and expanded state
  *
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON | undefined} state
  * @param {Path} path
  * @param {function (path: Path) : boolean} expand
@@ -40,33 +40,33 @@ const debug = createDebug('jsoneditor:documentState')
  * @returns {JSON | undefined}
  */
 // TODO: refactor syncState so we don't have to pass path=[] all the time, this is only used internally for recursiveness
-export function syncState (doc, state, path, expand, forceRefresh = false) {
+export function syncState (json, state, path, expand, forceRefresh = false) {
   // TODO: this function can be made way more efficient if we pass prevState:
   //  when immutable, we can simply be done already when the state === prevState
 
-  const updatedState = Array.isArray(doc) ? [] : {}
+  const updatedState = Array.isArray(json) ? [] : {}
 
   updatedState[STATE_ID] = (state && state[STATE_ID])
     ? state[STATE_ID]
     : uniqueId()
 
-  if (isObject(doc)) {
-    updatedState[STATE_KEYS] = syncKeys(doc, state && state[STATE_KEYS])
+  if (isObject(json)) {
+    updatedState[STATE_KEYS] = syncKeys(json, state && state[STATE_KEYS])
 
     updatedState[STATE_EXPANDED] = (state && !forceRefresh)
       ? state[STATE_EXPANDED]
       : expand(path)
 
     if (updatedState[STATE_EXPANDED]) {
-      Object.keys(doc).forEach(key => {
-        const childDocument = doc[key]
+      Object.keys(json).forEach(key => {
+        const childJson = json[key]
         const childState = state && state[key]
-        updatedState[key] = syncState(childDocument, childState, path.concat(key), expand, forceRefresh)
+        updatedState[key] = syncState(childJson, childState, path.concat(key), expand, forceRefresh)
       })
     }
 
     // FIXME: must create new id's in case of duplicate id's
-  } else if (Array.isArray(doc)) {
+  } else if (Array.isArray(json)) {
     updatedState[STATE_EXPANDED] = (state && !forceRefresh)
       ? state[STATE_EXPANDED]
       : expand(path)
@@ -78,10 +78,10 @@ export function syncState (doc, state, path, expand, forceRefresh = false) {
 
     if (updatedState[STATE_EXPANDED]) {
       updatedState[STATE_VISIBLE_SECTIONS].forEach(({ start, end }) => {
-        forEachIndex(start, Math.min(doc.length, end), index => {
-          const childDocument = doc[index]
+        forEachIndex(start, Math.min(json.length, end), index => {
+          const childJson = json[index]
           const childState = state && state[index]
-          updatedState[index] = syncState(childDocument, childState, path.concat(index), expand, forceRefresh)
+          updatedState[index] = syncState(childJson, childState, path.concat(index), expand, forceRefresh)
         })
       })
     }
@@ -121,13 +121,13 @@ export function createState (json) {
 
 /**
  * Expand a node
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON} state
  * @param {Path} path
  * @return {JSON} returns the updated state
  */
-export function expandSinglePath (doc, state, path) {
-  const value = getIn(doc, path)
+export function expandSinglePath (json, state, path) {
+  const value = getIn(json, path)
 
   if (isObject(value)) {
     return updateIn(state, path, objectState => {
@@ -164,13 +164,13 @@ export function expandSinglePath (doc, state, path) {
 
 /**
  * Invoke a callback function for every visible item in the array
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON} state
  * @param {function (index: number)} callback
  */
-export function forEachVisibleIndex (doc, state, callback) {
+export function forEachVisibleIndex (json, state, callback) {
   state[STATE_VISIBLE_SECTIONS].forEach(({ start, end }) => {
-    forEachIndex(start, Math.min(doc.length, end), callback)
+    forEachIndex(start, Math.min(json.length, end), callback)
   })
 }
 
@@ -181,13 +181,13 @@ export function forEachKey (state, callback) {
 
 /**
  * Expand all nodes on given path
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON} state
  * @param {Path} path
  * @return {JSON} returns the updated state
  */
 // TODO: write unit tests for expandPath
-export function expandPath (doc, state, path) {
+export function expandPath (json, state, path) {
   let updatedState = state
 
   for (let i = 0; i < path.length; i++) {
@@ -210,9 +210,9 @@ export function expandPath (doc, state, path) {
     }
 
     // FIXME: the way to sync the state of this nested, just expanded object/array is complicated. Refactor this
-    const partialDoc = getIn(doc, partialPath)
+    const partialJson = getIn(json, partialPath)
     updatedState = updateIn(updatedState, partialPath, partialState => {
-      return syncState(partialDoc, partialState, [], () => false)
+      return syncState(partialJson, partialState, [], () => false)
     })
   }
 
@@ -244,31 +244,31 @@ export function ensureItemIsVisible (state, path, index) {
 }
 
 // TODO: write unit tests
-export function expandRecursively (doc, state, path) {
-  const childDoc = getIn(doc, path)
+export function expandRecursively (json, state, path) {
+  const childJson = getIn(json, path)
 
   return updateIn(state, path, childState => {
-    return _expandRecursively(childDoc, childState)
+    return _expandRecursively(childJson, childState)
   })
 }
 
-function _expandRecursively (doc, state) {
-  if (isObject(doc)) {
-    let updatedState = expandSinglePath(doc, state, [])
+function _expandRecursively (json, state) {
+  if (isObject(json)) {
+    let updatedState = expandSinglePath(json, state, [])
 
     forEachKey(updatedState, (key) => {
-      const updatedChildState = _expandRecursively(doc[key], updatedState[key])
+      const updatedChildState = _expandRecursively(json[key], updatedState[key])
       updatedState = setIn(updatedState, [key], updatedChildState)
     })
 
     return updatedState
   }
 
-  if (Array.isArray(doc)) {
-    let updatedState = expandSinglePath(doc, state, [])
+  if (Array.isArray(json)) {
+    let updatedState = expandSinglePath(json, state, [])
 
-    forEachVisibleIndex(doc, updatedState, (index) => {
-      const updatedChildState = _expandRecursively(doc[index], updatedState[index])
+    forEachVisibleIndex(json, updatedState, (index) => {
+      const updatedChildState = _expandRecursively(json[index], updatedState[index])
       updatedState = setIn(updatedState, [index], updatedChildState)
     })
 
@@ -280,13 +280,13 @@ function _expandRecursively (doc, state) {
 
 /**
  * Collapse the node at given path
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON} state
  * @param {Path} path
  * @returns {JSON} returns the updated state
  */
-export function collapseSinglePath (doc, state, path) {
-  const value = getIn(doc, path)
+export function collapseSinglePath (json, state, path) {
+  const value = getIn(json, path)
 
   if (Array.isArray(value)) {
     return updateIn(state, path, arrayState => {
@@ -313,20 +313,20 @@ export function collapseSinglePath (doc, state, path) {
 
 /**
  * Expand a section of items in an array
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON} state
  * @param {Path} path
  * @param {Section} section
  * @return {JSON} returns the updated state
  */
 // TODO: write unit test
-export function expandSection (doc, state, path, section) {
+export function expandSection (json, state, path, section) {
   const updatedState = updateIn(state, path.concat(STATE_VISIBLE_SECTIONS), (sections) => {
     return mergeSections(sections.concat(section))
   })
 
   // instantiate all new expanded items
-  return syncState(doc, updatedState, path, () => false)
+  return syncState(json, updatedState, path, () => false)
 }
 
 /**
@@ -352,13 +352,13 @@ export function syncKeys (object, prevKeys) {
 }
 
 /**
- * Apply patch operations to both doc and state
- * @param {JSON} doc
+ * Apply patch operations to both json and state
+ * @param {JSON} json
  * @param {JSON} state
  * @param {JSONPatchDocument} operations
- * @returns {{doc: JSON, state: JSON}}
+ * @returns {{json: JSON, state: JSON}}
  */
-export function documentStatePatch (doc, state, operations) {
+export function documentStatePatch (json, state, operations) {
   // TODO: split this function in smaller functions, it's too large
 
   function before (state, operation) {
@@ -482,14 +482,14 @@ export function documentStatePatch (doc, state, operations) {
     return updatedState
   }
 
-  debug('documentStatePatch', doc, state, operations)
+  debug('documentStatePatch', json, state, operations)
 
-  const updatedDoc = immutableJSONPatch(doc, operations)
-  const initializedState = initializeState(doc, state, operations)
+  const updatedJson = immutableJSONPatch(json, operations)
+  const initializedState = initializeState(json, state, operations)
   const updatedState = immutableJSONPatch(initializedState, operations, { before, after })
 
   return {
-    doc: updatedDoc,
+    json: updatedJson,
     state: updatedState
   }
 }
@@ -498,24 +498,24 @@ export function documentStatePatch (doc, state, operations) {
  * Initialize the state needed to perform the JSON patch operations.
  * For example to a change in a nested object which is not expanded and
  * hence has no state initialize, we need to create this nested state
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON} state
  * @param {JSONPatchDocument} operations
  */
-export function initializeState (doc, state, operations) {
+export function initializeState (json, state, operations) {
   let updatedState = state
 
-  function initializePath (doc, state, path) {
+  function initializePath (json, state, path) {
     let updatedState = state
 
-    if (existsIn(doc, path) && !existsIn(updatedState, path)) {
+    if (existsIn(json, path) && !existsIn(updatedState, path)) {
       // first make sure the parent is initialized
       if (path.length > 0) {
-        updatedState = initializePath(doc, updatedState, initial(path))
+        updatedState = initializePath(json, updatedState, initial(path))
       }
 
       // then initialize the state itself
-      updatedState = setIn(updatedState, path, createState(getIn(doc, path)))
+      updatedState = setIn(updatedState, path, createState(getIn(json, path)))
     }
 
     return updatedState
@@ -523,23 +523,23 @@ export function initializeState (doc, state, operations) {
 
   operations.forEach(operation => {
     const from = typeof operation.from === 'string'
-      ? parseJSONPointerWithArrayIndices(doc, operation.from)
+      ? parseJSONPointerWithArrayIndices(json, operation.from)
       : null
     const path = typeof operation.path === 'string'
-      ? parseJSONPointerWithArrayIndices(doc, operation.path)
+      ? parseJSONPointerWithArrayIndices(json, operation.path)
       : null
 
     if (operation.op === 'add') {
-      updatedState = initializePath(doc, updatedState, initial(path)) // initialize parent only
+      updatedState = initializePath(json, updatedState, initial(path)) // initialize parent only
     }
 
     if (operation.op === 'copy' || operation.op === 'move') {
-      updatedState = initializePath(doc, updatedState, from)
-      updatedState = initializePath(doc, updatedState, initial(path)) // initialize parent only
+      updatedState = initializePath(json, updatedState, from)
+      updatedState = initializePath(json, updatedState, initial(path)) // initialize parent only
     }
 
     if (operation.op === 'remove' || operation.op === 'replace' || operation.op === 'test') {
-      updatedState = initializePath(doc, updatedState, path)
+      updatedState = initializePath(json, updatedState, path)
     }
   })
 
@@ -662,31 +662,31 @@ export function getNextKeys (keys, key, includeKey = false) {
 
 /**
  * Get all paths which are visible and rendered
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON} state
  * @returns {Path[]}
  */
-// TODO: create memoized version of getVisiblePaths which remembers just the previous result if doc and state are the same
-export function getVisiblePaths (doc, state) {
+// TODO: create memoized version of getVisiblePaths which remembers just the previous result if json and state are the same
+export function getVisiblePaths (json, state) {
   const paths = []
 
-  function _recurse (doc, state, path) {
+  function _recurse (json, state, path) {
     paths.push(path)
 
-    if (doc && state && state[STATE_EXPANDED] === true) {
-      if (Array.isArray(doc)) {
-        forEachVisibleIndex(doc, state, index => {
-          _recurse(doc[index], state[index], path.concat(index))
+    if (json && state && state[STATE_EXPANDED] === true) {
+      if (Array.isArray(json)) {
+        forEachVisibleIndex(json, state, index => {
+          _recurse(json[index], state[index], path.concat(index))
         })
       } else { // Object
         forEachKey(state, key => {
-          _recurse(doc[key], state[key], path.concat(key))
+          _recurse(json[key], state[key], path.concat(key))
         })
       }
     }
   }
 
-  _recurse(doc, state, [])
+  _recurse(json, state, [])
 
   return paths
 }
@@ -701,25 +701,25 @@ export const CARET_POSITION = {
 /**
  * Get all caret position which are visible and rendered:
  * before a node, at a key, at a value, appending an object/arrayc
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON} state
  * @returns {CaretPosition[]}
  */
-// TODO: create memoized version of getVisibleCaretPositions which remembers just the previous result if doc and state are the same
-export function getVisibleCaretPositions (doc, state) {
+// TODO: create memoized version of getVisibleCaretPositions which remembers just the previous result if json and state are the same
+export function getVisibleCaretPositions (json, state) {
   const paths = []
 
-  function _recurse (doc, state, path) {
+  function _recurse (json, state, path) {
     paths.push({ path, type: CARET_POSITION.VALUE })
 
-    if (doc && state && state[STATE_EXPANDED] === true) {
+    if (json && state && state[STATE_EXPANDED] === true) {
       paths.push({ path, type: CARET_POSITION.INSIDE })
 
-      if (Array.isArray(doc)) {
-        forEachVisibleIndex(doc, state, index => {
+      if (Array.isArray(json)) {
+        forEachVisibleIndex(json, state, index => {
           const itemPath = path.concat(index)
 
-          _recurse(doc[index], state[index], itemPath)
+          _recurse(json[index], state[index], itemPath)
           paths.push({ path: itemPath, type: CARET_POSITION.AFTER })
         })
       } else { // Object
@@ -727,14 +727,14 @@ export function getVisibleCaretPositions (doc, state) {
           const propertyPath = path.concat(key)
 
           paths.push({ path: propertyPath, type: CARET_POSITION.KEY })
-          _recurse(doc[key], state[key], propertyPath)
+          _recurse(json[key], state[key], propertyPath)
           paths.push({ path: propertyPath, type: CARET_POSITION.AFTER })
         })
       }
     }
   }
 
-  _recurse(doc, state, [])
+  _recurse(json, state, [])
 
   return paths
 }
@@ -742,14 +742,14 @@ export function getVisibleCaretPositions (doc, state) {
 /**
  * Find the previous visible path.
  * This can be the last child of the previous object or array, or the parent of a first entry.
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON} state
  * @param {Path} path
  * @return {Path | null}
  */
 // TODO: write tests for getPreviousVisiblePath
-export function getPreviousVisiblePath (doc, state, path) {
-  const visiblePaths = getVisiblePaths(doc, state)
+export function getPreviousVisiblePath (json, state, path) {
+  const visiblePaths = getVisiblePaths(json, state)
   const visiblePathPointers = visiblePaths.map(compileJSONPointer)
   const pathPointer = compileJSONPointer(path)
   const index = visiblePathPointers.indexOf(pathPointer)
@@ -764,14 +764,14 @@ export function getPreviousVisiblePath (doc, state, path) {
 /**
  * Find the next visible path.
  * This can be the next parent entry.
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON} state
  * @param {Path} path
  * @return {Path | null} path
  */
 // TODO: write tests for getNextVisiblePath
-export function getNextVisiblePath (doc, state, path) {
-  const visiblePaths = getVisiblePaths(doc, state)
+export function getNextVisiblePath (json, state, path) {
+  const visiblePaths = getVisiblePaths(json, state)
   const visiblePathPointers = visiblePaths.map(compileJSONPointer)
   const index = visiblePathPointers.indexOf(compileJSONPointer(path))
 

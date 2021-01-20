@@ -9,11 +9,11 @@ export * from 'immutable-json-patch/lib/esm/jsonPointer.js'
  * For example, '/array/2/name' returns ['array', 2, 'name'] when array turns
  * out to be an actual Array
  *
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {string} path
  */
 // TODO: unit test
-export function parseJSONPointerWithArrayIndices (doc, path) {
+export function parseJSONPointerWithArrayIndices (json, path) {
   const parsedPath = parseJSONPointer(path)
 
   // parse Array indexes into a number
@@ -24,7 +24,7 @@ export function parseJSONPointerWithArrayIndices (doc, path) {
       // this path part contains a number.
       // See if the document actually contains an array
       const parentPath = parsedPath.slice(0, i)
-      const parent = getIn(doc, parentPath)
+      const parent = getIn(json, parentPath)
 
       if (Array.isArray(parent)) {
         parsedPath[i] = parseInt(section)

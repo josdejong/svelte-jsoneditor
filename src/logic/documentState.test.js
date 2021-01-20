@@ -27,7 +27,7 @@ import {
 
 describe('documentState', () => {
   it('syncState', () => {
-    const doc = {
+    const json = {
       array: [1, 2, { c: 6 }],
       object: { a: 4, b: 5 },
       value: 'hello'
@@ -41,7 +41,7 @@ describe('documentState', () => {
       throw new Error('Undefined id')
     }
 
-    const state = syncState(doc, undefined, [], expand)
+    const state = syncState(json, undefined, [], expand)
 
     const expectedState = {}
     expectedState[STATE_EXPANDED] = true
@@ -96,27 +96,27 @@ describe('documentState', () => {
   })
 
   it('get all expanded paths', () => {
-    const doc = {
+    const json = {
       array: [1, 2, { c: 6 }],
       object: { a: 4, b: 5 },
       value: 'hello'
     }
 
-    const state = syncState(doc, undefined, [], path => false)
-    assert.deepStrictEqual(getVisiblePaths(doc, state), [
+    const state = syncState(json, undefined, [], path => false)
+    assert.deepStrictEqual(getVisiblePaths(json, state), [
       []
     ])
 
-    const state0 = syncState(doc, undefined, [], path => path.length <= 0)
-    assert.deepStrictEqual(getVisiblePaths(doc, state0), [
+    const state0 = syncState(json, undefined, [], path => path.length <= 0)
+    assert.deepStrictEqual(getVisiblePaths(json, state0), [
       [],
       ['array'],
       ['object'],
       ['value']
     ])
 
-    const state1 = syncState(doc, undefined, [], path => path.length <= 1)
-    assert.deepStrictEqual(getVisiblePaths(doc, state1), [
+    const state1 = syncState(json, undefined, [], path => path.length <= 1)
+    assert.deepStrictEqual(getVisiblePaths(json, state1), [
       [],
       ['array'],
       ['array', 0],
@@ -128,8 +128,8 @@ describe('documentState', () => {
       ['value']
     ])
 
-    const state2 = syncState(doc, undefined, [], path => path.length <= 2)
-    assert.deepStrictEqual(getVisiblePaths(doc, state2), [
+    const state2 = syncState(json, undefined, [], path => path.length <= 2)
+    assert.deepStrictEqual(getVisiblePaths(json, state2), [
       [],
       ['array'],
       ['array', 0],
@@ -145,13 +145,13 @@ describe('documentState', () => {
 
   it('getVisiblePaths should recon with visible sections in an array', () => {
     const count = 5 * ARRAY_SECTION_SIZE
-    const doc = {
+    const json = {
       array: times(count, (index) => `item ${index}`)
     }
 
     // by default, should have a visible section from 0-100 only (so 100-500 is invisible)
-    const state1 = syncState(doc, undefined, [], path => path.length <= 1)
-    assert.deepStrictEqual(getVisiblePaths(doc, state1), [
+    const state1 = syncState(json, undefined, [], path => path.length <= 1)
+    assert.deepStrictEqual(getVisiblePaths(json, state1), [
       [],
       ['array'],
       ...times(ARRAY_SECTION_SIZE, (index) => ['array', index])
@@ -160,8 +160,8 @@ describe('documentState', () => {
     // create a visible section from 200-300 (in addition to the visible section 0-100)
     const start = 2 * ARRAY_SECTION_SIZE
     const end = 3 * ARRAY_SECTION_SIZE
-    const state2 = expandSection(doc, state1, ['array'], { start, end })
-    assert.deepStrictEqual(getVisiblePaths(doc, state2), [
+    const state2 = expandSection(json, state1, ['array'], { start, end })
+    assert.deepStrictEqual(getVisiblePaths(json, state2), [
       [],
       ['array'],
       ...times(ARRAY_SECTION_SIZE, (index) => ['array', index]),
@@ -170,19 +170,19 @@ describe('documentState', () => {
   })
 
   it('should get all visible caret positions', () => {
-    const doc = {
+    const json = {
       array: [1, 2, { c: 6 }],
       object: { a: 4, b: 5 },
       value: 'hello'
     }
 
-    const state = syncState(doc, undefined, [], path => false)
-    assert.deepStrictEqual(getVisibleCaretPositions(doc, state), [
+    const state = syncState(json, undefined, [], path => false)
+    assert.deepStrictEqual(getVisibleCaretPositions(json, state), [
       { path: [], type: CARET_POSITION.VALUE }
     ])
 
-    const state0 = syncState(doc, undefined, [], path => path.length <= 0)
-    assert.deepStrictEqual(getVisibleCaretPositions(doc, state0), [
+    const state0 = syncState(json, undefined, [], path => path.length <= 0)
+    assert.deepStrictEqual(getVisibleCaretPositions(json, state0), [
       { path: [], type: CARET_POSITION.VALUE },
       { path: [], type: CARET_POSITION.INSIDE },
       { path: ['array'], type: CARET_POSITION.KEY },
@@ -196,8 +196,8 @@ describe('documentState', () => {
       { path: ['value'], type: CARET_POSITION.AFTER }
     ])
 
-    const state1 = syncState(doc, undefined, [], path => path.length <= 1)
-    assert.deepStrictEqual(getVisibleCaretPositions(doc, state1), [
+    const state1 = syncState(json, undefined, [], path => path.length <= 1)
+    assert.deepStrictEqual(getVisibleCaretPositions(json, state1), [
       { path: [], type: CARET_POSITION.VALUE },
       { path: [], type: CARET_POSITION.INSIDE },
       { path: ['array'], type: CARET_POSITION.KEY },
@@ -225,8 +225,8 @@ describe('documentState', () => {
       { path: ['value'], type: CARET_POSITION.AFTER }
     ])
 
-    const state2 = syncState(doc, undefined, [], path => path.length <= 2)
-    assert.deepStrictEqual(getVisibleCaretPositions(doc, state2), [
+    const state2 = syncState(json, undefined, [], path => path.length <= 2)
+    assert.deepStrictEqual(getVisibleCaretPositions(json, state2), [
       { path: [], type: CARET_POSITION.VALUE },
       { path: [], type: CARET_POSITION.INSIDE },
       { path: ['array'], type: CARET_POSITION.KEY },
@@ -261,13 +261,13 @@ describe('documentState', () => {
 
   it('getVisibleCaretPositions should recon with visible sections in an array', () => {
     const count = 5 * ARRAY_SECTION_SIZE
-    const doc = {
+    const json = {
       array: times(count, (index) => `item ${index}`)
     }
 
     // by default, should have a visible section from 0-100 only (so 100-500 is invisible)
-    const state1 = syncState(doc, undefined, [], path => path.length <= 1)
-    assert.deepStrictEqual(getVisibleCaretPositions(doc, state1), flatMap([
+    const state1 = syncState(json, undefined, [], path => path.length <= 1)
+    assert.deepStrictEqual(getVisibleCaretPositions(json, state1), flatMap([
       { path: [], type: CARET_POSITION.VALUE },
       { path: [], type: CARET_POSITION.INSIDE },
 
@@ -288,8 +288,8 @@ describe('documentState', () => {
     // create a visible section from 200-300 (in addition to the visible section 0-100)
     const start = 2 * ARRAY_SECTION_SIZE
     const end = 3 * ARRAY_SECTION_SIZE
-    const state2 = expandSection(doc, state1, ['array'], { start, end })
-    assert.deepStrictEqual(getVisibleCaretPositions(doc, state2), flatMap([
+    const state2 = expandSection(json, state1, ['array'], { start, end })
+    assert.deepStrictEqual(getVisibleCaretPositions(json, state2), flatMap([
       { path: [], type: CARET_POSITION.VALUE },
       { path: [], type: CARET_POSITION.INSIDE },
 
@@ -352,8 +352,8 @@ describe('documentState', () => {
 
   describe('expand', () => {
     it('should expand an object', () => {
-      const doc = { a: 2, b: { bb: 3 } }
-      const state = expandSinglePath(doc, createState(doc), [])
+      const json = { a: 2, b: { bb: 3 } }
+      const state = expandSinglePath(json, createState(json), [])
 
       const expected = {}
       expected[STATE_ID] = state[STATE_ID]
@@ -369,7 +369,7 @@ describe('documentState', () => {
       assert.deepStrictEqual(state, expected)
 
       // expand nested object
-      const state2 = expandSinglePath(doc, state, ['b'])
+      const state2 = expandSinglePath(json, state, ['b'])
 
       const expected2 = {}
       expected2[STATE_ID] = state[STATE_ID]
@@ -389,8 +389,8 @@ describe('documentState', () => {
     })
 
     it('should expand an array', () => {
-      const doc = [1, 2, 3]
-      const state = expandSinglePath(doc, createState(doc), [])
+      const json = [1, 2, 3]
+      const state = expandSinglePath(json, createState(json), [])
 
       const expected = []
       expected[STATE_ID] = state[STATE_ID]
@@ -409,8 +409,8 @@ describe('documentState', () => {
     })
 
     it('should not expand a primitive value', () => {
-      const doc = 42
-      const state = expandSinglePath(doc, createState(doc), [])
+      const json = 42
+      const state = expandSinglePath(json, createState(json), [])
 
       const expected = {}
       expected[STATE_ID] = state[STATE_ID]
@@ -422,13 +422,13 @@ describe('documentState', () => {
 
   describe('collapse', () => {
     it('should collapse an object', () => {
-      const doc = { a: 2, b: { bb: 3 } }
-      const state = expandSinglePath(doc, createState(doc), [])
+      const json = { a: 2, b: { bb: 3 } }
+      const state = expandSinglePath(json, createState(json), [])
       assert.strictEqual(state[STATE_EXPANDED], true)
       assert.notStrictEqual(state.a, undefined)
       assert.notStrictEqual(state.b, undefined)
 
-      const collapsedState = collapseSinglePath(doc, state, [])
+      const collapsedState = collapseSinglePath(json, state, [])
 
       const expected = {}
       expected[STATE_ID] = state[STATE_ID]
@@ -438,14 +438,14 @@ describe('documentState', () => {
     })
 
     it('should collapse an array', () => {
-      const doc = [1, 2, 3]
-      const state = createState(doc)
+      const json = [1, 2, 3]
+      const state = createState(json)
       assert.strictEqual(state.length, 0)
       assert.strictEqual(state[1], undefined)
       assert.strictEqual(state[2], undefined)
       assert.strictEqual(state[2], undefined)
 
-      const expandedState = expandSinglePath(doc, state, [])
+      const expandedState = expandSinglePath(json, state, [])
       assert.strictEqual(expandedState[STATE_EXPANDED], true)
       assert.deepStrictEqual(expandedState[STATE_VISIBLE_SECTIONS], DEFAULT_VISIBLE_SECTIONS)
       assert.strictEqual(expandedState.length, 3)
@@ -453,7 +453,7 @@ describe('documentState', () => {
       assert.notStrictEqual(expandedState[2], undefined)
       assert.notStrictEqual(expandedState[2], undefined)
 
-      const collapsedState = collapseSinglePath(doc, expandedState, [])
+      const collapsedState = collapseSinglePath(json, expandedState, [])
       assert.deepStrictEqual(collapsedState, state)
       assert.deepStrictEqual(collapsedState[STATE_VISIBLE_SECTIONS], DEFAULT_VISIBLE_SECTIONS)
       assert.strictEqual(collapsedState.length, 0)
@@ -463,23 +463,23 @@ describe('documentState', () => {
     })
 
     it('should not do anything in case of collapsing a primitive value', () => {
-      const doc = 42
-      const state = createState(doc)
+      const json = 42
+      const state = createState(json)
 
-      const expandedState = expandSinglePath(doc, state, [])
+      const expandedState = expandSinglePath(json, state, [])
       assert.deepStrictEqual(expandedState, state)
 
-      const collapsedState = collapseSinglePath(doc, state, [])
+      const collapsedState = collapseSinglePath(json, state, [])
       assert.deepStrictEqual(collapsedState, state)
     })
   })
 
   describe('documentStatePatch', () => {
     it('add: should add a value to an object', () => {
-      const doc = { a: 2, b: 3 }
-      const state = createState(doc)
+      const json = { a: 2, b: 3 }
+      const state = createState(json)
 
-      const updatedState = documentStatePatch(doc, state, [
+      const updatedState = documentStatePatch(json, state, [
         { op: 'add', path: '/c', value: 4 }
       ]).state
 
@@ -490,10 +490,10 @@ describe('documentState', () => {
     })
 
     it('add: should add a value to an object (expanded)', () => {
-      const doc = { a: 2, b: 3 }
-      const state = expandSinglePath(doc, createState(doc), [])
+      const json = { a: 2, b: 3 }
+      const state = expandSinglePath(json, createState(json), [])
 
-      const updatedState = documentStatePatch(doc, state, [
+      const updatedState = documentStatePatch(json, state, [
         { op: 'add', path: '/c', value: 4 }
       ]).state
 
@@ -532,11 +532,11 @@ describe('documentState', () => {
     })
 
     it('replace: should replace the root document itself', () => {
-      const doc = {
+      const json = {
         a: 2,
         b: 3
       }
-      const state = syncState(doc, undefined, [], () => true)
+      const state = syncState(json, undefined, [], () => true)
 
       assert.deepStrictEqual(state[STATE_KEYS], ['a', 'b'])
       assert.deepStrictEqual(state[STATE_EXPANDED], true)
@@ -549,7 +549,7 @@ describe('documentState', () => {
         path: '',
         value: { d: 4 }
       }]
-      const updatedState = documentStatePatch(doc, state, operations).state
+      const updatedState = documentStatePatch(json, state, operations).state
 
       assert.deepStrictEqual(updatedState[STATE_KEYS], ['d'])
       assert.deepStrictEqual(updatedState[STATE_EXPANDED], false)
@@ -588,15 +588,15 @@ describe('documentState', () => {
   })
 
   describe('shiftVisibleSections', () => {
-    const doc = [1, 2, 3, 4, 5, 6, 7, 8]
-    const state = syncState(doc, undefined, [], () => true)
+    const json = [1, 2, 3, 4, 5, 6, 7, 8]
+    const state = syncState(json, undefined, [], () => true)
     state[STATE_VISIBLE_SECTIONS] = [
       { start: 0, end: 2 },
       { start: 4, end: 6 }
     ]
 
     it('should have the right initial indices visible', () => {
-      assert.deepStrictEqual(getVisibleIndices(doc, state), [0, 1, 4, 5])
+      assert.deepStrictEqual(getVisibleIndices(json, state), [0, 1, 4, 5])
     })
 
     it('should insert at the start of a visible section', () => {
@@ -655,12 +655,12 @@ describe('documentState', () => {
   })
 
   describe('initializeState', () => {
-    const doc = {
+    const json = {
       array: [1, 2, { c: 6 }],
       object: { a: 4, b: 5 },
       value: 'hello'
     }
-    const state = syncState(doc, undefined, [], () => false)
+    const state = syncState(json, undefined, [], () => false)
 
     it('should have non expanded initial state', () => {
       assert.deepStrictEqual(state[STATE_EXPANDED], false)
@@ -672,7 +672,7 @@ describe('documentState', () => {
 
     it('should initialize nested state for operation add', () => {
       const operations = [{ op: 'add', path: '/array/2/d', value: 7 }]
-      const updatedState = initializeState(doc, state, operations)
+      const updatedState = initializeState(json, state, operations)
 
       assert.deepStrictEqual(Array.isArray(updatedState.array), true)
       assert.deepStrictEqual(updatedState.array[STATE_EXPANDED], false)
@@ -685,7 +685,7 @@ describe('documentState', () => {
 
     it('should initialize nested state for operation move', () => {
       const operations = [{ op: 'move', from: '/object/a', path: '/array/0' }]
-      const updatedState = initializeState(doc, state, operations)
+      const updatedState = initializeState(json, state, operations)
 
       assert.deepStrictEqual(typeof updatedState.object, 'object')
       assert.deepStrictEqual(updatedState.object[STATE_EXPANDED], false)
@@ -700,7 +700,7 @@ describe('documentState', () => {
 
     it('should initialize nested state for operation copy', () => {
       const operations = [{ op: 'copy', from: '/object/a', path: '/array/0' }]
-      const updatedState = initializeState(doc, state, operations)
+      const updatedState = initializeState(json, state, operations)
 
       assert.deepStrictEqual(typeof updatedState.object, 'object')
       assert.deepStrictEqual(updatedState.object[STATE_EXPANDED], false)
@@ -715,7 +715,7 @@ describe('documentState', () => {
 
     it('should initialize nested state for operation remove', () => {
       const operations = [{ op: 'remove', path: '/object/a' }]
-      const updatedState = initializeState(doc, state, operations)
+      const updatedState = initializeState(json, state, operations)
 
       assert.deepStrictEqual(typeof updatedState.object, 'object')
       assert.deepStrictEqual(updatedState.object[STATE_EXPANDED], false)
@@ -724,7 +724,7 @@ describe('documentState', () => {
 
     it('should initialize nested state for operation replace', () => {
       const operations = [{ op: 'replace', path: '/object/a', value: 42 }]
-      const updatedState = initializeState(doc, state, operations)
+      const updatedState = initializeState(json, state, operations)
 
       assert.deepStrictEqual(typeof updatedState.object, 'object')
       assert.deepStrictEqual(updatedState.object[STATE_EXPANDED], false)
@@ -733,23 +733,23 @@ describe('documentState', () => {
 
     it('should initialize nested state for operation test', () => {
       const operations = [{ op: 'test', path: '/object/a', value: 42 }]
-      const updatedState = initializeState(doc, state, operations)
+      const updatedState = initializeState(json, state, operations)
 
       assert.deepStrictEqual(typeof updatedState.object, 'object')
       assert.deepStrictEqual(updatedState.object[STATE_EXPANDED], false)
       assert.deepStrictEqual(typeof updatedState.object.a, 'object')
     })
 
-    it('should not initialize nested state when not existing in doc itself', () => {
+    it('should not initialize nested state when not existing in json itself', () => {
       const operations = [{ op: 'add', path: '/foo/bar', value: 42 }]
-      const updatedState = initializeState(doc, state, operations)
+      const updatedState = initializeState(json, state, operations)
 
       assert.deepStrictEqual(updatedState.foo, undefined)
     })
 
-    it('should initialize state for replacing the whole doc', () => {
+    it('should initialize state for replacing the whole json', () => {
       const operations = [{ op: 'replace', path: '', value: 42 }]
-      const updatedState = initializeState(doc, state, operations)
+      const updatedState = initializeState(json, state, operations)
 
       assert.deepStrictEqual(updatedState, state)
     })
@@ -758,14 +758,14 @@ describe('documentState', () => {
 
 /**
  * Helper function to get the visible indices of an Array state
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSON} state
  * @returns {number[]}
  */
-function getVisibleIndices (doc, state) {
+function getVisibleIndices (json, state) {
   const visibleIndices = []
 
-  forEachVisibleIndex(doc, state, (index) => {
+  forEachVisibleIndex(json, state, (index) => {
     visibleIndices.push(index)
   })
 

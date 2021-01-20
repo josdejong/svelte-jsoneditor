@@ -139,11 +139,11 @@
 			onChange: ({ json, text }) => console.log('onChange', { json, text }),
 			onFocus: () => console.log('got focus...'),
 			onBlur: () => console.log('lost focus...'),
-			validator: doc => {
+			validator: json => {
 				if (
-					doc && typeof doc === 'object' &&
-					doc.object && typeof doc.object === 'object' &&
-					doc.object.a === 'b') {
+					json && typeof json === 'object' &&
+					json.object && typeof json.object === 'object' &&
+					json.object.a === 'b') {
 					return [
 						{
 							path: ['object', 'a'],
@@ -303,11 +303,11 @@
 		}
 
 		document.getElementById('updateTextRepairable').onclick = () => {
-			const updatedDoc = {
+			const updatedJson = {
 				...json,
 				updated: ':)'
 			}
-			const str = JSON.stringify(updatedDoc, null, 2)
+			const str = JSON.stringify(updatedJson, null, 2)
 			const index = str.lastIndexOf(',')
 			const invalidStr = str.slice(0, index) + str.slice(index + 1)
 			testEditor.update({ text: invalidStr })
@@ -321,11 +321,11 @@
 		}
 
 		document.getElementById('updateTextInvalid').onclick = () =>	{
-			const updatedDoc = {
+			const updatedJson = {
 				...json,
 				updated: ':)'
 			}
-			const str = JSON.stringify(updatedDoc, null, 2)
+			const str = JSON.stringify(updatedJson, null, 2)
 			const index = str.lastIndexOf('}')
 			const invalidStr = str.slice(0, index) + ']' + str.slice(index + 1)
 			testEditor.update({ text: invalidStr })

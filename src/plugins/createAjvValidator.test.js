@@ -81,7 +81,7 @@ describe('createAjvValidator', () => {
   it('should create a validate function', () => {
     const validate = createAjvValidator(schema, schemaRefs)
 
-    const invalidDoc = {
+    const invalidJson = {
       firstName: 'John',
       lastName: 'Doe',
       gender: null,
@@ -94,7 +94,7 @@ describe('createAjvValidator', () => {
       }
     }
 
-    assert.deepStrictEqual(validate(invalidDoc), [
+    assert.deepStrictEqual(validate(invalidJson), [
       { path: ['gender'], message: 'should be equal to one of: "male", "female"' },
       { path: ['age'], message: 'should be integer' },
       { path: ['job'], message: 'should have required property \'address\'' },

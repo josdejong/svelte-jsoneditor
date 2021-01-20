@@ -15,7 +15,8 @@
   const debug = createDebug('jsoneditor:Main')
 
   export let json = ''
-  export let text
+  // eslint-disable-next-line no-undef-init
+  export let text = undefined
   export let mode
   export let mainMenuBar
   export let validator
@@ -258,7 +259,7 @@
       <JSONEditorComponent
         bind:this={ref}
         bind:mode
-        bind:externalDoc={json}
+        bind:externalJson={json}
         bind:mainMenuBar
         bind:validator
         onChangeJson={handleChangeJson}

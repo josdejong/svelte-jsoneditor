@@ -51,7 +51,7 @@ export function sortObjectKeys (json, rootPath = [], direction = 1) {
 
 /**
  * Sort the items of an array
- * @param {JSON} doc                The document containing (optionally nested)
+ * @param {JSON} json                The document containing (optionally nested)
  *                                  the array to be sorted.
  * @param {Path} [rootPath=[]]      Relative path when the array was located
  * @param {Path} [propertyPath=[]]  Nested path to the property on which to sort the contents
@@ -59,11 +59,11 @@ export function sortObjectKeys (json, rootPath = [], direction = 1) {
  * @return {JSONPatchDocument}      Returns a JSONPatch document with move operation
  *                                  to get the array sorted.
  */
-export function sortArray (doc, rootPath = [], propertyPath = [], direction = 1) {
+export function sortArray (json, rootPath = [], propertyPath = [], direction = 1) {
   const comparator = createObjectComparator(propertyPath, direction)
 
   // TODO: make the mechanism to sort configurable? Like use sortOperationsMove and sortOperationsMoveAdvanced
-  const array = getIn(doc, rootPath)
+  const array = getIn(json, rootPath)
   return [
     {
       op: 'replace',
@@ -210,15 +210,15 @@ export function sortOperationsMoveAdvanced (array, comparator) {
  * Throws an error when not all operations are move operation inside the same
  * array.
  *
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {JSONPatchDocument} operations
  * @returns {JSON}
  */
 // TODO: write unit tests
-export function fastPatchSort (doc, operations) {
+export function fastPatchSort (json, operations) {
   if (isEmpty(operations)) {
     // nothing to do :)
-    return doc
+    return json
   }
 
   // validate whether all operations are "move" operations
@@ -232,13 +232,13 @@ export function fastPatchSort (doc, operations) {
 
   // parse all paths
   const parsedOperations = operations.map(operation => ({
-    from: parseJSONPointerWithArrayIndices(doc, operation.from),
-    path: parseJSONPointerWithArrayIndices(doc, operation.path)
+    from: parseJSONPointerWithArrayIndices(json, operation.from),
+    path: parseJSONPointerWithArrayIndices(json, operation.path)
   }))
 
   // validate whether the move actions take place in an array
   const arrayPath = initial(first(parsedOperations).path)
-  const array = getIn(doc, arrayPath)
+  const array = getIn(json, arrayPath)
   if (!Array.isArray(array)) {
     throw new Error('Cannot apply fastPatchSort: not an Array ' +
       '(path: ' + JSON.stringify(arrayPath) + ')')
@@ -263,5 +263,5 @@ export function fastPatchSort (doc, operations) {
     updatedArray.splice(toIndex, 0, value)
   })
 
-  return setIn(doc, arrayPath, updatedArray)
+  return setIn(json, arrayPath, updatedArray)
 }

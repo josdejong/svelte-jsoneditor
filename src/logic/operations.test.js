@@ -21,7 +21,7 @@ describe('operations', () => {
     })
 
     it('should create a nested object via type "structure"', () => {
-      const doc = [
+      const json = [
         {
           a: 2,
           b: {
@@ -31,7 +31,7 @@ describe('operations', () => {
         }
       ]
 
-      assert.deepStrictEqual(createNewValue(doc, { type: SELECTION_TYPE.MULTI, paths: [[0]] }, 'structure'), {
+      assert.deepStrictEqual(createNewValue(json, { type: SELECTION_TYPE.MULTI, paths: [[0]] }, 'structure'), {
         a: '',
         b: {
           c: ''

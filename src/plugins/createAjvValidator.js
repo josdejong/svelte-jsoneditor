@@ -7,7 +7,7 @@ import { draft06 } from '../generated/ajv/draft06.js'
  * Create a JSON Schema validator powered by Ajv.
  * @param {JSON} schema
  * @param {Object} [schemaRefs=undefined]  An object containing JSON Schema references
- * @return {function (doc: JSON) : Array<Object>} Returns a valiation function
+ * @return {function (json: JSON) : Array<Object>} Returns a valiation function
  */
 export function createAjvValidator (schema, schemaRefs) {
   const ajv = Ajv({
@@ -30,24 +30,24 @@ export function createAjvValidator (schema, schemaRefs) {
 
   const validateAjv = ajv.compile(schema)
 
-  return function validate (doc) {
-    validateAjv(doc)
+  return function validate (json) {
+    validateAjv(json)
     const ajvErrors = validateAjv.errors || []
 
     return ajvErrors
       .map(improveAjvError)
-      .map(error => normalizeAjvError(doc, error))
+      .map(error => normalizeAjvError(json, error))
   }
 }
 
 /**
- * @param {JSON} doc
+ * @param {JSON} json
  * @param {Object} ajvError
  * @return {ValidationError}
  */
-function normalizeAjvError (doc, ajvError) {
+function normalizeAjvError (json, ajvError) {
   return {
-    path: parseJSONPointerWithArrayIndices(doc, ajvError.dataPath),
+    path: parseJSONPointerWithArrayIndices(json, ajvError.dataPath),
     message: ajvError.message
   }
 }
