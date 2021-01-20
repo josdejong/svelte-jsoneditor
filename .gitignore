@@ -2,6 +2,5 @@
 .idea
 node_modules
 /dist/
-/src/generated
 
 .eslintcache

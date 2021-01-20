@@ -1,7 +1,5 @@
 import Ajv from 'ajv'
 import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
-import { draft04 } from '../generated/ajv/draft04.js'
-import { draft06 } from '../generated/ajv/draft06.js'
 
 /**
  * Create a JSON Schema validator powered by Ajv.
@@ -10,17 +8,11 @@ import { draft06 } from '../generated/ajv/draft06.js'
  * @return {function (json: JSON) : Array<Object>} Returns a valiation function
  */
 export function createAjvValidator (schema, schemaRefs) {
-  const ajv = Ajv({
+  const ajv = new Ajv({
     allErrors: true,
     verbose: true,
-    schemaId: 'auto',
-    jsonPointers: true,
     $data: true
   })
-
-  // support both draft-04 and draft-06 alongside the latest draft-07
-  ajv.addMetaSchema(draft04)
-  ajv.addMetaSchema(draft06)
 
   if (schemaRefs) {
     Object.keys(schemaRefs).forEach(ref => {
