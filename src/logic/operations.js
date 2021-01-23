@@ -253,6 +253,64 @@ export function duplicate (json, state, paths) {
 }
 
 /**
+ * Create a JSONPatch for an extract action.
+ *
+ * @param {JSON} json
+ * @param {JSON} state
+ * @param {Selection} selection
+ * @return {JSONPatchDocument}
+ */
+// TODO: write unit tests
+export function extract (json, state, selection) {
+  if (selection.type === SELECTION_TYPE.VALUE) {
+    return [
+      {
+        op: 'move',
+        from: compileJSONPointer(selection.focusPath),
+        path: ''
+      }
+    ]
+  }
+
+  if (selection.type === SELECTION_TYPE.MULTI) {
+    const parentPath = initial(selection.focusPath)
+    const parent = getIn(json, parentPath)
+
+    if (Array.isArray(parent)) {
+      const value = selection.paths.map(path => {
+        const index = last(path)
+        return parent[index]
+      })
+
+      return [
+        {
+          op: 'replace',
+          path: '',
+          value
+        }
+      ]
+    } else { // object
+      const value = {}
+      selection.paths.forEach(path => {
+        const key = last(path)
+        value[key] = parent[key]
+      })
+
+      return [
+        {
+          op: 'replace',
+          path: '',
+          value
+        }
+      ]
+    }
+  }
+
+  // this should never happen
+  throw new Error('Cannot extract: unsupported type of selection ' + JSON.stringify(selection))
+}
+
+/**
  * @param {JSON} json
  * @param {JSON} state
  * @param {Selection} selection

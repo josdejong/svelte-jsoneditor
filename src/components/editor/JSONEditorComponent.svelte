@@ -32,6 +32,7 @@
     createNewValue,
     createRemoveOperations,
     duplicate,
+    extract,
     insert
   } from '../../logic/operations.js'
   import {
@@ -408,6 +409,23 @@
     debug('duplicate', { selection })
 
     const operations = duplicate(json, state, selection.paths)
+
+    handlePatch(operations)
+  }
+
+  function handleExtract () {
+    if (
+      readOnly ||
+      !selection ||
+      (selection.type !== SELECTION_TYPE.MULTI && selection.type !== SELECTION_TYPE.VALUE) ||
+      isEmpty(selection.focusPath) // root selected, cannot extract
+    ) {
+      return
+    }
+
+    debug('extract', { selection })
+
+    const operations = extract(json, state, selection)
 
     handlePatch(operations)
   }
@@ -979,6 +997,7 @@
       onCopy={handleCopy}
       onRemove={handleRemove}
       onDuplicate={handleDuplicate}
+      onExtract={handleExtract}
       onInsert={handleInsert}
       onUndo={handleUndo}
       onRedo={handleRedo}

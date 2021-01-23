@@ -4,6 +4,7 @@
   import {
     faClone,
     faCopy,
+    faCropAlt,
     faCut,
     faFilter,
     faPaste,
@@ -37,6 +38,7 @@
   export let onCopy
   export let onRemove
   export let onDuplicate
+  export let onExtract
   export let onInsert
   export let onUndo
   export let onRedo
@@ -58,6 +60,11 @@
   )
   $: canDuplicate = selection != null &&
     (selection.type === SELECTION_TYPE.MULTI) &&
+    !isEmpty(selection.focusPath) // must not be root
+  $: canExtract = selection != null && (
+      selection.type === SELECTION_TYPE.MULTI ||
+      selection.type === SELECTION_TYPE.VALUE
+    ) &&
     !isEmpty(selection.focusPath) // must not be root
 
   function handleToggleSearch () {
@@ -162,13 +169,21 @@
   >
     <Icon data={faClone} />
   </button>
-  <DropdownMenu 
-    items={insertItems} 
+  <button
+    class="button extract"
+    on:click={onExtract}
+    disabled={readOnly || !canExtract}
+    title="Extract"
+  >
+    <Icon data={faCropAlt} />
+  </button>
+  <DropdownMenu
+    items={insertItems}
     title="Insert new structure (Insert)"
   >
-    <button 
+    <button
       class="button insert"
-      slot="defaultItem" 
+      slot="defaultItem"
       on:click={handleInsertStructure}
       disabled={readOnly || !hasSelection}
     >
