@@ -18,6 +18,10 @@
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
   import { SIMPLE_MODAL_OPTIONS } from '../../constants.js'
+  import {
+    faJSONEditorCollapse,
+    faJSONEditorExpand
+  } from '../../img/customFontawesomeIcons.js'
   import { SELECTION_TYPE } from '../../logic/selection.js'
   import DropdownMenu from '../controls/DropdownMenu.svelte'
   import CopyPasteModal from '../modals/CopyPasteModal.svelte'
@@ -33,6 +37,8 @@
   export let selection
   export let historyState
 
+  export let onExpandAll
+  export let onCollapseAll
   export let onCut
   export let onCopy
   export let onRemove
@@ -118,6 +124,24 @@
 </script>
 
 <div class="menu">
+
+  <button
+    class="button expand-all"
+    on:click={onExpandAll}
+    title="Expand all"
+  >
+    <Icon data={faJSONEditorExpand} />
+  </button>
+  <button
+    class="button collapse-all"
+    on:click={onCollapseAll}
+    title="Collapse all"
+  >
+    <Icon data={faJSONEditorCollapse} />
+  </button>
+
+  <div class="separator"></div>
+
   <button
     class="button cut"
     on:click={onCut}
@@ -162,13 +186,13 @@
   >
     <Icon data={faClone} />
   </button>
-  <DropdownMenu 
-    items={insertItems} 
+  <DropdownMenu
+    items={insertItems}
     title="Insert new structure (Insert)"
   >
-    <button 
+    <button
       class="button insert"
-      slot="defaultItem" 
+      slot="defaultItem"
       on:click={handleInsertStructure}
       disabled={readOnly || !hasSelection}
     >

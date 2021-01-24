@@ -752,6 +752,14 @@
     })
   }
 
+  function handleExpandAll () {
+    handleExpand([], true, true)
+  }
+
+  function handleCollapseAll () {
+    handleExpand([], false, true)
+  }
+
   /**
    * @param {SelectionSchema} selectionSchema
    */
@@ -975,6 +983,8 @@
 
       selection={selection}
 
+      onExpandAll={handleExpandAll}
+      onCollapseAll={handleCollapseAll}
       onCut={handleCut}
       onCopy={handleCopy}
       onRemove={handleRemove}
