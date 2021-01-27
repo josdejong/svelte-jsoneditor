@@ -1,5 +1,6 @@
 <script>
   import classnames from 'classnames'
+  import { compileJSONPointer } from 'immutable-json-patch'
   import { isEqual } from 'lodash-es'
   import { onDestroy } from 'svelte'
   import { ACTIVE_SEARCH_RESULT, STATE_SEARCH_VALUE } from '../../constants.js'
@@ -9,7 +10,7 @@
     setCursorToEnd,
     setPlainText
   } from '../../utils/domUtils.js'
-  import { compileJSONPointer } from 'immutable-json-patch'
+  import { keyComboFromEvent } from '../../utils/keyBindings.js'
   import { isUrl, stringConvert, valueType } from '../../utils/typeUtils.js'
 
   export let path
@@ -122,13 +123,15 @@
   function handleValueKeyDown (event) {
     event.stopPropagation()
 
-    if (event.key === 'Escape') {
+    const combo = keyComboFromEvent(event)
+
+    if (combo === 'Escape') {
       // cancel changes
       setDomValue(value)
       onSelect({ type: SELECTION_TYPE.VALUE, path })
     }
 
-    if (!readOnly && (event.key === 'Enter' || event.key === 'Tab') && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+    if (!readOnly && (combo === 'Enter' || combo === 'Tab')) {
       // updating newValue here is important to handle when contents are changed
       // programmatically when edit mode is opened after typing a character
       newValue = getDomValue()
