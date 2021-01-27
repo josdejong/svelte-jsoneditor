@@ -782,20 +782,21 @@
   }
 
   function handleKeyDown (event) {
-    const combo = keyComboFromEvent(event)
+    // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
+    const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
     const keepAnchorPath = event.shiftKey
 
-    if (combo === 'Ctrl+X' || combo === 'Command+X') {
+    if (combo === 'Ctrl+X') {
       event.preventDefault()
       handleCut()
     }
-    if (combo === 'Ctrl+C' || combo === 'Command+C') {
+    if (combo === 'Ctrl+C') {
       event.preventDefault()
       handleCopy()
     }
     // Ctrl+V (paste) is handled by the on:paste event
 
-    if (combo === 'Ctrl+D' || combo === 'Command+D') {
+    if (combo === 'Ctrl+D') {
       event.preventDefault()
       handleDuplicate()
     }
@@ -807,7 +808,7 @@
       event.preventDefault()
       handleInsert('structure')
     }
-    if (combo === 'Ctrl+A' || combo === 'Command+A') {
+    if (combo === 'Ctrl+A') {
       event.preventDefault()
       selection = selectAll()
     }
@@ -906,12 +907,12 @@
       selection = null
     }
 
-    if (combo === 'Ctrl+F' || combo === 'Command+F') {
+    if (combo === 'Ctrl+F') {
       event.preventDefault()
       showSearch = true
     }
 
-    if (combo === 'Ctrl+Z' || combo === 'Command+Z') {
+    if (combo === 'Ctrl+Z') {
       event.preventDefault()
 
       // TODO: find a better way to restore focus
@@ -927,7 +928,7 @@
       }
     }
 
-    if (combo === 'Ctrl+Shift+Z' || combo === 'Command+Shift+Z') {
+    if (combo === 'Ctrl+Shift+Z') {
       event.preventDefault()
 
       // TODO: find a better way to restore focus

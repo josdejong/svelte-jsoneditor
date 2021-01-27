@@ -2,9 +2,12 @@
 
 <script>
   import { getContext } from 'svelte'
+  import { IS_MAC } from '../../utils/navigatorUtils.js'
   import Header from './Header.svelte'
 
   const { close } = getContext('simple-modal')
+
+  const ctrl = IS_MAC ? '⌘' : 'Ctrl'
 </script>
 
 <div class="jsoneditor-modal copy-paste">
@@ -18,19 +21,19 @@
     <div class="shortcuts">
       <div class="shortcut">
         <div class="key">
-          Ctrl+C
+          {ctrl}+C
         </div>
         for copy
       </div>
       <div class="shortcut">
         <div class="key">
-          Ctrl+X
+          {ctrl}+X
         </div>
         for cut
       </div>
       <div class="shortcut">
         <div class="key">
-          Ctrl+V
+          {ctrl}+V
         </div>
         for paste
       </div>
