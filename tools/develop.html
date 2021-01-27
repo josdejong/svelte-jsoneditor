@@ -192,12 +192,12 @@
     // const stringifiedSize = JSON.stringify(largeJson).length
     // console.log(`large json stringified size: ${filesize(stringifiedSize)}`)
 
-    testEditor.set({ json: largeJson })
+    testEditor.set(largeJson)
     window.largeJson = largeJson // for debugging
   }
 
   document.getElementById('clearJson').onclick = function handleClearJson() {
-    testEditor.set({ json: {} })
+    testEditor.set({})
   }
 
   document.getElementById('patchJson').onclick = function handleClearJson() {
@@ -245,7 +245,7 @@
       console.timeEnd('parse JSON')
 
       console.time('set JSON')
-      testEditor.set({ json })
+      testEditor.set(json)
       console.timeEnd('set JSON')
     }
     reader.readAsText(file)
@@ -292,14 +292,14 @@
     })
   }
 
-  document.getElementById('setTextValid').onclick = () =>	testEditor.set({ text: '[1,2,3]' })
-  document.getElementById('updateTextValid').onclick = () =>	testEditor.update({ text: '[1,2,3,4]' })
+  document.getElementById('setTextValid').onclick = () =>	testEditor.setText('[1,2,3]')
+  document.getElementById('updateTextValid').onclick = () =>	testEditor.updateText('[1,2,3,4]')
 
   document.getElementById('setTextRepairable').onclick = () => {
     const str = JSON.stringify(json, null, 2)
     const index = str.lastIndexOf(',')
     const invalidStr = str.slice(0, index) + str.slice(index + 1)
-    testEditor.set({ text: invalidStr })
+    testEditor.setText(invalidStr)
   }
 
   document.getElementById('updateTextRepairable').onclick = () => {
@@ -310,14 +310,14 @@
     const str = JSON.stringify(updatedJson, null, 2)
     const index = str.lastIndexOf(',')
     const invalidStr = str.slice(0, index) + str.slice(index + 1)
-    testEditor.update({ text: invalidStr })
+    testEditor.updateText(invalidStr)
   }
 
   document.getElementById('setTextInvalid').onclick = () =>	{
     const str = JSON.stringify(json, null, 2)
     const index = str.lastIndexOf('}')
     const invalidStr = str.slice(0, index) + ']' + str.slice(index + 1)
-    testEditor.set({ text: invalidStr })
+    testEditor.setText(invalidStr)
   }
 
   document.getElementById('updateTextInvalid').onclick = () =>	{
@@ -328,7 +328,7 @@
     const str = JSON.stringify(updatedJson, null, 2)
     const index = str.lastIndexOf('}')
     const invalidStr = str.slice(0, index) + ']' + str.slice(index + 1)
-    testEditor.update({ text: invalidStr })
+    testEditor.updateText(invalidStr)
   }
 
   document.getElementById('scrollToPath').onclick = () => {

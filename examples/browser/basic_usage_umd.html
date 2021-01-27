@@ -38,16 +38,13 @@
       'time': 1575599819000,
       'string': 'Hello World'
     }
-    const content = {
-      json
-    }
-    editor.set(content)
+    editor.set(json)
   }
 
   // get json
   document.getElementById('getJSON').onclick = function () {
-    const content = editor.get()
-    alert(JSON.stringify(content, null, 2))
+    const json = editor.get()
+    alert(JSON.stringify(json, null, 2))
   }
 </script>
 </body>

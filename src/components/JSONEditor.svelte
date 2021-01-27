@@ -34,99 +34,92 @@
   let ref
 
   export function get () {
-    return {
-      text,
-      json: (typeof text === 'string')
-        ? undefined
-        : json
-    }
+    return (typeof text === 'string')
+      ? JSON.parse(text)
+      : json
   }
 
-  export function set (newContent) {
+  export function getText () {
+    return (typeof text === 'string')
+      ? text
+      : JSON.stringify(json, null, 2)
+  }
+
+  export function set (newJson) {
     debug('set')
 
-    if (!isContent(newContent)) {
-      throw new Error('Invalid content: object with either a json or text property expected')
+    // new editor id -> will re-create the editor
+    instanceId = uniqueId()
+
+    text = undefined
+    json = newJson
+    repairing = false
+  }
+
+  export function setText (newNext) {
+    debug('setText')
+
+    if (text === newNext) {
+      // do NOT apply the text again when there are no changes,
+      // this would switch the editor from repair mode to non-repair mode
+      // as soon as the text has become valid json
+      return
     }
 
-    if (typeof newContent.text === 'string') {
-      if (text === newContent.text) {
-        // do NOT apply the text again when there are no changes,
-        // this would switch the editor from repair mode to non-repair mode
-        // as soon as the text has become valid json
-        return
-      }
+    try {
+      const newJson = JSON.parse(newNext)
 
-      try {
-        const newJson = JSON.parse(newContent.text)
+      debug('set text parsing successful')
 
-        debug('set text parsing successful')
+      set(newJson)
+    } catch (err) {
+      // will open JSONRepair window
 
-        set({ json: newJson })
-      } catch (err) {
-        // will open JSONRepair window
-
-        // Important: do NOT update json here!
-        // when cancelling repair, we want to get back the old json
-        text = newContent.text
-        repairing = newContent.text !== undefined
-        createInstanceOnRepair = true
-        debug('set text parsing failed, could not auto repair')
-      }
-    } else {
-      // new editor id -> will re-create the editor
-      instanceId = uniqueId()
-
-      text = undefined
-      json = newContent.json
-      repairing = false
+      // Important: do NOT update json here!
+      // when cancelling repair, we want to get back the old json
+      text = newNext
+      repairing = newNext !== undefined
+      createInstanceOnRepair = true
+      debug('set text parsing failed, could not auto repair')
     }
   }
 
-  export function update (updatedContent) {
-    debug('update', { updatedContent })
+  export function update (updatedJson) {
+    debug('update')
 
-    if (!isContent(updatedContent)) {
-      throw new Error('Invalid content: object with either a json or text property expected')
-    }
-
-    if (typeof updatedContent.text === 'string') {
-      if (text === updatedContent.text) {
-        // do NOT apply the text again when there are no changes,
-        // this would switch the editor from repair mode to non-repair mode
-        // as soon as the text has become valid json
-        return
-      }
-
-      try {
-        const updatedJson = JSON.parse(updatedContent.text)
-        text = undefined
-        json = updatedJson
-        repairing = false
-        debug('update text parsing successful')
-      } catch (err) {
-        // will open JSONRepair window
-
-        // Important: do NOT update json or createInstanceOnRepair here!
-        // when cancelling repair, we want to get back the old json,
-        // and when this update was called after a set, we should not change
-        // createInstanceOnRepair back to false here
-        text = updatedContent.text
-        repairing = true
-
-        debug('update text parsing failed, could not auto repair')
-      }
-    } else {
-      text = undefined
-      json = updatedContent.json
-      repairing = false
-    }
+    text = undefined
+    json = updatedJson
+    repairing = false
   }
 
-  function isContent (value) {
-    return (value &&
-      typeof value === 'object' &&
-      (value.json !== undefined || typeof value.text === 'string'))
+  export function updateText (updatedText) {
+    debug('updateText')
+
+    if (text === updatedText) {
+      // do NOT apply the text again when there are no changes,
+      // this would switch the editor from repair mode to non-repair mode
+      // as soon as the text has become valid json
+      return
+    }
+
+    try {
+      const updatedJson = JSON.parse(updatedText)
+
+      debug('update text parsing successful')
+
+      update(updatedJson)
+    } catch (err) {
+      // will open JSONRepair window
+
+      // Important: do NOT update json or createInstanceOnRepair here!
+      // when cancelling repair, we want to get back the old json,
+      // and when this update was called after a set, we should not change
+      // createInstanceOnRepair back to false here
+      text = updatedText
+      repairing = true
+
+      debug('update text parsing failed, could not auto repair')
+    }
   }
 
   export function patch (operations, newSelection) {
