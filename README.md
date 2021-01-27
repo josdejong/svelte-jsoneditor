@@ -53,6 +53,7 @@ Or one-way binding:
   }
   
   function onChange(content) {
+    // content is an object { json: JSON | undefined, text: string | undefined }
     console.log('onChange: ', content)
     json = content.json
   }
@@ -86,9 +87,10 @@ Load as ES module:
     target: document.getElementById('jsoneditor'),
     props: {
       json: {
-        text: 'Hello World'
+        greeting: 'Hello World'
       },
       onChange: (content) => {
+        // content is an object { json: JSON | undefined, text: string | undefined }
         console.log('onChange', content)
       }
     }
@@ -115,9 +117,10 @@ Or using UMD (exposed as `window.jsoneditor.JSONEditor`):
     target: document.getElementById('jsoneditor'),
     props: {
       json: {
-        text: 'Hello World'
+        greeting: 'Hello World'
       },
       onChange: (content) => {
+        // content is an object { json: JSON | undefined, text: string | undefined }
         console.log('onChange', content)
       }
     }
@@ -154,6 +157,7 @@ const editor = new JSONEditor({
   props: {
     json,
     onChange: (content) => {
+      // content is an object { json: JSON | undefined, text: string | undefined }
       console.log('onChange', content)
     }
   }
@@ -183,9 +187,12 @@ const editor = new JSONEditor({
 
 ### methods
 
-- `get(): { json?: JSON, text?: string }` Get the current JSON document
-- `set({ json?: JSON, text?: string })` Replace the current JSON document. Will reset the state of the editor.
-- `update({ json?: JSON, text?: string })` Update the loaded JSON document, keeping the state of the editor (like expanded objects).
+- `get(): JSON` Get the current JSON document. Will throw an error when the editor is in Repair mode and does not contain valid JSON.
+- `getText(): string` Get the current JSON document as stringified JSON.
+- `set(json: JSON)` Replace the current JSON document. Will reset the state of the editor.
+- `setText(text: string)` Replace the current JSON document, passing stringified JSON contents. When the text cannot be parsed as JSON, the editor will go into Repair mode.
+- `update(json: JSON)` Update the loaded JSON document, keeping the state of the editor (like expanded objects).
+- `updateText(text: JSON)` Update the loaded JSON document, keeping the state of the editor (like expanded objects). When the passed text cannot be parsed as JSON, the editor will go into Repair mode.
 - `patch(operations: JSONPatchDocument)` Apply a JSON patch document to update the contents of the JSON document.
 - `scrollTo(path: Array.<string|number>)` Scroll the editor vertically such that the specified path comes into view. The path will be expanded when needed.
 - `focus()`. Give the editor focus.
