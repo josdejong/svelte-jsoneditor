@@ -37,7 +37,7 @@
 	}
 
 	.editor {
-		max-width: 500px;
+		max-width: 600px;
 		height: 400px;
 	}
 </style>
