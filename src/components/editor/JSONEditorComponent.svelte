@@ -428,6 +428,12 @@
     const operations = extract(json, state, selection)
 
     handlePatch(operations)
+
+    if (isObjectOrArray(json)) {
+      // expand extracted object/array
+      handleExpand([], true, true)
+      focus() // TODO: find a more robust way to keep focus than sprinkling focusHiddenInput() everywhere
+    }
   }
 
   /**

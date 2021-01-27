@@ -415,7 +415,7 @@ export function getInitialSelection (json, state) {
 export function createSelectionFromOperations (json, operations) {
   if (operations.length === 1) {
     const operation = first(operations)
-    if (operation.op === 'replace') {
+    if (operation.op === 'replace' || operation.op === 'move') {
       // replaced value
       const path = parseJSONPointerWithArrayIndices(json, operation.path)
 
