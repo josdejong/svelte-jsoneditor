@@ -880,11 +880,11 @@
       }
     }
 
-    if (combo.length === 1 && selection) {
+    if (combo.length === (combo.startsWith('Shift+') ? 7 : 1) && selection) {
       // a regular key like a, A, _, etc is entered.
       // Replace selected contents with a new value having this first character as text
       event.preventDefault()
-      handleInsertCharacter(combo)
+      handleInsertCharacter(event.key)
     }
 
     if (combo === 'Enter' && (selection.type === SELECTION_TYPE.AFTER || selection.type === SELECTION_TYPE.INSIDE)) {
