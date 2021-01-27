@@ -4,6 +4,8 @@
 
 // FIXME: implement an escape sequence for the separator +
 
+import { IS_MAC } from './navigatorUtils.js'
+
 /**
  * Get a named key from a key code.
  * For example:
@@ -27,7 +29,7 @@ export function keyComboFromEvent (event) {
 
   if (event.ctrlKey) { combi.push('Ctrl') }
   if (event.metaKey) { combi.push('Command') }
-  if (event.altKey) { combi.push(isMac ? 'Option' : 'Alt') }
+  if (event.altKey) { combi.push(IS_MAC ? 'Option' : 'Alt') }
   if (event.shiftKey) { combi.push('Shift') }
 
   const keyName = nameFromKeyCode(event.which)
@@ -79,8 +81,6 @@ function normalizeKeyCombo (combo) {
 
   return upper
 }
-
-const isMac = window.navigator.platform.toUpperCase().indexOf('MAC') >= 0
 
 const metaCodes = {
   Ctrl: true,

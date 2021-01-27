@@ -12,6 +12,7 @@
     setCursorToEnd,
     setPlainText
   } from '../../utils/domUtils.js'
+  import { keyComboFromEvent } from '../../utils/keyBindings.js'
 
   export let path
   export let key
@@ -91,15 +92,17 @@
   }
 
   async function handleKeyKeyDown (event) {
+    const combo = keyComboFromEvent(event)
+
     event.stopPropagation()
 
-    if (event.key === 'Escape') {
+    if (combo === 'Escape') {
       // cancel changes
       setDomKey(key)
       onSelect({ type: SELECTION_TYPE.KEY, path })
     }
 
-    if (!readOnly && (event.key === 'Enter' || event.key === 'Tab') && !event.ctrlKey && !event.shiftKey && !event.altKey) {
+    if (!readOnly && (combo === 'Enter' || combo === 'Tab')) {
       // updating newKey here is important to handle when contents are changed
       // programmatically when edit mode is opened after typing a character
       newKey = getDomKey()
