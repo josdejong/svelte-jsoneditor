@@ -23,8 +23,8 @@ export const faJSONEditorFormat = {
   prefix: 'fas',
   iconName: 'jsoneditor-format',
   icon: [512, 512, [], null,
-    'M 128,128 v 64 h 384 v -64 z ' +
-    'M 128,256 v 64 h 320 v -64 z ' +
+    'M 160,128 v 64 h 352 v -64 z ' +
+    'M 160,256 v 64 h 288 v -64 z ' +
     'M 0,384 v 64 h 320 v -64 z ' +
     'M 0,0 V 64 H 416 V 0 Z'
   ]
