@@ -20,6 +20,7 @@
   // eslint-disable-next-line no-undef-init
   export let text = undefined
   export let readOnly = false
+  export let indentation = 2
   export let mode = MODE.TREE
   export let mainMenuBar = true
   export let validator = null
@@ -46,7 +47,7 @@
   export function getText() {
     return (typeof text === 'string')
       ? text
-      : JSON.stringify(json, null, 2)
+      : JSON.stringify(json, null, indentation)
   }
 
   export function set(newJson) {
@@ -247,6 +248,8 @@
   }
 
   function handleChangeText(updatedText) {
+    text = updatedText
+
     if (onChange) {
       onChange({
         json: undefined,
@@ -287,8 +290,9 @@
     {#if mode === MODE.CODE}
       <CodeMode
         bind:this={refCodeMode}
-        bind:text
+        text={typeof text === 'string' ? text : JSON.stringify(json, null, indentation)}
         readOnly={readOnly}
+        indentation={indentation}
         mainMenuBar={mainMenuBar}
         onChange={handleChangeText}
         onFocus={handleFocus}
@@ -299,6 +303,7 @@
         <JSONEditorComponent
           bind:this={refTreeMode}
           readOnly={readOnly}
+          indentation={indentation}
           bind:externalJson={json}
           bind:mainMenuBar
           bind:validator

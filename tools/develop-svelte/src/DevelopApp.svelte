@@ -18,10 +18,16 @@
 
 	let showTreeEditor = true
 	let showCodeEditor = true
+	let indentation = 2
 </script>
 
 <main>
 	<h1>svelte-jsoneditor development application</h1>
+	<p>
+		<label>
+			Indentation: <input type="number" bind:value={indentation} />
+		</label>
+	</p>
 	<div class="columns">
 		<div class="left">
 			<p>
@@ -33,6 +39,7 @@
 				{#if showTreeEditor}
 					<JSONEditor
 						bind:json
+						indentation={indentation}
 					/>
 				{/if}
 			</div>
@@ -54,6 +61,7 @@
 				{#if showCodeEditor}
 					<JSONEditor
 						mode="code"
+						indentation={indentation}
 						bind:text
 					/>
 				{/if}

@@ -138,6 +138,7 @@
         id: transformModalId,
         json: json,
         selectedPath: [],
+        indentation,
         onTransform: async (operations) => {
           debug('onTransform', operations)
           patch(operations)

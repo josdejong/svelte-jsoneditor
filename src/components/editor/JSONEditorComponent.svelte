@@ -15,7 +15,6 @@
   import { createJump } from '../../assets/jump.js/src/jump.js'
   import {
     MAX_SEARCH_RESULTS,
-    MODE,
     SCROLL_DURATION,
     SEARCH_PROGRESS_THROTTLE,
     SIMPLE_MODAL_OPTIONS,
@@ -94,6 +93,7 @@
   export let mainMenuBar = true
   export let validator = null
   export let visible = true
+  export let indentation = 2
   export let onChangeJson = () => {}
 
   function noop () {}
@@ -294,7 +294,7 @@
       return
     }
 
-    const clipboard = selectionToPartialJson(json, selection)
+    const clipboard = selectionToPartialJson(json, selection, indentation)
     if (clipboard == null) {
       return
     }
@@ -313,7 +313,7 @@
   }
 
   async function handleCopy () {
-    const clipboard = selectionToPartialJson(json, selection)
+    const clipboard = selectionToPartialJson(json, selection, indentation)
     if (clipboard == null) {
       return
     }
@@ -622,6 +622,7 @@
       id: transformModalId,
       json: json,
       selectedPath,
+      indentation,
       onTransform: async (operations) => {
         debug('onTransform', selectedPath, operations)
         patch(operations, selection)

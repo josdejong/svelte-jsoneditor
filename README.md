@@ -170,6 +170,7 @@ const editor = new JSONEditor({
 - `json` Pass the JSON document to be rendered in the JSONEditor
 - `readOnly: boolean` If `true`, the editor is read only. Default value is `false`.
 - `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
+- `indentation: number` Number of spaces use for indentation when stringifying JSON.
 - `validator: function (json): ValidationError[]`. Validate the JSON document.
   For example use the built-in JSON Schema validator powered by Ajv:
   ```js

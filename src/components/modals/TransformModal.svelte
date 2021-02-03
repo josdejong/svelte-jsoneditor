@@ -18,6 +18,7 @@
   export let json
   export let selectedPath
   export let onTransform
+  export let indentation = 2
 
   $: selectedJson = getIn(json, selectedPath)
 
@@ -61,7 +62,7 @@
     try {
       const jsonTransformed = evalTransform(json, query)
 
-      preview = truncate(JSON.stringify(jsonTransformed, null, 2), MAX_PREVIEW_CHARACTERS)
+      preview = truncate(JSON.stringify(jsonTransformed, null, indentation), MAX_PREVIEW_CHARACTERS)
       previewHasError = false
     } catch (err) {
       preview = err.toString()
