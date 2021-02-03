@@ -34,7 +34,8 @@
   let hasFocus = false
   let repairing = (text !== undefined)
 
-  let ref
+  let refTreeMode
+  let refCodeMode
 
   export function get() {
     return (typeof text === 'string')
@@ -130,23 +131,23 @@
       throw new Error('Cannot apply patch whilst repairing invalid JSON')
     }
 
-    return ref.patch(operations, newSelection)
+    return refTreeMode.patch(operations, newSelection)
   }
 
   export function expand(callback) {
-    return ref.expand(callback)
+    return refTreeMode.expand(callback)
   }
 
   export function collapse(callback) {
-    return ref.collapse(callback)
+    return refTreeMode.collapse(callback)
   }
 
   export function scrollTo(path) {
-    return ref.scrollTo(path)
+    return refTreeMode.scrollTo(path)
   }
 
   export function findElement(path) {
-    return ref.findElement(path)
+    return refTreeMode.findElement(path)
   }
 
   export function setValidator(newValidator) {
@@ -174,7 +175,13 @@
   }
 
   export function focus() {
-    ref.focus()
+    if (refCodeMode) {
+      refCodeMode.focus()
+    }
+
+    if (refTreeMode) {
+      refTreeMode.focus()
+    }
   }
 
   export function destroy() {
@@ -212,12 +219,10 @@
       json = ''
     }
 
-    setTimeout(() => ref.focus())
+    setTimeout(() => refTreeMode.focus())
   }
 
   function handleChangeText(updatedText) {
-    debug('handleChangeText')
-
     if (onChange) {
       onChange({
         json: undefined,
@@ -227,8 +232,6 @@
   }
 
   function handleChangeJson(updatedJson) {
-    debug('handleChangeJson')
-
     repairing = false
     text = undefined
 
@@ -259,15 +262,18 @@
   <div class="jsoneditor-main" class:focus={hasFocus}>
     {#if mode === MODE.CODE}
       <CodeMode
-        readOnly={readOnly}
+        bind:this={refCodeMode}
         bind:text
-        bind:mainMenuBar
+        readOnly={readOnly}
+        mainMenuBar={mainMenuBar}
         onChange={handleChangeText}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
       />
     {:else} <!-- mode === MODE.TREE -->
       {#key instanceId}
         <JSONEditorComponent
-          bind:this={ref}
+          bind:this={refTreeMode}
           readOnly={readOnly}
           bind:externalJson={json}
           bind:mainMenuBar

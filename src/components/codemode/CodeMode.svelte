@@ -19,6 +19,8 @@
   export let indentation = 2 // TODO: make indentation configurable
   export let aceTheme = 'ace/theme/jsoneditor' // TODO: make aceTheme configurable
   export let onChange = null
+  export let onFocus = () => {}
+  export let onBlur = () => {}
   export let onError = (err) => console.error(err) // FIXME: show error to the user
 
   const debug = createDebug('jsoneditor:CodeMode')
@@ -57,6 +59,10 @@
   const { open } = getContext('simple-modal')
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
+
+  export function focus () {
+    aceEditor.focus()
+  }
 
   /**
    * @param {JSONPatchDocument} operations
@@ -113,7 +119,7 @@
           patch(operations)
         }
       }, SORT_MODAL_OPTIONS, {
-        // onClose: () => focus() // FIXME
+        onClose: focus
       })
     } catch (err) {
       onError(err)
@@ -137,7 +143,7 @@
           patch(operations)
         }
       }, TRANSFORM_MODAL_OPTIONS, {
-        // onClose: () => focus() // FIXME
+        onClose: focus
       })
     } catch (err) {
       onError(err)
@@ -194,6 +200,8 @@
 
     // register onchange event
     aceEditor.on('change', onChange)
+    aceEditor.on('focus', onFocus)
+    aceEditor.on('blur', onBlur)
 
     return aceEditor
   }
