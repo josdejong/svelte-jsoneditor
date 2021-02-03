@@ -26,7 +26,7 @@
     class="button format"
     disabled={readOnly}
     on:click={() => onFormat()}
-    title="Format JSON"
+    title="Format JSON: add proper indentation and new lines (Ctrl+\)"
   >
     <Icon data={faExpandArrowsAlt} />
   </button>
@@ -34,7 +34,7 @@
     class="button compact"
     disabled={readOnly}
     on:click={() => onCompact()}
-    title="Compact JSON"
+    title="Compact JSON: remove all white spacing and new lines (Ctrl+Shift+\)"
   >
     <Icon data={faCompressArrowsAlt} />
   </button>

@@ -12,7 +12,9 @@
 		'string': 'Hello World'
 	}
 
-	let text = '{\n  "greeting" : "hello world"\n}'
+	let text = JSON.stringify({
+		greeting: 'hello world'
+	}, null, 2)
 
 	let showTreeEditor = true
 	let showCodeEditor = true

@@ -7,6 +7,7 @@
     SORT_MODAL_OPTIONS,
     TRANSFORM_MODAL_OPTIONS
   } from '../../constants.js'
+  import { keyComboFromEvent } from '../../utils/keyBindings.js'
   import SortModal from '../modals/SortModal.svelte'
   import TransformModal from '../modals/TransformModal.svelte'
   import CodeMenu from './CodeMenu.svelte'
@@ -151,6 +152,21 @@
     aceEditor.getSession().getUndoManager().redo(false)
   }
 
+  function handleKeyDown (event) {
+    // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
+    const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
+
+    if (combo === 'Ctrl+\\') {
+      event.preventDefault()
+      handleFormat()
+    }
+
+    if (combo === 'Ctrl+Shift+\\') {
+      event.preventDefault()
+      handleCompact()
+    }
+  }
+
   function createAceEditor ({ target, ace, readOnly, indentation, onChange }) {
     debug('create Ace editor')
 
@@ -219,7 +235,10 @@
   }
 </script>
 
-<div class="code-mode">
+<div
+  class="code-mode"
+  on:keydown={handleKeyDown}
+>
   {#if mainMenuBar}
     <CodeMenu
       readOnly={readOnly}
