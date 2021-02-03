@@ -7,7 +7,7 @@ import {
   fastPatchSort,
   sortOperationsMove,
   sortOperationsMoveAdvanced
-} from '../src/logic/sort.js'
+} from '../../src/logic/sort.js'
 
 function generateArray (size, changes) {
   const array = times(size).map((item, index) => index)

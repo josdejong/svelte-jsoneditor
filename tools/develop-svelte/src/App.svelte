@@ -16,7 +16,7 @@
 </script>
 
 <main>
-	<h1>Basic usage of svelte-jsoneditor in a Svelte application</h1>
+	<h1>svelte-jsoneditor development application</h1>
 	<p>
 		<label>
 			<input type="checkbox" bind:checked={show} /> Show editor
