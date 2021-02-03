@@ -131,23 +131,47 @@
       throw new Error('Cannot apply patch whilst repairing invalid JSON')
     }
 
-    return refTreeMode.patch(operations, newSelection)
+    if (refTreeMode) {
+      return refTreeMode.patch(operations, newSelection)
+    }
+
+    if (refCodeMode) {
+      return refCodeMode.patch(operations)
+    }
   }
 
   export function expand(callback) {
-    return refTreeMode.expand(callback)
+    if (refTreeMode) {
+      return refTreeMode.expand(callback)
+    }
+
+    throw new Error(`Method expand is not available in mode "${mode}"`)
   }
 
   export function collapse(callback) {
-    return refTreeMode.collapse(callback)
+    if (refTreeMode) {
+      return refTreeMode.collapse(callback)
+    }
+
+    throw new Error(`Method collapse is not available in mode "${mode}"`)
   }
 
   export function scrollTo(path) {
-    return refTreeMode.scrollTo(path)
+    if (refTreeMode) {
+      return refTreeMode.scrollTo(path)
+    }
+
+    // TODO: implement scrollTo for code mode
+
+    throw new Error(`Method scrollTo is not available in mode "${mode}"`)
   }
 
   export function findElement(path) {
-    return refTreeMode.findElement(path)
+    if (refTreeMode) {
+      return refTreeMode.findElement(path)
+    }
+
+    throw new Error(`Method findElement is not available in mode "${mode}"`)
   }
 
   export function setValidator(newValidator) {
@@ -219,7 +243,7 @@
       json = ''
     }
 
-    setTimeout(() => refTreeMode.focus())
+    setTimeout(focus)
   }
 
   function handleChangeText(updatedText) {
