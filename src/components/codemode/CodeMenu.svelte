@@ -1,13 +1,15 @@
 <script>
   import {
-    faCompressArrowsAlt,
-    faExpandArrowsAlt,
     faFilter,
     faRedo,
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
   import Icon from 'svelte-awesome'
+  import {
+    faJSONEditorCompact,
+    faJSONEditorFormat
+  } from '../../img/customFontawesomeIcons.js'
 
   export let readOnly = false
   export let onFormat
@@ -28,7 +30,7 @@
     on:click={() => onFormat()}
     title="Format JSON: add proper indentation and new lines (Ctrl+\)"
   >
-    <Icon data={faExpandArrowsAlt} />
+    <Icon data={faJSONEditorFormat} />
   </button>
   <button
     class="button compact"
@@ -36,7 +38,7 @@
     on:click={() => onCompact()}
     title="Compact JSON: remove all white spacing and new lines (Ctrl+Shift+\)"
   >
-    <Icon data={faCompressArrowsAlt} />
+    <Icon data={faJSONEditorCompact} />
   </button>
 
   <div class="separator"></div>
