@@ -168,8 +168,7 @@ const editor = new JSONEditor({
 ### properties
 
 - `json` Pass the JSON document to be rendered in the JSONEditor
-- `mode: 'edit' | 'view'` Open the editor in editable mode (`'edit'`) or 
-  readonly (`'view'`). Default is `'edit'`
+- `readOnly: boolean` If `true`, the editor is read only. Default value is `false`.
 - `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
 - `validator: function (json): ValidationError[]`. Validate the JSON document.
   For example use the built-in JSON Schema validator powered by Ajv:

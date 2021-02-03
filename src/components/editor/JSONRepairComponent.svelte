@@ -15,7 +15,7 @@
   import { createFocusTracker } from '../controls/createFocusTracker.js'
 
   export let text = ''
-  export let mode = MODE.EDIT
+  export let readOnly = false
   export let onParse
   export let onRepair
   export let onChange = null
@@ -46,8 +46,6 @@
     }
   })
 
-
-  $: readOnly = mode === MODE.VIEW
   $: error = getErrorMessage(text)
   $: repairable = isRepairable(text)
 

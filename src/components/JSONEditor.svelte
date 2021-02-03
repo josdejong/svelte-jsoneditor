@@ -4,9 +4,11 @@
 />
 
 <script>
+  import CodeMode from './codemode/CodeMode.svelte'
   import createDebug from 'debug'
   import jsonrepair from 'jsonrepair'
   import Modal from 'svelte-simple-modal'
+  import { MODE } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
   import JSONEditorComponent from './editor/JSONEditorComponent.svelte'
   import JSONRepairComponent from './editor/JSONRepairComponent.svelte'
@@ -17,9 +19,10 @@
   export let json = ''
   // eslint-disable-next-line no-undef-init
   export let text = undefined
-  export let mode
-  export let mainMenuBar
-  export let validator
+  export let readOnly = false
+  export let mode = MODE.TREE
+  export let mainMenuBar = true
+  export let validator = null
   export let onChange = null
   export let onClassName = () => {}
   export let onFocus = () => {}
@@ -33,19 +36,19 @@
 
   let ref
 
-  export function get () {
+  export function get() {
     return (typeof text === 'string')
       ? JSON.parse(text)
       : json
   }
 
-  export function getText () {
+  export function getText() {
     return (typeof text === 'string')
       ? text
       : JSON.stringify(json, null, 2)
   }
 
-  export function set (newJson) {
+  export function set(newJson) {
     debug('set')
 
     // new editor id -> will re-create the editor
@@ -56,7 +59,7 @@
     repairing = false
   }
 
-  export function setText (newNext) {
+  export function setText(newNext) {
     debug('setText')
 
     if (text === newNext) {
@@ -84,7 +87,7 @@
     }
   }
 
-  export function update (updatedJson) {
+  export function update(updatedJson) {
     debug('update')
 
     text = undefined
@@ -92,7 +95,7 @@
     repairing = false
   }
 
-  export function updateText (updatedText) {
+  export function updateText(updatedText) {
     debug('updateText')
 
     if (text === updatedText) {
@@ -122,7 +125,7 @@
     }
   }
 
-  export function patch (operations, newSelection) {
+  export function patch(operations, newSelection) {
     if (repairing) {
       throw new Error('Cannot apply patch whilst repairing invalid JSON')
     }
@@ -130,55 +133,55 @@
     return ref.patch(operations, newSelection)
   }
 
-  export function expand (callback) {
+  export function expand(callback) {
     return ref.expand(callback)
   }
 
-  export function collapse (callback) {
+  export function collapse(callback) {
     return ref.collapse(callback)
   }
 
-  export function scrollTo (path) {
+  export function scrollTo(path) {
     return ref.scrollTo(path)
   }
 
-  export function findElement (path) {
+  export function findElement(path) {
     return ref.findElement(path)
   }
 
-  export function setValidator (newValidator) {
+  export function setValidator(newValidator) {
     validator = newValidator
   }
 
-  export function getValidator () {
+  export function getValidator() {
     return validator
   }
 
-  export function setMainMenuBar (newMainMenuBar) {
+  export function setMainMenuBar(newMainMenuBar) {
     mainMenuBar = newMainMenuBar
   }
 
-  export function getMainMenuBar () {
+  export function getMainMenuBar() {
     return mainMenuBar
   }
 
-  export function setMode (newMode) {
+  export function setMode(newMode) {
     mode = newMode
   }
 
-  export function getMode () {
+  export function getMode() {
     return mode
   }
 
-  export function focus () {
+  export function focus() {
     ref.focus()
   }
 
-  export function destroy () {
+  export function destroy() {
     this.$destroy()
   }
 
-  function handleApplyRepair (repairedText) {
+  function handleApplyRepair(repairedText) {
     debug('handleApplyRepair')
 
     const repairedJson = JSON.parse(repairedText)
@@ -201,7 +204,7 @@
     handleChangeJson(repairedJson)
   }
 
-  function handleCancelRepair () {
+  function handleCancelRepair() {
     repairing = false
     createInstanceOnRepair = false
     text = undefined
@@ -212,7 +215,7 @@
     setTimeout(() => ref.focus())
   }
 
-  function handleChangeText (updatedText) {
+  function handleChangeText(updatedText) {
     debug('handleChangeText')
 
     if (onChange) {
@@ -223,7 +226,7 @@
     }
   }
 
-  function handleChangeJson (updatedJson) {
+  function handleChangeJson(updatedJson) {
     debug('handleChangeJson')
 
     repairing = false
@@ -237,14 +240,14 @@
     }
   }
 
-  function handleFocus () {
+  function handleFocus() {
     hasFocus = true
     if (onFocus) {
       onFocus()
     }
   }
 
-  function handleBlur () {
+  function handleBlur() {
     hasFocus = false
     if (onBlur) {
       onBlur()
@@ -254,33 +257,41 @@
 
 <Modal>
   <div class="jsoneditor-main" class:focus={hasFocus}>
-    {#key instanceId}
-      <JSONEditorComponent
-        bind:this={ref}
-        bind:mode
-        bind:externalJson={json}
+    {#if mode === MODE.CODE}
+      <CodeMode
+        readOnly={readOnly}
+        bind:text
         bind:mainMenuBar
-        bind:validator
-        onChangeJson={handleChangeJson}
-        bind:onClassName
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        visible={!repairing}
       />
-      {#if repairing}
-        <JSONRepairComponent
-          bind:text={text}
-          bind:mode
-          onParse={JSON.parse}
-          onRepair={jsonrepair}
-          onChange={handleChangeText}
-          onApply={handleApplyRepair}
-          onCancel={handleCancelRepair}
+    {:else} <!-- mode === MODE.TREE -->
+      {#key instanceId}
+        <JSONEditorComponent
+          bind:this={ref}
+          readOnly={readOnly}
+          bind:externalJson={json}
+          bind:mainMenuBar
+          bind:validator
+          onChangeJson={handleChangeJson}
+          bind:onClassName
           onFocus={handleFocus}
           onBlur={handleBlur}
+          visible={!repairing}
         />
-      {/if}
-    {/key}
+        {#if repairing}
+          <JSONRepairComponent
+            bind:text={text}
+            readOnly={readOnly}
+            onParse={JSON.parse}
+            onRepair={jsonrepair}
+            onChange={handleChangeText}
+            onApply={handleApplyRepair}
+            onCancel={handleCancelRepair}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+          />
+        {/if}
+      {/key}
+    {/if}
   </div>
 </Modal>
 

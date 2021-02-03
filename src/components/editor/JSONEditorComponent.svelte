@@ -19,7 +19,9 @@
     SCROLL_DURATION,
     SEARCH_PROGRESS_THROTTLE,
     SIMPLE_MODAL_OPTIONS,
-    STATE_EXPANDED
+    SORT_MODAL_OPTIONS,
+    STATE_EXPANDED,
+    TRANSFORM_MODAL_OPTIONS
   } from '../../constants.js'
   import {
     documentStatePatch,
@@ -87,7 +89,7 @@
   let hasFocus = false
   const jump = createJump()
 
-  export let mode = MODE.EDIT
+  export let readOnly = false
   export let externalJson = {}
   export let mainMenuBar = true
   export let validator = null
@@ -131,7 +133,6 @@
       : (path.length === 1 && path[0] === 0) // first item of an array?
   }
 
-  $: readOnly = mode === MODE.VIEW
   $: jsonIsEmpty = json !== ''
   $: validationErrorsList = validator ? validator(json) : []
   $: validationErrors = mapValidationErrors(validationErrorsList)
@@ -605,13 +606,7 @@
         handleExpand(selectedPath, true)
         // FIXME: because we apply expand *after* the patch, when doing undo/redo, the expanded state is not restored
       }
-    }, {
-      ...SIMPLE_MODAL_OPTIONS,
-      styleWindow: {
-        ...SIMPLE_MODAL_OPTIONS.styleWindow,
-        width: '400px'
-      }
-    }, {
+    }, SORT_MODAL_OPTIONS, {
       onClose: () => focus()
     })
   }
@@ -635,17 +630,7 @@
         handleExpand(selectedPath, true)
         // FIXME: because we apply expand *after* the patch, when doing undo/redo, the expanded state is not restored
       }
-    }, {
-      ...SIMPLE_MODAL_OPTIONS,
-      styleWindow: {
-        ...SIMPLE_MODAL_OPTIONS.styleWindow,
-        width: '600px'
-      },
-      styleContent: {
-        overflow: 'auto', // TODO: would be more neat if the header is fixed instead of scrolls along
-        padding: 0
-      }
-    }, {
+    }, TRANSFORM_MODAL_OPTIONS, {
       onClose: () => focus()
     })
   }

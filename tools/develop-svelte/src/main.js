@@ -1,10 +1,8 @@
-import App from './App.svelte';
+import DevelopApp from './DevelopApp.svelte';
 
-const app = new App({
+const app = new DevelopApp({
 	target: document.body,
-	props: {
-		name: 'world'
-	}
+	props: {}
 });
 
 export default app;

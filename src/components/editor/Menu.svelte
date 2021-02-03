@@ -134,14 +134,14 @@
 
   <button
     class="button expand-all"
-    on:click={onExpandAll}
+    on:click={() => onExpandAll()}
     title="Expand all"
   >
     <Icon data={faJSONEditorExpand} />
   </button>
   <button
     class="button collapse-all"
-    on:click={onCollapseAll}
+    on:click={() => onCollapseAll()}
     title="Collapse all"
   >
     <Icon data={faJSONEditorCollapse} />
@@ -151,7 +151,7 @@
 
   <button
     class="button cut"
-    on:click={onCut}
+    on:click={() => onCut()}
     disabled={readOnly || !hasSelectionContents}
     title="Cut (Ctrl+X)"
   >
@@ -159,7 +159,7 @@
   </button>
   <button
     class="button copy"
-    on:click={onCopy}
+    on:click={() => onCopy()}
     disabled={!hasSelectionContents}
     title="Copy (Ctrl+C)"
   >
@@ -179,7 +179,7 @@
 
   <button
     class="button remove"
-    on:click={onRemove}
+    on:click={() => onRemove()}
     disabled={readOnly || !hasSelectionContents}
     title="Remove (Delete)"
   >
@@ -187,7 +187,7 @@
   </button>
   <button
     class="button duplicate"
-    on:click={onDuplicate}
+    on:click={() => onDuplicate()}
     disabled={readOnly || !canDuplicate}
     title="Duplicate (Ctrl+D)"
   >
@@ -195,7 +195,7 @@
   </button>
   <button
     class="button extract"
-    on:click={onExtract}
+    on:click={() => onExtract()}
     disabled={readOnly || !canExtract}
     title="Extract"
   >
@@ -220,7 +220,7 @@
   <button
     class="button sort"
     disabled={readOnly}
-    on:click={onSort}
+    on:click={() => onSort()}
     title="Sort"
   >
     <Icon data={faSortAmountDownAlt} />
@@ -228,7 +228,7 @@
   <button
     class="button transform"
     disabled={readOnly}
-    on:click={onTransform}
+    on:click={() => onTransform()}
     title="Transform contents (filter, sort, project)"
   >
     <Icon data={faFilter} />
@@ -250,7 +250,7 @@
   <button
     class="button undo"
     disabled={!historyState.canUndo}
-    on:click={onUndo}
+    on:click={() => onUndo()}
     title="Undo (Ctrl+Z)"
   >
     <Icon data={faUndo} />
@@ -258,7 +258,7 @@
   <button
     class="button redo"
     disabled={!historyState.canRedo}
-    on:click={onRedo}
+    on:click={() => onRedo()}
     title="Redo (Ctrl+Shift+Z)"
   >
     <Icon data={faRedo} />

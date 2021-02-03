@@ -1,7 +1,7 @@
 
 export const MODE = {
-  EDIT: 'edit',
-  VIEW: 'view'
+  TREE: 'tree',
+  CODE: 'code'
 }
 
 export const STATE_ID = Symbol('id')
@@ -38,6 +38,26 @@ export const SIMPLE_MODAL_OPTIONS = {
   styleContent: {
     padding: '0px',
     overflow: 'visible' // needed for select box dropdowns which are larger than the modal
+  }
+}
+
+export const SORT_MODAL_OPTIONS = {
+  ...SIMPLE_MODAL_OPTIONS,
+  styleWindow: {
+    ...SIMPLE_MODAL_OPTIONS.styleWindow,
+    width: '400px'
+  }
+}
+
+export const TRANSFORM_MODAL_OPTIONS = {
+  ...SIMPLE_MODAL_OPTIONS,
+  styleWindow: {
+    ...SIMPLE_MODAL_OPTIONS.styleWindow,
+    width: '600px'
+  },
+  styleContent: {
+    overflow: 'auto', // TODO: would be more neat if the header is fixed instead of scrolls along
+    padding: 0
   }
 }
 
