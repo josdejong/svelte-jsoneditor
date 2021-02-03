@@ -54,15 +54,15 @@
      id="layer1">
     <path
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.06904px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 0,0 V 64 H 512 V 0 Z"
+       d="M 0,32 V 96 H 512 V 32 Z"
        id="path11" />
     <path
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.06904px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 0,128 v 64 h 512 v -64 z"
+       d="m 0,160 v 64 h 512 v -64 z"
        id="path11-5" />
     <path
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.886405px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 0,256 v 64 h 352 v -64 z"
+       d="m 0,288 v 64 h 352 v -64 z"
        id="path11-9" />
   </g>
 </svg>

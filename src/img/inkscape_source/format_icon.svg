@@ -54,19 +54,19 @@
      id="layer1">
     <path
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.960769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 160,128 v 64 h 352 v -64 z"
+       d="m 160,160 v 64 h 352 v -64 z"
        id="path834" />
     <path
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.953463px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 160,256 v 64 h 288 v -64 z"
+       d="m 160,288 v 64 h 288 v -64 z"
        id="path836" />
     <path
-       style="fill:#000000;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
-       d="m 0,384 v 64 h 320 v -64 z"
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 0,416 v 64 h 320 v -64 z"
        id="path838" />
     <path
-       style="fill:#000000;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1"
-       d="M 0,0 V 64 H 416 V 0 Z"
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 0,32 V 96 H 416 V 32 Z"
        id="path840" />
   </g>
 </svg>

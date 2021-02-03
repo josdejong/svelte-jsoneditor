@@ -23,10 +23,10 @@ export const faJSONEditorFormat = {
   prefix: 'fas',
   iconName: 'jsoneditor-format',
   icon: [512, 512, [], null,
-    'M 160,128 v 64 h 352 v -64 z ' +
-    'M 160,256 v 64 h 288 v -64 z ' +
-    'M 0,384 v 64 h 320 v -64 z ' +
-    'M 0,0 V 64 H 416 V 0 Z'
+    'M 0,32 v 64 h 416 v -64 z ' +
+    'M 160,160 v 64 h 352 v -64 z ' +
+    'M 160,288 v 64 h 288 v -64 z ' +
+    'M 0,416 v 64 h 320 v -64 z'
   ]
 }
 
@@ -34,8 +34,8 @@ export const faJSONEditorCompact = {
   prefix: 'fas',
   iconName: 'jsoneditor-compact',
   icon: [512, 512, [], null,
-    'M 0,0 V 64 H 512 V 0 Z ' +
-    'm 0,128 v 64 h 512 v -64 z ' +
-    'M 0,256 v 64 h 352 v -64 z'
+    'M 0,32 v 64 h 512 v -64 z ' +
+    'M 0,160 v 64 h 512 v -64 z ' +
+    'M 0,288 v 64 h 352 v -64 z'
   ]
 }
