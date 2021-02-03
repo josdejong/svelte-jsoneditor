@@ -76,6 +76,19 @@
   >
     <Icon data={faRedo} />
   </button>
+
+  <div class="empty-space"></div>
+
+  <div class="powered-by">
+    <a
+      href="https://ace.c9.io/"
+      target="_blank"
+      rel='noopener noreferrer'
+      title='Code mode is powered by Ace editor'
+    >
+      powered by ace
+    </a>
+  </div>
 </div>
 
 <style src="./CodeMenu.scss"></style>
