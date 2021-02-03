@@ -2,7 +2,7 @@
   import createDebug from 'debug'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import { uniqueId } from 'lodash-es'
-  import { getContext } from 'svelte'
+  import { getContext, onDestroy, onMount } from 'svelte'
   import {
     SORT_MODAL_OPTIONS,
     TRANSFORM_MODAL_OPTIONS
@@ -10,17 +10,48 @@
   import SortModal from '../modals/SortModal.svelte'
   import TransformModal from '../modals/TransformModal.svelte'
   import CodeMenu from './CodeMenu.svelte'
+  import ace from './ace/index.js'
 
   export let readOnly = false
   export let mainMenuBar = true
   export let text = ''
-  export let indentation = 2 // FIXME: make indentation configurable
+  export let indentation = 2 // TODO: make indentation configurable
+  export let aceTheme = 'ace/theme/jsoneditor' // TODO: make aceTheme configurable
+  export let onChange = null
   export let onError = (err) => console.error(err) // FIXME: show error to the user
 
   const debug = createDebug('jsoneditor:CodeMode')
 
-  let canUndo = true // FIXME
-  let canRedo = true // FIXME
+  let aceEditorRef
+  let aceEditor
+  let aceEditorText
+
+  let onChangeDisabled = false
+
+  $: setAceEditorValue(text)
+
+  onMount(() => {
+    aceEditor = createAceEditor ({
+      target: aceEditorRef,
+      ace,
+      readOnly,
+      indentation,
+      onChange: onChangeAceEditorValue
+    })
+
+    // load initial text
+    setAceEditorValue(text)
+    aceEditor.session.getUndoManager().reset()
+  })
+
+  onDestroy(() => {
+    debug('Destroy Ace editor')
+    aceEditor.destroy()
+    aceEditor = null
+  })
+
+  let canUndo = false
+  let canRedo = false
 
   const { open } = getContext('simple-modal')
   const sortModalId = uniqueId()
@@ -113,11 +144,78 @@
   }
 
   function handleUndo () {
-    // FIXME: implement undo
+    aceEditor.getSession().getUndoManager().undo(false)
   }
 
   function handleRedo () {
-    // FIXME: implement redo
+    aceEditor.getSession().getUndoManager().redo(false)
+  }
+
+  function createAceEditor ({ target, ace, readOnly, indentation, onChange }) {
+    debug('create Ace editor')
+
+    const aceEditor = ace.edit(target)
+    const aceSession = aceEditor.getSession()
+    aceEditor.$blockScrolling = Infinity
+    aceEditor.setTheme(aceTheme)
+    aceEditor.setOptions({ readOnly })
+    aceEditor.setShowPrintMargin(false)
+    aceEditor.setFontSize('13px')
+    aceSession.setMode('ace/mode/json')
+    aceSession.setTabSize(indentation)
+    aceSession.setUseSoftTabs(true)
+    aceSession.setUseWrapMode(true)
+
+    // disable Ctrl+L quickkey of Ace (is used by the browser to select the address bar)
+    aceEditor.commands.bindKey('Ctrl-L', null)
+    aceEditor.commands.bindKey('Command-L', null)
+
+    // disable the quickkeys we want to use for Format and Compact
+    aceEditor.commands.bindKey('Ctrl-\\', null)
+    aceEditor.commands.bindKey('Command-\\', null)
+    aceEditor.commands.bindKey('Ctrl-Shift-\\', null)
+    aceEditor.commands.bindKey('Command-Shift-\\', null)
+
+    // register onchange event
+    aceEditor.on('change', onChange)
+
+    return aceEditor
+  }
+
+  function setAceEditorValue (text) {
+    onChangeDisabled = true
+    if (aceEditor && text !== aceEditorText) {
+      aceEditorText = text
+      aceEditor.setValue(text, -1)
+
+      setTimeout(() => updateCanUndoRedo())
+    }
+    onChangeDisabled = false
+  }
+
+  function onChangeAceEditorValue () {
+    if (onChangeDisabled) {
+      return
+    }
+
+
+    aceEditorText = aceEditor.getValue()
+    text = aceEditorText
+
+    setTimeout(() => updateCanUndoRedo())
+
+    if (onChange) {
+      onChange(text)
+    }
+  }
+
+  function updateCanUndoRedo () {
+    const undoManager = aceEditor.getSession().getUndoManager()
+
+    if (undoManager && undoManager.hasUndo && undoManager.hasRedo) {
+      canUndo = undoManager.hasUndo()
+      canRedo = undoManager.hasRedo()
+    }
   }
 </script>
 
@@ -135,7 +233,7 @@
       canRedo={canRedo}
     />
   {/if}
-  <textarea bind:value={text}></textarea>
+  <div class="contents" bind:this={aceEditorRef}></div>
 </div>
 
 <style src="./CodeMode.scss"></style>

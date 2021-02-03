@@ -59,7 +59,7 @@
 
 			<p>
 				<button on:click={() => text = '[1, 2, 3, 4]'}>
-					Set text
+					Update text
 				</button>
 			</p>
 
@@ -82,6 +82,7 @@
 
 	.columns {
 		display: flex;
+		gap: 20px;
 	}
 
 	.columns .left,

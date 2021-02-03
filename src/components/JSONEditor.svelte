@@ -262,6 +262,7 @@
         readOnly={readOnly}
         bind:text
         bind:mainMenuBar
+        onChange={handleChangeText}
       />
     {:else} <!-- mode === MODE.TREE -->
       {#key instanceId}
