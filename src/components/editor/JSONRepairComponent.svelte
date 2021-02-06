@@ -9,10 +9,10 @@
   import createDebug from 'debug'
   import { onDestroy, onMount } from 'svelte'
   import Icon from 'svelte-awesome'
-  import { MODE } from '../../constants.js'
   import { activeElementIsChildOf, getWindow } from '../../utils/domUtils.js'
   import { normalizeJsonParseError } from '../../utils/jsonUtils.js'
   import { createFocusTracker } from '../controls/createFocusTracker.js'
+  import Menu from '../controls/Menu.svelte'
 
   export let text = ''
   export let readOnly = false
@@ -51,7 +51,7 @@
 
   $: debug('error', error)
 
-  function getErrorMessage (jsonText) {
+  function getErrorMessage(jsonText) {
     try {
       onParse(jsonText)
       return null
@@ -60,7 +60,7 @@
     }
   }
 
-  function isRepairable (jsonText) {
+  function isRepairable(jsonText) {
     try {
       onRepair(jsonText)
       return true
@@ -69,7 +69,7 @@
     }
   }
 
-  function goToError () {
+  function goToError() {
     if (domTextArea && error && error.position != null) {
       domTextArea.setSelectionRange(error.position, error.position)
       setTimeout(() => {
@@ -78,7 +78,7 @@
     }
   }
 
-  function handleChange (event) {
+  function handleChange(event) {
     debug('handleChange')
 
     const value = event.target.value
@@ -94,11 +94,11 @@
     }
   }
 
-  function handleApply () {
+  function handleApply() {
     onApply(text)
   }
 
-  function handleRepair () {
+  function handleRepair() {
     try {
       // TODO: simpleJsonRepair should also partially apply fixes. Now it's all or nothing
       text = onRepair(text)
@@ -110,25 +110,30 @@
       // no need to do something with the error
     }
   }
+
+  $: items = [
+    {
+      space: true
+    },
+    {
+      icon: faTimes,
+      title: 'Cancel repair',
+      className: 'cancel',
+      onClick: onCancel
+    }
+  ]
 </script>
 
 <div
   class="json-repair"
   bind:this={domJsonRepair}
 >
-  <div class="menu">
-    <div class="info">
+  <Menu items={items}>
+    <div slot="left" class="info">
       Repair invalid JSON, then click apply
     </div>
-    <div class="space"></div>
-    <button
-      class="button"
-      title="Cancel repair"
-      on:click={onCancel}
-    >
-      <Icon data={faTimes} />
-    </button>
-  </div>
+  </Menu>
+
   {#if error}
     <div class="json-repair-error">
       <div class="message">

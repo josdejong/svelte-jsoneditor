@@ -146,11 +146,44 @@
  */
 
 /**
+ * @typedef {{
+ *   prefix: string,
+ *   iconName: string,
+ *   icon: Array
+ * }} FontAwesomeIcon
+ */
+
+/**
+ * @typedef {Object} MenuButtonItem
+ * @property {FontAwesomeIcon} icon
+ * @property {function} onClick
+ * @property {string} [title=undefined]
+ * @property {string} [className=undefined]
+ * @property {boolean} [disabled=false]
+ * @property {boolean} [disabled=false]
+ */
+
+/**
+ * @typedef {Object} MenuSeparatorItem
+ * @property {true} separator
+ */
+
+/**
+ * @typedef {Object} MenuSpaceItem
+ * @property {true} space
+ */
+
+/**
  * @typedef {Object} MenuDropdownItem
  * @property {string} text
  * @property {function} onClick
  * @property {string} [title=undefined]
  * @property {boolean} [default=false]
+ * @property {boolean} [disabled=false]
+ */
+
+/**
+ * @typedef {MenuButtonItem | MenuDropdownItem | MenuSeparatorItem | MenuSpaceItem} MenuItem
  */
 
 /**

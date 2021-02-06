@@ -5,11 +5,11 @@
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
-  import Icon from 'svelte-awesome'
   import {
     faJSONEditorCompact,
     faJSONEditorFormat
   } from '../../img/customFontawesomeIcons.js'
+  import Menu from '../controls/Menu.svelte'
 
   export let readOnly = false
   export let onFormat
@@ -20,68 +20,65 @@
   export let onRedo
   export let canUndo
   export let canRedo
+
+  /* @type {MenuItem[]} */
+  $: items = [
+    {
+      icon: faJSONEditorFormat,
+      title: 'Format JSON: add proper indentation and new lines (Ctrl+\\)',
+      className: 'format',
+      onClick: onFormat,
+      disabled: readOnly
+    },
+    {
+      icon: faJSONEditorCompact,
+      title: 'Compact JSON: remove all white spacing and new lines (Ctrl+Shift+\\)',
+      className: 'compact',
+      onClick: onCompact,
+      disabled: readOnly
+    },
+    {
+      separator: true
+    },
+    {
+      icon: faSortAmountDownAlt,
+      title: 'Sort',
+      className: 'sort',
+      onClick: onSort,
+      disabled: readOnly
+    },
+    {
+      icon: faFilter,
+      title: 'Transform contents (filter, sort, project)',
+      className: 'transform',
+      onClick: onTransform,
+      disabled: readOnly
+    },
+    {
+      separator: true
+    },
+    {
+      icon: faUndo,
+      title: 'Undo (Ctrl+Z)',
+      className: 'undo',
+      onClick: onUndo,
+      disabled: !canUndo
+    },
+    {
+      icon: faRedo,
+      title: 'Redo (Ctrl+Shift+Z)',
+      className: 'redo',
+      onClick: onRedo,
+      disabled: !canRedo
+    },
+    {
+      space: true
+    },
+  ]
 </script>
 
-<div class="menu">
-
-  <button
-    class="button format"
-    disabled={readOnly}
-    on:click={() => onFormat()}
-    title="Format JSON: add proper indentation and new lines (Ctrl+\)"
-  >
-    <Icon data={faJSONEditorFormat} />
-  </button>
-  <button
-    class="button compact"
-    disabled={readOnly}
-    on:click={() => onCompact()}
-    title="Compact JSON: remove all white spacing and new lines (Ctrl+Shift+\)"
-  >
-    <Icon data={faJSONEditorCompact} />
-  </button>
-
-  <div class="separator"></div>
-
-  <button
-    class="button sort"
-    disabled={readOnly}
-    on:click={() => onSort()}
-    title="Sort"
-  >
-    <Icon data={faSortAmountDownAlt} />
-  </button>
-  <button
-    class="button transform"
-    disabled={readOnly}
-    on:click={() => onTransform()}
-    title="Transform contents (filter, sort, project)"
-  >
-    <Icon data={faFilter} />
-  </button>
-
-  <div class="separator"></div>
-
-  <button
-    class="button undo"
-    disabled={!canUndo}
-    on:click={() => onUndo()}
-    title="Undo (Ctrl+Z)"
-  >
-    <Icon data={faUndo} />
-  </button>
-  <button
-    class="button redo"
-    disabled={!canRedo}
-    on:click={() => onRedo()}
-    title="Redo (Ctrl+Shift+Z)"
-  >
-    <Icon data={faRedo} />
-  </button>
-
-  <div class="empty-space"></div>
-
-  <div class="powered-by">
+<Menu items={items}>
+  <div slot="right" class="powered-by">
     <a
       href="https://ace.c9.io/"
       target="_blank"
@@ -91,6 +88,6 @@
       powered by ace
     </a>
   </div>
-</div>
+</Menu>
 
 <style src="./CodeMenu.scss"></style>

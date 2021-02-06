@@ -73,7 +73,7 @@
   import SortModal from '../modals/SortModal.svelte'
   import TransformModal from '../modals/TransformModal.svelte'
   import JSONNode from './JSONNode.svelte'
-  import Menu from './Menu.svelte'
+  import Menu from './TreeMenu.svelte'
   import Welcome from './Welcome.svelte'
 
   const debug = createDebug('jsoneditor:TreeMode')
@@ -1010,6 +1010,8 @@
       onSearchText={handleSearchText}
       onNextSearchResult={handleNextSearchResult}
       onPreviousSearchResult={handlePreviousSearchResult}
+
+      onFocus={focus}
     />
   {/if}
   <label class="hidden-input-label">

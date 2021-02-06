@@ -1,22 +1,15 @@
-// FIXME: create shared file for menu styling
-@import '../editor/menu.scss';
+@import '../../styles.scss';
 
-.menu {
-  .empty-space {
-    flex: 1;
-  }
+.powered-by {
+  font-size: 8pt;
+  padding: 0 10px 3px;
 
-  .powered-by {
-    font-size: 8pt;
-    padding: 0 10px 3px;
+  a {
+    color: $white;
+    opacity: 0.7;
 
-    a {
-      color: $white;
-      opacity: 0.7;
-
-      &:hover {
-        opacity: 1;
-      }
+    &:hover {
+      opacity: 1;
     }
   }
 }
