@@ -19,6 +19,10 @@
 	let showTreeEditor = true
 	let showCodeEditor = true
 	let indentation = 2
+
+	function onCreateMenu(mode, items) {
+		console.log('onCreateMenu', mode, items)
+	}
 </script>
 
 <main>
@@ -40,6 +44,7 @@
 					<JSONEditor
 						bind:json
 						indentation={indentation}
+						onCreateMenu={onCreateMenu}
 					/>
 				{/if}
 			</div>
@@ -61,8 +66,9 @@
 				{#if showCodeEditor}
 					<JSONEditor
 						mode="code"
-						indentation={indentation}
 						bind:text
+						indentation={indentation}
+						onCreateMenu={onCreateMenu}
 					/>
 				{/if}
 			</div>

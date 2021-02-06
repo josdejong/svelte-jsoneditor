@@ -157,6 +157,7 @@
  * @typedef {Object} MenuButtonItem
  * @property {FontAwesomeIcon} icon
  * @property {function} onClick
+ * @property {string} [text=undefined]
  * @property {string} [title=undefined]
  * @property {string} [className=undefined]
  * @property {boolean} [disabled=false]

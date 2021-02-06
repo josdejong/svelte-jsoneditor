@@ -34,7 +34,12 @@
         title={item.title}
         disabled={item.disabled || false}
       >
-        <Icon data={item.icon} />
+        {#if item.icon}
+          <Icon data={item.icon} />
+        {/if}
+        {#if item.text}
+          {item.text}
+        {/if}
       </button>
     {/if}
   {/each}

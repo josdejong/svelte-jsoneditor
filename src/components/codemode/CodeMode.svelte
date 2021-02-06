@@ -21,6 +21,7 @@
   export let onChange = null
   export let onFocus = () => {}
   export let onBlur = () => {}
+  export let onCreateMenu = () => {}
   export let onError = (err) => console.error(err) // FIXME: show error to the user
 
   const debug = createDebug('jsoneditor:CodeMode')
@@ -259,6 +260,7 @@
       onRedo={handleRedo}
       canUndo={canUndo}
       canRedo={canRedo}
+      onCreateMenu={onCreateMenu}
     />
   {/if}
   <div class="contents" bind:this={aceEditorRef}></div>

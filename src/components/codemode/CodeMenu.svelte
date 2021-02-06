@@ -20,9 +20,10 @@
   export let onRedo
   export let canUndo
   export let canRedo
+  export let onCreateMenu = () => {}
 
   /* @type {MenuItem[]} */
-  $: items = [
+  $: defaultItems = [
     {
       icon: faJSONEditorFormat,
       title: 'Format JSON: add proper indentation and new lines (Ctrl+\\)',
@@ -75,6 +76,8 @@
       space: true
     },
   ]
+
+  $: items = onCreateMenu('code', defaultItems) || defaultItems
 </script>
 
 <Menu items={items}>

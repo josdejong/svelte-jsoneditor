@@ -26,6 +26,7 @@
   export let validator = null
   export let onChange = null
   export let onClassName = () => {}
+  export let onCreateMenu = () => {}
   export let onFocus = () => {}
   export let onBlur = () => {}
 
@@ -297,6 +298,7 @@
         onChange={handleChangeText}
         onFocus={handleFocus}
         onBlur={handleBlur}
+        onCreateMenu={onCreateMenu}
       />
     {:else} <!-- mode === MODE.TREE -->
       {#key instanceId}
@@ -308,7 +310,8 @@
           bind:mainMenuBar
           bind:validator
           onChangeJson={handleChangeJson}
-          bind:onClassName
+          onClassName={onClassName}
+          onCreateMenu={onCreateMenu}
           onFocus={handleFocus}
           onBlur={handleBlur}
           visible={!repairing}
@@ -324,6 +327,7 @@
             onCancel={handleCancelRepair}
             onFocus={handleFocus}
             onBlur={handleBlur}
+            onCreateMenu={onCreateMenu}
           />
         {/if}
       {/key}

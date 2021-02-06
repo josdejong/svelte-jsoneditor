@@ -73,7 +73,7 @@
   import SortModal from '../modals/SortModal.svelte'
   import TransformModal from '../modals/TransformModal.svelte'
   import JSONNode from './JSONNode.svelte'
-  import Menu from './TreeMenu.svelte'
+  import TreeMenu from './TreeMenu.svelte'
   import Welcome from './Welcome.svelte'
 
   const debug = createDebug('jsoneditor:TreeMode')
@@ -95,6 +95,7 @@
   export let visible = true
   export let indentation = 2
   export let onChangeJson = () => {}
+  export let onCreateMenu = () => {}
 
   function noop () {}
 
@@ -368,7 +369,10 @@
       text,
       onParse: parsePartialJson,
       onRepair: repairPartialJson,
-      onApply
+      onApply,
+      onCreateMenu,
+      onFocus,
+      onBlur
     }, {
       ...SIMPLE_MODAL_OPTIONS,
       styleWindow: {
@@ -984,7 +988,7 @@
   bind:this={domJsonEditor}
 >
   {#if mainMenuBar}
-    <Menu
+    <TreeMenu
       readOnly={readOnly}
       historyState={historyState}
       searchText={searchText}
@@ -1012,6 +1016,7 @@
       onPreviousSearchResult={handlePreviousSearchResult}
 
       onFocus={focus}
+      onCreateMenu={onCreateMenu}
     />
   {/if}
   <label class="hidden-input-label">

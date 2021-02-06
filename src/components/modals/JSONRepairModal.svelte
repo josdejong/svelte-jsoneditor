@@ -8,6 +8,9 @@
   export let onParse
   export let onRepair
   export let onApply
+  export let onFocus
+  export let onBlur
+  export let onCreateMenu
 
   const { close } = getContext('simple-modal')
 
@@ -27,4 +30,7 @@
   onRepair={onRepair}
   onApply={handleApply}
   onCancel={handleCancel}
+  onFocus={onFocus}
+  onBlur={onBlur}
+  onCreateMenu={onCreateMenu}
 />

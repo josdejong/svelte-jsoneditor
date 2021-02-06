@@ -23,6 +23,7 @@
   export let onCancel
   export let onFocus
   export let onBlur
+  export let onCreateMenu = () => {}
 
   const debug = createDebug('jsoneditor:JSONRepair')
 
@@ -111,7 +112,7 @@
     }
   }
 
-  $: items = [
+  $: defaultItems = [
     {
       space: true
     },
@@ -122,6 +123,8 @@
       onClick: onCancel
     }
   ]
+
+  $: items = onCreateMenu('repair', defaultItems) || defaultItems
 </script>
 
 <div

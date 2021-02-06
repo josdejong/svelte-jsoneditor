@@ -182,6 +182,10 @@ const editor = new JSONEditor({
   Callback which is invoked on every change made in the JSON document.
 - `onClassName(path: Array.<string|number>, value: any): string | undefined`. 
   Add a custom class name to specific nodes, based on their path and/or value.
+- `onCreateMenu(mode: string, items: Array) : Array | undefined`.
+  Callback which can be used to make changes to the menu items. New items can
+  be added, or existing items can be removed or reorganized. When the function 
+  returns `undefined`, the original `items` will be applied.
 - `onFocus()` callback fired when the editor got focus.
 - `onBlur()` callback fired when the editor lost focus.
 

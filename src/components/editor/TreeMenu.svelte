@@ -55,6 +55,7 @@
   export let onPreviousSearchResult
 
   export let onFocus
+  export let onCreateMenu = () => {}
 
   $: hasSelection = selection != null
   $: hasSelectionContents = selection != null && (
@@ -98,7 +99,7 @@
   }
 
   /* @type {MenuItem[]} */
-  $: items = [
+  $: defaultItems = [
     {
       icon: faJSONEditorExpand,
       title: 'Expand all',
@@ -241,11 +242,11 @@
       space: true
     },
   ]
+
+  $: items = onCreateMenu('tree', defaultItems) || defaultItems
 </script>
 
-<Menu
-  items={items}
->
+<Menu items={items}>
   <div slot="right" class="search-box-container">
     {#if showSearch}
       <SearchBox
