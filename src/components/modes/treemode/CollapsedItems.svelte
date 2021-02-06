@@ -1,8 +1,8 @@
 <script>
   import {
     INDENTATION_WIDTH
-  } from '../../constants.js'
-  import { getExpandItemsSections } from '../../logic/expandItemsSections.js'
+  } from '../../../constants.js'
+  import { getExpandItemsSections } from '../../../logic/expandItemsSections.js'
 
   export let visibleSections
   export let sectionIndex
@@ -33,8 +33,8 @@
   }
 </script>
 
-<div 
-  class="collapsed-items" 
+<div
+  class="collapsed-items"
   on:mousemove={handleMouseMove}
   style={getIndentationStyle(path.length + 2)}
 >

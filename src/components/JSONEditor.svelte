@@ -4,14 +4,14 @@
 />
 
 <script>
-  import CodeMode from './codemode/CodeMode.svelte'
   import createDebug from 'debug'
   import jsonrepair from 'jsonrepair'
   import Modal from 'svelte-simple-modal'
   import { MODE } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
-  import JSONEditorComponent from './editor/JSONEditorComponent.svelte'
-  import JSONRepairComponent from './editor/JSONRepairComponent.svelte'
+  import CodeMode from './modes/codemode/CodeMode.svelte'
+  import RepairMode from './modes/repairmode/RepairMode.svelte'
+  import TreeMode from './modes/treemode/TreeMode.svelte'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
@@ -302,7 +302,7 @@
       />
     {:else} <!-- mode === MODE.TREE -->
       {#key instanceId}
-        <JSONEditorComponent
+        <TreeMode
           bind:this={refTreeMode}
           readOnly={readOnly}
           indentation={indentation}
@@ -317,7 +317,7 @@
           visible={!repairing}
         />
         {#if repairing}
-          <JSONRepairComponent
+          <RepairMode
             bind:text={text}
             readOnly={readOnly}
             onParse={JSON.parse}

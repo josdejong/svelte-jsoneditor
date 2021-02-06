@@ -6,11 +6,11 @@
   import {
     SORT_MODAL_OPTIONS,
     TRANSFORM_MODAL_OPTIONS
-  } from '../../constants.js'
-  import { keyComboFromEvent } from '../../utils/keyBindings.js'
-  import SortModal from '../modals/SortModal.svelte'
-  import TransformModal from '../modals/TransformModal.svelte'
-  import CodeMenu from './CodeMenu.svelte'
+  } from '../../../constants.js'
+  import { keyComboFromEvent } from '../../../utils/keyBindings.js'
+  import SortModal from '../../modals/SortModal.svelte'
+  import TransformModal from '../../modals/TransformModal.svelte'
+  import CodeMenu from './menu/CodeMenu.svelte'
   import ace from './ace/index.js'
 
   export let readOnly = false

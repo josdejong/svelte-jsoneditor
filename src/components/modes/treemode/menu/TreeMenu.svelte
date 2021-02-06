@@ -17,14 +17,14 @@
   } from '@fortawesome/free-solid-svg-icons'
   import { isEmpty } from 'lodash-es'
   import { getContext } from 'svelte'
-  import { SIMPLE_MODAL_OPTIONS } from '../../constants.js'
+  import { SIMPLE_MODAL_OPTIONS } from '../../../../constants.js'
   import {
     faJSONEditorCollapse,
     faJSONEditorExpand
-  } from '../../img/customFontawesomeIcons.js'
-  import { SELECTION_TYPE } from '../../logic/selection.js'
-  import Menu from '../controls/Menu.svelte'
-  import CopyPasteModal from '../modals/CopyPasteModal.svelte'
+  } from '../../../../img/customFontawesomeIcons.js'
+  import { SELECTION_TYPE } from '../../../../logic/selection.js'
+  import Menu from '../../../controls/Menu.svelte'
+  import CopyPasteModal from '../../../modals/CopyPasteModal.svelte'
   import SearchBox from './SearchBox.svelte'
 
   const {open} = getContext('simple-modal')

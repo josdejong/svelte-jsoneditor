@@ -3,15 +3,15 @@
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isEqual } from 'lodash-es'
   import { onDestroy } from 'svelte'
-  import { ACTIVE_SEARCH_RESULT, STATE_SEARCH_VALUE } from '../../constants.js'
-  import { SELECTION_TYPE } from '../../logic/selection.js'
+  import { ACTIVE_SEARCH_RESULT, STATE_SEARCH_VALUE } from '../../../constants.js'
+  import { SELECTION_TYPE } from '../../../logic/selection.js'
   import {
     getPlainText,
     setCursorToEnd,
     setPlainText
-  } from '../../utils/domUtils.js'
-  import { keyComboFromEvent } from '../../utils/keyBindings.js'
-  import { isUrl, stringConvert, valueType } from '../../utils/typeUtils.js'
+  } from '../../../utils/domUtils.js'
+  import { keyComboFromEvent } from '../../../utils/keyBindings.js'
+  import { isUrl, stringConvert, valueType } from '../../../utils/typeUtils.js'
 
   export let path
   export let value

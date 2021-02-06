@@ -1,5 +1,5 @@
 @import '../styles';
-@import '../components/editor/json-node-selected-mixin.scss';
+@import 'modes/treemode/json-node-selected-mixin.scss';
 
 .jsoneditor-main {
   width: 100%;

@@ -1,0 +1,14 @@
+@import '../../../styles';
+
+.code-mode {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+
+  .contents {
+    width: 100%;
+    height: 100%;
+  }
+}

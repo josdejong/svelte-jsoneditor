@@ -5,14 +5,14 @@
   import {
     ACTIVE_SEARCH_RESULT,
     STATE_SEARCH_PROPERTY
-  } from '../../constants.js'
-  import { SELECTION_TYPE } from '../../logic/selection.js'
+  } from '../../../constants.js'
+  import { SELECTION_TYPE } from '../../../logic/selection.js'
   import {
     getPlainText,
     setCursorToEnd,
     setPlainText
-  } from '../../utils/domUtils.js'
-  import { keyComboFromEvent } from '../../utils/keyBindings.js'
+  } from '../../../utils/domUtils.js'
+  import { keyComboFromEvent } from '../../../utils/keyBindings.js'
 
   export let path
   export let key

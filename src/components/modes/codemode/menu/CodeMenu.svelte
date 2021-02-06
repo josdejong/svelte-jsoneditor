@@ -8,8 +8,8 @@
   import {
     faJSONEditorCompact,
     faJSONEditorFormat
-  } from '../../img/customFontawesomeIcons.js'
-  import Menu from '../controls/Menu.svelte'
+  } from '../../../../img/customFontawesomeIcons.js'
+  import Menu from '../../../controls/Menu.svelte'
 
   export let readOnly = false
   export let onFormat

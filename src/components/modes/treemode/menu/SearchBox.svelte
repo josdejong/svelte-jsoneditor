@@ -4,8 +4,8 @@
   import { debounce } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import { faCircleNotch, faSearch, faChevronDown, faChevronUp, faTimes } from '@fortawesome/free-solid-svg-icons'
-  import { DEBOUNCE_DELAY, MAX_SEARCH_RESULTS } from '../../constants.js'
-  import { keyComboFromEvent } from '../../utils/keyBindings.js'
+  import { DEBOUNCE_DELAY, MAX_SEARCH_RESULTS } from '../../../../constants.js'
+  import { keyComboFromEvent } from '../../../../utils/keyBindings.js'
 
   export let text = ''
   export let searching

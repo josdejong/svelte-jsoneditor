@@ -19,17 +19,17 @@
     STATE_KEYS,
     STATE_VISIBLE_SECTIONS,
     VALIDATION_ERROR
-  } from '../../constants.js'
-  import { getVisibleCaretPositions } from '../../logic/documentState.js'
-  import { rename } from '../../logic/operations.js'
-  import { SELECTION_TYPE } from '../../logic/selection.js'
+  } from '../../../constants.js'
+  import { getVisibleCaretPositions } from '../../../logic/documentState.js'
+  import { rename } from '../../../logic/operations.js'
+  import { SELECTION_TYPE } from '../../../logic/selection.js'
   import {
     getSelectionTypeFromTarget,
     isChildOfAttribute,
     isChildOfNodeName,
     isContentEditableDiv
-  } from '../../utils/domUtils.js'
-  import { valueType } from '../../utils/typeUtils.js'
+  } from '../../../utils/domUtils.js'
+  import { valueType } from '../../../utils/typeUtils.js'
   import CollapsedItems from './CollapsedItems.svelte'
   import JSONKey from './JSONKey.svelte'
   import JSONValue from './JSONValue.svelte'

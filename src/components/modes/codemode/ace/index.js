@@ -6,7 +6,7 @@ import './theme-jsoneditor'
 
 // embed Ace json worker
 // https://github.com/ajaxorg/ace/issues/3913
-import jsonWorkerDataUrl from '../../../generated/worker-json-data-url.js'
+import jsonWorkerDataUrl from '../../../../generated/worker-json-data-url.js'
 
 ace.config.setModuleUrl('ace/mode/json_worker', jsonWorkerDataUrl)
 
