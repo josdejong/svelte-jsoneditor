@@ -10,7 +10,7 @@
   export let onApply
   export let onFocus
   export let onBlur
-  export let onCreateMenu
+  export let onRenderMenu
 
   const { close } = getContext('simple-modal')
 
@@ -32,5 +32,5 @@
   onCancel={handleCancel}
   onFocus={onFocus}
   onBlur={onBlur}
-  onCreateMenu={onCreateMenu}
+  onRenderMenu={onRenderMenu}
 />

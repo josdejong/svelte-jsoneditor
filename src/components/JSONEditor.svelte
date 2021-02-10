@@ -4,19 +4,18 @@
 />
 
 <script>
+  import { faCode } from '@fortawesome/free-solid-svg-icons'
   import createDebug from 'debug'
-  import jsonrepair from 'jsonrepair'
   import Modal from 'svelte-simple-modal'
   import { MODE } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
   import CodeMode from './modes/codemode/CodeMode.svelte'
-  import RepairMode from './modes/repairmode/RepairMode.svelte'
   import TreeMode from './modes/treemode/TreeMode.svelte'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
 
-  export let json = ''
+  export let json = undefined
   // eslint-disable-next-line no-undef-init
   export let text = undefined
   export let readOnly = false
@@ -26,23 +25,30 @@
   export let validator = null
   export let onChange = null
   export let onClassName = () => {}
-  export let onCreateMenu = () => {}
+  export let onRenderMenu = () => {}
+  export let onChangeMode = () => {}
+  export let onError = (err) => {
+    console.error(err)
+    alert(err.toString()) // TODO: create a nice alert modal
+  }
   export let onFocus = () => {}
   export let onBlur = () => {}
 
   let instanceId = uniqueId()
-  let createInstanceOnRepair = false
 
   let hasFocus = false
-  let repairing = (text !== undefined)
 
   let refTreeMode
   let refCodeMode
 
+  $: textForCodeMode = (mode === MODE.CODE)
+    ? getText(json, text)
+    : undefined
+
   export function get() {
-    return (typeof text === 'string')
-      ? JSON.parse(text)
-      : json
+    return json !== undefined
+      ? json
+      : JSON.parse(text || '')
   }
 
   export function getText() {
@@ -59,35 +65,16 @@
 
     text = undefined
     json = newJson
-    repairing = false
   }
 
-  export function setText(newNext) {
+  export function setText(newText) {
     debug('setText')
 
-    if (text === newNext) {
-      // do NOT apply the text again when there are no changes,
-      // this would switch the editor from repair mode to non-repair mode
-      // as soon as the text has become valid json
-      return
-    }
+    // new editor id -> will re-create the editor
+    instanceId = uniqueId()
 
-    try {
-      const newJson = JSON.parse(newNext)
-
-      debug('set text parsing successful')
-
-      set(newJson)
-    } catch (err) {
-      // will open JSONRepair window
-
-      // Important: do NOT update json here!
-      // when cancelling repair, we want to get back the old json
-      text = newNext
-      repairing = newNext !== undefined
-      createInstanceOnRepair = true
-      debug('set text parsing failed, could not auto repair')
-    }
+    text = newText
+    json = undefined
   }
 
   export function update(updatedJson) {
@@ -95,42 +82,23 @@
 
     text = undefined
     json = updatedJson
-    repairing = false
   }
 
   export function updateText(updatedText) {
     debug('updateText')
 
-    if (text === updatedText) {
-      // do NOT apply the text again when there are no changes,
-      // this would switch the editor from repair mode to non-repair mode
-      // as soon as the text has become valid json
-      return
-    }
-
-    try {
-      const updatedJson = JSON.parse(updatedText)
-
-      debug('update text parsing successful')
-
-      update(updatedJson)
-    } catch (err) {
-      // will open JSONRepair window
-
-      // Important: do NOT update json or createInstanceOnRepair here!
-      // when cancelling repair, we want to get back the old json,
-      // and when this update was called after a set, we should not change
-      // createInstanceOnRepair back to false here
-      text = updatedText
-      repairing = true
-
-      debug('update text parsing failed, could not auto repair')
-    }
+    text = updatedText
+    json = undefined
   }
 
   export function patch(operations, newSelection) {
-    if (repairing) {
-      throw new Error('Cannot apply patch whilst repairing invalid JSON')
+    if (json === undefined) {
+      try {
+        json = JSON.parse(text)
+        text = undefined
+      } catch (err) {
+        throw new Error('Cannot apply patch: current document contains invalid JSON')
+      }
     }
 
     if (refTreeMode) {
@@ -214,61 +182,32 @@
     this.$destroy()
   }
 
-  function handleApplyRepair(repairedText) {
-    debug('handleApplyRepair')
-
-    const repairedJson = JSON.parse(repairedText)
-
-    repairing = false
-
-    if (createInstanceOnRepair) {
-      createInstanceOnRepair = false
-      set({
-        json: repairedJson,
-        text: undefined
-      })
-    } else {
-      update({
-        json: repairedJson,
-        text: undefined
-      })
-    }
-
-    handleChangeJson(repairedJson)
-  }
-
-  function handleCancelRepair() {
-    repairing = false
-    createInstanceOnRepair = false
-    text = undefined
-    if (json === undefined) {
-      json = ''
-    }
-
-    setTimeout(focus)
-  }
-
   function handleChangeText(updatedText) {
     text = updatedText
+    json = undefined
 
     if (onChange) {
       onChange({
-        json: undefined,
-        text: updatedText
+        json,
+        text
       })
     }
   }
 
   function handleChangeJson(updatedJson) {
-    repairing = false
+    json = updatedJson
     text = undefined
 
     if (onChange) {
       onChange({
-        json: updatedJson,
-        text: undefined
+        json,
+        text
       })
     }
+  }
+
+  function handleRequestRepair () {
+    mode = MODE.CODE
   }
 
   function handleFocus() {
@@ -284,54 +223,74 @@
       onBlur()
     }
   }
+
+  function toggleCodeMode() {
+    mode = (mode === MODE.CODE)
+      ? MODE.TREE
+      : MODE.CODE
+
+    onChangeMode(mode)
+    setTimeout(focus)
+  }
+
+  $: isCodeMode = mode === MODE.CODE
+  $: modeMenuItems = [
+    {
+      icon: faCode,
+      title: `Toggle code mode on/off (currently: ${isCodeMode ? 'on' : 'off'})`,
+      className: 'code-mode' + (isCodeMode ? ' selected' : ''),
+      onClick: toggleCodeMode
+    },
+    {
+      separator: true
+    },
+  ]
+
+  function handleCreateMenu(mode, items) {
+    const updatedItems = (mode === MODE.TREE || mode === MODE.CODE)
+      ? modeMenuItems.concat(items)
+      : items
+
+    return onRenderMenu(mode, updatedItems) || updatedItems
+  }
 </script>
 
 <Modal>
   <div class="jsoneditor-main" class:focus={hasFocus}>
-    {#if mode === MODE.CODE}
-      <CodeMode
-        bind:this={refCodeMode}
-        text={typeof text === 'string' ? text : JSON.stringify(json, null, indentation)}
-        readOnly={readOnly}
-        indentation={indentation}
-        mainMenuBar={mainMenuBar}
-        onChange={handleChangeText}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        onCreateMenu={onCreateMenu}
-      />
-    {:else} <!-- mode === MODE.TREE -->
-      {#key instanceId}
+    {#key instanceId}
+      {#if mode === MODE.CODE}
+        <CodeMode
+          bind:this={refCodeMode}
+          text={textForCodeMode}
+          readOnly={readOnly}
+          indentation={indentation}
+          mainMenuBar={mainMenuBar}
+          onChange={handleChangeText}
+          onError={onError}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onRenderMenu={handleCreateMenu}
+        />
+      {:else} <!-- mode === MODE.TREE -->
         <TreeMode
           bind:this={refTreeMode}
           readOnly={readOnly}
           indentation={indentation}
-          bind:externalJson={json}
-          bind:mainMenuBar
-          bind:validator
-          onChangeJson={handleChangeJson}
+          externalJson={json}
+          externalText={text}
+          mainMenuBar={mainMenuBar}
+          validator={validator}
+          onError={onError}
+          onChange={handleChangeJson}
+          onRequestRepair={handleRequestRepair}
           onClassName={onClassName}
-          onCreateMenu={onCreateMenu}
+          onRenderMenu={handleCreateMenu}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          visible={!repairing}
+          visible={true}
         />
-        {#if repairing}
-          <RepairMode
-            bind:text={text}
-            readOnly={readOnly}
-            onParse={JSON.parse}
-            onRepair={jsonrepair}
-            onChange={handleChangeText}
-            onApply={handleApplyRepair}
-            onCancel={handleCancelRepair}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onCreateMenu={onCreateMenu}
-          />
-        {/if}
-      {/key}
-    {/if}
+      {/if}
+    {/key}
   </div>
 </Modal>
 

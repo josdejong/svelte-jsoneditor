@@ -20,7 +20,7 @@
   export let onRedo
   export let canUndo
   export let canRedo
-  export let onCreateMenu = () => {}
+  export let onRenderMenu = () => {}
 
   /* @type {MenuItem[]} */
   $: defaultItems = [
@@ -77,7 +77,7 @@
     },
   ]
 
-  $: items = onCreateMenu('code', defaultItems) || defaultItems
+  $: items = onRenderMenu('code', defaultItems) || defaultItems
 </script>
 
 <Menu items={items}>

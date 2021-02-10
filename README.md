@@ -178,11 +178,13 @@ const editor = new JSONEditor({
   
   const validator = createAjvValidator(schema, schemaRefs)
   ```
+- `onError(err: Error)`.
+  Callback fired when an error occurs. Default implementation is to log an error in the console and show a simple alert message to the user.
 - `onChange({ json: JSON | undefined, text: string | undefined})`.
   Callback which is invoked on every change made in the JSON document.
 - `onClassName(path: Array.<string|number>, value: any): string | undefined`. 
   Add a custom class name to specific nodes, based on their path and/or value.
-- `onCreateMenu(mode: string, items: Array) : Array | undefined`.
+- `onRenderMenu(mode: string, items: Array) : Array | undefined`.
   Callback which can be used to make changes to the menu items. New items can
   be added, or existing items can be removed or reorganized. When the function 
   returns `undefined`, the original `items` will be applied.

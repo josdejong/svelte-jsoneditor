@@ -12,16 +12,22 @@
 		'string': 'Hello World'
 	}
 
-	let text = JSON.stringify({
-		greeting: 'hello world'
-	}, null, 2)
+	let text = undefined
 
 	let showTreeEditor = true
-	let showCodeEditor = true
+	let showCodeEditor = false
 	let indentation = 2
 
-	function onCreateMenu(mode, items) {
-		console.log('onCreateMenu', mode, items)
+	function onRenderMenu(mode, items) {
+		console.log('onRenderMenu', mode, items)
+	}
+
+	function onChange({ json, text }) {
+		console.log('onChange', { json, text })
+	}
+
+	function onChangeMode(mode) {
+		console.log('onChangeMode', mode)
 	}
 </script>
 
@@ -31,6 +37,20 @@
 		<label>
 			Indentation: <input type="number" bind:value={indentation} />
 		</label>
+	</p>
+	<p>
+		<button on:click={() => {
+					text = undefined
+					json = [1, 2, 3, 4, 5]
+				}}>
+			Update json
+		</button>
+		<button on:click={() => {
+					text = '[1, 2, 3, 4]'
+					json = undefined
+				}}>
+			Update text
+		</button>
 	</p>
 	<div class="columns">
 		<div class="left">
@@ -42,18 +62,24 @@
 			<div class="editor">
 				{#if showTreeEditor}
 					<JSONEditor
+						bind:text
 						bind:json
 						indentation={indentation}
-						onCreateMenu={onCreateMenu}
+						onRenderMenu={onRenderMenu}
+						onChange={onChange}
+						onChangeMode={onChangeMode}
 					/>
 				{/if}
 			</div>
 
-			<pre>
-				<code>
-				{JSON.stringify(json, null, 2)}
-				</code>
-			</pre>
+			<div class="data">
+				json contents:
+				<pre>
+					<code>
+					{json !== undefined ? JSON.stringify(json, null, 2) : 'undefined'}
+					</code>
+				</pre>
+			</div>
 		</div>
 		<div class="right">
 			<p>
@@ -67,23 +93,22 @@
 					<JSONEditor
 						mode="code"
 						bind:text
+						bind:json
 						indentation={indentation}
-						onCreateMenu={onCreateMenu}
+						onRenderMenu={onRenderMenu}
+						onChange={onChange}
+						onChangeMode={onChangeMode}
 					/>
 				{/if}
 			</div>
-
-			<p>
-				<button on:click={() => text = '[1, 2, 3, 4]'}>
-					Update text
-				</button>
-			</p>
-
-			<pre>
-				<code>
-				{text}
-				</code>
-			</pre>
+			<div class="data">
+				text contents:
+				<pre>
+					<code>
+					{text}
+					</code>
+				</pre>
+			</div>
 		</div>
 	</div>
 </main>
@@ -107,12 +132,20 @@
 	}
 
 	.editor {
-		max-width: 600px;
+		/*max-width: 600px;*/
 		height: 400px;
 	}
 
 	.code-editor {
-		max-width: 600px;
+		/*max-width: 600px;*/
 		height: 400px;
+	}
+
+	.data {
+		margin-top: 10px;
+	}
+
+	pre {
+		background: #f5f5f5;
 	}
 </style>

@@ -19,10 +19,10 @@
   export let indentation = 2 // TODO: make indentation configurable
   export let aceTheme = 'ace/theme/jsoneditor' // TODO: make aceTheme configurable
   export let onChange = null
+  export let onError
   export let onFocus = () => {}
   export let onBlur = () => {}
-  export let onCreateMenu = () => {}
-  export let onError = (err) => console.error(err) // FIXME: show error to the user
+  export let onRenderMenu = () => {}
 
   const debug = createDebug('jsoneditor:CodeMode')
 
@@ -71,10 +71,15 @@
   export function patch (operations) {
     debug('patch', operations)
 
+    const oldText = text
     const json = JSON.parse(text)
     const updatedJson = immutableJSONPatch(json, operations)
     const undo = revertJSONPatch(json, operations)
     text = JSON.stringify(updatedJson, null, indentation)
+
+    if (text !== oldText) {
+      emitOnChange()
+    }
 
     return {
       json,
@@ -86,20 +91,30 @@
   function handleFormat () {
     debug('format')
     try {
+      const oldText = text
       const json = JSON.parse(text)
       text = JSON.stringify(json, null, indentation)
+
+      if (text !== oldText) {
+        emitOnChange()
+      }
     } catch (err) {
-      onError()
+      onError(err)
     }
   }
 
   function handleCompact () {
     debug('compact')
     try {
+      const oldText = text
       const json = JSON.parse(text)
       text = JSON.stringify(json)
+
+      if (text !== oldText) {
+        emitOnChange()
+      }
     } catch (err) {
-      onError()
+      onError(err)
     }
   }
 
@@ -224,14 +239,14 @@
       return
     }
 
-
     aceEditorText = aceEditor.getValue()
-    text = aceEditorText
 
-    setTimeout(() => updateCanUndoRedo())
+    if (text !== aceEditorText) {
+      text = aceEditorText
 
-    if (onChange) {
-      onChange(text)
+      setTimeout(() => updateCanUndoRedo())
+
+      emitOnChange()
     }
   }
 
@@ -241,6 +256,12 @@
     if (undoManager && undoManager.hasUndo && undoManager.hasRedo) {
       canUndo = undoManager.hasUndo()
       canRedo = undoManager.hasRedo()
+    }
+  }
+
+  function emitOnChange () {
+    if (onChange) {
+      onChange(text)
     }
   }
 </script>
@@ -260,7 +281,7 @@
       onRedo={handleRedo}
       canUndo={canUndo}
       canRedo={canRedo}
-      onCreateMenu={onCreateMenu}
+      onRenderMenu={onRenderMenu}
     />
   {/if}
   <div class="contents" bind:this={aceEditorRef}></div>

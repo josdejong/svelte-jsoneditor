@@ -55,7 +55,7 @@
   export let onPreviousSearchResult
 
   export let onFocus
-  export let onCreateMenu = () => {}
+  export let onRenderMenu = () => {}
 
   $: hasSelection = selection != null
   $: hasSelectionContents = selection != null && (
@@ -243,7 +243,7 @@
     },
   ]
 
-  $: items = onCreateMenu('tree', defaultItems) || defaultItems
+  $: items = onRenderMenu('tree', defaultItems) || defaultItems
 </script>
 
 <Menu items={items}>

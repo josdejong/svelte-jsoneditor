@@ -1,0 +1,43 @@
+@import '../../styles.scss';
+
+.message {
+  font-family: $font-family-mono;
+  font-size: $font-size-mono;
+
+  padding: $padding;
+  display: flex;
+  gap: $padding;
+  flex-wrap: wrap;
+  align-items: center;
+
+  &.success {
+    background: $green;
+    color: $white;
+  }
+
+  .text {
+    flex: 1;
+    min-width: 60%;
+  }
+
+  &.error {
+    background: $red;
+    color: $white;
+  }
+
+  .actions {
+    display: flex;
+    gap: $padding;
+
+    button.action {
+      background: rgba(255, 255, 255, 0.2);
+      color: $white;
+
+      padding: $padding/2 $padding;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
+}

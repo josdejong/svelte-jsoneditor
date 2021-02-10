@@ -1,6 +1,7 @@
 <svelte:options immutable={true} />
 
 <script>
+  import { faCheck, faCode } from '@fortawesome/free-solid-svg-icons'
   import createDebug from 'debug'
   import {
     compileJSONPointer,
@@ -10,6 +11,7 @@
     setIn,
     updateIn
   } from 'immutable-json-patch'
+  import jsonrepair from 'jsonrepair'
   import { initial, isEmpty, isEqual, throttle, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
   import { createJump } from '../../../assets/jump.js/src/jump.js'
@@ -65,10 +67,14 @@
     setCursorToEnd
   } from '../../../utils/domUtils.js'
   import { parseJSONPointerWithArrayIndices } from '../../../utils/jsonPointer.js'
-  import { parsePartialJson, repairPartialJson } from '../../../utils/jsonUtils.js'
+  import {
+    parsePartialJson,
+    repairPartialJson
+  } from '../../../utils/jsonUtils.js'
   import { keyComboFromEvent } from '../../../utils/keyBindings.js'
   import { isObject, isObjectOrArray, isUrl } from '../../../utils/typeUtils.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
+  import Message from '../../controls/Message.svelte'
   import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
   import SortModal from '../../modals/SortModal.svelte'
   import TransformModal from '../../modals/TransformModal.svelte'
@@ -78,7 +84,7 @@
 
   const debug = createDebug('jsoneditor:TreeMode')
 
-  const { open } = getContext('simple-modal')
+  const {open} = getContext('simple-modal')
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
 
@@ -89,15 +95,21 @@
   const jump = createJump()
 
   export let readOnly = false
-  export let externalJson = {}
+  export let externalJson = undefined
+  export let externalText = undefined
   export let mainMenuBar = true
   export let validator = null
   export let visible = true
   export let indentation = 2
-  export let onChangeJson = () => {}
-  export let onCreateMenu = () => {}
+  export let onError
+  export let onChange
+  export let onRequestRepair = () => {
+  }
+  export let onRenderMenu = () => {
+  }
 
-  function noop () {}
+  function noop() {
+  }
 
   /** @type {function (path: Path, value: *) : string} */
   export let onClassName
@@ -123,12 +135,12 @@
     }
   })
 
-  let json = externalJson
+  let json = externalJson // FIXME: initialize based on externalText
   let state = syncState(json, undefined, [], defaultExpand)
 
   let selection = null
 
-  function defaultExpand (path) {
+  function defaultExpand(path) {
     return path.length < 1
       ? true
       : (path.length === 1 && path[0] === 0) // first item of an array?
@@ -144,35 +156,35 @@
   let searchResult
   let searchHandler
 
-  function handleSearchProgress (results) {
+  function handleSearchProgress(results) {
     searchResult = updateSearchResult(json, results, searchResult)
   }
 
   const handleSearchProgressDebounced = throttle(handleSearchProgress, SEARCH_PROGRESS_THROTTLE)
 
-  function handleSearchDone (results) {
+  function handleSearchDone(results) {
     searchResult = updateSearchResult(json, results, searchResult)
     searching = false
-    debug('finished search')
+    // debug('finished search')
   }
 
-  async function handleSearchText (text) {
+  async function handleSearchText(text) {
     searchText = text
     await tick() // await for the search results to be updated
     await focusActiveSearchResult(searchResult && searchResult.activeItem)
   }
 
-  async function handleNextSearchResult () {
+  async function handleNextSearchResult() {
     searchResult = searchNext(searchResult)
     await focusActiveSearchResult(searchResult && searchResult.activeItem)
   }
 
-  async function handlePreviousSearchResult () {
+  async function handlePreviousSearchResult() {
     searchResult = searchPrevious(searchResult)
     await focusActiveSearchResult(searchResult && searchResult.activeItem)
   }
 
-  async function focusActiveSearchResult (activeItem) {
+  async function focusActiveSearchResult(activeItem) {
     if (activeItem) {
       const path = initial(activeItem)
       state = expandPath(json, state, path)
@@ -184,11 +196,11 @@
   $: {
     // cancel previous search when still running
     if (searchHandler && searchHandler.cancel) {
-      debug('cancel previous search')
+      // debug('cancel previous search')
       searchHandler.cancel()
     }
 
-    debug('start search', searchText)
+    // debug('start search', searchText)
     searching = true
 
     searchHandler = searchAsync(searchText, json, state, {
@@ -205,29 +217,37 @@
   })
   let historyState = history.getState()
 
-  export function expand (callback = () => true) {
+  export function expand(callback = () => true) {
     state = syncState(json, state, [], callback, true)
   }
 
-  export function collapse (callback = () => false) {
+  export function collapse(callback = () => false) {
     state = syncState(json, state, [], callback, true)
   }
 
   // two-way binding of externalJson and json (internal)
   // when receiving an updated prop, we have to update state.
-  // when changing json in the editor, the bound external property must be udpated
-  $: update(externalJson)
-  $: externalJson = json
+  // when changing json in the editor, the bound external property must be updated
+  $: applyExternalJson(externalJson)
 
-  export function get () {
+  $: applyExternalText(externalText)
+
+  let textIsRepaired = false
+  $: textIsUnrepairable = (externalText !== undefined && json === undefined)
+
+  export function get() {
     return json
   }
 
-  function update (updatedJson = {}) {
+  function applyExternalJson(updatedJson) {
+    if (updatedJson === undefined) {
+      return
+    }
+
     // TODO: this is inefficient. Make an optional flag promising that the updates are immutable so we don't have to do a deep equality check? First do some profiling!
     const changed = !isEqual(json, updatedJson)
 
-    debug('update', { changed })
+    debug('update', {changed})
 
     if (!changed) {
       // no actual change, don't do anything
@@ -241,8 +261,8 @@
     state = syncState(json, state, [], defaultExpand)
 
     history.add({
-      undo: [{ op: 'replace', path: '', value: prevJson }],
-      redo: [{ op: 'replace', path: '', value: json }],
+      undo: [{op: 'replace', path: '', value: prevJson}],
+      redo: [{op: 'replace', path: '', value: json}],
       prevState,
       state,
       prevSelection: removeEditModeFromSelection(selection),
@@ -250,11 +270,30 @@
     })
   }
 
+  function applyExternalText(text) {
+    if (text === undefined || externalJson !== undefined) {
+      return
+    }
+
+    textIsRepaired = false
+
+    try {
+      applyExternalJson(JSON.parse(text))
+    } catch (err) {
+      try {
+        textIsRepaired = true
+        applyExternalJson(JSON.parse(jsonrepair(text)))
+      } catch (err) {
+        json = undefined
+      }
+    }
+  }
+
   /**
    * @param {JSONPatchDocument} operations
    * @param {Selection} [newSelection]
    */
-  export function patch (operations, newSelection) {
+  export function patch(operations, newSelection) {
     const prevState = state
     const prevSelection = selection
 
@@ -290,7 +329,7 @@
   $: debug('state', state)
   $: debug('selection', selection)
 
-  async function handleCut () {
+  async function handleCut() {
     if (readOnly || !selection) {
       return
     }
@@ -300,36 +339,37 @@
       return
     }
 
-    debug('cut', { selection, clipboard })
+    debug('cut', {selection, clipboard})
 
     try {
       await navigator.clipboard.writeText(clipboard)
     } catch (err) {
-      // TODO: report error to user -> onError callback
-      console.error(err)
+      onError(err)
     }
 
-    const { operations, newSelection } = createRemoveOperations(json, state, selection)
+    const {
+      operations,
+      newSelection
+    } = createRemoveOperations(json, state, selection)
     handlePatch(operations, newSelection)
   }
 
-  async function handleCopy () {
+  async function handleCopy() {
     const clipboard = selectionToPartialJson(json, selection, indentation)
     if (clipboard == null) {
       return
     }
 
-    debug('copy', { clipboard })
+    debug('copy', {clipboard})
 
     try {
       await navigator.clipboard.writeText(clipboard)
     } catch (err) {
-      // TODO: report error to user -> onError callback
-      console.error(err)
+      onError(err)
     }
   }
 
-  function handlePaste (event) {
+  function handlePaste(event) {
     event.preventDefault()
 
     if (readOnly || !selection) {
@@ -348,10 +388,10 @@
     }
   }
 
-  function doPaste (clipboardText) {
+  function doPaste(clipboardText) {
     const operations = insert(json, state, selection, clipboardText)
 
-    debug('paste', { clipboardText, operations, selection })
+    debug('paste', {clipboardText, operations, selection})
 
     handlePatch(operations)
 
@@ -364,13 +404,13 @@
       })
   }
 
-  function openRepairModal (text, onApply) {
+  function openRepairModal(text, onApply) {
     open(JSONRepairModal, {
       text,
       onParse: parsePartialJson,
       onRepair: repairPartialJson,
       onApply,
-      onCreateMenu,
+      onRenderMenu,
       onFocus,
       onBlur
     }, {
@@ -389,19 +429,22 @@
     })
   }
 
-  function handleRemove () {
+  function handleRemove() {
     if (readOnly || !selection) {
       return
     }
 
-    const { operations, newSelection } = createRemoveOperations(json, state, selection)
+    const {
+      operations,
+      newSelection
+    } = createRemoveOperations(json, state, selection)
 
-    debug('remove', { operations, selection, newSelection })
+    debug('remove', {operations, selection, newSelection})
 
     handlePatch(operations, newSelection)
   }
 
-  function handleDuplicate () {
+  function handleDuplicate() {
     if (
       readOnly ||
       !selection ||
@@ -411,14 +454,14 @@
       return
     }
 
-    debug('duplicate', { selection })
+    debug('duplicate', {selection})
 
     const operations = duplicate(json, state, selection.paths)
 
     handlePatch(operations)
   }
 
-  function handleExtract () {
+  function handleExtract() {
     if (
       readOnly ||
       !selection ||
@@ -428,7 +471,7 @@
       return
     }
 
-    debug('extract', { selection })
+    debug('extract', {selection})
 
     const operations = extract(json, state, selection)
 
@@ -444,7 +487,7 @@
   /**
    * @param {'value' | 'object' | 'array' | 'structure'} type
    */
-  function handleInsert (type) {
+  function handleInsert(type) {
     if (readOnly || !selection) {
       return
     }
@@ -452,7 +495,7 @@
     const newValue = createNewValue(json, selection, type)
     const data = JSON.stringify(newValue)
     const operations = insert(json, state, selection, data)
-    debug('handleInsert', { type, operations, newValue, data })
+    debug('handleInsert', {type, operations, newValue, data})
 
     handlePatch(operations)
 
@@ -485,7 +528,7 @@
       })
   }
 
-  function replaceActiveElementContents (char) {
+  function replaceActiveElementContents(char) {
     const activeElement = getWindow(domJsonEditor).document.activeElement
     if (activeElement.isContentEditable) {
       activeElement.textContent = char
@@ -494,7 +537,7 @@
     }
   }
 
-  async function handleInsertCharacter (char) {
+  async function handleInsertCharacter(char) {
     // a regular key like a, A, _, etc is entered.
     // Replace selected contents with a new value having this first character as text
     if (readOnly || !selection) {
@@ -502,7 +545,7 @@
     }
 
     if (selection.type === SELECTION_TYPE.KEY) {
-      selection = { ...selection, edit: true }
+      selection = {...selection, edit: true}
       await tick()
       setTimeout(() => replaceActiveElementContents(char))
       return
@@ -517,7 +560,7 @@
         selection.type === SELECTION_TYPE.VALUE &&
         !isObjectOrArray(getIn(json, selection.focusPath))
       ) {
-        selection = { ...selection, edit: true }
+        selection = {...selection, edit: true}
         await tick()
         setTimeout(() => replaceActiveElementContents(char))
       } else {
@@ -526,7 +569,7 @@
     }
   }
 
-  async function handleInsertValueWithCharacter (char) {
+  async function handleInsertValueWithCharacter(char) {
     if (readOnly || !selection) {
       return
     }
@@ -549,7 +592,7 @@
     setTimeout(() => replaceActiveElementContents(char))
   }
 
-  function handleUndo () {
+  function handleUndo() {
     if (!history.getState().canUndo) {
       return
     }
@@ -563,14 +606,14 @@
     state = item.prevState
     selection = item.prevSelection
 
-    debug('undo', { item, json, state, selection })
+    debug('undo', {item, json, state, selection})
 
     emitOnChange()
 
     focus()
   }
 
-  function handleRedo () {
+  function handleRedo() {
     if (!history.getState().canRedo) {
       return
     }
@@ -584,14 +627,14 @@
     state = item.state
     selection = item.selection
 
-    debug('redo', { item, json, state, selection })
+    debug('redo', {item, json, state, selection})
 
     emitOnChange()
 
     focus()
   }
 
-  function handleSort () {
+  function handleSort() {
     if (readOnly) {
       return
     }
@@ -615,7 +658,7 @@
     })
   }
 
-  function handleTransform () {
+  function handleTransform() {
     if (readOnly) {
       return
     }
@@ -644,7 +687,7 @@
    * Scroll the window vertically to the node with given path
    * @param {Path} path
    */
-  export async function scrollTo (path) {
+  export async function scrollTo(path) {
     state = expandPath(json, state, path)
     await tick()
 
@@ -652,7 +695,7 @@
     const offset = -(divContents.getBoundingClientRect().height / 4)
 
     if (elem) {
-      debug('scrollTo', { path, elem, divContents })
+      debug('scrollTo', {path, elem, divContents})
       jump(elem, {
         container: divContents,
         offset,
@@ -665,7 +708,7 @@
    * Find the DOM element of a given path.
    * Note that the path can only be found when the node is expanded.
    */
-  export function findElement (path) {
+  export function findElement(path) {
     return divContents.querySelector(`div[data-path="${compileJSONPointer(path)}"]`)
   }
 
@@ -674,7 +717,7 @@
    * When the path is already in view, nothing is done
    * @param {Path} path
    */
-  function scrollIntoView (path) {
+  function scrollIntoView(path) {
     const elem = divContents.querySelector(`div[data-path="${compileJSONPointer(path)}"]`)
 
     if (elem) {
@@ -703,8 +746,8 @@
     }
   }
 
-  function emitOnChange () {
-    onChangeJson(json)
+  function emitOnChange() {
+    onChange(json)
   }
 
   /**
@@ -713,7 +756,7 @@
    *                                   The new selection will be determined
    *                                   based on the operations.
    */
-  function handlePatch (
+  function handlePatch(
     operations,
     newSelection = createSelectionFromOperations(json, operations)
   ) {
@@ -736,7 +779,7 @@
    * @param {boolean} expanded  True to expand, false to collapse
    * @param {boolean} [recursive=false]  Only applicable when expanding
    */
-  function handleExpand (path, expanded, recursive = false) {
+  function handleExpand(path, expanded, recursive = false) {
     // TODO: move this function into documentState.js
     if (recursive) {
       state = updateIn(state, path, (childState) => {
@@ -766,18 +809,18 @@
     })
   }
 
-  function handleExpandAll () {
+  function handleExpandAll() {
     handleExpand([], true, true)
   }
 
-  function handleCollapseAll () {
+  function handleCollapseAll() {
     handleExpand([], false, true)
   }
 
   /**
    * @param {SelectionSchema} selectionSchema
    */
-  function handleSelect (selectionSchema) {
+  function handleSelect(selectionSchema) {
     if (selectionSchema) {
       selection = createSelection(json, state, selectionSchema)
     } else {
@@ -789,13 +832,13 @@
     setTimeout(() => focus())
   }
 
-  function handleExpandSection (path, section) {
+  function handleExpandSection(path, section) {
     debug('handleExpandSection', path, section)
 
     state = expandSection(json, state, path, section)
   }
 
-  function handleKeyDown (event) {
+  function handleKeyDown(event) {
     // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
     const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
     const keepAnchorPath = event.shiftKey
@@ -864,7 +907,10 @@
         const parent = getIn(json, initial(path))
         if (Array.isArray(parent)) {
           // change into selection of the value
-          selection = createSelection(json, state, { type: SELECTION_TYPE.VALUE, path })
+          selection = createSelection(json, state, {
+            type: SELECTION_TYPE.VALUE,
+            path
+          })
         }
       }
 
@@ -959,7 +1005,7 @@
     }
   }
 
-  function handleMouseDown (event) {
+  function handleMouseDown(event) {
     // TODO: ugly to have to have two setTimeout here. Without it, hiddenInput will blur
     setTimeout(() => {
       setTimeout(() => {
@@ -971,7 +1017,7 @@
     })
   }
 
-  export function focus () {
+  export function focus() {
     // with just .focus(), sometimes the input doesn't react on onpaste events
     // in Chrome when having a large document open and then doing cut/paste.
     // Calling both .focus() and .select() did solve this issue.
@@ -1016,7 +1062,7 @@
       onPreviousSearchResult={handlePreviousSearchResult}
 
       onFocus={focus}
-      onCreateMenu={onCreateMenu}
+      onRenderMenu={onRenderMenu}
     />
   {/if}
   <label class="hidden-input-label">
@@ -1027,26 +1073,58 @@
       on:paste={handlePaste}
     />
   </label>
-  <div class="contents" bind:this={divContents}>
-    {#if !jsonIsEmpty}
-      <Welcome />
-    {/if}
-    <JSONNode
-      value={json}
-      path={[]}
-      state={state}
-      readOnly={readOnly}
-      searchResult={searchResult && searchResult.itemsWithActive}
-      validationErrors={validationErrors}
-      onPatch={handlePatch}
-      onInsert={handleInsert}
-      onExpand={handleExpand}
-      onSelect={handleSelect}
-      onExpandSection={handleExpandSection}
-      onClassName={onClassName || noop}
-      selection={selection}
+  {#if json === undefined}
+    <Message
+      type="error"
+      message="The loaded JSON document is invalid and could not be repaired automatically."
+      actions={[
+          {
+            icon: faCode,
+            text: 'Repair manually',
+            onClick: onRequestRepair
+          }
+        ]}
     />
-  </div>
+  {:else}
+    <div class="contents" bind:this={divContents}>
+      {#if !jsonIsEmpty}
+        <Welcome />
+      {/if}
+      <JSONNode
+        value={json}
+        path={[]}
+        state={state}
+        readOnly={readOnly}
+        searchResult={searchResult && searchResult.itemsWithActive}
+        validationErrors={validationErrors}
+        onPatch={handlePatch}
+        onInsert={handleInsert}
+        onExpand={handleExpand}
+        onSelect={handleSelect}
+        onExpandSection={handleExpandSection}
+        onClassName={onClassName || noop}
+        selection={selection}
+      />
+    </div>
+    {#if textIsRepaired && externalText !== undefined}
+      <Message
+        type="success"
+        message="The loaded JSON document was invalid but is successfully repaired."
+        actions={[
+          {
+            icon: faCheck,
+            text: 'Ok',
+            onClick: emitOnChange
+          },
+          {
+            icon: faCode,
+            text: 'Repair manually instead',
+            onClick: onRequestRepair
+          }
+        ]}
+      />
+    {/if}
+  {/if}
 </div>
 
 <style src="./TreeMode.scss"></style>

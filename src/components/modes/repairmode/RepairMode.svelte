@@ -7,6 +7,7 @@
     faWrench
   } from '@fortawesome/free-solid-svg-icons'
   import createDebug from 'debug'
+  import Message from '../../controls/Message.svelte'
   import { onDestroy, onMount } from 'svelte'
   import Icon from 'svelte-awesome'
   import { activeElementIsChildOf, getWindow } from '../../../utils/domUtils.js'
@@ -23,7 +24,8 @@
   export let onCancel
   export let onFocus
   export let onBlur
-  export let onCreateMenu = () => {}
+  export let onCreateMenu = () => {
+  }
 
   const debug = createDebug('jsoneditor:JSONRepair')
 
@@ -125,6 +127,34 @@
   ]
 
   $: items = onCreateMenu('repair', defaultItems) || defaultItems
+
+  $: gotoAction = {
+    icon: faArrowDown,
+    text: 'Show me',
+    title: 'Scroll to the error location',
+    onClick: goToError
+  }
+
+  $: repairAction = {
+    icon: faWrench,
+    text: 'Auto repair',
+    title: 'Automatically repair JSON',
+    onClick: handleRepair
+  }
+
+  $: errorActions = repairable
+    ? [gotoAction, repairAction]
+    : [gotoAction]
+
+  $: successActions = [
+    {
+      icon: faCheck,
+      text: 'Apply',
+      title: 'Apply fixed JSON',
+      disabled: readOnly,
+      onClick: handleApply
+    }
+  ]
 </script>
 
 <div
@@ -138,46 +168,18 @@
   </Menu>
 
   {#if error}
-    <div class="json-repair-error">
-      <div class="message">
-        <Icon data={faExclamationTriangle} /> Cannot parse JSON: {error.message}.
-      </div>
-      <div class="actions">
-        <button
-          on:click={goToError}
-          class="button primary action"
-          title="Scroll to the error location"
-        >
-          <Icon data={faArrowDown} /> Show me
-        </button>
-        {#if repairable}
-          <button
-            on:click={handleRepair}
-            class="button primary action"
-            title="Automatically repair JSON"
-            disabled={readOnly}
-          >
-            <Icon data={faWrench}/> Auto repair
-          </button>
-        {/if}
-      </div>
-    </div>
+    <Message
+      type="error"
+      icon={faExclamationTriangle}
+      message={`Cannot parse JSON: ${error.message}`}
+      actions={errorActions}
+    />
   {:else}
-    <div class="json-repair-valid">
-      <div class="message">
-        JSON is valid now and can be parsed.
-      </div>
-      <div class="actions">
-        <button
-          on:click={handleApply}
-          class="button primary action"
-          title="Apply fixed JSON"
-          disabled={readOnly}
-        >
-          <Icon data={faCheck} /> Apply
-        </button>
-      </div>
-    </div>
+    <Message
+      type="success"
+      message="JSON is valid now and can be parsed."
+      actions={successActions}
+    />
   {/if}
   <textarea
     bind:this={domTextArea}
