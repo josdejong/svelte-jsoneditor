@@ -27,6 +27,10 @@
     .tag {
       background: $selection-background-meta;
     }
+
+    :global(.boolean-toggle) {
+      color: $selection-color;
+    }
   }
 
   // key selected

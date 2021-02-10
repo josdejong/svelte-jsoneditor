@@ -26,6 +26,7 @@
 <div
   class="boolean-toggle"
   on:mousedown={toggleBooleanValue}
+  title="Click to toggle this boolean value"
 >
   <Icon data={value === true ? faCheckSquare : faSquare} />
 </div>
