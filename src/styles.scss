@@ -28,6 +28,12 @@ $gray-transparent: rgba(0, 0, 0, 0.38); // #9d9d9d but with transparency
 $light-gray: rgb(192, 192, 192); // #c0c0c0
 $light-gray-transparent: rgba(0, 0, 0, 0.25); // #c0c0c0
 
+$value-color-string: #008000;
+$value-color-number: #ee422e;
+$value-color-boolean: #ff8c00;
+$value-color-null: #004ED0;
+$value-color-url: $value-color-string;
+
 $contents-background: $white;
 $selection-background: $theme-color;
 $selection-color: $white;

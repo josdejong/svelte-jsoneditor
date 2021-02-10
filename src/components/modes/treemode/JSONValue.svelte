@@ -3,7 +3,10 @@
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isEqual } from 'lodash-es'
   import { onDestroy } from 'svelte'
-  import { ACTIVE_SEARCH_RESULT, STATE_SEARCH_VALUE } from '../../../constants.js'
+  import {
+    ACTIVE_SEARCH_RESULT,
+    STATE_SEARCH_VALUE
+  } from '../../../constants.js'
   import { SELECTION_TYPE } from '../../../logic/selection.js'
   import {
     getPlainText,
@@ -12,6 +15,7 @@
   } from '../../../utils/domUtils.js'
   import { keyComboFromEvent } from '../../../utils/keyBindings.js'
   import { isUrl, stringConvert, valueType } from '../../../utils/typeUtils.js'
+  import BooleanToggle from './BooleanToggle.svelte'
 
   export let path
   export let value
@@ -48,7 +52,7 @@
     setDomValue(value)
   }
 
-  function updateValue () {
+  function updateValue() {
     if (newValue !== value) {
       value = newValue // prevent loops when value and newValue are temporarily not in sync
 
@@ -60,7 +64,7 @@
     }
   }
 
-  function getDomValue () {
+  function getDomValue() {
     if (!domValue) {
       return value
     }
@@ -69,14 +73,14 @@
     return stringConvert(valueText) // TODO: implement support for type "string"
   }
 
-  function setDomValue (updatedValue) {
+  function setDomValue(updatedValue) {
     if (domValue) {
       newValue = updatedValue
       setPlainText(domValue, updatedValue)
     }
   }
 
-  function focusValue () {
+  function focusValue() {
     // TODO: this timeout is ugly
     setTimeout(() => {
       if (domValue) {
@@ -85,7 +89,7 @@
     })
   }
 
-  function getValueClass (value, searchResult) {
+  function getValueClass(value, searchResult) {
     const type = valueType(value)
 
     return classnames('editable-div', SELECTION_TYPE.VALUE, type, {
@@ -96,7 +100,7 @@
     })
   }
 
-  function handleValueInput () {
+  function handleValueInput() {
     newValue = getDomValue()
     if (newValue === '') {
       // immediately update to cleanup any left over <br/>
@@ -104,7 +108,7 @@
     }
   }
 
-  function handleValueClick (event) {
+  function handleValueClick(event) {
     if (valueIsUrl && event.ctrlKey) {
       event.preventDefault()
       event.stopPropagation()
@@ -113,14 +117,14 @@
     }
   }
 
-  function handleValueDoubleClick (event) {
+  function handleValueDoubleClick(event) {
     if (!readOnly && !editValue) {
       event.preventDefault()
-      onSelect({ type: SELECTION_TYPE.VALUE, path, edit: true })
+      onSelect({type: SELECTION_TYPE.VALUE, path, edit: true})
     }
   }
 
-  function handleValueKeyDown (event) {
+  function handleValueKeyDown(event) {
     event.stopPropagation()
 
     const combo = keyComboFromEvent(event)
@@ -128,7 +132,7 @@
     if (combo === 'Escape') {
       // cancel changes
       setDomValue(value)
-      onSelect({ type: SELECTION_TYPE.VALUE, path })
+      onSelect({type: SELECTION_TYPE.VALUE, path})
     }
 
     if (!readOnly && (combo === 'Enter' || combo === 'Tab')) {
@@ -139,10 +143,19 @@
       // apply changes
       updateValue()
 
-      onSelect({ type: SELECTION_TYPE.VALUE, path, next: true })
+      onSelect({type: SELECTION_TYPE.VALUE, path, next: true})
     }
   }
 </script>
+
+{#if (!editValue && (value === true || value === false))}
+  <BooleanToggle
+    path={path}
+    value={value}
+    onPatch={onPatch}
+    onSelect={onSelect}
+  />
+{/if}
 
 <div
   data-type="selectable-value"

@@ -1,0 +1,8 @@
+@import '../../../styles';
+
+.boolean-toggle {
+  color: $value-color-boolean;
+  position: relative;
+  top: 1px;
+  padding-left: $padding/2;
+}

@@ -15,7 +15,7 @@
 	let text = undefined
 
 	let showTreeEditor = true
-	let showCodeEditor = false
+	let showCodeEditor = true
 	let indentation = 2
 
 	function onRenderMenu(mode, items) {
@@ -132,12 +132,12 @@
 	}
 
 	.editor {
-		/*max-width: 600px;*/
+		max-width: 800px;
 		height: 400px;
 	}
 
 	.code-editor {
-		/*max-width: 600px;*/
+		max-width: 800px;
 		height: 400px;
 	}
 

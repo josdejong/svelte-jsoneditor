@@ -3,7 +3,7 @@
 
 .value {
   &.string {
-    color: #008000;
+    color: $value-color-string;
   }
 
   &.object,
@@ -13,23 +13,23 @@
   }
 
   &.number {
-    color: #ee422e;
+    color: $value-color-number;
   }
 
   &.boolean {
-    color: #ff8c00;
+    color: $value-color-boolean;
   }
 
   &.null {
-    color: #004ED0;
+    color: $value-color-null;
   }
 
   &.invalid {
-    color: #000000;
+    color: $black;
   }
 
   &.url {
-    color: green;
+    color: $value-color-url;
     text-decoration: underline;
   }
 
@@ -49,4 +49,3 @@
     }
   }
 }
-
