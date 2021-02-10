@@ -33,6 +33,7 @@
   let onChangeDisabled = false
 
   $: setAceEditorValue(text)
+  $: updateIndentation(indentation)
 
   onMount(() => {
     aceEditor = createAceEditor ({
@@ -247,6 +248,12 @@
       setTimeout(() => updateCanUndoRedo())
 
       emitOnChange()
+    }
+  }
+
+  function updateIndentation (indentation) {
+    if (aceEditor) {
+      aceEditor.getSession().setTabSize(indentation)
     }
   }
 
