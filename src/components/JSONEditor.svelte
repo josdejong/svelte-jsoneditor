@@ -265,6 +265,7 @@
           readOnly={readOnly}
           indentation={indentation}
           mainMenuBar={mainMenuBar}
+          validator={validator}
           onChange={handleChangeText}
           onError={onError}
           onFocus={handleFocus}

@@ -20,6 +20,7 @@
   export let text = ''
   export let indentation = 2 // TODO: make indentation configurable
   export let aceTheme = 'ace/theme/jsoneditor' // TODO: make aceTheme configurable
+  export let validator
   export let onChange = null
   export let onError
   export let onFocus = () => {}
@@ -323,6 +324,11 @@
     />
   {/if}
   <div class="contents" bind:this={aceEditorRef}></div>
+  {#if validator}
+    <div class="info">
+      This BETA version of code mode doesn't have support yet for JSON Schema or custom validators.
+    </div>
+  {/if}
 </div>
 
 <style src="./CodeMode.scss"></style>
