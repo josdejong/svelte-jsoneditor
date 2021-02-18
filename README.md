@@ -168,7 +168,9 @@ const editor = new JSONEditor({
 ### properties
 
 - `json` Pass the JSON document to be rendered in the JSONEditor
+<!-- FIXME: readOnly is currently broken
 - `readOnly: boolean` If `true`, the editor is read only. Default value is `false`.
+-->
 - `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
 - `indentation: number` Number of spaces use for indentation when stringifying JSON.
 - `validator: function (json): ValidationError[]`. Validate the JSON document.
@@ -201,7 +203,7 @@ const editor = new JSONEditor({
 - `updateText(text: JSON)` Update the loaded JSON document, keeping the state of the editor (like expanded objects). When the passed text cannot be parsed as JSON, the editor will go into Repair mode.
 - `patch(operations: JSONPatchDocument)` Apply a JSON patch document to update the contents of the JSON document.
 - `scrollTo(path: Array.<string|number>)` Scroll the editor vertically such that the specified path comes into view. The path will be expanded when needed.
-- `focus()`. Give the editor focus.
+- `focus()`. Give the editor focus. 
 - `destroy()`. Destroy the editor, remove it from the DOM.
 
 ## Develop

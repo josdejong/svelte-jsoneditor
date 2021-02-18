@@ -15,8 +15,9 @@
 	let text = undefined
 
 	let showTreeEditor = true
-	let showCodeEditor = true
+	let showCodeEditor = false
 	let indentation = 2
+	let height = '400px'
 
 	function onRenderMenu(mode, items) {
 		console.log('onRenderMenu', mode, items)
@@ -36,6 +37,9 @@
 	<p>
 		<label>
 			Indentation: <input type="number" bind:value={indentation} />
+		</label>
+		<label>
+			Height: <input type="text" bind:value={height} />
 		</label>
 	</p>
 	<p>
@@ -65,7 +69,7 @@
 					<input type="checkbox" bind:checked={showTreeEditor} /> Show editor
 				</label>
 			</p>
-			<div class="editor">
+			<div class="editor" style="height: {height}">
 				{#if showTreeEditor}
 					<JSONEditor
 						bind:text
@@ -94,7 +98,7 @@
 				</label>
 			</p>
 
-			<div class="code-editor">
+			<div class="code-editor" style="height: {height}">
 				{#if showCodeEditor}
 					<JSONEditor
 						mode="code"

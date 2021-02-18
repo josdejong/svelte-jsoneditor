@@ -44,6 +44,12 @@
       onChange: onChangeAceEditorValue
     })
 
+    if (resizeObserver) {
+      resizeObserver.observe(aceEditorRef)
+    } else {
+      debug('WARNING: ResizeObserver is undefined. Code editor will not automatically be resized')
+    }
+
     // load initial text
     setAceEditorValue(text)
     aceEditor.session.getUndoManager().reset()
@@ -53,10 +59,19 @@
     debug('Destroy Ace editor')
     aceEditor.destroy()
     aceEditor = null
+
+    if (resizeObserver) {
+      resizeObserver.unobserve(aceEditorRef)
+      resizeObserver = null
+    }
   })
 
   let canUndo = false
   let canRedo = false
+
+  let resizeObserver = window.ResizeObserver
+    ? new window.ResizeObserver(resize)
+    : null
 
   const { open } = getContext('simple-modal')
   const sortModalId = uniqueId()
@@ -89,7 +104,12 @@
     }
   }
 
-  function handleFormat () {
+  function resize() {
+    const force = false
+    aceEditor.resize(force)
+  }
+
+  function handleFormat() {
     debug('format')
     try {
       const oldText = text
