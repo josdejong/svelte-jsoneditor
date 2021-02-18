@@ -15,7 +15,7 @@
 	let text = undefined
 
 	let showTreeEditor = true
-	let showCodeEditor = false
+	let showCodeEditor = true
 	let indentation = 2
 	let height = '400px'
 
@@ -66,7 +66,7 @@
 		<div class="left">
 			<p>
 				<label>
-					<input type="checkbox" bind:checked={showTreeEditor} /> Show editor
+					<input type="checkbox" bind:checked={showTreeEditor} /> Show tree editor
 				</label>
 			</p>
 			<div class="editor" style="height: {height}">
@@ -94,7 +94,7 @@
 		<div class="right">
 			<p>
 				<label>
-					<input type="checkbox" bind:checked={showCodeEditor} /> Show editor
+					<input type="checkbox" bind:checked={showCodeEditor} /> Show code editor
 				</label>
 			</p>
 
