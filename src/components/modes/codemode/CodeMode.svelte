@@ -7,7 +7,9 @@
     SORT_MODAL_OPTIONS,
     TRANSFORM_MODAL_OPTIONS
   } from '../../../constants.js'
+  import { activeElementIsChildOf, getWindow } from '../../../utils/domUtils.js'
   import { keyComboFromEvent } from '../../../utils/keyBindings.js'
+  import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import SortModal from '../../modals/SortModal.svelte'
   import TransformModal from '../../modals/TransformModal.svelte'
   import CodeMenu from './menu/CodeMenu.svelte'
@@ -29,6 +31,7 @@
   let aceEditorRef
   let aceEditor
   let aceEditorText
+  let domCodeMode
 
   let onChangeDisabled = false
 
@@ -80,6 +83,15 @@
   export function focus () {
     aceEditor.focus()
   }
+
+  createFocusTracker({
+    onMount,
+    onDestroy,
+    getWindow: () => getWindow(domCodeMode),
+    hasFocus: () => activeElementIsChildOf(domCodeMode),
+    onFocus,
+    onBlur
+  })
 
   /**
    * @param {JSONPatchDocument} operations
@@ -238,8 +250,6 @@
 
     // register onchange event
     aceEditor.on('change', onChange)
-    aceEditor.on('focus', onFocus)
-    aceEditor.on('blur', onBlur)
 
     return aceEditor
   }
@@ -296,6 +306,7 @@
 <div
   class="code-mode"
   on:keydown={handleKeyDown}
+  bind:this={domCodeMode}
 >
   {#if mainMenuBar}
     <CodeMenu
