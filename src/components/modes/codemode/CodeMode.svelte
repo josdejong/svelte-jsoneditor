@@ -1,7 +1,7 @@
 <script>
   import {
     faExclamationTriangle,
-    faInfo,
+    faInfoCircle,
     faWrench
   } from '@fortawesome/free-solid-svg-icons'
   import createDebug from 'debug'
@@ -402,7 +402,7 @@
   {#if validator}
     <Message
       type="error"
-      icon={faInfo}
+      icon={faInfoCircle}
       message="This BETA version of code mode doesn't have support yet for JSON Schema or custom validators."
     />
   {/if}

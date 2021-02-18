@@ -37,4 +37,13 @@
     position: relative;
     padding: $contents-padding;
   }
+
+  .preview {
+    color: $gray;
+    overflow: auto;
+    white-space: pre-wrap;
+    font-family: $font-family-mono;
+    font-size: $font-size-mono;
+    padding: 2px;
+  }
 }
