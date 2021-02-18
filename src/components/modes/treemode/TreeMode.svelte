@@ -135,8 +135,8 @@
     }
   })
 
-  let json
-  let state
+  let json = externalJson
+  let state = syncState(json, undefined, [], defaultExpand)
 
   let selection = null
 

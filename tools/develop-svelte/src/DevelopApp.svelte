@@ -1,5 +1,5 @@
 <script>
-	import { JSONEditor } from 'svelte-jsoneditor'
+	import { JSONEditor, createAjvValidator } from 'svelte-jsoneditor'
 
 	let json = {
 		'array': [1, 2, 3],
@@ -12,12 +12,34 @@
 		'string': 'Hello World'
 	}
 
+	const schema = {
+		"title": "Employee",
+		"description": "Object containing employee details",
+		"type": "object",
+		"properties": {
+			"boolean": {
+				"title": "A boolean",
+				"type": "boolean"
+			},
+			"array": {
+				"items": {
+					"type": "number",
+					"minimum": 10
+				}
+			}
+		},
+		"required": ["foo"]
+	}
+
+	const validator = createAjvValidator(schema)
+
 	let text = undefined
 
 	let showTreeEditor = true
 	let showCodeEditor = true
 	let indentation = 2
 	let height = '400px'
+	let validate = false
 
 	function onRenderMenu(mode, items) {
 		console.log('onRenderMenu', mode, items)
@@ -40,6 +62,9 @@
 		</label>
 		<label>
 			Height: <input type="text" bind:value={height} />
+		</label>
+		<label>
+			<input type="checkbox" bind:checked={validate} /> Validate
 		</label>
 	</p>
 	<p>
@@ -75,6 +100,7 @@
 						bind:text
 						bind:json
 						indentation={indentation}
+						validator={validate ? validator : undefined}
 						onRenderMenu={onRenderMenu}
 						onChange={onChange}
 						onChangeMode={onChangeMode}
@@ -105,6 +131,7 @@
 						bind:text
 						bind:json
 						indentation={indentation}
+						validator={validate ? validator : undefined}
 						onRenderMenu={onRenderMenu}
 						onChange={onChange}
 						onChangeMode={onChangeMode}
