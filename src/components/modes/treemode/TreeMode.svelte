@@ -135,8 +135,8 @@
     }
   })
 
-  let json = externalJson // FIXME: initialize based on externalText
-  let state = syncState(json, undefined, [], defaultExpand)
+  let json
+  let state
 
   let selection = null
 
@@ -245,29 +245,32 @@
     }
 
     // TODO: this is inefficient. Make an optional flag promising that the updates are immutable so we don't have to do a deep equality check? First do some profiling!
-    const changed = !isEqual(json, updatedJson)
+    const isChanged = !isEqual(json, updatedJson)
+    const isNew = json === undefined
 
-    debug('update', {changed})
+    debug('update', { isChanged, isNew })
 
-    if (!changed) {
+    if (!isChanged) {
       // no actual change, don't do anything
       return
     }
 
-    const prevState = state
+    const prevState = isNew ? undefined : state
     const prevJson = json
 
     json = updatedJson
-    state = syncState(json, state, [], defaultExpand)
+    state = syncState(json, prevState, [], defaultExpand)
 
-    history.add({
-      undo: [{op: 'replace', path: '', value: prevJson}],
-      redo: [{op: 'replace', path: '', value: json}],
-      prevState,
-      state,
-      prevSelection: removeEditModeFromSelection(selection),
-      selection: removeEditModeFromSelection(selection)
-    })
+    if (!isNew && prevState) {
+      history.add({
+        undo: [{op: 'replace', path: '', value: prevJson}],
+        redo: [{op: 'replace', path: '', value: json}],
+        prevState,
+        state,
+        prevSelection: removeEditModeFromSelection(selection),
+        selection: removeEditModeFromSelection(selection)
+      })
+    }
   }
 
   function applyExternalText(text) {
@@ -1085,6 +1088,7 @@
           }
         ]}
     />
+    <!-- TODO: show a gray colored preview of the text -->
   {:else}
     <div class="contents" bind:this={divContents}>
       {#if !jsonIsEmpty}

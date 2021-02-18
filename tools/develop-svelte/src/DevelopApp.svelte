@@ -51,6 +51,12 @@
 				}}>
 			Update text
 		</button>
+		<button on:click={() => {
+			text = '[1, 2, 3, 4}'
+			json = undefined
+		}}>
+			Update text (invalid)
+		</button>
 	</p>
 	<div class="columns">
 		<div class="left">
