@@ -22,6 +22,7 @@
 				"type": "boolean"
 			},
 			"array": {
+				"type": "array",
 				"items": {
 					"type": "number",
 					"minimum": 10

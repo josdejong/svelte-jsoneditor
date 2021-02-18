@@ -9,7 +9,6 @@
   import createDebug from 'debug'
   import Message from '../../controls/Message.svelte'
   import { onDestroy, onMount } from 'svelte'
-  import Icon from 'svelte-awesome'
   import { activeElementIsChildOf, getWindow } from '../../../utils/domUtils.js'
   import { normalizeJsonParseError } from '../../../utils/jsonUtils.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'

@@ -17,6 +17,7 @@ export const VALIDATION_ERROR = Symbol('validation:error')
 export const SCROLL_DURATION = 300 // ms
 export const DEBOUNCE_DELAY = 300
 export const SEARCH_PROGRESS_THROTTLE = 300 // ms
+export const CHECK_VALID_JSON_DELAY = 300 // ms
 export const MAX_SEARCH_RESULTS = 1000
 export const ARRAY_SECTION_SIZE = 100
 export const DEFAULT_VISIBLE_SECTIONS = [{ start: 0, end: ARRAY_SECTION_SIZE }]
@@ -72,3 +73,7 @@ export const HOVER_COLLECTION = 'hover-collection'
 
 export const INSERT_AFTER_EXPLANATION = 'Click to insert contents after this entry'
 export const INSERT_INSIDE_EXPLANATION = 'Click to insert contents inside this array or object'
+
+export const JSON_STATUS_VALID = 'valid'
+export const JSON_STATUS_REPAIRABLE = 'repairable'
+export const JSON_STATUS_INVALID = 'invalid'

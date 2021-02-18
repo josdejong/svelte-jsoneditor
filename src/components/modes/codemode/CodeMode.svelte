@@ -1,19 +1,30 @@
 <script>
+  import {
+    faExclamationTriangle,
+    faInfo,
+    faWrench
+  } from '@fortawesome/free-solid-svg-icons'
   import createDebug from 'debug'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
-  import { uniqueId } from 'lodash-es'
+  import jsonrepair from 'jsonrepair'
+  import { debounce, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount } from 'svelte'
   import {
+    CHECK_VALID_JSON_DELAY,
+    JSON_STATUS_INVALID,
+    JSON_STATUS_REPAIRABLE,
+    JSON_STATUS_VALID,
     SORT_MODAL_OPTIONS,
     TRANSFORM_MODAL_OPTIONS
   } from '../../../constants.js'
   import { activeElementIsChildOf, getWindow } from '../../../utils/domUtils.js'
   import { keyComboFromEvent } from '../../../utils/keyBindings.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
+  import Message from '../../controls/Message.svelte'
   import SortModal from '../../modals/SortModal.svelte'
   import TransformModal from '../../modals/TransformModal.svelte'
-  import CodeMenu from './menu/CodeMenu.svelte'
   import ace from './ace/index.js'
+  import CodeMenu from './menu/CodeMenu.svelte'
 
   export let readOnly = false
   export let mainMenuBar = true
@@ -23,9 +34,12 @@
   export let validator
   export let onChange = null
   export let onError
-  export let onFocus = () => {}
-  export let onBlur = () => {}
-  export let onRenderMenu = () => {}
+  export let onFocus = () => {
+  }
+  export let onBlur = () => {
+  }
+  export let onRenderMenu = () => {
+  }
 
   const debug = createDebug('jsoneditor:CodeMode')
 
@@ -40,7 +54,7 @@
   $: updateIndentation(indentation)
 
   onMount(() => {
-    aceEditor = createAceEditor ({
+    aceEditor = createAceEditor({
       target: aceEditorRef,
       ace,
       readOnly,
@@ -77,11 +91,11 @@
     ? new window.ResizeObserver(resize)
     : null
 
-  const { open } = getContext('simple-modal')
+  const {open} = getContext('simple-modal')
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
 
-  export function focus () {
+  export function focus() {
     aceEditor.focus()
   }
 
@@ -97,7 +111,7 @@
   /**
    * @param {JSONPatchDocument} operations
    */
-  export function patch (operations) {
+  export function patch(operations) {
     debug('patch', operations)
 
     const oldText = text
@@ -137,7 +151,7 @@
     }
   }
 
-  function handleCompact () {
+  function handleCompact() {
     debug('compact')
     try {
       const oldText = text
@@ -152,7 +166,21 @@
     }
   }
 
-  function handleSort () {
+  function handleRepair() {
+    debug('repair')
+    try {
+      const oldText = text
+      text = jsonrepair(text)
+
+      if (text !== oldText) {
+        emitOnChange()
+      }
+    } catch (err) {
+      onError(err)
+    }
+  }
+
+  function handleSort() {
     if (readOnly) {
       return
     }
@@ -176,7 +204,7 @@
     }
   }
 
-  function handleTransform () {
+  function handleTransform() {
     if (readOnly) {
       return
     }
@@ -201,15 +229,15 @@
     }
   }
 
-  function handleUndo () {
+  function handleUndo() {
     aceEditor.getSession().getUndoManager().undo(false)
   }
 
-  function handleRedo () {
+  function handleRedo() {
     aceEditor.getSession().getUndoManager().redo(false)
   }
 
-  function handleKeyDown (event) {
+  function handleKeyDown(event) {
     // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
     const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
 
@@ -224,14 +252,14 @@
     }
   }
 
-  function createAceEditor ({ target, ace, readOnly, indentation, onChange }) {
+  function createAceEditor({target, ace, readOnly, indentation, onChange}) {
     debug('create Ace editor')
 
     const aceEditor = ace.edit(target)
     const aceSession = aceEditor.getSession()
     aceEditor.$blockScrolling = Infinity
     aceEditor.setTheme(aceTheme)
-    aceEditor.setOptions({ readOnly })
+    aceEditor.setOptions({readOnly})
     aceEditor.setShowPrintMargin(false)
     aceEditor.setFontSize('13px')
     aceSession.setMode('ace/mode/json')
@@ -255,7 +283,7 @@
     return aceEditor
   }
 
-  function setAceEditorValue (text) {
+  function setAceEditorValue(text) {
     onChangeDisabled = true
     if (aceEditor && text !== aceEditorText) {
       aceEditorText = text
@@ -266,7 +294,7 @@
     onChangeDisabled = false
   }
 
-  function onChangeAceEditorValue () {
+  function onChangeAceEditorValue() {
     if (onChangeDisabled) {
       return
     }
@@ -282,13 +310,13 @@
     }
   }
 
-  function updateIndentation (indentation) {
+  function updateIndentation(indentation) {
     if (aceEditor) {
       aceEditor.getSession().setTabSize(indentation)
     }
   }
 
-  function updateCanUndoRedo () {
+  function updateCanUndoRedo() {
     const undoManager = aceEditor.getSession().getUndoManager()
 
     if (undoManager && undoManager.hasUndo && undoManager.hasRedo) {
@@ -297,11 +325,36 @@
     }
   }
 
-  function emitOnChange () {
+  function emitOnChange() {
     if (onChange) {
       onChange(text)
     }
   }
+
+  let jsonStatus = JSON_STATUS_VALID
+
+  function checkValidJson(text) {
+    try {
+      // FIXME: instead of parsing the JSON here (which is expensive),
+      //  get the parse error from the Ace Editor worker instead
+      JSON.parse(text)
+
+      jsonStatus = JSON_STATUS_VALID
+    } catch (err) {
+      try {
+        JSON.parse(jsonrepair(text))
+        jsonStatus = JSON_STATUS_REPAIRABLE
+      } catch (err) {
+        jsonStatus = JSON_STATUS_INVALID
+      }
+    }
+
+    debug('checked json status', jsonStatus)
+  }
+
+  const debouncedCheckValidJson = debounce(checkValidJson, CHECK_VALID_JSON_DELAY)
+
+  $: debouncedCheckValidJson(text)
 </script>
 
 <div
@@ -324,10 +377,34 @@
     />
   {/if}
   <div class="contents" bind:this={aceEditorRef}></div>
+  {#if jsonStatus === JSON_STATUS_REPAIRABLE}
+    <Message
+      type="error"
+      icon={faExclamationTriangle}
+      message="JSON document is invalid, but can be repaired."
+      actions={[
+        {
+          icon: faWrench,
+          text: 'Auto repair',
+          title: 'Automatically repair JSON',
+          onClick: handleRepair
+        }
+      ]}
+    />
+  {/if}
+  {#if jsonStatus === JSON_STATUS_INVALID}
+    <Message
+      type="error"
+      icon={faExclamationTriangle}
+      message="JSON document is invalid, and cannot be repaired automatically."
+    />
+  {/if}
   {#if validator}
-    <div class="info">
-      This BETA version of code mode doesn't have support yet for JSON Schema or custom validators.
-    </div>
+    <Message
+      type="error"
+      icon={faInfo}
+      message="This BETA version of code mode doesn't have support yet for JSON Schema or custom validators."
+    />
   {/if}
 </div>
 
