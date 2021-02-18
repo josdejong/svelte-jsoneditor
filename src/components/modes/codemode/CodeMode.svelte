@@ -171,6 +171,8 @@
     try {
       const oldText = text
       text = jsonrepair(text)
+      jsonStatus = JSON_STATUS_VALID
+      jsonParseError = undefined
 
       if (text !== oldText) {
         emitOnChange()
@@ -332,15 +334,18 @@
   }
 
   let jsonStatus = JSON_STATUS_VALID
+  let jsonParseError = undefined
 
   function checkValidJson(text) {
+    jsonStatus = JSON_STATUS_VALID
+    jsonParseError = undefined
+
     try {
       // FIXME: instead of parsing the JSON here (which is expensive),
       //  get the parse error from the Ace Editor worker instead
       JSON.parse(text)
-
-      jsonStatus = JSON_STATUS_VALID
     } catch (err) {
+      jsonParseError = err.toString()
       try {
         JSON.parse(jsonrepair(text))
         jsonStatus = JSON_STATUS_REPAIRABLE
@@ -355,6 +360,15 @@
   const debouncedCheckValidJson = debounce(checkValidJson, CHECK_VALID_JSON_DELAY)
 
   $: debouncedCheckValidJson(text)
+
+  $: repairActions = (jsonStatus === JSON_STATUS_REPAIRABLE)
+    ? [{
+      icon: faWrench,
+      text: 'Auto repair',
+      title: 'Automatically repair JSON',
+      onClick: handleRepair
+    }]
+    : []
 </script>
 
 <div
@@ -377,26 +391,12 @@
     />
   {/if}
   <div class="contents" bind:this={aceEditorRef}></div>
-  {#if jsonStatus === JSON_STATUS_REPAIRABLE}
+  {#if jsonParseError}
     <Message
       type="error"
       icon={faExclamationTriangle}
-      message="JSON document is invalid, but can be repaired."
-      actions={[
-        {
-          icon: faWrench,
-          text: 'Auto repair',
-          title: 'Automatically repair JSON',
-          onClick: handleRepair
-        }
-      ]}
-    />
-  {/if}
-  {#if jsonStatus === JSON_STATUS_INVALID}
-    <Message
-      type="error"
-      icon={faExclamationTriangle}
-      message="JSON document is invalid, and cannot be repaired automatically."
+      message={jsonParseError}
+      actions={repairActions}
     />
   {/if}
   {#if validator}
