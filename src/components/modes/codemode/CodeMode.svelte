@@ -263,7 +263,7 @@
     aceEditor.setTheme(aceTheme)
     aceEditor.setOptions({readOnly})
     aceEditor.setShowPrintMargin(false)
-    aceEditor.setFontSize('13px')
+    aceEditor.setFontSize('14px') // must correspond with CSS $font-size-mono
     aceSession.setMode('ace/mode/json')
     aceSession.setTabSize(indentation)
     aceSession.setUseSoftTabs(true)
