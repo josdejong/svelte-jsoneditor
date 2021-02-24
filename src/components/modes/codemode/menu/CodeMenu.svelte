@@ -74,7 +74,7 @@
     },
     {
       space: true
-    },
+    }
   ]
 
   $: items = onRenderMenu('code', defaultItems) || defaultItems

@@ -27,7 +27,7 @@
   import CopyPasteModal from '../../../modals/CopyPasteModal.svelte'
   import SearchBox from './SearchBox.svelte'
 
-  const {open} = getContext('simple-modal')
+  const { open } = getContext('simple-modal')
 
   export let readOnly
   export let searchText
@@ -67,26 +67,26 @@
     (selection.type === SELECTION_TYPE.MULTI) &&
     !isEmpty(selection.focusPath) // must not be root
   $: canExtract = selection != null && (
-      selection.type === SELECTION_TYPE.MULTI ||
+    selection.type === SELECTION_TYPE.MULTI ||
       selection.type === SELECTION_TYPE.VALUE
-    ) &&
+  ) &&
     !isEmpty(selection.focusPath) // must not be root
 
-  function handleToggleSearch() {
+  function handleToggleSearch () {
     showSearch = !showSearch
   }
 
-  function clearSearchResult() {
+  function clearSearchResult () {
     showSearch = false
     onSearchText('')
     setTimeout(onFocus)
   }
 
-  function handleInsertStructure() {
+  function handleInsertStructure () {
     onInsert('structure')
   }
 
-  function handlePasteFromMenu() {
+  function handlePasteFromMenu () {
     open(CopyPasteModal, {}, {
       ...SIMPLE_MODAL_OPTIONS,
       styleWindow: {
@@ -240,7 +240,7 @@
     },
     {
       space: true
-    },
+    }
   ]
 
   $: items = onRenderMenu('tree', defaultItems) || defaultItems

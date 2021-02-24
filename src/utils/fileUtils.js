@@ -7,7 +7,7 @@
  *                             want the output in KiB
  * @return {string} Returns a human readable size
  */
-export function formatSize(size, kilo = 1000) {
+export function formatSize (size, kilo = 1000) {
   if (size < 0.9 * kilo) {
     return size.toFixed() + ' B'
   }

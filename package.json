@@ -16,7 +16,7 @@
     "start": "rollup -c -w",
     "build": "rollup -c",
     "test": "mocha src/**/*.test.js",
-    "lint": "eslint --cache src/**/*.svelte src/**/*.js tools/**/*.js *.js --ignore-pattern src/generated --ignore-pattern examples",
+    "lint": "eslint --cache src/**/*.svelte src/**/*.js tools/**/*.js *.js --ignore-pattern src/generated --ignore-pattern examples --ignore-pattern tools/develop-svelte/**/*.js",
     "postinstall": "cd tools && node generateEmbeddedAceJsonWorker.js && cd ..",
     "prepublishOnly": "npm run lint && npm test && npm run build"
   },

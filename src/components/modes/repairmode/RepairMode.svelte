@@ -53,7 +53,7 @@
 
   $: debug('error', error)
 
-  function getErrorMessage(jsonText) {
+  function getErrorMessage (jsonText) {
     try {
       onParse(jsonText)
       return null
@@ -62,7 +62,7 @@
     }
   }
 
-  function isRepairable(jsonText) {
+  function isRepairable (jsonText) {
     try {
       onRepair(jsonText)
       return true
@@ -71,7 +71,7 @@
     }
   }
 
-  function goToError() {
+  function goToError () {
     if (domTextArea && error && error.position != null) {
       domTextArea.setSelectionRange(error.position, error.position)
       setTimeout(() => {
@@ -80,7 +80,7 @@
     }
   }
 
-  function handleChange(event) {
+  function handleChange (event) {
     debug('handleChange')
 
     const value = event.target.value
@@ -96,11 +96,11 @@
     }
   }
 
-  function handleApply() {
+  function handleApply () {
     onApply(text)
   }
 
-  function handleRepair() {
+  function handleRepair () {
     try {
       // TODO: simpleJsonRepair should also partially apply fixes. Now it's all or nothing
       text = onRepair(text)

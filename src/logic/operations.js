@@ -575,9 +575,9 @@ export function createRemoveOperations (json, state, selection) {
       const index = last(firstPath)
       const newSelection = index === 0
         ? createSelection(json, state, {
-            type: SELECTION_TYPE.INSIDE,
-            path: parentPath
-          })
+          type: SELECTION_TYPE.INSIDE,
+          path: parentPath
+        })
         : createSelection(json, state, {
           type: SELECTION_TYPE.AFTER,
           path: parentPath.concat([index - 1])
@@ -592,9 +592,9 @@ export function createRemoveOperations (json, state, selection) {
       const previousKey = keys[index - 1]
       const newSelection = index === 0
         ? createSelection(json, state, {
-            type: SELECTION_TYPE.INSIDE,
-            path: parentPath
-          })
+          type: SELECTION_TYPE.INSIDE,
+          path: parentPath
+        })
         : createSelection(json, state, {
           type: SELECTION_TYPE.AFTER,
           path: parentPath.concat([previousKey])

@@ -85,7 +85,7 @@
 
   const debug = createDebug('jsoneditor:TreeMode')
 
-  const {open} = getContext('simple-modal')
+  const { open } = getContext('simple-modal')
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
 
@@ -96,8 +96,8 @@
   const jump = createJump()
 
   export let readOnly = false
-  export let externalJson = undefined
-  export let externalText = undefined
+  export let externalJson
+  export let externalText
   export let mainMenuBar = true
   export let validator = null
   export let visible = true
@@ -109,7 +109,7 @@
   export let onRenderMenu = () => {
   }
 
-  function noop() {
+  function noop () {
   }
 
   /** @type {function (path: Path, value: *) : string} */
@@ -141,7 +141,7 @@
 
   let selection = null
 
-  function defaultExpand(path) {
+  function defaultExpand (path) {
     return path.length < 1
       ? true
       : (path.length === 1 && path[0] === 0) // first item of an array?
@@ -157,35 +157,35 @@
   let searchResult
   let searchHandler
 
-  function handleSearchProgress(results) {
+  function handleSearchProgress (results) {
     searchResult = updateSearchResult(json, results, searchResult)
   }
 
   const handleSearchProgressDebounced = throttle(handleSearchProgress, SEARCH_PROGRESS_THROTTLE)
 
-  function handleSearchDone(results) {
+  function handleSearchDone (results) {
     searchResult = updateSearchResult(json, results, searchResult)
     searching = false
     // debug('finished search')
   }
 
-  async function handleSearchText(text) {
+  async function handleSearchText (text) {
     searchText = text
     await tick() // await for the search results to be updated
     await focusActiveSearchResult(searchResult && searchResult.activeItem)
   }
 
-  async function handleNextSearchResult() {
+  async function handleNextSearchResult () {
     searchResult = searchNext(searchResult)
     await focusActiveSearchResult(searchResult && searchResult.activeItem)
   }
 
-  async function handlePreviousSearchResult() {
+  async function handlePreviousSearchResult () {
     searchResult = searchPrevious(searchResult)
     await focusActiveSearchResult(searchResult && searchResult.activeItem)
   }
 
-  async function focusActiveSearchResult(activeItem) {
+  async function focusActiveSearchResult (activeItem) {
     if (activeItem) {
       const path = initial(activeItem)
       state = expandPath(json, state, path)
@@ -218,11 +218,11 @@
   })
   let historyState = history.getState()
 
-  export function expand(callback = () => true) {
+  export function expand (callback = () => true) {
     state = syncState(json, state, [], callback, true)
   }
 
-  export function collapse(callback = () => false) {
+  export function collapse (callback = () => false) {
     state = syncState(json, state, [], callback, true)
   }
 
@@ -236,11 +236,11 @@
   let textIsRepaired = false
   $: textIsUnrepairable = (externalText !== undefined && json === undefined)
 
-  export function get() {
+  export function get () {
     return json
   }
 
-  function applyExternalJson(updatedJson) {
+  function applyExternalJson (updatedJson) {
     if (updatedJson === undefined) {
       return
     }
@@ -264,8 +264,8 @@
 
     if (!isNew && prevState) {
       history.add({
-        undo: [{op: 'replace', path: '', value: prevJson}],
-        redo: [{op: 'replace', path: '', value: json}],
+        undo: [{ op: 'replace', path: '', value: prevJson }],
+        redo: [{ op: 'replace', path: '', value: json }],
         prevState,
         state,
         prevSelection: removeEditModeFromSelection(selection),
@@ -274,7 +274,7 @@
     }
   }
 
-  function applyExternalText(text) {
+  function applyExternalText (text) {
     if (text === undefined || externalJson !== undefined) {
       return
     }
@@ -299,7 +299,7 @@
    * @param {JSONPatchDocument} operations
    * @param {Selection} [newSelection]
    */
-  export function patch(operations, newSelection) {
+  export function patch (operations, newSelection) {
     const prevState = state
     const prevSelection = selection
 
@@ -335,7 +335,7 @@
   $: debug('state', state)
   $: debug('selection', selection)
 
-  async function handleCut() {
+  async function handleCut () {
     if (readOnly || !selection) {
       return
     }
@@ -345,7 +345,7 @@
       return
     }
 
-    debug('cut', {selection, clipboard})
+    debug('cut', { selection, clipboard })
 
     try {
       await navigator.clipboard.writeText(clipboard)
@@ -360,13 +360,13 @@
     handlePatch(operations, newSelection)
   }
 
-  async function handleCopy() {
+  async function handleCopy () {
     const clipboard = selectionToPartialJson(json, selection, indentation)
     if (clipboard == null) {
       return
     }
 
-    debug('copy', {clipboard})
+    debug('copy', { clipboard })
 
     try {
       await navigator.clipboard.writeText(clipboard)
@@ -375,7 +375,7 @@
     }
   }
 
-  function handlePaste(event) {
+  function handlePaste (event) {
     event.preventDefault()
 
     if (readOnly || !selection) {
@@ -394,10 +394,10 @@
     }
   }
 
-  function doPaste(clipboardText) {
+  function doPaste (clipboardText) {
     const operations = insert(json, state, selection, clipboardText)
 
-    debug('paste', {clipboardText, operations, selection})
+    debug('paste', { clipboardText, operations, selection })
 
     handlePatch(operations)
 
@@ -410,7 +410,7 @@
       })
   }
 
-  function openRepairModal(text, onApply) {
+  function openRepairModal (text, onApply) {
     open(JSONRepairModal, {
       text,
       onParse: parsePartialJson,
@@ -435,7 +435,7 @@
     })
   }
 
-  function handleRemove() {
+  function handleRemove () {
     if (readOnly || !selection) {
       return
     }
@@ -445,12 +445,12 @@
       newSelection
     } = createRemoveOperations(json, state, selection)
 
-    debug('remove', {operations, selection, newSelection})
+    debug('remove', { operations, selection, newSelection })
 
     handlePatch(operations, newSelection)
   }
 
-  function handleDuplicate() {
+  function handleDuplicate () {
     if (
       readOnly ||
       !selection ||
@@ -460,14 +460,14 @@
       return
     }
 
-    debug('duplicate', {selection})
+    debug('duplicate', { selection })
 
     const operations = duplicate(json, state, selection.paths)
 
     handlePatch(operations)
   }
 
-  function handleExtract() {
+  function handleExtract () {
     if (
       readOnly ||
       !selection ||
@@ -477,7 +477,7 @@
       return
     }
 
-    debug('extract', {selection})
+    debug('extract', { selection })
 
     const operations = extract(json, state, selection)
 
@@ -493,7 +493,7 @@
   /**
    * @param {'value' | 'object' | 'array' | 'structure'} type
    */
-  function handleInsert(type) {
+  function handleInsert (type) {
     if (readOnly || !selection) {
       return
     }
@@ -501,7 +501,7 @@
     const newValue = createNewValue(json, selection, type)
     const data = JSON.stringify(newValue)
     const operations = insert(json, state, selection, data)
-    debug('handleInsert', {type, operations, newValue, data})
+    debug('handleInsert', { type, operations, newValue, data })
 
     handlePatch(operations)
 
@@ -534,7 +534,7 @@
       })
   }
 
-  function replaceActiveElementContents(char) {
+  function replaceActiveElementContents (char) {
     const activeElement = getWindow(domJsonEditor).document.activeElement
     if (activeElement.isContentEditable) {
       activeElement.textContent = char
@@ -543,7 +543,7 @@
     }
   }
 
-  async function handleInsertCharacter(char) {
+  async function handleInsertCharacter (char) {
     // a regular key like a, A, _, etc is entered.
     // Replace selected contents with a new value having this first character as text
     if (readOnly || !selection) {
@@ -551,7 +551,7 @@
     }
 
     if (selection.type === SELECTION_TYPE.KEY) {
-      selection = {...selection, edit: true}
+      selection = { ...selection, edit: true }
       await tick()
       setTimeout(() => replaceActiveElementContents(char))
       return
@@ -566,7 +566,7 @@
         selection.type === SELECTION_TYPE.VALUE &&
         !isObjectOrArray(getIn(json, selection.focusPath))
       ) {
-        selection = {...selection, edit: true}
+        selection = { ...selection, edit: true }
         await tick()
         setTimeout(() => replaceActiveElementContents(char))
       } else {
@@ -575,7 +575,7 @@
     }
   }
 
-  async function handleInsertValueWithCharacter(char) {
+  async function handleInsertValueWithCharacter (char) {
     if (readOnly || !selection) {
       return
     }
@@ -598,7 +598,7 @@
     setTimeout(() => replaceActiveElementContents(char))
   }
 
-  function handleUndo() {
+  function handleUndo () {
     if (!history.getState().canUndo) {
       return
     }
@@ -612,14 +612,14 @@
     state = item.prevState
     selection = item.prevSelection
 
-    debug('undo', {item, json, state, selection})
+    debug('undo', { item, json, state, selection })
 
     emitOnChange()
 
     focus()
   }
 
-  function handleRedo() {
+  function handleRedo () {
     if (!history.getState().canRedo) {
       return
     }
@@ -633,14 +633,14 @@
     state = item.state
     selection = item.selection
 
-    debug('redo', {item, json, state, selection})
+    debug('redo', { item, json, state, selection })
 
     emitOnChange()
 
     focus()
   }
 
-  function handleSort() {
+  function handleSort () {
     if (readOnly) {
       return
     }
@@ -664,7 +664,7 @@
     })
   }
 
-  function handleTransform() {
+  function handleTransform () {
     if (readOnly) {
       return
     }
@@ -693,7 +693,7 @@
    * Scroll the window vertically to the node with given path
    * @param {Path} path
    */
-  export async function scrollTo(path) {
+  export async function scrollTo (path) {
     state = expandPath(json, state, path)
     await tick()
 
@@ -701,7 +701,7 @@
     const offset = -(divContents.getBoundingClientRect().height / 4)
 
     if (elem) {
-      debug('scrollTo', {path, elem, divContents})
+      debug('scrollTo', { path, elem, divContents })
       jump(elem, {
         container: divContents,
         offset,
@@ -714,7 +714,7 @@
    * Find the DOM element of a given path.
    * Note that the path can only be found when the node is expanded.
    */
-  export function findElement(path) {
+  export function findElement (path) {
     return divContents.querySelector(`div[data-path="${compileJSONPointer(path)}"]`)
   }
 
@@ -723,7 +723,7 @@
    * When the path is already in view, nothing is done
    * @param {Path} path
    */
-  function scrollIntoView(path) {
+  function scrollIntoView (path) {
     const elem = divContents.querySelector(`div[data-path="${compileJSONPointer(path)}"]`)
 
     if (elem) {
@@ -752,7 +752,7 @@
     }
   }
 
-  function emitOnChange() {
+  function emitOnChange () {
     onChange(json)
   }
 
@@ -762,7 +762,7 @@
    *                                   The new selection will be determined
    *                                   based on the operations.
    */
-  function handlePatch(
+  function handlePatch (
     operations,
     newSelection = createSelectionFromOperations(json, operations)
   ) {
@@ -785,7 +785,7 @@
    * @param {boolean} expanded  True to expand, false to collapse
    * @param {boolean} [recursive=false]  Only applicable when expanding
    */
-  function handleExpand(path, expanded, recursive = false) {
+  function handleExpand (path, expanded, recursive = false) {
     // TODO: move this function into documentState.js
     if (recursive) {
       state = updateIn(state, path, (childState) => {
@@ -815,18 +815,18 @@
     })
   }
 
-  function handleExpandAll() {
+  function handleExpandAll () {
     handleExpand([], true, true)
   }
 
-  function handleCollapseAll() {
+  function handleCollapseAll () {
     handleExpand([], false, true)
   }
 
   /**
    * @param {SelectionSchema} selectionSchema
    */
-  function handleSelect(selectionSchema) {
+  function handleSelect (selectionSchema) {
     if (selectionSchema) {
       selection = createSelection(json, state, selectionSchema)
     } else {
@@ -838,13 +838,13 @@
     setTimeout(() => focus())
   }
 
-  function handleExpandSection(path, section) {
+  function handleExpandSection (path, section) {
     debug('handleExpandSection', path, section)
 
     state = expandSection(json, state, path, section)
   }
 
-  function handleKeyDown(event) {
+  function handleKeyDown (event) {
     // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
     const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
     const keepAnchorPath = event.shiftKey
@@ -1011,7 +1011,7 @@
     }
   }
 
-  function handleMouseDown(event) {
+  function handleMouseDown (event) {
     // TODO: ugly to have to have two setTimeout here. Without it, hiddenInput will blur
     setTimeout(() => {
       setTimeout(() => {
@@ -1023,7 +1023,7 @@
     })
   }
 
-  export function focus() {
+  export function focus () {
     // with just .focus(), sometimes the input doesn't react on onpaste events
     // in Chrome when having a large document open and then doing cut/paste.
     // Calling both .focus() and .select() did solve this issue.

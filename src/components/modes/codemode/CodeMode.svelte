@@ -102,11 +102,11 @@
     ? new window.ResizeObserver(resize)
     : null
 
-  const {open} = getContext('simple-modal')
+  const { open } = getContext('simple-modal')
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
 
-  export function focus() {
+  export function focus () {
     aceEditor.focus()
   }
 
@@ -122,7 +122,7 @@
   /**
    * @param {JSONPatchDocument} operations
    */
-  export function patch(operations) {
+  export function patch (operations) {
     debug('patch', operations)
 
     const oldText = text
@@ -142,12 +142,12 @@
     }
   }
 
-  function resize() {
+  function resize () {
     const force = false
     aceEditor.resize(force)
   }
 
-  function handleFormat() {
+  function handleFormat () {
     debug('format')
     try {
       const oldText = text
@@ -162,7 +162,7 @@
     }
   }
 
-  function handleCompact() {
+  function handleCompact () {
     debug('compact')
     try {
       const oldText = text
@@ -177,7 +177,7 @@
     }
   }
 
-  function handleRepair() {
+  function handleRepair () {
     debug('repair')
     try {
       const oldText = text
@@ -193,7 +193,7 @@
     }
   }
 
-  function handleSort() {
+  function handleSort () {
     if (readOnly) {
       return
     }
@@ -217,7 +217,7 @@
     }
   }
 
-  function handleTransform() {
+  function handleTransform () {
     if (readOnly) {
       return
     }
@@ -242,15 +242,15 @@
     }
   }
 
-  function handleUndo() {
+  function handleUndo () {
     aceEditor.getSession().getUndoManager().undo(false)
   }
 
-  function handleRedo() {
+  function handleRedo () {
     aceEditor.getSession().getUndoManager().redo(false)
   }
 
-  function handleKeyDown(event) {
+  function handleKeyDown (event) {
     // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
     const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
 
@@ -275,19 +275,19 @@
     }
   }
 
-  function handleAcceptTooLarge() {
+  function handleAcceptTooLarge () {
     acceptTooLarge = true
     setAceEditorValue(text, true)
   }
 
-  function createAceEditor({target, ace, readOnly, indentation, onChange}) {
+  function createAceEditor ({ target, ace, readOnly, indentation, onChange }) {
     debug('create Ace editor')
 
     const aceEditor = ace.edit(target)
     const aceSession = aceEditor.getSession()
     aceEditor.$blockScrolling = Infinity
     aceEditor.setTheme(aceTheme)
-    aceEditor.setOptions({readOnly})
+    aceEditor.setOptions({ readOnly })
     aceEditor.setShowPrintMargin(false)
     aceEditor.setFontSize('14px') // must correspond with CSS $font-size-mono
     aceSession.setMode('ace/mode/json')
@@ -311,7 +311,7 @@
     return aceEditor
   }
 
-  function setAceEditorValue(text, force = false) {
+  function setAceEditorValue (text, force = false) {
     if (aceEditorDisabled && !force) {
       debug('not applying text: editor is disabled')
       return
@@ -327,7 +327,7 @@
     onChangeDisabled = false
   }
 
-  function onChangeAceEditorValue() {
+  function onChangeAceEditorValue () {
     if (onChangeDisabled) {
       return
     }
@@ -343,13 +343,13 @@
     }
   }
 
-  function updateIndentation(indentation) {
+  function updateIndentation (indentation) {
     if (aceEditor) {
       aceEditor.getSession().setTabSize(indentation)
     }
   }
 
-  function updateCanUndoRedo() {
+  function updateCanUndoRedo () {
     const undoManager = aceEditor.getSession().getUndoManager()
 
     if (undoManager && undoManager.hasUndo && undoManager.hasRedo) {
@@ -360,22 +360,22 @@
 
   const updateCancelUndoRedoDebounced = debounce(updateCanUndoRedo, 0) // just on next tick
 
-  function emitOnChange() {
+  function emitOnChange () {
     if (onChange) {
       onChange(text)
     }
   }
 
   let jsonStatus = JSON_STATUS_VALID
-  let jsonParseError = undefined
+  let jsonParseError
 
-  function checkValidJson(text) {
+  function checkValidJson (text) {
     jsonStatus = JSON_STATUS_VALID
     jsonParseError = undefined
 
     // FIXME: utilize the parse errors coming from AceEditor worker, only try to repair then
     if (text.length > MAX_REPAIRABLE_SIZE) {
-      debug(`checkValidJson: not validating, document too large`)
+      debug('checkValidJson: not validating, document too large')
       return
     }
 
@@ -402,11 +402,11 @@
 
   $: repairActions = (jsonStatus === JSON_STATUS_REPAIRABLE)
     ? [{
-      icon: faWrench,
-      text: 'Auto repair',
-      title: 'Automatically repair JSON',
-      onClick: handleRepair
-    }]
+        icon: faWrench,
+        text: 'Auto repair',
+        title: 'Automatically repair JSON',
+        onClick: handleRepair
+      }]
     : []
 </script>
 
