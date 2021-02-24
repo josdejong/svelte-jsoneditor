@@ -26,14 +26,14 @@
   $: defaultItems = [
     {
       icon: faJSONEditorFormat,
-      title: 'Format JSON: add proper indentation and new lines (Ctrl+\\)',
+      title: 'Format JSON: add proper indentation and new lines (Ctrl+I)',
       className: 'format',
       onClick: onFormat,
       disabled: readOnly
     },
     {
       icon: faJSONEditorCompact,
-      title: 'Compact JSON: remove all white spacing and new lines (Ctrl+Shift+\\)',
+      title: 'Compact JSON: remove all white spacing and new lines (Ctrl+Shift+I)',
       className: 'compact',
       onClick: onCompact,
       disabled: readOnly

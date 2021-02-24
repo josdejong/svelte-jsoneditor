@@ -254,13 +254,23 @@
     // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
     const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
 
-    if (combo === 'Ctrl+\\') {
+    debug('keydown', combo)
+
+    if (
+      combo === 'Ctrl+I' ||
+      combo === 'Ctrl+\\' // for backward compatibility
+    ) {
       event.preventDefault()
+      event.stopPropagation()
       handleFormat()
     }
 
-    if (combo === 'Ctrl+Shift+\\') {
+    if (
+      combo === 'Ctrl+Shift+I' ||
+      combo === 'Ctrl+Shift+\\' // for backward compatibility
+    ) {
       event.preventDefault()
+      event.stopPropagation()
       handleCompact()
     }
   }
