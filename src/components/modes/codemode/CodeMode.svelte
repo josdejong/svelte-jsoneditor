@@ -14,6 +14,7 @@
     JSON_STATUS_INVALID,
     JSON_STATUS_REPAIRABLE,
     JSON_STATUS_VALID,
+    MAX_REPAIRABLE_SIZE,
     SORT_MODAL_OPTIONS,
     TRANSFORM_MODAL_OPTIONS
   } from '../../../constants.js'
@@ -74,14 +75,17 @@
   })
 
   onDestroy(() => {
-    debug('Destroy Ace editor')
-    aceEditor.destroy()
-    aceEditor = null
+    checkValidJsonDebounced.cancel()
+    updateCancelUndoRedoDebounced.cancel()
 
     if (resizeObserver) {
       resizeObserver.unobserve(aceEditorRef)
       resizeObserver = null
     }
+
+    debug('Destroy Ace editor')
+    aceEditor.destroy()
+    aceEditor = null
   })
 
   let canUndo = false
@@ -291,7 +295,7 @@
       aceEditorText = text
       aceEditor.setValue(text, -1)
 
-      setTimeout(() => updateCanUndoRedo())
+      updateCancelUndoRedoDebounced()
     }
     onChangeDisabled = false
   }
@@ -306,7 +310,7 @@
     if (text !== aceEditorText) {
       text = aceEditorText
 
-      setTimeout(() => updateCanUndoRedo())
+      updateCancelUndoRedoDebounced()
 
       emitOnChange()
     }
@@ -327,6 +331,8 @@
     }
   }
 
+  const updateCancelUndoRedoDebounced = debounce(updateCanUndoRedo, 0) // just on next tick
+
   function emitOnChange() {
     if (onChange) {
       onChange(text)
@@ -339,6 +345,12 @@
   function checkValidJson(text) {
     jsonStatus = JSON_STATUS_VALID
     jsonParseError = undefined
+
+    // FIXME: utilize the parse errors coming from AceEditor worker, only try to repair then
+    if (text.length > MAX_REPAIRABLE_SIZE) {
+      debug(`checkValidJson: not validating, document too large`)
+      return
+    }
 
     try {
       // FIXME: instead of parsing the JSON here (which is expensive),
@@ -357,9 +369,9 @@
     debug('checked json status', jsonStatus)
   }
 
-  const debouncedCheckValidJson = debounce(checkValidJson, CHECK_VALID_JSON_DELAY)
+  const checkValidJsonDebounced = debounce(checkValidJson, CHECK_VALID_JSON_DELAY)
 
-  $: debouncedCheckValidJson(text)
+  $: checkValidJsonDebounced(text)
 
   $: repairActions = (jsonStatus === JSON_STATUS_REPAIRABLE)
     ? [{

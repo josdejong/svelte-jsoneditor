@@ -22,6 +22,7 @@ export const MAX_SEARCH_RESULTS = 1000
 export const ARRAY_SECTION_SIZE = 100
 export const DEFAULT_VISIBLE_SECTIONS = [{ start: 0, end: ARRAY_SECTION_SIZE }]
 export const MAX_PREVIEW_CHARACTERS = 20e3 // characters
+export const MAX_REPAIRABLE_SIZE = 1024 * 1024 // 1 MB
 
 export const INDENTATION_WIDTH = 18 // pixels IMPORTANT: keep in sync with sass constant $indentation-width
 

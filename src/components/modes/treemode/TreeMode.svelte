@@ -16,6 +16,7 @@
   import { getContext, onDestroy, onMount, tick } from 'svelte'
   import { createJump } from '../../../assets/jump.js/src/jump.js'
   import {
+    MAX_REPAIRABLE_SIZE,
     MAX_SEARCH_RESULTS,
     SCROLL_DURATION,
     SEARCH_PROGRESS_THROTTLE,
@@ -284,8 +285,10 @@
       applyExternalJson(JSON.parse(text))
     } catch (err) {
       try {
-        textIsRepaired = true
-        applyExternalJson(JSON.parse(jsonrepair(text)))
+        if (text.length < MAX_REPAIRABLE_SIZE) {
+          applyExternalJson(JSON.parse(jsonrepair(text)))
+          textIsRepaired = true
+        }
       } catch (err) {
         json = undefined
       }
