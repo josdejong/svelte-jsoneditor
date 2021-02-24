@@ -25,6 +25,11 @@
     color: $white;
   }
 
+  &.warning {
+    background: $warning-color;
+    color: $white;
+  }
+
   .actions {
     display: flex;
     gap: $padding;

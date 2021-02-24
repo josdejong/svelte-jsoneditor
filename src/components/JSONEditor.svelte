@@ -210,6 +210,10 @@
     mode = MODE.CODE
   }
 
+  function handleSwitchToTreeMode () {
+    mode = MODE.TREE
+  }
+
   function handleFocus() {
     hasFocus = true
     if (onFocus) {
@@ -267,6 +271,7 @@
           mainMenuBar={mainMenuBar}
           validator={validator}
           onChange={handleChangeText}
+          onSwitchToTreeMode={handleSwitchToTreeMode}
           onError={onError}
           onFocus={handleFocus}
           onBlur={handleBlur}

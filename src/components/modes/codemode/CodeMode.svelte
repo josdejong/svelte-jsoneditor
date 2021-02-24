@@ -14,12 +14,14 @@
     JSON_STATUS_INVALID,
     JSON_STATUS_REPAIRABLE,
     JSON_STATUS_VALID,
+    MAX_DOCUMENT_SIZE_CODE_MODE,
     MAX_REPAIRABLE_SIZE,
     SORT_MODAL_OPTIONS,
     TRANSFORM_MODAL_OPTIONS
   } from '../../../constants.js'
   import { activeElementIsChildOf, getWindow } from '../../../utils/domUtils.js'
   import { keyComboFromEvent } from '../../../utils/keyBindings.js'
+  import { formatSize } from '../../../utils/fileUtils.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import SortModal from '../../modals/SortModal.svelte'
@@ -34,6 +36,7 @@
   export let aceTheme = 'ace/theme/jsoneditor' // TODO: make aceTheme configurable
   export let validator
   export let onChange = null
+  export let onSwitchToTreeMode = () => {}
   export let onError
   export let onFocus = () => {
   }
@@ -50,6 +53,10 @@
   let domCodeMode
 
   let onChangeDisabled = false
+  let acceptTooLarge = false
+
+  $: tooLarge = text && text.length > MAX_DOCUMENT_SIZE_CODE_MODE
+  $: aceEditorDisabled = tooLarge && !acceptTooLarge
 
   $: setAceEditorValue(text)
   $: updateIndentation(indentation)
@@ -258,6 +265,11 @@
     }
   }
 
+  function handleAcceptTooLarge() {
+    acceptTooLarge = true
+    setAceEditorValue(text, true)
+  }
+
   function createAceEditor({target, ace, readOnly, indentation, onChange}) {
     debug('create Ace editor')
 
@@ -289,7 +301,12 @@
     return aceEditor
   }
 
-  function setAceEditorValue(text) {
+  function setAceEditorValue(text, force = false) {
+    if (aceEditorDisabled && !force) {
+      debug('not applying text: editor is disabled')
+      return
+    }
+
     onChangeDisabled = true
     if (aceEditor && text !== aceEditorText) {
       aceEditorText = text
@@ -402,7 +419,31 @@
       onRenderMenu={onRenderMenu}
     />
   {/if}
-  <div class="contents" bind:this={aceEditorRef}></div>
+  {#if aceEditorDisabled}
+    <Message
+      icon={faExclamationTriangle}
+      type="error"
+      message={
+        `The JSON document is larger than ${formatSize(MAX_DOCUMENT_SIZE_CODE_MODE, 1024)}, ` +
+        `and may crash your browser when loading it in code mode. Actual size: ${formatSize(text.length, 1024)}.`
+      }
+      actions={[
+          {
+            text: 'Open anyway',
+            title: 'Open the document in code mode',
+            onClick: handleAcceptTooLarge
+          },
+          {
+            text: 'Open in tree mode',
+            title: 'Open the document in tree mode',
+            onClick: onSwitchToTreeMode
+          }
+        ]}
+    />
+  {/if}
+
+  <div class="contents" class:visible={!aceEditorDisabled} bind:this={aceEditorRef}></div>
+
   {#if jsonParseError}
     <Message
       type="error"
@@ -411,11 +452,12 @@
       actions={repairActions}
     />
   {/if}
+
   {#if validator}
     <Message
-      type="error"
+      type="warning"
       icon={faInfoCircle}
-      message="This BETA version of code mode doesn't have support yet for JSON Schema or custom validators."
+      message="This BETA version of code mode doesn't yet have support for JSON Schema or custom validators."
     />
   {/if}
 </div>
