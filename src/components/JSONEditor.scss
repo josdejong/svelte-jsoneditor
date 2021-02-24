@@ -9,24 +9,4 @@
   &.focus {
     box-shadow: $outline-shadow;
   }
-
-  :global(.menu .button.selected ) {
-    width: $menu-button-size - 2 * $pressed-button-margin;
-    height: $menu-button-size - 2 * $pressed-button-margin;
-    margin: $pressed-button-margin;
-    $p: $padding/2 - $pressed-button-margin;
-    padding: ($p + 1px) ($p - 1px) ($p - 1px) ($p + 1px);
-
-    box-shadow: inset 1px 1px 2px #1d4075;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 1px;
-
-    color: white;
-    cursor: pointer;
-
-    &:hover,
-    &:focus {
-      background: rgba(255, 255, 255, 0.4);
-    }
-  }
 }
