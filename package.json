@@ -1,7 +1,7 @@
 {
   "name": "svelte-jsoneditor",
   "description": "A web-based tool to view, edit, format, transform, and validate JSON",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "svelte": "dist/jsoneditor.mjs",
   "module": "dist/jsoneditor.mjs",
   "main": "dist/jsoneditor.js",
@@ -17,7 +17,7 @@
     "build": "rollup -c",
     "test": "mocha src/**/*.test.js",
     "lint": "eslint --cache src/**/*.svelte src/**/*.js tools/**/*.js *.js --ignore-pattern src/generated --ignore-pattern examples --ignore-pattern tools/develop-svelte/**/*.js",
-    "postinstall": "cd tools && node generateEmbeddedAceJsonWorker.js && cd ..",
+    "prepare": "cd tools && node generateEmbeddedAceJsonWorker.js && cd ..",
     "prepublishOnly": "npm run lint && npm test && npm run build"
   },
   "dependencies": {
