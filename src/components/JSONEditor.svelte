@@ -15,7 +15,7 @@
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
 
-  export let json
+  export let json = {}
   // eslint-disable-next-line no-undef-init
   export let text = undefined
   export let readOnly = false
