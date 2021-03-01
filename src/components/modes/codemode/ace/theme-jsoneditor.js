@@ -37,7 +37,7 @@ color: #333
 }
 
 .ace-jsoneditor.ace_editor {
-font-family: consolas, monaco, "lucida console", "dejavu sans mono", "droid sans mono", monospace, "courier new",  courier;
+font-family: consolas, monaco, "lucida console", "dejavu sans mono", "droid sans mono", monospace, "courier new", courier;
 line-height: 1.3;
 background-color: #fff;
 }
