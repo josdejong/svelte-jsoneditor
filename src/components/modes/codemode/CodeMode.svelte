@@ -15,7 +15,7 @@
     JSON_STATUS_REPAIRABLE,
     JSON_STATUS_VALID,
     MAX_DOCUMENT_SIZE_CODE_MODE,
-    MAX_REPAIRABLE_SIZE,
+    MAX_AUTO_REPAIRABLE_SIZE,
     SORT_MODAL_OPTIONS,
     TRANSFORM_MODAL_OPTIONS
   } from '../../../constants.js'
@@ -374,7 +374,7 @@
     jsonParseError = undefined
 
     // FIXME: utilize the parse errors coming from AceEditor worker, only try to repair then
-    if (text.length > MAX_REPAIRABLE_SIZE) {
+    if (text.length > MAX_AUTO_REPAIRABLE_SIZE) {
       debug('checkValidJson: not validating, document too large')
       return
     }
