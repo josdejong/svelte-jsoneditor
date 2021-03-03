@@ -2,9 +2,7 @@
 
 // TODO: simplify the CSS needed to correctly highlight the selection
 
-@mixin json-node-selected-mixin ($selection-background, $selection-color) {
-  $selection-background-meta: lighten($selection-background, 15%);
-
+@mixin json-node-selected-mixin ($selection-background) {
   // entry selected
   &.selected {
     .header,
@@ -15,21 +13,6 @@
     :global(.key),
     :global(.value) {
       background-color: $selection-background !important;
-      color: $selection-color;
-    }
-
-    .bracket,
-    .separator,
-    .index {
-      color: $selection-background-meta;
-    }
-
-    .tag {
-      background: $selection-background-meta;
-    }
-
-    :global(.boolean-toggle) {
-      color: $selection-color;
     }
   }
 
@@ -38,7 +21,6 @@
     > .contents-outer > .contents > :global(.identifier) > :global(.key),
     > .header-outer > .header > :global(.identifier) > :global(.key) {
       background-color: $selection-background;
-      color: $selection-color;
 
       &.empty::after {
         content: none;
@@ -49,7 +31,6 @@
   // value selected (part 1)
   &.selected-value > .contents-outer > .contents > :global(.value) {
     background-color: $selection-background;
-    color: $selection-color;
 
     &.empty::after {
       content: none;
@@ -66,15 +47,6 @@
             linear-gradient(to bottom left, transparent 50.5%, $theme-color-light 50.5%),
             linear-gradient(to top right, transparent 50.5%, $theme-color-light 50.5%),
             linear-gradient(to top left, transparent 50.5%, $theme-color-light 50.5%);
-    color: $selection-color;
-
-    :global(.expand-items) {
-      color: $selection-color;
-
-      :global(&:hover) {
-        color: $red;
-      }
-    }
   }
 
   // value selected (part 2)
@@ -90,22 +62,10 @@
     .items .footer,
     .items .expand {
       background-color: $selection-background !important;
-      color: $selection-color;
 
       :global(.key),
       :global(.value) {
         background-color: $selection-background !important;
-        color: $selection-color;
-      }
-
-      .index,
-      .bracket,
-      .separator {
-        color: $selection-background-meta;
-      }
-
-      .tag {
-        background: $selection-background-meta;
       }
     }
   }
@@ -114,7 +74,7 @@
     &.selected {
       display: flex;
       z-index: 2;
-      outline-color: $selection-background;
+      outline-color: $dark-gray;
     }
   }
 }

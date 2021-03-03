@@ -13,8 +13,7 @@ div.editable-div {
 
   &[contenteditable="true"] {
     outline: 2px solid $edit-border-color;
-    background: $theme-color;
-    color: $selection-color !important;
+    background: $white !important;
     position: relative;
     border-radius: 0;
     z-index: 3; // must be on top of hovering the entry below it

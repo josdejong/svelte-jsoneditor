@@ -102,7 +102,7 @@
   }
 
   .insert-area {
-    $height: 4px;
+    $height: 2px;
 
     display: none;
     position: relative;
@@ -125,6 +125,8 @@
       display: none;
     }
   }
+
+  @include json-node-selected-mixin($selection-background);
 }
 
 .expand {
@@ -205,16 +207,6 @@
 
 .identifier {
   vertical-align: top;
-}
-
-.json-node {
-  @include json-node-selected-mixin($selection-background, $selection-color);
-}
-
-:global(.jsoneditor-main:not(.focus)) {
-  .json-node {
-    @include json-node-selected-mixin($light-gray, $white);
-  }
 }
 
 :global(.bubble.dark) {
