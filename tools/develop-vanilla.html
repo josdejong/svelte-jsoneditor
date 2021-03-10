@@ -137,6 +137,7 @@
   const props = {
     json,
     onChange: ({ json, text }) => console.log('onChange', { json, text }),
+    onChangeMode: (mode) => console.log('onChangeMode', mode),
     onFocus: () => console.log('got focus...'),
     onBlur: () => console.log('lost focus...'),
     validator: json => {
@@ -240,12 +241,8 @@
       console.timeEnd('load file')
       const text = event.target.result
 
-      console.time('parse JSON')
-      const json = JSON.parse(text)
-      console.timeEnd('parse JSON')
-
       console.time('set JSON')
-      testEditor.set(json)
+      testEditor.setText(text)
       console.timeEnd('set JSON')
     }
     reader.readAsText(file)

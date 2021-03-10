@@ -215,10 +215,12 @@
 
   function handleRequestRepair() {
     mode = MODE.CODE
+    onChangeMode(mode)
   }
 
   function handleSwitchToTreeMode() {
     mode = MODE.TREE
+    onChangeMode(mode)
   }
 
   function handleFocus() {
