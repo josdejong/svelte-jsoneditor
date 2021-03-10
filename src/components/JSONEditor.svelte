@@ -296,6 +296,7 @@
             onChange={handleChangeText}
             onFocus={handleFocus}
             onBlur={handleBlur}
+            onRenderMenu={handleCreateMenu}
           />
         {/if}
         <TreeMode

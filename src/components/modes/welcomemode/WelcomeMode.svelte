@@ -19,6 +19,7 @@
   export let onChange
   export let onFocus
   export let onBlur
+  export let onRenderMenu = () => {}
   export let readOnly = false
 
   let domWelcomeMode
@@ -103,7 +104,7 @@
     domHiddenInput.select()
   }
 
-  const items = [
+  const defaultItems = [
     {
       icon: faPaste,
       title: 'Paste (Ctrl+V)',
@@ -143,6 +144,9 @@
       ]
     }
   ]
+
+
+  $: items = onRenderMenu('tree', defaultItems) || defaultItems
 </script>
 
 
