@@ -87,6 +87,18 @@
 		}}>
 			Update text (invalid)
 		</button>
+		<button on:click={() => {
+			text = ''
+			json = undefined
+		}}>
+			Set empty text
+		</button>
+		<button on:click={() => {
+			text = undefined
+			json = ''
+		}}>
+			Set empty string
+		</button>
 	</p>
 	<div class="columns">
 		<div class="left">

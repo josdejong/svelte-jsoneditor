@@ -20,6 +20,10 @@
   export let onRedo
   export let canUndo
   export let canRedo
+  export let canFormat
+  export let canCompact
+  export let canSort
+  export let canTransform
   export let onRenderMenu = () => {}
 
   /* @type {MenuItem[]} */
@@ -29,14 +33,14 @@
       title: 'Format JSON: add proper indentation and new lines (Ctrl+I)',
       className: 'format',
       onClick: onFormat,
-      disabled: readOnly
+      disabled: readOnly || !canFormat
     },
     {
       icon: faJSONEditorCompact,
       title: 'Compact JSON: remove all white spacing and new lines (Ctrl+Shift+I)',
       className: 'compact',
       onClick: onCompact,
-      disabled: readOnly
+      disabled: readOnly || !canCompact
     },
     {
       separator: true
@@ -46,14 +50,14 @@
       title: 'Sort',
       className: 'sort',
       onClick: onSort,
-      disabled: readOnly
+      disabled: readOnly || !canSort
     },
     {
       icon: faFilter,
       title: 'Transform contents (filter, sort, project)',
       className: 'transform',
       onClick: onTransform,
-      disabled: readOnly
+      disabled: readOnly || !canTransform
     },
     {
       separator: true

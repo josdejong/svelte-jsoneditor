@@ -55,6 +55,7 @@
   let onChangeDisabled = false
   let acceptTooLarge = false
 
+  $: isNewDocument = text.length === 0
   $: tooLarge = text && text.length > MAX_DOCUMENT_SIZE_CODE_MODE
   $: aceEditorDisabled = tooLarge && !acceptTooLarge
 
@@ -379,6 +380,11 @@
       return
     }
 
+    if (isNewDocument) {
+      // new, empty document, do not try to parse
+      return
+    }
+
     try {
       // FIXME: instead of parsing the JSON here (which is expensive),
       //  get the parse error from the Ace Editor worker instead
@@ -424,6 +430,10 @@
       onTransform={handleTransform}
       onUndo={handleUndo}
       onRedo={handleRedo}
+      canFormat={!isNewDocument}
+      canCompact={!isNewDocument}
+      canSort={!isNewDocument}
+      canTransform={!isNewDocument}
       canUndo={canUndo}
       canRedo={canRedo}
       onRenderMenu={onRenderMenu}

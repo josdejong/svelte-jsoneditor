@@ -80,7 +80,6 @@
   import TransformModal from '../../modals/TransformModal.svelte'
   import JSONNode from './JSONNode.svelte'
   import TreeMenu from './menu/TreeMenu.svelte'
-  import Welcome from './Welcome.svelte'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -146,7 +145,6 @@
       : (path.length === 1 && path[0] === 0) // first item of an array?
   }
 
-  $: jsonIsEmpty = json !== ''
   $: validationErrorsList = validator ? validator(json) : []
   $: validationErrors = mapValidationErrors(validationErrorsList)
 
@@ -1030,7 +1028,7 @@
 </script>
 
 <div
-  class="jsoneditor"
+  class="tree-mode"
   class:visible
   on:keydown={handleKeyDown}
   on:mousedown={handleMouseDown}
@@ -1096,9 +1094,6 @@
     </div>
   {:else}
     <div class="contents" bind:this={divContents}>
-      {#if !jsonIsEmpty}
-        <Welcome />
-      {/if}
       <JSONNode
         value={json}
         path={[]}

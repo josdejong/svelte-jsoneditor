@@ -7,6 +7,7 @@
   import { faCode } from '@fortawesome/free-solid-svg-icons'
   import createDebug from 'debug'
   import Modal from 'svelte-simple-modal'
+  import WelcomeMode from './modes/welcomemode/WelcomeMode.svelte'
   import { MODE } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
   import CodeMode from './modes/codemode/CodeMode.svelte'
@@ -24,40 +25,46 @@
   export let mainMenuBar = true
   export let validator = null
   export let onChange = null
-  export let onClassName = () => {}
-  export let onRenderMenu = () => {}
-  export let onChangeMode = () => {}
+  export let onClassName = () => {
+  }
+  export let onRenderMenu = () => {
+  }
+  export let onChangeMode = () => {
+  }
   export let onError = (err) => {
     console.error(err)
     alert(err.toString()) // TODO: create a nice alert modal
   }
-  export let onFocus = () => {}
-  export let onBlur = () => {}
+  export let onFocus = () => {
+  }
+  export let onBlur = () => {
+  }
 
   let instanceId = uniqueId()
 
   let hasFocus = false
 
   let refTreeMode
+  let refWelcomeMode
   let refCodeMode
 
   $: textForCodeMode = (mode === MODE.CODE)
     ? getText(json, text)
     : undefined
 
-  export function get () {
+  export function get() {
     return json !== undefined
       ? json
       : JSON.parse(text || '')
   }
 
-  export function getText () {
+  export function getText() {
     return (typeof text === 'string')
       ? text
       : JSON.stringify(json, null, indentation)
   }
 
-  export function set (newJson) {
+  export function set(newJson) {
     debug('set')
 
     // new editor id -> will re-create the editor
@@ -67,7 +74,7 @@
     json = newJson
   }
 
-  export function setText (newText) {
+  export function setText(newText) {
     debug('setText')
 
     // new editor id -> will re-create the editor
@@ -77,21 +84,21 @@
     json = undefined
   }
 
-  export function update (updatedJson) {
+  export function update(updatedJson) {
     debug('update')
 
     text = undefined
     json = updatedJson
   }
 
-  export function updateText (updatedText) {
+  export function updateText(updatedText) {
     debug('updateText')
 
     text = updatedText
     json = undefined
   }
 
-  export function patch (operations, newSelection) {
+  export function patch(operations, newSelection) {
     if (json === undefined) {
       try {
         json = JSON.parse(text)
@@ -110,7 +117,7 @@
     }
   }
 
-  export function expand (callback) {
+  export function expand(callback) {
     if (refTreeMode) {
       return refTreeMode.expand(callback)
     }
@@ -118,7 +125,7 @@
     throw new Error(`Method expand is not available in mode "${mode}"`)
   }
 
-  export function collapse (callback) {
+  export function collapse(callback) {
     if (refTreeMode) {
       return refTreeMode.collapse(callback)
     }
@@ -126,7 +133,7 @@
     throw new Error(`Method collapse is not available in mode "${mode}"`)
   }
 
-  export function scrollTo (path) {
+  export function scrollTo(path) {
     if (refTreeMode) {
       return refTreeMode.scrollTo(path)
     }
@@ -136,7 +143,7 @@
     throw new Error(`Method scrollTo is not available in mode "${mode}"`)
   }
 
-  export function findElement (path) {
+  export function findElement(path) {
     if (refTreeMode) {
       return refTreeMode.findElement(path)
     }
@@ -144,45 +151,45 @@
     throw new Error(`Method findElement is not available in mode "${mode}"`)
   }
 
-  export function setValidator (newValidator) {
+  export function setValidator(newValidator) {
     validator = newValidator
   }
 
-  export function getValidator () {
+  export function getValidator() {
     return validator
   }
 
-  export function setMainMenuBar (newMainMenuBar) {
+  export function setMainMenuBar(newMainMenuBar) {
     mainMenuBar = newMainMenuBar
   }
 
-  export function getMainMenuBar () {
+  export function getMainMenuBar() {
     return mainMenuBar
   }
 
-  export function setMode (newMode) {
+  export function setMode(newMode) {
     mode = newMode
   }
 
-  export function getMode () {
+  export function getMode() {
     return mode
   }
 
-  export function focus () {
+  export function focus() {
     if (refCodeMode) {
       refCodeMode.focus()
-    }
-
-    if (refTreeMode) {
+    } else if (refWelcomeMode) {
+      refWelcomeMode.focus()
+    } else if (refTreeMode) {
       refTreeMode.focus()
     }
   }
 
-  export function destroy () {
+  export function destroy() {
     this.$destroy()
   }
 
-  function handleChangeText (updatedText) {
+  function handleChangeText(updatedText) {
     text = updatedText
     json = undefined
 
@@ -194,7 +201,7 @@
     }
   }
 
-  function handleChangeJson (updatedJson) {
+  function handleChangeJson(updatedJson) {
     json = updatedJson
     text = undefined
 
@@ -206,29 +213,29 @@
     }
   }
 
-  function handleRequestRepair () {
+  function handleRequestRepair() {
     mode = MODE.CODE
   }
 
-  function handleSwitchToTreeMode () {
+  function handleSwitchToTreeMode() {
     mode = MODE.TREE
   }
 
-  function handleFocus () {
+  function handleFocus() {
     hasFocus = true
     if (onFocus) {
       onFocus()
     }
   }
 
-  function handleBlur () {
+  function handleBlur() {
     hasFocus = false
     if (onBlur) {
       onBlur()
     }
   }
 
-  function toggleCodeMode () {
+  function toggleCodeMode() {
     mode = (mode === MODE.CODE)
       ? MODE.TREE
       : MODE.CODE
@@ -236,6 +243,8 @@
     onChangeMode(mode)
     setTimeout(focus)
   }
+
+  $: isNewDocument = text === '' && json === undefined
 
   $: isCodeMode = mode === MODE.CODE
   $: modeMenuItems = [
@@ -250,7 +259,7 @@
     }
   ]
 
-  function handleCreateMenu (mode, items) {
+  function handleCreateMenu(mode, items) {
     const updatedItems = (mode === MODE.TREE || mode === MODE.CODE)
       ? modeMenuItems.concat(items)
       : items
@@ -278,6 +287,15 @@
           onRenderMenu={handleCreateMenu}
         />
       {:else} <!-- mode === MODE.TREE -->
+        {#if isNewDocument}
+          <WelcomeMode
+            bind:this={refWelcomeMode}
+            readOnly={readOnly}
+            onChange={handleChangeText}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+          />
+        {/if}
         <TreeMode
           bind:this={refTreeMode}
           readOnly={readOnly}
@@ -293,7 +311,7 @@
           onRenderMenu={handleCreateMenu}
           onFocus={handleFocus}
           onBlur={handleBlur}
-          visible={true}
+          visible={!isNewDocument}
         />
       {/if}
     {/key}
