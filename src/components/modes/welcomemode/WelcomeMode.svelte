@@ -56,19 +56,19 @@
     })
   }
 
-  function handleInsertObject() {
+  function handleInsertObject () {
     onChange('{}')
   }
 
-  function handleInsertArray() {
+  function handleInsertArray () {
     onChange('[]')
   }
 
-  function handleInsertValue() {
+  function handleInsertValue () {
     onChange('""')
   }
 
-  function handleKeyDown(event) {
+  function handleKeyDown (event) {
     // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
     const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
 
