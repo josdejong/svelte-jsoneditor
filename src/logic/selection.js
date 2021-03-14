@@ -187,7 +187,7 @@ export function getSelectionUp (json, state, selection, keepAnchorPath = false) 
  * @returns {Selection | null}
  */
 export function getSelectionDown (json, state, selection, keepAnchorPath = false) {
-  // TODO: this function is too large, break it down
+  // TODO: this function is too large, break it down in two separate functions: one for keepAnchorPath = true, and one for keepAnchorPath = false?
   const nextPath = getNextVisiblePath(json, state, selection.focusPath)
   const anchorPath = nextPath
   const focusPath = nextPath
@@ -196,15 +196,15 @@ export function getSelectionDown (json, state, selection, keepAnchorPath = false
     return null
   }
 
-  // if the focusPath is an Array or object, we must not step into it but
-  // over it, we pass state with this array/object collapsed
-  const collapsedState = isObjectOrArray(getIn(json, selection.focusPath))
-    ? setIn(state, selection.focusPath.concat(STATE_EXPANDED), false, true)
-    : state
-
-  const nextPathAfter = getNextVisiblePath(json, collapsedState, selection.focusPath)
-
   if (keepAnchorPath) {
+    // if the focusPath is an Array or object, we must not step into it but
+    // over it, we pass state with this array/object collapsed
+    const collapsedState = isObjectOrArray(getIn(json, selection.focusPath))
+      ? setIn(state, selection.focusPath.concat(STATE_EXPANDED), false, true)
+      : state
+
+    const nextPathAfter = getNextVisiblePath(json, collapsedState, selection.focusPath)
+
     // multi selection
     if (nextPathAfter === null) {
       return null
@@ -256,15 +256,11 @@ export function getSelectionDown (json, state, selection, keepAnchorPath = false
     })
   }
 
-  if (nextPathAfter === null) {
-    return null
-  }
-
-  // multi selection or AFTER
+  // selection type MULTI or AFTER
   return createSelection(json, state, {
     type: SELECTION_TYPE.MULTI,
-    anchorPath: nextPathAfter,
-    focusPath: nextPathAfter
+    anchorPath: nextPath,
+    focusPath: nextPath
   })
 }
 

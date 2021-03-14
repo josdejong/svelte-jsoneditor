@@ -378,7 +378,7 @@ describe('selection', () => {
       }
       const state2 = syncState(json2, undefined, [], () => true)
 
-      it('should get selection up from KEY selection', () => {
+      it('should get selection down from KEY selection', () => {
         assert.deepStrictEqual(getSelectionDown(json2, state2,
           createSelection(json2, state2, { type: SELECTION_TYPE.KEY, path: ['obj'] })),
         { type: SELECTION_TYPE.KEY, anchorPath: ['obj', 'c'], focusPath: ['obj', 'c'] })
@@ -393,7 +393,7 @@ describe('selection', () => {
         { type: SELECTION_TYPE.VALUE, anchorPath: ['arr', 0], focusPath: ['arr', 0] })
       })
 
-      it('should get selection up from VALUE selection', () => {
+      it('should get selection down from VALUE selection', () => {
         assert.deepStrictEqual(getSelectionDown(json2, state2,
           createSelection(json2, state2, { type: SELECTION_TYPE.VALUE, path: ['obj'] })),
         { type: SELECTION_TYPE.VALUE, anchorPath: ['obj', 'c'], focusPath: ['obj', 'c'] })
@@ -411,7 +411,7 @@ describe('selection', () => {
         { type: SELECTION_TYPE.VALUE, anchorPath: ['arr', 1], focusPath: ['arr', 1] })
       })
 
-      it('should get selection up from AFTER selection', () => {
+      it('should get selection down from AFTER selection', () => {
         assert.deepStrictEqual(getSelectionDown(json2, state2,
           createSelection(json2, state2, { type: SELECTION_TYPE.AFTER, path: ['arr', 0] })),
         createSelection(json2, state2, { type: SELECTION_TYPE.MULTI, anchorPath: ['arr', 1], focusPath: ['arr', 1] }))
@@ -423,10 +423,10 @@ describe('selection', () => {
         // FIXME
         assert.deepStrictEqual(getSelectionDown(json2, state2,
           createSelection(json2, state2, { type: SELECTION_TYPE.AFTER, path: ['obj'] })),
-        createSelection(json2, state2, { type: SELECTION_TYPE.MULTI, anchorPath: ['arr'], focusPath: ['arr'] }))
+        createSelection(json2, state2, { type: SELECTION_TYPE.MULTI, anchorPath: ['obj', 'c'], focusPath: ['obj', 'c'] }))
       })
 
-      it('should get selection up from INSIDE selection', () => {
+      it('should get selection down from INSIDE selection', () => {
         assert.deepStrictEqual(getSelectionDown(json2, state2,
           createSelection(json2, state2, { type: SELECTION_TYPE.INSIDE, path: ['arr'] })),
         createSelection(json2, state2, { type: SELECTION_TYPE.MULTI, anchorPath: ['arr', 0], focusPath: ['arr', 0] }))
@@ -436,14 +436,14 @@ describe('selection', () => {
         createSelection(json2, state2, { type: SELECTION_TYPE.MULTI, anchorPath: ['obj', 'c'], focusPath: ['obj', 'c'] }))
       })
 
-      it('should get selection up from MULTI selection', () => {
+      it('should get selection down from MULTI selection', () => {
         assert.deepStrictEqual(getSelectionDown(json2, state2,
           createSelection(json2, state2, { type: SELECTION_TYPE.MULTI, anchorPath: ['arr'], focusPath: ['a'] })),
         createSelection(json2, state2, { type: SELECTION_TYPE.MULTI, anchorPath: ['obj'], focusPath: ['obj'] }))
 
         assert.deepStrictEqual(getSelectionDown(json2, state2,
           createSelection(json2, state2, { type: SELECTION_TYPE.MULTI, anchorPath: ['a'], focusPath: ['arr'] })),
-        createSelection(json2, state2, { type: SELECTION_TYPE.MULTI, anchorPath: ['d'], focusPath: ['d'] }))
+        createSelection(json2, state2, { type: SELECTION_TYPE.MULTI, anchorPath: ['arr', 0], focusPath: ['arr', 0] }))
       })
     })
   })
