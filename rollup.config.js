@@ -47,7 +47,7 @@ export default {
     )
 
     if (!isAjvCircularWarning) {
-      console.warning(`(!) ${warning.message}`);
+      console.warn(`(!) ${warning.message}`);
     }
   }
 }
