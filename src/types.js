@@ -130,7 +130,7 @@
  */
 
 /**
- * @typedef {{type: 'value', path: Path, edit?: boolean, next?: boolean}} ValueSelectionSchema
+ * @typedef {{type: 'value', path: Path, edit?: boolean, next?: boolean, nextInside?: boolean}} ValueSelectionSchema
  */
 
 /**

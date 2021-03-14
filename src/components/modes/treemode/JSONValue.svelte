@@ -143,7 +143,7 @@
       // apply changes
       updateValue()
 
-      onSelect({ type: SELECTION_TYPE.VALUE, path, next: true })
+      onSelect({ type: SELECTION_TYPE.VALUE, path, nextInside: true })
     }
   }
 </script>

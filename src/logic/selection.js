@@ -187,6 +187,7 @@ export function getSelectionUp (json, state, selection, keepAnchorPath = false) 
  * @returns {Selection | null}
  */
 export function getSelectionDown (json, state, selection, keepAnchorPath = false) {
+  // TODO: this function is too large, break it down
   const nextPath = getNextVisiblePath(json, state, selection.focusPath)
   const anchorPath = nextPath
   const focusPath = nextPath
@@ -265,6 +266,38 @@ export function getSelectionDown (json, state, selection, keepAnchorPath = false
     anchorPath: nextPathAfter,
     focusPath: nextPathAfter
   })
+}
+
+/**
+ * Get the next selection for a value inside the current object/array
+ * If there is no next value, select AFTER.
+ * Only applicable for SELECTION_TYPE.VALUE
+ * @param {JSON} json
+ * @param {JSON} state
+ * @param {Selection} selection
+ * @returns {Selection | null}
+ */
+export function getSelectionNextInside (json, state, selection) {
+  // TODO: write unit tests for getSelectionNextInside
+  const path = selection.focusPath
+  const parentPath = initial(path)
+  const childPath = [last(path)]
+
+  const nextPathInside = getNextVisiblePath(getIn(json, parentPath), getIn(state, parentPath), childPath)
+
+  if (nextPathInside) {
+    const fullPath = parentPath.concat(nextPathInside)
+
+    return createSelection(json, state, {
+      type: SELECTION_TYPE.VALUE,
+      path: parentPath.concat(nextPathInside)
+    })
+  } else {
+    return createSelection(json, state, {
+      type: SELECTION_TYPE.AFTER,
+      path
+    })
+  }
 }
 
 /**
@@ -560,7 +593,7 @@ export function removeEditModeFromSelection (selection) {
 // TODO: write unit tests
 export function createSelection (json, state, selectionSchema) {
   // TODO: remove next from SelectionSchema, pass it as a separate argument
-  const { type, anchorPath, focusPath, path, edit = false, next = false } = selectionSchema
+  const { type, anchorPath, focusPath, path, edit = false, next = false, nextInside = false } = selectionSchema
 
   if (type === SELECTION_TYPE.KEY) {
     let selection = {
@@ -585,6 +618,9 @@ export function createSelection (json, state, selectionSchema) {
     }
     if (next) {
       selection = getSelectionDown(json, state, selection) || selection
+    }
+    if (nextInside) {
+      selection = getSelectionNextInside(json, state, selection) || selection
     }
     return selection
   } else if (type === SELECTION_TYPE.AFTER) {
