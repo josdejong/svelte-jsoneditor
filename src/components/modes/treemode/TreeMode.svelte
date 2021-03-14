@@ -557,13 +557,17 @@
     } else if (char === '[') {
       handleInsert('array')
     } else {
-      if (
-        selection.type === SELECTION_TYPE.VALUE &&
-        !isObjectOrArray(getIn(json, selection.focusPath))
-      ) {
-        selection = { ...selection, edit: true }
-        await tick()
-        setTimeout(() => replaceActiveElementContents(char))
+      if (selection.type === SELECTION_TYPE.VALUE) {
+        if (!isObjectOrArray(getIn(json, selection.focusPath))) {
+          selection = { ...selection, edit: true }
+          await tick()
+          setTimeout(() => replaceActiveElementContents(char))
+        } else {
+          // TODO: replace the object/array with editing a text in edit mode?
+          //  (Ideally this this should not create an entry in history though,
+          //  which isn't really possible right now since we have to apply
+          //  a patch to change the object/array into a value)
+        }
       } else {
         await handleInsertValueWithCharacter(char)
       }
@@ -946,12 +950,14 @@
       // Replace selected contents with a new value having this first character as text
       event.preventDefault()
       handleInsertCharacter(event.key)
+      return
     }
 
     if (combo === 'Enter' && (selection.type === SELECTION_TYPE.AFTER || selection.type === SELECTION_TYPE.INSIDE)) {
       // Enter on an insert area -> open the area in edit mode
       event.preventDefault()
       handleInsertCharacter('')
+      return
     }
 
     if (combo === 'Ctrl+Enter' && selection && selection.type === SELECTION_TYPE.VALUE) {
