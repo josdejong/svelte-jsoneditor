@@ -115,6 +115,7 @@
     {
       separator: true
     },
+    /* TODO: cleanup
     {
       icon: faCut,
       title: 'Cut (Ctrl+X)',
@@ -198,6 +199,7 @@
     {
       separator: true
     },
+    */
     {
       icon: faSortAmountDownAlt,
       title: 'Sort',
@@ -216,15 +218,6 @@
       separator: true
     },
     {
-      icon: faSearch,
-      title: 'Search (Ctrl+F)',
-      className: 'search',
-      onClick: handleToggleSearch
-    },
-    {
-      separator: true
-    },
-    {
       icon: faUndo,
       title: 'Undo (Ctrl+Z)',
       className: 'undo',
@@ -237,6 +230,15 @@
       className: 'redo',
       onClick: onRedo,
       disabled: !historyState.canRedo
+    },
+    {
+      separator: true
+    },
+    {
+      icon: faSearch,
+      title: 'Search (Ctrl+F)',
+      className: 'search',
+      onClick: handleToggleSearch
     },
     {
       space: true

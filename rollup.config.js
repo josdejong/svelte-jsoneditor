@@ -39,15 +39,15 @@ export default {
     production && terser()
   ],
 
-  // suppress Ajv circular dependency warnings, see https://github.com/ajv-validator/ajv/issues/1399
-  onwarn: warning => {
-    const isAjvCircularWarning = (
-      warning.code === 'CIRCULAR_DEPENDENCY' &&
-      warning.importer.includes('ajv')
-    )
-
-    if (!isAjvCircularWarning) {
-      console.warn(`(!) ${warning.message}`);
-    }
-  }
+  // // suppress Ajv circular dependency warnings, see https://github.com/ajv-validator/ajv/issues/1399
+  // onwarn: warning => {
+  //   const isAjvCircularWarning = (
+  //     warning.code === 'CIRCULAR_DEPENDENCY' &&
+  //     warning.importer.includes('ajv')
+  //   )
+  //
+  //   if (!isAjvCircularWarning) {
+  //     console.warn(`(!) ${warning.message}`);
+  //   }
+  // }
 }

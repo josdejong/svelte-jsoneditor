@@ -75,7 +75,9 @@
   import { isObject, isObjectOrArray, isUrl } from '../../../utils/typeUtils.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
+  import CopyPasteModal from '../../modals/CopyPasteModal.svelte'
   import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
+  import ContextMenu from './contextmenu/ContextMenu.svelte'
   import SortModal from '../../modals/SortModal.svelte'
   import TransformModal from '../../modals/TransformModal.svelte'
   import JSONNode from './JSONNode.svelte'
@@ -86,6 +88,8 @@
   const { open } = getContext('simple-modal')
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
+
+  const { openAbsolutePopup, closeAbsolutePopup } = getContext('absolute-popup')
 
   let divContents
   let domHiddenInput
@@ -330,6 +334,30 @@
   $: debug('state', state)
   $: debug('selection', selection)
 
+  function handleEditKey () {
+    if (readOnly || !selection) {
+      return
+    }
+
+    selection = createSelection(json, state, {
+      type: SELECTION_TYPE.KEY,
+      path: selection.focusPath,
+      edit: true
+    })
+  }
+
+  function handleEditValue () {
+    if (readOnly || !selection) {
+      return
+    }
+
+    selection = createSelection(json, state, {
+      type: SELECTION_TYPE.VALUE,
+      path: selection.focusPath,
+      edit: true
+    })
+  }
+
   async function handleCut () {
     if (readOnly || !selection) {
       return
@@ -387,6 +415,18 @@
         doPaste(repairedText)
       })
     }
+  }
+
+  function handlePasteFromMenu () {
+    open(CopyPasteModal, {}, {
+      ...SIMPLE_MODAL_OPTIONS,
+      styleWindow: {
+        ...SIMPLE_MODAL_OPTIONS.styleWindow,
+        width: '450px'
+      }
+    }, {
+      onClose: () => setTimeout(onFocus)
+    })
   }
 
   function doPaste (clipboardText) {
@@ -1024,6 +1064,44 @@
     })
   }
 
+  function handleContextMenu (event) {
+    event.stopPropagation()
+    event.preventDefault()
+
+    const props = {
+      selection,
+
+      onEditKey: handleEditKey,
+      onEditValue: handleEditValue,
+
+      onCut: handleCut,
+      onCopy: handleCopy,
+      onPaste: handlePasteFromMenu,
+
+      onRemove: handleRemove,
+      onDuplicate: handleDuplicate,
+      onExtract: handleExtract,
+
+      onInsert: handleInsert,
+
+      onSort: handleSort,
+      onTransform: handleTransform,
+
+      onCloseContextMenu: function () {
+        closeAbsolutePopup()
+        focus()
+      }
+    }
+
+    openAbsolutePopup(ContextMenu, props, {
+      left: event.clientX,
+      top: event.clientY,
+      closeOnOuterClick: true
+    })
+
+    return false
+  }
+
   export function focus () {
     // with just .focus(), sometimes the input doesn't react on onpaste events
     // in Chrome when having a large document open and then doing cut/paste.
@@ -1038,6 +1116,7 @@
   class:visible
   on:keydown={handleKeyDown}
   on:mousedown={handleMouseDown}
+  on:contextmenu={handleContextMenu}
   bind:this={domJsonEditor}
 >
   {#if mainMenuBar}
