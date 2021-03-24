@@ -218,7 +218,7 @@ Install dependencies:
 npm install
 ```
 
-Start watcher:
+Start watcher and demo project (at localhost:5000):
 
 ```
 npm start

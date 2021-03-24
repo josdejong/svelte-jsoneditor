@@ -13,7 +13,8 @@
   },
   "license": "ISC",
   "scripts": {
-    "start": "rollup -c -w",
+    "start": "concurrently \"npm run dev\" \"cd tools/develop-svelte && npm run dev\"",
+    "dev": "rollup -c -w",
     "build": "rollup -c",
     "test": "mocha src/**/*.test.js",
     "lint": "eslint --cache src/**/*.svelte src/**/*.js tools/**/*.js *.js --ignore-pattern src/generated --ignore-pattern examples --ignore-pattern tools/develop-svelte/**/*.js",
@@ -41,6 +42,7 @@
     "@rollup/plugin-commonjs": "17.1.0",
     "@rollup/plugin-json": "4.1.0",
     "@rollup/plugin-node-resolve": "11.2.0",
+    "concurrently": "6.0.0",
     "eslint": "7.22.0",
     "eslint-config-standard": "16.0.2",
     "eslint-plugin-import": "2.22.1",
