@@ -17,9 +17,7 @@ export default {
   plugins: [
     svelte({
       // enable run-time checks when not in production
-      compilerOptions: {
-        dev: !production
-      },
+      dev: !production,
 
       // we want to embed the CSS in the generated JS bundle
       emitCss: false,
