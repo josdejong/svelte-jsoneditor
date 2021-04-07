@@ -1133,16 +1133,8 @@
       searchResult={searchResult}
       bind:showSearch
 
-      selection={selection}
-
       onExpandAll={handleExpandAll}
       onCollapseAll={handleCollapseAll}
-      onCut={handleCut}
-      onCopy={handleCopy}
-      onRemove={handleRemove}
-      onDuplicate={handleDuplicate}
-      onExtract={handleExtract}
-      onInsert={handleInsert}
       onUndo={handleUndo}
       onRedo={handleRedo}
       onSort={handleSort}

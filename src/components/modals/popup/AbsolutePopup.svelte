@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script>
   import createDebug from 'debug'
   import { setContext, tick } from 'svelte'
