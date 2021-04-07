@@ -679,12 +679,10 @@
     focus()
   }
 
-  function handleSort () {
+  function openSortModal (selectedPath) {
     if (readOnly) {
       return
     }
-
-    const selectedPath = selection ? findRootPath(selection) : []
 
     open(SortModal, {
       id: sortModalId,
@@ -703,12 +701,24 @@
     })
   }
 
-  function handleTransform () {
-    if (readOnly) {
+  function handleSortSelection () {
+    if (!selection) {
       return
     }
 
-    const selectedPath = selection ? findRootPath(selection) : []
+    const selectedPath = findRootPath(selection)
+    openSortModal(selectedPath)
+  }
+
+  function handleSortAll () {
+    const selectedPath = []
+    openSortModal(selectedPath)
+  }
+
+  function openTransformModal (selectedPath) {
+    if (readOnly) {
+      return
+    }
 
     open(TransformModal, {
       id: transformModalId,
@@ -726,6 +736,20 @@
     }, TRANSFORM_MODAL_OPTIONS, {
       onClose: () => focus()
     })
+  }
+
+  function handleTransformSelection () {
+    if (!selection) {
+      return
+    }
+
+    const selectedPath = findRootPath(selection)
+    openTransformModal(selectedPath)
+  }
+
+  function handleTransformAll () {
+    const selectedPath = []
+    openTransformModal(selectedPath)
   }
 
   /**
@@ -1088,8 +1112,8 @@
 
       onInsert: handleInsert,
 
-      onSort: handleSort,
-      onTransform: handleTransform,
+      onSort: handleSortSelection,
+      onTransform: handleTransformSelection,
 
       onCloseContextMenu: function () {
         closeAbsolutePopup()
@@ -1137,8 +1161,8 @@
       onCollapseAll={handleCollapseAll}
       onUndo={handleUndo}
       onRedo={handleRedo}
-      onSort={handleSort}
-      onTransform={handleTransform}
+      onSort={handleSortAll}
+      onTransform={handleTransformAll}
 
       onSearchText={handleSearchText}
       onNextSearchResult={handleNextSearchResult}
