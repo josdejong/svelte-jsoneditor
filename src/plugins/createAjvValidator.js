@@ -39,7 +39,7 @@ export function createAjvValidator (schema, schemaRefs) {
  */
 function normalizeAjvError (json, ajvError) {
   return {
-    path: parseJSONPointerWithArrayIndices(json, ajvError.dataPath),
+    path: parseJSONPointerWithArrayIndices(json, ajvError.instancePath),
     message: ajvError.message
   }
 }
