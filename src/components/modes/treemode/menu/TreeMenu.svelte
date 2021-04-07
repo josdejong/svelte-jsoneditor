@@ -82,21 +82,21 @@
     setTimeout(onFocus)
   }
 
-  function handleInsertStructure () {
-    onInsert('structure')
-  }
-
-  function handlePasteFromMenu () {
-    open(CopyPasteModal, {}, {
-      ...SIMPLE_MODAL_OPTIONS,
-      styleWindow: {
-        ...SIMPLE_MODAL_OPTIONS.styleWindow,
-        width: '450px'
-      }
-    }, {
-      onClose: () => setTimeout(onFocus)
-    })
-  }
+  // function handleInsertStructure () {
+  //   onInsert('structure')
+  // }
+  //
+  // function handlePasteFromMenu () {
+  //   open(CopyPasteModal, {}, {
+  //     ...SIMPLE_MODAL_OPTIONS,
+  //     styleWindow: {
+  //       ...SIMPLE_MODAL_OPTIONS.styleWindow,
+  //       width: '450px'
+  //     }
+  //   }, {
+  //     onClose: () => setTimeout(onFocus)
+  //   })
+  // }
 
   /* @type {MenuItem[]} */
   $: defaultItems = [

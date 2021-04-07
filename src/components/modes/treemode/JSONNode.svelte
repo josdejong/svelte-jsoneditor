@@ -22,7 +22,10 @@
   } from '../../../constants.js'
   import { getVisibleCaretPositions } from '../../../logic/documentState.js'
   import { rename } from '../../../logic/operations.js'
-  import { SELECTION_TYPE } from '../../../logic/selection.js'
+  import {
+    isPathInsideSelection,
+    SELECTION_TYPE
+  } from '../../../logic/selection.js'
   import {
     getSelectionTypeFromTarget,
     isChildOfAttribute,
@@ -119,9 +122,20 @@
       return
     }
 
+    event.stopPropagation()
+    event.preventDefault()
+
+    const anchorType = getSelectionTypeFromTarget(event.target)
+
+    // if this node is inside the current selection, do nothing
+    if (selection && isPathInsideSelection(selection, path, anchorType)) {
+      // TODO: implement start of a drag event in this case
+      return
+    }
+
     singleton.mousedown = true
     singleton.selectionAnchor = path
-    singleton.selectionAnchorType = getSelectionTypeFromTarget(event.target)
+    singleton.selectionAnchorType = anchorType
     singleton.selectionFocus = path
 
     if (event.shiftKey) {
@@ -132,7 +146,7 @@
         focusPath: path
       })
     } else {
-      switch (singleton.selectionAnchorType) {
+      switch (anchorType) {
         case SELECTION_TYPE.KEY:
           onSelect({ type: SELECTION_TYPE.KEY, path })
           break
@@ -153,14 +167,12 @@
         case SELECTION_TYPE.AFTER:
         case SELECTION_TYPE.INSIDE:
           // do nothing: event already handled by event listener on the element or component itself
+          // TODO: move the logic here instead of in separate event listeners
           break
       }
     }
 
-    event.stopPropagation()
-    event.preventDefault()
-
-    // we attache the mouse up event listener to the global document,
+    // we attach the mouse up event listener to the global document,
     // so we will not miss if the mouse up is happening outside of the editor
     document.addEventListener('mouseup', handleMouseUp)
   }

@@ -1,12 +1,3 @@
-.absolute-popup-overlay {
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  background: transparent;
-  z-index: 1000;
-}
 
 .absolute-popup {
   position: relative;
@@ -15,6 +6,15 @@
   width: 0;
   height: 0;
   z-index: 1001;
+
+  .hidden-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    border: none;
+  }
 
   .absolute-popup-content {
     position: absolute;

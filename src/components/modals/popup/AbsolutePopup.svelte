@@ -1,6 +1,7 @@
 <script>
   import createDebug from 'debug'
-  import { setContext } from 'svelte'
+  import { setContext, tick } from 'svelte'
+  import { isChildOf } from '../../../utils/domUtils.js'
   import { keyComboFromEvent } from '../../../utils/keyBindings.js'
 
   const debug = createDebug('jsoneditor:AbsolutePopup')
@@ -8,27 +9,38 @@
   let popupComponent = null
   let popupProps = null
   let popupOptions = {}
+
   let refAbsolutePopup
+  let refHiddenInput
 
   function openAbsolutePopup(Component, props, options) {
     debug('open...', options)
     popupComponent = Component
     popupProps = props || {}
     popupOptions = options || {}
+
+    tick().then(focus)
   }
 
   function closeAbsolutePopup() {
+    const onClose = popupOptions.onClose
+
     popupComponent = null
     popupProps = null
     popupOptions = {}
+
+    if (onClose) {
+      onClose()
+    }
   }
 
-  function handleClickOutside (event) {
-    if (popupComponent && popupOptions.closeOnOuterClick) {
+  function handleWindowMouseDown (event) {
+    if (
+      popupComponent &&
+      popupOptions.closeOnOuterClick &&
+      !isChildOf(event.target, (e) => e === refAbsolutePopup)
+    ) {
       closeAbsolutePopup()
-
-      event.stopPropagation()
-      event.preventDefault()
     }
   }
 
@@ -36,7 +48,12 @@
     event.stopPropagation()
   }
 
-  // TODO: implement Escape to close the popup
+  function handleKeyDown (event) {
+    const combo = keyComboFromEvent(event)
+    if (combo === 'Escape') {
+      closeAbsolutePopup()
+    }
+  }
 
   function calculateStyle() {
     const rect = refAbsolutePopup.getBoundingClientRect()
@@ -44,27 +61,32 @@
     return `left: ${popupOptions.left - rect.left}px; top: ${popupOptions.top - rect.top}px;`
   }
 
+  function focus() {
+    if (refHiddenInput) {
+      refHiddenInput.focus()
+    }
+  }
+
   setContext('absolute-popup', { openAbsolutePopup, closeAbsolutePopup })
 </script>
 
-{#if popupComponent && popupOptions.closeOnOuterClick}
-  <div
-    class="absolute-popup-overlay"
-    on:click={handleClickOutside}
-    on:contextmenu={handleClickOutside}
-  ></div>
-{/if}
+<svelte:window
+  on:mousedown|capture={handleWindowMouseDown}
+  on:keydown|capture={handleKeyDown}
+/>
 
 <div
   bind:this={refAbsolutePopup}
   class="absolute-popup"
   on:mousedown={handleMouseDownInside}
+  on:keydown={handleKeyDown}
 >
   {#if popupComponent && popupProps}
     <div
       class="absolute-popup-content"
       style={calculateStyle()}
     >
+      <input bind:this={refHiddenInput} class="hidden-input" />
       <svelte:component this={popupComponent} {...popupProps} />
     </div>
   {/if}

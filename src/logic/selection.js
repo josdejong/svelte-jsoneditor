@@ -105,6 +105,51 @@ export function isSelectionInsidePath (selection, path) {
 }
 
 /**
+ * @param {Selection} selection
+ * @param {Path} path
+ * @param {string} anchorType
+ * @return boolean
+ */
+// TODO: write unit test
+export function isPathInsideSelection (selection, path, anchorType) {
+  let p = path.slice(0)
+
+  if (selection.type === SELECTION_TYPE.MULTI) {
+    while (p.length > 0) {
+      if (selection.pathsMap[compileJSONPointer(p)] === true) {
+        return true
+      }
+
+      p.pop()
+    }
+  }
+
+  if (selection.type === SELECTION_TYPE.KEY) {
+    return anchorType === SELECTION_TYPE.KEY && isEqual(selection.focusPath, path)
+  }
+
+  if (selection.type === SELECTION_TYPE.VALUE) {
+    if (anchorType === SELECTION_TYPE.VALUE && isEqual(selection.focusPath, path)) {
+      return true
+    }
+
+    if (
+      pathStartsWith(path, selection.focusPath) &&
+      path.length > selection.focusPath.length &&
+      (
+        anchorType === SELECTION_TYPE.KEY ||
+        anchorType === SELECTION_TYPE.VALUE ||
+        anchorType === SELECTION_TYPE.MULTI
+      )
+    ) {
+      return true
+    }
+  }
+
+  return false
+}
+
+/**
  * @param {JSON} json
  * @param {JSON} state
  * @param {Selection} selection

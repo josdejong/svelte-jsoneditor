@@ -1065,6 +1065,10 @@
   }
 
   function handleContextMenu (event) {
+    if (!selection || selection.edit) {
+      return
+    }
+
     event.stopPropagation()
     event.preventDefault()
 
@@ -1096,7 +1100,8 @@
     openAbsolutePopup(ContextMenu, props, {
       left: event.clientX,
       top: event.clientY,
-      closeOnOuterClick: true
+      closeOnOuterClick: true,
+      onClose: focus
     })
 
     return false
