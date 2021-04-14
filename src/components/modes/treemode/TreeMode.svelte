@@ -12,7 +12,14 @@
     updateIn
   } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
-  import { initial, isEmpty, isEqual, throttle, uniqueId } from 'lodash-es'
+  import {
+    initial,
+    isEmpty,
+    isEqual,
+    last,
+    throttle,
+    uniqueId
+  } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
   import { createJump } from '../../../assets/jump.js/src/jump.js'
   import {
@@ -77,9 +84,9 @@
   import Message from '../../controls/Message.svelte'
   import CopyPasteModal from '../../modals/CopyPasteModal.svelte'
   import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
-  import ContextMenu from './contextmenu/ContextMenu.svelte'
   import SortModal from '../../modals/SortModal.svelte'
   import TransformModal from '../../modals/TransformModal.svelte'
+  import ContextMenu from './contextmenu/ContextMenu.svelte'
   import JSONNode from './JSONNode.svelte'
   import TreeMenu from './menu/TreeMenu.svelte'
 
@@ -567,6 +574,41 @@
           setTimeout(() => replaceActiveElementContents(''))
         }
       })
+  }
+
+  function handleInsertBefore () {
+    const selectionBefore = getSelectionUp(json, state, selection, false)
+
+    debug('insert before', selection, selectionBefore)
+
+    const parentPath = initial(selection.focusPath)
+    if (isEqual(parentPath, initial(selectionBefore.focusPath))) {
+      selection = createSelection(json, state, {
+        type: SELECTION_TYPE.AFTER,
+        path: selectionBefore.focusPath
+      })
+    } else {
+      selection = createSelection(json, state, {
+        type: SELECTION_TYPE.INSIDE,
+        path: parentPath
+      })
+    }
+  }
+
+  function handleInsertAfter () {
+    const path = selection.paths
+      ? last(selection.paths)
+      : selection.focusPath
+
+    debug('insert after', path)
+
+    selection = createSelection(json, state, {
+      type: SELECTION_TYPE.AFTER,
+      path
+    })
+
+    // TODO: it may be nice to also open the context menu
+    //  (though it's not so easy to get the location of the context menu button)
   }
 
   function replaceActiveElementContents (char) {
@@ -1105,7 +1147,9 @@
       onDuplicate: handleDuplicate,
       onExtract: handleExtract,
 
+      onInsertBefore: handleInsertBefore,
       onInsert: handleInsert,
+      onInsertAfter: handleInsertAfter,
 
       onSort: handleSortSelection,
       onTransform: handleTransformSelection,

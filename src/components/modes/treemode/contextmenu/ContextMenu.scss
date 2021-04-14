@@ -13,7 +13,8 @@
   .row {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: start;
+    justify-content: stretch;
 
     button {
       flex: 1;
@@ -30,16 +31,22 @@
         background: unset;
       }
 
-      &.insert {
+      .insert {
+        $size: 18px;
+
+        display: inline-block;
+        position: relative;
+        width: $size;
+        height: $size;
+
         font-family: $font-family-mono;
         font-weight: bold;
-        position: relative;
-        overflow: hidden;
 
-        .quote {
+        .quote,
+        .plus {
           position: absolute;
-          top: 10px;
-          left: 14px;
+          top: 0;
+          left: 2px;
           font-size: 24px;
         }
       }
@@ -55,10 +62,25 @@
     }
   }
 
+  .column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    &:not(:last-child) {
+      border-right: 1px solid $gray-highlight;
+    }
+
+    button {
+      text-align: left;
+      min-width: 130px;
+    }
+  }
+
   .separator {
     width: 100%;
     height: 1px;
     background: $gray-highlight;
-    //margin: 5px 0;
   }
 }

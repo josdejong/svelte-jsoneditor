@@ -2,12 +2,13 @@
 
 <script>
   import {
+    faCaretSquareDown,
+    faCaretSquareUp,
     faClone,
     faCopy,
     faCropAlt,
     faCut,
     faFilter,
-    faMagic,
     faPaste,
     faPen,
     faSortAmountDownAlt,
@@ -27,7 +28,9 @@
   export let onRemove
   export let onDuplicate
   export let onExtract
+  export let onInsertBefore
   export let onInsert
+  export let onInsertAfter
   export let onSort
   export let onTransform
 
@@ -50,6 +53,10 @@
     selection.type === SELECTION_TYPE.VALUE ||
     (selection.type === SELECTION_TYPE.MULTI && selection.paths.length === 1)
   )
+
+  $: insertText = hasSelectionContents
+    ? 'Replace with'
+    : 'Insert'
 
   function handleEditKey () {
     onCloseContextMenu()
@@ -106,6 +113,16 @@
     onTransform()
   }
 
+  function handleInsertBefore () {
+    onCloseContextMenu()
+    onInsertBefore()
+  }
+
+  function handleInsertAfter () {
+    onCloseContextMenu()
+    onInsertAfter()
+  }
+
 </script>
 
 <div class="jsoneditor-contextmenu">
@@ -131,81 +148,69 @@
   </div>
   <div class="separator"></div>
   <div class="row">
-    <button on:click={handleRemove} disabled={!hasSelectionContents}>
-      <Icon data={faTimes} /> Remove
-    </button>
-    <button on:click={handleDuplicate} disabled={!canDuplicate}>
-      <Icon data={faClone} /> Duplicate
-    </button>
-    <button on:click={handleExtract} disabled={!canExtract}>
-      <Icon data={faCropAlt} /> Extract
-    </button>
-  </div>
-  <div class="separator"></div>
-  <div class="row">
-    <div class="insert-text" class:disabled={true}>Insert before</div>
-    <button disabled title="Insert structure"><Icon data={faMagic} /></button>
-    <button disabled class="insert" title="Insert object">{'{}'}</button>
-    <button disabled class="insert" title="Insert array">[]</button>
-    <button disabled class="insert" title="Insert value">
-      <span class="quote">"</span>
-      &nbsp;
-    </button>
-  </div>
-  <div class="row">
-    <div class="insert-text" class:disabled="{!hasSelection}">
-      {hasSelectionContents ? 'Replace' : 'Insert'}
+    <div class="column">
+      <button on:click={handleRemove} disabled={!hasSelectionContents}>
+        <Icon data={faTimes} /> Remove
+      </button>
+      <button on:click={handleDuplicate} disabled={!canDuplicate}>
+        <Icon data={faClone} /> Duplicate
+      </button>
+      <button on:click={handleExtract} disabled={!canExtract}>
+        <Icon data={faCropAlt} /> Extract
+      </button>
+      <button on:click={handleSort} disabled={!hasSelectionContents}>
+        <Icon data={faSortAmountDownAlt} /> Sort
+      </button>
+      <button on:click={handleTransform} disabled={!hasSelectionContents}>
+        <Icon data={faFilter} /> Transform
+      </button>
     </div>
-    <button
-      on:click={() => handleInsert('structure')}
-      title="Insert structure"
-      disabled={!hasSelection}
-    >
-      <Icon data={faMagic} />
-    </button>
-    <button
-      on:click={() => handleInsert('object')}
-      class="insert"
-      title="Insert object"
-      disabled={!hasSelection}
-    >
-      {'{}'}
-    </button>
-    <button
-      on:click={() => handleInsert('array')}
-      class="insert"
-      title="Insert array"
-      disabled={!hasSelection}
-    >
-      []
-    </button>
-    <button
-      on:click={() => handleInsert('value')}
-      class="insert"
-      title="Insert value"
-      disabled={!hasSelection}
-    >
-      <span class="quote">"</span>
-      &nbsp;
-    </button>
-  </div>
-  <div class="row">
-    <div class="insert-text" class:disabled={true}>Insert after</div>
-    <button disabled title="Insert structure"><Icon data={faMagic} /></button>
-    <button disabled class="insert" title="Insert object">{'{}'}</button>
-    <button disabled class="insert" title="Insert array">[]</button>
-    <button disabled class="insert" title="Insert value">
-      <span class="quote">"</span>
-      &nbsp;
-    </button>
+    <div class="column">
+      <button
+        on:click={() => handleInsert('structure')}
+        title="${insertText} structure"
+        disabled={!hasSelection}
+      >
+        <span class="insert"><span class="plus">{'+'}</span></span> {insertText} structure
+      </button>
+      <button
+        on:click={() => handleInsert('object')}
+        title="{insertText} object"
+        disabled={!hasSelection}
+      >
+        <span class="insert">{'{}'}</span> {insertText} object
+      </button>
+      <button
+        on:click={() => handleInsert('array')}
+        title="{insertText} array"
+        disabled={!hasSelection}
+      >
+        <span class="insert">[]</span> {insertText} array
+      </button>
+      <button
+        on:click={() => handleInsert('value')}
+        title="{insertText} value"
+        disabled={!hasSelection}
+      >
+        <span class="insert"><span class="quote">"</span></span> {insertText} value
+      </button>
+    </div>
   </div>
   <div class="separator"></div>
   <div class="row">
-    <button on:click={handleSort} disabled={!hasSelectionContents}>
-      <Icon data={faSortAmountDownAlt} /> Sort
+    <button
+      title="Select area before current entry to insert or paste contents"
+      disabled={!hasSelectionContents}
+      on:click={handleInsertBefore}
+    >
+      <Icon data={faCaretSquareUp} /> Insert before
     </button>
-    <button on:click={handleTransform} disabled={!hasSelectionContents}>
-      <Icon data={faFilter} /> Transform
+    <button
+      title="Select area after current entry to insert or paste contents"
+      disabled={!hasSelectionContents}
+      on:click={handleInsertAfter}
+    >
+      <Icon data={faCaretSquareDown} /> Insert after
     </button>
   </div>
 </div>
