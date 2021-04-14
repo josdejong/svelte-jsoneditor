@@ -11,9 +11,7 @@
     HOVER_INSERT_AFTER,
     HOVER_INSERT_INSIDE,
     INDENTATION_WIDTH,
-    INSERT_AFTER_EXPLANATION,
     INSERT_EXPLANATION,
-    INSERT_INSIDE_EXPLANATION,
     STATE_EXPANDED,
     STATE_ID,
     STATE_KEYS,
@@ -34,6 +32,7 @@
   } from '../../../utils/domUtils.js'
   import { valueType } from '../../../utils/typeUtils.js'
   import CollapsedItems from './CollapsedItems.svelte'
+  import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
   import JSONKey from './JSONKey.svelte'
   import JSONValue from './JSONValue.svelte'
   import { singleton } from './singleton.js'
@@ -50,6 +49,7 @@
   export let onInsert
   export let onExpand
   export let onSelect
+  export let onContextMenu
   export let onClassName
 
   /** @type {function (path: Path, section: Section)} */
@@ -88,24 +88,24 @@
 
   $: type = valueType(value)
 
-  function getIndentationStyle (level) {
+  function getIndentationStyle(level) {
     return `margin-left: ${level * INDENTATION_WIDTH}px`
   }
 
-  function toggleExpand (event) {
+  function toggleExpand(event) {
     event.stopPropagation()
 
     const recursive = event.ctrlKey
     onExpand(path, !expanded, recursive)
   }
 
-  function handleExpand (event) {
+  function handleExpand(event) {
     event.stopPropagation()
 
     onExpand(path, true)
   }
 
-  function handleUpdateKey (oldKey, newKey) {
+  function handleUpdateKey(oldKey, newKey) {
     const operations = rename(path, keys, oldKey, newKey)
     onPatch(operations)
 
@@ -116,7 +116,7 @@
     return newKeyUnique
   }
 
-  function handleMouseDown (event) {
+  function handleMouseDown(event) {
     // check if the mouse down is not happening in the key or value input fields or on a button
     if (isContentEditableDiv(event.target) || isChildOfNodeName(event.target, 'BUTTON')) {
       return
@@ -148,11 +148,11 @@
     } else {
       switch (anchorType) {
         case SELECTION_TYPE.KEY:
-          onSelect({ type: SELECTION_TYPE.KEY, path })
+          onSelect({type: SELECTION_TYPE.KEY, path})
           break
 
         case SELECTION_TYPE.VALUE:
-          onSelect({ type: SELECTION_TYPE.VALUE, path })
+          onSelect({type: SELECTION_TYPE.VALUE, path})
           break
 
         case SELECTION_TYPE.MULTI:
@@ -160,7 +160,11 @@
             const lastCaretPosition = last(getVisibleCaretPositions(value, state))
             onSelect(lastCaretPosition)
           } else {
-            onSelect({ type: SELECTION_TYPE.MULTI, anchorPath: path, focusPath: path })
+            onSelect({
+              type: SELECTION_TYPE.MULTI,
+              anchorPath: path,
+              focusPath: path
+            })
           }
           break
 
@@ -177,7 +181,7 @@
     document.addEventListener('mouseup', handleMouseUp)
   }
 
-  function handleMouseMove (event) {
+  function handleMouseMove(event) {
     if (singleton.mousedown) {
       event.preventDefault()
       event.stopPropagation()
@@ -206,7 +210,7 @@
     }
   }
 
-  function handleMouseUp (event) {
+  function handleMouseUp(event) {
     if (singleton.mousedown) {
       event.stopPropagation()
 
@@ -216,30 +220,40 @@
     document.removeEventListener('mouseup', handleMouseUp)
   }
 
-  function handleMouseOver (event) {
+  function handleMouseOver(event) {
     event.stopPropagation()
 
     if (isChildOfAttribute(event.target, 'data-type', 'selectable-value')) {
       hover = HOVER_COLLECTION
-    } else if (isChildOfAttribute(event.target, 'data-type', 'insert-button-area-inside')) {
+    } else if (isChildOfAttribute(event.target, 'data-type', 'insert-selection-area-inside')) {
       hover = HOVER_INSERT_INSIDE
-    } else if (isChildOfAttribute(event.target, 'data-type', 'insert-button-area-after')) {
+    } else if (isChildOfAttribute(event.target, 'data-type', 'insert-selection-area-after')) {
       hover = HOVER_INSERT_AFTER
     }
   }
 
-  function handleMouseOut (event) {
+  function handleMouseOut(event) {
     event.stopPropagation()
 
     hover = null
   }
 
-  function handleInsertInside () {
-    onSelect({ type: SELECTION_TYPE.INSIDE, path })
+  function handleInsertInside() {
+    onSelect({type: SELECTION_TYPE.INSIDE, path})
   }
 
-  function handleInsertAfter () {
-    onSelect({ type: SELECTION_TYPE.AFTER, path })
+  function handleInsertAfter() {
+    onSelect({type: SELECTION_TYPE.AFTER, path})
+  }
+
+  function handleInsertInsideOpenContextMenu(event) {
+    handleInsertInside()
+    onContextMenu(event)
+  }
+
+  function handleInsertAfterOpenContextMenu(event) {
+    handleInsertAfter()
+    onContextMenu(event)
   }
 
   $: indentationStyle = getIndentationStyle(path.length)
@@ -289,26 +303,27 @@
             {/if}
           </div>
         </div>
+        {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
+          <div class="context-menu-button-anchor">
+            <ContextMenuButton onContextMenu={onContextMenu} />
+          </div>
+        {/if}
       </div>
       {#if expanded}
         <div
-          class="insert-button-area inside"
-          data-type="insert-button-area-inside"
+          class="insert-selection-area inside"
+          data-type="insert-selection-area-inside"
           on:mousedown={handleInsertInside}
-        >
-          <button class="insert-button" title={INSERT_INSIDE_EXPLANATION}>&#8617;</button>
-        </div>
+        ></div>
       {:else}
         {#if validationError}
           <ValidationError validationError={validationError} onExpand={handleExpand} />
         {/if}
         <div
-          class="insert-button-area after"
-          data-type="insert-button-area-after"
+          class="insert-selection-area after"
+          data-type="insert-selection-area-after"
           on:mousedown={handleInsertAfter}
-        >
-          <button class="insert-button" title={INSERT_AFTER_EXPLANATION}>&#8617;</button>
-        </div>
+        ></div>
       {/if}
     </div>
     {#if expanded}
@@ -317,9 +332,12 @@
           class="insert-area inside"
           class:hovered={hover === HOVER_INSERT_INSIDE}
           class:selected={selectedInside}
+          data-type="insert-selection-area-inside"
           style={getIndentationStyle(path.length + 1)}
           title={INSERT_EXPLANATION}
-        ></div>
+        >
+          <ContextMenuButton onContextMenu={handleInsertInsideOpenContextMenu} />
+        </div>
         {#each visibleSections as visibleSection, sectionIndex (sectionIndex)}
           {#each value.slice(visibleSection.start, Math.min(visibleSection.end, value.length)) as item, itemIndex (state[visibleSection.start + itemIndex][STATE_ID])}
             <svelte:self
@@ -334,6 +352,7 @@
               onExpand={onExpand}
               onSelect={onSelect}
               onExpandSection={onExpandSection}
+              onContextMenu={onContextMenu}
               onClassName={onClassName}
               selection={selection}
             >
@@ -359,12 +378,10 @@
         </div>
         {#if !root}
           <div
-            class="insert-button-area after"
-            data-type="insert-button-area-after"
+            class="insert-selection-area after"
+            data-type="insert-selection-area-after"
             on:mousedown={handleInsertAfter}
-          >
-            <button class="insert-button" title={INSERT_AFTER_EXPLANATION}>&#8617;</button>
-          </div>
+          ></div>
         {/if}
       </div>
     {/if}
@@ -399,27 +416,28 @@
             {/if}
           </div>
         </div>
+        {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
+          <div class="context-menu-button-anchor">
+            <ContextMenuButton onContextMenu={onContextMenu} />
+          </div>
+        {/if}
       </div>
       {#if expanded}
         <div
-          class="insert-button-area inside"
-          data-type="insert-button-area-inside"
+          class="insert-selection-area inside"
+          data-type="insert-selection-area-inside"
           on:mousedown={handleInsertInside}
-        >
-          <button class="insert-button" title={INSERT_INSIDE_EXPLANATION}>&#8617;</button>
-        </div>
+        ></div>
       {:else}
         {#if validationError}
           <ValidationError validationError={validationError} onExpand={handleExpand} />
         {/if}
         {#if !root}
           <div
-            class="insert-button-area after"
-            data-type="insert-button-area-after"
+            class="insert-selection-area after"
+            data-type="insert-selection-area-after"
             on:mousedown={handleInsertAfter}
-          >
-            <button class="insert-button" title={INSERT_AFTER_EXPLANATION}>&#8617;</button>
-          </div>
+          ></div>
         {/if}
       {/if}
     </div>
@@ -429,9 +447,12 @@
           class="insert-area inside"
           class:hovered={hover === HOVER_INSERT_INSIDE}
           class:selected={selectedInside}
+          data-type="insert-selection-area-inside"
           style={getIndentationStyle(path.length + 1)}
           title={INSERT_EXPLANATION}
-        ></div>
+        >
+          <ContextMenuButton onContextMenu={handleInsertInsideOpenContextMenu} />
+        </div>
         {#each keys as key (state[key][STATE_ID])}
           <svelte:self
             value={value[key]}
@@ -445,6 +466,7 @@
             onExpand={onExpand}
             onSelect={onSelect}
             onExpandSection={onExpandSection}
+            onContextMenu={onContextMenu}
             onClassName={onClassName}
             selection={selection}
           >
@@ -458,6 +480,9 @@
                 onSelect={onSelect}
                 searchResult={searchResult ? searchResult[key] : undefined}
               />
+              {#if selection && selection.type === SELECTION_TYPE.KEY && !selection.edit && isEqual(selection.focusPath, path.concat(key))}
+                <ContextMenuButton onContextMenu={onContextMenu} />
+              {/if}
             </div
           ></svelte:self>
         {/each}
@@ -468,12 +493,10 @@
         </div>
         {#if !root}
           <div
-            class="insert-button-area after"
-            data-type="insert-button-area-after"
+            class="insert-selection-area after"
+            data-type="insert-selection-area-after"
             on:mousedown={handleInsertAfter}
-          >
-            <button class="insert-button" title={INSERT_AFTER_EXPLANATION}>&#8617;</button>
-          </div>
+          ></div>
         {/if}
       </div>
     {/if}
@@ -493,18 +516,21 @@
           onSelect={onSelect}
           searchResult={searchResult}
         />
+        {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
+          <div class="context-menu-button-anchor">
+            <ContextMenuButton onContextMenu={onContextMenu} />
+          </div>
+        {/if}
       </div>
       {#if validationError}
         <ValidationError validationError={validationError} onExpand={handleExpand} />
       {/if}
       {#if !root}
         <div
-          class="insert-button-area after"
-          data-type="insert-button-area-after"
+          class="insert-selection-area after"
+          data-type="insert-selection-area-after"
           on:mousedown={handleInsertAfter}
-        >
-          <button class="insert-button" title={INSERT_AFTER_EXPLANATION}>&#8617;</button>
-        </div>
+        ></div>
       {/if}
     </div>
   {/if}
@@ -512,9 +538,12 @@
     class="insert-area after"
     class:hovered={hover === HOVER_INSERT_AFTER}
     class:selected={selectedAfter}
+    data-type="insert-selection-area-after"
     style={indentationStyle}
     title={INSERT_EXPLANATION}
-  ></div>
+  >
+    <ContextMenuButton onContextMenu={handleInsertAfterOpenContextMenu} />
+  </div>
 </div>
 
 <style src="./JSONNode.scss"></style>

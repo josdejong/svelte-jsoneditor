@@ -1077,6 +1077,8 @@
   }
 
   function handleMouseDown (event) {
+    console.log('handleMouseDown', event)
+
     // TODO: ugly to have to have two setTimeout here. Without it, hiddenInput will blur
     setTimeout(() => {
       setTimeout(() => {
@@ -1088,14 +1090,7 @@
     })
   }
 
-  function handleContextMenu (event) {
-    if (!selection || selection.edit) {
-      return
-    }
-
-    event.stopPropagation()
-    event.preventDefault()
-
+  function openContextMenu ({ left, top }) {
     const props = {
       selection,
 
@@ -1122,10 +1117,24 @@
     }
 
     openAbsolutePopup(ContextMenu, props, {
-      left: event.clientX,
-      top: event.clientY,
+      left,
+      top,
       closeOnOuterClick: true,
       onClose: focus
+    })
+  }
+
+  function handleContextMenu (event) {
+    if (!selection || selection.edit) {
+      return
+    }
+
+    event.stopPropagation()
+    event.preventDefault()
+
+    openContextMenu({
+      left: event.clientX,
+      top: event.clientY
     })
 
     return false
@@ -1212,6 +1221,7 @@
         onExpand={handleExpand}
         onSelect={handleSelect}
         onExpandSection={handleExpandSection}
+        onContextMenu={openContextMenu}
         onClassName={onClassName || noop}
         selection={selection}
       />

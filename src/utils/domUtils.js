@@ -250,11 +250,11 @@ export function getSelectionTypeFromTarget (target) {
     return SELECTION_TYPE.VALUE
   }
 
-  if (isChildOfAttribute(target, 'data-type', 'insert-button-area-inside')) {
+  if (isChildOfAttribute(target, 'data-type', 'insert-selection-area-inside')) {
     return SELECTION_TYPE.INSIDE
   }
 
-  if (isChildOfAttribute(target, 'data-type', 'insert-button-area-after')) {
+  if (isChildOfAttribute(target, 'data-type', 'insert-selection-area-after')) {
     return SELECTION_TYPE.AFTER
   }
 

@@ -73,9 +73,6 @@ export const HOVER_INSERT_INSIDE = 'hover-insert-inside'
 export const HOVER_INSERT_AFTER = 'hover-insert-after'
 export const HOVER_COLLECTION = 'hover-collection'
 
-export const INSERT_AFTER_EXPLANATION = 'Click to insert contents after this entry'
-export const INSERT_INSIDE_EXPLANATION = 'Click to insert contents inside this array or object'
-
 export const JSON_STATUS_VALID = 'valid'
 export const JSON_STATUS_REPAIRABLE = 'repairable'
 export const JSON_STATUS_INVALID = 'invalid'

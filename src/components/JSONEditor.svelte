@@ -13,7 +13,6 @@
   import { uniqueId } from '../utils/uniqueId.js'
   import CodeMode from './modes/codemode/CodeMode.svelte'
   import TreeMode from './modes/treemode/TreeMode.svelte'
-  import { setContext } from 'svelte'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')

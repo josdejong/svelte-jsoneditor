@@ -77,7 +77,7 @@
     padding-left: $line-height + $input-padding; // must be the same as the width of the expand button
   }
 
-  .insert-button-area {
+  .insert-selection-area {
     visibility: hidden;
     padding: 0 $padding / 2;
     flex: 1; // must fill all left over space at the right side of the editor, so you can click there
@@ -94,11 +94,15 @@
     }
   }
 
-  &:hover > .contents-outer .insert-button-area:not(.selected),
-  .header-outer:hover > .insert-button-area:not(.selected),
-  .footer-outer:hover .insert-button-area:not(.selected) {
+  &:hover > .contents-outer .insert-selection-area:not(.selected),
+  .header-outer:hover > .insert-selection-area:not(.selected),
+  .footer-outer:hover .insert-selection-area:not(.selected) {
     visibility: visible;
     z-index: 1;
+  }
+
+  .context-menu-button-anchor {
+    position: relative;
   }
 
   .insert-area {
@@ -113,9 +117,21 @@
     margin-right: $padding/2;
     outline: $height/2 solid; // color depends on hovered/selected/inactive+selected
 
+    :global(.context-menu-button) {
+      right: -$height/2;
+      background: $selection-background;
+    }
+
     &.hovered {
       display: flex;
       outline-color: $hovered-background-transparent;
+    }
+
+    &.selected {
+      // TODO: move this into json-node-selected-mixin
+      :global(.context-menu-button) {
+        background: $dark-gray;
+      }
     }
   }
 
@@ -169,8 +185,7 @@
   }
 }
 
-.tag,
-.insert-button {
+.tag {
   border: none;
   font-size: $font-size-small;
   font-family: $font-family;
@@ -192,21 +207,9 @@
   }
 }
 
-.insert-button {
-  padding: 0 4px;
-  margin: 0;
-  line-height: $line-height;
-
-  // not transparent: not inside header or contents (which may be highlighted with a special background or so)
-  background: $hovered-background;
-
-  &:hover {
-    background: $light-gray;
-  }
-}
-
 .identifier {
   vertical-align: top;
+  position: relative;
 }
 
 :global(.bubble.dark) {
