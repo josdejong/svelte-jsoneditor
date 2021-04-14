@@ -41,9 +41,9 @@
     (selection.type === SELECTION_TYPE.MULTI) &&
     !isEmpty(selection.focusPath) // must not be root
   $: canExtract = selection != null && (
-      selection.type === SELECTION_TYPE.MULTI ||
+    selection.type === SELECTION_TYPE.MULTI ||
       selection.type === SELECTION_TYPE.VALUE
-    ) &&
+  ) &&
     !isEmpty(selection.focusPath) // must not be root
   $: canEdit = selection != null && (
     selection.type === SELECTION_TYPE.KEY ||
@@ -51,57 +51,57 @@
     (selection.type === SELECTION_TYPE.MULTI && selection.paths.length === 1)
   )
 
-  function handleEditKey() {
+  function handleEditKey () {
     onCloseContextMenu()
     onEditKey()
   }
 
-  function handleEditValue() {
+  function handleEditValue () {
     onCloseContextMenu()
     onEditValue()
   }
 
-  function handleCut() {
+  function handleCut () {
     onCloseContextMenu()
     onCut()
   }
 
-  function handleCopy() {
+  function handleCopy () {
     onCloseContextMenu()
     onCopy()
   }
 
-  function handlePaste() {
+  function handlePaste () {
     onCloseContextMenu()
     onPaste()
   }
 
-  function handleRemove() {
+  function handleRemove () {
     onCloseContextMenu()
     onRemove()
   }
 
-  function handleDuplicate() {
+  function handleDuplicate () {
     onCloseContextMenu()
     onDuplicate()
   }
 
-  function handleExtract() {
+  function handleExtract () {
     onCloseContextMenu()
     onExtract()
   }
 
-  function handleInsert(type) {
+  function handleInsert (type) {
     onCloseContextMenu()
     onInsert(type)
   }
 
-  function handleSort() {
+  function handleSort () {
     onCloseContextMenu()
     onSort()
   }
 
-  function handleTransform() {
+  function handleTransform () {
     onCloseContextMenu()
     onTransform()
   }

@@ -15,7 +15,7 @@
   let refAbsolutePopup
   let refHiddenInput
 
-  function openAbsolutePopup(Component, props, options) {
+  function openAbsolutePopup (Component, props, options) {
     debug('open...', options)
     popupComponent = Component
     popupProps = props || {}
@@ -24,7 +24,7 @@
     tick().then(focus)
   }
 
-  function closeAbsolutePopup() {
+  function closeAbsolutePopup () {
     const onClose = popupOptions.onClose
 
     popupComponent = null
@@ -57,13 +57,13 @@
     }
   }
 
-  function calculateStyle() {
+  function calculateStyle () {
     const rect = refAbsolutePopup.getBoundingClientRect()
 
     return `left: ${popupOptions.left - rect.left}px; top: ${popupOptions.top - rect.top}px;`
   }
 
-  function focus() {
+  function focus () {
     if (refHiddenInput) {
       refHiddenInput.focus()
     }

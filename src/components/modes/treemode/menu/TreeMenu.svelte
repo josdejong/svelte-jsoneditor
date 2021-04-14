@@ -8,15 +8,12 @@
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
-  import { getContext } from 'svelte'
   import {
     faJSONEditorCollapse,
     faJSONEditorExpand
   } from '../../../../img/customFontawesomeIcons.js'
   import Menu from '../../../controls/Menu.svelte'
   import SearchBox from './SearchBox.svelte'
-
-  const { open } = getContext('simple-modal')
 
   export let readOnly
   export let searchText

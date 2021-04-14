@@ -112,7 +112,7 @@ export function isSelectionInsidePath (selection, path) {
  */
 // TODO: write unit test
 export function isPathInsideSelection (selection, path, anchorType) {
-  let p = path.slice(0)
+  const p = path.slice(0)
 
   if (selection.type === SELECTION_TYPE.MULTI) {
     while (p.length > 0) {
@@ -327,8 +327,6 @@ export function getSelectionNextInside (json, state, selection) {
   const nextPathInside = getNextVisiblePath(getIn(json, parentPath), getIn(state, parentPath), childPath)
 
   if (nextPathInside) {
-    const fullPath = parentPath.concat(nextPathInside)
-
     return createSelection(json, state, {
       type: SELECTION_TYPE.VALUE,
       path: parentPath.concat(nextPathInside)

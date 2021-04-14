@@ -88,24 +88,24 @@
 
   $: type = valueType(value)
 
-  function getIndentationStyle(level) {
+  function getIndentationStyle (level) {
     return `margin-left: ${level * INDENTATION_WIDTH}px`
   }
 
-  function toggleExpand(event) {
+  function toggleExpand (event) {
     event.stopPropagation()
 
     const recursive = event.ctrlKey
     onExpand(path, !expanded, recursive)
   }
 
-  function handleExpand(event) {
+  function handleExpand (event) {
     event.stopPropagation()
 
     onExpand(path, true)
   }
 
-  function handleUpdateKey(oldKey, newKey) {
+  function handleUpdateKey (oldKey, newKey) {
     const operations = rename(path, keys, oldKey, newKey)
     onPatch(operations)
 
@@ -116,7 +116,7 @@
     return newKeyUnique
   }
 
-  function handleMouseDown(event) {
+  function handleMouseDown (event) {
     // check if the mouse down is not happening in the key or value input fields or on a button
     if (isContentEditableDiv(event.target) || isChildOfNodeName(event.target, 'BUTTON')) {
       return
@@ -148,11 +148,11 @@
     } else {
       switch (anchorType) {
         case SELECTION_TYPE.KEY:
-          onSelect({type: SELECTION_TYPE.KEY, path})
+          onSelect({ type: SELECTION_TYPE.KEY, path })
           break
 
         case SELECTION_TYPE.VALUE:
-          onSelect({type: SELECTION_TYPE.VALUE, path})
+          onSelect({ type: SELECTION_TYPE.VALUE, path })
           break
 
         case SELECTION_TYPE.MULTI:
@@ -181,7 +181,7 @@
     document.addEventListener('mouseup', handleMouseUp)
   }
 
-  function handleMouseMove(event) {
+  function handleMouseMove (event) {
     if (singleton.mousedown) {
       event.preventDefault()
       event.stopPropagation()
@@ -210,7 +210,7 @@
     }
   }
 
-  function handleMouseUp(event) {
+  function handleMouseUp (event) {
     if (singleton.mousedown) {
       event.stopPropagation()
 
@@ -220,7 +220,7 @@
     document.removeEventListener('mouseup', handleMouseUp)
   }
 
-  function handleMouseOver(event) {
+  function handleMouseOver (event) {
     event.stopPropagation()
 
     if (isChildOfAttribute(event.target, 'data-type', 'selectable-value')) {
@@ -232,26 +232,26 @@
     }
   }
 
-  function handleMouseOut(event) {
+  function handleMouseOut (event) {
     event.stopPropagation()
 
     hover = null
   }
 
-  function handleInsertInside() {
-    onSelect({type: SELECTION_TYPE.INSIDE, path})
+  function handleInsertInside () {
+    onSelect({ type: SELECTION_TYPE.INSIDE, path })
   }
 
-  function handleInsertAfter() {
-    onSelect({type: SELECTION_TYPE.AFTER, path})
+  function handleInsertAfter () {
+    onSelect({ type: SELECTION_TYPE.AFTER, path })
   }
 
-  function handleInsertInsideOpenContextMenu(event) {
+  function handleInsertInsideOpenContextMenu (event) {
     handleInsertInside()
     onContextMenu(event)
   }
 
-  function handleInsertAfterOpenContextMenu(event) {
+  function handleInsertAfterOpenContextMenu (event) {
     handleInsertAfter()
     onContextMenu(event)
   }
