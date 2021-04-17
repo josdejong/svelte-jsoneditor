@@ -748,7 +748,7 @@
       return
     }
 
-    const selectedPath = findRootPath(selection)
+    const selectedPath = findRootPath(json, selection)
     openSortModal(selectedPath)
   }
 
@@ -785,7 +785,7 @@
       return
     }
 
-    const selectedPath = findRootPath(selection)
+    const selectedPath = findRootPath(json, selection)
     openTransformModal(selectedPath)
   }
 

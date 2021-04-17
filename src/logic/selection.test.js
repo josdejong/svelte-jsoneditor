@@ -102,7 +102,15 @@ describe('selection', () => {
   })
 
   it('should find the root path from a selection', () => {
-    assert.deepStrictEqual(findRootPath({
+    const json = {
+      a: {
+        b: 1,
+        c: 2,
+        d: 3
+      }
+    }
+
+    assert.deepStrictEqual(findRootPath(json, {
       type: SELECTION_TYPE.MULTI,
       anchorPath: ['a', 'b'],
       focusPath: ['a', 'd'],
@@ -118,11 +126,15 @@ describe('selection', () => {
       }
     }), ['a'])
 
-    const path = ['a', 'b']
-    assert.deepStrictEqual(findRootPath({ type: SELECTION_TYPE.AFTER, path, anchorPath: path, focusPath: path }), [])
-    assert.deepStrictEqual(findRootPath({ type: SELECTION_TYPE.INSIDE, path, anchorPath: path, focusPath: path }), [])
-    assert.deepStrictEqual(findRootPath({ type: SELECTION_TYPE.KEY, path, anchorPath: path, focusPath: path }), [])
-    assert.deepStrictEqual(findRootPath({ type: SELECTION_TYPE.VALUE, path, anchorPath: path, focusPath: path }), path)
+    const path1 = ['a', 'b']
+    const path2 = ['a']
+    assert.deepStrictEqual(findRootPath(json, { type: SELECTION_TYPE.AFTER, path: path1, anchorPath: path1, focusPath: path1 }), path2)
+    assert.deepStrictEqual(findRootPath(json, { type: SELECTION_TYPE.INSIDE, path: path1, anchorPath: path1, focusPath: path1 }), path2)
+    assert.deepStrictEqual(findRootPath(json, { type: SELECTION_TYPE.KEY, path: path1, anchorPath: path1, focusPath: path1 }), path2)
+    assert.deepStrictEqual(findRootPath(json, { type: SELECTION_TYPE.VALUE, path: path1, anchorPath: path1, focusPath: path1 }), path2)
+
+
+    assert.deepStrictEqual(findRootPath(json, { type: SELECTION_TYPE.VALUE, path: path2, anchorPath: path2, focusPath: path2 }), path2)
   })
 
   describe('navigate', () => {
