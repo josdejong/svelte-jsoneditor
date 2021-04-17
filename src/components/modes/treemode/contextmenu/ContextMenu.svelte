@@ -127,41 +127,80 @@
 
 <div class="jsoneditor-contextmenu">
   <div class="row">
-    <button on:click={handleEditKey} disabled={!canEdit}>
+    <button
+      title="Edit the key (Double-click on the key)"
+      on:click={handleEditKey}
+      disabled={!canEdit}
+    >
       <Icon data={faPen} /> Edit key
     </button>
-    <button on:click={handleEditValue} disabled={!canEdit}>
+    <button
+      title="Edit the value (Double-click on the value)"
+      on:click={handleEditValue}
+      disabled={!canEdit}
+    >
       <Icon data={faPen} /> Edit value
     </button>
   </div>
   <div class="separator"></div>
   <div class="row">
-    <button on:click={handleCut} disabled={!hasSelectionContents}>
+    <button
+      title="Cut selected contents (Ctrl+X)"
+      on:click={handleCut}
+      disabled={!hasSelectionContents}>
       <Icon data={faCut} /> Cut
     </button>
-    <button on:click={handleCopy} disabled={!hasSelectionContents}>
+    <button
+      title="Copy selected contents (Ctrl+C)"
+      on:click={handleCopy}
+      disabled={!hasSelectionContents}
+    >
       <Icon data={faCopy} /> Copy
     </button>
-    <button on:click={handlePaste} disabled={!hasSelection}>
+    <button
+      title="Paste clipboard contents (Ctrl+V)"
+      on:click={handlePaste}
+      disabled={!hasSelection}
+    >
       <Icon data={faPaste} /> Paste
     </button>
   </div>
   <div class="separator"></div>
   <div class="row">
     <div class="column">
-      <button on:click={handleRemove} disabled={!hasSelectionContents}>
+      <button
+        title="Remove selected contents (Delete)"
+        on:click={handleRemove}
+        disabled={!hasSelectionContents}
+      >
         <Icon data={faTimes} /> Remove
       </button>
-      <button on:click={handleDuplicate} disabled={!canDuplicate}>
+      <button
+        title="Duplicate selected contents (Ctrl+D)"
+        on:click={handleDuplicate}
+        disabled={!canDuplicate}
+      >
         <Icon data={faClone} /> Duplicate
       </button>
-      <button on:click={handleExtract} disabled={!canExtract}>
+      <button
+        title="Extract selected contents"
+        on:click={handleExtract}
+        disabled={!canExtract}
+      >
         <Icon data={faCropAlt} /> Extract
       </button>
-      <button on:click={handleSort} disabled={!hasSelectionContents}>
+      <button
+        title="Sort array or object contents"
+        on:click={handleSort}
+        disabled={!hasSelectionContents}
+      >
         <Icon data={faSortAmountDownAlt} /> Sort
       </button>
-      <button on:click={handleTransform} disabled={!hasSelectionContents}>
+      <button
+        title="Transform array or object contents (filter, sort, project)"
+        on:click={handleTransform}
+        disabled={!hasSelectionContents}
+      >
         <Icon data={faFilter} /> Transform
       </button>
     </div>
