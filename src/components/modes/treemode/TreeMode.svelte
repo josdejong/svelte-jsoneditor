@@ -341,6 +341,14 @@
   $: debug('state', state)
   $: debug('selection', selection)
 
+  function hasSelectionContents () {
+    return selection && (
+      selection.type === SELECTION_TYPE.MULTI ||
+      selection.type === SELECTION_TYPE.KEY ||
+      selection.type === SELECTION_TYPE.VALUE
+    )
+  }
+
   function handleEditKey () {
     if (readOnly || !selection) {
       return
@@ -366,7 +374,7 @@
   }
 
   async function handleCut () {
-    if (readOnly || !selection) {
+    if (readOnly || !hasSelectionContents()) {
       return
     }
 
@@ -490,14 +498,6 @@
     debug('remove', { operations, selection, newSelection })
 
     handlePatch(operations, newSelection)
-  }
-
-  function hasSelectionContents () {
-    return selection && (
-      selection.type === SELECTION_TYPE.MULTI ||
-      selection.type === SELECTION_TYPE.KEY ||
-      selection.type === SELECTION_TYPE.VALUE
-    )
   }
 
   function handleDuplicate () {
