@@ -1134,6 +1134,7 @@
 
   function openContextMenu ({ left, top }) {
     const props = {
+      json,
       selection,
 
       onEditKey: handleEditKey,

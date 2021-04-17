@@ -14,11 +14,15 @@
     faSortAmountDownAlt,
     faTimes
   } from '@fortawesome/free-solid-svg-icons'
-  import { isEmpty } from 'lodash-es'
+  import { getIn } from 'immutable-json-patch'
+  import { initial, isEmpty } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import { SELECTION_TYPE } from '../../../../logic/selection.js'
+  import { isObjectOrArray } from '../../../../utils/typeUtils.js'
 
+  export let json
   export let selection
+
   export let onCloseContextMenu
   export let onEditKey
   export let onEditValue
@@ -35,24 +39,41 @@
   export let onTransform
 
   $: hasSelection = selection != null
+
   $: hasSelectionContents = selection != null && (
     selection.type === SELECTION_TYPE.MULTI ||
     selection.type === SELECTION_TYPE.KEY ||
     selection.type === SELECTION_TYPE.VALUE
   )
+
   $: canDuplicate = selection != null &&
     (selection.type === SELECTION_TYPE.MULTI) &&
     !isEmpty(selection.focusPath) // must not be root
+
   $: canExtract = selection != null && (
     selection.type === SELECTION_TYPE.MULTI ||
       selection.type === SELECTION_TYPE.VALUE
   ) &&
     !isEmpty(selection.focusPath) // must not be root
-  $: canEdit = selection != null && (
-    selection.type === SELECTION_TYPE.KEY ||
-    selection.type === SELECTION_TYPE.VALUE ||
-    (selection.type === SELECTION_TYPE.MULTI && selection.paths.length === 1)
-  )
+
+  $: canEditKey =
+    selection != null &&
+    (
+      selection.type === SELECTION_TYPE.KEY ||
+      selection.type === SELECTION_TYPE.VALUE ||
+      (selection.type === SELECTION_TYPE.MULTI && selection.paths.length === 1)
+    ) &&
+    !isEmpty(selection.focusPath) &&
+    !Array.isArray(getIn(json, initial(selection.focusPath)))
+
+  $: canEditValue =
+    selection != null &&
+    (
+      selection.type === SELECTION_TYPE.KEY ||
+      selection.type === SELECTION_TYPE.VALUE ||
+      (selection.type === SELECTION_TYPE.MULTI && selection.paths.length === 1)
+    ) &&
+    !isObjectOrArray(getIn(json, selection.focusPath))
 
   $: insertText = hasSelectionContents
     ? 'Replace with'
@@ -130,14 +151,14 @@
     <button
       title="Edit the key (Double-click on the key)"
       on:click={handleEditKey}
-      disabled={!canEdit}
+      disabled={!canEditKey}
     >
       <Icon data={faPen} /> Edit key
     </button>
     <button
       title="Edit the value (Double-click on the value)"
       on:click={handleEditValue}
-      disabled={!canEdit}
+      disabled={!canEditValue}
     >
       <Icon data={faPen} /> Edit value
     </button>
