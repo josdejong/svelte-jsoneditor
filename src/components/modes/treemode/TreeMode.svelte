@@ -492,11 +492,18 @@
     handlePatch(operations, newSelection)
   }
 
+  function hasSelectionContents () {
+    return selection && (
+      selection.type === SELECTION_TYPE.MULTI ||
+      selection.type === SELECTION_TYPE.KEY ||
+      selection.type === SELECTION_TYPE.VALUE
+    )
+  }
+
   function handleDuplicate () {
     if (
       readOnly ||
-      !selection ||
-      (selection.type !== SELECTION_TYPE.MULTI) ||
+      !hasSelectionContents() ||
       isEmpty(selection.focusPath) // root selected, cannot duplicate
     ) {
       return
@@ -504,7 +511,7 @@
 
     debug('duplicate', { selection })
 
-    const operations = duplicate(json, state, selection.paths)
+    const operations = duplicate(json, state, selection.paths || [selection.focusPath])
 
     handlePatch(operations)
   }

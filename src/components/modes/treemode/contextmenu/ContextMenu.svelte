@@ -39,6 +39,7 @@
   export let onTransform
 
   $: hasSelection = selection != null
+  $: rootSelected = hasSelection && isEmpty(selection.focusPath)
 
   $: hasSelectionContents = selection != null && (
     selection.type === SELECTION_TYPE.MULTI ||
@@ -47,14 +48,14 @@
   )
 
   $: canDuplicate = selection != null &&
-    (selection.type === SELECTION_TYPE.MULTI) &&
-    !isEmpty(selection.focusPath) // must not be root
+    hasSelectionContents &&
+    !rootSelected // must not be root
 
   $: canExtract = selection != null && (
     selection.type === SELECTION_TYPE.MULTI ||
       selection.type === SELECTION_TYPE.VALUE
   ) &&
-    !isEmpty(selection.focusPath) // must not be root
+    !rootSelected // must not be root
 
   $: canEditKey =
     selection != null &&
@@ -63,7 +64,7 @@
       selection.type === SELECTION_TYPE.VALUE ||
       (selection.type === SELECTION_TYPE.MULTI && selection.paths.length === 1)
     ) &&
-    !isEmpty(selection.focusPath) &&
+    !rootSelected &&
     !Array.isArray(getIn(json, initial(selection.focusPath)))
 
   $: canEditValue =
