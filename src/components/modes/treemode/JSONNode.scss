@@ -135,13 +135,6 @@
     }
   }
 
-  &.selected,
-  &.selected-value {
-    .insert-area {
-      display: none;
-    }
-  }
-
   @include json-node-selected-mixin($selection-background);
 }
 
