@@ -593,9 +593,9 @@
         type: SELECTION_TYPE.VALUE,
         path: selection.focusPath
       })
-
-      handleInsert(type)
     }
+
+    handleInsert(type)
   }
 
   function handleInsertBefore () {
