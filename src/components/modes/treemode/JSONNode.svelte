@@ -127,11 +127,12 @@
 
     const anchorType = getSelectionTypeFromTarget(event.target)
 
-    // if this node is inside the current selection, do nothing
-    if (selection && isPathInsideSelection(selection, path, anchorType)) {
-      // TODO: implement start of a drag event in this case
+    // when right clicking inside the current selection, do nothing
+    if (event.button === 2 && selection && isPathInsideSelection(selection, path, anchorType)) {
       return
     }
+
+    // TODO: implement start of a drag event when dragging selection with left mouse button
 
     singleton.mousedown = true
     singleton.selectionAnchor = path
