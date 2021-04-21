@@ -12,8 +12,9 @@
     padding-bottom: $contents-padding;
     box-sizing: border-box;
 
-    > .header-outer :global(.context-menu-button) {
-      top: 1px;
+    > .header-outer :global(.context-menu-button),
+    > .contents-outer > .contents :global(.context-menu-button) {
+      top: 0;
       right: -$context-menu-button-size - 2px;
     }
 

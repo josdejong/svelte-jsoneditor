@@ -261,14 +261,14 @@
   <div class="row">
     <button
       title="Select area before current entry to insert or paste contents"
-      disabled={!hasSelectionContents}
+      disabled={!hasSelectionContents || rootSelected}
       on:click={handleInsertBefore}
     >
       <Icon data={faCaretSquareUp} /> Insert before
     </button>
     <button
       title="Select area after current entry to insert or paste contents"
-      disabled={!hasSelectionContents}
+      disabled={!hasSelectionContents || rootSelected}
       on:click={handleInsertAfter}
     >
       <Icon data={faCaretSquareDown} /> Insert after
