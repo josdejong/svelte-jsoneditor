@@ -23,7 +23,7 @@
   export let onCancel
   export let onFocus
   export let onBlur
-  export let onCreateMenu = () => {
+  export let onRenderMenu = () => {
   }
 
   const debug = createDebug('jsoneditor:JSONRepair')
@@ -125,7 +125,7 @@
     }
   ]
 
-  $: items = onCreateMenu('repair', defaultItems) || defaultItems
+  $: items = onRenderMenu('repair', defaultItems) || defaultItems
 
   $: gotoAction = {
     icon: faArrowDown,

@@ -703,12 +703,17 @@ export function createSelection (json, state, selectionSchema) {
  */
 export function selectionToPartialJson (json, selection, indentation = 2) {
   if (selection.type === SELECTION_TYPE.KEY) {
-    return JSON.stringify(last(selection.focusPath))
+    const stringifiedKey = JSON.stringify(last(selection.focusPath))
+
+    return stringifiedKey.substring(1, stringifiedKey.length - 1) // remove the enclosing quotes
   }
 
   if (selection.type === SELECTION_TYPE.VALUE) {
     const value = getIn(json, selection.focusPath)
-    return JSON.stringify(value, null, indentation) // TODO: customizable indentation?
+    const stringifiedValue = JSON.stringify(value, null, indentation) // TODO: customizable indentation?
+    return (typeof value === 'string')
+      ? stringifiedValue.substring(1, stringifiedValue.length - 1) // remove the enclosing quotes
+      : stringifiedValue
   }
 
   if (selection.type === SELECTION_TYPE.MULTI) {
