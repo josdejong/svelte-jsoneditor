@@ -583,6 +583,21 @@
       })
   }
 
+  /**
+   * @param {'value' | 'object' | 'array' | 'structure'} type
+   */
+  function handleInsertFromContextMenu (type) {
+    if (selection.type === SELECTION_TYPE.KEY) {
+      // in this case, we do not want to rename the key, but replace the property
+      selection = createSelection(json, state, {
+        type: SELECTION_TYPE.VALUE,
+        path: selection.focusPath
+      })
+
+      handleInsert(type)
+    }
+  }
+
   function handleInsertBefore () {
     const selectionBefore = getSelectionUp(json, state, selection, false)
 
@@ -1156,7 +1171,7 @@
       onExtract: handleExtract,
 
       onInsertBefore: handleInsertBefore,
-      onInsert: handleInsert,
+      onInsert: handleInsertFromContextMenu,
       onInsertAfter: handleInsertAfter,
 
       onSort: handleSortSelection,
