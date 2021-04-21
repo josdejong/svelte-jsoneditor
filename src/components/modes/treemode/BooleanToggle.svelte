@@ -5,7 +5,6 @@
   import { SELECTION_TYPE } from '../../../logic/selection.js'
 
   export let onPatch
-  export let onSelect
   export let path
   export let value
 
@@ -16,9 +15,7 @@
       op: 'replace',
       path: compileJSONPointer(path),
       value: !value
-    }])
-
-    onSelect({ type: SELECTION_TYPE.VALUE, path })
+    }], null)
   }
 
 </script>

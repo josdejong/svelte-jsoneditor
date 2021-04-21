@@ -153,7 +153,6 @@
     path={path}
     value={value}
     onPatch={onPatch}
-    onSelect={onSelect}
   />
 {/if}
 
