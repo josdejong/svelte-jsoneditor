@@ -181,14 +181,14 @@
 		flex: 1;
 	}
 
-	.editor {
-		max-width: 800px;
-		height: 400px;
-	}
+	/*.editor {*/
+	/*	max-width: 800px;*/
+	/*	height: 400px;*/
+	/*}*/
 
 	.code-editor {
 		max-width: 800px;
-		height: 400px;
+		/*height: 400px;*/
 	}
 
 	.data {
