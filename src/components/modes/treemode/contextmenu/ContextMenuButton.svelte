@@ -1,6 +1,7 @@
 <script>
   import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
   import Icon from 'svelte-awesome'
+  import { CONTEXT_MENU_HEIGHT } from '../../../../constants.js'
 
   export let onContextMenu
 
@@ -13,9 +14,18 @@
     if (buttonElem) {
       const rect = buttonElem.getBoundingClientRect()
 
+      const windowHeight = window.innerHeight
+      const renderAbove = ((rect.bottom + CONTEXT_MENU_HEIGHT > windowHeight) && (rect.top > CONTEXT_MENU_HEIGHT))
+      const position = renderAbove
+        ? 'top'
+        : 'bottom'
+
       onContextMenu({
         left: rect.left,
-        top: rect.bottom + 2
+        top: renderAbove
+          ? rect.top - 2
+          : rect.bottom + 2,
+        position
       })
     }
   }

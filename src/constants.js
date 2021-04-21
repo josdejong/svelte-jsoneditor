@@ -76,3 +76,6 @@ export const HOVER_COLLECTION = 'hover-collection'
 export const JSON_STATUS_VALID = 'valid'
 export const JSON_STATUS_REPAIRABLE = 'repairable'
 export const JSON_STATUS_INVALID = 'invalid'
+
+// TODO: can we dynamically calculate the size?
+export const CONTEXT_MENU_HEIGHT = (40 + 2) * 8 // px

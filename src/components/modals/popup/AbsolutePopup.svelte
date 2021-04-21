@@ -66,7 +66,9 @@
   function calculateStyle () {
     const rect = refAbsolutePopup.getBoundingClientRect()
 
-    return `left: ${popupOptions.left - rect.left}px; top: ${popupOptions.top - rect.top}px;`
+    return popupOptions.position === 'top'
+      ? `left: ${popupOptions.left - rect.left}px; bottom: ${rect.top - popupOptions.top}px;`
+      : `left: ${popupOptions.left - rect.left}px; top: ${popupOptions.top - rect.top}px;`
   }
 
   function focus () {

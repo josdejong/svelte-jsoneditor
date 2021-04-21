@@ -23,6 +23,7 @@
   import { getContext, onDestroy, onMount, tick } from 'svelte'
   import { createJump } from '../../../assets/jump.js/src/jump.js'
   import {
+    CONTEXT_MENU_HEIGHT,
     MAX_SEARCH_RESULTS,
     SCROLL_DURATION,
     SEARCH_PROGRESS_THROTTLE,
@@ -1154,7 +1155,7 @@
     })
   }
 
-  function openContextMenu ({ left, top }) {
+  function openContextMenu ({ left, top, position }) {
     const props = {
       json,
       selection,
@@ -1186,6 +1187,7 @@
     openAbsolutePopup(ContextMenu, props, {
       left,
       top,
+      position,
       closeOnOuterClick: true,
       onClose: focus
     })
@@ -1199,10 +1201,14 @@
     event.stopPropagation()
     event.preventDefault()
 
-    openContextMenu({
-      left: event.clientX,
-      top: event.clientY
-    })
+    const top = event.clientY
+    const left = event.clientX
+    const windowHeight = window.innerHeight
+    const position = ((top + CONTEXT_MENU_HEIGHT > windowHeight) && (top > CONTEXT_MENU_HEIGHT))
+      ? 'top'
+      : 'bottom'
+
+    openContextMenu({ position, left, top })
 
     return false
   }
