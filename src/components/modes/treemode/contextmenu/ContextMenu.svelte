@@ -227,33 +227,36 @@
       </button>
     </div>
     <div class="column">
+      <div class="label">
+        {insertText}:
+      </div>
       <button
         on:click={() => handleInsert('structure')}
-        title="${insertText} structure"
+        title="{insertText} structure"
         disabled={!hasSelection}
       >
-        <span class="insert"><span class="plus">{'+'}</span></span> {insertText} structure
+        <span class="insert"><span class="plus">{'+'}</span></span> Structure
       </button>
       <button
         on:click={() => handleInsert('object')}
         title="{insertText} object"
         disabled={!hasSelection}
       >
-        <span class="insert">{'{}'}</span> {insertText} object
+        <span class="insert">{'{}'}</span> Object
       </button>
       <button
         on:click={() => handleInsert('array')}
         title="{insertText} array"
         disabled={!hasSelection}
       >
-        <span class="insert">[]</span> {insertText} array
+        <span class="insert">[]</span> Array
       </button>
       <button
         on:click={() => handleInsert('value')}
         title="{insertText} value"
         disabled={!hasSelection}
       >
-        <span class="insert"><span class="quote">"</span></span> {insertText} value
+        <span class="insert"><span class="quote">"</span></span> Value
       </button>
     </div>
   </div>

@@ -16,10 +16,17 @@
     align-items: start;
     justify-content: stretch;
 
+    div.label {
+      flex: 1;
+      white-space: nowrap;
+      padding: $padding;
+      color: $gray;
+    }
+
     button {
       flex: 1;
       white-space: nowrap;
-      padding: $padding $padding;
+      padding: $padding;
       color: inherit;
 
       &:hover {
@@ -45,19 +52,10 @@
         .quote,
         .plus {
           position: absolute;
-          top: 0;
+          top: -4px;
           left: 2px;
           font-size: 24px;
         }
-      }
-    }
-
-    .insert-text {
-      padding: $padding;
-      width: 100px;
-
-      &.disabled {
-        color: $gray;
       }
     }
   }
