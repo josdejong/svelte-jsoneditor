@@ -23,7 +23,7 @@
 
 <button
   class="context-menu-button"
-  title="Open context menu (Click here, or right click anywhere)"
+  title="Open context menu (Click here, or right click on the selection)"
   on:click={handleClick}
 >
   <Icon data={faCaretDown} />

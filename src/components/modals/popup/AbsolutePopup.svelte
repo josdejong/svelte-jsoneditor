@@ -25,20 +25,22 @@
   }
 
   function closeAbsolutePopup () {
-    const onClose = popupOptions.onClose
+    if (popupComponent) {
+      const onClose = popupOptions.onClose
 
-    popupComponent = null
-    popupProps = null
-    popupOptions = {}
+      popupComponent = null
+      popupProps = null
+      popupOptions = {}
 
-    if (onClose) {
-      onClose()
+      if (onClose) {
+        onClose()
+      }
     }
   }
 
   function handleWindowMouseDown (event) {
     if (
-      popupComponent &&
+      popupOptions &&
       popupOptions.closeOnOuterClick &&
       !isChildOf(event.target, (e) => e === refAbsolutePopup)
     ) {
@@ -55,6 +57,10 @@
     if (combo === 'Escape') {
       closeAbsolutePopup()
     }
+  }
+
+  function handleScrollWheel () {
+    closeAbsolutePopup()
   }
 
   function calculateStyle () {
@@ -75,6 +81,7 @@
 <svelte:window
   on:mousedown|capture={handleWindowMouseDown}
   on:keydown|capture={handleKeyDown}
+  on:wheel|capture={handleScrollWheel}
 />
 
 <div
