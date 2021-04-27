@@ -617,6 +617,8 @@
         path: parentPath
       })
     }
+
+    tick().then(handleContextMenu)
   }
 
   function handleInsertAfter () {
@@ -631,8 +633,7 @@
       path
     })
 
-    // TODO: it may be nice to also open the context menu
-    //  (though it's not so easy to get the location of the context menu button)
+    tick().then(handleContextMenu)
   }
 
   function replaceActiveElementContents (char) {
@@ -1205,10 +1206,12 @@
       return
     }
 
-    event.stopPropagation()
-    event.preventDefault()
+    if (event) {
+      event.stopPropagation()
+      event.preventDefault()
+    }
 
-    if (event.type === 'contextmenu' && event.target !== refHiddenInput) {
+    if (event && event.type === 'contextmenu' && event.target !== refHiddenInput) {
       // right mouse click to open context menu
       openContextMenu({
         left: event.clientX,
