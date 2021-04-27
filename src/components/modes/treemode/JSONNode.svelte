@@ -337,9 +337,7 @@
           style={getIndentationStyle(path.length + 1)}
           title={INSERT_EXPLANATION}
         >
-          {#if selectedInside || hover === HOVER_INSERT_INSIDE}
-            <ContextMenuButton selected={selectedInside} onContextMenu={handleInsertInsideOpenContextMenu} />
-          {/if}
+          <ContextMenuButton selected={selectedInside} onContextMenu={handleInsertInsideOpenContextMenu} />
         </div>
         {#each visibleSections as visibleSection, sectionIndex (sectionIndex)}
           {#each value.slice(visibleSection.start, Math.min(visibleSection.end, value.length)) as item, itemIndex (state[visibleSection.start + itemIndex][STATE_ID])}
@@ -454,9 +452,7 @@
           style={getIndentationStyle(path.length + 1)}
           title={INSERT_EXPLANATION}
         >
-          {#if selectedInside || hover === HOVER_INSERT_INSIDE}
-            <ContextMenuButton selected={selectedInside} onContextMenu={handleInsertInsideOpenContextMenu} />
-          {/if}
+          <ContextMenuButton selected={selectedInside} onContextMenu={handleInsertInsideOpenContextMenu} />
         </div>
         {#each keys as key (state[key][STATE_ID])}
           <svelte:self
@@ -547,9 +543,7 @@
     style={indentationStyle}
     title={INSERT_EXPLANATION}
   >
-    {#if selectedAfter || hover === HOVER_INSERT_AFTER}
-      <ContextMenuButton selected={selectedAfter} onContextMenu={handleInsertAfterOpenContextMenu} />
-    {/if}
+    <ContextMenuButton selected={selectedAfter} onContextMenu={handleInsertAfterOpenContextMenu} />
   </div>
 </div>
 
