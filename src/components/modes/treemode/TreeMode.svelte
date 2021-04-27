@@ -99,9 +99,9 @@
 
   const { openAbsolutePopup, closeAbsolutePopup } = getContext('absolute-popup')
 
-  let divContents
-  let domHiddenInput
-  let domJsonEditor
+  let refContents
+  let refHiddenInput
+  let refJsonEditor
   let hasFocus = false
   const jump = createJump()
 
@@ -130,8 +130,8 @@
   createFocusTracker({
     onMount,
     onDestroy,
-    getWindow: () => getWindow(domJsonEditor),
-    hasFocus: () => activeElementIsChildOf(domJsonEditor),
+    getWindow: () => getWindow(refJsonEditor),
+    hasFocus: () => activeElementIsChildOf(refJsonEditor),
     onFocus: () => {
       hasFocus = true
       if (onFocus) {
@@ -635,7 +635,7 @@
   }
 
   function replaceActiveElementContents (char) {
-    const activeElement = getWindow(domJsonEditor).document.activeElement
+    const activeElement = getWindow(refJsonEditor).document.activeElement
     if (activeElement.isContentEditable) {
       activeElement.textContent = char
       setCursorToEnd(activeElement)
@@ -826,12 +826,12 @@
     await tick()
 
     const elem = findElement(path)
-    const offset = -(divContents.getBoundingClientRect().height / 4)
+    const offset = -(refContents.getBoundingClientRect().height / 4)
 
     if (elem) {
-      debug('scrollTo', { path, elem, divContents })
+      debug('scrollTo', { path, elem, refContents })
       jump(elem, {
-        container: divContents,
+        container: refContents,
         offset,
         duration: SCROLL_DURATION
       })
@@ -843,7 +843,7 @@
    * Note that the path can only be found when the node is expanded.
    */
   export function findElement (path) {
-    return divContents.querySelector(`div[data-path="${compileJSONPointer(path)}"]`)
+    return refContents.querySelector(`div[data-path="${compileJSONPointer(path)}"]`)
   }
 
   /**
@@ -852,10 +852,10 @@
    * @param {Path} path
    */
   function scrollIntoView (path) {
-    const elem = divContents.querySelector(`div[data-path="${compileJSONPointer(path)}"]`)
+    const elem = refContents.querySelector(`div[data-path="${compileJSONPointer(path)}"]`)
 
     if (elem) {
-      const viewPortRect = divContents.getBoundingClientRect()
+      const viewPortRect = refContents.getBoundingClientRect()
       const elemRect = elem.getBoundingClientRect()
       const margin = 20
       const elemHeight = isObjectOrArray(getIn(json, path))
@@ -865,14 +865,14 @@
       if (elemRect.top < viewPortRect.top + margin) {
         // scroll down
         jump(elem, {
-          container: divContents,
+          container: refContents,
           offset: -margin,
           duration: 0
         })
       } else if (elemRect.top + elemHeight > viewPortRect.bottom - margin) {
         // scroll up
         jump(elem, {
-          container: divContents,
+          container: refContents,
           offset: -(viewPortRect.height - elemHeight - margin),
           duration: 0
         })
@@ -937,7 +937,7 @@
 
     // set focus to the hidden input, so we can capture quick keys like Ctrl+X, Ctrl+C, Ctrl+V
     setTimeout(() => {
-      if (!activeElementIsChildOf(domJsonEditor)) {
+      if (!activeElementIsChildOf(refJsonEditor)) {
         focus()
       }
     })
@@ -1002,6 +1002,10 @@
     if (combo === 'Ctrl+A') {
       event.preventDefault()
       selection = selectAll()
+    }
+
+    if (combo === 'Ctrl+Q') {
+      handleContextMenu(event)
     }
 
     if (combo === 'Up' || combo === 'Shift+Up') {
@@ -1201,8 +1205,36 @@
     event.stopPropagation()
     event.preventDefault()
 
-    const top = event.clientY
-    const left = event.clientX
+    function calculatePosition () {
+      if (event.type === 'contextmenu') {
+        return {
+          top: event.clientY,
+          left: event.clientX
+        }
+      } else { // type === 'keydown' (from the quick key Ctrl+Q)
+
+        // TODO: doesn't work when having selected a key
+        const refAnchor = refContents.querySelector('.context-menu-button-anchor')
+
+        if (refAnchor) {
+          const rect = refAnchor.getBoundingClientRect()
+          const size = 18 // This size must be kept in sync with the size in CSS
+          return {
+            top: rect.top - size / 2,
+            left: rect.left - size / 2
+          }
+        }
+
+        // fallback on just displaying the ContextMenu top left
+        const rect = refContents.getBoundingClientRect()
+        return {
+          top: rect.top + 2,
+          left: rect.left + 2
+        }
+      }
+    }
+
+    const { top, left } = calculatePosition()
     const windowHeight = window.innerHeight
     const position = ((top + CONTEXT_MENU_HEIGHT > windowHeight) && (top > CONTEXT_MENU_HEIGHT))
       ? 'top'
@@ -1217,8 +1249,8 @@
     // with just .focus(), sometimes the input doesn't react on onpaste events
     // in Chrome when having a large document open and then doing cut/paste.
     // Calling both .focus() and .select() did solve this issue.
-    domHiddenInput.focus()
-    domHiddenInput.select()
+    refHiddenInput.focus()
+    refHiddenInput.select()
   }
 </script>
 
@@ -1228,7 +1260,7 @@
   on:keydown={handleKeyDown}
   on:mousedown={handleMouseDown}
   on:contextmenu={handleContextMenu}
-  bind:this={domJsonEditor}
+  bind:this={refJsonEditor}
 >
   {#if mainMenuBar}
     <TreeMenu
@@ -1258,7 +1290,7 @@
     <input
       class="hidden-input"
       tabindex="-1"
-      bind:this={domHiddenInput}
+      bind:this={refHiddenInput}
       on:paste={handlePaste}
     />
   </label>
@@ -1281,7 +1313,7 @@
       {externalText}
     </div>
   {:else}
-    <div class="contents" bind:this={divContents}>
+    <div class="contents" bind:this={refContents}>
       <JSONNode
         value={json}
         path={[]}

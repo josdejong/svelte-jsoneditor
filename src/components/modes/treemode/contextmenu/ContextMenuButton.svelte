@@ -33,7 +33,7 @@
 
 <button
   class="context-menu-button"
-  title="Open context menu (Click here, or right click on the selection)"
+  title="Open context menu (Click here, right click on the selection, or use the ContextMenu button or Ctrl+Q)"
   on:click={handleClick}
 >
   <Icon data={faCaretDown} />
