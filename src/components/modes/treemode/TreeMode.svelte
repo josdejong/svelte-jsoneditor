@@ -1208,22 +1208,22 @@
     event.preventDefault()
 
     function calculatePosition () {
-      if (event.type === 'contextmenu') {
+      if (event.type === 'contextmenu' && event.target !== refHiddenInput) {
+        // right mouse click to open context menu
         return {
           top: event.clientY,
           left: event.clientX
         }
-      } else { // type === 'keydown' (from the quick key Ctrl+Q)
-
-        // TODO: doesn't work when having selected a key
-        const refAnchor = refContents.querySelector('.context-menu-button-anchor')
+      } else {
+        // type === 'keydown' (from the quick key Ctrl+Q)
+        // or target is hidden input -> context menu button on keyboard
+        const refAnchor = refContents.querySelector('.context-menu-button')
 
         if (refAnchor) {
           const rect = refAnchor.getBoundingClientRect()
-          const size = 18 // This size must be kept in sync with the size in CSS
           return {
-            top: rect.top - size / 2,
-            left: rect.left - size / 2
+            top: rect.top,
+            left: rect.left
           }
         }
 
