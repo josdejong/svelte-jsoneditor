@@ -24,6 +24,7 @@
   import { createJump } from '../../../assets/jump.js/src/jump.js'
   import {
     CONTEXT_MENU_HEIGHT,
+    CONTEXT_MENU_WIDTH,
     MAX_SEARCH_RESULTS,
     SCROLL_DURATION,
     SEARCH_PROGRESS_THROTTLE,
@@ -1159,7 +1160,7 @@
     })
   }
 
-  function openContextMenu ({ left, top, position }) {
+  function openContextMenu ({ left, top, verticalPosition, horizontalPosition }) {
     const props = {
       json,
       selection,
@@ -1191,7 +1192,8 @@
     openAbsolutePopup(ContextMenu, props, {
       left,
       top,
-      position,
+      verticalPosition,
+      horizontalPosition,
       closeOnOuterClick: true,
       onClose: focus
     })
@@ -1234,13 +1236,16 @@
       }
     }
 
+    // TODO: move all this logic inside AbsolutePopup
     const { top, left } = calculatePosition()
-    const windowHeight = window.innerHeight
-    const position = ((top + CONTEXT_MENU_HEIGHT > windowHeight) && (top > CONTEXT_MENU_HEIGHT))
+    const verticalPosition = ((top + CONTEXT_MENU_HEIGHT >  window.innerHeight) && (top > CONTEXT_MENU_HEIGHT))
       ? 'top'
       : 'bottom'
+    const horizontalPosition = ((left + CONTEXT_MENU_WIDTH >  window.innerWidth) && (left > CONTEXT_MENU_WIDTH))
+      ? 'left'
+      : 'right'
 
-    openContextMenu({ position, left, top })
+    openContextMenu({ left, top, verticalPosition, horizontalPosition })
 
     return false
   }

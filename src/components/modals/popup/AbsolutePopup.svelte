@@ -66,9 +66,15 @@
   function calculateStyle () {
     const rect = refAbsolutePopup.getBoundingClientRect()
 
-    return popupOptions.position === 'top'
-      ? `left: ${popupOptions.left - rect.left}px; bottom: ${rect.top - popupOptions.top}px;`
-      : `left: ${popupOptions.left - rect.left}px; top: ${popupOptions.top - rect.top}px;`
+    const verticalStyling = popupOptions.verticalPosition === 'top'
+      ? `bottom: ${rect.top - popupOptions.top}px;`
+      : `top: ${popupOptions.top - rect.top}px;`
+
+    const horizontalStyling = popupOptions.horizontalPosition === 'left'
+      ? `right: ${rect.left - popupOptions.left}px;`
+      : `left: ${popupOptions.left - rect.left}px;`
+
+    return verticalStyling + ' ' + horizontalStyling
   }
 
   function focus () {

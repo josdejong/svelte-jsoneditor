@@ -1,7 +1,10 @@
 <script>
   import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
   import Icon from 'svelte-awesome'
-  import { CONTEXT_MENU_HEIGHT } from '../../../../constants.js'
+  import {
+    CONTEXT_MENU_HEIGHT,
+    CONTEXT_MENU_WIDTH
+  } from '../../../../constants.js'
 
   export let onContextMenu
 
@@ -14,18 +17,27 @@
     if (buttonElem) {
       const rect = buttonElem.getBoundingClientRect()
 
+      // TODO: move all this logic inside AbsolutePopup
       const windowHeight = window.innerHeight
+      const windowWidth = window.innerWidth
       const renderAbove = ((rect.bottom + CONTEXT_MENU_HEIGHT > windowHeight) && (rect.top > CONTEXT_MENU_HEIGHT))
-      const position = renderAbove
+      const verticalPosition = renderAbove
         ? 'top'
         : 'bottom'
+      const renderLeft = ((rect.left + CONTEXT_MENU_WIDTH > windowWidth) && (rect.right > CONTEXT_MENU_WIDTH))
+      const horizontalPosition = renderLeft
+        ? 'left'
+        : 'right'
 
       onContextMenu({
-        left: rect.left,
+        left: renderLeft
+          ? rect.right
+          : rect.left,
         top: renderAbove
           ? rect.top - 2
           : rect.bottom + 2,
-        position
+        verticalPosition,
+        horizontalPosition
       })
     }
   }

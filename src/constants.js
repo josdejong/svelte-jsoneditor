@@ -79,3 +79,4 @@ export const JSON_STATUS_INVALID = 'invalid'
 
 // TODO: can we dynamically calculate the size?
 export const CONTEXT_MENU_HEIGHT = (40 + 2) * 8 // px
+export const CONTEXT_MENU_WIDTH = 260 // px
