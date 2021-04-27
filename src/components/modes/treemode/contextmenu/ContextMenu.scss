@@ -10,6 +10,11 @@
 
   $gray-highlight: lighten($dark-gray, 5%);
 
+  button:focus {
+    background: $gray-highlight;
+    //outline: 1px solid red;
+  }
+
   .row {
     display: flex;
     flex-direction: row;
