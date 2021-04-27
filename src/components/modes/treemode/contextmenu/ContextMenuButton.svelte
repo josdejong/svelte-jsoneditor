@@ -16,27 +16,10 @@
     }
 
     if (buttonElem) {
-      const rect = buttonElem.getBoundingClientRect()
-
-      // TODO: move all this logic inside AbsolutePopup
-      const renderAbove = ((rect.bottom + CONTEXT_MENU_HEIGHT > window.innerHeight) && (rect.top > CONTEXT_MENU_HEIGHT))
-      const verticalPosition = renderAbove
-        ? 'top'
-        : 'bottom'
-      const renderLeft = ((rect.left + CONTEXT_MENU_WIDTH > window.innerWidth) && (rect.right > CONTEXT_MENU_WIDTH))
-      const horizontalPosition = renderLeft
-        ? 'left'
-        : 'right'
-
       onContextMenu({
-        left: renderLeft
-          ? rect.right
-          : rect.left,
-        top: renderAbove
-          ? rect.top - 2
-          : rect.bottom + 2,
-        verticalPosition,
-        horizontalPosition
+        anchor: buttonElem,
+        width: CONTEXT_MENU_WIDTH,
+        height: CONTEXT_MENU_HEIGHT,
       })
     }
   }

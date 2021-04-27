@@ -12,7 +12,7 @@
   let popupProps = null
   let popupOptions = {}
 
-  let refAbsolutePopup
+  let refRootPopup
   let refHiddenInput
 
   function openAbsolutePopup (Component, props, options) {
@@ -42,7 +42,7 @@
     if (
       popupOptions &&
       popupOptions.closeOnOuterClick &&
-      !isChildOf(event.target, (e) => e === refAbsolutePopup)
+      !isChildOf(event.target, (e) => e === refRootPopup)
     ) {
       closeAbsolutePopup()
     }
@@ -64,17 +64,69 @@
   }
 
   function calculateStyle () {
-    const rect = refAbsolutePopup.getBoundingClientRect()
+    function calculatePosition () {
+      if (popupOptions.anchor) {
+        const { anchor, width, height } = popupOptions
+        const { left, top, bottom, right } = anchor.getBoundingClientRect()
 
-    const verticalStyling = popupOptions.verticalPosition === 'top'
-      ? `bottom: ${rect.top - popupOptions.top}px;`
-      : `top: ${popupOptions.top - rect.top}px;`
+        const renderAbove = ((top + height > window.innerHeight) && (top > height))
+        const verticalPosition = renderAbove
+          ? 'top'
+          : 'bottom'
 
-    const horizontalStyling = popupOptions.horizontalPosition === 'left'
-      ? `right: ${rect.left - popupOptions.left}px;`
-      : `left: ${popupOptions.left - rect.left}px;`
+        const renderLeft = ((left + width > window.innerWidth) && (left > width))
+        const horizontalPosition = renderLeft
+          ? 'left'
+          : 'right'
 
-    return verticalStyling + ' ' + horizontalStyling
+        return {
+          left: renderLeft
+            ? right
+            : left,
+          top: renderAbove
+            ? top - 2
+            : bottom + 2,
+          verticalPosition,
+          horizontalPosition
+        }
+      } else if (
+        typeof popupOptions.left === 'number' &&
+        typeof popupOptions.top === 'number'
+      ) {
+        const { left, top, width, height } = popupOptions
+        const renderAbove = ((top + height > window.innerHeight) && (top > height))
+        const verticalPosition = renderAbove
+          ? 'top'
+          : 'bottom'
+
+        const renderLeft = ((left + width > window.innerWidth) && (left > width))
+        const horizontalPosition = renderLeft
+          ? 'left'
+          : 'right'
+
+        return {
+          left,
+          top,
+          verticalPosition,
+          horizontalPosition
+        }
+      } else {
+        throw new Error('Invalid config: pass either "left" and "top", or pass "anchor"')
+      }
+    }
+
+    const rootRect = refRootPopup.getBoundingClientRect()
+    const { left, top, width, height, verticalPosition, horizontalPosition } = calculatePosition()
+
+    const verticalStyling = verticalPosition === 'top'
+      ? `bottom: ${rootRect.top - top}px;`
+      : `top: ${top - rootRect.top}px;`
+
+    const horizontalStyling = horizontalPosition === 'left'
+      ? `right: ${rootRect.left - left}px;`
+      : `left: ${left - rootRect.left}px;`
+
+    return verticalStyling + horizontalStyling
   }
 
   function focus () {
@@ -93,7 +145,7 @@
 />
 
 <div
-  bind:this={refAbsolutePopup}
+  bind:this={refRootPopup}
   class="absolute-popup"
   on:mousedown={handleMouseDownInside}
   on:keydown={handleKeyDown}

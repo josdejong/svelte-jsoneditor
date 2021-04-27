@@ -1160,7 +1160,7 @@
     })
   }
 
-  function openContextMenu ({ left, top, verticalPosition, horizontalPosition }) {
+  function openContextMenu ({ anchor, left, top, width, height }) {
     const props = {
       json,
       selection,
@@ -1192,8 +1192,9 @@
     openAbsolutePopup(ContextMenu, props, {
       left,
       top,
-      verticalPosition,
-      horizontalPosition,
+      width,
+      height,
+      anchor,
       closeOnOuterClick: true,
       onClose: focus
     })
@@ -1207,45 +1208,35 @@
     event.stopPropagation()
     event.preventDefault()
 
-    function calculatePosition () {
-      if (event.type === 'contextmenu' && event.target !== refHiddenInput) {
-        // right mouse click to open context menu
-        return {
-          top: event.clientY,
-          left: event.clientX
-        }
+    if (event.type === 'contextmenu' && event.target !== refHiddenInput) {
+      // right mouse click to open context menu
+      openContextMenu({
+        left: event.clientX,
+        top: event.clientY,
+        width: CONTEXT_MENU_WIDTH,
+        height: CONTEXT_MENU_HEIGHT
+      })
+    } else {
+      // type === 'keydown' (from the quick key Ctrl+Q)
+      // or target is hidden input -> context menu button on keyboard
+      const anchor = refContents.querySelector('.context-menu-button.selected')
+      if (anchor) {
+        openContextMenu({
+          anchor,
+          width: CONTEXT_MENU_WIDTH,
+          height: CONTEXT_MENU_HEIGHT
+        })
       } else {
-        // type === 'keydown' (from the quick key Ctrl+Q)
-        // or target is hidden input -> context menu button on keyboard
-        const refAnchor = refContents.querySelector('.context-menu-button.selected')
-
-        if (refAnchor) {
-          const rect = refAnchor.getBoundingClientRect()
-          return {
-            top: rect.top,
-            left: rect.left
-          }
-        }
-
         // fallback on just displaying the ContextMenu top left
         const rect = refContents.getBoundingClientRect()
-        return {
+        openContextMenu({
           top: rect.top + 2,
-          left: rect.left + 2
-        }
+          left: rect.left + 2,
+          width: CONTEXT_MENU_WIDTH,
+          height: CONTEXT_MENU_HEIGHT
+        })
       }
     }
-
-    // TODO: move all this logic inside AbsolutePopup
-    const { top, left } = calculatePosition()
-    const verticalPosition = ((top + CONTEXT_MENU_HEIGHT >  window.innerHeight) && (top > CONTEXT_MENU_HEIGHT))
-      ? 'top'
-      : 'bottom'
-    const horizontalPosition = ((left + CONTEXT_MENU_WIDTH >  window.innerWidth) && (left > CONTEXT_MENU_WIDTH))
-      ? 'left'
-      : 'right'
-
-    openContextMenu({ left, top, verticalPosition, horizontalPosition })
 
     return false
   }
