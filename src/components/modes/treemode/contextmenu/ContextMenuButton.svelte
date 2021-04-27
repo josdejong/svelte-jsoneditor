@@ -2,6 +2,7 @@
   import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
   import Icon from 'svelte-awesome'
   import {
+    CONTEXT_MENU_EXPLANATION,
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH
   } from '../../../../constants.js'
@@ -28,7 +29,7 @@
 <button
   class="context-menu-button"
   class:selected={selected}
-  title="Open context menu (Click here, right click on the selection, or use the ContextMenu button or Ctrl+Q)"
+  title={CONTEXT_MENU_EXPLANATION}
   on:click={handleClick}
 >
   <Icon data={faCaretDown} />

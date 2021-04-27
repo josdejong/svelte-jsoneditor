@@ -69,6 +69,11 @@ export const INSERT_EXPLANATION = 'Insert or paste contents, ' +
   'enter { to insert a new object, ' +
   'or start typing to insert a new value'
 
+export const CONTEXT_MENU_EXPLANATION = 'Open context menu ' +
+  '(Click here, ' +
+  'right click on the selection, ' +
+  'or use the context menu button or Ctrl+Q)'
+
 export const HOVER_INSERT_INSIDE = 'hover-insert-inside'
 export const HOVER_INSERT_AFTER = 'hover-insert-after'
 export const HOVER_COLLECTION = 'hover-collection'

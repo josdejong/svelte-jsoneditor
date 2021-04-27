@@ -1241,6 +1241,14 @@
     return false
   }
 
+  function handleContextMenuFromTreeMenu (event) {
+    openContextMenu({
+      anchor: event.target,
+      width: CONTEXT_MENU_WIDTH,
+      height: CONTEXT_MENU_HEIGHT
+    })
+  }
+
   export function focus () {
     // with just .focus(), sometimes the input doesn't react on onpaste events
     // in Chrome when having a large document open and then doing cut/paste.
@@ -1273,6 +1281,7 @@
       onRedo={handleRedo}
       onSort={handleSortAll}
       onTransform={handleTransformAll}
+      onContextMenu={handleContextMenuFromTreeMenu}
 
       onSearchText={handleSearchText}
       onNextSearchResult={handleNextSearchResult}

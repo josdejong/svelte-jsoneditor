@@ -2,12 +2,14 @@
 
 <script>
   import {
+    faEllipsisV,
     faFilter,
     faRedo,
     faSearch,
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
+  import { CONTEXT_MENU_EXPLANATION } from '../../../../constants.js'
   import {
     faJSONEditorCollapse,
     faJSONEditorExpand
@@ -28,6 +30,7 @@
   export let onRedo
   export let onSort
   export let onTransform
+  export let onContextMenu
 
   export let onSearchText
   export let onNextSearchResult
@@ -102,6 +105,15 @@
       title: 'Search (Ctrl+F)',
       className: 'search',
       onClick: handleToggleSearch
+    },
+    {
+      separator: true
+    },
+    {
+      icon: faEllipsisV,
+      title: CONTEXT_MENU_EXPLANATION,
+      className: 'contextmenu',
+      onClick: onContextMenu
     },
     {
       space: true

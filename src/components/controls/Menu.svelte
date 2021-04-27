@@ -21,7 +21,7 @@
         <button
           class="button {item.className}"
           slot="defaultItem"
-          on:click={() => item.onClick()}
+          on:click={item.onClick}
           disabled={item.disabled}
         >
           <Icon data={item.icon} />
@@ -30,7 +30,7 @@
     {:else}
       <button
         class="button {item.className}"
-        on:click={() => item.onClick()}
+        on:click={item.onClick}
         title={item.title}
         disabled={item.disabled || false}
       >
