@@ -306,7 +306,7 @@
         </div>
         {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="context-menu-button-anchor">
-            <ContextMenuButton onContextMenu={onContextMenu} />
+            <ContextMenuButton selected={true} onContextMenu={onContextMenu} />
           </div>
         {/if}
       </div>
@@ -338,7 +338,7 @@
           title={INSERT_EXPLANATION}
         >
           {#if selectedInside || hover === HOVER_INSERT_INSIDE}
-            <ContextMenuButton onContextMenu={handleInsertInsideOpenContextMenu} />
+            <ContextMenuButton selected={selectedInside} onContextMenu={handleInsertInsideOpenContextMenu} />
           {/if}
         </div>
         {#each visibleSections as visibleSection, sectionIndex (sectionIndex)}
@@ -421,7 +421,7 @@
         </div>
         {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="context-menu-button-anchor">
-            <ContextMenuButton onContextMenu={onContextMenu} />
+            <ContextMenuButton selected={true} onContextMenu={onContextMenu} />
           </div>
         {/if}
       </div>
@@ -455,7 +455,7 @@
           title={INSERT_EXPLANATION}
         >
           {#if selectedInside || hover === HOVER_INSERT_INSIDE}
-            <ContextMenuButton onContextMenu={handleInsertInsideOpenContextMenu} />
+            <ContextMenuButton selected={selectedInside} onContextMenu={handleInsertInsideOpenContextMenu} />
           {/if}
         </div>
         {#each keys as key (state[key][STATE_ID])}
@@ -486,7 +486,7 @@
                 searchResult={searchResult ? searchResult[key] : undefined}
               />
               {#if selection && selection.type === SELECTION_TYPE.KEY && !selection.edit && isEqual(selection.focusPath, path.concat(key))}
-                <ContextMenuButton onContextMenu={onContextMenu} />
+                <ContextMenuButton selected={true} onContextMenu={onContextMenu} />
               {/if}
             </div
           ></svelte:self>
@@ -523,7 +523,7 @@
         />
         {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="context-menu-button-anchor">
-            <ContextMenuButton onContextMenu={onContextMenu} />
+            <ContextMenuButton selected={true} onContextMenu={onContextMenu} />
           </div>
         {/if}
       </div>
@@ -548,7 +548,7 @@
     title={INSERT_EXPLANATION}
   >
     {#if selectedAfter || hover === HOVER_INSERT_AFTER}
-      <ContextMenuButton onContextMenu={handleInsertAfterOpenContextMenu} />
+      <ContextMenuButton selected={selectedAfter} onContextMenu={handleInsertAfterOpenContextMenu} />
     {/if}
   </div>
 </div>

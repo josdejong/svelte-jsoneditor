@@ -1217,7 +1217,7 @@
       } else {
         // type === 'keydown' (from the quick key Ctrl+Q)
         // or target is hidden input -> context menu button on keyboard
-        const refAnchor = refContents.querySelector('.context-menu-button')
+        const refAnchor = refContents.querySelector('.context-menu-button.selected')
 
         if (refAnchor) {
           const rect = refAnchor.getBoundingClientRect()

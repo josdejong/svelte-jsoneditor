@@ -6,6 +6,7 @@
     CONTEXT_MENU_WIDTH
   } from '../../../../constants.js'
 
+  export let selected
   export let onContextMenu
 
   function handleClick (event) {
@@ -43,6 +44,7 @@
 
 <button
   class="context-menu-button"
+  class:selected={selected}
   title="Open context menu (Click here, right click on the selection, or use the ContextMenu button or Ctrl+Q)"
   on:click={handleClick}
 >
