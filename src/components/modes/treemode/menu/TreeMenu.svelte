@@ -81,6 +81,18 @@
       disabled: readOnly
     },
     {
+      icon: faSearch,
+      title: 'Search (Ctrl+F)',
+      className: 'search',
+      onClick: handleToggleSearch
+    },
+    {
+      icon: faEllipsisV,
+      title: CONTEXT_MENU_EXPLANATION,
+      className: 'contextmenu',
+      onClick: onContextMenu
+    },
+    {
       separator: true
     },
     {
@@ -96,24 +108,6 @@
       className: 'redo',
       onClick: onRedo,
       disabled: !historyState.canRedo
-    },
-    {
-      separator: true
-    },
-    {
-      icon: faSearch,
-      title: 'Search (Ctrl+F)',
-      className: 'search',
-      onClick: handleToggleSearch
-    },
-    {
-      separator: true
-    },
-    {
-      icon: faEllipsisV,
-      title: CONTEXT_MENU_EXPLANATION,
-      className: 'contextmenu',
-      onClick: onContextMenu
     },
     {
       space: true
