@@ -337,7 +337,7 @@
           style={getIndentationStyle(path.length + 1)}
           title={INSERT_EXPLANATION}
         >
-          {#if selectedInside}
+          {#if selectedInside || hover === HOVER_INSERT_INSIDE}
             <ContextMenuButton onContextMenu={handleInsertInsideOpenContextMenu} />
           {/if}
         </div>
@@ -454,7 +454,7 @@
           style={getIndentationStyle(path.length + 1)}
           title={INSERT_EXPLANATION}
         >
-          {#if selectedInside}
+          {#if selectedInside || hover === HOVER_INSERT_INSIDE}
             <ContextMenuButton onContextMenu={handleInsertInsideOpenContextMenu} />
           {/if}
         </div>
@@ -547,7 +547,7 @@
     style={indentationStyle}
     title={INSERT_EXPLANATION}
   >
-    {#if selectedAfter}
+    {#if selectedAfter || hover === HOVER_INSERT_AFTER}
       <ContextMenuButton onContextMenu={handleInsertAfterOpenContextMenu} />
     {/if}
   </div>
