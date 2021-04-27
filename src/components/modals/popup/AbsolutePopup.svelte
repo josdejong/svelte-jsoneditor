@@ -69,46 +69,33 @@
         const { anchor, width, height } = popupOptions
         const { left, top, bottom, right } = anchor.getBoundingClientRect()
 
-        const renderAbove = ((top + height > window.innerHeight) && (top > height))
-        const verticalPosition = renderAbove
-          ? 'top'
-          : 'bottom'
-
-        const renderLeft = ((left + width > window.innerWidth) && (left > width))
-        const horizontalPosition = renderLeft
-          ? 'left'
-          : 'right'
+        const positionAbove = ((top + height > window.innerHeight) && (top > height))
+        const positionLeft = ((left + width > window.innerWidth) && (left > width))
 
         return {
-          left: renderLeft
+          left: positionLeft
             ? right
             : left,
-          top: renderAbove
+          top: positionAbove
             ? top - 2
             : bottom + 2,
-          verticalPosition,
-          horizontalPosition
+          positionAbove,
+          positionLeft
         }
       } else if (
         typeof popupOptions.left === 'number' &&
         typeof popupOptions.top === 'number'
       ) {
         const { left, top, width, height } = popupOptions
-        const renderAbove = ((top + height > window.innerHeight) && (top > height))
-        const verticalPosition = renderAbove
-          ? 'top'
-          : 'bottom'
 
-        const renderLeft = ((left + width > window.innerWidth) && (left > width))
-        const horizontalPosition = renderLeft
-          ? 'left'
-          : 'right'
+        const positionAbove = ((top + height > window.innerHeight) && (top > height))
+        const positionLeft = ((left + width > window.innerWidth) && (left > width))
 
         return {
           left,
           top,
-          verticalPosition,
-          horizontalPosition
+          positionAbove,
+          positionLeft
         }
       } else {
         throw new Error('Invalid config: pass either "left" and "top", or pass "anchor"')
@@ -116,13 +103,13 @@
     }
 
     const rootRect = refRootPopup.getBoundingClientRect()
-    const { left, top, width, height, verticalPosition, horizontalPosition } = calculatePosition()
+    const { left, top, width, height, positionAbove, positionLeft } = calculatePosition()
 
-    const verticalStyling = verticalPosition === 'top'
+    const verticalStyling = positionAbove
       ? `bottom: ${rootRect.top - top}px;`
       : `top: ${top - rootRect.top}px;`
 
-    const horizontalStyling = horizontalPosition === 'left'
+    const horizontalStyling = positionLeft
       ? `right: ${rootRect.left - left}px;`
       : `left: ${left - rootRect.left}px;`
 
