@@ -242,6 +242,12 @@ Run linter:
 npm run lint
 ```
 
+Publish to npm (will increase version number and publish to npm):
+
+```
+npm run release
+```
+
 ## License
 
 Released under the [ISC license](LICENSE.md).

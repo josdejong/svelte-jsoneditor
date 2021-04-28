@@ -20,7 +20,7 @@
     "lint": "eslint --cache src/**/*.svelte src/**/*.js tools/**/*.js *.js --ignore-pattern src/generated --ignore-pattern examples --ignore-pattern tools/develop-svelte/**/*.js",
     "prepare": "husky install && cd tools && node generateEmbeddedAceJsonWorker.js && cd ..",
     "prepublishOnly": "npm run lint && npm test && npm run build",
-    "release": "standard-version"
+    "release": "standard-version && git push --tag && npm publish"
   },
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^5.15.3",
