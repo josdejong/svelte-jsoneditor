@@ -40,6 +40,8 @@
     "sveltip": "^0.0.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "12.1.1",
+    "@commitlint/config-conventional": "12.1.1",
     "@rollup/plugin-commonjs": "18.0.0",
     "@rollup/plugin-json": "4.1.0",
     "@rollup/plugin-node-resolve": "11.2.1",
@@ -51,6 +53,7 @@
     "eslint-plugin-promise": "5.1.0",
     "eslint-plugin-standard": "4.1.0",
     "eslint-plugin-svelte3": "3.1.2",
+    "husky": "6.0.0",
     "mocha": "8.3.2",
     "rollup": "2.45.2",
     "rollup-plugin-svelte": "7.1.0",
@@ -58,8 +61,7 @@
     "sass": "1.32.11",
     "standard-version": "9.2.0",
     "svelte": "3.37.0",
-    "svelte-preprocess": "4.7.2",
-    "husky": "^6.0.0"
+    "svelte-preprocess": "4.7.2"
   },
   "keywords": [
     "svelte"
