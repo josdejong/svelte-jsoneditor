@@ -18,7 +18,7 @@
     "build": "rollup -c",
     "test": "mocha src/**/*.test.js",
     "lint": "eslint --cache src/**/*.svelte src/**/*.js tools/**/*.js *.js --ignore-pattern src/generated --ignore-pattern examples --ignore-pattern tools/develop-svelte/**/*.js",
-    "prepare": "cd tools && node generateEmbeddedAceJsonWorker.js && cd .. && husky install",
+    "prepare": "husky install && cd tools && node generateEmbeddedAceJsonWorker.js && cd ..",
     "prepublishOnly": "npm run lint && npm test && npm run build",
     "release": "standard-version"
   },
@@ -69,5 +69,10 @@
   "files": [
     "dist",
     "README.md"
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  }
 }
