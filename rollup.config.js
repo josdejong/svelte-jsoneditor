@@ -18,7 +18,7 @@ export default {
     svelte({
       compilerOptions: {
         // enable run-time checks when not in production
-        dev: !production,
+        dev: !production
       },
 
       // we want to embed the CSS in the generated JS bundle

@@ -20,7 +20,7 @@
       onContextMenu({
         anchor: buttonElem,
         width: CONTEXT_MENU_WIDTH,
-        height: CONTEXT_MENU_HEIGHT,
+        height: CONTEXT_MENU_HEIGHT
       })
     }
   }

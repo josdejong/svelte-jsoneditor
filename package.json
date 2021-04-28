@@ -16,7 +16,7 @@
     "start": "concurrently \"npm run dev\" \"cd tools/develop-svelte && npm run dev\"",
     "dev": "rollup -c -w",
     "build": "rollup -c",
-    "test": "mocha src/**/*.test.js",
+    "test": "mocha src/**/*.test.js --reporter dot",
     "lint": "eslint --cache src/**/*.svelte src/**/*.js tools/**/*.js *.js --ignore-pattern src/generated --ignore-pattern examples --ignore-pattern tools/develop-svelte/**/*.js",
     "prepare": "husky install && cd tools && node generateEmbeddedAceJsonWorker.js && cd ..",
     "prepublishOnly": "npm run lint && npm test && npm run build",

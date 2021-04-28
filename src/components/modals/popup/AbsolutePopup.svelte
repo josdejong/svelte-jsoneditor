@@ -103,7 +103,7 @@
     }
 
     const rootRect = refRootPopup.getBoundingClientRect()
-    const { left, top, width, height, positionAbove, positionLeft } = calculatePosition()
+    const { left, top, positionAbove, positionLeft } = calculatePosition()
 
     const verticalStyling = positionAbove
       ? `bottom: ${rootRect.top - top}px;`

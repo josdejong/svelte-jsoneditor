@@ -133,7 +133,6 @@ describe('selection', () => {
     assert.deepStrictEqual(findRootPath(json, { type: SELECTION_TYPE.KEY, path: path1, anchorPath: path1, focusPath: path1 }), path2)
     assert.deepStrictEqual(findRootPath(json, { type: SELECTION_TYPE.VALUE, path: path1, anchorPath: path1, focusPath: path1 }), path2)
 
-
     assert.deepStrictEqual(findRootPath(json, { type: SELECTION_TYPE.VALUE, path: path2, anchorPath: path2, focusPath: path2 }), path2)
   })
 

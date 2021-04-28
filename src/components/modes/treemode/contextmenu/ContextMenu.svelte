@@ -203,7 +203,7 @@
       }
     }
 
-    if (combo === 'Up' || combo === 'Down' || combo === 'Left'|| combo === 'Right') {
+    if (combo === 'Up' || combo === 'Down' || combo === 'Left' || combo === 'Right') {
       event.preventDefault()
       focusNextButton(event.target, combo.toLowerCase())
     }

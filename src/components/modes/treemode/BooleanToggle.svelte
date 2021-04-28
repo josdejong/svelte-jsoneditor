@@ -2,7 +2,6 @@
   import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
   import { compileJSONPointer } from 'immutable-json-patch'
   import Icon from 'svelte-awesome'
-  import { SELECTION_TYPE } from '../../../logic/selection.js'
 
   export let onPatch
   export let path
