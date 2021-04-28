@@ -18,7 +18,7 @@
     "build": "rollup -c",
     "test": "mocha src/**/*.test.js",
     "lint": "eslint --cache src/**/*.svelte src/**/*.js tools/**/*.js *.js --ignore-pattern src/generated --ignore-pattern examples --ignore-pattern tools/develop-svelte/**/*.js",
-    "prepare": "cd tools && node generateEmbeddedAceJsonWorker.js && cd ..",
+    "prepare": "cd tools && node generateEmbeddedAceJsonWorker.js && cd .. && husky install",
     "prepublishOnly": "npm run lint && npm test && npm run build",
     "release": "standard-version"
   },
@@ -58,7 +58,8 @@
     "sass": "1.32.11",
     "standard-version": "9.2.0",
     "svelte": "3.37.0",
-    "svelte-preprocess": "4.7.2"
+    "svelte-preprocess": "4.7.2",
+    "husky": "^6.0.0"
   },
   "keywords": [
     "svelte"
