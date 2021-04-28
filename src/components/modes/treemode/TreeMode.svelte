@@ -71,6 +71,7 @@
   import { mapValidationErrors } from '../../../logic/validation.js'
   import {
     activeElementIsChildOf,
+    findParentWithNodeName,
     getWindow,
     isChildOfNodeName,
     setCursorToEnd
@@ -1256,7 +1257,7 @@
 
   function handleContextMenuFromTreeMenu (event) {
     openContextMenu({
-      anchor: event.target,
+      anchor: findParentWithNodeName(event.target, 'BUTTON'),
       width: CONTEXT_MENU_WIDTH,
       height: CONTEXT_MENU_HEIGHT
     })

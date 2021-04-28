@@ -238,6 +238,24 @@ export function activeElementIsChildOf (element) {
 }
 
 /**
+ * Traverse over the parents of the element until a node is found with the
+ * searched for node name. If the element itself contains the nodeName, the
+ * element itself will be returned
+ * @param {HTMLElement} element
+ * @param {string} nodeName
+ * @return {HTMLElement | undefined}
+ */
+export function findParentWithNodeName (element, nodeName) {
+  let e = element
+
+  while (e && e.nodeName !== nodeName) {
+    e = e.parentNode
+  }
+
+  return e
+}
+
+/**
  * @param {HTMLElement} target
  * @returns {string | null}
  */
