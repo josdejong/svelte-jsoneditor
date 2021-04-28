@@ -492,10 +492,20 @@
       return
     }
 
+    // in case of a selected key or value, we change the selection to the whole
+    // entry to remove this, we do not want to clear a key or value only.
+    const removeSelection = (selection.type === SELECTION_TYPE.KEY || selection.type === SELECTION_TYPE.VALUE)
+      ? createSelection(json, state, {
+        type: SELECTION_TYPE.MULTI,
+        anchorPath: selection.anchorPath,
+        focusPath: selection.focusPath
+      })
+      : selection
+
     const {
       operations,
       newSelection
-    } = createRemoveOperations(json, state, selection)
+    } = createRemoveOperations(json, state, removeSelection)
 
     debug('remove', { operations, selection, newSelection })
 
