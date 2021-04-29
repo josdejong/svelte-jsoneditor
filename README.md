@@ -216,6 +216,7 @@ Install dependencies:
 
 ```
 npm install
+(cd tools/develop-svelte && npm install)
 ```
 
 Start watcher and demo project (at localhost:5000):
