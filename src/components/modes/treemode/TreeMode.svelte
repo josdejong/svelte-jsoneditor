@@ -161,10 +161,6 @@
       : (path.length === 1 && path[0] === 0) // first item of an array?
   }
 
-  // TODO: debounce JSON schema validation
-  $: validationErrorsList = validator ? validator(json) : []
-  $: validationErrors = mapValidationErrors(validationErrorsList)
-
   let showSearch = false
   let searching = false
   let searchText = ''
@@ -262,6 +258,10 @@
 
   let textIsRepaired = false
   $: textIsUnrepairable = (externalText !== undefined && json === undefined)
+
+  // TODO: debounce JSON schema validation
+  $: validationErrorsList = validator ? validator(json) : []
+  $: validationErrors = mapValidationErrors(validationErrorsList)
 
   export function get () {
     return json
