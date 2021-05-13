@@ -13,13 +13,43 @@
     width: 100%;
 
     tr {
+      cursor: pointer;
+
       &:hover {
         background-color: rgba(255, 255, 255, 0.1);
-        cursor: pointer;
       }
 
       td {
         padding: 4px $padding;
+        vertical-align:middle;
+
+        &.validation-error-icon {
+          width: 36px;
+          box-sizing: border-box;
+        }
+
+        &.validation-error-action {
+          width: 36px;
+          box-sizing: border-box;
+          padding: 0;
+
+          button.validation-errors-collapse {
+            width: 36px;
+            height: 100%;
+            cursor: pointer;
+
+            &:hover {
+              background-color: rgba(255, 255, 255, 0.2);
+            }
+          }
+        }
+
+        div.validation-errors-expand {
+          display: inline-block;
+          position: relative;
+          top: 3px;
+          // TODO: position this in a better way
+        }
       }
     }
   }
