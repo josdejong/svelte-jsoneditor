@@ -307,6 +307,7 @@
   function setSelection (start, end) {
     aceEditor.selection.setRange({ start, end })
     aceEditor.scrollToLine(start.row, true)
+    aceEditor.focus()
   }
 
   function createAceEditor ({ target, ace, readOnly, indentation, onChange }) {

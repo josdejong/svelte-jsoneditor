@@ -33,7 +33,13 @@
     <table>
       <tbody>
         {#each validationErrorsList as validationError, index}
-          <tr class="validation-error" on:click={selectError(validationError)}>
+          <tr
+            class="validation-error"
+            on:click={() => {
+              // trigger on the next tick to prevent the editor not getting focus
+              setTimeout(() => selectError(validationError))
+            }}
+          >
             <td class="validation-error-icon">
               <Icon data={faExclamationTriangle} />
             </td>
