@@ -1,0 +1,26 @@
+@import '../../styles.scss';
+
+.validation-errors-overview {
+  font-family: $font-family-mono;
+  font-size: $font-size-mono;
+  background: $warning-color;
+  color: $white;
+  overflow: auto;
+  max-height: $errors-overview-max-height;
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+
+    tr {
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        cursor: pointer;
+      }
+
+      td {
+        padding: $padding/2 $padding;
+      }
+    }
+  }
+}

@@ -21,6 +21,8 @@
     uniqueId
   } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
+  import ValidationErrorsOverview
+    from '../../controls/ValidationErrorsOverview.svelte'
   import { createJump } from '../../../assets/jump.js/src/jump.js'
   import {
     CONTEXT_MENU_HEIGHT,
@@ -220,6 +222,20 @@
       onDone: handleSearchDone,
       maxResults: MAX_SEARCH_RESULTS
     })
+  }
+
+  /**
+   * @param {ValidationError} error
+   **/
+  function handleSelectValidationError (error) {
+    debug('select validation error', error)
+
+    selection = createSelection(json, state, {
+      type: SELECTION_TYPE.MULTI,
+      anchorPath: error.path,
+      focusPath: error.path
+    })
+    scrollTo(error.path)
   }
 
   const history = createHistory({
@@ -1350,6 +1366,12 @@
         selection={selection}
       />
     </div>
+
+    <ValidationErrorsOverview
+      validationErrorsList={validationErrorsList}
+      selectError={handleSelectValidationError}
+    />
+
     {#if textIsRepaired && externalText !== undefined}
       <Message
         type="success"
