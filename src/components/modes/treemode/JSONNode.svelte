@@ -304,6 +304,9 @@
             {/if}
           </div>
         </div>
+        {#if validationError}
+          <ValidationError validationError={validationError} onExpand={handleExpand} />
+        {/if}
         {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={onContextMenu} />
@@ -317,9 +320,6 @@
           on:mousedown={handleInsertInside}
         ></div>
       {:else}
-        {#if validationError}
-          <ValidationError validationError={validationError} onExpand={handleExpand} />
-        {/if}
         <div
           class="insert-selection-area after"
           data-type="insert-selection-area-after"
@@ -417,6 +417,9 @@
             {/if}
           </div>
         </div>
+        {#if validationError}
+          <ValidationError validationError={validationError} onExpand={handleExpand} />
+        {/if}
         {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={onContextMenu} />
@@ -430,9 +433,6 @@
           on:mousedown={handleInsertInside}
         ></div>
       {:else}
-        {#if validationError}
-          <ValidationError validationError={validationError} onExpand={handleExpand} />
-        {/if}
         {#if !root}
           <div
             class="insert-selection-area after"
