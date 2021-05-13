@@ -304,9 +304,6 @@
             {/if}
           </div>
         </div>
-        {#if validationError}
-          <ValidationError validationError={validationError} onExpand={handleExpand} />
-        {/if}
         {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={onContextMenu} />
@@ -420,9 +417,6 @@
             {/if}
           </div>
         </div>
-        {#if validationError}
-          <ValidationError validationError={validationError} onExpand={handleExpand} />
-        {/if}
         {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={onContextMenu} />
