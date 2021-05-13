@@ -1,3 +1,5 @@
+import { compileJSONPointer } from 'immutable-json-patch'
+import jsonSourceMap from 'json-source-map'
 import jsonrepair from 'jsonrepair'
 
 /**
@@ -209,6 +211,37 @@ export function countCharacterOccurrences (text, character, start = 0, end = tex
   }
 
   return count
+}
+
+/**
+ * Find the text location of a JSON path
+ * @param {string} text
+ * @param {Path} path
+ * @return {{path: Path, row: number, column: number} | null}
+ */
+// TODO: write unit tests
+export function findTextLocation (text, path) {
+  try {
+    const jsmap = jsonSourceMap.parse(text)
+
+    const pointerName = compileJSONPointer(path)
+    const pointer = jsmap.pointers[pointerName]
+    if (pointer) {
+      return {
+        path: path,
+        row: pointer.key
+          ? pointer.key.line
+          : (pointer.value ? pointer.value.line : 0),
+        column: pointer.key
+          ? pointer.key.column
+          : (pointer.value ? pointer.value.column : 0)
+      }
+    }
+  } catch (err) {
+    console.error(err)
+  }
+
+  return null
 }
 
 const POSITION_REGEX = /(position|char) (\d+)/

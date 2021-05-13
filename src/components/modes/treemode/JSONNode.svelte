@@ -313,6 +313,9 @@
           </div>
         {/if}
       </div>
+      {#if validationError && (!expanded || !validationError.isChildError)}
+        <ValidationError validationError={validationError} onExpand={handleExpand} />
+      {/if}
       {#if expanded}
         <div
           class="insert-selection-area inside"
@@ -426,6 +429,9 @@
           </div>
         {/if}
       </div>
+      {#if validationError && (!expanded || !validationError.isChildError)}
+        <ValidationError validationError={validationError} onExpand={handleExpand} />
+      {/if}
       {#if expanded}
         <div
           class="insert-selection-area inside"

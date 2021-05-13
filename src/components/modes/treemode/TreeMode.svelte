@@ -21,6 +21,8 @@
     uniqueId
   } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
+  import ValidationErrorsOverview
+    from '../../controls/ValidationErrorsOverview.svelte'
   import { createJump } from '../../../assets/jump.js/src/jump.js'
   import {
     CONTEXT_MENU_HEIGHT,
@@ -159,9 +161,6 @@
       : (path.length === 1 && path[0] === 0) // first item of an array?
   }
 
-  $: validationErrorsList = validator ? validator(json) : []
-  $: validationErrors = mapValidationErrors(validationErrorsList)
-
   let showSearch = false
   let searching = false
   let searchText = ''
@@ -222,6 +221,20 @@
     })
   }
 
+  /**
+   * @param {ValidationError} error
+   **/
+  function handleSelectValidationError (error) {
+    debug('select validation error', error)
+
+    selection = createSelection(json, state, {
+      type: SELECTION_TYPE.VALUE,
+      path: error.path
+    })
+    scrollTo(error.path)
+    focus()
+  }
+
   const history = createHistory({
     onChange: (state) => {
       historyState = state
@@ -246,6 +259,10 @@
 
   let textIsRepaired = false
   $: textIsUnrepairable = (externalText !== undefined && json === undefined)
+
+  // TODO: debounce JSON schema validation
+  $: validationErrorsList = validator ? validator(json) : []
+  $: validationErrors = mapValidationErrors(validationErrorsList)
 
   export function get () {
     return json
@@ -1350,6 +1367,12 @@
         selection={selection}
       />
     </div>
+
+    <ValidationErrorsOverview
+      validationErrorsList={validationErrorsList}
+      selectError={handleSelectValidationError}
+    />
+
     {#if textIsRepaired && externalText !== undefined}
       <Message
         type="success"

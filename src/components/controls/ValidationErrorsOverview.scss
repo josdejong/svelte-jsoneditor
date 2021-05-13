@@ -1,0 +1,56 @@
+@import '../../styles.scss';
+
+.validation-errors-overview {
+  font-family: $font-family-mono;
+  font-size: $font-size-mono;
+  background: $warning-color;
+  color: $white;
+  overflow: auto;
+  max-height: $errors-overview-max-height;
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+
+    tr {
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      td {
+        padding: 4px $padding;
+        vertical-align:middle;
+
+        &.validation-error-icon {
+          width: 36px;
+          box-sizing: border-box;
+        }
+
+        &.validation-error-action {
+          width: 36px;
+          box-sizing: border-box;
+          padding: 0;
+
+          button.validation-errors-collapse {
+            width: 36px;
+            height: 26px;
+            cursor: pointer;
+
+            &:hover {
+              background-color: rgba(255, 255, 255, 0.2);
+            }
+          }
+        }
+
+        div.validation-errors-expand {
+          display: inline-block;
+          position: relative;
+          top: 3px;
+          // TODO: position this icon in a better way
+        }
+      }
+    }
+  }
+}
