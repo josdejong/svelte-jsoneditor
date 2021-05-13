@@ -6,7 +6,7 @@
   import createDebug from 'debug'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
-  import { debounce, isEmpty, uniqueId } from 'lodash-es'
+  import { debounce, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount } from 'svelte'
   import {
     CHECK_VALID_JSON_DELAY,
@@ -298,6 +298,7 @@
       column: annotation.column
     }
     setSelection(location, location)
+    focus()
   }
 
   /**
@@ -307,7 +308,6 @@
   function setSelection (start, end) {
     aceEditor.selection.setRange({ start, end })
     aceEditor.scrollToLine(start.row, true)
-    aceEditor.focus()
   }
 
   function createAceEditor ({ target, ace, readOnly, indentation, onChange }) {
@@ -550,12 +550,10 @@
     />
   {/if}
 
-  {#if !isEmpty(validationErrorsList)}
-    <ValidationErrorsOverview
-      validationErrorsList={validationErrorsList}
-      selectError={handleSelectValidationError}
-    />
-  {/if}
+  <ValidationErrorsOverview
+    validationErrorsList={validationErrorsList}
+    selectError={handleSelectValidationError}
+  />
 </div>
 
 <style src="./CodeMode.scss"></style>

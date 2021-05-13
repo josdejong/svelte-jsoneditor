@@ -232,6 +232,7 @@
       path: error.path
     })
     scrollTo(error.path)
+    focus()
   }
 
   const history = createHistory({
@@ -1367,12 +1368,10 @@
       />
     </div>
 
-    {#if !isEmpty(validationErrorsList)}
-      <ValidationErrorsOverview
-        validationErrorsList={validationErrorsList}
-        selectError={handleSelectValidationError}
-      />
-    {/if}
+    <ValidationErrorsOverview
+      validationErrorsList={validationErrorsList}
+      selectError={handleSelectValidationError}
+    />
 
     {#if textIsRepaired && externalText !== undefined}
       <Message
