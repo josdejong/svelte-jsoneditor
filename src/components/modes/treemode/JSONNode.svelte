@@ -304,15 +304,15 @@
             {/if}
           </div>
         </div>
-        {#if validationError && (!expanded || !validationError.isChildError)}
-          <ValidationError validationError={validationError} onExpand={handleExpand} />
-        {/if}
         {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={onContextMenu} />
           </div>
         {/if}
       </div>
+      {#if validationError && (!expanded || !validationError.isChildError)}
+        <ValidationError validationError={validationError} onExpand={handleExpand} />
+      {/if}
       {#if expanded}
         <div
           class="insert-selection-area inside"
@@ -417,15 +417,15 @@
             {/if}
           </div>
         </div>
-        {#if validationError && (!expanded || !validationError.isChildError)}
-          <ValidationError validationError={validationError} onExpand={handleExpand} />
-        {/if}
         {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={onContextMenu} />
           </div>
         {/if}
       </div>
+      {#if validationError && (!expanded || !validationError.isChildError)}
+        <ValidationError validationError={validationError} onExpand={handleExpand} />
+      {/if}
       {#if expanded}
         <div
           class="insert-selection-area inside"
