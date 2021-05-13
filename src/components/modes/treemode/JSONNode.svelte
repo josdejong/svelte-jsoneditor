@@ -310,6 +310,9 @@
           </div>
         {/if}
       </div>
+      {#if validationError && (!expanded || !validationError.isChildError)}
+        <ValidationError validationError={validationError} onExpand={handleExpand} />
+      {/if}
       {#if expanded}
         <div
           class="insert-selection-area inside"
@@ -317,9 +320,6 @@
           on:mousedown={handleInsertInside}
         ></div>
       {:else}
-        {#if validationError}
-          <ValidationError validationError={validationError} onExpand={handleExpand} />
-        {/if}
         <div
           class="insert-selection-area after"
           data-type="insert-selection-area-after"
@@ -423,6 +423,9 @@
           </div>
         {/if}
       </div>
+      {#if validationError && (!expanded || !validationError.isChildError)}
+        <ValidationError validationError={validationError} onExpand={handleExpand} />
+      {/if}
       {#if expanded}
         <div
           class="insert-selection-area inside"
@@ -430,9 +433,6 @@
           on:mousedown={handleInsertInside}
         ></div>
       {:else}
-        {#if validationError}
-          <ValidationError validationError={validationError} onExpand={handleExpand} />
-        {/if}
         {#if !root}
           <div
             class="insert-selection-area after"

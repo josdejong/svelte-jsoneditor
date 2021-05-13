@@ -51,7 +51,7 @@
 	let showCodeEditor = true
 	let indentation = 2
 	let height = '400px'
-	let validate = false
+	let validate = true
 
 	function onRenderMenu(mode, items) {
 		console.log('onRenderMenu', mode, items)
