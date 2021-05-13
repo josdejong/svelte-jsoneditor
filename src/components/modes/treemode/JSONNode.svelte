@@ -304,7 +304,7 @@
             {/if}
           </div>
         </div>
-        {#if validationError}
+        {#if validationError && (!expanded || !validationError.isChildError)}
           <ValidationError validationError={validationError} onExpand={handleExpand} />
         {/if}
         {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
@@ -417,7 +417,7 @@
             {/if}
           </div>
         </div>
-        {#if validationError}
+        {#if validationError && (!expanded || !validationError.isChildError)}
           <ValidationError validationError={validationError} onExpand={handleExpand} />
         {/if}
         {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}

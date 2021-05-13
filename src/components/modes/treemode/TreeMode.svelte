@@ -161,6 +161,7 @@
       : (path.length === 1 && path[0] === 0) // first item of an array?
   }
 
+  // TODO: debounce JSON schema validation
   $: validationErrorsList = validator ? validator(json) : []
   $: validationErrors = mapValidationErrors(validationErrorsList)
 
@@ -1367,10 +1368,12 @@
       />
     </div>
 
-    <ValidationErrorsOverview
-      validationErrorsList={validationErrorsList}
-      selectError={handleSelectValidationError}
-    />
+    {#if !isEmpty(validationErrorsList)}
+      <ValidationErrorsOverview
+        validationErrorsList={validationErrorsList}
+        selectError={handleSelectValidationError}
+      />
+    {/if}
 
     {#if textIsRepaired && externalText !== undefined}
       <Message

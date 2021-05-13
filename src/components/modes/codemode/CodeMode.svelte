@@ -1,29 +1,30 @@
 <script>
   import {
     faExclamationTriangle,
-    faInfoCircle,
     faWrench
   } from '@fortawesome/free-solid-svg-icons'
   import createDebug from 'debug'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
-  import { debounce, uniqueId } from 'lodash-es'
+  import { debounce, isEmpty, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount } from 'svelte'
   import {
     CHECK_VALID_JSON_DELAY,
     JSON_STATUS_INVALID,
     JSON_STATUS_REPAIRABLE,
     JSON_STATUS_VALID,
-    MAX_DOCUMENT_SIZE_CODE_MODE,
     MAX_AUTO_REPAIRABLE_SIZE,
+    MAX_DOCUMENT_SIZE_CODE_MODE,
     SORT_MODAL_OPTIONS,
     TRANSFORM_MODAL_OPTIONS
   } from '../../../constants.js'
   import { activeElementIsChildOf, getWindow } from '../../../utils/domUtils.js'
-  import { keyComboFromEvent } from '../../../utils/keyBindings.js'
   import { formatSize } from '../../../utils/fileUtils.js'
+  import { keyComboFromEvent } from '../../../utils/keyBindings.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
+  import ValidationErrorsOverview
+    from '../../controls/ValidationErrorsOverview.svelte'
   import SortModal from '../../modals/SortModal.svelte'
   import TransformModal from '../../modals/TransformModal.svelte'
   import ace from './ace/index.js'
@@ -34,9 +35,10 @@
   export let text = ''
   export let indentation = 2 // TODO: make indentation configurable
   export let aceTheme = 'ace/theme/jsoneditor' // TODO: make aceTheme configurable
-  export let validator
+  export let validator = null
   export let onChange = null
-  export let onSwitchToTreeMode = () => {}
+  export let onSwitchToTreeMode = () => {
+  }
   export let onError
   export let onFocus = () => {
   }
@@ -54,6 +56,8 @@
 
   let onChangeDisabled = false
   let acceptTooLarge = false
+
+  let validationErrorsList = []
 
   $: isNewDocument = text.length === 0
   $: tooLarge = text && text.length > MAX_DOCUMENT_SIZE_CODE_MODE
@@ -281,6 +285,15 @@
     setAceEditorValue(text, true)
   }
 
+  /**
+   * @param {ValidationError} error
+   **/
+  function handleSelectValidationError (error) {
+    debug('select validation error', error)
+
+    // FIXME: move cursor to the error
+  }
+
   function createAceEditor ({ target, ace, readOnly, indentation, onChange }) {
     debug('create Ace editor')
 
@@ -373,6 +386,7 @@
   function checkValidJson (text) {
     jsonStatus = JSON_STATUS_VALID
     jsonParseError = undefined
+    validationErrorsList = []
 
     // FIXME: utilize the parse errors coming from AceEditor worker, only try to repair then
     if (text.length > MAX_AUTO_REPAIRABLE_SIZE) {
@@ -388,7 +402,11 @@
     try {
       // FIXME: instead of parsing the JSON here (which is expensive),
       //  get the parse error from the Ace Editor worker instead
-      JSON.parse(text)
+      const json = JSON.parse(text)
+
+      if (validator) {
+        validationErrorsList = validator(json)
+      }
     } catch (err) {
       jsonParseError = err.toString()
       try {
@@ -473,11 +491,10 @@
     />
   {/if}
 
-  {#if validator}
-    <Message
-      type="warning"
-      icon={faInfoCircle}
-      message="This BETA version of code mode doesn't yet have support for JSON Schema or custom validators."
+  {#if !isEmpty(validationErrorsList)}
+    <ValidationErrorsOverview
+      validationErrorsList={validationErrorsList}
+      selectError={handleSelectValidationError}
     />
   {/if}
 </div>
