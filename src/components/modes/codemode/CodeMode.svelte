@@ -20,6 +20,7 @@
   } from '../../../constants.js'
   import { activeElementIsChildOf, getWindow } from '../../../utils/domUtils.js'
   import { formatSize } from '../../../utils/fileUtils.js'
+  import { findTextLocation } from '../../../utils/jsonUtils.js'
   import { keyComboFromEvent } from '../../../utils/keyBindings.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
@@ -291,7 +292,21 @@
   function handleSelectValidationError (error) {
     debug('select validation error', error)
 
-    // FIXME: move cursor to the error
+    const annotation = validationErrorToAnnotation(error)
+    const location = {
+      row: annotation.row,
+      column: annotation.column
+    }
+    setSelection(location, location)
+  }
+
+  /**
+   * @param {Point} start
+   * @param {Point} end
+   **/
+  function setSelection (start, end) {
+    aceEditor.selection.setRange({ start, end })
+    aceEditor.scrollToLine(start.row, true)
   }
 
   function createAceEditor ({ target, ace, readOnly, indentation, onChange }) {
@@ -319,10 +334,51 @@
     aceEditor.commands.bindKey('Ctrl-Shift-\\', null)
     aceEditor.commands.bindKey('Command-Shift-\\', null)
 
+    // replace ace setAnnotations with custom function that also covers jsoneditor annotations
+    const originalSetAnnotations = aceSession.setAnnotations
+    aceSession.setAnnotations = function (annotations) {
+      const newAnnotations = annotations && annotations.length
+        ? annotations
+        : validationErrorsList.map(validationErrorToAnnotation)
+
+      debug('setAnnotations', { annotations, newAnnotations })
+
+      originalSetAnnotations.call(this, newAnnotations)
+    }
+
     // register onchange event
     aceEditor.on('change', onChange)
 
     return aceEditor
+  }
+
+  function validationErrorToAnnotation (validationError) {
+    const location = findTextLocation(text, validationError.path)
+
+    return {
+      row: location ? location.row : 0,
+      column: location ? location.column : 0,
+      text: validationError.message,
+      type: 'warning'
+    }
+  }
+
+  /**
+   * refresh ERROR annotations state
+   * error annotations are handled by the ace json mode (ace/mode/json)
+   * validation annotations are handled by this mode
+   * therefore in order to refresh we send only the annotations of error type in order to maintain its state
+   * @private
+   */
+  function refreshAnnotations () {
+    debug('refresh annotations')
+    const session = aceEditor && aceEditor.getSession()
+    if (session) {
+      const errorAnnotations = session.getAnnotations()
+        .filter(annotation => annotation.type === 'error')
+
+      session.setAnnotations(errorAnnotations)
+    }
   }
 
   function setAceEditorValue (text, force = false) {
@@ -407,6 +463,8 @@
       if (validator) {
         validationErrorsList = validator(json)
       }
+
+      refreshAnnotations()
     } catch (err) {
       jsonParseError = err.toString()
       try {

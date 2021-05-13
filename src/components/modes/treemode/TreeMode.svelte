@@ -232,9 +232,8 @@
     debug('select validation error', error)
 
     selection = createSelection(json, state, {
-      type: SELECTION_TYPE.MULTI,
-      anchorPath: error.path,
-      focusPath: error.path
+      type: SELECTION_TYPE.VALUE,
+      path: error.path
     })
     scrollTo(error.path)
   }
