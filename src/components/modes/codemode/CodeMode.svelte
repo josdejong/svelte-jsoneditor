@@ -440,7 +440,7 @@
   let jsonStatus = JSON_STATUS_VALID
   let jsonParseError
 
-  function checkValidJson (text) {
+  function checkValidJson () {
     jsonStatus = JSON_STATUS_VALID
     jsonParseError = undefined
     validationErrorsList = []
@@ -481,7 +481,10 @@
 
   const checkValidJsonDebounced = debounce(checkValidJson, CHECK_VALID_JSON_DELAY)
 
+  // we pass unused arguments to trigger calling checkValidJson when text or validator changes
+  // TODO: find a better solution
   $: checkValidJsonDebounced(text)
+  $: checkValidJson(validator)
 
   $: repairActions = (jsonStatus === JSON_STATUS_REPAIRABLE)
     ? [{
