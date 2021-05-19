@@ -14,9 +14,11 @@
     faJSONEditorCollapse,
     faJSONEditorExpand
   } from '../../../../img/customFontawesomeIcons.js'
+  import { isObjectOrArray } from '../../../../utils/typeUtils.js'
   import Menu from '../../../controls/Menu.svelte'
   import SearchBox from './SearchBox.svelte'
 
+  export let json
   export let readOnly
   export let searchText
   export let searchResult
@@ -55,13 +57,15 @@
       icon: faJSONEditorExpand,
       title: 'Expand all',
       className: 'expand-all',
-      onClick: onExpandAll
+      onClick: onExpandAll,
+      disabled: !isObjectOrArray(json)
     },
     {
       icon: faJSONEditorCollapse,
       title: 'Collapse all',
       className: 'collapse-all',
-      onClick: onCollapseAll
+      onClick: onCollapseAll,
+      disabled: !isObjectOrArray(json)
     },
     {
       separator: true
@@ -71,14 +75,14 @@
       title: 'Sort',
       className: 'sort',
       onClick: onSort,
-      disabled: readOnly
+      disabled: readOnly || json === undefined
     },
     {
       icon: faFilter,
       title: 'Transform contents (filter, sort, project)',
       className: 'transform',
       onClick: onTransform,
-      disabled: readOnly
+      disabled: readOnly || json === undefined
     },
     {
       icon: faSearch,

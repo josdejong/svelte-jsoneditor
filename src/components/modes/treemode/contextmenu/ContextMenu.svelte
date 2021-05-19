@@ -53,26 +53,30 @@
     })
   })
 
+  $: hasJson = json !== undefined
   $: hasSelection = selection != null
   $: rootSelected = hasSelection && isEmpty(selection.focusPath)
 
-  $: hasSelectionContents = selection != null && (
+  $: hasSelectionContents = hasJson &&
+    selection != null && (
     selection.type === SELECTION_TYPE.MULTI ||
     selection.type === SELECTION_TYPE.KEY ||
     selection.type === SELECTION_TYPE.VALUE
   )
 
-  $: canDuplicate = selection != null &&
+  $: canDuplicate = hasJson &&
     hasSelectionContents &&
     !rootSelected // must not be root
 
-  $: canExtract = selection != null && (
+  $: canExtract = hasJson &&
+    selection != null && (
     selection.type === SELECTION_TYPE.MULTI ||
       selection.type === SELECTION_TYPE.VALUE
   ) &&
     !rootSelected // must not be root
 
   $: canEditKey =
+    hasJson &&
     selection != null &&
     (
       selection.type === SELECTION_TYPE.KEY ||
@@ -83,6 +87,7 @@
     !Array.isArray(getIn(json, initial(selection.focusPath)))
 
   $: canEditValue =
+    hasJson &&
     selection != null &&
     (
       selection.type === SELECTION_TYPE.KEY ||

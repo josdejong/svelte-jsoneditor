@@ -8,7 +8,6 @@
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import createDebug from 'debug'
   import Modal from 'svelte-simple-modal'
-  import WelcomeMode from './modes/welcomemode/WelcomeMode.svelte'
   import { MODE } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
   import CodeMode from './modes/codemode/CodeMode.svelte'
@@ -47,7 +46,6 @@
 
   let refJSONEditor
   let refTreeMode
-  let refWelcomeMode
   let refCodeMode
 
   $: textForCodeMode = (mode === MODE.CODE)
@@ -180,8 +178,6 @@
   export function focus () {
     if (refCodeMode) {
       refCodeMode.focus()
-    } else if (refWelcomeMode) {
-      refWelcomeMode.focus()
     } else if (refTreeMode) {
       refTreeMode.focus()
     }
@@ -248,8 +244,6 @@
     setTimeout(focus)
   }
 
-  $: isNewDocument = text === '' && json === undefined
-
   $: isCodeMode = mode === MODE.CODE
   $: modeMenuItems = [
     {
@@ -292,16 +286,6 @@
             onRenderMenu={handleCreateMenu}
           />
         {:else} <!-- mode === MODE.TREE -->
-          {#if isNewDocument}
-            <WelcomeMode
-              bind:this={refWelcomeMode}
-              readOnly={readOnly}
-              onChange={handleChangeText}
-              onFocus={handleFocus}
-              onBlur={handleBlur}
-              onRenderMenu={handleCreateMenu}
-            />
-          {/if}
           <TreeMode
             bind:this={refTreeMode}
             readOnly={readOnly}
@@ -311,13 +295,13 @@
             mainMenuBar={mainMenuBar}
             validator={validator}
             onError={onError}
-            onChange={handleChangeJson}
+            onChangeJson={handleChangeJson}
+            onChangeText={handleChangeText}
             onRequestRepair={handleRequestRepair}
             onClassName={onClassName}
             onRenderMenu={handleCreateMenu}
             onFocus={handleFocus}
             onBlur={handleBlur}
-            visible={!isNewDocument}
           />
         {/if}
       {/key}

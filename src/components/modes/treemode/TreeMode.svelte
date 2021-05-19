@@ -21,8 +21,6 @@
     uniqueId
   } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
-  import ValidationErrorsOverview
-    from '../../controls/ValidationErrorsOverview.svelte'
   import { createJump } from '../../../assets/jump.js/src/jump.js'
   import {
     CONTEXT_MENU_HEIGHT,
@@ -36,6 +34,7 @@
     TRANSFORM_MODAL_OPTIONS
   } from '../../../constants.js'
   import {
+    createState,
     documentStatePatch,
     expandPath,
     expandSection,
@@ -87,6 +86,8 @@
   import { isObject, isObjectOrArray, isUrl } from '../../../utils/typeUtils.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
+  import ValidationErrorsOverview
+    from '../../controls/ValidationErrorsOverview.svelte'
   import CopyPasteModal from '../../modals/CopyPasteModal.svelte'
   import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
   import SortModal from '../../modals/SortModal.svelte'
@@ -94,6 +95,7 @@
   import ContextMenu from './contextmenu/ContextMenu.svelte'
   import JSONNode from './JSONNode.svelte'
   import TreeMenu from './menu/TreeMenu.svelte'
+  import Welcome from './Welcome.svelte'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -117,7 +119,8 @@
   export let visible = true
   export let indentation = 2
   export let onError
-  export let onChange
+  export let onChangeJson
+  export let onChangeText
   export let onRequestRepair = () => {
   }
   export let onRenderMenu = () => {
@@ -151,6 +154,7 @@
   })
 
   let json = externalJson
+  let text = externalText
   let state = syncState(json, undefined, [], defaultExpand)
 
   let selection = null
@@ -258,7 +262,7 @@
   $: applyExternalText(externalText)
 
   let textIsRepaired = false
-  $: textIsUnrepairable = (externalText !== undefined && json === undefined)
+  $: textIsUnrepairable = (text !== undefined && json === undefined)
 
   // TODO: debounce JSON schema validation
   $: validationErrorsList = validator ? validator(json) : []
@@ -275,48 +279,112 @@
 
     // TODO: this is inefficient. Make an optional flag promising that the updates are immutable so we don't have to do a deep equality check? First do some profiling!
     const isChanged = !isEqual(json, updatedJson)
-    const isNew = json === undefined
+    const isText = json === undefined
 
-    debug('update', { isChanged, isNew })
+    debug('update', { isChanged, isText })
 
     if (!isChanged) {
       // no actual change, don't do anything
       return
     }
 
-    const prevState = isNew ? undefined : state
+    const prevState = state
     const prevJson = json
+    const prevText = text
 
     json = updatedJson
     state = syncState(json, prevState, [], defaultExpand)
 
-    if (!isNew && prevState) {
-      history.add({
-        undo: [{ op: 'replace', path: '', value: prevJson }],
-        redo: [{ op: 'replace', path: '', value: json }],
-        prevState,
-        state,
-        prevSelection: removeEditModeFromSelection(selection),
-        selection: removeEditModeFromSelection(selection)
-      })
-    }
+    addHistoryItem({ prevJson, prevState, prevText })
   }
 
-  function applyExternalText (text) {
-    if (text === undefined || externalJson !== undefined) {
+  function applyExternalText (updatedText) {
+    if (updatedText === undefined || externalJson !== undefined) {
       return
     }
 
+    if (updatedText === text) {
+      // no actual change, don't do anything
+      return
+    }
+
+    // make sure there is a selection,
+    // else we cannot paste or insert in case of an empty document
+    selection = createSelection(json, state, {
+      type: SELECTION_TYPE.MULTI,
+      anchorPath: [],
+      focusPath: []
+    })
+
     textIsRepaired = false
 
+    const prevJson = json
+    const prevState = state
+    const prevText = text
+
     try {
-      applyExternalJson(JSON.parse(text))
+      applyExternalJson(JSON.parse(updatedText))
     } catch (err) {
       try {
-        applyExternalJson(JSON.parse(jsonrepair(text)))
+        applyExternalJson(JSON.parse(jsonrepair(updatedText)))
         textIsRepaired = true
       } catch (err) {
+        // no valid JSON, will show empty document or invalid json
         json = undefined
+        text = externalText
+        state = createState(json)
+      }
+    }
+
+    addHistoryItem({ prevJson, prevState, prevText })
+  }
+
+  function addHistoryItem ({ prevJson, prevState, prevText }) {
+    if (json !== undefined) {
+      if (prevJson !== undefined) {
+        // regular undo/redo with JSON patch
+        history.add({
+          undo: {
+            patch: [{ op: 'replace', path: '', value: prevJson }],
+            state: prevState,
+            selection: removeEditModeFromSelection(selection)
+          },
+          redo: {
+            patch: [{ op: 'replace', path: '', value: json }],
+            state,
+            selection: removeEditModeFromSelection(selection)
+          }
+        })
+      } else {
+        history.add({
+          undo: {
+            text: prevText,
+            state: prevState,
+            selection: removeEditModeFromSelection(selection)
+          },
+          redo: {
+            json,
+            state,
+            selection: removeEditModeFromSelection(selection)
+          }
+        })
+      }
+    } else {
+      if (prevJson !== undefined) {
+        history.add({
+          undo: {
+            json: prevJson,
+            state: prevState,
+            selection: removeEditModeFromSelection(selection)
+          },
+          redo: {
+            text,
+            state,
+            selection: removeEditModeFromSelection(selection)
+          }
+        })
+      } else {
+        // this cannot happen. Nothing to do, no change
       }
     }
   }
@@ -326,6 +394,10 @@
    * @param {Selection} [newSelection]
    */
   export function patch (operations, newSelection) {
+    if (json === undefined) {
+      throw new Error('Cannot apply patch: no JSON')
+    }
+
     const prevState = state
     const prevSelection = selection
 
@@ -341,12 +413,16 @@
     }
 
     history.add({
-      undo,
-      redo: operations,
-      prevState,
-      state,
-      prevSelection: removeEditModeFromSelection(prevSelection),
-      selection: removeEditModeFromSelection(newSelection || selection)
+      undo: {
+        patch: undo,
+        state: prevState,
+        selection: removeEditModeFromSelection(prevSelection)
+      },
+      redo: {
+        patch: operations,
+        state,
+        selection: removeEditModeFromSelection(newSelection || selection)
+      }
     })
 
     return {
@@ -465,19 +541,25 @@
   }
 
   function doPaste (clipboardText) {
-    const operations = insert(json, state, selection, clipboardText)
+    if (json !== undefined) {
+      const operations = insert(json, state, selection, clipboardText)
 
-    debug('paste', { clipboardText, operations, selection })
+      debug('paste', { clipboardText, operations, selection })
 
-    handlePatch(operations)
+      handlePatch(operations)
 
-    // expand newly inserted object/array
-    operations
-      .filter(operation => isObjectOrArray(operation.value))
-      .forEach(async operation => {
-        const path = parseJSONPointerWithArrayIndices(json, operation.path)
-        handleExpand(path, true, false)
-      })
+      // expand newly inserted object/array
+      operations
+        .filter(operation => isObjectOrArray(operation.value))
+        .forEach(async operation => {
+          const path = parseJSONPointerWithArrayIndices(json, operation.path)
+          handleExpand(path, true, false)
+        })
+    } else {
+      debug('paste', { clipboardText })
+
+      handleChangeText(clipboardText)
+    }
   }
 
   function openRepairModal (text, onApply) {
@@ -520,14 +602,22 @@
       })
       : selection
 
-    const {
-      operations,
-      newSelection
-    } = createRemoveOperations(json, state, removeSelection)
+    if (isEmpty(selection.focusPath)) {
+      // root selected -> clear complete document
+      debug('remove', { selection })
 
-    debug('remove', { operations, selection, newSelection })
+      onChangeText('')
+    } else {
+      // remove selection
+      const {
+        operations,
+        newSelection
+      } = createRemoveOperations(json, state, removeSelection)
 
-    handlePatch(operations, newSelection)
+      debug('remove', { operations, selection, newSelection })
+
+      handlePatch(operations, newSelection)
+    }
   }
 
   function handleDuplicate () {
@@ -578,39 +668,46 @@
     }
 
     const newValue = createNewValue(json, selection, type)
-    const data = JSON.stringify(newValue)
-    const operations = insert(json, state, selection, data)
-    debug('handleInsert', { type, operations, newValue, data })
 
-    handlePatch(operations)
+    if (json !== undefined) {
+      const data = JSON.stringify(newValue)
+      const operations = insert(json, state, selection, data)
+      debug('handleInsert', { type, operations, newValue, data })
 
-    operations
-      .filter(operation => (operation.op === 'add' || operation.op === 'replace'))
-      .forEach(async operation => {
-        const path = parseJSONPointerWithArrayIndices(json, operation.path)
+      handlePatch(operations)
 
-        if (isObjectOrArray(newValue)) {
-          // expand newly inserted object/array
-          handleExpand(path, true, true)
-          focus() // TODO: find a more robust way to keep focus than sprinkling focusHiddenInput() everywhere
-        }
+      operations
+        .filter(operation => (operation.op === 'add' || operation.op === 'replace'))
+        .forEach(async operation => {
+          const path = parseJSONPointerWithArrayIndices(json, operation.path)
 
-        if (newValue === '') {
-          // open the newly inserted value in edit mode
-          const parent = !isEmpty(path)
-            ? getIn(json, initial(path))
-            : null
+          if (isObjectOrArray(newValue)) {
+            // expand newly inserted object/array
+            handleExpand(path, true, true)
+            focus() // TODO: find a more robust way to keep focus than sprinkling focusHiddenInput() everywhere
+          }
 
-          selection = createSelection(json, state, {
-            type: isObject(parent) ? SELECTION_TYPE.KEY : SELECTION_TYPE.VALUE,
-            path,
-            edit: true
-          })
+          if (newValue === '') {
+            // open the newly inserted value in edit mode
+            const parent = !isEmpty(path)
+              ? getIn(json, initial(path))
+              : null
 
-          await tick()
-          setTimeout(() => replaceActiveElementContents(''))
-        }
-      })
+            selection = createSelection(json, state, {
+              type: isObject(parent) ? SELECTION_TYPE.KEY : SELECTION_TYPE.VALUE,
+              path,
+              edit: true
+            })
+
+            await tick()
+            setTimeout(() => replaceActiveElementContents(''))
+          }
+        })
+    } else {
+      debug('handleInsert', { type, newValue })
+
+      handleChangeJson(newValue)
+    }
   }
 
   /**
@@ -742,9 +839,20 @@
       return
     }
 
-    json = immutableJSONPatch(json, item.undo)
-    state = item.prevState
-    selection = item.prevSelection
+    selection = item.undo.selection
+    state = item.undo.state
+    if (item.undo.json !== undefined) {
+      json = item.undo.json
+      text = undefined
+    } else if (item.undo.patch) {
+      json = immutableJSONPatch(json, item.undo.patch)
+      text = undefined
+    } else if (item.undo.text !== undefined) {
+      json = undefined
+      text = item.undo.text
+    } else {
+      console.error('Invalid undo item', item)
+    }
 
     debug('undo', { item, json, state, selection })
 
@@ -763,9 +871,20 @@
       return
     }
 
-    json = immutableJSONPatch(json, item.redo)
-    state = item.state
-    selection = item.selection
+    selection = item.redo.selection
+    state = item.redo.state
+    if (item.redo.json !== undefined) {
+      json = item.redo.json
+      text = undefined
+    } else if (item.redo.patch) {
+      json = immutableJSONPatch(json, item.redo.patch)
+      text = undefined
+    } else if (item.redo.text !== undefined) {
+      json = undefined
+      text = item.redo.text
+    } else {
+      console.error('Invalid redo item', item)
+    }
 
     debug('redo', { item, json, state, selection })
 
@@ -911,7 +1030,11 @@
   }
 
   function emitOnChange () {
-    onChange(json)
+    if (json !== undefined) {
+      onChangeJson(json)
+    } else if (text !== undefined) {
+      onChangeText(text)
+    }
   }
 
   /**
@@ -935,6 +1058,51 @@
     emitOnChange()
 
     return patchResult
+  }
+
+  function handleChangeJson (updatedJson) {
+    const prevState = state
+    const prevJson = json
+    const prevText = text
+
+    json = updatedJson
+    state = syncState(json, prevState, [], defaultExpand)
+    text = undefined
+
+    addHistoryItem({ prevJson, prevState, prevText })
+
+    emitOnChange()
+  }
+
+  function handleChangeText (updatedText) {
+    const prevState = state
+    const prevJson = json
+    const prevText = text
+
+    textIsRepaired = false
+
+    try {
+      json = JSON.parse(updatedText)
+      text = undefined
+      state = syncState(json, prevState, [], defaultExpand)
+    } catch (err) {
+      try {
+        json = JSON.parse(jsonrepair(updatedText))
+        state = syncState(json, prevState, [], defaultExpand)
+        text = undefined
+        textIsRepaired = true
+      } catch (err) {
+        // no valid JSON, will show empty document or invalid json
+        json = undefined
+        text = updatedText
+
+        state = createState(json)
+      }
+    }
+
+    addHistoryItem({ prevJson, prevState, prevText })
+
+    emitOnChange()
   }
 
   /**
@@ -1299,6 +1467,7 @@
 >
   {#if mainMenuBar}
     <TreeMenu
+      json={json}
       readOnly={readOnly}
       historyState={historyState}
       searchText={searchText}
@@ -1331,23 +1500,27 @@
     />
   </label>
   {#if json === undefined}
-    <Message
-      type="error"
-      message="The loaded JSON document is invalid and could not be repaired automatically."
-      actions={[
+    {#if text === ''}
+      <Welcome />
+    {:else}
+      <Message
+        type="error"
+        message="The loaded JSON document is invalid and could not be repaired automatically."
+        actions={[
           {
             icon: faCode,
             text: 'Repair manually',
             onClick: onRequestRepair
           }
         ]}
-    />
-    <div class="preview" on:mousedown={event => {
-      // this event handler is needed here because on mousedown we set focus to the editor
-      event.stopPropagation()
-    }}>
-      {externalText}
-    </div>
+      />
+      <div class="preview" on:mousedown={event => {
+        // this event handler is needed here because on mousedown we set focus to the editor
+        event.stopPropagation()
+      }}>
+        {text}
+      </div>
+    {/if}
   {:else}
     <div class="contents" bind:this={refContents}>
       <JSONNode
@@ -1373,7 +1546,7 @@
       selectError={handleSelectValidationError}
     />
 
-    {#if textIsRepaired && externalText !== undefined}
+    {#if textIsRepaired && text !== undefined}
       <Message
         type="success"
         message="The loaded JSON document was invalid but is successfully repaired."
