@@ -13,7 +13,7 @@
   },
   "license": "ISC",
   "scripts": {
-    "start": "concurrently \"npm run dev\" \"cd tools/develop-svelte && npm run dev\"",
+    "start": "cd tools/develop-svelte && npm run dev",
     "dev": "rollup -c -w",
     "build": "rollup -c",
     "test": "mocha src/**/*.test.js --reporter dot",
@@ -46,7 +46,6 @@
     "@rollup/plugin-commonjs": "19.0.0",
     "@rollup/plugin-json": "4.1.0",
     "@rollup/plugin-node-resolve": "13.0.0",
-    "concurrently": "6.1.0",
     "eslint": "7.26.0",
     "eslint-config-standard": "16.0.2",
     "eslint-plugin-import": "2.22.1",
