@@ -206,7 +206,6 @@ const editor = new JSONEditor({
 })
 ```
 
-
 ### properties
 
 - `json` Pass the JSON document to be rendered in the JSONEditor

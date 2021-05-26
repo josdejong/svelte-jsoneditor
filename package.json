@@ -56,6 +56,7 @@
     "husky": "6.0.0",
     "mocha": "8.4.0",
     "rollup": "2.47.0",
+    "rollup-plugin-delete": "2.0.0",
     "rollup-plugin-svelte": "7.1.0",
     "rollup-plugin-terser": "7.0.2",
     "sass": "1.32.13",
