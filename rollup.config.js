@@ -1,20 +1,23 @@
 import commonjs from '@rollup/plugin-commonjs'
 import json from '@rollup/plugin-json'
-import svelte from 'rollup-plugin-svelte'
 import resolve from '@rollup/plugin-node-resolve'
-import pkg from './package.json'
-import sveltePreprocess from 'svelte-preprocess'
+import del from 'rollup-plugin-delete'
+import svelte from 'rollup-plugin-svelte'
 import { terser } from 'rollup-plugin-terser'
+import sveltePreprocess from 'svelte-preprocess'
+import pkg from './package.json'
 
 const production = !process.env.ROLLUP_WATCH
 
 export default {
   input: 'src/index.js',
   output: [
-    { file: pkg.module, format: 'es' },
+    { file: pkg.module, format: 'es', sourcemap: true },
     { file: pkg.main, format: 'umd', name: 'jsoneditor', sourcemap: true }
   ],
   plugins: [
+    del({ targets: 'dist/*' }),
+
     svelte({
       compilerOptions: {
         // enable run-time checks when not in production

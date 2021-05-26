@@ -47,6 +47,6 @@
 
 	.editor {
 		max-width: 600px;
-		height: 400px;
+		height: 410px;
 	}
 </style>
