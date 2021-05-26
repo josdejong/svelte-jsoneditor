@@ -10,7 +10,7 @@ div.collapsed-items {
 
   // https://sharkcoder.com/visual/borders
   $size: 8px;
-  padding: $padding / 2;
+  padding: $padding-half;
   border: $size solid transparent;
   border-width: $size 0;
   background-color: $background-color;
@@ -31,7 +31,7 @@ div.collapsed-items {
 
   div.text,
   button.expand-items {
-    margin: 0 $padding / 2;
+    margin: 0 $padding-half;
   }
 
   div.text {

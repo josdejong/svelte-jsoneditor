@@ -16,7 +16,7 @@
   }
 
   button.open-dropdown {
-    padding: $padding / 2;
+    padding: $padding-half;
     margin: 0;
     border-radius: 0;
   }
@@ -38,7 +38,7 @@
     button {
       width: 100%;
       text-align: left;
-      padding: $padding / 2;
+      padding: $padding-half;
       margin: 0;
 
       &:hover {

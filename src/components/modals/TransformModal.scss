@@ -20,7 +20,7 @@
   .label {
     font-weight: bold;
     padding-top: $padding * 2;
-    padding-bottom: $padding / 2;
+    padding-bottom: $padding-half;
     display: block;
 
     button {
@@ -35,7 +35,7 @@
     border-radius: $border-radius;
     outline: none;
     box-sizing: border-box;
-    padding: $padding / 2;
+    padding: $padding-half;
     font-family: $font-family-mono;
     font-size: $font-size-mono;
     color: $black;

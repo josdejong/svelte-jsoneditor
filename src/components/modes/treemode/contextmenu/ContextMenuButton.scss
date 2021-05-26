@@ -1,9 +1,11 @@
 @import '../../../../styles';
 
 .context-menu-button {
+  $context-menu-button-size-half: 0.5 * $context-menu-button-size;
+
   position: absolute;
-  top: -$context-menu-button-size/2;
-  right: -$context-menu-button-size/2;
+  top: -$context-menu-button-size-half;
+  right: -$context-menu-button-size-half;
   width: $context-menu-button-size;
   height: $context-menu-button-size;
   padding: 0;

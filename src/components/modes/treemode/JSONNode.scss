@@ -85,7 +85,7 @@
 
   .insert-selection-area {
     visibility: hidden;
-    padding: 0 $padding / 2;
+    padding: 0 $padding-half;
     flex: 1; // must fill all left over space at the right side of the editor, so you can click there
 
     &.inside {
@@ -113,6 +113,7 @@
 
   .insert-area {
     $height: 2px;
+    $height-half: 0.5 * $height;
 
     display: none;
     position: relative;
@@ -120,11 +121,11 @@
     max-width: 250px;
     min-width: 100px;
     height: 0;
-    margin-right: $padding/2;
-    outline: $height/2 solid; // color depends on hovered/selected/inactive+selected
+    margin-right: $padding-half;
+    outline: $height-half solid; // color depends on hovered/selected/inactive+selected
 
     :global(.context-menu-button) {
-      right: -$height/2;
+      right: -$height-half;
       background: $selection-background;
     }
 
@@ -173,7 +174,7 @@
 }
 
 .index {
-  padding: 0 $padding / 2;
+  padding: 0 $padding-half;
 }
 
 .bracket {

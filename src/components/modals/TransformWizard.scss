@@ -17,22 +17,22 @@ table.transform-wizard {
         width: 100%;
         display: flex;
         flex-direction: row;
-        margin-bottom: $padding/2;
+        margin-bottom: $padding-half;
 
         :global(.selectContainer) {
           &.filter-field {
             flex: 4;
-            margin-right: $padding/2;
+            margin-right: $padding-half;
           }
 
           &.filter-relation {
             flex: 1;
-            margin-right: $padding/2;
+            margin-right: $padding-half;
           }
 
           &.sort-field {
             flex: 3;
-            margin-right: $padding/2;
+            margin-right: $padding-half;
           }
 
           &.sort-direction {
