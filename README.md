@@ -10,6 +10,8 @@ The library is written with Svelte, but can be used in any framework (React, Ang
 
 ## Install
 
+Install via npm:
+
 ```
 npm install
 ```
@@ -18,7 +20,47 @@ npm install
 
 See the [/examples](/examples) section for some full examples.
 
-### Svelte
+### Svelte setup 
+
+In order to use `svelte-jsoneditor` in your project, a couple of plugins needs to be installed and configured: 
+
+- `@rollup/plugin-json` needed by `ajv` to load a JSON Schema definition from a JSON file
+- `svelte-preprocess` and `sass` needed to preprocess SASS styling of the editor
+
+First, install the required plugins dependencies:
+
+```
+npm install --save-dev @rollup/plugin-json svelte-preprocess sass
+```
+
+Now, configure the plugins in your `./rollup.config.js` configuration:
+
+```js
+// rollup.config.js
+
+// ...
+import json from '@rollup/plugin-json'
+import sveltePreprocess from 'svelte-preprocess'
+
+// ...
+export default {
+  // ...
+  plugins: [
+    svelte({
+      // ...
+      
+      preprocess: sveltePreprocess()
+    })
+  ],
+  
+  // ...
+  json()
+}
+```
+
+A full example of a `rollup.config.js` can be found here: [examples/svelte-basic-example/rollup.config.js](https://github.com/josdejong/svelte-jsoneditor/blob/main/examples/svelte-basic-example/rollup.config.js).
+
+### Svelte usage
 
 Create a JSONEditor with two-way binding `bind:json`:
 
@@ -67,7 +109,7 @@ Or one-way binding:
 </div>
 ```
 
-### Browser
+### Browser usage
 
 Load as ES module:
 
@@ -113,7 +155,7 @@ Or using UMD (exposed as `window.jsoneditor.JSONEditor`):
 <div id="jsoneditor"></div>
 
 <script>
-  const editor = new JSONEditor({
+  const editor = new window.jsoneditor.JSONEditor({
     target: document.getElementById('jsoneditor'),
     props: {
       json: {
