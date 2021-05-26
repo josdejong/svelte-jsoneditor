@@ -1,7 +1,9 @@
 @import '../../../styles';
 
 // TODO: create a class shared by .expand and .validation-error buttons
-.validation-error {
+button.validation-error {
+  @include jsoneditor-button;
+
   color: $warning-color;
   padding: 0 $input-padding;
   height: $line-height;

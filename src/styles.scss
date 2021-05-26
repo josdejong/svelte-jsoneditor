@@ -66,7 +66,7 @@ $errors-overview-max-height: 25%;
 $box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.24);
 $outline-shadow: 0 0 10px 0 rgba(56, 131, 250, 0.8);
 
-button {
+@mixin jsoneditor-button {
   border: none;
   background: transparent;
   color: inherit;
@@ -74,9 +74,12 @@ button {
   font-family: $font-family;
   font-size: $font-size;
   padding: $menu-padding;
+  margin: 0;
 }
 
-button.primary {
+@mixin jsoneditor-button-primary {
+  @include jsoneditor-button;
+
   background: $theme-color;
   color: $white;
   padding: $padding 2 * $padding;

@@ -24,6 +24,7 @@
     display: block;
 
     button {
+      @include jsoneditor-button;
       font-weight: bold;
     }
   }

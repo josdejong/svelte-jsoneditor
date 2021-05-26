@@ -12,7 +12,11 @@
   }
 
   button.close {
+    border: none;
+    background: transparent;
     min-width: 32px;
+    color: inherit;
+    cursor: pointer;
 
     &:hover {
       background: rgba(255, 255, 255, 0.1);

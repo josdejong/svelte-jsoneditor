@@ -35,6 +35,8 @@
     gap: $padding;
 
     button.action {
+      @include jsoneditor-button;
+
       background: rgba(255, 255, 255, 0.2);
       color: $white;
 

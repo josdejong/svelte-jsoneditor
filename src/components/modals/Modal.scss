@@ -26,6 +26,10 @@
       justify-content: flex-end;
 
       padding-top: $padding;
+
+      button {
+        @include jsoneditor-button-primary;
+      }
     }
   }
 }
