@@ -293,6 +293,7 @@
     const prevText = text
 
     json = updatedJson
+    text = undefined
     state = syncState(json, prevState, [], defaultExpand)
 
     addHistoryItem({ prevJson, prevState, prevText })
@@ -327,6 +328,7 @@
     } catch (err) {
       try {
         applyExternalJson(JSON.parse(jsonrepair(updatedText)))
+        text = updatedText
         textIsRepaired = true
       } catch (err) {
         // no valid JSON, will show empty document or invalid json
@@ -467,6 +469,11 @@
       path: selection.focusPath,
       edit: true
     })
+  }
+
+  function handleApplyAutoRepair () {
+    textIsRepaired = false
+    emitOnChange()
   }
 
   async function handleCut () {
@@ -1546,7 +1553,7 @@
       selectError={handleSelectValidationError}
     />
 
-    {#if textIsRepaired && text !== undefined}
+    {#if textIsRepaired}
       <Message
         type="success"
         message="The loaded JSON document was invalid but is successfully repaired."
@@ -1554,7 +1561,7 @@
           {
             icon: faCheck,
             text: 'Ok',
-            onClick: emitOnChange
+            onClick: handleApplyAutoRepair
           },
           {
             icon: faCode,
