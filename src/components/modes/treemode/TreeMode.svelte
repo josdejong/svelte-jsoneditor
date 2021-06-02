@@ -1521,10 +1521,7 @@
           }
         ]}
       />
-      <div class="preview" on:mousedown={event => {
-        // this event handler is needed here because on mousedown we set focus to the editor
-        event.stopPropagation()
-      }}>
+      <div class="preview">
         {text}
       </div>
     {/if}
