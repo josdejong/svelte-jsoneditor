@@ -1,28 +1,27 @@
 <script>
 	import { JSONEditor, createAjvValidator } from 'svelte-jsoneditor'
 
-	// let json = {
-	// 	"array": [1, 2, [3,4,5]],
-	// 	"boolean": true,
-	// 	"color": "#82b92c",
-	// 	"htmlcode": '&quot;',
-	// 	"escaped_unicode": '\\u20b9',
-	// 	"unicode": '\u{1F600},\uD83D\uDCA9',
-	// 	"return": '\n',
-	// 	"null": null,
-	// 	"number": 123,
-	// 	"object": {"a": "b", "c": "d"},
-	// 	"string": "Hello World",
-	// 	"timestamp": 1534952749890,
-	// 	"url": "http://jsoneditoronline.org",
-	// 	"<button onclick=alert('oopsie!!!')>test xss</button>": "xss?",
-	// 	"xss array": [
-	// 		{
-	// 			"<button onclick=alert('oopsie!!!')>test xss</button>": "xss?"
-	// 		}
-	// 	]
-	// }
-	let json = undefined
+	let json = {
+		"array": [1, 2, [3,4,5]],
+		"boolean": true,
+		"color": "#82b92c",
+		"htmlcode": '&quot;',
+		"escaped_unicode": '\\u20b9',
+		"unicode": '\u{1F600},\uD83D\uDCA9',
+		"return": '\n',
+		"null": null,
+		"number": 123,
+		"object": {"a": "b", "c": "d"},
+		"string": "Hello World",
+		"timestamp": 1534952749890,
+		"url": "http://jsoneditoronline.org",
+		"<button onclick=alert('oopsie!!!')>test xss</button>": "xss?",
+		"xss array": [
+			{
+				"<button onclick=alert('oopsie!!!')>test xss</button>": "xss?"
+			}
+		]
+	}
 
 	const schema = {
 		"title": "Employee",
@@ -46,7 +45,7 @@
 
 	const validator = createAjvValidator(schema)
 
-	let text = undefined //'foo bar baz, ]'
+	let text = undefined
 
 	let showTreeEditor = true
 	let showCodeEditor = true

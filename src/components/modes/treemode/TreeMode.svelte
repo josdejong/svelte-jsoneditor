@@ -157,7 +157,7 @@
   let text
   let state = syncState({}, undefined, [], defaultExpand)
 
-  let selection = createDefaultSelection()
+  let selection = null
 
   function defaultExpand (path) {
     return path.length < 1
@@ -335,7 +335,7 @@
       }
     }
 
-    if (!selection) {
+    if (!selection && (text === '' || text === undefined)) {
       // make sure there is a selection,
       // else we cannot paste or insert in case of an empty document
       selection = createDefaultSelection()
@@ -1374,7 +1374,7 @@
   }
 
   function handleMouseDown (event) {
-    console.log('handleMouseDown', event)
+    debug('handleMouseDown', event)
 
     // TODO: ugly to have to have two setTimeout here. Without it, hiddenInput will blur
     setTimeout(() => {
@@ -1382,6 +1382,10 @@
         if (!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) {
           // for example when clicking on the empty area in the main menu
           focus()
+
+          if (!selection) {
+            selection = createDefaultSelection()
+          }
         }
       })
     })
