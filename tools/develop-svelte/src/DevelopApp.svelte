@@ -1,27 +1,28 @@
 <script>
 	import { JSONEditor, createAjvValidator } from 'svelte-jsoneditor'
 
-	let json = {
-		"array": [1, 2, [3,4,5]],
-		"boolean": true,
-		"color": "#82b92c",
-		"htmlcode": '&quot;',
-		"escaped_unicode": '\\u20b9',
-		"unicode": '\u{1F600},\uD83D\uDCA9',
-		"return": '\n',
-		"null": null,
-		"number": 123,
-		"object": {"a": "b", "c": "d"},
-		"string": "Hello World",
-		"timestamp": 1534952749890,
-		"url": "http://jsoneditoronline.org",
-		"<button onclick=alert('oopsie!!!')>test xss</button>": "xss?",
-		"xss array": [
-			{
-				"<button onclick=alert('oopsie!!!')>test xss</button>": "xss?"
-			}
-		]
-	}
+	// let json = {
+	// 	"array": [1, 2, [3,4,5]],
+	// 	"boolean": true,
+	// 	"color": "#82b92c",
+	// 	"htmlcode": '&quot;',
+	// 	"escaped_unicode": '\\u20b9',
+	// 	"unicode": '\u{1F600},\uD83D\uDCA9',
+	// 	"return": '\n',
+	// 	"null": null,
+	// 	"number": 123,
+	// 	"object": {"a": "b", "c": "d"},
+	// 	"string": "Hello World",
+	// 	"timestamp": 1534952749890,
+	// 	"url": "http://jsoneditoronline.org",
+	// 	"<button onclick=alert('oopsie!!!')>test xss</button>": "xss?",
+	// 	"xss array": [
+	// 		{
+	// 			"<button onclick=alert('oopsie!!!')>test xss</button>": "xss?"
+	// 		}
+	// 	]
+	// }
+	let json = undefined
 
 	const schema = {
 		"title": "Employee",
@@ -45,7 +46,7 @@
 
 	const validator = createAjvValidator(schema)
 
-	let text = undefined
+	let text = undefined //'foo bar baz, ]'
 
 	let showTreeEditor = true
 	let showCodeEditor = true
@@ -57,8 +58,12 @@
 		console.log('onRenderMenu', mode, items)
 	}
 
-	function onChange({ json, text }) {
-		console.log('onChange', { json, text })
+	function onChangeTree({ json, text }) {
+		console.log('onChangeTree', { json, text })
+	}
+
+	function onChangeCode({ json, text }) {
+		console.log('onChangeCode', { json, text })
 	}
 
 	function onChangeMode(mode) {
@@ -93,12 +98,6 @@
 			Update text
 		</button>
 		<button on:click={() => {
-			text = '[1, 2, 3, 4}'
-			json = undefined
-		}}>
-			Update text (invalid)
-		</button>
-		<button on:click={() => {
 			text = ''
 			json = undefined
 		}}>
@@ -109,6 +108,18 @@
 			json = ''
 		}}>
 			Set empty string
+		</button>
+		<button on:click={() => {
+			text = 'abc'
+			json = undefined
+		}}>
+			Set repairable text
+		</button>
+		<button on:click={() => {
+			text = '[1, 2, 3 }'
+			json = undefined
+		}}>
+			Set unrepairable text
 		</button>
 	</p>
 	<div class="columns">
@@ -126,7 +137,7 @@
 						indentation={indentation}
 						validator={validate ? validator : undefined}
 						onRenderMenu={onRenderMenu}
-						onChange={onChange}
+						onChange={onChangeTree}
 						onChangeMode={onChangeMode}
 					/>
 				{/if}
@@ -157,7 +168,7 @@
 						indentation={indentation}
 						validator={validate ? validator : undefined}
 						onRenderMenu={onRenderMenu}
-						onChange={onChange}
+						onChange={onChangeCode}
 						onChangeMode={onChangeMode}
 					/>
 				{/if}

@@ -153,11 +153,11 @@
     }
   })
 
-  let json = externalJson
-  let text = externalText
-  let state = syncState(json, undefined, [], defaultExpand)
+  let json
+  let text
+  let state = syncState({}, undefined, [], defaultExpand)
 
-  let selection = null
+  let selection = createDefaultSelection()
 
   function defaultExpand (path) {
     return path.length < 1
@@ -258,7 +258,6 @@
   // when receiving an updated prop, we have to update state.
   // when changing json in the editor, the bound external property must be updated
   $: applyExternalJson(externalJson)
-
   $: applyExternalText(externalText)
 
   let textIsRepaired = false
@@ -291,12 +290,14 @@
     const prevState = state
     const prevJson = json
     const prevText = text
+    const prevTextIsRepaired = textIsRepaired
 
     json = updatedJson
-    text = undefined
     state = syncState(json, prevState, [], defaultExpand)
+    text = undefined
+    textIsRepaired = false
 
-    addHistoryItem({ prevJson, prevState, prevText })
+    addHistoryItem({ prevJson, prevState, prevText, prevTextIsRepaired })
   }
 
   function applyExternalText (updatedText) {
@@ -309,39 +310,46 @@
       return
     }
 
-    // make sure there is a selection,
-    // else we cannot paste or insert in case of an empty document
-    selection = createSelection(json, state, {
-      type: SELECTION_TYPE.MULTI,
-      anchorPath: [],
-      focusPath: []
-    })
-
-    textIsRepaired = false
-
     const prevJson = json
     const prevState = state
     const prevText = text
+    const prevTextIsRepaired = textIsRepaired
 
     try {
-      applyExternalJson(JSON.parse(updatedText))
+      json = JSON.parse(updatedText)
+      state = syncState(json, prevState, [], defaultExpand)
+      text = updatedText
+      textIsRepaired = false
     } catch (err) {
       try {
-        applyExternalJson(JSON.parse(jsonrepair(updatedText)))
+        json = JSON.parse(jsonrepair(updatedText))
+        state = syncState(json, prevState, [], defaultExpand)
         text = updatedText
         textIsRepaired = true
       } catch (err) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
-        text = externalText
         state = createState(json)
+        text = externalText
+        textIsRepaired = false
       }
     }
 
-    addHistoryItem({ prevJson, prevState, prevText })
+    if (!selection) {
+      // make sure there is a selection,
+      // else we cannot paste or insert in case of an empty document
+      selection = createDefaultSelection()
+    }
+
+    addHistoryItem({ prevJson, prevState, prevText, prevTextIsRepaired })
   }
 
-  function addHistoryItem ({ prevJson, prevState, prevText }) {
+  function addHistoryItem ({ prevJson, prevState, prevText, prevTextIsRepaired }) {
+    if (prevJson === undefined && prevText === undefined) {
+      // initialization -> do not create a history item
+      return
+    }
+
     if (json !== undefined) {
       if (prevJson !== undefined) {
         // regular undo/redo with JSON patch
@@ -349,24 +357,31 @@
           undo: {
             patch: [{ op: 'replace', path: '', value: prevJson }],
             state: prevState,
+            text: prevText,
+            textIsRepaired: prevTextIsRepaired,
             selection: removeEditModeFromSelection(selection)
           },
           redo: {
             patch: [{ op: 'replace', path: '', value: json }],
             state,
+            text,
+            textIsRepaired,
             selection: removeEditModeFromSelection(selection)
           }
         })
       } else {
         history.add({
           undo: {
-            text: prevText,
             state: prevState,
+            text: prevText,
+            textIsRepaired: prevTextIsRepaired,
             selection: removeEditModeFromSelection(selection)
           },
           redo: {
             json,
             state,
+            text,
+            textIsRepaired,
             selection: removeEditModeFromSelection(selection)
           }
         })
@@ -377,10 +392,13 @@
           undo: {
             json: prevJson,
             state: prevState,
+            text: prevText,
+            textIsRepaired: prevTextIsRepaired,
             selection: removeEditModeFromSelection(selection)
           },
           redo: {
             text,
+            textIsRepaired,
             state,
             selection: removeEditModeFromSelection(selection)
           }
@@ -389,6 +407,14 @@
         // this cannot happen. Nothing to do, no change
       }
     }
+  }
+
+  function createDefaultSelection () {
+    return createSelection(json || {}, state, {
+      type: SELECTION_TYPE.MULTI,
+      anchorPath: [],
+      focusPath: []
+    })
   }
 
   /**
@@ -402,6 +428,8 @@
 
     const prevState = state
     const prevSelection = selection
+    const prevText = text
+    const prevTextIsRepaired = textIsRepaired
 
     debug('patch', operations, newSelection)
 
@@ -409,6 +437,8 @@
     const update = documentStatePatch(json, state, operations)
     json = update.json
     state = update.state
+    text = undefined
+    textIsRepaired = false
 
     if (newSelection) {
       selection = newSelection
@@ -418,11 +448,15 @@
       undo: {
         patch: undo,
         state: prevState,
+        text: prevText,
+        textIsRepaired: prevTextIsRepaired,
         selection: removeEditModeFromSelection(prevSelection)
       },
       redo: {
         patch: operations,
         state,
+        text,
+        textIsRepaired,
         selection: removeEditModeFromSelection(newSelection || selection)
       }
     })
@@ -472,8 +506,9 @@
   }
 
   function handleApplyAutoRepair () {
-    textIsRepaired = false
-    emitOnChange()
+    if (json !== undefined) {
+      handleChangeJson(json)
+    }
   }
 
   async function handleCut () {
@@ -847,19 +882,12 @@
     }
 
     selection = item.undo.selection
+    json = item.undo.patch
+      ? immutableJSONPatch(json, item.undo.patch)
+      : item.undo.json
     state = item.undo.state
-    if (item.undo.json !== undefined) {
-      json = item.undo.json
-      text = undefined
-    } else if (item.undo.patch) {
-      json = immutableJSONPatch(json, item.undo.patch)
-      text = undefined
-    } else if (item.undo.text !== undefined) {
-      json = undefined
-      text = item.undo.text
-    } else {
-      console.error('Invalid undo item', item)
-    }
+    text = item.undo.text
+    textIsRepaired = item.undo.textIsRepaired
 
     debug('undo', { item, json, state, selection })
 
@@ -879,19 +907,12 @@
     }
 
     selection = item.redo.selection
+    json = item.redo.patch
+      ? immutableJSONPatch(json, item.redo.patch)
+      : item.redo.json
     state = item.redo.state
-    if (item.redo.json !== undefined) {
-      json = item.redo.json
-      text = undefined
-    } else if (item.redo.patch) {
-      json = immutableJSONPatch(json, item.redo.patch)
-      text = undefined
-    } else if (item.redo.text !== undefined) {
-      json = undefined
-      text = item.redo.text
-    } else {
-      console.error('Invalid redo item', item)
-    }
+    text = item.redo.text
+    textIsRepaired = item.redo.textIsRepaired
 
     debug('redo', { item, json, state, selection })
 
@@ -1037,10 +1058,10 @@
   }
 
   function emitOnChange () {
-    if (json !== undefined) {
-      onChangeJson(json)
-    } else if (text !== undefined) {
+    if (text !== undefined) {
       onChangeText(text)
+    } else if (json !== undefined) {
+      onChangeJson(json)
     }
   }
 
@@ -1071,12 +1092,14 @@
     const prevState = state
     const prevJson = json
     const prevText = text
+    const prevTextIsRepaired = textIsRepaired
 
     json = updatedJson
     state = syncState(json, prevState, [], defaultExpand)
     text = undefined
+    textIsRepaired = false
 
-    addHistoryItem({ prevJson, prevState, prevText })
+    addHistoryItem({ prevJson, prevState, prevText, prevTextIsRepaired })
 
     emitOnChange()
   }
@@ -1085,29 +1108,29 @@
     const prevState = state
     const prevJson = json
     const prevText = text
-
-    textIsRepaired = false
+    const prevTextIsRepaired = textIsRepaired
 
     try {
       json = JSON.parse(updatedText)
-      text = undefined
       state = syncState(json, prevState, [], defaultExpand)
+      text = updatedText
+      textIsRepaired = false
     } catch (err) {
       try {
         json = JSON.parse(jsonrepair(updatedText))
         state = syncState(json, prevState, [], defaultExpand)
-        text = undefined
+        text = updatedText
         textIsRepaired = true
       } catch (err) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
-        text = updatedText
-
         state = createState(json)
+        text = updatedText
+        textIsRepaired = false
       }
     }
 
-    addHistoryItem({ prevJson, prevState, prevText })
+    addHistoryItem({ prevJson, prevState, prevText, prevTextIsRepaired })
 
     emitOnChange()
   }
@@ -1507,7 +1530,7 @@
     />
   </label>
   {#if json === undefined}
-    {#if text === ''}
+    {#if text === '' || text === undefined}
       <Welcome />
     {:else}
       <Message
