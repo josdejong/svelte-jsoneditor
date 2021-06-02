@@ -911,7 +911,7 @@
       selectedPath,
       onSort: async (operations) => {
         debug('onSort', selectedPath, operations)
-        patch(operations, selection)
+        handlePatch(operations, selection)
 
         // expand the newly replaced array
         handleExpand(selectedPath, true)
@@ -948,7 +948,7 @@
       indentation,
       onTransform: async (operations) => {
         debug('onTransform', selectedPath, operations)
-        patch(operations, selection)
+        handlePatch(operations, selection)
 
         // expand the newly replaced array
         handleExpand(selectedPath, true)
