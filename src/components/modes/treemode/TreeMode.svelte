@@ -932,7 +932,12 @@
       selectedPath,
       onSort: async (operations) => {
         debug('onSort', selectedPath, operations)
-        handlePatch(operations, selection)
+
+        const newSelection = createSelection(json, state, {
+          type: SELECTION_TYPE.VALUE,
+          path: selectedPath
+        })
+        handlePatch(operations, newSelection)
 
         // expand the newly replaced array
         handleExpand(selectedPath, true)
@@ -969,7 +974,12 @@
       indentation,
       onTransform: async (operations) => {
         debug('onTransform', selectedPath, operations)
-        handlePatch(operations, selection)
+
+        const newSelection = createSelection(json, state, {
+          type: SELECTION_TYPE.VALUE,
+          path: selectedPath
+        })
+        handlePatch(operations, newSelection)
 
         // expand the newly replaced array
         handleExpand(selectedPath, true)
