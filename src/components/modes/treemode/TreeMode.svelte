@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script>
-  import { faCheck, faCode } from '@fortawesome/free-solid-svg-icons'
+  import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import createDebug from 'debug'
   import {
     compileJSONPointer,
@@ -158,6 +158,8 @@
   let state = syncState({}, undefined, [], defaultExpand)
 
   let selection = null
+
+  let pastedJson
 
   function defaultExpand (path) {
     return path.length < 1
@@ -1093,6 +1095,8 @@
 
     const patchResult = patch(operations, newSelection)
 
+    pastedJson = undefined
+
     emitOnChange()
 
     return patchResult
@@ -1208,6 +1212,12 @@
     debug('handleExpandSection', path, section)
 
     state = expandSection(json, state, path, section)
+  }
+
+  function handlePasteJson (newPastedJson) {
+    debug('pasted json as text', newPastedJson)
+
+    pastedJson = newPastedJson
   }
 
   function handleKeyDown (event) {
@@ -1492,6 +1502,31 @@
     })
   }
 
+  async function handleParsePastedJson () {
+    const { path, contents } = pastedJson
+
+    // exit edit mode
+    selection = createSelection(json, state, {
+      type: SELECTION_TYPE.VALUE,
+      path
+    })
+
+    await tick()
+
+    // replace the value with the JSON object/array
+    handlePatch([{
+      op: 'replace',
+      path: compileJSONPointer(path),
+      value: contents
+    }])
+
+    handleExpand(path, true)
+  }
+
+  function handleClearPastedJson () {
+    pastedJson = undefined
+  }
+
   export function focus () {
     // with just .focus(), sometimes the input doesn't react on onpaste events
     // in Chrome when having a large document open and then doing cut/paste.
@@ -1575,6 +1610,7 @@
         onInsert={handleInsert}
         onExpand={handleExpand}
         onSelect={handleSelect}
+        onPasteJson={handlePasteJson}
         onExpandSection={handleExpandSection}
         onContextMenu={openContextMenu}
         onClassName={onClassName || noop}
@@ -1582,10 +1618,23 @@
       />
     </div>
 
-    <ValidationErrorsOverview
-      validationErrorsList={validationErrorsList}
-      selectError={handleSelectValidationError}
-    />
+    {#if pastedJson}
+      <Message
+        type="info"
+        message={`You pasted a JSON ${Array.isArray(pastedJson.contents) ? 'array' : 'object'} as text`}
+        actions={[
+          {
+            icon: faWrench,
+            text: 'Paste as JSON instead',
+            onClick: handleParsePastedJson
+          },
+          {
+            text: 'Leave as is',
+            onClick: handleClearPastedJson
+          }
+        ]}
+      />
+    {/if}
 
     {#if textIsRepaired}
       <Message
@@ -1605,6 +1654,11 @@
         ]}
       />
     {/if}
+
+    <ValidationErrorsOverview
+      validationErrorsList={validationErrorsList}
+      selectError={handleSelectValidationError}
+    />
   {/if}
 </div>
 

@@ -14,7 +14,12 @@
     setPlainText
   } from '../../../utils/domUtils.js'
   import { keyComboFromEvent } from '../../../utils/keyBindings.js'
-  import { isUrl, stringConvert, valueType } from '../../../utils/typeUtils.js'
+  import {
+    isObjectOrArray,
+    isUrl,
+    stringConvert,
+    valueType
+  } from '../../../utils/typeUtils.js'
   import BooleanToggle from './BooleanToggle.svelte'
 
   export let path
@@ -23,6 +28,7 @@
   export let onPatch
   export let selection
   export let onSelect
+  export let onPasteJson
   export let searchResult
 
   onDestroy(() => {
@@ -146,6 +152,22 @@
       onSelect({ type: SELECTION_TYPE.VALUE, path, nextInside: true })
     }
   }
+
+  function handleValuePaste (event) {
+    try {
+      const clipboardText = event.clipboardData.getData('text/plain')
+      const pastedJson = JSON.parse(clipboardText)
+      if (isObjectOrArray(pastedJson)) {
+        onPasteJson({
+          path,
+          contents: pastedJson
+        })
+      }
+    } catch (err) {
+      // silently ignore: thee pasted text is no valid JSON object or array,
+      // no need to do anything
+    }
+  }
 </script>
 
 {#if (!editValue && (value === true || value === false))}
@@ -165,6 +187,7 @@
   on:click={handleValueClick}
   on:dblclick={handleValueDoubleClick}
   on:keydown={handleValueKeyDown}
+  on:paste={handleValuePaste}
   bind:this={domValue}
   title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : null}
 ></div>

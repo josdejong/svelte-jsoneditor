@@ -49,6 +49,7 @@
   export let onInsert
   export let onExpand
   export let onSelect
+  export let onPasteJson
   export let onContextMenu
   export let onClassName
 
@@ -352,6 +353,7 @@
               onInsert={onInsert}
               onExpand={onExpand}
               onSelect={onSelect}
+              onPasteJson={onPasteJson}
               onExpandSection={onExpandSection}
               onContextMenu={onContextMenu}
               onClassName={onClassName}
@@ -466,6 +468,7 @@
             onInsert={onInsert}
             onExpand={onExpand}
             onSelect={onSelect}
+            onPasteJson={onPasteJson}
             onExpandSection={onExpandSection}
             onContextMenu={onContextMenu}
             onClassName={onClassName}
@@ -515,6 +518,7 @@
           onPatch={onPatch}
           selection={selection}
           onSelect={onSelect}
+          onPasteJson={onPasteJson}
           searchResult={searchResult}
         />
         {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}

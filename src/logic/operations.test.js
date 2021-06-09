@@ -78,7 +78,6 @@ describe('operations', () => {
       { key: 'New item 1', value: 2 },
       { key: 'New item 2', value: 3 }
     ])
-    // FIXME: the following doesn't yet work
     assert.deepStrictEqual(clipboardToValues('{"id":1},{"id":2},{"id":3}'), [
       { key: 'New item 0', value: { id: 1 } },
       { key: 'New item 1', value: { id: 2 } },
