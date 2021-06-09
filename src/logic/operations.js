@@ -491,14 +491,18 @@ function moveDown (parentPath, key) {
  * @returns {Array.<{key: string, value: *}>}
  */
 export function clipboardToValues (clipboardText) {
-  // clipboardOriginal must not fix partial JSON, we need clipboardOriginal
-  // mostly to determine whether the original JSON was an object/array or not
+  const textIsObject = /^\s*{/.test(clipboardText)
+  const textIsArray = /^\s*\[/.test(clipboardText)
+
   const clipboardOriginal = parseAndRepairOrUndefined(clipboardText)
   const clipboardRepaired = clipboardOriginal !== undefined
-    ? clipboardOriginal // just performance optimization
+    ? clipboardOriginal
     : parsePartialJson(clipboardText, parseAndRepair)
 
-  if (isObjectOrArray(clipboardOriginal)) {
+  if (
+    (textIsObject && isObject(clipboardRepaired)) ||
+    (textIsArray && Array.isArray(clipboardRepaired))
+  ) {
     return [{ key: 'New item', value: clipboardRepaired }]
   }
 
