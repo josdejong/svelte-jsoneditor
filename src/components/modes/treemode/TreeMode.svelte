@@ -208,10 +208,10 @@
     setTimeout(() => {
       debug('searching...', searchText)
 
-      console.time('search')
+      // console.time('search') // TODO: cleanup
       const flatResults = search(searchText, json, state)
       searchResult = updateSearchResult(json, flatResults, searchResult)
-      console.timeEnd('search')
+      // console.timeEnd('search') // TODO: cleanup
 
       searching = false
     })
