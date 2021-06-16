@@ -44,7 +44,7 @@
 <div class="menu-dropdown" title={title} on:click={handleClick}>
   <slot name="defaultItem"></slot>
 
-  <button class="open-dropdown" on:click={toggleShow}>
+  <button type="button" class="open-dropdown" on:click={toggleShow}>
     <Icon data={faCaretDown} />
   </button>
 
@@ -53,6 +53,7 @@
       {#each items as item}
         <li>
           <button
+            type="button"
             on:click={() => item.onClick()}
             title={item.title}
             disabled={item.disabled}

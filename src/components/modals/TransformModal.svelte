@@ -147,7 +147,7 @@
     />
 
     <div class="label">
-      <button on:click={toggleShowWizard}>
+      <button type="button" on:click={toggleShowWizard}>
         <Icon data={showWizard ? faCaretDown : faCaretRight} />
         Wizard
       </button>
@@ -184,6 +184,7 @@
 
     <div class="actions">
       <button
+        type="button"
         class="primary"
         on:click={handleTransform}
         use:focus

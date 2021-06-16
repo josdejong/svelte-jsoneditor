@@ -58,6 +58,7 @@
               <td class="validation-error-action">
                 {#if index === 0 && validationErrorsList.length > 1}
                   <button
+                    type="button"
                     class="validation-errors-collapse"
                     on:click|stopPropagation={collapse}
                     title="Collapse validation errors"

@@ -41,7 +41,7 @@
   <div>
     <div class="text">Items {startIndex}-{endIndex}</div
     >{#each expandItemsSections as expandItemsSection
-    }<button class="expand-items" on:click={() => onExpandSection(path, expandItemsSection)}>
+    }<button type="button" class="expand-items" on:click={() => onExpandSection(path, expandItemsSection)}>
         show {expandItemsSection.start}-{expandItemsSection.end}
       </button>
     {/each}
