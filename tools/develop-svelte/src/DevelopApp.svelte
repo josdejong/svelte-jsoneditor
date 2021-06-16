@@ -1,5 +1,6 @@
 <script>
-	import { JSONEditor, createAjvValidator } from 'svelte-jsoneditor'
+	import { createAjvValidator, JSONEditor } from 'svelte-jsoneditor'
+	import { useLocalStorage } from './utils.js'
 
 	let json = {
 		"array": [1, 2, [3,4,5]],
@@ -47,22 +48,27 @@
 
 	let text = undefined
 
-	let showTreeEditor = true
-	let showCodeEditor = true
+	const showTreeEditor = useLocalStorage('svelte-jsoneditor-demo-showTreeEditor', true)
+	const showCodeEditor = useLocalStorage('svelte-jsoneditor-demo-showCodeEditor', true)
+	const showRawContents = useLocalStorage('svelte-jsoneditor-demo-showRawContents', true)
 	let indentation = 2
 	let height = '400px'
-	let validate = false
+	const validate = useLocalStorage('svelte-jsoneditor-demo-validate', true)
 
 	function onRenderMenu(mode, items) {
 		console.log('onRenderMenu', mode, items)
 	}
 
 	function onChangeTree({ json, text }) {
-		console.log('onChangeTree', { json, text })
+		if ($showRawContents) {
+			console.log('onChangeTree', { json, text })
+		}
 	}
 
 	function onChangeCode({ json, text }) {
-		console.log('onChangeCode', { json, text })
+		if ($showRawContents) {
+			console.log('onChangeCode', { json, text })
+		}
 	}
 
 	function onChangeMode(mode) {
@@ -80,7 +86,7 @@
 			Height: <input type="text" bind:value={height} />
 		</label>
 		<label>
-			<input type="checkbox" bind:checked={validate} /> Validate
+			<input type="checkbox" bind:checked={$validate} /> Validate
 		</label>
 	</p>
 	<p>
@@ -120,21 +126,47 @@
 		}}>
 			Set unrepairable text
 		</button>
+		<input
+			type="file"
+			on:change={(event) => {
+				console.log('loadFile', event.target.files)
+				console.time('load file')
+
+				const reader = new window.FileReader()
+				const file = event.target.files[0]
+				reader.onload = function (event) {
+					console.timeEnd('load file')
+
+					console.time('set JSON')
+					text = event.target.result
+					json = undefined
+					console.timeEnd('set JSON')
+				}
+				reader.readAsText(file)
+			}}
+		/>
 	</p>
+
+	<p>
+		<label>
+			<input type="checkbox" bind:checked={$showRawContents} /> Show raw contents (at the bottom)
+		</label>
+	</p>
+
 	<div class="columns">
 		<div class="left">
 			<p>
 				<label>
-					<input type="checkbox" bind:checked={showTreeEditor} /> Show tree editor
+					<input type="checkbox" bind:checked={$showTreeEditor} /> Show tree editor
 				</label>
 			</p>
 			<div class="editor" style="height: {height}">
-				{#if showTreeEditor}
+				{#if $showTreeEditor}
 					<JSONEditor
 						bind:text
 						bind:json
 						indentation={indentation}
-						validator={validate ? validator : undefined}
+						validator={$validate ? validator : undefined}
 						onRenderMenu={onRenderMenu}
 						onChange={onChangeTree}
 						onChangeMode={onChangeMode}
@@ -142,44 +174,49 @@
 				{/if}
 			</div>
 
-			<div class="data">
-				json contents:
-				<pre>
+			{#if $showRawContents}
+				<div class="data">
+					json contents:
+					<pre>
 					<code>
 					{json !== undefined ? JSON.stringify(json, null, 2) : 'undefined'}
 					</code>
 				</pre>
-			</div>
+				</div>
+			{/if}
 		</div>
 		<div class="right">
 			<p>
 				<label>
-					<input type="checkbox" bind:checked={showCodeEditor} /> Show code editor
+					<input type="checkbox" bind:checked={$showCodeEditor} /> Show code editor
 				</label>
 			</p>
 
 			<div class="code-editor" style="height: {height}">
-				{#if showCodeEditor}
+				{#if $showCodeEditor}
 					<JSONEditor
 						mode="code"
 						bind:text
 						bind:json
 						indentation={indentation}
-						validator={validate ? validator : undefined}
+						validator={$validate ? validator : undefined}
 						onRenderMenu={onRenderMenu}
 						onChange={onChangeCode}
 						onChangeMode={onChangeMode}
 					/>
 				{/if}
 			</div>
-			<div class="data">
-				text contents:
-				<pre>
-					<code>
-					{text}
-					</code>
-				</pre>
-			</div>
+
+			{#if $showRawContents}
+				<div class="data">
+					text contents:
+					<pre>
+						<code>
+						{text}
+						</code>
+					</pre>
+				</div>
+			{/if}
 		</div>
 	</div>
 </main>
