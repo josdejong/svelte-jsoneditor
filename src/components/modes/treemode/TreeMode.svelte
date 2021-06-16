@@ -713,13 +713,12 @@
 
     const newValue = createNewValue(json, selection, type)
 
-    // TODO: remove this special case (json !== undefined)
     if (json !== undefined) {
       const data = JSON.stringify(newValue)
       const operations = insert(json, state, selection, data)
       debug('handleInsert', { type, operations, newValue, data })
 
-      // TODO: pass newSelection here, and an expand function called during patch (currently, redo is not correctly restoring selection)
+      // FIXME: pass newSelection here, and an expand function called during patch (currently, redo is not correctly restoring selection)
       handlePatch(operations)
 
       operations
@@ -756,6 +755,7 @@
           }
         })
     } else {
+      // document is empty or invalid (in that case it has text but no json)
       debug('handleInsert', { type, newValue })
 
       handleChangeJson(newValue)
