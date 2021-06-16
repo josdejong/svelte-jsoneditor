@@ -16,7 +16,7 @@ export const VALIDATION_ERROR = Symbol('validation:error')
 
 export const SCROLL_DURATION = 300 // ms
 export const DEBOUNCE_DELAY = 300
-export const SEARCH_PROGRESS_THROTTLE = 300 // ms
+export const SEARCH_UPDATE_THROTTLE = 300 // ms
 export const CHECK_VALID_JSON_DELAY = 300 // ms
 export const MAX_SEARCH_RESULTS = 1000
 export const ARRAY_SECTION_SIZE = 100

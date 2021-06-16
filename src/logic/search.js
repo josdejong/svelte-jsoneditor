@@ -7,7 +7,6 @@ import {
   STATE_SEARCH_VALUE
 } from '../constants.js'
 import { existsIn, getIn, setIn } from 'immutable-json-patch'
-import { valueType } from '../utils/typeUtils.js'
 
 /**
  * @typedef {Object} SearchResult
@@ -121,8 +120,6 @@ export function searchAsync (searchText, json, state, { onProgress, onDone, maxR
   // TODO: what is a good value for yieldAfterItemCount? (larger means faster results but also less responsive during search)
   const search = searchGenerator(searchText, json, state, yieldAfterItemCount)
 
-  // TODO: implement pause after having found x results (like 999)?
-
   let cancelled = false
   const results = []
   let newResults = false
@@ -187,43 +184,93 @@ export function * searchGenerator (searchText, json, state = undefined, yieldAft
     }
   }
 
-  function * searchRecursiveAsync (searchText, json, state, path) {
-    const type = valueType(json)
-
-    if (type === 'array') {
+  function * searchRecursiveAsync (searchTextLowerCase, json, state, path) {
+    if (Array.isArray(json)) {
       for (let i = 0; i < json.length; i++) {
-        yield * searchRecursiveAsync(searchText, json[i], state ? state[i] : undefined, path.concat([i]))
+        yield * searchRecursiveAsync(searchTextLowerCase, json[i], state ? state[i] : undefined, path.concat([i]))
       }
-    } else if (type === 'object') {
+    } else if (json !== null && typeof json === 'object') {
       const keys = state
         ? state[STATE_KEYS]
         : Object.keys(json)
 
       for (const key of keys) {
-        if (typeof key === 'string' && containsCaseInsensitive(key, searchText)) {
+        if (typeof key === 'string' && containsCaseInsensitive(key, searchTextLowerCase)) {
           yield path.concat([key, STATE_SEARCH_PROPERTY])
         }
         yield * incrementCounter()
 
-        yield * searchRecursiveAsync(searchText, json[key], state ? state[key] : undefined, path.concat([key]))
+        yield * searchRecursiveAsync(searchTextLowerCase, json[key], state ? state[key] : undefined, path.concat([key]))
       }
     } else { // type is a value
-      if (containsCaseInsensitive(json, searchText)) {
+      if (containsCaseInsensitive(json, searchTextLowerCase)) {
         yield path.concat([STATE_SEARCH_VALUE])
       }
       yield * incrementCounter()
     }
   }
 
-  return yield * searchRecursiveAsync(searchText, json, state, [])
+  const searchTextLowerCase = searchText.toLowerCase()
+
+  return yield * searchRecursiveAsync(searchTextLowerCase, json, state, [])
+}
+
+// TODO: comment
+export function search (searchText, json, state) {
+  const results = []
+  const path = [] // we reuse the same Array recursively, this is *much* faster than creating a new path every time
+
+  function searchRecursive (searchTextLowerCase, json, state) {
+    if (Array.isArray(json)) {
+      const level = path.length
+      path.push(0)
+
+      for (let i = 0; i < json.length; i++) {
+        path[level] = i
+        searchRecursive(searchTextLowerCase, json[i], state ? state[i] : undefined)
+      }
+
+      path.pop()
+    } else if (json !== null && typeof json === 'object') {
+      const level = path.length
+      path.push(0)
+
+      const keys = state
+        ? state[STATE_KEYS]
+        : Object.keys(json)
+
+      for (const key of keys) {
+        path[level] = key
+
+        if (containsCaseInsensitive(key, searchTextLowerCase)) {
+          results.push(path.concat([STATE_SEARCH_PROPERTY]))
+        }
+
+        searchRecursive(searchTextLowerCase, json[key], state ? state[key] : undefined)
+      }
+
+      path.pop()
+    } else { // type is a value
+      if (containsCaseInsensitive(json, searchTextLowerCase)) {
+        results.push(path.concat([STATE_SEARCH_VALUE]))
+      }
+    }
+  }
+
+  if (typeof searchText === 'string' && searchText !== '') {
+    const searchTextLowerCase = searchText.toLowerCase()
+    searchRecursive(searchTextLowerCase, json, state, [])
+  }
+
+  return results
 }
 
 /**
  * Do a case insensitive search for a search text in a text
  * @param {String} text
- * @param {String} searchText
+ * @param {String} searchTextLowerCase
  * @return {boolean} Returns true if `search` is found in `text`
  */
-export function containsCaseInsensitive (text, searchText) {
-  return String(text).toLowerCase().indexOf(searchText.toLowerCase()) !== -1
+export function containsCaseInsensitive (text, searchTextLowerCase) {
+  return String(text).toLowerCase().indexOf(searchTextLowerCase) !== -1
 }

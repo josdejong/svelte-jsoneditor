@@ -25,9 +25,8 @@
   import {
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
-    MAX_SEARCH_RESULTS,
     SCROLL_DURATION,
-    SEARCH_PROGRESS_THROTTLE,
+    SEARCH_UPDATE_THROTTLE,
     SIMPLE_MODAL_OPTIONS,
     SORT_MODAL_OPTIONS,
     STATE_EXPANDED,
@@ -49,7 +48,7 @@
     insert
   } from '../../../logic/operations.js'
   import {
-    searchAsync,
+    search,
     searchNext,
     searchPrevious,
     updateSearchResult
@@ -171,19 +170,6 @@
   let searching = false
   let searchText = ''
   let searchResult
-  let searchHandler
-
-  function handleSearchProgress (results) {
-    searchResult = updateSearchResult(json, results, searchResult)
-  }
-
-  const handleSearchProgressDebounced = throttle(handleSearchProgress, SEARCH_PROGRESS_THROTTLE)
-
-  function handleSearchDone (results) {
-    searchResult = updateSearchResult(json, results, searchResult)
-    searching = false
-    // debug('finished search')
-  }
 
   async function handleSearchText (text) {
     searchText = text
@@ -210,22 +196,31 @@
     }
   }
 
-  $: {
-    // cancel previous search when still running
-    if (searchHandler && searchHandler.cancel) {
-      // debug('cancel previous search')
-      searchHandler.cancel()
+  function applySearch () {
+    if (searchText === '') {
+      searchResult = undefined
+      return
     }
 
-    // debug('start search', searchText)
     searching = true
 
-    searchHandler = searchAsync(searchText, json, state, {
-      onProgress: handleSearchProgressDebounced,
-      onDone: handleSearchDone,
-      maxResults: MAX_SEARCH_RESULTS
+    // setTimeout is to wait until the search icon has been rendered
+    setTimeout(() => {
+      debug('searching...', searchText)
+
+      console.time('search')
+      const flatResults = search(searchText, json, state)
+      searchResult = updateSearchResult(json, flatResults, searchResult)
+      console.timeEnd('search')
+
+      searching = false
     })
   }
+
+  const applySearchThrottled = throttle(applySearch, SEARCH_UPDATE_THROTTLE)
+
+  // we pass non-used arguments searchText and json to trigger search when these variables change
+  $: applySearchThrottled(searchText, json)
 
   /**
    * @param {ValidationError} error
@@ -471,9 +466,9 @@
   }
 
   // TODO: cleanup logging
-  $: debug('json', json)
-  $: debug('state', state)
-  $: debug('selection', selection)
+  // $: debug('json', json)
+  // $: debug('state', state)
+  // $: debug('selection', selection)
 
   function hasSelectionContents () {
     return selection && (
