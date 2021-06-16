@@ -27,6 +27,7 @@
 </script>
 
 <button
+  type="button"
   class="context-menu-button"
   class:selected={selected}
   title={CONTEXT_MENU_EXPLANATION}

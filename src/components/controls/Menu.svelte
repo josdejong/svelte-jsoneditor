@@ -19,6 +19,7 @@
         title={item.title}
       >
         <button
+          type="button"
           class="button {item.className}"
           slot="defaultItem"
           on:click={item.onClick}
@@ -29,6 +30,7 @@
       </DropdownMenu>
     {:else}
       <button
+        type="button"
         class="button {item.className}"
         on:click={item.onClick}
         title={item.title}

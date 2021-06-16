@@ -138,6 +138,7 @@
 
     <div class="actions">
       <button
+        type="button"
         class="primary"
         on:click={handleSort}
         use:focus

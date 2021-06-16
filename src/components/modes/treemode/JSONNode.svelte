@@ -278,6 +278,7 @@
     <div class='header-outer' style={indentationStyle} >
       <div class='header'>
         <button
+          type="button"
           class='expand'
           on:click={toggleExpand}
           title='Expand or collapse this array (Ctrl+Click to expand/collapse recursively)'
@@ -300,7 +301,9 @@
               </div>
             {:else}
               <div class="bracket">[</div>
-              <button class="tag" on:click={handleExpand}>{value.length} items</button>
+              <button type="button" class="tag" on:click={handleExpand}>
+                {value.length} items
+              </button>
               <div class="bracket">]</div>
             {/if}
           </div>
@@ -392,6 +395,7 @@
     <div class='header-outer' style={indentationStyle} >
       <div class="header">
         <button
+          type="button"
           class='expand'
           on:click={toggleExpand}
           title='Expand or collapse this object (Ctrl+Click to expand/collapse recursively)'
@@ -414,7 +418,9 @@
               </div>
             {:else}
               <div class="bracket"> &lbrace;</div>
-              <button class="tag" on:click={handleExpand}>{Object.keys(value).length} props</button>
+              <button type="button" class="tag" on:click={handleExpand}>
+                {Object.keys(value).length} props
+              </button>
               <div class="bracket">&rbrace;</div>
             {/if}
           </div>

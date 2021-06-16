@@ -13,6 +13,7 @@
 
 <Sveltip dark text={message} top >
   <button
+    type="button"
     class='validation-error'
     on:click={onExpand}
   >

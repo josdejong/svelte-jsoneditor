@@ -67,7 +67,7 @@
 
 <div class="search-box">
   <form class="search-form" on:submit={handleSubmit} on:keydown={handleKeyDown}>
-    <button class="search-icon">
+    <button type="button" class="search-icon">
       {#if searching}
         <Icon data={faCircleNotch} spin />
       {:else}
@@ -86,13 +86,13 @@
     <div class="search-count" class:visible={text !== ''}>
       {activeIndex !== -1 ? `${activeIndex + 1}/` : ''}{formattedResultCount}
     </div>
-    <button class="search-next" on:click={onNext} type="button">
+    <button type="button" class="search-next" on:click={onNext}>
       <Icon data={faChevronDown} />
     </button>
-    <button class="search-previous" on:click={onPrevious} type="button">
+    <button type="button" class="search-previous" on:click={onPrevious}>
       <Icon data={faChevronUp} />
     </button>
-    <button class="search-clear" on:click={onClose} type="button">
+    <button type="button" class="search-clear" on:click={onClose}>
       <Icon data={faTimes} />
     </button>
   </form>

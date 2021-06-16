@@ -17,6 +17,7 @@
   <div class="actions">
     {#each actions as action}
       <button
+        type="button"
         on:click={action.onClick}
         class="button action primary"
         title={action.title}

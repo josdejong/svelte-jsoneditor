@@ -223,6 +223,7 @@
 >
   <div class="row">
     <button
+      type="button"
       title="Edit the key (Double-click on the key)"
       data-name="edit-key"
       data-down="cut,copy,paste"
@@ -233,6 +234,7 @@
       <Icon data={faPen} /> Edit key
     </button>
     <button
+      type="button"
       title="Edit the value (Double-click on the value)"
       data-name="edit-value"
       data-down="paste,copy,cut"
@@ -246,6 +248,7 @@
   <div class="separator"></div>
   <div class="row">
     <button
+      type="button"
       title="Cut selected contents (Ctrl+X)"
       data-name="cut"
       data-up="edit-key,edit-value"
@@ -256,6 +259,7 @@
       <Icon data={faCut} /> Cut
     </button>
     <button
+      type="button"
       title="Copy selected contents (Ctrl+C)"
       data-name="copy"
       data-up="edit-key,edit-value"
@@ -268,6 +272,7 @@
       <Icon data={faCopy} /> Copy
     </button>
     <button
+      type="button"
       title="Paste clipboard contents (Ctrl+V)"
       data-name="paste"
       data-up="edit-value,edit-key"
@@ -283,6 +288,7 @@
   <div class="row">
     <div class="column">
       <button
+        type="button"
         title="Remove selected contents (Delete)"
         data-name="remove"
         data-up="cut,copy,paste"
@@ -294,6 +300,7 @@
         <Icon data={faTimes} /> Remove
       </button>
       <button
+        type="button"
         title="Duplicate selected contents (Ctrl+D)"
         data-name="duplicate"
         data-up="remove"
@@ -305,6 +312,7 @@
         <Icon data={faClone} /> Duplicate
       </button>
       <button
+        type="button"
         title="Extract selected contents"
         data-name="extract"
         data-up="duplicate"
@@ -316,6 +324,7 @@
         <Icon data={faCropAlt} /> Extract
       </button>
       <button
+        type="button"
         title="Sort array or object contents"
         data-name="sort"
         data-up="extract"
@@ -327,6 +336,7 @@
         <Icon data={faSortAmountDownAlt} /> Sort
       </button>
       <button
+        type="button"
         title="Transform array or object contents (filter, sort, project)"
         data-name="transform"
         data-up="sort"
@@ -343,6 +353,7 @@
         {insertText}:
       </div>
       <button
+        type="button"
         on:click={() => handleInsert('structure')}
         title="{insertText} structure"
         data-name="insert-structure"
@@ -354,6 +365,7 @@
         <span class="insert"><span class="plus">{'+'}</span></span> Structure
       </button>
       <button
+        type="button"
         on:click={() => handleInsert('object')}
         title="{insertText} object"
         data-name="insert-object"
@@ -365,6 +377,7 @@
         <span class="insert">{'{}'}</span> Object
       </button>
       <button
+        type="button"
         on:click={() => handleInsert('array')}
         title="{insertText} array"
         data-name="insert-array"
@@ -376,6 +389,7 @@
         <span class="insert">[]</span> Array
       </button>
       <button
+        type="button"
         on:click={() => handleInsert('value')}
         title="{insertText} value"
         data-name="insert-value"
@@ -391,6 +405,7 @@
   <div class="separator"></div>
   <div class="row">
     <button
+      type="button"
       title="Select area before current entry to insert or paste contents"
       data-name="insert-before"
       data-up="transform"
@@ -401,6 +416,7 @@
       <Icon data={faCaretSquareUp} /> Insert before
     </button>
     <button
+      type="button"
       title="Select area after current entry to insert or paste contents"
       data-name="insert-after"
       data-up="insert-value"
