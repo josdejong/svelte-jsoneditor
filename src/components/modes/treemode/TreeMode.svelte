@@ -713,11 +713,13 @@
 
     const newValue = createNewValue(json, selection, type)
 
+    // TODO: remove this special case (json !== undefined)
     if (json !== undefined) {
       const data = JSON.stringify(newValue)
       const operations = insert(json, state, selection, data)
       debug('handleInsert', { type, operations, newValue, data })
 
+      // TODO: pass newSelection here, and an expand function called during patch (currently, redo is not correctly restoring selection)
       handlePatch(operations)
 
       operations
@@ -727,7 +729,13 @@
 
           if (isObjectOrArray(newValue)) {
             // expand newly inserted object/array
-            handleExpand(path, true, true)
+            handleExpand(path, true)
+
+            selection = createSelection(json || {}, state, {
+              type: SELECTION_TYPE.INSIDE,
+              path
+            })
+
             focus() // TODO: find a more robust way to keep focus than sprinkling focusHiddenInput() everywhere
           }
 
@@ -751,6 +759,16 @@
       debug('handleInsert', { type, newValue })
 
       handleChangeJson(newValue)
+
+      const path = []
+      handleExpand(path, true)
+
+      selection = createSelection(json, state, {
+        type: SELECTION_TYPE.INSIDE,
+        path
+      })
+
+      focus() // TODO: find a more robust way to keep focus than sprinkling focusHiddenInput() everywhere
     }
   }
 
