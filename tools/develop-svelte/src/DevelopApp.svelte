@@ -54,6 +54,8 @@
 	let indentation = 2
 	let height = '400px'
 	const validate = useLocalStorage('svelte-jsoneditor-demo-validate', true)
+	const readOnly = useLocalStorage('svelte-jsoneditor-demo-readOnly', false)
+	const mainMenuBar = useLocalStorage('svelte-jsoneditor-demo-mainMenuBar', true)
 
 	function onRenderMenu(mode, items) {
 		console.log('onRenderMenu', mode, items)
@@ -87,6 +89,12 @@
 		</label>
 		<label>
 			<input type="checkbox" bind:checked={$validate} /> Validate
+		</label>
+		<label>
+			<input type="checkbox" bind:checked={$mainMenuBar} /> Menu bar
+		</label>
+		<label>
+			<input type="checkbox" bind:checked={$readOnly} /> Read-only
 		</label>
 	</p>
 	<p>
@@ -165,6 +173,8 @@
 					<JSONEditor
 						bind:text
 						bind:json
+						mainMenuBar={$mainMenuBar}
+						readOnly={$readOnly}
 						indentation={indentation}
 						validator={$validate ? validator : undefined}
 						onRenderMenu={onRenderMenu}
@@ -198,6 +208,8 @@
 						mode="code"
 						bind:text
 						bind:json
+						mainMenuBar={$mainMenuBar}
+						readOnly={$readOnly}
 						indentation={indentation}
 						validator={$validate ? validator : undefined}
 						onRenderMenu={onRenderMenu}
