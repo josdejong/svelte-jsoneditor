@@ -254,15 +254,18 @@
       title: `Toggle code mode on/off (currently: ${isCodeMode ? 'on' : 'off'})`,
       className: 'code-mode' + (isCodeMode ? ' selected' : ''),
       onClick: toggleCodeMode
-    },
-    {
-      separator: true
     }
   ]
 
+  const separatorMenuItem = {
+    separator: true
+  }
+
   function handleCreateMenu (mode, items) {
     const updatedItems = (mode === MODE.TREE || mode === MODE.CODE)
-      ? modeMenuItems.concat(items)
+      ? (items[0].space === true)
+          ? modeMenuItems.concat(items) // menu is empty, readOnly mode
+          : modeMenuItems.concat([separatorMenuItem], items)
       : items
 
     return onRenderMenu(mode, updatedItems) || updatedItems

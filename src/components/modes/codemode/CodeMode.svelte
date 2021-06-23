@@ -66,6 +66,7 @@
 
   $: setAceEditorValue(text)
   $: updateIndentation(indentation)
+  $: updateReadOnly(readOnly)
 
   onMount(() => {
     aceEditor = createAceEditor({
@@ -417,6 +418,12 @@
   function updateIndentation (indentation) {
     if (aceEditor) {
       aceEditor.getSession().setTabSize(indentation)
+    }
+  }
+
+  function updateReadOnly (readOnly) {
+    if (aceEditor) {
+      aceEditor.setOptions({ readOnly })
     }
   }
 

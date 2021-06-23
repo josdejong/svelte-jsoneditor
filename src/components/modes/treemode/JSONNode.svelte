@@ -308,7 +308,7 @@
             {/if}
           </div>
         </div>
-        {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
+        {#if !readOnly && selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={onContextMenu} />
           </div>
@@ -333,16 +333,18 @@
     </div>
     {#if expanded}
       <div class="items">
-        <div
-          class="insert-area inside"
-          class:hovered={hover === HOVER_INSERT_INSIDE}
-          class:selected={selectedInside}
-          data-type="insert-selection-area-inside"
-          style={getIndentationStyle(path.length + 1)}
-          title={INSERT_EXPLANATION}
-        >
-          <ContextMenuButton selected={selectedInside} onContextMenu={handleInsertInsideOpenContextMenu} />
-        </div>
+        {#if !readOnly}
+          <div
+            class="insert-area inside"
+            class:hovered={hover === HOVER_INSERT_INSIDE}
+            class:selected={selectedInside}
+            data-type="insert-selection-area-inside"
+            style={getIndentationStyle(path.length + 1)}
+            title={INSERT_EXPLANATION}
+          >
+            <ContextMenuButton selected={selectedInside} onContextMenu={handleInsertInsideOpenContextMenu} />
+          </div>
+        {/if}
         {#each visibleSections as visibleSection, sectionIndex (sectionIndex)}
           {#each value.slice(visibleSection.start, Math.min(visibleSection.end, value.length)) as item, itemIndex (state[visibleSection.start + itemIndex][STATE_ID])}
             <svelte:self
@@ -425,7 +427,7 @@
             {/if}
           </div>
         </div>
-        {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
+        {#if !readOnly && selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={onContextMenu} />
           </div>
@@ -452,16 +454,18 @@
     </div>
     {#if expanded}
       <div class="props">
-        <div
-          class="insert-area inside"
-          class:hovered={hover === HOVER_INSERT_INSIDE}
-          class:selected={selectedInside}
-          data-type="insert-selection-area-inside"
-          style={getIndentationStyle(path.length + 1)}
-          title={INSERT_EXPLANATION}
-        >
-          <ContextMenuButton selected={selectedInside} onContextMenu={handleInsertInsideOpenContextMenu} />
-        </div>
+        {#if !readOnly}
+          <div
+            class="insert-area inside"
+            class:hovered={hover === HOVER_INSERT_INSIDE}
+            class:selected={selectedInside}
+            data-type="insert-selection-area-inside"
+            style={getIndentationStyle(path.length + 1)}
+            title={INSERT_EXPLANATION}
+          >
+            <ContextMenuButton selected={selectedInside} onContextMenu={handleInsertInsideOpenContextMenu} />
+          </div>
+        {/if}
         {#each keys as key (state[key][STATE_ID])}
           <svelte:self
             value={value[key]}
@@ -490,7 +494,7 @@
                 onSelect={onSelect}
                 searchResult={searchResult ? searchResult[key] : undefined}
               />
-              {#if selection && selection.type === SELECTION_TYPE.KEY && !selection.edit && isEqual(selection.focusPath, path.concat(key))}
+              {#if !readOnly && selection && selection.type === SELECTION_TYPE.KEY && !selection.edit && isEqual(selection.focusPath, path.concat(key))}
                 <ContextMenuButton selected={true} onContextMenu={onContextMenu} />
               {/if}
             </div
@@ -527,7 +531,7 @@
           onPasteJson={onPasteJson}
           searchResult={searchResult}
         />
-        {#if selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
+        {#if !readOnly && selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={onContextMenu} />
           </div>
@@ -545,16 +549,18 @@
       {/if}
     </div>
   {/if}
-  <div
-    class="insert-area after"
-    class:hovered={hover === HOVER_INSERT_AFTER}
-    class:selected={selectedAfter}
-    data-type="insert-selection-area-after"
-    style={indentationStyle}
-    title={INSERT_EXPLANATION}
-  >
-    <ContextMenuButton selected={selectedAfter} onContextMenu={handleInsertAfterOpenContextMenu} />
-  </div>
+  {#if !readOnly}
+    <div
+      class="insert-area after"
+      class:hovered={hover === HOVER_INSERT_AFTER}
+      class:selected={selectedAfter}
+      data-type="insert-selection-area-after"
+      style={indentationStyle}
+      title={INSERT_EXPLANATION}
+    >
+      <ContextMenuButton selected={selectedAfter} onContextMenu={handleInsertAfterOpenContextMenu} />
+    </div>
+  {/if}
 </div>
 
 <style src="./JSONNode.scss"></style>

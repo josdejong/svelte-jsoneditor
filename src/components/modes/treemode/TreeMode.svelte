@@ -1303,10 +1303,9 @@
         : getInitialSelection(json, state)
     }
 
-    if (combo === 'Enter' && selection && !readOnly) {
-      // when the selection consists of one Array item, change selection to editing its value
-      // TODO: this is a bit hacky
-      if (selection.type === SELECTION_TYPE.MULTI && selection.paths.length === 1) {
+    if (combo === 'Enter' && selection) {
+      // when the selection consists of a single Array item, change selection to editing its value
+      if (!readOnly && selection.type === SELECTION_TYPE.MULTI && selection.paths.length === 1) {
         const path = selection.focusPath
         const parent = getIn(json, initial(path))
         if (Array.isArray(parent)) {
@@ -1318,7 +1317,7 @@
         }
       }
 
-      if (selection.type === SELECTION_TYPE.KEY) {
+      if (!readOnly && selection.type === SELECTION_TYPE.KEY) {
         // go to key edit mode
         event.preventDefault()
         selection = {
@@ -1335,10 +1334,12 @@
           // expand object/array
           handleExpand(selection.focusPath, true)
         } else {
-          // go to value edit mode
-          selection = {
-            ...selection,
-            edit: true
+          if (!readOnly) {
+            // go to value edit mode
+            selection = {
+              ...selection,
+              edit: true
+            }
           }
         }
       }
@@ -1470,6 +1471,10 @@
   }
 
   function handleContextMenu (event) {
+    if (readOnly) {
+      return
+    }
+
     if (!selection || selection.edit) {
       return
     }
@@ -1513,6 +1518,10 @@
   }
 
   function handleContextMenuFromTreeMenu (event) {
+    if (readOnly) {
+      return
+    }
+
     openContextMenu({
       anchor: findParentWithNodeName(event.target, 'BUTTON'),
       width: CONTEXT_MENU_WIDTH,
@@ -1565,6 +1574,7 @@
   {#if mainMenuBar}
     <TreeMenu
       json={json}
+      selection={selection}
       readOnly={readOnly}
       historyState={historyState}
       searchText={searchText}
@@ -1579,6 +1589,7 @@
       onSort={handleSortAll}
       onTransform={handleTransformAll}
       onContextMenu={handleContextMenuFromTreeMenu}
+      onCopy={handleCopy}
 
       onSearchText={handleSearchText}
       onNextSearchResult={handleNextSearchResult}
