@@ -195,6 +195,15 @@ describe('documentState', () => {
       { path: ['value'], type: CARET_POSITION.VALUE },
       { path: ['value'], type: CARET_POSITION.AFTER }
     ])
+    assert.deepStrictEqual(getVisibleCaretPositions(json, state0, false), [
+      { path: [], type: CARET_POSITION.VALUE },
+      { path: ['array'], type: CARET_POSITION.KEY },
+      { path: ['array'], type: CARET_POSITION.VALUE },
+      { path: ['object'], type: CARET_POSITION.KEY },
+      { path: ['object'], type: CARET_POSITION.VALUE },
+      { path: ['value'], type: CARET_POSITION.KEY },
+      { path: ['value'], type: CARET_POSITION.VALUE }
+    ])
 
     const state1 = syncState(json, undefined, [], path => path.length <= 1)
     assert.deepStrictEqual(getVisibleCaretPositions(json, state1), [

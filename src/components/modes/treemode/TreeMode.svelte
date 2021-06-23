@@ -1293,13 +1293,13 @@
     if (combo === 'Left' || combo === 'Shift+Left') {
       event.preventDefault()
       selection = selection
-        ? getSelectionLeft(json, state, selection, keepAnchorPath) || selection
+        ? getSelectionLeft(json, state, selection, keepAnchorPath, !readOnly) || selection
         : getInitialSelection(json, state)
     }
     if (combo === 'Right' || combo === 'Shift+Right') {
       event.preventDefault()
       selection = selection
-        ? getSelectionRight(json, state, selection, keepAnchorPath) || selection
+        ? getSelectionRight(json, state, selection, keepAnchorPath, !readOnly) || selection
         : getInitialSelection(json, state)
     }
 

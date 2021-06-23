@@ -344,11 +344,12 @@ export function getSelectionNextInside (json, state, selection) {
  * @param {JSON} json
  * @param {JSON} state
  * @param {Selection} selection
+ * @param {boolean} includeInside
  * @returns {{next: (CaretPosition|null), caret: (CaretPosition|null), previous: (CaretPosition|null)}}
  */
 // TODO: unit test
-export function findCaretAndSiblings (json, state, selection) {
-  const visibleCaretPositions = getVisibleCaretPositions(json, state)
+export function findCaretAndSiblings (json, state, selection, includeInside) {
+  const visibleCaretPositions = getVisibleCaretPositions(json, state, includeInside)
 
   const index = visibleCaretPositions.findIndex(caret => {
     return isEqual(caret.path, selection.focusPath) && caret.type === selection.type
@@ -374,10 +375,17 @@ export function findCaretAndSiblings (json, state, selection) {
  * @param {JSON} state
  * @param {Selection} selection
  * @param {boolean} [keepAnchorPath=false]
+ * @param {boolean} [includeInside=true]
  * @returns {Selection | null}
  */
-export function getSelectionLeft (json, state, selection, keepAnchorPath = false) {
-  const { caret, previous } = findCaretAndSiblings(json, state, selection)
+export function getSelectionLeft (
+  json,
+  state,
+  selection,
+  keepAnchorPath = false,
+  includeInside = true
+) {
+  const { caret, previous } = findCaretAndSiblings(json, state, selection, includeInside)
 
   if (keepAnchorPath) {
     if (selection.type !== SELECTION_TYPE.MULTI) {
@@ -424,10 +432,17 @@ export function getSelectionLeft (json, state, selection, keepAnchorPath = false
  * @param {JSON} state
  * @param {Selection} selection
  * @param {boolean} [keepAnchorPath=false]
+ * @param {boolean} [includeInside=true]
  * @returns {Selection | null}
  */
-export function getSelectionRight (json, state, selection, keepAnchorPath = false) {
-  const { caret, next } = findCaretAndSiblings(json, state, selection)
+export function getSelectionRight (
+  json,
+  state,
+  selection,
+  keepAnchorPath = false,
+  includeInside = true
+) {
+  const { caret, next } = findCaretAndSiblings(json, state, selection, includeInside)
 
   if (keepAnchorPath) {
     if (selection.type !== SELECTION_TYPE.MULTI) {

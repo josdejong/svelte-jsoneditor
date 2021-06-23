@@ -701,32 +701,42 @@ export const CARET_POSITION = {
  * before a node, at a key, at a value, appending an object/arrayc
  * @param {JSON} json
  * @param {JSON} state
+ * @param {boolean} [includeInside=true]
  * @returns {CaretPosition[]}
  */
 // TODO: create memoized version of getVisibleCaretPositions which remembers just the previous result if json and state are the same
-export function getVisibleCaretPositions (json, state) {
+export function getVisibleCaretPositions (json, state, includeInside = true) {
   const paths = []
 
   function _recurse (json, state, path) {
     paths.push({ path, type: CARET_POSITION.VALUE })
 
     if (json && state && state[STATE_EXPANDED] === true) {
-      paths.push({ path, type: CARET_POSITION.INSIDE })
+      if (includeInside) {
+        paths.push({ path, type: CARET_POSITION.INSIDE })
+      }
 
       if (Array.isArray(json)) {
         forEachVisibleIndex(json, state, index => {
           const itemPath = path.concat(index)
 
           _recurse(json[index], state[index], itemPath)
-          paths.push({ path: itemPath, type: CARET_POSITION.AFTER })
+
+          if (includeInside) {
+            paths.push({ path: itemPath, type: CARET_POSITION.AFTER })
+          }
         })
       } else { // Object
         forEachKey(state, key => {
           const propertyPath = path.concat(key)
 
           paths.push({ path: propertyPath, type: CARET_POSITION.KEY })
+
           _recurse(json[key], state[key], propertyPath)
-          paths.push({ path: propertyPath, type: CARET_POSITION.AFTER })
+
+          if (includeInside) {
+            paths.push({ path: propertyPath, type: CARET_POSITION.AFTER })
+          }
         })
       }
     }
