@@ -74,7 +74,7 @@
     if (!isEqual(newQueryOptions, queryOptions)) {
       queryOptions = newQueryOptions
       const query = createQuery(json, queryOptions)
-  
+
       // console.log('query updated', query, queryOptions)
 
       onQuery(query)
@@ -89,17 +89,17 @@
       <div class='horizontal'>
         <Select
           containerClasses='filter-field'
-          items={fieldOptions} 
-          bind:selectedValue={filterField} 
+          items={fieldOptions}
+          bind:value={filterField}
         />
         <Select
           containerClasses='filter-relation'
-          items={filterRelationOptions} 
-          bind:selectedValue={filterRelation} 
+          items={filterRelationOptions}
+          bind:value={filterRelation}
         />
         <input
           class='filter-value'
-          bind:value={filterValue} 
+          bind:value={filterValue}
         />
       </div>
     </td>
@@ -110,13 +110,13 @@
       <div class='horizontal'>
         <Select
           containerClasses='sort-field'
-          items={fieldOptions} 
-          bind:selectedValue={sortField} 
+          items={fieldOptions}
+          bind:value={sortField}
         />
         <Select
           containerClasses='sort-direction'
-          items={sortDirectionOptions} 
-          bind:selectedValue={sortDirection} 
+          items={sortDirectionOptions}
+          bind:value={sortDirection}
         />
       </div>
     </td>
@@ -129,7 +129,7 @@
           containerClasses='pick-fields'
           items={pickFieldOptions}
           isMulti
-          bind:selectedValue={pickFields}
+          bind:value={pickFields}
         />
       </div>
     </td>

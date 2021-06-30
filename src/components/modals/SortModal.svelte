@@ -117,7 +117,7 @@
             <td>
               <Select
                 items={properties}
-                bind:selectedValue={selectedProperty}
+                bind:value={selectedProperty}
               />
             </td>
           </tr>
@@ -128,7 +128,7 @@
             <Select
               items={directions}
               containerClasses='test-class'
-              bind:selectedValue={selectedDirection}
+              bind:value={selectedDirection}
               isClearable={false}
             />
           </td>
