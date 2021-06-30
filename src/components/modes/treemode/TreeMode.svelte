@@ -1253,7 +1253,7 @@
       event.preventDefault()
       handleDuplicate()
     }
-    if (combo === 'Delete') {
+    if (combo === 'Delete' || combo === 'Backspace') {
       event.preventDefault()
       handleRemove()
     }
