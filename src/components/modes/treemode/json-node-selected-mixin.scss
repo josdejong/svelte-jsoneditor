@@ -41,12 +41,14 @@
   &.selected-value :global(.collapsed-items) {
     // TODO: this css is copied from CollapsedItems.scss. Figure out how to reuse this smartly with CSS or SASS
     background-color: $selection-background;
+
+    $shape-color: darken($selection-background, 5%);
     background-image:
-            linear-gradient($theme-color-light, $theme-color-light),
-            linear-gradient(to bottom right, transparent 50.5%, $theme-color-light 50.5%),
-            linear-gradient(to bottom left, transparent 50.5%, $theme-color-light 50.5%),
-            linear-gradient(to top right, transparent 50.5%, $theme-color-light 50.5%),
-            linear-gradient(to top left, transparent 50.5%, $theme-color-light 50.5%);
+            linear-gradient($shape-color, $shape-color),
+            linear-gradient(to bottom right, transparent 50.5%, $shape-color 50.5%),
+            linear-gradient(to bottom left, transparent 50.5%, $shape-color 50.5%),
+            linear-gradient(to top right, transparent 50.5%, $shape-color 50.5%),
+            linear-gradient(to top left, transparent 50.5%, $shape-color 50.5%);
   }
 
   // value selected (part 2)
