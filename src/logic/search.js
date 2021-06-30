@@ -1,3 +1,4 @@
+import { existsIn, getIn, setIn } from 'immutable-json-patch'
 import { initial, isEqual } from 'lodash-es'
 import {
   ACTIVE_SEARCH_RESULT,
@@ -6,8 +7,6 @@ import {
   STATE_SEARCH_PROPERTY,
   STATE_SEARCH_VALUE
 } from '../constants.js'
-import { existsIn, getIn, setIn } from 'immutable-json-patch'
-import { valueType } from '../utils/typeUtils.js'
 
 /**
  * @typedef {Object} SearchResult
@@ -112,118 +111,64 @@ export function searchPrevious (searchResult) {
   }
 }
 
-async function tick () {
-  return new Promise(setTimeout)
-}
-
 // TODO: comment
-export function searchAsync (searchText, json, state, { onProgress, onDone, maxResults = Infinity, yieldAfterItemCount = 10000 }) {
-  // TODO: what is a good value for yieldAfterItemCount? (larger means faster results but also less responsive during search)
-  const search = searchGenerator(searchText, json, state, yieldAfterItemCount)
-
-  // TODO: implement pause after having found x results (like 999)?
-
-  let cancelled = false
+export function search (searchText, json, state) {
   const results = []
-  let newResults = false
+  const path = [] // we reuse the same Array recursively, this is *much* faster than creating a new path every time
 
-  async function executeSearch () {
-    if (!searchText || searchText === '') {
-      onDone(results)
-      return
-    }
+  // TODO: implement maxResults
 
-    let next
-    do {
-      next = search.next()
-      if (next.value) {
-        if (results.length < maxResults) {
-          results.push(next.value) // TODO: make this immutable?
-          newResults = true
-        } else {
-          // max results limit reached
-          cancelled = true
-          onDone(results)
-        }
-      } else {
-        // time for a small break, give the browser space to do stuff
-        if (newResults) {
-          newResults = false
-          if (onProgress) {
-            onProgress(results)
-          }
-        }
+  function searchRecursive (searchTextLowerCase, json, state) {
+    if (Array.isArray(json)) {
+      const level = path.length
+      path.push(0)
 
-        await tick()
-      }
-
-      // eslint-disable-next-line no-unmodified-loop-condition
-    } while (!cancelled && !next.done)
-
-    if (next.done) {
-      onDone(results)
-    } // else: cancelled
-  }
-
-  // start searching on the next tick
-  setTimeout(executeSearch)
-
-  return {
-    cancel: () => {
-      cancelled = true
-    }
-  }
-}
-
-// TODO: comment
-export function * searchGenerator (searchText, json, state = undefined, yieldAfterItemCount = undefined) {
-  let count = 0
-
-  function * incrementCounter () {
-    count++
-    if (typeof yieldAfterItemCount === 'number' && count % yieldAfterItemCount === 0) {
-      // pause every x items
-      yield null
-    }
-  }
-
-  function * searchRecursiveAsync (searchText, json, state, path) {
-    const type = valueType(json)
-
-    if (type === 'array') {
       for (let i = 0; i < json.length; i++) {
-        yield * searchRecursiveAsync(searchText, json[i], state ? state[i] : undefined, path.concat([i]))
+        path[level] = i
+        searchRecursive(searchTextLowerCase, json[i], state ? state[i] : undefined)
       }
-    } else if (type === 'object') {
+
+      path.pop()
+    } else if (json !== null && typeof json === 'object') {
+      const level = path.length
+      path.push(0)
+
       const keys = state
         ? state[STATE_KEYS]
         : Object.keys(json)
 
       for (const key of keys) {
-        if (typeof key === 'string' && containsCaseInsensitive(key, searchText)) {
-          yield path.concat([key, STATE_SEARCH_PROPERTY])
-        }
-        yield * incrementCounter()
+        path[level] = key
 
-        yield * searchRecursiveAsync(searchText, json[key], state ? state[key] : undefined, path.concat([key]))
+        if (containsCaseInsensitive(key, searchTextLowerCase)) {
+          results.push(path.concat([STATE_SEARCH_PROPERTY]))
+        }
+
+        searchRecursive(searchTextLowerCase, json[key], state ? state[key] : undefined)
       }
+
+      path.pop()
     } else { // type is a value
-      if (containsCaseInsensitive(json, searchText)) {
-        yield path.concat([STATE_SEARCH_VALUE])
+      if (containsCaseInsensitive(json, searchTextLowerCase)) {
+        results.push(path.concat([STATE_SEARCH_VALUE]))
       }
-      yield * incrementCounter()
     }
   }
 
-  return yield * searchRecursiveAsync(searchText, json, state, [])
+  if (typeof searchText === 'string' && searchText !== '') {
+    const searchTextLowerCase = searchText.toLowerCase()
+    searchRecursive(searchTextLowerCase, json, state, [])
+  }
+
+  return results
 }
 
 /**
  * Do a case insensitive search for a search text in a text
  * @param {String} text
- * @param {String} searchText
+ * @param {String} searchTextLowerCase
  * @return {boolean} Returns true if `search` is found in `text`
  */
-export function containsCaseInsensitive (text, searchText) {
-  return String(text).toLowerCase().indexOf(searchText.toLowerCase()) !== -1
+export function containsCaseInsensitive (text, searchTextLowerCase) {
+  return String(text).toLowerCase().indexOf(searchTextLowerCase) !== -1
 }

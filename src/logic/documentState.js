@@ -1,4 +1,3 @@
-import createDebug from 'debug'
 import {
   compileJSONPointer,
   existsIn,
@@ -24,8 +23,6 @@ import {
   mergeSections,
   nextRoundNumber
 } from './expandItemsSections.js'
-
-const debug = createDebug('jsoneditor:documentState')
 
 /**
  * Sync a state object with the json it belongs to: update keys, limit, and expanded state
@@ -480,7 +477,7 @@ export function documentStatePatch (json, state, operations) {
     return updatedState
   }
 
-  debug('documentStatePatch', json, state, operations)
+  // debug('documentStatePatch', json, state, operations) // TODO: cleanup logging
 
   const updatedJson = immutableJSONPatch(json, operations)
   const initializedState = initializeState(json, state, operations)
