@@ -9,6 +9,7 @@
   position: relative;
   display: flex;
   flex-direction: row;
+  overflow: hidden;
 
   &.focus {
     box-shadow: $outline-shadow;

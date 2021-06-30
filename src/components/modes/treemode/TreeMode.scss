@@ -6,6 +6,7 @@
   flex-direction: column;
   position: relative;
   background: $white;
+  overflow: hidden;
 
   &:not(.visible) {
     visibility: hidden;

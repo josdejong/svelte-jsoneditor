@@ -21,7 +21,8 @@
 			{
 				"<button onclick=alert('oopsie!!!')>test xss</button>": "xss?"
 			}
-		]
+		],
+		"long line": "longline".repeat(20) // TODO: neatly handle long lines without breaking spaces
 	}
 
 	const schema = {
@@ -165,10 +166,10 @@
 		<div class="left">
 			<p>
 				<label>
-					<input type="checkbox" bind:checked={$showTreeEditor} /> Show tree editor
+						<input type="checkbox" bind:checked={$showTreeEditor} /> Show tree editor
 				</label>
 			</p>
-			<div class="editor" style="height: {height}">
+			<div class="tree-editor" style="height: {height}">
 				{#if $showTreeEditor}
 					<JSONEditor
 						bind:text
@@ -244,21 +245,20 @@
 	.columns {
 		display: flex;
 		gap: 20px;
+		width: 100%;
+		max-width: 1200px;
 	}
 
 	.columns .left,
 	.columns .right {
 		flex: 1;
+		min-width: 0;
 	}
 
-	/*.editor {*/
-	/*	max-width: 800px;*/
-	/*	height: 400px;*/
-	/*}*/
+	.tree-editor {
+	}
 
 	.code-editor {
-		max-width: 800px;
-		/*height: 400px;*/
 	}
 
 	.data {
