@@ -48,6 +48,18 @@ describe('search', () => {
     ])
   })
 
+  it('should limit search results to the provided max', () => {
+    const count = 10
+    const json = Array(count).fill(42)
+
+    const resultsAll = search('42', json, undefined)
+    assert.deepStrictEqual(resultsAll.length, count)
+
+    const maxResults = 4
+    const results = search('42', json, undefined, maxResults)
+    assert.deepStrictEqual(results.length, maxResults)
+  })
+
   it('should generate recursive search results from flat results', () => {
     // Based on document:
     const json = {

@@ -112,11 +112,9 @@ export function searchPrevious (searchResult) {
 }
 
 // TODO: comment
-export function search (searchText, json, state) {
+export function search (searchText, json, state, maxResults = Infinity) {
   const results = []
   const path = [] // we reuse the same Array recursively, this is *much* faster than creating a new path every time
-
-  // TODO: implement maxResults
 
   function searchRecursive (searchTextLowerCase, json, state) {
     if (Array.isArray(json)) {
@@ -125,7 +123,12 @@ export function search (searchText, json, state) {
 
       for (let i = 0; i < json.length; i++) {
         path[level] = i
+
         searchRecursive(searchTextLowerCase, json[i], state ? state[i] : undefined)
+
+        if (results.length >= maxResults) {
+          return
+        }
       }
 
       path.pop()
@@ -140,16 +143,20 @@ export function search (searchText, json, state) {
       for (const key of keys) {
         path[level] = key
 
-        if (containsCaseInsensitive(key, searchTextLowerCase)) {
+        if (containsCaseInsensitive(key, searchTextLowerCase) && results.length < maxResults) {
           results.push(path.concat([STATE_SEARCH_PROPERTY]))
         }
 
         searchRecursive(searchTextLowerCase, json[key], state ? state[key] : undefined)
+
+        if (results.length >= maxResults) {
+          return
+        }
       }
 
       path.pop()
     } else { // type is a value
-      if (containsCaseInsensitive(json, searchTextLowerCase)) {
+      if (containsCaseInsensitive(json, searchTextLowerCase) && results.length < maxResults) {
         results.push(path.concat([STATE_SEARCH_VALUE]))
       }
     }

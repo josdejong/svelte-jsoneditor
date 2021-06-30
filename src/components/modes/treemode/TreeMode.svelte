@@ -25,6 +25,7 @@
   import {
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
+    MAX_SEARCH_RESULTS,
     SCROLL_DURATION,
     SEARCH_UPDATE_THROTTLE,
     SIMPLE_MODAL_OPTIONS,
@@ -209,7 +210,7 @@
       debug('searching...', searchText)
 
       // console.time('search') // TODO: cleanup
-      const flatResults = search(searchText, json, state)
+      const flatResults = search(searchText, json, state, MAX_SEARCH_RESULTS)
       searchResult = updateSearchResult(json, flatResults, searchResult)
       // console.timeEnd('search') // TODO: cleanup
 
