@@ -63,14 +63,10 @@
 
   .header,
   .contents {
-    display: table;
+    display: flex;
     flex-direction: row;
 
     line-height: $line-height;
-
-    > :global(*) {
-      display: table-cell;
-    }
   }
 
   .contents {
@@ -146,7 +142,6 @@
 }
 
 .expand {
-  display: table-cell;
   position: relative;
   top: 2px;
   width: $line-height;
@@ -196,9 +191,13 @@
 }
 
 .tag {
-  vertical-align: top;
   padding: 0 4px 1px;
-  margin: 2px;
+  margin: 0 2px;
+  position: relative;
+  top: 1px;
+
+  height: $line-height - 2px;
+  line-height: $line-height - 4px;
 
   background: $light-gray-transparent;
 

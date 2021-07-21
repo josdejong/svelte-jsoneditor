@@ -12,3 +12,7 @@ button.validation-error {
   position: relative;
   top: 2px;
 }
+
+:global(.container) {
+  height: $line-height;
+}
