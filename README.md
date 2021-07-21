@@ -234,6 +234,38 @@ const editor = new JSONEditor({
   Callback which can be used to make changes to the menu items. New items can
   be added, or existing items can be removed or reorganized. When the function 
   returns `undefined`, the original `items` will be applied.
+
+  A menu item can be one of the following types:
+
+  - Button:
+  
+    ```ts
+    interface MenuButtonItem {
+      onClick: () => void
+      icon?: FontAwesomeIcon
+      text?: string
+      title?: string
+      className?: string
+      disabled?: boolean
+    }
+    ```
+
+  - Separator (gray vertical line between a group of items):
+  
+    ```ts
+    interface MenuSeparatorItem {
+      separator: true
+    }
+    ```
+    
+  - Space (fills up empty space):
+  
+    ```ts
+    interface MenuSpaceItem {
+      space: true
+    }
+    ```
+
 - `onFocus()` callback fired when the editor got focus.
 - `onBlur()` callback fired when the editor lost focus.
 

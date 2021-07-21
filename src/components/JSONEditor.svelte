@@ -261,7 +261,7 @@
     separator: true
   }
 
-  function handleCreateMenu (mode, items) {
+  function handleRenderMenu (mode, items) {
     const updatedItems = (mode === MODE.TREE || mode === MODE.CODE)
       ? (items[0].space === true)
           ? modeMenuItems.concat(items) // menu is empty, readOnly mode
@@ -289,7 +289,7 @@
             onError={onError}
             onFocus={handleFocus}
             onBlur={handleBlur}
-            onRenderMenu={handleCreateMenu}
+            onRenderMenu={handleRenderMenu}
           />
         {:else} <!-- mode === MODE.TREE -->
           <TreeMode
@@ -305,7 +305,7 @@
             onChangeText={handleChangeText}
             onRequestRepair={handleRequestRepair}
             onClassName={onClassName}
-            onRenderMenu={handleCreateMenu}
+            onRenderMenu={handleRenderMenu}
             onFocus={handleFocus}
             onBlur={handleBlur}
           />
