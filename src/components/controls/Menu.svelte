@@ -1,5 +1,4 @@
 <script>
-  import DropdownMenu from './DropdownMenu.svelte'
   import Icon from 'svelte-awesome'
 
   export let items = []
@@ -13,21 +12,6 @@
       <div class="separator"></div>
     {:else if item.space === true}
       <div class="space"></div>
-    {:else if item.items}
-      <DropdownMenu
-        items={item.items}
-        title={item.title}
-      >
-        <button
-          type="button"
-          class="button {item.className}"
-          slot="defaultItem"
-          on:click={item.onClick}
-          disabled={item.disabled}
-        >
-          <Icon data={item.icon} />
-        </button>
-      </DropdownMenu>
     {:else}
       <button
         type="button"

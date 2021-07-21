@@ -155,12 +155,11 @@
 
 /**
  * @typedef {Object} MenuButtonItem
- * @property {FontAwesomeIcon} icon
  * @property {function} onClick
+ * @property {FontAwesomeIcon} [icon]
  * @property {string} [text=undefined]
  * @property {string} [title=undefined]
  * @property {string} [className=undefined]
- * @property {boolean} [disabled=false]
  * @property {boolean} [disabled=false]
  */
 
@@ -175,16 +174,7 @@
  */
 
 /**
- * @typedef {Object} MenuDropdownItem
- * @property {string} text
- * @property {function} onClick
- * @property {string} [title=undefined]
- * @property {boolean} [default=false]
- * @property {boolean} [disabled=false]
- */
-
-/**
- * @typedef {MenuButtonItem | MenuDropdownItem | MenuSeparatorItem | MenuSpaceItem} MenuItem
+ * @typedef {MenuButtonItem | MenuSeparatorItem | MenuSpaceItem} MenuItem
  */
 
 /**
