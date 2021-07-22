@@ -5,6 +5,7 @@ div.editable-div {
   line-height: $line-height;
   min-width: 16px;
   word-break: normal;
+  overflow-wrap: anywhere;
   padding: 0 $input-padding;
   box-sizing: border-box;
   outline: none;

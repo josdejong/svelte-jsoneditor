@@ -22,7 +22,9 @@
 				"<button onclick=alert('oopsie!!!')>test xss</button>": "xss?"
 			}
 		],
-		"long line": "longline".repeat(20) // TODO: neatly handle long lines without breaking spaces
+		"long line": "longword".repeat(2) + ' ' +
+			"longword2".repeat(3) + ' ' +
+			"longline".repeat(20)
 	}
 
 	const schema = {
