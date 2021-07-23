@@ -30,7 +30,7 @@
     "classnames": "^2.3.1",
     "debug": "^4.3.1",
     "diff-sequences": "^27.0.6",
-    "immutable-json-patch": "^1.1.1",
+    "immutable-json-patch": "^1.1.2",
     "json-source-map": "^0.6.1",
     "jsonrepair": "^2.2.1",
     "lodash-es": "^4.17.21",
