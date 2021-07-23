@@ -249,6 +249,20 @@
     }
   }
 
+  function handleToggleSearch () {
+    if (aceEditor.searchBox) {
+      // toggle
+      if (aceEditor.searchBox.active) {
+        aceEditor.searchBox.hide()
+      } else {
+        aceEditor.searchBox.show()
+      }
+    } else {
+      // first time initialization
+      aceEditor.execCommand('find')
+    }
+  }
+
   function handleUndo () {
     aceEditor.getSession().getUndoManager().undo(false)
   }
@@ -520,6 +534,7 @@
       onCompact={handleCompact}
       onSort={handleSort}
       onTransform={handleTransform}
+      onToggleSearch={handleToggleSearch}
       onUndo={handleUndo}
       onRedo={handleRedo}
       canFormat={!isNewDocument}

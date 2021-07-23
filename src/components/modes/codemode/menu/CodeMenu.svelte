@@ -2,6 +2,7 @@
   import {
     faFilter,
     faRedo,
+    faSearch,
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
@@ -16,6 +17,7 @@
   export let onCompact
   export let onSort
   export let onTransform
+  export let onToggleSearch
   export let onUndo
   export let onRedo
   export let canUndo
@@ -59,6 +61,12 @@
           className: 'transform',
           onClick: onTransform,
           disabled: readOnly || !canTransform
+        },
+        {
+          icon: faSearch,
+          title: 'Search (Ctrl+F)',
+          className: 'search',
+          onClick: onToggleSearch
         },
         {
           separator: true
