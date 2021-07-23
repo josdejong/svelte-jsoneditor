@@ -540,22 +540,22 @@
         `and may crash your browser when loading it in code mode. Actual size: ${formatSize(text.length, 1024)}.`
       }
       actions={[
-          {
-            text: 'Open anyway',
-            title: 'Open the document in code mode',
-            onClick: handleAcceptTooLarge
-          },
-          {
-            text: 'Open in tree mode',
-            title: 'Open the document in tree mode',
-            onClick: onSwitchToTreeMode
-          },
-          {
-            text: 'Cancel',
-            title: 'Cancel opening this large document',
-            onClick: cancelLoadTooLarge
-          }
-        ]}
+        {
+          text: 'Open anyway',
+          title: 'Open the document in code mode. This may freeze or crash your browser.',
+          onClick: handleAcceptTooLarge
+        },
+        {
+          text: 'Open in tree mode',
+          title: 'Open the document in tree mode. Tree mode can handle large documents.',
+          onClick: onSwitchToTreeMode
+        },
+        {
+          text: 'Cancel',
+          title: 'Cancel opening this large document.',
+          onClick: cancelLoadTooLarge
+        }
+      ]}
     />
   {/if}
 
