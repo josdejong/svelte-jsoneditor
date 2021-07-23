@@ -142,11 +142,9 @@
 }
 
 .expand {
-  position: relative;
-  top: 2px;
   width: $line-height;
   height: $line-height;
-  padding: 0;
+  padding: 1px 0 0;
   margin: 0;
   border: none;
   cursor: pointer;
