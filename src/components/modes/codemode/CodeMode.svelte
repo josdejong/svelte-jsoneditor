@@ -287,6 +287,11 @@
     setAceEditorValue(text, true)
   }
 
+  function cancelLoadTooLarge () {
+    // copy the latest contents of the Ace editor again into text
+    onChangeAceEditorValue()
+  }
+
   /**
    * @param {ValidationError} error
    **/
@@ -544,6 +549,11 @@
             text: 'Open in tree mode',
             title: 'Open the document in tree mode',
             onClick: onSwitchToTreeMode
+          },
+          {
+            text: 'Cancel',
+            title: 'Cancel opening this large document',
+            onClick: cancelLoadTooLarge
           }
         ]}
     />
