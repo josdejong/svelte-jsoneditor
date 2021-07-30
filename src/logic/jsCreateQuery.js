@@ -1,8 +1,6 @@
 import { isEmpty, last } from 'lodash-es'
 
 export function createQuery (json, queryOptions) {
-  console.log('createQuery', queryOptions)
-
   const { filter, sort, projection } = queryOptions
   const queryParts = []
 
