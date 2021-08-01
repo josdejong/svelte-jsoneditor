@@ -7,9 +7,9 @@ import {
   fastPatchSort,
   sortOperationsMove,
   sortOperationsMoveAdvanced
-} from '../../src/logic/sort.js'
+} from '../../src/lib/logic/sort.js'
 
-function generateArray (size, changes) {
+function generateArray(size, changes) {
   const array = times(size).map((item, index) => index)
 
   for (let i = 0; i < changes; i++) {
@@ -23,7 +23,7 @@ function generateArray (size, changes) {
   return array
 }
 
-function measure (callback) {
+function measure(callback) {
   const start = Date.now()
   const result = callback()
   const end = Date.now()
@@ -32,20 +32,26 @@ function measure (callback) {
   return [result, duration]
 }
 
-function sortBenchmark (size, changes) {
+function sortBenchmark(size, changes) {
   // TODO: also compare size of patch (KB)
   // TODO: also compare with simply replacing the whole array
 
   const array = generateArray(size, changes)
 
   const [operationsSimple, createPatchSimple] = measure(() => sortOperationsMove(array, comparator))
-  const [operationsAdvanced, createPatchAdvanced] = measure(() => sortOperationsMoveAdvanced(array, comparator))
+  const [operationsAdvanced, createPatchAdvanced] = measure(() =>
+    sortOperationsMoveAdvanced(array, comparator)
+  )
 
   const [sortedSimple, applySimple] = measure(() => immutableJSONPatch(array, operationsSimple))
-  const [sortedAdvanced, applyAdvanced] = measure(() => immutableJSONPatch(array, operationsAdvanced))
+  const [sortedAdvanced, applyAdvanced] = measure(() =>
+    immutableJSONPatch(array, operationsAdvanced)
+  )
 
   const [fastSortedSimple, fastApplySimple] = measure(() => fastPatchSort(array, operationsSimple))
-  const [fastSortedAdvanced, fastApplyAdvanced] = measure(() => fastPatchSort(array, operationsAdvanced))
+  const [fastSortedAdvanced, fastApplyAdvanced] = measure(() =>
+    fastPatchSort(array, operationsAdvanced)
+  )
 
   // validate the results
   const sorted = sortBy(array)

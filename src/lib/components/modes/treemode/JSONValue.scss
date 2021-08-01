@@ -1,0 +1,51 @@
+@import '../../../styles';
+@import 'shared';
+
+.value {
+  &.string {
+    color: $value-color-string;
+  }
+
+  &.object,
+  &.array {
+    min-width: 16px;
+    color: $meta-color;
+  }
+
+  &.number {
+    color: $value-color-number;
+  }
+
+  &.boolean {
+    color: $value-color-boolean;
+  }
+
+  &.null {
+    color: $value-color-null;
+  }
+
+  &.invalid {
+    color: $black;
+  }
+
+  &.url {
+    color: $value-color-url;
+    text-decoration: underline;
+  }
+
+  &:hover {
+    background: $hovered-background-transparent;
+  }
+
+  &.empty {
+    min-width: 4em;
+
+    &::after {
+      content: 'value';
+
+      &[contenteditable='true'] {
+        content: none;
+      }
+    }
+  }
+}

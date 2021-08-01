@@ -1,0 +1,30 @@
+@import '../../../styles';
+
+.code-mode {
+  flex: 1;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background: $white;
+
+  .contents {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    &:not(.visible) {
+      visibility: hidden;
+    }
+
+    .loading-space {
+      flex: 1;
+    }
+
+    .loading {
+      flex: 2;
+      text-align: center;
+      color: $gray;
+      box-sizing: border-box;
+    }
+  }
+}

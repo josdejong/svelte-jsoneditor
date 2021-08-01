@@ -1,0 +1,73 @@
+@import '../../../styles';
+
+// TODO: simplify the CSS needed to correctly highlight the selection
+
+@mixin json-node-selected-mixin($selection-background) {
+  // entry selected
+  &.selected {
+    .header,
+    .contents,
+    .meta,
+    .expand,
+    .footer,
+    :global(.key),
+    :global(.value) {
+      background-color: $selection-background !important;
+    }
+  }
+
+  // key selected
+  &.selected-key {
+    > .contents-outer > .contents > :global(.identifier > .key),
+    > .header-outer > .header > :global(.identifier > .key) {
+      background-color: $selection-background;
+    }
+  }
+
+  // value selected (part 1)
+  &.selected-value > .contents-outer > .contents > :global(.value) {
+    background-color: $selection-background;
+  }
+
+  &.selected :global(.collapsed-items),
+  &.selected-value :global(.collapsed-items) {
+    // TODO: this css is copied from CollapsedItems.scss. Figure out how to reuse this smartly with CSS or SASS
+    background-color: $selection-background;
+
+    $shape-color: darken($selection-background, 5%);
+    background-image: linear-gradient($shape-color, $shape-color),
+      linear-gradient(to bottom right, transparent 50.5%, $shape-color 50.5%),
+      linear-gradient(to bottom left, transparent 50.5%, $shape-color 50.5%),
+      linear-gradient(to top right, transparent 50.5%, $shape-color 50.5%),
+      linear-gradient(to top left, transparent 50.5%, $shape-color 50.5%);
+  }
+
+  // value selected (part 2)
+  &.selected-value {
+    .meta,
+    > .footer-outer > .footer,
+    .props .contents,
+    .props .header,
+    .props .footer,
+    .props .expand,
+    .items .contents,
+    .items .header,
+    .items .footer,
+    .items .expand {
+      background-color: $selection-background !important;
+
+      :global(.key),
+      :global(.value) {
+        background-color: $selection-background !important;
+      }
+    }
+  }
+
+  .insert-area {
+    &.selected {
+      display: flex;
+      z-index: 2;
+      outline-color: $dark-gray;
+    }
+  }
+}

@@ -1,6 +1,6 @@
 .DS_Store
+.eslintcache
 .idea
 node_modules
-/dist/
-
-.eslintcache
+/package
+/.svelte-kit

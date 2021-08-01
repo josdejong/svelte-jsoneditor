@@ -1,0 +1,23 @@
+@import '../../../styles';
+@import 'shared';
+
+.key {
+  display: inline-block;
+  min-height: $line-height;
+
+  &:hover {
+    background: $hovered-background-transparent;
+  }
+
+  &.empty {
+    min-width: 3em;
+
+    &::after {
+      content: 'key';
+
+      &[contenteditable='true'] {
+        content: none;
+      }
+    }
+  }
+}

@@ -2,7 +2,7 @@
 
 A web-based tool to view, edit, format, transform, and validate JSON
 
-The library is written with Svelte, but can be used in any framework (React, Angular, plain JavaScript).
+The library is written with Svelte, but can be used in any framework (React, Vue, Angular, plain JavaScript).
 
 ![JSONEditor screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_screenshot.png)
 
@@ -13,52 +13,48 @@ The library is written with Svelte, but can be used in any framework (React, Ang
 Install via npm:
 
 ```
-npm install
+npm install svelte-jsoneditor
 ```
 
 ## Use
 
 See the [/examples](/examples) section for some full examples.
 
-### Svelte setup 
+### SvelteKit setup
 
-In order to use `svelte-jsoneditor` in your project, a couple of plugins needs to be installed and configured: 
+There is currently an issue in SvelteKit with processing some dependencies (more precisely: Vite used by SvelteKit). `svelte-jsoneditor` depends on some libraries that hit this issue. To work around it, each of these dependencies needs to be listed in the configuration. Without the workaround, you'll see errors like "ReferenceError: module is not defined" (for `debug`, `ajv`, `ace-builds`, etc.).
 
-- `@rollup/plugin-json` needed by `ajv` to load a JSON Schema definition from a JSON file
-- `svelte-preprocess` and `sass` needed to preprocess SASS styling of the editor
-
-First, install the required plugins dependencies:
-
-```
-npm install --save-dev @rollup/plugin-json svelte-preprocess sass
-```
-
-Now, configure the plugins in your `./rollup.config.js` configuration:
+In your SvelteKit configuration file `svelte.config.js`, add the following:
 
 ```js
-// rollup.config.js
+// svelte.config.js
 
 // ...
-import json from '@rollup/plugin-json'
-import sveltePreprocess from 'svelte-preprocess'
 
-// ...
-export default {
+const config = {
   // ...
-  plugins: [
-    svelte({
-      // ...
-      
-      preprocess: sveltePreprocess()
-    })
-  ],
-  
-  // ...
-  json()
+  kit: {
+    // ...
+
+    vite: {
+      optimizeDeps: {
+        include: [
+          'ace-builds/src-noconflict/ace',
+          'ace-builds/src-noconflict/ext-searchbox',
+          'ace-builds/src-noconflict/mode-json',
+          'ajv',
+          'classnames',
+          'debug',
+          'diff-sequences',
+          'json-source-map',
+          'natural-compare-lite'
+        ]
+      }
+    }
+  }
 }
+// ...
 ```
-
-A full example of a `rollup.config.js` can be found here: [examples/svelte-basic-example/rollup.config.js](https://github.com/josdejong/svelte-jsoneditor/blob/main/examples/svelte-basic-example/rollup.config.js).
 
 ### Svelte usage
 
@@ -69,13 +65,13 @@ Create a JSONEditor with two-way binding `bind:json`:
   import { JSONEditor } from 'svelte-jsoneditor'
 
   let json = {
-    'array': [1, 2, 3],
-    'boolean': true,
-    'color': '#82b92c',
-    'null': null,
-    'number': 123,
-    'object': {'a': 'b', 'c': 'd'},
-    'string': 'Hello World'
+    array: [1, 2, 3],
+    boolean: true,
+    color: '#82b92c',
+    null: null,
+    number: 123,
+    object: { a: 'b', c: 'd' },
+    string: 'Hello World'
   }
 </script>
 
@@ -91,9 +87,9 @@ Or one-way binding:
   import { JSONEditor } from 'svelte-jsoneditor'
 
   let json = {
-    text: 'Hello World'
+    greeting: 'Hello World'
   }
-  
+
   function onChange(content) {
     // content is an object { json: JSON | undefined, text: string | undefined }
     console.log('onChange: ', content)
@@ -102,73 +98,42 @@ Or one-way binding:
 </script>
 
 <div>
-  <JSONEditor 
-    json={json}
-    onChange={onChange}
-  />
+  <JSONEditor json="{json}" onChange="{onChange}" />
 </div>
 ```
 
-### Browser usage
+### Standalone bundle (use in React, Vue, Angular, plain JavaScript, ...)
 
-Load as ES module:
+The library provides a standalone bundle of the editor which can be used in any browser environment and framework. In a framework like React, Vue, or Angular, you'll need to write some wrapper code around the class interface.
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>JSONEditor</title>
-</head>
-<body>
-<div id="jsoneditor"></div>
-
-<script type="module">
-  import { JSONEditor } from 'svelte-jsoneditor/dist/jsoneditor.mjs'
-
-  const editor = new JSONEditor({
-    target: document.getElementById('jsoneditor'),
-    props: {
-      json: {
-        greeting: 'Hello World'
-      },
-      onChange: (content) => {
-        // content is an object { json: JSON | undefined, text: string | undefined }
-        console.log('onChange', content)
-      }
-    }
-  })
-</script>
-</body>
-</html>
-```
-
-Or using UMD (exposed as `window.jsoneditor.JSONEditor`):
+Browser example loading the ES module:
 
 ```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <title>JSONEditor</title>
-  <script src="svelte-jsoneditor/dist/jsoneditor.js"></script>
-</head>
-<body>
-<div id="jsoneditor"></div>
+  <head>
+    <title>JSONEditor</title>
+  </head>
+  <body>
+    <div id="jsoneditor"></div>
 
-<script>
-  const editor = new window.jsoneditor.JSONEditor({
-    target: document.getElementById('jsoneditor'),
-    props: {
-      json: {
-        greeting: 'Hello World'
-      },
-      onChange: (content) => {
-        // content is an object { json: JSON | undefined, text: string | undefined }
-        console.log('onChange', content)
-      }
-    }
-  })
-</script>
-</body>
+    <script type="module">
+      import { JSONEditor } from 'svelte-jsoneditor/dist/jsoneditor.js'
+
+      const editor = new JSONEditor({
+        target: document.getElementById('jsoneditor'),
+        props: {
+          json: {
+            greeting: 'Hello World'
+          },
+          onChange: (content) => {
+            // content is an object { json: JSON | undefined, text: string | undefined }
+            console.log('onChange', content)
+          }
+        }
+      })
+    </script>
+  </body>
 </html>
 ```
 
@@ -179,13 +144,12 @@ Or using UMD (exposed as `window.jsoneditor.JSONEditor`):
 Svelte component:
 
 ```html
-
 <script>
   import { JSONEditor } from 'svelte-jsoneditor'
 </script>
 
 <div>
-  <JSONEditor json={json} />
+  <JSONEditor json="{json}" />
 </div>
 ```
 
@@ -211,34 +175,36 @@ const editor = new JSONEditor({
 - `json` Pass the JSON document to be rendered in the JSONEditor
 <!-- FIXME: readOnly is currently broken
 - `readOnly: boolean` If `true`, the editor is read only. Default value is `false`.
--->
+  -->
 - `mode: 'tree' | 'code'`. Open the editor in `'tree'` mode (default) or `'code'` mode.
 - `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
 - `readOnly: boolean` Open the editor in read-only mode: no changes can be made, non-relevant buttons are hidden from the menu, and the context menu is not enabled. Default value is `false`.
 - `indentation: number` Number of spaces use for indentation when stringifying JSON.
 - `validator: function (json): ValidationError[]`. Validate the JSON document.
   For example use the built-in JSON Schema validator powered by Ajv:
+
   ```js
   import { createAjvValidator } from 'svelte-jsoneditor'
-  
+
   const validator = createAjvValidator(schema, schemaRefs)
   ```
+
 - `onError(err: Error)`.
   Callback fired when an error occurs. Default implementation is to log an error in the console and show a simple alert message to the user.
 - `onChange({ json: JSON | undefined, text: string | undefined})`.
   Callback which is invoked on every change made in the JSON document.
 - `onChangeMode(mode: string)`. Invoked when the mode is changed.
-- `onClassName(path: Array.<string|number>, value: any): string | undefined`. 
+- `onClassName(path: Array.<string|number>, value: any): string | undefined`.
   Add a custom class name to specific nodes, based on their path and/or value.
 - `onRenderMenu(mode: string, items: Array) : Array | undefined`.
   Callback which can be used to make changes to the menu items. New items can
-  be added, or existing items can be removed or reorganized. When the function 
+  be added, or existing items can be removed or reorganized. When the function
   returns `undefined`, the original `items` will be applied.
 
   A menu item can be one of the following types:
 
   - Button:
-  
+
     ```ts
     interface MenuButtonItem {
       onClick: () => void
@@ -251,15 +217,15 @@ const editor = new JSONEditor({
     ```
 
   - Separator (gray vertical line between a group of items):
-  
+
     ```ts
     interface MenuSeparatorItem {
       separator: true
     }
     ```
-    
+
   - Space (fills up empty space):
-  
+
     ```ts
     interface MenuSpaceItem {
       space: true
@@ -279,7 +245,7 @@ const editor = new JSONEditor({
 - `updateText(text: JSON)` Update the loaded JSON document, keeping the state of the editor (like expanded objects).
 - `patch(operations: JSONPatchDocument)` Apply a JSON patch document to update the contents of the JSON document.
 - `scrollTo(path: Array.<string|number>)` Scroll the editor vertically such that the specified path comes into view. The path will be expanded when needed.
-- `focus()`. Give the editor focus. 
+- `focus()`. Give the editor focus.
 - `destroy()`. Destroy the editor, remove it from the DOM.
 
 ## Develop
@@ -296,13 +262,13 @@ npm install
 Start the demo project (at http://localhost:5000):
 
 ```
-npm start
+npm run dev
 ```
 
 Build the library:
 
 ```
-npm run build
+npm run package
 ```
 
 Run unit tests:
