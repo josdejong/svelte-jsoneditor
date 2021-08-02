@@ -22,7 +22,7 @@
     "__lint": "prettier --check --plugin-search-dir=. . && eslint --cache --ignore-path .gitignore .",
     "format": "prettier --write --plugin-search-dir=. .",
     "prepare": "husky install && cd tools && node generateEmbeddedAceJsonWorker.js && cd ..",
-    "release": "npm run lint && npm test && npm run package && standard-version && git push && git push --tag && npm publish package/"
+    "release": "npm run lint && npm test && standard-version && npm run package && git push && git push --tag && npm publish package/"
   },
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^5.15.3",
