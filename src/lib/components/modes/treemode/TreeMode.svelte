@@ -83,7 +83,7 @@
 
   const debug = createDebug('jsoneditor:TreeMode')
 
-  const isSSR = import.meta && import.meta.env && import.meta.env.SSR === true
+  const isSSR = typeof window === 'undefined'
   debug('isSSR:', isSSR)
 
   const { open } = getContext('simple-modal')

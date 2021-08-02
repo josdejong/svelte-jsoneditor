@@ -225,7 +225,7 @@ export function setCursorToEnd(element) {
  * @return {Window}
  */
 export function getWindow(element) {
-  return element?.ownerDocument?.defaultView
+  return element && element.ownerDocument && element.ownerDocument.defaultView
 }
 
 /**

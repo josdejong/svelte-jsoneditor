@@ -41,7 +41,7 @@
 
   const debug = createDebug('jsoneditor:CodeMode')
 
-  const isSSR = import.meta && import.meta.env && import.meta.env.SSR === true
+  const isSSR = typeof window === 'undefined'
   debug('isSSR:', isSSR)
 
   let aceEditorRef
@@ -63,11 +63,14 @@
   $: updateReadOnly(readOnly)
 
   onMount(async () => {
+    if (isSSR) {
+      return
+    }
+
     try {
       // We load ace dynamically to prevent trying to load it serverside (SSR),
       // since this is not supported by ace
       const { ace } = await import('./ace/index.js')
-      // TODO: only show the "loading..." message when loading takes longer than 100ms or so
 
       aceEditor = createAceEditor({
         target: aceEditorRef,
@@ -610,10 +613,7 @@
       />
     {/if}
 
-    <div class="contents" class:visible={!aceEditorDisabled} bind:this={aceEditorRef}>
-      <div class="loading-space" />
-      <div class="loading">loading...</div>
-    </div>
+    <div class="contents" class:visible={!aceEditorDisabled} bind:this={aceEditorRef} />
 
     {#if jsonParseError}
       <Message
