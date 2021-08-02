@@ -252,14 +252,13 @@ const editor = new JSONEditor({
 
 Clone the git repository
 
-Install dependencies:
+Install dependencies (once):
 
 ```
 npm install
-(cd tools/develop-svelte && npm install)
 ```
 
-Start the demo project (at http://localhost:5000):
+Start the demo project (at http://localhost:3000):
 
 ```
 npm run dev
