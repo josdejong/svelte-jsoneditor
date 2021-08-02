@@ -682,7 +682,8 @@
 
     if (isObjectOrArray(json)) {
       // expand extracted object/array
-      handleExpand([], true, true)
+      handleExpand([], true, false)
+
       focus() // TODO: find a more robust way to keep focus than sprinkling focusHiddenInput() everywhere
     }
   }
