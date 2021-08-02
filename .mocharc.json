@@ -1,6 +1,6 @@
 {
-  "extension": ["js", "ts"],
+  "extension": ["js"],
   "require": "ts-node/register",
-  "spec": ["src/**/*.test.js", "src/**/*.test.ts"],
+  "spec": ["src/**/*.test.js"],
   "reporter": "dot"
 }
