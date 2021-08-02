@@ -13,18 +13,17 @@
   "license": "ISC",
   "scripts": {
     "dev": "svelte-kit dev",
-    "build": "svelte-kit build",
-    "test": "mocha",
     "preview": "svelte-kit preview",
     "package": "svelte-kit package && rollup --config rollup.config.bundle.js",
+    "test": "mocha",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
     "lint": "prettier --check --plugin-search-dir=. .",
     "__lint": "prettier --check --plugin-search-dir=. . && eslint --cache --ignore-path .gitignore .",
     "format": "prettier --write --plugin-search-dir=. .",
     "prepare": "husky install && cd tools && node generateEmbeddedAceJsonWorker.js && cd ..",
-    "prepublishOnly": "npm run lint && npm test && npm run build",
-    "release": "standard-version && git push --tag && npm publish"
+    "prepublishOnly": "npm run lint && npm test && npm run package",
+    "release": "standard-version && git push --tag && npm publish package"
   },
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^5.15.3",
