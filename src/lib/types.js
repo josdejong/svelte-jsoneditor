@@ -154,6 +154,14 @@
  */
 
 /**
+ * @typedef {Object} DropdownButtonItem
+ * @property {string} text
+ * @property {function} onClick
+ * @property {FontAwesomeIcon} [icon]
+ * @property {string} [title=undefined]
+ */
+
+/**
  * @typedef {Object} MenuButtonItem
  * @property {function} onClick
  * @property {FontAwesomeIcon} [icon]

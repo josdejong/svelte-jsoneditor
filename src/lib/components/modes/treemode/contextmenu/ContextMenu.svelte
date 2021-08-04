@@ -1,6 +1,7 @@
 <svelte:options immutable={true} />
 
 <script>
+  import DropdownButton from '$lib/components/controls/DropdownButton.svelte'
   import {
     faCaretSquareDown,
     faCaretSquareUp,
@@ -104,12 +105,22 @@
 
   function handleCut() {
     onCloseContextMenu()
-    onCut()
+    onCut(true)
+  }
+
+  function handleCutCompact() {
+    onCloseContextMenu()
+    onCut(false)
   }
 
   function handleCopy() {
     onCloseContextMenu()
-    onCopy()
+    onCopy(true)
+  }
+
+  function handleCopyCompact() {
+    onCloseContextMenu()
+    onCopy(false)
   }
 
   function handlePaste() {
@@ -205,6 +216,40 @@
       focusNextButton(event.target, combo.toLowerCase())
     }
   }
+
+  $: cutDropdownItems = [
+    {
+      icon: faCut,
+      text: 'Cut formatted',
+      title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
+      onClick: handleCut,
+      disabled: !hasSelectionContents
+    },
+    {
+      icon: faCut,
+      text: 'Cut compact',
+      title: 'Cut selected contents, without indentation (Ctrl+Shift+X)',
+      onClick: handleCutCompact,
+      disabled: !hasSelectionContents
+    }
+  ]
+
+  $: copyDropdownItems = [
+    {
+      icon: faCopy,
+      text: 'Copy formatted',
+      title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
+      onClick: handleCopy,
+      disabled: !hasSelectionContents
+    },
+    {
+      icon: faCopy,
+      text: 'Copy compact',
+      title: 'Copy selected contents, without indentation (Ctrl+Shift+C)',
+      onClick: handleCopyCompact,
+      disabled: !hasSelectionContents
+    }
+  ]
 </script>
 
 <div class="jsoneditor-contextmenu" bind:this={refContextMenu} on:keydown={handleKeyDown}>
@@ -234,31 +279,37 @@
   </div>
   <div class="separator" />
   <div class="row">
-    <button
-      type="button"
-      title="Cut selected contents (Ctrl+X)"
-      data-name="cut"
-      data-up="edit-key,edit-value"
-      data-down="remove"
-      data-right="copy"
-      on:click={handleCut}
-      disabled={!hasSelectionContents}
-    >
-      <Icon data={faCut} /> Cut
-    </button>
-    <button
-      type="button"
-      title="Copy selected contents (Ctrl+C)"
-      data-name="copy"
-      data-up="edit-key,edit-value"
-      data-down="insert-structure"
-      data-left="cut"
-      data-right="paste"
-      on:click={handleCopy}
-      disabled={!hasSelectionContents}
-    >
-      <Icon data={faCopy} /> Copy
-    </button>
+    <DropdownButton width="150px" items={cutDropdownItems}>
+      <button
+        slot="defaultItem"
+        type="button"
+        title="Cut selected contents, formatted with indentation (Ctrl+X)"
+        data-name="cut"
+        data-up="edit-key,edit-value"
+        data-down="remove"
+        data-right="copy"
+        on:click={handleCut}
+        disabled={!hasSelectionContents}
+      >
+        <Icon data={faCut} /> Cut
+      </button>
+    </DropdownButton>
+    <DropdownButton width="150px" items={copyDropdownItems}>
+      <button
+        slot="defaultItem"
+        type="button"
+        title="Copy selected contents, formatted with indentation (Ctrl+C)"
+        data-name="copy"
+        data-up="edit-key,edit-value"
+        data-down="insert-structure"
+        data-left="cut"
+        data-right="paste"
+        on:click={handleCopy}
+        disabled={!hasSelectionContents}
+      >
+        <Icon data={faCopy} /> Copy
+      </button>
+    </DropdownButton>
     <button
       type="button"
       title="Paste clipboard contents (Ctrl+V)"

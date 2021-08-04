@@ -488,17 +488,18 @@
     }
   }
 
-  async function handleCut() {
+  async function handleCut(indent = true) {
     if (readOnly || !hasSelectionContents()) {
       return
     }
 
-    const clipboard = selectionToPartialJson(json, selection, indentation)
+    const cutIndentation = indent ? indentation : null
+    const clipboard = selectionToPartialJson(json, selection, cutIndentation)
     if (clipboard == null) {
       return
     }
 
-    debug('cut', { selection, clipboard })
+    debug('cut', { selection, clipboard, indent })
 
     try {
       await navigator.clipboard.writeText(clipboard)
@@ -510,13 +511,14 @@
     handlePatch(operations, newSelection)
   }
 
-  async function handleCopy() {
-    const clipboard = selectionToPartialJson(json, selection, indentation)
+  async function handleCopy(indent = true) {
+    const copyIndentation = indent ? indentation : null
+    const clipboard = selectionToPartialJson(json, selection, copyIndentation)
     if (clipboard == null) {
       return
     }
 
-    debug('copy', { clipboard })
+    debug('copy', { clipboard, indent })
 
     try {
       await navigator.clipboard.writeText(clipboard)
@@ -1241,12 +1243,24 @@
     const keepAnchorPath = event.shiftKey
 
     if (combo === 'Ctrl+X') {
+      // cut formatted
       event.preventDefault()
-      handleCut()
+      handleCut(true)
+    }
+    if (combo === 'Ctrl+Shift+X') {
+      // cut compact
+      event.preventDefault()
+      handleCut(false)
     }
     if (combo === 'Ctrl+C') {
+      // copy formatted
       event.preventDefault()
-      handleCopy()
+      handleCopy(true)
+    }
+    if (combo === 'Ctrl+Shift+C') {
+      // copy compact
+      event.preventDefault()
+      handleCopy(false)
     }
     // Ctrl+V (paste) is handled by the on:paste event
 

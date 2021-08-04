@@ -1,0 +1,76 @@
+@import '../../styles';
+
+.dropdown-button {
+  @include jsoneditor-button;
+  position: relative;
+  padding: 0;
+  display: flex;
+
+  ul {
+    margin: 0;
+    padding: 0;
+
+    li {
+      margin: 0;
+      padding: 0;
+      list-style-type: none;
+    }
+  }
+
+  button.open-dropdown {
+    @include jsoneditor-button;
+
+    padding: $padding $padding-half;
+    background: $dark-gray;
+    color: $white;
+
+    $gray-highlight: lighten($dark-gray, 5%);
+
+    &:hover {
+      background: $gray-highlight;
+    }
+
+    &:disabled {
+      color: $gray;
+      background: unset;
+    }
+
+    border-radius: 0;
+  }
+
+  .items {
+    $background: lighten($dark-gray, 5%);
+    $background-highlight: lighten($background, 5%);
+
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1;
+    background: $background;
+    color: $white;
+    box-shadow: $box-shadow;
+
+    &.visible {
+      display: block;
+    }
+
+    button {
+      @include jsoneditor-button;
+
+      width: 100%;
+      text-align: left;
+      padding: $padding;
+      margin: 0;
+
+      &:hover {
+        background: $background-highlight;
+      }
+
+      &:disabled {
+        color: $gray;
+        background: unset;
+      }
+    }
+  }
+}
