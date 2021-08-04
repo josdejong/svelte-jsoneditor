@@ -1,6 +1,9 @@
 @import '../../styles';
 
 .dropdown-button {
+  $background: lighten($dark-gray, 5%);
+  $background-highlight: lighten($background, 5%);
+
   @include jsoneditor-button;
   position: relative;
   padding: 0;
@@ -26,6 +29,10 @@
 
     $gray-highlight: lighten($dark-gray, 5%);
 
+    &.visible {
+      background: $background;
+    }
+
     &:hover {
       background: $gray-highlight;
     }
@@ -39,9 +46,6 @@
   }
 
   .items {
-    $background: lighten($dark-gray, 5%);
-    $background-highlight: lighten($background, 5%);
-
     display: none;
     position: absolute;
     top: 100%;

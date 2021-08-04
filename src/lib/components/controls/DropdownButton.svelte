@@ -46,7 +46,7 @@
 <div class="dropdown-button" {title} on:click={handleClick}>
   <slot name="defaultItem" />
 
-  <button type="button" class="open-dropdown" on:click={toggleShow}>
+  <button type="button" class="open-dropdown" class:visible on:click={toggleShow}>
     <Icon data={faCaretDown} />
   </button>
 
