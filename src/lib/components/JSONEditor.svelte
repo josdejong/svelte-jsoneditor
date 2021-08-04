@@ -2,11 +2,11 @@
 
 <script>
   import { faCode } from '@fortawesome/free-solid-svg-icons'
-  import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import createDebug from 'debug'
   import Modal from 'svelte-simple-modal'
   import { MODE } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
+  import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import CodeMode from './modes/codemode/CodeMode.svelte'
   import TreeMode from './modes/treemode/TreeMode.svelte'
 
@@ -29,6 +29,9 @@
     // no op by default
   }
   export let onRenderMenu = () => {
+    // no op by default
+  }
+  export let onTransform = () => {
     // no op by default
   }
   export let onChangeMode = () => {
@@ -124,12 +127,14 @@
     throw new Error(`Method expand is not available in mode "${mode}"`)
   }
 
-  export function collapse(callback) {
-    if (refTreeMode) {
-      return refTreeMode.collapse(callback)
-    }
+  export function transform() {
+    const selectedPath = []
 
-    throw new Error(`Method collapse is not available in mode "${mode}"`)
+    if (refCodeMode) {
+      refCodeMode.openTransformModal(selectedPath)
+    } else if (refTreeMode) {
+      refTreeMode.openTransformModal(selectedPath)
+    }
   }
 
   export function scrollTo(path) {
@@ -285,6 +290,7 @@
             onFocus={handleFocus}
             onBlur={handleBlur}
             onRenderMenu={handleRenderMenu}
+            {onTransform}
           />
         {:else}
           <!-- mode === MODE.TREE -->
@@ -301,9 +307,10 @@
             onChangeText={handleChangeText}
             onRequestRepair={handleRequestRepair}
             {onClassName}
-            onRenderMenu={handleRenderMenu}
             onFocus={handleFocus}
             onBlur={handleBlur}
+            onRenderMenu={handleRenderMenu}
+            {onTransform}
           />
         {/if}
       {/key}

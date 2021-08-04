@@ -110,6 +110,7 @@
   export let onChangeText
   export let onRequestRepair = () => {}
   export let onRenderMenu = () => {}
+  export let onTransform = () => {}
 
   function noop() {}
 
@@ -227,10 +228,6 @@
   let historyState = history.getState()
 
   export function expand(callback = () => true) {
-    state = syncState(json, state, [], callback, true)
-  }
-
-  export function collapse(callback = () => false) {
     state = syncState(json, state, [], callback, true)
   }
 
@@ -965,7 +962,7 @@
     openSortModal(selectedPath)
   }
 
-  function openTransformModal(selectedPath) {
+  export function openTransformModal(selectedPath) {
     if (readOnly) {
       return
     }
@@ -980,11 +977,16 @@
         onTransform: async (operations) => {
           debug('onTransform', selectedPath, operations)
 
+          const updatedOperations = onTransform(operations) || operations
+          if (isEmpty(updatedOperations)) {
+            return
+          }
+
           const newSelection = createSelection(json, state, {
             type: SELECTION_TYPE.VALUE,
             path: selectedPath
           })
-          handlePatch(operations, newSelection)
+          handlePatch(updatedOperations, newSelection)
 
           // expand the newly replaced array
           handleExpand(selectedPath, true)

@@ -3,7 +3,7 @@
   import createDebug from 'debug'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
-  import { debounce, uniqueId } from 'lodash-es'
+  import { debounce, isEmpty, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount } from 'svelte'
   import {
     CHECK_VALID_JSON_DELAY,
@@ -38,6 +38,7 @@
   export let onFocus = () => {}
   export let onBlur = () => {}
   export let onRenderMenu = () => {}
+  export let onTransform = () => {}
 
   const debug = createDebug('jsoneditor:CodeMode')
 
@@ -245,11 +246,7 @@
     }
   }
 
-  function handleTransform() {
-    if (readOnly) {
-      return
-    }
-
+  export function openTransformModal(selectedPath) {
     try {
       const json = JSON.parse(text)
 
@@ -258,11 +255,17 @@
         {
           id: transformModalId,
           json: json,
-          selectedPath: [],
+          selectedPath,
           indentation,
           onTransform: async (operations) => {
-            debug('onTransform', operations)
-            patch(operations)
+            debug('onTransform', selectedPath, operations)
+
+            const updatedOperations = onTransform(operations) || operations
+            if (isEmpty(updatedOperations)) {
+              return
+            }
+
+            patch(updatedOperations)
           }
         },
         TRANSFORM_MODAL_OPTIONS,
@@ -273,6 +276,15 @@
     } catch (err) {
       onError(err)
     }
+  }
+
+  function handleTransform() {
+    if (readOnly) {
+      return
+    }
+
+    const selectedPath = []
+    openTransformModal(selectedPath)
   }
 
   function handleToggleSearch() {

@@ -147,8 +147,9 @@
         json,
         onChange: ({ json, text }) => console.log('onChange', { json, text }),
         onChangeMode: (mode) => console.log('onChangeMode', mode),
-        onFocus: () => console.log('got focus...'),
-        onBlur: () => console.log('lost focus...'),
+        onFocus: () => console.log('onFocus'),
+        onBlur: () => console.log('onBlur'),
+        onTransform: (operations) => console.log('onTransform', operations),
         validator: (json) => {
           if (
             json &&
@@ -275,7 +276,7 @@
       }
 
       document.getElementById('collapseAll').onclick = function () {
-        testEditor.collapse(() => false)
+        testEditor.expand(() => false)
       }
 
       document.getElementById('mainMenuBar').onclick = function (event) {

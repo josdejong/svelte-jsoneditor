@@ -1,6 +1,7 @@
 <svelte:options immutable={true} />
 
 <script>
+  import { uniqueId } from '../../utils/uniqueId.js'
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import * as _ from 'lodash-es'
   import { debounce, isEmpty } from 'lodash-es'
@@ -14,9 +15,9 @@
   import { transformModalState } from './transformModalState.js'
   import TransformWizard from './TransformWizard.svelte'
 
-  export let id
+  export let id = 'transform-modal-' + uniqueId()
   export let json
-  export let selectedPath
+  export let selectedPath = []
   export let onTransform
   export let indentation = 2
 
