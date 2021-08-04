@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script>
-  import DropdownButton from '$lib/components/controls/DropdownButton.svelte'
+  import DropdownButton from '../../../../components/controls/DropdownButton.svelte'
   import {
     faCaretSquareDown,
     faCaretSquareUp,

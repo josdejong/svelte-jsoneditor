@@ -3,7 +3,7 @@
 <script>
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
-  import { compileJSONPointer, getIn, parseJSONPointer } from 'immutable-json-patch'
+  import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
   import { isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
@@ -49,6 +49,8 @@
   export let onPasteJson
   export let onContextMenu
   export let onClassName
+  export let onDrag
+  export let onDragEnd
 
   /** @type {function (path: Path, section: Section)} */
   export let onExpandSection
@@ -176,9 +178,10 @@
       }
     }
 
-    // we attach the mouse up event listener to the global document,
-    // so we will not miss if the mouse up is happening outside of the editor
-    document.addEventListener('mouseup', handleMouseUp)
+    // we attach the mousemove and mouseup event listeners to the global document,
+    // so we will not miss if the mouse events happen outside of the editor
+    document.addEventListener('mousemove', onDrag, true)
+    document.addEventListener('mouseup', handleMouseUpGlobal)
   }
 
   function handleMouseMove(event) {
@@ -210,14 +213,16 @@
     }
   }
 
-  function handleMouseUp(event) {
+  function handleMouseUpGlobal(event) {
     if (singleton.mousedown) {
       event.stopPropagation()
 
       singleton.mousedown = false
     }
 
-    document.removeEventListener('mouseup', handleMouseUp)
+    onDragEnd()
+    document.removeEventListener('mousemove', onDrag, true)
+    document.removeEventListener('mouseup', handleMouseUpGlobal)
   }
 
   function handleMouseOver(event) {
@@ -367,6 +372,8 @@
               {onExpandSection}
               {onContextMenu}
               {onClassName}
+              {onDrag}
+              {onDragEnd}
               {selection}
             >
               <div slot="identifier" class="identifier">
@@ -486,6 +493,8 @@
             {onExpandSection}
             {onContextMenu}
             {onClassName}
+            {onDrag}
+            {onDragEnd}
             {selection}
           >
             <div slot="identifier" class="identifier">

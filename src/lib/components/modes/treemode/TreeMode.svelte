@@ -1,6 +1,7 @@
 <svelte:options immutable={true} />
 
 <script>
+  import { createAutoScrollHandler } from '../../../components/controls/createAutoScrollHandler.js'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import createDebug from 'debug'
   import {
@@ -1577,6 +1578,8 @@
     refHiddenInput.focus()
     refHiddenInput.select()
   }
+
+  $: autoScrollHandler = createAutoScrollHandler(refContents)
 </script>
 
 <div
@@ -1637,7 +1640,7 @@
         </div>
       {/if}
     {:else}
-      <div class="contents" bind:this={refContents}>
+      <div class="contents" data-jsoneditor-scrollable-contents={true} bind:this={refContents}>
         <JSONNode
           value={json}
           path={[]}
@@ -1653,6 +1656,8 @@
           onExpandSection={handleExpandSection}
           onContextMenu={openContextMenu}
           onClassName={onClassName || noop}
+          onDrag={autoScrollHandler.onDrag}
+          onDragEnd={autoScrollHandler.onDragEnd}
           {selection}
         />
       </div>

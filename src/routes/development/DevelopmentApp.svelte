@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createAjvValidator, JSONEditor } from '$lib'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
+  import { range } from 'lodash-es'
 
   let json = {
     array: [1, 2, [3, 4, 5]],
@@ -132,6 +133,14 @@
       }}
     >
       Set empty string
+    </button>
+    <button
+      on:click={() => {
+        text = undefined
+        json = range(0, 999)
+      }}
+    >
+      Set long array
     </button>
     <button
       on:click={() => {
