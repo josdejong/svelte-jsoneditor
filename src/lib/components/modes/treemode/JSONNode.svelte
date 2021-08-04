@@ -1,6 +1,11 @@
 <svelte:options immutable={true} />
 
 <script>
+  import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
+  import classnames from 'classnames'
+  import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
+  import { isEqual, last } from 'lodash-es'
+  import Icon from 'svelte-awesome'
   import {
     HOVER_COLLECTION,
     HOVER_INSERT_AFTER,
@@ -12,22 +17,17 @@
     STATE_KEYS,
     STATE_VISIBLE_SECTIONS,
     VALIDATION_ERROR
-  } from '$lib/constants.js'
-  import { getVisibleCaretPositions } from '$lib/logic/documentState.js'
-  import { rename } from '$lib/logic/operations.js'
-  import { isPathInsideSelection, SELECTION_TYPE } from '$lib/logic/selection.js'
+  } from '../../../constants.js'
+  import { getVisibleCaretPositions } from '../../../logic/documentState.js'
+  import { rename } from '../../../logic/operations.js'
+  import { isPathInsideSelection, SELECTION_TYPE } from '../../../logic/selection.js'
   import {
     getSelectionTypeFromTarget,
     isChildOfAttribute,
     isChildOfNodeName,
     isContentEditableDiv
-  } from '$lib/utils/domUtils.js'
-  import { valueType } from '$lib/utils/typeUtils.js'
-  import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
-  import classnames from 'classnames'
-  import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
-  import { isEqual, last } from 'lodash-es'
-  import Icon from 'svelte-awesome'
+  } from '../../../utils/domUtils.js'
+  import { valueType } from '../../../utils/typeUtils.js'
   import CollapsedItems from './CollapsedItems.svelte'
   import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
   import JSONKey from './JSONKey.svelte'
