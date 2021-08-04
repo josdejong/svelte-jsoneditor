@@ -49,6 +49,7 @@
     "@rollup/plugin-commonjs": "20.0.0",
     "@rollup/plugin-json": "4.1.0",
     "@rollup/plugin-node-resolve": "13.0.4",
+    "@rollup/plugin-typescript": "8.2.5",
     "@sveltejs/kit": "next",
     "@types/cookie": "0.4.1",
     "@types/lodash-es": "4.17.4",

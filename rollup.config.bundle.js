@@ -1,6 +1,7 @@
 import commonjs from '@rollup/plugin-commonjs'
 import json from '@rollup/plugin-json'
 import resolve from '@rollup/plugin-node-resolve'
+import typescript from '@rollup/plugin-typescript'
 import path from 'path'
 import svelte from 'rollup-plugin-svelte'
 import { terser } from 'rollup-plugin-terser'
@@ -41,10 +42,10 @@ export default {
     resolve({
       browser: true
     }),
-
     commonjs(),
     json(),
-    resolve(),
+
+    typescript(),
 
     // minify
     production && terser()

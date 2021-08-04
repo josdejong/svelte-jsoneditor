@@ -1,7 +1,9 @@
 <svelte:options immutable={true} />
 
 <script>
-  import DropdownButton from '../../../../components/controls/DropdownButton.svelte'
+  import { SELECTION_TYPE } from '$lib/logic/selection.js'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
+  import { isObjectOrArray } from '$lib/utils/typeUtils.js'
   import {
     faCaretSquareDown,
     faCaretSquareUp,
@@ -19,9 +21,7 @@
   import { initial, isEmpty } from 'lodash-es'
   import { onMount } from 'svelte'
   import Icon from 'svelte-awesome'
-  import { SELECTION_TYPE } from '../../../../logic/selection.js'
-  import { keyComboFromEvent } from '../../../../utils/keyBindings.js'
-  import { isObjectOrArray } from '../../../../utils/typeUtils.js'
+  import DropdownButton from '../../../../components/controls/DropdownButton.svelte'
 
   export let json
   export let selection
