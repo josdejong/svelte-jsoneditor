@@ -119,9 +119,9 @@
   export function expand(callback) {
     if (refTreeMode) {
       return refTreeMode.expand(callback)
+    } else {
+      throw new Error(`Method expand is not available in mode "${mode}"`)
     }
-
-    throw new Error(`Method expand is not available in mode "${mode}"`)
   }
 
   /**
@@ -135,27 +135,27 @@
       refCodeMode.openTransformModal(options)
     } else if (refTreeMode) {
       refTreeMode.openTransformModal(options)
+    } else {
+      throw new Error(`Method transform is not available in mode "${mode}"`)
     }
-
-    throw new Error(`Method transform is not available in mode "${mode}"`)
   }
 
   export function scrollTo(path) {
     if (refTreeMode) {
       return refTreeMode.scrollTo(path)
+    } else {
+      // TODO: implement scrollTo for code mode
+
+      throw new Error(`Method scrollTo is not available in mode "${mode}"`)
     }
-
-    // TODO: implement scrollTo for code mode
-
-    throw new Error(`Method scrollTo is not available in mode "${mode}"`)
   }
 
   export function findElement(path) {
     if (refTreeMode) {
       return refTreeMode.findElement(path)
+    } else {
+      throw new Error(`Method findElement is not available in mode "${mode}"`)
     }
-
-    throw new Error(`Method findElement is not available in mode "${mode}"`)
   }
 
   export function setValidator(newValidator) {
