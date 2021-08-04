@@ -38,7 +38,6 @@
   export let onFocus = () => {}
   export let onBlur = () => {}
   export let onRenderMenu = () => {}
-  export let onTransform = () => {}
 
   const debug = createDebug('jsoneditor:CodeMode')
 
@@ -246,31 +245,39 @@
     }
   }
 
-  export function openTransformModal(selectedPath) {
+  export function openTransformModal({ id, selectedPath, onTransform, onClose }) {
     try {
       const json = JSON.parse(text)
 
       open(
         TransformModal,
         {
-          id: transformModalId,
+          id: id || transformModalId,
           json: json,
           selectedPath,
           indentation,
-          onTransform: async (operations) => {
-            debug('onTransform', selectedPath, operations)
+          onTransform: onTransform
+            ? (operations) => {
+                onTransform({
+                  operations,
+                  json,
+                  transformedJson: immutableJSONPatch(json, operations)
+                })
+              }
+            : async (operations) => {
+                debug('onTransform', selectedPath, operations)
 
-            const updatedOperations = onTransform(operations) || operations
-            if (isEmpty(updatedOperations)) {
-              return
-            }
-
-            patch(updatedOperations)
-          }
+                patch(operations)
+              }
         },
         TRANSFORM_MODAL_OPTIONS,
         {
-          onClose: focus
+          onClose: () => {
+            focus()
+            if (onClose) {
+              onClose()
+            }
+          }
         }
       )
     } catch (err) {
@@ -283,8 +290,9 @@
       return
     }
 
-    const selectedPath = []
-    openTransformModal(selectedPath)
+    openTransformModal({
+      selectedPath: []
+    })
   }
 
   function handleToggleSearch() {

@@ -31,9 +31,6 @@
   export let onRenderMenu = () => {
     // no op by default
   }
-  export let onTransform = () => {
-    // no op by default
-  }
   export let onChangeMode = () => {
     // no op by default
   }
@@ -127,14 +124,20 @@
     throw new Error(`Method expand is not available in mode "${mode}"`)
   }
 
-  export function transform() {
-    const selectedPath = []
-
+  /**
+   * @param {Object} options
+   * @property {string} [id]
+   * @property {({ operations: JSONPatchDocument, json: JSON, transformedJson: JSON }) => void} [onTransform]
+   * @property {() => void} [onClose]
+   */
+  export function transform(options) {
     if (refCodeMode) {
-      refCodeMode.openTransformModal(selectedPath)
+      refCodeMode.openTransformModal(options)
     } else if (refTreeMode) {
-      refTreeMode.openTransformModal(selectedPath)
+      refTreeMode.openTransformModal(options)
     }
+
+    throw new Error(`Method transform is not available in mode "${mode}"`)
   }
 
   export function scrollTo(path) {
@@ -290,7 +293,6 @@
             onFocus={handleFocus}
             onBlur={handleBlur}
             onRenderMenu={handleRenderMenu}
-            {onTransform}
           />
         {:else}
           <!-- mode === MODE.TREE -->
@@ -310,7 +312,6 @@
             onFocus={handleFocus}
             onBlur={handleBlur}
             onRenderMenu={handleRenderMenu}
-            {onTransform}
           />
         {/if}
       {/key}

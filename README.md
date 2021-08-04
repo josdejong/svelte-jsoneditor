@@ -225,8 +225,6 @@ const editor = new JSONEditor({
     }
     ```
 
-- `onTransform(operations: JSONPatchDocument) : JSONPatchDocument | undefined`.
-  Intercept a transform operation. The returned operations will be applied. This makes it possible to adjust the transform operations, or effectively cancel it by returning an empty JSONPatchDocument. When `undefined` is returned, the original `operations` will be applied.
 - `onFocus()` callback fired when the editor got focus.
 - `onBlur()` callback fired when the editor lost focus.
 
@@ -237,13 +235,13 @@ const editor = new JSONEditor({
 - `set(json: JSON)` Replace the current JSON document. Will reset the state of the editor.
 - `setText(text: string)` Replace the current JSON document, passing stringified JSON contents.
 - `update(json: JSON)` Update the loaded JSON document, keeping the state of the editor (like expanded objects).
-- `updateText(text: JSON)` Update the loaded JSON document, keeping the state of the editor (like expanded objects).
+- `updateText(text: string)` Update the loaded JSON document, keeping the state of the editor (like expanded objects).
 - `patch(operations: JSONPatchDocument)` Apply a JSON patch document to update the contents of the JSON document. A JSON patch document is a list with JSON Patch operations.
 - `expand([callback: (path: Path) => boolean])` Expand or collapse paths in the editor. The `callback` determines which paths will be expanded. If no `callback` is provided, all paths will be expanded. It is only possible to expand a path when all of its parent paths are expanded too. Examples:
   - `editor.expand(path => true)` expand all
   - `editor.expand(path => false)` collapse all
   - `editor.expand(path => path.length < 2)` expand all paths up to 2 levels deep
-- `transform()` programmatically trigger clicking of the transform button in the main menu, opening the transform model. See also `onTransform` to intercept the result.
+- `transform({ id?: string, onTransform?: ({ operations: JSONPatchDocument, json: JSON, transformedJson: JSON }) => void, onClose?: () => void })` programmatically trigger clicking of the transform button in the main menu, opening the transform model. If a callback `onTransform` is provided, it will replace the build-in logic to apply a transform, allowing you to process the transform operations in an alternative way. If provided, `onClose` callback will trigger when the transform modal closes, both after the user clicked apply or cancel. If an `id` is provided, the transform modal will load the previous status of this `id` instead of the status of the editors transform modal.
 - `scrollTo(path: Array.<string|number>)` Scroll the editor vertically such that the specified path comes into view. The path will be expanded when needed.
 - `focus()`. Give the editor focus.
 - `destroy()`. Destroy the editor, remove it from the DOM.

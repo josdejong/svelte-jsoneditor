@@ -110,7 +110,6 @@
   export let onChangeText
   export let onRequestRepair = () => {}
   export let onRenderMenu = () => {}
-  export let onTransform = () => {}
 
   function noop() {}
 
@@ -962,7 +961,7 @@
     openSortModal(selectedPath)
   }
 
-  export function openTransformModal(selectedPath) {
+  export function openTransformModal({ id, selectedPath, onTransform, onClose }) {
     if (readOnly) {
       return
     }
@@ -970,32 +969,40 @@
     open(
       TransformModal,
       {
-        id: transformModalId,
+        id: id || transformModalId,
         json: json,
         selectedPath,
         indentation,
-        onTransform: async (operations) => {
-          debug('onTransform', selectedPath, operations)
+        onTransform: onTransform
+          ? (operations) => {
+              onTransform({
+                operations,
+                json,
+                transformedJson: immutableJSONPatch(json, operations)
+              })
+            }
+          : async (operations) => {
+              debug('onTransform', selectedPath, operations)
 
-          const updatedOperations = onTransform(operations) || operations
-          if (isEmpty(updatedOperations)) {
-            return
-          }
+              const newSelection = createSelection(json, state, {
+                type: SELECTION_TYPE.VALUE,
+                path: selectedPath
+              })
+              handlePatch(operations, newSelection)
 
-          const newSelection = createSelection(json, state, {
-            type: SELECTION_TYPE.VALUE,
-            path: selectedPath
-          })
-          handlePatch(updatedOperations, newSelection)
-
-          // expand the newly replaced array
-          handleExpand(selectedPath, true)
-          // FIXME: because we apply expand *after* the patch, when doing undo/redo, the expanded state is not restored
-        }
+              // expand the newly replaced array
+              handleExpand(selectedPath, true)
+              // FIXME: because we apply expand *after* the patch, when doing undo/redo, the expanded state is not restored
+            }
       },
       TRANSFORM_MODAL_OPTIONS,
       {
-        onClose: () => focus()
+        onClose: () => {
+          focus()
+          if (onClose) {
+            onClose()
+          }
+        }
       }
     )
   }
@@ -1006,12 +1013,15 @@
     }
 
     const selectedPath = findRootPath(json, selection)
-    openTransformModal(selectedPath)
+    openTransformModal({
+      selectedPath
+    })
   }
 
   function handleTransformAll() {
-    const selectedPath = []
-    openTransformModal(selectedPath)
+    openTransformModal({
+      selectedPath: []
+    })
   }
 
   /**
