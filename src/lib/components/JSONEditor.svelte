@@ -23,6 +23,7 @@
   export let indentation = 2
   export let mode = MODE.TREE
   export let mainMenuBar = true
+  export let navigationBar = true
   export let validator = null
   export let onChange = null
   export let onClassName = () => {
@@ -174,6 +175,14 @@
     return mainMenuBar
   }
 
+  export function setNavigationBar(newNavigationBar) {
+    navigationBar = newNavigationBar
+  }
+
+  export function getNavigationBar() {
+    return navigationBar
+  }
+
   export function setMode(newMode) {
     mode = newMode
   }
@@ -286,6 +295,7 @@
             {readOnly}
             {indentation}
             {mainMenuBar}
+            {navigationBar}
             {validator}
             onChange={handleChangeText}
             onSwitchToTreeMode={handleSwitchToTreeMode}
@@ -303,6 +313,7 @@
             externalJson={json}
             externalText={text}
             {mainMenuBar}
+            {navigationBar}
             {validator}
             {onError}
             onChangeJson={handleChangeJson}

@@ -81,6 +81,7 @@
   import JSONNode from './JSONNode.svelte'
   import TreeMenu from './menu/TreeMenu.svelte'
   import Welcome from './Welcome.svelte'
+  import NavigationBar from '../../../components/controls/navigationBar/NavigationBar.svelte'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -103,6 +104,7 @@
   export let externalJson
   export let externalText
   export let mainMenuBar = true
+  export let navigationBar = true
   export let validator = null
   export let visible = true
   export let indentation = 2
@@ -1445,7 +1447,7 @@
     })
   }
 
-  function openContextMenu({ anchor, left, top, width, height }) {
+  function openContextMenu({ anchor, left, top, width, height, offsetTop, offsetLeft }) {
     const props = {
       json,
       selection,
@@ -1477,6 +1479,8 @@
     openAbsolutePopup(ContextMenu, props, {
       left,
       top,
+      offsetTop,
+      offsetLeft,
       width,
       height,
       anchor,
@@ -1514,6 +1518,7 @@
       if (anchor) {
         openContextMenu({
           anchor,
+          offsetTop: 2,
           width: CONTEXT_MENU_WIDTH,
           height: CONTEXT_MENU_HEIGHT
         })
@@ -1539,6 +1544,7 @@
 
     openContextMenu({
       anchor: findParentWithNodeName(event.target, 'BUTTON'),
+      offsetTop: 0,
       width: CONTEXT_MENU_WIDTH,
       height: CONTEXT_MENU_HEIGHT
     })
@@ -1569,6 +1575,13 @@
 
   function handleClearPastedJson() {
     pastedJson = undefined
+  }
+
+  function handleNavigationBarSelect(newSelection) {
+    selection = newSelection
+
+    focus()
+    scrollTo(newSelection.focusPath)
   }
 
   export function focus() {
@@ -1613,6 +1626,16 @@
       onPreviousSearchResult={handlePreviousSearchResult}
       onFocus={focus}
       {onRenderMenu}
+    />
+  {/if}
+
+  {#if navigationBar}
+    <NavigationBar
+      name={Array.isArray(json) ? 'array' : 'object'}
+      {json}
+      {state}
+      {selection}
+      onSelect={handleNavigationBarSelect}
     />
   {/if}
 

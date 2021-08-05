@@ -1,0 +1,38 @@
+@import '../../../styles';
+
+.jse-navigation-bar-item {
+  position: relative;
+  display: flex;
+
+  button.jse-navigation-bar-button {
+    font-family: $font-family-mono;
+    font-size: $font-size-mono;
+    padding: $padding-half 2px;
+    border: none;
+    background: transparent;
+    color: $dark-gray;
+    cursor: pointer;
+    outline: none;
+    min-width: 24px;
+    white-space: nowrap;
+
+    &:focus,
+    &:hover {
+      background: darken($very-light-gray, 10%);
+    }
+
+    &.jse-navigation-bar-arrow {
+      font-size: $font-size-mono - 10px;
+      line-height: $font-size-mono - 10px;
+      padding: $padding-half $padding;
+
+      &.open {
+        background: $white;
+      }
+    }
+  }
+
+  &:last-child {
+    padding-right: $padding;
+  }
+}

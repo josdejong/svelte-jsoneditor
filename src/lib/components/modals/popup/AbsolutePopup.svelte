@@ -38,7 +38,7 @@
     }
   }
 
-  function handleWindowMouseDown(event) {
+  function closeWhenOutside(event) {
     if (
       popupOptions &&
       popupOptions.closeOnOuterClick &&
@@ -46,6 +46,10 @@
     ) {
       closeAbsolutePopup()
     }
+  }
+
+  function handleWindowMouseDown(event) {
+    closeWhenOutside(event)
   }
 
   function handleMouseDownInside(event) {
@@ -59,22 +63,22 @@
     }
   }
 
-  function handleScrollWheel() {
-    closeAbsolutePopup()
+  function handleScrollWheel(event) {
+    closeWhenOutside(event)
   }
 
   function calculateStyle() {
     function calculatePosition() {
       if (popupOptions.anchor) {
-        const { anchor, width, height } = popupOptions
+        const { anchor, width, height, offsetTop = 0, offsetLeft = 0 } = popupOptions
         const { left, top, bottom, right } = anchor.getBoundingClientRect()
 
         const positionAbove = top + height > window.innerHeight && top > height
         const positionLeft = left + width > window.innerWidth && left > width
 
         return {
-          left: positionLeft ? right : left,
-          top: positionAbove ? top - 2 : bottom + 2,
+          left: positionLeft ? right - offsetLeft : left + offsetLeft,
+          top: positionAbove ? top - offsetTop : bottom + offsetTop,
           positionAbove,
           positionLeft
         }

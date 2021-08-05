@@ -1,0 +1,40 @@
+@import '../../../styles';
+
+.jse-navigation-bar-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 3; // above the floating ContextMenuButton
+  background: white;
+  box-shadow: $box-shadow;
+  display: flex;
+  flex-direction: column;
+  max-height: 300px;
+  overflow: auto;
+  min-width: 80px;
+
+  button.jse-navigation-bar-dropdown-item {
+    font-family: $font-family-mono;
+    font-size: $font-size-mono;
+    border: none;
+    background: transparent;
+    color: $dark-gray;
+    cursor: pointer;
+    outline: none;
+    text-align: left;
+    white-space: nowrap;
+    box-sizing: border-box;
+    // FIXME: must align exactly with the text in the navigation bar, how to ensure that?
+    padding: $padding-half 36px;
+
+    &:focus,
+    &:hover {
+      background: $background-gray;
+    }
+
+    &.selected {
+      background: $dark-gray;
+      color: white;
+    }
+  }
+}

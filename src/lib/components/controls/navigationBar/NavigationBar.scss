@@ -1,0 +1,18 @@
+@import '../../../styles';
+
+.jse-navigation-bar {
+  font-family: $font-family-mono;
+  font-size: $font-size-mono;
+  background: $very-light-gray;
+  color: $dark-gray;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  overflow: hidden;
+
+  .jse-navigation-bar-empty {
+    line-height: $font-size-mono;
+    padding: $padding-half $padding;
+    color: $light-gray;
+  }
+}

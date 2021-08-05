@@ -166,11 +166,9 @@ const editor = new JSONEditor({
 ### properties
 
 - `json` Pass the JSON document to be rendered in the JSONEditor
-<!-- FIXME: readOnly is currently broken
-- `readOnly: boolean` If `true`, the editor is read only. Default value is `false`.
-  -->
 - `mode: 'tree' | 'code'`. Open the editor in `'tree'` mode (default) or `'code'` mode.
 - `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
+- `navigationBar: boolean` Show the navigation bar with, where you can see the selected path and navigate through your document from there. Default value is `true`.
 - `readOnly: boolean` Open the editor in read-only mode: no changes can be made, non-relevant buttons are hidden from the menu, and the context menu is not enabled. Default value is `false`.
 - `indentation: number` Number of spaces use for indentation when stringifying JSON.
 - `validator: function (json): ValidationError[]`. Validate the JSON document.

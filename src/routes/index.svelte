@@ -2,7 +2,7 @@
   import DevelopmentApp from './development/DevelopmentApp.svelte'
 
   export const prerender = true
-  export const ssr = true
+  export const ssr = false
 </script>
 
 <svelte:head>

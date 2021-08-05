@@ -121,3 +121,14 @@ export function forEachIndex(start, end, iteratee) {
     iteratee(index)
   }
 }
+
+/**
+ * Limit the number of items in an array
+ * @param {Array} array
+ * @param {number} max
+ * @returns {Array}
+ */
+// TODO: write unit test
+export function limit(array, max) {
+  return array.length > max ? array.slice(0, max) : array
+}

@@ -58,6 +58,7 @@
   const validate = useLocalStorage('svelte-jsoneditor-demo-validate', true)
   const readOnly = useLocalStorage('svelte-jsoneditor-demo-readOnly', false)
   const mainMenuBar = useLocalStorage('svelte-jsoneditor-demo-mainMenuBar', true)
+  const navigationBar = useLocalStorage('svelte-jsoneditor-demo-navigationBar', true)
 
   function onRenderMenu(mode, items) {
     if (!import.meta.env.SSR) {
@@ -95,7 +96,10 @@
       <input type="checkbox" bind:checked={$validate} /> Validate
     </label>
     <label>
-      <input type="checkbox" bind:checked={$mainMenuBar} /> Menu bar
+      <input type="checkbox" bind:checked={$mainMenuBar} /> Main menu bar
+    </label>
+    <label>
+      <input type="checkbox" bind:checked={$navigationBar} /> Navigation bar
     </label>
     <label>
       <input type="checkbox" bind:checked={$readOnly} /> Read-only
@@ -198,6 +202,7 @@
             bind:text
             bind:json
             mainMenuBar={$mainMenuBar}
+            navigationBar={$navigationBar}
             readOnly={$readOnly}
             {indentation}
             validator={$validate ? validator : undefined}
@@ -233,6 +238,7 @@
             bind:text
             bind:json
             mainMenuBar={$mainMenuBar}
+            navigationBar={$navigationBar}
             readOnly={$readOnly}
             {indentation}
             validator={$validate ? validator : undefined}
