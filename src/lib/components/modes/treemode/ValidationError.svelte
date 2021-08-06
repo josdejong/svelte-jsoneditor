@@ -37,6 +37,8 @@
   on:click={onExpand}
   on:mouseover={handleMouseOver}
   on:mouseout={handleMouseOut}
+  on:focus={undefined}
+  on:blur={undefined}
 >
   <Icon data={faExclamationTriangle} />
 </button>
