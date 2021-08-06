@@ -414,7 +414,7 @@
 
   /**
    * @param {JSONPatchDocument} operations
-   * @param {Selection} [newSelection]
+   * @param {Selection | (json: JSON, state: JSON) => Selection} [newSelection]
    */
   export function patch(operations, newSelection) {
     if (json === undefined) {
@@ -435,11 +435,13 @@
     state = update.state
     text = undefined
     textIsRepaired = false
-    selection = clearSelectionWhenNotExisting(selection, json)
 
-    if (newSelection) {
+    if (typeof newSelection === 'function') {
+      selection = newSelection(json, state)
+    } else if (newSelection) {
       selection = newSelection
     }
+    selection = clearSelectionWhenNotExisting(selection, json)
 
     history.add({
       undo: {
@@ -454,7 +456,7 @@
         state,
         text,
         textIsRepaired,
-        selection: removeEditModeFromSelection(newSelection || selection)
+        selection: removeEditModeFromSelection(selection)
       }
     })
 
@@ -703,7 +705,7 @@
       // expand extracted object/array
       handleExpand([], true, false)
 
-      focus() // TODO: find a more robust way to keep focus than sprinkling focusHiddenInput() everywhere
+      focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
     }
   }
 
@@ -722,40 +724,49 @@
       const operations = insert(json, state, selection, data)
       debug('handleInsert', { type, operations, newValue, data })
 
-      // FIXME: pass newSelection here, and an expand function called during patch (currently, redo is not correctly restoring selection)
-      handlePatch(operations)
+      const operation = last(
+        operations.filter((operation) => operation.op === 'add' || operation.op === 'replace')
+      )
 
-      operations
-        .filter((operation) => operation.op === 'add' || operation.op === 'replace')
-        .forEach(async (operation) => {
-          const path = parseJSONPointerWithArrayIndices(json, operation.path)
+      handlePatch(operations, (patchedJson, patchedState) => {
+        // TODO: extract determining the newSelection in a separate function
+        if (operation) {
+          const path = parseJSONPointerWithArrayIndices(patchedJson, operation.path)
 
           if (isObjectOrArray(newValue)) {
-            // expand newly inserted object/array
             handleExpand(path, true)
 
-            selection = createSelection(json || {}, state, {
+            return createSelection(patchedJson || {}, patchedState, {
               type: SELECTION_TYPE.INSIDE,
               path
             })
-
-            focus() // TODO: find a more robust way to keep focus than sprinkling focusHiddenInput() everywhere
           }
 
           if (newValue === '') {
             // open the newly inserted value in edit mode
-            const parent = !isEmpty(path) ? getIn(json, initial(path)) : null
+            const parent = !isEmpty(path) ? getIn(patchedJson, initial(path)) : null
 
-            selection = createSelection(json, state, {
+            return createSelection(patchedJson, patchedState, {
               type: isObject(parent) ? SELECTION_TYPE.KEY : SELECTION_TYPE.VALUE,
               path,
               edit: true
             })
-
-            await tick()
-            setTimeout(() => replaceActiveElementContents(''))
           }
-        })
+
+          return undefined
+        }
+      })
+
+      if (operation) {
+        focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
+
+        if (newValue === '') {
+          // open the newly inserted value in edit mode
+          tick().then(() => {
+            setTimeout(() => replaceActiveElementContents(''))
+          })
+        }
+      }
     } else {
       // document is empty or invalid (in that case it has text but no json)
       debug('handleInsert', { type, newValue })
@@ -770,7 +781,7 @@
         path
       })
 
-      focus() // TODO: find a more robust way to keep focus than sprinkling focusHiddenInput() everywhere
+      focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
     }
   }
 
@@ -1654,13 +1665,7 @@
   {/if}
 
   {#if navigationBar}
-    <NavigationBar
-      name={Array.isArray(json) ? 'array' : 'object'}
-      {json}
-      {state}
-      {selection}
-      onSelect={handleNavigationBarSelect}
-    />
+    <NavigationBar {json} {state} {selection} onSelect={handleNavigationBarSelect} />
   {/if}
 
   {#if !isSSR}
