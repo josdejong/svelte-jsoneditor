@@ -152,10 +152,18 @@ export function isPathInsideSelection(selection, path, anchorType) {
  * @param {JSON} state
  * @param {Selection} selection
  * @param {boolean} [keepAnchorPath=false]
+ * @param {boolean} [useFocusPath=false]
  * @returns {Selection | null}
  */
-export function getSelectionUp(json, state, selection, keepAnchorPath = false) {
-  const previousPath = getPreviousVisiblePath(json, state, selection.focusPath)
+export function getSelectionUp(
+  json,
+  state,
+  selection,
+  keepAnchorPath = false,
+  useFocusPath = false
+) {
+  const path = !useFocusPath && selection.paths ? first(selection.paths) : selection.focusPath
+  const previousPath = getPreviousVisiblePath(json, state, path)
 
   if (previousPath === null) {
     return null
@@ -201,8 +209,8 @@ export function getSelectionUp(json, state, selection, keepAnchorPath = false) {
     // FIXME: when after an expanded object/array, should go to the last item inside the object/array
     return createSelection(json, state, {
       type: SELECTION_TYPE.MULTI,
-      anchorPath: selection.focusPath,
-      focusPath: selection.focusPath
+      anchorPath: path,
+      focusPath: path
     })
   }
 
@@ -210,8 +218,8 @@ export function getSelectionUp(json, state, selection, keepAnchorPath = false) {
     // select the node itself, not the previous node,
     return createSelection(json, state, {
       type: SELECTION_TYPE.MULTI,
-      anchorPath: selection.focusPath,
-      focusPath: selection.focusPath
+      anchorPath: path,
+      focusPath: path
     })
   }
 
@@ -228,11 +236,19 @@ export function getSelectionUp(json, state, selection, keepAnchorPath = false) {
  * @param {JSON} state
  * @param {Selection} selection
  * @param {boolean} [keepAnchorPath=false]
+ * @param {boolean} [useFocusPath=false]
  * @returns {Selection | null}
  */
-export function getSelectionDown(json, state, selection, keepAnchorPath = false) {
+export function getSelectionDown(
+  json,
+  state,
+  selection,
+  keepAnchorPath = false,
+  useFocusPath = false
+) {
   // TODO: this function is too large, break it down in two separate functions: one for keepAnchorPath = true, and one for keepAnchorPath = false?
-  const nextPath = getNextVisiblePath(json, state, selection.focusPath)
+  const path = !useFocusPath && selection.paths ? last(selection.paths) : selection.focusPath
+  const nextPath = getNextVisiblePath(json, state, path)
   const anchorPath = nextPath
   const focusPath = nextPath
 
@@ -243,11 +259,11 @@ export function getSelectionDown(json, state, selection, keepAnchorPath = false)
   if (keepAnchorPath) {
     // if the focusPath is an Array or object, we must not step into it but
     // over it, we pass state with this array/object collapsed
-    const collapsedState = isObjectOrArray(getIn(json, selection.focusPath))
-      ? setIn(state, selection.focusPath.concat(STATE_EXPANDED), false, true)
+    const collapsedState = isObjectOrArray(getIn(json, path))
+      ? setIn(state, path.concat(STATE_EXPANDED), false, true)
       : state
 
-    const nextPathAfter = getNextVisiblePath(json, collapsedState, selection.focusPath)
+    const nextPathAfter = getNextVisiblePath(json, collapsedState, path)
 
     // multi selection
     if (nextPathAfter === null) {

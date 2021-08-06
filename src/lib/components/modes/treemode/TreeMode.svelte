@@ -1329,7 +1329,7 @@
     if (combo === 'Up' || combo === 'Shift+Up') {
       event.preventDefault()
       selection = selection
-        ? getSelectionUp(json, state, selection, keepAnchorPath) || selection
+        ? getSelectionUp(json, state, selection, keepAnchorPath, true) || selection
         : getInitialSelection(json, state)
 
       scrollIntoView(selection.focusPath)
@@ -1337,7 +1337,7 @@
     if (combo === 'Down' || combo === 'Shift+Down') {
       event.preventDefault()
       selection = selection
-        ? getSelectionDown(json, state, selection, keepAnchorPath) || selection
+        ? getSelectionDown(json, state, selection, keepAnchorPath, true) || selection
         : getInitialSelection(json, state)
 
       scrollIntoView(selection.focusPath)

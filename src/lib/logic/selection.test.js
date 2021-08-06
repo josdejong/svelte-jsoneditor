@@ -575,6 +575,25 @@ describe('selection', () => {
           ),
           createSelection(json2, state2, {
             type: SELECTION_TYPE.MULTI,
+            anchorPath: ['a'],
+            focusPath: ['a']
+          })
+        )
+
+        assert.deepStrictEqual(
+          getSelectionUp(
+            json2,
+            state2,
+            createSelection(json2, state2, {
+              type: SELECTION_TYPE.MULTI,
+              anchorPath: ['obj'],
+              focusPath: ['d']
+            }),
+            false,
+            true
+          ),
+          createSelection(json2, state2, {
+            type: SELECTION_TYPE.MULTI,
             anchorPath: ['arr', 1],
             focusPath: ['arr', 1]
           })
@@ -741,6 +760,25 @@ describe('selection', () => {
               anchorPath: ['arr'],
               focusPath: ['a']
             })
+          ),
+          createSelection(json2, state2, {
+            type: SELECTION_TYPE.MULTI,
+            anchorPath: ['arr', 0],
+            focusPath: ['arr', 0]
+          })
+        )
+
+        assert.deepStrictEqual(
+          getSelectionDown(
+            json2,
+            state2,
+            createSelection(json2, state2, {
+              type: SELECTION_TYPE.MULTI,
+              anchorPath: ['arr'],
+              focusPath: ['a']
+            }),
+            false,
+            true
           ),
           createSelection(json2, state2, {
             type: SELECTION_TYPE.MULTI,
