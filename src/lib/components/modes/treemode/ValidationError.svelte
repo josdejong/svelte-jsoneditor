@@ -2,7 +2,7 @@
   import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
   import Icon from 'svelte-awesome'
   import { getContext } from 'svelte'
-  import ValidationErrorPopup from '$lib/components/modes/treemode/ValidationErrorPopup.svelte'
+  import ValidationErrorPopup from '../../../components/modes/treemode/ValidationErrorPopup.svelte'
 
   const { openAbsolutePopup, closeAbsolutePopup } = getContext('absolute-popup')
 
