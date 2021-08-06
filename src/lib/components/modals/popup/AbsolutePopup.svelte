@@ -70,11 +70,20 @@
   function calculateStyle() {
     function calculatePosition() {
       if (popupOptions.anchor) {
-        const { anchor, width, height, offsetTop = 0, offsetLeft = 0 } = popupOptions
+        const {
+          anchor,
+          width = 0,
+          height = 0,
+          offsetTop = 0,
+          offsetLeft = 0,
+          position
+        } = popupOptions
         const { left, top, bottom, right } = anchor.getBoundingClientRect()
 
-        const positionAbove = top + height > window.innerHeight && top > height
-        const positionLeft = left + width > window.innerWidth && left > width
+        const positionAbove =
+          position === 'top' || (top + height > window.innerHeight && top > height)
+        const positionLeft =
+          position === 'left' || (left + width > window.innerWidth && left > width)
 
         return {
           left: positionLeft ? right - offsetLeft : left + offsetLeft,
@@ -83,7 +92,7 @@
           positionLeft
         }
       } else if (typeof popupOptions.left === 'number' && typeof popupOptions.top === 'number') {
-        const { left, top, width, height } = popupOptions
+        const { left, top, width = 0, height = 0 } = popupOptions
 
         const positionAbove = top + height > window.innerHeight && top > height
         const positionLeft = left + width > window.innerWidth && left > width

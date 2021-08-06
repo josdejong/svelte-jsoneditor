@@ -1,0 +1,9 @@
+@import '../../../styles';
+
+.jse-validation-error-popup {
+  padding: $padding-half $padding;
+  border-radius: $border-radius;
+  background: $dark-gray;
+  color: white;
+  white-space: nowrap;
+}

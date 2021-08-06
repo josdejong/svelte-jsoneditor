@@ -40,8 +40,7 @@
     "sass": "^1.37.5",
     "svelte-awesome": "^2.3.2",
     "svelte-select": "^4.3.0",
-    "svelte-simple-modal": "^1.0.0",
-    "sveltip": "^0.0.1"
+    "svelte-simple-modal": "^1.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "13.1.0",
