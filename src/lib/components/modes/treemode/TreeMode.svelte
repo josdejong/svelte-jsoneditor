@@ -1,9 +1,9 @@
 <svelte:options immutable={true} />
 
 <script>
-  import { createAutoScrollHandler } from "../../../components/controls/createAutoScrollHandler.js";
-  import { faCheck, faCode, faWrench } from "@fortawesome/free-solid-svg-icons";
-  import createDebug from "debug";
+  import { createAutoScrollHandler } from '../../../components/controls/createAutoScrollHandler.js'
+  import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
+  import createDebug from 'debug'
   import {
     compileJSONPointer,
     existsIn,
@@ -12,11 +12,11 @@
     revertJSONPatch,
     setIn,
     updateIn
-  } from "immutable-json-patch";
-  import jsonrepair from "jsonrepair";
-  import { initial, isEmpty, isEqual, last, throttle, uniqueId } from "lodash-es";
-  import { getContext, onDestroy, onMount, tick } from "svelte";
-  import { createJump } from "../../../assets/jump.js/src/jump.js";
+  } from 'immutable-json-patch'
+  import jsonrepair from 'jsonrepair'
+  import { initial, isEmpty, isEqual, last, throttle, uniqueId } from 'lodash-es'
+  import { getContext, onDestroy, onMount, tick } from 'svelte'
+  import { createJump } from '../../../assets/jump.js/src/jump.js'
   import {
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
@@ -27,23 +27,23 @@
     SORT_MODAL_OPTIONS,
     STATE_EXPANDED,
     TRANSFORM_MODAL_OPTIONS
-  } from "../../../constants.js";
+  } from '../../../constants.js'
   import {
     createState,
     documentStatePatch,
     expandPath,
     expandSection,
     syncState
-  } from "../../../logic/documentState.js";
-  import { createHistory } from "../../../logic/history.js";
+  } from '../../../logic/documentState.js'
+  import { createHistory } from '../../../logic/history.js'
   import {
     createNewValue,
     createRemoveOperations,
     duplicate,
     extract,
     insert
-  } from "../../../logic/operations.js";
-  import { search, searchNext, searchPrevious, updateSearchResult } from "../../../logic/search.js";
+  } from '../../../logic/operations.js'
+  import { search, searchNext, searchPrevious, updateSearchResult } from '../../../logic/search.js'
   import {
     createSelection,
     createSelectionFromOperations,
@@ -58,31 +58,31 @@
     selectAll,
     SELECTION_TYPE,
     selectionToPartialJson
-  } from "../../../logic/selection.js";
-  import { mapValidationErrors } from "../../../logic/validation.js";
+  } from '../../../logic/selection.js'
+  import { mapValidationErrors } from '../../../logic/validation.js'
   import {
     activeElementIsChildOf,
     findParentWithNodeName,
     getWindow,
     isChildOfNodeName,
     setCursorToEnd
-  } from "../../../utils/domUtils.js";
-  import { parseJSONPointerWithArrayIndices } from "../../../utils/jsonPointer.js";
-  import { parsePartialJson, repairPartialJson } from "../../../utils/jsonUtils.js";
-  import { keyComboFromEvent } from "../../../utils/keyBindings.js";
-  import { isObject, isObjectOrArray, isUrl } from "../../../utils/typeUtils.js";
-  import { createFocusTracker } from "../../controls/createFocusTracker.js";
-  import Message from "../../controls/Message.svelte";
-  import ValidationErrorsOverview from "../../controls/ValidationErrorsOverview.svelte";
-  import CopyPasteModal from "../../modals/CopyPasteModal.svelte";
-  import JSONRepairModal from "../../modals/JSONRepairModal.svelte";
-  import SortModal from "../../modals/SortModal.svelte";
-  import TransformModal from "../../modals/TransformModal.svelte";
-  import ContextMenu from "./contextmenu/ContextMenu.svelte";
-  import JSONNode from "./JSONNode.svelte";
-  import TreeMenu from "./menu/TreeMenu.svelte";
-  import Welcome from "./Welcome.svelte";
-  import NavigationBar from "../../../components/controls/navigationBar/NavigationBar.svelte";
+  } from '../../../utils/domUtils.js'
+  import { parseJSONPointerWithArrayIndices } from '../../../utils/jsonPointer.js'
+  import { parsePartialJson, repairPartialJson } from '../../../utils/jsonUtils.js'
+  import { keyComboFromEvent } from '../../../utils/keyBindings.js'
+  import { isObject, isObjectOrArray, isUrl } from '../../../utils/typeUtils.js'
+  import { createFocusTracker } from '../../controls/createFocusTracker.js'
+  import Message from '../../controls/Message.svelte'
+  import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
+  import CopyPasteModal from '../../modals/CopyPasteModal.svelte'
+  import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
+  import SortModal from '../../modals/SortModal.svelte'
+  import TransformModal from '../../modals/TransformModal.svelte'
+  import ContextMenu from './contextmenu/ContextMenu.svelte'
+  import JSONNode from './JSONNode.svelte'
+  import TreeMenu from './menu/TreeMenu.svelte'
+  import Welcome from './Welcome.svelte'
+  import NavigationBar from '../../../components/controls/navigationBar/NavigationBar.svelte'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
