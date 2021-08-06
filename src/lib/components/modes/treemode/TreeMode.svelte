@@ -802,11 +802,12 @@
 
   function handleInsertBefore() {
     const selectionBefore = getSelectionUp(json, state, selection, false)
-
-    debug('insert before', selection, selectionBefore)
-
     const parentPath = initial(selection.focusPath)
-    if (isEqual(parentPath, initial(selectionBefore.focusPath))) {
+
+    if (
+      !isEmpty(selectionBefore.focusPath) &&
+      isEqual(parentPath, initial(selectionBefore.focusPath))
+    ) {
       selection = createSelection(json, state, {
         type: SELECTION_TYPE.AFTER,
         path: selectionBefore.focusPath
@@ -817,6 +818,8 @@
         path: parentPath
       })
     }
+
+    debug('insert before', { selection, selectionBefore, parentPath })
 
     tick().then(handleContextMenu)
   }

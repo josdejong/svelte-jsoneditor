@@ -156,12 +156,13 @@ export function isPathInsideSelection(selection, path, anchorType) {
  */
 export function getSelectionUp(json, state, selection, keepAnchorPath = false) {
   const previousPath = getPreviousVisiblePath(json, state, selection.focusPath)
-  const anchorPath = previousPath
-  const focusPath = previousPath
 
   if (previousPath === null) {
     return null
   }
+
+  const anchorPath = previousPath
+  const focusPath = previousPath
 
   if (keepAnchorPath) {
     // multi selection
