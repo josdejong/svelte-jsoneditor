@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <div class="welcome">
   <div class="space before" />
   <div class="contents">

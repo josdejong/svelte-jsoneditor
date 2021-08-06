@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script>
   import { limit } from '../../../utils/arrayUtils'
   import { truncate } from '../../../utils/stringUtils'

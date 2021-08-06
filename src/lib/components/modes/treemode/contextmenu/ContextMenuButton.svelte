@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script>
   import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
   import Icon from 'svelte-awesome'

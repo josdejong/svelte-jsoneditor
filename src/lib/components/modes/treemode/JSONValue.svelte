@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script>
   import classnames from 'classnames'
   import { compileJSONPointer } from 'immutable-json-patch'

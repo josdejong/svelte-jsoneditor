@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script>
   import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
   import { compileJSONPointer } from 'immutable-json-patch'

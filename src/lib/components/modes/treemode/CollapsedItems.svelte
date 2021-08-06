@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script>
   import { INDENTATION_WIDTH } from '../../../constants.js'
   import { getExpandItemsSections } from '../../../logic/expandItemsSections.js'

@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script>
   import { faExclamationTriangle, faWrench } from '@fortawesome/free-solid-svg-icons'
   import createDebug from 'debug'
