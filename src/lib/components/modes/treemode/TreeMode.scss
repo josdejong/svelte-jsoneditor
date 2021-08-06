@@ -32,6 +32,15 @@
     }
   }
 
+  .search-box-container {
+    position: relative;
+    height: 0;
+    top: $padding;
+    margin-right: $padding + 20px;
+    text-align: right;
+    z-index: 3; // must be above the ContextMenuButton
+  }
+
   .contents {
     flex: 1;
     overflow: auto;

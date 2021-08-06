@@ -8,6 +8,7 @@ $button-width: 20px;
   border-radius: $border-radius;
   background: $white;
   box-shadow: $box-shadow;
+  display: inline-block;
 
   .search-form {
     display: flex;
@@ -24,6 +25,7 @@ $button-width: 20px;
       border: none;
       padding: 0;
       margin: 0;
+      line-height: 12px; // TODO: this is ugly. center position the icon buttons and text in a better way
     }
 
     button {

@@ -1,9 +1,1 @@
 @import '../../../../styles';
-
-.search-box-container {
-  position: absolute;
-  top: 100%;
-  right: $search-box-offset + 20px; // keep space for scrollbar
-  margin-top: $search-box-offset;
-  z-index: 2;
-}

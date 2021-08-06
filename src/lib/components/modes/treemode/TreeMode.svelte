@@ -83,6 +83,7 @@
   import TreeMenu from './menu/TreeMenu.svelte'
   import Welcome from './Welcome.svelte'
   import NavigationBar from '../../../components/controls/navigationBar/NavigationBar.svelte'
+  import SearchBox from '../../../components/modes/treemode/menu/SearchBox.svelte'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -165,13 +166,19 @@
   }
 
   async function handleNextSearchResult() {
-    searchResult = searchNext(searchResult)
+    searchResult = searchResult ? searchNext(searchResult) : searchResult
     await focusActiveSearchResult(searchResult && searchResult.activeItem)
   }
 
   async function handlePreviousSearchResult() {
-    searchResult = searchPrevious(searchResult)
+    searchResult = searchResult ? searchPrevious(searchResult) : searchResult
     await focusActiveSearchResult(searchResult && searchResult.activeItem)
+  }
+
+  function clearSearchResult() {
+    showSearch = false
+    handleSearchText('')
+    focus()
   }
 
   async function focusActiveSearchResult(activeItem) {
@@ -1647,9 +1654,6 @@
       {selection}
       {readOnly}
       {historyState}
-      {searchText}
-      {searching}
-      {searchResult}
       bind:showSearch
       onExpandAll={handleExpandAll}
       onCollapseAll={handleCollapseAll}
@@ -1659,10 +1663,6 @@
       onTransform={handleTransformAll}
       onContextMenu={handleContextMenuFromTreeMenu}
       onCopy={handleCopy}
-      onSearchText={handleSearchText}
-      onNextSearchResult={handleNextSearchResult}
-      onPreviousSearchResult={handlePreviousSearchResult}
-      onFocus={focus}
       {onRenderMenu}
     />
   {/if}
@@ -1695,6 +1695,20 @@
         </div>
       {/if}
     {:else}
+      {#if showSearch}
+        <div class="search-box-container" class:navigation-bar-offset={navigationBar}>
+          <SearchBox
+            text={searchText}
+            resultCount={searchResult ? searchResult.count : 0}
+            activeIndex={searchResult ? searchResult.activeIndex : 0}
+            {searching}
+            onChange={handleSearchText}
+            onNext={handleNextSearchResult}
+            onPrevious={handlePreviousSearchResult}
+            onClose={clearSearchResult}
+          />
+        </div>
+      {/if}
       <div class="contents" data-jsoneditor-scrollable-contents={true} bind:this={refContents}>
         <JSONNode
           value={json}

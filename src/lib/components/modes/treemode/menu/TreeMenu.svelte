@@ -18,15 +18,11 @@
   import { SELECTION_TYPE } from '../../../../logic/selection.js'
   import { isObjectOrArray } from '../../../../utils/typeUtils.js'
   import Menu from '../../../controls/Menu.svelte'
-  import SearchBox from './SearchBox.svelte'
 
   export let json
   export let selection
 
   export let readOnly
-  export let searchText
-  export let searchResult
-  export let searching
   export let showSearch = false
   export let historyState
 
@@ -39,21 +35,10 @@
   export let onContextMenu
   export let onCopy
 
-  export let onSearchText
-  export let onNextSearchResult
-  export let onPreviousSearchResult
-
-  export let onFocus
   export let onRenderMenu = () => {}
 
   function handleToggleSearch() {
     showSearch = !showSearch
-  }
-
-  function clearSearchResult() {
-    showSearch = false
-    onSearchText('')
-    setTimeout(onFocus)
   }
 
   $: hasJson = json !== undefined
@@ -162,21 +147,6 @@
   $: items = onRenderMenu('tree', defaultItems) || defaultItems
 </script>
 
-<Menu {items}>
-  <div slot="right" class="search-box-container">
-    {#if showSearch}
-      <SearchBox
-        text={searchText}
-        resultCount={searchResult ? searchResult.count : 0}
-        activeIndex={searchResult ? searchResult.activeIndex : 0}
-        {searching}
-        onChange={onSearchText}
-        onNext={onNextSearchResult}
-        onPrevious={onPreviousSearchResult}
-        onClose={clearSearchResult}
-      />
-    {/if}
-  </div>
-</Menu>
+<Menu {items} />
 
 <style src="./TreeMenu.scss"></style>

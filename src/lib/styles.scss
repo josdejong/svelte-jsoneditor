@@ -53,6 +53,8 @@ $menu-button-size: 32px;
 $pressed-button-margin: 2px;
 $input-padding: 5px;
 $search-box-offset: 10px;
+$navigation-bar-height: 27px; // TODO: having this hardcoded is ugly
+$search-box-offset-navigation-bar: $search-box-offset + $navigation-bar-height;
 $border-radius: 3px;
 
 $padding: 10px;
