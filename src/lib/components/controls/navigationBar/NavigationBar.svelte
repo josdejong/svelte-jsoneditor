@@ -8,6 +8,7 @@
   import { createSelection, SELECTION_TYPE } from '../../../logic/selection'
   import createDebug from 'debug'
   import NavigationBarItem from '../../../components/controls/navigationBar/NavigationBarItem.svelte'
+  import { caseInsensitiveNaturalCompare } from '../../../logic/sort'
 
   const debug = createDebug('jsoneditor:NavigationBar')
 
@@ -45,7 +46,12 @@
     if (Array.isArray(node)) {
       return range(0, node.length)
     } else if (isObject(node)) {
-      return getIn(state, path.concat(STATE_KEYS)) || Object.keys(node)
+      const keys = getIn(state, path.concat(STATE_KEYS)) || Object.keys(node)
+
+      const sortedKeys = keys.slice(0)
+      sortedKeys.sort(caseInsensitiveNaturalCompare)
+
+      return sortedKeys
     } else {
       // never happens but just for robustness...
       return []

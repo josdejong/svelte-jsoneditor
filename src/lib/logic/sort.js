@@ -6,7 +6,7 @@ import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
 
 const diffSequences = diffSequencesExport.default || diffSequencesExport
 
-function caseInsensitiveNaturalCompare(a, b) {
+export function caseInsensitiveNaturalCompare(a, b) {
   const aLower = typeof a === 'string' ? a.toLowerCase() : a
   const bLower = typeof b === 'string' ? b.toLowerCase() : b
 

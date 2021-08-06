@@ -22,8 +22,12 @@
     }
 
     &.jse-navigation-bar-arrow {
-      font-size: $font-size-mono - 10px;
-      line-height: $font-size-mono - 10px;
+      // TODO: fix the height of the buttons for real, this is an ugly
+      //  trick to make the buttons have the same height.
+      //  when there is no selection, the navigation bar must have the same
+      //  height as when there is a selection
+      font-size: $font-size-mono - 8px;
+      line-height: $font-size-mono - 8px;
       padding: $padding-half $padding;
 
       &.open {
