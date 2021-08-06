@@ -72,7 +72,7 @@
 </script>
 
 <div class="jse-navigation-bar" bind:this={refNavigationBar}>
-  {#each path as item, index (item)}
+  {#each path as item, index (index)}
     <NavigationBarItem {getItems} {path} {index} onSelect={handleSelect} />
   {/each}
   {#if hasNextItem}

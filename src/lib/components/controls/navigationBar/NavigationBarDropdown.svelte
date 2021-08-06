@@ -11,7 +11,7 @@
 </script>
 
 <div class="jse-navigation-bar-dropdown">
-  {#each limit(items, MAX_ITEMS) as item}
+  {#each limit(items, MAX_ITEMS) as item (item)}
     <button
       class="jse-navigation-bar-dropdown-item"
       class:selected={item === selectedItem}
