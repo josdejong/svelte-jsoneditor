@@ -2,7 +2,7 @@
 
 <script>
   import { getContext } from 'svelte'
-  import JSONRepairComponent from '../modes/repairmode/RepairMode.svelte'
+  import JSONRepairComponent from './repair/JSONRepairComponent.svelte'
 
   export let text
   export let onParse

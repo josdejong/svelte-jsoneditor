@@ -155,7 +155,7 @@
   ]
 </script>
 
-<div class="json-repair" bind:this={domJsonRepair}>
+<div class="json-repair-component" bind:this={domJsonRepair}>
   <Menu {items}>
     <div slot="left" class="info">Repair invalid JSON, then click apply</div>
   </Menu>
@@ -186,4 +186,4 @@
   />
 </div>
 
-<style src="./RepairMode.scss"></style>
+<style src="./JSONRepairComponent.scss"></style>
