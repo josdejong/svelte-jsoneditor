@@ -159,44 +159,16 @@
     }
   }
 
-  export function setValidator(newValidator) {
-    validator = newValidator
-  }
-
-  export function getValidator() {
-    return validator
-  }
-
-  export function setMainMenuBar(newMainMenuBar) {
-    mainMenuBar = newMainMenuBar
-  }
-
-  export function getMainMenuBar() {
-    return mainMenuBar
-  }
-
-  export function setNavigationBar(newNavigationBar) {
-    navigationBar = newNavigationBar
-  }
-
-  export function getNavigationBar() {
-    return navigationBar
-  }
-
-  export function setMode(newMode) {
-    mode = newMode
-  }
-
-  export function getMode() {
-    return mode
-  }
-
   export function focus() {
     if (refCodeMode) {
       refCodeMode.focus()
     } else if (refTreeMode) {
       refTreeMode.focus()
     }
+  }
+
+  export function updateProps(props) {
+    this.$set(props)
   }
 
   export function destroy() {

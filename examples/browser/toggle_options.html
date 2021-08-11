@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>JSONEditor | Toggle options</title>
+
+    <style>
+      body,
+      input,
+      label {
+        font-family: verdana, serif;
+        font-size: 12pt;
+      }
+
+      #jsoneditor {
+        width: 600px;
+        height: 500px;
+      }
+    </style>
+  </head>
+  <body>
+    <p>
+      <label> <input type="checkbox" id="mainMenuBar" checked /> Show main menu bar </label>
+      <label> <input type="checkbox" id="navigationBar" checked /> Show navigation bar </label>
+      <label> <input type="checkbox" id="readOnly" /> Read only </label>
+    </p>
+    <div id="jsoneditor"></div>
+
+    <script type="module">
+      import { JSONEditor } from '../../package/dist/jsoneditor.js'
+
+      // create the editor
+      const editor = new JSONEditor({
+        target: document.getElementById('jsoneditor'),
+        props: {
+          json: {
+            array: [1, 2, 3],
+            boolean: true,
+            color: '#82b92c',
+            null: null,
+            number: 123,
+            object: { a: 'b', c: 'd' },
+            time: 1575599819000,
+            string: 'Hello World'
+          }
+        }
+      })
+
+      document.getElementById('mainMenuBar').onchange = (event) => {
+        editor.updateProps({
+          mainMenuBar: event.target.checked
+        })
+      }
+
+      document.getElementById('navigationBar').onchange = (event) => {
+        editor.updateProps({
+          navigationBar: event.target.checked
+        })
+      }
+
+      document.getElementById('readOnly').onchange = (event) => {
+        editor.updateProps({
+          readOnly: event.target.checked
+        })
+      }
+
+      window.editor = editor
+    </script>
+  </body>
+</html>

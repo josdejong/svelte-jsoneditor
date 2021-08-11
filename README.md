@@ -149,7 +149,7 @@ Svelte component:
 JavasScript class:
 
 ```js
-import { JSONEditor } from 'svelte-jsoneditor'
+import { JSONEditor } from 'svelte-jsoneditor/dist/jsoneditor.js'
 
 const editor = new JSONEditor({
   target: document.getElementById('jsoneditor'),
@@ -235,6 +235,14 @@ const editor = new JSONEditor({
 - `update(json: JSON)` Update the loaded JSON document, keeping the state of the editor (like expanded objects).
 - `updateText(text: string)` Update the loaded JSON document, keeping the state of the editor (like expanded objects).
 - `patch(operations: JSONPatchDocument)` Apply a JSON patch document to update the contents of the JSON document. A JSON patch document is a list with JSON Patch operations.
+- `updateProps(props: Object)` update some or all of the properties. Updated `json` or `text` can be passed too; this is equivalent to calling `update(json)` and `updateText(text)`. Example:
+
+  ```js
+  editor.updateProps({
+    readOnly: true
+  })
+  ```
+
 - `expand([callback: (path: Path) => boolean])` Expand or collapse paths in the editor. The `callback` determines which paths will be expanded. If no `callback` is provided, all paths will be expanded. It is only possible to expand a path when all of its parent paths are expanded too. Examples:
   - `editor.expand(path => true)` expand all
   - `editor.expand(path => false)` collapse all
