@@ -8,7 +8,7 @@
 
   export let value
 
-  $: text = new Date(value).toString()
+  $: text = `Time: ${new Date(value).toString()}`
 </script>
 
 <div class="jse-timestamp" use:tooltip={{ text, ...absolutePopupContext }}>

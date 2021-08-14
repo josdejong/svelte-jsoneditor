@@ -11,6 +11,7 @@
   import { keyComboFromEvent } from '../../../utils/keyBindings.js'
   import {
     isBoolean,
+    isColor,
     isObjectOrArray,
     isTimestamp,
     isUrl,
@@ -18,7 +19,8 @@
     valueType
   } from '../../../utils/typeUtils.js'
   import BooleanToggle from './value/BooleanToggle.svelte'
-  import Timestamp from '$lib/components/modes/treemode/value/Timestamp.svelte'
+  import Timestamp from '../../../components/modes/treemode/value/Timestamp.svelte'
+  import Color from '../../../components/modes/treemode/value/Color.svelte'
 
   export let path
   export let value
@@ -175,6 +177,9 @@
 {#if !editValue}
   {#if isBoolean(value)}
     <BooleanToggle {path} {value} {onPatch} />
+  {/if}
+  {#if isColor(value)}
+    <Color {path} {value} {onPatch} />
   {/if}
 {/if}
 

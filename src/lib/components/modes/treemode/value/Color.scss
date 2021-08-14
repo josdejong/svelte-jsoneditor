@@ -1,0 +1,18 @@
+@import '../../../../styles';
+
+.jse-color {
+  $margin: 2px;
+  $size: $line-height - 2 * $margin;
+
+  width: $size;
+  height: $size;
+  box-sizing: border-box;
+  padding: 0;
+  margin: $margin;
+
+  border: 1px solid $black;
+  border-radius: 2px;
+  background: $white;
+  outline: none;
+  cursor: pointer;
+}

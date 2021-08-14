@@ -51,6 +51,8 @@ export function isBoolean(value) {
  * @return {boolean}
  */
 export function isTimestamp(value) {
+  const YEAR_2000 = 946684800000
+
   return (
     typeof value === 'number' &&
     value > YEAR_2000 &&
@@ -60,7 +62,30 @@ export function isTimestamp(value) {
   )
 }
 
-const YEAR_2000 = 946684800000
+/**
+ * Get the applied color given a color name or code
+ * Source: https://stackoverflow.com/questions/6386090/validating-css-color-names/33184805
+ * @param {string} color
+ * @returns {string | null} returns the color if the input is a valid
+ *                   color, and returns null otherwise. Example output:
+ *                   'rgba(255,0,0,0.7)' or 'rgb(255,0,0)'
+ */
+export function getColorCSS(color) {
+  // TODO: test performance impact of this function
+  const colorStyleElement = document.createElement('div')
+
+  colorStyleElement.style.color = color
+  return colorStyleElement.style.color.split(/\s+/).join('').toLowerCase() || null
+}
+
+/**
+ * Test if a string contains a valid color name or code.
+ * @param {string} value
+ * @returns {boolean} returns true if a valid color, false otherwise
+ */
+export function isColor(value) {
+  return !!getColorCSS(value)
+}
 
 /**
  * Get the type of a value
