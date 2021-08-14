@@ -36,6 +36,33 @@ export function isObjectOrArray(value) {
 }
 
 /**
+ * Test whether a value is a boolean
+ *
+ * @param {*} value
+ * @return {boolean}
+ */
+export function isBoolean(value) {
+  return value === true || value === false
+}
+
+/**
+ * Test whether a value is a timestamp in milliseconds after the year 2000.
+ * @param {*} value
+ * @return {boolean}
+ */
+export function isTimestamp(value) {
+  return (
+    typeof value === 'number' &&
+    value > YEAR_2000 &&
+    isFinite(value) &&
+    Math.floor(value) === value &&
+    !isNaN(new Date(value).valueOf())
+  )
+}
+
+const YEAR_2000 = 946684800000
+
+/**
  * Get the type of a value
  * @param {*} value
  * @return {String} type

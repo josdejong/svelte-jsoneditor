@@ -9,8 +9,16 @@
   import { SELECTION_TYPE } from '../../../logic/selection.js'
   import { getPlainText, setCursorToEnd, setPlainText } from '../../../utils/domUtils.js'
   import { keyComboFromEvent } from '../../../utils/keyBindings.js'
-  import { isObjectOrArray, isUrl, stringConvert, valueType } from '../../../utils/typeUtils.js'
-  import BooleanToggle from './BooleanToggle.svelte'
+  import {
+    isBoolean,
+    isObjectOrArray,
+    isTimestamp,
+    isUrl,
+    stringConvert,
+    valueType
+  } from '../../../utils/typeUtils.js'
+  import BooleanToggle from './value/BooleanToggle.svelte'
+  import Timestamp from '$lib/components/modes/treemode/value/Timestamp.svelte'
 
   export let path
   export let value
@@ -163,8 +171,11 @@
   }
 </script>
 
-{#if !editValue && (value === true || value === false)}
-  <BooleanToggle {path} {value} {onPatch} />
+<!-- TODO: create an API to customize rendering of a value -->
+{#if !editValue}
+  {#if isBoolean(value)}
+    <BooleanToggle {path} {value} {onPatch} />
+  {/if}
 {/if}
 
 <div
@@ -180,5 +191,12 @@
   bind:this={domValue}
   title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : null}
 />
+
+<!-- TODO: create an API to customize rendering of a value -->
+{#if !editValue}
+  {#if isTimestamp(value)}
+    <Timestamp {value} />
+  {/if}
+{/if}
 
 <style src="./JSONValue.scss"></style>
