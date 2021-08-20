@@ -388,6 +388,7 @@
               total={value.length}
               {path}
               {onExpandSection}
+              {selection}
             />
           {/if}
         {/each}

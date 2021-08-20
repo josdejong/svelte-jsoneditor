@@ -3,11 +3,13 @@
 <script>
   import { INDENTATION_WIDTH } from '../../../constants.js'
   import { getExpandItemsSections } from '../../../logic/expandItemsSections.js'
+  import { compileJSONPointer } from 'immutable-json-patch'
 
   export let visibleSections
   export let sectionIndex
   export let total
   export let path
+  export let selection
 
   /** @type {function (path: Path, section: Section)} */
   export let onExpandSection
@@ -16,6 +18,11 @@
 
   $: startIndex = visibleSection.end
   $: endIndex = visibleSections[sectionIndex + 1] ? visibleSections[sectionIndex + 1].start : total
+
+  $: selected =
+    selection && selection.pathsMap
+      ? selection.pathsMap[compileJSONPointer(path.concat(startIndex))] === true
+      : false
 
   $: expandItemsSections = getExpandItemsSections(startIndex, endIndex)
 
@@ -33,6 +40,7 @@
 
 <div
   class="collapsed-items"
+  class:selected
   on:mousemove={handleMouseMove}
   style={getIndentationStyle(path.length + 2)}
 >

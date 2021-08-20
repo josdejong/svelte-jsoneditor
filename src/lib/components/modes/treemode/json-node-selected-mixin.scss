@@ -29,6 +29,7 @@
     background-color: $selection-background;
   }
 
+  :global(.collapsed-items.selected),
   &.selected :global(.collapsed-items),
   &.selected-value :global(.collapsed-items) {
     // TODO: this css is copied from CollapsedItems.scss. Figure out how to reuse this smartly with CSS or SASS
