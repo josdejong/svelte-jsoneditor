@@ -1,3 +1,8 @@
+<script context="module" lang="ts">
+  export const prerender = true
+  export const ssr = false
+</script>
+
 <script lang="ts">
   import { createAjvValidator, JSONEditor } from '$lib'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
@@ -82,6 +87,10 @@
     console.log('onChangeMode', mode)
   }
 </script>
+
+<svelte:head>
+  <title>development application | svelte-jsoneditor</title>
+</svelte:head>
 
 <div class="demo-app">
   <h1>svelte-jsoneditor development application</h1>
@@ -264,13 +273,6 @@
 </div>
 
 <style>
-  h1 {
-    color: #ff3e00;
-    text-transform: uppercase;
-    font-size: 1.5em;
-    font-weight: 100;
-  }
-
   .columns {
     display: flex;
     gap: 20px;

@@ -18,7 +18,10 @@ npm install svelte-jsoneditor
 
 ## Use
 
-See the [/examples](/examples) section for some full examples.
+### Examples
+
+- Svelte examples: [/src/routes/examples](/src/routes/examples)
+- Plain JavaScript examples: [/examples/browser](/examples/browser)
 
 ### SvelteKit setup
 
@@ -66,10 +69,11 @@ Create a JSONEditor with two-way binding `bind:json`:
     object: { a: 'b', c: 'd' },
     string: 'Hello World'
   }
+  let text = undefined // used when in code mode
 </script>
 
 <div>
-  <JSONEditor bind:json />
+  <JSONEditor bind:json bind:text />
 </div>
 ```
 
@@ -82,8 +86,9 @@ Or one-way binding:
   let json = {
     greeting: 'Hello World'
   }
+  let text = undefined // used when in code mode
 
-  function onChange(content) {
+  function handleChange(content) {
     // content is an object { json: JSON | undefined, text: string | undefined }
     console.log('onChange: ', content)
     json = content.json
@@ -91,7 +96,7 @@ Or one-way binding:
 </script>
 
 <div>
-  <JSONEditor json="{json}" onChange="{onChange}" />
+  <JSONEditor {json} {text} onChange="{handleChange}" />
 </div>
 ```
 
@@ -125,6 +130,9 @@ Browser example loading the ES module:
           }
         }
       })
+
+      // use methods get, getText, set, setText, update, updateText, and onChange
+      // to get data in or out of the editor. Use updateProps to update properties.
     </script>
   </body>
 </html>
@@ -142,7 +150,7 @@ Svelte component:
 </script>
 
 <div>
-  <JSONEditor json="{json}" />
+  <JSONEditor {json} {text} />
 </div>
 ```
 

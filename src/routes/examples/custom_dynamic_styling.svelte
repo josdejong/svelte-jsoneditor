@@ -1,0 +1,55 @@
+<script>
+  import { JSONEditor } from '$lib' // replace this with 'svelte-jsoneditor'
+
+  let json = {
+    array: [1, 2, 3],
+    boolean: true,
+    color: '#82b92c',
+    null: null,
+    number: 123,
+    object: { a: 'b', c: 'd' },
+    string: 'Hello World'
+  }
+  let text = undefined // used when in code mode
+
+  function handleClassName(path, value) {
+    if (JSON.stringify(path) === '["object","c"]' || JSON.stringify(path) === '["string"]') {
+      return 'custom-class-highlight'
+    }
+
+    if (value === true || value === false) {
+      return 'custom-class-boolean'
+    }
+  }
+</script>
+
+<svelte:head>
+  <title>Custom, dynamic styling | svelte-jsoneditor</title>
+</svelte:head>
+
+<h1>Custom, dynamic styling</h1>
+
+<p>
+  You can apply dynamic styling depending on the document contents using <code>onClassName</code>.
+  In this example, all boolean values get a red background, and nodes with paths
+  <code>/string</code> and <code>/object/c</code> get a green background.
+</p>
+
+<div class="editor">
+  <JSONEditor bind:json bind:text onClassName={handleClassName} />
+</div>
+
+<style>
+  .editor {
+    width: 700px;
+    height: 400px;
+  }
+
+  :global(.json-node.custom-class-highlight .contents) {
+    background: #bfff66;
+  }
+
+  :global(.json-node.custom-class-boolean .value) {
+    background: #ffb5c2;
+  }
+</style>
