@@ -299,4 +299,13 @@
   pre {
     background: #f5f5f5;
   }
+
+  p {
+    max-width: none;
+  }
+
+  button,
+  input {
+    font-size: 11pt;
+  }
 </style>
