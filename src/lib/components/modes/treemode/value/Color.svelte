@@ -10,6 +10,7 @@
   export let onPatch
   export let path
   export let value
+  export let readOnly
 
   $: color = getColorCSS(value)
 
@@ -27,6 +28,10 @@
   }
 
   function openColorPicker(event) {
+    if (readOnly) {
+      return
+    }
+
     // estimate of the color picker height
     // we'll render the color picker on top
     // when there is not enough space below, and there is enough space above

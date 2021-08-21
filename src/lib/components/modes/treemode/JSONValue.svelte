@@ -179,7 +179,7 @@
     <BooleanToggle {path} {value} {onPatch} />
   {/if}
   {#if isColor(value)}
-    <Color {path} {value} {onPatch} />
+    <Color {path} {value} {onPatch} {readOnly} />
   {/if}
 {/if}
 
