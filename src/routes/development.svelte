@@ -8,27 +8,30 @@
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
 
-  let json = {
-    array: [1, 2, [3, 4, 5]],
-    boolean: true,
-    color: '#82b92c',
-    htmlcode: '&quot;',
-    escaped_unicode: '\\u20b9',
-    unicode: '\u{1F600},\uD83D\uDCA9',
-    return: '\n',
-    null: null,
-    number: 123,
-    object: { a: 'b', c: 'd' },
-    string: 'Hello World',
-    timestamp: 1534952749890,
-    url: 'http://jsoneditoronline.org',
-    "<button onclick=alert('oopsie!!!')>test xss</button>": 'xss?',
-    'xss array': [
-      {
-        "<button onclick=alert('oopsie!!!')>test xss</button>": 'xss?'
-      }
-    ],
-    'long line': 'longword'.repeat(2) + ' ' + 'longword2'.repeat(3) + ' ' + 'longline'.repeat(20)
+  let content = {
+    text: undefined,
+    json: {
+      array: [1, 2, [3, 4, 5]],
+      boolean: true,
+      color: '#82b92c',
+      htmlcode: '&quot;',
+      escaped_unicode: '\\u20b9',
+      unicode: '\u{1F600},\uD83D\uDCA9',
+      return: '\n',
+      null: null,
+      number: 123,
+      object: { a: 'b', c: 'd' },
+      string: 'Hello World',
+      timestamp: 1534952749890,
+      url: 'http://jsoneditoronline.org',
+      "<button onclick=alert('oopsie!!!')>test xss</button>": 'xss?',
+      'xss array': [
+        {
+          "<button onclick=alert('oopsie!!!')>test xss</button>": 'xss?'
+        }
+      ],
+      'long line': 'longword'.repeat(2) + ' ' + 'longword2'.repeat(3) + ' ' + 'longline'.repeat(20)
+    }
   }
 
   const schema = {
@@ -71,15 +74,15 @@
     }
   }
 
-  function onChangeTree({ json, text }) {
+  function onChangeTree(content) {
     if ($showRawContents) {
-      console.log('onChangeTree', { json, text })
+      console.log('onChangeTree', content)
     }
   }
 
-  function onChangeCode({ json, text }) {
+  function onChangeCode(content) {
     if ($showRawContents) {
-      console.log('onChangeCode', { json, text })
+      console.log('onChangeCode', content)
     }
   }
 
@@ -117,56 +120,70 @@
   <p>
     <button
       on:click={() => {
-        text = undefined
-        json = [1, 2, 3, 4, 5]
+        content = {
+          text: undefined,
+          json: [1, 2, 3, 4, 5]
+        }
       }}
     >
       Update json
     </button>
     <button
       on:click={() => {
-        text = '[1, 2, 3, 4]'
-        json = undefined
+        content = {
+          text: '[1, 2, 3, 4]',
+          json: undefined
+        }
       }}
     >
       Update text
     </button>
     <button
       on:click={() => {
-        text = ''
-        json = undefined
+        content = {
+          text: '',
+          json: undefined
+        }
       }}
     >
       Set empty text
     </button>
     <button
       on:click={() => {
-        text = undefined
-        json = ''
+        content = {
+          text: undefined,
+          json: ''
+        }
       }}
     >
       Set empty string
     </button>
     <button
       on:click={() => {
-        text = undefined
-        json = range(0, 999)
+        content = {
+          text: undefined,
+          json: range(0, 999)
+        }
       }}
     >
       Set long array
     </button>
     <button
       on:click={() => {
-        text = 'abc'
-        json = undefined
+        content = {
+          text: 'abc',
+          json: undefined
+        }
       }}
     >
       Set repairable text
     </button>
     <button
       on:click={() => {
-        text = '[1, 2, 3 }'
-        json = undefined
+        content = {
+          text: '[1, 2, 3 }',
+          json: undefined
+        }
       }}
     >
       Set unrepairable text
@@ -183,8 +200,12 @@
           console.timeEnd('load file')
 
           console.time('set JSON')
-          text = event.target.result
-          json = undefined
+
+          content = {
+            text: event.target.result,
+            json: undefined
+          }
+
           console.timeEnd('set JSON')
         }
         reader.readAsText(file)
@@ -208,8 +229,7 @@
       <div class="tree-editor" style="height: {height}">
         {#if $showTreeEditor}
           <JSONEditor
-            bind:text
-            bind:json
+            bind:content
             mainMenuBar={$mainMenuBar}
             navigationBar={$navigationBar}
             readOnly={$readOnly}
@@ -227,7 +247,7 @@
           json contents:
           <pre>
 					<code>
-					{json !== undefined ? JSON.stringify(json, null, 2) : 'undefined'}
+					{content.json !== undefined ? JSON.stringify(content.json, null, 2) : 'undefined'}
 					</code>
 				</pre>
         </div>
@@ -244,8 +264,7 @@
         {#if $showCodeEditor}
           <JSONEditor
             mode="code"
-            bind:text
-            bind:json
+            bind:content
             mainMenuBar={$mainMenuBar}
             navigationBar={$navigationBar}
             readOnly={$readOnly}
@@ -263,7 +282,7 @@
           text contents:
           <pre>
 						<code>
-						{text}
+						{content.text}
 						</code>
 					</pre>
         </div>

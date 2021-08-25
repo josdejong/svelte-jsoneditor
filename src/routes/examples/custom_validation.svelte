@@ -59,22 +59,24 @@
     return errors
   }
 
-  let json = {
-    team: [
-      {
-        name: 'Joe',
-        age: 17
-      },
-      {
-        name: 'Sarah',
-        age: 13
-      },
-      {
-        name: 'Jack'
-      }
-    ]
+  let content = {
+    text: undefined, // used when in code mode
+    json: {
+      team: [
+        {
+          name: 'Joe',
+          age: 17
+        },
+        {
+          name: 'Sarah',
+          age: 13
+        },
+        {
+          name: 'Jack'
+        }
+      ]
+    }
   }
-  let text = undefined // used when in code mode
 </script>
 
 <svelte:head>
@@ -93,7 +95,7 @@
 </ul>
 
 <div class="editor">
-  <JSONEditor bind:json bind:text validator={customValidator} />
+  <JSONEditor bind:content validator={customValidator} />
 </div>
 
 <style>

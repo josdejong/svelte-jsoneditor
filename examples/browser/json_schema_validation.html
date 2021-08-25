@@ -104,17 +104,20 @@
         }
       }
 
-      const json = {
-        firstName: 'John',
-        lastName: 'Doe',
-        gender: null,
-        age: '28',
-        availableToHire: true,
-        job: {
-          company: 'freelance',
-          role: 'developer',
-          salary: 100
-        }
+      const content = {
+        json: {
+          firstName: 'John',
+          lastName: 'Doe',
+          gender: null,
+          age: '28',
+          availableToHire: true,
+          job: {
+            company: 'freelance',
+            role: 'developer',
+            salary: 100
+          }
+        },
+        text: undefined
       }
 
       // create the editor
@@ -122,7 +125,7 @@
       const editor = new JSONEditor({
         target: document.getElementById('jsoneditor'),
         props: {
-          json,
+          content,
           onChange: (update) => console.log('onChange', update),
           validator: createAjvValidator(schema, schemaRefs)
         }

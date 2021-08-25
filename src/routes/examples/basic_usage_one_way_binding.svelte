@@ -1,21 +1,22 @@
 <script>
   import { JSONEditor } from '$lib' // replace this with 'svelte-jsoneditor'
 
-  let json = {
-    array: [1, 2, 3],
-    boolean: true,
-    color: '#82b92c',
-    null: null,
-    number: 123,
-    object: { a: 'b', c: 'd' },
-    string: 'Hello World'
+  let content = {
+    text: undefined, // used when in code mode
+    json: {
+      array: [1, 2, 3],
+      boolean: true,
+      color: '#82b92c',
+      null: null,
+      number: 123,
+      object: { a: 'b', c: 'd' },
+      string: 'Hello World'
+    }
   }
-  let text = undefined // used when in code mode
 
-  function handleChange(content) {
-    console.log('contents changed:', { json, text })
-    json = content.json
-    text = content.text
+  function handleChange(updatedContent) {
+    console.log('contents changed:', updatedContent)
+    content = updatedContent
   }
 </script>
 
@@ -26,12 +27,12 @@
 <h1>Basic usage (one-way binding)</h1>
 
 <p>
-  Use JSONEditor with one-way binding: pass read-only properties <code>json</code> and
-  <code>text</code>, and pass an <code>onChange</code> callback function to receive changes.
+  Use JSONEditor with one-way binding: pass read-only property <code>content</code>, and pass an
+  <code>onChange</code> callback function to receive changes.
 </p>
 
 <div class="editor">
-  <JSONEditor {json} {text} onChange={handleChange} />
+  <JSONEditor {content} onChange={handleChange} />
 </div>
 
 <style>

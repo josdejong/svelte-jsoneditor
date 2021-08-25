@@ -103,16 +103,14 @@
   const jump = createJump()
 
   export let readOnly = false
-  export let externalJson
-  export let externalText
+  export let externalContent
   export let mainMenuBar = true
   export let navigationBar = true
   export let validator = null
   export let visible = true
   export let indentation = 2
   export let onError
-  export let onChangeJson
-  export let onChangeText
+  export let onChange
   export let onRequestRepair = () => {}
   export let onRenderMenu = () => {}
 
@@ -241,11 +239,9 @@
     state = syncState(json, state, [], callback, true)
   }
 
-  // two-way binding of externalJson and json (internal)
-  // when receiving an updated prop, we have to update state.
-  // when changing json in the editor, the bound external property must be updated
-  $: applyExternalJson(externalJson)
-  $: applyExternalText(externalText)
+  // two-way binding of externalContent and internal json and text (
+  // when receiving an updated prop, we have to update state for example
+  $: applyExternalContent(externalContent)
 
   let textIsRepaired = false
   $: textIsUnrepairable = text !== undefined && json === undefined
@@ -256,6 +252,16 @@
 
   export function get() {
     return json
+  }
+
+  function applyExternalContent(updatedContent) {
+    if (updatedContent.json !== undefined) {
+      applyExternalJson(updatedContent.json)
+    }
+
+    if (updatedContent.text !== undefined) {
+      applyExternalText(updatedContent.text)
+    }
   }
 
   function applyExternalJson(updatedJson) {
@@ -290,7 +296,7 @@
   }
 
   function applyExternalText(updatedText) {
-    if (updatedText === undefined || externalJson !== undefined) {
+    if (updatedText === undefined || externalContent.json !== undefined) {
       return
     }
 
@@ -322,7 +328,7 @@
         // no valid JSON, will show empty document or invalid json
         json = undefined
         state = createState(json)
-        text = externalText
+        text = externalContent.text
         textIsRepaired = false
         selection = clearSelectionWhenNotExisting(selection, json)
       }
@@ -1133,9 +1139,15 @@
 
   function emitOnChange() {
     if (text !== undefined) {
-      onChangeText(text)
+      onChange({
+        text,
+        json: undefined
+      })
     } else if (json !== undefined) {
-      onChangeJson(json)
+      onChange({
+        text: undefined,
+        json
+      })
     }
   }
 

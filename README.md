@@ -61,20 +61,22 @@ Create a JSONEditor with two-way binding `bind:json`:
 <script>
   import { JSONEditor } from 'svelte-jsoneditor'
 
-  let json = {
-    array: [1, 2, 3],
-    boolean: true,
-    color: '#82b92c',
-    null: null,
-    number: 123,
-    object: { a: 'b', c: 'd' },
-    string: 'Hello World'
+  let content = {
+    text: undefined, // used when in code mode
+    json: {
+      array: [1, 2, 3],
+      boolean: true,
+      color: '#82b92c',
+      null: null,
+      number: 123,
+      object: { a: 'b', c: 'd' },
+      string: 'Hello World'
+    }
   }
-  let text = undefined // used when in code mode
 </script>
 
 <div>
-  <JSONEditor bind:json bind:text />
+  <JSONEditor bind:content />
 </div>
 ```
 
@@ -84,20 +86,22 @@ Or one-way binding:
 <script>
   import { JSONEditor } from 'svelte-jsoneditor'
 
-  let json = {
-    greeting: 'Hello World'
+  let content = {
+    text: undefined, // used when in code mode
+    json: {
+      greeting: 'Hello World'
+    }
   }
-  let text = undefined // used when in code mode
 
-  function handleChange(content) {
+  function handleChange(updatedContent) {
     // content is an object { json: JSON | undefined, text: string | undefined }
-    console.log('onChange: ', content)
-    json = content.json
+    console.log('onChange: ', updatedContent)
+    content = updatedContent
   }
 </script>
 
 <div>
-  <JSONEditor {json} {text} onChange="{handleChange}" />
+  <JSONEditor {content} onChange="{handleChange}" />
 </div>
 ```
 
@@ -119,15 +123,21 @@ Browser example loading the ES module:
     <script type="module">
       import { JSONEditor } from 'svelte-jsoneditor/dist/jsoneditor.js'
 
+      let content = {
+        text: undefined,
+        json: {
+          greeting: 'Hello World'
+        }
+      }
+
       const editor = new JSONEditor({
         target: document.getElementById('jsoneditor'),
         props: {
-          json: {
-            greeting: 'Hello World'
-          },
-          onChange: (content) => {
+          content,
+          onChange: (updatedContent) => {
             // content is an object { json: JSON | undefined, text: string | undefined }
-            console.log('onChange', content)
+            console.log('onChange', updatedContent)
+            content = updatedContent
           }
         }
       })
@@ -151,7 +161,7 @@ Svelte component:
 </script>
 
 <div>
-  <JSONEditor {json} {text} />
+  <JSONEditor {content} />
 </div>
 ```
 
@@ -163,10 +173,10 @@ import { JSONEditor } from 'svelte-jsoneditor/dist/jsoneditor.js'
 const editor = new JSONEditor({
   target: document.getElementById('jsoneditor'),
   props: {
-    json,
-    onChange: (content) => {
+    content,
+    onChange: (updatedContent) => {
       // content is an object { json: JSON | undefined, text: string | undefined }
-      console.log('onChange', content)
+      console.log('onChange', updatedContent)
     }
   }
 })
@@ -174,7 +184,7 @@ const editor = new JSONEditor({
 
 ### properties
 
-- `json` Pass the JSON document to be rendered in the JSONEditor
+- `content: { json: JSON | undefined, text: string | undefined }` Pass the JSON contents to be rendered in the JSONEditor. Contents is an object containing a property `json` and `text`. Only one of the two must be defined. In case of `tree` mode, `json` is used. In case of `code` mode, `text` is used.
 - `mode: 'tree' | 'code'`. Open the editor in `'tree'` mode (default) or `'code'` mode.
 - `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
 - `navigationBar: boolean` Show the navigation bar with, where you can see the selected path and navigate through your document from there. Default value is `true`.

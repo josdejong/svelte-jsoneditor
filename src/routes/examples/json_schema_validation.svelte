@@ -69,19 +69,21 @@
 
   const validator = createAjvValidator(schema, schemaRefs)
 
-  let json = {
-    firstName: 'John',
-    lastName: 'Doe',
-    gender: null,
-    age: '28',
-    availableToHire: true,
-    job: {
-      company: 'freelance',
-      role: 'developer',
-      salary: 100
+  let content = {
+    text: undefined, // used when in code mode
+    json: {
+      firstName: 'John',
+      lastName: 'Doe',
+      gender: null,
+      age: '28',
+      availableToHire: true,
+      job: {
+        company: 'freelance',
+        role: 'developer',
+        salary: 100
+      }
     }
   }
-  let text = undefined // used when in code mode
 </script>
 
 <svelte:head>
@@ -100,7 +102,7 @@
 </p>
 
 <div class="editor">
-  <JSONEditor bind:json bind:text {validator} />
+  <JSONEditor bind:content {validator} />
 </div>
 
 <style>

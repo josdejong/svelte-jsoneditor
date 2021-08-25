@@ -14,10 +14,7 @@
   const debug = createDebug('jsoneditor:Main')
 
   // eslint-disable-next-line no-undef-init
-  export let json = undefined
-
-  // eslint-disable-next-line no-undef-init
-  export let text = undefined
+  export let content = {}
 
   export let readOnly = false
   export let indentation = 2
@@ -54,14 +51,16 @@
   let refTreeMode
   let refCodeMode
 
-  $: textForCodeMode = mode === MODE.CODE ? getText(json, text) : undefined
+  $: textForCodeMode = mode === MODE.CODE ? getText(content.json, content.text) : undefined
 
   export function get() {
-    return json !== undefined ? json : JSON.parse(text || '')
+    return content.json !== undefined ? content.json : JSON.parse(content.text || '')
   }
 
   export function getText() {
-    return typeof text === 'string' ? text : JSON.stringify(json, null, indentation)
+    return typeof content.text === 'string'
+      ? content.text
+      : JSON.stringify(content.json, null, indentation)
   }
 
   export function set(newJson) {
@@ -70,8 +69,10 @@
     // new editor id -> will re-create the editor
     instanceId = uniqueId()
 
-    text = undefined
-    json = newJson
+    content = {
+      text: undefined,
+      json: newJson
+    }
   }
 
   export function setText(newText) {
@@ -80,29 +81,37 @@
     // new editor id -> will re-create the editor
     instanceId = uniqueId()
 
-    text = newText
-    json = undefined
+    content = {
+      text: newText,
+      json: undefined
+    }
   }
 
   export function update(updatedJson) {
     debug('update')
 
-    text = undefined
-    json = updatedJson
+    content = {
+      text: undefined,
+      json: updatedJson
+    }
   }
 
   export function updateText(updatedText) {
     debug('updateText')
 
-    text = updatedText
-    json = undefined
+    content = {
+      text: updatedText,
+      json: undefined
+    }
   }
 
   export function patch(operations, newSelection) {
-    if (json === undefined) {
+    if (content.json === undefined) {
       try {
-        json = JSON.parse(text)
-        text = undefined
+        content = {
+          json: JSON.parse(content.text),
+          text: undefined
+        }
       } catch (err) {
         throw new Error('Cannot apply patch: current document contains invalid JSON')
       }
@@ -175,28 +184,22 @@
     this.$destroy()
   }
 
-  function handleChangeText(updatedText) {
-    text = updatedText
-    json = undefined
+  /**
+   * @param {{json: JSON, text: undefined} | {json: undefined, text: string}} updatedContent
+   */
+  function handleChange(updatedContent) {
+    content = updatedContent
 
     if (onChange) {
-      onChange({
-        json,
-        text
-      })
+      onChange(updatedContent)
     }
   }
 
-  function handleChangeJson(updatedJson) {
-    json = updatedJson
-    text = undefined
-
-    if (onChange) {
-      onChange({
-        json,
-        text
-      })
-    }
+  function handleChangeText(updatedText) {
+    handleChange({
+      text: updatedText,
+      json: undefined
+    })
   }
 
   function handleRequestRepair() {
@@ -282,14 +285,12 @@
             bind:this={refTreeMode}
             {readOnly}
             {indentation}
-            externalJson={json}
-            externalText={text}
+            externalContent={content}
             {mainMenuBar}
             {navigationBar}
             {validator}
             {onError}
-            onChangeJson={handleChangeJson}
-            onChangeText={handleChangeText}
+            onChange={handleChange}
             onRequestRepair={handleRequestRepair}
             {onClassName}
             onFocus={handleFocus}

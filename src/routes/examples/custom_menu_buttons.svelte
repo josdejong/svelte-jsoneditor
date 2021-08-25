@@ -2,21 +2,24 @@
   import { JSONEditor } from '$lib' // replace this with 'svelte-jsoneditor'
   import { faCopy } from '@fortawesome/free-regular-svg-icons'
 
-  let json = {
-    array: [1, 2, 3],
-    boolean: true,
-    color: '#82b92c',
-    null: null,
-    number: 123,
-    object: { a: 'b', c: 'd' },
-    string: 'Hello World'
+  let content = {
+    text: undefined, // used when in code mode
+    json: {
+      array: [1, 2, 3],
+      boolean: true,
+      color: '#82b92c',
+      null: null,
+      number: 123,
+      object: { a: 'b', c: 'd' },
+      string: 'Hello World'
+    }
   }
-  let text = undefined // used when in code mode
 
   function handleCopy() {
     console.log('Custom copy button clicked')
 
-    const contents = text !== undefined ? text : JSON.stringify(json, null, 2)
+    const contents =
+      content.text !== undefined ? content.text : JSON.stringify(content.json, null, 2)
 
     navigator.clipboard.writeText(contents).catch((err) => console.error(err))
   }
@@ -55,7 +58,7 @@
 </p>
 
 <div class="editor">
-  <JSONEditor bind:json bind:text onRenderMenu={handleRenderMenu} />
+  <JSONEditor bind:content onRenderMenu={handleRenderMenu} />
 </div>
 
 <style>
