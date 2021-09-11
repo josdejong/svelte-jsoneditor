@@ -7,10 +7,9 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### ⚠ BREAKING CHANGES
 
+* Properties `json` and `text` are replaced by `content: { json, text }`
 * Methods `getText`, `setText`, and `updateText` are removed, use `get`, `set` and `update` instead.
-Methods `get` `set`, and `update` now expect and return a content
-object `{ json: JSON } | { text: string }` instead of the json data.
-* properties `json` and `text` are replaced by `content: { json, text }`
+* Methods `get` `set`, and `update` now expect and return a content object `{ json: JSON } | { text: string }` instead of the json data.
 
 ### Features
 
