@@ -94,7 +94,7 @@ Or one-way binding:
   }
 
   function handleChange(updatedContent) {
-    // content is an object { json: JSON | undefined, text: string | undefined }
+    // content is an object { json: JSON } | { text: string }
     console.log('onChange: ', updatedContent)
     content = updatedContent
   }
@@ -135,15 +135,15 @@ Browser example loading the ES module:
         props: {
           content,
           onChange: (updatedContent) => {
-            // content is an object { json: JSON | undefined, text: string | undefined }
+            // content is an object { json: JSON } | { text: string }
             console.log('onChange', updatedContent)
             content = updatedContent
           }
         }
       })
 
-      // use methods get, getText, set, setText, update, updateText, and onChange
-      // to get data in or out of the editor. Use updateProps to update properties.
+      // use methods get, set, update, and onChange to get data in or out of the editor.
+      // Use updateProps to update properties.
     </script>
   </body>
 </html>
@@ -175,7 +175,7 @@ const editor = new JSONEditor({
   props: {
     content,
     onChange: (updatedContent) => {
-      // content is an object { json: JSON | undefined, text: string | undefined }
+      // content is an object { json: JSON } | { text: string }
       console.log('onChange', updatedContent)
     }
   }
@@ -184,7 +184,7 @@ const editor = new JSONEditor({
 
 ### properties
 
-- `content: { json: JSON | undefined, text: string | undefined }` Pass the JSON contents to be rendered in the JSONEditor. Contents is an object containing a property `json` and `text`. Only one of the two must be defined. In case of `tree` mode, `json` is used. In case of `code` mode, `text` is used.
+- `content: { json: JSON } | { text: string }` Pass the JSON contents to be rendered in the JSONEditor. Contents is an object containing a property `json` and `text`. Only one of the two must be defined. In case of `tree` mode, `json` is used. In case of `code` mode, `text` is used.
 - `mode: 'tree' | 'code'`. Open the editor in `'tree'` mode (default) or `'code'` mode.
 - `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
 - `navigationBar: boolean` Show the navigation bar with, where you can see the selected path and navigate through your document from there. Default value is `true`.
@@ -247,14 +247,11 @@ const editor = new JSONEditor({
 
 ### methods
 
-- `get(): JSON` Get the current JSON document. Will throw an error when the editor is `code` mode and does not contain valid JSON.
-- `getText(): string` Get the current JSON document as stringified JSON.
-- `set(json: JSON)` Replace the current JSON document. Will reset the state of the editor.
-- `setText(text: string)` Replace the current JSON document, passing stringified JSON contents.
-- `update(json: JSON)` Update the loaded JSON document, keeping the state of the editor (like expanded objects).
-- `updateText(text: string)` Update the loaded JSON document, keeping the state of the editor (like expanded objects).
+- `get(): { json: JSON } | { text: string }` Get the current JSON document.
+- `set(content: { json: JSON } | { text: string })` Replace the current content. Will reset the state of the editor. See also method `update(content)`.
+- `update(content: { json: JSON } | { text: string })` Update the loaded content, keeping the state of the editor (like expanded objects). You can also call `editor.updateProps({ content })`. See also method `set(content)`.
 - `patch(operations: JSONPatchDocument)` Apply a JSON patch document to update the contents of the JSON document. A JSON patch document is a list with JSON Patch operations.
-- `updateProps(props: Object)` update some or all of the properties. Updated `json` or `text` can be passed too; this is equivalent to calling `update(json)` and `updateText(text)`. Example:
+- `updateProps(props: Object)` update some or all of the properties. Updated `content` can be passed too; this is equivalent to calling `update(content)`. Example:
 
   ```js
   editor.updateProps({

@@ -62,55 +62,38 @@
   $: textForCodeMode = mode === MODE.CODE ? getText(content.json, content.text) : undefined
 
   export function get() {
-    return content.json !== undefined ? content.json : JSON.parse(content.text || '')
+    return content
   }
 
-  export function getText() {
+  function getText() {
     return typeof content.text === 'string'
       ? content.text
       : JSON.stringify(content.json, null, indentation)
   }
 
-  export function set(newJson) {
+  export function set(newContent) {
     debug('set')
 
-    // new editor id -> will re-create the editor
-    instanceId = uniqueId()
-
-    content = {
-      text: undefined,
-      json: newJson
+    const contentError = validateContentType(newContent)
+    if (contentError) {
+      throw new Error(contentError)
     }
-  }
-
-  export function setText(newText) {
-    debug('setText')
 
     // new editor id -> will re-create the editor
     instanceId = uniqueId()
 
-    content = {
-      text: newText,
-      json: undefined
-    }
+    content = newContent
   }
 
-  export function update(updatedJson) {
+  export function update(updatedContent) {
     debug('update')
 
-    content = {
-      text: undefined,
-      json: updatedJson
+    const contentError = validateContentType(updatedContent)
+    if (contentError) {
+      throw new Error(contentError)
     }
-  }
 
-  export function updateText(updatedText) {
-    debug('updateText')
-
-    content = {
-      text: updatedText,
-      json: undefined
-    }
+    content = updatedContent
   }
 
   export function patch(operations, newSelection) {
