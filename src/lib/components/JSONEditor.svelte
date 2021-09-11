@@ -6,6 +6,7 @@
   import Modal from 'svelte-simple-modal'
   import { MODE } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
+  import { validateContentType } from '../utils/jsonUtils'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import CodeMode from './modes/codemode/CodeMode.svelte'
   import TreeMode from './modes/treemode/TreeMode.svelte'
@@ -14,7 +15,14 @@
   const debug = createDebug('jsoneditor:Main')
 
   // eslint-disable-next-line no-undef-init
-  export let content = {}
+  export let content = { text: '' }
+
+  $: {
+    const contentError = validateContentType(content)
+    if (contentError) {
+      console.error('Error: ' + contentError)
+    }
+  }
 
   export let readOnly = false
   export let indentation = 2

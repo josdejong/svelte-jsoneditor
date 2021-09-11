@@ -3,7 +3,8 @@ import {
   calculatePosition,
   countCharacterOccurrences,
   parsePartialJson,
-  normalizeJsonParseError
+  normalizeJsonParseError,
+  validateContentType
 } from './jsonUtils.js'
 
 describe('jsonUtils', () => {
@@ -86,5 +87,28 @@ describe('jsonUtils', () => {
     }
     deepStrictEqual(parsePartialJson(partialJson), expected)
     deepStrictEqual(parsePartialJson(partialJson + ','), expected)
+  })
+
+  it('should validate content type', () => {
+    deepStrictEqual(validateContentType({ json: [1, 2, 3] }), null)
+    deepStrictEqual(validateContentType({ text: '[1,2,3]' }), null)
+
+    deepStrictEqual(
+      validateContentType({ text: [1, 2, 3] }),
+      'Content "text" property must be string'
+    )
+
+    deepStrictEqual(
+      validateContentType({ json: [1, 2, 3], text: '[1,2,3]' }),
+      'Content must contain either a property "json" or a property "text" but not both'
+    )
+
+    deepStrictEqual(
+      validateContentType({}),
+      'Content must contain either a property "json" or a property "text"'
+    )
+
+    deepStrictEqual(validateContentType([]), 'Content must be an object')
+    deepStrictEqual(validateContentType(2), 'Content must be an object')
   })
 })

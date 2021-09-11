@@ -1,6 +1,7 @@
 import { compileJSONPointer } from 'immutable-json-patch'
 import jsonSourceMap from 'json-source-map'
 import jsonrepair from 'jsonrepair'
+import { isObject } from './typeUtils.js'
 
 /**
  * Parse the JSON. if this fails, try to repair and parse.
@@ -220,6 +221,33 @@ export function findTextLocation(text, path) {
   }
 
   return null
+}
+
+/**
+ * @param {any} content
+ * @return {string | null} Returns a string with validation error message when
+ *                         there is an issue, or null otherwise
+ */
+export function validateContentType(content) {
+  if (!isObject(content)) {
+    return 'Content must be an object'
+  }
+
+  if (content.json !== undefined) {
+    if (content.text !== undefined) {
+      return 'Content must contain either a property "json" or a property "text" but not both'
+    } else {
+      return null
+    }
+  } else {
+    if (content.text === undefined) {
+      return 'Content must contain either a property "json" or a property "text"'
+    } else if (typeof content.text !== 'string') {
+      return 'Content "text" property must be string'
+    } else {
+      return null
+    }
+  }
 }
 
 const POSITION_REGEX = /(position|char) (\d+)/

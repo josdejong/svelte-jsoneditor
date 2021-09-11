@@ -5,27 +5,7 @@
  */
 
 /**
- * @typedef {{
- *   json: JSON?,
- *   text: string?
- * }} Content
- */
-
-/**
- * @typedef {{
- *   name: string?,
- *   history: boolean?,
- *   indentation: number | string?,
- *   onChange: function (patch: JSONPatchDocument, revert: JSONPatchDocument)?,
- *   onChangeText: function ()?,
- *   onChangeMode: function (mode: string, prevMode: string)?,
- *   onError:  function (err: Error)?,
- *   isPropertyEditable: function (Path)?
- *   isValueEditable: function (Path)?,
- *   escapeUnicode: boolean?,
- *   expand: function(path: Path) : boolean?,
- *   ajv: Object?
- * }} Options
+ * @typedef {{ json: JSON } | { text: string}} Content
  */
 
 /**

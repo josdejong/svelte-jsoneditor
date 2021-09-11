@@ -14,6 +14,7 @@
   "scripts": {
     "dev": "svelte-kit dev",
     "preview": "svelte-kit preview",
+    "build": "npm run package",
     "package": "svelte-kit package && rollup --config rollup.config.bundle.js",
     "test": "mocha",
     "check": "svelte-check --tsconfig ./tsconfig.json",
