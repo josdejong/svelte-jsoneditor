@@ -5,7 +5,7 @@
   import createDebug from 'debug'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
-  import { debounce, isEmpty, uniqueId } from 'lodash-es'
+  import { debounce, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount } from 'svelte'
   import {
     CHECK_VALID_JSON_DELAY,
@@ -412,14 +412,18 @@
     // replace ace setAnnotations with custom function that also covers jsoneditor annotations
     const originalSetAnnotations = aceSession.setAnnotations
     aceSession.setAnnotations = function (annotations) {
-      const newAnnotations =
-        annotations && annotations.length
-          ? annotations
-          : validationErrorsList.map(validationErrorToAnnotation)
+      if (text !== '') {
+        const newAnnotations =
+          annotations && annotations.length
+            ? annotations
+            : validationErrorsList.map(validationErrorToAnnotation)
 
-      debug('setAnnotations', { annotations, newAnnotations })
+        debug('setAnnotations', { annotations, newAnnotations })
 
-      originalSetAnnotations.call(this, newAnnotations)
+        originalSetAnnotations.call(this, newAnnotations)
+      } else {
+        originalSetAnnotations.call(this, [])
+      }
     }
 
     // register onchange event
