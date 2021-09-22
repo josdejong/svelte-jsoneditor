@@ -2,7 +2,7 @@
 
 // TODO: simplify the CSS needed to correctly highlight the selection
 
-@mixin json-node-selected-mixin($selection-background) {
+@mixin json-node-selected-mixin($selection-background, $insert-area-background) {
   // entry selected
   &.selected {
     .header,
@@ -68,7 +68,21 @@
     &.selected {
       display: flex;
       z-index: 2;
-      outline-color: $dark-gray;
+      outline-color: $insert-area-background;
+    }
+  }
+
+  .insert-area {
+    &.selected {
+      :global(.context-menu-button) {
+        background: $insert-area-background;
+      }
+    }
+  }
+
+  .context-menu-button-anchor {
+    :global(.context-menu-button) {
+      background: $insert-area-background;
     }
   }
 }

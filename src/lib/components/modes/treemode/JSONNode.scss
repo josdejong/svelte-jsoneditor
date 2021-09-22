@@ -129,16 +129,16 @@
       display: flex;
       outline-color: $hovered-background-transparent;
     }
-
-    &.selected {
-      // TODO: move this into json-node-selected-mixin
-      :global(.context-menu-button) {
-        background: $dark-gray;
-      }
-    }
   }
 
-  @include json-node-selected-mixin($selection-background);
+  @include json-node-selected-mixin($selection-background, $dark-gray);
+}
+
+// lighter selection color when the editor doesn't have focus
+:global(.jsoneditor-main:not(.focus)) {
+  .json-node {
+    @include json-node-selected-mixin(lighten($selection-background, 10%), $selection-background);
+  }
 }
 
 .expand {
