@@ -1369,12 +1369,16 @@
       selection = selection
         ? getSelectionLeft(json, state, selection, keepAnchorPath, !readOnly) || selection
         : getInitialSelection(json, state)
+
+      scrollIntoView(selection.focusPath)
     }
     if (combo === 'Right' || combo === 'Shift+Right') {
       event.preventDefault()
       selection = selection
         ? getSelectionRight(json, state, selection, keepAnchorPath, !readOnly) || selection
         : getInitialSelection(json, state)
+
+      scrollIntoView(selection.focusPath)
     }
 
     if (combo === 'Enter' && selection) {
