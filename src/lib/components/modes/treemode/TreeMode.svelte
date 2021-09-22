@@ -671,7 +671,10 @@
       // root selected -> clear complete document
       debug('remove', { selection })
 
-      onChangeText('')
+      onChange({
+        text: '',
+        json: undefined
+      })
     } else {
       // remove selection
       const { operations, newSelection } = createRemoveOperations(json, state, removeSelection)
