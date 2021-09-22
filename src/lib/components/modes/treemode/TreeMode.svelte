@@ -121,11 +121,15 @@
   export let onFocus
   export let onBlur
 
+  // modalOpen is true when one of the modals is open.
+  // This is used to track whether the editor still has focus
+  let modalOpen = false
+
   createFocusTracker({
     onMount,
     onDestroy,
     getWindow: () => getWindow(refJsonEditor),
-    hasFocus: () => activeElementIsChildOf(refJsonEditor),
+    hasFocus: () => (modalOpen && document.hasFocus()) || activeElementIsChildOf(refJsonEditor),
     onFocus: () => {
       hasFocus = true
       if (onFocus) {
@@ -973,6 +977,8 @@
       return
     }
 
+    modalOpen = true
+
     open(
       SortModal,
       {
@@ -995,7 +1001,10 @@
       },
       SORT_MODAL_OPTIONS,
       {
-        onClose: () => focus()
+        onClose: () => {
+          modalOpen = false
+          focus()
+        }
       }
     )
   }
@@ -1018,6 +1027,8 @@
     if (readOnly) {
       return
     }
+
+    modalOpen = true
 
     open(
       TransformModal,
@@ -1051,6 +1062,7 @@
       TRANSFORM_MODAL_OPTIONS,
       {
         onClose: () => {
+          modalOpen = false
           focus()
           if (onClose) {
             onClose()
@@ -1540,6 +1552,8 @@
       }
     }
 
+    modalOpen = true
+
     openAbsolutePopup(ContextMenu, props, {
       left,
       top,
@@ -1549,7 +1563,10 @@
       height,
       anchor,
       closeOnOuterClick: true,
-      onClose: focus
+      onClose: () => {
+        modalOpen = false
+        focus()
+      }
     })
   }
 

@@ -133,11 +133,15 @@
     }
   }
 
+  // modalOpen is true when one of the modals is open.
+  // This is used to track whether the editor still has focus
+  let modalOpen = false
+
   createFocusTracker({
     onMount,
     onDestroy,
     getWindow: () => getWindow(domCodeMode),
-    hasFocus: () => activeElementIsChildOf(domCodeMode),
+    hasFocus: () => (modalOpen && document.hasFocus()) || activeElementIsChildOf(domCodeMode),
     onFocus,
     onBlur
   })
@@ -226,6 +230,8 @@
     try {
       const json = JSON.parse(text)
 
+      modalOpen = true
+
       open(
         SortModal,
         {
@@ -239,7 +245,10 @@
         },
         SORT_MODAL_OPTIONS,
         {
-          onClose: focus
+          onClose: () => {
+            modalOpen = false
+            focus()
+          }
         }
       )
     } catch (err) {
@@ -250,6 +259,8 @@
   export function openTransformModal({ id, selectedPath, onTransform, onClose }) {
     try {
       const json = JSON.parse(text)
+
+      modalOpen = true
 
       open(
         TransformModal,
@@ -275,6 +286,7 @@
         TRANSFORM_MODAL_OPTIONS,
         {
           onClose: () => {
+            modalOpen = false
             focus()
             if (onClose) {
               onClose()
