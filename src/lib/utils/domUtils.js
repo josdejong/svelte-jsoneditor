@@ -114,8 +114,8 @@ export function traverseInnerText(element, buffer) {
 
   // text node
   if (element.nodeValue) {
-    // remove return characters and the whitespace surrounding return characters
-    const trimmedValue = element.nodeValue.replace(/\s*\n\s*/g, '')
+    // remove return characters and the whitespaces surrounding those return characters
+    const trimmedValue = element.nodeValue.replace(/(\b|^)\s*\n\s*(\b|$)/g, '')
     if (trimmedValue !== '') {
       return buffer.flush() + trimmedValue
     } else {
