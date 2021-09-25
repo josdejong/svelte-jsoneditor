@@ -19,9 +19,9 @@
   import { onMount } from 'svelte'
   import Icon from 'svelte-awesome'
   import DropdownButton from '../../../../components/controls/DropdownButton.svelte'
-  import { SELECTION_TYPE } from '../../../../logic/selection.js'
-  import { keyComboFromEvent } from '../../../../utils/keyBindings.js'
-  import { isObjectOrArray } from '../../../../utils/typeUtils.js'
+  import { SELECTION_TYPE } from '$lib/logic/selection'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings'
+  import { isObjectOrArray } from '$lib/utils/typeUtils'
 
   export let json
   export let selection

@@ -17,17 +17,17 @@
     STATE_KEYS,
     STATE_VISIBLE_SECTIONS,
     VALIDATION_ERROR
-  } from '../../../constants.js'
-  import { getVisibleCaretPositions } from '../../../logic/documentState.js'
-  import { rename } from '../../../logic/operations.js'
-  import { isPathInsideSelection, SELECTION_TYPE } from '../../../logic/selection.js'
+  } from '$lib/constants'
+  import { getVisibleCaretPositions } from '$lib/logic/documentState'
+  import { rename } from '$lib/logic/operations'
+  import { isPathInsideSelection, SELECTION_TYPE } from '$lib/logic/selection'
   import {
     getSelectionTypeFromTarget,
     isChildOfAttribute,
     isChildOfNodeName,
     isContentEditableDiv
-  } from '../../../utils/domUtils.js'
-  import { valueType } from '../../../utils/typeUtils.js'
+  } from '$lib/utils/domUtils'
+  import { valueType } from '$lib/utils/typeUtils'
   import CollapsedItems from './CollapsedItems.svelte'
   import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
   import JSONKey from './JSONKey.svelte'

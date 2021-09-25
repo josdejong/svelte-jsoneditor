@@ -10,13 +10,10 @@
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
-  import { CONTEXT_MENU_EXPLANATION } from '../../../../constants.js'
-  import {
-    faJSONEditorCollapse,
-    faJSONEditorExpand
-  } from '../../../../img/customFontawesomeIcons.js'
-  import { SELECTION_TYPE } from '../../../../logic/selection.js'
-  import { isObjectOrArray } from '../../../../utils/typeUtils.js'
+  import { CONTEXT_MENU_EXPLANATION } from '$lib/constants'
+  import { faJSONEditorCollapse, faJSONEditorExpand } from '$lib/img/customFontawesomeIcons'
+  import { SELECTION_TYPE } from '$lib/logic/selection'
+  import { isObjectOrArray } from '$lib/utils/typeUtils'
   import Menu from '../../../controls/Menu.svelte'
 
   export let json

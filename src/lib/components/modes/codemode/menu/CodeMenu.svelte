@@ -8,10 +8,7 @@
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
-  import {
-    faJSONEditorCompact,
-    faJSONEditorFormat
-  } from '../../../../img/customFontawesomeIcons.js'
+  import { faJSONEditorCompact, faJSONEditorFormat } from '$lib/img/customFontawesomeIcons'
   import Menu from '../../../controls/Menu.svelte'
 
   export let readOnly = false

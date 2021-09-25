@@ -4,10 +4,10 @@
   import classnames from 'classnames'
   import { isEqual } from 'lodash-es'
   import { onDestroy, tick } from 'svelte'
-  import { ACTIVE_SEARCH_RESULT, STATE_SEARCH_PROPERTY } from '../../../constants.js'
-  import { SELECTION_TYPE } from '../../../logic/selection.js'
-  import { getPlainText, setCursorToEnd, setPlainText } from '../../../utils/domUtils.js'
-  import { keyComboFromEvent } from '../../../utils/keyBindings.js'
+  import { ACTIVE_SEARCH_RESULT, STATE_SEARCH_PROPERTY } from '$lib/constants'
+  import { SELECTION_TYPE } from '$lib/logic/selection'
+  import { getPlainText, setCursorToEnd, setPlainText } from '$lib/utils/domUtils'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings'
 
   export let path
   export let key

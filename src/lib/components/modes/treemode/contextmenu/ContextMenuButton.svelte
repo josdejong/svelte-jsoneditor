@@ -7,7 +7,7 @@
     CONTEXT_MENU_EXPLANATION,
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH
-  } from '../../../../constants.js'
+  } from '$lib/constants.js'
 
   export let selected
   export let onContextMenu

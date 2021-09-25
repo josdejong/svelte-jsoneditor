@@ -5,10 +5,10 @@
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isEqual } from 'lodash-es'
   import { onDestroy } from 'svelte'
-  import { ACTIVE_SEARCH_RESULT, STATE_SEARCH_VALUE } from '../../../constants.js'
-  import { SELECTION_TYPE } from '../../../logic/selection.js'
-  import { getPlainText, setCursorToEnd, setPlainText } from '../../../utils/domUtils.js'
-  import { keyComboFromEvent } from '../../../utils/keyBindings.js'
+  import { ACTIVE_SEARCH_RESULT, STATE_SEARCH_VALUE } from '$lib/constants'
+  import { SELECTION_TYPE } from '$lib/logic/selection'
+  import { getPlainText, setCursorToEnd, setPlainText } from '$lib/utils/domUtils'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import {
     isBoolean,
     isColor,
@@ -17,7 +17,7 @@
     isUrl,
     stringConvert,
     valueType
-  } from '../../../utils/typeUtils.js'
+  } from '$lib/utils/typeUtils'
   import BooleanToggle from './value/BooleanToggle.svelte'
   import Timestamp from '../../../components/modes/treemode/value/Timestamp.svelte'
   import Color from '../../../components/modes/treemode/value/Color.svelte'

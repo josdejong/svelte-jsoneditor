@@ -10,8 +10,8 @@
     faChevronUp,
     faTimes
   } from '@fortawesome/free-solid-svg-icons'
-  import { DEBOUNCE_DELAY, MAX_SEARCH_RESULTS } from '../../../../constants.js'
-  import { keyComboFromEvent } from '../../../../utils/keyBindings.js'
+  import { DEBOUNCE_DELAY, MAX_SEARCH_RESULTS } from '$lib/constants'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings'
 
   export let text = ''
   export let searching

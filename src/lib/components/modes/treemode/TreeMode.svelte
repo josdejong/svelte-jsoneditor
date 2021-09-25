@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script>
-  import { createAutoScrollHandler } from '../../../components/controls/createAutoScrollHandler.js'
+  import { createAutoScrollHandler } from '$lib/components/controls/createAutoScrollHandler'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import createDebug from 'debug'
   import {
@@ -16,7 +16,7 @@
   import jsonrepair from 'jsonrepair'
   import { initial, isEmpty, isEqual, last, throttle, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
-  import { createJump } from '../../../assets/jump.js/src/jump.js'
+  import { createJump } from '$lib/assets/jump.js/src/jump'
   import {
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
@@ -27,23 +27,23 @@
     SORT_MODAL_OPTIONS,
     STATE_EXPANDED,
     TRANSFORM_MODAL_OPTIONS
-  } from '../../../constants.js'
+  } from '$lib/constants'
   import {
     createState,
     documentStatePatch,
     expandPath,
     expandSection,
     syncState
-  } from '../../../logic/documentState.js'
-  import { createHistory } from '../../../logic/history.js'
+  } from '$lib/logic/documentState'
+  import { createHistory } from '$lib/logic/history'
   import {
     createNewValue,
     createRemoveOperations,
     duplicate,
     extract,
     insert
-  } from '../../../logic/operations.js'
-  import { search, searchNext, searchPrevious, updateSearchResult } from '../../../logic/search.js'
+  } from '$lib/logic/operations'
+  import { search, searchNext, searchPrevious, updateSearchResult } from '$lib/logic/search'
   import {
     createSelection,
     createSelectionFromOperations,
@@ -58,19 +58,19 @@
     selectAll,
     SELECTION_TYPE,
     selectionToPartialJson
-  } from '../../../logic/selection.js'
-  import { mapValidationErrors } from '../../../logic/validation.js'
+  } from '$lib/logic/selection'
+  import { mapValidationErrors } from '$lib/logic/validation'
   import {
     activeElementIsChildOf,
     findParentWithNodeName,
     getWindow,
     isChildOfNodeName,
     setCursorToEnd
-  } from '../../../utils/domUtils.js'
-  import { parseJSONPointerWithArrayIndices } from '../../../utils/jsonPointer.js'
-  import { parsePartialJson, repairPartialJson } from '../../../utils/jsonUtils.js'
-  import { keyComboFromEvent } from '../../../utils/keyBindings.js'
-  import { isObject, isObjectOrArray, isUrl } from '../../../utils/typeUtils.js'
+  } from '$lib/utils/domUtils'
+  import { parseJSONPointerWithArrayIndices } from '$lib/utils/jsonPointer.js'
+  import { parsePartialJson, repairPartialJson } from '$lib/utils/jsonUtils'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings'
+  import { isObject, isObjectOrArray, isUrl } from '$lib/utils/typeUtils'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'

@@ -1,6 +1,6 @@
 <script>
-  import { getColorCSS } from '../../../../utils/typeUtils'
-  import { getWindow } from '../../../../utils/domUtils'
+  import { getColorCSS } from '$lib/utils/typeUtils'
+  import { getWindow } from '$lib/utils/domUtils'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getContext } from 'svelte'
   import ColorPickerPopup from '../../../../components/controls/ColorPickerPopup.svelte'

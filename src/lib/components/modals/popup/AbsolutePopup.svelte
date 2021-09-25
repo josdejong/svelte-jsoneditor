@@ -3,8 +3,8 @@
 <script>
   import createDebug from 'debug'
   import { setContext, tick } from 'svelte'
-  import { isChildOf } from '../../../utils/domUtils.js'
-  import { keyComboFromEvent } from '../../../utils/keyBindings.js'
+  import { isChildOf } from '$lib/utils/domUtils'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings'
 
   const debug = createDebug('jsoneditor:AbsolutePopup')
 

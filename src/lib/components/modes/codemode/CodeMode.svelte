@@ -16,11 +16,11 @@
     MAX_DOCUMENT_SIZE_CODE_MODE,
     SORT_MODAL_OPTIONS,
     TRANSFORM_MODAL_OPTIONS
-  } from '../../../constants.js'
-  import { activeElementIsChildOf, getWindow } from '../../../utils/domUtils.js'
-  import { formatSize } from '../../../utils/fileUtils.js'
-  import { findTextLocation } from '../../../utils/jsonUtils.js'
-  import { keyComboFromEvent } from '../../../utils/keyBindings.js'
+  } from '$lib/constants'
+  import { activeElementIsChildOf, getWindow } from '../../../utils/domUtils'
+  import { formatSize } from '$lib/utils/fileUtils'
+  import { findTextLocation } from '$lib/utils/jsonUtils'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'

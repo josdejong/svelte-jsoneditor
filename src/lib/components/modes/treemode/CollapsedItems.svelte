@@ -1,8 +1,8 @@
 <svelte:options immutable={true} />
 
 <script>
-  import { INDENTATION_WIDTH } from '../../../constants.js'
-  import { getExpandItemsSections } from '../../../logic/expandItemsSections.js'
+  import { INDENTATION_WIDTH } from '$lib/constants'
+  import { getExpandItemsSections } from '$lib/logic/expandItemsSections'
   import { compileJSONPointer } from 'immutable-json-patch'
 
   export let visibleSections
