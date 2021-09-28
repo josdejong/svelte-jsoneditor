@@ -4,7 +4,7 @@ import {
   AUTO_SCROLL_SPEED_FAST,
   AUTO_SCROLL_SPEED_NORMAL,
   AUTO_SCROLL_SPEED_SLOW
-} from '../../constants.js'
+} from '../../constants.ts'
 
 const debug = createDebug('jsoneditor:AutoScrollHandler')
 

@@ -4,7 +4,7 @@ import {
   STATE_KEYS,
   STATE_SEARCH_PROPERTY,
   STATE_SEARCH_VALUE
-} from '../constants.js'
+} from '../constants.ts'
 import { syncState } from './documentState.js'
 import { createRecursiveSearchResults, search } from './search.js'
 

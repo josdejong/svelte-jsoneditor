@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { mapValidationErrors } from './validation.js'
-import { VALIDATION_ERROR } from '../constants.js'
+import { VALIDATION_ERROR } from '../constants.ts'
 
 describe('validation', () => {
   it('should turn a list with validation errors into a nested object', () => {

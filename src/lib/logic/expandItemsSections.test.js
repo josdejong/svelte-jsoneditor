@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { ARRAY_SECTION_SIZE } from '../constants.js'
+import { ARRAY_SECTION_SIZE } from '../constants.ts'
 import {
   currentRoundNumber,
   getExpandItemsSections,

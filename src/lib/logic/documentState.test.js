@@ -7,7 +7,7 @@ import {
   STATE_ID,
   STATE_KEYS,
   STATE_VISIBLE_SECTIONS
-} from '../constants.js'
+} from '../constants.ts'
 import { isObject } from '../utils/typeUtils.js'
 import {
   CARET_POSITION,

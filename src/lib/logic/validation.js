@@ -1,5 +1,5 @@
 import { initial } from 'lodash-es'
-import { VALIDATION_ERROR } from '../constants.js'
+import { VALIDATION_ERROR } from '../constants.ts'
 import { existsIn, setIn } from 'immutable-json-patch'
 
 /**

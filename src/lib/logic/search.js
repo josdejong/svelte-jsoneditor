@@ -6,7 +6,7 @@ import {
   STATE_KEYS,
   STATE_SEARCH_PROPERTY,
   STATE_SEARCH_VALUE
-} from '../constants.js'
+} from '../constants.ts'
 
 /**
  * @typedef {Object} SearchResult

@@ -7,7 +7,7 @@
   import { debounce, isEmpty } from 'lodash-es'
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
-  import { DEBOUNCE_DELAY, MAX_PREVIEW_CHARACTERS } from '../../constants.js'
+  import { DEBOUNCE_DELAY, MAX_PREVIEW_CHARACTERS } from '../../constants.ts'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { truncate } from '../../utils/stringUtils.js'

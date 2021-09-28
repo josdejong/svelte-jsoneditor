@@ -13,7 +13,7 @@ import {
   STATE_ID,
   STATE_KEYS,
   STATE_VISIBLE_SECTIONS
-} from '../constants.js'
+} from '../constants.ts'
 import { forEachIndex } from '../utils/arrayUtils.js'
 import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
 import { isObject } from '../utils/typeUtils.js'

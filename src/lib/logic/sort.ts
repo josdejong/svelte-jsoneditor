@@ -1,12 +1,13 @@
+import type { JSON, Path } from '$lib/types.js'
 import diffSequencesExport from 'diff-sequences'
-import { compileJSONPointer, getIn, setIn } from 'immutable-json-patch'
+import { compileJSONPointer, getIn, JSONPatchDocument, setIn } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import naturalCompare from 'natural-compare-lite'
 import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
 
 const diffSequences = diffSequencesExport.default || diffSequencesExport
 
-export function caseInsensitiveNaturalCompare(a, b) {
+export function caseInsensitiveNaturalCompare(a: unknown, b: unknown): number {
   const aLower = typeof a === 'string' ? a.toLowerCase() : a
   const bLower = typeof b === 'string' ? b.toLowerCase() : b
 
@@ -15,14 +16,18 @@ export function caseInsensitiveNaturalCompare(a, b) {
 
 /**
  * Sort the keys of an object
- * @param {JSON} json             The the JSON containg the (optionally nested)
+ * @param {JSON} json             The the JSON containing the (optionally nested)
  *                                object to be sorted
  * @param {Path} [rootPath=[]]    Relative path when the array was located
  * @param {1 | -1} [direction=1]  Pass 1 to sort ascending, -1 to sort descending
  * @return {JSONPatchDocument}    Returns a JSONPatch document with move operation
  *                                to get the array sorted.
  */
-export function sortObjectKeys(json, rootPath = [], direction = 1) {
+export function sortObjectKeys(
+  json: JSON,
+  rootPath: Path = [],
+  direction: 1 | -1 = 1
+): JSONPatchDocument {
   const object = getIn(json, rootPath)
   const keys = Object.keys(object)
   const sortedKeys = keys.slice()
@@ -56,7 +61,12 @@ export function sortObjectKeys(json, rootPath = [], direction = 1) {
  * @return {JSONPatchDocument}      Returns a JSONPatch document with move operation
  *                                  to get the array sorted.
  */
-export function sortArray(json, rootPath = [], propertyPath = [], direction = 1) {
+export function sortArray(
+  json: JSON,
+  rootPath: Path[] = [],
+  propertyPath: Path[] = [],
+  direction: 1 | -1 = 1
+): JSONPatchDocument {
   const comparator = createObjectComparator(propertyPath, direction)
 
   // TODO: make the mechanism to sort configurable? Like use sortOperationsMove and sortOperationsMoveAdvanced
@@ -75,7 +85,7 @@ export function sortArray(json, rootPath = [], propertyPath = [], direction = 1)
  * @param {Path} propertyPath
  * @param {1 | -1} direction
  */
-function createObjectComparator(propertyPath, direction) {
+function createObjectComparator(propertyPath: Path, direction: 1 | -1) {
   return function comparator(a, b) {
     const valueA = getIn(a, propertyPath)
     const valueB = getIn(b, propertyPath)
@@ -103,7 +113,10 @@ function createObjectComparator(propertyPath, direction) {
  * @param {function (a, b) : number} comparator
  * @return {Array.<{ op: 'move', from: string, path: string }>}
  */
-export function sortOperationsMove(array, comparator) {
+export function sortOperationsMove(
+  array: Array<unknown>,
+  comparator: (a: unknown, b: unknown) => number
+): Array<{ op: 'move'; from: string; path: string }> {
   const operations = []
   const sorted = []
 
@@ -139,7 +152,10 @@ export function sortOperationsMove(array, comparator) {
  * @param {function (a, b) : number} comparator
  * @return {Array.<{ op: 'move', from: string, path: string }>}
  */
-export function sortOperationsMoveAdvanced(array, comparator) {
+export function sortOperationsMoveAdvanced(
+  array: Array<any>,
+  comparator: (arg0: a, arg1: b) => number
+): Array<{ op: 'move'; from: string; path: string }> {
   const moves = []
 
   const sortedIndices = array
@@ -216,7 +232,7 @@ export function sortOperationsMoveAdvanced(array, comparator) {
  * @returns {JSON}
  */
 // TODO: write unit tests
-export function fastPatchSort(json, operations) {
+export function fastPatchSort(json: JSON, operations: JSONPatchDocument): JSON {
   if (isEmpty(operations)) {
     // nothing to do :)
     return json

@@ -1,13 +1,13 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
+  import { DropdownButtonItem } from './../../types.d.ts'
   import Icon from 'svelte-awesome'
   import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
   import { onDestroy, onMount } from 'svelte'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
 
-  /** @type {DropdownButtonItem[]} */
-  export let items = []
+  export let items: DropdownButtonItem[] = []
   export let title = null
   export let width = '120px'
 

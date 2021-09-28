@@ -9,7 +9,7 @@ import {
   sortOperationsMoveAdvanced
 } from '../../src/lib/logic/sort.js'
 
-function generateArray(size, changes) {
+function generateArray(size: number, changes: number): number[] {
   const array = times(size).map((item, index) => index)
 
   for (let i = 0; i < changes; i++) {
@@ -32,7 +32,7 @@ function measure(callback) {
   return [result, duration]
 }
 
-function sortBenchmark(size, changes) {
+function sortBenchmark(size: number, changes: number) {
   // TODO: also compare size of patch (KB)
   // TODO: also compare with simply replacing the whole array
 
@@ -74,7 +74,7 @@ function sortBenchmark(size, changes) {
   }
 }
 
-const comparator = (a, b) => a - b
+const comparator = (a: number, b: number) => a - b
 
 const results = [
   sortBenchmark(100, 5),

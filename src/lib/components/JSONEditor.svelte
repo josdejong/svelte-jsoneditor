@@ -1,10 +1,10 @@
 <svelte:options accessors={false} immutable={true} />
 
-<script>
+<script lang="ts">
   import { faCode } from '@fortawesome/free-solid-svg-icons'
   import createDebug from 'debug'
   import Modal from 'svelte-simple-modal'
-  import { MODE } from '../constants.js'
+  import { MODE } from '../constants.ts'
   import { uniqueId } from '../utils/uniqueId.js'
   import { validateContentType } from '../utils/jsonUtils'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
@@ -14,8 +14,7 @@
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
 
-  // eslint-disable-next-line no-undef-init
-  export let content = { text: '' }
+  export let content: JSON = { text: '' }
 
   $: {
     const contentError = validateContentType(content)
