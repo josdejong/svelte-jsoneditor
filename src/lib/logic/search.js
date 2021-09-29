@@ -142,6 +142,7 @@ export function search(searchText, json, state, maxResults = Infinity) {
       for (const key of keys) {
         path[level] = key
 
+        // TODO: replace with a new function findCaseInsensitiveMatches
         if (containsCaseInsensitive(key, searchTextLowerCase) && results.length < maxResults) {
           results.push(path.concat([STATE_SEARCH_PROPERTY]))
         }
@@ -156,6 +157,8 @@ export function search(searchText, json, state, maxResults = Infinity) {
       path.pop()
     } else {
       // type is a value
+
+      // TODO: replace with a new function findCaseInsensitiveMatches
       if (containsCaseInsensitive(json, searchTextLowerCase) && results.length < maxResults) {
         results.push(path.concat([STATE_SEARCH_VALUE]))
       }
@@ -164,7 +167,7 @@ export function search(searchText, json, state, maxResults = Infinity) {
 
   if (typeof searchText === 'string' && searchText !== '') {
     const searchTextLowerCase = searchText.toLowerCase()
-    searchRecursive(searchTextLowerCase, json, state, [])
+    searchRecursive(searchTextLowerCase, json, state)
   }
 
   return results
@@ -178,4 +181,37 @@ export function search(searchText, json, state, maxResults = Infinity) {
  */
 export function containsCaseInsensitive(text, searchTextLowerCase) {
   return String(text).toLowerCase().indexOf(searchTextLowerCase) !== -1
+}
+
+/**
+ * Do a case insensitive search for a search text in a text
+ * @param {String} text
+ * @param {String} searchTextLowerCase
+ * @return {Array.<{ start: number, end: number }> | undefined} Returns a list with all matches if any, or null when there are no matches
+ */
+export function findCaseInsensitiveMatches(text, searchTextLowerCase) {
+  const textLower = String(text).toLowerCase()
+
+  let matches = undefined
+  let position = -1
+  let index = -1
+
+  do {
+    index = textLower.indexOf(searchTextLowerCase, position)
+
+    if (index !== -1) {
+      position = index + searchTextLowerCase.length
+
+      if (!Array.isArray(matches)) {
+        matches = []
+      }
+
+      matches.push({
+        start: index,
+        end: position
+      })
+    }
+  } while (index !== -1)
+
+  return matches
 }

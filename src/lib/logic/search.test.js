@@ -6,7 +6,7 @@ import {
   STATE_SEARCH_VALUE
 } from '../constants.js'
 import { syncState } from './documentState.js'
-import { createRecursiveSearchResults, search } from './search.js'
+import { createRecursiveSearchResults, findCaseInsensitiveMatches, search } from './search.js'
 
 describe('search', () => {
   it('search in JSON', () => {
@@ -89,6 +89,24 @@ describe('search', () => {
     expected.a[2][STATE_SEARCH_VALUE] = SEARCH_RESULT
 
     assert.deepStrictEqual(actual, expected)
+  })
+
+  it('should find all case insensitive matches', () => {
+    assert.deepStrictEqual(findCaseInsensitiveMatches('hello world, Hello world', 'hello'), [
+      { start: 0, end: 5 },
+      { start: 13, end: 18 }
+    ])
+
+    assert.deepStrictEqual(findCaseInsensitiveMatches('hahaha', 'haha'), [{ start: 0, end: 4 }])
+    assert.deepStrictEqual(findCaseInsensitiveMatches('hahahahaha', 'haha'), [
+      { start: 0, end: 4 },
+      { start: 4, end: 8 }
+    ])
+
+    assert.deepStrictEqual(
+      findCaseInsensitiveMatches('hello world, Hello world', 'greeting'),
+      undefined
+    )
   })
 
   // TODO: test searchNext
