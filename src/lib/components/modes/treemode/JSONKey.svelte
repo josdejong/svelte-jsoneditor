@@ -4,10 +4,10 @@
   import classnames from 'classnames'
   import { isEqual } from 'lodash-es'
   import { onDestroy, tick } from 'svelte'
-  import { ACTIVE_SEARCH_RESULT, STATE_SEARCH_PROPERTY } from '$lib/constants'
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import { getPlainText, setCursorToEnd, setPlainText } from '$lib/utils/domUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
+  import SearchResultHighlighter from '$lib/components/modes/treemode/highlight/SearchResultHighlighter.svelte'
 
   export let path
   export let key
@@ -28,7 +28,7 @@
   $: selectedKey =
     selection && selection.type === SELECTION_TYPE.KEY ? isEqual(selection.focusPath, path) : false
   $: editKey = selectedKey && selection && selection.edit === true
-  $: keyClass = getKeyClass(newKey, searchResult)
+  $: keyClass = getKeyClass(newKey)
 
   $: if (editKey === true) {
     // edit changed to true -> set focus to end of input
@@ -117,24 +117,39 @@
     }
   }
 
-  function getKeyClass(key, searchResult) {
+  function getKeyClass(key) {
     return classnames('editable-div', 'key', {
-      search: searchResult && searchResult[STATE_SEARCH_PROPERTY],
-      active: searchResult && searchResult[STATE_SEARCH_PROPERTY] === ACTIVE_SEARCH_RESULT,
       empty: key === ''
     })
   }
 </script>
 
-<div
-  data-type="selectable-key"
-  class={keyClass}
-  contenteditable={editKey}
-  spellcheck="false"
-  on:input={handleKeyInput}
-  on:dblclick={handleKeyDoubleClick}
-  on:keydown={handleKeyKeyDown}
-  bind:this={domKey}
-/>
+{#if editKey}
+  <div
+    data-type="selectable-key"
+    class={keyClass}
+    contenteditable="true"
+    spellcheck="false"
+    on:input={handleKeyInput}
+    on:dblclick={handleKeyDoubleClick}
+    on:keydown={handleKeyKeyDown}
+    bind:this={domKey}
+  />
+{:else}
+  <div
+    data-type="selectable-key"
+    class={keyClass}
+    contenteditable="false"
+    spellcheck="false"
+    on:dblclick={handleKeyDoubleClick}
+    on:keydown={handleKeyKeyDown}
+  >
+    {#if searchResult}
+      <SearchResultHighlighter text={key} {searchResult} />
+    {:else}
+      {key}
+    {/if}
+  </div>
+{/if}
 
 <style src="./JSONKey.scss"></style>

@@ -19,14 +19,6 @@ div.editable-div {
     z-index: 3; // must be on top of hovering the entry below it
   }
 
-  &.search {
-    background-color: $highlight-color;
-
-    &.active {
-      background-color: $highlight-active-color;
-    }
-  }
-
   &.empty {
     &:not(:focus) {
       outline: 1px dotted $light-gray-transparent;

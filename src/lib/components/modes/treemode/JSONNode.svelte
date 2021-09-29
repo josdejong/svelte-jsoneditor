@@ -3,7 +3,7 @@
 <script>
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
-  import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
+  import { compileJSONPointer, getIn, parseJSONPointer } from 'immutable-json-patch'
   import { isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
@@ -15,6 +15,8 @@
     STATE_EXPANDED,
     STATE_ID,
     STATE_KEYS,
+    STATE_SEARCH_PROPERTY,
+    STATE_SEARCH_VALUE,
     STATE_VISIBLE_SECTIONS,
     VALIDATION_ERROR
   } from '$lib/constants'
@@ -506,7 +508,9 @@
                 onUpdateKey={handleUpdateKey}
                 {selection}
                 {onSelect}
-                searchResult={searchResult ? searchResult[key] : undefined}
+                searchResult={searchResult
+                  ? getIn(searchResult, [key, STATE_SEARCH_PROPERTY])
+                  : undefined}
               />
               {#if !readOnly && selection && selection.type === SELECTION_TYPE.KEY && !selection.edit && isEqual(selection.focusPath, path.concat(key))}
                 <ContextMenuButton selected={true} {onContextMenu} />
@@ -543,7 +547,7 @@
           {selection}
           {onSelect}
           {onPasteJson}
-          {searchResult}
+          searchResult={searchResult ? searchResult[STATE_SEARCH_VALUE] : undefined}
         />
         {#if !readOnly && selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="context-menu-button-anchor">

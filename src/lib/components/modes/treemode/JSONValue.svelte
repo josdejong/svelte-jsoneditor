@@ -5,7 +5,6 @@
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isEqual } from 'lodash-es'
   import { onDestroy } from 'svelte'
-  import { ACTIVE_SEARCH_RESULT, STATE_SEARCH_VALUE } from '$lib/constants'
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import { getPlainText, setCursorToEnd, setPlainText } from '$lib/utils/domUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
@@ -21,6 +20,7 @@
   import BooleanToggle from './value/BooleanToggle.svelte'
   import Timestamp from '../../../components/modes/treemode/value/Timestamp.svelte'
   import Color from '../../../components/modes/treemode/value/Color.svelte'
+  import SearchResultHighlighter from '$lib/components/modes/treemode/highlight/SearchResultHighlighter.svelte'
 
   export let path
   export let value
@@ -29,6 +29,8 @@
   export let selection
   export let onSelect
   export let onPasteJson
+
+  /** @type {SearchResultItem | undefined} */
   export let searchResult
 
   onDestroy(() => {
@@ -43,7 +45,7 @@
     selection && selection.type === SELECTION_TYPE.VALUE
       ? isEqual(selection.focusPath, path)
       : false
-  $: valueClass = getValueClass(newValue, searchResult)
+  $: valueClass = getValueClass(newValue)
   $: editValue = selectedValue && selection && selection.edit === true
   $: valueIsUrl = isUrl(value)
 
@@ -98,12 +100,10 @@
     })
   }
 
-  function getValueClass(value, searchResult) {
+  function getValueClass(value) {
     const type = valueType(value)
 
     return classnames('editable-div', SELECTION_TYPE.VALUE, type, {
-      search: searchResult && searchResult[STATE_SEARCH_VALUE],
-      active: searchResult && searchResult[STATE_SEARCH_VALUE] === ACTIVE_SEARCH_RESULT,
       url: isUrl(value),
       empty: typeof value === 'string' && value.length === 0
     })
@@ -183,22 +183,37 @@
   {/if}
 {/if}
 
-<div
-  data-type="selectable-value"
-  class={valueClass}
-  contenteditable={editValue}
-  spellcheck="false"
-  on:input={handleValueInput}
-  on:click={handleValueClick}
-  on:dblclick={handleValueDoubleClick}
-  on:keydown={handleValueKeyDown}
-  on:paste={handleValuePaste}
-  bind:this={domValue}
-  title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : null}
-/>
+{#if editValue}
+  <div
+    data-type="selectable-value"
+    class={valueClass}
+    contenteditable="true"
+    spellcheck="false"
+    on:input={handleValueInput}
+    on:click={handleValueClick}
+    on:dblclick={handleValueDoubleClick}
+    on:keydown={handleValueKeyDown}
+    on:paste={handleValuePaste}
+    bind:this={domValue}
+  />
+{:else}
+  <div
+    data-type="selectable-value"
+    class={valueClass}
+    contenteditable="false"
+    spellcheck="false"
+    on:click={handleValueClick}
+    on:dblclick={handleValueDoubleClick}
+    title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : null}
+  >
+    {#if searchResult}
+      <SearchResultHighlighter text={String(value)} {searchResult} />
+    {:else}
+      {value}
+    {/if}
+  </div>
 
-<!-- TODO: create an API to customize rendering of a value -->
-{#if !editValue}
+  <!-- TODO: create an API to customize rendering of a value -->
   {#if isTimestamp(value)}
     <Timestamp {value} />
   {/if}

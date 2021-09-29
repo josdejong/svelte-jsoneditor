@@ -185,7 +185,7 @@
 
   async function focusActiveSearchResult(activeItem) {
     if (activeItem) {
-      const path = initial(activeItem)
+      const path = activeItem.path
       state = expandPath(json, state, path)
       await tick()
       scrollTo(path)

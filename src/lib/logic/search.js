@@ -1,12 +1,7 @@
 import { existsIn, getIn, setIn } from 'immutable-json-patch'
-import { initial, isEqual } from 'lodash-es'
-import {
-  ACTIVE_SEARCH_RESULT,
-  SEARCH_RESULT,
-  STATE_KEYS,
-  STATE_SEARCH_PROPERTY,
-  STATE_SEARCH_VALUE
-} from '../constants.js'
+import { isEqual, last } from 'lodash-es'
+import { STATE_KEYS, STATE_SEARCH_PROPERTY, STATE_SEARCH_VALUE } from '../constants.js'
+import { pushLimited } from '../utils/arrayUtils.js'
 
 /**
  * @typedef {Object} SearchResult
@@ -18,6 +13,15 @@ import {
  * @property {number} count
  */
 
+/**
+ * @typedef {Object} SearchResultItem
+ * @property {Path} path
+ * @property {Symbol} field
+ * @property {number} fieldIndex
+ * @property {number} start
+ * @property {number} end
+ */
+
 // TODO: comment
 export function updateSearchResult(json, flatResults, previousResult) {
   const flatItems = flatResults
@@ -25,15 +29,19 @@ export function updateSearchResult(json, flatResults, previousResult) {
   const items = createRecursiveSearchResults(json, flatItems)
 
   const activeItem =
-    previousResult && previousResult.activeItem && existsIn(items, previousResult.activeItem)
+    previousResult &&
+    previousResult.activeItem &&
+    existsIn(items, getNestedSearchResultPath(previousResult.activeItem))
       ? previousResult.activeItem
       : flatItems[0]
 
-  const activeIndex = flatItems.findIndex((item) => isEqual(item, activeItem))
+  const activeIndex = flatItems.findIndex((item) =>
+    hasEqualSearchResultItemPointer(item, activeItem)
+  )
 
   const itemsWithActive =
     items && activeItem && activeIndex !== -1
-      ? setIn(items, activeItem, ACTIVE_SEARCH_RESULT)
+      ? setIn(items, getActiveItemPropertyPath(activeItem), true)
       : items
 
   return {
@@ -46,19 +54,27 @@ export function updateSearchResult(json, flatResults, previousResult) {
   }
 }
 
-// TODO: comment
+/**
+ * @param {JSON} referenceJson
+ * @param {SearchResultItem[]} flatResults
+ * @returns {{}}
+ */
 export function createRecursiveSearchResults(referenceJson, flatResults) {
   // TODO: smart update result based on previous results to make the results immutable when there is no actual change
   let result = {}
 
-  flatResults.forEach((path) => {
-    const parentPath = initial(path)
-    if (!existsIn(result, parentPath)) {
-      const item = getIn(referenceJson, parentPath)
-      result = setIn(result, parentPath, Array.isArray(item) ? [] : {}, true)
+  flatResults.forEach((searchResultItem) => {
+    const path = searchResultItem.path
+
+    // when the path is an array, we'll add a symbol on the array, but then
+    // setIn has no information to determine whether to create an array or an
+    // object, so we do that here explicitly based on referenceJson
+    if (!existsIn(result, path)) {
+      const item = getIn(referenceJson, path)
+      result = setIn(result, path, Array.isArray(item) ? [] : {}, true)
     }
 
-    result = setIn(result, path, SEARCH_RESULT)
+    result = setIn(result, getNestedSearchResultPath(searchResultItem), searchResultItem, true)
   })
 
   return result
@@ -79,7 +95,7 @@ export function searchNext(searchResult) {
   const nextActiveItem = searchResult.flatItems[nextActiveIndex]
 
   const itemsWithActive = nextActiveItem
-    ? setIn(searchResult.items, nextActiveItem, ACTIVE_SEARCH_RESULT, true)
+    ? setIn(searchResult.items, getActiveItemPropertyPath(nextActiveItem), true, true)
     : searchResult.items
 
   return {
@@ -101,7 +117,7 @@ export function searchPrevious(searchResult) {
   const previousActiveItem = searchResult.flatItems[previousActiveIndex]
 
   const itemsWithActive = previousActiveItem
-    ? setIn(searchResult.items, previousActiveItem, ACTIVE_SEARCH_RESULT, true)
+    ? setIn(searchResult.items, getActiveItemPropertyPath(previousActiveItem), true, true)
     : searchResult.items
 
   return {
@@ -142,9 +158,14 @@ export function search(searchText, json, state, maxResults = Infinity) {
       for (const key of keys) {
         path[level] = key
 
-        // TODO: replace with a new function findCaseInsensitiveMatches
-        if (containsCaseInsensitive(key, searchTextLowerCase) && results.length < maxResults) {
-          results.push(path.concat([STATE_SEARCH_PROPERTY]))
+        const matches = findCaseInsensitiveMatches(
+          key,
+          searchTextLowerCase,
+          path.slice(0),
+          STATE_SEARCH_PROPERTY
+        )
+        if (matches !== undefined) {
+          pushLimited(results, matches, maxResults)
         }
 
         searchRecursive(searchTextLowerCase, json[key], state ? state[key] : undefined)
@@ -157,10 +178,14 @@ export function search(searchText, json, state, maxResults = Infinity) {
       path.pop()
     } else {
       // type is a value
-
-      // TODO: replace with a new function findCaseInsensitiveMatches
-      if (containsCaseInsensitive(json, searchTextLowerCase) && results.length < maxResults) {
-        results.push(path.concat([STATE_SEARCH_VALUE]))
+      const matches = findCaseInsensitiveMatches(
+        json,
+        searchTextLowerCase,
+        path.slice(0),
+        STATE_SEARCH_VALUE
+      )
+      if (matches !== undefined) {
+        pushLimited(results, matches, maxResults)
       }
     }
   }
@@ -177,19 +202,11 @@ export function search(searchText, json, state, maxResults = Infinity) {
  * Do a case insensitive search for a search text in a text
  * @param {String} text
  * @param {String} searchTextLowerCase
- * @return {boolean} Returns true if `search` is found in `text`
+ * @param {Path} path
+ * @param {Symbol} field
+ * @return {SearchResultItem[] | undefined} Returns a list with all matches if any, or null when there are no matches
  */
-export function containsCaseInsensitive(text, searchTextLowerCase) {
-  return String(text).toLowerCase().indexOf(searchTextLowerCase) !== -1
-}
-
-/**
- * Do a case insensitive search for a search text in a text
- * @param {String} text
- * @param {String} searchTextLowerCase
- * @return {Array.<{ start: number, end: number }> | undefined} Returns a list with all matches if any, or null when there are no matches
- */
-export function findCaseInsensitiveMatches(text, searchTextLowerCase) {
+export function findCaseInsensitiveMatches(text, searchTextLowerCase, path, field) {
   const textLower = String(text).toLowerCase()
 
   let matches = undefined
@@ -206,12 +223,92 @@ export function findCaseInsensitiveMatches(text, searchTextLowerCase) {
         matches = []
       }
 
+      const fieldIndex = matches.length
       matches.push({
+        path,
+        field,
+        fieldIndex,
         start: index,
-        end: position
+        end: position,
+        active: false
       })
     }
   } while (index !== -1)
 
   return matches
+}
+
+/**
+ * Split the text into separate parts for each search result and the text
+ * in between.
+ * @param {string} text
+ * @param {SearchResultItem[]} matches
+ * @return {Array<{text: string, type: 'normal' | 'highlight', active: boolean}>}
+ */
+export function splitValue(text, matches) {
+  const parts = []
+
+  let previousEnd = 0
+
+  for (const match of matches) {
+    const precedingText = text.slice(previousEnd, match.start)
+    if (precedingText !== '') {
+      parts.push({
+        type: 'normal',
+        text: precedingText,
+        active: false
+      })
+    }
+
+    const matchingText = text.slice(match.start, match.end)
+    parts.push({
+      type: 'highlight',
+      text: matchingText,
+      active: match.active
+    })
+
+    previousEnd = match.end
+  }
+
+  const lastMatch = last(matches)
+  if (lastMatch.end < text.length) {
+    parts.push({
+      type: 'normal',
+      text: text.slice(lastMatch.end),
+      active: false
+    })
+  }
+
+  return parts
+}
+
+/**
+ * Get the path of the .active property on a nested search result
+ * @param {SearchResultItem} activeItem
+ * @return {Path}
+ */
+function getActiveItemPropertyPath(activeItem) {
+  return activeItem.path.concat(activeItem.field, activeItem.fieldIndex, 'active')
+}
+
+/**
+ * Get the path of the search result property on a nested search result
+ * @param {SearchResultItem} searchResultItem
+ * @return {Path}
+ */
+function getNestedSearchResultPath(searchResultItem) {
+  return searchResultItem.path.concat(searchResultItem.field, searchResultItem.fieldIndex)
+}
+
+/**
+ * @param {SearchResultItem} a
+ * @param {SearchResultItem} b
+ * @return {boolean}
+ */
+function hasEqualSearchResultItemPointer(a, b) {
+  // we must NOT compare .fieldIndex or .active
+  // TODO: refactor the data models so fieldIndex is not part of it?
+
+  // we also don't compare end, so we will keep the search result focus whilst typing in the search box
+  return a.start === b.start && a.field === b.field && isEqual(a.path, b.path)
 }

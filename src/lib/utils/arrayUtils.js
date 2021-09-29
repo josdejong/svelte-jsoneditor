@@ -132,3 +132,17 @@ export function forEachIndex(start, end, iteratee) {
 export function limit(array, max) {
   return array.length > max ? array.slice(0, max) : array
 }
+
+/**
+ * @param {Array} array
+ * @param {Array} newItems
+ * @param {number} max
+ */
+// TODO: write unit test
+export function pushLimited(array, newItems, max) {
+  const iMax = Math.min(newItems.length, max - array.length)
+
+  for (let i = 0; i < iMax; i++) {
+    array.push(newItems[i])
+  }
+}

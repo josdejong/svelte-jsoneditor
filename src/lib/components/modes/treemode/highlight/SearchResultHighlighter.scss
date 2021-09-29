@@ -1,0 +1,11 @@
+@import '../../../../styles';
+
+.jse-highlight {
+  background-color: $highlight-color;
+  outline: 1px solid darken($highlight-color, 10%);
+
+  &.jse-active {
+    background-color: $highlight-active-color;
+    outline: 1px solid darken($highlight-active-color, 10%);
+  }
+}
