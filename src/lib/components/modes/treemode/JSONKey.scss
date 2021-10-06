@@ -3,7 +3,19 @@
 
 .key {
   display: inline-block;
+  line-height: $line-height;
+  min-width: 16px;
   min-height: $line-height;
+  word-break: normal;
+  padding: 0 $input-padding;
+  box-sizing: border-box;
+  outline: none;
+  border-radius: 1px;
+  vertical-align: top;
+
+  &:hover {
+    background: $hovered-background-transparent;
+  }
 
   &:hover {
     background: $hovered-background-transparent;
@@ -11,13 +23,13 @@
 
   &.empty {
     min-width: 3em;
+    outline: 1px dotted $light-gray-transparent;
+    -moz-outline-radius: 2px;
 
     &::after {
+      pointer-events: none;
+      color: $light-gray-transparent;
       content: 'key';
-
-      &[contenteditable='true'] {
-        content: none;
-      }
     }
   }
 }

@@ -2,12 +2,8 @@
 
 <script>
   import classnames from 'classnames'
-  import { compileJSONPointer } from 'immutable-json-patch'
   import { isEqual } from 'lodash-es'
-  import { onDestroy } from 'svelte'
   import { SELECTION_TYPE } from '$lib/logic/selection'
-  import { getPlainText, setCursorToEnd, setPlainText } from '$lib/utils/domUtils'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import {
     isBoolean,
     isColor,
@@ -18,9 +14,12 @@
     valueType
   } from '$lib/utils/typeUtils'
   import BooleanToggle from './value/BooleanToggle.svelte'
-  import Timestamp from '../../../components/modes/treemode/value/Timestamp.svelte'
-  import Color from '../../../components/modes/treemode/value/Color.svelte'
-  import SearchResultHighlighter from '$lib/components/modes/treemode/highlight/SearchResultHighlighter.svelte'
+  import Timestamp from './value/Timestamp.svelte'
+  import Color from './value/Color.svelte'
+  import EditableDiv from './value/EditableDiv.svelte'
+  import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
+  import { compileJSONPointer } from 'immutable-json-patch'
+  import { escapeHTML } from '$lib/utils/domUtils'
 
   export let path
   export let value
@@ -33,88 +32,20 @@
   /** @type {SearchResultItem | undefined} */
   export let searchResult
 
-  onDestroy(() => {
-    updateValue()
-  })
-
-  let domValue
-  let newValue = value
-  let valueClass
-
   $: selectedValue =
     selection && selection.type === SELECTION_TYPE.VALUE
       ? isEqual(selection.focusPath, path)
       : false
-  $: valueClass = getValueClass(newValue)
-  $: editValue = selectedValue && selection && selection.edit === true
+  $: editValue = !readOnly && selectedValue && selection && selection.edit === true
   $: valueIsUrl = isUrl(value)
-
-  $: if (editValue === true) {
-    focusValue()
-  }
-
-  $: if (editValue === false) {
-    updateValue()
-  }
-
-  $: if (domValue) {
-    setDomValue(value)
-  }
-
-  function updateValue() {
-    if (newValue !== value) {
-      value = newValue // prevent loops when value and newValue are temporarily not in sync
-
-      onPatch([
-        {
-          op: 'replace',
-          path: compileJSONPointer(path),
-          value: newValue
-        }
-      ])
-    }
-  }
-
-  function getDomValue() {
-    if (!domValue) {
-      return value
-    }
-
-    const valueText = getPlainText(domValue)
-    return stringConvert(valueText) // TODO: implement support for type "string"
-  }
-
-  function setDomValue(updatedValue) {
-    if (domValue) {
-      newValue = updatedValue
-      setPlainText(domValue, updatedValue)
-    }
-  }
-
-  function focusValue() {
-    // TODO: this timeout is ugly
-    setTimeout(() => {
-      if (domValue) {
-        setCursorToEnd(domValue)
-      }
-    })
-  }
 
   function getValueClass(value) {
     const type = valueType(value)
 
-    return classnames('editable-div', SELECTION_TYPE.VALUE, type, {
+    return classnames(SELECTION_TYPE.VALUE, type, {
       url: isUrl(value),
       empty: typeof value === 'string' && value.length === 0
     })
-  }
-
-  function handleValueInput() {
-    newValue = getDomValue()
-    if (newValue === '') {
-      // immediately update to cleanup any left over <br/>
-      setDomValue('')
-    }
   }
 
   function handleValueClick(event) {
@@ -133,33 +64,25 @@
     }
   }
 
-  function handleValueKeyDown(event) {
-    event.stopPropagation()
+  function handleChangeValue(newValue) {
+    onPatch([
+      {
+        op: 'replace',
+        path: compileJSONPointer(path),
+        value: stringConvert(newValue) // TODO: implement support for type "string"
+      }
+    ])
 
-    const combo = keyComboFromEvent(event)
-
-    if (combo === 'Escape') {
-      // cancel changes
-      setDomValue(value)
-      onSelect({ type: SELECTION_TYPE.VALUE, path })
-    }
-
-    if (!readOnly && (combo === 'Enter' || combo === 'Tab')) {
-      // updating newValue here is important to handle when contents are changed
-      // programmatically when edit mode is opened after typing a character
-      newValue = getDomValue()
-
-      // apply changes
-      updateValue()
-
-      onSelect({ type: SELECTION_TYPE.VALUE, path, nextInside: true })
-    }
+    onSelect({ type: SELECTION_TYPE.VALUE, path, nextInside: true })
   }
 
-  function handleValuePaste(event) {
+  function handleCancelChange() {
+    onSelect({ type: SELECTION_TYPE.VALUE, path })
+  }
+
+  function handlePaste(pastedText) {
     try {
-      const clipboardText = event.clipboardData.getData('text/plain')
-      const pastedJson = JSON.parse(clipboardText)
+      const pastedJson = JSON.parse(pastedText)
       if (isObjectOrArray(pastedJson)) {
         onPasteJson({
           path,
@@ -171,37 +94,33 @@
       // no need to do anything
     }
   }
+
+  function handleOnValueClass(value) {
+    return getValueClass(stringConvert(value))
+  }
 </script>
 
-<!-- TODO: create an API to customize rendering of a value -->
-{#if !editValue}
+{#if editValue}
+  <EditableDiv
+    {value}
+    onChange={handleChangeValue}
+    onCancel={handleCancelChange}
+    onPaste={handlePaste}
+    onValueClass={handleOnValueClass}
+  />
+{:else}
+  <!-- TODO: create an API to customize rendering of a value -->
+
   {#if isBoolean(value)}
     <BooleanToggle {path} {value} {onPatch} />
   {/if}
   {#if isColor(value)}
     <Color {path} {value} {onPatch} {readOnly} />
   {/if}
-{/if}
 
-{#if editValue}
   <div
     data-type="selectable-value"
-    class={valueClass}
-    contenteditable="true"
-    spellcheck="false"
-    on:input={handleValueInput}
-    on:click={handleValueClick}
-    on:dblclick={handleValueDoubleClick}
-    on:keydown={handleValueKeyDown}
-    on:paste={handleValuePaste}
-    bind:this={domValue}
-  />
-{:else}
-  <div
-    data-type="selectable-value"
-    class={valueClass}
-    contenteditable="false"
-    spellcheck="false"
+    class={getValueClass(value)}
     on:click={handleValueClick}
     on:dblclick={handleValueDoubleClick}
     title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : null}
@@ -209,7 +128,7 @@
     {#if searchResult}
       <SearchResultHighlighter text={String(value)} {searchResult} />
     {:else}
-      {value}
+      {escapeHTML(value)}
     {/if}
   </div>
 

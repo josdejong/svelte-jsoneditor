@@ -1,5 +1,6 @@
 <script>
   import { splitValue } from '$lib/logic/search'
+  import { escapeHTML } from '$lib/utils/domUtils'
 
   /** @type {string} */
   export let text
@@ -14,7 +15,7 @@
   {#if part.type === 'normal'}
     {part.text}
   {:else}
-    <span class="jse-highlight" class:jse-active={part.active}>{part.text}</span>
+    <span class="jse-highlight" class:jse-active={part.active}>{escapeHTML(part.text)}</span>
   {/if}
 {/each}
 
