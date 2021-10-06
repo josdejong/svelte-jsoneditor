@@ -2,65 +2,117 @@
 
 $search-size: 24px;
 $button-width: 20px;
+$padding-section-left: 32px;
 
-.search-box {
-  border: 2px solid $theme-color;
+.jse-search-box {
+  border: 1px solid $gray;
   border-radius: $border-radius;
-  background: $white;
+
+  background: $background-gray;
   box-shadow: $box-shadow;
   display: inline-block;
+  width: 400px;
+  max-width: 100%;
+  overflow: auto;
 
-  .search-form {
+  .jse-search-form {
     display: flex;
-    align-items: center;
-    padding: 0 5px;
+    align-items: stretch;
 
     button {
       color: $light-gray;
       display: block;
-      width: $search-size;
-      height: $search-size;
+      //height: $search-size;
+      //width: $button-width;
       text-align: center;
       background: transparent;
       border: none;
-      padding: 0;
+      padding: $padding-half;
       margin: 0;
-      line-height: 12px; // TODO: this is ugly. center position the icon buttons and text in a better way
-    }
+      //line-height: 12px; // TODO: this is ugly. center position the icon buttons and text in a better way
 
-    button {
-      width: $button-width;
       cursor: pointer;
 
       &:hover,
       &:active {
         color: $gray;
-
-        &.search-icon {
-          color: $light-gray;
-          cursor: inherit;
-        }
+        background: $hovered-background;
       }
     }
 
-    .search-input {
-      border: none;
+    input {
+      border: 1px solid $border-gray;
+      border-radius: $border-radius;
       height: $search-size;
       padding: 0 $input-padding;
       margin: 0;
       flex: 1;
-      width: 100px;
       outline: none;
     }
 
-    .search-count {
-      color: $light-gray;
-      font-size: $font-size-small;
-      visibility: hidden;
-      padding: 0 $input-padding;
+    .jse-replace-toggle {
+      padding: $padding $padding-half;
+      min-width: 20px;
+      background: darken($background-gray, 3%);
 
-      &.visible {
-        visibility: visible;
+      &:hover,
+      &:active {
+        color: $gray;
+        background: darken($background-gray, 5%);
+      }
+    }
+
+    .jse-search-contents {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: $padding-half;
+      gap: $padding-half;
+
+      .jse-search-section {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        position: relative;
+        padding-left: $padding-section-left;
+
+        .jse-search-icon {
+          color: $light-gray;
+          cursor: inherit;
+          background: inherit;
+          position: absolute;
+          top: $padding-half;
+          left: $padding-half;
+        }
+
+        label.jse-search-input-label {
+          flex: 1;
+          display: flex;
+        }
+
+        .jse-search-count {
+          color: $light-gray;
+          font-size: $font-size-small;
+          visibility: hidden;
+          padding: 0 $input-padding;
+          min-width: 36px;
+          text-align: center;
+
+          &.jse-visible {
+            visibility: visible;
+          }
+        }
+      }
+
+      .jse-replace-section {
+        padding-left: $padding-section-left;
+
+        button {
+          width: auto;
+        }
+
+        flex: 1;
+        display: flex;
       }
     }
   }

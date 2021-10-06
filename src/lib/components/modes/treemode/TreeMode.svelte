@@ -157,11 +157,13 @@
   }
 
   let showSearch = false
+  let showReplace = false
   let searching = false
   let searchText = ''
   let searchResult
 
   async function handleSearchText(text) {
+    console.log('search text updated', text)
     searchText = text
     await tick() // await for the search results to be updated
     await focusActiveSearchResult(searchResult && searchResult.activeItem)
@@ -177,8 +179,19 @@
     await focusActiveSearchResult(searchResult && searchResult.activeItem)
   }
 
+  function handleReplace(text, replacementText) {
+    // FIXME: implement
+    console.log('handleReplace', text, replacementText)
+  }
+
+  function handleReplaceAll(text, replacementText) {
+    // FIXME: implement
+    console.log('handleReplaceAll', text, replacementText)
+  }
+
   function clearSearchResult() {
     showSearch = false
+    showReplace = false
     handleSearchText('')
     focus()
   }
@@ -1469,7 +1482,28 @@
 
     if (combo === 'Ctrl+F') {
       event.preventDefault()
-      showSearch = true
+
+      showSearch = false
+      showReplace = false
+
+      tick().then(() => {
+        // trick to make sure the focus goes to the search box
+        showSearch = true
+        showReplace = false
+      })
+    }
+
+    if (combo === 'Ctrl+H') {
+      event.preventDefault()
+
+      showSearch = false
+      showReplace = false
+
+      tick().then(() => {
+        // trick to make sure the focus goes to the search box
+        showSearch = true
+        showReplace = true
+      })
     }
 
     if (combo === 'Ctrl+Z') {
@@ -1737,10 +1771,13 @@
             text={searchText}
             resultCount={searchResult ? searchResult.count : 0}
             activeIndex={searchResult ? searchResult.activeIndex : 0}
+            {showReplace}
             {searching}
             onChange={handleSearchText}
             onNext={handleNextSearchResult}
             onPrevious={handlePreviousSearchResult}
+            onReplace={handleReplace}
+            onReplaceAll={handleReplaceAll}
             onClose={clearSearchResult}
           />
         </div>
