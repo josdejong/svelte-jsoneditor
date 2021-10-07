@@ -185,6 +185,7 @@ const editor = new JSONEditor({
 ### properties
 
 - `content: { json: JSON } | { text: string }` Pass the JSON contents to be rendered in the JSONEditor. Contents is an object containing a property `json` and `text`. Only one of the two must be defined. In case of `tree` mode, `json` is used. In case of `code` mode, `text` is used.
+- `defaultContent: { json: JSON } | { text: string }` Pass contents to be set as the content value on first render. This is helpful specifically for React or other scenarios where you want to pass a start value into the editor without controlling content on each change.
 - `mode: 'tree' | 'code'`. Open the editor in `'tree'` mode (default) or `'code'` mode.
 - `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
 - `navigationBar: boolean` Show the navigation bar with, where you can see the selected path and navigate through your document from there. Default value is `true`.
