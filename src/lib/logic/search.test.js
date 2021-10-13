@@ -1,9 +1,12 @@
 import assert from 'assert'
+import { immutableJSONPatch } from 'immutable-json-patch'
 import { STATE_KEYS, STATE_SEARCH_PROPERTY, STATE_SEARCH_VALUE } from '../constants.js'
 import { syncState } from './documentState.js'
 import {
   createRecursiveSearchResults,
+  createSearchAndReplaceOperations,
   findCaseInsensitiveMatches,
+  replaceText,
   search,
   splitValue
 } from './search.js'
@@ -248,6 +251,87 @@ describe('search', () => {
         active: false
       }
     ])
+  })
+
+  it('should replace text', () => {
+    assert.strictEqual(replaceText('hello, world!', '***', 7, 12), 'hello, ***!')
+  })
+
+  it('should create operations to replace a search result value', () => {
+    const json = {
+      before: 'text',
+      'hello world': 'hello world, hello WORLD, world',
+      after: 'text'
+    }
+    const state = syncState(json, undefined, [], () => true)
+
+    const results = search('world', json, state)
+
+    const { operations, newSelection } = createSearchAndReplaceOperations(
+      json,
+      state,
+      '*',
+      results[2]
+    )
+
+    assert.deepStrictEqual(operations, [
+      {
+        op: 'replace',
+        path: '/hello world',
+        value: 'hello world, hello *, world'
+      }
+    ])
+
+    assert.deepStrictEqual(newSelection, {
+      type: 'value',
+      anchorPath: ['hello world'],
+      focusPath: ['hello world'],
+      edit: false
+    })
+
+    const updatedJson = immutableJSONPatch(json, operations)
+    assert.deepStrictEqual(updatedJson, {
+      before: 'text',
+      'hello world': 'hello world, hello *, world',
+      after: 'text'
+    })
+  })
+
+  it('should create operations to replace a search result key', () => {
+    const json = {
+      before: 'text',
+      'hello world': 'hello world, hello WORLD, world',
+      after: 'text'
+    }
+    const state = syncState(json, undefined, [], () => true)
+
+    const results = search('world', json, state)
+
+    const { operations, newSelection } = createSearchAndReplaceOperations(
+      json,
+      state,
+      '*',
+      results[0]
+    )
+
+    assert.deepStrictEqual(operations, [
+      { op: 'move', from: '/hello world', path: '/hello *' },
+      { op: 'move', from: '/after', path: '/after' }
+    ])
+
+    assert.deepStrictEqual(newSelection, {
+      type: 'key',
+      anchorPath: ['hello *'],
+      focusPath: ['hello *'],
+      edit: false
+    })
+
+    const updatedJson = immutableJSONPatch(json, operations)
+    assert.deepStrictEqual(updatedJson, {
+      before: 'text',
+      'hello *': 'hello world, hello WORLD, world',
+      after: 'text'
+    })
   })
 
   // TODO: test searchNext

@@ -46,7 +46,7 @@
     const pendingChanges = text !== inputText
     if (pendingChanges) {
       onChangeDebounced.cancel()
-      onChange(inputText, inputReplaceText)
+      onChange(inputText)
     } else {
       onNext()
     }
@@ -55,13 +55,11 @@
   function handleInput(event) {
     inputText = event.target.value
 
-    onChangeDebounced(inputText, inputReplaceText)
+    onChangeDebounced(inputText)
   }
 
   function handleReplaceInput(event) {
     inputReplaceText = event.target.value
-
-    onChangeDebounced(inputText, inputReplaceText)
   }
 
   function handleKeyDown(event) {

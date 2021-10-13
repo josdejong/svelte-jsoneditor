@@ -1,7 +1,10 @@
-import { existsIn, getIn, setIn } from 'immutable-json-patch'
-import { isEqual, last } from 'lodash-es'
+import { compileJSONPointer, existsIn, getIn, setIn } from 'immutable-json-patch'
+import { initial, isEqual, last } from 'lodash-es'
 import { STATE_KEYS, STATE_SEARCH_PROPERTY, STATE_SEARCH_VALUE } from '../constants.js'
 import { pushLimited } from '../utils/arrayUtils.js'
+import { getKeys } from './documentState.js'
+import { createSelectionFromOperations } from './selection.js'
+import { rename } from './operations.js'
 
 /**
  * @typedef {Object} SearchResult
@@ -236,6 +239,69 @@ export function findCaseInsensitiveMatches(text, searchTextLowerCase, path, fiel
   } while (index !== -1)
 
   return matches
+}
+
+/**
+ * Replace a search result item with a replacement text
+ * @param {string} text
+ * @param {string} replacementText
+ * @param {number} start
+ * @param {number} end
+ */
+export function replaceText(text, replacementText, start, end) {
+  return text.substring(0, start) + replacementText + text.substring(end)
+}
+
+/**
+ * @param {JSON} json
+ * @param {JSON} state
+ * @param {string} replacementText
+ * @param {SearchResultItem} searchResultItem
+ * @returns {{newSelection: Selection, operations: JSONPatchDocument}}
+ */
+export function createSearchAndReplaceOperations(json, state, replacementText, searchResultItem) {
+  const { field, path, start, end } = searchResultItem
+
+  if (field === STATE_SEARCH_PROPERTY) {
+    // replace a key
+    const parentPath = initial(path)
+    const oldKey = last(path)
+    const keys = getKeys(state, parentPath)
+    const newKey = replaceText(oldKey, replacementText, start, end)
+
+    const operations = rename(parentPath, keys, oldKey, newKey)
+    const newSelection = createSelectionFromOperations(json, operations)
+
+    return {
+      newSelection,
+      operations
+    }
+  } else if (field === STATE_SEARCH_VALUE) {
+    // replace a value
+    const currentValue = getIn(json, path)
+    if (currentValue === undefined) {
+      throw new Error(`Cannot replace: path not found ${compileJSONPointer(path)}`)
+    }
+
+    const value = replaceText(currentValue, replacementText, start, end)
+
+    const operations = [
+      {
+        op: 'replace',
+        path: compileJSONPointer(path),
+        value
+      }
+    ]
+
+    const newSelection = createSelectionFromOperations(json, operations)
+
+    return {
+      newSelection,
+      operations
+    }
+  } else {
+    throw new Error(`Cannot replace: unknown type of search result field ${field}`)
+  }
 }
 
 /**
