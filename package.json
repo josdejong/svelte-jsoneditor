@@ -1,7 +1,7 @@
 {
   "name": "svelte-jsoneditor",
   "description": "A web-based tool to view, edit, format, transform, and validate JSON",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "type": "module",
   "svelte": "index.js",
   "module": "dist/jsoneditor.js",
@@ -15,6 +15,7 @@
     "dev": "svelte-kit dev",
     "preview": "svelte-kit preview",
     "build": "npm run package",
+    "build:watch": "npm run package -- --watch",
     "package": "svelte-kit package && rollup --config rollup.config.bundle.js",
     "test": "mocha",
     "check": "svelte-check --tsconfig ./tsconfig.json",

@@ -14,7 +14,8 @@ export const ACTIVE_SEARCH_RESULT = Symbol('search:active-result')
 export const VALIDATION_ERROR = Symbol('validation:error')
 
 export const SCROLL_DURATION = 300 // ms
-export const DEBOUNCE_DELAY = 300
+export const DEBOUNCE_DELAY = 300 // ms
+export const CODE_MODE_ONCHANGE_DELAY = 300 // ms
 export const SEARCH_UPDATE_THROTTLE = 300 // ms
 export const CHECK_VALID_JSON_DELAY = 300 // ms
 export const AUTO_SCROLL_INTERVAL = 50 // ms
