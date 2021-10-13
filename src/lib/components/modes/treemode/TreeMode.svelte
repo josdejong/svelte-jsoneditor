@@ -983,6 +983,9 @@
     emitOnChange()
 
     focus()
+    if (selection) {
+      scrollTo(selection.focusPath)
+    }
   }
 
   function handleRedo() {
@@ -1006,6 +1009,9 @@
     emitOnChange()
 
     focus()
+    if (selection) {
+      scrollTo(selection.focusPath)
+    }
   }
 
   function openSortModal(selectedPath) {
