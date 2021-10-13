@@ -9,6 +9,7 @@
   import { getContext, onDestroy, onMount } from 'svelte'
   import {
     CHECK_VALID_JSON_DELAY,
+    CODE_MODE_ONCHANGE_DELAY,
     JSON_STATUS_INVALID,
     JSON_STATUS_REPAIRABLE,
     JSON_STATUS_VALID,
@@ -79,7 +80,7 @@
         ace,
         readOnly,
         indentation,
-        onChange: onChangeAceEditorValue
+        onChange: onChangeAceEditorValueDebounced
       })
 
       if (resizeObserver) {
@@ -528,6 +529,14 @@
   }
 
   const updateCancelUndoRedoDebounced = debounce(updateCanUndoRedo, 0) // just on next tick
+
+  // debounce the input: when pressing Enter at the end of a line, two change
+  // events are fired: one with the new Return character, and a second with
+  // indentation added on the new line. This causes a race condition when used
+  // for example in React. Debouncing the onChange events also results in not
+  // firing a change event with every character that a user types, but only as
+  // soon as the user stops typing.
+  const onChangeAceEditorValueDebounced = debounce(onChangeAceEditorValue, CODE_MODE_ONCHANGE_DELAY)
 
   function emitOnChange() {
     if (onChange) {
