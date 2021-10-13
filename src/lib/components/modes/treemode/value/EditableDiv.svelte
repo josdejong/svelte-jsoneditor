@@ -17,7 +17,7 @@
 
   let domValue
   let valueClass = onValueClass(value)
-  let canceled = false
+  let closed = false
 
   onMount(() => {
     debug('onMount', { value })
@@ -30,9 +30,9 @@
   onDestroy(() => {
     const newValue = getDomValue()
 
-    debug('onDestroy', { canceled, value, newValue })
+    debug('onDestroy', { closed, value, newValue })
 
-    if (!canceled && newValue !== value) {
+    if (!closed && newValue !== value) {
       onChange(newValue)
     }
   })
@@ -64,14 +64,17 @@
 
     if (combo === 'Escape') {
       // cancel changes (needed to prevent triggering a change onDestroy)
-      canceled = true
+      closed = true
 
       onCancel()
     }
 
     if (combo === 'Enter' || combo === 'Tab') {
       // apply changes
-      onChange(getDomValue())
+      closed = true
+
+      const newValue = getDomValue()
+      onChange(newValue)
     }
   }
 
