@@ -12,12 +12,6 @@ const config = {
 
     package: {
       dir: 'package'
-    },
-
-    vite: {
-      ssr: {
-        noExternal: ['lodash-es']
-      }
     }
   }
 }
