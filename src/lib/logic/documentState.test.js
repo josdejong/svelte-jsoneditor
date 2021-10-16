@@ -102,7 +102,7 @@ describe('documentState', () => {
       value: 'hello'
     }
 
-    const state = syncState(json, undefined, [], (path) => false)
+    const state = syncState(json, undefined, [], (_path) => false)
     assert.deepStrictEqual(getVisiblePaths(json, state), [[]])
 
     const state0 = syncState(json, undefined, [], (path) => path.length <= 0)
@@ -169,7 +169,7 @@ describe('documentState', () => {
       value: 'hello'
     }
 
-    const state = syncState(json, undefined, [], (path) => false)
+    const state = syncState(json, undefined, [], (_path) => false)
     assert.deepStrictEqual(getVisibleCaretPositions(json, state), [
       { path: [], type: CARET_POSITION.VALUE }
     ])

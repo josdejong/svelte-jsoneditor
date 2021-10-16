@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { DropdownButtonItem } from './../../types.d.ts'
+  import { DropdownButtonItem } from './../../types.ts'
   import Icon from 'svelte-awesome'
   import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
   import { onDestroy, onMount } from 'svelte'

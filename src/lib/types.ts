@@ -3,7 +3,7 @@
 /**
  * @typedef {{} | [] | string | number | boolean | null} JSON
  */
-export type JSON = {} | [] | string | number | boolean | null
+export type JSON = Record<string, unknown> | [] | string | number | boolean | null
 
 /**
  * @typedef {{ json: JSON } | { text: string}} Content

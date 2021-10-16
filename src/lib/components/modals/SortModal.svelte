@@ -8,7 +8,7 @@
   import { getNestedPaths } from '../../utils/arrayUtils.js'
   import { isObject } from '../../utils/typeUtils.js'
   import { stringifyPath } from '../../utils/pathUtils.js'
-  import { sortArray, sortObjectKeys } from '../../logic/sort.js'
+  import { sortArray, sortObjectKeys } from '../../logic/sort.ts'
   import { sortModalState } from './sortModalState.js'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
 

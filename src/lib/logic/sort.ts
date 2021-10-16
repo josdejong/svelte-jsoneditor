@@ -5,7 +5,8 @@ import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import naturalCompare from 'natural-compare-lite'
 import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
 
-const diffSequences = diffSequencesExport.default || diffSequencesExport
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const diffSequences = (diffSequencesExport as any).default || diffSequencesExport
 
 export function caseInsensitiveNaturalCompare(a: unknown, b: unknown): number {
   const aLower = typeof a === 'string' ? a.toLowerCase() : a
@@ -152,9 +153,9 @@ export function sortOperationsMove(
  * @param {function (a, b) : number} comparator
  * @return {Array.<{ op: 'move', from: string, path: string }>}
  */
-export function sortOperationsMoveAdvanced(
-  array: Array<any>,
-  comparator: (arg0: a, arg1: b) => number
+export function sortOperationsMoveAdvanced<T>(
+  array: Array<T>,
+  comparator: (arg0: T, arg1: T) => number
 ): Array<{ op: 'move'; from: string; path: string }> {
   const moves = []
 

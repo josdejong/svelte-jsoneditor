@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs'
 import path from 'path'
 
-export function addBundleExports(packageFolder: string, file: string, sourcemapFile: string): void {
+export function addBundleExports(packageFolder, file, sourcemapFile) {
   const pkgFile = path.join(packageFolder, 'package.json')
 
   const distPkg = JSON.parse(String(readFileSync(pkgFile)))

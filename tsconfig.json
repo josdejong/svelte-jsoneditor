@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
-    "module": "es2020",
+    "module": "ESNext",
     "lib": ["es2020"],
     "target": "es2019",
     /**
@@ -23,7 +23,13 @@
     "paths": {
       "$lib": ["src/lib"],
       "$lib/*": ["src/lib/*"]
+    },
+    "allowJs": true
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
     }
   },
-  "include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte"]
+  "include": ["src/**/*.js", "src/**/*.ts", "src/**/*.svelte"]
 }
