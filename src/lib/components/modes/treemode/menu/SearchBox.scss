@@ -1,6 +1,6 @@
 @import '../../../../styles';
 
-$search-size: 24px;
+$search-size: 28px;
 $button-width: 20px;
 $padding-section-left: 32px;
 
@@ -20,17 +20,15 @@ $padding-section-left: 32px;
     align-items: stretch;
 
     button {
+      font-family: $font-family;
+      font-size: $font-size;
       color: $light-gray;
       display: block;
-      //height: $search-size;
-      //width: $button-width;
       text-align: center;
       background: transparent;
       border: none;
-      padding: $padding-half;
+      padding: 0 $input-padding;
       margin: 0;
-      //line-height: 12px; // TODO: this is ugly. center position the icon buttons and text in a better way
-
       cursor: pointer;
 
       &:hover,
@@ -41,6 +39,9 @@ $padding-section-left: 32px;
     }
 
     input {
+      font-family: $font-family;
+      font-size: $font-size;
+      color: $black;
       border: 1px solid $border-gray;
       border-radius: $border-radius;
       height: $search-size;
