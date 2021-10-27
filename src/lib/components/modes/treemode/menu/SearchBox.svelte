@@ -68,9 +68,20 @@
     event.stopPropagation()
     const combo = keyComboFromEvent(event)
 
+    if (combo === 'Enter') {
+      event.preventDefault()
+      onNext()
+    }
+
     if (combo === 'Ctrl+Enter' || combo === 'Command+Enter') {
       event.preventDefault()
-      // TODO: move focus to the active element
+
+      if (showReplace) {
+        handleReplace()
+      } else {
+        onNext()
+        // TODO: move focus to the active element
+      }
     }
 
     if (combo === 'Ctrl+H') {
@@ -83,6 +94,10 @@
 
       onClose()
     }
+  }
+
+  function handleReplace() {
+    onReplace(inputText, inputReplaceText)
   }
 
   function initSearchInput(element) {
@@ -151,10 +166,8 @@
             value={replaceText}
             on:input={handleReplaceInput}
           />
-          <button
-            type="button"
-            title="Replace current occurrence"
-            on:click={() => onReplace(inputText, inputReplaceText)}>Replace</button
+          <button type="button" title="Replace current occurrence" on:click={handleReplace}
+            >Replace</button
           >
           <button
             type="button"

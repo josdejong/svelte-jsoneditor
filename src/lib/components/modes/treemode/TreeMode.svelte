@@ -204,7 +204,7 @@
 
     await tick()
 
-    await handleNextSearchResult()
+    await focusActiveSearchResult(searchResult && searchResult.activeItem)
   }
 
   function handleReplaceAll(text, replacementText) {
