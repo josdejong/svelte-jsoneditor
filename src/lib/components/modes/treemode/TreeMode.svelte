@@ -1794,23 +1794,21 @@
         </div>
       {/if}
     {:else}
-      {#if showSearch}
-        <div class="search-box-container" class:navigation-bar-offset={navigationBar}>
-          <SearchBox
-            text={searchText}
-            resultCount={searchResult ? searchResult.count : 0}
-            activeIndex={searchResult ? searchResult.activeIndex : 0}
-            {showReplace}
-            {searching}
-            onChange={handleSearchText}
-            onNext={handleNextSearchResult}
-            onPrevious={handlePreviousSearchResult}
-            onReplace={handleReplace}
-            onReplaceAll={handleReplaceAll}
-            onClose={clearSearchResult}
-          />
-        </div>
-      {/if}
+      <div class="search-box-container">
+        <SearchBox
+          show={showSearch}
+          resultCount={searchResult ? searchResult.count : 0}
+          activeIndex={searchResult ? searchResult.activeIndex : 0}
+          {showReplace}
+          {searching}
+          onChange={handleSearchText}
+          onNext={handleNextSearchResult}
+          onPrevious={handlePreviousSearchResult}
+          onReplace={handleReplace}
+          onReplaceAll={handleReplaceAll}
+          onClose={clearSearchResult}
+        />
+      </div>
       <div class="contents" data-jsoneditor-scrollable-contents={true} bind:this={refContents}>
         <JSONNode
           value={json}
