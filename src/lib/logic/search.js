@@ -31,12 +31,12 @@ export function updateSearchResult(json, flatResults, previousResult) {
 
   const items = createRecursiveSearchResults(json, flatItems)
 
+  const activePath =
+    previousResult && previousResult.activeItem
+      ? getNestedSearchResultPath(previousResult.activeItem)
+      : undefined
   const activeItem =
-    previousResult &&
-    previousResult.activeItem &&
-    existsIn(items, getNestedSearchResultPath(previousResult.activeItem))
-      ? previousResult.activeItem
-      : flatItems[0]
+    activePath && existsIn(items, activePath) ? getIn(items, activePath) : flatItems[0]
 
   const activeIndex = flatItems.findIndex((item) =>
     hasEqualSearchResultItemPointer(item, activeItem)
@@ -53,7 +53,7 @@ export function updateSearchResult(json, flatResults, previousResult) {
     flatItems,
     count: flatItems.length,
     activeItem,
-    activeIndex: activeIndex
+    activeIndex
   }
 }
 
