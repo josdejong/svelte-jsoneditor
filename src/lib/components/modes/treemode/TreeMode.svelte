@@ -44,6 +44,7 @@
     insert
   } from '$lib/logic/operations'
   import {
+    createSearchAndReplaceAllOperations,
     createSearchAndReplaceOperations,
     search,
     searchNext,
@@ -207,9 +208,21 @@
     await focusActiveSearchResult(searchResult && searchResult.activeItem)
   }
 
-  function handleReplaceAll(text, replacementText) {
-    // FIXME: implement
-    console.log('handleReplaceAll', text, replacementText)
+  async function handleReplaceAll(text, replacementText) {
+    debug('handleReplaceAll', { text, replacementText })
+
+    const { operations, newSelection } = createSearchAndReplaceAllOperations(
+      json,
+      state,
+      text,
+      replacementText
+    )
+
+    patch(operations, newSelection)
+
+    await tick()
+
+    await focusActiveSearchResult(searchResult && searchResult.activeItem)
   }
 
   function clearSearchResult() {

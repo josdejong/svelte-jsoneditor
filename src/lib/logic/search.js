@@ -1,7 +1,6 @@
 import { compileJSONPointer, existsIn, getIn, setIn } from 'immutable-json-patch'
-import { initial, isEqual, last } from 'lodash-es'
+import { forEachRight, initial, isEqual, last } from 'lodash-es'
 import { STATE_KEYS, STATE_SEARCH_PROPERTY, STATE_SEARCH_VALUE } from '../constants.js'
-import { pushLimited } from '../utils/arrayUtils.js'
 import { getKeys } from './documentState.js'
 import { createSelectionFromOperations } from './selection.js'
 import { rename } from './operations.js'
@@ -136,6 +135,12 @@ export function search(searchText, json, state, maxResults = Infinity) {
   const results = []
   const path = [] // we reuse the same Array recursively, this is *much* faster than creating a new path every time
 
+  function onMatch(match) {
+    if (results.length < maxResults) {
+      results.push(match)
+    }
+  }
+
   function searchRecursive(searchTextLowerCase, json, state) {
     if (Array.isArray(json)) {
       const level = path.length
@@ -161,15 +166,7 @@ export function search(searchText, json, state, maxResults = Infinity) {
       for (const key of keys) {
         path[level] = key
 
-        const matches = findCaseInsensitiveMatches(
-          key,
-          searchTextLowerCase,
-          path.slice(0),
-          STATE_SEARCH_PROPERTY
-        )
-        if (matches !== undefined) {
-          pushLimited(results, matches, maxResults)
-        }
+        findCaseInsensitiveMatches(key, searchTextLowerCase, path, STATE_SEARCH_PROPERTY, onMatch)
 
         searchRecursive(searchTextLowerCase, json[key], state ? state[key] : undefined)
 
@@ -181,15 +178,7 @@ export function search(searchText, json, state, maxResults = Infinity) {
       path.pop()
     } else {
       // type is a value
-      const matches = findCaseInsensitiveMatches(
-        json,
-        searchTextLowerCase,
-        path.slice(0),
-        STATE_SEARCH_VALUE
-      )
-      if (matches !== undefined) {
-        pushLimited(results, matches, maxResults)
-      }
+      findCaseInsensitiveMatches(json, searchTextLowerCase, path, STATE_SEARCH_VALUE, onMatch)
     }
   }
 
@@ -207,12 +196,12 @@ export function search(searchText, json, state, maxResults = Infinity) {
  * @param {String} searchTextLowerCase
  * @param {Path} path
  * @param {Symbol} field
- * @return {SearchResultItem[] | undefined} Returns a list with all matches if any, or null when there are no matches
+ * @param {(searchResultItem: SearchResultItem) => void} onMatch
  */
-export function findCaseInsensitiveMatches(text, searchTextLowerCase, path, field) {
+export function findCaseInsensitiveMatches(text, searchTextLowerCase, path, field, onMatch) {
   const textLower = String(text).toLowerCase()
 
-  let matches = undefined
+  let fieldIndex = 0
   let position = -1
   let index = -1
 
@@ -222,23 +211,18 @@ export function findCaseInsensitiveMatches(text, searchTextLowerCase, path, fiel
     if (index !== -1) {
       position = index + searchTextLowerCase.length
 
-      if (!Array.isArray(matches)) {
-        matches = []
-      }
-
-      const fieldIndex = matches.length
-      matches.push({
-        path,
+      onMatch({
+        path: path.slice(0), // path may be mutated in a later stage, therefore we store a copy
         field,
         fieldIndex,
         start: index,
         end: position,
         active: false
       })
+
+      fieldIndex++
     }
   } while (index !== -1)
-
-  return matches
 }
 
 /**
@@ -250,6 +234,23 @@ export function findCaseInsensitiveMatches(text, searchTextLowerCase, path, fiel
  */
 export function replaceText(text, replacementText, start, end) {
   return text.substring(0, start) + replacementText + text.substring(end)
+}
+
+/**
+ * Replace all matches with a replacement text
+ * @param {string} text
+ * @param {string} replacementText
+ * @param {Array<{start: number, end: number}>} occurrences
+ * @return {string}
+ */
+export function replaceAllText(text, replacementText, occurrences) {
+  let updatedText = text
+
+  forEachRight(occurrences, (occurrence) => {
+    updatedText = replaceText(updatedText, replacementText, occurrence.start, occurrence.end)
+  })
+
+  return updatedText
 }
 
 /**
@@ -282,8 +283,9 @@ export function createSearchAndReplaceOperations(json, state, replacementText, s
     if (currentValue === undefined) {
       throw new Error(`Cannot replace: path not found ${compileJSONPointer(path)}`)
     }
+    const currentValueText = typeof currentValue === 'string' ? currentValue : String(currentValue)
 
-    const value = replaceText(currentValue, replacementText, start, end)
+    const value = replaceText(currentValueText, replacementText, start, end)
 
     const operations = [
       {
@@ -301,6 +303,101 @@ export function createSearchAndReplaceOperations(json, state, replacementText, s
     }
   } else {
     throw new Error(`Cannot replace: unknown type of search result field ${field}`)
+  }
+}
+
+/**
+ * @param {JSON} json
+ * @param {JSON} state
+ * @param {string} searchText
+ * @param {string} replacementText
+ * @returns {{newSelection: Selection, operations: JSONPatchDocument}}
+ */
+export function createSearchAndReplaceAllOperations(json, state, searchText, replacementText) {
+  // TODO: to improve performance, we could reuse existing search results (except when hitting a maxResult limit)
+  const searchResultItems = search(searchText, json, state, Infinity /* maxResults */)
+
+  // step 1: deduplicate matches inside the same field/value
+  // (filter, map, and group)
+  const deduplicatedMatches = []
+  for (let i = 0; i < searchResultItems.length; i++) {
+    const previousItem = searchResultItems[i - 1]
+    const item = searchResultItems[i]
+    if (i === 0 || item.field !== previousItem.field || !isEqual(item.path, previousItem.path)) {
+      deduplicatedMatches.push({
+        path: item.path,
+        field: item.field,
+        items: [item]
+      })
+    } else {
+      last(deduplicatedMatches).items.push(item)
+    }
+  }
+
+  // step 2: sort from deepest nested to least nested
+  // this is needed to replace in that order because paths may change
+  // if there are replacements in keys
+  deduplicatedMatches.sort((a, b) => {
+    // sort values first, properties next
+    if (a.field !== b.field) {
+      if (a.field === STATE_SEARCH_PROPERTY) {
+        return 1
+      } else {
+        return -1
+      }
+    }
+
+    // sort longest paths first, shortest last
+    return b.path.length - a.path.length
+  })
+
+  // step 3: call createSearchAndReplaceOperations for each of the matches
+  let allOperations = []
+  let lastNewSelection = undefined
+  deduplicatedMatches.forEach((match) => {
+    // TODO: there is overlap with the logic of createSearchAndReplaceOperations. Can we extract and reuse this logic?
+    const { field, path, items } = match
+
+    if (field === STATE_SEARCH_PROPERTY) {
+      // replace a key
+      const parentPath = initial(path)
+      const oldKey = last(path)
+      const keys = getKeys(state, parentPath)
+      const newKey = replaceAllText(oldKey, replacementText, items)
+
+      const operations = rename(parentPath, keys, oldKey, newKey)
+      allOperations = allOperations.concat(operations)
+
+      lastNewSelection = createSelectionFromOperations(json, operations)
+    } else if (field === STATE_SEARCH_VALUE) {
+      // replace a value
+      const currentValue = getIn(json, path)
+      if (currentValue === undefined) {
+        throw new Error(`Cannot replace: path not found ${compileJSONPointer(path)}`)
+      }
+      const currentValueText =
+        typeof currentValue === 'string' ? currentValue : String(currentValue)
+
+      const value = replaceAllText(currentValueText, replacementText, items)
+
+      const operations = [
+        {
+          op: 'replace',
+          path: compileJSONPointer(path),
+          value
+        }
+      ]
+      allOperations = allOperations.concat(operations)
+
+      lastNewSelection = createSelectionFromOperations(json, operations)
+    } else {
+      throw new Error(`Cannot replace: unknown type of search result field ${field}`)
+    }
+  })
+
+  return {
+    operations: allOperations,
+    newSelection: lastNewSelection
   }
 }
 

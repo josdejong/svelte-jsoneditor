@@ -4,6 +4,7 @@ import { STATE_KEYS, STATE_SEARCH_PROPERTY, STATE_SEARCH_VALUE } from '../consta
 import { syncState } from './documentState.js'
 import {
   createRecursiveSearchResults,
+  createSearchAndReplaceAllOperations,
   createSearchAndReplaceOperations,
   findCaseInsensitiveMatches,
   replaceText,
@@ -199,24 +200,27 @@ describe('search', () => {
     const field = STATE_SEARCH_VALUE
 
     assert.deepStrictEqual(
-      findCaseInsensitiveMatches('hello world, Hello world', 'hello', path, field),
+      findAndCollectCaseInsensitiveMatches('hello world, Hello world', 'hello', path, field),
       [
         { path, field, fieldIndex: 0, start: 0, end: 5, active: false },
         { path, field, fieldIndex: 1, start: 13, end: 18, active: false }
       ]
     )
 
-    assert.deepStrictEqual(findCaseInsensitiveMatches('hahaha', 'haha', path, field), [
+    assert.deepStrictEqual(findAndCollectCaseInsensitiveMatches('hahaha', 'haha', path, field), [
       { path, field, fieldIndex: 0, start: 0, end: 4, active: false }
     ])
-    assert.deepStrictEqual(findCaseInsensitiveMatches('hahahahaha', 'haha', path, field), [
-      { path, field, fieldIndex: 0, start: 0, end: 4, active: false },
-      { path, field, fieldIndex: 1, start: 4, end: 8, active: false }
-    ])
+    assert.deepStrictEqual(
+      findAndCollectCaseInsensitiveMatches('hahahahaha', 'haha', path, field),
+      [
+        { path, field, fieldIndex: 0, start: 0, end: 4, active: false },
+        { path, field, fieldIndex: 1, start: 4, end: 8, active: false }
+      ]
+    )
 
     assert.deepStrictEqual(
-      findCaseInsensitiveMatches('hello world, Hello world', 'greeting', path, field),
-      undefined
+      findAndCollectCaseInsensitiveMatches('hello world, Hello world', 'greeting', path, field),
+      []
     )
   })
 
@@ -225,7 +229,12 @@ describe('search', () => {
     const searchTextLowerCase = 'hello'
     const path = []
     const field = STATE_SEARCH_VALUE
-    const searchResults = findCaseInsensitiveMatches(text, searchTextLowerCase, path, field)
+    const searchResults = findAndCollectCaseInsensitiveMatches(
+      text,
+      searchTextLowerCase,
+      path,
+      field
+    )
 
     const parts = splitValue(text, searchResults)
 
@@ -334,6 +343,66 @@ describe('search', () => {
     })
   })
 
+  it('should create operations to replace all search results', () => {
+    const json = {
+      before: 'text',
+      'hello world': {
+        'nested world': 'hello world, hello WORLD, world'
+      },
+      after: 'text'
+    }
+    const state = syncState(json, undefined, [], () => true)
+
+    const searchText = 'world'
+    const replacementText = '*'
+    const { operations, newSelection } = createSearchAndReplaceAllOperations(
+      json,
+      state,
+      searchText,
+      replacementText
+    )
+
+    assert.deepStrictEqual(operations, [
+      {
+        op: 'replace',
+        path: '/hello world/nested world',
+        value: 'hello *, hello *, *'
+      },
+      {
+        op: 'move',
+        from: '/hello world/nested world',
+        path: '/hello world/nested *'
+      },
+      { op: 'move', from: '/hello world', path: '/hello *' },
+      { op: 'move', from: '/after', path: '/after' }
+    ])
+
+    assert.deepStrictEqual(newSelection, {
+      anchorPath: ['hello *'],
+      edit: false,
+      focusPath: ['hello *'],
+      type: 'key'
+    })
+
+    const updatedJson = immutableJSONPatch(json, operations)
+    assert.deepStrictEqual(updatedJson, {
+      before: 'text',
+      'hello *': {
+        'nested *': 'hello *, hello *, *'
+      },
+      after: 'text'
+    })
+  })
+
   // TODO: test searchNext
   // TODO: test searchPrevious
 })
+
+// helper function to collect matches
+function findAndCollectCaseInsensitiveMatches(text, searchTextLowerCase, path, field) {
+  const matches = []
+
+  findCaseInsensitiveMatches(text, searchTextLowerCase, path, field, (match) => matches.push(match))
+
+  return matches
+}
