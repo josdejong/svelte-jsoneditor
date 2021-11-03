@@ -101,7 +101,6 @@
   })
 
   onDestroy(() => {
-    checkValidJsonDebounced.cancel()
     updateCancelUndoRedoDebounced.cancel()
 
     if (resizeObserver) {
@@ -586,11 +585,9 @@
     debug('checked json status', jsonStatus)
   }
 
-  const checkValidJsonDebounced = debounce(checkValidJson, CHECK_VALID_JSON_DELAY)
-
   // we pass unused arguments to trigger calling checkValidJson when text or validator changes
   // TODO: find a better solution
-  $: checkValidJsonDebounced(text)
+  $: checkValidJson(text)
   $: checkValidJson(validator)
 
   $: repairActions =
