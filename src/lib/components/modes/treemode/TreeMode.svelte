@@ -326,7 +326,7 @@
     const isChanged = !isEqual(json, updatedJson)
     const isText = json === undefined
 
-    debug('update', { isChanged, isText })
+    debug('update external json', { isChanged, isText })
 
     if (!isChanged) {
       // no actual change, don't do anything
@@ -346,6 +346,9 @@
     selection = clearSelectionWhenNotExisting(selection, json)
 
     addHistoryItem({ prevJson, prevState, prevText, prevTextIsRepaired, prevSelection })
+
+    // TODO: triggering applySearchThrottled() here should not be needed
+    applySearchThrottled()
   }
 
   function applyExternalText(updatedText) {
@@ -357,6 +360,8 @@
       // no actual change, don't do anything
       return
     }
+
+    debug('update external text')
 
     const prevJson = json
     const prevState = state
@@ -394,6 +399,9 @@
     }
 
     addHistoryItem({ prevJson, prevState, prevText, prevTextIsRepaired, prevSelection })
+
+    // TODO: triggering applySearchThrottled() here should not be needed
+    applySearchThrottled()
   }
 
   function clearSelectionWhenNotExisting(selection, json) {
