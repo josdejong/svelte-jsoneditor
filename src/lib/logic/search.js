@@ -4,6 +4,7 @@ import { STATE_KEYS, STATE_SEARCH_PROPERTY, STATE_SEARCH_VALUE } from '../consta
 import { getKeys } from './documentState.js'
 import { createSelectionFromOperations } from './selection.js'
 import { rename } from './operations.js'
+import { stringConvert } from '../utils/typeUtils.js'
 
 /**
  * @typedef {Object} SearchResult
@@ -291,7 +292,7 @@ export function createSearchAndReplaceOperations(json, state, replacementText, s
       {
         op: 'replace',
         path: compileJSONPointer(path),
-        value
+        value: stringConvert(value)
       }
     ]
 
@@ -384,7 +385,7 @@ export function createSearchAndReplaceAllOperations(json, state, searchText, rep
         {
           op: 'replace',
           path: compileJSONPointer(path),
-          value
+          value: stringConvert(value)
         }
       ]
       allOperations = allOperations.concat(operations)

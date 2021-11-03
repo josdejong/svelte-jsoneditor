@@ -343,6 +343,78 @@ describe('search', () => {
     })
   })
 
+  it('should create operations to replace with a numeric value', () => {
+    const json = {
+      value: 2
+    }
+    const state = syncState(json, undefined, [], () => true)
+
+    const results = search('2', json, state)
+
+    const { operations } = createSearchAndReplaceOperations(json, state, '4', results[0])
+
+    assert.deepStrictEqual(operations, [
+      {
+        op: 'replace',
+        path: '/value',
+        value: 4
+      }
+    ])
+
+    const updatedJson = immutableJSONPatch(json, operations)
+    assert.deepStrictEqual(updatedJson, {
+      value: 4
+    })
+  })
+
+  it('should create operations to replace with a boolean value', () => {
+    const json = {
+      value: 2
+    }
+    const state = syncState(json, undefined, [], () => true)
+
+    const results = search('2', json, state)
+
+    const { operations } = createSearchAndReplaceOperations(json, state, 'true', results[0])
+
+    assert.deepStrictEqual(operations, [
+      {
+        op: 'replace',
+        path: '/value',
+        value: true
+      }
+    ])
+
+    const updatedJson = immutableJSONPatch(json, operations)
+    assert.deepStrictEqual(updatedJson, {
+      value: true
+    })
+  })
+
+  it('should create operations to replace with a null value', () => {
+    const json = {
+      value: 2
+    }
+    const state = syncState(json, undefined, [], () => true)
+
+    const results = search('2', json, state)
+
+    const { operations } = createSearchAndReplaceOperations(json, state, 'null', results[0])
+
+    assert.deepStrictEqual(operations, [
+      {
+        op: 'replace',
+        path: '/value',
+        value: null
+      }
+    ])
+
+    const updatedJson = immutableJSONPatch(json, operations)
+    assert.deepStrictEqual(updatedJson, {
+      value: null
+    })
+  })
+
   it('should create operations to replace a numeric value with a string', () => {
     const json = {
       value: 2
@@ -438,6 +510,35 @@ describe('search', () => {
     const updatedJson = immutableJSONPatch(json, operations)
     assert.deepStrictEqual(updatedJson, {
       value: '*'
+    })
+  })
+
+  it('should create operations to replace all search results with a numeric value', () => {
+    const json = {
+      value: 2
+    }
+    const state = syncState(json, undefined, [], () => true)
+
+    const searchText = '2'
+    const replacementText = '4'
+    const { operations } = createSearchAndReplaceAllOperations(
+      json,
+      state,
+      searchText,
+      replacementText
+    )
+
+    assert.deepStrictEqual(operations, [
+      {
+        op: 'replace',
+        path: '/value',
+        value: 4
+      }
+    ])
+
+    const updatedJson = immutableJSONPatch(json, operations)
+    assert.deepStrictEqual(updatedJson, {
+      value: 4
     })
   })
 
