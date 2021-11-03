@@ -1,12 +1,10 @@
-import { existsIn, getIn, setIn } from 'immutable-json-patch'
-import { initial, isEqual } from 'lodash-es'
-import {
-  ACTIVE_SEARCH_RESULT,
-  SEARCH_RESULT,
-  STATE_KEYS,
-  STATE_SEARCH_PROPERTY,
-  STATE_SEARCH_VALUE
-} from '../constants.js'
+import { compileJSONPointer, existsIn, getIn, setIn } from 'immutable-json-patch'
+import { forEachRight, initial, isEqual, last } from 'lodash-es'
+import { STATE_KEYS, STATE_SEARCH_PROPERTY, STATE_SEARCH_VALUE } from '../constants.js'
+import { getKeys } from './documentState.js'
+import { createSelectionFromOperations } from './selection.js'
+import { rename } from './operations.js'
+import { stringConvert } from '../utils/typeUtils.js'
 
 /**
  * @typedef {Object} SearchResult
@@ -18,22 +16,35 @@ import {
  * @property {number} count
  */
 
+/**
+ * @typedef {Object} SearchResultItem
+ * @property {Path} path
+ * @property {Symbol} field
+ * @property {number} fieldIndex
+ * @property {number} start
+ * @property {number} end
+ */
+
 // TODO: comment
 export function updateSearchResult(json, flatResults, previousResult) {
   const flatItems = flatResults
 
   const items = createRecursiveSearchResults(json, flatItems)
 
+  const activePath =
+    previousResult && previousResult.activeItem
+      ? getNestedSearchResultPath(previousResult.activeItem)
+      : undefined
   const activeItem =
-    previousResult && previousResult.activeItem && existsIn(items, previousResult.activeItem)
-      ? previousResult.activeItem
-      : flatItems[0]
+    activePath && existsIn(items, activePath) ? getIn(items, activePath) : flatItems[0]
 
-  const activeIndex = flatItems.findIndex((item) => isEqual(item, activeItem))
+  const activeIndex = flatItems.findIndex((item) =>
+    hasEqualSearchResultItemPointer(item, activeItem)
+  )
 
   const itemsWithActive =
     items && activeItem && activeIndex !== -1
-      ? setIn(items, activeItem, ACTIVE_SEARCH_RESULT)
+      ? setIn(items, getActiveItemPropertyPath(activeItem), true)
       : items
 
   return {
@@ -42,23 +53,31 @@ export function updateSearchResult(json, flatResults, previousResult) {
     flatItems,
     count: flatItems.length,
     activeItem,
-    activeIndex: activeIndex
+    activeIndex
   }
 }
 
-// TODO: comment
+/**
+ * @param {JSON} referenceJson
+ * @param {SearchResultItem[]} flatResults
+ * @returns {{}}
+ */
 export function createRecursiveSearchResults(referenceJson, flatResults) {
   // TODO: smart update result based on previous results to make the results immutable when there is no actual change
   let result = {}
 
-  flatResults.forEach((path) => {
-    const parentPath = initial(path)
-    if (!existsIn(result, parentPath)) {
-      const item = getIn(referenceJson, parentPath)
-      result = setIn(result, parentPath, Array.isArray(item) ? [] : {}, true)
+  flatResults.forEach((searchResultItem) => {
+    const path = searchResultItem.path
+
+    // when the path is an array, we'll add a symbol on the array, but then
+    // setIn has no information to determine whether to create an array or an
+    // object, so we do that here explicitly based on referenceJson
+    if (!existsIn(result, path)) {
+      const item = getIn(referenceJson, path)
+      result = setIn(result, path, Array.isArray(item) ? [] : {}, true)
     }
 
-    result = setIn(result, path, SEARCH_RESULT)
+    result = setIn(result, getNestedSearchResultPath(searchResultItem), searchResultItem, true)
   })
 
   return result
@@ -79,7 +98,7 @@ export function searchNext(searchResult) {
   const nextActiveItem = searchResult.flatItems[nextActiveIndex]
 
   const itemsWithActive = nextActiveItem
-    ? setIn(searchResult.items, nextActiveItem, ACTIVE_SEARCH_RESULT, true)
+    ? setIn(searchResult.items, getActiveItemPropertyPath(nextActiveItem), true, true)
     : searchResult.items
 
   return {
@@ -101,7 +120,7 @@ export function searchPrevious(searchResult) {
   const previousActiveItem = searchResult.flatItems[previousActiveIndex]
 
   const itemsWithActive = previousActiveItem
-    ? setIn(searchResult.items, previousActiveItem, ACTIVE_SEARCH_RESULT, true)
+    ? setIn(searchResult.items, getActiveItemPropertyPath(previousActiveItem), true, true)
     : searchResult.items
 
   return {
@@ -116,6 +135,12 @@ export function searchPrevious(searchResult) {
 export function search(searchText, json, state, maxResults = Infinity) {
   const results = []
   const path = [] // we reuse the same Array recursively, this is *much* faster than creating a new path every time
+
+  function onMatch(match) {
+    if (results.length < maxResults) {
+      results.push(match)
+    }
+  }
 
   function searchRecursive(searchTextLowerCase, json, state) {
     if (Array.isArray(json)) {
@@ -142,9 +167,7 @@ export function search(searchText, json, state, maxResults = Infinity) {
       for (const key of keys) {
         path[level] = key
 
-        if (containsCaseInsensitive(key, searchTextLowerCase) && results.length < maxResults) {
-          results.push(path.concat([STATE_SEARCH_PROPERTY]))
-        }
+        findCaseInsensitiveMatches(key, searchTextLowerCase, path, STATE_SEARCH_PROPERTY, onMatch)
 
         searchRecursive(searchTextLowerCase, json[key], state ? state[key] : undefined)
 
@@ -156,15 +179,13 @@ export function search(searchText, json, state, maxResults = Infinity) {
       path.pop()
     } else {
       // type is a value
-      if (containsCaseInsensitive(json, searchTextLowerCase) && results.length < maxResults) {
-        results.push(path.concat([STATE_SEARCH_VALUE]))
-      }
+      findCaseInsensitiveMatches(json, searchTextLowerCase, path, STATE_SEARCH_VALUE, onMatch)
     }
   }
 
   if (typeof searchText === 'string' && searchText !== '') {
     const searchTextLowerCase = searchText.toLowerCase()
-    searchRecursive(searchTextLowerCase, json, state, [])
+    searchRecursive(searchTextLowerCase, json, state)
   }
 
   return results
@@ -174,8 +195,284 @@ export function search(searchText, json, state, maxResults = Infinity) {
  * Do a case insensitive search for a search text in a text
  * @param {String} text
  * @param {String} searchTextLowerCase
- * @return {boolean} Returns true if `search` is found in `text`
+ * @param {Path} path
+ * @param {Symbol} field
+ * @param {(searchResultItem: SearchResultItem) => void} onMatch
  */
-export function containsCaseInsensitive(text, searchTextLowerCase) {
-  return String(text).toLowerCase().indexOf(searchTextLowerCase) !== -1
+export function findCaseInsensitiveMatches(text, searchTextLowerCase, path, field, onMatch) {
+  const textLower = String(text).toLowerCase()
+
+  let fieldIndex = 0
+  let position = -1
+  let index = -1
+
+  do {
+    index = textLower.indexOf(searchTextLowerCase, position)
+
+    if (index !== -1) {
+      position = index + searchTextLowerCase.length
+
+      onMatch({
+        path: path.slice(0), // path may be mutated in a later stage, therefore we store a copy
+        field,
+        fieldIndex,
+        start: index,
+        end: position,
+        active: false
+      })
+
+      fieldIndex++
+    }
+  } while (index !== -1)
+}
+
+/**
+ * Replace a search result item with a replacement text
+ * @param {string} text
+ * @param {string} replacementText
+ * @param {number} start
+ * @param {number} end
+ */
+export function replaceText(text, replacementText, start, end) {
+  return text.substring(0, start) + replacementText + text.substring(end)
+}
+
+/**
+ * Replace all matches with a replacement text
+ * @param {string} text
+ * @param {string} replacementText
+ * @param {Array<{start: number, end: number}>} occurrences
+ * @return {string}
+ */
+export function replaceAllText(text, replacementText, occurrences) {
+  let updatedText = text
+
+  forEachRight(occurrences, (occurrence) => {
+    updatedText = replaceText(updatedText, replacementText, occurrence.start, occurrence.end)
+  })
+
+  return updatedText
+}
+
+/**
+ * @param {JSON} json
+ * @param {JSON} state
+ * @param {string} replacementText
+ * @param {SearchResultItem} searchResultItem
+ * @returns {{newSelection: Selection, operations: JSONPatchDocument}}
+ */
+export function createSearchAndReplaceOperations(json, state, replacementText, searchResultItem) {
+  const { field, path, start, end } = searchResultItem
+
+  if (field === STATE_SEARCH_PROPERTY) {
+    // replace a key
+    const parentPath = initial(path)
+    const oldKey = last(path)
+    const keys = getKeys(state, parentPath)
+    const newKey = replaceText(oldKey, replacementText, start, end)
+
+    const operations = rename(parentPath, keys, oldKey, newKey)
+    const newSelection = createSelectionFromOperations(json, operations)
+
+    return {
+      newSelection,
+      operations
+    }
+  } else if (field === STATE_SEARCH_VALUE) {
+    // replace a value
+    const currentValue = getIn(json, path)
+    if (currentValue === undefined) {
+      throw new Error(`Cannot replace: path not found ${compileJSONPointer(path)}`)
+    }
+    const currentValueText = typeof currentValue === 'string' ? currentValue : String(currentValue)
+
+    const value = replaceText(currentValueText, replacementText, start, end)
+
+    const operations = [
+      {
+        op: 'replace',
+        path: compileJSONPointer(path),
+        value: stringConvert(value)
+      }
+    ]
+
+    const newSelection = createSelectionFromOperations(json, operations)
+
+    return {
+      newSelection,
+      operations
+    }
+  } else {
+    throw new Error(`Cannot replace: unknown type of search result field ${field}`)
+  }
+}
+
+/**
+ * @param {JSON} json
+ * @param {JSON} state
+ * @param {string} searchText
+ * @param {string} replacementText
+ * @returns {{newSelection: Selection, operations: JSONPatchDocument}}
+ */
+export function createSearchAndReplaceAllOperations(json, state, searchText, replacementText) {
+  // TODO: to improve performance, we could reuse existing search results (except when hitting a maxResult limit)
+  const searchResultItems = search(searchText, json, state, Infinity /* maxResults */)
+
+  // step 1: deduplicate matches inside the same field/value
+  // (filter, map, and group)
+  const deduplicatedMatches = []
+  for (let i = 0; i < searchResultItems.length; i++) {
+    const previousItem = searchResultItems[i - 1]
+    const item = searchResultItems[i]
+    if (i === 0 || item.field !== previousItem.field || !isEqual(item.path, previousItem.path)) {
+      deduplicatedMatches.push({
+        path: item.path,
+        field: item.field,
+        items: [item]
+      })
+    } else {
+      last(deduplicatedMatches).items.push(item)
+    }
+  }
+
+  // step 2: sort from deepest nested to least nested
+  // this is needed to replace in that order because paths may change
+  // if there are replacements in keys
+  deduplicatedMatches.sort((a, b) => {
+    // sort values first, properties next
+    if (a.field !== b.field) {
+      if (a.field === STATE_SEARCH_PROPERTY) {
+        return 1
+      } else {
+        return -1
+      }
+    }
+
+    // sort longest paths first, shortest last
+    return b.path.length - a.path.length
+  })
+
+  // step 3: call createSearchAndReplaceOperations for each of the matches
+  let allOperations = []
+  let lastNewSelection = undefined
+  deduplicatedMatches.forEach((match) => {
+    // TODO: there is overlap with the logic of createSearchAndReplaceOperations. Can we extract and reuse this logic?
+    const { field, path, items } = match
+
+    if (field === STATE_SEARCH_PROPERTY) {
+      // replace a key
+      const parentPath = initial(path)
+      const oldKey = last(path)
+      const keys = getKeys(state, parentPath)
+      const newKey = replaceAllText(oldKey, replacementText, items)
+
+      const operations = rename(parentPath, keys, oldKey, newKey)
+      allOperations = allOperations.concat(operations)
+
+      lastNewSelection = createSelectionFromOperations(json, operations)
+    } else if (field === STATE_SEARCH_VALUE) {
+      // replace a value
+      const currentValue = getIn(json, path)
+      if (currentValue === undefined) {
+        throw new Error(`Cannot replace: path not found ${compileJSONPointer(path)}`)
+      }
+      const currentValueText =
+        typeof currentValue === 'string' ? currentValue : String(currentValue)
+
+      const value = replaceAllText(currentValueText, replacementText, items)
+
+      const operations = [
+        {
+          op: 'replace',
+          path: compileJSONPointer(path),
+          value: stringConvert(value)
+        }
+      ]
+      allOperations = allOperations.concat(operations)
+
+      lastNewSelection = createSelectionFromOperations(json, operations)
+    } else {
+      throw new Error(`Cannot replace: unknown type of search result field ${field}`)
+    }
+  })
+
+  return {
+    operations: allOperations,
+    newSelection: lastNewSelection
+  }
+}
+
+/**
+ * Split the text into separate parts for each search result and the text
+ * in between.
+ * @param {string} text
+ * @param {SearchResultItem[]} matches
+ * @return {Array<{text: string, type: 'normal' | 'highlight', active: boolean}>}
+ */
+export function splitValue(text, matches) {
+  const parts = []
+
+  let previousEnd = 0
+
+  for (const match of matches) {
+    const precedingText = text.slice(previousEnd, match.start)
+    if (precedingText !== '') {
+      parts.push({
+        type: 'normal',
+        text: precedingText,
+        active: false
+      })
+    }
+
+    const matchingText = text.slice(match.start, match.end)
+    parts.push({
+      type: 'highlight',
+      text: matchingText,
+      active: match.active
+    })
+
+    previousEnd = match.end
+  }
+
+  const lastMatch = last(matches)
+  if (lastMatch.end < text.length) {
+    parts.push({
+      type: 'normal',
+      text: text.slice(lastMatch.end),
+      active: false
+    })
+  }
+
+  return parts
+}
+
+/**
+ * Get the path of the .active property on a nested search result
+ * @param {SearchResultItem} activeItem
+ * @return {Path}
+ */
+function getActiveItemPropertyPath(activeItem) {
+  return activeItem.path.concat(activeItem.field, activeItem.fieldIndex, 'active')
+}
+
+/**
+ * Get the path of the search result property on a nested search result
+ * @param {SearchResultItem} searchResultItem
+ * @return {Path}
+ */
+function getNestedSearchResultPath(searchResultItem) {
+  return searchResultItem.path.concat(searchResultItem.field, searchResultItem.fieldIndex)
+}
+
+/**
+ * @param {SearchResultItem} a
+ * @param {SearchResultItem} b
+ * @return {boolean}
+ */
+function hasEqualSearchResultItemPointer(a, b) {
+  // we must NOT compare .fieldIndex or .active
+  // TODO: refactor the data models so fieldIndex is not part of it?
+
+  // we also don't compare end, so we will keep the search result focus whilst typing in the search box
+  return a.start === b.start && a.field === b.field && isEqual(a.path, b.path)
 }

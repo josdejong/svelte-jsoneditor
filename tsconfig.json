@@ -20,8 +20,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
-    "allowJs": true,
-    "checkJs": true,
+    "allowJs": false, // turned off (temporarily?) because else Mocha tests fail to run in WebStorm, see https://youtrack.jetbrains.com/issue/WEB-50130
+    "checkJs": false,
     "paths": {
       "$lib": ["src/lib"],
       "$lib/*": ["src/lib/*"]

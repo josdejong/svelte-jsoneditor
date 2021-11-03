@@ -1,39 +1,16 @@
 @import '../../../styles';
-@import 'shared';
+@import 'shared.scss';
 
 .value {
+  line-height: $line-height;
+  min-width: 16px;
+  word-break: normal;
+  padding: 0 $input-padding;
+  box-sizing: border-box;
+  outline: none;
+  border-radius: 1px;
+  vertical-align: top;
   overflow-wrap: anywhere;
-
-  &.string {
-    color: $value-color-string;
-  }
-
-  &.object,
-  &.array {
-    min-width: 16px;
-    color: $meta-color;
-  }
-
-  &.number {
-    color: $value-color-number;
-  }
-
-  &.boolean {
-    color: $value-color-boolean;
-  }
-
-  &.null {
-    color: $value-color-null;
-  }
-
-  &.invalid {
-    color: $black;
-  }
-
-  &.url {
-    color: $value-color-url;
-    text-decoration: underline;
-  }
 
   &:hover {
     background: $hovered-background-transparent;
@@ -41,13 +18,13 @@
 
   &.empty {
     min-width: 4em;
+    outline: 1px dotted $light-gray-transparent;
+    -moz-outline-radius: 2px;
 
     &::after {
+      pointer-events: none;
+      color: $light-gray-transparent;
       content: 'value';
-
-      &[contenteditable='true'] {
-        content: none;
-      }
     }
   }
 }

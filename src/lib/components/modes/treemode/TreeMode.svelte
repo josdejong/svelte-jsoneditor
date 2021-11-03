@@ -43,7 +43,14 @@
     extract,
     insert
   } from '$lib/logic/operations'
-  import { search, searchNext, searchPrevious, updateSearchResult } from '$lib/logic/search'
+  import {
+    createSearchAndReplaceAllOperations,
+    createSearchAndReplaceOperations,
+    search,
+    searchNext,
+    searchPrevious,
+    updateSearchResult
+  } from '$lib/logic/search'
   import {
     createSelection,
     createSelectionFromOperations,
@@ -157,11 +164,13 @@
   }
 
   let showSearch = false
+  let showReplace = false
   let searching = false
   let searchText = ''
   let searchResult
 
   async function handleSearchText(text) {
+    console.log('search text updated', text)
     searchText = text
     await tick() // await for the search results to be updated
     await focusActiveSearchResult(searchResult && searchResult.activeItem)
@@ -177,15 +186,55 @@
     await focusActiveSearchResult(searchResult && searchResult.activeItem)
   }
 
+  async function handleReplace(text, replacementText) {
+    const activeItem = searchResult.activeItem
+    debug('handleReplace', { replacementText, activeItem })
+
+    if (!searchResult || !activeItem) {
+      return
+    }
+
+    const { operations, newSelection } = createSearchAndReplaceOperations(
+      json,
+      state,
+      replacementText,
+      activeItem
+    )
+
+    handlePatch(operations, newSelection)
+
+    await tick()
+
+    await focusActiveSearchResult(searchResult && searchResult.activeItem)
+  }
+
+  async function handleReplaceAll(text, replacementText) {
+    debug('handleReplaceAll', { text, replacementText })
+
+    const { operations, newSelection } = createSearchAndReplaceAllOperations(
+      json,
+      state,
+      text,
+      replacementText
+    )
+
+    handlePatch(operations, newSelection)
+
+    await tick()
+
+    await focusActiveSearchResult(searchResult && searchResult.activeItem)
+  }
+
   function clearSearchResult() {
     showSearch = false
+    showReplace = false
     handleSearchText('')
     focus()
   }
 
   async function focusActiveSearchResult(activeItem) {
     if (activeItem) {
-      const path = initial(activeItem)
+      const path = activeItem.path
       state = expandPath(json, state, path)
       await tick()
       scrollTo(path)
@@ -277,7 +326,7 @@
     const isChanged = !isEqual(json, updatedJson)
     const isText = json === undefined
 
-    debug('update', { isChanged, isText })
+    debug('update external json', { isChanged, isText })
 
     if (!isChanged) {
       // no actual change, don't do anything
@@ -297,6 +346,9 @@
     selection = clearSelectionWhenNotExisting(selection, json)
 
     addHistoryItem({ prevJson, prevState, prevText, prevTextIsRepaired, prevSelection })
+
+    // TODO: triggering applySearchThrottled() here should not be needed
+    applySearchThrottled()
   }
 
   function applyExternalText(updatedText) {
@@ -308,6 +360,8 @@
       // no actual change, don't do anything
       return
     }
+
+    debug('update external text')
 
     const prevJson = json
     const prevState = state
@@ -345,6 +399,9 @@
     }
 
     addHistoryItem({ prevJson, prevState, prevText, prevTextIsRepaired, prevSelection })
+
+    // TODO: triggering applySearchThrottled() here should not be needed
+    applySearchThrottled()
   }
 
   function clearSelectionWhenNotExisting(selection, json) {
@@ -927,6 +984,10 @@
   }
 
   function handleUndo() {
+    if (readOnly) {
+      return
+    }
+
     if (!history.getState().canUndo) {
       return
     }
@@ -947,9 +1008,16 @@
     emitOnChange()
 
     focus()
+    if (selection) {
+      scrollTo(selection.focusPath)
+    }
   }
 
   function handleRedo() {
+    if (readOnly) {
+      return
+    }
+
     if (!history.getState().canRedo) {
       return
     }
@@ -970,6 +1038,9 @@
     emitOnChange()
 
     focus()
+    if (selection) {
+      scrollTo(selection.focusPath)
+    }
   }
 
   function openSortModal(selectedPath) {
@@ -1469,7 +1540,28 @@
 
     if (combo === 'Ctrl+F') {
       event.preventDefault()
-      showSearch = true
+
+      showSearch = false
+      showReplace = false
+
+      tick().then(() => {
+        // trick to make sure the focus goes to the search box
+        showSearch = true
+        showReplace = false
+      })
+    }
+
+    if (combo === 'Ctrl+H') {
+      event.preventDefault()
+
+      showSearch = false
+      showReplace = false
+
+      tick().then(() => {
+        // trick to make sure the focus goes to the search box
+        showSearch = true
+        showReplace = true
+      })
     }
 
     if (combo === 'Ctrl+Z') {
@@ -1731,20 +1823,22 @@
         </div>
       {/if}
     {:else}
-      {#if showSearch}
-        <div class="search-box-container" class:navigation-bar-offset={navigationBar}>
-          <SearchBox
-            text={searchText}
-            resultCount={searchResult ? searchResult.count : 0}
-            activeIndex={searchResult ? searchResult.activeIndex : 0}
-            {searching}
-            onChange={handleSearchText}
-            onNext={handleNextSearchResult}
-            onPrevious={handlePreviousSearchResult}
-            onClose={clearSearchResult}
-          />
-        </div>
-      {/if}
+      <div class="search-box-container">
+        <SearchBox
+          show={showSearch}
+          resultCount={searchResult ? searchResult.count : 0}
+          activeIndex={searchResult ? searchResult.activeIndex : 0}
+          {showReplace}
+          {searching}
+          {readOnly}
+          onChange={handleSearchText}
+          onNext={handleNextSearchResult}
+          onPrevious={handlePreviousSearchResult}
+          onReplace={handleReplace}
+          onReplaceAll={handleReplaceAll}
+          onClose={clearSearchResult}
+        />
+      </div>
       <div class="contents" data-jsoneditor-scrollable-contents={true} bind:this={refContents}>
         <JSONNode
           value={json}

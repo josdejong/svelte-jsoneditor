@@ -3,11 +3,9 @@
 <script>
   import classnames from 'classnames'
   import { isEqual } from 'lodash-es'
-  import { onDestroy, tick } from 'svelte'
-  import { ACTIVE_SEARCH_RESULT, STATE_SEARCH_PROPERTY } from '$lib/constants'
   import { SELECTION_TYPE } from '$lib/logic/selection'
-  import { getPlainText, setCursorToEnd, setPlainText } from '$lib/utils/domUtils'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings'
+  import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
+  import EditableDiv from './value/EditableDiv.svelte'
 
   export let path
   export let key
@@ -17,98 +15,9 @@
   export let onSelect
   export let searchResult
 
-  onDestroy(() => {
-    updateKey()
-  })
-
-  let domKey
-  let newKey = key
-  let keyClass
-
   $: selectedKey =
     selection && selection.type === SELECTION_TYPE.KEY ? isEqual(selection.focusPath, path) : false
-  $: editKey = selectedKey && selection && selection.edit === true
-  $: keyClass = getKeyClass(newKey, searchResult)
-
-  $: if (editKey === true) {
-    // edit changed to true -> set focus to end of input
-    focusKey()
-  }
-
-  $: if (domKey) {
-    setDomKey(key)
-  }
-
-  $: if (editKey === false) {
-    updateKey()
-  }
-
-  function updateKey() {
-    if (key !== newKey) {
-      // must be handled by the parent which has knowledge about the other keys
-      const uniqueKey = onUpdateKey(key, newKey)
-      if (uniqueKey !== newKey) {
-        setDomKey(uniqueKey)
-      }
-    }
-  }
-
-  function getDomKey() {
-    if (!domKey) {
-      return key
-    }
-
-    return getPlainText(domKey)
-  }
-
-  function setDomKey(updatedKey) {
-    if (domKey) {
-      newKey = updatedKey
-      setPlainText(domKey, updatedKey)
-    }
-  }
-
-  function focusKey() {
-    // TODO: this timeout is ugly
-    setTimeout(() => {
-      if (domKey) {
-        setCursorToEnd(domKey)
-      }
-    })
-  }
-
-  function handleKeyInput() {
-    newKey = getDomKey()
-    if (newKey === '') {
-      // immediately update to cleanup any left over <br/>
-      setDomKey('')
-    }
-  }
-
-  async function handleKeyKeyDown(event) {
-    const combo = keyComboFromEvent(event)
-
-    event.stopPropagation()
-
-    if (combo === 'Escape') {
-      // cancel changes
-      setDomKey(key)
-      onSelect({ type: SELECTION_TYPE.KEY, path })
-    }
-
-    if (!readOnly && (combo === 'Enter' || combo === 'Tab')) {
-      // updating newKey here is important to handle when contents are changed
-      // programmatically when edit mode is opened after typing a character
-      newKey = getDomKey()
-
-      // apply changes
-      updateKey()
-
-      // we apply selection on next tick, since the actual path will change
-      await tick()
-      onSelect({ type: SELECTION_TYPE.KEY, path, next: true })
-    }
-  }
+  $: editKey = !readOnly && selectedKey && selection && selection.edit === true
 
   function handleKeyDoubleClick(event) {
     if (!editKey && !readOnly) {
@@ -117,24 +26,33 @@
     }
   }
 
-  function getKeyClass(key, searchResult) {
-    return classnames('editable-div', 'key', {
-      search: searchResult && searchResult[STATE_SEARCH_PROPERTY],
-      active: searchResult && searchResult[STATE_SEARCH_PROPERTY] === ACTIVE_SEARCH_RESULT,
+  function getKeyClass(key) {
+    return classnames('key', {
       empty: key === ''
     })
   }
+
+  function handleChangeValue(newKey) {
+    onUpdateKey(key, newKey)
+
+    onSelect({ type: SELECTION_TYPE.KEY, path, next: true })
+  }
+
+  function handleCancelChange() {
+    onSelect({ type: SELECTION_TYPE.KEY, path })
+  }
 </script>
 
-<div
-  data-type="selectable-key"
-  class={keyClass}
-  contenteditable={editKey}
-  spellcheck="false"
-  on:input={handleKeyInput}
-  on:dblclick={handleKeyDoubleClick}
-  on:keydown={handleKeyKeyDown}
-  bind:this={domKey}
-/>
+{#if editKey}
+  <EditableDiv value={key} onChange={handleChangeValue} onCancel={handleCancelChange} />
+{:else}
+  <div data-type="selectable-key" class={getKeyClass(key)} on:dblclick={handleKeyDoubleClick}>
+    {#if searchResult}
+      <SearchResultHighlighter text={key} {searchResult} />
+    {:else}
+      {key}
+    {/if}
+  </div>
+{/if}
 
 <style src="./JSONKey.scss"></style>

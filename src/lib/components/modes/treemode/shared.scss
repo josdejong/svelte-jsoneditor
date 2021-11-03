@@ -1,41 +1,34 @@
 @import '../../../styles';
 
-// for key and value
-div.editable-div {
-  line-height: $line-height;
-  min-width: 16px;
-  word-break: normal;
-  padding: 0 $input-padding;
-  box-sizing: border-box;
-  outline: none;
-  border-radius: 1px;
-  vertical-align: top;
-
-  &[contenteditable='true'] {
-    outline: 2px solid $edit-border-color;
-    background: $white !important;
-    position: relative;
-    border-radius: 0;
-    z-index: 3; // must be on top of hovering the entry below it
+.value {
+  &.string {
+    color: $value-color-string;
   }
 
-  &.search {
-    background-color: $highlight-color;
-
-    &.active {
-      background-color: $highlight-active-color;
-    }
+  &.object,
+  &.array {
+    min-width: 16px;
+    color: $meta-color;
   }
 
-  &.empty {
-    &:not(:focus) {
-      outline: 1px dotted $light-gray-transparent;
-      -moz-outline-radius: 2px;
-    }
+  &.number {
+    color: $value-color-number;
+  }
 
-    &::after {
-      pointer-events: none;
-      color: $light-gray-transparent;
-    }
+  &.boolean {
+    color: $value-color-boolean;
+  }
+
+  &.null {
+    color: $value-color-null;
+  }
+
+  &.invalid {
+    color: $black;
+  }
+
+  &.url {
+    color: $value-color-url;
+    text-decoration: underline;
   }
 }

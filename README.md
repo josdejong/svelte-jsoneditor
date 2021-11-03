@@ -34,7 +34,7 @@ In your SvelteKit configuration file `svelte.config.js`, add the list with depen
 // svelte.config.js
 
 // ...
-import { viteOptimizeDeps } from 'svelte-jsoneditor/config.js'
+import { viteOptimizeDeps } from 'svelte-jsoneditor/config'
 
 const config = {
   // ...
