@@ -145,5 +145,3 @@
 </script>
 
 <Menu {items} />
-
-<style src="./TreeMenu.scss"></style>
