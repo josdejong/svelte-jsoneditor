@@ -1822,6 +1822,7 @@
           activeIndex={searchResult ? searchResult.activeIndex : 0}
           {showReplace}
           {searching}
+          {readOnly}
           onChange={handleSearchText}
           onNext={handleNextSearchResult}
           onPrevious={handlePreviousSearchResult}

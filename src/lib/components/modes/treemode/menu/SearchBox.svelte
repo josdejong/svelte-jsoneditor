@@ -20,6 +20,7 @@
   export let resultCount = 0
   export let activeIndex = 0
   export let showReplace = false
+  export let readOnly = false
   export let onChange = () => {}
   export let onPrevious = () => {}
   export let onNext = () => {}
@@ -49,7 +50,7 @@
   }
 
   function toggleShowReplace() {
-    showReplace = !showReplace
+    showReplace = !showReplace && !readOnly
   }
 
   function handleSubmit(event) {
@@ -100,7 +101,19 @@
   }
 
   function handleReplace() {
+    if (readOnly) {
+      return
+    }
+
     onReplace(text, replaceText)
+  }
+
+  function handleReplaceAll() {
+    if (readOnly) {
+      return
+    }
+
+    onReplaceAll(text, replaceText)
   }
 
   function initSearchInput(element) {
@@ -111,14 +124,16 @@
 {#if show}
   <div class="jse-search-box">
     <form class="jse-search-form" on:submit={handleSubmit} on:keydown={handleKeyDown}>
-      <button
-        type="button"
-        class="jse-replace-toggle"
-        title="Toggle visibility of replace options (Ctrl+H)"
-        on:click={toggleShowReplace}
-      >
-        <Icon data={showReplace ? faCaretDown : faCaretRight} />
-      </button>
+      {#if !readOnly}
+        <button
+          type="button"
+          class="jse-replace-toggle"
+          title="Toggle visibility of replace options (Ctrl+H)"
+          on:click={toggleShowReplace}
+        >
+          <Icon data={showReplace ? faCaretDown : faCaretRight} />
+        </button>
+      {/if}
       <div class="jse-search-contents">
         <div class="jse-search-section">
           <div class="jse-search-icon">
@@ -165,7 +180,7 @@
             <Icon data={faTimes} />
           </button>
         </div>
-        {#if showReplace}
+        {#if showReplace && !readOnly}
           <div class="jse-replace-section">
             <input
               class="jse-replace-input"
@@ -178,10 +193,8 @@
               title="Replace current occurrence (Ctrl+Enter)"
               on:click={handleReplace}>Replace</button
             >
-            <button
-              type="button"
-              title="Replace all occurrences"
-              on:click={() => onReplaceAll(text, replaceText)}>All</button
+            <button type="button" title="Replace all occurrences" on:click={handleReplaceAll}
+              >All</button
             >
           </div>
         {/if}
