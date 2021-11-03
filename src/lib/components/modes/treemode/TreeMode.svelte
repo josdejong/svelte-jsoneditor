@@ -976,6 +976,10 @@
   }
 
   function handleUndo() {
+    if (readOnly) {
+      return
+    }
+
     if (!history.getState().canUndo) {
       return
     }
@@ -1002,6 +1006,10 @@
   }
 
   function handleRedo() {
+    if (readOnly) {
+      return
+    }
+
     if (!history.getState().canRedo) {
       return
     }
