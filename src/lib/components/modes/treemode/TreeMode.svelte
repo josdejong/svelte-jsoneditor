@@ -201,7 +201,7 @@
       activeItem
     )
 
-    patch(operations, newSelection)
+    handlePatch(operations, newSelection)
 
     await tick()
 
@@ -218,7 +218,7 @@
       replacementText
     )
 
-    patch(operations, newSelection)
+    handlePatch(operations, newSelection)
 
     await tick()
 
