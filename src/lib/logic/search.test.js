@@ -343,6 +343,24 @@ describe('search', () => {
     })
   })
 
+  it('should create operations to replace a numeric value with a string', () => {
+    const json = {
+      value: 2
+    }
+    const state = syncState(json, undefined, [], () => true)
+
+    const results = search('2', json, state)
+
+    const { operations } = createSearchAndReplaceOperations(json, state, '*', results[0])
+
+    assert.deepStrictEqual(operations, [{ op: 'replace', path: '/value', value: '*' }])
+
+    const updatedJson = immutableJSONPatch(json, operations)
+    assert.deepStrictEqual(updatedJson, {
+      value: '*'
+    })
+  })
+
   it('should create operations to replace all search results', () => {
     const json = {
       before: 'text',
@@ -391,6 +409,35 @@ describe('search', () => {
         'nested *': 'hello *, hello *, *'
       },
       after: 'text'
+    })
+  })
+
+  it('should create operations to replace all search results matching a numeric value', () => {
+    const json = {
+      value: 2
+    }
+    const state = syncState(json, undefined, [], () => true)
+
+    const searchText = '2'
+    const replacementText = '*'
+    const { operations } = createSearchAndReplaceAllOperations(
+      json,
+      state,
+      searchText,
+      replacementText
+    )
+
+    assert.deepStrictEqual(operations, [
+      {
+        op: 'replace',
+        path: '/value',
+        value: '*'
+      }
+    ])
+
+    const updatedJson = immutableJSONPatch(json, operations)
+    assert.deepStrictEqual(updatedJson, {
+      value: '*'
     })
   })
 
