@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { escapeHTML, regexReturnAndSurroundingWhitespace, unescapeHTML } from './domUtils.js'
+import { escapeHTML, removeReturnsAndSurroundingWhitespace, unescapeHTML } from './domUtils.js'
 
 describe('domUtils', () => {
   it('escapeHTML', () => {
@@ -22,8 +22,8 @@ describe('domUtils', () => {
 
   it('regex should match whitespace and surrounding whitespace', () => {
     assert.strictEqual(
-      'A\nB  \nC  \n  D \n\n E F'.replace(regexReturnAndSurroundingWhitespace, '*'),
-      'A*B*C*D*E F'
+      removeReturnsAndSurroundingWhitespace(' \n A\nB  \nC  \n  D \n\n E F\n '),
+      'ABCDE F'
     )
   })
 })

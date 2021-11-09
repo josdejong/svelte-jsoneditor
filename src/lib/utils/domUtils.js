@@ -115,7 +115,7 @@ export function traverseInnerText(element, buffer) {
   // text node
   if (element.nodeValue) {
     // remove return characters and the whitespaces surrounding those return characters
-    const trimmedValue = element.nodeValue.replace(regexReturnAndSurroundingWhitespace, '')
+    const trimmedValue = removeReturnsAndSurroundingWhitespace(element.nodeValue)
     if (trimmedValue !== '') {
       return buffer.flush() + trimmedValue
     } else {
@@ -160,7 +160,11 @@ export function traverseInnerText(element, buffer) {
 
 // regular expression matching one or multiple return characters with all their
 // enclosing white spaces
-export const regexReturnAndSurroundingWhitespace = /(\b|^)\s*\n\s*(\b|$)/g
+export function removeReturnsAndSurroundingWhitespace(text) {
+  return text.replace(/(\b|^)\s*(\b|$)/g, (match) => {
+    return /\n/.exec(match) ? '' : match
+  })
+}
 
 export function isChildOfNodeName(element, nodeName) {
   return isChildOf(element, (e) => e.nodeName.toUpperCase() === nodeName.toUpperCase())
