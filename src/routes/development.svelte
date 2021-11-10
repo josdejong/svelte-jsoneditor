@@ -74,15 +74,15 @@
     }
   }
 
-  function onChangeTree(content) {
+  function onChangeTree(content, previousContent, patchResult) {
     if ($showRawContents) {
-      console.log('onChangeTree', content)
+      console.log('onChangeTree', content, previousContent, patchResult)
     }
   }
 
-  function onChangeCode(content) {
+  function onChangeCode(content, previousContent, patchResult) {
     if ($showRawContents) {
-      console.log('onChangeCode', content)
+      console.log('onChangeCode', content, previousContent, patchResult)
     }
   }
 

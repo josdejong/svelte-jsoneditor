@@ -184,7 +184,7 @@ const editor = new JSONEditor({
 
 ### properties
 
-- `content: { json: JSON } | { text: string }` Pass the JSON contents to be rendered in the JSONEditor. Contents is an object containing a property `json` and `text`. Only one of the two must be defined. In case of `tree` mode, `json` is used. In case of `code` mode, `text` is used.
+- `content: Content` Pass the JSON contents to be rendered in the JSONEditor. Contents is an object containing a property `json` and `text`. Only one of the two must be defined. In case of `tree` mode, `json` is used. In case of `code` mode, `text` is used.
 - `mode: 'tree' | 'code'`. Open the editor in `'tree'` mode (default) or `'code'` mode.
 - `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
 - `navigationBar: boolean` Show the navigation bar with, where you can see the selected path and navigate through your document from there. Default value is `true`.
@@ -201,10 +201,9 @@ const editor = new JSONEditor({
 
 - `onError(err: Error)`.
   Callback fired when an error occurs. Default implementation is to log an error in the console and show a simple alert message to the user.
-- `onChange({ json: JSON | undefined, text: string | undefined})`.
-  Callback which is invoked on every change made in the JSON document.
+- `onChange(content: Content, previousContent: Content, patchResult: JSONPatchResult | null)`. The callback which is invoked on every change made in the JSON document. The parameter `patchResult` is only available in `tree` mode, and not in `text` mode, since a change in arbitrary text cannot be expressed as a JSON Patch document.
 - `onChangeMode(mode: string)`. Invoked when the mode is changed.
-- `onClassName(path: Array.<string|number>, value: any): string | undefined`.
+- `onClassName(path: Path, value: any): string | undefined`.
   Add a custom class name to specific nodes, based on their path and/or value.
 - `onRenderMenu(mode: string, items: Array) : Array | undefined`.
   Callback which can be used to make changes to the menu items. New items can
@@ -247,10 +246,10 @@ const editor = new JSONEditor({
 
 ### methods
 
-- `get(): { json: JSON } | { text: string }` Get the current JSON document.
-- `set(content: { json: JSON } | { text: string })` Replace the current content. Will reset the state of the editor. See also method `update(content)`.
-- `update(content: { json: JSON } | { text: string })` Update the loaded content, keeping the state of the editor (like expanded objects). You can also call `editor.updateProps({ content })`. See also method `set(content)`.
-- `patch(operations: JSONPatchDocument)` Apply a JSON patch document to update the contents of the JSON document. A JSON patch document is a list with JSON Patch operations.
+- `get(): Content` Get the current JSON document.
+- `set(content: Content)` Replace the current content. Will reset the state of the editor. See also method `update(content)`.
+- `update(content: Content)` Update the loaded content, keeping the state of the editor (like expanded objects). You can also call `editor.updateProps({ content })`. See also method `set(content)`.
+- `patch(operations: JSONPatchDocument) : JSONPatchResult` Apply a JSON patch document to update the contents of the JSON document. A JSON patch document is a list with JSON Patch operations.
 - `updateProps(props: Object)` update some or all of the properties. Updated `content` can be passed too; this is equivalent to calling `update(content)`. Example:
 
   ```js
@@ -264,9 +263,41 @@ const editor = new JSONEditor({
   - `editor.expand(path => false)` collapse all
   - `editor.expand(path => path.length < 2)` expand all paths up to 2 levels deep
 - `transform({ id?: string, onTransform?: ({ operations: JSONPatchDocument, json: JSON, transformedJson: JSON }) => void, onClose?: () => void })` programmatically trigger clicking of the transform button in the main menu, opening the transform model. If a callback `onTransform` is provided, it will replace the build-in logic to apply a transform, allowing you to process the transform operations in an alternative way. If provided, `onClose` callback will trigger when the transform modal closes, both after the user clicked apply or cancel. If an `id` is provided, the transform modal will load the previous status of this `id` instead of the status of the editors transform modal.
-- `scrollTo(path: Array.<string|number>)` Scroll the editor vertically such that the specified path comes into view. The path will be expanded when needed.
+- `scrollTo(path: Path)` Scroll the editor vertically such that the specified path comes into view. The path will be expanded when needed.
 - `focus()`. Give the editor focus.
 - `destroy()`. Destroy the editor, remove it from the DOM.
+
+### Types
+
+```ts
+type JSON = Object<string, JSON> | Array<JSON> | string | number | boolean | null
+
+type Content = { json: JSON; text: undefined } | { json: undefined; text: string }
+
+type Path = Array<string | number>
+
+type JSONPatchDocument = JSONPatchOperation[]
+
+type JSONPatchOperation = {
+  op: 'add' | 'remove' | 'replace' | 'copy' | 'move' | 'test'
+  path: string
+  from?: string
+  value?: JSON
+}
+
+type JSONPatchResult = {
+  json: JSON
+  previousJson: JSON
+  undo: JSONPatchDocument
+  redo: JSONPatchDocument
+}
+
+type ValidationError = {
+  path: Path
+  message: string
+  isChildError?: boolean
+}
+```
 
 ## Develop
 

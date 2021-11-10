@@ -30,7 +30,10 @@
   export let mainMenuBar = true
   export let navigationBar = true
   export let validator = null
+
+  /** @type {((content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void) | null} */
   export let onChange = null
+
   export let onClassName = () => {
     // no op by default
   }
@@ -176,21 +179,36 @@
   }
 
   /**
-   * @param {{json: JSON, text: undefined} | {json: undefined, text: string}} updatedContent
+   * @param {Content} updatedContent
+   * @param {Content} previousContent
+   * @param {JSONPatchResult | null} patchResult
    */
-  function handleChange(updatedContent) {
+  function handleChange(updatedContent, previousContent, patchResult) {
     content = updatedContent
 
     if (onChange) {
-      onChange(updatedContent)
+      onChange(updatedContent, previousContent, patchResult)
     }
   }
 
-  function handleChangeText(updatedText) {
-    handleChange({
+  /**
+   * @param {string} updatedText
+   * @param {string} previousText
+   */
+  function handleChangeText(updatedText, previousText) {
+    const updatedContent = {
       text: updatedText,
       json: undefined
-    })
+    }
+
+    const previousContent = {
+      text: previousText,
+      json: undefined
+    }
+
+    const patchResult = null
+
+    handleChange(updatedContent, previousContent, patchResult)
   }
 
   function handleRequestRepair() {

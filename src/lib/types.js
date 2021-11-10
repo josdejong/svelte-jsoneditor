@@ -1,11 +1,11 @@
 /** JSDoc type definitions */
 
 /**
- * @typedef {{} | [] | string | number | boolean | null} JSON
+ * @typedef {Object<string, JSON> | Array<JSON> | string | number | boolean | null} JSON
  */
 
 /**
- * @typedef {{ json: JSON } | { text: string}} Content
+ * @typedef {{ json: JSON, text: undefined } | { json: undefined, text: string}} Content
  */
 
 /**
@@ -54,9 +54,10 @@
 
 /**
  * @typedef {{
- *   patch: JSONPatchDocument,
- *   revert: JSONPatchDocument,
- *   error: Error | null
+ *   json: JSON,
+ *   previousJson: JSON,
+ *   undo: JSONPatchDocument,
+ *   redo: JSONPatchDocument
  * }} JSONPatchResult
  */
 

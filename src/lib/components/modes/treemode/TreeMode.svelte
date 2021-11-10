@@ -117,6 +117,8 @@
   export let visible = true
   export let indentation = 2
   export let onError
+
+  /** @type {(content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void} */
   export let onChange
   export let onRequestRepair = () => {}
   export let onRenderMenu = () => {}
@@ -333,19 +335,25 @@
       return
     }
 
-    const prevState = state
-    const prevJson = json
-    const prevText = text
-    const prevTextIsRepaired = textIsRepaired
-    const prevSelection = selection
+    const previousState = state
+    const previousJson = json
+    const previousText = text
+    const previousTextIsRepaired = textIsRepaired
+    const previousSelection = selection
 
     json = updatedJson
-    state = syncState(json, prevState, [], defaultExpand)
+    state = syncState(json, previousState, [], defaultExpand)
     text = undefined
     textIsRepaired = false
     selection = clearSelectionWhenNotExisting(selection, json)
 
-    addHistoryItem({ prevJson, prevState, prevText, prevTextIsRepaired, prevSelection })
+    addHistoryItem({
+      previousJson,
+      previousState,
+      previousText,
+      previousTextIsRepaired,
+      previousSelection
+    })
 
     // TODO: triggering applySearchThrottled() here should not be needed
     applySearchThrottled()
@@ -363,22 +371,22 @@
 
     debug('update external text')
 
-    const prevJson = json
-    const prevState = state
-    const prevText = text
-    const prevTextIsRepaired = textIsRepaired
-    const prevSelection = selection
+    const previousJson = json
+    const previousState = state
+    const previousText = text
+    const previousTextIsRepaired = textIsRepaired
+    const previousSelection = selection
 
     try {
       json = JSON.parse(updatedText)
-      state = syncState(json, prevState, [], defaultExpand)
+      state = syncState(json, previousState, [], defaultExpand)
       text = updatedText
       textIsRepaired = false
       selection = clearSelectionWhenNotExisting(selection, json)
     } catch (err) {
       try {
         json = JSON.parse(jsonrepair(updatedText))
-        state = syncState(json, prevState, [], defaultExpand)
+        state = syncState(json, previousState, [], defaultExpand)
         text = updatedText
         textIsRepaired = true
         selection = clearSelectionWhenNotExisting(selection, json)
@@ -398,7 +406,13 @@
       selection = createDefaultSelection()
     }
 
-    addHistoryItem({ prevJson, prevState, prevText, prevTextIsRepaired, prevSelection })
+    addHistoryItem({
+      previousJson,
+      previousState,
+      previousText,
+      previousTextIsRepaired,
+      previousSelection
+    })
 
     // TODO: triggering applySearchThrottled() here should not be needed
     applySearchThrottled()
@@ -413,22 +427,28 @@
     return null
   }
 
-  function addHistoryItem({ prevJson, prevState, prevText, prevTextIsRepaired, prevSelection }) {
-    if (prevJson === undefined && prevText === undefined) {
+  function addHistoryItem({
+    previousJson,
+    previousState,
+    previousText,
+    previousTextIsRepaired,
+    previousSelection
+  }) {
+    if (previousJson === undefined && previousText === undefined) {
       // initialization -> do not create a history item
       return
     }
 
     if (json !== undefined) {
-      if (prevJson !== undefined) {
+      if (previousJson !== undefined) {
         // regular undo/redo with JSON patch
         history.add({
           undo: {
-            patch: [{ op: 'replace', path: '', value: prevJson }],
-            state: prevState,
-            text: prevText,
-            textIsRepaired: prevTextIsRepaired,
-            selection: removeEditModeFromSelection(prevSelection)
+            patch: [{ op: 'replace', path: '', value: previousJson }],
+            state: previousState,
+            text: previousText,
+            textIsRepaired: previousTextIsRepaired,
+            selection: removeEditModeFromSelection(previousSelection)
           },
           redo: {
             patch: [{ op: 'replace', path: '', value: json }],
@@ -441,10 +461,10 @@
       } else {
         history.add({
           undo: {
-            state: prevState,
-            text: prevText,
-            textIsRepaired: prevTextIsRepaired,
-            selection: removeEditModeFromSelection(prevSelection)
+            state: previousState,
+            text: previousText,
+            textIsRepaired: previousTextIsRepaired,
+            selection: removeEditModeFromSelection(previousSelection)
           },
           redo: {
             json,
@@ -456,14 +476,14 @@
         })
       }
     } else {
-      if (prevJson !== undefined) {
+      if (previousJson !== undefined) {
         history.add({
           undo: {
-            json: prevJson,
-            state: prevState,
-            text: prevText,
-            textIsRepaired: prevTextIsRepaired,
-            selection: removeEditModeFromSelection(prevSelection)
+            json: previousJson,
+            state: previousState,
+            text: previousText,
+            textIsRepaired: previousTextIsRepaired,
+            selection: removeEditModeFromSelection(previousSelection)
           },
           redo: {
             text,
@@ -489,16 +509,18 @@
   /**
    * @param {JSONPatchDocument} operations
    * @param {Selection | (json: JSON, state: JSON) => Selection} [newSelection]
+   * @return {JSONPatchResult}
    */
   export function patch(operations, newSelection) {
     if (json === undefined) {
       throw new Error('Cannot apply patch: no JSON')
     }
 
-    const prevState = state
-    const prevText = text
-    const prevTextIsRepaired = textIsRepaired
-    const prevSelection = selection
+    const previousJson = json
+    const previousState = state
+    const previousText = text
+    const previousTextIsRepaired = textIsRepaired
+    const previousSelection = selection
 
     debug('patch', operations, newSelection)
 
@@ -520,10 +542,10 @@
     history.add({
       undo: {
         patch: undo,
-        state: prevState,
-        text: prevText,
-        textIsRepaired: prevTextIsRepaired,
-        selection: removeEditModeFromSelection(prevSelection)
+        state: previousState,
+        text: previousText,
+        textIsRepaired: previousTextIsRepaired,
+        selection: removeEditModeFromSelection(previousSelection)
       },
       redo: {
         patch: operations,
@@ -536,6 +558,7 @@
 
     return {
       json,
+      previousJson,
       undo,
       redo: operations
     }
@@ -732,10 +755,9 @@
       // root selected -> clear complete document
       debug('remove', { selection })
 
-      onChange({
-        text: '',
-        json: undefined
-      })
+      const patchResult = null
+
+      onChange({ text: '', json: undefined }, { text, json }, patchResult)
     } else {
       // remove selection
       const { operations, newSelection } = createRemoveOperations(json, state, removeSelection)
@@ -997,6 +1019,8 @@
       return
     }
 
+    const previousContent = { json, text }
+
     selection = item.undo.selection
     json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
     state = item.undo.state
@@ -1005,7 +1029,14 @@
 
     debug('undo', { item, json, state, selection })
 
-    emitOnChange()
+    const patchResult = {
+      json,
+      previousJson: previousContent.json,
+      redo: item.undo.patch,
+      undo: item.redo.patch
+    }
+
+    emitOnChange(previousContent, patchResult)
 
     focus()
     if (selection) {
@@ -1027,6 +1058,8 @@
       return
     }
 
+    const previousContent = { json, text }
+
     selection = item.redo.selection
     json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
     state = item.redo.state
@@ -1035,7 +1068,14 @@
 
     debug('redo', { item, json, state, selection })
 
-    emitOnChange()
+    const patchResult = {
+      json,
+      previousJson: previousContent.json,
+      redo: item.redo.patch,
+      undo: item.undo.patch
+    }
+
+    emitOnChange(previousContent, patchResult)
 
     focus()
     if (selection) {
@@ -1223,17 +1263,17 @@
     }
   }
 
-  function emitOnChange() {
+  /**
+   * @param {Content} previousContent
+   * @param {JSONPatchResult | null} patchResult
+   */
+  function emitOnChange(previousContent, patchResult) {
+    // make sure we cannot send an invalid contents like having both
+    // json and text defined, or having none defined
     if (text !== undefined) {
-      onChange({
-        text,
-        json: undefined
-      })
+      onChange({ text, json: undefined }, previousContent, patchResult)
     } else if (json !== undefined) {
-      onChange({
-        text: undefined,
-        json
-      })
+      onChange({ text: undefined, json }, previousContent, patchResult)
     }
   }
 
@@ -1250,50 +1290,62 @@
 
     debug('handlePatch', operations, newSelection)
 
+    const previousContent = { json, text }
     const patchResult = patch(operations, newSelection)
 
     pastedJson = undefined
 
-    emitOnChange()
+    emitOnChange(previousContent, patchResult)
 
     return patchResult
   }
 
   function handleChangeJson(updatedJson) {
-    const prevState = state
-    const prevJson = json
-    const prevText = text
-    const prevTextIsRepaired = textIsRepaired
-    const prevSelection = selection
+    const previousState = state
+    const previousJson = json
+    const previousText = text
+    const previousContent = { json, text }
+    const previousTextIsRepaired = textIsRepaired
+    const previousSelection = selection
 
     json = updatedJson
-    state = syncState(json, prevState, [], defaultExpand)
+    state = syncState(json, previousState, [], defaultExpand)
     text = undefined
     textIsRepaired = false
     selection = clearSelectionWhenNotExisting(selection, json)
 
-    addHistoryItem({ prevJson, prevState, prevText, prevTextIsRepaired, prevSelection })
+    addHistoryItem({
+      previousJson,
+      previousState,
+      previousText,
+      previousTextIsRepaired,
+      previousSelection
+    })
 
-    emitOnChange()
+    // TODO: work out the patchResult when fully replacing json (is just a replace of the root)
+    const patchResult = null
+
+    emitOnChange(previousContent, patchResult)
   }
 
   function handleChangeText(updatedText) {
-    const prevState = state
-    const prevJson = json
-    const prevText = text
-    const prevTextIsRepaired = textIsRepaired
-    const prevSelection = selection
+    const previousState = state
+    const previousJson = json
+    const previousText = text
+    const previousContent = { json, text }
+    const previousTextIsRepaired = textIsRepaired
+    const previousSelection = selection
 
     try {
       json = JSON.parse(updatedText)
-      state = syncState(json, prevState, [], defaultExpand)
+      state = syncState(json, previousState, [], defaultExpand)
       text = updatedText
       textIsRepaired = false
       selection = clearSelectionWhenNotExisting(selection, json)
     } catch (err) {
       try {
         json = JSON.parse(jsonrepair(updatedText))
-        state = syncState(json, prevState, [], defaultExpand)
+        state = syncState(json, previousState, [], defaultExpand)
         text = updatedText
         textIsRepaired = true
         selection = clearSelectionWhenNotExisting(selection, json)
@@ -1307,9 +1359,18 @@
       }
     }
 
-    addHistoryItem({ prevJson, prevState, prevText, prevTextIsRepaired, prevSelection })
+    addHistoryItem({
+      previousJson,
+      previousState,
+      previousText,
+      previousTextIsRepaired,
+      previousSelection
+    })
 
-    emitOnChange()
+    // no JSON patch actions available in text mode
+    const patchResult = null
+
+    emitOnChange(previousContent, patchResult)
   }
 
   /**

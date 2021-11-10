@@ -8,7 +8,6 @@
   import { debounce, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount } from 'svelte'
   import {
-    CHECK_VALID_JSON_DELAY,
     CODE_MODE_ONCHANGE_DELAY,
     JSON_STATUS_INVALID,
     JSON_STATUS_REPAIRABLE,
@@ -35,7 +34,10 @@
   export let indentation = 2 // TODO: make indentation configurable
   export let aceTheme = 'ace/theme/jsoneditor' // TODO: make aceTheme configurable
   export let validator = null
+
+  /** @type {((text: string, previousText: string) => void) | null} */
   export let onChange = null
+
   export let onSwitchToTreeMode = () => {}
   export let onError
   export let onFocus = () => {}
@@ -148,22 +150,24 @@
 
   /**
    * @param {JSONPatchDocument} operations
+   * @return {JSONPatchResult}
    */
   export function patch(operations) {
     debug('patch', operations)
 
-    const oldText = text
-    const json = JSON.parse(text)
-    const updatedJson = immutableJSONPatch(json, operations)
-    const undo = revertJSONPatch(json, operations)
+    const previousText = text
+    const previousJson = JSON.parse(text)
+    const updatedJson = immutableJSONPatch(previousJson, operations)
+    const undo = revertJSONPatch(previousJson, operations)
     text = JSON.stringify(updatedJson, null, indentation)
 
-    if (text !== oldText) {
-      emitOnChange()
+    if (text !== previousText) {
+      emitOnChange(text, previousText)
     }
 
     return {
-      json,
+      json: updatedJson,
+      previousJson,
       undo,
       redo: operations
     }
@@ -179,12 +183,12 @@
   function handleFormat() {
     debug('format')
     try {
-      const oldText = text
+      const previousText = text
       const json = JSON.parse(text)
       text = JSON.stringify(json, null, indentation)
 
-      if (text !== oldText) {
-        emitOnChange()
+      if (text !== previousText) {
+        emitOnChange(text, previousText)
       }
     } catch (err) {
       onError(err)
@@ -194,12 +198,12 @@
   function handleCompact() {
     debug('compact')
     try {
-      const oldText = text
+      const previousText = text
       const json = JSON.parse(text)
       text = JSON.stringify(json)
 
-      if (text !== oldText) {
-        emitOnChange()
+      if (text !== previousText) {
+        emitOnChange(text, previousText)
       }
     } catch (err) {
       onError(err)
@@ -209,13 +213,13 @@
   function handleRepair() {
     debug('repair')
     try {
-      const oldText = text
+      const previousText = text
       text = jsonrepair(text)
       jsonStatus = JSON_STATUS_VALID
       jsonParseError = undefined
 
-      if (text !== oldText) {
-        emitOnChange()
+      if (text !== previousText) {
+        emitOnChange(text, previousText)
       }
     } catch (err) {
       onError(err)
@@ -498,11 +502,14 @@
     aceEditorText = aceEditor.getValue()
 
     if (text !== aceEditorText) {
+      const previousText = aceEditorText
+
+      // apply to text before emitting onChange to prevent infinite loops
       text = aceEditorText
 
       updateCancelUndoRedoDebounced()
 
-      emitOnChange()
+      emitOnChange(text, previousText)
     }
   }
 
@@ -537,9 +544,13 @@
   // soon as the user stops typing.
   const onChangeAceEditorValueDebounced = debounce(onChangeAceEditorValue, CODE_MODE_ONCHANGE_DELAY)
 
-  function emitOnChange() {
+  /**
+   * @param {string} text
+   * @param {string} previousText
+   */
+  function emitOnChange(text, previousText) {
     if (onChange) {
-      onChange(text)
+      onChange(text, previousText)
     }
   }
 
