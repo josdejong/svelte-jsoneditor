@@ -26,13 +26,14 @@
     "prepare": "husky install && cd tools && node generateEmbeddedAceJsonWorker.js && cd ..",
     "release": "npm run lint && npm test && standard-version && npm run package && git push && git push --tag && npm publish package/"
   },
+  "__comment_dep_debug": "workaround debug-esm from https://github.com/visionmedia/debug/pull/852",
   "dependencies": {
     "@fortawesome/free-regular-svg-icons": "^5.15.4",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "ace-builds": "^1.4.13",
     "ajv": "^8.6.3",
     "classnames": "^2.3.1",
-    "debug": "^4.3.2",
+    "debug": "github:milahu/debug#28e27c8b4249fec2f778cf61f13e18e8c814822a",
     "diff-sequences": "^27.0.6",
     "immutable-json-patch": "^1.1.2",
     "json-source-map": "^0.6.1",
