@@ -4,9 +4,10 @@
 </script>
 
 <script lang="ts">
-  import { createAjvValidator, JSONEditor } from '$lib'
+  import { createAjvValidator, JSONEditor, jmespathQueryLanguage, lodashQueryLanguage } from '$lib'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
+  import Select from 'svelte-select'
 
   let content = {
     text: undefined,
@@ -55,6 +56,8 @@
   }
 
   const validator = createAjvValidator(schema)
+  const queryLanguages = [lodashQueryLanguage, jmespathQueryLanguage]
+  let queryLanguageId = queryLanguages[0].value
 
   let text = undefined
 
@@ -89,6 +92,11 @@
   function onChangeMode(mode) {
     console.log('onChangeMode', mode)
   }
+
+  function onChangeQueryLanguage(id) {
+    // TODO implement
+    console.log('onChangeQueryLanguage', id)
+  }
 </script>
 
 <svelte:head>
@@ -116,6 +124,13 @@
     <label>
       <input type="checkbox" bind:checked={$readOnly} /> Read-only
     </label>
+  </p>
+  <p>
+    Query language: <select bind:value={queryLanguageId}>
+      {#each queryLanguages as queryLanguage}
+        <option value={queryLanguage.id}>{queryLanguage.name}</option>
+      {/each}
+    </select>
   </p>
   <p>
     <button
@@ -235,6 +250,9 @@
             readOnly={$readOnly}
             {indentation}
             validator={$validate ? validator : undefined}
+            {queryLanguages}
+            {queryLanguageId}
+            {onChangeQueryLanguage}
             {onRenderMenu}
             onChange={onChangeTree}
             {onChangeMode}
@@ -270,6 +288,9 @@
             readOnly={$readOnly}
             {indentation}
             validator={$validate ? validator : undefined}
+            {queryLanguages}
+            {queryLanguageId}
+            {onChangeQueryLanguage}
             {onRenderMenu}
             onChange={onChangeCode}
             {onChangeMode}

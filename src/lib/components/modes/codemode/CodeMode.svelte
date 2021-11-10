@@ -38,6 +38,15 @@
   /** @type {((text: string, previousText: string) => void) | null} */
   export let onChange = null
 
+  /** @type {QueryLanguage[]} */
+  export let queryLanguages
+
+  /** @type {string} */
+  export let queryLanguageId
+
+  /** @type {(queryLanguageId: string) => void} */
+  export let onChangeQueryLanguage
+
   export let onSwitchToTreeMode = () => {}
   export let onError
   export let onFocus = () => {}
@@ -273,6 +282,9 @@
           json: json,
           selectedPath,
           indentation,
+          queryLanguages,
+          queryLanguageId,
+          onChangeQueryLanguage,
           onTransform: onTransform
             ? (operations) => {
                 onTransform({

@@ -1,6 +1,33 @@
+import * as _ from 'lodash-es'
 import { isEmpty, last } from 'lodash-es'
 
-export function createQuery(json, queryOptions) {
+const description = `
+<p>
+  Enter a JavaScript function to filter, sort, or transform the data.
+</p>
+<p>
+  You can use <a href="https://lodash.com" target="_blank" rel="noopener noreferrer">Lodash</a>
+  functions like <code>_.map</code>, <code>_.filter</code>,
+  <code>_.orderBy</code>, <code>_.sortBy</code>, <code>_.groupBy</code>,
+  <code>_.pick</code>, <code>_.uniq</code>, <code>_.get</code>, etcetera.
+</p>
+`
+
+/** @type {QueryLanguage} */
+export const lodashQueryLanguage = {
+  id: 'lodash',
+  name: 'Lodash',
+  description,
+  createQuery,
+  executeQuery
+}
+
+/**
+ * @param {JSON} json
+ * @param {QueryLanguageOptions} queryOptions
+ * @returns {string}
+ */
+function createQuery(json, queryOptions) {
   const { filter, sort, projection } = queryOptions
   const queryParts = []
 
@@ -41,4 +68,18 @@ export function createQuery(json, queryOptions) {
   queryParts.push('  return data\n')
 
   return `function query (data) {\n${queryParts.join('')}}`
+}
+
+/**
+ * @param {JSON} json
+ * @param {string} query
+ * @returns {JSON}
+ */
+function executeQuery(json, query) {
+  // FIXME: replace unsafe new Function with a JS based query language
+  //  As long as we don't persist or fetch queries, there is no security risk.
+  // TODO: only import the most relevant subset of lodash instead of the full library?
+  // eslint-disable-next-line no-new-func
+  const queryFn = new Function('_', `'use strict'; return (${query})`)(_)
+  return queryFn(json)
 }

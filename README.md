@@ -93,9 +93,9 @@ Or one-way binding:
     }
   }
 
-  function handleChange(updatedContent) {
+  function handleChange(updatedContent, previousContent, patchResult) {
     // content is an object { json: JSON } | { text: string }
-    console.log('onChange: ', updatedContent)
+    console.log('onChange: ', updatedContent, previousContent, patchResult)
     content = updatedContent
   }
 </script>
@@ -134,9 +134,9 @@ Browser example loading the ES module:
         target: document.getElementById('jsoneditor'),
         props: {
           content,
-          onChange: (updatedContent) => {
+          onChange: (updatedContent, previousContent, patchResult) => {
             // content is an object { json: JSON } | { text: string }
-            console.log('onChange', updatedContent)
+            console.log('onChange', updatedContent, previousContent, patchResult)
             content = updatedContent
           }
         }
@@ -174,9 +174,9 @@ const editor = new JSONEditor({
   target: document.getElementById('jsoneditor'),
   props: {
     content,
-    onChange: (updatedContent) => {
+    onChange: (updatedContent, previousContent, patchResult) => {
       // content is an object { json: JSON } | { text: string }
-      console.log('onChange', updatedContent)
+      console.log('onChange', updatedContent, previousContent, patchResult)
     }
   }
 })

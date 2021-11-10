@@ -4,11 +4,11 @@
   import Select from 'svelte-select'
   import { getNestedPaths } from '../../utils/arrayUtils.js'
   import { stringifyPath } from '../../utils/pathUtils.js'
-  import { createQuery } from '../../logic/jsCreateQuery.js'
   import { isEmpty, isEqual } from 'lodash-es'
 
   export let json
   export let onQuery
+  export let createQuery
 
   // fields
   export let filterField

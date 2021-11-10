@@ -114,6 +114,16 @@
   export let mainMenuBar = true
   export let navigationBar = true
   export let validator = null
+
+  /** @type {QueryLanguage[]} */
+  export let queryLanguages
+
+  /** @type {string} */
+  export let queryLanguageId
+
+  /** @type {(queryLanguageId: string) => void} */
+  export let onChangeQueryLanguage
+
   export let visible = true
   export let indentation = 2
   export let onError
@@ -1148,6 +1158,9 @@
         json: json,
         selectedPath,
         indentation,
+        queryLanguages,
+        queryLanguageId,
+        onChangeQueryLanguage,
         onTransform: onTransform
           ? (operations) => {
               onTransform({

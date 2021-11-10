@@ -35,6 +35,7 @@
     "debug": "^4.3.2",
     "diff-sequences": "^27.0.6",
     "immutable-json-patch": "^1.1.2",
+    "jmespath": "^0.15.0",
     "json-source-map": "^0.6.1",
     "jsonrepair": "^2.2.1",
     "lodash-es": "^4.17.21",

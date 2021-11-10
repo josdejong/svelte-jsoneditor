@@ -8,6 +8,7 @@ export const viteOptimizeDeps = [
   'classnames',
   'debug',
   'diff-sequences',
+  'jmespath', // TODO: double check whether jmespath dep is necessary here
   'json-source-map',
   'natural-compare-lite'
 ]

@@ -3,7 +3,6 @@
 <script>
   import { uniqueId } from '../../utils/uniqueId.js'
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
-  import * as _ from 'lodash-es'
   import { debounce, isEmpty } from 'lodash-es'
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
@@ -18,12 +17,25 @@
   export let id = 'transform-modal-' + uniqueId()
   export let json
   export let selectedPath = []
+
+  /** @type {QueryLanguage[]} */
+  export let queryLanguages
+
+  /** @type {string} */
+  export let queryLanguageId
+
+  /** @type {(queryLanguageId: string) => void} */
+  export let onChangeQueryLanguage // TODO: implement a dropdown to change the selected query language
+
   export let onTransform
   export let indentation = 2
 
   $: selectedJson = getIn(json, selectedPath)
 
-  const DEFAULT_QUERY = 'function query (data) {\n  return data\n}'
+  function getSelectedQueryLanguage() {
+    // TODO: log a console warning when the queryLanguage is not found
+    return queryLanguages.find((item) => item.id === queryLanguageId) || queryLanguages[0]
+  }
 
   const { close } = getContext('simple-modal')
 
@@ -31,7 +43,7 @@
 
   const state = transformModalState[stateId] || {}
 
-  let query = state.query || DEFAULT_QUERY
+  let query = state.query || getSelectedQueryLanguage().createQuery(json, {})
   let previewHasError = false
   let preview = ''
 
@@ -45,15 +57,6 @@
   let sortDirection = state.sortDirection || null
   let pickFields = state.pickFields || null
 
-  function evalTransform(json, query) {
-    // FIXME: replace unsafe new Function with a JS based query language
-    //  As long as we don't persist or fetch queries, there is no security risk.
-    // TODO: only import the most relevant subset of lodash instead of the full library?
-    // eslint-disable-next-line no-new-func
-    const queryFn = new Function('_', `'use strict'; return (${query})`)(_)
-    return queryFn(json)
-  }
-
   function updateQuery(newQuery) {
     // console.log('updated query by wizard', newQuery)
     query = newQuery
@@ -61,7 +64,7 @@
 
   function previewTransform(json, query) {
     try {
-      const jsonTransformed = evalTransform(json, query)
+      const jsonTransformed = getSelectedQueryLanguage().executeQuery(json, query)
 
       preview = truncate(JSON.stringify(jsonTransformed, null, indentation), MAX_PREVIEW_CHARACTERS)
       previewHasError = false
@@ -79,7 +82,7 @@
 
   function handleTransform() {
     try {
-      const jsonTransformed = evalTransform(selectedJson, query)
+      const jsonTransformed = getSelectedQueryLanguage().executeQuery(selectedJson, query)
 
       onTransform([
         {
@@ -127,13 +130,7 @@
   <Header title="Transform" />
   <div class="contents">
     <div class="description">
-      Enter a JavaScript function to filter, sort, or transform the data.
-    </div>
-    <div class="description">
-      You can use <a href="https://lodash.com" target="_blank" rel="noopener noreferrer">Lodash</a>
-      functions like <code>_.map</code>, <code>_.filter</code>,
-      <code>_.orderBy</code>, <code>_.sortBy</code>, <code>_.groupBy</code>,
-      <code>_.pick</code>, <code>_.uniq</code>, <code>_.get</code>, etcetera.
+      {@html getSelectedQueryLanguage().description}
     </div>
 
     <div class="label">Path</div>
@@ -162,6 +159,7 @@
           bind:pickFields
           json={selectedJson}
           onQuery={updateQuery}
+          createQuery={getSelectedQueryLanguage().createQuery}
         />
       {:else}
         (Only available for arrays, not for objects)
@@ -169,7 +167,7 @@
     {/if}
 
     <div class="label">Query</div>
-    <textarea class="query" bind:value={query} />
+    <textarea class="query" spellcheck="false" bind:value={query} />
 
     <div class="label">Preview</div>
     <textarea class="preview" class:error={previewHasError} bind:value={preview} readonly />

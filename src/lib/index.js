@@ -6,6 +6,8 @@ export const JSONEditor = _JSONEditor
 
 // plugins
 export { createAjvValidator } from './plugins/createAjvValidator.js'
+export { lodashQueryLanguage } from './plugins/query/lodashQueryLanguage.js'
+export { jmespathQueryLanguage } from './plugins/query/jmespathQueryLanguage.js'
 
 // utils
 export const SortModal = _SortModal

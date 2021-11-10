@@ -174,3 +174,28 @@
  * @typedef {{start: number, end: number}} Section
  *  Start included, end excluded
  */
+
+/**
+ * @typedef {Object} QueryLanguage
+ * @property {string} id     A unique identifier
+ * @property {string} name   Short, human readable name
+ * @property {string} description
+ * @property {(json: JSON, queryOptions: QueryLanguageOptions) => string} createQuery
+ * @property {(json: JSON, query: string) => JSON} executeQuery
+ */
+
+/**
+ * @typedef {Object} QueryLanguageOptions
+ * @property {{
+ *   field: string,
+ *   relation: '==' | '!=' | '<' | '<=' | '>' | '>=',
+ *   value: string
+ * }} filter
+ * @property {{
+ *   field: string,
+ *   direction: 'asc' | 'desc'
+ * }} sort
+ * @property {{
+ *   fields: string[]
+ * }} projection
+ */
