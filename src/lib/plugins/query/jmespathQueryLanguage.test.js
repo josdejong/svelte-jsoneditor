@@ -2,6 +2,9 @@ import assert from 'assert'
 import { parsePath, parseString } from './jmespathQueryLanguage.js'
 
 describe('jmespathQueryLanguage', () => {
+  // TODO: write tests for createQuery
+  // TODO: write tests for executeQuery
+
   describe('jsonPath', () => {
     it('should parse a json path', () => {
       assert.deepStrictEqual(parsePath(''), [])

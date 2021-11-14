@@ -4,10 +4,15 @@
 </script>
 
 <script lang="ts">
-  import { createAjvValidator, JSONEditor, jmespathQueryLanguage, lodashQueryLanguage } from '$lib'
+  import {
+    createAjvValidator,
+    JSONEditor,
+    jmespathQueryLanguage,
+    lodashQueryLanguage,
+    javascriptQueryLanguage
+  } from '$lib'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
-  import Select from 'svelte-select'
 
   let content = {
     text: undefined,
@@ -56,7 +61,7 @@
   }
 
   const validator = createAjvValidator(schema)
-  const queryLanguages = [lodashQueryLanguage, jmespathQueryLanguage]
+  const queryLanguages = [javascriptQueryLanguage, lodashQueryLanguage, jmespathQueryLanguage]
   let queryLanguageId = queryLanguages[0].value
 
   let text = undefined

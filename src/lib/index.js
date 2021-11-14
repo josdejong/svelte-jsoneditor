@@ -7,6 +7,7 @@ export const JSONEditor = _JSONEditor
 // plugins
 export { createAjvValidator } from './plugins/createAjvValidator.js'
 export { lodashQueryLanguage } from './plugins/query/lodashQueryLanguage.js'
+export { javascriptQueryLanguage } from './plugins/query/javascriptQueryLanguage.js'
 export { jmespathQueryLanguage } from './plugins/query/jmespathQueryLanguage.js'
 
 // utils
