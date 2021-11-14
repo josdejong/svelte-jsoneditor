@@ -28,26 +28,34 @@ export const jmespathQueryLanguage = {
  * @param {QueryLanguageOptions} queryOptions
  * @return {string} Returns a query (as string)
  */
-export function createQuery(json, queryOptions) {
+function createQuery(json, queryOptions) {
   const { sort, filter, projection } = queryOptions
   let query = ''
 
   if (filter) {
-    const examplePath = filter.field !== '@' ? ['0'].concat(parsePath('.' + filter.field)) : ['0']
+    const examplePath = ['0'].concat(filter.field)
     const exampleValue = getIn(json, examplePath)
     const value1 = typeof exampleValue === 'string' ? filter.value : parseString(filter.value)
 
     query +=
-      '[? ' + filter.field + ' ' + filter.relation + ' ' + '`' + JSON.stringify(value1) + '`' + ']'
+      '[? ' +
+      stringifyPathForJmespath(filter.field) +
+      ' ' +
+      filter.relation +
+      ' ' +
+      '`' +
+      JSON.stringify(value1) +
+      '`' +
+      ']'
   } else {
     query += Array.isArray(json) ? '[*]' : '@'
   }
 
   if (sort) {
     if (sort.direction === 'desc') {
-      query += ' | reverse(sort_by(@, &' + sort.field + '))'
+      query += ' | reverse(sort_by(@, &' + stringifyPathForJmespath(sort.field) + '))'
     } else {
-      query += ' | sort_by(@, &' + sort.field + ')'
+      query += ' | sort_by(@, &' + stringifyPathForJmespath(sort.field) + ')'
     }
   }
 
@@ -57,15 +65,14 @@ export function createQuery(json, queryOptions) {
     }
 
     if (projection.fields.length === 1) {
-      query += '.' + projection.fields[0]
+      query += '.' + stringifyPathForJmespath(projection.fields[0])
     } else if (projection.fields.length > 1) {
       query +=
         '.{' +
         projection.fields
-          .map((value) => {
-            const parts = value.split('.')
-            const last = parts[parts.length - 1]
-            return last + ': ' + value
+          .map((field) => {
+            const name = field[field.length - 1]
+            return name + ': ' + stringifyPathForJmespath(field)
           })
           .join(', ') +
         '}'
@@ -84,85 +91,8 @@ export function createQuery(json, queryOptions) {
  * @param {string} query
  * @return {JSON} Returns the transformed JSON
  */
-export function executeQuery(json, query) {
+function executeQuery(json, query) {
   return jmespath.search(json, query)
-}
-
-// TODO: move parsePath to pathUtils.js?
-/**
- * Parse a JSON path like '.items[3].name' into an array
- * @param {string} jsonPath
- * @return {Array}
- */
-export function parsePath(jsonPath) {
-  const path = []
-  let i = 0
-
-  function parseProperty() {
-    let prop = ''
-    while (jsonPath[i] !== undefined && /[\w$]/.test(jsonPath[i])) {
-      prop += jsonPath[i]
-      i++
-    }
-
-    if (prop === '') {
-      throw new Error('Invalid JSON path: property name expected at index ' + i)
-    }
-
-    return prop
-  }
-
-  function parseIndex(end) {
-    let name = ''
-    while (jsonPath[i] !== undefined && jsonPath[i] !== end) {
-      name += jsonPath[i]
-      i++
-    }
-
-    if (jsonPath[i] !== end) {
-      throw new Error('Invalid JSON path: unexpected end, character ' + end + ' expected')
-    }
-
-    return name
-  }
-
-  while (jsonPath[i] !== undefined) {
-    if (jsonPath[i] === '.') {
-      i++
-      path.push(parseProperty())
-    } else if (jsonPath[i] === '[') {
-      i++
-
-      if (jsonPath[i] === "'" || jsonPath[i] === '"') {
-        const end = jsonPath[i]
-        i++
-
-        path.push(parseIndex(end))
-
-        if (jsonPath[i] !== end) {
-          throw new Error("Invalid JSON path: closing quote ' expected at index " + i)
-        }
-        i++
-      } else {
-        let index = parseIndex(']').trim()
-        if (index.length === 0) {
-          throw new Error('Invalid JSON path: array value expected at index ' + i)
-        }
-        // Coerce numeric indices to numbers, but ignore star
-        index = index === '*' ? index : JSON.parse(index)
-        path.push(index)
-      }
-
-      if (jsonPath[i] !== ']') {
-        throw new Error('Invalid JSON path: closing bracket ] expected at index ' + i)
-      }
-      i++
-    } else {
-      throw new Error('Invalid JSON path: unexpected character "' + jsonPath[i] + '" at index ' + i)
-    }
-  }
-
-  return path
 }
 
 /**
@@ -195,4 +125,32 @@ export function parseString(str) {
   }
 
   return str
+}
+
+/**
+ * @param {string[]} path
+ * @returns {string}
+ */
+// TODO: unit test stringifyPathForJmespath
+// TODO: Isn't there a helper function exposed by the JMESPath library?
+export function stringifyPathForJmespath(path) {
+  if (path.length === 0) {
+    return '@'
+  }
+
+  const str = path
+    .map((prop) => {
+      if (typeof prop === 'number') {
+        return '[' + prop + ']'
+      } else if (typeof prop === 'string' && prop.match(/^[A-Za-z0-9_$]+$/)) {
+        return '.' + prop
+      } else {
+        return '."' + prop + '"'
+      }
+    })
+    .join('')
+
+  return str[0] === '.'
+    ? str.slice(1) // remove first dot
+    : str
 }

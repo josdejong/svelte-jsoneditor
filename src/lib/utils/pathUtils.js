@@ -10,7 +10,13 @@
 export function stringifyPath(path) {
   return path
     .map((prop) => {
-      return typeof prop === 'number' ? `[${prop}]` : `.${prop}`
+      if (typeof prop === 'number') {
+        return '[' + prop + ']'
+      } else if (typeof prop === 'string' && prop.match(/^[A-Za-z0-9_$]+$/)) {
+        return '.' + prop
+      } else {
+        return '["' + prop + '"]'
+      }
     })
     .join('')
 }

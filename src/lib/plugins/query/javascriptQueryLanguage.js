@@ -14,11 +14,11 @@ export const javascriptQueryLanguage = {
 }
 
 /**
- * Turn a path like
+ * Turn a path like:
  *
  *   ['location', 'latitude']
  *
- * into a JavaScript selector
+ * into a JavaScript selector (string) like:
  *
  *   '?.["location"]?.["latitude"]'
  *

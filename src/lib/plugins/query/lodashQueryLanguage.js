@@ -44,7 +44,7 @@ function createQuery(json, queryOptions) {
 
   if (sort) {
     queryParts.push(
-      `  data = _.orderBy(data, ${JSON.stringify(sort.field)}, '${sort.direction}')\n`
+      `  data = _.orderBy(data, [${JSON.stringify(sort.field)}], ['${sort.direction}'])\n`
     )
   }
 

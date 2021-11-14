@@ -1,22 +1,22 @@
 import assert from 'assert'
-import { jmespathQueryLanguage, parseString } from './jmespathQueryLanguage.js'
+import { javascriptQueryLanguage } from './javascriptQueryLanguage.js'
 import { cloneDeep } from 'lodash-es'
 
-const { createQuery, executeQuery } = jmespathQueryLanguage
+const { createQuery, executeQuery } = javascriptQueryLanguage
 
-describe('jmespathQueryLanguage', () => {
+const user1 = { _id: '1', user: { name: 'Stuart', age: 6 } }
+const user3 = { _id: '3', user: { name: 'Kevin', age: 8 } }
+const user2 = { _id: '2', user: { name: 'Bob', age: 7 } }
+
+const users = [user1, user3, user2]
+const originalUsers = cloneDeep([user1, user3, user2])
+
+describe('javascriptQueryLanguage', () => {
   describe('createQuery and executeQuery', () => {
-    const user1 = { _id: '1', user: { name: 'Stuart', age: 6 } }
-    const user3 = { _id: '3', user: { name: 'Kevin', age: 8 } }
-    const user2 = { _id: '2', user: { name: 'Bob', age: 7 } }
-
-    const users = [user1, user3, user2]
-    const originalUsers = cloneDeep([user1, user3, user2])
-
     it('should create a and execute an empty query', () => {
       const query = createQuery(users, {})
       const result = executeQuery(users, query)
-      assert.deepStrictEqual(query, '[*]')
+      assert.deepStrictEqual(query, 'function query (data) {\n  return data\n}')
       assert.deepStrictEqual(result, users)
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
@@ -29,7 +29,13 @@ describe('jmespathQueryLanguage', () => {
           value: 'Bob'
         }
       })
-      assert.deepStrictEqual(query, '[? user.name == `"Bob"`]')
+      assert.deepStrictEqual(
+        query,
+        'function query (data) {\n' +
+          '  data = data.filter(item => item?.["user"]?.["name"] == \'Bob\')\n' +
+          '  return data\n' +
+          '}'
+      )
 
       const result = executeQuery(users, query)
       assert.deepStrictEqual(result, [user2])
@@ -39,7 +45,6 @@ describe('jmespathQueryLanguage', () => {
     it('should create and execute a filter query for the whole array item', () => {
       const data = [2, 3, 1]
       const originalData = cloneDeep(data)
-
       const query = createQuery(data, {
         filter: {
           field: [],
@@ -47,7 +52,13 @@ describe('jmespathQueryLanguage', () => {
           value: '1'
         }
       })
-      assert.deepStrictEqual(query, '[? @ == `1`]')
+      assert.deepStrictEqual(
+        query,
+        'function query (data) {\n' +
+          "  data = data.filter(item => item == '1')\n" +
+          '  return data\n' +
+          '}'
+      )
 
       const result = executeQuery(data, query)
       assert.deepStrictEqual(result, [1])
@@ -61,11 +72,21 @@ describe('jmespathQueryLanguage', () => {
           direction: 'asc'
         }
       })
-      assert.deepStrictEqual(query, '[*] | sort_by(@, &user.age)')
+      assert.deepStrictEqual(
+        query,
+        'function query (data) {\n' +
+          '  data = data.slice().sort((a, b) => {\n' +
+          '    // sort ascending\n' +
+          '    const valueA = a?.["user"]?.["age"]\n' +
+          '    const valueB = b?.["user"]?.["age"]\n' +
+          '    return valueA > valueB ? 1 : valueA < valueB ? -1 : 0\n' +
+          '  })\n' +
+          '  return data\n' +
+          '}'
+      )
 
       const result = executeQuery(users, query)
       assert.deepStrictEqual(result, [user1, user2, user3])
-
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
@@ -76,11 +97,21 @@ describe('jmespathQueryLanguage', () => {
           direction: 'desc'
         }
       })
-      assert.deepStrictEqual(query, '[*] | reverse(sort_by(@, &user.age))')
+      assert.deepStrictEqual(
+        query,
+        'function query (data) {\n' +
+          '  data = data.slice().sort((a, b) => {\n' +
+          '    // sort descending\n' +
+          '    const valueA = a?.["user"]?.["age"]\n' +
+          '    const valueB = b?.["user"]?.["age"]\n' +
+          '    return valueA > valueB ? -1 : valueA < valueB ? 1 : 0\n' +
+          '  })\n' +
+          '  return data\n' +
+          '}'
+      )
 
       const result = executeQuery(users, query)
       assert.deepStrictEqual(result, [user3, user2, user1])
-
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
@@ -90,11 +121,17 @@ describe('jmespathQueryLanguage', () => {
           fields: [['user', 'name']]
         }
       })
-      assert.deepStrictEqual(query, '[*].user.name')
+
+      assert.deepStrictEqual(
+        query,
+        'function query (data) {\n' +
+          '  data = data.map(item => item?.["user"]?.["name"])\n' +
+          '  return data\n' +
+          '}'
+      )
 
       const result = executeQuery(users, query)
       assert.deepStrictEqual(result, ['Stuart', 'Kevin', 'Bob'])
-
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
@@ -104,7 +141,17 @@ describe('jmespathQueryLanguage', () => {
           fields: [['user', 'name'], ['_id']]
         }
       })
-      assert.deepStrictEqual(query, '[*].{name: user.name, _id: _id}')
+
+      assert.deepStrictEqual(
+        query,
+        'function query (data) {\n' +
+          '  data = data.map(item => ({\n' +
+          '    "name": item?.["user"]?.["name"],\n' +
+          '    "_id": item?.["_id"]})\n' +
+          '  )\n' +
+          '  return data\n' +
+          '}'
+      )
 
       const result = executeQuery(users, query)
       assert.deepStrictEqual(result, [
@@ -112,7 +159,6 @@ describe('jmespathQueryLanguage', () => {
         { name: 'Kevin', _id: '3' },
         { name: 'Bob', _id: '2' }
       ])
-
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
@@ -131,29 +177,25 @@ describe('jmespathQueryLanguage', () => {
           fields: [['user', 'name']]
         }
       })
-      assert.deepStrictEqual(query, '[? user.age <= `7`] | sort_by(@, &user.name) | [*].user.name')
+
+      assert.deepStrictEqual(
+        query,
+        'function query (data) {\n' +
+          '  data = data.filter(item => item?.["user"]?.["age"] <= \'7\')\n' +
+          '  data = data.slice().sort((a, b) => {\n' +
+          '    // sort ascending\n' +
+          '    const valueA = a?.["user"]?.["name"]\n' +
+          '    const valueB = b?.["user"]?.["name"]\n' +
+          '    return valueA > valueB ? 1 : valueA < valueB ? -1 : 0\n' +
+          '  })\n' +
+          '  data = data.map(item => item?.["user"]?.["name"])\n' +
+          '  return data\n' +
+          '}'
+      )
 
       const result = executeQuery(users, query)
       assert.deepStrictEqual(result, ['Bob', 'Stuart'])
-
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
-  })
-
-  it('should parse a string', () => {
-    assert.strictEqual(parseString('foo'), 'foo')
-    assert.strictEqual(parseString('234foo'), '234foo')
-    assert.strictEqual(parseString('  234'), 234)
-    assert.strictEqual(parseString('234  '), 234)
-    assert.strictEqual(parseString('2.3'), 2.3)
-    assert.strictEqual(parseString('null'), null)
-    assert.strictEqual(parseString('true'), true)
-    assert.strictEqual(parseString('false'), false)
-    assert.strictEqual(parseString('+1'), 1)
-    assert.strictEqual(parseString(' '), ' ')
-    assert.strictEqual(parseString(''), '')
-    assert.strictEqual(parseString('"foo"'), '"foo"')
-    assert.strictEqual(parseString('"2"'), '"2"')
-    assert.strictEqual(parseString("'foo'"), "'foo'")
   })
 })
