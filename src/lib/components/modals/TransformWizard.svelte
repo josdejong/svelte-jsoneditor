@@ -83,9 +83,15 @@
     <th>Filter</th>
     <td>
       <div class="horizontal">
-        <Select containerClasses="filter-field" items={fieldOptions} bind:value={filterPath} />
+        <Select
+          containerClasses="filter-path"
+          showIndicator
+          items={fieldOptions}
+          bind:value={filterPath}
+        />
         <Select
           containerClasses="filter-relation"
+          showIndicator
           items={filterRelationOptions}
           bind:value={filterRelation}
         />
@@ -97,9 +103,15 @@
     <th>Sort</th>
     <td>
       <div class="horizontal">
-        <Select containerClasses="sort-field" items={fieldOptions} bind:value={sortPath} />
+        <Select
+          containerClasses="sort-path"
+          showIndicator
+          items={fieldOptions}
+          bind:value={sortPath}
+        />
         <Select
           containerClasses="sort-direction"
+          showIndicator
           items={sortDirectionOptions}
           bind:value={sortDirection}
         />
@@ -111,9 +123,10 @@
     <td>
       <div class="horizontal">
         <Select
-          containerClasses="projection-fields"
-          items={projectionOptions}
+          containerClasses="projection-paths"
           isMulti
+          showIndicator
+          items={projectionOptions}
           bind:value={projectionPaths}
         />
       </div>

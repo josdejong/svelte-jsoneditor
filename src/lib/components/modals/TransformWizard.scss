@@ -19,17 +19,17 @@ table.transform-wizard {
         flex-direction: row;
         margin-bottom: $padding-half;
 
-        :global(.selectContainer.filter-field) {
+        :global(.selectContainer.filter-path) {
           flex: 4;
           margin-right: $padding-half;
         }
 
         :global(.selectContainer.filter-relation) {
-          flex: 1;
+          flex: 1.5;
           margin-right: $padding-half;
         }
 
-        :global(.selectContainer.sort-field) {
+        :global(.selectContainer.sort-path) {
           flex: 3;
           margin-right: $padding-half;
         }
@@ -38,7 +38,7 @@ table.transform-wizard {
           flex: 1;
         }
 
-        :global(.selectContainer.projection-fields) {
+        :global(.selectContainer.projection-paths) {
           flex: 1;
         }
 

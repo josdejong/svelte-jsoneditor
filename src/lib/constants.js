@@ -60,7 +60,7 @@ export const TRANSFORM_MODAL_OPTIONS = {
   ...SIMPLE_MODAL_OPTIONS,
   styleWindow: {
     ...SIMPLE_MODAL_OPTIONS.styleWindow,
-    width: '600px'
+    width: '700px'
   },
   styleContent: {
     overflow: 'auto', // TODO: would be more neat if the header is fixed instead of scrolls along
