@@ -24,7 +24,7 @@ describe('javascriptQueryLanguage', () => {
     it('should create and execute a filter query for a nested property', () => {
       const query = createQuery(users, {
         filter: {
-          field: ['user', 'name'],
+          path: ['user', 'name'],
           relation: '==',
           value: 'Bob'
         }
@@ -48,7 +48,7 @@ describe('javascriptQueryLanguage', () => {
 
       const query = createQuery(data, {
         filter: {
-          field: ['user name!'],
+          path: ['user name!'],
           relation: '==',
           value: 'Bob'
         }
@@ -71,7 +71,7 @@ describe('javascriptQueryLanguage', () => {
       const originalData = cloneDeep(data)
       const query = createQuery(data, {
         filter: {
-          field: [],
+          path: [],
           relation: '==',
           value: '1'
         }
@@ -92,7 +92,7 @@ describe('javascriptQueryLanguage', () => {
     it('should create and execute a sort query in ascending direction', () => {
       const query = createQuery(users, {
         sort: {
-          field: ['user', 'age'],
+          path: ['user', 'age'],
           direction: 'asc'
         }
       })
@@ -117,7 +117,7 @@ describe('javascriptQueryLanguage', () => {
     it('should create and execute a sort query in descending direction', () => {
       const query = createQuery(users, {
         sort: {
-          field: ['user', 'age'],
+          path: ['user', 'age'],
           direction: 'desc'
         }
       })
@@ -142,7 +142,7 @@ describe('javascriptQueryLanguage', () => {
     it('should create and execute a project query for a single property', () => {
       const query = createQuery(users, {
         projection: {
-          fields: [['user', 'name']]
+          paths: [['user', 'name']]
         }
       })
 
@@ -162,7 +162,7 @@ describe('javascriptQueryLanguage', () => {
     it('should create and execute a project query for a multiple properties', () => {
       const query = createQuery(users, {
         projection: {
-          fields: [['user', 'name'], ['_id']]
+          paths: [['user', 'name'], ['_id']]
         }
       })
 
@@ -189,16 +189,16 @@ describe('javascriptQueryLanguage', () => {
     it('should create and execute a query with filter, sort and project', () => {
       const query = createQuery(users, {
         filter: {
-          field: ['user', 'age'],
+          path: ['user', 'age'],
           relation: '<=',
           value: '7'
         },
         sort: {
-          field: ['user', 'name'],
+          path: ['user', 'name'],
           direction: 'asc'
         },
         projection: {
-          fields: [['user', 'name']]
+          paths: [['user', 'name']]
         }
       })
 

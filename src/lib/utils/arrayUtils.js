@@ -83,7 +83,7 @@ export function getNestedPaths(array, includeObjects = false) {
   function recurseNestedPaths(obj, path) {
     const isValue = !Array.isArray(obj) && !isObject(obj)
 
-    if (isValue || includeObjects) {
+    if (isValue || (includeObjects && path.length > 0)) {
       pathsMap[compileJSONPointer(path)] = true
     }
 

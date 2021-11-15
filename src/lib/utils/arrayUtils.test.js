@@ -46,7 +46,6 @@ describe('arrayUtils', () => {
       ]
 
       assert.deepStrictEqual(getNestedPaths(json, true), [
-        [],
         ['location'],
         ['location', 'latitude'],
         ['location', 'longitude'],

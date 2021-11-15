@@ -33,13 +33,13 @@ function createQuery(json, queryOptions) {
   let query = ''
 
   if (filter) {
-    const examplePath = ['0'].concat(filter.field)
+    const examplePath = ['0'].concat(filter.path)
     const exampleValue = getIn(json, examplePath)
     const value1 = typeof exampleValue === 'string' ? filter.value : parseString(filter.value)
 
     query +=
       '[? ' +
-      stringifyPathForJmespath(filter.field) +
+      stringifyPathForJmespath(filter.path) +
       ' ' +
       filter.relation +
       ' ' +
@@ -53,9 +53,9 @@ function createQuery(json, queryOptions) {
 
   if (sort) {
     if (sort.direction === 'desc') {
-      query += ' | reverse(sort_by(@, &' + stringifyPathForJmespath(sort.field) + '))'
+      query += ' | reverse(sort_by(@, &' + stringifyPathForJmespath(sort.path) + '))'
     } else {
-      query += ' | sort_by(@, &' + stringifyPathForJmespath(sort.field) + ')'
+      query += ' | sort_by(@, &' + stringifyPathForJmespath(sort.path) + ')'
     }
   }
 
@@ -64,15 +64,17 @@ function createQuery(json, queryOptions) {
       query += ' | [*]'
     }
 
-    if (projection.fields.length === 1) {
-      query += '.' + stringifyPathForJmespath(projection.fields[0])
-    } else if (projection.fields.length > 1) {
+    if (projection.paths.length === 1) {
+      const path = projection.paths[0]
+
+      query += '.' + stringifyPathForJmespath(path)
+    } else if (projection.paths.length > 1) {
       query +=
         '.{' +
-        projection.fields
-          .map((field) => {
-            const name = field[field.length - 1]
-            return name + ': ' + stringifyPathForJmespath(field)
+        projection.paths
+          .map((path) => {
+            const name = path[path.length - 1]
+            return name + ': ' + stringifyPathForJmespath(path)
           })
           .join(', ') +
         '}'

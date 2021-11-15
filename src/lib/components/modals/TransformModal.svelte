@@ -50,12 +50,12 @@
   // showWizard is not stored inside a stateId
   let showWizard = transformModalState.showWizard !== false
 
-  let filterField = state.filterField || null
+  let filterPath = state.filterPath || null
   let filterRelation = state.filterRelation || null
   let filterValue = state.filterValue || null
-  let sortField = state.sortField || null
+  let sortPath = state.sortPath || null
   let sortDirection = state.sortDirection || null
-  let pickFields = state.pickFields || null
+  let projectionPaths = state.projectionPaths || null
 
   function updateQuery(newQuery) {
     // console.log('updated query by wizard', newQuery)
@@ -96,12 +96,12 @@
       // just in memory, not persisted
       transformModalState[stateId] = {
         query,
-        filterField,
+        filterPath,
         filterRelation,
         filterValue,
-        sortField,
+        sortPath,
         sortDirection,
-        pickFields
+        projectionPaths
       }
 
       close()
@@ -151,12 +151,12 @@
     {#if showWizard}
       {#if Array.isArray(selectedJson)}
         <TransformWizard
-          bind:filterField
+          bind:filterPath
           bind:filterRelation
           bind:filterValue
-          bind:sortField
+          bind:sortPath
           bind:sortDirection
-          bind:pickFields
+          bind:projectionPaths
           json={selectedJson}
           onQuery={updateQuery}
           createQuery={getSelectedQueryLanguage().createQuery}

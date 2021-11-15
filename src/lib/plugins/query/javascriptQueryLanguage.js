@@ -22,11 +22,11 @@ export const javascriptQueryLanguage = {
  *
  *   '?.["location"]?.["latitude"]'
  *
- * @param {Path} field
+ * @param {Path} path
  * @returns {string}
  */
-function createPropertySelector(field) {
-  return field.map((f) => `?.[${JSON.stringify(f)}]`).join('')
+function createPropertySelector(path) {
+  return path.map((f) => `?.[${JSON.stringify(f)}]`).join('')
 }
 
 /**
@@ -41,7 +41,7 @@ function createQuery(json, queryOptions) {
   if (filter) {
     // Note that the comparisons embrace type coercion,
     // so a filter value like '5' (text) will match numbers like 5 too.
-    const getActualValue = 'item => item' + createPropertySelector(filter.field)
+    const getActualValue = 'item => item' + createPropertySelector(filter.path)
 
     queryParts.push(
       `  data = data.filter(${getActualValue} ${filter.relation} '${filter.value}')\n`
@@ -53,8 +53,8 @@ function createQuery(json, queryOptions) {
       queryParts.push(
         `  data = data.slice().sort((a, b) => {\n` +
           `    // sort descending\n` +
-          `    const valueA = a${createPropertySelector(sort.field)}\n` +
-          `    const valueB = b${createPropertySelector(sort.field)}\n` +
+          `    const valueA = a${createPropertySelector(sort.path)}\n` +
+          `    const valueB = b${createPropertySelector(sort.path)}\n` +
           `    return valueA > valueB ? -1 : valueA < valueB ? 1 : 0\n` +
           `  })\n`
       )
@@ -63,8 +63,8 @@ function createQuery(json, queryOptions) {
       queryParts.push(
         `  data = data.slice().sort((a, b) => {\n` +
           `    // sort ascending\n` +
-          `    const valueA = a${createPropertySelector(sort.field)}\n` +
-          `    const valueB = b${createPropertySelector(sort.field)}\n` +
+          `    const valueA = a${createPropertySelector(sort.path)}\n` +
+          `    const valueB = b${createPropertySelector(sort.path)}\n` +
           `    return valueA > valueB ? 1 : valueA < valueB ? -1 : 0\n` +
           `  })\n`
       )
@@ -74,17 +74,16 @@ function createQuery(json, queryOptions) {
   if (projection) {
     // It is possible to make a util function "pickFlat"
     // and use that when building the query to make it more readable.
-    if (projection.fields.length > 1) {
-      const fields = projection.fields.map((field) => {
-        const name = field[field.length - 1] || 'item' // 'item' in case of having selected the whole item
-        const item = 'item' + createPropertySelector(field)
+    if (projection.paths.length > 1) {
+      const paths = projection.paths.map((path) => {
+        const name = path[path.length - 1] || 'item' // 'item' in case of having selected the whole item
+        const item = 'item' + createPropertySelector(path)
         return `    ${JSON.stringify(name)}: ${item}`
       })
 
-      queryParts.push(`  data = data.map(item => ({\n${fields.join(',\n')}})\n  )\n`)
+      queryParts.push(`  data = data.map(item => ({\n${paths.join(',\n')}})\n  )\n`)
     } else {
-      const field = projection.fields[0]
-      const item = 'item' + createPropertySelector(field)
+      const item = 'item' + createPropertySelector(projection.paths[0])
 
       queryParts.push(`  data = data.map(item => ${item})\n`)
     }

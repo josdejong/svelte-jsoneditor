@@ -11,19 +11,19 @@
   export let createQuery
 
   // fields
-  export let filterField
+  export let filterPath
   export let filterRelation
   export let filterValue
-  export let sortField
+  export let sortPath
   export let sortDirection
-  export let pickFields
+  export let projectionPaths
 
   // options
   $: jsonIsArray = Array.isArray(json)
   $: paths = jsonIsArray ? getNestedPaths(json) : undefined
   $: pathsIncludingObjects = jsonIsArray ? getNestedPaths(json, true) : undefined
   $: fieldOptions = paths ? paths.map(pathToOption) : undefined
-  $: pickFieldOptions = pathsIncludingObjects ? pathsIncludingObjects.map(pathToOption) : undefined
+  $: projectionOptions = pathsIncludingObjects ? pathsIncludingObjects.map(pathToOption) : undefined
 
   const filterRelationOptions = ['==', '!=', '<', '<=', '>', '>='].map((relation) => ({
     value: relation,
@@ -46,24 +46,24 @@
   $: {
     const newQueryOptions = {}
 
-    if (filterField && filterRelation && filterValue) {
+    if (filterPath && filterRelation && filterValue) {
       newQueryOptions.filter = {
-        field: filterField.value,
+        path: filterPath.value,
         relation: filterRelation.value,
         value: filterValue
       }
     }
 
-    if (sortField && sortDirection) {
+    if (sortPath && sortDirection) {
       newQueryOptions.sort = {
-        field: sortField.value,
+        path: sortPath.value,
         direction: sortDirection.value
       }
     }
 
-    if (pickFields) {
+    if (projectionPaths) {
       newQueryOptions.projection = {
-        fields: pickFields.map((item) => item.value)
+        paths: projectionPaths.map((item) => item.value)
       }
     }
 
@@ -83,7 +83,7 @@
     <th>Filter</th>
     <td>
       <div class="horizontal">
-        <Select containerClasses="filter-field" items={fieldOptions} bind:value={filterField} />
+        <Select containerClasses="filter-field" items={fieldOptions} bind:value={filterPath} />
         <Select
           containerClasses="filter-relation"
           items={filterRelationOptions}
@@ -97,7 +97,7 @@
     <th>Sort</th>
     <td>
       <div class="horizontal">
-        <Select containerClasses="sort-field" items={fieldOptions} bind:value={sortField} />
+        <Select containerClasses="sort-field" items={fieldOptions} bind:value={sortPath} />
         <Select
           containerClasses="sort-direction"
           items={sortDirectionOptions}
@@ -111,10 +111,10 @@
     <td>
       <div class="horizontal">
         <Select
-          containerClasses="pick-fields"
-          items={pickFieldOptions}
+          containerClasses="projection-fields"
+          items={projectionOptions}
           isMulti
-          bind:value={pickFields}
+          bind:value={projectionPaths}
         />
       </div>
     </td>
