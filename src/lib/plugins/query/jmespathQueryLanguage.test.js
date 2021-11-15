@@ -36,21 +36,21 @@ describe('jmespathQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original data
     })
 
-    it('should create and execute a filter query for a nested property', () => {
-      const data = users.map((item) => ({ 'user name': item.user.name }))
+    it('should create and execute a filter query for a property with sepcial characters in the name', () => {
+      const data = users.map((item) => ({ 'user name!': item.user.name }))
       const originalData = cloneDeep(data)
 
       const query = createQuery(data, {
         filter: {
-          field: ['user name'],
+          field: ['user name!'],
           relation: '==',
           value: 'Bob'
         }
       })
-      assert.deepStrictEqual(query, '[? "user name" == `"Bob"`]')
+      assert.deepStrictEqual(query, '[? "user name!" == `"Bob"`]')
 
       const result = executeQuery(data, query)
-      assert.deepStrictEqual(result, [{ 'user name': 'Bob' }])
+      assert.deepStrictEqual(result, [{ 'user name!': 'Bob' }])
       assert.deepStrictEqual(data, originalData) // must not touch the original data
     })
 

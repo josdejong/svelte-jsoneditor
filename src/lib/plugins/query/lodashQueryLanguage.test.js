@@ -45,13 +45,13 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original data
     })
 
-    it('should create and execute a filter query for a property with spaces in the name', () => {
-      const data = users.map((item) => ({ 'user name': item.user.name }))
+    it('should create and execute a filter query for a property with sepcial characters in the name', () => {
+      const data = users.map((item) => ({ 'user name!': item.user.name }))
       const originalData = cloneDeep(data)
 
       const query = createQuery(data, {
         filter: {
-          field: ['user name'],
+          field: ['user name!'],
           relation: '==',
           value: 'Bob'
         }
@@ -59,13 +59,13 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.filter(item => _.get(item, ["user name"]) == \'Bob\')\n' +
+          '  data = data.filter(item => _.get(item, ["user name!"]) == \'Bob\')\n' +
           '  return data\n' +
           '}'
       )
 
       const result = executeQuery(data, query)
-      assert.deepStrictEqual(result, [{ 'user name': 'Bob' }])
+      assert.deepStrictEqual(result, [{ 'user name!': 'Bob' }])
       assert.deepStrictEqual(data, originalData) // must not touch the original data
     })
 
