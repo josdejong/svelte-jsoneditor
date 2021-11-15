@@ -67,7 +67,10 @@ function createQuery(json, queryOptions) {
     if (projection.paths.length === 1) {
       const path = projection.paths[0]
 
-      query += '.' + stringifyPathForJmespath(path)
+      query +=
+        path.length === 0
+          ? '' // edge case, selecting projection of "whole item"
+          : '.' + stringifyPathForJmespath(path)
     } else if (projection.paths.length > 1) {
       query +=
         '.{' +
