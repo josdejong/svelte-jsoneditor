@@ -507,7 +507,7 @@
   }
 
   function onChangeAceEditorValue() {
-    if (onChangeDisabled) {
+    if (onChangeDisabled || !aceEditor) {
       return
     }
 
