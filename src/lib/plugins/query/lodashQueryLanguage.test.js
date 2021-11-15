@@ -22,22 +22,51 @@ describe('lodashQueryLanguage', () => {
     })
 
     it('should create and execute a filter query for a nested property', () => {
-      assert.deepStrictEqual(
-        createQuery(
-          {},
-          {
-            filter: {
-              field: ['user', 'name'],
-              relation: '==',
-              value: 'Bob'
-            }
+      const query = createQuery(
+        {},
+        {
+          filter: {
+            field: ['user', 'name'],
+            relation: '==',
+            value: 'Bob'
           }
-        ),
+        }
+      )
+      assert.deepStrictEqual(
+        query,
         'function query (data) {\n' +
           '  data = data.filter(item => _.get(item, ["user","name"]) == \'Bob\')\n' +
           '  return data\n' +
           '}'
       )
+
+      const result = executeQuery(users, query)
+      assert.deepStrictEqual(result, [user2])
+      assert.deepStrictEqual(users, originalUsers) // must not touch the original data
+    })
+
+    it('should create and execute a filter query for a property with spaces in the name', () => {
+      const data = users.map((item) => ({ 'user name': item.user.name }))
+      const originalData = cloneDeep(data)
+
+      const query = createQuery(data, {
+        filter: {
+          field: ['user name'],
+          relation: '==',
+          value: 'Bob'
+        }
+      })
+      assert.deepStrictEqual(
+        query,
+        'function query (data) {\n' +
+          '  data = data.filter(item => _.get(item, ["user name"]) == \'Bob\')\n' +
+          '  return data\n' +
+          '}'
+      )
+
+      const result = executeQuery(data, query)
+      assert.deepStrictEqual(result, [{ 'user name': 'Bob' }])
+      assert.deepStrictEqual(data, originalData) // must not touch the original data
     })
 
     it('should create and execute a filter query for the whole array item', () => {
@@ -50,8 +79,6 @@ describe('lodashQueryLanguage', () => {
           value: '1'
         }
       })
-      const result = executeQuery(data, query)
-
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
@@ -60,6 +87,7 @@ describe('lodashQueryLanguage', () => {
           '}'
       )
 
+      const result = executeQuery(data, query)
       assert.deepStrictEqual(result, [1])
       assert.deepStrictEqual(data, originalData) // must not touch the original data
     })
@@ -71,8 +99,6 @@ describe('lodashQueryLanguage', () => {
           direction: 'asc'
         }
       })
-      const result = executeQuery(users, query)
-
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
@@ -80,6 +106,8 @@ describe('lodashQueryLanguage', () => {
           '  return data\n' +
           '}'
       )
+
+      const result = executeQuery(users, query)
       assert.deepStrictEqual(result, [user1, user2, user3])
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
@@ -91,8 +119,6 @@ describe('lodashQueryLanguage', () => {
           direction: 'desc'
         }
       })
-      const result = executeQuery(users, query)
-
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
@@ -100,6 +126,8 @@ describe('lodashQueryLanguage', () => {
           '  return data\n' +
           '}'
       )
+
+      const result = executeQuery(users, query)
       assert.deepStrictEqual(result, [user3, user2, user1])
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
@@ -110,8 +138,6 @@ describe('lodashQueryLanguage', () => {
           fields: [['user', 'name']]
         }
       })
-      const result = executeQuery(users, query)
-
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
@@ -119,6 +145,8 @@ describe('lodashQueryLanguage', () => {
           '  return data\n' +
           '}'
       )
+
+      const result = executeQuery(users, query)
       assert.deepStrictEqual(result, ['Stuart', 'Kevin', 'Bob'])
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
@@ -129,8 +157,6 @@ describe('lodashQueryLanguage', () => {
           fields: [['user', 'name'], ['_id']]
         }
       })
-      const result = executeQuery(users, query)
-
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
@@ -142,6 +168,7 @@ describe('lodashQueryLanguage', () => {
           '}'
       )
 
+      const result = executeQuery(users, query)
       assert.deepStrictEqual(result, [
         { name: 'Stuart', _id: '1' },
         { name: 'Kevin', _id: '3' },
