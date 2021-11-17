@@ -2,6 +2,10 @@
 @import 'Modal';
 
 .jsoneditor-modal.sort {
+  .contents {
+    overflow: hidden;
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;

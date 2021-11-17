@@ -36,15 +36,16 @@ export const SIMPLE_MODAL_OPTIONS = {
   styleBg: {
     top: 0,
     left: 0,
-    background: 'rgba(0, 0, 0, 0.3)',
-    justifyContent: 'normal'
+    background: 'rgba(0, 0, 0, 0.3)'
   },
   styleWindow: {
     borderRadius: '2px'
   },
+  styleWindowWrap: {},
   styleContent: {
-    padding: '0px',
-    overflow: 'visible' // needed for select box dropdowns which are larger than the modal
+    flex: 1,
+    display: 'flex',
+    padding: '0px'
   }
 }
 
@@ -61,10 +62,6 @@ export const TRANSFORM_MODAL_OPTIONS = {
   styleWindow: {
     ...SIMPLE_MODAL_OPTIONS.styleWindow,
     width: '700px'
-  },
-  styleContent: {
-    overflow: 'auto', // TODO: would be more neat if the header is fixed instead of scrolls along
-    padding: 0
   }
 }
 
