@@ -36,8 +36,6 @@
 
   $: selectedJson = getIn(json, selectedPath)
 
-  $: selectedQueryLanguage = getSelectedQueryLanguage(queryLanguageId)
-
   const { close } = getContext('simple-modal')
 
   const stateId = `${id}:${compileJSONPointer(selectedPath)}`
@@ -63,7 +61,7 @@
 
   function updateQueryByWizard(newQueryOptions) {
     queryOptions = newQueryOptions
-    query = selectedQueryLanguage.createQuery(json, newQueryOptions)
+    query = getSelectedQueryLanguage(queryLanguageId).createQuery(json, newQueryOptions)
     isManual = false
 
     debug('updateQueryByWizard', { queryOptions, query, isManual })
@@ -77,8 +75,10 @@
 
   function previewTransform(json, query) {
     try {
-      debug('previewTransform', { query, selectedQueryLanguage })
-      const jsonTransformed = selectedQueryLanguage.executeQuery(json, query)
+      debug('previewTransform', {
+        query
+      })
+      const jsonTransformed = getSelectedQueryLanguage(queryLanguageId).executeQuery(json, query)
 
       preview = truncate(JSON.stringify(jsonTransformed, null, indentation), MAX_PREVIEW_CHARACTERS)
       previewHasError = false
@@ -97,7 +97,10 @@
   function handleTransform() {
     try {
       debug('handleTransform', { query })
-      const jsonTransformed = selectedQueryLanguage.executeQuery(selectedJson, query)
+      const jsonTransformed = getSelectedQueryLanguage(queryLanguageId).executeQuery(
+        selectedJson,
+        query
+      )
 
       onTransform([
         {
@@ -157,7 +160,7 @@
     />
     <div class="contents">
       <div class="description">
-        {@html selectedQueryLanguage.description}
+        {@html getSelectedQueryLanguage(queryLanguageId).description}
       </div>
 
       <div class="label">Path</div>
