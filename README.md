@@ -241,6 +241,27 @@ const editor = new JSONEditor({
     }
     ```
 
+- `queryLanguages: QueryLanguage[]`.  
+   Configure one or multiple query language that can be used in the Transform modal. The library comes with three languages:
+
+  ```ts
+  import {
+    jmespathQueryLanguage,
+    lodashQueryLanguage,
+    javascriptQueryLanguage
+  } from 'svelte-jsoneditor'
+
+  const allQueryLanguages = [jmespathQueryLanguage, lodashQueryLanguage, javascriptQueryLanguage]
+  ```
+
+  By default, only `javascriptQueryLanguage` is loaded.
+
+- `queryLanguageId`.
+  The `id` of the currently selected query language.
+
+- `onChangeQueryLanguage: (queryLanguageId: string) => void`.
+  Callback function invoked when the user changes the selected query language in the TransformModal via the configuration button top right.
+
 - `onFocus()` callback fired when the editor got focus.
 - `onBlur()` callback fired when the editor lost focus.
 
@@ -296,6 +317,29 @@ type ValidationError = {
   path: Path
   message: string
   isChildError?: boolean
+}
+
+type QueryLanguage = {
+  id: string
+  name: string
+  description: string
+  createQuery: (json: JSON, queryOptions: QueryLanguageOptions) => string
+  executeQuery: (json: JSON, query: string) => JSON
+}
+
+type QueryLanguageOptions = {
+  filter?: {
+    path: string[]
+    relation: '==' | '!=' | '<' | '<=' | '>' | '>='
+    value: string
+  }
+  sort?: {
+    path: string[]
+    direction: 'asc' | 'desc'
+  }
+  projection?: {
+    paths: string[][]
+  }
 }
 ```
 

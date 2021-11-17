@@ -92,7 +92,11 @@
     </p>
 
     <script type="module">
-      import { JSONEditor } from '../package/dist/jsoneditor.js'
+      import {
+        JSONEditor,
+        lodashQueryLanguage,
+        jmespathQueryLanguage
+      } from '../package/dist/jsoneditor.js'
 
       const json = {
         array: [
@@ -170,7 +174,8 @@
           }
 
           return []
-        }
+        },
+        queryLanguages: [lodashQueryLanguage, jmespathQueryLanguage]
       }
       const testEditor = new JSONEditor({ target, props })
 

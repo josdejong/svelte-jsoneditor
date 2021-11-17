@@ -271,8 +271,7 @@
             {indentation}
             validator={$validate ? validator : undefined}
             {queryLanguages}
-            {queryLanguageId}
-            {onChangeQueryLanguage}
+            bind:queryLanguageId
             {onRenderMenu}
             onChange={onChangeTree}
             {onChangeMode}

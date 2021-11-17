@@ -10,6 +10,7 @@
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import CodeMode from './modes/codemode/CodeMode.svelte'
   import TreeMode from './modes/treemode/TreeMode.svelte'
+  import { javascriptQueryLanguage } from '../plugins/query/javascriptQueryLanguage.js'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
@@ -32,10 +33,10 @@
   export let validator = null
 
   /** @type {QueryLanguage[]} */
-  export let queryLanguages
+  export let queryLanguages = [javascriptQueryLanguage]
 
   /** @type {string} */
-  export let queryLanguageId
+  export let queryLanguageId = queryLanguages[0].id
 
   /** @type {(queryLanguageId: string) => void} */
   export let onChangeQueryLanguage = () => {

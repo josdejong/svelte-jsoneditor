@@ -9,15 +9,12 @@ export const STATE_VISIBLE_SECTIONS = Symbol('visible sections')
 export const STATE_KEYS = Symbol('keys')
 export const STATE_SEARCH_PROPERTY = Symbol('search:property')
 export const STATE_SEARCH_VALUE = Symbol('search:value')
-export const SEARCH_RESULT = Symbol('search:result')
-export const ACTIVE_SEARCH_RESULT = Symbol('search:active-result')
 export const VALIDATION_ERROR = Symbol('validation:error')
 
 export const SCROLL_DURATION = 300 // ms
 export const DEBOUNCE_DELAY = 300 // ms
 export const CODE_MODE_ONCHANGE_DELAY = 300 // ms
 export const SEARCH_UPDATE_THROTTLE = 300 // ms
-export const CHECK_VALID_JSON_DELAY = 300 // ms
 export const AUTO_SCROLL_INTERVAL = 50 // ms
 export const AUTO_SCROLL_SPEED_SLOW = 200 // pixels per second
 export const AUTO_SCROLL_SPEED_NORMAL = 400 // pixels per second
@@ -41,7 +38,6 @@ export const SIMPLE_MODAL_OPTIONS = {
   styleWindow: {
     borderRadius: '2px'
   },
-  styleWindowWrap: {},
   styleContent: {
     flex: 1,
     display: 'flex',

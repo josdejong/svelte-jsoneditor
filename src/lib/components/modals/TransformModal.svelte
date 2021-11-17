@@ -12,8 +12,8 @@
   import { truncate } from '../../utils/stringUtils.js'
   import { transformModalState } from './transformModalState.js'
   import TransformWizard from './TransformWizard.svelte'
-  import TransformModalHeader from '$lib/components/modals/TransformModalHeader.svelte'
-  import AbsolutePopup from '$lib/components/modals/popup/AbsolutePopup.svelte'
+  import TransformModalHeader from './TransformModalHeader.svelte'
+  import AbsolutePopup from './popup/AbsolutePopup.svelte'
   import createDebug from 'debug'
 
   const debug = createDebug('jsoneditor:TransformModal')
