@@ -1,0 +1,31 @@
+@import '../../../styles';
+
+.jse-select-query-language {
+  position: relative;
+  width: 32px;
+
+  .jse-select-query-language-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: $box-shadow;
+
+    .jse-query-language {
+      @include jsoneditor-button;
+
+      text-align: left;
+      padding: $padding 2 * $padding;
+      white-space: nowrap;
+      color: white;
+      background: $dark-gray;
+
+      $gray-highlight: lighten($dark-gray, 5%);
+
+      &:hover {
+        background: $gray-highlight;
+      }
+    }
+  }
+}

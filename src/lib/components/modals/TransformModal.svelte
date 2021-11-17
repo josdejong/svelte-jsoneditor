@@ -10,9 +10,13 @@
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { truncate } from '../../utils/stringUtils.js'
-  import Header from './Header.svelte'
   import { transformModalState } from './transformModalState.js'
   import TransformWizard from './TransformWizard.svelte'
+  import TransformModalHeader from '$lib/components/modals/TransformModalHeader.svelte'
+  import AbsolutePopup from '$lib/components/modals/popup/AbsolutePopup.svelte'
+  import createDebug from 'debug'
+
+  const debug = createDebug('jsoneditor:TransformModal')
 
   export let id = 'transform-modal-' + uniqueId()
   export let json
@@ -25,17 +29,15 @@
   export let queryLanguageId
 
   /** @type {(queryLanguageId: string) => void} */
-  export let onChangeQueryLanguage // TODO: implement a dropdown to change the selected query language
+  export let onChangeQueryLanguage
 
   export let onTransform
   export let indentation = 2
 
   $: selectedJson = getIn(json, selectedPath)
 
-  function getSelectedQueryLanguage() {
-    // TODO: log a console warning when the queryLanguage is not found
-    return queryLanguages.find((item) => item.id === queryLanguageId) || queryLanguages[0]
-  }
+  $: selectedQueryLanguage =
+    queryLanguages.find((item) => item.id === queryLanguageId) || queryLanguages[0]
 
   const { close } = getContext('simple-modal')
 
@@ -43,7 +45,9 @@
 
   const state = transformModalState[stateId] || {}
 
-  let query = state.query || getSelectedQueryLanguage().createQuery(json, {})
+  let query
+  $: query = state.query || selectedQueryLanguage.createQuery(json, {}) // FIXME: should apply wizard
+
   let previewHasError = false
   let preview = ''
 
@@ -64,7 +68,8 @@
 
   function previewTransform(json, query) {
     try {
-      const jsonTransformed = getSelectedQueryLanguage().executeQuery(json, query)
+      debug('previewTransform', { query, selectedQueryLanguage })
+      const jsonTransformed = selectedQueryLanguage.executeQuery(json, query)
 
       preview = truncate(JSON.stringify(jsonTransformed, null, indentation), MAX_PREVIEW_CHARACTERS)
       previewHasError = false
@@ -82,7 +87,8 @@
 
   function handleTransform() {
     try {
-      const jsonTransformed = getSelectedQueryLanguage().executeQuery(selectedJson, query)
+      debug('handleTransform', { query })
+      const jsonTransformed = selectedQueryLanguage.executeQuery(selectedJson, query)
 
       onTransform([
         {
@@ -124,66 +130,78 @@
   function focus(element) {
     element.focus()
   }
+
+  function handleChangeQueryLanguage(newQueryLanguageId) {
+    debug('handleChangeQueryLanguage', newQueryLanguageId)
+    queryLanguageId = newQueryLanguageId
+    onChangeQueryLanguage(newQueryLanguageId)
+  }
 </script>
 
 <div class="jsoneditor-modal transform">
-  <Header title="Transform" />
-  <div class="contents">
-    <div class="description">
-      {@html getSelectedQueryLanguage().description}
-    </div>
-
-    <div class="label">Path</div>
-    <input
-      class="path"
-      type="text"
-      readonly
-      title="Selected path"
-      value={!isEmpty(selectedPath) ? stringifyPath(selectedPath) : '(whole document)'}
+  <AbsolutePopup>
+    <TransformModalHeader
+      {queryLanguages}
+      {queryLanguageId}
+      onChangeQueryLanguage={handleChangeQueryLanguage}
     />
+    <div class="contents">
+      <div class="description">
+        {@html selectedQueryLanguage.description}
+      </div>
 
-    <div class="label">
-      <button type="button" on:click={toggleShowWizard}>
-        <Icon data={showWizard ? faCaretDown : faCaretRight} />
-        Wizard
-      </button>
-    </div>
-    {#if showWizard}
-      {#if Array.isArray(selectedJson)}
-        <TransformWizard
-          bind:filterPath
-          bind:filterRelation
-          bind:filterValue
-          bind:sortPath
-          bind:sortDirection
-          bind:projectionPaths
-          json={selectedJson}
-          onQuery={updateQuery}
-          createQuery={getSelectedQueryLanguage().createQuery}
-        />
-      {:else}
-        (Only available for arrays, not for objects)
+      <div class="label">Path</div>
+      <input
+        class="path"
+        type="text"
+        readonly
+        title="Selected path"
+        value={!isEmpty(selectedPath) ? stringifyPath(selectedPath) : '(whole document)'}
+      />
+
+      <div class="label">
+        <button type="button" on:click={toggleShowWizard}>
+          <Icon data={showWizard ? faCaretDown : faCaretRight} />
+          Wizard
+        </button>
+      </div>
+      {#if showWizard}
+        {#if Array.isArray(selectedJson)}
+          <TransformWizard
+            bind:filterPath
+            bind:filterRelation
+            bind:filterValue
+            bind:sortPath
+            bind:sortDirection
+            bind:projectionPaths
+            json={selectedJson}
+            onQuery={updateQuery}
+            createQuery={selectedQueryLanguage.createQuery}
+          />
+        {:else}
+          (Only available for arrays, not for objects)
+        {/if}
       {/if}
-    {/if}
 
-    <div class="label">Query</div>
-    <textarea class="query" spellcheck="false" bind:value={query} />
+      <div class="label">Query</div>
+      <textarea class="query" spellcheck="false" bind:value={query} />
 
-    <div class="label">Preview</div>
-    <textarea class="preview" class:error={previewHasError} bind:value={preview} readonly />
+      <div class="label">Preview</div>
+      <textarea class="preview" class:error={previewHasError} bind:value={preview} readonly />
 
-    <div class="actions">
-      <button
-        type="button"
-        class="primary"
-        on:click={handleTransform}
-        use:focus
-        disabled={previewHasError}
-      >
-        Transform
-      </button>
+      <div class="actions">
+        <button
+          type="button"
+          class="primary"
+          on:click={handleTransform}
+          use:focus
+          disabled={previewHasError}
+        >
+          Transform
+        </button>
+      </div>
     </div>
-  </div>
+  </AbsolutePopup>
 </div>
 
 <style src="./TransformModal.scss"></style>

@@ -61,8 +61,6 @@
   }
 
   const validator = createAjvValidator(schema)
-  const queryLanguages = [javascriptQueryLanguage, lodashQueryLanguage, jmespathQueryLanguage]
-  let queryLanguageId = queryLanguages[0].value
 
   let text = undefined
 
@@ -75,6 +73,15 @@
   const readOnly = useLocalStorage('svelte-jsoneditor-demo-readOnly', false)
   const mainMenuBar = useLocalStorage('svelte-jsoneditor-demo-mainMenuBar', true)
   const navigationBar = useLocalStorage('svelte-jsoneditor-demo-navigationBar', true)
+  const multipleQueryLanguages = useLocalStorage(
+    'svelte-jsoneditor-demo-multipleQueryLanguages',
+    true
+  )
+
+  $: queryLanguages = $multipleQueryLanguages
+    ? [javascriptQueryLanguage, lodashQueryLanguage, jmespathQueryLanguage]
+    : [javascriptQueryLanguage]
+  let queryLanguageId = javascriptQueryLanguage.id // TODO: store in local storage
 
   function onRenderMenu(mode, items) {
     if (!import.meta.env.SSR) {
@@ -98,9 +105,9 @@
     console.log('onChangeMode', mode)
   }
 
-  function onChangeQueryLanguage(id) {
-    // TODO implement
-    console.log('onChangeQueryLanguage', id)
+  function onChangeQueryLanguage(newQueryLanguageId) {
+    console.log('onChangeQueryLanguage', newQueryLanguageId)
+    queryLanguageId = newQueryLanguageId
   }
 </script>
 
@@ -131,12 +138,20 @@
     </label>
   </p>
   <p>
-    Query language: <select bind:value={queryLanguageId}>
-      {#each queryLanguages as queryLanguage}
-        <option value={queryLanguage.id}>{queryLanguage.name}</option>
-      {/each}
-    </select>
+    <label>
+      <input type="checkbox" bind:checked={$multipleQueryLanguages} /> Multiple query languages
+    </label>
   </p>
+  {#if $multipleQueryLanguages}
+    <p>
+      Selected query language:
+      <select bind:value={queryLanguageId}>
+        {#each queryLanguages as queryLanguage}
+          <option value={queryLanguage.id}>{queryLanguage.name}</option>
+        {/each}
+      </select>
+    </p>
+  {/if}
   <p>
     <button
       on:click={() => {

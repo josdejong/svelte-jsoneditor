@@ -10,7 +10,6 @@
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import CodeMode from './modes/codemode/CodeMode.svelte'
   import TreeMode from './modes/treemode/TreeMode.svelte'
-  import { lodashQueryLanguage } from '$lib/plugins/query/lodashQueryLanguage'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
@@ -39,7 +38,9 @@
   export let queryLanguageId
 
   /** @type {(queryLanguageId: string) => void} */
-  export let onChangeQueryLanguage
+  export let onChangeQueryLanguage = () => {
+    // no op by default
+  }
 
   /** @type {((content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void) | null} */
   export let onChange = null
@@ -276,6 +277,12 @@
 
     return onRenderMenu(mode, updatedItems) || updatedItems
   }
+
+  function handleChangeQueryLanguage(newQueryLanguageId) {
+    debug('handleChangeQueryLanguage', newQueryLanguageId)
+    queryLanguageId = newQueryLanguageId
+    onChangeQueryLanguage(newQueryLanguageId)
+  }
 </script>
 
 <Modal>
@@ -293,7 +300,7 @@
             {validator}
             {queryLanguages}
             {queryLanguageId}
-            {onChangeQueryLanguage}
+            onChangeQueryLanguage={handleChangeQueryLanguage}
             onChange={handleChangeText}
             onSwitchToTreeMode={handleSwitchToTreeMode}
             {onError}
@@ -313,7 +320,7 @@
             {validator}
             {queryLanguages}
             {queryLanguageId}
-            {onChangeQueryLanguage}
+            onChangeQueryLanguage={handleChangeQueryLanguage}
             {onError}
             onChange={handleChange}
             onRequestRepair={handleRequestRepair}
