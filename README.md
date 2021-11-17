@@ -329,16 +329,16 @@ type QueryLanguage = {
 
 type QueryLanguageOptions = {
   filter?: {
-    path: string[]
-    relation: '==' | '!=' | '<' | '<=' | '>' | '>='
-    value: string
+    path?: string[]
+    relation?: '==' | '!=' | '<' | '<=' | '>' | '>='
+    value?: string
   }
   sort?: {
-    path: string[]
-    direction: 'asc' | 'desc'
+    path?: string[]
+    direction?: 'asc' | 'desc'
   }
   projection?: {
-    paths: string[][]
+    paths?: string[][]
   }
 }
 ```

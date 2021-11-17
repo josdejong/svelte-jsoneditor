@@ -38,7 +38,7 @@ function createQuery(json, queryOptions) {
   const { filter, sort, projection } = queryOptions
   const queryParts = []
 
-  if (filter) {
+  if (filter && filter.path && filter.relation && filter.value) {
     // Note that the comparisons embrace type coercion,
     // so a filter value like '5' (text) will match numbers like 5 too.
     const getActualValue = 'item => item' + createPropertySelector(filter.path)
@@ -48,7 +48,7 @@ function createQuery(json, queryOptions) {
     )
   }
 
-  if (sort) {
+  if (sort && sort.path && sort.direction) {
     if (sort.direction === 'desc') {
       queryParts.push(
         `  data = data.slice().sort((a, b) => {\n` +
@@ -71,7 +71,7 @@ function createQuery(json, queryOptions) {
     }
   }
 
-  if (projection) {
+  if (projection && projection.paths) {
     // It is possible to make a util function "pickFlat"
     // and use that when building the query to make it more readable.
     if (projection.paths.length > 1) {

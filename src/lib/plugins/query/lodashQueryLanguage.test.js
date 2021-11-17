@@ -35,7 +35,7 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.filter(item => _.get(item, ["user","name"]) == \'Bob\')\n' +
+          '  data = _.filter(data, item => _.get(item, ["user","name"]) == \'Bob\')\n' +
           '  return data\n' +
           '}'
       )
@@ -59,7 +59,7 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.filter(item => _.get(item, ["user name!"]) == \'Bob\')\n' +
+          '  data = _.filter(data, item => _.get(item, ["user name!"]) == \'Bob\')\n' +
           '  return data\n' +
           '}'
       )
@@ -82,7 +82,7 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          "  data = data.filter(item => item == '1')\n" +
+          "  data = _.filter(data, item => item == '1')\n" +
           '  return data\n' +
           '}'
       )
@@ -141,7 +141,7 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.map(item => _.get(item, ["user","name"]))\n' +
+          '  data = _.map(data, item => _.get(item, ["user","name"]))\n' +
           '  return data\n' +
           '}'
       )
@@ -160,7 +160,7 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.map(item => ({\n' +
+          '  data = _.map(data, item => ({\n' +
           '    "name": _.get(item, ["user","name"]),\n' +
           '    "_id": _.get(item, ["_id"])})\n' +
           '  )\n' +
@@ -197,9 +197,9 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.filter(item => _.get(item, ["user","age"]) <= \'7\')\n' +
+          '  data = _.filter(data, item => _.get(item, ["user","age"]) <= \'7\')\n' +
           '  data = _.orderBy(data, [["user","name"]], [\'asc\'])\n' +
-          '  data = data.map(item => _.get(item, ["user","name"]))\n' +
+          '  data = _.map(data, item => _.get(item, ["user","name"]))\n' +
           '  return data\n' +
           '}'
       )

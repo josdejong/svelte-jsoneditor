@@ -32,7 +32,7 @@ function createQuery(json, queryOptions) {
   const { sort, filter, projection } = queryOptions
   let query = ''
 
-  if (filter) {
+  if (filter && filter.path && filter.relation && filter.value) {
     const examplePath = ['0'].concat(filter.path)
     const exampleValue = getIn(json, examplePath)
     const value1 = typeof exampleValue === 'string' ? filter.value : parseString(filter.value)
@@ -51,7 +51,7 @@ function createQuery(json, queryOptions) {
     query += Array.isArray(json) ? '[*]' : '@'
   }
 
-  if (sort) {
+  if (sort && sort.path && sort.direction) {
     if (sort.direction === 'desc') {
       query += ' | reverse(sort_by(@, &' + stringifyPathForJmespath(sort.path) + '))'
     } else {
@@ -59,7 +59,7 @@ function createQuery(json, queryOptions) {
     }
   }
 
-  if (projection) {
+  if (projection && projection.paths) {
     if (query[query.length - 1] !== ']') {
       query += ' | [*]'
     }

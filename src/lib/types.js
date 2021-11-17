@@ -187,15 +187,15 @@
 /**
  * @typedef {Object} QueryLanguageOptions
  * @property {{
- *   path: string[],
- *   relation: '==' | '!=' | '<' | '<=' | '>' | '>=',
- *   value: string
+ *   path?: string[],
+ *   relation?: '==' | '!=' | '<' | '<=' | '>' | '>=',
+ *   value?: string
  * }} [filter]
  * @property {{
- *   path: string[],
- *   direction: 'asc' | 'desc'
+ *   path?: string[],
+ *   direction?: 'asc' | 'desc'
  * }} [sort]
  * @property {{
- *   paths: string[][]
+ *   paths?: string[][]
  * }} [projection]
  */

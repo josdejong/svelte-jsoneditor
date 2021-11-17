@@ -31,24 +31,24 @@ function createQuery(json, queryOptions) {
   const { filter, sort, projection } = queryOptions
   const queryParts = []
 
-  if (filter) {
+  if (filter && filter.path && filter.relation && filter.value) {
     // Note that the comparisons embrace type coercion,
     // so a filter value like '5' (text) will match numbers like 5 too.
     const getActualValue = !isEmpty(filter.path)
       ? `item => _.get(item, ${JSON.stringify(filter.path)})`
       : 'item => item'
     queryParts.push(
-      `  data = data.filter(${getActualValue} ${filter.relation} '${filter.value}')\n`
+      `  data = _.filter(data, ${getActualValue} ${filter.relation} '${filter.value}')\n`
     )
   }
 
-  if (sort) {
+  if (sort && sort.path && sort.direction) {
     queryParts.push(
       `  data = _.orderBy(data, [${JSON.stringify(sort.path)}], ['${sort.direction}'])\n`
     )
   }
 
-  if (projection) {
+  if (projection && projection.paths) {
     // It is possible to make a util function "pickFlat"
     // and use that when building the query to make it more readable.
     if (projection.paths.length > 1) {
@@ -57,11 +57,11 @@ function createQuery(json, queryOptions) {
         const item = !isEmpty(path) ? `_.get(item, ${JSON.stringify(path)})` : 'item'
         return `    ${JSON.stringify(name)}: ${item}`
       })
-      queryParts.push(`  data = data.map(item => ({\n${paths.join(',\n')}})\n  )\n`)
+      queryParts.push(`  data = _.map(data, item => ({\n${paths.join(',\n')}})\n  )\n`)
     } else {
       const path = projection.paths[0]
       const item = !isEmpty(path) ? `_.get(item, ${JSON.stringify(path)})` : 'item'
-      queryParts.push(`  data = data.map(item => ${item})\n`)
+      queryParts.push(`  data = _.map(data, item => ${item})\n`)
     }
   }
 

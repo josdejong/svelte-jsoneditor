@@ -36,8 +36,7 @@
 
   $: selectedJson = getIn(json, selectedPath)
 
-  $: selectedQueryLanguage =
-    queryLanguages.find((item) => item.id === queryLanguageId) || queryLanguages[0]
+  $: selectedQueryLanguage = getSelectedQueryLanguage(queryLanguageId)
 
   const { close } = getContext('simple-modal')
 
@@ -45,25 +44,35 @@
 
   const state = transformModalState[stateId] || {}
 
-  let query
-  $: query = state.query || selectedQueryLanguage.createQuery(json, {}) // FIXME: should apply wizard
+  // showWizard is not stored inside a stateId
+  let showWizard = transformModalState.showWizard !== false
+
+  let queryOptions = state.queryOptions || {}
+  let query =
+    queryLanguageId === state.queryLanguageId && state.query
+      ? state.query
+      : getSelectedQueryLanguage(queryLanguageId).createQuery(json, state.queryOptions || {})
+  let isManual = state.isManual || false
 
   let previewHasError = false
   let preview = ''
 
-  // showWizard is not stored inside a stateId
-  let showWizard = transformModalState.showWizard !== false
+  function getSelectedQueryLanguage(queryLanguageId) {
+    return queryLanguages.find((item) => item.id === queryLanguageId) || queryLanguages[0]
+  }
 
-  let filterPath = state.filterPath || null
-  let filterRelation = state.filterRelation || null
-  let filterValue = state.filterValue || null
-  let sortPath = state.sortPath || null
-  let sortDirection = state.sortDirection || null
-  let projectionPaths = state.projectionPaths || null
+  function updateQueryByWizard(newQueryOptions) {
+    queryOptions = newQueryOptions
+    query = selectedQueryLanguage.createQuery(json, newQueryOptions)
+    isManual = false
 
-  function updateQuery(newQuery) {
-    // console.log('updated query by wizard', newQuery)
-    query = newQuery
+    debug('updateQueryByWizard', { queryOptions, query, isManual })
+  }
+
+  function handleChangeQuery(event) {
+    query = event.target.value
+    isManual = true
+    debug('handleChangeQuery', { query, isManual })
   }
 
   function previewTransform(json, query) {
@@ -101,13 +110,10 @@
       // remember the selected values for the next time we open the SortModal
       // just in memory, not persisted
       transformModalState[stateId] = {
+        queryOptions,
         query,
-        filterPath,
-        filterRelation,
-        filterValue,
-        sortPath,
-        sortDirection,
-        projectionPaths
+        queryLanguageId,
+        isManual
       }
 
       close()
@@ -135,6 +141,10 @@
     debug('handleChangeQueryLanguage', newQueryLanguageId)
     queryLanguageId = newQueryLanguageId
     onChangeQueryLanguage(newQueryLanguageId)
+
+    const newSelectedQueryLanguage = getSelectedQueryLanguage(queryLanguageId)
+    query = newSelectedQueryLanguage.createQuery(json, queryOptions)
+    isManual = false
   }
 </script>
 
@@ -167,24 +177,14 @@
       </div>
       {#if showWizard}
         {#if Array.isArray(selectedJson)}
-          <TransformWizard
-            bind:filterPath
-            bind:filterRelation
-            bind:filterValue
-            bind:sortPath
-            bind:sortDirection
-            bind:projectionPaths
-            json={selectedJson}
-            onQuery={updateQuery}
-            createQuery={selectedQueryLanguage.createQuery}
-          />
+          <TransformWizard {queryOptions} json={selectedJson} onChange={updateQueryByWizard} />
         {:else}
           (Only available for arrays, not for objects)
         {/if}
       {/if}
 
       <div class="label">Query</div>
-      <textarea class="query" spellcheck="false" bind:value={query} />
+      <textarea class="query" spellcheck="false" value={query} on:input={handleChangeQuery} />
 
       <div class="label">Preview</div>
       <textarea class="preview" class:error={previewHasError} bind:value={preview} readonly />

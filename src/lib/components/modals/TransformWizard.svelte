@@ -5,25 +5,25 @@
   import { getNestedPaths } from '../../utils/arrayUtils.js'
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { isEmpty, isEqual } from 'lodash-es'
+  import { setIn } from 'immutable-json-patch'
+  import createDebug from 'debug'
+
+  const debug = createDebug('jsoneditor:TransformWizard')
 
   export let json
-  export let onQuery
-  export let createQuery
 
-  // fields
-  export let filterPath
-  export let filterRelation
-  export let filterValue
-  export let sortPath
-  export let sortDirection
-  export let projectionPaths
+  /** @type {QueryLanguageOptions} */
+  export let queryOptions = {}
+
+  /** @type {(queryOptions: QueryLanguageOptions) => void} */
+  export let onChange
 
   // options
   $: jsonIsArray = Array.isArray(json)
-  $: paths = jsonIsArray ? getNestedPaths(json) : undefined
-  $: pathsIncludingObjects = jsonIsArray ? getNestedPaths(json, true) : undefined
-  $: fieldOptions = paths ? paths.map(pathToOption) : undefined
-  $: projectionOptions = pathsIncludingObjects ? pathsIncludingObjects.map(pathToOption) : undefined
+  $: paths = jsonIsArray ? getNestedPaths(json) : []
+  $: pathsIncludingObjects = jsonIsArray ? getNestedPaths(json, true) : []
+  $: fieldOptions = paths.map(pathToOption)
+  $: projectionOptions = pathsIncludingObjects ? pathsIncludingObjects.map(pathToOption) : []
 
   const filterRelationOptions = ['==', '!=', '<', '<=', '>', '>='].map((relation) => ({
     value: relation,
@@ -35,6 +35,24 @@
     { value: 'desc', label: 'descending' }
   ]
 
+  // TODO: the binding with the select boxes is very cumbersome. Can we simplify this?
+  let filterPath = queryOptions?.filter?.path ? pathToOption(queryOptions.filter.path) : null
+  let filterRelation = queryOptions?.filter?.relation
+    ? filterRelationOptions.find((option) => option.value === queryOptions.filter.relation)
+    : null
+  let filterValue = queryOptions?.filter?.value || ''
+  let sortPath = queryOptions?.sort?.path ? pathToOption(queryOptions.sort.path) : null
+  let sortDirection = queryOptions?.sort?.direction
+    ? sortDirectionOptions.find((option) => option.value === queryOptions.sort.direction)
+    : null
+  let projectionPaths = queryOptions?.projection?.paths
+    ? queryOptions.projection.paths.map(pathToOption)
+    : null
+
+  $: fieldPath = queryOptions?.filter?.path
+    ? fieldOptions.find((option) => isEqual(option.value, queryOptions?.filter?.path))
+    : null
+
   function pathToOption(path) {
     return {
       value: path,
@@ -42,40 +60,60 @@
     }
   }
 
-  let queryOptions = {}
-  $: {
-    const newQueryOptions = {}
-
-    if (filterPath && filterRelation && filterValue) {
-      newQueryOptions.filter = {
-        path: filterPath.value,
-        relation: filterRelation.value,
-        value: filterValue
-      }
-    }
-
-    if (sortPath && sortDirection) {
-      newQueryOptions.sort = {
-        path: sortPath.value,
-        direction: sortDirection.value
-      }
-    }
-
-    if (projectionPaths) {
-      newQueryOptions.projection = {
-        paths: projectionPaths.map((item) => item.value)
-      }
-    }
-
-    if (!isEqual(newQueryOptions, queryOptions)) {
-      queryOptions = newQueryOptions
-      const query = createQuery(json, queryOptions)
-
-      // console.log('query updated', query, queryOptions)
-
-      onQuery(query)
+  function changeFilterPath(path) {
+    if (!isEqual(queryOptions?.filter?.path, path)) {
+      debug('changeFilterPath', path)
+      queryOptions = setIn(queryOptions, ['filter', 'path'], path, true)
+      onChange(queryOptions)
     }
   }
+
+  function changeFilterRelation(relation) {
+    if (!isEqual(queryOptions?.filter?.relation, relation)) {
+      debug('changeFilterRelation', relation)
+      queryOptions = setIn(queryOptions, ['filter', 'relation'], relation, true)
+      onChange(queryOptions)
+    }
+  }
+
+  function changeFilterValue(value) {
+    if (!isEqual(queryOptions?.filter?.value, value)) {
+      debug('changeFilterValue', value)
+      queryOptions = setIn(queryOptions, ['filter', 'value'], value, true)
+      onChange(queryOptions)
+    }
+  }
+
+  function changeSortPath(path) {
+    if (!isEqual(queryOptions?.sort?.path, path)) {
+      debug('changeSortPath', path)
+      queryOptions = setIn(queryOptions, ['sort', 'path'], path, true)
+      onChange(queryOptions)
+    }
+  }
+
+  function changeSortDirection(direction) {
+    if (!isEqual(queryOptions?.sort?.direction, direction)) {
+      debug('changeSortDirection', direction)
+      queryOptions = setIn(queryOptions, ['sort', 'direction'], direction, true)
+      onChange(queryOptions)
+    }
+  }
+
+  function changeProjectionPaths(paths) {
+    if (!isEqual(queryOptions?.projection?.paths, paths)) {
+      debug('changeProjectionPaths', paths)
+      queryOptions = setIn(queryOptions, ['projection', 'paths'], paths, true)
+      onChange(queryOptions)
+    }
+  }
+
+  $: changeFilterPath(filterPath?.value || null)
+  $: changeFilterRelation(filterRelation?.value || null)
+  $: changeFilterValue(filterValue || null)
+  $: changeSortPath(sortPath?.value || null)
+  $: changeSortDirection(sortDirection?.value || null)
+  $: changeProjectionPaths(projectionPaths ? projectionPaths.map((item) => item.value) : null)
 </script>
 
 <table class="transform-wizard">
