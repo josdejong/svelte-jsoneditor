@@ -5,7 +5,7 @@ import _TransformModal from './components/modals/TransformModal.svelte'
 export const JSONEditor = _JSONEditor
 
 // plugins
-export { createAjvValidator } from './plugins/createAjvValidator.js'
+export { createAjvValidator } from './plugins/validator/createAjvValidator.js'
 export { lodashQueryLanguage } from './plugins/query/lodashQueryLanguage.js'
 export { javascriptQueryLanguage } from './plugins/query/javascriptQueryLanguage.js'
 export { jmespathQueryLanguage } from './plugins/query/jmespathQueryLanguage.js'

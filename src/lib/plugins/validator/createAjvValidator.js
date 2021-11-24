@@ -1,5 +1,5 @@
 import Ajv from 'ajv'
-import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
+import { parseJSONPointerWithArrayIndices } from '../../utils/jsonPointer.js'
 
 /**
  * Create a JSON Schema validator powered by Ajv.
