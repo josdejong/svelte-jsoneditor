@@ -5,7 +5,7 @@
   import { isEqual } from 'lodash-es'
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
-  import EditableDiv from '../../../plugins/value/components/EditableDiv.svelte'
+  import EditableDiv from '../../controls/EditableDiv.svelte'
 
   export let path
   export let key

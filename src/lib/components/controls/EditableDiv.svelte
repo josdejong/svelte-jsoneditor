@@ -5,21 +5,18 @@
   import { getPlainText, setCursorToEnd, setPlainText } from '$lib/utils/domUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import createDebug from 'debug'
-  import { compileJSONPointer } from 'immutable-json-patch'
-  import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils'
-  import { SELECTION_TYPE } from '$lib/logic/selection'
-  import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
+  import { noop } from 'lodash-es'
 
-  const debug = createDebug('jsoneditor:ValueEditor')
+  const debug = createDebug('jsoneditor:EditableDiv')
 
-  export let path
   export let value
-  export let onPatch
-  export let onPasteJson
-  export let onSelect
+  export let onChange
+  export let onCancel
+  export let onPaste = noop
+  export let onValueClass = () => ''
 
   let domValue
-  let valueClass = determineValueClass(value)
+  let valueClass = onValueClass(value)
   let closed = false
 
   onMount(() => {
@@ -36,7 +33,7 @@
     debug('onDestroy', { closed, value, newValue })
 
     if (!closed && newValue !== value) {
-      applyChange(newValue)
+      onChange(newValue)
     }
   })
 
@@ -57,7 +54,7 @@
     }
 
     // update class
-    valueClass = determineValueClass(newValue)
+    valueClass = onValueClass(newValue)
   }
 
   function handleValueKeyDown(event) {
@@ -69,7 +66,7 @@
       // cancel changes (needed to prevent triggering a change onDestroy)
       closed = true
 
-      onSelect({ type: SELECTION_TYPE.VALUE, path })
+      onCancel()
     }
 
     if (combo === 'Enter' || combo === 'Tab') {
@@ -77,41 +74,17 @@
       closed = true
 
       const newValue = getDomValue()
-      applyChange(newValue)
+      onChange(newValue)
     }
   }
 
   function handleValuePaste(event) {
-    const clipboardText = event.clipboardData.getData('text/plain')
-
-    try {
-      const pastedJson = JSON.parse(clipboardText)
-      if (isObjectOrArray(pastedJson)) {
-        onPasteJson({
-          path,
-          contents: pastedJson
-        })
-      }
-    } catch (err) {
-      // silently ignore: thee pasted text is no valid JSON object or array,
-      // no need to do anything
+    if (!onPaste) {
+      return
     }
-  }
 
-  function applyChange(newValue) {
-    onPatch([
-      {
-        op: 'replace',
-        path: compileJSONPointer(path),
-        value: stringConvert(newValue) // TODO: implement support for type "string"
-      }
-    ])
-
-    onSelect({ type: SELECTION_TYPE.VALUE, path, nextInside: true })
-  }
-
-  function determineValueClass(value) {
-    return getValueClass(stringConvert(value))
+    const clipboardText = event.clipboardData.getData('text/plain')
+    onPaste(clipboardText)
   }
 </script>
 

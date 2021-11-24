@@ -3,7 +3,7 @@ import { isEqual } from 'lodash-es'
 import { isBoolean, isColor, isTimestamp } from '../../utils/typeUtils.js'
 import BooleanToggle from './components/BooleanToggle.svelte'
 import Color from './components/Color.svelte'
-import EditableDiv from './components/EditableDiv.svelte'
+import EditableDiv from './components/EditableValue.svelte'
 import ReadonlyValue from './components/ReadonlyValue.svelte'
 import Timestamp from './components/Timestamp.svelte'
 
