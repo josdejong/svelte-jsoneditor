@@ -5,18 +5,21 @@
   import { getPlainText, setCursorToEnd, setPlainText } from '$lib/utils/domUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import createDebug from 'debug'
-  import { noop } from 'lodash-es'
+  import { compileJSONPointer } from 'immutable-json-patch'
+  import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils'
+  import { SELECTION_TYPE } from '$lib/logic/selection'
+  import { getValueClass } from '$lib/components/modes/treemode/value/utils/getValueClass'
 
   const debug = createDebug('jsoneditor:ValueEditor')
 
+  export let path
   export let value
-  export let onChange
-  export let onCancel
-  export let onPaste = noop
-  export let onValueClass = () => ''
+  export let onPatch
+  export let onPasteJson
+  export let onSelect
 
   let domValue
-  let valueClass = onValueClass(value)
+  let valueClass = determineValueClass(value)
   let closed = false
 
   onMount(() => {
@@ -33,7 +36,7 @@
     debug('onDestroy', { closed, value, newValue })
 
     if (!closed && newValue !== value) {
-      onChange(newValue)
+      applyChange(newValue)
     }
   })
 
@@ -54,7 +57,7 @@
     }
 
     // update class
-    valueClass = onValueClass(newValue)
+    valueClass = determineValueClass(newValue)
   }
 
   function handleValueKeyDown(event) {
@@ -66,7 +69,7 @@
       // cancel changes (needed to prevent triggering a change onDestroy)
       closed = true
 
-      onCancel()
+      onSelect({ type: SELECTION_TYPE.VALUE, path })
     }
 
     if (combo === 'Enter' || combo === 'Tab') {
@@ -74,17 +77,41 @@
       closed = true
 
       const newValue = getDomValue()
-      onChange(newValue)
+      applyChange(newValue)
     }
   }
 
   function handleValuePaste(event) {
-    if (!onPaste) {
-      return
-    }
-
     const clipboardText = event.clipboardData.getData('text/plain')
-    onPaste(clipboardText)
+
+    try {
+      const pastedJson = JSON.parse(clipboardText)
+      if (isObjectOrArray(pastedJson)) {
+        onPasteJson({
+          path,
+          contents: pastedJson
+        })
+      }
+    } catch (err) {
+      // silently ignore: thee pasted text is no valid JSON object or array,
+      // no need to do anything
+    }
+  }
+
+  function applyChange(newValue) {
+    onPatch([
+      {
+        op: 'replace',
+        path: compileJSONPointer(path),
+        value: stringConvert(newValue) // TODO: implement support for type "string"
+      }
+    ])
+
+    onSelect({ type: SELECTION_TYPE.VALUE, path, nextInside: true })
+  }
+
+  function determineValueClass(value) {
+    return getValueClass(stringConvert(value))
   }
 </script>
 
