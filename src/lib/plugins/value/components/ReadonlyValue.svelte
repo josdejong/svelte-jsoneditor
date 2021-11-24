@@ -1,7 +1,9 @@
+<svelte:options immutable={true} />
+
 <script>
   import { isUrl } from '$lib/utils/typeUtils.js'
   import { SELECTION_TYPE } from '$lib/logic/selection.js'
-  import SearchResultHighlighter from '../highlight/SearchResultHighlighter.svelte'
+  import SearchResultHighlighter from '../../../components/modes/treemode/highlight/SearchResultHighlighter.svelte'
   import { escapeHTML } from '$lib/utils/domUtils.js'
   import { getValueClass } from './utils/getValueClass'
 
@@ -46,4 +48,4 @@
   {/if}
 </div>
 
-<style src="./ReadonlyDiv.scss"></style>
+<style src="./ReadonlyValue.scss"></style>

@@ -1,6 +1,6 @@
-import { isUrl, valueType } from '../../../../../utils/typeUtils.js'
+import { isUrl, valueType } from '../../../../utils/typeUtils.js'
 import classnames from 'classnames'
-import { SELECTION_TYPE } from '../../../../../logic/selection.js'
+import { SELECTION_TYPE } from '../../../../logic/selection.js'
 
 export function getValueClass(value) {
   const type = valueType(value)

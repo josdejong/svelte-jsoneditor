@@ -5,12 +5,17 @@
   import { compileJSONPointer } from 'immutable-json-patch'
   import Icon from 'svelte-awesome'
 
-  export let onPatch
   export let path
   export let value
+  export let readOnly
+  export let onPatch
 
   function toggleBooleanValue(event) {
     event.stopPropagation()
+
+    if (readOnly) {
+      return
+    }
 
     onPatch(
       [

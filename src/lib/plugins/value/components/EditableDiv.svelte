@@ -8,7 +8,7 @@
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils'
   import { SELECTION_TYPE } from '$lib/logic/selection'
-  import { getValueClass } from '$lib/components/modes/treemode/value/utils/getValueClass'
+  import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
 
   const debug = createDebug('jsoneditor:ValueEditor')
 

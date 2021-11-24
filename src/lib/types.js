@@ -199,3 +199,21 @@
  *   paths?: string[][]
  * }} [projection]
  */
+
+/**
+ * @typedef {Object} RenderValueProps
+ * @property {Path} path
+ * @property {JSON} value
+ * @property {boolean} readOnly
+ * @property {Selection | undefined} selection
+ * @property {SearchResultItem | undefined} searchResult
+ * @property {(patch: JSONPatchDocument, newSelection: Selection | null) => void} onPatch
+ * @property {(pastedJson: { path: Path, contents: JSON }) => void} onPasteJson
+ * @property {(selection: Selection) => void} onSelect
+ */
+
+/**
+ * @typedef {Object} RenderValueConstructor
+ * @property {SvelteComponentConstructor} component
+ * @property {Object} props
+ */
