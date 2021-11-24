@@ -49,6 +49,7 @@
   export let onExpand
   export let onSelect
   export let onPasteJson
+  export let onRenderValue
   export let onContextMenu
   export let onClassName
   export let onDrag
@@ -372,6 +373,7 @@
               {onSelect}
               {onPasteJson}
               {onExpandSection}
+              {onRenderValue}
               {onContextMenu}
               {onClassName}
               {onDrag}
@@ -494,6 +496,7 @@
             {onSelect}
             {onPasteJson}
             {onExpandSection}
+            {onRenderValue}
             {onContextMenu}
             {onClassName}
             {onDrag}
@@ -515,8 +518,8 @@
               {#if !readOnly && selection && selection.type === SELECTION_TYPE.KEY && !selection.edit && isEqual(selection.focusPath, path.concat(key))}
                 <ContextMenuButton selected={true} {onContextMenu} />
               {/if}
-            </div></svelte:self
-          >
+            </div>
+          </svelte:self>
         {/each}
       </div>
       <div class="footer-outer" style={indentationStyle}>
@@ -547,6 +550,7 @@
           {selection}
           {onSelect}
           {onPasteJson}
+          {onRenderValue}
           searchResult={searchResult ? searchResult[STATE_SEARCH_VALUE] : undefined}
         />
         {#if !readOnly && selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}

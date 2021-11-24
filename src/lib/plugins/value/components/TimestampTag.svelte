@@ -17,4 +17,4 @@
   <Icon data={faClock} />
 </div>
 
-<style src="Timestamp.scss"></style>
+<style src="TimestampTag.scss"></style>

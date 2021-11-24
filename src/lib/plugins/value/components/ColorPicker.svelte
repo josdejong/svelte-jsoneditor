@@ -66,4 +66,4 @@
   on:click={openColorPicker}
 />
 
-<style src="./Color.scss"></style>
+<style src="./ColorPicker.scss"></style>

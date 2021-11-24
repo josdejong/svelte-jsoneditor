@@ -130,6 +130,9 @@
 
   /** @type {(content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void} */
   export let onChange
+
+  /** @type {(props: RenderValueProps) => RenderValueConstructor[]} */
+  export let onRenderValue
   export let onRequestRepair = () => {}
   export let onRenderMenu = () => {}
 
@@ -1927,6 +1930,7 @@
           onSelect={handleSelect}
           onPasteJson={handlePasteJson}
           onExpandSection={handleExpandSection}
+          {onRenderValue}
           onContextMenu={openContextMenu}
           onClassName={onClassName || noop}
           onDrag={autoScrollHandler.onDrag}

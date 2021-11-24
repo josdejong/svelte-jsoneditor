@@ -5,7 +5,7 @@
   import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils'
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
-  import EditableDiv from '$lib/components/controls/EditableDiv.svelte'
+  import EditableDiv from '../../../components/controls/EditableDiv.svelte'
 
   export let path
   export let value

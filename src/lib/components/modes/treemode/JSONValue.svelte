@@ -1,8 +1,6 @@
 <svelte:options immutable={true} />
 
 <script>
-  import { renderValue } from '$lib/plugins/value/renderValue.js'
-
   export let path
   export let value
   export let readOnly
@@ -14,8 +12,9 @@
   export let onPatch
   export let onPasteJson
   export let onSelect
+  export let onRenderValue
 
-  $: renderers = renderValue({
+  $: renderers = onRenderValue({
     path,
     value,
     readOnly,

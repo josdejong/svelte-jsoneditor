@@ -11,6 +11,7 @@
   import CodeMode from './modes/codemode/CodeMode.svelte'
   import TreeMode from './modes/treemode/TreeMode.svelte'
   import { javascriptQueryLanguage } from '../plugins/query/javascriptQueryLanguage.js'
+  import { renderValue } from '$lib/plugins/value/renderValue'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
@@ -45,6 +46,9 @@
 
   /** @type {((content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void) | null} */
   export let onChange = null
+
+  /** @type {(props: RenderValueProps) => RenderValueConstructor[]} */
+  export let onRenderValue = renderValue
 
   export let onClassName = () => {
     // no op by default
@@ -325,6 +329,7 @@
             {onError}
             onChange={handleChange}
             onRequestRepair={handleRequestRepair}
+            {onRenderValue}
             {onClassName}
             onFocus={handleFocus}
             onBlur={handleBlur}
