@@ -182,7 +182,7 @@
   let searchResult
 
   async function handleSearchText(text) {
-    console.log('search text updated', text)
+    debug('search text updated', text)
     searchText = text
     await tick() // await for the search results to be updated
     await focusActiveSearchResult(searchResult && searchResult.activeItem)
