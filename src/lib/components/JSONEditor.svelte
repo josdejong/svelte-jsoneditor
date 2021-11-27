@@ -301,7 +301,6 @@
             {readOnly}
             {indentation}
             {mainMenuBar}
-            {navigationBar}
             {validator}
             {queryLanguages}
             {queryLanguageId}
