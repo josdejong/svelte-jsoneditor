@@ -3,7 +3,7 @@
 <script>
   import { createAutoScrollHandler } from '$lib/components/controls/createAutoScrollHandler'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
-  import createDebug from 'debug'
+  import { createDebug } from '../../../utils/debug.js'
   import {
     compileJSONPointer,
     existsIn,

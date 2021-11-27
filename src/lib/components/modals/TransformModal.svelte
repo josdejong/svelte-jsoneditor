@@ -14,7 +14,7 @@
   import TransformWizard from './TransformWizard.svelte'
   import TransformModalHeader from './TransformModalHeader.svelte'
   import AbsolutePopup from './popup/AbsolutePopup.svelte'
-  import createDebug from 'debug'
+  import { createDebug } from '../../utils/debug'
 
   const debug = createDebug('jsoneditor:TransformModal')
 

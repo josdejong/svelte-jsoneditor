@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script>
-  import createDebug from 'debug'
+  import { createDebug } from '../../../utils/debug'
   import { setContext, tick } from 'svelte'
   import { isChildOf } from '$lib/utils/domUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'

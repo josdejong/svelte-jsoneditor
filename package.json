@@ -32,7 +32,6 @@
     "ace-builds": "^1.4.13",
     "ajv": "^8.8.2",
     "classnames": "^2.3.1",
-    "debug": "^4.3.2",
     "diff-sequences": "^27.0.6",
     "immutable-json-patch": "^1.1.2",
     "jmespath": "^0.15.0",

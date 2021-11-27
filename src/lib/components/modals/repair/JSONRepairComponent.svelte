@@ -8,7 +8,7 @@
     faTimes,
     faWrench
   } from '@fortawesome/free-solid-svg-icons'
-  import createDebug from 'debug'
+  import { createDebug } from '../../../utils/debug'
   import Message from '../../controls/Message.svelte'
   import { onDestroy, onMount } from 'svelte'
   import { activeElementIsChildOf, getWindow } from '../../../utils/domUtils.js'

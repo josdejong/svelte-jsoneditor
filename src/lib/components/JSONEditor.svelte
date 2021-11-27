@@ -2,7 +2,7 @@
 
 <script>
   import { faCode } from '@fortawesome/free-solid-svg-icons'
-  import createDebug from 'debug'
+  import { createDebug } from '../utils/debug'
   import Modal from 'svelte-simple-modal'
   import { MODE } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
