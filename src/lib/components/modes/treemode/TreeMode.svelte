@@ -3,7 +3,7 @@
 <script>
   import { createAutoScrollHandler } from '$lib/components/controls/createAutoScrollHandler'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
-  import createDebug from 'debug'
+  import { createDebug } from '../../../utils/debug.js'
   import {
     compileJSONPointer,
     existsIn,
@@ -185,7 +185,7 @@
   let searchResult
 
   async function handleSearchText(text) {
-    console.log('search text updated', text)
+    debug('search text updated', text)
     searchText = text
     await tick() // await for the search results to be updated
     await focusActiveSearchResult(searchResult && searchResult.activeItem)

@@ -6,7 +6,7 @@
   import { isObject, isObjectOrArray } from '../../../utils/typeUtils'
   import { STATE_KEYS } from '../../../constants'
   import { createSelection, SELECTION_TYPE } from '../../../logic/selection'
-  import createDebug from 'debug'
+  import { createDebug } from '../../../utils/debug'
   import NavigationBarItem from '../../../components/controls/navigationBar/NavigationBarItem.svelte'
   import { caseInsensitiveNaturalCompare } from '../../../logic/sort'
 
