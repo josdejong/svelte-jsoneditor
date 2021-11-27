@@ -377,6 +377,15 @@
   </div>
 </div>
 
+<!--
+Workaround for the console warning:
+
+ <Development> received an unexpected slot "default".
+
+See https://github.com/sveltejs/kit/issues/981
+-->
+{#if false}<slot />{/if}
+
 <style>
   .columns {
     display: flex;
