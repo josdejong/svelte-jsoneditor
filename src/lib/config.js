@@ -6,7 +6,6 @@ export const viteOptimizeDeps = [
   'ace-builds/src-noconflict/mode-json',
   'ajv',
   'classnames',
-  'debug',
   'diff-sequences',
   'jmespath', // TODO: double check whether jmespath dep is necessary here
   'json-source-map',

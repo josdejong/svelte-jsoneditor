@@ -2,7 +2,7 @@
 
 <script>
   import { faExclamationTriangle, faWrench } from '@fortawesome/free-solid-svg-icons'
-  import createDebug from 'debug'
+  import { createDebug } from '../../../utils/debug'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
   import { debounce, uniqueId } from 'lodash-es'
