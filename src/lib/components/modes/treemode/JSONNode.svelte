@@ -17,6 +17,7 @@
     STATE_KEYS,
     STATE_SEARCH_PROPERTY,
     STATE_SEARCH_VALUE,
+    STATE_SELECTION,
     STATE_VISIBLE_SECTIONS,
     VALIDATION_ERROR
   } from '$lib/constants'
@@ -60,27 +61,14 @@
 
   export let selection
 
-  // TODO: this is not efficient. Create a nested object with the selection and pass that
-  $: selected =
-    selection && selection.pathsMap ? selection.pathsMap[compileJSONPointer(path)] === true : false
+  // TODO: it is ugly to have to translate selection into selectionObj, and not accidentally use the wrong one. Is there an other way?
+  $: selectionObj = selection && selection[STATE_SELECTION]
 
-  $: selectedAfter =
-    selection && selection.type === SELECTION_TYPE.AFTER
-      ? isEqual(selection.focusPath, path)
-      : false
-
-  $: selectedInside =
-    selection && selection.type === SELECTION_TYPE.INSIDE
-      ? isEqual(selection.focusPath, path)
-      : false
-
-  $: selectedKey =
-    selection && selection.type === SELECTION_TYPE.KEY ? isEqual(selection.focusPath, path) : false
-
-  $: selectedValue =
-    selection && selection.type === SELECTION_TYPE.VALUE
-      ? isEqual(selection.focusPath, path)
-      : false
+  $: selected = !!(selectionObj && selectionObj.pathsMap)
+  $: selectedAfter = !!(selectionObj && selectionObj.type === SELECTION_TYPE.AFTER)
+  $: selectedInside = !!(selectionObj && selectionObj.type === SELECTION_TYPE.INSIDE)
+  $: selectedKey = !!(selectionObj && selectionObj.type === SELECTION_TYPE.KEY)
+  $: selectedValue = !!(selectionObj && selectionObj.type === SELECTION_TYPE.VALUE)
 
   $: expanded = state[STATE_EXPANDED]
   $: visibleSections = state[STATE_VISIBLE_SECTIONS]
@@ -132,7 +120,11 @@
     const anchorType = getSelectionTypeFromTarget(event.target)
 
     // when right-clicking inside the current selection, do nothing
-    if (event.button === 2 && selection && isPathInsideSelection(selection, path, anchorType)) {
+    if (
+      event.button === 2 &&
+      selectionObj &&
+      isPathInsideSelection(selectionObj, path, anchorType)
+    ) {
       return
     }
 
@@ -147,7 +139,7 @@
       // Shift+Click will select multiple entries
       onSelect({
         type: SELECTION_TYPE.MULTI,
-        anchorPath: selection.anchorPath,
+        anchorPath: selectionObj.anchorPath,
         focusPath: path
       })
     } else {
@@ -314,7 +306,7 @@
             {/if}
           </div>
         </div>
-        {#if !readOnly && selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
+        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} {onContextMenu} />
           </div>
@@ -360,13 +352,14 @@
               value={item}
               path={path.concat(visibleSection.start + itemIndex)}
               state={state[visibleSection.start + itemIndex]}
-              {readOnly}
+              selection={selection ? selection[visibleSection.start + itemIndex] : undefined}
               searchResult={searchResult
                 ? searchResult[visibleSection.start + itemIndex]
                 : undefined}
               validationErrors={validationErrors
                 ? validationErrors[visibleSection.start + itemIndex]
                 : undefined}
+              {readOnly}
               {onPatch}
               {onInsert}
               {onExpand}
@@ -378,7 +371,6 @@
               {onClassName}
               {onDrag}
               {onDragEnd}
-              {selection}
             >
               <div slot="identifier" class="identifier">
                 <div class="index">{visibleSection.start + itemIndex}</div>
@@ -392,7 +384,7 @@
               total={value.length}
               {path}
               {onExpandSection}
-              {selection}
+              {selectionObj}
             />
           {/if}
         {/each}
@@ -442,7 +434,7 @@
             {/if}
           </div>
         </div>
-        {#if !readOnly && selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
+        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} {onContextMenu} />
           </div>
@@ -487,9 +479,10 @@
             value={value[key]}
             path={path.concat(key)}
             state={state[key]}
-            {readOnly}
+            selection={selection ? selection[key] : undefined}
             searchResult={searchResult ? searchResult[key] : undefined}
             validationErrors={validationErrors ? validationErrors[key] : undefined}
+            {readOnly}
             {onPatch}
             {onInsert}
             {onExpand}
@@ -501,7 +494,6 @@
             {onClassName}
             {onDrag}
             {onDragEnd}
-            {selection}
           >
             <div slot="identifier" class="identifier">
               <JSONKey
@@ -515,7 +507,7 @@
                   ? getIn(searchResult, [key, STATE_SEARCH_PROPERTY])
                   : undefined}
               />
-              {#if !readOnly && selection && selection.type === SELECTION_TYPE.KEY && !selection.edit && isEqual(selection.focusPath, path.concat(key))}
+              {#if !readOnly && selectionObj && selectionObj.type === SELECTION_TYPE.KEY && !selectionObj.edit && isEqual(selectionObj.focusPath, path.concat(key))}
                 <ContextMenuButton selected={true} {onContextMenu} />
               {/if}
             </div>
@@ -553,7 +545,7 @@
           {onRenderValue}
           searchResult={searchResult ? searchResult[STATE_SEARCH_VALUE] : undefined}
         />
-        {#if !readOnly && selection && (selection.type === SELECTION_TYPE.VALUE || selection.type === SELECTION_TYPE.MULTI) && !selection.edit && isEqual(selection.focusPath, path)}
+        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} {onContextMenu} />
           </div>

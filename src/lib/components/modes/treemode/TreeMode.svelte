@@ -52,6 +52,7 @@
     updateSearchResult
   } from '$lib/logic/search'
   import {
+    createRecursiveSelection,
     createSelection,
     createSelectionFromOperations,
     findRootPath,
@@ -171,6 +172,8 @@
   let state = syncState({}, undefined, [], defaultExpand)
 
   let selection = null
+
+  $: recursiveSelection = createRecursiveSelection(json, selection)
 
   let pastedJson
 
@@ -1921,9 +1924,10 @@
           value={json}
           path={[]}
           {state}
-          {readOnly}
+          selection={recursiveSelection}
           searchResult={searchResult && searchResult.itemsWithActive}
           {validationErrors}
+          {readOnly}
           onPatch={handlePatch}
           onInsert={handleInsert}
           onExpand={handleExpand}
@@ -1935,7 +1939,6 @@
           onClassName={onClassName || noop}
           onDrag={autoScrollHandler.onDrag}
           onDragEnd={autoScrollHandler.onDragEnd}
-          {selection}
         />
       </div>
 
