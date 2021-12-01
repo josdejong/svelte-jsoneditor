@@ -1,5 +1,5 @@
 <script>
-  import { EnumValue, JSONEditor, renderValue } from '$lib'
+  import { EnumValue, JSONEditor, renderValue } from 'svelte-jsoneditor'
   import ReadonlyPassword from './components/ReadonlyPassword.svelte'
 
   let content = {

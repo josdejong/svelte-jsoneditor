@@ -1,5 +1,10 @@
 <script>
-  import { JSONEditor, createAjvValidator, renderValue, renderJSONSchemaEnum } from '$lib'
+  import {
+    JSONEditor,
+    createAjvValidator,
+    renderValue,
+    renderJSONSchemaEnum
+  } from 'svelte-jsoneditor'
 
   const schema = {
     title: 'Employee',
