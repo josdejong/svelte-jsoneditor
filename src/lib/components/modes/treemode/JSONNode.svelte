@@ -306,7 +306,7 @@
             {/if}
           </div>
         </div>
-        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
+        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} {onContextMenu} />
           </div>
@@ -384,7 +384,7 @@
               total={value.length}
               {path}
               {onExpandSection}
-              {selectionObj}
+              selection={selectionObj}
             />
           {/if}
         {/each}
@@ -434,7 +434,7 @@
             {/if}
           </div>
         </div>
-        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
+        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} {onContextMenu} />
           </div>
@@ -500,14 +500,12 @@
                 path={path.concat(key)}
                 {key}
                 {readOnly}
+                selection={selection?.[key]?.[STATE_SELECTION]}
+                searchResult={searchResult?.[key]?.[STATE_SEARCH_PROPERTY]}
                 onUpdateKey={handleUpdateKey}
-                {selection}
                 {onSelect}
-                searchResult={searchResult
-                  ? getIn(searchResult, [key, STATE_SEARCH_PROPERTY])
-                  : undefined}
               />
-              {#if !readOnly && selectionObj && selectionObj.type === SELECTION_TYPE.KEY && !selectionObj.edit && isEqual(selectionObj.focusPath, path.concat(key))}
+              {#if !readOnly && selectionObj && selectionObj.type === SELECTION_TYPE.KEY && !selectionObj.edit}
                 <ContextMenuButton selected={true} {onContextMenu} />
               {/if}
             </div>
@@ -538,14 +536,14 @@
           {path}
           {value}
           {readOnly}
+          selection={selectionObj}
+          searchResult={searchResult ? searchResult[STATE_SEARCH_VALUE] : undefined}
           {onPatch}
-          {selection}
           {onSelect}
           {onPasteJson}
           {onRenderValue}
-          searchResult={searchResult ? searchResult[STATE_SEARCH_VALUE] : undefined}
         />
-        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
+        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} {onContextMenu} />
           </div>

@@ -1,0 +1,23 @@
+@import '../../../styles';
+
+.jse-enum-value {
+  background: $hovered-background-transparent;
+  border: none;
+  padding: 0;
+
+  font-family: $font-family-mono;
+  font-size: $font-size-mono;
+
+  cursor: pointer;
+
+  &.selected {
+    background: $selection-background;
+    color: $selection-color;
+  }
+}
+
+:global(.json-node.selected) {
+  .jse-enum-value {
+    background: transparent;
+  }
+}

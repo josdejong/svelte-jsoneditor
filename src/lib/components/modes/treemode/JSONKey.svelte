@@ -15,8 +15,7 @@
   export let onSelect
   export let searchResult
 
-  $: selectedKey =
-    selection && selection.type === SELECTION_TYPE.KEY ? isEqual(selection.focusPath, path) : false
+  $: selectedKey = selection && selection.type === SELECTION_TYPE.KEY
   $: editKey = !readOnly && selectedKey && selection && selection.edit === true
 
   function handleKeyDoubleClick(event) {

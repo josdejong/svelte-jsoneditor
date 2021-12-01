@@ -1,5 +1,5 @@
 <script>
-  import { JSONEditor, createAjvValidator } from '$lib' // replace this with 'svelte-jsoneditor'
+  import { JSONEditor, createAjvValidator, renderValue, renderJSONSchemaEnum } from '$lib'
 
   const schema = {
     title: 'Employee',
@@ -67,7 +67,13 @@
     }
   }
 
+  // create a JSON schema validator powered by Ajv
   const validator = createAjvValidator(schema, schemaRefs)
+
+  // enable rendering a select box for enums
+  function onRenderValue(props) {
+    return renderJSONSchemaEnum(props, schema, schemaRefs) || renderValue(props)
+  }
 
   let content = {
     text: undefined, // used when in code mode
@@ -98,11 +104,11 @@
   property <code>age</code> which must be a positive integer.
 </p>
 <p>
-  See <a href="http://json-schema.org/" target="_blank">http://json-schema.org/</a> for more information.
+  See <a href="https://json-schema.org/" target="_blank">https://json-schema.org/</a> for more information.
 </p>
 
 <div class="editor">
-  <JSONEditor bind:content {validator} />
+  <JSONEditor bind:content {validator} {onRenderValue} />
 </div>
 
 <style>
