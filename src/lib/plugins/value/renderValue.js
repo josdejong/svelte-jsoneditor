@@ -15,18 +15,12 @@ export function renderValue({
   path,
   value,
   readOnly,
-  selection,
   searchResult,
+  isEditing,
   onPatch,
   onPasteJson,
   onSelect
 }) {
-  const isSelected =
-    selection && selection.type === SELECTION_TYPE.VALUE
-      ? isEqual(selection.focusPath, path)
-      : false
-  const isEditing = !readOnly && isSelected && selection && selection.edit === true
-
   const renderers = []
 
   if (!isEditing && isBoolean(value)) {

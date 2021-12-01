@@ -24,6 +24,9 @@
       <a href="examples/custom_validation">Custom validation</a>
     </li>
     <li>
+      <a href="examples/custom_value_renderer">Custom value renderer (hide password)</a>
+    </li>
+    <li>
       <a href="examples/json_schema_validation">JSON Schema validation</a>
     </li>
   </ul>

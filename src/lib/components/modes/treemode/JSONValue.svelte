@@ -1,6 +1,9 @@
 <svelte:options immutable={true} />
 
 <script>
+  import { SELECTION_TYPE } from '$lib/logic/selection.js'
+  import { isEqual } from 'lodash-es'
+
   export let path
   export let value
   export let readOnly
@@ -14,10 +17,19 @@
   export let onSelect
   export let onRenderValue
 
+  $: isSelected =
+    selection && selection.type === SELECTION_TYPE.VALUE
+      ? isEqual(selection.focusPath, path)
+      : false
+
+  $: isEditing = !readOnly && isSelected && selection && selection.edit === true
+
   $: renderers = onRenderValue({
     path,
     value,
     readOnly,
+    isSelected,
+    isEditing,
     selection,
     searchResult,
     onPatch,

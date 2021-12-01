@@ -131,7 +131,7 @@
 
     const anchorType = getSelectionTypeFromTarget(event.target)
 
-    // when right clicking inside the current selection, do nothing
+    // when right-clicking inside the current selection, do nothing
     if (event.button === 2 && selection && isPathInsideSelection(selection, path, anchorType)) {
       return
     }

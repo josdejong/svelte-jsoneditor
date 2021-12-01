@@ -206,7 +206,11 @@ const editor = new JSONEditor({
 - `onClassName(path: Path, value: any): string | undefined`.
   Add a custom class name to specific nodes, based on their path and/or value.
 - `onRenderValue(props: RenderValueProps) : RenderValueConstructor[]`
+
+  _EXPERIMENTAL! This API will most likely change in future versions._
+
   Customize rendering of the values. By default, `renderValue` is used, which renders a value as an editable div and depending on the value can also render a boolean toggle, a color picker, and a timestamp tag. Multiple components can be rendered alongside each other, like the boolean toggle and color picker being rendered left from the editable div. Built in value renderer components: `EditableValue`, `ReadonlyValue`, `BooleanToggle`, `ColorPicker`, `TimestampTag`.
+
 - `onRenderMenu(mode: string, items: Array) : Array | undefined`.
   Callback which can be used to make changes to the menu items. New items can
   be added, or existing items can be removed or reorganized. When the function
@@ -349,6 +353,8 @@ type RenderValueProps = {
   value: JSON
   readOnly: boolean
   selection?: Selection
+  isSelected: boolean
+  isEditing: boolean
   searchResult?: SearchResultItem
   onPatch: (patch: JSONPatchDocument, newSelection: Selection | null) => void
   onPasteJson: (pastedJson: { path: Path; contents: JSON }) => void
