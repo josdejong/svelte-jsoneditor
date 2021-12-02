@@ -14,7 +14,7 @@ export function renderJSONSchemaEnum(props, schema, schemaRefs) {
   const enumValues = getJSONSchemaOptions(schema, schemaRefs, props.path)
 
   if (enumValues) {
-    const { value, path, readOnly, onPatch, isSelected } = props
+    const { value, path, readOnly, onPatch, onSelect, isSelected } = props
 
     const options = enumValues.map((value) => ({
       value,
@@ -29,6 +29,7 @@ export function renderJSONSchemaEnum(props, schema, schemaRefs) {
           path,
           readOnly,
           onPatch,
+          onSelect,
           isSelected,
           options
         }

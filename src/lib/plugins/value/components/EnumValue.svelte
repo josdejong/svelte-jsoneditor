@@ -2,18 +2,33 @@
 
 <script>
   import { compileJSONPointer } from 'immutable-json-patch'
+  import { SELECTION_TYPE } from '$lib/logic/selection.js'
+  import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass.js'
 
   export let path
   export let value
   export let readOnly
   export let isSelected
   export let onPatch
+  export let onSelect
 
   /** @type {Array<{value: any, text: string}>} */
   export let options
 
-  let selected = value
-  $: selected = value
+  let refSelect
+
+  let bindValue = value
+  $: bindValue = value
+
+  function applyFocus(isSelected) {
+    if (isSelected) {
+      if (refSelect) {
+        refSelect.focus()
+      }
+    }
+  }
+
+  $: applyFocus(isSelected)
 
   function handleSelect(event) {
     event.stopPropagation()
@@ -22,31 +37,28 @@
       return
     }
 
-    onPatch(
-      [
-        {
-          op: 'replace',
-          path: compileJSONPointer(path),
-          value: selected
-        }
-      ],
-      null
-    )
+    onPatch([
+      {
+        op: 'replace',
+        path: compileJSONPointer(path),
+        value: bindValue
+      }
+    ])
+
+    onSelect({ type: SELECTION_TYPE.VALUE, path })
   }
 
   function handleMouseDown(event) {
+    // stop propagation to prevent selecting the whole line
     event.stopPropagation()
   }
-
-  // FIXME: handle focus/blur correctly, make sure also arrow keys and enter work to select/edit
-  // FIXME: losing focus after selecting a value
-  // TODO: colorize the value when it is a string/number/etc
 </script>
 
 <select
-  class="jse-enum-value"
+  class={`jse-enum-value ${getValueClass(bindValue)}`}
   class:selected={isSelected}
-  bind:value={selected}
+  bind:value={bindValue}
+  bind:this={refSelect}
   on:change={handleSelect}
   on:mousedown={handleMouseDown}
 >

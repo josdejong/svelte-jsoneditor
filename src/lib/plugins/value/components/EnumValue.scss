@@ -1,4 +1,5 @@
 @import '../../../styles';
+@import '../../../components/controls/EditableDivShared';
 
 .jse-enum-value {
   background: $hovered-background-transparent;
@@ -9,10 +10,16 @@
   font-size: $font-size-mono;
 
   cursor: pointer;
+  outline: none;
 
   &.selected {
     background: $selection-background;
     color: $selection-color;
+  }
+
+  &.value:focus {
+    // override the color to black when editing
+    color: $black;
   }
 }
 
