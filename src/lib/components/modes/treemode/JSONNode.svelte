@@ -306,7 +306,7 @@
             {/if}
           </div>
         </div>
-        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit}
+        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} {onContextMenu} />
           </div>
@@ -434,7 +434,7 @@
             {/if}
           </div>
         </div>
-        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit}
+        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} {onContextMenu} />
           </div>
@@ -505,7 +505,7 @@
                 onUpdateKey={handleUpdateKey}
                 {onSelect}
               />
-              {#if !readOnly && selectionObj && selectionObj.type === SELECTION_TYPE.KEY && !selectionObj.edit}
+              {#if !readOnly && selectionObj && selectionObj.type === SELECTION_TYPE.KEY && !selectionObj.edit && isEqual(selectionObj.focusPath, path.concat(key))}
                 <ContextMenuButton selected={true} {onContextMenu} />
               {/if}
             </div>
@@ -543,7 +543,7 @@
           {onPasteJson}
           {onRenderValue}
         />
-        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit}
+        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
           <div class="context-menu-button-anchor">
             <ContextMenuButton selected={true} {onContextMenu} />
           </div>
