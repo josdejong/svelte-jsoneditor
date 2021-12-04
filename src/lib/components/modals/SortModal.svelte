@@ -11,6 +11,9 @@
   import { sortArray, sortObjectKeys } from '../../logic/sort.js'
   import { sortModalState } from './sortModalState.js'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
+  import { createDebug } from '$lib/utils/debug.js'
+
+  const debug = createDebug('jsoneditor:SortModal')
 
   export let id
   export let json // the whole document
@@ -47,6 +50,17 @@
     }
   }
 
+  $: {
+    // remember the selected values for the next time we open the SortModal
+    // just in memory, not persisted
+    sortModalState[stateId] = {
+      selectedProperty,
+      selectedDirection
+    }
+
+    debug('store state in memory', stateId, sortModalState[stateId])
+  }
+
   function pathToOption(path) {
     return {
       value: path,
@@ -55,13 +69,6 @@
   }
 
   function handleSort() {
-    // remember the selected values for the next time we open the SortModal
-    // just in memory, not persisted
-    sortModalState[stateId] = {
-      selectedProperty,
-      selectedDirection
-    }
-
     if (jsonIsArray) {
       if (!selectedProperty) {
         return

@@ -94,6 +94,19 @@
     previewTransformDebounced(selectedJson, query)
   }
 
+  $: {
+    // remember the selected values for the next time we open the SortModal
+    // just in memory, not persisted
+    transformModalState[stateId] = {
+      queryOptions,
+      query,
+      queryLanguageId,
+      isManual
+    }
+
+    debug('store state in memory', stateId, transformModalState[stateId])
+  }
+
   function handleTransform() {
     try {
       debug('handleTransform', { query })
@@ -109,15 +122,6 @@
           value: jsonTransformed
         }
       ])
-
-      // remember the selected values for the next time we open the SortModal
-      // just in memory, not persisted
-      transformModalState[stateId] = {
-        queryOptions,
-        query,
-        queryLanguageId,
-        isManual
-      }
 
       close()
     } catch (err) {
