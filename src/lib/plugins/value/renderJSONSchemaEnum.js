@@ -16,10 +16,16 @@ export function renderJSONSchemaEnum(props, schema, schemaRefs) {
   if (enumValues) {
     const { value, path, readOnly, onPatch, onSelect, isSelected } = props
 
-    const options = enumValues.map((value) => ({
-      value,
-      text: value
+    const options = enumValues.map((enumValue) => ({
+      value: enumValue,
+      text: enumValue
     }))
+
+    // make sure the current value is also added as one of the options,
+    // else it would look as if the first option is the current value
+    const optionsWithValue = enumValues.find((enumValue) => enumValue === props.value)
+      ? options
+      : [{ value, text: value }].concat(options)
 
     return [
       {
@@ -31,7 +37,7 @@ export function renderJSONSchemaEnum(props, schema, schemaRefs) {
           onPatch,
           onSelect,
           isSelected,
-          options
+          options: optionsWithValue
         }
       }
     ]
