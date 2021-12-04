@@ -1,5 +1,5 @@
 <script>
-  import { JSONEditor } from '$lib' // replace this with 'svelte-jsoneditor'
+  import { JSONEditor } from 'svelte-jsoneditor'
   import { faCopy } from '@fortawesome/free-regular-svg-icons'
 
   let content = {

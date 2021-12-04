@@ -1,5 +1,5 @@
-@import '../../../../styles';
-@import '../shared.scss';
+@import '../../styles';
+@import './EditableDivShared';
 
 // for key and value
 div.jse-editable-div {
@@ -11,6 +11,7 @@ div.jse-editable-div {
   outline: none;
   border-radius: 1px;
   vertical-align: top;
+  overflow-wrap: anywhere;
 
   &[contenteditable='true'] {
     outline: 2px solid $edit-border-color;

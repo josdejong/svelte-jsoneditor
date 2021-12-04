@@ -1,16 +1,18 @@
+<svelte:options immutable={true} />
+
 <script>
   import { getColorCSS } from '$lib/utils/typeUtils'
   import { getWindow } from '$lib/utils/domUtils'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getContext } from 'svelte'
-  import ColorPickerPopup from '../../../../components/controls/ColorPickerPopup.svelte'
+  import ColorPickerPopup from '../../../components/controls/ColorPickerPopup.svelte'
 
   const { openAbsolutePopup } = getContext('absolute-popup')
 
-  export let onPatch
   export let path
   export let value
   export let readOnly
+  export let onPatch
 
   $: color = getColorCSS(value)
 
@@ -64,4 +66,4 @@
   on:click={openColorPicker}
 />
 
-<style src="./Color.scss"></style>
+<style src="./ColorPicker.scss"></style>

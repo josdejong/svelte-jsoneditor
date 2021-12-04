@@ -1,6 +1,6 @@
-import { compileJSONPointer, getIn, setIn } from 'immutable-json-patch'
+import { compileJSONPointer, existsIn, getIn, setIn } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
-import { STATE_EXPANDED, STATE_KEYS } from '../constants.js'
+import { STATE_EXPANDED, STATE_KEYS, STATE_SELECTION } from '../constants.js'
 import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
 import { isObject, isObjectOrArray } from '../utils/typeUtils.js'
 import {
@@ -791,6 +791,38 @@ export function selectionToPartialJson(json, selection, indentation = 2) {
   }
 
   return null
+}
+
+/**
+ * @param {JSON} referenceJson
+ * @param {Selection} selection
+ * @returns {{} | null}
+ */
+// TODO: write unit tests
+export function createRecursiveSelection(referenceJson, selection) {
+  if (!selection) {
+    return null
+  }
+
+  let result = {}
+
+  const paths = selection.type === SELECTION_TYPE.MULTI ? selection.paths : [selection.focusPath]
+
+  paths.forEach((path) => {
+    const selectionPath = path.concat(STATE_SELECTION)
+
+    // when the path is an array, we'll add a symbol on the array, but then
+    // setIn has no information to determine whether to create an array or an
+    // object, so we do that here explicitly based on referenceJson
+    if (!existsIn(result, selectionPath)) {
+      const item = getIn(referenceJson, selectionPath)
+      result = setIn(result, selectionPath, Array.isArray(item) ? [] : {}, true)
+    }
+
+    result = setIn(result, selectionPath, selection, true)
+  })
+
+  return result
 }
 
 /**

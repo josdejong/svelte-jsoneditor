@@ -2,10 +2,10 @@
 
 <script>
   import classnames from 'classnames'
-  import { isEqual } from 'lodash-es'
+  import { initial } from 'lodash-es'
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
-  import EditableDiv from './value/EditableDiv.svelte'
+  import EditableDiv from '../../controls/EditableDiv.svelte'
 
   export let path
   export let key
@@ -15,8 +15,7 @@
   export let onSelect
   export let searchResult
 
-  $: selectedKey =
-    selection && selection.type === SELECTION_TYPE.KEY ? isEqual(selection.focusPath, path) : false
+  $: selectedKey = selection && selection.type === SELECTION_TYPE.KEY
   $: editKey = !readOnly && selectedKey && selection && selection.edit === true
 
   function handleKeyDoubleClick(event) {
@@ -33,9 +32,10 @@
   }
 
   function handleChangeValue(newKey) {
-    onUpdateKey(key, newKey)
+    const updatedKey = onUpdateKey(key, newKey)
+    const updatedPath = initial(path).concat(updatedKey)
 
-    onSelect({ type: SELECTION_TYPE.KEY, path, next: true })
+    onSelect({ type: SELECTION_TYPE.KEY, path: updatedPath, next: true })
   }
 
   function handleCancelChange() {

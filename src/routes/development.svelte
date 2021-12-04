@@ -9,7 +9,10 @@
     JSONEditor,
     jmespathQueryLanguage,
     lodashQueryLanguage,
-    javascriptQueryLanguage
+    javascriptQueryLanguage,
+    renderValue,
+    EditableValue,
+    ReadonlyValue
   } from '$lib'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
@@ -73,6 +76,10 @@
   const readOnly = useLocalStorage('svelte-jsoneditor-demo-readOnly', false)
   const mainMenuBar = useLocalStorage('svelte-jsoneditor-demo-mainMenuBar', true)
   const navigationBar = useLocalStorage('svelte-jsoneditor-demo-navigationBar', true)
+  const useCustomValueRenderer = useLocalStorage(
+    'svelte-jsoneditor-demo-useCustomValueRenderer',
+    true
+  )
   const multipleQueryLanguages = useLocalStorage(
     'svelte-jsoneditor-demo-multipleQueryLanguages',
     true
@@ -82,6 +89,36 @@
     ? [javascriptQueryLanguage, lodashQueryLanguage, jmespathQueryLanguage]
     : [javascriptQueryLanguage]
   let queryLanguageId = javascriptQueryLanguage.id // TODO: store in local storage
+
+  // only editable/readonly div, no color picker, boolean toggle, timestamp
+  function customRenderValue({
+    path,
+    value,
+    readOnly,
+    searchResult,
+    isEditing,
+    onPatch,
+    onPasteJson,
+    onSelect
+  }) {
+    const renderers = []
+
+    if (isEditing) {
+      renderers.push({
+        component: EditableValue,
+        props: { path, value, onPatch, onPasteJson, onSelect }
+      })
+    }
+
+    if (!isEditing) {
+      renderers.push({
+        component: ReadonlyValue,
+        props: { path, value, readOnly, searchResult, onSelect }
+      })
+    }
+
+    return renderers
+  }
 
   function onRenderMenu(mode, items) {
     if (!import.meta.env.SSR) {
@@ -135,6 +172,9 @@
     </label>
     <label>
       <input type="checkbox" bind:checked={$readOnly} /> Read-only
+    </label>
+    <label>
+      <input type="checkbox" bind:checked={$useCustomValueRenderer} /> Custom onRenderValue
     </label>
   </p>
   <p>
@@ -274,6 +314,7 @@
             bind:queryLanguageId
             {onRenderMenu}
             onChange={onChangeTree}
+            onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
             {onChangeMode}
           />
         {/if}
@@ -312,6 +353,7 @@
             {onChangeQueryLanguage}
             {onRenderMenu}
             onChange={onChangeCode}
+            onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
             {onChangeMode}
           />
         {/if}
@@ -330,6 +372,15 @@
     </div>
   </div>
 </div>
+
+<!--
+Workaround for the console warning:
+
+ <Development> received an unexpected slot "default".
+
+See https://github.com/sveltejs/kit/issues/981
+-->
+{#if false}<slot />{/if}
 
 <style>
   .columns {

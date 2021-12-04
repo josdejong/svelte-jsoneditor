@@ -1,5 +1,5 @@
 <script>
-  import { JSONEditor } from '$lib' // replace this with 'svelte-jsoneditor'
+  import { JSONEditor } from 'svelte-jsoneditor'
 
   /**
    * rules:
@@ -13,27 +13,27 @@
     if (json && Array.isArray(json.team)) {
       // check whether each team member has name and age filled in correctly
       json.team.forEach(function (member, index) {
-        if (typeof member !== 'object') {
+        if (member && typeof member === 'object') {
+          if ('name' in member) {
+            if (typeof member.name !== 'string') {
+              errors.push({ path: ['team', index, 'name'], message: 'Name must be a string' })
+            }
+          } else {
+            errors.push({ path: ['team', index], message: 'Required property "name"" missing' })
+          }
+
+          if ('age' in member) {
+            if (typeof member.age !== 'number') {
+              errors.push({ path: ['team', index, 'age'], message: 'Age must be a number' })
+            }
+          } else {
+            errors.push({ path: ['team', index], message: 'Required property "age" missing' })
+          }
+        } else {
           errors.push({
             path: ['team', index],
             message: 'Member must be an object with properties "name" and "age"'
           })
-        }
-
-        if ('name' in member) {
-          if (typeof member.name !== 'string') {
-            errors.push({ path: ['team', index, 'name'], message: 'Name must be a string' })
-          }
-        } else {
-          errors.push({ path: ['team', index], message: 'Required property "name"" missing' })
-        }
-
-        if ('age' in member) {
-          if (typeof member.age !== 'number') {
-            errors.push({ path: ['team', index, 'age'], message: 'Age must be a number' })
-          }
-        } else {
-          errors.push({ path: ['team', index], message: 'Required property "age" missing' })
         }
       })
 

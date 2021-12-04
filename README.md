@@ -205,6 +205,23 @@ const editor = new JSONEditor({
 - `onChangeMode(mode: string)`. Invoked when the mode is changed.
 - `onClassName(path: Path, value: any): string | undefined`.
   Add a custom class name to specific nodes, based on their path and/or value.
+- `onRenderValue(props: RenderValueProps) : RenderValueConstructor[]`
+
+  _EXPERIMENTAL! This API will most likely change in future versions._
+
+  Customize rendering of the values. By default, `renderValue` is used, which renders a value as an editable div and depending on the value can also render a boolean toggle, a color picker, and a timestamp tag. Multiple components can be rendered alongside each other, like the boolean toggle and color picker being rendered left from the editable div. Built in value renderer components: `EditableValue`, `ReadonlyValue`, `BooleanToggle`, `ColorPicker`, `TimestampTag`, `EnumValue`.
+
+  For JSON Schema enums, there is a value renderer `renderJSONSchemaEnum` which renders enums using the `EnumValue` component. This can be used like:
+
+  ```js
+  import { renderJSONSchemaEnum, renderValue } from 'svelte-jsoneditor'
+
+  function onRenderValue(props) {
+    // use the enum renderer, and fallback on the default renderer
+    return renderJSONSchemaEnum(props, schema, schemaRefs) || renderValue(props)
+  }
+  ```
+
 - `onRenderMenu(mode: string, items: Array) : Array | undefined`.
   Callback which can be used to make changes to the menu items. New items can
   be added, or existing items can be removed or reorganized. When the function
@@ -340,6 +357,24 @@ type QueryLanguageOptions = {
   projection?: {
     paths?: string[][]
   }
+}
+
+type RenderValueProps = {
+  path: Path
+  value: JSON
+  readOnly: boolean
+  selection?: Selection
+  isSelected: boolean
+  isEditing: boolean
+  searchResult?: SearchResultItem
+  onPatch: (patch: JSONPatchDocument, newSelection: Selection | null) => void
+  onPasteJson: (pastedJson: { path: Path; contents: JSON }) => void
+  onSelect: (selection: Selection) => void
+}
+
+type RenderValueConstructor = {
+  component: SvelteComponentConstructor
+  props: Object
 }
 ```
 

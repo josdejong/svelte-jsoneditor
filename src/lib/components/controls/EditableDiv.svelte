@@ -4,10 +4,10 @@
   import { onDestroy, onMount } from 'svelte'
   import { getPlainText, setCursorToEnd, setPlainText } from '$lib/utils/domUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
-  import { createDebug } from '../../../../utils/debug'
+  import { createDebug } from '$lib/utils/debug'
   import { noop } from 'lodash-es'
 
-  const debug = createDebug('jsoneditor:ValueEditor')
+  const debug = createDebug('jsoneditor:EditableDiv')
 
   export let value
   export let onChange

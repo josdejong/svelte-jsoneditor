@@ -1,6 +1,7 @@
 @import '../../../styles';
-@import 'shared.scss';
+@import '../../../components/controls/EditableDivShared';
 
+// TODO: also share most of the following styling with EditableDiv
 .value {
   line-height: $line-height;
   min-width: 16px;
