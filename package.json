@@ -1,7 +1,7 @@
 {
   "name": "svelte-jsoneditor",
   "description": "A web-based tool to view, edit, format, transform, and validate JSON",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "type": "module",
   "svelte": "index.js",
   "module": "dist/jsoneditor.js",
@@ -58,7 +58,7 @@
     "@types/mocha": "9.0.0",
     "@typescript-eslint/eslint-plugin": "5.5.0",
     "@typescript-eslint/parser": "5.5.0",
-    "eslint": "8.3.0",
+    "eslint": "8.4.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-svelte3": "3.2.1",
     "husky": "7.0.4",

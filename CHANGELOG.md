@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.7](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.6...v0.3.7) (2021-12-04)
+
+
+### Features
+
+* custom rendering with onRenderValue, performance improvements, and fixes ([635f542](https://github.com/josdejong/svelte-jsoneditor/commit/635f542d92b21350100d2333764657d60650d167))
+
 ### [0.3.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.5...v0.3.6) (2021-11-27)
 
 
