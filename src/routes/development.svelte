@@ -15,7 +15,7 @@
     ReadonlyValue
   } from '$lib'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
-  import { isEqual, range } from 'lodash-es'
+  import { range } from 'lodash-es'
 
   let content = {
     text: undefined,
@@ -95,16 +95,12 @@
     path,
     value,
     readOnly,
-    selection,
     searchResult,
+    isEditing,
     onPatch,
     onPasteJson,
     onSelect
   }) {
-    const isSelected =
-      selection && selection.type === 'value' ? isEqual(selection.focusPath, path) : false
-    const isEditing = !readOnly && isSelected && selection && selection.edit === true
-
     const renderers = []
 
     if (isEditing) {

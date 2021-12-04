@@ -2,7 +2,7 @@
 
 <script>
   import classnames from 'classnames'
-  import { isEqual } from 'lodash-es'
+  import { initial } from 'lodash-es'
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
@@ -32,9 +32,10 @@
   }
 
   function handleChangeValue(newKey) {
-    onUpdateKey(key, newKey)
+    const updatedKey = onUpdateKey(key, newKey)
+    const updatedPath = initial(path).concat(updatedKey)
 
-    onSelect({ type: SELECTION_TYPE.KEY, path, next: true })
+    onSelect({ type: SELECTION_TYPE.KEY, path: updatedPath, next: true })
   }
 
   function handleCancelChange() {
