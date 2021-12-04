@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.9](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.8...v0.3.9) (2021-12-04)
+
+
+### Bug Fixes
+
+* remember state of TransformModal and SortModal on every change instead of only after submit ([caa4364](https://github.com/josdejong/svelte-jsoneditor/commit/caa4364eba8c3db06b265e55bc0e0d6bc35c828e))
+
 ### [0.3.8](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.7...v0.3.8) (2021-12-04)
 
 
