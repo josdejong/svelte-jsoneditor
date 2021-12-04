@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.8](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.7...v0.3.8) (2021-12-04)
+
+
+### Bug Fixes
+
+* add current value to the enum dropdown if needed ([8f11bac](https://github.com/josdejong/svelte-jsoneditor/commit/8f11baca5b5613250b7d60ddfcaaf7f13b12fdc7))
+
 ### [0.3.7](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.6...v0.3.7) (2021-12-04)
 
 
