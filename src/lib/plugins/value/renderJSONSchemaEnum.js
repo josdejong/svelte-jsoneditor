@@ -23,7 +23,7 @@ export function renderJSONSchemaEnum(props, schema, schemaRefs) {
 
     // make sure the current value is also added as one of the options,
     // else it would look as if the first option is the current value
-    const optionsWithValue = enumValues.find((enumValue) => enumValue === props.value)
+    const optionsWithValue = enumValues.includes(props.value)
       ? options
       : [{ value, text: value }].concat(options)
 
