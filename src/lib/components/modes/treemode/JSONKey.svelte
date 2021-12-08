@@ -6,6 +6,7 @@
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
+  import { escapeHTML } from '$lib/utils/domUtils.js'
 
   export let path
   export let key
@@ -50,7 +51,7 @@
     {#if searchResult}
       <SearchResultHighlighter text={key} {searchResult} />
     {:else}
-      {key}
+      {escapeHTML(key)}
     {/if}
   </div>
 {/if}
