@@ -297,6 +297,9 @@
           <div class="meta-inner" data-type="selectable-value">
             {#if expanded}
               <div class="bracket expanded">[</div>
+              <span class="tag readonly">
+                {value.length} items
+              </span>
             {:else}
               <div class="bracket">[</div>
               <button type="button" class="tag" on:click={handleExpand}>

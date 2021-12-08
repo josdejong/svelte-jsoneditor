@@ -62,6 +62,10 @@
         background-color: $selection-background !important;
       }
     }
+
+    .tag.readonly {
+      background: transparent;
+    }
   }
 
   .insert-area {

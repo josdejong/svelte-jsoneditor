@@ -183,24 +183,26 @@
   font-size: $font-size-small;
   font-family: $font-family;
   color: $white;
+  background: $light-gray-transparent;
   border-radius: 2px;
   cursor: pointer;
   position: relative;
-}
-
-.tag {
+  display: inline-block;
   padding: 0 4px 1px;
   margin: 0 2px;
-  position: relative;
   top: 1px;
 
   height: $line-height - 2px;
   line-height: $line-height - 4px;
 
-  background: $light-gray-transparent;
-
   &:hover {
     background: lighten($light-gray-transparent, 15%);
+  }
+
+  &.readonly {
+    color: $light-gray-transparent;
+    background: $background-gray;
+    cursor: inherit;
   }
 }
 
