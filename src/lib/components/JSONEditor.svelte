@@ -31,6 +31,8 @@
   export let mode = MODE.TREE
   export let mainMenuBar = true
   export let navigationBar = true
+  export let escapeControlCharacters = false
+  export let escapeUnicodeCharacters = false
   export let validator = null
 
   /** @type {QueryLanguage[]} */
@@ -321,6 +323,8 @@
             externalContent={content}
             {mainMenuBar}
             {navigationBar}
+            {escapeControlCharacters}
+            {escapeUnicodeCharacters}
             {validator}
             {queryLanguages}
             {queryLanguageId}

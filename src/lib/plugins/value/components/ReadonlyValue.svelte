@@ -4,12 +4,13 @@
   import { isUrl } from '$lib/utils/typeUtils.js'
   import { SELECTION_TYPE } from '$lib/logic/selection.js'
   import SearchResultHighlighter from '../../../components/modes/treemode/highlight/SearchResultHighlighter.svelte'
-  import { escapeHTML } from '$lib/utils/domUtils.js'
   import { getValueClass } from './utils/getValueClass'
+  import { addNewLineSuffix } from '$lib/utils/domUtils.js'
 
   export let path
   export let value
   export let readOnly
+  export let normalization
   export let onSelect
 
   /** @type {SearchResultItem | undefined} */
@@ -42,9 +43,9 @@
   title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : null}
 >
   {#if searchResult}
-    <SearchResultHighlighter text={String(value)} {searchResult} />
+    <SearchResultHighlighter text={normalization.escapeValue(value)} {searchResult} />
   {:else}
-    {escapeHTML(value)}
+    {addNewLineSuffix(normalization.escapeValue(value))}
   {/if}
 </div>
 

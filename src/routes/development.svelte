@@ -18,29 +18,43 @@
   import { range } from 'lodash-es'
 
   let content = {
-    text: undefined,
-    json: {
-      array: [1, 2, [3, 4, 5]],
-      boolean: true,
-      color: '#82b92c',
-      htmlcode: '&quot;',
-      escaped_unicode: '\\u20b9',
-      unicode: '\u{1F600},\uD83D\uDCA9',
-      return: '\n',
-      null: null,
-      number: 123,
-      object: { a: 'b', c: 'd' },
-      string: 'Hello World',
-      timestamp: 1534952749890,
-      url: 'http://jsoneditoronline.org',
-      "<button onclick=alert('oopsie!!!')>test xss</button>": 'xss?',
-      'xss array': [
-        {
-          "<button onclick=alert('oopsie!!!')>test xss</button>": 'xss?'
-        }
-      ],
-      'long line': 'longword'.repeat(2) + ' ' + 'longword2'.repeat(3) + ' ' + 'longline'.repeat(20)
+    text: `{
+  "array": [
+    1,
+    2,
+    [
+      3,
+      4,
+      5
+    ]
+  ],
+  "boolean": true,
+  "color": "#82b92c",
+  "html_code": "&quot;",
+  "html_characters<a>": "<a>",
+  "escaped_unicode": "\\u2794",
+  "unicode": "😀,💩",
+  "return": "\\n",
+  "null": null,
+  "number": 123,
+  "object": {
+    "a": "b",
+    "c": "d"
+  },
+  "string": "Greeting!",
+  "multi\\nline    text": "Hello\\nWorld    text",
+  "tab": "Hello\\tTab",
+  "timestamp": 1534952749890,
+  "url": "https://jsoneditoronline.org",
+  "xss?": "<button onclick=alert('oopsie!!!')>test xss</button>",
+  "xss array": [
+    {
+      "<button onclick=alert('oopsie!!!')>test xss</button>": "xss?"
     }
+  ],
+  "long line": "longwordlongword longword2longword2longword2 longlinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelongline"
+}`,
+    json: undefined
   }
 
   const schema = {
@@ -76,6 +90,14 @@
   const readOnly = useLocalStorage('svelte-jsoneditor-demo-readOnly', false)
   const mainMenuBar = useLocalStorage('svelte-jsoneditor-demo-mainMenuBar', true)
   const navigationBar = useLocalStorage('svelte-jsoneditor-demo-navigationBar', true)
+  const escapeControlCharacters = useLocalStorage(
+    'svelte-jsoneditor-demo-escapeControlCharacters',
+    false
+  )
+  const escapeUnicodeCharacters = useLocalStorage(
+    'svelte-jsoneditor-demo-escapeUnicodeCharacters',
+    false
+  )
   const useCustomValueRenderer = useLocalStorage(
     'svelte-jsoneditor-demo-useCustomValueRenderer',
     true
@@ -161,17 +183,25 @@
     <label>
       Height: <input type="text" bind:value={height} />
     </label>
+  </p>
+  <p>
     <label>
-      <input type="checkbox" bind:checked={$validate} /> Validate
+      <input type="checkbox" bind:checked={$validate} /> validate
     </label>
     <label>
-      <input type="checkbox" bind:checked={$mainMenuBar} /> Main menu bar
+      <input type="checkbox" bind:checked={$mainMenuBar} /> mainMenuBar
     </label>
     <label>
-      <input type="checkbox" bind:checked={$navigationBar} /> Navigation bar
+      <input type="checkbox" bind:checked={$navigationBar} /> navigationBar
     </label>
     <label>
-      <input type="checkbox" bind:checked={$readOnly} /> Read-only
+      <input type="checkbox" bind:checked={$escapeControlCharacters} /> escapeControlCharacters
+    </label>
+    <label>
+      <input type="checkbox" bind:checked={$escapeUnicodeCharacters} /> escapeUnicodeCharacters
+    </label>
+    <label>
+      <input type="checkbox" bind:checked={$readOnly} /> readOnly
     </label>
     <label>
       <input type="checkbox" bind:checked={$useCustomValueRenderer} /> Custom onRenderValue
@@ -307,6 +337,8 @@
             bind:content
             mainMenuBar={$mainMenuBar}
             navigationBar={$navigationBar}
+            escapeControlCharacters={$escapeControlCharacters}
+            escapeUnicodeCharacters={$escapeUnicodeCharacters}
             readOnly={$readOnly}
             {indentation}
             validator={$validate ? validator : undefined}
@@ -345,6 +377,8 @@
             bind:content
             mainMenuBar={$mainMenuBar}
             navigationBar={$navigationBar}
+            escapeControlCharacters={$escapeControlCharacters}
+            escapeUnicodeCharacters={$escapeUnicodeCharacters}
             readOnly={$readOnly}
             {indentation}
             validator={$validate ? validator : undefined}
@@ -417,5 +451,9 @@ See https://github.com/sveltejs/kit/issues/981
   button,
   input {
     font-size: 11pt;
+  }
+
+  label {
+    white-space: nowrap;
   }
 </style>

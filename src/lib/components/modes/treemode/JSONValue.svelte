@@ -12,6 +12,9 @@
   /** @type {SearchResultItem | undefined} */
   export let searchResult
 
+  /** @type {ValueNormalization} */
+  export let normalization
+
   export let onPatch
   export let onPasteJson
   export let onSelect
@@ -30,6 +33,7 @@
     readOnly,
     isSelected,
     isEditing,
+    normalization,
     selection,
     searchResult,
     onPatch,

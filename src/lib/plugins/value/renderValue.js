@@ -1,5 +1,3 @@
-import { SELECTION_TYPE } from '../../logic/selection.js'
-import { isEqual } from 'lodash-es'
 import { isBoolean, isColor, isTimestamp } from '../../utils/typeUtils.js'
 import BooleanToggle from './components/BooleanToggle.svelte'
 import ColorPicker from './components/ColorPicker.svelte'
@@ -17,6 +15,7 @@ export function renderValue({
   readOnly,
   searchResult,
   isEditing,
+  normalization,
   onPatch,
   onPasteJson,
   onSelect
@@ -40,14 +39,14 @@ export function renderValue({
   if (isEditing) {
     renderers.push({
       component: EditableValue,
-      props: { path, value, onPatch, onPasteJson, onSelect }
+      props: { path, value, normalization, onPatch, onPasteJson, onSelect }
     })
   }
 
   if (!isEditing) {
     renderers.push({
       component: ReadonlyValue,
-      props: { path, value, readOnly, searchResult, onSelect }
+      props: { path, value, readOnly, normalization, searchResult, onSelect }
     })
   }
 

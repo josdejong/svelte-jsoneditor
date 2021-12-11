@@ -45,6 +45,7 @@
   export let readOnly
   export let searchResult
   export let validationErrors
+  export let normalization
   export let onPatch
   export let onInsert
   export let onExpand
@@ -363,6 +364,7 @@
                 ? validationErrors[visibleSection.start + itemIndex]
                 : undefined}
               {readOnly}
+              {normalization}
               {onPatch}
               {onInsert}
               {onExpand}
@@ -486,6 +488,7 @@
             searchResult={searchResult ? searchResult[key] : undefined}
             validationErrors={validationErrors ? validationErrors[key] : undefined}
             {readOnly}
+            {normalization}
             {onPatch}
             {onInsert}
             {onExpand}
@@ -503,6 +506,7 @@
                 path={path.concat(key)}
                 {key}
                 {readOnly}
+                {normalization}
                 selection={selection?.[key]?.[STATE_SELECTION]}
                 searchResult={searchResult?.[key]?.[STATE_SEARCH_PROPERTY]}
                 onUpdateKey={handleUpdateKey}
@@ -539,6 +543,7 @@
           {path}
           {value}
           {readOnly}
+          {normalization}
           selection={selectionObj}
           searchResult={searchResult ? searchResult[STATE_SEARCH_VALUE] : undefined}
           {onPatch}

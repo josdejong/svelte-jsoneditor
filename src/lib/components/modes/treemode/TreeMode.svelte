@@ -70,6 +70,7 @@
   import { mapValidationErrors } from '$lib/logic/validation'
   import {
     activeElementIsChildOf,
+    createNormalizationFunctions,
     findParentWithNodeName,
     getWindow,
     isChildOfNodeName,
@@ -114,6 +115,8 @@
   export let externalContent
   export let mainMenuBar = true
   export let navigationBar = true
+  export let escapeControlCharacters = false
+  export let escapeUnicodeCharacters = false
   export let validator = null
 
   /** @type {QueryLanguage[]} */
@@ -172,6 +175,11 @@
   let state = syncState({}, undefined, [], defaultExpand)
 
   let selection = null
+
+  $: normalization = createNormalizationFunctions({
+    escapeControlCharacters,
+    escapeUnicodeCharacters
+  })
 
   $: recursiveSelection = createRecursiveSelection(json, selection)
 
@@ -1928,6 +1936,7 @@
           searchResult={searchResult && searchResult.itemsWithActive}
           {validationErrors}
           {readOnly}
+          {normalization}
           onPatch={handlePatch}
           onInsert={handleInsert}
           onExpand={handleExpand}

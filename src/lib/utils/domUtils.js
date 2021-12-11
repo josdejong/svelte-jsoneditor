@@ -8,7 +8,7 @@ import { SELECTION_TYPE } from '../logic/selection.js'
  * @return {string}
  */
 export function getPlainText(element) {
-  return unescapeHTML(traverseInnerText(element))
+  return traverseInnerText(element)
 }
 
 /**
@@ -17,40 +17,114 @@ export function getPlainText(element) {
  * @param {string} text
  */
 export function setPlainText(element, text) {
-  element.innerHTML = escapeHTML(text)
+  element.innerText = text
 }
-/**
- * escape a text, such that it can be displayed safely in an HTML element
- * @param {string} text
- * @return {string} escapedText
- */
-export function escapeHTML(text) {
-  if (typeof text !== 'string') {
-    return String(text)
-  } else {
-    const htmlEscaped = String(text)
-      .replace(/&/g, '&amp;') // must be replaced first!
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/ {2}/g, ' &nbsp;') // replace double space with an nbsp and space
-      .replace(/^ /, '&nbsp;') // space at start
-      .replace(/ $/, '&nbsp;') // space at end
 
-    const json = JSON.stringify(htmlEscaped)
-    return json.substring(1, json.length - 1) // remove enclosing double quotes
+/**
+ * // TODO: comment
+ * @param escapeControlCharacters
+ * @param escapeUnicodeCharacters
+ * @return {ValueNormalization}
+ */
+// FIXME: unit test
+export function createNormalizationFunctions({ escapeControlCharacters, escapeUnicodeCharacters }) {
+  if (escapeControlCharacters) {
+    if (escapeUnicodeCharacters) {
+      return normalizeControlAndUnicode
+    } else {
+      return normalizeControl
+    }
+  } else {
+    if (escapeUnicodeCharacters) {
+      return normalizeUnicode
+    } else {
+      return normalizeNothing
+    }
   }
 }
 
-/**
- * unescape a string.
- * @param {string} escapedText
- * @return {string} text
- */
-export function unescapeHTML(escapedText) {
-  const json = '"' + escapeJSON(escapedText) + '"'
-  const htmlEscaped = JSON.parse(json) // TODO: replace with a JSON.parse which does do linting and give an informative error
+const normalizeControlAndUnicode = {
+  escapeValue: (value) => jsonEscapeUnicode(jsonEscapeControl(String(value))),
+  // FIXME: repairEscapeChars
+  unescapeValue: (value) => jsonUnescapeControl(jsonUnescapeUTF(repairEscapeChars(value)))
+}
 
-  return htmlEscaped.replace(/&nbsp;/g, ' ') // non breaking space character
+const normalizeControl = {
+  escapeValue: (value) => jsonEscapeControl(String(value)),
+  // FIXME: repairEscapeChars
+  unescapeValue: (value) => jsonUnescapeControl(repairEscapeChars(value))
+}
+
+const normalizeUnicode = {
+  escapeValue: (value) => jsonEscapeUnicode(String(value)),
+  unescapeValue: (value) => jsonUnescapeUTF(value)
+}
+
+const normalizeNothing = {
+  escapeValue: (value) => String(value),
+  unescapeValue: (value) => value
+}
+
+/**
+ * @param {any} value
+ * @return {string} value
+ */
+export function addNewLineSuffix(value) {
+  if (typeof value !== 'string') {
+    return String(value)
+  }
+
+  if (value.endsWith('\n')) {
+    // DOM innerText strips the last \n, therefore we add an extra \n here
+    return value + '\n'
+  }
+
+  return value
+}
+
+/**
+ * Source:  https://stackoverflow.com/questions/12271547/shouldnt-json-stringify-escape-unicode-characters
+ * @param {string} value
+ * @returns {string}
+ */
+// FIXME: unit test
+export function jsonEscapeUnicode(value) {
+  return value.replace(/[^\x20-\x7F]/g, (x) => {
+    if (x === '\b' || x === '\f' || x === '\n' || x === '\r' || x === '\t') {
+      return x
+    }
+
+    return '\\u' + ('000' + x.codePointAt(0).toString(16)).slice(-4)
+  })
+}
+
+/**
+ * @param {string} value
+ */
+// FIXME: unit test
+export function jsonUnescapeUTF(value) {
+  return jsonEscapeControl(value)
+}
+
+/**
+ * @param {string} value
+ */
+// FIXME: unit test
+export function jsonEscapeControl(value) {
+  const json = JSON.stringify(value)
+  return json.substring(1, json.length - 1) // remove enclosing double quotes
+}
+
+/**
+ * @param {string} value
+ */
+// FIXME: unit test
+export function jsonUnescapeControl(value) {
+  try {
+    return JSON.parse('"' + value + '"')
+  } catch (err) {
+    return value
+  }
 }
 
 /**
@@ -62,7 +136,7 @@ export function unescapeHTML(escapedText) {
  * @return {string} escapedText
  * @private
  */
-export function escapeJSON(text) {
+export function repairEscapeChars(text) {
   // TODO: replace with some smart regex (only when a new solution is faster!)
   let escaped = ''
   let i = 0
@@ -77,6 +151,8 @@ export function escapeJSON(text) {
       c = text.charAt(i)
       if (c === '' || '"\\/bfnrtu'.indexOf(c) === -1) {
         escaped += '\\' // no valid escape character
+
+        // FIXME: in case of unicode, check whether followed by 4 HEX characters
       }
       escaped += c
     } else if (c === '"') {
@@ -87,7 +163,12 @@ export function escapeJSON(text) {
     i++
   }
 
-  return escaped
+  // TODO: unit test try/catch
+  try {
+    return JSON.parse('"' + escaped + '"')
+  } catch (err) {
+    return text
+  }
 }
 
 /**
