@@ -281,8 +281,8 @@
   <div class="row">
     <DropdownButton width="150px" items={cutDropdownItems}>
       <button
-        slot="defaultItem"
         type="button"
+        slot="defaultItem"
         title="Cut selected contents, formatted with indentation (Ctrl+X)"
         data-name="cut"
         data-up="edit-key,edit-value"
@@ -296,8 +296,8 @@
     </DropdownButton>
     <DropdownButton width="150px" items={copyDropdownItems}>
       <button
-        slot="defaultItem"
         type="button"
+        slot="defaultItem"
         title="Copy selected contents, formatted with indentation (Ctrl+C)"
         data-name="copy"
         data-up="edit-key,edit-value"

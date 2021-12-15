@@ -15,6 +15,7 @@
 <div class="jse-navigation-bar-dropdown">
   {#each limit(items, MAX_ITEMS) as item (item)}
     <button
+      type="button"
       class="jse-navigation-bar-dropdown-item"
       class:selected={item === selectedItem}
       on:click|stopPropagation={() => onSelect(item)}
@@ -24,7 +25,11 @@
     </button>
   {/each}
   {#if items.length > MAX_ITEMS}
-    <button class="jse-navigation-bar-dropdown-item" title="Limited to {MAX_ITEMS} items">
+    <button
+      type="button"
+      class="jse-navigation-bar-dropdown-item"
+      title="Limited to {MAX_ITEMS} items"
+    >
       ...
     </button>
   {/if}
