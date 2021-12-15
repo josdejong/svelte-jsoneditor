@@ -1853,6 +1853,11 @@
         debug('click outside the editor, stop edit mode')
         selection = { ...selection, edit: false }
 
+        if (hasFocus) {
+          refHiddenInput.focus()
+          refHiddenInput.blur()
+        }
+
         // This is ugly: we need to wait until the EditableDiv has triggered onSelect,
         //  and have onSelect call refHiddenInput.focus(). After that we can call blur()
         //  to remove the focus.
