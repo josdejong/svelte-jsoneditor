@@ -2,7 +2,7 @@
 
 <script>
   import { onDestroy, onMount } from 'svelte'
-  import { getPlainText, isChildOf, setCursorToEnd, setPlainText } from '$lib/utils/domUtils'
+  import { getPlainText, setCursorToEnd, setPlainText } from '$lib/utils/domUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { createDebug } from '$lib/utils/debug'
   import { noop } from 'lodash-es'
@@ -87,27 +87,7 @@
     const clipboardText = event.clipboardData.getData('text/plain')
     onPaste(clipboardText)
   }
-
-  function handleWindowMouseDown(event) {
-    const outsideEditableDiv = !isChildOf(event.target, (element) => element === domValue)
-    if (outsideEditableDiv) {
-      // apply changes
-      closed = true
-
-      const newValue = getDomValue()
-      if (newValue !== value) {
-        const passiveExit = true
-        onChange(newValue, passiveExit)
-      }
-
-      // FIXME: after applying the change, when the mouse click was outside of
-      //  the editor, it should loose focus directly (right now the hidden input
-      //  always gets focus after any selection change)
-    }
-  }
 </script>
-
-<svelte:window on:mousedown|capture={handleWindowMouseDown} />
 
 <div
   class={'jse-editable-div ' + valueClass}

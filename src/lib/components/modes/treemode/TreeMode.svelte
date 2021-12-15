@@ -72,6 +72,7 @@
     activeElementIsChildOf,
     findParentWithNodeName,
     getWindow,
+    isChildOf,
     isChildOfNodeName,
     setCursorToEnd
   } from '$lib/utils/domUtils'
@@ -1845,8 +1846,30 @@
     refHiddenInput.select()
   }
 
+  function handleWindowMouseDown(event) {
+    const outsideEditor = !isChildOf(event.target, (element) => element === refJsonEditor)
+    if (outsideEditor) {
+      if (selection && selection.edit) {
+        debug('click outside the editor, stop edit mode')
+        selection = { ...selection, edit: false }
+
+        // This is ugly: we need to wait until the EditableDiv has triggered onSelect,
+        //  and have onSelect call refHiddenInput.focus(). After that we can call blur()
+        //  to remove the focus.
+        // TODO: find a better solution
+        tick().then(() => {
+          setTimeout(() => {
+            refHiddenInput.blur()
+          })
+        })
+      }
+    }
+  }
+
   $: autoScrollHandler = createAutoScrollHandler(refContents)
 </script>
+
+<svelte:window on:mousedown={handleWindowMouseDown} />
 
 <div
   class="tree-mode"
