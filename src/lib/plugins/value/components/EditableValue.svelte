@@ -13,7 +13,7 @@
   export let onPasteJson
   export let onSelect
 
-  function handleChangeValue(newValue) {
+  function handleChangeValue(newValue, passiveExit = false) {
     onPatch([
       {
         op: 'replace',
@@ -22,7 +22,11 @@
       }
     ])
 
-    onSelect({ type: SELECTION_TYPE.VALUE, path, nextInside: true })
+    onSelect({
+      type: SELECTION_TYPE.VALUE,
+      path,
+      nextInside: !passiveExit
+    })
   }
 
   function handleCancelChange() {

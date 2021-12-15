@@ -32,11 +32,15 @@
     })
   }
 
-  function handleChangeValue(newKey) {
+  function handleChangeValue(newKey, passiveExit = false) {
     const updatedKey = onUpdateKey(key, newKey)
     const updatedPath = initial(path).concat(updatedKey)
 
-    onSelect({ type: SELECTION_TYPE.KEY, path: updatedPath, next: true })
+    onSelect({
+      type: SELECTION_TYPE.KEY,
+      path: updatedPath,
+      next: !passiveExit
+    })
   }
 
   function handleCancelChange() {
