@@ -35,7 +35,8 @@
     debug('onDestroy', { closed, value, newValue })
 
     if (!closed && newValue !== value) {
-      onChange(newValue)
+      const passiveExit = true
+      onChange(newValue, passiveExit)
     }
   })
 

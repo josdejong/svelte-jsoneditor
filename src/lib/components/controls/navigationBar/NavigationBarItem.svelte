@@ -47,6 +47,7 @@
 
 <div class="jse-navigation-bar-item" bind:this={refNavigationBarItem}>
   <button
+    type="button"
     class="jse-navigation-bar-button jse-navigation-bar-arrow"
     class:open
     on:click={openDropdown}
@@ -54,7 +55,11 @@
     <Icon data={faAngleRight} />
   </button>
   {#if selectedItem !== undefined}
-    <button class="jse-navigation-bar-button" on:click={() => handleSelectItem(selectedItem)}>
+    <button
+      type="button"
+      class="jse-navigation-bar-button"
+      on:click={() => handleSelectItem(selectedItem)}
+    >
       {selectedItem}
     </button>
   {/if}

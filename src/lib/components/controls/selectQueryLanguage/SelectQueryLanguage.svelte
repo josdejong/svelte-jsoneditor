@@ -21,6 +21,7 @@
   <div class="jse-select-query-language-container">
     {#each queryLanguages as queryLanguage}
       <button
+        type="button"
         on:click={() => handleChangeQueryLanguage(queryLanguage.id)}
         class="jse-query-language"
         class:selected={queryLanguage.id === queryLanguageId}

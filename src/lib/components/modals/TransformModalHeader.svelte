@@ -44,8 +44,8 @@
   <div class="title">Transform</div>
   {#if queryLanguages.length > 1}
     <button
-      bind:this={refConfigButton}
       type="button"
+      bind:this={refConfigButton}
       class="config"
       on:click={openConfig}
       title="Select a query language"
