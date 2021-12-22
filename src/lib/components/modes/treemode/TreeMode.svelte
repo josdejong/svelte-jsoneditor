@@ -1253,7 +1253,9 @@
    * Note that the path can only be found when the node is expanded.
    */
   export function findElement(path) {
-    return refContents.querySelector(`div[data-path="${compileJSONPointer(path)}"]`)
+    return refContents.querySelector(
+      `div[data-path="${encodeURIComponent(compileJSONPointer(path))}"]`
+    )
   }
 
   /**
@@ -1262,7 +1264,9 @@
    * @param {Path} path
    */
   function scrollIntoView(path) {
-    const elem = refContents.querySelector(`div[data-path="${compileJSONPointer(path)}"]`)
+    const elem = refContents.querySelector(
+      `div[data-path="${encodeURIComponent(compileJSONPointer(path))}"]`
+    )
 
     if (elem) {
       const viewPortRect = refContents.getBoundingClientRect()

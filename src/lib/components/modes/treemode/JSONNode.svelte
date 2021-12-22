@@ -262,7 +262,7 @@
 
 <div
   class={classnames('json-node', { expanded }, onClassName(path, value))}
-  data-path={compileJSONPointer(path)}
+  data-path={encodeURIComponent(compileJSONPointer(path))}
   class:root
   class:selected
   class:selected-key={selectedKey}
