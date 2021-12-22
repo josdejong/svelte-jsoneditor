@@ -70,9 +70,15 @@
     </p>
     <p>
       <label for="mainMenuBar">
-        <input id="mainMenuBar" type="checkbox" checked /> Show menu
+        <input id="mainMenuBar" type="checkbox" checked /> mainMenuBar
       </label>
-      <label for="readOnly"> <input id="readOnly" type="checkbox" /> Read only </label>
+      <label for="readOnly"> <input id="readOnly" type="checkbox" /> readOnly </label>
+      <label for="escapeControlCharacters">
+        <input id="escapeControlCharacters" type="checkbox" /> escapeControlCharacters
+      </label>
+      <label for="escapeUnicodeCharacters">
+        <input id="escapeUnicodeCharacters" type="checkbox" /> escapeUnicodeCharacters
+      </label>
       <label for="customClassNames">
         <input id="customClassNames" type="checkbox" /> Custom class names
       </label>
@@ -296,6 +302,18 @@
       document.getElementById('readOnly').onclick = function (event) {
         testEditor.updateProps({
           readOnly: event.target.checked
+        })
+      }
+
+      document.getElementById('escapeControlCharacters').onclick = function (event) {
+        testEditor.updateProps({
+          escapeControlCharacters: event.target.checked
+        })
+      }
+
+      document.getElementById('escapeUnicodeCharacters').onclick = function (event) {
+        testEditor.updateProps({
+          escapeUnicodeCharacters: event.target.checked
         })
       }
 
