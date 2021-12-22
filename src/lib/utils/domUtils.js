@@ -1,7 +1,6 @@
-// TODO: write unit tests for getPlainText and setPlainText
-
 import { SELECTION_TYPE } from '../logic/selection.js'
 import { compileJSONPointer } from 'immutable-json-patch'
+import { stringConvert } from './typeUtils.js'
 
 /**
  * Get the plain text from an HTML element
@@ -22,12 +21,14 @@ export function setPlainText(element, text) {
 }
 
 /**
- * // TODO: comment
- * @param escapeControlCharacters
- * @param escapeUnicodeCharacters
+ * Create serialization functions to escape and stringify text,
+ * and the other way around: to parse and unescape text.
+ * @param {{
+ *   escapeControlCharacters: boolean,
+ *   escapeUnicodeCharacters: boolean
+ * }} options
  * @return {ValueNormalization}
  */
-// FIXME: unit test
 export function createNormalizationFunctions({ escapeControlCharacters, escapeUnicodeCharacters }) {
   if (escapeControlCharacters) {
     if (escapeUnicodeCharacters) {
@@ -46,24 +47,84 @@ export function createNormalizationFunctions({ escapeControlCharacters, escapeUn
 
 const normalizeControlAndUnicode = {
   escapeValue: (value) => jsonEscapeUnicode(jsonEscapeControl(String(value))),
-  // FIXME: repairEscapeChars
-  unescapeValue: (value) => jsonUnescapeControl(jsonUnescapeUTF(repairEscapeChars(value)))
+  unescapeValue: (value) => jsonUnescapeControl(jsonUnescapeUnicode(value))
 }
 
 const normalizeControl = {
   escapeValue: (value) => jsonEscapeControl(String(value)),
-  // FIXME: repairEscapeChars
-  unescapeValue: (value) => jsonUnescapeControl(repairEscapeChars(value))
+  unescapeValue: (value) => jsonUnescapeControl(value)
 }
 
 const normalizeUnicode = {
   escapeValue: (value) => jsonEscapeUnicode(String(value)),
-  unescapeValue: (value) => jsonUnescapeUTF(value)
+  unescapeValue: (value) => jsonUnescapeUnicode(value)
 }
 
 const normalizeNothing = {
   escapeValue: (value) => String(value),
   unescapeValue: (value) => value
+}
+
+/**
+ * Source:  https://stackoverflow.com/questions/12271547/shouldnt-json-stringify-escape-unicode-characters
+ * @param {string} value
+ * @returns {string}
+ */
+export function jsonEscapeUnicode(value) {
+  return value.replace(/[^\x20-\x7F]/g, (x) => {
+    if (x === '\b' || x === '\f' || x === '\n' || x === '\r' || x === '\t') {
+      return x
+    }
+
+    return '\\u' + ('000' + x.codePointAt(0).toString(16)).slice(-4)
+  })
+}
+
+/**
+ * @param {string} value
+ */
+export function jsonUnescapeUnicode(value) {
+  return value.replace(/\\u[a-fA-F0-9]{4}/g, (x) => {
+    try {
+      return JSON.parse('"' + x + '"')
+    } catch (err) {
+      return x
+    }
+  })
+}
+
+const controlCharacters = {
+  '\b': '\\b',
+  '\f': '\\f',
+  '\n': '\\n',
+  '\r': '\\r',
+  '\t': '\\t'
+}
+
+const escapedControlCharacters = {
+  '\\b': '\b',
+  '\\f': '\f',
+  '\\n': '\n',
+  '\\r': '\r',
+  '\\t': '\t'
+}
+
+/**
+ * @param {string} value
+ */
+export function jsonEscapeControl(value) {
+  return value.replace(/[\b\f\n\r\t]/g, (x) => {
+    return controlCharacters[x] || x
+  })
+}
+
+/**
+ * @param {string} value
+ */
+export function jsonUnescapeControl(value) {
+  return value.replace(/\\[bfnrt]/g, (x) => {
+    return escapedControlCharacters[x] || x
+  })
 }
 
 /**
@@ -81,95 +142,6 @@ export function addNewLineSuffix(value) {
   }
 
   return value
-}
-
-/**
- * Source:  https://stackoverflow.com/questions/12271547/shouldnt-json-stringify-escape-unicode-characters
- * @param {string} value
- * @returns {string}
- */
-// FIXME: unit test
-export function jsonEscapeUnicode(value) {
-  return value.replace(/[^\x20-\x7F]/g, (x) => {
-    if (x === '\b' || x === '\f' || x === '\n' || x === '\r' || x === '\t') {
-      return x
-    }
-
-    return '\\u' + ('000' + x.codePointAt(0).toString(16)).slice(-4)
-  })
-}
-
-/**
- * @param {string} value
- */
-// FIXME: unit test
-export function jsonUnescapeUTF(value) {
-  return jsonEscapeControl(value)
-}
-
-/**
- * @param {string} value
- */
-// FIXME: unit test
-export function jsonEscapeControl(value) {
-  const json = JSON.stringify(value)
-  return json.substring(1, json.length - 1) // remove enclosing double quotes
-}
-
-/**
- * @param {string} value
- */
-// FIXME: unit test
-export function jsonUnescapeControl(value) {
-  try {
-    return JSON.parse('"' + value + '"')
-  } catch (err) {
-    return value
-  }
-}
-
-/**
- * escape a text to make it a valid JSON string. The method will:
- *   - replace unescaped double quotes with '\"'
- *   - replace unescaped backslash with '\\'
- *   - replace returns with '\n'
- * @param {string} text
- * @return {string} escapedText
- * @private
- */
-export function repairEscapeChars(text) {
-  // TODO: replace with some smart regex (only when a new solution is faster!)
-  let escaped = ''
-  let i = 0
-  while (i < text.length) {
-    let c = text.charAt(i)
-    if (c === '\n') {
-      escaped += '\\n'
-    } else if (c === '\\') {
-      escaped += c
-      i++
-
-      c = text.charAt(i)
-      if (c === '' || '"\\/bfnrtu'.indexOf(c) === -1) {
-        escaped += '\\' // no valid escape character
-
-        // FIXME: in case of unicode, check whether followed by 4 HEX characters
-      }
-      escaped += c
-    } else if (c === '"') {
-      escaped += '\\"'
-    } else {
-      escaped += c
-    }
-    i++
-  }
-
-  // TODO: unit test try/catch
-  try {
-    return JSON.parse('"' + escaped + '"')
-  } catch (err) {
-    return text
-  }
 }
 
 /**
