@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.10](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.9...v0.3.10) (2021-12-22)
+
+
+### Features
+
+* implement options escapeControlCharacters and escapeUnicodeCharacters ([#42](https://github.com/josdejong/svelte-jsoneditor/issues/42)) ([cfdd8cc](https://github.com/josdejong/svelte-jsoneditor/commit/cfdd8cca0639a93ca5bb62cca84b31e7b3c9ee6f))
+* show tag with array item count also when expanded ([b427fe7](https://github.com/josdejong/svelte-jsoneditor/commit/b427fe7f4618a633882b241ee771d05ce3daa092))
+
+
+### Bug Fixes
+
+* add property `type` to `<button>` where missing (see [#39](https://github.com/josdejong/svelte-jsoneditor/issues/39)) ([880795f](https://github.com/josdejong/svelte-jsoneditor/commit/880795f751ffa18f2f5fe63958a880e1d80de165))
+* clicking outside the editor should stop editing a key/value (see [#40](https://github.com/josdejong/svelte-jsoneditor/issues/40)) ([b67de42](https://github.com/josdejong/svelte-jsoneditor/commit/b67de420fd0be2057c85c175f0e1bc0d8ee2b3e5))
+* escape special characters in keys ([10fdedd](https://github.com/josdejong/svelte-jsoneditor/commit/10fdedd2d422020c6fb2e3f81ae96a1db5156381))
+* make sure editor blur when clicking outside ([aef0d57](https://github.com/josdejong/svelte-jsoneditor/commit/aef0d57899ef0c3683b9cfda1255c926b937551a))
+* partial fix for [#40](https://github.com/josdejong/svelte-jsoneditor/issues/40), clicking outside the editor should stop editing a key/value ([70eab0c](https://github.com/josdejong/svelte-jsoneditor/commit/70eab0c5f6204c844396d19f048e86a20b56ad38))
+
 ### [0.3.9](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.8...v0.3.9) (2021-12-04)
 
 
