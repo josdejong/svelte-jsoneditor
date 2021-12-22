@@ -303,6 +303,7 @@
             {readOnly}
             {indentation}
             {mainMenuBar}
+            {escapeUnicodeCharacters}
             {validator}
             {queryLanguages}
             {queryLanguageId}
