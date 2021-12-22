@@ -6,13 +6,17 @@
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
-  import { escapeHTML } from '$lib/utils/domUtils.js'
+  import { addNewLineSuffix } from '$lib/utils/domUtils.js'
 
   export let path
   export let key
   export let readOnly
   export let onUpdateKey
   export let selection
+
+  /** @type {ValueNormalization} */
+  export let normalization
+
   export let onSelect
   export let searchResult
 
@@ -33,7 +37,7 @@
   }
 
   function handleChangeValue(newKey, passiveExit = false) {
-    const updatedKey = onUpdateKey(key, newKey)
+    const updatedKey = onUpdateKey(key, normalization.unescapeValue(newKey))
     const updatedPath = initial(path).concat(updatedKey)
 
     onSelect({
@@ -49,13 +53,18 @@
 </script>
 
 {#if editKey}
-  <EditableDiv value={key} onChange={handleChangeValue} onCancel={handleCancelChange} />
+  <EditableDiv
+    value={normalization.escapeValue(key)}
+    shortText
+    onChange={handleChangeValue}
+    onCancel={handleCancelChange}
+  />
 {:else}
   <div data-type="selectable-key" class={getKeyClass(key)} on:dblclick={handleKeyDoubleClick}>
     {#if searchResult}
-      <SearchResultHighlighter text={key} {searchResult} />
+      <SearchResultHighlighter text={normalization.escapeValue(key)} {searchResult} />
     {:else}
-      {escapeHTML(key)}
+      {addNewLineSuffix(normalization.escapeValue(key))}
     {/if}
   </div>
 {/if}

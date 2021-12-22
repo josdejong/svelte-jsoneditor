@@ -69,6 +69,7 @@
     white-space: pre-wrap;
     font-family: $font-family-mono;
     font-size: $font-size-mono;
+    line-height: $font-size-mono + 4px;
     padding: 2px;
   }
 }

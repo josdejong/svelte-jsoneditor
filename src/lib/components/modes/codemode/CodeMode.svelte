@@ -17,7 +17,12 @@
     SORT_MODAL_OPTIONS,
     TRANSFORM_MODAL_OPTIONS
   } from '$lib/constants'
-  import { activeElementIsChildOf, getWindow } from '../../../utils/domUtils'
+  import {
+    activeElementIsChildOf,
+    createNormalizationFunctions,
+    getWindow,
+    jsonEscapeUnicode
+  } from '../../../utils/domUtils'
   import { formatSize } from '$lib/utils/fileUtils'
   import { findTextLocation } from '$lib/utils/jsonUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
@@ -32,6 +37,7 @@
   export let mainMenuBar = true
   export let text = ''
   export let indentation = 2 // TODO: make indentation configurable
+  export let escapeUnicodeCharacters = false
   export let aceTheme = 'ace/theme/jsoneditor' // TODO: make aceTheme configurable
   export let validator = null
 
@@ -72,9 +78,23 @@
   $: tooLarge = text && text.length > MAX_DOCUMENT_SIZE_CODE_MODE
   $: aceEditorDisabled = tooLarge && !acceptTooLarge
 
+  $: normalization = createNormalizationFunctions({
+    escapeControlCharacters: false,
+    escapeUnicodeCharacters
+  })
+
   $: setAceEditorValue(text)
   $: updateIndentation(indentation)
   $: updateReadOnly(readOnly)
+
+  // force updating the text when escapeUnicodeCharacters changes
+  let previousEscapeUnicodeCharacters = escapeUnicodeCharacters
+  $: {
+    if (previousEscapeUnicodeCharacters !== escapeUnicodeCharacters) {
+      previousEscapeUnicodeCharacters = escapeUnicodeCharacters
+      forceUpdateText()
+    }
+  }
 
   onMount(async () => {
     if (isSSR) {
@@ -499,11 +519,16 @@
     onChangeDisabled = true
     if (aceEditor && text !== aceEditorText) {
       aceEditorText = text
-      aceEditor.setValue(text, -1)
+      aceEditor.setValue(normalization.escapeValue(text), -1)
 
       updateCancelUndoRedoDebounced()
     }
     onChangeDisabled = false
+  }
+
+  function forceUpdateText() {
+    debug('forceUpdateText', { escapeUnicodeCharacters })
+    aceEditor.setValue(normalization.escapeValue(text), -1)
   }
 
   function onChangeAceEditorValue() {
@@ -511,7 +536,7 @@
       return
     }
 
-    aceEditorText = aceEditor.getValue()
+    aceEditorText = normalization.unescapeValue(aceEditor.getValue())
 
     if (text !== aceEditorText) {
       const previousText = aceEditorText

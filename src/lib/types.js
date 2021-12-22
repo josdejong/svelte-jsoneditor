@@ -209,6 +209,7 @@
  * @property {SearchResultItem | undefined} searchResult
  * @property {boolean} isSelected
  * @property {boolean} isEditing
+ * @property {ValueNormalization} normalization
  * @property {(patch: JSONPatchDocument, newSelection: Selection | null) => void} onPatch
  * @property {(pastedJson: { path: Path, contents: JSON }) => void} onPasteJson
  * @property {(selection: Selection) => void} onSelect
@@ -218,4 +219,18 @@
  * @typedef {Object} RenderValueConstructor
  * @property {SvelteComponentConstructor} component
  * @property {Object} props
+ */
+
+/**
+ * @typedef {Object} ValueNormalization
+ * @property {(any) => string} escapeValue
+ * @property {(string) => string} unescapeValue
+ */
+
+/**
+ * @typedef {(any) => string} EscapeValue
+ */
+
+/**
+ * @typedef {(string) => string} UnescapeValue
  */

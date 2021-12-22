@@ -3,7 +3,7 @@
 <script>
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
-  import { compileJSONPointer, getIn, parseJSONPointer } from 'immutable-json-patch'
+  import { parseJSONPointer } from 'immutable-json-patch'
   import { isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
@@ -28,7 +28,8 @@
     getSelectionTypeFromTarget,
     isChildOfAttribute,
     isChildOfNodeName,
-    isContentEditableDiv
+    isContentEditableDiv,
+    toDataPath
   } from '$lib/utils/domUtils'
   import { valueType } from '$lib/utils/typeUtils'
   import CollapsedItems from './CollapsedItems.svelte'
@@ -45,6 +46,7 @@
   export let readOnly
   export let searchResult
   export let validationErrors
+  export let normalization
   export let onPatch
   export let onInsert
   export let onExpand
@@ -261,7 +263,7 @@
 
 <div
   class={classnames('json-node', { expanded }, onClassName(path, value))}
-  data-path={compileJSONPointer(path)}
+  data-path={toDataPath(path)}
   class:root
   class:selected
   class:selected-key={selectedKey}
@@ -363,6 +365,7 @@
                 ? validationErrors[visibleSection.start + itemIndex]
                 : undefined}
               {readOnly}
+              {normalization}
               {onPatch}
               {onInsert}
               {onExpand}
@@ -486,6 +489,7 @@
             searchResult={searchResult ? searchResult[key] : undefined}
             validationErrors={validationErrors ? validationErrors[key] : undefined}
             {readOnly}
+            {normalization}
             {onPatch}
             {onInsert}
             {onExpand}
@@ -503,6 +507,7 @@
                 path={path.concat(key)}
                 {key}
                 {readOnly}
+                {normalization}
                 selection={selection?.[key]?.[STATE_SELECTION]}
                 searchResult={searchResult?.[key]?.[STATE_SEARCH_PROPERTY]}
                 onUpdateKey={handleUpdateKey}
@@ -539,6 +544,7 @@
           {path}
           {value}
           {readOnly}
+          {normalization}
           selection={selectionObj}
           searchResult={searchResult ? searchResult[STATE_SEARCH_VALUE] : undefined}
           {onPatch}

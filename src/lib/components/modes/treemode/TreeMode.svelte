@@ -70,11 +70,13 @@
   import { mapValidationErrors } from '$lib/logic/validation'
   import {
     activeElementIsChildOf,
+    createNormalizationFunctions,
     findParentWithNodeName,
     getWindow,
     isChildOf,
     isChildOfNodeName,
-    setCursorToEnd
+    setCursorToEnd,
+    toDataPath
   } from '$lib/utils/domUtils'
   import { parseJSONPointerWithArrayIndices } from '$lib/utils/jsonPointer.js'
   import { parsePartialJson, repairPartialJson } from '$lib/utils/jsonUtils'
@@ -115,6 +117,8 @@
   export let externalContent
   export let mainMenuBar = true
   export let navigationBar = true
+  export let escapeControlCharacters = false
+  export let escapeUnicodeCharacters = false
   export let validator = null
 
   /** @type {QueryLanguage[]} */
@@ -173,6 +177,11 @@
   let state = syncState({}, undefined, [], defaultExpand)
 
   let selection = null
+
+  $: normalization = createNormalizationFunctions({
+    escapeControlCharacters,
+    escapeUnicodeCharacters
+  })
 
   $: recursiveSelection = createRecursiveSelection(json, selection)
 
@@ -1246,7 +1255,7 @@
    * Note that the path can only be found when the node is expanded.
    */
   export function findElement(path) {
-    return refContents.querySelector(`div[data-path="${compileJSONPointer(path)}"]`)
+    return refContents.querySelector(`div[data-path="${toDataPath(path)}"]`)
   }
 
   /**
@@ -1255,7 +1264,7 @@
    * @param {Path} path
    */
   function scrollIntoView(path) {
-    const elem = refContents.querySelector(`div[data-path="${compileJSONPointer(path)}"]`)
+    const elem = refContents.querySelector(`div[data-path="${toDataPath(path)}"]`)
 
     if (elem) {
       const viewPortRect = refContents.getBoundingClientRect()
@@ -1956,6 +1965,7 @@
           searchResult={searchResult && searchResult.itemsWithActive}
           {validationErrors}
           {readOnly}
+          {normalization}
           onPatch={handlePatch}
           onInsert={handleInsert}
           onExpand={handleExpand}

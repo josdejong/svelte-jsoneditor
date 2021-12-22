@@ -1,6 +1,6 @@
 <script>
   import { splitValue } from '$lib/logic/search'
-  import { escapeHTML } from '$lib/utils/domUtils'
+  import { addNewLineSuffix } from '$lib/utils/domUtils.js'
 
   /** @type {string} */
   export let text
@@ -8,14 +8,14 @@
   /** @type {SearchResultItem} */
   export let searchResult
 
-  $: parts = splitValue(text, searchResult)
+  $: parts = splitValue(String(text), searchResult)
 </script>
 
 {#each parts as part}
   {#if part.type === 'normal'}
     {part.text}
   {:else}
-    <span class="jse-highlight" class:jse-active={part.active}>{escapeHTML(part.text)}</span>
+    <span class="jse-highlight" class:jse-active={part.active}>{addNewLineSuffix(part.text)}</span>
   {/if}
 {/each}
 

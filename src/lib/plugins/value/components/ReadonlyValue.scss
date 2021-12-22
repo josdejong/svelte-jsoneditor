@@ -5,13 +5,15 @@
 .value {
   line-height: $line-height;
   min-width: 16px;
-  word-break: normal;
   padding: 0 $input-padding;
   box-sizing: border-box;
   outline: none;
   border-radius: 1px;
   vertical-align: top;
+
+  word-break: normal;
   overflow-wrap: anywhere;
+  white-space: pre-wrap; // important for rendering multiple consecutive spaces
 
   &:hover {
     background: $hovered-background-transparent;

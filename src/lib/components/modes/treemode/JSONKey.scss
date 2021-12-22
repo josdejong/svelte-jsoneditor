@@ -5,12 +5,15 @@
   line-height: $line-height;
   min-width: 16px;
   min-height: $line-height;
-  word-break: normal;
   padding: 0 $input-padding;
   box-sizing: border-box;
   outline: none;
   border-radius: 1px;
   vertical-align: top;
+
+  word-break: normal;
+  overflow-wrap: normal; // not anywhere as for JSONValue
+  white-space: pre-wrap; // important for rendering multiple consecutive spaces
 
   &:hover {
     background: $hovered-background-transparent;

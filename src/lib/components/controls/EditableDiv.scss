@@ -5,13 +5,19 @@
 div.jse-editable-div {
   line-height: $line-height;
   min-width: 16px;
-  word-break: normal;
   padding: 0 $input-padding;
   box-sizing: border-box;
   outline: none;
   border-radius: 1px;
   vertical-align: top;
+
+  word-break: normal;
+  white-space: pre-wrap; // important for rendering multiple consecutive spaces
   overflow-wrap: anywhere;
+
+  &.shortText {
+    overflow-wrap: normal;
+  }
 
   &[contenteditable='true'] {
     outline: 2px solid $edit-border-color;

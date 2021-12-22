@@ -2,14 +2,16 @@
 
 <script>
   import { onDestroy, onMount } from 'svelte'
-  import { getPlainText, setCursorToEnd, setPlainText } from '$lib/utils/domUtils'
+  import { addNewLineSuffix, getPlainText, setCursorToEnd, setPlainText } from '$lib/utils/domUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { createDebug } from '$lib/utils/debug'
+  import classnames from 'classnames'
   import { noop } from 'lodash-es'
 
   const debug = createDebug('jsoneditor:EditableDiv')
 
   export let value
+  export let shortText = false
   export let onChange
   export let onCancel
   export let onPaste = noop
@@ -43,14 +45,14 @@
   }
 
   function setDomValue(updatedValue) {
-    setPlainText(domValue, updatedValue)
+    setPlainText(domValue, addNewLineSuffix(updatedValue))
   }
 
   function handleValueInput() {
     const newValue = getDomValue()
 
     if (newValue === '') {
-      // immediately update to cleanup any left over <br/>
+      // immediately update to clean up any left over <br/>
       setDomValue('')
     }
 
@@ -90,7 +92,7 @@
 </script>
 
 <div
-  class={'jse-editable-div ' + valueClass}
+  class={classnames('jse-editable-div', valueClass, { shortText })}
   contenteditable="true"
   spellcheck="false"
   on:input={handleValueInput}

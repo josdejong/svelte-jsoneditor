@@ -9,6 +9,7 @@
 
   export let path
   export let value
+  export let normalization
   export let onPatch
   export let onPasteJson
   export let onSelect
@@ -18,7 +19,7 @@
       {
         op: 'replace',
         path: compileJSONPointer(path),
-        value: stringConvert(newValue) // TODO: implement support for type "string"
+        value: stringConvert(normalization.unescapeValue(newValue)) // TODO: implement support for type "string"
       }
     ])
 
@@ -49,12 +50,12 @@
   }
 
   function handleOnValueClass(value) {
-    return getValueClass(stringConvert(value))
+    return getValueClass(stringConvert(normalization.unescapeValue(value)))
   }
 </script>
 
 <EditableDiv
-  {value}
+  value={normalization.escapeValue(value)}
   onChange={handleChangeValue}
   onCancel={handleCancelChange}
   onPaste={handlePaste}
