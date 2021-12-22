@@ -74,7 +74,8 @@
     findParentWithNodeName,
     getWindow,
     isChildOfNodeName,
-    setCursorToEnd
+    setCursorToEnd,
+    toDataPath
   } from '$lib/utils/domUtils'
   import { parseJSONPointerWithArrayIndices } from '$lib/utils/jsonPointer.js'
   import { parsePartialJson, repairPartialJson } from '$lib/utils/jsonUtils'
@@ -1253,9 +1254,7 @@
    * Note that the path can only be found when the node is expanded.
    */
   export function findElement(path) {
-    return refContents.querySelector(
-      `div[data-path="${encodeURIComponent(compileJSONPointer(path))}"]`
-    )
+    return refContents.querySelector(`div[data-path="${toDataPath(path)}"]`)
   }
 
   /**
@@ -1264,9 +1263,7 @@
    * @param {Path} path
    */
   function scrollIntoView(path) {
-    const elem = refContents.querySelector(
-      `div[data-path="${encodeURIComponent(compileJSONPointer(path))}"]`
-    )
+    const elem = refContents.querySelector(`div[data-path="${toDataPath(path)}"]`)
 
     if (elem) {
       const viewPortRect = refContents.getBoundingClientRect()

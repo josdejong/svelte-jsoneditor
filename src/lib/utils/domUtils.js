@@ -1,6 +1,7 @@
 // TODO: write unit tests for getPlainText and setPlainText
 
 import { SELECTION_TYPE } from '../logic/selection.js'
+import { compileJSONPointer } from 'immutable-json-patch'
 
 /**
  * Get the plain text from an HTML element
@@ -366,4 +367,13 @@ export function getSelectionTypeFromTarget(target) {
   }
 
   return SELECTION_TYPE.MULTI
+}
+
+/**
+ * Stringify a path into a string that can be used as attribute in HTML
+ * @param {Path} path
+ * @returns {string}
+ */
+export function toDataPath(path) {
+  return encodeURIComponent(compileJSONPointer(path))
 }

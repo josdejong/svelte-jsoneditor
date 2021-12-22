@@ -3,7 +3,7 @@
 <script>
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
-  import { compileJSONPointer, getIn, parseJSONPointer } from 'immutable-json-patch'
+  import { parseJSONPointer } from 'immutable-json-patch'
   import { isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
@@ -28,7 +28,8 @@
     getSelectionTypeFromTarget,
     isChildOfAttribute,
     isChildOfNodeName,
-    isContentEditableDiv
+    isContentEditableDiv,
+    toDataPath
   } from '$lib/utils/domUtils'
   import { valueType } from '$lib/utils/typeUtils'
   import CollapsedItems from './CollapsedItems.svelte'
@@ -262,7 +263,7 @@
 
 <div
   class={classnames('json-node', { expanded }, onClassName(path, value))}
-  data-path={encodeURIComponent(compileJSONPointer(path))}
+  data-path={toDataPath(path)}
   class:root
   class:selected
   class:selected-key={selectedKey}
