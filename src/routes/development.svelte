@@ -32,7 +32,7 @@
   "color": "#82b92c",
   "html_code": "&quot;",
   "html_characters<a>": "<a>",
-  "escaped_unicode": "\\u2794",
+  "escaped_unicode": "\\u260e",
   "unicode": "😀,💩",
   "return": "\\n",
   "null": null,
