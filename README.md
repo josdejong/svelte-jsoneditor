@@ -366,12 +366,26 @@ type RenderValueProps = {
   value: JSON
   readOnly: boolean
   selection?: Selection
+  searchResult?: SearchResultItem
   isSelected: boolean
   isEditing: boolean
-  searchResult?: SearchResultItem
+  normalization: ValueNormalization
   onPatch: (patch: JSONPatchDocument, newSelection: Selection | null) => void
   onPasteJson: (pastedJson: { path: Path; contents: JSON }) => void
   onSelect: (selection: Selection) => void
+}
+
+type ValueNormalization = {
+  escapeValue: (any) => string
+  unescapeValue: (string) => string
+}
+
+type SearchResultItem = {
+  path: Path
+  field: Symbol
+  fieldIndex: number
+  start: number
+  end: number
 }
 
 type RenderValueConstructor = {

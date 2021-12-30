@@ -100,7 +100,7 @@
   )
   const useCustomValueRenderer = useLocalStorage(
     'svelte-jsoneditor-demo-useCustomValueRenderer',
-    true
+    false
   )
   const multipleQueryLanguages = useLocalStorage(
     'svelte-jsoneditor-demo-multipleQueryLanguages',
@@ -117,6 +117,7 @@
     path,
     value,
     readOnly,
+    normalization,
     searchResult,
     isEditing,
     onPatch,
@@ -128,14 +129,14 @@
     if (isEditing) {
       renderers.push({
         component: EditableValue,
-        props: { path, value, onPatch, onPasteJson, onSelect }
+        props: { path, value, normalization, onPatch, onPasteJson, onSelect }
       })
     }
 
     if (!isEditing) {
       renderers.push({
         component: ReadonlyValue,
-        props: { path, value, readOnly, searchResult, onSelect }
+        props: { path, value, readOnly, normalization, searchResult, onSelect }
       })
     }
 
