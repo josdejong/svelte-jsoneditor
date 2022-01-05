@@ -888,7 +888,7 @@
         if (newValue === '') {
           // open the newly inserted value in edit mode
           tick().then(() => {
-            setTimeout(() => replaceActiveElementContents(''))
+            setTimeout(() => insertActiveElementContents('', true))
           })
         }
       }
@@ -962,10 +962,15 @@
     tick().then(handleContextMenu)
   }
 
-  function replaceActiveElementContents(char) {
+  /**
+   * Insert (append or replace) the text contents of the current active element
+   * @param {string} char
+   * @param {boolean} replaceContents
+   */
+  function insertActiveElementContents(char, replaceContents) {
     const activeElement = getWindow(refJsonEditor).document.activeElement
     if (activeElement.isContentEditable) {
-      activeElement.textContent = char
+      activeElement.textContent = replaceContents ? char : (activeElement.textContent + char)
       setCursorToEnd(activeElement)
       // FIXME: should trigger an oninput, else the component will not update it's newKey/newValue variable
     }
@@ -979,9 +984,13 @@
     }
 
     if (selection.type === SELECTION_TYPE.KEY) {
+      // only replace contents when not yet in edit mode (can happen when entering
+      // multiple characters very quickly after each other due to the async handling)
+      const replaceContents = !selection.edit
+
       selection = { ...selection, edit: true }
       await tick()
-      setTimeout(() => replaceActiveElementContents(char))
+      setTimeout(() => insertActiveElementContents(char, replaceContents))
       return
     }
 
@@ -992,9 +1001,13 @@
     } else {
       if (selection.type === SELECTION_TYPE.VALUE) {
         if (!isObjectOrArray(getIn(json, selection.focusPath))) {
+          // only replace contents when not yet in edit mode (can happen when entering
+          // multiple characters very quickly after each other due to the async handling)
+          const replaceContents = !selection.edit
+
           selection = { ...selection, edit: true }
           await tick()
-          setTimeout(() => replaceActiveElementContents(char))
+          setTimeout(() => insertActiveElementContents(char, replaceContents))
         } else {
           // TODO: replace the object/array with editing a text in edit mode?
           //  (Ideally this this should not create an entry in history though,
@@ -1015,6 +1028,10 @@
     // first insert a new value
     handleInsert('value')
 
+    // only replace contents when not yet in edit mode (can happen when entering
+    // multiple characters very quickly after each other due to the async handling)
+    const replaceContents = !selection.edit
+
     // next, open the new value in edit mode and apply the current character
     const path = selection.focusPath
     const parent = getIn(json, initial(path))
@@ -1028,7 +1045,7 @@
     })
 
     await tick()
-    setTimeout(() => replaceActiveElementContents(char))
+    setTimeout(() => insertActiveElementContents(char, replaceContents))
   }
 
   function handleUndo() {
