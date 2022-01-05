@@ -350,7 +350,7 @@ export function getSelectionTypeFromTarget(target) {
  * @returns {string}
  */
 export function encodeDataPath(path) {
-  return JSON.stringify(path)
+  return encodeURIComponent(JSON.stringify(path))
 }
 
 /**
@@ -359,7 +359,7 @@ export function encodeDataPath(path) {
  * @returns {Path}
  */
 export function decodeDataPath(pathStr) {
-  return JSON.parse(pathStr)
+  return JSON.parse(decodeURIComponent(pathStr))
 }
 
 /**
