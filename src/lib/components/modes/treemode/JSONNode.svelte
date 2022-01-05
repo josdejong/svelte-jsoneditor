@@ -298,7 +298,7 @@
         <div class="meta">
           <div class="meta-inner" data-type="selectable-value">
             {#if expanded}
-              <div class="bracket expanded">[</div>
+              <div class="bracket">[</div>
               <span class="tag readonly">
                 {value.length} items
               </span>
