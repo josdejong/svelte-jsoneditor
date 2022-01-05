@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.13](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.12...v0.3.13) (2022-01-05)
+
+
+### Bug Fixes
+
+* clicking on another node whilst editing did not move the focus there ([b2fe3d7](https://github.com/josdejong/svelte-jsoneditor/commit/b2fe3d7e558358d4aa7f0400d90da366b56bbb6c))
+* fix too large padding for expanded array bracket ([0963960](https://github.com/josdejong/svelte-jsoneditor/commit/09639609d9b642a9df0caa663caaad6903816cd8))
+* issue in encode/decode datapath ([a56cb1b](https://github.com/josdejong/svelte-jsoneditor/commit/a56cb1ba867c336f8ee72b7c505ba669024beb28))
+* make the code robust against missing refContents ([360de5e](https://github.com/josdejong/svelte-jsoneditor/commit/360de5e9e01b6008f5062fec70ffb621b66f70ed))
+* scrollTo throwing exception when contents is empty ([68fcb6a](https://github.com/josdejong/svelte-jsoneditor/commit/68fcb6aaa59490130e528b25bdea014a315e7285))
+* styling tweak for the readonly item count tag ([5bbb679](https://github.com/josdejong/svelte-jsoneditor/commit/5bbb679efccb235a17fafcc82919ea14cb62c66d))
+* when opening edit mode, sometimes the first typed character was lost ([22b5577](https://github.com/josdejong/svelte-jsoneditor/commit/22b5577f3432501776b56abdedda5c1854f5d809))
+
 ### [0.3.12](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.11...v0.3.12) (2022-01-05)
 
 
