@@ -25,11 +25,12 @@
   import { rename } from '$lib/logic/operations'
   import { isPathInsideSelection, SELECTION_TYPE } from '$lib/logic/selection'
   import {
+    encodeDataPath,
+    getDataPathFromTarget,
     getSelectionTypeFromTarget,
     isChildOfAttribute,
     isChildOfNodeName,
-    isContentEditableDiv,
-    toDataPath
+    isContentEditableDiv
   } from '$lib/utils/domUtils'
   import { valueType } from '$lib/utils/typeUtils'
   import CollapsedItems from './CollapsedItems.svelte'
@@ -38,6 +39,7 @@
   import JSONValue from './JSONValue.svelte'
   import { singleton } from './singleton.js'
   import ValidationError from './ValidationError.svelte'
+  import { createDebug } from '$lib/utils/debug.js'
 
   // eslint-disable-next-line no-undef-init
   export let value
@@ -51,12 +53,15 @@
   export let onInsert
   export let onExpand
   export let onSelect
+  export let onMoveSelection
   export let onPasteJson
   export let onRenderValue
   export let onContextMenu
   export let onClassName
   export let onDrag
   export let onDragEnd
+
+  const debug = createDebug('jsoneditor:JSONNode')
 
   /** @type {function (path: Path, section: Section)} */
   export let onExpandSection
@@ -119,20 +124,28 @@
     event.stopPropagation()
     event.preventDefault()
 
+    // we attach the mousemove and mouseup event listeners to the global document,
+    // so we will not miss if the mouse events happen outside the editor
+    document.addEventListener('mousemove', onDrag, true)
+    document.addEventListener('mouseup', handleMouseUpGlobal)
+
     const anchorType = getSelectionTypeFromTarget(event.target)
 
-    // when right-clicking inside the current selection, do nothing
-    if (
-      event.button === 2 &&
-      selectionObj &&
-      isPathInsideSelection(selectionObj, path, anchorType)
-    ) {
+    // when right-clicking inside the current selection, do nothing: context menu will open
+    // when left-clicking inside the current selection, do nothing: it can be the start of dragging
+    if (selectionObj && isPathInsideSelection(selectionObj, path, anchorType)) {
+      if (event.button === 0) {
+        const draggingInitialPath = getDataPathFromTarget(event.target)
+
+        debug('start dragging...', draggingInitialPath)
+        singleton.draggingSelection = true
+        singleton.draggingInitialPath = draggingInitialPath
+      }
+
       return
     }
 
-    // TODO: implement start of a drag event when dragging selection with left mouse button
-
-    singleton.mousedown = true
+    singleton.selecting = true
     singleton.selectionAnchor = path
     singleton.selectionAnchorType = anchorType
     singleton.selectionFocus = path
@@ -174,15 +187,10 @@
           break
       }
     }
-
-    // we attach the mousemove and mouseup event listeners to the global document,
-    // so we will not miss if the mouse events happen outside of the editor
-    document.addEventListener('mousemove', onDrag, true)
-    document.addEventListener('mouseup', handleMouseUpGlobal)
   }
 
   function handleMouseMove(event) {
-    if (singleton.mousedown) {
+    if (singleton.selecting) {
       event.preventDefault()
       event.stopPropagation()
 
@@ -208,13 +216,47 @@
         })
       }
     }
+
+    if (singleton.draggingSelection) {
+      const draggingPath = getDataPathFromTarget(event.target)
+
+      if (!isEqual(draggingPath, singleton.draggingPath)) {
+        singleton.draggingPath = draggingPath
+
+        // const sharedPath = findSharedPath(singleton.draggingInitialPath, singleton.draggingPath)
+        //
+        // debug('draggingSelection', {
+        //   initial: singleton.draggingInitialPath,
+        //   path,
+        //   sharedPath
+        // })
+
+        onMoveSelection(singleton.draggingInitialPath, draggingPath)
+
+        singleton.draggingInitialPath = draggingPath
+      }
+    }
   }
 
   function handleMouseUpGlobal(event) {
-    if (singleton.mousedown) {
-      event.stopPropagation()
+    if (singleton.selecting) {
+      singleton.selecting = false
 
-      singleton.mousedown = false
+      event.stopPropagation()
+    }
+
+    if (singleton.draggingSelection) {
+      singleton.draggingSelection = false
+
+      const draggingPath = getDataPathFromTarget(event.target)
+
+      if (!isEqual(draggingPath, singleton.draggingPath)) {
+        singleton.draggingPath = draggingPath
+
+        onMoveSelection(singleton.draggingInitialPath, draggingPath)
+
+        singleton.draggingInitialPath = draggingPath
+      }
     }
 
     onDragEnd()
@@ -263,7 +305,7 @@
 
 <div
   class={classnames('json-node', { expanded }, onClassName(path, value))}
-  data-path={toDataPath(path)}
+  data-path={encodeDataPath(path)}
   class:root
   class:selected
   class:selected-key={selectedKey}
@@ -370,6 +412,7 @@
               {onInsert}
               {onExpand}
               {onSelect}
+              {onMoveSelection}
               {onPasteJson}
               {onExpandSection}
               {onRenderValue}
@@ -494,6 +537,7 @@
             {onInsert}
             {onExpand}
             {onSelect}
+            {onMoveSelection}
             {onPasteJson}
             {onExpandSection}
             {onRenderValue}

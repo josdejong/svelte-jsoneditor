@@ -3,7 +3,7 @@ import {
   createNormalizationFunctions,
   jsonEscapeUnicode,
   removeReturnsAndSurroundingWhitespace,
-  toDataPath
+  encodeDataPath
 } from './domUtils.js'
 
 describe('domUtils', () => {
@@ -15,7 +15,7 @@ describe('domUtils', () => {
   })
 
   it('serialize data path', () => {
-    strictEqual('%2Fpath%2Fto%2F2%2Farray', toDataPath(['path', 'to', 2, 'array']))
+    strictEqual('%2Fpath%2Fto%2F2%2Farray', encodeDataPath(['path', 'to', 2, 'array']))
   })
 
   describe('should escape/unescape text', () => {

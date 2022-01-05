@@ -41,7 +41,8 @@
     createRemoveOperations,
     duplicate,
     extract,
-    insert
+    insert,
+    moveInsideParent
   } from '$lib/logic/operations'
   import {
     createSearchAndReplaceAllOperations,
@@ -71,12 +72,12 @@
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
+    encodeDataPath,
     findParentWithNodeName,
     getWindow,
     isChildOf,
     isChildOfNodeName,
-    setCursorToEnd,
-    toDataPath
+    setCursorToEnd
   } from '$lib/utils/domUtils'
   import { parseJSONPointerWithArrayIndices } from '$lib/utils/jsonPointer.js'
   import { parsePartialJson, repairPartialJson } from '$lib/utils/jsonUtils'
@@ -1031,6 +1032,20 @@
     setTimeout(() => replaceActiveElementContents(char))
   }
 
+  function handleMoveSelection(fromPath, toPath) {
+    if (readOnly || !selection) {
+      return
+    }
+
+    debug('move selection', fromPath, toPath, selection)
+
+    const operations = moveInsideParent(json, state, selection, fromPath, toPath)
+
+    if (operations) {
+      handlePatch(operations)
+    }
+  }
+
   function handleUndo() {
     if (readOnly) {
       return
@@ -1255,7 +1270,7 @@
    * Note that the path can only be found when the node is expanded.
    */
   export function findElement(path) {
-    return refContents.querySelector(`div[data-path="${toDataPath(path)}"]`)
+    return refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
   }
 
   /**
@@ -1264,7 +1279,7 @@
    * @param {Path} path
    */
   function scrollIntoView(path) {
-    const elem = refContents.querySelector(`div[data-path="${toDataPath(path)}"]`)
+    const elem = refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
 
     if (elem) {
       const viewPortRect = refContents.getBoundingClientRect()
@@ -1970,6 +1985,7 @@
           onInsert={handleInsert}
           onExpand={handleExpand}
           onSelect={handleSelect}
+          onMoveSelection={handleMoveSelection}
           onPasteJson={handlePasteJson}
           onExpandSection={handleExpandSection}
           {onRenderValue}

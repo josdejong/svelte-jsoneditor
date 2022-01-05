@@ -605,7 +605,7 @@ export function createPathsMap(paths) {
 // TODO: write unit tests for findSharedPath
 export function findSharedPath(path1, path2) {
   let i = 0
-  while (i < path1.length && path1[i] === path2[i]) {
+  while (i < path1.length && i < path2.length && path1[i] === path2[i]) {
     i++
   }
 

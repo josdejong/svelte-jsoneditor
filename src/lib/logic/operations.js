@@ -8,8 +8,10 @@ import {
   createSelection,
   createSelectionFromOperations,
   getParentPath,
+  pathStartsWith,
   SELECTION_TYPE
 } from './selection.js'
+import { STATE_KEYS } from '../constants.js'
 
 /**
  * Create a JSONPatch for an insert operation.
@@ -416,6 +418,73 @@ export function insert(json, state, selection, clipboardText) {
 
   // this should never happen
   throw new Error('Cannot insert: unsupported type of selection ' + JSON.stringify(selection))
+}
+
+// TODO: work out, WIP
+// TODO: comment
+export function moveInsideParent(json, state, selection, fromPath, toPath) {
+  const parentPath = initial(selection.focusPath)
+  if (pathStartsWith(toPath, parentPath) && toPath.length > parentPath.length) {
+    const fromPathChild = fromPath.slice(0, parentPath.length + 1)
+    const toPathChild = toPath.slice(0, parentPath.length + 1)
+
+    const parent = getIn(json, parentPath)
+    const anchorKey = selection.anchorPath[parentPath.length]
+    const focusKey = selection.focusPath[parentPath.length]
+    const fromKey = fromPath[parentPath.length]
+    const toKey = toPath[parentPath.length]
+
+    if (isObject(parent)) {
+      const keys = getIn(state, parentPath.concat(STATE_KEYS))
+      const anchorIndex = keys.indexOf(anchorKey)
+      const focusIndex = keys.indexOf(focusKey)
+      const fromIndex = keys.indexOf(fromKey)
+      const toIndex = keys.indexOf(toKey)
+
+      if (anchorIndex !== -1 && focusIndex !== -1 && fromIndex !== -1 && toIndex !== -1) {
+        const startIndex = Math.min(anchorIndex, focusIndex)
+        const endIndex = Math.max(anchorIndex, focusIndex)
+        const shift = toIndex - fromIndex
+
+        console.log(
+          'move inside object:',
+          fromPathChild,
+          toPathChild,
+          selection,
+          startIndex,
+          fromIndex,
+          toIndex
+        )
+
+        if (shift < 0) {
+          // TODO
+        }
+
+        if (shift > 0) {
+          // TODO
+        }
+      }
+    } else {
+      const startIndex = Math.min(anchorKey, focusKey)
+      const endIndex = Math.max(anchorKey, focusKey)
+      const fromIndex = fromKey
+      const toIndex = toKey
+      const shift = toIndex - fromIndex
+
+      debug('move inside array:', parentPath, startIndex, fromIndex, toIndex)
+
+      if (shift < 0) {
+        // TODO
+      }
+
+      if (shift > 0) {
+        // TODO
+      }
+    }
+  }
+
+  // TODO: throw exception?
+  return undefined
 }
 
 export function createNewValue(json, selection, type) {
