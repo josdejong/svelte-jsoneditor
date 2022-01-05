@@ -1234,18 +1234,15 @@
    * @param {Path} path
    */
   export async function scrollTo(path) {
-    if (!refContents) {
-      return
-    }
-
     state = expandPath(json, state, path)
     await tick()
 
     const elem = findElement(path)
-    const offset = -(refContents.getBoundingClientRect().height / 4)
-
     if (elem) {
       debug('scrollTo', { path, elem, refContents })
+
+      const offset = -(refContents.getBoundingClientRect().height / 4)
+
       jump(elem, {
         container: refContents,
         offset,
