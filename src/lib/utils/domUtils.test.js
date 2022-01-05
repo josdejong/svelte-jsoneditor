@@ -1,9 +1,10 @@
-import { strictEqual } from 'assert'
+import { deepStrictEqual, strictEqual } from 'assert'
 import {
   createNormalizationFunctions,
+  decodeDataPath,
+  encodeDataPath,
   jsonEscapeUnicode,
-  removeReturnsAndSurroundingWhitespace,
-  encodeDataPath
+  removeReturnsAndSurroundingWhitespace
 } from './domUtils.js'
 
 describe('domUtils', () => {
@@ -14,8 +15,21 @@ describe('domUtils', () => {
     )
   })
 
-  it('serialize data path', () => {
-    strictEqual('%2Fpath%2Fto%2F2%2Farray', encodeDataPath(['path', 'to', 2, 'array']))
+  it('encode data path', () => {
+    strictEqual(
+      encodeDataPath(['path', 'to', 2, 'array', 'special\ncharacters']),
+      '["path","to",2,"array","special\\ncharacters"]'
+    )
+  })
+
+  it('decode data path', () => {
+    deepStrictEqual(decodeDataPath('["path","to",2,"array","special\\ncharacters"]'), [
+      'path',
+      'to',
+      2,
+      'array',
+      'special\ncharacters'
+    ])
   })
 
   describe('should escape/unescape text', () => {

@@ -1,5 +1,4 @@
 import { SELECTION_TYPE } from '../logic/selection.js'
-import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 
 /**
  * Get the plain text from an HTML element
@@ -351,7 +350,7 @@ export function getSelectionTypeFromTarget(target) {
  * @returns {string}
  */
 export function encodeDataPath(path) {
-  return encodeURIComponent(compileJSONPointer(path))
+  return JSON.stringify(path)
 }
 
 /**
@@ -360,7 +359,7 @@ export function encodeDataPath(path) {
  * @returns {Path}
  */
 export function decodeDataPath(pathStr) {
-  return parseJSONPointer(decodeURIComponent(pathStr))
+  return JSON.parse(pathStr)
 }
 
 /**

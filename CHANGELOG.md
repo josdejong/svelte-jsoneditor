@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.12](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.11...v0.3.12) (2022-01-05)
+
+
+### Bug Fixes
+
+* revert "fix: upgrade to the latest version of sveltekit and vite, removing the need for viteOptimizeDeps"
+
+### [0.3.11](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.10...v0.3.11) (2022-01-05)
+
+
+### Bug Fixes
+
+* property `normalization` missing the docs and in development application ([002b7e9](https://github.com/josdejong/svelte-jsoneditor/commit/002b7e995decc602962a4b74c5cd6847477df405))
+* tweak font for ubuntu and mac ([b05009c](https://github.com/josdejong/svelte-jsoneditor/commit/b05009c4b41b200ec8703c85373f55f96138f96f))
+* upgrade to the latest version of sveltekit and vite, removing the need for viteOptimizeDeps ([c7211a3](https://github.com/josdejong/svelte-jsoneditor/commit/c7211a30981a453ee0a86ac2594bf0cca3431436))
+
 ### [0.3.10](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.9...v0.3.10) (2021-12-22)
 
 
