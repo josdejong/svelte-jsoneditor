@@ -1234,6 +1234,10 @@
    * @param {Path} path
    */
   export async function scrollTo(path) {
+    if (!refContents) {
+      return
+    }
+
     state = expandPath(json, state, path)
     await tick()
 
@@ -1255,7 +1259,9 @@
    * Note that the path can only be found when the node is expanded.
    */
   export function findElement(path) {
-    return refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
+    return refContents
+      ? refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
+      : undefined
   }
 
   /**
@@ -1264,31 +1270,33 @@
    * @param {Path} path
    */
   function scrollIntoView(path) {
-    const elem = refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
+    const elem = findElement(path)
 
-    if (elem) {
-      const viewPortRect = refContents.getBoundingClientRect()
-      const elemRect = elem.getBoundingClientRect()
-      const margin = 20
-      const elemHeight = isObjectOrArray(getIn(json, path))
-        ? margin // do not use real height when array or object
-        : elemRect.height
+    if (!elem || !refContents) {
+      return
+    }
 
-      if (elemRect.top < viewPortRect.top + margin) {
-        // scroll down
-        jump(elem, {
-          container: refContents,
-          offset: -margin,
-          duration: 0
-        })
-      } else if (elemRect.top + elemHeight > viewPortRect.bottom - margin) {
-        // scroll up
-        jump(elem, {
-          container: refContents,
-          offset: -(viewPortRect.height - elemHeight - margin),
-          duration: 0
-        })
-      }
+    const viewPortRect = refContents.getBoundingClientRect()
+    const elemRect = elem.getBoundingClientRect()
+    const margin = 20
+    const elemHeight = isObjectOrArray(getIn(json, path))
+      ? margin // do not use real height when array or object
+      : elemRect.height
+
+    if (elemRect.top < viewPortRect.top + margin) {
+      // scroll down
+      jump(elem, {
+        container: refContents,
+        offset: -margin,
+        duration: 0
+      })
+    } else if (elemRect.top + elemHeight > viewPortRect.bottom - margin) {
+      // scroll up
+      jump(elem, {
+        container: refContents,
+        offset: -(viewPortRect.height - elemHeight - margin),
+        duration: 0
+      })
     }
   }
 
@@ -1753,11 +1761,7 @@
   }
 
   function handleContextMenu(event) {
-    if (readOnly) {
-      return
-    }
-
-    if (!selection || selection.edit) {
+    if (readOnly || !selection || selection.edit || !refContents) {
       return
     }
 
