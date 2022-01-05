@@ -24,35 +24,6 @@ npm install svelte-jsoneditor
 - Plain JavaScript examples: [/examples/browser](/examples/browser)
 - React example: [https://codesandbox.io/s/svelte-jsoneditor-react-59wxz](https://codesandbox.io/s/svelte-jsoneditor-react-59wxz)
 
-### SvelteKit setup
-
-There is currently an issue in SvelteKit with processing some dependencies (more precisely: Vite used by SvelteKit). `svelte-jsoneditor` depends on some libraries that hit this issue. To work around it, each of these dependencies needs to be listed in the configuration. Without the workaround, you'll see errors like "ReferenceError: module is not defined" (for `debug`, `ajv`, `ace-builds`, etc.).
-
-In your SvelteKit configuration file `svelte.config.js`, add the list with dependencies `viteOptimizeDeps`, available in the `svelte-jsoneditor/config.js`, and use that in the configuration of vite (`config.kit.vite.optimizeDeps.include`):
-
-```js
-// svelte.config.js
-
-// ...
-import { viteOptimizeDeps } from 'svelte-jsoneditor/config'
-
-const config = {
-  // ...
-
-  kit: {
-    // ...
-
-    vite: {
-      optimizeDeps: {
-        include: [...viteOptimizeDeps]
-      }
-    }
-  }
-}
-
-// ...
-```
-
 ### Svelte usage
 
 Create a JSONEditor with two-way binding `bind:json`:
