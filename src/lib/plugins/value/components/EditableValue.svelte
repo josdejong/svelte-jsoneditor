@@ -15,19 +15,24 @@
   export let onSelect
 
   function handleChangeValue(newValue, passiveExit = false) {
-    onPatch([
-      {
-        op: 'replace',
-        path: compileJSONPointer(path),
-        value: stringConvert(normalization.unescapeValue(newValue)) // TODO: implement support for type "string"
-      }
-    ])
+    onPatch(
+      [
+        {
+          op: 'replace',
+          path: compileJSONPointer(path),
+          value: stringConvert(normalization.unescapeValue(newValue)) // TODO: implement support for type "string"
+        }
+      ],
+      null
+    )
 
-    onSelect({
-      type: SELECTION_TYPE.VALUE,
-      path,
-      nextInside: !passiveExit
-    })
+    if (!passiveExit) {
+      onSelect({
+        type: SELECTION_TYPE.VALUE,
+        path,
+        nextInside: true
+      })
+    }
   }
 
   function handleCancelChange() {

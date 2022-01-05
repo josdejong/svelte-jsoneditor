@@ -970,7 +970,7 @@
   function insertActiveElementContents(char, replaceContents) {
     const activeElement = getWindow(refJsonEditor).document.activeElement
     if (activeElement.isContentEditable) {
-      activeElement.textContent = replaceContents ? char : (activeElement.textContent + char)
+      activeElement.textContent = replaceContents ? char : activeElement.textContent + char
       setCursorToEnd(activeElement)
       // FIXME: should trigger an oninput, else the component will not update it's newKey/newValue variable
     }
