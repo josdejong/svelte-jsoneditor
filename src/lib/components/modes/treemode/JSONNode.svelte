@@ -29,7 +29,7 @@
     isChildOfAttribute,
     isChildOfNodeName,
     isContentEditableDiv,
-    toDataPath
+    encodeDataPath
   } from '$lib/utils/domUtils'
   import { valueType } from '$lib/utils/typeUtils'
   import CollapsedItems from './CollapsedItems.svelte'
@@ -263,7 +263,7 @@
 
 <div
   class={classnames('json-node', { expanded }, onClassName(path, value))}
-  data-path={toDataPath(path)}
+  data-path={encodeDataPath(path)}
   class:root
   class:selected
   class:selected-key={selectedKey}

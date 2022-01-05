@@ -1,6 +1,4 @@
 import { SELECTION_TYPE } from '../logic/selection.js'
-import { compileJSONPointer } from 'immutable-json-patch'
-import { stringConvert } from './typeUtils.js'
 
 /**
  * Get the plain text from an HTML element
@@ -251,14 +249,25 @@ function hasAttribute(element, name, value) {
  * @returns {*}
  */
 export function isChildOf(element, predicate) {
-  // TODO: can we replace isChildOf with Element.closest?
+  return !!findParent(element, predicate)
+}
+
+/**
+ * Test if the element or one of it's parents has a certain predicate
+ * Can be use for example to check whether the element or it's parent has
+ * a specific attribute or nodeName.
+ * @param {HTMLElement} element
+ * @param {function (element: HTMLElement) : boolean} predicate
+ * @returns {HTMLElement | undefined}
+ */
+export function findParent(element, predicate) {
   let e = element
 
   while (e && !predicate(e)) {
     e = e.parentNode
   }
 
-  return e && predicate(e)
+  return e || undefined
 }
 
 /**
@@ -308,13 +317,7 @@ export function activeElementIsChildOf(element) {
  * @return {HTMLElement | undefined}
  */
 export function findParentWithNodeName(element, nodeName) {
-  let e = element
-
-  while (e && e.nodeName !== nodeName) {
-    e = e.parentNode
-  }
-
-  return e
+  return findParent(element, (e) => e.nodeName === nodeName)
 }
 
 /**
@@ -342,10 +345,32 @@ export function getSelectionTypeFromTarget(target) {
 }
 
 /**
- * Stringify a path into a string that can be used as attribute in HTML
+ * Encode a path into a string that can be used as attribute in HTML
  * @param {Path} path
  * @returns {string}
  */
-export function toDataPath(path) {
-  return encodeURIComponent(compileJSONPointer(path))
+export function encodeDataPath(path) {
+  return JSON.stringify(path)
+}
+
+/**
+ * Decode a path that was stringified for use as an HTML attribute
+ * @param {string} pathStr
+ * @returns {Path}
+ */
+export function decodeDataPath(pathStr) {
+  return JSON.parse(pathStr)
+}
+
+/**
+ * Find the data path of the given element. Traverses the parent nodes until find
+ * @param {HTMLElement} target
+ * @returns {Path | null}
+ */
+export function getDataPathFromTarget(target) {
+  const parent = findParent(target, (element) => {
+    return element.hasAttribute('data-path')
+  })
+
+  return parent ? decodeDataPath(parent.getAttribute('data-path')) : null
 }
