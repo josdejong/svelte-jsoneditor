@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [0.3.12](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.11...v0.3.12) (2022-01-05)
 
+
+### Bug Fixes
+
+* revert "fix: upgrade to the latest version of sveltekit and vite, removing the need for viteOptimizeDeps"
+
 ### [0.3.11](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.10...v0.3.11) (2022-01-05)
 
 
