@@ -62,6 +62,7 @@
   export let onExpandSection
 
   export let selection
+  export let getFullSelection
 
   // TODO: it is ugly to have to translate selection into selectionObj, and not accidentally use the wrong one. Is there an other way?
   $: selectionObj = selection && selection[STATE_SELECTION]
@@ -139,11 +140,14 @@
 
     if (event.shiftKey) {
       // Shift+Click will select multiple entries
-      onSelect({
-        type: SELECTION_TYPE.MULTI,
-        anchorPath: selectionObj.anchorPath,
-        focusPath: path
-      })
+      const fullSelection = getFullSelection()
+      if (fullSelection) {
+        onSelect({
+          type: SELECTION_TYPE.MULTI,
+          anchorPath: fullSelection.anchorPath,
+          focusPath: path
+        })
+      }
     } else {
       switch (anchorType) {
         case SELECTION_TYPE.KEY:
@@ -366,6 +370,7 @@
                 : undefined}
               {readOnly}
               {normalization}
+              {getFullSelection}
               {onPatch}
               {onInsert}
               {onExpand}
@@ -490,6 +495,7 @@
             validationErrors={validationErrors ? validationErrors[key] : undefined}
             {readOnly}
             {normalization}
+            {getFullSelection}
             {onPatch}
             {onInsert}
             {onExpand}

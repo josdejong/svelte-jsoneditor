@@ -1900,6 +1900,10 @@
     }
   }
 
+  function getFullSelection() {
+    return selection
+  }
+
   $: autoScrollHandler = createAutoScrollHandler(refContents)
 </script>
 
@@ -1986,6 +1990,7 @@
           {validationErrors}
           {readOnly}
           {normalization}
+          {getFullSelection}
           onPatch={handlePatch}
           onInsert={handleInsert}
           onExpand={handleExpand}
