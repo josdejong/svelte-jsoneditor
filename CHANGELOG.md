@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.14](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.13...v0.3.14) (2022-01-08)
+
+
+### Bug Fixes
+
+* expand contents when pasting in an empty document ([a3c8021](https://github.com/josdejong/svelte-jsoneditor/commit/a3c80216370dfa176b0eafd6afa9e88a0f9d579f))
+* shift-click not working when selecting an area in between two nodes ([c21f1f3](https://github.com/josdejong/svelte-jsoneditor/commit/c21f1f310382b39c4ca4b27725b982feeb48acbf))
+* shift-click to select multiple items broken ([a28bbdf](https://github.com/josdejong/svelte-jsoneditor/commit/a28bbdf8c8a3354a9f6e32efd2cb7b44656f91dd))
+
 ### [0.3.13](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.12...v0.3.13) (2022-01-05)
 
 
