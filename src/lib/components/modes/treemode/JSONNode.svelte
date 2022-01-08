@@ -244,21 +244,31 @@
     hover = null
   }
 
-  function handleInsertInside() {
-    onSelect({ type: SELECTION_TYPE.INSIDE, path })
+  function handleInsertInside(event) {
+    if (!event.shiftKey) {
+      event.stopPropagation()
+      event.preventDefault()
+
+      onSelect({ type: SELECTION_TYPE.INSIDE, path })
+    }
   }
 
-  function handleInsertAfter() {
-    onSelect({ type: SELECTION_TYPE.AFTER, path })
+  function handleInsertAfter(event) {
+    if (!event.shiftKey) {
+      event.stopPropagation()
+      event.preventDefault()
+
+      onSelect({ type: SELECTION_TYPE.AFTER, path })
+    }
   }
 
   function handleInsertInsideOpenContextMenu(event) {
-    handleInsertInside()
+    handleInsertInside(event)
     onContextMenu(event)
   }
 
   function handleInsertAfterOpenContextMenu(event) {
-    handleInsertAfter()
+    handleInsertAfter(event)
     onContextMenu(event)
   }
 
