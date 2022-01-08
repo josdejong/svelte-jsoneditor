@@ -728,6 +728,8 @@
       debug('paste', { clipboardText })
 
       handleChangeText(clipboardText)
+
+      handleExpand([], true, false)
     }
   }
 
@@ -1403,7 +1405,7 @@
       } catch (err) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
-        state = createState(json)
+        state = syncState(json, createState(json), [], defaultExpand)
         text = updatedText
         textIsRepaired = false
         selection = clearSelectionWhenNotExisting(selection, json)
