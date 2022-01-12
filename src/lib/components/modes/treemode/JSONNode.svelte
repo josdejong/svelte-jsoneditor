@@ -262,14 +262,14 @@
     }
   }
 
-  function handleInsertInsideOpenContextMenu(event) {
-    handleInsertInside(event)
-    onContextMenu(event)
+  function handleInsertInsideOpenContextMenu(props) {
+    onSelect({ type: SELECTION_TYPE.INSIDE, path })
+    onContextMenu(props)
   }
 
-  function handleInsertAfterOpenContextMenu(event) {
-    handleInsertAfter(event)
-    onContextMenu(event)
+  function handleInsertAfterOpenContextMenu(props) {
+    onSelect({ type: SELECTION_TYPE.AFTER, path })
+    onContextMenu(props)
   }
 
   $: indentationStyle = getIndentationStyle(path.length)
