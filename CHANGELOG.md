@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.15](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.14...v0.3.15) (2022-01-12)
+
+
+### Bug Fixes
+
+* regression in clicking the context menu button on an insert area ([f5bcc71](https://github.com/josdejong/svelte-jsoneditor/commit/f5bcc7166720bac94b7ea222f5e95e8a39368d46))
+
 ### [0.3.14](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.13...v0.3.14) (2022-01-08)
 
 
