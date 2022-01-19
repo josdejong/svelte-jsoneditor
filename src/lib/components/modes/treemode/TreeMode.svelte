@@ -25,6 +25,7 @@
     SEARCH_UPDATE_THROTTLE,
     SIMPLE_MODAL_OPTIONS,
     SORT_MODAL_OPTIONS,
+    STATE_ENFORCE_STRING,
     STATE_EXPANDED,
     TRANSFORM_MODAL_OPTIONS
   } from '$lib/constants'
@@ -71,17 +72,17 @@
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
+    encodeDataPath,
     findParentWithNodeName,
     getWindow,
     isChildOf,
     isChildOfNodeName,
-    setCursorToEnd,
-    encodeDataPath
+    setCursorToEnd
   } from '$lib/utils/domUtils'
   import { parseJSONPointerWithArrayIndices } from '$lib/utils/jsonPointer.js'
   import { parsePartialJson, repairPartialJson } from '$lib/utils/jsonUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
-  import { isObject, isObjectOrArray, isUrl } from '$lib/utils/typeUtils'
+  import { isObject, isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
@@ -626,6 +627,31 @@
       path: selection.focusPath,
       edit: true
     })
+  }
+
+  function handleToggleEnforceString() {
+    if (readOnly || !selection || selection.type !== SELECTION_TYPE.VALUE) {
+      return
+    }
+
+    const path = selection.focusPath
+    const statePath = path.concat(STATE_ENFORCE_STRING)
+    const enforceString = !getIn(state, statePath)
+
+    state = setIn(state, statePath, enforceString, true)
+
+    const value = getIn(json, path)
+    const updatedValue = enforceString ? String(value) : stringConvert(value)
+
+    if (updatedValue !== value) {
+      handlePatch([
+        {
+          op: 'replace',
+          path: compileJSONPointer(path),
+          value: updatedValue
+        }
+      ])
+    }
   }
 
   function handleApplyAutoRepair() {
@@ -1732,10 +1758,12 @@
   function openContextMenu({ anchor, left, top, width, height, offsetTop, offsetLeft }) {
     const props = {
       json,
+      state,
       selection,
 
       onEditKey: handleEditKey,
       onEditValue: handleEditValue,
+      onToggleEnforceString: handleToggleEnforceString,
 
       onCut: handleCut,
       onCopy: handleCopy,
