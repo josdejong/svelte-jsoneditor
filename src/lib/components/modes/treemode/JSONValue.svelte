@@ -7,6 +7,7 @@
   export let path
   export let value
   export let readOnly
+  export let enforceString
   export let selection
 
   /** @type {SearchResultItem | undefined} */
@@ -31,6 +32,7 @@
     path,
     value,
     readOnly,
+    enforceString,
     isSelected,
     isEditing,
     normalization,

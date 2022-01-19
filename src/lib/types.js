@@ -205,6 +205,7 @@
  * @property {Path} path
  * @property {JSON} value
  * @property {boolean} readOnly
+ * @property {boolean} enforceString
  * @property {Selection | undefined} selection
  * @property {SearchResultItem | undefined} searchResult
  * @property {boolean} isSelected

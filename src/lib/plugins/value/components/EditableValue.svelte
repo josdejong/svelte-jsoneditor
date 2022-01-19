@@ -10,9 +10,14 @@
   export let path
   export let value
   export let normalization
+  export let enforceString
   export let onPatch
   export let onPasteJson
   export let onSelect
+
+  function convert(value) {
+    return enforceString ? value : stringConvert(value)
+  }
 
   function handleChangeValue(newValue, passiveExit = false) {
     onPatch(
@@ -20,7 +25,7 @@
         {
           op: 'replace',
           path: compileJSONPointer(path),
-          value: stringConvert(normalization.unescapeValue(newValue)) // TODO: implement support for type "string"
+          value: convert(normalization.unescapeValue(newValue))
         }
       ],
       null
@@ -55,7 +60,7 @@
   }
 
   function handleOnValueClass(value) {
-    return getValueClass(stringConvert(normalization.unescapeValue(value)))
+    return getValueClass(convert(normalization.unescapeValue(value)))
   }
 </script>
 

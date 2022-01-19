@@ -25,11 +25,11 @@
   import { rename } from '$lib/logic/operations'
   import { isPathInsideSelection, SELECTION_TYPE } from '$lib/logic/selection'
   import {
+    encodeDataPath,
     getSelectionTypeFromTarget,
     isChildOfAttribute,
     isChildOfNodeName,
-    isContentEditableDiv,
-    encodeDataPath
+    isContentEditableDiv
   } from '$lib/utils/domUtils'
   import { valueType } from '$lib/utils/typeUtils'
   import CollapsedItems from './CollapsedItems.svelte'
@@ -38,6 +38,7 @@
   import JSONValue from './JSONValue.svelte'
   import { singleton } from './singleton.js'
   import ValidationError from './ValidationError.svelte'
+  import { STATE_ENFORCE_STRING } from '$lib/constants.js'
 
   // eslint-disable-next-line no-undef-init
   export let value
@@ -560,6 +561,7 @@
           {path}
           {value}
           {readOnly}
+          enforceString={state ? state[STATE_ENFORCE_STRING] : false}
           {normalization}
           selection={selectionObj}
           searchResult={searchResult ? searchResult[STATE_SEARCH_VALUE] : undefined}
