@@ -1,6 +1,5 @@
 <script context="module" lang="ts">
   export const prerender = true
-  export const ssr = false
 </script>
 
 <script lang="ts">
@@ -42,6 +41,7 @@
     "c": "d"
   },
   "string": "Greeting!",
+  "stringContainingNumber": "1234",
   "multi\\nline    text": "Hello\\nWorld    text",
   "tab": "Hello\\tTab",
   "timestamp": 1534952749890,
