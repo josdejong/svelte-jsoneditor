@@ -9,6 +9,7 @@ export const STATE_VISIBLE_SECTIONS = Symbol('visible sections')
 export const STATE_KEYS = Symbol('keys')
 export const STATE_SEARCH_PROPERTY = Symbol('search:property')
 export const STATE_SEARCH_VALUE = Symbol('search:value')
+export const STATE_ENFORCE_STRING = Symbol('enforce string')
 export const STATE_SELECTION = Symbol('selection')
 export const VALIDATION_ERROR = Symbol('validation:error')
 

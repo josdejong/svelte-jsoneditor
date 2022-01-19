@@ -9,6 +9,7 @@ import {
 import { initial, isEqual, last, uniqueId } from 'lodash-es'
 import {
   DEFAULT_VISIBLE_SECTIONS,
+  STATE_ENFORCE_STRING,
   STATE_EXPANDED,
   STATE_ID,
   STATE_KEYS,
@@ -16,7 +17,7 @@ import {
 } from '../constants.js'
 import { forEachIndex } from '../utils/arrayUtils.js'
 import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
-import { isObject } from '../utils/typeUtils.js'
+import { isObject, isStringContainingPrimitiveValue } from '../utils/typeUtils.js'
 import {
   currentRoundNumber,
   inVisibleSection,
@@ -83,6 +84,13 @@ export function syncState(json, state, path, expand, forceRefresh = false) {
     }
   } else {
     // primitive value (string, number, boolean, null)
+    if (state && state[STATE_ENFORCE_STRING] !== undefined) {
+      // keep as is
+      updatedState[STATE_ENFORCE_STRING] = state[STATE_ENFORCE_STRING]
+    } else if (isStringContainingPrimitiveValue(json)) {
+      // set to true when needed (else, leave undefined)
+      updatedState[STATE_ENFORCE_STRING] = true
+    }
   }
 
   return updatedState
@@ -110,9 +118,14 @@ export function createState(json) {
   }
 
   // primitive value
-  return {
+  const state = {
     [STATE_ID]: uniqueId()
   }
+  if (isStringContainingPrimitiveValue(json)) {
+    state[STATE_ENFORCE_STRING] = true
+  }
+
+  return state
 }
 
 /**

@@ -136,20 +136,39 @@ export function isUrl(text) {
  * @private
  */
 export function stringConvert(str) {
-  const num = Number(str) // will nicely fail with '123ab'
-  const numFloat = parseFloat(str) // will nicely fail with '  '
-
   if (str === '') {
     return ''
-  } else if (str === 'null') {
+  }
+
+  if (str === 'null') {
     return null
-  } else if (str === 'true') {
+  }
+
+  if (str === 'true') {
     return true
-  } else if (str === 'false') {
+  }
+
+  if (str === 'false') {
     return false
-  } else if (!isNaN(num) && !isNaN(numFloat)) {
+  }
+
+  const num = Number(str)
+  if (
+    !isNaN(num) && // will nicely fail with '123ab'
+    !isNaN(parseFloat(str)) // will nicely fail with '  '
+  ) {
     return num
   } else {
     return str
   }
+}
+
+/**
+ * Test whether a string contains a numeric, boolean, or null value.
+ * Returns true when the string contains a number, boolean, or null.
+ * @param {any} str
+ * @return {boolean}
+ */
+export function isStringContainingPrimitiveValue(str) {
+  return typeof str === 'string' && typeof stringConvert(str) !== 'string'
 }
