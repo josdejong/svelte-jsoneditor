@@ -365,6 +365,7 @@ type RenderValueProps = {
   path: Path
   value: JSON
   readOnly: boolean
+  enforceString?: boolean
   selection?: Selection
   searchResult?: SearchResultItem
   isSelected: boolean

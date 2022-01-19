@@ -561,7 +561,7 @@
           {path}
           {value}
           {readOnly}
-          enforceString={state ? state[STATE_ENFORCE_STRING] : false}
+          enforceString={state ? state[STATE_ENFORCE_STRING] : undefined}
           {normalization}
           selection={selectionObj}
           searchResult={searchResult ? searchResult[STATE_SEARCH_VALUE] : undefined}
