@@ -12,14 +12,13 @@
  *     debug('testing:', 2 + 2)
  *
  * By default, logging is only enabled when a property DEBUG is set in the
- * in the localStorage of your browser:
+ * localStorage of your browser:
  *
  *     localStorage['debug'] = '*'
  *
  * The actual value of 'debug' is not used. You can choose other conditions to
  * enable/disable debugging if you want, for example some flag determining
  * whether in development or production.
- *
  *
  * @param {string} namespace
  * @param {boolean} [enabled]
