@@ -12,6 +12,7 @@
   import TreeMode from './modes/treemode/TreeMode.svelte'
   import { javascriptQueryLanguage } from '../plugins/query/javascriptQueryLanguage.js'
   import { renderValue } from '$lib/plugins/value/renderValue'
+  import { tick } from 'svelte'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
@@ -229,13 +230,17 @@
     handleChange(updatedContent, previousContent, patchResult)
   }
 
-  function handleRequestRepair() {
+  async function handleRequestRepair() {
     mode = MODE.CODE
+
+    await tick()
     onChangeMode(mode)
   }
 
-  function handleSwitchToTreeMode() {
+  async function handleSwitchToTreeMode() {
     mode = MODE.TREE
+
+    await tick()
     onChangeMode(mode)
   }
 
@@ -253,11 +258,12 @@
     }
   }
 
-  function toggleCodeMode() {
+  async function toggleCodeMode() {
     mode = mode === MODE.CODE ? MODE.TREE : MODE.CODE
 
+    await tick()
+    focus()
     onChangeMode(mode)
-    setTimeout(focus)
   }
 
   $: isCodeMode = mode === MODE.CODE
