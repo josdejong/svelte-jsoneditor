@@ -7,17 +7,14 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* implement button "Enforce string" in ContextMenu ([721f7f4](https://github.com/josdejong/svelte-jsoneditor/commit/721f7f4b34177e8d2b70e9cc4ffcd45f71682e26))
-* implement STATE_ENFORCE_STRING in documentState ([3544f8a](https://github.com/josdejong/svelte-jsoneditor/commit/3544f8a766806a2029654ec05047a38424009901))
-* update all dependencies and devDependencies ([34e86cf](https://github.com/josdejong/svelte-jsoneditor/commit/34e86cf7eca86cc769b39c38211ce1513a211e74))
-* use STATE_ENFORCE_STRING in EditableValue and search&replace ([54c2001](https://github.com/josdejong/svelte-jsoneditor/commit/54c200195c3c2b57011277983689ef6bbd4f5f0b))
+* implement support for enforcing a value to stay a string when it contains a numeric value.
+  This can be toggled via the button "Enforce string" in ContextMenu, under "Edit value".
 
 
 ### Bug Fixes
 
 * [#45](https://github.com/josdejong/svelte-jsoneditor/issues/45) invoke onChangeMode after re-rendering instead of before ([c8894ce](https://github.com/josdejong/svelte-jsoneditor/commit/c8894ce2b618df3cadf5cc8a6ac8a3cc44c15c9f))
-* enlarge the drop down button ([a0a0363](https://github.com/josdejong/svelte-jsoneditor/commit/a0a036397c20ad367b4463c2e39f4b76379001b3))
-* replace deprecated `export const ssr = false` with hooks ([edbbffa](https://github.com/josdejong/svelte-jsoneditor/commit/edbbffad015a5f36f9d7c2ae5b52a311e89bf9a8))
+
 
 ### [0.3.15](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.14...v0.3.15) (2022-01-12)
 
