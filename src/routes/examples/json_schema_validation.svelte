@@ -44,7 +44,7 @@
     required: ['firstName', 'lastName']
   }
 
-  const schemaRefs = {
+  const schemaDefinitions = {
     job: {
       title: 'Job description',
       type: 'object',
@@ -73,11 +73,11 @@
   }
 
   // create a JSON schema validator powered by Ajv
-  const validator = createAjvValidator(schema, schemaRefs)
+  const validator = createAjvValidator(schema, schemaDefinitions)
 
   // enable rendering a select box for enums
   function onRenderValue(props) {
-    return renderJSONSchemaEnum(props, schema, schemaRefs) || renderValue(props)
+    return renderJSONSchemaEnum(props, schema, schemaDefinitions) || renderValue(props)
   }
 
   let content = {

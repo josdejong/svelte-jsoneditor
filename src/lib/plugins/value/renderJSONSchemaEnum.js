@@ -7,11 +7,11 @@ import { getJSONSchemaOptions } from '../../utils/jsonSchemaUtils.js'
  * have to fallback on the default valueRender function
  * @param {RenderValueProps} props
  * @param {JSON} schema
- * @param {JSON} schemaRefs
+ * @param {JSON} schemaDefinitions
  * @return {RenderValueConstructor[]}
  */
-export function renderJSONSchemaEnum(props, schema, schemaRefs) {
-  const enumValues = getJSONSchemaOptions(schema, schemaRefs, props.path)
+export function renderJSONSchemaEnum(props, schema, schemaDefinitions) {
+  const enumValues = getJSONSchemaOptions(schema, schemaDefinitions, props.path)
 
   if (enumValues) {
     const { value, path, readOnly, onPatch, onSelect, isSelected } = props

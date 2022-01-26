@@ -198,7 +198,7 @@ const editor = new JSONEditor({
   ```js
   import { createAjvValidator } from 'svelte-jsoneditor'
 
-  const validator = createAjvValidator(schema, schemaRefs)
+  const validator = createAjvValidator(schema, schemaDefinitions)
   ```
 
 - `onError(err: Error)`.
@@ -220,7 +220,7 @@ const editor = new JSONEditor({
 
   function onRenderValue(props) {
     // use the enum renderer, and fallback on the default renderer
-    return renderJSONSchemaEnum(props, schema, schemaRefs) || renderValue(props)
+    return renderJSONSchemaEnum(props, schema, schemaDefinitions) || renderValue(props)
   }
   ```
 

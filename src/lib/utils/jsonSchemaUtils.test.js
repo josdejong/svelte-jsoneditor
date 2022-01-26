@@ -112,7 +112,7 @@ describe('jsonSchemaUtils', () => {
           }
         }
       }
-      const schemaRefs = {
+      const schemaDefinitions = {
         second_schema: {
           definitions: {
             some_def: {
@@ -130,7 +130,7 @@ describe('jsonSchemaUtils', () => {
       const expectedSchema = {
         enum: [1, 2, 3]
       }
-      assert.deepStrictEqual(findSchema(schema, schemaRefs, path), expectedSchema)
+      assert.deepStrictEqual(findSchema(schema, schemaDefinitions, path), expectedSchema)
     })
 
     it('should find array referenced schema within multi-level object properties', () => {
@@ -145,7 +145,7 @@ describe('jsonSchemaUtils', () => {
           }
         }
       }
-      const schemaRefs = {
+      const schemaDefinitions = {
         second_schema: {
           definitions: {
             some_def: {
@@ -163,7 +163,7 @@ describe('jsonSchemaUtils', () => {
       const expectedSchema = {
         enum: [1, 2, 3]
       }
-      assert.deepStrictEqual(findSchema(schema, schemaRefs, path), expectedSchema)
+      assert.deepStrictEqual(findSchema(schema, schemaDefinitions, path), expectedSchema)
     })
 
     it('should return null for path that has no schema', () => {

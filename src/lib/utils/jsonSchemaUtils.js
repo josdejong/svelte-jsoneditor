@@ -1,12 +1,12 @@
 /**
  * Find enum options for given path in a JSONSchema
  * @param {JSON} schema
- * @param {JSON} schemaRefs
+ * @param {JSON} [schemaDefinitions=undefined]
  * @param {Path} path
  * @returns {Array<any> | null}
  */
-export function getJSONSchemaOptions(schema, schemaRefs, path) {
-  const schemaForPath = findSchema(schema, schemaRefs || {}, path)
+export function getJSONSchemaOptions(schema, schemaDefinitions, path) {
+  const schemaForPath = findSchema(schema, schemaDefinitions || {}, path)
 
   return schemaForPath ? findEnum(schemaForPath) : null
 }
@@ -43,13 +43,18 @@ export function findEnum(schema) {
  * Source: https://github.com/josdejong/jsoneditor/blob/develop/src/js/Node.js
  *
  * @param {JSON} topLevelSchema
- * @param {JSON} schemaRefs
+ * @param {JSON} schemaDefinitions
  * @param {Array.<string | number>} path
  * @param {Object} currentSchema
  * @return {Object | null}
  * @private
  */
-export function findSchema(topLevelSchema, schemaRefs, path, currentSchema = topLevelSchema) {
+export function findSchema(
+  topLevelSchema,
+  schemaDefinitions,
+  path,
+  currentSchema = topLevelSchema
+) {
   const nextPath = path.slice(1, path.length)
   const nextKey = path[0]
 
@@ -65,8 +70,8 @@ export function findSchema(topLevelSchema, schemaRefs, path, currentSchema = top
 
     if ('$ref' in currentSchema && typeof currentSchema.$ref === 'string') {
       const ref = currentSchema.$ref
-      if (ref in schemaRefs) {
-        currentSchema = schemaRefs[ref]
+      if (ref in schemaDefinitions) {
+        currentSchema = schemaDefinitions[ref]
       } else if (ref.startsWith('#/')) {
         const refPath = ref.substring(2).split('/')
         currentSchema = topLevelSchema
@@ -79,15 +84,15 @@ export function findSchema(topLevelSchema, schemaRefs, path, currentSchema = top
         }
       } else if (ref.match(/#\//g)?.length === 1) {
         const [schemaUrl, relativePath] = ref.split('#/')
-        if (schemaUrl in schemaRefs) {
-          const referencedSchema = schemaRefs[schemaUrl]
+        if (schemaUrl in schemaDefinitions) {
+          const referencedSchema = schemaDefinitions[schemaUrl]
           const reference = { $ref: '#/'.concat(relativePath) }
           const auxNextPath = []
           auxNextPath.push(nextKey)
           if (nextPath.length > 0) {
             auxNextPath.push(...nextPath)
           }
-          return findSchema(referencedSchema, schemaRefs, auxNextPath, reference)
+          return findSchema(referencedSchema, schemaDefinitions, auxNextPath, reference)
         } else {
           throw Error(`Unable to resolve reference ${ref}`)
         }
@@ -109,7 +114,7 @@ export function findSchema(topLevelSchema, schemaRefs, path, currentSchema = top
         nextKey in currentSchema.properties
       ) {
         currentSchema = currentSchema.properties[nextKey]
-        return findSchema(topLevelSchema, schemaRefs, nextPath, currentSchema)
+        return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
       }
       if (
         typeof currentSchema.patternProperties === 'object' &&
@@ -118,13 +123,13 @@ export function findSchema(topLevelSchema, schemaRefs, path, currentSchema = top
         for (const prop in currentSchema.patternProperties) {
           if (nextKey.match(prop)) {
             currentSchema = currentSchema.patternProperties[prop]
-            return findSchema(topLevelSchema, schemaRefs, nextPath, currentSchema)
+            return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
           }
         }
       }
       if (typeof currentSchema.additionalProperties === 'object') {
         currentSchema = currentSchema.additionalProperties
-        return findSchema(topLevelSchema, schemaRefs, nextPath, currentSchema)
+        return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
       }
       continue
     }
@@ -134,7 +139,7 @@ export function findSchema(topLevelSchema, schemaRefs, path, currentSchema = top
       currentSchema.items !== null
     ) {
       currentSchema = currentSchema.items
-      return findSchema(topLevelSchema, schemaRefs, nextPath, currentSchema)
+      return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
     }
   }
 
