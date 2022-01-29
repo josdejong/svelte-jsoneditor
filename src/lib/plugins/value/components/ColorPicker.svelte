@@ -62,7 +62,7 @@
 <button
   class="jse-color"
   style="background: {color}"
-  title={!readOnly ? 'Click to open a color picker' : undefined}
+  title={!readOnly ? 'Click to open a color picker' : `Color ${value}`}
   on:click={openColorPicker}
 />
 
