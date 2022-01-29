@@ -33,7 +33,7 @@
 <div
   class="boolean-toggle"
   on:mousedown={toggleBooleanValue}
-  title="Click to toggle this boolean value"
+  title={!readOnly ? 'Click to toggle this boolean value' : undefined}
 >
   <Icon data={value === true ? faCheckSquare : faSquare} />
 </div>
