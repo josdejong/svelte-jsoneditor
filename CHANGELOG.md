@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.17](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.16...v0.3.17) (2022-02-09)
+
+
+### Bug Fixes
+
+* improve explanatory titles on color picker and boolean toggle when readOnly ([aac632b](https://github.com/josdejong/svelte-jsoneditor/commit/aac632bcb9ceeb9a9ab4358aefdea2523c0adb4e))
+* only show explanatory titles on color picker and boolean toggle when editable ([4971138](https://github.com/josdejong/svelte-jsoneditor/commit/49711385d97ba10499285a02b9c365b7719f7c55))
+* rename schemaRefs to schemaDefinitions (not breaking, just a renamed function argument) ([0e7d653](https://github.com/josdejong/svelte-jsoneditor/commit/0e7d65335212188011d7ba0c3ce8438a99b22ee5))
+* shortcut Shift+Enter to create a newline not working on Chrome ([48a10a6](https://github.com/josdejong/svelte-jsoneditor/commit/48a10a667ce1d19258bb09f7cb23e8931ba9f39f))
+* update dependencies ([4bc6d53](https://github.com/josdejong/svelte-jsoneditor/commit/4bc6d5356c5f401bf5a0e0ff60a67a046b346e5a))
+
 ### [0.3.16](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.15...v0.3.16) (2022-01-20)
 
 
