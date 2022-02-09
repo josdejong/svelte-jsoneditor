@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.18](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.17...v0.3.18) (2022-02-09)
+
+
+### Bug Fixes
+
+* race condition when toggling mode ([2a97ab5](https://github.com/josdejong/svelte-jsoneditor/commit/2a97ab55191ddb5e9a79591a74bf342a0e89e9e8))
+* update all dependencies ([f083d2c](https://github.com/josdejong/svelte-jsoneditor/commit/f083d2c1c9570e91b24ee037d1d988c9e733722f))
+
 ### [0.3.17](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.16...v0.3.17) (2022-02-09)
 
 
