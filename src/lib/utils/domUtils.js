@@ -143,71 +143,13 @@ export function addNewLineSuffix(value) {
 }
 
 /**
- * Get the inner text of an HTML element (for example a div element)
- * @param {Element} element
- * @param {Object} [buffer]
- * @return {string} innerText
+ * Remove a newline suffix from text returned by element.innerText, it adds
+ * one return too much.
+ * @param {string} text
+ * @returns {string}
  */
-export function traverseInnerText(element, buffer) {
-  const first = buffer === undefined
-  if (first) {
-    buffer = {
-      _text: '',
-      flush: function () {
-        const text = this._text
-        this._text = ''
-        return text
-      },
-      set: function (text) {
-        this._text = text
-      }
-    }
-  }
-
-  // text node
-  if (element.nodeValue) {
-    // remove return characters and the whitespaces surrounding those return characters
-    const trimmedValue = removeReturnsAndSurroundingWhitespace(element.nodeValue)
-    if (trimmedValue !== '') {
-      return buffer.flush() + trimmedValue
-    } else {
-      // ignore empty text
-      return ''
-    }
-  }
-
-  // divs or other HTML elements
-  if (element.hasChildNodes()) {
-    const childNodes = element.childNodes
-    let innerText = ''
-
-    for (let i = 0, iMax = childNodes.length; i < iMax; i++) {
-      const child = childNodes[i]
-
-      if (child.nodeName === 'DIV' || child.nodeName === 'P') {
-        const prevChild = childNodes[i - 1]
-        const prevName = prevChild ? prevChild.nodeName : undefined
-        if (prevName && prevName !== 'DIV' && prevName !== 'P' && prevName !== 'BR') {
-          if (innerText !== '') {
-            innerText += '\n'
-          }
-          buffer.flush()
-        }
-        innerText += traverseInnerText(child, buffer)
-        buffer.set('\n')
-      } else if (child.nodeName === 'BR') {
-        innerText += buffer.flush()
-        buffer.set('\n')
-      } else {
-        innerText += traverseInnerText(child, buffer)
-      }
-    }
-
-    return innerText
-  }
-
-  // br or unknown
-  return ''
+export function removeNewLineSuffix(text) {
+  return text.replace(/\n$/, '')
 }
 
 // regular expression matching one or multiple return characters with all their
