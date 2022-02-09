@@ -234,14 +234,14 @@
     mode = MODE.CODE
 
     await tick()
-    onChangeMode(mode)
+    onChangeMode(MODE.CODE)
   }
 
   async function handleSwitchToTreeMode() {
     mode = MODE.TREE
 
     await tick()
-    onChangeMode(mode)
+    onChangeMode(MODE.TREE)
   }
 
   function handleFocus() {
@@ -259,11 +259,13 @@
   }
 
   async function toggleCodeMode() {
-    mode = mode === MODE.CODE ? MODE.TREE : MODE.CODE
+    const newMode = mode === MODE.CODE ? MODE.TREE : MODE.CODE
+    mode = newMode
 
     await tick()
     focus()
-    onChangeMode(mode)
+
+    onChangeMode(newMode)
   }
 
   $: isCodeMode = mode === MODE.CODE
