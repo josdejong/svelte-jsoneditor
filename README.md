@@ -38,10 +38,8 @@ import { viteOptimizeDeps } from 'svelte-jsoneditor/config'
 
 const config = {
   // ...
-
   kit: {
     // ...
-
     vite: {
       optimizeDeps: {
         include: [...viteOptimizeDeps]
@@ -52,6 +50,23 @@ const config = {
 
 // ...
 ```
+
+Alternatively, it's possible to set `experimental.prebundleSvelteLibraries` to `true` in your `svelte.config.js` file:
+
+```js
+// svelte.config.js
+
+const config = {
+  // ...
+  experimental: {
+    prebundleSvelteLibraries: true
+  }
+}
+
+// ...
+```
+
+For more information, see https://kit.svelte.dev/faq#packages
 
 ### Svelte usage
 
