@@ -100,12 +100,12 @@
 <Menu {items}>
   <div slot="right" class="powered-by">
     <a
-      href="https://ace.c9.io/"
+      href="https://codemirror.net/6/"
       target="_blank"
       rel="noopener noreferrer"
-      title="Code mode is powered by Ace editor"
+      title="Code mode is powered by CodeMirror"
     >
-      powered by ace
+      powered by CodeMirror
     </a>
   </div>
 </Menu>

@@ -26,7 +26,7 @@ npm install svelte-jsoneditor
 
 ### SvelteKit setup
 
-There is currently an issue in SvelteKit with processing some dependencies (more precisely: Vite used by SvelteKit). `svelte-jsoneditor` depends on some libraries that hit this issue. To work around it, each of these dependencies needs to be listed in the configuration. Without the workaround, you'll see errors like "ReferenceError: module is not defined" (for `debug`, `ajv`, `ace-builds`, etc.).
+There is currently an issue in SvelteKit with processing some dependencies (more precisely: Vite used by SvelteKit). `svelte-jsoneditor` depends on some libraries that hit this issue. To work around it, each of these dependencies needs to be listed in the configuration. Without the workaround, you'll see errors like "ReferenceError: module is not defined" (for `ajv`, `jmespath`, `diff-sequences`, etc.).
 
 In your SvelteKit configuration file `svelte.config.js`, add the list with dependencies `viteOptimizeDeps`, available in the `svelte-jsoneditor/config.js`, and use that in the configuration of vite (`config.kit.vite.optimizeDeps.include`):
 
