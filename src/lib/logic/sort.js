@@ -1,10 +1,8 @@
-import diffSequencesExport from 'diff-sequences'
+import diffSequence from '../generated/diffSequence.js'
 import { compileJSONPointer, getIn, setIn } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import naturalCompare from 'natural-compare-lite'
 import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
-
-const diffSequences = diffSequencesExport.default || diffSequencesExport
 
 export function caseInsensitiveNaturalCompare(a, b) {
   const aLower = typeof a === 'string' ? a.toLowerCase() : a
@@ -166,7 +164,7 @@ export function sortOperationsMoveAdvanced(array, comparator) {
     return aIndex === sortedIndices[bIndex]
   }
 
-  diffSequences(size, size, isCommon, foundSubsequence)
+  diffSequence(size, size, isCommon, foundSubsequence)
   foundSubsequence(0, size, size)
 
   // every move will change the actual indices, so we've to adjust for that

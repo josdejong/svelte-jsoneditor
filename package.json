@@ -23,7 +23,7 @@
     "lint": "prettier --check --plugin-search-dir=. .",
     "__lint": "prettier --check --plugin-search-dir=. . && eslint --cache --ignore-path .gitignore .",
     "format": "prettier --write --plugin-search-dir=. .",
-    "prepare": "husky install && cd tools && node generateEmbeddedAceJsonWorker.js && cd ..",
+    "prepare": "husky install && cd tools && node generateEmbeddedAceJsonWorker.js && node generateDiffSequenceEsm.js && cd ..",
     "release": "npm run lint && npm test && standard-version && npm run package && git push && git push --tag && npm publish package/"
   },
   "dependencies": {
