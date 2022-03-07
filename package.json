@@ -1,7 +1,7 @@
 {
   "name": "svelte-jsoneditor",
   "description": "A web-based tool to view, edit, format, transform, and validate JSON",
-  "version": "0.3.18",
+  "version": "0.3.20",
   "type": "module",
   "svelte": "index.js",
   "module": "dist/jsoneditor.js",
@@ -23,7 +23,7 @@
     "lint": "prettier --check --plugin-search-dir=. .",
     "__lint": "prettier --check --plugin-search-dir=. . && eslint --cache --ignore-path .gitignore .",
     "format": "prettier --write --plugin-search-dir=. .",
-    "prepare": "husky install",
+    "prepare": "husky install && cd tools && node generateDiffSequenceEsm.js && cd ..",
     "release": "npm run lint && npm test && standard-version && npm run package && git push && git push --tag && npm publish package/"
   },
   "dependencies": {
