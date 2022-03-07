@@ -34,6 +34,7 @@
   import { EditorView, keymap } from '@codemirror/view'
   import { indentWithTab } from '@codemirror/commands'
   import { json as jsonLang } from '@codemirror/lang-json'
+  import { indentUnit } from '@codemirror/language'
   import { highlightStyle } from '$lib/components/modes/codemode/codemirror/codemirror-theme.js'
   import { Compartment } from '@codemirror/state'
   import { closeSearchPanel, openSearchPanel } from '@codemirror/search'
@@ -85,7 +86,7 @@
 
   let validationErrorsList = []
   const readOnlyCompartment = new Compartment()
-  const tabSizeCompartment = new Compartment()
+  const indentUnitCompartment = new Compartment()
 
   $: isNewDocument = text.length === 0
   $: tooLarge = text && text.length > MAX_DOCUMENT_SIZE_CODE_MODE
@@ -405,8 +406,7 @@
         }),
         jsonLang(),
         readOnlyCompartment.of(EditorState.readOnly.of(readOnly)),
-        // FIXME: implement setting and updating indentation (should work but doesn't)
-        tabSizeCompartment.of(EditorState.tabSize.of(indentation)),
+        indentUnitCompartment.of(createIndentUnit(indentation)),
         EditorView.lineWrapping
       ]
     })
@@ -513,7 +513,7 @@
       debug('updateIndentation', indentation)
 
       codeMirrorView.dispatch({
-        effects: tabSizeCompartment.reconfigure(EditorState.tabSize.of(indentation))
+        effects: indentUnitCompartment.reconfigure(createIndentUnit(indentation))
       })
     }
   }
@@ -526,6 +526,14 @@
         effects: readOnlyCompartment.reconfigure(EditorState.readOnly.of(readOnly))
       })
     }
+  }
+
+  /**
+   * @param {number} indentation
+   * @returns {Extension}
+   */
+  function createIndentUnit(indentation) {
+    return indentUnit.of(' '.repeat(indentation))
   }
 
   function updateCanUndoRedo() {
