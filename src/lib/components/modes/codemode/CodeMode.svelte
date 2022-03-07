@@ -368,24 +368,29 @@
     debug('select validation error', error)
 
     const annotation = validationErrorToAnnotation(error)
-    const location = {
-      row: annotation.row,
-      column: annotation.column
-    }
-    setSelection(location, location)
+
+    // we take pos as head, not as anchor, so when the whole object is selected,
+    // we do not scroll to the end but to the start of the object
+    setSelection(annotation.posEnd, annotation.pos)
+
     focus()
   }
 
   /**
-   * @param {Point} start
-   * @param {Point} end
+   * @param {number} anchor
+   * @param {number} head
    **/
-  function setSelection(start, end) {
-    // FIXME: implement setSelection for CodeMirror
-    // if (aceEditor) {
-    //   aceEditor.selection.setRange({ start, end })
-    //   aceEditor.scrollToLine(start.row, true)
-    // }
+  function setSelection(anchor, head) {
+    debug('setSelection', { anchor, head })
+
+    if (codeMirrorView) {
+      codeMirrorView.dispatch(
+        codeMirrorView.state.update({
+          selection: { anchor, head },
+          scrollIntoView: true
+        })
+      )
+    }
   }
 
   function createCodeMirrorView({ target, initialText, readOnly, indentation, onChange }) {
@@ -427,8 +432,10 @@
     const location = findTextLocation(text, validationError.path)
 
     return {
-      row: location ? location.row : 0,
-      column: location ? location.column : 0,
+      row: location.row,
+      column: location.column,
+      pos: location.pos,
+      posEnd: location.posEnd,
       text: validationError.message,
       type: 'warning'
     }
