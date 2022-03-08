@@ -72,9 +72,10 @@
   const debug = createDebug('jsoneditor:CodeMode')
 
   const formatCompactKeyBinding = {
-    key: 'Mod+I',
+    key: 'Mod-i',
     run: handleFormat,
-    shift: handleCompact
+    shift: handleCompact,
+    preventDefault: true
   }
 
   const isSSR = typeof window === 'undefined'
@@ -420,6 +421,7 @@
     const state = EditorState.create({
       doc: initialText,
       extensions: [
+        keymap.of([indentWithTab, formatCompactKeyBinding]),
         linter(
           () => {
             onChangeCodeMirrorValueDebounced.flush()
@@ -431,7 +433,6 @@
         lintGutter(),
         basicSetup,
         highlightStyle,
-        keymap.of([indentWithTab, formatCompactKeyBinding]),
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
             onChangeCodeMirrorValueDebounced()
