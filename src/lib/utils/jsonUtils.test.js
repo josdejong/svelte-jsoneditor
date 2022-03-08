@@ -30,7 +30,7 @@ describe('jsonUtils', () => {
       position: 4,
       line: 1,
       column: 2,
-      message: errorMessage
+      message: "expected property name or '}' at line 2 column 3"
     })
   })
 
@@ -52,7 +52,7 @@ describe('jsonUtils', () => {
       position: 15,
       line: 2,
       column: 2,
-      message: errorMessage
+      message: 'expected double-quoted property name at line 3 column 3'
     })
   })
 
