@@ -64,6 +64,7 @@
   }
 
   .preview {
+    flex: 1;
     color: $gray;
     overflow: auto;
     white-space: pre-wrap;
