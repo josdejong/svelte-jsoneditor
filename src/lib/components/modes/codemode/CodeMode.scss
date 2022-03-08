@@ -28,6 +28,10 @@
         line-height: 1.3em;
         color: $black;
       }
+
+      :global(.cm-gutters) {
+        background: $very-light-gray;
+      }
     }
 
     .loading-space {
