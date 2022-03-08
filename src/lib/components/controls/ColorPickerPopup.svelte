@@ -1,5 +1,6 @@
 <script>
-  import { onDestroy, onMount } from 'svelte'
+  import { onDestroy, onMount, tick } from 'svelte'
+  import VanillaPicker from 'vanilla-picker'
 
   export let color
   export let onChange
@@ -9,17 +10,17 @@
   let colorPicker
 
   onMount(async () => {
-    const VanillaPicker = (await import('vanilla-picker')).default
+    await tick() // must render the DOM first
 
     colorPicker = new VanillaPicker({
       parent: ref,
-      color: color,
+      color,
       popup: showOnTop ? 'top' : 'bottom',
       onDone: function (color) {
         const alpha = color.rgba[3]
         const hex =
           alpha === 1
-            ? color.hex.substr(0, 7) // return #RRGGBB
+            ? color.hex.substring(0, 7) // return #RRGGBB
             : color.hex // return #RRGGBBAA
         onChange(hex)
       }
@@ -29,7 +30,9 @@
   })
 
   onDestroy(() => {
-    colorPicker.destroy()
+    if (colorPicker) {
+      colorPicker.destroy()
+    }
   })
 </script>
 
