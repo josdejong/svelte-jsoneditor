@@ -32,6 +32,11 @@
       :global(.cm-gutters) {
         background: $very-light-gray;
       }
+
+      :global(.cm-diagnostic) {
+        font-size: $font-size;
+        font-family: $font-family;
+      }
     }
 
     .loading-space {
