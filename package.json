@@ -34,6 +34,7 @@
     "@codemirror/history": "0.19.2",
     "@codemirror/lang-json": "0.19.2",
     "@codemirror/language": "0.19.8",
+    "@codemirror/lint": "0.19.6",
     "@codemirror/search": "0.19.9",
     "@codemirror/state": "0.19.9",
     "@codemirror/view": "0.19.46",

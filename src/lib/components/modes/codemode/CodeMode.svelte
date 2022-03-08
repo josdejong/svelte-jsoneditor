@@ -33,17 +33,21 @@
   import { basicSetup, EditorState } from '@codemirror/basic-setup'
   import { EditorView, keymap } from '@codemirror/view'
   import { indentWithTab } from '@codemirror/commands'
+  import { linter, lintGutter } from '@codemirror/lint'
   import { json as jsonLang } from '@codemirror/lang-json'
   import { indentUnit } from '@codemirror/language'
-  import { highlightStyle } from '$lib/components/modes/codemode/codemirror/codemirror-theme.js'
+  import { highlightStyle } from './codemirror/codemirror-theme.js'
   import { Compartment } from '@codemirror/state'
   import { closeSearchPanel, openSearchPanel } from '@codemirror/search'
   import { redo, redoDepth, undo, undoDepth } from '@codemirror/history'
+  import { normalizeJsonParseError } from '../../../utils/jsonUtils.js'
+  import { MAX_VALIDATABLE_SIZE } from '../../../constants.js'
+  import { measure } from '../../../utils/timeUtils.js'
 
   export let readOnly = false
   export let mainMenuBar = true
   export let text = ''
-  export let indentation = 2 // TODO: make indentation configurable
+  export let indentation = 2
   export let escapeUnicodeCharacters = false
   export let validator = null
 
@@ -84,7 +88,8 @@
   let onChangeDisabled = false
   let acceptTooLarge = false
 
-  let validationErrorsList = []
+  /** @type{ValidationError[]} */
+  let validationErrors = []
   const readOnlyCompartment = new Compartment()
   const indentUnitCompartment = new Compartment()
 
@@ -120,8 +125,7 @@
         target: codeMirrorRef,
         initialText: text,
         readOnly,
-        indentation,
-        onChange: onChangeCodeMirrorValueDebounced
+        indentation
       })
 
       focus()
@@ -362,16 +366,33 @@
   }
 
   /**
-   * @param {ValidationError} error
+   * @param {ValidationError} validationError
    **/
-  function handleSelectValidationError(error) {
-    debug('select validation error', error)
+  function handleSelectValidationError(validationError) {
+    debug('select validation error', validationError)
 
-    const annotation = validationErrorToAnnotation(error)
+    const richValidationError = toRichValidationError(validationError)
 
-    // we take pos as head, not as anchor, so when the whole object is selected,
-    // we do not scroll to the end but to the start of the object
-    setSelection(annotation.posEnd, annotation.pos)
+    // we take "to" as head, not as anchor, because the scrollIntoView will
+    // move to the head, and when a large whole object is selected as a whole,
+    // we want to scroll to the start of the object and not the end
+    setSelection(richValidationError.from, richValidationError.to)
+
+    focus()
+  }
+
+  /**
+   * @param {ParseError} parseError
+   **/
+  function handleSelectParseError(parseError) {
+    debug('select parse error', parseError)
+
+    const richParseError = toRichParseError(parseError)
+
+    // we take "to" as head, not as anchor, because the scrollIntoView will
+    // move to the head, and when a large whole object is selected as a whole,
+    // we want to scroll to the start of the object and not the end
+    setSelection(richParseError.from, richParseError.to)
 
     focus()
   }
@@ -393,20 +414,27 @@
     }
   }
 
-  function createCodeMirrorView({ target, initialText, readOnly, indentation, onChange }) {
+  function createCodeMirrorView({ target, initialText, readOnly, indentation }) {
     debug('Create CodeMirror editor', { readOnly, indentation })
-
-    // FIXME: implement markers for JSON Schema errors and parse errors
 
     const state = EditorState.create({
       doc: initialText,
       extensions: [
+        linter(
+          () => {
+            onChangeCodeMirrorValueDebounced.flush()
+
+            return validate()
+          },
+          { delay: CODE_MODE_ONCHANGE_DELAY }
+        ),
+        lintGutter(),
         basicSetup,
         highlightStyle,
         keymap.of([indentWithTab, formatCompactKeyBinding]),
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
-            onChange()
+            onChangeCodeMirrorValueDebounced()
           }
         }),
         jsonLang(),
@@ -428,36 +456,52 @@
     return codeMirrorView ? normalization.unescapeValue(codeMirrorView.state.doc.toString()) : ''
   }
 
-  function validationErrorToAnnotation(validationError) {
-    const location = findTextLocation(text, validationError.path)
+  /**
+   * @param {ValidationError} validationError
+   * @returns {RichValidationError}
+   */
+  function toRichValidationError(validationError) {
+    const { path, message, isChildError } = validationError
+    const { line, column, from, to } = findTextLocation(text, path)
 
     return {
-      row: location.row,
-      column: location.column,
-      pos: location.pos,
-      posEnd: location.posEnd,
-      text: validationError.message,
-      type: 'warning'
+      path,
+      isChildError,
+      line,
+      column,
+      from,
+      to,
+      message,
+      severity: 'warning',
+      actions: []
     }
   }
 
   /**
-   * refresh ERROR annotations state
-   * validation annotations are handled by this mode
-   * therefore in order to refresh we send only the annotations of error type in order to maintain its state
-   * @private
+   * @param {ParseError} parseError
+   * @param {boolean} isRepairable
+   * @returns {RichValidationError}
    */
-  function refreshAnnotations() {
-    // FIXME: implement refreshAnnotations for CodeMirror
-    debug('refresh annotations')
-    // const session = aceEditor && aceEditor.getSession()
-    // if (session) {
-    //   const errorAnnotations = session
-    //     .getAnnotations()
-    //     .filter((annotation) => annotation.type === 'error')
-    //
-    //   session.setAnnotations(errorAnnotations)
-    // }
+  function toRichParseError(parseError, isRepairable) {
+    const { line, column, position, message } = parseError
+
+    return {
+      path: null,
+      line,
+      column,
+      from: position || 0,
+      to: position || 0,
+      severity: 'error',
+      message,
+      actions: isRepairable
+        ? [
+            {
+              name: 'Auto repair',
+              apply: () => handleRepair()
+            }
+          ]
+        : null
+    }
   }
 
   function setCodeMirrorValue(text, force = false) {
@@ -572,48 +616,85 @@
   }
 
   let jsonStatus = JSON_STATUS_VALID
-  let jsonParseError
 
-  function checkValidJson() {
+  /** @type {ParseError || null} */
+  let jsonParseError = null
+
+  /**
+   * @returns {Diagnostic[]}
+   */
+  function validate() {
+    debug('validate')
     jsonStatus = JSON_STATUS_VALID
-    jsonParseError = undefined
-    validationErrorsList = []
+    jsonParseError = null
+    validationErrors = []
 
-    if (text.length > MAX_AUTO_REPAIRABLE_SIZE) {
-      debug('checkValidJson: not validating, document too large')
-      return
+    if (text.length > MAX_VALIDATABLE_SIZE) {
+      return [
+        {
+          from: 0,
+          to: 0,
+          message: 'Validation turned off: the document is too large',
+          severity: 'info'
+        }
+      ]
     }
 
     if (isNewDocument) {
       // new, empty document, do not try to parse
-      return
+      return []
     }
 
     try {
-      const json = JSON.parse(text)
+      const json = measure(
+        () => JSON.parse(text),
+        (duration) => debug(`validate: parsed json in ${duration} ms`)
+      )
 
-      if (validator) {
-        validationErrorsList = validator(json)
+      if (!validator) {
+        return []
       }
 
-      refreshAnnotations()
+      validationErrors = measure(
+        () => validator(json),
+        (duration) => debug(`validate: validated json in ${duration} ms`)
+      )
+
+      return validationErrors.map(toRichValidationError)
     } catch (err) {
-      jsonParseError = err.toString()
-      try {
-        JSON.parse(jsonrepair(text))
-        jsonStatus = JSON_STATUS_REPAIRABLE
-      } catch (err) {
-        jsonStatus = JSON_STATUS_INVALID
-      }
-    }
+      const isRepairable = measure(
+        () => canAutoRepair(text),
+        (duration) => debug(`validate: checked whether repairable in ${duration} ms`)
+      )
 
-    debug('checked json status', jsonStatus)
+      jsonParseError = normalizeJsonParseError(text, err.message || err.toString())
+      jsonStatus = isRepairable ? JSON_STATUS_REPAIRABLE : JSON_STATUS_INVALID
+
+      return [toRichParseError(jsonParseError, isRepairable)]
+    }
   }
 
-  // we pass unused arguments to trigger calling checkValidJson when text or validator changes
-  // TODO: find a better solution
-  $: checkValidJson(text)
-  $: checkValidJson(validator)
+  function canAutoRepair(text) {
+    if (text.length > MAX_AUTO_REPAIRABLE_SIZE) {
+      return false
+    }
+
+    try {
+      JSON.parse(jsonrepair(text))
+
+      return true
+    } catch (err) {
+      return false
+    }
+  }
+
+  function triggerValidation() {
+    // a trick to trigger running diagnostics again
+    forceUpdateText()
+  }
+
+  // we pass unused argument to trigger the editor to update the diagnostics
+  $: triggerValidation(validator)
 
   $: repairActions =
     jsonStatus === JSON_STATUS_REPAIRABLE
@@ -688,12 +769,13 @@
       <Message
         type="error"
         icon={faExclamationTriangle}
-        message={jsonParseError}
+        message={jsonParseError.message}
         actions={repairActions}
+        onClick={() => handleSelectParseError(jsonParseError)}
       />
     {/if}
 
-    <ValidationErrorsOverview {validationErrorsList} selectError={handleSelectValidationError} />
+    <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
   {:else}
     <div class="contents" class:visible={true}>
       <div class="loading-space" />

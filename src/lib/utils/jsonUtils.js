@@ -158,7 +158,7 @@ export function normalizeJsonParseError(jsonText, parseErrorMessage) {
       position,
       line,
       column,
-      message: parseErrorMessage.replace(/^JSON.parse: /, '')
+      message: parseErrorMessage.replace(/^JSON.parse: /, '').replace(/ of the JSON data$/, '')
     }
   }
 }
@@ -200,7 +200,7 @@ export function countCharacterOccurrences(text, character, start = 0, end = text
  * Find the text location of a JSON path
  * @param {string} text
  * @param {Path} path
- * @return {{path: Path, row: number, column: number, pos: number, posEnd: number} | null}
+ * @return {{path: Path, line: number, column: number, from: number, to: number} | null}
  */
 // TODO: write unit tests
 export function findTextLocation(text, path) {
@@ -212,10 +212,10 @@ export function findTextLocation(text, path) {
     if (pointer) {
       return {
         path: path,
-        row: pointer.key ? pointer.key.line : pointer.value ? pointer.value.line : 0,
+        line: pointer.key ? pointer.key.line : pointer.value ? pointer.value.line : 0,
         column: pointer.key ? pointer.key.column : pointer.value ? pointer.value.column : 0,
-        pos: pointer.key ? pointer.key.pos : pointer.value ? pointer.value.pos : 0,
-        posEnd: pointer.keyEnd ? pointer.keyEnd.pos : pointer.valueEnd ? pointer.valueEnd.pos : 0
+        from: pointer.key ? pointer.key.pos : pointer.value ? pointer.value.pos : 0,
+        to: pointer.keyEnd ? pointer.keyEnd.pos : pointer.valueEnd ? pointer.valueEnd.pos : 0
       }
     }
   } catch (err) {

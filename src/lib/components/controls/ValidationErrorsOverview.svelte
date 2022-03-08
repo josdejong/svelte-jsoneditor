@@ -13,7 +13,7 @@
   /**
    * @type {ValidationError[]}
    **/
-  export let validationErrorsList
+  export let validationErrors
 
   /**
    * @type {function(error: ValidationError)}
@@ -29,16 +29,14 @@
   function expand() {
     expanded = true
   }
-
-  $: filteredValidationErrors = validationErrorsList.filter((error) => !error.isChildError)
 </script>
 
-{#if !isEmpty(validationErrorsList)}
+{#if !isEmpty(validationErrors)}
   <div class="validation-errors-overview">
-    {#if expanded || validationErrorsList.length === 1}
+    {#if expanded || validationErrors.length === 1}
       <table>
         <tbody>
-          {#each validationErrorsList as validationError, index}
+          {#each validationErrors as validationError, index}
             <tr
               class="validation-error"
               on:click={() => {
@@ -56,7 +54,7 @@
                 {validationError.message}
               </td>
               <td class="validation-error-action">
-                {#if index === 0 && validationErrorsList.length > 1}
+                {#if index === 0 && validationErrors.length > 1}
                   <button
                     type="button"
                     class="validation-errors-collapse"
@@ -79,7 +77,7 @@
               <Icon data={faExclamationTriangle} />
             </td>
             <td>
-              {validationErrorsList.length} validation errors
+              {validationErrors.length} validation errors
               <div class="validation-errors-expand">
                 <Icon data={faAngleRight} />
               </div>

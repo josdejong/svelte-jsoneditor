@@ -329,8 +329,9 @@
   $: textIsUnrepairable = text !== undefined && json === undefined
 
   // TODO: debounce JSON schema validation
-  $: validationErrorsList = validator ? validator(json) : []
-  $: validationErrors = mapValidationErrors(validationErrorsList)
+  /** @type{ValidationError[]} */
+  $: validationErrors = validator ? validator(json) : []
+  $: validationErrorsMap = mapValidationErrors(validationErrors)
 
   export function get() {
     return json
@@ -2015,7 +2016,7 @@
           {state}
           selection={recursiveSelection}
           searchResult={searchResult && searchResult.itemsWithActive}
-          {validationErrors}
+          validationErrors={validationErrorsMap}
           {readOnly}
           {normalization}
           {getFullSelection}
@@ -2072,7 +2073,7 @@
         />
       {/if}
 
-      <ValidationErrorsOverview {validationErrorsList} selectError={handleSelectValidationError} />
+      <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
     {/if}
   {:else}
     <div class="contents">
