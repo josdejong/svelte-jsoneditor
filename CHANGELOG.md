@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.21](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.20...v0.3.21) (2022-03-08)
+
+
+### Features
+
+* replace Ace with CodeMirror 6 ([#46](https://github.com/josdejong/svelte-jsoneditor/issues/46)) ([71cc856](https://github.com/josdejong/svelte-jsoneditor/commit/71cc856c81456dbb788b14d847e30a289bf2a129))
+
 ### [0.3.20](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.19...v0.3.20) (2022-03-07)
 
 
