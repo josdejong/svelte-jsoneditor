@@ -1,7 +1,7 @@
 {
   "name": "svelte-jsoneditor",
   "description": "A web-based tool to view, edit, format, transform, and validate JSON",
-  "version": "0.3.22",
+  "version": "0.3.23",
   "type": "module",
   "svelte": "index.js",
   "module": "dist/jsoneditor.js",
