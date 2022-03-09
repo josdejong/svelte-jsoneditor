@@ -328,7 +328,7 @@
         <Icon data={faCut} /> Cut
       </button>
     </DropdownButton>
-    <DropdownButton width="150px" items={copyDropdownItems}>
+    <DropdownButton width="160px" items={copyDropdownItems}>
       <button
         type="button"
         slot="defaultItem"
