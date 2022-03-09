@@ -23,7 +23,7 @@
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { isObjectOrArray } from '$lib/utils/typeUtils'
   import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
-  import { STATE_ENFORCE_STRING } from '$lib/constants.js'
+  import { STATE_ENFORCE_STRING } from '$lib/constants'
 
   export let json
   export let state

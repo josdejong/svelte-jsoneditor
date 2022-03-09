@@ -1499,8 +1499,9 @@
 
   /**
    * @param {SelectionSchema} selectionSchema
+   * @param {{ ensureFocus?: boolean }} options
    */
-  function handleSelect(selectionSchema) {
+  function handleSelect(selectionSchema, options) {
     if (selectionSchema) {
       selection = createSelection(json, state, selectionSchema)
     } else {
@@ -1509,7 +1510,9 @@
 
     // set focus to the hidden input, so we can capture quick keys like Ctrl+X, Ctrl+C, Ctrl+V
     // we do this after a setTimeout in case the selection was made by clicking a button
-    setTimeout(() => focus())
+    if (options?.ensureFocus !== false) {
+      setTimeout(() => focus())
+    }
   }
 
   function handleExpandSection(path, section) {

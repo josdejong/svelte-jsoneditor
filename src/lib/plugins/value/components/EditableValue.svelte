@@ -6,6 +6,7 @@
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
   import EditableDiv from '../../../components/controls/EditableDiv.svelte'
+  import { UPDATE_SELECTION } from '../../../constants.js'
 
   export let path
   export let value
@@ -19,7 +20,7 @@
     return enforceString ? value : stringConvert(value)
   }
 
-  function handleChangeValue(newValue, passiveExit = false) {
+  function handleChangeValue(newValue, updateSelection) {
     onPatch(
       [
         {
@@ -31,12 +32,22 @@
       null
     )
 
-    if (!passiveExit) {
+    if (updateSelection === UPDATE_SELECTION.NEXT_INSIDE) {
       onSelect({
         type: SELECTION_TYPE.VALUE,
         path,
         nextInside: true
       })
+    }
+
+    if (updateSelection === UPDATE_SELECTION.SELF) {
+      onSelect(
+        {
+          type: SELECTION_TYPE.VALUE,
+          path
+        },
+        { ensureFocus: false }
+      )
     }
   }
 
