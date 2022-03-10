@@ -6,13 +6,14 @@
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
-  import { addNewLineSuffix } from '$lib/utils/domUtils.js'
+  import { addNewLineSuffix } from '$lib/utils/domUtils'
   import { UPDATE_SELECTION } from '../../../constants.js'
 
   export let path
   export let key
   export let readOnly
   export let onUpdateKey
+  export let onFind
   export let selection
 
   /** @type {ValueNormalization} */
@@ -71,6 +72,7 @@
     shortText
     onChange={handleChangeValue}
     onCancel={handleCancelChange}
+    {onFind}
   />
 {:else}
   <div data-type="selectable-key" class={getKeyClass(key)} on:dblclick={handleKeyDoubleClick}>

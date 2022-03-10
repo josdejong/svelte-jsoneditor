@@ -15,6 +15,7 @@
   export let onPatch
   export let onPasteJson
   export let onSelect
+  export let onFind
 
   function convert(value) {
     return enforceString ? value : stringConvert(value)
@@ -80,5 +81,6 @@
   onChange={handleChangeValue}
   onCancel={handleCancelChange}
   onPaste={handlePaste}
+  {onFind}
   onValueClass={handleOnValueClass}
 />

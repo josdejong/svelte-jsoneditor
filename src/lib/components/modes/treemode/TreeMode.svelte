@@ -1530,6 +1530,22 @@
     }
   }
 
+  /**
+   * @param {boolean} findAndReplace
+   */
+  function openFind(findAndReplace) {
+    debug('openFind', { findAndReplace })
+
+    showSearch = false
+    showReplace = false
+
+    tick().then(() => {
+      // trick to make sure the focus goes to the search box
+      showSearch = true
+      showReplace = findAndReplace
+    })
+  }
+
   function handleExpandSection(path, section) {
     debug('handleExpandSection', path, section)
 
@@ -1699,28 +1715,12 @@
 
     if (combo === 'Ctrl+F') {
       event.preventDefault()
-
-      showSearch = false
-      showReplace = false
-
-      tick().then(() => {
-        // trick to make sure the focus goes to the search box
-        showSearch = true
-        showReplace = false
-      })
+      openFind(false)
     }
 
     if (combo === 'Ctrl+H') {
       event.preventDefault()
-
-      showSearch = false
-      showReplace = false
-
-      tick().then(() => {
-        // trick to make sure the focus goes to the search box
-        showSearch = true
-        showReplace = true
-      })
+      openFind(true)
     }
 
     if (combo === 'Ctrl+Z') {
@@ -2042,6 +2042,7 @@
           onInsert={handleInsert}
           onExpand={handleExpand}
           onSelect={handleSelect}
+          onFind={openFind}
           onMoveSelection={handleMoveSelection}
           onPasteJson={handlePasteJson}
           onExpandSection={handleExpandSection}

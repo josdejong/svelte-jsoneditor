@@ -20,6 +20,7 @@
   export let shortText = false
   export let onChange
   export let onCancel
+  export let onFind
   export let onPaste = noop
   export let onValueClass = () => ''
 
@@ -68,7 +69,7 @@
   function handleValueKeyDown(event) {
     event.stopPropagation()
 
-    const combo = keyComboFromEvent(event)
+    const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
 
     if (combo === 'Escape') {
       // cancel changes (needed to prevent triggering a change onDestroy)
@@ -83,6 +84,16 @@
 
       const newValue = getDomValue()
       onChange(newValue, UPDATE_SELECTION.NEXT_INSIDE)
+    }
+
+    if (combo === 'Ctrl+F') {
+      event.preventDefault()
+      onFind(false)
+    }
+
+    if (combo === 'Ctrl+H') {
+      event.preventDefault()
+      onFind(true)
     }
   }
 
@@ -109,6 +120,8 @@
       closed = true
       if (newValue !== value) {
         onChange(newValue, UPDATE_SELECTION.SELF)
+      } else {
+        onCancel()
       }
     }
   }
