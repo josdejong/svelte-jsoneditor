@@ -3,6 +3,7 @@ import { flatMap, times } from 'lodash-es'
 import {
   ARRAY_SECTION_SIZE,
   DEFAULT_VISIBLE_SECTIONS,
+  STATE_ENFORCE_STRING,
   STATE_EXPANDED,
   STATE_ID,
   STATE_KEYS,
@@ -322,6 +323,24 @@ describe('documentState', () => {
     )
   })
 
+  it('should update enforce string in syncState', () => {
+    const json1 = 42
+    const state1 = syncState(json1, undefined, [], (path) => false)
+
+    const json2 = '42'
+    const state2 = syncState(json2, state1, [], (path) => false)
+
+    // should not override when containing a boolean false
+    const json3 = '42'
+    const state3 = { ...state2, [STATE_ENFORCE_STRING]: false }
+    const state3updated = syncState(json3, state3, [], (path) => false)
+
+    assert.strictEqual(state1[STATE_ENFORCE_STRING], undefined)
+    assert.strictEqual(state2[STATE_ENFORCE_STRING], true)
+    assert.strictEqual(state3[STATE_ENFORCE_STRING], false)
+    assert.strictEqual(state3updated[STATE_ENFORCE_STRING], false)
+  })
+
   describe('createState', () => {
     it('should create state for an object', () => {
       const state = createState({ a: 2, b: 3 })
@@ -352,6 +371,17 @@ describe('documentState', () => {
 
       const expected = {}
       expected[STATE_ID] = state[STATE_ID]
+
+      assert.deepStrictEqual(state, expected)
+      assert(typeof state[STATE_ID] === 'string')
+    })
+
+    it('should create state with enforce string', () => {
+      const state = createState('42')
+
+      const expected = {}
+      expected[STATE_ID] = state[STATE_ID]
+      expected[STATE_ENFORCE_STRING] = true
 
       assert.deepStrictEqual(state, expected)
       assert(typeof state[STATE_ID] === 'string')

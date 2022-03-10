@@ -7,6 +7,7 @@
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
   import { addNewLineSuffix } from '$lib/utils/domUtils.js'
+  import { UPDATE_SELECTION } from '../../../constants.js'
 
   export let path
   export let key
@@ -36,15 +37,27 @@
     })
   }
 
-  function handleChangeValue(newKey, passiveExit = false) {
+  function handleChangeValue(newKey, updateSelection) {
     const updatedKey = onUpdateKey(key, normalization.unescapeValue(newKey))
     const updatedPath = initial(path).concat(updatedKey)
 
-    onSelect({
-      type: SELECTION_TYPE.KEY,
-      path: updatedPath,
-      next: !passiveExit
-    })
+    if (updateSelection === UPDATE_SELECTION.NEXT_INSIDE) {
+      onSelect({
+        type: SELECTION_TYPE.KEY,
+        path: updatedPath,
+        next: true
+      })
+    }
+
+    if (updateSelection === UPDATE_SELECTION.SELF) {
+      onSelect(
+        {
+          type: SELECTION_TYPE.KEY,
+          path: updatedPath
+        },
+        { ensureFocus: false }
+      )
+    }
   }
 
   function handleCancelChange() {

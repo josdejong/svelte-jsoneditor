@@ -4,19 +4,21 @@ import { parseJSONPointerWithArrayIndices } from '../../utils/jsonPointer.js'
 /**
  * Create a JSON Schema validator powered by Ajv.
  * @param {JSON} schema
- * @param {JSON} [schemaRefs=undefined]  An object containing JSON Schema references
- * @return {function (json: JSON) : Array<Object>} Returns a valiation function
+ * @param {JSON} [schemaDefinitions=undefined]
+ *                    An object containing JSON Schema definitions
+ *                    which can be referenced using $ref
+ * @return {function (json: JSON) : Array<Object>} Returns a validation function
  */
-export function createAjvValidator(schema, schemaRefs) {
+export function createAjvValidator(schema, schemaDefinitions) {
   const ajv = new (Ajv.default || Ajv)({
     allErrors: true,
     verbose: true,
     $data: true
   })
 
-  if (schemaRefs) {
-    Object.keys(schemaRefs).forEach((ref) => {
-      ajv.addSchema(schemaRefs[ref], ref)
+  if (schemaDefinitions) {
+    Object.keys(schemaDefinitions).forEach((ref) => {
+      ajv.addSchema(schemaDefinitions[ref], ref)
     })
   }
 

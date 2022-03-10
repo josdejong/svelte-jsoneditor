@@ -2,4 +2,5 @@
 static/**
 package/**
 node_modules/**
+src/lib/generated/**
 CHANGELOG.md

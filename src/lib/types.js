@@ -171,6 +171,28 @@
  */
 
 /**
+ * @typedef {{
+ *   position: number | null,
+ *   row: number | null,
+ *   column: number | null,
+ *   message: string
+ * }} ParseError
+ */
+
+/**
+ * @typedef {Object} RichValidationError
+ * @property {Path} [path]
+ * @property {boolean} [isChildError]
+ * @property {number} [line]
+ * @property {number} [column]
+ * @property {number} from
+ * @property {number} to
+ * @property {number} message
+ * @property {'info' | 'warning' | 'error'} [severity]
+ * @property {string[]} [actions]
+ */
+
+/**
  * @typedef {{start: number, end: number}} Section
  *  Start included, end excluded
  */
@@ -205,6 +227,7 @@
  * @property {Path} path
  * @property {JSON} value
  * @property {boolean} readOnly
+ * @property {boolean | undefined} enforceString
  * @property {Selection | undefined} selection
  * @property {SearchResultItem | undefined} searchResult
  * @property {boolean} isSelected

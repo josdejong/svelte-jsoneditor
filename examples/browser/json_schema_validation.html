@@ -76,7 +76,7 @@
         required: ['firstName', 'lastName']
       }
 
-      const schemaRefs = {
+      const schemaDefinitions = {
         job: {
           title: 'Job description',
           type: 'object',
@@ -127,7 +127,7 @@
         props: {
           content,
           onChange: (update) => console.log('onChange', update),
-          validator: createAjvValidator(schema, schemaRefs)
+          validator: createAjvValidator(schema, schemaDefinitions)
         }
       })
     </script>

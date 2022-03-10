@@ -39,7 +39,7 @@ const schema = {
   required: ['firstName', 'lastName']
 }
 
-const schemaRefs = {
+const schemaDefinitions = {
   job: {
     title: 'Job description',
     type: 'object',
@@ -69,7 +69,7 @@ const schemaRefs = {
 
 describe('createAjvValidator', () => {
   it('should create a validate function', () => {
-    const validate = createAjvValidator(schema, schemaRefs)
+    const validate = createAjvValidator(schema, schemaDefinitions)
 
     const invalidJson = {
       firstName: 'John',

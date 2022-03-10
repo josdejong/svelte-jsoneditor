@@ -23,10 +23,12 @@ export function createAutoScrollHandler(scrollableElement) {
   }
 
   function autoScrollCallback() {
-    // debug('auto scroll...')
-    const diff = autoScrollSpeed * (AUTO_SCROLL_INTERVAL / 1000)
+    if (scrollableElement) {
+      // debug('auto scroll...')
+      const diff = autoScrollSpeed * (AUTO_SCROLL_INTERVAL / 1000)
 
-    scrollableElement.scrollTop += diff
+      scrollableElement.scrollTop += diff
+    }
   }
 
   function startAutoScroll(speed) {

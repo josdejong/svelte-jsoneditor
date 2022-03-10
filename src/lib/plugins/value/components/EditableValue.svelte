@@ -6,28 +6,49 @@
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
   import EditableDiv from '../../../components/controls/EditableDiv.svelte'
+  import { UPDATE_SELECTION } from '../../../constants.js'
 
   export let path
   export let value
   export let normalization
+  export let enforceString
   export let onPatch
   export let onPasteJson
   export let onSelect
 
-  function handleChangeValue(newValue, passiveExit = false) {
-    onPatch([
-      {
-        op: 'replace',
-        path: compileJSONPointer(path),
-        value: stringConvert(normalization.unescapeValue(newValue)) // TODO: implement support for type "string"
-      }
-    ])
+  function convert(value) {
+    return enforceString ? value : stringConvert(value)
+  }
 
-    onSelect({
-      type: SELECTION_TYPE.VALUE,
-      path,
-      nextInside: !passiveExit
-    })
+  function handleChangeValue(newValue, updateSelection) {
+    onPatch(
+      [
+        {
+          op: 'replace',
+          path: compileJSONPointer(path),
+          value: convert(normalization.unescapeValue(newValue))
+        }
+      ],
+      null
+    )
+
+    if (updateSelection === UPDATE_SELECTION.NEXT_INSIDE) {
+      onSelect({
+        type: SELECTION_TYPE.VALUE,
+        path,
+        nextInside: true
+      })
+    }
+
+    if (updateSelection === UPDATE_SELECTION.SELF) {
+      onSelect(
+        {
+          type: SELECTION_TYPE.VALUE,
+          path
+        },
+        { ensureFocus: false }
+      )
+    }
   }
 
   function handleCancelChange() {
@@ -50,7 +71,7 @@
   }
 
   function handleOnValueClass(value) {
-    return getValueClass(stringConvert(normalization.unescapeValue(value)))
+    return getValueClass(convert(normalization.unescapeValue(value)))
   }
 </script>
 

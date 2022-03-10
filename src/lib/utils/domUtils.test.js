@@ -18,18 +18,15 @@ describe('domUtils', () => {
   it('encode data path', () => {
     strictEqual(
       encodeDataPath(['path', 'to', 2, 'array', 'special\ncharacters']),
-      '["path","to",2,"array","special\\ncharacters"]'
+      '%5B%22path%22%2C%22to%22%2C2%2C%22array%22%2C%22special%5Cncharacters%22%5D'
     )
   })
 
   it('decode data path', () => {
-    deepStrictEqual(decodeDataPath('["path","to",2,"array","special\\ncharacters"]'), [
-      'path',
-      'to',
-      2,
-      'array',
-      'special\ncharacters'
-    ])
+    deepStrictEqual(
+      decodeDataPath('%5B%22path%22%2C%22to%22%2C2%2C%22array%22%2C%22special%5Cncharacters%22%5D'),
+      ['path', 'to', 2, 'array', 'special\ncharacters']
+    )
   })
 
   describe('should escape/unescape text', () => {

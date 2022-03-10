@@ -1,6 +1,11 @@
 import { compileJSONPointer, existsIn, getIn, setIn } from 'immutable-json-patch'
 import { forEachRight, initial, isEqual, last } from 'lodash-es'
-import { STATE_KEYS, STATE_SEARCH_PROPERTY, STATE_SEARCH_VALUE } from '../constants.js'
+import {
+  STATE_ENFORCE_STRING,
+  STATE_KEYS,
+  STATE_SEARCH_PROPERTY,
+  STATE_SEARCH_VALUE
+} from '../constants.js'
 import { getKeys } from './documentState.js'
 import { createSelectionFromOperations } from './selection.js'
 import { rename } from './operations.js'
@@ -286,13 +291,15 @@ export function createSearchAndReplaceOperations(json, state, replacementText, s
     }
     const currentValueText = typeof currentValue === 'string' ? currentValue : String(currentValue)
 
+    const enforceString = getIn(state, path.concat([STATE_ENFORCE_STRING])) || false
+
     const value = replaceText(currentValueText, replacementText, start, end)
 
     const operations = [
       {
         op: 'replace',
         path: compileJSONPointer(path),
-        value: stringConvert(value)
+        value: enforceString ? value : stringConvert(value)
       }
     ]
 
@@ -379,13 +386,15 @@ export function createSearchAndReplaceAllOperations(json, state, searchText, rep
       const currentValueText =
         typeof currentValue === 'string' ? currentValue : String(currentValue)
 
+      const enforceString = getIn(state, path.concat([STATE_ENFORCE_STRING])) || false
+
       const value = replaceAllText(currentValueText, replacementText, items)
 
       const operations = [
         {
           op: 'replace',
           path: compileJSONPointer(path),
-          value: stringConvert(value)
+          value: enforceString ? value : stringConvert(value)
         }
       ]
       allOperations = allOperations.concat(operations)

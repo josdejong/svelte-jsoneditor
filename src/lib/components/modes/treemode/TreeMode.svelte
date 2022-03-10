@@ -25,6 +25,7 @@
     SEARCH_UPDATE_THROTTLE,
     SIMPLE_MODAL_OPTIONS,
     SORT_MODAL_OPTIONS,
+    STATE_ENFORCE_STRING,
     STATE_EXPANDED,
     TRANSFORM_MODAL_OPTIONS
   } from '$lib/constants'
@@ -82,7 +83,7 @@
   import { parseJSONPointerWithArrayIndices } from '$lib/utils/jsonPointer.js'
   import { parsePartialJson, repairPartialJson } from '$lib/utils/jsonUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
-  import { isObject, isObjectOrArray, isUrl } from '$lib/utils/typeUtils'
+  import { isObject, isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
@@ -329,8 +330,9 @@
   $: textIsUnrepairable = text !== undefined && json === undefined
 
   // TODO: debounce JSON schema validation
-  $: validationErrorsList = validator ? validator(json) : []
-  $: validationErrors = mapValidationErrors(validationErrorsList)
+  /** @type{ValidationError[]} */
+  $: validationErrors = validator ? validator(json) : []
+  $: validationErrorsMap = mapValidationErrors(validationErrors)
 
   export function get() {
     return json
@@ -629,6 +631,31 @@
     })
   }
 
+  function handleToggleEnforceString() {
+    if (readOnly || !selection || selection.type !== SELECTION_TYPE.VALUE) {
+      return
+    }
+
+    const path = selection.focusPath
+    const statePath = path.concat(STATE_ENFORCE_STRING)
+    const enforceString = !getIn(state, statePath)
+
+    state = setIn(state, statePath, enforceString, true)
+
+    const value = getIn(json, path)
+    const updatedValue = enforceString ? String(value) : stringConvert(value)
+
+    if (updatedValue !== value) {
+      handlePatch([
+        {
+          op: 'replace',
+          path: compileJSONPointer(path),
+          value: updatedValue
+        }
+      ])
+    }
+  }
+
   function handleApplyAutoRepair() {
     if (json !== undefined) {
       handleChangeJson(json)
@@ -729,6 +756,8 @@
       debug('paste', { clipboardText })
 
       handleChangeText(clipboardText)
+
+      handleExpand([], true, false)
     }
   }
 
@@ -889,7 +918,7 @@
         if (newValue === '') {
           // open the newly inserted value in edit mode
           tick().then(() => {
-            setTimeout(() => replaceActiveElementContents(''))
+            setTimeout(() => insertActiveElementContents('', true))
           })
         }
       }
@@ -963,10 +992,15 @@
     tick().then(handleContextMenu)
   }
 
-  function replaceActiveElementContents(char) {
+  /**
+   * Insert (append or replace) the text contents of the current active element
+   * @param {string} char
+   * @param {boolean} replaceContents
+   */
+  function insertActiveElementContents(char, replaceContents) {
     const activeElement = getWindow(refJsonEditor).document.activeElement
     if (activeElement.isContentEditable) {
-      activeElement.textContent = char
+      activeElement.textContent = replaceContents ? char : activeElement.textContent + char
       setCursorToEnd(activeElement)
       // FIXME: should trigger an oninput, else the component will not update it's newKey/newValue variable
     }
@@ -980,9 +1014,13 @@
     }
 
     if (selection.type === SELECTION_TYPE.KEY) {
+      // only replace contents when not yet in edit mode (can happen when entering
+      // multiple characters very quickly after each other due to the async handling)
+      const replaceContents = !selection.edit
+
       selection = { ...selection, edit: true }
       await tick()
-      setTimeout(() => replaceActiveElementContents(char))
+      setTimeout(() => insertActiveElementContents(char, replaceContents))
       return
     }
 
@@ -993,9 +1031,13 @@
     } else {
       if (selection.type === SELECTION_TYPE.VALUE) {
         if (!isObjectOrArray(getIn(json, selection.focusPath))) {
+          // only replace contents when not yet in edit mode (can happen when entering
+          // multiple characters very quickly after each other due to the async handling)
+          const replaceContents = !selection.edit
+
           selection = { ...selection, edit: true }
           await tick()
-          setTimeout(() => replaceActiveElementContents(char))
+          setTimeout(() => insertActiveElementContents(char, replaceContents))
         } else {
           // TODO: replace the object/array with editing a text in edit mode?
           //  (Ideally this this should not create an entry in history though,
@@ -1016,6 +1058,10 @@
     // first insert a new value
     handleInsert('value')
 
+    // only replace contents when not yet in edit mode (can happen when entering
+    // multiple characters very quickly after each other due to the async handling)
+    const replaceContents = !selection.edit
+
     // next, open the new value in edit mode and apply the current character
     const path = selection.focusPath
     const parent = getIn(json, initial(path))
@@ -1029,7 +1075,7 @@
     })
 
     await tick()
-    setTimeout(() => replaceActiveElementContents(char))
+    setTimeout(() => insertActiveElementContents(char, replaceContents))
   }
 
   function handleMoveSelection(fromPath, toPath) {
@@ -1253,10 +1299,11 @@
     await tick()
 
     const elem = findElement(path)
-    const offset = -(refContents.getBoundingClientRect().height / 4)
-
     if (elem) {
       debug('scrollTo', { path, elem, refContents })
+
+      const offset = -(refContents.getBoundingClientRect().height / 4)
+
       jump(elem, {
         container: refContents,
         offset,
@@ -1270,7 +1317,9 @@
    * Note that the path can only be found when the node is expanded.
    */
   export function findElement(path) {
-    return refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
+    return refContents
+      ? refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
+      : undefined
   }
 
   /**
@@ -1279,31 +1328,33 @@
    * @param {Path} path
    */
   function scrollIntoView(path) {
-    const elem = refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
+    const elem = findElement(path)
 
-    if (elem) {
-      const viewPortRect = refContents.getBoundingClientRect()
-      const elemRect = elem.getBoundingClientRect()
-      const margin = 20
-      const elemHeight = isObjectOrArray(getIn(json, path))
-        ? margin // do not use real height when array or object
-        : elemRect.height
+    if (!elem || !refContents) {
+      return
+    }
 
-      if (elemRect.top < viewPortRect.top + margin) {
-        // scroll down
-        jump(elem, {
-          container: refContents,
-          offset: -margin,
-          duration: 0
-        })
-      } else if (elemRect.top + elemHeight > viewPortRect.bottom - margin) {
-        // scroll up
-        jump(elem, {
-          container: refContents,
-          offset: -(viewPortRect.height - elemHeight - margin),
-          duration: 0
-        })
-      }
+    const viewPortRect = refContents.getBoundingClientRect()
+    const elemRect = elem.getBoundingClientRect()
+    const margin = 20
+    const elemHeight = isObjectOrArray(getIn(json, path))
+      ? margin // do not use real height when array or object
+      : elemRect.height
+
+    if (elemRect.top < viewPortRect.top + margin) {
+      // scroll down
+      jump(elem, {
+        container: refContents,
+        offset: -margin,
+        duration: 0
+      })
+    } else if (elemRect.top + elemHeight > viewPortRect.bottom - margin) {
+      // scroll up
+      jump(elem, {
+        container: refContents,
+        offset: -(viewPortRect.height - elemHeight - margin),
+        duration: 0
+      })
     }
   }
 
@@ -1396,7 +1447,7 @@
       } catch (err) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
-        state = createState(json)
+        state = syncState(json, createState(json), [], defaultExpand)
         text = updatedText
         textIsRepaired = false
         selection = clearSelectionWhenNotExisting(selection, json)
@@ -1463,8 +1514,9 @@
 
   /**
    * @param {SelectionSchema} selectionSchema
+   * @param {{ ensureFocus?: boolean }} options
    */
-  function handleSelect(selectionSchema) {
+  function handleSelect(selectionSchema, options) {
     if (selectionSchema) {
       selection = createSelection(json, state, selectionSchema)
     } else {
@@ -1473,7 +1525,9 @@
 
     // set focus to the hidden input, so we can capture quick keys like Ctrl+X, Ctrl+C, Ctrl+V
     // we do this after a setTimeout in case the selection was made by clicking a button
-    setTimeout(() => focus())
+    if (options?.ensureFocus !== false) {
+      setTimeout(() => focus())
+    }
   }
 
   function handleExpandSection(path, section) {
@@ -1723,10 +1777,12 @@
   function openContextMenu({ anchor, left, top, width, height, offsetTop, offsetLeft }) {
     const props = {
       json,
+      state,
       selection,
 
       onEditKey: handleEditKey,
       onEditValue: handleEditValue,
+      onToggleEnforceString: handleToggleEnforceString,
 
       onCut: handleCut,
       onCopy: handleCopy,
@@ -1768,11 +1824,7 @@
   }
 
   function handleContextMenu(event) {
-    if (readOnly) {
-      return
-    }
-
-    if (!selection || selection.edit) {
+    if (readOnly || !selection || selection.edit || !refContents) {
       return
     }
 
@@ -1895,6 +1947,10 @@
     }
   }
 
+  function getFullSelection() {
+    return selection
+  }
+
   $: autoScrollHandler = createAutoScrollHandler(refContents)
 </script>
 
@@ -1978,9 +2034,10 @@
           {state}
           selection={recursiveSelection}
           searchResult={searchResult && searchResult.itemsWithActive}
-          {validationErrors}
+          validationErrors={validationErrorsMap}
           {readOnly}
           {normalization}
+          {getFullSelection}
           onPatch={handlePatch}
           onInsert={handleInsert}
           onExpand={handleExpand}
@@ -2035,7 +2092,7 @@
         />
       {/if}
 
-      <ValidationErrorsOverview {validationErrorsList} selectError={handleSelectValidationError} />
+      <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
     {/if}
   {:else}
     <div class="contents">

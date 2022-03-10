@@ -22,13 +22,17 @@
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { isObjectOrArray } from '$lib/utils/typeUtils'
+  import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
+  import { STATE_ENFORCE_STRING } from '$lib/constants'
 
   export let json
+  export let state
   export let selection
 
   export let onCloseContextMenu
   export let onEditKey
   export let onEditValue
+  export let onToggleEnforceString
   export let onCut
   export let onCopy
   export let onPaste
@@ -93,6 +97,11 @@
 
   $: insertText = hasSelectionContents ? 'Replace with' : 'Insert'
 
+  $: enforceString =
+    selection != null
+      ? getIn(state, selection.focusPath.concat(STATE_ENFORCE_STRING)) === true
+      : false
+
   function handleEditKey() {
     onCloseContextMenu()
     onEditKey()
@@ -101,6 +110,11 @@
   function handleEditValue() {
     onCloseContextMenu()
     onEditValue()
+  }
+
+  function handleToggleEnforceString() {
+    onCloseContextMenu()
+    onToggleEnforceString()
   }
 
   function handleCut() {
@@ -217,6 +231,23 @@
     }
   }
 
+  $: editValueDropdownItems = [
+    {
+      icon: faPen,
+      text: 'Edit value',
+      title: 'Edit the value (Double-click on the value)',
+      onClick: handleEditValue,
+      disabled: !canEditValue
+    },
+    {
+      icon: enforceString ? faCheckSquare : faSquare,
+      text: 'Enforce string',
+      title: 'Enforce keeping the value as string when it contains a numeric value',
+      onClick: handleToggleEnforceString,
+      disabled: !canEditValue
+    }
+  ]
+
   $: cutDropdownItems = [
     {
       icon: faCut,
@@ -265,17 +296,20 @@
     >
       <Icon data={faPen} /> Edit key
     </button>
-    <button
-      type="button"
-      title="Edit the value (Double-click on the value)"
-      data-name="edit-value"
-      data-down="paste,copy,cut"
-      data-left="edit-key"
-      on:click={handleEditValue}
-      disabled={!canEditValue}
-    >
-      <Icon data={faPen} /> Edit value
-    </button>
+    <DropdownButton width="150px" items={editValueDropdownItems}>
+      <button
+        type="button"
+        slot="defaultItem"
+        title="Edit the value (Double-click on the value)"
+        data-name="edit-value"
+        data-down="paste,copy,cut"
+        data-left="edit-key"
+        on:click={handleEditValue}
+        disabled={!canEditValue}
+      >
+        <Icon data={faPen} /> Edit value
+      </button>
+    </DropdownButton>
   </div>
   <div class="separator" />
   <div class="row">
@@ -294,7 +328,7 @@
         <Icon data={faCut} /> Cut
       </button>
     </DropdownButton>
-    <DropdownButton width="150px" items={copyDropdownItems}>
+    <DropdownButton width="160px" items={copyDropdownItems}>
       <button
         type="button"
         slot="defaultItem"

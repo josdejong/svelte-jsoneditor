@@ -2,11 +2,17 @@
 
 <script>
   import { onDestroy, onMount } from 'svelte'
-  import { addNewLineSuffix, getPlainText, setCursorToEnd, setPlainText } from '$lib/utils/domUtils'
+  import {
+    addNewLineSuffix,
+    removeNewLineSuffix,
+    setCursorToEnd,
+    setPlainText
+  } from '$lib/utils/domUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { createDebug } from '$lib/utils/debug'
   import classnames from 'classnames'
   import { noop } from 'lodash-es'
+  import { UPDATE_SELECTION } from '../../constants.js'
 
   const debug = createDebug('jsoneditor:EditableDiv')
 
@@ -35,13 +41,12 @@
     debug('onDestroy', { closed, value, newValue })
 
     if (!closed && newValue !== value) {
-      const passiveExit = true
-      onChange(newValue, passiveExit)
+      onChange(newValue, UPDATE_SELECTION.NO)
     }
   })
 
   function getDomValue() {
-    return getPlainText(domValue)
+    return removeNewLineSuffix(domValue.innerText)
   }
 
   function setDomValue(updatedValue) {
@@ -77,7 +82,7 @@
       closed = true
 
       const newValue = getDomValue()
-      onChange(newValue)
+      onChange(newValue, UPDATE_SELECTION.NEXT_INSIDE)
     }
   }
 
@@ -89,6 +94,24 @@
     const clipboardText = event.clipboardData.getData('text/plain')
     onPaste(clipboardText)
   }
+
+  function handleBlur() {
+    const hasFocus = document.hasFocus()
+    const newValue = getDomValue()
+
+    debug('handleBlur', { hasFocus, closed, value, newValue })
+
+    // we only want to close the editable div when the focus did go to another
+    // element on the same page, but not when the user switches to another
+    // application or browser tab to copy/paste something whilst still editing
+    // the value, hence the check for document.hasFocus()
+    if (document.hasFocus() && !closed) {
+      closed = true
+      if (newValue !== value) {
+        onChange(newValue, UPDATE_SELECTION.SELF)
+      }
+    }
+  }
 </script>
 
 <div
@@ -98,6 +121,7 @@
   on:input={handleValueInput}
   on:keydown={handleValueKeyDown}
   on:paste={handleValuePaste}
+  on:blur={handleBlur}
   bind:this={domValue}
 />
 

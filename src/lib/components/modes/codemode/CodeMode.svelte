@@ -2,7 +2,7 @@
 
 <script>
   import { faExclamationTriangle, faWrench } from '@fortawesome/free-solid-svg-icons'
-  import { createDebug } from '../../../utils/debug'
+  import { createDebug } from '$lib/utils/debug'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
   import { debounce, uniqueId } from 'lodash-es'
@@ -20,25 +20,35 @@
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
-    getWindow,
-    jsonEscapeUnicode
-  } from '../../../utils/domUtils'
+    getWindow
+  } from '$lib/utils/domUtils'
   import { formatSize } from '$lib/utils/fileUtils'
   import { findTextLocation } from '$lib/utils/jsonUtils'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import SortModal from '../../modals/SortModal.svelte'
   import TransformModal from '../../modals/TransformModal.svelte'
   import CodeMenu from './menu/CodeMenu.svelte'
+  import { basicSetup, EditorState } from '@codemirror/basic-setup'
+  import { EditorView, keymap } from '@codemirror/view'
+  import { indentWithTab } from '@codemirror/commands'
+  import { linter, lintGutter } from '@codemirror/lint'
+  import { json as jsonLang } from '@codemirror/lang-json'
+  import { indentUnit } from '@codemirror/language'
+  import { highlightStyle } from './codemirror/codemirror-theme.js'
+  import { Compartment } from '@codemirror/state'
+  import { closeSearchPanel, openSearchPanel } from '@codemirror/search'
+  import { redo, redoDepth, undo, undoDepth } from '@codemirror/history'
+  import { normalizeJsonParseError } from '../../../utils/jsonUtils.js'
+  import { MAX_VALIDATABLE_SIZE } from '../../../constants.js'
+  import { measure } from '../../../utils/timeUtils.js'
 
   export let readOnly = false
   export let mainMenuBar = true
   export let text = ''
-  export let indentation = 2 // TODO: make indentation configurable
+  export let indentation = 2
   export let escapeUnicodeCharacters = false
-  export let aceTheme = 'ace/theme/jsoneditor' // TODO: make aceTheme configurable
   export let validator = null
 
   /** @type {((text: string, previousText: string) => void) | null} */
@@ -61,29 +71,39 @@
 
   const debug = createDebug('jsoneditor:CodeMode')
 
+  const formatCompactKeyBinding = {
+    key: 'Mod-i',
+    run: handleFormat,
+    shift: handleCompact,
+    preventDefault: true
+  }
+
   const isSSR = typeof window === 'undefined'
   debug('isSSR:', isSSR)
 
-  let aceEditorRef
-  let aceEditor
-  let aceEditorText
+  let codeMirrorRef
+  let codeMirrorView
+  let codeMirrorText
   let domCodeMode
 
   let onChangeDisabled = false
   let acceptTooLarge = false
 
-  let validationErrorsList = []
+  /** @type{ValidationError[]} */
+  let validationErrors = []
+  const readOnlyCompartment = new Compartment()
+  const indentUnitCompartment = new Compartment()
 
   $: isNewDocument = text.length === 0
   $: tooLarge = text && text.length > MAX_DOCUMENT_SIZE_CODE_MODE
-  $: aceEditorDisabled = tooLarge && !acceptTooLarge
+  $: codeEditorDisabled = tooLarge && !acceptTooLarge
 
   $: normalization = createNormalizationFunctions({
     escapeControlCharacters: false,
     escapeUnicodeCharacters
   })
 
-  $: setAceEditorValue(text)
+  $: setCodeMirrorValue(text)
   $: updateIndentation(indentation)
   $: updateReadOnly(readOnly)
 
@@ -102,27 +122,12 @@
     }
 
     try {
-      // We load ace dynamically to prevent trying to load it serverside (SSR),
-      // since this is not supported by ace
-      const { ace } = await import('./ace/index.js')
-
-      aceEditor = createAceEditor({
-        target: aceEditorRef,
-        ace,
+      codeMirrorView = createCodeMirrorView({
+        target: codeMirrorRef,
+        initialText: text,
         readOnly,
-        indentation,
-        onChange: onChangeAceEditorValueDebounced
+        indentation
       })
-
-      if (resizeObserver) {
-        resizeObserver.observe(aceEditorRef)
-      } else {
-        debug('WARNING: ResizeObserver is undefined. Code editor will not automatically be resized')
-      }
-
-      // load initial text
-      setAceEditorValue(text)
-      aceEditor.session.getUndoManager().reset()
 
       focus()
     } catch (err) {
@@ -132,35 +137,23 @@
   })
 
   onDestroy(() => {
-    updateCancelUndoRedoDebounced.cancel()
-
-    if (resizeObserver) {
-      resizeObserver.unobserve(aceEditorRef)
-      resizeObserver = null
-    }
-
-    if (aceEditor) {
-      debug('Destroy Ace editor')
-      aceEditor.destroy()
-      aceEditor = null
+    if (codeMirrorView) {
+      debug('Destroy CodeMirror editor')
+      codeMirrorView.destroy()
     }
   })
 
   let canUndo = false
   let canRedo = false
 
-  let resizeObserver =
-    typeof window !== 'undefined' && window.ResizeObserver
-      ? new window.ResizeObserver(resize)
-      : null
-
   const { open } = getContext('simple-modal')
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
 
   export function focus() {
-    if (aceEditor) {
-      aceEditor.focus()
+    if (codeMirrorView) {
+      debug('focus')
+      codeMirrorView.focus()
     }
   }
 
@@ -199,13 +192,6 @@
       previousJson,
       undo,
       redo: operations
-    }
-  }
-
-  function resize() {
-    if (aceEditor) {
-      const force = false
-      aceEditor.resize(force)
     }
   }
 
@@ -346,232 +332,268 @@
   }
 
   function handleToggleSearch() {
-    if (aceEditor.searchBox) {
-      // toggle
-      if (aceEditor.searchBox.active) {
-        aceEditor.searchBox.hide()
+    if (codeMirrorView) {
+      // TODO: figure out the proper way to detect whether the search panel is open
+      if (codeMirrorRef && codeMirrorRef.querySelector('.cm-search')) {
+        closeSearchPanel(codeMirrorView)
       } else {
-        aceEditor.searchBox.show()
+        openSearchPanel(codeMirrorView)
       }
-    } else {
-      // first time initialization
-      aceEditor.execCommand('find')
     }
   }
 
   function handleUndo() {
-    if (aceEditor) {
-      aceEditor.getSession().getUndoManager().undo(false)
+    if (codeMirrorView) {
+      undo(codeMirrorView)
+      focus()
     }
   }
 
   function handleRedo() {
-    if (aceEditor) {
-      aceEditor.getSession().getUndoManager().redo(false)
-    }
-  }
-
-  function handleKeyDown(event) {
-    // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
-    const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
-
-    debug('keydown', combo)
-
-    if (
-      combo === 'Ctrl+I' ||
-      combo === 'Ctrl+\\' // for backward compatibility
-    ) {
-      event.preventDefault()
-      event.stopPropagation()
-      handleFormat()
-    }
-
-    if (
-      combo === 'Ctrl+Shift+I' ||
-      combo === 'Ctrl+Shift+\\' // for backward compatibility
-    ) {
-      event.preventDefault()
-      event.stopPropagation()
-      handleCompact()
+    if (codeMirrorView) {
+      redo(codeMirrorView)
+      focus()
     }
   }
 
   function handleAcceptTooLarge() {
     acceptTooLarge = true
-    setAceEditorValue(text, true)
+    setCodeMirrorValue(text, true)
   }
 
   function cancelLoadTooLarge() {
-    // copy the latest contents of the Ace editor again into text
-    onChangeAceEditorValue()
+    // copy the latest contents of the code editor again into text
+    onChangeCodeMirrorValue()
   }
 
   /**
-   * @param {ValidationError} error
+   * @param {ValidationError} validationError
    **/
-  function handleSelectValidationError(error) {
-    debug('select validation error', error)
+  function handleSelectValidationError(validationError) {
+    debug('select validation error', validationError)
 
-    const annotation = validationErrorToAnnotation(error)
-    const location = {
-      row: annotation.row,
-      column: annotation.column
-    }
-    setSelection(location, location)
+    const richValidationError = toRichValidationError(validationError)
+
+    // we take "to" as head, not as anchor, because the scrollIntoView will
+    // move to the head, and when a large whole object is selected as a whole,
+    // we want to scroll to the start of the object and not the end
+    setSelection(richValidationError.from, richValidationError.to)
+
     focus()
   }
 
   /**
-   * @param {Point} start
-   * @param {Point} end
+   * @param {ParseError} parseError
    **/
-  function setSelection(start, end) {
-    if (aceEditor) {
-      aceEditor.selection.setRange({ start, end })
-      aceEditor.scrollToLine(start.row, true)
+  function handleSelectParseError(parseError) {
+    debug('select parse error', parseError)
+
+    const richParseError = toRichParseError(parseError)
+
+    // we take "to" as head, not as anchor, because the scrollIntoView will
+    // move to the head, and when a large whole object is selected as a whole,
+    // we want to scroll to the start of the object and not the end
+    setSelection(richParseError.from, richParseError.to)
+
+    focus()
+  }
+
+  /**
+   * @param {number} anchor
+   * @param {number} head
+   **/
+  function setSelection(anchor, head) {
+    debug('setSelection', { anchor, head })
+
+    if (codeMirrorView) {
+      codeMirrorView.dispatch(
+        codeMirrorView.state.update({
+          selection: { anchor, head },
+          scrollIntoView: true
+        })
+      )
     }
   }
 
-  function createAceEditor({ target, ace, readOnly, indentation, onChange }) {
-    debug('create Ace editor')
+  function createCodeMirrorView({ target, initialText, readOnly, indentation }) {
+    debug('Create CodeMirror editor', { readOnly, indentation })
 
-    const editor = ace.edit(target)
-    const aceSession = editor.getSession()
-    editor.$blockScrolling = Infinity
-    editor.setTheme(aceTheme)
-    editor.setOptions({ readOnly })
-    editor.setShowPrintMargin(false)
-    editor.setFontSize('14px') // must correspond with CSS $font-size-mono
-    aceSession.setMode('ace/mode/json')
-    aceSession.setTabSize(indentation)
-    aceSession.setUseSoftTabs(true)
-    aceSession.setUseWrapMode(true)
+    const state = EditorState.create({
+      doc: initialText,
+      extensions: [
+        keymap.of([indentWithTab, formatCompactKeyBinding]),
+        linter(
+          () => {
+            onChangeCodeMirrorValueDebounced.flush()
 
-    // disable Ctrl+L quickkey of Ace (is used by the browser to select the address bar)
-    editor.commands.bindKey('Ctrl-L', null)
-    editor.commands.bindKey('Command-L', null)
+            return validate()
+          },
+          { delay: CODE_MODE_ONCHANGE_DELAY }
+        ),
+        lintGutter(),
+        basicSetup,
+        highlightStyle,
+        EditorView.updateListener.of((update) => {
+          if (update.docChanged) {
+            onChangeCodeMirrorValueDebounced()
+          }
+        }),
+        jsonLang(),
+        readOnlyCompartment.of(EditorState.readOnly.of(readOnly)),
+        indentUnitCompartment.of(createIndentUnit(indentation)),
+        EditorView.lineWrapping
+      ]
+    })
 
-    // disable the quickkeys we want to use for Format and Compact
-    editor.commands.bindKey('Ctrl-\\', null)
-    editor.commands.bindKey('Command-\\', null)
-    editor.commands.bindKey('Ctrl-Shift-\\', null)
-    editor.commands.bindKey('Command-Shift-\\', null)
+    codeMirrorView = new EditorView({
+      state,
+      parent: target
+    })
 
-    // replace ace setAnnotations with custom function that also covers jsoneditor annotations
-    const originalSetAnnotations = aceSession.setAnnotations
-    aceSession.setAnnotations = function (annotations) {
-      if (text !== '') {
-        const newAnnotations =
-          annotations && annotations.length
-            ? annotations
-            : validationErrorsList.map(validationErrorToAnnotation)
-
-        debug('setAnnotations', { annotations, newAnnotations })
-
-        originalSetAnnotations.call(this, newAnnotations)
-      } else {
-        originalSetAnnotations.call(this, [])
-      }
-    }
-
-    // register onchange event
-    editor.on('change', onChange)
-
-    return editor
+    return codeMirrorView
   }
 
-  function validationErrorToAnnotation(validationError) {
-    const location = findTextLocation(text, validationError.path)
+  function getCodeMirrorValue() {
+    return codeMirrorView ? normalization.unescapeValue(codeMirrorView.state.doc.toString()) : ''
+  }
+
+  /**
+   * @param {ValidationError} validationError
+   * @returns {RichValidationError}
+   */
+  function toRichValidationError(validationError) {
+    const { path, message, isChildError } = validationError
+    const { line, column, from, to } = findTextLocation(text, path)
 
     return {
-      row: location ? location.row : 0,
-      column: location ? location.column : 0,
-      text: validationError.message,
-      type: 'warning'
+      path,
+      isChildError,
+      line,
+      column,
+      from,
+      to,
+      message,
+      severity: 'warning',
+      actions: []
     }
   }
 
   /**
-   * refresh ERROR annotations state
-   * error annotations are handled by the ace json mode (ace/mode/json)
-   * validation annotations are handled by this mode
-   * therefore in order to refresh we send only the annotations of error type in order to maintain its state
-   * @private
+   * @param {ParseError} parseError
+   * @param {boolean} isRepairable
+   * @returns {RichValidationError}
    */
-  function refreshAnnotations() {
-    debug('refresh annotations')
-    const session = aceEditor && aceEditor.getSession()
-    if (session) {
-      const errorAnnotations = session
-        .getAnnotations()
-        .filter((annotation) => annotation.type === 'error')
+  function toRichParseError(parseError, isRepairable) {
+    const { line, column, position, message } = parseError
 
-      session.setAnnotations(errorAnnotations)
+    return {
+      path: null,
+      line,
+      column,
+      from: position || 0,
+      to: position || 0,
+      severity: 'error',
+      message,
+      actions: isRepairable
+        ? [
+            {
+              name: 'Auto repair',
+              apply: () => handleRepair()
+            }
+          ]
+        : null
     }
   }
 
-  function setAceEditorValue(text, force = false) {
-    if (aceEditorDisabled && !force) {
+  function setCodeMirrorValue(text, force = false) {
+    if (codeEditorDisabled && !force) {
       debug('not applying text: editor is disabled')
       return
     }
 
-    onChangeDisabled = true
-    if (aceEditor && text !== aceEditorText) {
-      aceEditorText = text
-      aceEditor.setValue(normalization.escapeValue(text), -1)
+    if (codeMirrorView && text !== codeMirrorText) {
+      debug('setCodeMirrorValue')
 
-      updateCancelUndoRedoDebounced()
+      codeMirrorText = text
+
+      // keep state
+      // to reset state: codeMirrorView.setState(EditorState.create({doc: text, extensions: ...}))
+      codeMirrorView.dispatch({
+        changes: {
+          from: 0,
+          to: codeMirrorView.state.doc.length,
+          insert: normalization.escapeValue(text)
+        }
+      })
     }
-    onChangeDisabled = false
   }
 
   function forceUpdateText() {
     debug('forceUpdateText', { escapeUnicodeCharacters })
-    aceEditor.setValue(normalization.escapeValue(text), -1)
+
+    if (codeMirrorView) {
+      codeMirrorView.dispatch({
+        changes: {
+          from: 0,
+          to: codeMirrorView.state.doc.length,
+          insert: normalization.escapeValue(text)
+        }
+      })
+    }
   }
 
-  function onChangeAceEditorValue() {
-    if (onChangeDisabled || !aceEditor) {
+  function onChangeCodeMirrorValue() {
+    if (onChangeDisabled || !codeMirrorView) {
       return
     }
 
-    aceEditorText = normalization.unescapeValue(aceEditor.getValue())
+    codeMirrorText = getCodeMirrorValue()
+    if (codeMirrorText !== text) {
+      const previousText = codeMirrorText
 
-    if (text !== aceEditorText) {
-      const previousText = aceEditorText
+      debug('text changed')
+      text = codeMirrorText
 
-      // apply to text before emitting onChange to prevent infinite loops
-      text = aceEditorText
-
-      updateCancelUndoRedoDebounced()
+      updateCanUndoRedo()
 
       emitOnChange(text, previousText)
     }
   }
 
   function updateIndentation(indentation) {
-    if (aceEditor) {
-      aceEditor.getSession().setTabSize(indentation)
+    if (codeMirrorView) {
+      debug('updateIndentation', indentation)
+
+      codeMirrorView.dispatch({
+        effects: indentUnitCompartment.reconfigure(createIndentUnit(indentation))
+      })
     }
   }
 
   function updateReadOnly(readOnly) {
-    if (aceEditor) {
-      aceEditor.setOptions({ readOnly })
+    if (codeMirrorView) {
+      debug('updateReadOnly', readOnly)
+
+      codeMirrorView.dispatch({
+        effects: readOnlyCompartment.reconfigure(EditorState.readOnly.of(readOnly))
+      })
     }
+  }
+
+  /**
+   * @param {number} indentation
+   * @returns {Extension}
+   */
+  function createIndentUnit(indentation) {
+    return indentUnit.of(' '.repeat(indentation))
   }
 
   function updateCanUndoRedo() {
-    const undoManager = aceEditor ? aceEditor.getSession().getUndoManager() : undefined
+    canUndo = undoDepth(codeMirrorView.state) > 0
+    canRedo = redoDepth(codeMirrorView.state) > 0
 
-    if (undoManager && undoManager.hasUndo && undoManager.hasRedo) {
-      canUndo = undoManager.hasUndo()
-      canRedo = undoManager.hasRedo()
-    }
+    debug({ canUndo, canRedo })
   }
-
-  const updateCancelUndoRedoDebounced = debounce(updateCanUndoRedo, 0) // just on next tick
 
   // debounce the input: when pressing Enter at the end of a line, two change
   // events are fired: one with the new Return character, and a second with
@@ -579,7 +601,10 @@
   // for example in React. Debouncing the onChange events also results in not
   // firing a change event with every character that a user types, but only as
   // soon as the user stops typing.
-  const onChangeAceEditorValueDebounced = debounce(onChangeAceEditorValue, CODE_MODE_ONCHANGE_DELAY)
+  const onChangeCodeMirrorValueDebounced = debounce(
+    onChangeCodeMirrorValue,
+    CODE_MODE_ONCHANGE_DELAY
+  )
 
   /**
    * @param {string} text
@@ -592,51 +617,85 @@
   }
 
   let jsonStatus = JSON_STATUS_VALID
-  let jsonParseError
 
-  function checkValidJson() {
+  /** @type {ParseError || null} */
+  let jsonParseError = null
+
+  /**
+   * @returns {Diagnostic[]}
+   */
+  function validate() {
+    debug('validate')
     jsonStatus = JSON_STATUS_VALID
-    jsonParseError = undefined
-    validationErrorsList = []
+    jsonParseError = null
+    validationErrors = []
 
-    // FIXME: utilize the parse errors coming from AceEditor worker, only try to repair then
-    if (text.length > MAX_AUTO_REPAIRABLE_SIZE) {
-      debug('checkValidJson: not validating, document too large')
-      return
+    if (text.length > MAX_VALIDATABLE_SIZE) {
+      return [
+        {
+          from: 0,
+          to: 0,
+          message: 'Validation turned off: the document is too large',
+          severity: 'info'
+        }
+      ]
     }
 
     if (isNewDocument) {
       // new, empty document, do not try to parse
-      return
+      return []
     }
 
     try {
-      // FIXME: instead of parsing the JSON here (which is expensive),
-      //  get the parse error from the Ace Editor worker instead
-      const json = JSON.parse(text)
+      const json = measure(
+        () => JSON.parse(text),
+        (duration) => debug(`validate: parsed json in ${duration} ms`)
+      )
 
-      if (validator) {
-        validationErrorsList = validator(json)
+      if (!validator) {
+        return []
       }
 
-      refreshAnnotations()
+      validationErrors = measure(
+        () => validator(json),
+        (duration) => debug(`validate: validated json in ${duration} ms`)
+      )
+
+      return validationErrors.map(toRichValidationError)
     } catch (err) {
-      jsonParseError = err.toString()
-      try {
-        JSON.parse(jsonrepair(text))
-        jsonStatus = JSON_STATUS_REPAIRABLE
-      } catch (err) {
-        jsonStatus = JSON_STATUS_INVALID
-      }
-    }
+      const isRepairable = measure(
+        () => canAutoRepair(text),
+        (duration) => debug(`validate: checked whether repairable in ${duration} ms`)
+      )
 
-    debug('checked json status', jsonStatus)
+      jsonParseError = normalizeJsonParseError(text, err.message || err.toString())
+      jsonStatus = isRepairable ? JSON_STATUS_REPAIRABLE : JSON_STATUS_INVALID
+
+      return [toRichParseError(jsonParseError, isRepairable)]
+    }
   }
 
-  // we pass unused arguments to trigger calling checkValidJson when text or validator changes
-  // TODO: find a better solution
-  $: checkValidJson(text)
-  $: checkValidJson(validator)
+  function canAutoRepair(text) {
+    if (text.length > MAX_AUTO_REPAIRABLE_SIZE) {
+      return false
+    }
+
+    try {
+      JSON.parse(jsonrepair(text))
+
+      return true
+    } catch (err) {
+      return false
+    }
+  }
+
+  function triggerValidation() {
+    // a trick to trigger running diagnostics again
+    forceUpdateText()
+  }
+
+  // we pass unused argument to trigger the editor to update the diagnostics
+  $: triggerValidation(validator)
 
   $: repairActions =
     jsonStatus === JSON_STATUS_REPAIRABLE
@@ -651,7 +710,7 @@
       : []
 </script>
 
-<div class="code-mode" on:keydown={handleKeyDown} bind:this={domCodeMode}>
+<div class="code-mode" bind:this={domCodeMode}>
   {#if mainMenuBar}
     <CodeMenu
       {readOnly}
@@ -673,7 +732,7 @@
   {/if}
 
   {#if !isSSR}
-    {#if aceEditorDisabled}
+    {#if codeEditorDisabled}
       <Message
         icon={faExclamationTriangle}
         type="error"
@@ -705,18 +764,19 @@
       />
     {/if}
 
-    <div class="contents" class:visible={!aceEditorDisabled} bind:this={aceEditorRef} />
+    <div class="contents" class:visible={!codeEditorDisabled} bind:this={codeMirrorRef} />
 
     {#if jsonParseError}
       <Message
         type="error"
         icon={faExclamationTriangle}
-        message={jsonParseError}
+        message={jsonParseError.message}
         actions={repairActions}
+        onClick={() => handleSelectParseError(jsonParseError)}
       />
     {/if}
 
-    <ValidationErrorsOverview {validationErrorsList} selectError={handleSelectValidationError} />
+    <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
   {:else}
     <div class="contents" class:visible={true}>
       <div class="loading-space" />

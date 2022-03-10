@@ -10,10 +10,33 @@
   .contents {
     flex: 1;
     display: flex;
-    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+    min-height: 0;
 
     &:not(.visible) {
       visibility: hidden;
+    }
+
+    :global(.cm-editor) {
+      flex: 1;
+      overflow: hidden;
+
+      :global(.cm-scroller) {
+        font-family: $font-family-mono;
+        font-size: $font-size-mono;
+        line-height: 1.3em;
+        color: $black;
+      }
+
+      :global(.cm-gutters) {
+        background: $very-light-gray;
+      }
+
+      :global(.cm-diagnostic) {
+        font-size: $font-size;
+        font-family: $font-family;
+      }
     }
 
     .loading-space {

@@ -23,7 +23,7 @@
   button.open-dropdown {
     @include jsoneditor-button;
 
-    padding: $padding $padding-half;
+    padding: $padding;
     background: $dark-gray;
     color: $white;
 

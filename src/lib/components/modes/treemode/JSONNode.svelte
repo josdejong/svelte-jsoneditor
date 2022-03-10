@@ -40,6 +40,7 @@
   import { singleton } from './singleton.js'
   import ValidationError from './ValidationError.svelte'
   import { createDebug } from '$lib/utils/debug.js'
+  import { STATE_ENFORCE_STRING } from '$lib/constants.js'
 
   // eslint-disable-next-line no-undef-init
   export let value
@@ -67,6 +68,7 @@
   export let onExpandSection
 
   export let selection
+  export let getFullSelection
 
   // TODO: it is ugly to have to translate selection into selectionObj, and not accidentally use the wrong one. Is there an other way?
   $: selectionObj = selection && selection[STATE_SELECTION]
@@ -152,11 +154,14 @@
 
     if (event.shiftKey) {
       // Shift+Click will select multiple entries
-      onSelect({
-        type: SELECTION_TYPE.MULTI,
-        anchorPath: selectionObj.anchorPath,
-        focusPath: path
-      })
+      const fullSelection = getFullSelection()
+      if (fullSelection) {
+        onSelect({
+          type: SELECTION_TYPE.MULTI,
+          anchorPath: fullSelection.anchorPath,
+          focusPath: path
+        })
+      }
     } else {
       switch (anchorType) {
         case SELECTION_TYPE.KEY:
@@ -282,22 +287,32 @@
     hover = null
   }
 
-  function handleInsertInside() {
+  function handleInsertInside(event) {
+    if (!event.shiftKey) {
+      event.stopPropagation()
+      event.preventDefault()
+
+      onSelect({ type: SELECTION_TYPE.INSIDE, path })
+    }
+  }
+
+  function handleInsertAfter(event) {
+    if (!event.shiftKey) {
+      event.stopPropagation()
+      event.preventDefault()
+
+      onSelect({ type: SELECTION_TYPE.AFTER, path })
+    }
+  }
+
+  function handleInsertInsideOpenContextMenu(props) {
     onSelect({ type: SELECTION_TYPE.INSIDE, path })
+    onContextMenu(props)
   }
 
-  function handleInsertAfter() {
+  function handleInsertAfterOpenContextMenu(props) {
     onSelect({ type: SELECTION_TYPE.AFTER, path })
-  }
-
-  function handleInsertInsideOpenContextMenu(event) {
-    handleInsertInside()
-    onContextMenu(event)
-  }
-
-  function handleInsertAfterOpenContextMenu(event) {
-    handleInsertAfter()
-    onContextMenu(event)
+    onContextMenu(props)
   }
 
   $: indentationStyle = getIndentationStyle(path.length)
@@ -340,7 +355,7 @@
         <div class="meta">
           <div class="meta-inner" data-type="selectable-value">
             {#if expanded}
-              <div class="bracket expanded">[</div>
+              <div class="bracket">[</div>
               <span class="tag readonly">
                 {value.length} items
               </span>
@@ -408,6 +423,7 @@
                 : undefined}
               {readOnly}
               {normalization}
+              {getFullSelection}
               {onPatch}
               {onInsert}
               {onExpand}
@@ -533,6 +549,7 @@
             validationErrors={validationErrors ? validationErrors[key] : undefined}
             {readOnly}
             {normalization}
+            {getFullSelection}
             {onPatch}
             {onInsert}
             {onExpand}
@@ -588,6 +605,7 @@
           {path}
           {value}
           {readOnly}
+          enforceString={state ? state[STATE_ENFORCE_STRING] : undefined}
           {normalization}
           selection={selectionObj}
           searchResult={searchResult ? searchResult[STATE_SEARCH_VALUE] : undefined}
