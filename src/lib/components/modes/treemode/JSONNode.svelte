@@ -38,7 +38,7 @@
   import JSONValue from './JSONValue.svelte'
   import { singleton } from './singleton.js'
   import ValidationError from './ValidationError.svelte'
-  import { STATE_ENFORCE_STRING } from '$lib/constants.js'
+  import { STATE_ENFORCE_STRING } from '$lib/constants'
 
   // eslint-disable-next-line no-undef-init
   export let value
@@ -52,6 +52,7 @@
   export let onInsert
   export let onExpand
   export let onSelect
+  export let onFind
   export let onPasteJson
   export let onRenderValue
   export let onContextMenu
@@ -386,6 +387,7 @@
               {onInsert}
               {onExpand}
               {onSelect}
+              {onFind}
               {onPasteJson}
               {onExpandSection}
               {onRenderValue}
@@ -511,6 +513,7 @@
             {onInsert}
             {onExpand}
             {onSelect}
+            {onFind}
             {onPasteJson}
             {onExpandSection}
             {onRenderValue}
@@ -529,6 +532,7 @@
                 searchResult={searchResult?.[key]?.[STATE_SEARCH_PROPERTY]}
                 onUpdateKey={handleUpdateKey}
                 {onSelect}
+                {onFind}
               />
               {#if !readOnly && selectionObj && selectionObj.type === SELECTION_TYPE.KEY && !selectionObj.edit && isEqual(selectionObj.focusPath, path.concat(key))}
                 <ContextMenuButton selected={true} {onContextMenu} />
@@ -567,6 +571,7 @@
           searchResult={searchResult ? searchResult[STATE_SEARCH_VALUE] : undefined}
           {onPatch}
           {onSelect}
+          {onFind}
           {onPasteJson}
           {onRenderValue}
         />

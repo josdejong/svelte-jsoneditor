@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script>
-  import { SELECTION_TYPE } from '$lib/logic/selection.js'
+  import { SELECTION_TYPE } from '$lib/logic/selection'
   import { isEqual } from 'lodash-es'
 
   export let path
@@ -19,6 +19,7 @@
   export let onPatch
   export let onPasteJson
   export let onSelect
+  export let onFind
   export let onRenderValue
 
   $: isSelected =
@@ -40,7 +41,8 @@
     searchResult,
     onPatch,
     onPasteJson,
-    onSelect
+    onSelect,
+    onFind
   })
 </script>
 

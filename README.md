@@ -345,6 +345,7 @@ type RenderValueProps = {
   onPatch: (patch: JSONPatchDocument, newSelection: Selection | null) => void
   onPasteJson: (pastedJson: { path: Path; contents: JSON }) => void
   onSelect: (selection: Selection) => void
+  onFind: (findAndReplace: boolean) => void
 }
 
 type ValueNormalization = {

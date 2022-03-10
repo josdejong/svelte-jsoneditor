@@ -19,7 +19,8 @@ export function renderValue({
   normalization,
   onPatch,
   onPasteJson,
-  onSelect
+  onSelect,
+  onFind
 }) {
   const renderers = []
 
@@ -40,7 +41,7 @@ export function renderValue({
   if (isEditing) {
     renderers.push({
       component: EditableValue,
-      props: { path, value, enforceString, normalization, onPatch, onPasteJson, onSelect }
+      props: { path, value, enforceString, normalization, onPatch, onPasteJson, onSelect, onFind }
     })
   }
 
