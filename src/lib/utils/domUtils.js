@@ -195,7 +195,7 @@ export function isChildOf(element, predicate) {
 }
 
 /**
- * Test if the element or one of it's parents has a certain predicate
+ * Test if the element or one of its parents has a certain predicate
  * Can be use for example to check whether the element or it's parent has
  * a specific attribute or nodeName.
  * @param {HTMLElement} element

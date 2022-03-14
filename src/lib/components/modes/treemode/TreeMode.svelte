@@ -14,7 +14,7 @@
     updateIn
   } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
-  import { initial, isEmpty, isEqual, last, throttle, uniqueId } from 'lodash-es'
+  import { first, initial, isEmpty, isEqual, last, throttle, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
   import { createJump } from '$lib/assets/jump.js/src/jump'
   import {
@@ -80,7 +80,7 @@
     isChildOfNodeName,
     setCursorToEnd
   } from '$lib/utils/domUtils'
-  import { parseJSONPointerWithArrayIndices } from '$lib/utils/jsonPointer.js'
+  import { parseJSONPointerWithArrayIndices } from '$lib/utils/jsonPointer'
   import { parsePartialJson, repairPartialJson } from '$lib/utils/jsonUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { isObject, isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils'
@@ -97,6 +97,7 @@
   import Welcome from './Welcome.svelte'
   import NavigationBar from '../../../components/controls/navigationBar/NavigationBar.svelte'
   import SearchBox from '../../../components/modes/treemode/menu/SearchBox.svelte'
+  import { getDataPathFromTarget } from '../../../utils/domUtils.js'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -1078,18 +1079,74 @@
     setTimeout(() => insertActiveElementContents(char, replaceContents))
   }
 
-  function handleMoveSelection(fromPath, toPath) {
+  function handleMoveSelection(deltaY) {
     if (readOnly || !selection) {
       return
     }
 
-    debug('move selection', fromPath, toPath, selection)
+    debug('move selection', { deltaY, selection })
 
-    const operations = moveInsideParent(json, state, selection, fromPath, toPath)
+    function findSwapElement(path, threshold, getNextElement) {
+      let currentElement = findElement(path)
+      let cumulativeHeight = 0
+      let swapElement = undefined
 
-    if (operations) {
-      handlePatch(operations)
+      while (
+        currentElement &&
+        getNextElement(currentElement) &&
+        threshold > cumulativeHeight + getNextElement(currentElement).clientHeight / 2
+      ) {
+        currentElement = getNextElement(currentElement)
+        swapElement = currentElement
+        cumulativeHeight += currentElement.clientHeight
+      }
+
+      return swapElement
     }
+
+    if (deltaY < 0) {
+      // moving selection up
+      const startPath = selection.paths ? first(selection.paths) : selection.focusPath
+
+      const swapElement = findSwapElement(
+        startPath,
+        Math.abs(deltaY),
+        (elem) => elem.previousElementSibling
+      )
+
+      if (swapElement) {
+        debug('move selection before element: ', getDataPathFromTarget(swapElement), swapElement)
+
+        // TODO: deduplicate logic
+        const path = getDataPathFromTarget(swapElement)
+        const operations = moveInsideParent(json, state, selection, path)
+
+        if (operations) {
+          handlePatch(operations)
+          return true
+        }
+      }
+    } else {
+      // moving selection down
+      const endPath = selection.paths ? last(selection.paths) : selection.focusPath
+
+      const swapElement = findSwapElement(endPath, deltaY, (elem) => elem.nextElementSibling)
+
+      if (swapElement) {
+        debug('move selection after element: ', getDataPathFromTarget(swapElement), swapElement)
+
+        // TODO: deduplicate logic
+        const path = getDataPathFromTarget(swapElement)
+        const operations = moveInsideParent(json, state, selection, path)
+
+        if (operations) {
+          handlePatch(operations)
+          return true
+        }
+      }
+    }
+
+    return false
   }
 
   function handleUndo() {
@@ -1316,7 +1373,7 @@
    * Find the DOM element of a given path.
    * Note that the path can only be found when the node is expanded.
    */
-  export function findElement(path) {
+  function findElement(path) {
     return refContents
       ? refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
       : undefined
@@ -2038,6 +2095,7 @@
           {readOnly}
           {normalization}
           {getFullSelection}
+          {findElement}
           onPatch={handlePatch}
           onInsert={handleInsert}
           onExpand={handleExpand}

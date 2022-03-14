@@ -1,4 +1,4 @@
-import { cloneDeepWith, first, initial, isEmpty, last } from 'lodash-es'
+import { cloneDeepWith, first, initial, isEmpty, last, times } from 'lodash-es'
 import { compileJSONPointer, getIn } from 'immutable-json-patch'
 import { parseAndRepair, parseAndRepairOrUndefined, parsePartialJson } from '../utils/jsonUtils.js'
 import { findUniqueName } from '../utils/stringUtils.js'
@@ -422,64 +422,53 @@ export function insert(json, state, selection, clipboardText) {
 
 // TODO: work out, WIP
 // TODO: comment
-export function moveInsideParent(json, state, selection, fromPath, toPath) {
+export function moveInsideParent(json, state, selection, path) {
   const parentPath = initial(selection.focusPath)
-  if (pathStartsWith(toPath, parentPath) && toPath.length > parentPath.length) {
-    const fromPathChild = fromPath.slice(0, parentPath.length + 1)
-    const toPathChild = toPath.slice(0, parentPath.length + 1)
-
+  if (pathStartsWith(path, parentPath) && path.length > parentPath.length) {
     const parent = getIn(json, parentPath)
-    const anchorKey = selection.anchorPath[parentPath.length]
-    const focusKey = selection.focusPath[parentPath.length]
-    const fromKey = fromPath[parentPath.length]
-    const toKey = toPath[parentPath.length]
+    const startPath = selection.paths ? first(selection.paths) : selection.focusPath
+    const endPath = selection.paths ? last(selection.paths) : selection.focusPath
+    const startKey = last(startPath)
+    const endKey = last(endPath)
+    const toKey = path[parentPath.length]
 
     if (isObject(parent)) {
       const keys = getIn(state, parentPath.concat(STATE_KEYS))
-      const anchorIndex = keys.indexOf(anchorKey)
-      const focusIndex = keys.indexOf(focusKey)
-      const fromIndex = keys.indexOf(fromKey)
+      const startIndex = keys.indexOf(startKey)
+      const endIndex = keys.indexOf(endKey)
       const toIndex = keys.indexOf(toKey)
 
-      if (anchorIndex !== -1 && focusIndex !== -1 && fromIndex !== -1 && toIndex !== -1) {
-        const startIndex = Math.min(anchorIndex, focusIndex)
-        const endIndex = Math.max(anchorIndex, focusIndex)
-        const shift = toIndex - fromIndex
+      if (startIndex !== -1 && endIndex !== -1 && toIndex !== -1) {
+        console.log('move inside object:', selection, startIndex, toIndex)
 
-        console.log(
-          'move inside object:',
-          fromPathChild,
-          toPathChild,
-          selection,
-          startIndex,
-          fromIndex,
-          toIndex
-        )
-
-        if (shift < 0) {
-          // TODO
-        }
-
-        if (shift > 0) {
-          // TODO
+        if (toIndex > startIndex) {
+          // moving down
+          return [
+            ...keys.slice(startIndex, endIndex + 1),
+            ...keys.slice(endIndex + 2, keys.length)
+          ].map((key) => moveDown(parentPath, key))
+        } else {
+          // moving up
+          return [...keys.slice(toIndex, startIndex), ...keys.slice(endIndex + 1, keys.length)].map(
+            (key) => moveDown(parentPath, key)
+          )
         }
       }
     } else {
-      const startIndex = Math.min(anchorKey, focusKey)
-      const endIndex = Math.max(anchorKey, focusKey)
-      const fromIndex = fromKey
+      // array
+      const startIndex = startKey
+      const endIndex = endKey
       const toIndex = toKey
-      const shift = toIndex - fromIndex
+      const count = endIndex - startIndex + 1
 
-      debug('move inside array:', parentPath, startIndex, fromIndex, toIndex)
-
-      if (shift < 0) {
-        // TODO
+      const fromIndex = toIndex < startIndex ? endIndex : startIndex
+      const operation = {
+        op: 'move',
+        from: compileJSONPointer(parentPath.concat([fromIndex])),
+        path: compileJSONPointer(path)
       }
 
-      if (shift > 0) {
-        // TODO
-      }
+      return times(count, () => operation)
     }
   }
 

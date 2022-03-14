@@ -12,6 +12,7 @@
     HOVER_INSERT_INSIDE,
     INDENTATION_WIDTH,
     INSERT_EXPLANATION,
+    STATE_ENFORCE_STRING,
     STATE_EXPANDED,
     STATE_ID,
     STATE_KEYS,
@@ -39,8 +40,7 @@
   import JSONValue from './JSONValue.svelte'
   import { singleton } from './singleton.js'
   import ValidationError from './ValidationError.svelte'
-  import { createDebug } from '$lib/utils/debug.js'
-  import { STATE_ENFORCE_STRING } from '$lib/constants'
+  import { createDebug } from '$lib/utils/debug'
 
   // eslint-disable-next-line no-undef-init
   export let value
@@ -70,6 +70,7 @@
 
   export let selection
   export let getFullSelection
+  export let findElement
 
   // TODO: it is ugly to have to translate selection into selectionObj, and not accidentally use the wrong one. Is there an other way?
   $: selectionObj = selection && selection[STATE_SELECTION]
@@ -143,6 +144,7 @@
         debug('start dragging...', draggingInitialPath)
         singleton.draggingSelection = true
         singleton.draggingInitialPath = draggingInitialPath
+        singleton.draggingInitialEvent = event
       }
 
       return
@@ -224,22 +226,11 @@
     }
 
     if (singleton.draggingSelection) {
-      const draggingPath = getDataPathFromTarget(event.target)
-
-      if (!isEqual(draggingPath, singleton.draggingPath)) {
-        singleton.draggingPath = draggingPath
-
-        // const sharedPath = findSharedPath(singleton.draggingInitialPath, singleton.draggingPath)
-        //
-        // debug('draggingSelection', {
-        //   initial: singleton.draggingInitialPath,
-        //   path,
-        //   sharedPath
-        // })
-
-        onMoveSelection(singleton.draggingInitialPath, draggingPath)
-
-        singleton.draggingInitialPath = draggingPath
+      const deltaY = event.clientY - singleton.draggingInitialEvent.clientY
+      const moved = onMoveSelection(deltaY)
+      if (moved) {
+        // FIXME: resetting the deltaY like this is not accurate
+        singleton.draggingInitialEvent = event
       }
     }
   }
@@ -254,14 +245,11 @@
     if (singleton.draggingSelection) {
       singleton.draggingSelection = false
 
-      const draggingPath = getDataPathFromTarget(event.target)
-
-      if (!isEqual(draggingPath, singleton.draggingPath)) {
-        singleton.draggingPath = draggingPath
-
-        onMoveSelection(singleton.draggingInitialPath, draggingPath)
-
-        singleton.draggingInitialPath = draggingPath
+      const deltaY = event.clientY - singleton.draggingInitialEvent.clientY
+      const moved = onMoveSelection(deltaY)
+      if (moved) {
+        // FIXME: resetting the deltaY like this is not accurate
+        singleton.draggingInitialEvent = event
       }
     }
 
@@ -425,6 +413,7 @@
               {readOnly}
               {normalization}
               {getFullSelection}
+              {findElement}
               {onPatch}
               {onInsert}
               {onExpand}
@@ -552,6 +541,7 @@
             {readOnly}
             {normalization}
             {getFullSelection}
+            {findElement}
             {onPatch}
             {onInsert}
             {onExpand}
