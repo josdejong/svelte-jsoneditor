@@ -2,12 +2,7 @@
 
 <script>
   import { onDestroy, onMount } from 'svelte'
-  import {
-    addNewLineSuffix,
-    removeNewLineSuffix,
-    setCursorToEnd,
-    setPlainText
-  } from '$lib/utils/domUtils'
+  import { addNewLineSuffix, removeNewLineSuffix, setCursorToEnd } from '$lib/utils/domUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { createDebug } from '$lib/utils/debug'
   import classnames from 'classnames'
@@ -51,7 +46,7 @@
   }
 
   function setDomValue(updatedValue) {
-    setPlainText(domValue, addNewLineSuffix(updatedValue))
+    domValue.innerText = addNewLineSuffix(updatedValue)
   }
 
   function handleValueInput() {

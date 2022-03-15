@@ -103,7 +103,7 @@ describe('documentState', () => {
       value: 'hello'
     }
 
-    const state = syncState(json, undefined, [], (path) => false)
+    const state = syncState(json, undefined, [], () => false)
     assert.deepStrictEqual(getVisiblePaths(json, state), [[]])
 
     const state0 = syncState(json, undefined, [], (path) => path.length <= 0)
@@ -170,7 +170,7 @@ describe('documentState', () => {
       value: 'hello'
     }
 
-    const state = syncState(json, undefined, [], (path) => false)
+    const state = syncState(json, undefined, [], () => false)
     assert.deepStrictEqual(getVisibleCaretPositions(json, state), [
       { path: [], type: CARET_POSITION.VALUE }
     ])
@@ -325,15 +325,15 @@ describe('documentState', () => {
 
   it('should update enforce string in syncState', () => {
     const json1 = 42
-    const state1 = syncState(json1, undefined, [], (path) => false)
+    const state1 = syncState(json1, undefined, [], () => false)
 
     const json2 = '42'
-    const state2 = syncState(json2, state1, [], (path) => false)
+    const state2 = syncState(json2, state1, [], () => false)
 
     // should not override when containing a boolean false
     const json3 = '42'
     const state3 = { ...state2, [STATE_ENFORCE_STRING]: false }
-    const state3updated = syncState(json3, state3, [], (path) => false)
+    const state3updated = syncState(json3, state3, [], () => false)
 
     assert.strictEqual(state1[STATE_ENFORCE_STRING], undefined)
     assert.strictEqual(state2[STATE_ENFORCE_STRING], true)
