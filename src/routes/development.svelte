@@ -79,8 +79,6 @@
 
   const validator = createAjvValidator(schema)
 
-  let text = undefined
-
   const showTreeEditor = useLocalStorage('svelte-jsoneditor-demo-showTreeEditor', true)
   const showCodeEditor = useLocalStorage('svelte-jsoneditor-demo-showCodeEditor', true)
   const showRawContents = useLocalStorage('svelte-jsoneditor-demo-showRawContents', true)

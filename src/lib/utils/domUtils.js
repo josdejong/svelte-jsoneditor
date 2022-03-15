@@ -1,24 +1,6 @@
 import { SELECTION_TYPE } from '../logic/selection.js'
 
 /**
- * Get the plain text from an HTML element
- * @param {Element} element  An HTML DOM element like a DIV
- * @return {string}
- */
-export function getPlainText(element) {
-  return traverseInnerText(element)
-}
-
-/**
- * Set plain text in an HTML element
- * @param {Element} element  An HTML DOM element like a DIV
- * @param {string} text
- */
-export function setPlainText(element, text) {
-  element.innerText = text
-}
-
-/**
  * Create serialization functions to escape and stringify text,
  * and the other way around: to parse and unescape text.
  * @param {{
