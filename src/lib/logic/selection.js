@@ -47,7 +47,6 @@ export function expandSelection(json, state, anchorPath, focusPath) {
 
     if (isObject(value)) {
       const keys = getIn(state, sharedPath.concat(STATE_KEYS))
-      console.log('keys', keys)
       const anchorIndex = keys.indexOf(anchorKey)
       const focusIndex = keys.indexOf(focusKey)
 

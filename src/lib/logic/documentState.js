@@ -798,3 +798,69 @@ export function getNextVisiblePath(json, state, path) {
 
   return null
 }
+
+/**
+ * Find the previous path inside the current array/object
+ * @param {JSON} json
+ * @param {JSON} state
+ * @param {Path} path
+ * @return {Path | null} path
+ */
+// TODO: write unit tests
+export function getPreviousPathInside(json, state, path) {
+  const parentPath = initial(path)
+
+  if (Array.isArray(json)) {
+    const index = last(path)
+    if (index > 0) {
+      return parentPath.concat(index - 1)
+    }
+  } else {
+    // Object
+    const key = last(path)
+    const keys = getKeys(state, parentPath)
+
+    const index = keys.indexOf(key)
+    if (index !== -1) {
+      const previousKey = keys[index - 1]
+      if (previousKey !== undefined) {
+        return parentPath.concat(previousKey)
+      }
+    }
+  }
+
+  return null
+}
+
+/**
+ * Find the next path inside the current array/object
+ * @param {JSON} json
+ * @param {JSON} state
+ * @param {Path} path
+ * @return {Path | null} path
+ */
+// TODO: write unit tests
+export function getNextPathInside(json, state, path) {
+  const parentPath = initial(path)
+
+  if (Array.isArray(json)) {
+    const index = last(path)
+    if (index < json.length - 1) {
+      return parentPath.concat(index + 1)
+    }
+  } else {
+    // Object
+    const key = last(path)
+    const keys = getKeys(state, parentPath)
+
+    const index = keys.indexOf(key)
+    if (index !== -1) {
+      const nextKey = keys[index + 1]
+      if (nextKey !== undefined) {
+        return parentPath.concat(nextKey)
+      }
+    }
+  }
+
+  return null
+}

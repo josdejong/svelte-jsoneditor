@@ -180,6 +180,8 @@ describe('operations', () => {
 
     // TODO: test append, moving to bottom of an array
     // TODO: test append, moving to bottom of an object
+    // TODO: test moving up from the bottom of an array
+    // TODO: test moving up from the bottom of an object
   })
 
   // TODO: write tests for all operations

@@ -14,7 +14,7 @@
     updateIn
   } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
-  import { first, initial, isEmpty, isEqual, last, throttle, uniqueId } from 'lodash-es'
+  import { initial, isEmpty, isEqual, last, throttle, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
   import { createJump } from '$lib/assets/jump.js/src/jump'
   import {
@@ -42,8 +42,7 @@
     createRemoveOperations,
     duplicate,
     extract,
-    insert,
-    moveInsideParent
+    insert
   } from '$lib/logic/operations'
   import {
     createSearchAndReplaceAllOperations,
@@ -97,7 +96,6 @@
   import Welcome from './Welcome.svelte'
   import NavigationBar from '../../../components/controls/navigationBar/NavigationBar.svelte'
   import SearchBox from '../../../components/modes/treemode/menu/SearchBox.svelte'
-  import { getDataPathFromTarget } from '../../../utils/domUtils.js'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -1079,76 +1077,6 @@
     setTimeout(() => insertActiveElementContents(char, replaceContents))
   }
 
-  function handleMoveSelection(deltaY) {
-    if (readOnly || !selection) {
-      return
-    }
-
-    debug('move selection', { deltaY, selection })
-
-    function findSwapElement(path, threshold, getNextElement) {
-      let currentElement = findElement(path)
-      let cumulativeHeight = 0
-      let swapElement = undefined
-
-      while (
-        currentElement &&
-        getNextElement(currentElement) &&
-        threshold > cumulativeHeight + getNextElement(currentElement).clientHeight / 2
-      ) {
-        currentElement = getNextElement(currentElement)
-        swapElement = currentElement
-        cumulativeHeight += currentElement.clientHeight
-      }
-
-      return swapElement
-    }
-
-    if (deltaY < 0) {
-      // moving selection up
-      const startPath = selection.paths ? first(selection.paths) : selection.focusPath
-
-      const swapElement = findSwapElement(
-        startPath,
-        Math.abs(deltaY),
-        (elem) => elem.previousElementSibling
-      )
-
-      if (swapElement) {
-        debug('move selection before element: ', getDataPathFromTarget(swapElement), swapElement)
-
-        // TODO: deduplicate logic
-        const path = getDataPathFromTarget(swapElement)
-        const operations = moveInsideParent(json, state, selection, path)
-
-        if (operations) {
-          handlePatch(operations)
-          return true
-        }
-      }
-    } else {
-      // moving selection down
-      const endPath = selection.paths ? last(selection.paths) : selection.focusPath
-
-      const swapElement = findSwapElement(endPath, deltaY, (elem) => elem.nextElementSibling)
-
-      if (swapElement) {
-        debug('move selection after element: ', getDataPathFromTarget(swapElement), swapElement)
-
-        // TODO: deduplicate logic
-        const path = getDataPathFromTarget(swapElement)
-        const operations = moveInsideParent(json, state, selection, path)
-
-        if (operations) {
-          handlePatch(operations)
-          return true
-        }
-      }
-    }
-
-    return false
-  }
-
   function handleUndo() {
     if (readOnly) {
       return
@@ -2004,6 +1932,14 @@
     }
   }
 
+  function getFullJson() {
+    return json
+  }
+
+  function getFullState() {
+    return state
+  }
+
   function getFullSelection() {
     return selection
   }
@@ -2094,6 +2030,8 @@
           validationErrors={validationErrorsMap}
           {readOnly}
           {normalization}
+          {getFullJson}
+          {getFullState}
           {getFullSelection}
           {findElement}
           onPatch={handlePatch}
@@ -2101,7 +2039,6 @@
           onExpand={handleExpand}
           onSelect={handleSelect}
           onFind={openFind}
-          onMoveSelection={handleMoveSelection}
           onPasteJson={handlePasteJson}
           onExpandSection={handleExpandSection}
           {onRenderValue}
@@ -2109,6 +2046,9 @@
           onClassName={onClassName || noop}
           onDrag={autoScrollHandler.onDrag}
           onDragEnd={autoScrollHandler.onDragEnd}
+          onDragSelectionStart={noop}
+          onDragSelection={noop}
+          onDragSelectionEnd={noop}
         />
       </div>
 

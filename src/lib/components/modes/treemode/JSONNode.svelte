@@ -3,8 +3,8 @@
 <script>
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
-  import { parseJSONPointer } from 'immutable-json-patch'
-  import { isEqual, last } from 'lodash-es'
+  import { getIn, parseJSONPointer } from 'immutable-json-patch'
+  import { first, isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
     HOVER_COLLECTION,
@@ -41,6 +41,12 @@
   import { singleton } from './singleton.js'
   import ValidationError from './ValidationError.svelte'
   import { createDebug } from '$lib/utils/debug'
+  import { moveInsideParent } from '../../../logic/operations.js'
+  import {
+    documentStatePatch,
+    getNextPathInside,
+    getPreviousPathInside
+  } from '../../../logic/documentState.js'
 
   // eslint-disable-next-line no-undef-init
   export let value
@@ -55,13 +61,15 @@
   export let onExpand
   export let onSelect
   export let onFind
-  export let onMoveSelection
   export let onPasteJson
   export let onRenderValue
   export let onContextMenu
   export let onClassName
   export let onDrag
   export let onDragEnd
+  export let onDragSelectionStart
+  export let onDragSelection
+  export let onDragSelectionEnd
 
   const debug = createDebug('jsoneditor:JSONNode')
 
@@ -69,6 +77,8 @@
   export let onExpandSection
 
   export let selection
+  export let getFullJson
+  export let getFullState
   export let getFullSelection
   export let findElement
 
@@ -81,15 +91,19 @@
   $: selectedKey = !!(selectionObj && selectionObj.type === SELECTION_TYPE.KEY)
   $: selectedValue = !!(selectionObj && selectionObj.type === SELECTION_TYPE.VALUE)
 
-  $: expanded = state[STATE_EXPANDED]
-  $: visibleSections = state[STATE_VISIBLE_SECTIONS]
-  $: keys = state[STATE_KEYS]
+  $: resolvedValue = dragging !== undefined ? dragging.value : value
+  $: resolvedState = dragging !== undefined ? dragging.state : state
+
+  $: expanded = resolvedState[STATE_EXPANDED]
+  $: visibleSections = resolvedState[STATE_VISIBLE_SECTIONS]
+  $: keys = resolvedState[STATE_KEYS]
   $: validationError = validationErrors && validationErrors[VALIDATION_ERROR]
   $: root = path.length === 0
 
-  let hover = null
+  let hover = undefined
+  let dragging = undefined
 
-  $: type = valueType(value)
+  $: type = valueType(resolvedValue)
 
   function getIndentationStyle(level) {
     return `margin-left: ${level * INDENTATION_WIDTH}px`
@@ -139,17 +153,13 @@
     // when left-clicking inside the current selection, do nothing: it can be the start of dragging
     if (selectionObj && isPathInsideSelection(selectionObj, path, anchorType)) {
       if (event.button === 0) {
-        const draggingInitialPath = getDataPathFromTarget(event.target)
-
-        debug('start dragging...', draggingInitialPath)
-        singleton.draggingSelection = true
-        singleton.draggingInitialPath = draggingInitialPath
-        singleton.draggingInitialEvent = event
+        onDragSelectionStart(event)
       }
 
       return
     }
 
+    // TODO: refactor dragging, there are now two separate mechanisms handling mouse movement: with dragging.* and with singleton.*
     singleton.selecting = true
     singleton.selectionAnchor = path
     singleton.selectionAnchorType = anchorType
@@ -177,7 +187,7 @@
 
         case SELECTION_TYPE.MULTI:
           if (root && event.target.hasAttribute('data-path')) {
-            const lastCaretPosition = last(getVisibleCaretPositions(value, state))
+            const lastCaretPosition = last(getVisibleCaretPositions(resolvedValue, resolvedState))
             onSelect(lastCaretPosition)
           } else {
             onSelect({
@@ -225,14 +235,7 @@
       }
     }
 
-    if (singleton.draggingSelection) {
-      const deltaY = event.clientY - singleton.draggingInitialEvent.clientY
-      const moved = onMoveSelection(deltaY)
-      if (moved) {
-        // FIXME: resetting the deltaY like this is not accurate
-        singleton.draggingInitialEvent = event
-      }
-    }
+    onDragSelection(event)
   }
 
   function handleMouseUpGlobal(event) {
@@ -242,20 +245,119 @@
       event.stopPropagation()
     }
 
-    if (singleton.draggingSelection) {
-      singleton.draggingSelection = false
-
-      const deltaY = event.clientY - singleton.draggingInitialEvent.clientY
-      const moved = onMoveSelection(deltaY)
-      if (moved) {
-        // FIXME: resetting the deltaY like this is not accurate
-        singleton.draggingInitialEvent = event
-      }
-    }
-
+    onDragSelectionEnd(event)
     onDragEnd()
+
     document.removeEventListener('mousemove', onDrag, true)
     document.removeEventListener('mouseup', handleMouseUpGlobal)
+  }
+
+  function handleDragSelectionStart(event) {
+    debug('drag selection [start]', getDataPathFromTarget(event.target))
+
+    dragging = {
+      // FIXME: calculate based on position inside the scrollable contents instead of the "absolute position"
+      initialClientY: event.clientY,
+      value,
+      state
+    }
+  }
+
+  function handleDragSelection(event) {
+    if (dragging) {
+      debug('drag selection [move]', getDataPathFromTarget(event.target))
+
+      const deltaY = event.clientY - dragging.initialClientY
+      const { value, state } = onMoveSelection(deltaY)
+      dragging = {
+        ...dragging,
+        value,
+        state
+      }
+    }
+  }
+
+  function handleDragSelectionEnd(event) {
+    if (dragging) {
+      debug('drag selection [end]', getDataPathFromTarget(event.target))
+
+      const deltaY = event.clientY - dragging.initialClientY
+      const { operations } = onMoveSelection(deltaY)
+
+      if (operations) {
+        onPatch(operations)
+      }
+
+      dragging = undefined
+    }
+  }
+
+  /**
+   *
+   * @param deltaY
+   * @returns {{operations: null | JSONPatchDocument, value: JSONData, state: JSONData }}
+   */
+  function onMoveSelection(deltaY) {
+    // TODO: refactor this function
+    const fullJson = getFullJson()
+    const fullState = getFullState()
+    const fullSelection = getFullSelection()
+
+    debug('move selection', { deltaY, fullSelection })
+
+    if (!fullSelection) {
+      return { operations: null, value, state }
+    }
+
+    function findSwapPath(initialPath, threshold, getNextPath) {
+      let nextPath = getNextPath(initialPath)
+      let nextElement = nextPath ? findElement(nextPath) : null
+      let cumulativeHeight = 0
+      let swapPath = undefined
+
+      while (nextElement && threshold > cumulativeHeight + nextElement.clientHeight / 2) {
+        cumulativeHeight += nextElement.clientHeight
+        swapPath = nextPath
+
+        nextPath = getNextPath(nextPath)
+        nextElement = nextPath ? findElement(nextPath) : null
+      }
+
+      return swapPath
+    }
+
+    function findSwapPathUp() {
+      const startPath = fullSelection.paths ? first(fullSelection.paths) : fullSelection.focusPath
+
+      return findSwapPath(startPath, Math.abs(deltaY), (path) => {
+        return getPreviousPathInside(fullJson, fullState, path)
+      })
+    }
+
+    function findSwapPathDown() {
+      const endPath = fullSelection.paths ? last(fullSelection.paths) : fullSelection.focusPath
+
+      // FIXME: must return an object with both path, and operation: insert/append
+      return findSwapPath(endPath, Math.abs(deltaY), (path) => {
+        return getNextPathInside(fullJson, fullState, path)
+      })
+    }
+
+    const swapPath = deltaY < 0 ? findSwapPathUp() : findSwapPathDown()
+    if (swapPath) {
+      debug('move selection before path: ', swapPath)
+
+      const operations = moveInsideParent(fullJson, fullState, fullSelection, swapPath)
+      const update = documentStatePatch(fullJson, fullState, operations)
+
+      return {
+        operations,
+        value: getIn(update.json, path),
+        state: getIn(update.state, path)
+      }
+    } else {
+      return { operations: null, value, state }
+    }
   }
 
   function handleMouseOver(event) {
@@ -273,7 +375,7 @@
   function handleMouseOut(event) {
     event.stopPropagation()
 
-    hover = null
+    hover = undefined
   }
 
   function handleInsertInside(event) {
@@ -308,7 +410,7 @@
 </script>
 
 <div
-  class={classnames('json-node', { expanded }, onClassName(path, value))}
+  class={classnames('json-node', { expanded }, onClassName(path, resolvedValue))}
   data-path={encodeDataPath(path)}
   class:root
   class:selected
@@ -346,12 +448,12 @@
             {#if expanded}
               <div class="bracket">[</div>
               <span class="tag readonly">
-                {value.length} items
+                {resolvedValue.length} items
               </span>
             {:else}
               <div class="bracket">[</div>
               <button type="button" class="tag" on:click={handleExpand}>
-                {value.length} items
+                {resolvedValue.length} items
               </button>
               <div class="bracket">]</div>
             {/if}
@@ -398,11 +500,11 @@
           </div>
         {/if}
         {#each visibleSections as visibleSection, sectionIndex (sectionIndex)}
-          {#each value.slice(visibleSection.start, Math.min(visibleSection.end, value.length)) as item, itemIndex (state[visibleSection.start + itemIndex][STATE_ID])}
+          {#each resolvedValue.slice(visibleSection.start, Math.min(visibleSection.end, resolvedValue.length)) as item, itemIndex (resolvedState[visibleSection.start + itemIndex][STATE_ID])}
             <svelte:self
               value={item}
               path={path.concat(visibleSection.start + itemIndex)}
-              state={state[visibleSection.start + itemIndex]}
+              state={resolvedState[visibleSection.start + itemIndex]}
               selection={selection ? selection[visibleSection.start + itemIndex] : undefined}
               searchResult={searchResult
                 ? searchResult[visibleSection.start + itemIndex]
@@ -412,6 +514,8 @@
                 : undefined}
               {readOnly}
               {normalization}
+              {getFullJson}
+              {getFullState}
               {getFullSelection}
               {findElement}
               {onPatch}
@@ -419,7 +523,6 @@
               {onExpand}
               {onSelect}
               {onFind}
-              {onMoveSelection}
               {onPasteJson}
               {onExpandSection}
               {onRenderValue}
@@ -427,17 +530,20 @@
               {onClassName}
               {onDrag}
               {onDragEnd}
+              onDragSelectionStart={handleDragSelectionStart}
+              onDragSelection={handleDragSelection}
+              onDragSelectionEnd={handleDragSelectionEnd}
             >
               <div slot="identifier" class="identifier">
                 <div class="index">{visibleSection.start + itemIndex}</div>
               </div>
             </svelte:self>
           {/each}
-          {#if visibleSection.end < value.length}
+          {#if visibleSection.end < resolvedValue.length}
             <CollapsedItems
               {visibleSections}
               {sectionIndex}
-              total={value.length}
+              total={resolvedValue.length}
               {path}
               {onExpandSection}
               selection={selectionObj}
@@ -484,7 +590,7 @@
             {:else}
               <div class="bracket">&lbrace;</div>
               <button type="button" class="tag" on:click={handleExpand}>
-                {Object.keys(value).length} props
+                {Object.keys(resolvedValue).length} props
               </button>
               <div class="bracket">&rbrace;</div>
             {/if}
@@ -530,16 +636,18 @@
             />
           </div>
         {/if}
-        {#each keys as key (state[key][STATE_ID])}
+        {#each keys as key (resolvedState[key][STATE_ID])}
           <svelte:self
-            value={value[key]}
+            value={resolvedValue[key]}
             path={path.concat(key)}
-            state={state[key]}
+            state={resolvedState[key]}
             selection={selection ? selection[key] : undefined}
             searchResult={searchResult ? searchResult[key] : undefined}
             validationErrors={validationErrors ? validationErrors[key] : undefined}
             {readOnly}
             {normalization}
+            {getFullJson}
+            {getFullState}
             {getFullSelection}
             {findElement}
             {onPatch}
@@ -547,7 +655,6 @@
             {onExpand}
             {onSelect}
             {onFind}
-            {onMoveSelection}
             {onPasteJson}
             {onExpandSection}
             {onRenderValue}
@@ -555,6 +662,9 @@
             {onClassName}
             {onDrag}
             {onDragEnd}
+            onDragSelectionStart={handleDragSelectionStart}
+            onDragSelection={handleDragSelection}
+            onDragSelectionEnd={handleDragSelectionEnd}
           >
             <div slot="identifier" class="identifier">
               <JSONKey
@@ -599,7 +709,7 @@
           {path}
           {value}
           {readOnly}
-          enforceString={state ? state[STATE_ENFORCE_STRING] : undefined}
+          enforceString={resolvedState ? resolvedState[STATE_ENFORCE_STRING] : undefined}
           {normalization}
           selection={selectionObj}
           searchResult={searchResult ? searchResult[STATE_SEARCH_VALUE] : undefined}
