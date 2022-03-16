@@ -124,7 +124,7 @@
     try {
       codeMirrorView = createCodeMirrorView({
         target: codeMirrorRef,
-        initialText: text,
+        initialText: !codeEditorDisabled ? text : '',
         readOnly,
         indentation
       })
@@ -512,7 +512,7 @@
     }
 
     if (codeMirrorView && text !== codeMirrorText) {
-      debug('setCodeMirrorValue')
+      debug('setCodeMirrorValue length=', text.length)
 
       codeMirrorText = text
 
