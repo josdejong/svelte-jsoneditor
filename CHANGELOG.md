@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.24](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.23...v0.3.24) (2022-03-16)
+
+
+### Bug Fixes
+
+* component EditableDiv did not close when losing focus to another element on the same page ([a8abe71](https://github.com/josdejong/svelte-jsoneditor/commit/a8abe710f5e2d10bf31f7272f709d53665a1eb88))
+* define font for linting messages ([8a5456f](https://github.com/josdejong/svelte-jsoneditor/commit/8a5456f3de474c58e49b637617d1694b515e1055))
+* editor layout does overflow when opening a large minified document in code mode ([#48](https://github.com/josdejong/svelte-jsoneditor/issues/48)) ([5574d38](https://github.com/josdejong/svelte-jsoneditor/commit/5574d38164f48610842a0707be81cf9ca12bd53b))
+* implement quick keys Ctrl+F and Ctrl+H to open the find dialog whilst editing a key or value ([e608486](https://github.com/josdejong/svelte-jsoneditor/commit/e608486a53c59cb53b3cf1240884d7d2147fd345))
+* minor styling fix ([1399dd8](https://github.com/josdejong/svelte-jsoneditor/commit/1399dd8272de55f22d77b1633bd124632064606f))
+* styling tweaks ([1d15f2b](https://github.com/josdejong/svelte-jsoneditor/commit/1d15f2b2675922d4c566cdd6cec53caac70dcd7e))
+* wrapping line in Copy dropdown menu ([61b10ac](https://github.com/josdejong/svelte-jsoneditor/commit/61b10ac1d4a50b7d9b7e68b9316adbedd47ffd02))
+
 ### [0.3.23](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.22...v0.3.23) (2022-03-08)
 
 
