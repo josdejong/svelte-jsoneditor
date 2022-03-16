@@ -439,8 +439,6 @@ export function moveInsideParent(json, state, selection, path) {
       const toIndex = keys.indexOf(toKey)
 
       if (startIndex !== -1 && endIndex !== -1 && toIndex !== -1) {
-        console.log('move inside object:', selection, startIndex, toIndex)
-
         if (toIndex > startIndex) {
           // moving down
           return [
