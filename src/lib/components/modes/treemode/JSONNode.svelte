@@ -340,14 +340,22 @@
       return swapPath
     }
 
+    /**
+     * @returns {DragInsideAction | undefined}
+     */
     function findSwapPathUp() {
       const startPath = fullSelection.paths ? first(fullSelection.paths) : fullSelection.focusPath
 
-      return findSwapPath(startPath, Math.abs(deltaY), (path) => {
+      const swapPath = findSwapPath(startPath, Math.abs(deltaY), (path) => {
         return getPreviousPathInside(fullJson, fullState, path)
       })
+
+      return swapPath ? { beforePath: swapPath } : undefined
     }
 
+    /**
+     * @returns {DragInsideAction | undefined}
+     */
     function findSwapPathDown() {
       const endPath = fullSelection.paths ? last(fullSelection.paths) : fullSelection.focusPath
 
@@ -355,17 +363,21 @@
         return getNextPathInside(fullJson, fullState, path)
       })
 
-      // FIXME: must return an object with both path, and operation: insert/append
-      // we go to the next path because we want to end up *after* the found swap path
-      return swapPath ? getNextPathInside(fullJson, fullState, swapPath) : undefined
+      if (!swapPath) {
+        return undefined
+      }
+
+      const beforePath = getNextPathInside(fullJson, fullState, swapPath)
+
+      return beforePath ? { beforePath } : { append: true }
     }
 
-    const swapPath = deltaY < 0 ? findSwapPathUp() : findSwapPathDown()
-    if (swapPath) {
-      const operations = moveInsideParent(fullJson, fullState, fullSelection, swapPath)
+    const dragInsideAction = deltaY < 0 ? findSwapPathUp() : findSwapPathDown()
+    if (dragInsideAction) {
+      const operations = moveInsideParent(fullJson, fullState, fullSelection, dragInsideAction)
       const update = documentStatePatch(fullJson, fullState, operations)
 
-      debug('move selection before path: ', { swapPath: swapPath?.join(', '), operations })
+      debug('move selection before path: ', dragInsideAction)
 
       return {
         operations,

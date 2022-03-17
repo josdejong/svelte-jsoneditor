@@ -257,3 +257,7 @@
 /**
  * @typedef {(string) => string} UnescapeValue
  */
+
+/**
+ * @typedef {{ beforePath: Path} | {append: true}} DragInsideAction
+ */

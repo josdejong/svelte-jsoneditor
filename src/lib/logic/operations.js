@@ -422,21 +422,35 @@ export function insert(json, state, selection, clipboardText) {
 
 // TODO: work out, WIP
 // TODO: comment
-export function moveInsideParent(json, state, selection, path) {
+
+/**
+ * @param {JSON} json
+ * @param {JSON} state
+ * @param {Selection} selection
+ * @param {DragInsideAction} dragInsideAction
+ * @returns {{op: string, path: string, from: string}[]|number[]|{op: string, path: string, from: string}[]|undefined}
+ */
+export function moveInsideParent(json, state, selection, dragInsideAction) {
+  const { beforePath, append } = dragInsideAction
+
   const parentPath = initial(selection.focusPath)
-  if (pathStartsWith(path, parentPath) && path.length > parentPath.length) {
-    const parent = getIn(json, parentPath)
+  const parent = getIn(json, parentPath)
+
+  if (
+    append ||
+    (beforePath && pathStartsWith(beforePath, parentPath) && beforePath.length > parentPath.length)
+  ) {
     const startPath = selection.paths ? first(selection.paths) : selection.focusPath
     const endPath = selection.paths ? last(selection.paths) : selection.focusPath
     const startKey = last(startPath)
     const endKey = last(endPath)
-    const toKey = path[parentPath.length]
+    const toKey = beforePath ? beforePath[parentPath.length] : undefined
 
     if (isObject(parent)) {
       const keys = getIn(state, parentPath.concat(STATE_KEYS))
       const startIndex = keys.indexOf(startKey)
       const endIndex = keys.indexOf(endKey)
-      const toIndex = keys.indexOf(toKey)
+      const toIndex = append ? keys.length : keys.indexOf(toKey)
 
       if (startIndex !== -1 && endIndex !== -1 && toIndex !== -1) {
         if (toIndex > startIndex) {
@@ -457,11 +471,12 @@ export function moveInsideParent(json, state, selection, path) {
       const endIndex = endKey
       const toIndex = toKey
       const count = endIndex - startIndex + 1
+      const path = append ? parentPath.concat(parent.length) : beforePath
 
       const fromIndex = toIndex < startIndex ? endIndex : startIndex
       const operation = {
         op: 'move',
-        from: compileJSONPointer(parentPath.concat([fromIndex])),
+        from: compileJSONPointer(parentPath.concat(fromIndex)),
         path: compileJSONPointer(path)
       }
 
