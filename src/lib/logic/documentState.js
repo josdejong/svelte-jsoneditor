@@ -810,7 +810,7 @@ export function getNextVisiblePath(json, state, path) {
 export function getPreviousPathInside(json, state, path) {
   const parentPath = initial(path)
 
-  if (Array.isArray(json)) {
+  if (Array.isArray(parentPath)) {
     const index = last(path)
     if (index > 0) {
       return parentPath.concat(index - 1)
@@ -843,7 +843,7 @@ export function getPreviousPathInside(json, state, path) {
 export function getNextPathInside(json, state, path) {
   const parentPath = initial(path)
 
-  if (Array.isArray(json)) {
+  if (Array.isArray(parentPath)) {
     const index = last(path)
     if (index < json.length - 1) {
       return parentPath.concat(index + 1)
