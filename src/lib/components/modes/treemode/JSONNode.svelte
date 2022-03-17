@@ -351,18 +351,21 @@
     function findSwapPathDown() {
       const endPath = fullSelection.paths ? last(fullSelection.paths) : fullSelection.focusPath
 
-      // FIXME: must return an object with both path, and operation: insert/append
-      return findSwapPath(endPath, Math.abs(deltaY), (path) => {
+      const swapPath = findSwapPath(endPath, Math.abs(deltaY), (path) => {
         return getNextPathInside(fullJson, fullState, path)
       })
+
+      // FIXME: must return an object with both path, and operation: insert/append
+      // we go to the next path because we want to end up *after* the found swap path
+      return swapPath ? getNextPathInside(fullJson, fullState, swapPath) : undefined
     }
 
     const swapPath = deltaY < 0 ? findSwapPathUp() : findSwapPathDown()
     if (swapPath) {
-      debug('move selection before path: ', swapPath)
-
       const operations = moveInsideParent(fullJson, fullState, fullSelection, swapPath)
       const update = documentStatePatch(fullJson, fullState, operations)
+
+      debug('move selection before path: ', { swapPath: swapPath?.join(', '), operations })
 
       return {
         operations,

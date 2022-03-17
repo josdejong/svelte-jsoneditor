@@ -441,10 +441,9 @@ export function moveInsideParent(json, state, selection, path) {
       if (startIndex !== -1 && endIndex !== -1 && toIndex !== -1) {
         if (toIndex > startIndex) {
           // moving down
-          return [
-            ...keys.slice(startIndex, endIndex + 1),
-            ...keys.slice(endIndex + 2, keys.length)
-          ].map((key) => moveDown(parentPath, key))
+          return [...keys.slice(startIndex, endIndex + 1), ...keys.slice(toIndex, keys.length)].map(
+            (key) => moveDown(parentPath, key)
+          )
         } else {
           // moving up
           return [...keys.slice(toIndex, startIndex), ...keys.slice(endIndex + 1, keys.length)].map(
