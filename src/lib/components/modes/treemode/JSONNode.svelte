@@ -46,6 +46,10 @@
     getNextPathInside,
     getPreviousPathInside
   } from '../../../logic/documentState.js'
+  import {
+    createRecursiveSelection,
+    createSelectionFromOperations
+  } from '../../../logic/selection.js'
 
   // eslint-disable-next-line no-undef-init
   export let value
@@ -81,17 +85,17 @@
   export let getFullSelection
   export let findElement
 
-  // TODO: it is ugly to have to translate selection into selectionObj, and not accidentally use the wrong one. Is there an other way?
-  $: selectionObj = selection && selection[STATE_SELECTION]
+  $: resolvedValue = dragging !== undefined ? dragging.value : value
+  $: resolvedState = dragging !== undefined ? dragging.state : state
+  $: resolvedSelection = dragging !== undefined ? dragging.selection : selection
+
+  $: selectionObj = resolvedSelection && resolvedSelection[STATE_SELECTION]
 
   $: selected = !!(selectionObj && selectionObj.pathsMap)
   $: selectedAfter = !!(selectionObj && selectionObj.type === SELECTION_TYPE.AFTER)
   $: selectedInside = !!(selectionObj && selectionObj.type === SELECTION_TYPE.INSIDE)
   $: selectedKey = !!(selectionObj && selectionObj.type === SELECTION_TYPE.KEY)
   $: selectedValue = !!(selectionObj && selectionObj.type === SELECTION_TYPE.VALUE)
-
-  $: resolvedValue = dragging !== undefined ? dragging.value : value
-  $: resolvedState = dragging !== undefined ? dragging.state : state
 
   $: expanded = resolvedState[STATE_EXPANDED]
   $: visibleSections = resolvedState[STATE_VISIBLE_SECTIONS]
@@ -267,33 +271,35 @@
   }
 
   function handleDragSelectionStart(event) {
-    debug('drag selection [start]')
+    // debug('drag selection [start]', path) // TODO: cleanup
 
     dragging = {
       initialClientY: event.clientY,
       initialContentTop: findContentTop(),
       value,
-      state
+      state,
+      selection
     }
   }
 
   function handleDragSelection(event) {
     if (dragging) {
-      debug('drag selection [move]')
+      // debug('drag selection [move]', path) // TODO: cleanup
 
       const deltaY = calculateDeltaY(dragging, event)
-      const { value, state } = onMoveSelection(deltaY)
+      const { value, state, selection } = onMoveSelection(deltaY)
       dragging = {
         ...dragging,
         value,
-        state
+        state,
+        selection
       }
     }
   }
 
   function handleDragSelectionEnd(event) {
     if (dragging) {
-      debug('drag selection [end]')
+      // debug('drag selection [end]', path) // TODO: cleanup
 
       const deltaY = calculateDeltaY(dragging, event)
       const { operations } = onMoveSelection(deltaY)
@@ -312,15 +318,15 @@
    * @returns {{operations: null | JSONPatchDocument, value: JSONData, state: JSONData }}
    */
   function onMoveSelection(deltaY) {
-    // TODO: refactor this function
+    // TODO: refactor this function, it's a mess
     const fullJson = getFullJson()
     const fullState = getFullState()
     const fullSelection = getFullSelection()
 
-    debug('move selection', { deltaY, fullSelection })
+    debug('move selection', path, { deltaY, fullSelection })
 
     if (!fullSelection) {
-      return { operations: null, value, state }
+      return { operations: null, value, state, selection }
     }
 
     function findSwapPath(initialPath, threshold, getNextPath) {
@@ -369,23 +375,35 @@
 
       const beforePath = getNextPathInside(fullJson, fullState, swapPath)
 
-      return beforePath ? { beforePath } : { append: true }
+      return Array.isArray(value)
+        ? { beforePath: swapPath }
+        : beforePath
+        ? { beforePath }
+        : { append: true }
     }
 
     const dragInsideAction = deltaY < 0 ? findSwapPathUp() : findSwapPathDown()
     if (dragInsideAction) {
+      debug('move selection actions', dragInsideAction)
+
       const operations = moveInsideParent(fullJson, fullState, fullSelection, dragInsideAction)
       const update = documentStatePatch(fullJson, fullState, operations)
 
-      debug('move selection before path: ', dragInsideAction)
+      const fullUpdatedSelection = createRecursiveSelection(
+        fullJson,
+        createSelectionFromOperations(fullJson, operations)
+      )
+
+      const updatedSelection = Array.isArray(value) ? getIn(fullUpdatedSelection, path) : selection
 
       return {
         operations,
         value: getIn(update.json, path),
-        state: getIn(update.state, path)
+        state: getIn(update.state, path),
+        selection: updatedSelection
       }
     } else {
-      return { operations: null, value, state }
+      return { operations: null, value, state, selection }
     }
   }
 
@@ -534,7 +552,9 @@
               value={item}
               path={path.concat(visibleSection.start + itemIndex)}
               state={resolvedState[visibleSection.start + itemIndex]}
-              selection={selection ? selection[visibleSection.start + itemIndex] : undefined}
+              selection={resolvedSelection
+                ? resolvedSelection[visibleSection.start + itemIndex]
+                : undefined}
               searchResult={searchResult
                 ? searchResult[visibleSection.start + itemIndex]
                 : undefined}
@@ -670,7 +690,7 @@
             value={resolvedValue[key]}
             path={path.concat(key)}
             state={resolvedState[key]}
-            selection={selection ? selection[key] : undefined}
+            selection={resolvedSelection ? resolvedSelection[key] : undefined}
             searchResult={searchResult ? searchResult[key] : undefined}
             validationErrors={validationErrors ? validationErrors[key] : undefined}
             {readOnly}
@@ -701,7 +721,7 @@
                 {key}
                 {readOnly}
                 {normalization}
-                selection={selection?.[key]?.[STATE_SELECTION]}
+                selection={resolvedSelection?.[key]?.[STATE_SELECTION]}
                 searchResult={searchResult?.[key]?.[STATE_SEARCH_PROPERTY]}
                 onUpdateKey={handleUpdateKey}
                 {onSelect}

@@ -12,6 +12,9 @@ import {
   SELECTION_TYPE
 } from './selection.js'
 import { STATE_KEYS } from '../constants.js'
+import { createDebug } from '../utils/debug.js'
+
+const debug = createDebug('jsoneditor:operations')
 
 /**
  * Create a JSONPatch for an insert operation.
@@ -78,7 +81,7 @@ export function insertBefore(json, state, path, values) {
  * @return {JSONPatchDocument}
  */
 export function append(json, path, values) {
-  // TODO: find a better name and define datastructure for values
+  // TODO: find a better name and define data structure for values
   const parent = getIn(json, path)
 
   if (Array.isArray(parent)) {
@@ -143,7 +146,7 @@ export function rename(parentPath, keys, oldKey, newKey) {
  * @return {JSONPatchDocument}
  */
 export function replace(json, state, paths, values) {
-  // TODO: find a better name and define datastructure for values
+  // TODO: find a better name and define data structure for values
   const firstPath = first(paths)
   const parentPath = initial(firstPath)
   const parent = getIn(json, parentPath)
@@ -420,9 +423,6 @@ export function insert(json, state, selection, clipboardText) {
   throw new Error('Cannot insert: unsupported type of selection ' + JSON.stringify(selection))
 }
 
-// TODO: work out, WIP
-// TODO: comment
-
 /**
  * @param {JSON} json
  * @param {JSON} state
@@ -471,16 +471,34 @@ export function moveInsideParent(json, state, selection, dragInsideAction) {
       const endIndex = endKey
       const toIndex = toKey
       const count = endIndex - startIndex + 1
-      const path = append ? parentPath.concat(parent.length) : beforePath
 
-      const fromIndex = toIndex < startIndex ? endIndex : startIndex
-      const operation = {
-        op: 'move',
-        from: compileJSONPointer(parentPath.concat(fromIndex)),
-        path: compileJSONPointer(path)
+      if (toIndex < startIndex) {
+        // move up
+        const operations = times(count, (offset) => {
+          return {
+            op: 'move',
+            from: compileJSONPointer(parentPath.concat(startIndex + offset)),
+            path: compileJSONPointer(parentPath.concat(toIndex + offset))
+          }
+        })
+
+        debug('moveInsideParent', { startIndex, endIndex, toIndex, count, operations })
+
+        return operations
+      } else {
+        // move down
+        const operations = times(count, (offset) => {
+          return {
+            op: 'move',
+            from: compileJSONPointer(parentPath.concat(endIndex - offset)),
+            path: compileJSONPointer(parentPath.concat(toIndex - offset))
+          }
+        })
+
+        debug('moveInsideParent', { startIndex, endIndex, toIndex, count, operations })
+
+        return operations
       }
-
-      return times(count, () => operation)
     }
   }
 
