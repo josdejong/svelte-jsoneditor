@@ -147,7 +147,7 @@
 
     // we attach the mousemove and mouseup event listeners to the global document,
     // so we will not miss if the mouse events happen outside the editor
-    document.addEventListener('mousemove', onDrag, true)
+    document.addEventListener('mousemove', handleMouseMoveGlobal, true)
     document.addEventListener('mouseup', handleMouseUpGlobal)
 
     const anchorType = getSelectionTypeFromTarget(event.target)
@@ -237,8 +237,11 @@
         })
       }
     }
+  }
 
+  function handleMouseMoveGlobal(event) {
     onDragSelection(event)
+    onDrag(event)
   }
 
   function handleMouseUpGlobal(event) {
@@ -251,7 +254,7 @@
     onDragSelectionEnd(event)
     onDragEnd()
 
-    document.removeEventListener('mousemove', onDrag, true)
+    document.removeEventListener('mousemove', handleMouseMoveGlobal, true)
     document.removeEventListener('mouseup', handleMouseUpGlobal)
   }
 
