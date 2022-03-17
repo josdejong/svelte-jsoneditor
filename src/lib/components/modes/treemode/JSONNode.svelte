@@ -27,7 +27,6 @@
   import { isPathInsideSelection, SELECTION_TYPE } from '$lib/logic/selection'
   import {
     encodeDataPath,
-    getDataPathFromTarget,
     getSelectionTypeFromTarget,
     isChildOfAttribute,
     isChildOfNodeName,
@@ -252,12 +251,27 @@
     document.removeEventListener('mouseup', handleMouseUpGlobal)
   }
 
+  function findContentTop() {
+    return findElement([])?.getBoundingClientRect()?.top || 0
+  }
+
+  function calculateDeltaY(dragging, event) {
+    // calculate the contentOffset, this changes when scrolling
+    const contentTop = findContentTop()
+    const contentOffset = contentTop - dragging.initialContentTop
+
+    // calculate the vertical mouse movement
+    const clientOffset = event.clientY - dragging.initialClientY
+
+    return clientOffset - contentOffset
+  }
+
   function handleDragSelectionStart(event) {
-    debug('drag selection [start]', getDataPathFromTarget(event.target))
+    debug('drag selection [start]')
 
     dragging = {
-      // FIXME: calculate based on position inside the scrollable contents instead of the "absolute position"
       initialClientY: event.clientY,
+      initialContentTop: findContentTop(),
       value,
       state
     }
@@ -265,9 +279,9 @@
 
   function handleDragSelection(event) {
     if (dragging) {
-      debug('drag selection [move]', getDataPathFromTarget(event.target))
+      debug('drag selection [move]')
 
-      const deltaY = event.clientY - dragging.initialClientY
+      const deltaY = calculateDeltaY(dragging, event)
       const { value, state } = onMoveSelection(deltaY)
       dragging = {
         ...dragging,
@@ -279,9 +293,9 @@
 
   function handleDragSelectionEnd(event) {
     if (dragging) {
-      debug('drag selection [end]', getDataPathFromTarget(event.target))
+      debug('drag selection [end]')
 
-      const deltaY = event.clientY - dragging.initialClientY
+      const deltaY = calculateDeltaY(dragging, event)
       const { operations } = onMoveSelection(deltaY)
 
       if (operations) {
