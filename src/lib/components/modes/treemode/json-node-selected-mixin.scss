@@ -13,6 +13,11 @@
     :global(.key),
     :global(.value) {
       background-color: $selection-background !important;
+      cursor: grab;
+    }
+
+    .expand {
+      cursor: pointer;
     }
   }
 
@@ -21,12 +26,14 @@
     > .contents-outer > .contents > :global(.identifier) > :global(.key),
     > .header-outer > .header > :global(.identifier) > :global(.key) {
       background-color: $selection-background;
+      cursor: grab;
     }
   }
 
   // value selected (part 1)
   &.selected-value > .contents-outer > .contents > :global(.value) {
     background-color: $selection-background;
+    cursor: grab;
   }
 
   :global(.collapsed-items.selected),
@@ -34,6 +41,7 @@
   &.selected-value :global(.collapsed-items) {
     // TODO: this css is copied from CollapsedItems.scss. Figure out how to reuse this smartly with CSS or SASS
     background-color: $selection-background;
+    cursor: grab;
 
     $shape-color: darken($selection-background, 5%);
     background-image: linear-gradient($shape-color, $shape-color),
@@ -60,6 +68,7 @@
       :global(.key),
       :global(.value) {
         background-color: $selection-background !important;
+        cursor: grab;
       }
     }
   }
