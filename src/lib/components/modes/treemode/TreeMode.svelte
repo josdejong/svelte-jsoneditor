@@ -1363,7 +1363,10 @@
    *                                   The new selection will be determined
    *                                   based on the operations.
    */
-  function handlePatch(operations, newSelection = createSelectionFromOperations(json, operations)) {
+  function handlePatch(
+    operations,
+    newSelection = createSelectionFromOperations(json, state, operations)
+  ) {
     if (readOnly) {
       return
     }

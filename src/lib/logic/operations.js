@@ -633,7 +633,7 @@ export function createRemoveOperations(json, state, selection) {
     const newKey = ''
 
     const operations = rename(parentPath, keys, oldKey, newKey)
-    const newSelection = createSelectionFromOperations(json, operations)
+    const newSelection = createSelectionFromOperations(json, state, operations)
 
     return { operations, newSelection }
   }

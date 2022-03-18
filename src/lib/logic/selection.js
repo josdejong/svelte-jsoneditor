@@ -515,10 +515,11 @@ export function getInitialSelection(json, state) {
 
 /**
  * @param {JSON} json
+ * @param {JSON} state
  * @param {JSONPatchDocument} operations
- * @returns {MultiSelection}
+ * @returns {Selection | null}
  */
-export function createSelectionFromOperations(json, operations) {
+export function createSelectionFromOperations(json, state, operations) {
   if (operations.length === 1) {
     const operation = first(operations)
     if (operation.op === 'replace' || operation.op === 'move') {
@@ -569,15 +570,13 @@ export function createSelectionFromOperations(json, operations) {
     return null
   }
 
-  // TODO: make this function robust against operations which do not have consecutive paths
-
-  return {
+  // we use createSelection here because it contains logic to make sure that
+  // paths, focusPath, anchorPath are coherent and ordered correctly
+  return createSelection(json, state, {
     type: SELECTION_TYPE.MULTI,
-    paths,
     anchorPath: first(paths),
-    focusPath: last(paths),
-    pathsMap: createPathsMap(paths)
-  }
+    focusPath: last(paths)
+  })
 }
 
 /**

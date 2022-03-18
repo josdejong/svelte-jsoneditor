@@ -394,7 +394,7 @@
 
       const fullUpdatedSelection = createRecursiveSelection(
         fullJson,
-        createSelectionFromOperations(fullJson, operations)
+        createSelectionFromOperations(fullJson, fullState, operations)
       )
 
       const updatedSelection = Array.isArray(value) ? getIn(fullUpdatedSelection, path) : selection

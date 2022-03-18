@@ -277,7 +277,7 @@ export function createSearchAndReplaceOperations(json, state, replacementText, s
     const newKey = replaceText(oldKey, replacementText, start, end)
 
     const operations = rename(parentPath, keys, oldKey, newKey)
-    const newSelection = createSelectionFromOperations(json, operations)
+    const newSelection = createSelectionFromOperations(json, state, operations)
 
     return {
       newSelection,
@@ -303,7 +303,7 @@ export function createSearchAndReplaceOperations(json, state, replacementText, s
       }
     ]
 
-    const newSelection = createSelectionFromOperations(json, operations)
+    const newSelection = createSelectionFromOperations(json, state, operations)
 
     return {
       newSelection,
@@ -376,7 +376,7 @@ export function createSearchAndReplaceAllOperations(json, state, searchText, rep
       const operations = rename(parentPath, keys, oldKey, newKey)
       allOperations = allOperations.concat(operations)
 
-      lastNewSelection = createSelectionFromOperations(json, operations)
+      lastNewSelection = createSelectionFromOperations(json, state, operations)
     } else if (field === STATE_SEARCH_VALUE) {
       // replace a value
       const currentValue = getIn(json, path)
@@ -399,7 +399,7 @@ export function createSearchAndReplaceAllOperations(json, state, searchText, rep
       ]
       allOperations = allOperations.concat(operations)
 
-      lastNewSelection = createSelectionFromOperations(json, operations)
+      lastNewSelection = createSelectionFromOperations(json, state, operations)
     } else {
       throw new Error(`Cannot replace: unknown type of search result field ${field}`)
     }
