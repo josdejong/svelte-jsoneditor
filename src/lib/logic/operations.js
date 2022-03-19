@@ -487,11 +487,11 @@ export function moveInsideParent(json, state, selection, dragInsideAction) {
         return operations
       } else {
         // move down
-        const operations = times(count, (offset) => {
+        const operations = times(count, () => {
           return {
             op: 'move',
-            from: compileJSONPointer(parentPath.concat(endIndex - offset)),
-            path: compileJSONPointer(parentPath.concat(toIndex - offset))
+            from: compileJSONPointer(parentPath.concat(startIndex)),
+            path: compileJSONPointer(parentPath.concat(toIndex))
           }
         })
 

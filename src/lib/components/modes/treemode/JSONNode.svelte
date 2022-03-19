@@ -4,7 +4,7 @@
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
   import { getIn, parseJSONPointer } from 'immutable-json-patch'
-  import { isEqual, last } from 'lodash-es'
+  import { first, initial, isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
     HOVER_COLLECTION,
@@ -50,7 +50,7 @@
   } from '../../../logic/documentState.js'
   import {
     createRecursiveSelection,
-    createSelectionFromOperations,
+    createSelection,
     getEndPath,
     getStartPath
   } from '../../../logic/selection.js'
@@ -158,7 +158,7 @@
 
     // when right-clicking inside the current selection, do nothing: context menu will open
     // when left-clicking inside the current selection, do nothing: it can be the start of dragging
-    if (selectionObj && isPathInsideSelection(selectionObj, path, anchorType)) {
+    if (isPathInsideSelection(getFullSelection(), path, anchorType)) {
       if (event.button === 0) {
         onDragSelectionStart(event)
       }
@@ -280,6 +280,15 @@
   function handleDragSelectionStart(event) {
     // debug('drag selection [start]', path) // TODO: cleanup
 
+    const fullSelection = getFullSelection()
+    const selectionParentPath = initial(fullSelection.focusPath)
+    if (!isEqual(path, selectionParentPath)) {
+      // pass to parent
+      onDragSelectionStart(event)
+
+      return
+    }
+
     const heights = getAllElementHeights()
 
     debug('heights', heights)
@@ -290,6 +299,7 @@
       value,
       state,
       selection,
+      fullSelection,
       heights
     }
   }
@@ -299,12 +309,13 @@
       // debug('drag selection [move]', path) // TODO: cleanup
 
       const deltaY = calculateDeltaY(dragging, event)
-      const { value, state, selection } = onMoveSelection(deltaY, dragging.heights)
+      const { value, state, selection, fullSelection } = onMoveSelection(deltaY, dragging.heights)
       dragging = {
         ...dragging,
         value,
         state,
-        selection
+        selection,
+        fullSelection
       }
     }
   }
@@ -314,10 +325,10 @@
       // debug('drag selection [end]', path) // TODO: cleanup
 
       const deltaY = calculateDeltaY(dragging, event)
-      const { operations } = onMoveSelection(deltaY, dragging.heights)
+      const { operations, fullSelection } = onMoveSelection(deltaY, dragging.heights)
 
       if (operations) {
-        onPatch(operations)
+        onPatch(operations, fullSelection)
       }
 
       dragging = undefined
@@ -376,17 +387,19 @@
       let path = getPreviousPathInside(fullJson, fullState, initialPath)
       let height = heights[last(path)]
       let cumulativeHeight = 0
+      let offset = 0
       let swapPath = undefined
 
       while (height !== undefined && Math.abs(deltaY) > cumulativeHeight + height / 2) {
         cumulativeHeight += height
+        offset -= 1
         swapPath = path
 
         path = getPreviousPathInside(fullJson, fullState, path)
         height = heights[last(path)]
       }
 
-      return swapPath ? { beforePath: swapPath } : undefined
+      return swapPath ? { beforePath: swapPath, offset } : undefined
     }
 
     /**
@@ -399,10 +412,12 @@
       let path = getNextPathInside(fullJson, fullState, initialPath)
       let height = heights[last(path)]
       let cumulativeHeight = 0
+      let offset = 0
       let swapPath = undefined
 
       while (height !== undefined && Math.abs(deltaY) > cumulativeHeight + height / 2) {
         cumulativeHeight += height
+        offset += 1
         swapPath = path
 
         path = getNextPathInside(fullJson, fullState, path)
@@ -416,10 +431,27 @@
       const beforePath = getNextPathInside(fullJson, fullState, swapPath)
 
       return Array.isArray(value)
-        ? { beforePath: swapPath }
+        ? { beforePath: swapPath, offset }
         : beforePath
-        ? { beforePath }
-        : { append: true }
+        ? { beforePath, offset }
+        : { append: true, offset }
+    }
+
+    function createUpdatedArraySelection(offset) {
+      // FIXME: this function is hacky, refactor this
+      const startIndex = last(first(fullSelection.paths))
+      const endIndex = last(last(fullSelection.paths))
+
+      const updatedFullSelection = createSelection(fullJson, fullState, {
+        type: SELECTION_TYPE.MULTI,
+        anchorPath: path.concat(startIndex + offset),
+        focusPath: path.concat(endIndex + offset)
+      })
+
+      const recursiveSelection = createRecursiveSelection(fullJson, updatedFullSelection)
+      const updatedSelection = getIn(recursiveSelection, path)
+
+      return { updatedSelection, updatedFullSelection }
     }
 
     const dragInsideAction = deltaY < 0 ? findSwapPathUp() : findSwapPathDown()
@@ -429,21 +461,29 @@
       const operations = moveInsideParent(fullJson, fullState, fullSelection, dragInsideAction)
       const update = documentStatePatch(fullJson, fullState, operations)
 
-      const fullUpdatedSelection = createRecursiveSelection(
-        fullJson,
-        createSelectionFromOperations(fullJson, fullState, operations)
-      )
+      if (Array.isArray(value)) {
+        const { updatedSelection, updatedFullSelection } = createUpdatedArraySelection(
+          dragInsideAction.offset
+        )
 
-      const updatedSelection = Array.isArray(value) ? getIn(fullUpdatedSelection, path) : selection
-
-      return {
-        operations,
-        value: getIn(update.json, path),
-        state: getIn(update.state, path),
-        selection: updatedSelection
+        return {
+          operations,
+          value: getIn(update.json, path),
+          state: getIn(update.state, path),
+          selection: updatedSelection,
+          fullSelection: updatedFullSelection
+        }
+      } else {
+        return {
+          operations,
+          value: getIn(update.json, path),
+          state: getIn(update.state, path),
+          selection,
+          fullSelection
+        }
       }
     } else {
-      return { operations: null, value, state, selection }
+      return { operations: null, value, state, selection, fullSelection }
     }
   }
 

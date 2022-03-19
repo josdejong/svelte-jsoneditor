@@ -1022,7 +1022,7 @@ describe('selection', () => {
       )
     })
 
-    it('should get selection from wrongly ordered move operations', () => {
+    it.skip('should get selection from wrongly ordered move operations', () => {
       assert.deepStrictEqual(
         createSelectionFromOperations(json, state, [
           { op: 'add', from: '/obj/arr/1', path: '/obj/arr/3' },

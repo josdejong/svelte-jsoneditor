@@ -128,6 +128,10 @@ export function isSelectionInsidePath(selection, path) {
  */
 // TODO: write unit test
 export function isPathInsideSelection(selection, path, anchorType) {
+  if (!selection) {
+    return false
+  }
+
   const p = path.slice(0)
 
   if (selection.type === SELECTION_TYPE.MULTI) {
@@ -586,13 +590,15 @@ export function createSelectionFromOperations(json, state, operations) {
     return null
   }
 
-  // we use createSelection here because it contains logic to make sure that
-  // paths, focusPath, anchorPath are coherent and ordered correctly
-  return createSelection(json, state, {
+  // TODO: make this function robust against operations which do not have consecutive paths or have wrongly ordered paths
+
+  return {
     type: SELECTION_TYPE.MULTI,
+    paths,
     anchorPath: first(paths),
-    focusPath: last(paths)
-  })
+    focusPath: last(paths),
+    pathsMap: createPathsMap(paths)
+  }
 }
 
 /**

@@ -129,8 +129,8 @@ describe('operations', () => {
       const path = ['array', 4]
       const operations = moveInsideParent(json, state, selection, { beforePath: path })
       assert.deepStrictEqual(operations, [
-        { op: 'move', from: '/array/2', path: '/array/4' },
-        { op: 'move', from: '/array/1', path: '/array/3' }
+        { op: 'move', from: '/array/1', path: '/array/4' },
+        { op: 'move', from: '/array/1', path: '/array/4' }
       ])
 
       const updatedJson = documentStatePatch(json, state, operations).json
