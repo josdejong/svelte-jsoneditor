@@ -4,7 +4,7 @@
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
   import { getIn, parseJSONPointer } from 'immutable-json-patch'
-  import { first, isEqual, last } from 'lodash-es'
+  import { isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
     HOVER_COLLECTION,
@@ -48,7 +48,9 @@
   } from '../../../logic/documentState.js'
   import {
     createRecursiveSelection,
-    createSelectionFromOperations
+    createSelectionFromOperations,
+    getEndPath,
+    getStartPath
   } from '../../../logic/selection.js'
 
   // eslint-disable-next-line no-undef-init
@@ -332,32 +334,25 @@
       return { operations: null, value, state, selection }
     }
 
-    function findSwapPath(initialPath, threshold, getNextPath) {
-      let nextPath = getNextPath(initialPath)
-      let nextElement = nextPath ? findElement(nextPath) : null
-      let cumulativeHeight = 0
-      let swapPath = undefined
-
-      while (nextElement && threshold > cumulativeHeight + nextElement.clientHeight / 2) {
-        cumulativeHeight += nextElement.clientHeight
-        swapPath = nextPath
-
-        nextPath = getNextPath(nextPath)
-        nextElement = nextPath ? findElement(nextPath) : null
-      }
-
-      return swapPath
-    }
-
     /**
      * @returns {DragInsideAction | undefined}
      */
     function findSwapPathUp() {
-      const startPath = fullSelection.paths ? first(fullSelection.paths) : fullSelection.focusPath
+      // TODO: simplify this function
+      const initialPath = getStartPath(fullSelection)
 
-      const swapPath = findSwapPath(startPath, Math.abs(deltaY), (path) => {
-        return getPreviousPathInside(fullJson, fullState, path)
-      })
+      let path = getPreviousPathInside(fullJson, fullState, initialPath)
+      let element = path ? findElement(path) : null
+      let cumulativeHeight = 0
+      let swapPath = undefined
+
+      while (element && Math.abs(deltaY) > cumulativeHeight + element.clientHeight / 2) {
+        cumulativeHeight += element.clientHeight
+        swapPath = path
+
+        path = getPreviousPathInside(fullJson, fullState, path)
+        element = path ? findElement(path) : null
+      }
 
       return swapPath ? { beforePath: swapPath } : undefined
     }
@@ -366,11 +361,21 @@
      * @returns {DragInsideAction | undefined}
      */
     function findSwapPathDown() {
-      const endPath = fullSelection.paths ? last(fullSelection.paths) : fullSelection.focusPath
+      // TODO: simplify this function
+      const initialPath = getEndPath(fullSelection)
 
-      const swapPath = findSwapPath(endPath, Math.abs(deltaY), (path) => {
-        return getNextPathInside(fullJson, fullState, path)
-      })
+      let path = getNextPathInside(fullJson, fullState, initialPath)
+      let element = path ? findElement(path) : null
+      let cumulativeHeight = 0
+      let swapPath = undefined
+
+      while (element && Math.abs(deltaY) > cumulativeHeight + element.clientHeight / 2) {
+        cumulativeHeight += element.clientHeight
+        swapPath = path
+
+        path = getNextPathInside(fullJson, fullState, path)
+        element = path ? findElement(path) : null
+      }
 
       if (!swapPath) {
         return undefined

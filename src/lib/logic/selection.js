@@ -93,6 +93,22 @@ export function getParentPath(selection) {
 
 /**
  * @param {Selection} selection
+ * @returns {Path}
+ */
+export function getStartPath(selection) {
+  return selection.paths ? first(selection.paths) : selection.focusPath
+}
+
+/**
+ * @param {Selection} selection
+ * @returns {Path}
+ */
+export function getEndPath(selection) {
+  return selection.paths ? last(selection.paths) : selection.focusPath
+}
+
+/**
+ * @param {Selection} selection
  * @param {Path} path
  * @return boolean
  */
