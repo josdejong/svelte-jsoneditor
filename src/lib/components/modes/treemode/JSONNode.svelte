@@ -285,7 +285,7 @@
 
     const heights = getAllElementHeights()
 
-    debug('heights', heights)
+    debug('dragSelectionStart', { selection, heights })
 
     dragging = {
       initialClientY: event.clientY,
@@ -294,7 +294,8 @@
       state,
       selection,
       fullSelection,
-      heights
+      heights,
+      offset: 0
     }
 
     document.addEventListener('mousemove', handleDragSelection, true)
@@ -304,13 +305,21 @@
   function handleDragSelection(event) {
     if (dragging) {
       const deltaY = calculateDeltaY(dragging, event)
-      const { value, state, selection, fullSelection } = onMoveSelection(deltaY, dragging.heights)
-      dragging = {
-        ...dragging,
-        value,
-        state,
-        selection,
-        fullSelection
+      const { value, state, selection, fullSelection, offset } = onMoveSelection(
+        deltaY,
+        dragging.heights
+      )
+
+      if (offset !== dragging.offset) {
+        debug('drag selection', offset, fullSelection)
+        dragging = {
+          ...dragging,
+          value,
+          state,
+          selection,
+          fullSelection,
+          offset
+        }
       }
     }
   }
@@ -367,10 +376,8 @@
     const fullState = getFullState()
     const fullSelection = getFullSelection()
 
-    debug('move selection', path, { deltaY, fullSelection, heights })
-
     if (!fullSelection) {
-      return { operations: null, value, state, selection }
+      return { operations: null, value, state, selection, offset: 0 }
     }
 
     /**
@@ -452,8 +459,6 @@
 
     const dragInsideAction = deltaY < 0 ? findSwapPathUp() : findSwapPathDown()
     if (dragInsideAction) {
-      debug('move selection actions', dragInsideAction)
-
       const operations = moveInsideParent(fullJson, fullState, fullSelection, dragInsideAction)
       const update = documentStatePatch(fullJson, fullState, operations)
 
@@ -467,7 +472,8 @@
           value: getIn(update.json, path),
           state: getIn(update.state, path),
           selection: updatedSelection,
-          fullSelection: updatedFullSelection
+          fullSelection: updatedFullSelection,
+          offset: dragInsideAction.offset
         }
       } else {
         return {
@@ -475,11 +481,12 @@
           value: getIn(update.json, path),
           state: getIn(update.state, path),
           selection,
-          fullSelection
+          fullSelection,
+          offset: dragInsideAction.offset
         }
       }
     } else {
-      return { operations: null, value, state, selection, fullSelection }
+      return { operations: null, value, state, selection, fullSelection, offset: 0 }
     }
   }
 
