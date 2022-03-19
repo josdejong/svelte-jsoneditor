@@ -43,6 +43,8 @@
   import { moveInsideParent } from '../../../logic/operations.js'
   import {
     documentStatePatch,
+    forEachKey,
+    forEachVisibleIndex,
     getNextPathInside,
     getPreviousPathInside
   } from '../../../logic/documentState.js'
@@ -278,12 +280,17 @@
   function handleDragSelectionStart(event) {
     // debug('drag selection [start]', path) // TODO: cleanup
 
+    const heights = getAllElementHeights()
+
+    debug('heights', heights)
+
     dragging = {
       initialClientY: event.clientY,
       initialContentTop: findContentTop(),
       value,
       state,
-      selection
+      selection,
+      heights
     }
   }
 
@@ -292,7 +299,7 @@
       // debug('drag selection [move]', path) // TODO: cleanup
 
       const deltaY = calculateDeltaY(dragging, event)
-      const { value, state, selection } = onMoveSelection(deltaY)
+      const { value, state, selection } = onMoveSelection(deltaY, dragging.heights)
       dragging = {
         ...dragging,
         value,
@@ -307,7 +314,7 @@
       // debug('drag selection [end]', path) // TODO: cleanup
 
       const deltaY = calculateDeltaY(dragging, event)
-      const { operations } = onMoveSelection(deltaY)
+      const { operations } = onMoveSelection(deltaY, dragging.heights)
 
       if (operations) {
         onPatch(operations)
@@ -318,17 +325,42 @@
   }
 
   /**
+   * Get a map with the element heights of all rendered childs
+   * @returns {Object<string, number>}
+   */
+  function getAllElementHeights() {
+    const heights = {}
+
+    function addHeight(keyOrIndex) {
+      const element = findElement(path.concat(keyOrIndex))
+      if (element != null) {
+        heights[keyOrIndex] = element.clientHeight
+      }
+    }
+
+    if (Array.isArray(value)) {
+      forEachVisibleIndex(value, state, addHeight)
+    } else {
+      // value is Object
+      forEachKey(state, addHeight)
+    }
+
+    return heights
+  }
+
+  /**
    *
-   * @param deltaY
+   * @param {number} deltaY
+   * @param {Object<string, number>} heights
    * @returns {{operations: null | JSONPatchDocument, value: JSONData, state: JSONData }}
    */
-  function onMoveSelection(deltaY) {
-    // TODO: refactor this function, it's a mess
+  function onMoveSelection(deltaY, heights) {
+    // TODO: refactor this function, it's a mess. idea: upfront, create an array with the key/index of every child and it's height. Just loop over that array instead of getPreviousPathInside
     const fullJson = getFullJson()
     const fullState = getFullState()
     const fullSelection = getFullSelection()
 
-    debug('move selection', path, { deltaY, fullSelection })
+    debug('move selection', path, { deltaY, fullSelection, heights })
 
     if (!fullSelection) {
       return { operations: null, value, state, selection }
@@ -342,16 +374,16 @@
       const initialPath = getStartPath(fullSelection)
 
       let path = getPreviousPathInside(fullJson, fullState, initialPath)
-      let element = path ? findElement(path) : null
+      let height = heights[last(path)]
       let cumulativeHeight = 0
       let swapPath = undefined
 
-      while (element && Math.abs(deltaY) > cumulativeHeight + element.clientHeight / 2) {
-        cumulativeHeight += element.clientHeight
+      while (height !== undefined && Math.abs(deltaY) > cumulativeHeight + height / 2) {
+        cumulativeHeight += height
         swapPath = path
 
         path = getPreviousPathInside(fullJson, fullState, path)
-        element = path ? findElement(path) : null
+        height = heights[last(path)]
       }
 
       return swapPath ? { beforePath: swapPath } : undefined
@@ -365,16 +397,16 @@
       const initialPath = getEndPath(fullSelection)
 
       let path = getNextPathInside(fullJson, fullState, initialPath)
-      let element = path ? findElement(path) : null
+      let height = heights[last(path)]
       let cumulativeHeight = 0
       let swapPath = undefined
 
-      while (element && Math.abs(deltaY) > cumulativeHeight + element.clientHeight / 2) {
-        cumulativeHeight += element.clientHeight
+      while (height !== undefined && Math.abs(deltaY) > cumulativeHeight + height / 2) {
+        cumulativeHeight += height
         swapPath = path
 
         path = getNextPathInside(fullJson, fullState, path)
-        element = path ? findElement(path) : null
+        height = heights[last(path)]
       }
 
       if (!swapPath) {
