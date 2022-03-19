@@ -75,8 +75,6 @@
   export let onDrag
   export let onDragEnd
   export let onDragSelectionStart
-  export let onDragSelection
-  export let onDragSelectionEnd
 
   const debug = createDebug('jsoneditor:JSONNode')
 
@@ -244,7 +242,6 @@
   }
 
   function handleMouseMoveGlobal(event) {
-    onDragSelection(event)
     onDrag(event)
   }
 
@@ -255,7 +252,6 @@
       event.stopPropagation()
     }
 
-    onDragSelectionEnd(event)
     onDragEnd()
 
     document.removeEventListener('mousemove', handleMouseMoveGlobal, true)

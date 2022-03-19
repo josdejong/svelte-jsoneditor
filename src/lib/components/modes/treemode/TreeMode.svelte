@@ -2050,8 +2050,6 @@
           onDrag={autoScrollHandler.onDrag}
           onDragEnd={autoScrollHandler.onDragEnd}
           onDragSelectionStart={noop}
-          onDragSelection={noop}
-          onDragSelectionEnd={noop}
         />
       </div>
 
