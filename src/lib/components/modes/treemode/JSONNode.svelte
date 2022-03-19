@@ -278,8 +278,6 @@
   }
 
   function handleDragSelectionStart(event) {
-    // debug('drag selection [start]', path) // TODO: cleanup
-
     const fullSelection = getFullSelection()
     const selectionParentPath = initial(fullSelection.focusPath)
     if (!isEqual(path, selectionParentPath)) {
@@ -302,12 +300,13 @@
       fullSelection,
       heights
     }
+
+    document.addEventListener('mousemove', handleDragSelection, true)
+    document.addEventListener('mouseup', handleDragSelectionEnd)
   }
 
   function handleDragSelection(event) {
     if (dragging) {
-      // debug('drag selection [move]', path) // TODO: cleanup
-
       const deltaY = calculateDeltaY(dragging, event)
       const { value, state, selection, fullSelection } = onMoveSelection(deltaY, dragging.heights)
       dragging = {
@@ -322,8 +321,6 @@
 
   function handleDragSelectionEnd(event) {
     if (dragging) {
-      // debug('drag selection [end]', path) // TODO: cleanup
-
       const deltaY = calculateDeltaY(dragging, event)
       const { operations, fullSelection } = onMoveSelection(deltaY, dragging.heights)
 
@@ -332,6 +329,9 @@
       }
 
       dragging = undefined
+
+      document.removeEventListener('mousemove', handleDragSelection, true)
+      document.removeEventListener('mouseup', handleDragSelectionEnd)
     }
   }
 
@@ -660,8 +660,6 @@
               {onDrag}
               {onDragEnd}
               onDragSelectionStart={handleDragSelectionStart}
-              onDragSelection={handleDragSelection}
-              onDragSelectionEnd={handleDragSelectionEnd}
             >
               <div slot="identifier" class="identifier">
                 <div class="index">{visibleSection.start + itemIndex}</div>
@@ -792,8 +790,6 @@
             {onDrag}
             {onDragEnd}
             onDragSelectionStart={handleDragSelectionStart}
-            onDragSelection={handleDragSelection}
-            onDragSelectionEnd={handleDragSelectionEnd}
           >
             <div slot="identifier" class="identifier">
               <JSONKey
