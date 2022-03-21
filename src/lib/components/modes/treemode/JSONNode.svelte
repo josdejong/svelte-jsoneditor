@@ -324,7 +324,7 @@
       })
 
       if (operations) {
-        onPatch(operations, updatedFullSelection)
+        onPatch(operations, updatedFullSelection || getFullSelection())
       }
 
       dragging = undefined
