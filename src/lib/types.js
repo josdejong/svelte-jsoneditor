@@ -259,5 +259,14 @@
  */
 
 /**
- * @typedef {{ beforePath: Path} | {append: true}} DragInsideAction
+ * @typedef {Object} DragInsideProps
+ * @property {JSON} fullJson
+ * @property {JSON} fullState
+ * @property {Selection} fullSelection
+ * @property {number} deltaY
+ * @property {Object<string, number>} heights
+ */
+
+/**
+ * @typedef {{ beforePath: Path, offset: number} | {append: true, offset: number}} DragInsideAction
  */
