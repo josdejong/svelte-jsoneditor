@@ -44,6 +44,13 @@ export function onMoveSelection({ fullJson, fullState, fullSelection, deltaY, it
   }
 
   const operations = moveInsideParent(fullJson, fullState, fullSelection, dragInsideAction)
+
+  // TODO: documentStatePatch is relatively slow for large documents
+  //  This is for example noticeable in a large array where we drag a few
+  //  properties inside one of the nested objects. In this case we know we do
+  //  not need the full document, only the nested changes. So we can optimize
+  //  performance here by taking only the relative, nested json and state, and
+  //  changing the operations into relative operations.
   const update = documentStatePatch(fullJson, fullState, operations)
 
   const path = initial(getStartPath(fullSelection))
