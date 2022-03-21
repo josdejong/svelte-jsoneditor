@@ -12,9 +12,6 @@ import {
   SELECTION_TYPE
 } from './selection.js'
 import { STATE_KEYS } from '../constants.js'
-import { createDebug } from '../utils/debug.js'
-
-const debug = createDebug('jsoneditor:operations')
 
 /**
  * Create a JSONPatch for an insert operation.
@@ -482,7 +479,7 @@ export function moveInsideParent(json, state, selection, dragInsideAction) {
           }
         })
 
-        debug('moveInsideParent', { startIndex, endIndex, toIndex, count, operations })
+        // debug('moveInsideParent', { startIndex, endIndex, toIndex, count, operations })
 
         return operations
       } else {
@@ -495,7 +492,7 @@ export function moveInsideParent(json, state, selection, dragInsideAction) {
           }
         })
 
-        debug('moveInsideParent', { startIndex, endIndex, toIndex, count, operations })
+        // debug('moveInsideParent', { startIndex, endIndex, toIndex, count, operations })
 
         return operations
       }

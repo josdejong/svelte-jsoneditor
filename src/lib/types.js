@@ -264,13 +264,11 @@
 
 /**
  * @typedef {Object} DragInsideProps
- * @property {JSON} fullJson
- * @property {JSON} fullState
  * @property {Selection} fullSelection
  * @property {number} deltaY
- * @property {Object<string, number>} heights
+ * @property {Array.<{ path: Path, height: number}>} items
  */
 
 /**
- * @typedef {{ beforePath: Path, offset: number} | {append: true, offset: number}} DragInsideAction
+ * @typedef {{ beforePath: Path, indexOffset: number} | {append: true, indexOffset: number}} DragInsideAction
  */

@@ -43,7 +43,6 @@
   import { forEachKey, forEachVisibleIndex } from '../../../logic/documentState.js'
   import { onMoveSelection } from '../../../logic/dragging.js'
 
-  // eslint-disable-next-line no-undef-init
   export let value
   export let path
   export let state
@@ -271,9 +270,9 @@
       return
     }
 
-    const heights = getAllElementHeights()
+    const items = getVisibleItemsWithHeights()
 
-    debug('dragSelectionStart', { selection, heights })
+    debug('dragSelectionStart', { selection, items })
 
     dragging = {
       initialClientY: event.clientY,
@@ -281,7 +280,7 @@
       updatedValue: undefined,
       updatedState: undefined,
       updatedSelection: undefined,
-      heights,
+      items,
       indexOffset: 0
     }
 
@@ -297,7 +296,7 @@
         fullState: getFullState(),
         fullSelection: getFullSelection(),
         deltaY,
-        heights: dragging.heights
+        items: dragging.items
       })
 
       if (indexOffset !== dragging.indexOffset) {
@@ -321,7 +320,7 @@
         fullState: getFullState(),
         fullSelection: getFullSelection(),
         deltaY,
-        heights: dragging.heights
+        items: dragging.items
       })
 
       if (operations) {
@@ -336,16 +335,21 @@
   }
 
   /**
-   * Get a map with the element heights of all rendered childs
-   * @returns {Object<string, number>}
+   * Get a list with all visible items and their rendered heights inside
+   * this object or array
+   * @returns {Array.<{ path: Path, height: number }>}
    */
-  function getAllElementHeights() {
-    const heights = {}
+  function getVisibleItemsWithHeights() {
+    const items = []
 
     function addHeight(keyOrIndex) {
-      const element = findElement(path.concat(keyOrIndex))
+      const itemPath = path.concat(keyOrIndex)
+      const element = findElement(itemPath)
       if (element != null) {
-        heights[keyOrIndex] = element.clientHeight
+        items.push({
+          path: itemPath,
+          height: element.clientHeight
+        })
       }
     }
 
@@ -356,7 +360,7 @@
       forEachKey(state, addHeight)
     }
 
-    return heights
+    return items
   }
 
   function handleMouseOver(event) {
