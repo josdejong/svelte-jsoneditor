@@ -292,23 +292,21 @@
   function handleDragSelection(event) {
     if (dragging) {
       const deltaY = calculateDeltaY(dragging, event)
-      const { updatedValue, updatedState, updatedSelection, updatedFullSelection, indexOffset } =
-        onMoveSelection({
-          fullJson: getFullJson(),
-          fullState: getFullState(),
-          fullSelection: getFullSelection(),
-          deltaY,
-          heights: dragging.heights
-        })
+      const { updatedValue, updatedState, updatedSelection, indexOffset } = onMoveSelection({
+        fullJson: getFullJson(),
+        fullState: getFullState(),
+        fullSelection: getFullSelection(),
+        deltaY,
+        heights: dragging.heights
+      })
 
       if (indexOffset !== dragging.indexOffset) {
-        debug('drag selection', indexOffset, updatedFullSelection)
+        debug('drag selection', indexOffset, deltaY)
         dragging = {
           ...dragging,
           updatedValue,
           updatedState,
           updatedSelection,
-          updatedFullSelection,
           indexOffset
         }
       }
