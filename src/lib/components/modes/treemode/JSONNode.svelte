@@ -75,9 +75,12 @@
   export let getFullSelection
   export let findElement
 
-  $: resolvedValue = dragging !== undefined ? dragging.value : value
-  $: resolvedState = dragging !== undefined ? dragging.state : state
-  $: resolvedSelection = dragging !== undefined ? dragging.selection : selection
+  let hover = undefined
+  let dragging = undefined
+
+  $: resolvedValue = dragging?.updatedValue !== undefined ? dragging.updatedValue : value
+  $: resolvedState = dragging?.updatedState !== undefined ? dragging.updatedState : state
+  $: resolvedSelection = dragging?.updatedSelection != null ? dragging.updatedSelection : selection
 
   $: selectionObj = resolvedSelection && resolvedSelection[STATE_SELECTION]
 
@@ -92,9 +95,6 @@
   $: keys = resolvedState[STATE_KEYS]
   $: validationError = validationErrors && validationErrors[VALIDATION_ERROR]
   $: root = path.length === 0
-
-  let hover = undefined
-  let dragging = undefined
 
   $: type = valueType(resolvedValue)
 
@@ -278,12 +278,11 @@
     dragging = {
       initialClientY: event.clientY,
       initialContentTop: findContentTop(),
-      value,
-      state,
-      selection,
-      fullSelection,
+      updatedValue: undefined,
+      updatedState: undefined,
+      updatedSelection: undefined,
       heights,
-      offset: 0
+      indexOffset: 0
     }
 
     document.addEventListener('mousemove', handleDragSelection, true)
@@ -293,23 +292,24 @@
   function handleDragSelection(event) {
     if (dragging) {
       const deltaY = calculateDeltaY(dragging, event)
-      const draggingUpdated = onMoveSelection({
-        fullJson: getFullJson(),
-        fullState: getFullState(),
-        fullSelection: getFullSelection(),
-        value,
-        state,
-        selection,
-        path,
-        deltaY,
-        heights: dragging.heights
-      })
+      const { updatedValue, updatedState, updatedSelection, updatedFullSelection, indexOffset } =
+        onMoveSelection({
+          fullJson: getFullJson(),
+          fullState: getFullState(),
+          fullSelection: getFullSelection(),
+          deltaY,
+          heights: dragging.heights
+        })
 
-      if (draggingUpdated.offset !== dragging.offset) {
-        debug('drag selection', draggingUpdated.offset, draggingUpdated.fullSelection)
+      if (indexOffset !== dragging.indexOffset) {
+        debug('drag selection', indexOffset, updatedFullSelection)
         dragging = {
           ...dragging,
-          ...draggingUpdated
+          updatedValue,
+          updatedState,
+          updatedSelection,
+          updatedFullSelection,
+          indexOffset
         }
       }
     }
@@ -318,20 +318,16 @@
   function handleDragSelectionEnd(event) {
     if (dragging) {
       const deltaY = calculateDeltaY(dragging, event)
-      const { operations, fullSelection } = onMoveSelection({
+      const { operations, updatedFullSelection } = onMoveSelection({
         fullJson: getFullJson(),
         fullState: getFullState(),
         fullSelection: getFullSelection(),
-        value,
-        state,
-        selection,
-        path,
         deltaY,
         heights: dragging.heights
       })
 
       if (operations) {
-        onPatch(operations, fullSelection)
+        onPatch(operations, updatedFullSelection)
       }
 
       dragging = undefined

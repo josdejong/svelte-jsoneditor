@@ -99,6 +99,10 @@
  */
 
 /**
+ * @typedef {Object<string, RecursiveSelection> || Array<RecursiveSelection>} RecursiveSelection
+ */
+
+/**
  * @typedef {{type: 'after', path: Path}} AfterSelectionSchema
  */
 

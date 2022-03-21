@@ -817,7 +817,7 @@ export function selectionToPartialJson(json, selection, indentation = 2) {
 /**
  * @param {JSON} referenceJson
  * @param {Selection} selection
- * @returns {{} | null}
+ * @returns {RecursiveSelection | null}
  */
 // TODO: write unit tests
 export function createRecursiveSelection(referenceJson, selection) {
