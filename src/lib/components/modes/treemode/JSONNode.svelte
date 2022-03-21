@@ -4,7 +4,7 @@
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
   import { getIn, parseJSONPointer } from 'immutable-json-patch'
-  import { first, initial, isEqual, last } from 'lodash-es'
+  import { initial, isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
     HOVER_COLLECTION,
@@ -442,8 +442,8 @@
 
     function createUpdatedArraySelection(offset) {
       // FIXME: this function is hacky, refactor this
-      const startIndex = last(first(fullSelection.paths))
-      const endIndex = last(last(fullSelection.paths))
+      const startIndex = last(getStartPath(fullSelection))
+      const endIndex = last(getEndPath(fullSelection))
 
       const updatedFullSelection = createSelection(fullJson, fullState, {
         type: SELECTION_TYPE.MULTI,
