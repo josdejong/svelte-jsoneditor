@@ -6,35 +6,9 @@ import {
   SELECTION_TYPE
 } from './selection.js'
 import { documentStatePatch } from './documentState.js'
-import { first, initial, isEqual, last } from 'lodash-es'
+import { initial, isEqual, last } from 'lodash-es'
 import { getIn } from 'immutable-json-patch'
 import { moveInsideParent } from './operations.js'
-
-/**
- * Test whether all paths in the selection are rendered, which is the
- * case when they are all in the visible, rendered items
- * @param {Selection} selection
- * @param {RenderedItem[]} items
- * @return {boolean}
- */
-export function fullSelectionVisible(selection, items) {
-  // the paths in the selection are ordered from top to bottom
-  // the items too. We utilize this
-  const selectionPaths = selection.paths || [selection.focusPath]
-
-  const firstSelectionPath = first(selectionPaths)
-  const offset = items.findIndex((item) => isEqual(item.path, firstSelectionPath))
-
-  if (offset === -1) {
-    return false
-  }
-
-  return selectionPaths.every((selectionPath, index) => {
-    const itemPath = items[index + offset]?.path
-
-    return isEqual(selectionPath, itemPath)
-  })
-}
 
 /**
  * @param {JSON} fullJson
@@ -51,14 +25,13 @@ export function fullSelectionVisible(selection, items) {
  * @property {Selection | undefined} updatedFullSelection
  * @property {number} indexOffset
  */
-// TODO: write unit tests for onMoveSelection
 export function onMoveSelection({ fullJson, fullState, fullSelection, deltaY, items }) {
   const dragInsideAction =
     deltaY < 0
       ? findSwapPathUp({ fullSelection, deltaY, items })
       : findSwapPathDown({ fullSelection, deltaY, items })
 
-  if (!dragInsideAction) {
+  if (!dragInsideAction || dragInsideAction.indexOffset === 0) {
     return {
       operations: undefined,
       updatedValue: undefined,

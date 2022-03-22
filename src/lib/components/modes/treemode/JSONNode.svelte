@@ -4,7 +4,7 @@
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
   import { parseJSONPointer } from 'immutable-json-patch'
-  import { initial, isEqual, last } from 'lodash-es'
+  import { first, initial, isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
     HOVER_COLLECTION,
@@ -40,8 +40,9 @@
   import { singleton } from './singleton.js'
   import ValidationError from './ValidationError.svelte'
   import { createDebug } from '$lib/utils/debug'
-  import { forEachKey, forEachVisibleIndex } from '../../../logic/documentState.js'
-  import { fullSelectionVisible, onMoveSelection } from '../../../logic/dragging.js'
+  import { forEachKey } from '../../../logic/documentState.js'
+  import { onMoveSelection } from '../../../logic/dragging.js'
+  import { forEachIndex } from '../../../utils/arrayUtils.js'
 
   export let value
   export let path
@@ -270,17 +271,15 @@
       return
     }
 
-    const items = getVisibleItemsWithHeights()
+    // note that the returned items will be of one section only,
+    // and when the selection is spread over multiple sections,
+    // no items will be returned: this is not (yet) supported
+    const items = getVisibleItemsWithHeights(fullSelection)
 
-    // Verify whether all selected items are visible. To keep things simple,
-    // we do not support dragging of items that are invisible,
-    // like in a large array with collapsed sections.
-    const allSelectedItemsVisible = fullSelectionVisible(fullSelection, items)
+    debug('dragSelectionStart', { fullSelection, items })
 
-    debug('dragSelectionStart', { fullSelection, items, allSelectedItemsVisible })
-
-    if (!allSelectedItemsVisible) {
-      debug('dragSelectionStart: cannot drag partially invisible selection')
+    if (!items) {
+      debug('Cannot drag the current selection (probably spread over multiple sections)')
       return
     }
 
@@ -310,7 +309,7 @@
       })
 
       if (indexOffset !== dragging.indexOffset) {
-        debug('drag selection', indexOffset, deltaY)
+        debug('drag selection', indexOffset, deltaY, updatedSelection)
         dragging = {
           ...dragging,
           updatedValue,
@@ -347,9 +346,10 @@
   /**
    * Get a list with all visible items and their rendered heights inside
    * this object or array
-   * @returns {RenderedItem[]}
+   * @param {Selection} fullSelection
+   * @returns {RenderedItem[] | null}
    */
-  function getVisibleItemsWithHeights() {
+  function getVisibleItemsWithHeights(fullSelection) {
     const items = []
 
     function addHeight(keyOrIndex) {
@@ -364,7 +364,25 @@
     }
 
     if (Array.isArray(value)) {
-      forEachVisibleIndex(value, state, addHeight)
+      const startPath = first(fullSelection.paths) || fullSelection.focusPath
+      const endPath = last(fullSelection.paths) || fullSelection.focusPath
+      const startIndex = last(startPath)
+      const endIndex = last(endPath)
+
+      // find the section where the selection is
+      // if the selection is spread over multiple visible sections,
+      // we will not return any items, so dragging will not work there.
+      // We do this to keep things simple for now.
+      const currentSection = state[STATE_VISIBLE_SECTIONS].find((visibleSection) => {
+        return startIndex >= visibleSection.start && endIndex <= visibleSection.end
+      })
+
+      if (!currentSection) {
+        return null
+      }
+
+      const { start, end } = currentSection
+      forEachIndex(start, Math.min(value.length, end), addHeight)
     } else {
       // value is Object
       forEachKey(state, addHeight)
