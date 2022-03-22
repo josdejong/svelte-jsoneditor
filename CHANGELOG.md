@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.25](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.24...v0.3.25) (2022-03-22)
+
+
+### Features
+
+* drag selected contents up and down ([#50](https://github.com/josdejong/svelte-jsoneditor/issues/50)) ([c3c4113](https://github.com/josdejong/svelte-jsoneditor/commit/c3c4113441c2a2df111da5e74b312a9146900927))
+
+
+### Bug Fixes
+
+* validate in code mode not always triggering ([246cf67](https://github.com/josdejong/svelte-jsoneditor/commit/246cf670259393c56934f0955df31ec957e3f863))
+
 ### [0.3.24](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.23...v0.3.24) (2022-03-16)
 
 
