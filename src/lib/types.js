@@ -79,23 +79,27 @@
  */
 
 /**
- * @typedef {{type: 'after', path: Path, anchorPath: Path, focusPath: Path}} AfterSelection
+ * @typedef {{type: 'after', anchorPath: Path, focusPath: Path}} AfterSelection
  */
 
 /**
- * @typedef {{type: 'inside', path: Path, anchorPath: Path, focusPath: Path}} InsideSelection
+ * @typedef {{type: 'inside', anchorPath: Path, focusPath: Path}} InsideSelection
  */
 
 /**
- * @typedef {{type: 'key', path: Path, anchorPath: Path, focusPath: Path, edit?: boolean}} KeySelection
+ * @typedef {{type: 'key', anchorPath: Path, focusPath: Path, edit?: boolean}} KeySelection
  */
 
 /**
- * @typedef {{type: 'value', path: Path, anchorPath: Path, focusPath: Path, edit?: boolean}} ValueSelection
+ * @typedef {{type: 'value', anchorPath: Path, focusPath: Path, edit?: boolean}} ValueSelection
  */
 
 /**
  * @typedef {MultiSelection | AfterSelection | InsideSelection | KeySelection | ValueSelection} Selection
+ */
+
+/**
+ * @typedef {Object<string, RecursiveSelection> || Array<RecursiveSelection>} RecursiveSelection
  */
 
 /**
@@ -256,4 +260,19 @@
 
 /**
  * @typedef {(string) => string} UnescapeValue
+ */
+
+/**
+ * @typedef {Object} DragInsideProps
+ * @property {Selection} fullSelection
+ * @property {number} deltaY
+ * @property {Array.<{ path: Path, height: number}>} items
+ */
+
+/**
+ * @typedef {{ beforePath: Path, indexOffset: number} | {append: true, indexOffset: number}} DragInsideAction
+ */
+
+/**
+ * @typedef {{ path: Path, height: number }} RenderedItem
  */

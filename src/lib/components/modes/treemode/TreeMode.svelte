@@ -79,7 +79,7 @@
     isChildOfNodeName,
     setCursorToEnd
   } from '$lib/utils/domUtils'
-  import { parseJSONPointerWithArrayIndices } from '$lib/utils/jsonPointer.js'
+  import { parseJSONPointerWithArrayIndices } from '$lib/utils/jsonPointer'
   import { parsePartialJson, repairPartialJson } from '$lib/utils/jsonUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { isObject, isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils'
@@ -1301,7 +1301,7 @@
    * Find the DOM element of a given path.
    * Note that the path can only be found when the node is expanded.
    */
-  export function findElement(path) {
+  function findElement(path) {
     return refContents
       ? refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
       : undefined
@@ -1363,7 +1363,10 @@
    *                                   The new selection will be determined
    *                                   based on the operations.
    */
-  function handlePatch(operations, newSelection = createSelectionFromOperations(json, operations)) {
+  function handlePatch(
+    operations,
+    newSelection = createSelectionFromOperations(json, state, operations)
+  ) {
     if (readOnly) {
       return
     }
@@ -1932,6 +1935,14 @@
     }
   }
 
+  function getFullJson() {
+    return json
+  }
+
+  function getFullState() {
+    return state
+  }
+
   function getFullSelection() {
     return selection
   }
@@ -2022,7 +2033,10 @@
           validationErrors={validationErrorsMap}
           {readOnly}
           {normalization}
+          {getFullJson}
+          {getFullState}
           {getFullSelection}
+          {findElement}
           onPatch={handlePatch}
           onInsert={handleInsert}
           onExpand={handleExpand}
@@ -2035,6 +2049,7 @@
           onClassName={onClassName || noop}
           onDrag={autoScrollHandler.onDrag}
           onDragEnd={autoScrollHandler.onDragEnd}
+          onDragSelectionStart={noop}
         />
       </div>
 

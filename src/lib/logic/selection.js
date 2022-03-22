@@ -93,6 +93,22 @@ export function getParentPath(selection) {
 
 /**
  * @param {Selection} selection
+ * @returns {Path}
+ */
+export function getStartPath(selection) {
+  return selection.paths ? first(selection.paths) : selection.focusPath
+}
+
+/**
+ * @param {Selection} selection
+ * @returns {Path}
+ */
+export function getEndPath(selection) {
+  return selection.paths ? last(selection.paths) : selection.focusPath
+}
+
+/**
+ * @param {Selection} selection
  * @param {Path} path
  * @return boolean
  */
@@ -112,6 +128,10 @@ export function isSelectionInsidePath(selection, path) {
  */
 // TODO: write unit test
 export function isPathInsideSelection(selection, path, anchorType) {
+  if (!selection) {
+    return false
+  }
+
   const p = path.slice(0)
 
   if (selection.type === SELECTION_TYPE.MULTI) {
@@ -515,10 +535,11 @@ export function getInitialSelection(json, state) {
 
 /**
  * @param {JSON} json
+ * @param {JSON} state
  * @param {JSONPatchDocument} operations
- * @returns {MultiSelection}
+ * @returns {Selection | null}
  */
-export function createSelectionFromOperations(json, operations) {
+export function createSelectionFromOperations(json, state, operations) {
   if (operations.length === 1) {
     const operation = first(operations)
     if (operation.op === 'replace' || operation.op === 'move') {
@@ -569,7 +590,7 @@ export function createSelectionFromOperations(json, operations) {
     return null
   }
 
-  // TODO: make this function robust against operations which do not have consecutive paths
+  // TODO: make this function robust against operations which do not have consecutive paths or have wrongly ordered paths
 
   return {
     type: SELECTION_TYPE.MULTI,
@@ -605,7 +626,7 @@ export function createPathsMap(paths) {
 // TODO: write unit tests for findSharedPath
 export function findSharedPath(path1, path2) {
   let i = 0
-  while (i < path1.length && path1[i] === path2[i]) {
+  while (i < path1.length && i < path2.length && path1[i] === path2[i]) {
     i++
   }
 
@@ -796,7 +817,7 @@ export function selectionToPartialJson(json, selection, indentation = 2) {
 /**
  * @param {JSON} referenceJson
  * @param {Selection} selection
- * @returns {{} | null}
+ * @returns {RecursiveSelection | null}
  */
 // TODO: write unit tests
 export function createRecursiveSelection(referenceJson, selection) {

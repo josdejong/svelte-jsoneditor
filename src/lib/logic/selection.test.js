@@ -996,7 +996,7 @@ describe('selection', () => {
   describe('createSelectionFromOperations', () => {
     it('should get selection from add operations', () => {
       assert.deepStrictEqual(
-        createSelectionFromOperations(json, [
+        createSelectionFromOperations(json, state, [
           { op: 'add', path: '/obj/arr/2', value: 42 },
           { op: 'add', path: '/obj/arr/3', value: 43 }
         ]),
@@ -1007,59 +1007,89 @@ describe('selection', () => {
         })
       )
     })
-  })
 
-  it('should get selection from copy operations', () => {
-    assert.deepStrictEqual(
-      createSelectionFromOperations(json, [{ op: 'copy', from: '/str', path: '/strCopy' }]),
-      createSelection(json, state, {
-        type: SELECTION_TYPE.MULTI,
-        anchorPath: ['strCopy'],
-        focusPath: ['strCopy']
-      })
-    )
-  })
+    it('should get selection from move operations', () => {
+      assert.deepStrictEqual(
+        createSelectionFromOperations(json, state, [
+          { op: 'add', from: '/obj/arr/0', path: '/obj/arr/2' },
+          { op: 'add', from: '/obj/arr/1', path: '/obj/arr/3' }
+        ]),
+        createSelection(json, state, {
+          type: SELECTION_TYPE.MULTI,
+          anchorPath: ['obj', 'arr', 2],
+          focusPath: ['obj', 'arr', 3]
+        })
+      )
+    })
 
-  it('should get selection from replace operations', () => {
-    assert.deepStrictEqual(
-      createSelectionFromOperations(json, [
-        { op: 'replace', path: '/str', value: 'hello world (updated)' }
-      ]),
-      createSelection(json, state, {
-        type: SELECTION_TYPE.VALUE,
-        path: ['str']
-      })
-    )
-  })
+    it.skip('should get selection from wrongly ordered move operations', () => {
+      assert.deepStrictEqual(
+        createSelectionFromOperations(json, state, [
+          { op: 'add', from: '/obj/arr/1', path: '/obj/arr/3' },
+          { op: 'add', from: '/obj/arr/0', path: '/obj/arr/2' }
+        ]),
+        createSelection(json, state, {
+          type: SELECTION_TYPE.MULTI,
+          anchorPath: ['obj', 'arr', 3],
+          focusPath: ['obj', 'arr', 2]
+        })
+      )
+    })
 
-  it('should get selection from renaming a key', () => {
-    assert.deepStrictEqual(
-      createSelectionFromOperations(json, [
-        { op: 'move', from: '/str', path: '/strRenamed' },
-        { op: 'move', from: '/foo', path: '/foo' },
-        { op: 'move', from: '/bar', path: '/bar' }
-      ]),
-      createSelection(json, state, {
-        type: SELECTION_TYPE.KEY,
-        path: ['strRenamed']
-      })
-    )
-  })
+    it('should get selection from copy operations', () => {
+      assert.deepStrictEqual(
+        createSelectionFromOperations(json, state, [
+          { op: 'copy', from: '/str', path: '/strCopy' }
+        ]),
+        createSelection(json, state, {
+          type: SELECTION_TYPE.MULTI,
+          anchorPath: ['strCopy'],
+          focusPath: ['strCopy']
+        })
+      )
+    })
 
-  it('should get selection from removing a key', () => {
-    assert.deepStrictEqual(
-      createSelectionFromOperations(json, [{ op: 'remove', path: '/str' }]),
-      null
-    )
-  })
+    it('should get selection from replace operations', () => {
+      assert.deepStrictEqual(
+        createSelectionFromOperations(json, state, [
+          { op: 'replace', path: '/str', value: 'hello world (updated)' }
+        ]),
+        createSelection(json, state, {
+          type: SELECTION_TYPE.VALUE,
+          path: ['str']
+        })
+      )
+    })
 
-  it('should get selection from inserting a new root document', () => {
-    assert.deepStrictEqual(
-      createSelectionFromOperations(json, [{ op: 'replace', path: '', value: 'test' }]),
-      createSelection(json, state, {
-        type: SELECTION_TYPE.VALUE,
-        path: []
-      })
-    )
+    it('should get selection from renaming a key', () => {
+      assert.deepStrictEqual(
+        createSelectionFromOperations(json, state, [
+          { op: 'move', from: '/str', path: '/strRenamed' },
+          { op: 'move', from: '/foo', path: '/foo' },
+          { op: 'move', from: '/bar', path: '/bar' }
+        ]),
+        createSelection(json, state, {
+          type: SELECTION_TYPE.KEY,
+          path: ['strRenamed']
+        })
+      )
+    })
+
+    it('should get selection from removing a key', () => {
+      assert.deepStrictEqual(
+        createSelectionFromOperations(json, state, [{ op: 'remove', path: '/str' }]),
+        null
+      )
+    })
+
+    it('should get selection from inserting a new root document', () => {
+      assert.deepStrictEqual(
+        createSelectionFromOperations(json, state, [{ op: 'replace', path: '', value: 'test' }]),
+        createSelection(json, state, {
+          type: SELECTION_TYPE.VALUE,
+          path: []
+        })
+      )
+    })
   })
 })

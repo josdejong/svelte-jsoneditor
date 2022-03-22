@@ -1,4 +1,4 @@
-import { strictEqual, deepStrictEqual } from 'assert'
+import { deepStrictEqual, strictEqual } from 'assert'
 import {
   createNormalizationFunctions,
   decodeDataPath,
