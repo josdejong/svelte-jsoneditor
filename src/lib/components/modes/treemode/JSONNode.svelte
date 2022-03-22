@@ -4,7 +4,7 @@
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
   import { parseJSONPointer } from 'immutable-json-patch'
-  import { isEqual, last } from 'lodash-es'
+  import { first, initial, isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
     HOVER_COLLECTION,
@@ -12,6 +12,7 @@
     HOVER_INSERT_INSIDE,
     INDENTATION_WIDTH,
     INSERT_EXPLANATION,
+    STATE_ENFORCE_STRING,
     STATE_EXPANDED,
     STATE_ID,
     STATE_KEYS,
@@ -38,9 +39,11 @@
   import JSONValue from './JSONValue.svelte'
   import { singleton } from './singleton.js'
   import ValidationError from './ValidationError.svelte'
-  import { STATE_ENFORCE_STRING } from '$lib/constants'
+  import { createDebug } from '$lib/utils/debug'
+  import { forEachKey } from '../../../logic/documentState.js'
+  import { onMoveSelection } from '../../../logic/dragging.js'
+  import { forEachIndex } from '../../../utils/arrayUtils.js'
 
-  // eslint-disable-next-line no-undef-init
   export let value
   export let path
   export let state
@@ -59,15 +62,27 @@
   export let onClassName
   export let onDrag
   export let onDragEnd
+  export let onDragSelectionStart
+
+  const debug = createDebug('jsoneditor:JSONNode')
 
   /** @type {function (path: Path, section: Section)} */
   export let onExpandSection
 
   export let selection
+  export let getFullJson
+  export let getFullState
   export let getFullSelection
+  export let findElement
 
-  // TODO: it is ugly to have to translate selection into selectionObj, and not accidentally use the wrong one. Is there an other way?
-  $: selectionObj = selection && selection[STATE_SELECTION]
+  let hover = undefined
+  let dragging = undefined
+
+  $: resolvedValue = dragging?.updatedValue !== undefined ? dragging.updatedValue : value
+  $: resolvedState = dragging?.updatedState !== undefined ? dragging.updatedState : state
+  $: resolvedSelection = dragging?.updatedSelection != null ? dragging.updatedSelection : selection
+
+  $: selectionObj = resolvedSelection && resolvedSelection[STATE_SELECTION]
 
   $: selected = !!(selectionObj && selectionObj.pathsMap)
   $: selectedAfter = !!(selectionObj && selectionObj.type === SELECTION_TYPE.AFTER)
@@ -75,15 +90,13 @@
   $: selectedKey = !!(selectionObj && selectionObj.type === SELECTION_TYPE.KEY)
   $: selectedValue = !!(selectionObj && selectionObj.type === SELECTION_TYPE.VALUE)
 
-  $: expanded = state[STATE_EXPANDED]
-  $: visibleSections = state[STATE_VISIBLE_SECTIONS]
-  $: keys = state[STATE_KEYS]
+  $: expanded = resolvedState[STATE_EXPANDED]
+  $: visibleSections = resolvedState[STATE_VISIBLE_SECTIONS]
+  $: keys = resolvedState[STATE_KEYS]
   $: validationError = validationErrors && validationErrors[VALIDATION_ERROR]
   $: root = path.length === 0
 
-  let hover = null
-
-  $: type = valueType(value)
+  $: type = valueType(resolvedValue)
 
   function getIndentationStyle(level) {
     return `margin-left: ${level * INDENTATION_WIDTH}px`
@@ -122,20 +135,25 @@
     event.stopPropagation()
     event.preventDefault()
 
+    // we attach the mousemove and mouseup event listeners to the global document,
+    // so we will not miss if the mouse events happen outside the editor
+    document.addEventListener('mousemove', handleMouseMoveGlobal, true)
+    document.addEventListener('mouseup', handleMouseUpGlobal)
+
     const anchorType = getSelectionTypeFromTarget(event.target)
 
-    // when right-clicking inside the current selection, do nothing
-    if (
-      event.button === 2 &&
-      selectionObj &&
-      isPathInsideSelection(selectionObj, path, anchorType)
-    ) {
+    // when right-clicking inside the current selection, do nothing: context menu will open
+    // when left-clicking inside the current selection, do nothing: it can be the start of dragging
+    if (isPathInsideSelection(getFullSelection(), path, anchorType)) {
+      if (event.button === 0) {
+        onDragSelectionStart(event)
+      }
+
       return
     }
 
-    // TODO: implement start of a drag event when dragging selection with left mouse button
-
-    singleton.mousedown = true
+    // TODO: refactor dragging, there are now two separate mechanisms handling mouse movement: with dragging.* and with singleton.*
+    singleton.selecting = true
     singleton.selectionAnchor = path
     singleton.selectionAnchorType = anchorType
     singleton.selectionFocus = path
@@ -162,7 +180,7 @@
 
         case SELECTION_TYPE.MULTI:
           if (root && event.target.hasAttribute('data-path')) {
-            const lastCaretPosition = last(getVisibleCaretPositions(value, state))
+            const lastCaretPosition = last(getVisibleCaretPositions(resolvedValue, resolvedState))
             onSelect(lastCaretPosition)
           } else {
             onSelect({
@@ -180,15 +198,10 @@
           break
       }
     }
-
-    // we attach the mousemove and mouseup event listeners to the global document,
-    // so we will not miss if the mouse events happen outside of the editor
-    document.addEventListener('mousemove', onDrag, true)
-    document.addEventListener('mouseup', handleMouseUpGlobal)
   }
 
   function handleMouseMove(event) {
-    if (singleton.mousedown) {
+    if (singleton.selecting) {
       event.preventDefault()
       event.stopPropagation()
 
@@ -216,16 +229,166 @@
     }
   }
 
-  function handleMouseUpGlobal(event) {
-    if (singleton.mousedown) {
-      event.stopPropagation()
+  function handleMouseMoveGlobal(event) {
+    onDrag(event)
+  }
 
-      singleton.mousedown = false
+  function handleMouseUpGlobal(event) {
+    if (singleton.selecting) {
+      singleton.selecting = false
+
+      event.stopPropagation()
     }
 
     onDragEnd()
-    document.removeEventListener('mousemove', onDrag, true)
+
+    document.removeEventListener('mousemove', handleMouseMoveGlobal, true)
     document.removeEventListener('mouseup', handleMouseUpGlobal)
+  }
+
+  function findContentTop() {
+    return findElement([])?.getBoundingClientRect()?.top || 0
+  }
+
+  function calculateDeltaY(dragging, event) {
+    // calculate the contentOffset, this changes when scrolling
+    const contentTop = findContentTop()
+    const contentOffset = contentTop - dragging.initialContentTop
+
+    // calculate the vertical mouse movement
+    const clientOffset = event.clientY - dragging.initialClientY
+
+    return clientOffset - contentOffset
+  }
+
+  function handleDragSelectionStart(event) {
+    const fullSelection = getFullSelection()
+    const selectionParentPath = initial(fullSelection.focusPath)
+    if (!isEqual(path, selectionParentPath)) {
+      // pass to parent
+      onDragSelectionStart(event)
+
+      return
+    }
+
+    // note that the returned items will be of one section only,
+    // and when the selection is spread over multiple sections,
+    // no items will be returned: this is not (yet) supported
+    const items = getVisibleItemsWithHeights(fullSelection)
+
+    debug('dragSelectionStart', { fullSelection, items })
+
+    if (!items) {
+      debug('Cannot drag the current selection (probably spread over multiple sections)')
+      return
+    }
+
+    dragging = {
+      initialClientY: event.clientY,
+      initialContentTop: findContentTop(),
+      updatedValue: undefined,
+      updatedState: undefined,
+      updatedSelection: undefined,
+      items,
+      indexOffset: 0
+    }
+
+    document.addEventListener('mousemove', handleDragSelection, true)
+    document.addEventListener('mouseup', handleDragSelectionEnd)
+  }
+
+  function handleDragSelection(event) {
+    if (dragging) {
+      const deltaY = calculateDeltaY(dragging, event)
+      const { updatedValue, updatedState, updatedSelection, indexOffset } = onMoveSelection({
+        fullJson: getFullJson(),
+        fullState: getFullState(),
+        fullSelection: getFullSelection(),
+        deltaY,
+        items: dragging.items
+      })
+
+      if (indexOffset !== dragging.indexOffset) {
+        debug('drag selection', indexOffset, deltaY, updatedSelection)
+        dragging = {
+          ...dragging,
+          updatedValue,
+          updatedState,
+          updatedSelection,
+          indexOffset
+        }
+      }
+    }
+  }
+
+  function handleDragSelectionEnd(event) {
+    if (dragging) {
+      const deltaY = calculateDeltaY(dragging, event)
+      const { operations, updatedFullSelection } = onMoveSelection({
+        fullJson: getFullJson(),
+        fullState: getFullState(),
+        fullSelection: getFullSelection(),
+        deltaY,
+        items: dragging.items
+      })
+
+      if (operations) {
+        onPatch(operations, updatedFullSelection || getFullSelection())
+      }
+
+      dragging = undefined
+
+      document.removeEventListener('mousemove', handleDragSelection, true)
+      document.removeEventListener('mouseup', handleDragSelectionEnd)
+    }
+  }
+
+  /**
+   * Get a list with all visible items and their rendered heights inside
+   * this object or array
+   * @param {Selection} fullSelection
+   * @returns {RenderedItem[] | null}
+   */
+  function getVisibleItemsWithHeights(fullSelection) {
+    const items = []
+
+    function addHeight(keyOrIndex) {
+      const itemPath = path.concat(keyOrIndex)
+      const element = findElement(itemPath)
+      if (element != null) {
+        items.push({
+          path: itemPath,
+          height: element.clientHeight
+        })
+      }
+    }
+
+    if (Array.isArray(value)) {
+      const startPath = first(fullSelection.paths) || fullSelection.focusPath
+      const endPath = last(fullSelection.paths) || fullSelection.focusPath
+      const startIndex = last(startPath)
+      const endIndex = last(endPath)
+
+      // find the section where the selection is
+      // if the selection is spread over multiple visible sections,
+      // we will not return any items, so dragging will not work there.
+      // We do this to keep things simple for now.
+      const currentSection = state[STATE_VISIBLE_SECTIONS].find((visibleSection) => {
+        return startIndex >= visibleSection.start && endIndex <= visibleSection.end
+      })
+
+      if (!currentSection) {
+        return null
+      }
+
+      const { start, end } = currentSection
+      forEachIndex(start, Math.min(value.length, end), addHeight)
+    } else {
+      // value is Object
+      forEachKey(state, addHeight)
+    }
+
+    return items
   }
 
   function handleMouseOver(event) {
@@ -243,7 +406,7 @@
   function handleMouseOut(event) {
     event.stopPropagation()
 
-    hover = null
+    hover = undefined
   }
 
   function handleInsertInside(event) {
@@ -278,7 +441,7 @@
 </script>
 
 <div
-  class={classnames('json-node', { expanded }, onClassName(path, value))}
+  class={classnames('json-node', { expanded }, onClassName(path, resolvedValue))}
   data-path={encodeDataPath(path)}
   class:root
   class:selected
@@ -316,12 +479,12 @@
             {#if expanded}
               <div class="bracket">[</div>
               <span class="tag readonly">
-                {value.length} items
+                {resolvedValue.length} items
               </span>
             {:else}
               <div class="bracket">[</div>
               <button type="button" class="tag" on:click={handleExpand}>
-                {value.length} items
+                {resolvedValue.length} items
               </button>
               <div class="bracket">]</div>
             {/if}
@@ -368,12 +531,14 @@
           </div>
         {/if}
         {#each visibleSections as visibleSection, sectionIndex (sectionIndex)}
-          {#each value.slice(visibleSection.start, Math.min(visibleSection.end, value.length)) as item, itemIndex (state[visibleSection.start + itemIndex][STATE_ID])}
+          {#each resolvedValue.slice(visibleSection.start, Math.min(visibleSection.end, resolvedValue.length)) as item, itemIndex (resolvedState[visibleSection.start + itemIndex][STATE_ID])}
             <svelte:self
               value={item}
               path={path.concat(visibleSection.start + itemIndex)}
-              state={state[visibleSection.start + itemIndex]}
-              selection={selection ? selection[visibleSection.start + itemIndex] : undefined}
+              state={resolvedState[visibleSection.start + itemIndex]}
+              selection={resolvedSelection
+                ? resolvedSelection[visibleSection.start + itemIndex]
+                : undefined}
               searchResult={searchResult
                 ? searchResult[visibleSection.start + itemIndex]
                 : undefined}
@@ -382,7 +547,10 @@
                 : undefined}
               {readOnly}
               {normalization}
+              {getFullJson}
+              {getFullState}
               {getFullSelection}
+              {findElement}
               {onPatch}
               {onInsert}
               {onExpand}
@@ -395,17 +563,18 @@
               {onClassName}
               {onDrag}
               {onDragEnd}
+              onDragSelectionStart={handleDragSelectionStart}
             >
               <div slot="identifier" class="identifier">
                 <div class="index">{visibleSection.start + itemIndex}</div>
               </div>
             </svelte:self>
           {/each}
-          {#if visibleSection.end < value.length}
+          {#if visibleSection.end < resolvedValue.length}
             <CollapsedItems
               {visibleSections}
               {sectionIndex}
-              total={value.length}
+              total={resolvedValue.length}
               {path}
               {onExpandSection}
               selection={selectionObj}
@@ -452,7 +621,7 @@
             {:else}
               <div class="bracket">&lbrace;</div>
               <button type="button" class="tag" on:click={handleExpand}>
-                {Object.keys(value).length} props
+                {Object.keys(resolvedValue).length} props
               </button>
               <div class="bracket">&rbrace;</div>
             {/if}
@@ -498,17 +667,20 @@
             />
           </div>
         {/if}
-        {#each keys as key (state[key][STATE_ID])}
+        {#each keys as key (resolvedState[key][STATE_ID])}
           <svelte:self
-            value={value[key]}
+            value={resolvedValue[key]}
             path={path.concat(key)}
-            state={state[key]}
-            selection={selection ? selection[key] : undefined}
+            state={resolvedState[key]}
+            selection={resolvedSelection ? resolvedSelection[key] : undefined}
             searchResult={searchResult ? searchResult[key] : undefined}
             validationErrors={validationErrors ? validationErrors[key] : undefined}
             {readOnly}
             {normalization}
+            {getFullJson}
+            {getFullState}
             {getFullSelection}
+            {findElement}
             {onPatch}
             {onInsert}
             {onExpand}
@@ -521,6 +693,7 @@
             {onClassName}
             {onDrag}
             {onDragEnd}
+            onDragSelectionStart={handleDragSelectionStart}
           >
             <div slot="identifier" class="identifier">
               <JSONKey
@@ -528,7 +701,7 @@
                 {key}
                 {readOnly}
                 {normalization}
-                selection={selection?.[key]?.[STATE_SELECTION]}
+                selection={resolvedSelection?.[key]?.[STATE_SELECTION]}
                 searchResult={searchResult?.[key]?.[STATE_SEARCH_PROPERTY]}
                 onUpdateKey={handleUpdateKey}
                 {onSelect}
@@ -565,7 +738,7 @@
           {path}
           {value}
           {readOnly}
-          enforceString={state ? state[STATE_ENFORCE_STRING] : undefined}
+          enforceString={resolvedState ? resolvedState[STATE_ENFORCE_STRING] : undefined}
           {normalization}
           selection={selectionObj}
           searchResult={searchResult ? searchResult[STATE_SEARCH_VALUE] : undefined}

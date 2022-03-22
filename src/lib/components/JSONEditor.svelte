@@ -173,14 +173,6 @@
     }
   }
 
-  export function findElement(path) {
-    if (refTreeMode) {
-      return refTreeMode.findElement(path)
-    } else {
-      throw new Error(`Method findElement is not available in mode "${mode}"`)
-    }
-  }
-
   export function focus() {
     if (refCodeMode) {
       refCodeMode.focus()

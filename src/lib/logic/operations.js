@@ -1,4 +1,4 @@
-import { cloneDeepWith, first, initial, isEmpty, last } from 'lodash-es'
+import { cloneDeepWith, first, initial, isEmpty, last, times } from 'lodash-es'
 import { compileJSONPointer, getIn } from 'immutable-json-patch'
 import { parseAndRepair, parseAndRepairOrUndefined, parsePartialJson } from '../utils/jsonUtils.js'
 import { findUniqueName } from '../utils/stringUtils.js'
@@ -8,8 +8,10 @@ import {
   createSelection,
   createSelectionFromOperations,
   getParentPath,
+  pathStartsWith,
   SELECTION_TYPE
 } from './selection.js'
+import { STATE_KEYS } from '../constants.js'
 
 /**
  * Create a JSONPatch for an insert operation.
@@ -76,7 +78,7 @@ export function insertBefore(json, state, path, values) {
  * @return {JSONPatchDocument}
  */
 export function append(json, path, values) {
-  // TODO: find a better name and define datastructure for values
+  // TODO: find a better name and define data structure for values
   const parent = getIn(json, path)
 
   if (Array.isArray(parent)) {
@@ -141,7 +143,7 @@ export function rename(parentPath, keys, oldKey, newKey) {
  * @return {JSONPatchDocument}
  */
 export function replace(json, state, paths, values) {
-  // TODO: find a better name and define datastructure for values
+  // TODO: find a better name and define data structure for values
   const firstPath = first(paths)
   const parentPath = initial(firstPath)
   const parent = getIn(json, parentPath)
@@ -418,6 +420,89 @@ export function insert(json, state, selection, clipboardText) {
   throw new Error('Cannot insert: unsupported type of selection ' + JSON.stringify(selection))
 }
 
+/**
+ * @param {JSON} json
+ * @param {JSON} state
+ * @param {Selection} selection
+ * @param {DragInsideAction} dragInsideAction
+ * @returns {{op: string, path: string, from: string}[]|number[]|{op: string, path: string, from: string}[]|undefined}
+ */
+export function moveInsideParent(json, state, selection, dragInsideAction) {
+  const { beforePath, append } = dragInsideAction
+
+  const parentPath = initial(selection.focusPath)
+  const parent = getIn(json, parentPath)
+
+  if (
+    append ||
+    (beforePath && pathStartsWith(beforePath, parentPath) && beforePath.length > parentPath.length)
+  ) {
+    const startPath = selection.paths ? first(selection.paths) : selection.focusPath
+    const endPath = selection.paths ? last(selection.paths) : selection.focusPath
+    const startKey = last(startPath)
+    const endKey = last(endPath)
+    const toKey = beforePath ? beforePath[parentPath.length] : undefined
+
+    if (isObject(parent)) {
+      const keys = getIn(state, parentPath.concat(STATE_KEYS))
+      const startIndex = keys.indexOf(startKey)
+      const endIndex = keys.indexOf(endKey)
+      const toIndex = append ? keys.length : keys.indexOf(toKey)
+
+      if (startIndex !== -1 && endIndex !== -1 && toIndex !== -1) {
+        if (toIndex > startIndex) {
+          // moving down
+          return [...keys.slice(startIndex, endIndex + 1), ...keys.slice(toIndex, keys.length)].map(
+            (key) => moveDown(parentPath, key)
+          )
+        } else {
+          // moving up
+          return [...keys.slice(toIndex, startIndex), ...keys.slice(endIndex + 1, keys.length)].map(
+            (key) => moveDown(parentPath, key)
+          )
+        }
+      }
+    } else {
+      // array
+      const startIndex = startKey
+      const endIndex = endKey
+      const toIndex = toKey
+      const count = endIndex - startIndex + 1
+
+      if (toIndex < startIndex) {
+        // move up
+        const operations = times(count, (offset) => {
+          return {
+            op: 'move',
+            from: compileJSONPointer(parentPath.concat(startIndex + offset)),
+            path: compileJSONPointer(parentPath.concat(toIndex + offset))
+          }
+        })
+
+        // debug('moveInsideParent', { startIndex, endIndex, toIndex, count, operations })
+
+        return operations
+      } else {
+        // move down
+        const operations = times(count, () => {
+          return {
+            op: 'move',
+            from: compileJSONPointer(parentPath.concat(startIndex)),
+            path: compileJSONPointer(parentPath.concat(toIndex))
+          }
+        })
+
+        // debug('moveInsideParent', { startIndex, endIndex, toIndex, count, operations })
+
+        return operations
+      }
+    }
+  }
+
+  // TODO: throw exception?
+  return undefined
+}
+
 export function createNewValue(json, selection, type) {
   if (type === 'object') {
     return {}
@@ -545,7 +630,7 @@ export function createRemoveOperations(json, state, selection) {
     const newKey = ''
 
     const operations = rename(parentPath, keys, oldKey, newKey)
-    const newSelection = createSelectionFromOperations(json, operations)
+    const newSelection = createSelectionFromOperations(json, state, operations)
 
     return { operations, newSelection }
   }
