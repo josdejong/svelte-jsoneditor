@@ -641,7 +641,7 @@
       ]
     }
 
-    if (isNewDocument) {
+    if (text.length === 0) {
       // new, empty document, do not try to parse
       return []
     }
