@@ -6,16 +6,42 @@ import {
   SELECTION_TYPE
 } from './selection.js'
 import { documentStatePatch } from './documentState.js'
-import { initial, isEqual, last } from 'lodash-es'
+import { first, initial, isEqual, last } from 'lodash-es'
 import { getIn } from 'immutable-json-patch'
 import { moveInsideParent } from './operations.js'
+
+/**
+ * Test whether all paths in the selection are rendered, which is the
+ * case when they are all in the visible, rendered items
+ * @param {Selection} selection
+ * @param {RenderedItem[]} items
+ * @return {boolean}
+ */
+export function fullSelectionVisible(selection, items) {
+  // the paths in the selection are ordered from top to bottom
+  // the items too. We utilize this
+  const selectionPaths = selection.paths || [selection.focusPath]
+
+  const firstSelectionPath = first(selectionPaths)
+  const offset = items.findIndex((item) => isEqual(item.path, firstSelectionPath))
+
+  if (offset === -1) {
+    return false
+  }
+
+  return selectionPaths.every((selectionPath, index) => {
+    const itemPath = items[index + offset]?.path
+
+    return isEqual(selectionPath, itemPath)
+  })
+}
 
 /**
  * @param {JSON} fullJson
  * @param {JSON} fullState
  * @param {Selection} fullSelection
  * @param {number} deltaY
- * @param {Array.<{path: Path, height: number}>} items
+ * @param {RenderedItem[]} items
  *
  * @returns {Object}
  * @property {JSONPatchDocument | undefined} operations
@@ -141,7 +167,7 @@ function findSwapPathDown({ items, fullSelection, deltaY }) {
 }
 
 /**
- * @param {Array.<{ path: Path, height: number}>} items
+ * @param {RenderedItem[]} items
  * @param {JSON} fullJson
  * @param {JSON} fullState
  * @param {Selection} fullSelection

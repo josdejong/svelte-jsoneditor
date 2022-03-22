@@ -272,3 +272,7 @@
 /**
  * @typedef {{ beforePath: Path, indexOffset: number} | {append: true, indexOffset: number}} DragInsideAction
  */
+
+/**
+ * @typedef {{ path: Path, height: number }} RenderedItem
+ */

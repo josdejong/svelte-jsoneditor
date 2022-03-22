@@ -41,7 +41,7 @@
   import ValidationError from './ValidationError.svelte'
   import { createDebug } from '$lib/utils/debug'
   import { forEachKey, forEachVisibleIndex } from '../../../logic/documentState.js'
-  import { onMoveSelection } from '../../../logic/dragging.js'
+  import { fullSelectionVisible, onMoveSelection } from '../../../logic/dragging.js'
 
   export let value
   export let path
@@ -272,7 +272,17 @@
 
     const items = getVisibleItemsWithHeights()
 
-    debug('dragSelectionStart', { selection, items })
+    // Verify whether all selected items are visible. To keep things simple,
+    // we do not support dragging of items that are invisible,
+    // like in a large array with collapsed sections.
+    const allSelectedItemsVisible = fullSelectionVisible(fullSelection, items)
+
+    debug('dragSelectionStart', { fullSelection, items, allSelectedItemsVisible })
+
+    if (!allSelectedItemsVisible) {
+      debug('dragSelectionStart: cannot drag partially invisible selection')
+      return
+    }
 
     dragging = {
       initialClientY: event.clientY,
@@ -337,7 +347,7 @@
   /**
    * Get a list with all visible items and their rendered heights inside
    * this object or array
-   * @returns {Array.<{ path: Path, height: number }>}
+   * @returns {RenderedItem[]}
    */
   function getVisibleItemsWithHeights() {
     const items = []
