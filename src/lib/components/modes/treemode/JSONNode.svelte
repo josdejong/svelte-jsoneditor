@@ -47,33 +47,16 @@
   export let value
   export let path
   export let state
-  export let readOnly
+  export let selection
   export let searchResult
   export let validationErrors
-  export let normalization
-  export let onPatch
-  export let onInsert
-  export let onExpand
-  export let onSelect
-  export let onFind
-  export let onPasteJson
-  export let onRenderValue
-  export let onContextMenu
-  export let onClassName
-  export let onDrag
-  export let onDragEnd
+
+  /** @type {TreeModeContext} */
+  export let context
+
   export let onDragSelectionStart
 
   const debug = createDebug('jsoneditor:JSONNode')
-
-  /** @type {function (path: Path, section: Section)} */
-  export let onExpandSection
-
-  export let selection
-  export let getFullJson
-  export let getFullState
-  export let getFullSelection
-  export let findElement
 
   let hover = undefined
   let dragging = undefined
@@ -106,18 +89,18 @@
     event.stopPropagation()
 
     const recursive = event.ctrlKey
-    onExpand(path, !expanded, recursive)
+    context.onExpand(path, !expanded, recursive)
   }
 
   function handleExpand(event) {
     event.stopPropagation()
 
-    onExpand(path, true)
+    context.onExpand(path, true)
   }
 
   function handleUpdateKey(oldKey, newKey) {
     const operations = rename(path, keys, oldKey, newKey)
-    onPatch(operations)
+    context.onPatch(operations)
 
     // It is possible that the applied key differs from newKey,
     // to prevent duplicate keys. Here we figure out the actually applied key
@@ -144,7 +127,7 @@
 
     // when right-clicking inside the current selection, do nothing: context menu will open
     // when left-clicking inside the current selection, do nothing: it can be the start of dragging
-    if (isPathInsideSelection(getFullSelection(), path, anchorType)) {
+    if (isPathInsideSelection(context.getFullSelection(), path, anchorType)) {
       if (event.button === 0) {
         onDragSelectionStart(event)
       }
@@ -160,9 +143,9 @@
 
     if (event.shiftKey) {
       // Shift+Click will select multiple entries
-      const fullSelection = getFullSelection()
+      const fullSelection = context.getFullSelection()
       if (fullSelection) {
-        onSelect({
+        context.onSelect({
           type: SELECTION_TYPE.MULTI,
           anchorPath: fullSelection.anchorPath,
           focusPath: path
@@ -171,19 +154,19 @@
     } else {
       switch (anchorType) {
         case SELECTION_TYPE.KEY:
-          onSelect({ type: SELECTION_TYPE.KEY, path })
+          context.onSelect({ type: SELECTION_TYPE.KEY, path })
           break
 
         case SELECTION_TYPE.VALUE:
-          onSelect({ type: SELECTION_TYPE.VALUE, path })
+          context.onSelect({ type: SELECTION_TYPE.VALUE, path })
           break
 
         case SELECTION_TYPE.MULTI:
           if (root && event.target.hasAttribute('data-path')) {
             const lastCaretPosition = last(getVisibleCaretPositions(resolvedValue, resolvedState))
-            onSelect(lastCaretPosition)
+            context.onSelect(lastCaretPosition)
           } else {
-            onSelect({
+            context.onSelect({
               type: SELECTION_TYPE.MULTI,
               anchorPath: path,
               focusPath: path
@@ -221,7 +204,7 @@
       ) {
         singleton.selectionFocus = path
 
-        onSelect({
+        context.onSelect({
           anchorPath: singleton.selectionAnchor,
           focusPath: singleton.selectionFocus
         })
@@ -230,7 +213,7 @@
   }
 
   function handleMouseMoveGlobal(event) {
-    onDrag(event)
+    context.onDrag(event)
   }
 
   function handleMouseUpGlobal(event) {
@@ -240,14 +223,14 @@
       event.stopPropagation()
     }
 
-    onDragEnd()
+    context.onDragEnd()
 
     document.removeEventListener('mousemove', handleMouseMoveGlobal, true)
     document.removeEventListener('mouseup', handleMouseUpGlobal)
   }
 
   function findContentTop() {
-    return findElement([])?.getBoundingClientRect()?.top || 0
+    return context.findElement([])?.getBoundingClientRect()?.top || 0
   }
 
   function calculateDeltaY(dragging, event) {
@@ -262,7 +245,7 @@
   }
 
   function handleDragSelectionStart(event) {
-    const fullSelection = getFullSelection()
+    const fullSelection = context.getFullSelection()
     const selectionParentPath = initial(fullSelection.focusPath)
     if (!isEqual(path, selectionParentPath)) {
       // pass to parent
@@ -301,9 +284,9 @@
     if (dragging) {
       const deltaY = calculateDeltaY(dragging, event)
       const { updatedValue, updatedState, updatedSelection, indexOffset } = onMoveSelection({
-        fullJson: getFullJson(),
-        fullState: getFullState(),
-        fullSelection: getFullSelection(),
+        fullJson: context.getFullJson(),
+        fullState: context.getFullState(),
+        fullSelection: context.getFullSelection(),
         deltaY,
         items: dragging.items
       })
@@ -325,15 +308,15 @@
     if (dragging) {
       const deltaY = calculateDeltaY(dragging, event)
       const { operations, updatedFullSelection } = onMoveSelection({
-        fullJson: getFullJson(),
-        fullState: getFullState(),
-        fullSelection: getFullSelection(),
+        fullJson: context.getFullJson(),
+        fullState: context.getFullState(),
+        fullSelection: context.getFullSelection(),
         deltaY,
         items: dragging.items
       })
 
       if (operations) {
-        onPatch(operations, updatedFullSelection || getFullSelection())
+        context.onPatch(operations, updatedFullSelection || context.getFullSelection())
       }
 
       dragging = undefined
@@ -354,7 +337,7 @@
 
     function addHeight(keyOrIndex) {
       const itemPath = path.concat(keyOrIndex)
-      const element = findElement(itemPath)
+      const element = context.findElement(itemPath)
       if (element != null) {
         items.push({
           path: itemPath,
@@ -414,7 +397,7 @@
       event.stopPropagation()
       event.preventDefault()
 
-      onSelect({ type: SELECTION_TYPE.INSIDE, path })
+      context.onSelect({ type: SELECTION_TYPE.INSIDE, path })
     }
   }
 
@@ -423,25 +406,25 @@
       event.stopPropagation()
       event.preventDefault()
 
-      onSelect({ type: SELECTION_TYPE.AFTER, path })
+      context.onSelect({ type: SELECTION_TYPE.AFTER, path })
     }
   }
 
   function handleInsertInsideOpenContextMenu(props) {
-    onSelect({ type: SELECTION_TYPE.INSIDE, path })
-    onContextMenu(props)
+    context.onSelect({ type: SELECTION_TYPE.INSIDE, path })
+    context.onContextMenu(props)
   }
 
   function handleInsertAfterOpenContextMenu(props) {
-    onSelect({ type: SELECTION_TYPE.AFTER, path })
-    onContextMenu(props)
+    context.onSelect({ type: SELECTION_TYPE.AFTER, path })
+    context.onContextMenu(props)
   }
 
   $: indentationStyle = getIndentationStyle(path.length)
 </script>
 
 <div
-  class={classnames('json-node', { expanded }, onClassName(path, resolvedValue))}
+  class={classnames('json-node', { expanded }, context.onClassName(path, resolvedValue))}
   data-path={encodeDataPath(path)}
   class:root
   class:selected
@@ -490,9 +473,9 @@
             {/if}
           </div>
         </div>
-        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
+        {#if !context.readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
           <div class="context-menu-button-anchor">
-            <ContextMenuButton selected={true} {onContextMenu} />
+            <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
       </div>
@@ -515,7 +498,7 @@
     </div>
     {#if expanded}
       <div class="items">
-        {#if !readOnly}
+        {#if !context.readOnly}
           <div
             class="insert-area inside"
             class:hovered={hover === HOVER_INSERT_INSIDE}
@@ -545,24 +528,7 @@
               validationErrors={validationErrors
                 ? validationErrors[visibleSection.start + itemIndex]
                 : undefined}
-              {readOnly}
-              {normalization}
-              {getFullJson}
-              {getFullState}
-              {getFullSelection}
-              {findElement}
-              {onPatch}
-              {onInsert}
-              {onExpand}
-              {onSelect}
-              {onFind}
-              {onPasteJson}
-              {onExpandSection}
-              {onRenderValue}
-              {onContextMenu}
-              {onClassName}
-              {onDrag}
-              {onDragEnd}
+              {context}
               onDragSelectionStart={handleDragSelectionStart}
             >
               <div slot="identifier" class="identifier">
@@ -576,7 +542,7 @@
               {sectionIndex}
               total={resolvedValue.length}
               {path}
-              {onExpandSection}
+              onExpandSection={context.onExpandSection}
               selection={selectionObj}
             />
           {/if}
@@ -627,9 +593,9 @@
             {/if}
           </div>
         </div>
-        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
+        {#if !context.readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
           <div class="context-menu-button-anchor">
-            <ContextMenuButton selected={true} {onContextMenu} />
+            <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
       </div>
@@ -652,7 +618,7 @@
     </div>
     {#if expanded}
       <div class="props">
-        {#if !readOnly}
+        {#if !context.readOnly}
           <div
             class="insert-area inside"
             class:hovered={hover === HOVER_INSERT_INSIDE}
@@ -675,40 +641,20 @@
             selection={resolvedSelection ? resolvedSelection[key] : undefined}
             searchResult={searchResult ? searchResult[key] : undefined}
             validationErrors={validationErrors ? validationErrors[key] : undefined}
-            {readOnly}
-            {normalization}
-            {getFullJson}
-            {getFullState}
-            {getFullSelection}
-            {findElement}
-            {onPatch}
-            {onInsert}
-            {onExpand}
-            {onSelect}
-            {onFind}
-            {onPasteJson}
-            {onExpandSection}
-            {onRenderValue}
-            {onContextMenu}
-            {onClassName}
-            {onDrag}
-            {onDragEnd}
+            {context}
             onDragSelectionStart={handleDragSelectionStart}
           >
             <div slot="identifier" class="identifier">
               <JSONKey
                 path={path.concat(key)}
                 {key}
-                {readOnly}
-                {normalization}
+                {context}
                 selection={resolvedSelection?.[key]?.[STATE_SELECTION]}
                 searchResult={searchResult?.[key]?.[STATE_SEARCH_PROPERTY]}
                 onUpdateKey={handleUpdateKey}
-                {onSelect}
-                {onFind}
               />
-              {#if !readOnly && selectionObj && selectionObj.type === SELECTION_TYPE.KEY && !selectionObj.edit && isEqual(selectionObj.focusPath, path.concat(key))}
-                <ContextMenuButton selected={true} {onContextMenu} />
+              {#if !context.readOnly && selectionObj && selectionObj.type === SELECTION_TYPE.KEY && !selectionObj.edit && isEqual(selectionObj.focusPath, path.concat(key))}
+                <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
               {/if}
             </div>
           </svelte:self>
@@ -737,20 +683,14 @@
         <JSONValue
           {path}
           {value}
-          {readOnly}
           enforceString={resolvedState ? resolvedState[STATE_ENFORCE_STRING] : undefined}
-          {normalization}
           selection={selectionObj}
           searchResult={searchResult ? searchResult[STATE_SEARCH_VALUE] : undefined}
-          {onPatch}
-          {onSelect}
-          {onFind}
-          {onPasteJson}
-          {onRenderValue}
+          {context}
         />
-        {#if !readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
+        {#if !context.readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
           <div class="context-menu-button-anchor">
-            <ContextMenuButton selected={true} {onContextMenu} />
+            <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
       </div>
@@ -766,7 +706,7 @@
       {/if}
     </div>
   {/if}
-  {#if !readOnly}
+  {#if !context.readOnly}
     <div
       class="insert-area after"
       class:hovered={hover === HOVER_INSERT_AFTER}

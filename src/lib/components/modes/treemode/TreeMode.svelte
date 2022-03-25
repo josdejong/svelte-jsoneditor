@@ -864,7 +864,7 @@
   }
 
   /**
-   * @param {'value' | 'object' | 'array' | 'structure'} type
+   * @param {InsertType} type
    */
   function handleInsert(type) {
     if (readOnly || !selection) {
@@ -1762,6 +1762,9 @@
     })
   }
 
+  /**
+   * @param {ContextMenuProps} contextMenuProps
+   */
   function openContextMenu({ anchor, left, top, width, height, offsetTop, offsetLeft }) {
     const props = {
       json,
@@ -1947,6 +1950,29 @@
     return selection
   }
 
+  $: context = {
+    readOnly,
+    normalization,
+    getFullJson,
+    getFullState,
+    getFullSelection,
+    findElement,
+    onPatch: handlePatch,
+    onInsert: handleInsert,
+    onExpand: handleExpand,
+    onSelect: handleSelect,
+    onFind: openFind,
+    onPasteJson: handlePasteJson,
+    onExpandSection: handleExpandSection,
+    onRenderValue,
+    onContextMenu: openContextMenu,
+    onClassName: onClassName || noop,
+    onDrag: autoScrollHandler.onDrag,
+    onDragEnd: autoScrollHandler.onDragEnd
+  }
+
+  $: debug('context changed', context)
+
   $: autoScrollHandler = createAutoScrollHandler(refContents)
 </script>
 
@@ -2031,24 +2057,7 @@
           selection={recursiveSelection}
           searchResult={searchResult && searchResult.itemsWithActive}
           validationErrors={validationErrorsMap}
-          {readOnly}
-          {normalization}
-          {getFullJson}
-          {getFullState}
-          {getFullSelection}
-          {findElement}
-          onPatch={handlePatch}
-          onInsert={handleInsert}
-          onExpand={handleExpand}
-          onSelect={handleSelect}
-          onFind={openFind}
-          onPasteJson={handlePasteJson}
-          onExpandSection={handleExpandSection}
-          {onRenderValue}
-          onContextMenu={openContextMenu}
-          onClassName={onClassName || noop}
-          onDrag={autoScrollHandler.onDrag}
-          onDragEnd={autoScrollHandler.onDragEnd}
+          {context}
           onDragSelectionStart={noop}
         />
       </div>

@@ -276,3 +276,39 @@
 /**
  * @typedef {{ path: Path, height: number }} RenderedItem
  */
+
+/**
+ * @typedef {'value' | 'object' | 'array' | 'structure'} InsertType
+ */
+
+/**
+ * @typedef {Object} ContextMenuProps
+ * @property {Element} anchor
+ * @property {number} left
+ * @property {number} top
+ * @property {number} width
+ * @property {number} height
+ * @property {number} offsetTop
+ * @property {number} offsetLeft
+ */
+
+/**
+ * @typedef {Object} TreeModeContext
+ * @property {boolean} readOnly
+ * @property {ValueNormalization} normalization
+ * @property {() => JSON} getFullJson
+ * @property {() => JSON} getFullState
+ * @property {() => Selection} getFullSelection
+ * @property {(path: Path) => Element | null} findElement
+ * @property {(operations: JSONPatchDocument, newSelection?: Selection) => void} onPatch
+ * @property {(type: InsertType) => void} onInsert
+ * @property {(path: Path, expanded: boolean, recursive?: boolean = false) => void} onExpand
+ * @property {{selectionSchema: SelectionSchema, options?: { ensureFocus?: boolean }}} onSelect
+ * @property {(findAndReplace: boolean) => void} onFind
+ * @property {(path: Path, section: Section) => void} onExpandSection
+ * @property {(props: RenderValueProps) => RenderValueConstructor[]} onRenderValue
+ * @property {(contextMenuProps: ContextMenuProps) => void} onContextMenu
+ * @property {function (path: Path, value: *) : string} onClassName
+ * @property {(event: Event) => void} onDrag
+ * @property {(event: Event) => void} onDragEnd
+ */
