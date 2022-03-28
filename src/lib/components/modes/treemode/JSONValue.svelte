@@ -6,43 +6,37 @@
 
   export let path
   export let value
-  export let readOnly
+
+  /** @type {TreeModeContext} */
+  export let context
+
   export let enforceString
   export let selection
 
   /** @type {SearchResultItem | undefined} */
   export let searchResult
 
-  /** @type {ValueNormalization} */
-  export let normalization
-
-  export let onPatch
-  export let onPasteJson
-  export let onSelect
-  export let onFind
-  export let onRenderValue
-
   $: isSelected =
     selection && selection.type === SELECTION_TYPE.VALUE
       ? isEqual(selection.focusPath, path)
       : false
 
-  $: isEditing = !readOnly && isSelected && selection && selection.edit === true
+  $: isEditing = !context.readOnly && isSelected && selection && selection.edit === true
 
-  $: renderers = onRenderValue({
+  $: renderers = context.onRenderValue({
     path,
     value,
-    readOnly,
+    readOnly: context.readOnly,
     enforceString,
     isSelected,
     isEditing,
-    normalization,
+    normalization: context.normalization,
     selection,
     searchResult,
-    onPatch,
-    onPasteJson,
-    onSelect,
-    onFind
+    onPatch: context.onPatch,
+    onPasteJson: context.onPasteJson,
+    onSelect: context.onSelect,
+    onFind: context.onFind
   })
 </script>
 

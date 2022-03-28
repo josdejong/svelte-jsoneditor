@@ -11,24 +11,20 @@
 
   export let path
   export let key
-  export let readOnly
   export let onUpdateKey
-  export let onFind
   export let selection
-
-  /** @type {ValueNormalization} */
-  export let normalization
-
-  export let onSelect
   export let searchResult
 
+  /** @type {TreeModeContext} */
+  export let context
+
   $: selectedKey = selection && selection.type === SELECTION_TYPE.KEY
-  $: editKey = !readOnly && selectedKey && selection && selection.edit === true
+  $: editKey = !context.readOnly && selectedKey && selection && selection.edit === true
 
   function handleKeyDoubleClick(event) {
-    if (!editKey && !readOnly) {
+    if (!editKey && !context.readOnly) {
       event.preventDefault()
-      onSelect({ type: SELECTION_TYPE.KEY, path, edit: true })
+      context.onSelect({ type: SELECTION_TYPE.KEY, path, edit: true })
     }
   }
 
@@ -39,11 +35,11 @@
   }
 
   function handleChangeValue(newKey, updateSelection) {
-    const updatedKey = onUpdateKey(key, normalization.unescapeValue(newKey))
+    const updatedKey = onUpdateKey(key, context.normalization.unescapeValue(newKey))
     const updatedPath = initial(path).concat(updatedKey)
 
     if (updateSelection === UPDATE_SELECTION.NEXT_INSIDE) {
-      onSelect({
+      context.onSelect({
         type: SELECTION_TYPE.KEY,
         path: updatedPath,
         next: true
@@ -51,7 +47,7 @@
     }
 
     if (updateSelection === UPDATE_SELECTION.SELF) {
-      onSelect(
+      context.onSelect(
         {
           type: SELECTION_TYPE.KEY,
           path: updatedPath
@@ -62,24 +58,24 @@
   }
 
   function handleCancelChange() {
-    onSelect({ type: SELECTION_TYPE.KEY, path })
+    context.onSelect({ type: SELECTION_TYPE.KEY, path })
   }
 </script>
 
 {#if editKey}
   <EditableDiv
-    value={normalization.escapeValue(key)}
+    value={context.normalization.escapeValue(key)}
     shortText
     onChange={handleChangeValue}
     onCancel={handleCancelChange}
-    {onFind}
+    onFind={context.onFind}
   />
 {:else}
   <div data-type="selectable-key" class={getKeyClass(key)} on:dblclick={handleKeyDoubleClick}>
     {#if searchResult}
-      <SearchResultHighlighter text={normalization.escapeValue(key)} {searchResult} />
+      <SearchResultHighlighter text={context.normalization.escapeValue(key)} {searchResult} />
     {:else}
-      {addNewLineSuffix(normalization.escapeValue(key))}
+      {addNewLineSuffix(context.normalization.escapeValue(key))}
     {/if}
   </div>
 {/if}
