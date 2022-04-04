@@ -370,7 +370,7 @@
     const previousSelection = selection
 
     json = updatedJson
-    state = syncState(json, previousState, [], defaultExpand)
+    state = syncState(json, previousState, [], defaultExpand, true)
     text = undefined
     textIsRepaired = false
     selection = clearSelectionWhenNotExisting(selection, json)
@@ -407,14 +407,14 @@
 
     try {
       json = JSON.parse(updatedText)
-      state = syncState(json, previousState, [], defaultExpand)
+      state = syncState(json, previousState, [], defaultExpand, true)
       text = updatedText
       textIsRepaired = false
       selection = clearSelectionWhenNotExisting(selection, json)
     } catch (err) {
       try {
         json = JSON.parse(jsonrepair(updatedText))
-        state = syncState(json, previousState, [], defaultExpand)
+        state = syncState(json, previousState, [], defaultExpand, true)
         text = updatedText
         textIsRepaired = true
         selection = clearSelectionWhenNotExisting(selection, json)
