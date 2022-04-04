@@ -486,13 +486,13 @@
         <div
           class="insert-selection-area inside"
           data-type="insert-selection-area-inside"
-          on:mousedown={handleInsertInside}
+          on:click={handleInsertInside}
         />
       {:else}
         <div
           class="insert-selection-area after"
           data-type="insert-selection-area-after"
-          on:mousedown={handleInsertAfter}
+          on:click={handleInsertAfter}
         />
       {/if}
     </div>
@@ -556,7 +556,7 @@
           <div
             class="insert-selection-area after"
             data-type="insert-selection-area-after"
-            on:mousedown={handleInsertAfter}
+            on:click={handleInsertAfter}
           />
         {/if}
       </div>
@@ -606,13 +606,13 @@
         <div
           class="insert-selection-area inside"
           data-type="insert-selection-area-inside"
-          on:mousedown={handleInsertInside}
+          on:click={handleInsertInside}
         />
       {:else if !root}
         <div
           class="insert-selection-area after"
           data-type="insert-selection-area-after"
-          on:mousedown={handleInsertAfter}
+          on:click={handleInsertAfter}
         />
       {/if}
     </div>
@@ -668,7 +668,7 @@
           <div
             class="insert-selection-area after"
             data-type="insert-selection-area-after"
-            on:mousedown={handleInsertAfter}
+            on:click={handleInsertAfter}
           />
         {/if}
       </div>
@@ -701,7 +701,7 @@
         <div
           class="insert-selection-area after"
           data-type="insert-selection-area-after"
-          on:mousedown={handleInsertAfter}
+          on:click={handleInsertAfter}
         />
       {/if}
     </div>
