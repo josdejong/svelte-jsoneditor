@@ -749,17 +749,24 @@
   function doPaste(clipboardText) {
     if (json !== undefined) {
       const operations = insert(json, state, selection, clipboardText)
+      const expandAllRecursive = !isLargeContent(
+        { text: clipboardText },
+        MAX_DOCUMENT_SIZE_EXPAND_ALL
+      )
 
-      debug('paste', { clipboardText, operations, selection })
+      debug('paste', { clipboardText, operations, selection, expandAllRecursive })
 
       handlePatch(operations)
 
       // expand newly inserted object/array
       operations
         .filter((operation) => isObjectOrArray(operation.value))
-        .forEach(async (operation) => {
-          const path = parseJSONPointerWithArrayIndices(json, operation.path)
-          handleExpand(path, true, false)
+        .forEach(async (operation, index) => {
+          // keep the same behavior as the getDefaultExpand method
+          if (expandAllRecursive || index === 0) {
+            const path = parseJSONPointerWithArrayIndices(json, operation.path)
+            handleExpand(path, true, expandAllRecursive)
+          }
         })
     } else {
       debug('paste', { clipboardText })
