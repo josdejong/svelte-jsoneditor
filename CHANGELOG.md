@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.28](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.27...v0.3.28) (2022-04-04)
+
+
+### Bug Fixes
+
+* could not select items when starting to drag right from an item ([c5de4d5](https://github.com/josdejong/svelte-jsoneditor/commit/c5de4d5ac84675c0a6292f439c845f3ee51e2a4b))
+* insert area visible whilst selecting or dragging ([5d1e68f](https://github.com/josdejong/svelte-jsoneditor/commit/5d1e68f248d1ad9a7f898a50b4945f50eacc1488))
+
 ### [0.3.27](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.26...v0.3.27) (2022-04-04)
 
 
