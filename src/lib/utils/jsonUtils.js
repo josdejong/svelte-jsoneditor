@@ -252,6 +252,92 @@ export function validateContentType(content) {
   }
 }
 
+/**
+ * Check whether content contains text (and not JSON)
+ * @param {Content} content
+ * @return {boolean}
+ */
+export function isTextContent(content) {
+  return typeof content.text === 'string'
+}
+
+/**
+ * Returns true when the (estimated) size of the the contents exceeds the
+ * provided maxSize.
+ * @param {Content} content
+ * @param {number} maxSize  Maximum content size in bytes
+ * @return {boolean}
+ */
+export function isLargeContent(content, maxSize) {
+  return estimateSerializedSize(content, maxSize) > maxSize
+}
+
+/**
+ * A rough, fast estimation on whether a document is larger than given size
+ * when serialized.
+ *
+ * @param {Content} content
+ * @param {number} [maxSize]  Optional max size in bytes. When reached,
+ *                            size estimation will be cancelled. This is useful
+ *                            when you're only interested in knowing whether
+ *                            the size exceeds a certain maximum size.
+ * @return {number}
+ */
+export function estimateSerializedSize(content, maxSize = Infinity) {
+  if (isTextContent(content)) {
+    return content.text.length
+  }
+
+  const json = content.json
+
+  let estimatedSize = 0
+
+  function recurse(json) {
+    if (Array.isArray(json)) {
+      // open and close bracket, commas between items
+      estimatedSize += 2 + (json.length - 1)
+
+      if (estimatedSize > maxSize) {
+        return estimatedSize
+      }
+
+      for (let i = 0; i < json.length; i++) {
+        const item = json[i]
+
+        recurse(item)
+
+        if (estimatedSize > maxSize) {
+          return estimatedSize
+        }
+      }
+    } else if (isObject(json)) {
+      const keys = Object.keys(json)
+
+      // open and close brackets, separators between all keys and values, comma's between key/value pairs
+      estimatedSize += 2 + keys.length + (keys.length - 1)
+
+      for (let k = 0; k < keys.length; k++) {
+        const key = keys[k]
+        const value = json[key]
+
+        // key length and double quotes around it
+        estimatedSize += key.length + 2
+
+        recurse(value)
+      }
+    } else if (typeof json === 'string') {
+      estimatedSize += json.length + 2 // string length plus two for the double quote characters
+    } else {
+      // true, false, null, number
+      estimatedSize += String(json).length
+    }
+  }
+
+  recurse(json)
+
+  return estimatedSize
+}
+
 const POSITION_REGEX = /(position|char) (\d+)/
 const LINE_REGEX = /line (\d+)/
 const COLUMN_REGEX = /column (\d+)/

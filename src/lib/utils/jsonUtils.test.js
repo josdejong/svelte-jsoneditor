@@ -2,8 +2,11 @@ import { deepStrictEqual, strictEqual } from 'assert'
 import {
   calculatePosition,
   countCharacterOccurrences,
-  parsePartialJson,
+  estimateSerializedSize,
+  isLargeContent,
+  isTextContent,
   normalizeJsonParseError,
+  parsePartialJson,
   validateContentType
 } from './jsonUtils.js'
 
@@ -110,5 +113,69 @@ describe('jsonUtils', () => {
 
     deepStrictEqual(validateContentType([]), 'Content must be an object')
     deepStrictEqual(validateContentType(2), 'Content must be an object')
+  })
+
+  describe('estimateSerializedSize', () => {
+    it('should estimate the size of a small document (1)', () => {
+      const doc = { id: 2, name: 'Suzan' }
+      strictEqual(JSON.stringify(doc).length, 23)
+      strictEqual(estimateSerializedSize({ json: doc }), 23)
+    })
+
+    it('should estimate the size of a small document (2)', () => {
+      const doc = [
+        { id: 1, name: 'Jo' },
+        { id: 2, name: 'Suzan' },
+        { id: 3, name: 'Ann' }
+      ]
+      strictEqual(JSON.stringify(doc).length, 68)
+      strictEqual(estimateSerializedSize({ json: doc }), 68)
+    })
+
+    it('should estimate the size of a large document', () => {
+      const doc = createLargeDoc()
+      strictEqual(JSON.stringify(doc).length, 5881)
+      strictEqual(estimateSerializedSize({ json: doc }), 5881)
+    })
+
+    it('should stop size estimation when exceeding the provided maxSize', () => {
+      const doc = createLargeDoc()
+
+      strictEqual(estimateSerializedSize({ json: doc }, 1000), 1004)
+    })
+
+    function createLargeDoc() {
+      const doc = []
+
+      for (let i = 0; i < 100; i++) {
+        doc.push({
+          id: i,
+          name: 'Item ' + i,
+          stuff: [true, false, null, 123.2]
+        })
+      }
+
+      return doc
+    }
+  })
+
+  describe('isLargeContent', () => {
+    const text = '[1,2,3,4,5,6,7,8,9,0]'
+    const textContent = { text }
+    const jsonContent = { json: JSON.parse(text) }
+
+    strictEqual(isLargeContent(textContent, 100), false)
+    strictEqual(isLargeContent(textContent, 10), true)
+
+    strictEqual(isLargeContent(jsonContent, 100), false)
+    strictEqual(isLargeContent(jsonContent, 10), true)
+  })
+
+  describe('isTextContent', () => {
+    strictEqual(isTextContent({ text: '' }), true)
+    strictEqual(isTextContent({ json: [] }), false)
+    strictEqual(isTextContent({ text: '', json: [] }), true)
+    strictEqual(isTextContent(1), false)
+    strictEqual(isTextContent({}), false)
   })
 })

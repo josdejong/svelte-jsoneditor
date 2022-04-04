@@ -33,6 +33,7 @@ export const SortModal = _SortModal
 export const TransformModal = _TransformModal
 export { getJSONSchemaOptions, findSchema, findEnum } from './utils/jsonSchemaUtils.js'
 export { parseJSONPointerWithArrayIndices } from './utils/jsonPointer.js'
+export { isTextContent, isLargeContent, estimateSerializedSize } from './utils/jsonUtils.js'
 export {
   parseJSONPointer,
   compileJSONPointer,

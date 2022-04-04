@@ -96,6 +96,8 @@
   import Welcome from './Welcome.svelte'
   import NavigationBar from '../../../components/controls/navigationBar/NavigationBar.svelte'
   import SearchBox from '../../../components/modes/treemode/menu/SearchBox.svelte'
+  import { isLargeContent } from '../../../utils/jsonUtils.js'
+  import { MAX_DOCUMENT_SIZE_EXPAND_ALL } from '../../../constants.js'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -175,7 +177,7 @@
 
   let json
   let text
-  let state = syncState({}, undefined, [], defaultExpand)
+  let state = syncState({}, undefined, [], expandMinimal)
 
   let selection = null
 
@@ -188,8 +190,16 @@
 
   let pastedJson
 
-  function defaultExpand(path) {
-    return path.length < 1 ? true : path.length === 1 && path[0] === 0 // first item of an array?
+  function expandMinimal(path) {
+    return path.length < 1 ? true : path.length === 1 && path[0] === 0 // first item of an array
+  }
+
+  function expandAll() {
+    return true
+  }
+
+  function getDefaultExpand(json) {
+    return isLargeContent({ json }, MAX_DOCUMENT_SIZE_EXPAND_ALL) ? expandMinimal : expandAll
   }
 
   let showSearch = false
@@ -370,7 +380,7 @@
     const previousSelection = selection
 
     json = updatedJson
-    state = syncState(json, previousState, [], defaultExpand, true)
+    state = syncState(json, previousState, [], getDefaultExpand(json), true)
     text = undefined
     textIsRepaired = false
     selection = clearSelectionWhenNotExisting(selection, json)
@@ -407,14 +417,14 @@
 
     try {
       json = JSON.parse(updatedText)
-      state = syncState(json, previousState, [], defaultExpand, true)
+      state = syncState(json, previousState, [], getDefaultExpand(json), true)
       text = updatedText
       textIsRepaired = false
       selection = clearSelectionWhenNotExisting(selection, json)
     } catch (err) {
       try {
         json = JSON.parse(jsonrepair(updatedText))
-        state = syncState(json, previousState, [], defaultExpand, true)
+        state = syncState(json, previousState, [], getDefaultExpand(json), true)
         text = updatedText
         textIsRepaired = true
         selection = clearSelectionWhenNotExisting(selection, json)
@@ -1392,7 +1402,7 @@
     const previousSelection = selection
 
     json = updatedJson
-    state = syncState(json, previousState, [], defaultExpand)
+    state = syncState(json, previousState, [], expandMinimal)
     text = undefined
     textIsRepaired = false
     selection = clearSelectionWhenNotExisting(selection, json)
@@ -1421,21 +1431,21 @@
 
     try {
       json = JSON.parse(updatedText)
-      state = syncState(json, previousState, [], defaultExpand)
+      state = syncState(json, previousState, [], expandMinimal)
       text = updatedText
       textIsRepaired = false
       selection = clearSelectionWhenNotExisting(selection, json)
     } catch (err) {
       try {
         json = JSON.parse(jsonrepair(updatedText))
-        state = syncState(json, previousState, [], defaultExpand)
+        state = syncState(json, previousState, [], expandMinimal)
         text = updatedText
         textIsRepaired = true
         selection = clearSelectionWhenNotExisting(selection, json)
       } catch (err) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
-        state = syncState(json, createState(json), [], defaultExpand)
+        state = syncState(json, createState(json), [], expandMinimal)
         text = updatedText
         textIsRepaired = false
         selection = clearSelectionWhenNotExisting(selection, json)
@@ -1472,7 +1482,7 @@
       state = setIn(state, path.concat(STATE_EXPANDED), expanded, true)
 
       state = updateIn(state, path, (childState) => {
-        return syncState(getIn(json, path), childState, [], defaultExpand, false)
+        return syncState(getIn(json, path), childState, [], expandMinimal, false)
       })
     }
 

@@ -6,7 +6,7 @@
   import Modal from 'svelte-simple-modal'
   import { MODE } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
-  import { validateContentType } from '../utils/jsonUtils'
+  import { isTextContent, validateContentType } from '../utils/jsonUtils'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import CodeMode from './modes/codemode/CodeMode.svelte'
   import TreeMode from './modes/treemode/TreeMode.svelte'
@@ -88,9 +88,7 @@
   }
 
   function getText() {
-    return typeof content.text === 'string'
-      ? content.text
-      : JSON.stringify(content.json, null, indentation)
+    return isTextContent(content) ? content.text : JSON.stringify(content.json, null, indentation)
   }
 
   export function set(newContent) {
