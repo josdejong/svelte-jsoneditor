@@ -1,7 +1,9 @@
 // used by JSONNode during dragging
 export const singleton = {
-  mousedown: false,
+  selecting: false,
   selectionAnchor: null, // Path
   selectionAnchorType: null, // Selection type
-  selectionFocus: null // Path
+  selectionFocus: null, // Path
+
+  dragging: false
 }

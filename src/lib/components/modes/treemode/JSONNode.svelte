@@ -275,6 +275,7 @@
       items,
       indexOffset: 0
     }
+    singleton.dragging = true
 
     document.addEventListener('mousemove', handleDragSelection, true)
     document.addEventListener('mouseup', handleDragSelectionEnd)
@@ -320,6 +321,7 @@
       }
 
       dragging = undefined
+      singleton.dragging = false
 
       document.removeEventListener('mousemove', handleDragSelection, true)
       document.removeEventListener('mouseup', handleDragSelectionEnd)
@@ -375,6 +377,10 @@
   }
 
   function handleMouseOver(event) {
+    if (singleton.selecting || singleton.dragging) {
+      return
+    }
+
     event.stopPropagation()
 
     if (isChildOfAttribute(event.target, 'data-type', 'selectable-value')) {
