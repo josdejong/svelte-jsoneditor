@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.27](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.26...v0.3.27) (2022-04-04)
+
+
+### Bug Fixes
+
+* when pasting, expand all pasted contents by default when small ([ec9703c](https://github.com/josdejong/svelte-jsoneditor/commit/ec9703c741bf0575864ce699a4c3ea708acdf57a))
+
 ### [0.3.26](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.25...v0.3.26) (2022-04-04)
 
 
