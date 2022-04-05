@@ -118,7 +118,8 @@
           overflow: visible;
 
           textarea.query {
-            height: 200px;
+            min-height: 150px;
+            flex: none;
           }
 
           :global(.jsoneditor-main) {
