@@ -37,16 +37,9 @@
       padding-bottom: 0;
     }
 
-    .contents-inner {
-      flex: 1;
-      display: flex;
-      overflow: hidden;
-      padding: 2 * $padding;
-    }
-
     .actions {
       padding: 2 * $padding;
-      padding-top: 0;
+      padding-top: $padding;
     }
 
     .columns {
@@ -54,6 +47,11 @@
       display: flex;
       gap: 2 * $padding;
       overflow: hidden;
+
+      &.all {
+        padding: 2 * $padding;
+        padding-bottom: $padding;
+      }
 
       .column {
         flex: 1;
@@ -102,22 +100,25 @@
         flex-direction: column;
 
         &.all {
+          overflow: auto;
         }
 
         .column {
           flex: 1;
+          overflow: visible;
+
+          textarea.query {
+            height: 200px;
+          }
+
+          :global(.jsoneditor-main) {
+            height: 300px;
+            flex: none;
+          }
 
           &.query {
             overflow: visible;
           }
-        }
-      }
-
-      .contents-inner {
-        overflow: auto;
-
-        .columns.all {
-          min-height: 1000px;
         }
       }
     }

@@ -168,65 +168,59 @@
         {@html getSelectedQueryLanguage(queryLanguageId).description}
       </div>
 
-      <div class="contents-inner">
-        <div class="columns all">
-          <div class="column query flex-3">
-            <div class="label">Path</div>
-            <input
-              class="path"
-              type="text"
-              readonly
-              title="Selected path"
-              value={!isEmpty(selectedPath) ? stringifyPath(selectedPath) : '(whole document)'}
-            />
+      <div class="columns all">
+        <div class="column query flex-3">
+          <div class="label">Path</div>
+          <input
+            class="path"
+            type="text"
+            readonly
+            title="Selected path"
+            value={!isEmpty(selectedPath) ? stringifyPath(selectedPath) : '(whole document)'}
+          />
 
-            <div class="label">
-              <button type="button" on:click={toggleShowWizard}>
-                <Icon data={showWizard ? faCaretDown : faCaretRight} />
-                Wizard
-              </button>
-            </div>
-            {#if showWizard}
-              {#if Array.isArray(selectedJson)}
-                <TransformWizard
-                  {queryOptions}
-                  json={selectedJson}
-                  onChange={updateQueryByWizard}
-                />
-              {:else}
-                (Only available for arrays, not for objects)
-              {/if}
-            {/if}
-
-            <div class="label">Query</div>
-            <textarea class="query" spellcheck="false" value={query} on:input={handleChangeQuery} />
+          <div class="label">
+            <button type="button" on:click={toggleShowWizard}>
+              <Icon data={showWizard ? faCaretDown : faCaretRight} />
+              Wizard
+            </button>
           </div>
-          <div class="column flex-4">
-            <div class="columns query-data">
-              <div class="column">
-                <div class="label">Original</div>
+          {#if showWizard}
+            {#if Array.isArray(selectedJson)}
+              <TransformWizard {queryOptions} json={selectedJson} onChange={updateQueryByWizard} />
+            {:else}
+              (Only available for arrays, not for objects)
+            {/if}
+          {/if}
+
+          <div class="label">Query</div>
+          <textarea class="query" spellcheck="false" value={query} on:input={handleChangeQuery} />
+        </div>
+        <div class="column flex-4">
+          <div class="columns query-data">
+            <div class="column">
+              <div class="label">Original</div>
+              <JSONEditor
+                content={selectedContent}
+                readOnly={true}
+                mainMenuBar={false}
+                navigationBar={false}
+              />
+            </div>
+            <div class="column">
+              <div class="label">Preview</div>
+              {#if !previewError}
                 <JSONEditor
-                  content={selectedContent}
+                  content={previewContent}
                   readOnly={true}
                   mainMenuBar={false}
                   navigationBar={false}
                 />
-              </div>
-              <div class="column">
-                <div class="label">Preview</div>
-                {#if !previewError}
-                  <JSONEditor
-                    content={previewContent}
-                    readOnly={true}
-                    mainMenuBar={false}
-                    navigationBar={false}
-                  />
-                {:else}
-                  <div class="preview error">
-                    {previewError.toString()}
-                  </div>
-                {/if}
-              </div>
+              {:else}
+                <div class="preview error">
+                  {previewError.toString()}
+                </div>
+              {/if}
             </div>
           </div>
         </div>
