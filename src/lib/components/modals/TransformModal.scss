@@ -83,8 +83,8 @@
 
         @media screen and (max-width: 1600px) {
           & {
+            flex: 3;
             flex-direction: column;
-            margin-bottom: 3.5 * $padding; // This is a trick to compensate for the padding of the labels
           }
         }
 
@@ -92,6 +92,13 @@
           flex-direction: column;
           gap: 0;
           margin-bottom: 0;
+        }
+      }
+
+      @media screen and (max-width: 1600px) {
+        .query-contents {
+          // This is an ugly trick to compensate for the padding of the labels in .preview-data
+          margin-bottom: -2 * $padding + 2px;
         }
       }
     }
