@@ -122,7 +122,7 @@
           <tr>
             <th>Property</th>
             <td>
-              <Select items={properties} bind:value={selectedProperty} />
+              <Select showIndicator items={properties} bind:value={selectedProperty} />
             </td>
           </tr>
         {/if}
@@ -130,8 +130,9 @@
           <th>Direction</th>
           <td>
             <Select
-              items={directions}
               containerClasses="test-class"
+              showIndicator
+              items={directions}
               bind:value={selectedDirection}
               isClearable={false}
             />
@@ -139,6 +140,8 @@
         </tr>
       </tbody>
     </table>
+
+    <div class="space" />
 
     <div class="actions">
       <button

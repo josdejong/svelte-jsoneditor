@@ -3,13 +3,12 @@
 
 .jsoneditor-modal.sort {
   .contents {
-    overflow: hidden;
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
-    border-spacing: none;
+    border-spacing: 0;
 
     th,
     td {
@@ -33,6 +32,14 @@
           border: 1px solid $background-gray;
         }
       }
+
+      :global(.selectContainer input) {
+        box-sizing: border-box;
+      }
     }
+  }
+
+  .space {
+    height: 200px; // Trick for the property select box dropdown to be fully visible
   }
 }
