@@ -216,9 +216,9 @@
           </div>
           <textarea class="query" spellcheck="false" value={query} on:input={handleChangeQuery} />
         </div>
-        <div class="data-contents">
+        <div class="data-contents" class:hide-original-data={!showOriginal}>
           <!--          <div class="query-data" class:hide-original={!showOriginal}>-->
-          <div class="original-data" class:no-flex={!showOriginal}>
+          <div class="original-data" class:hide={!showOriginal}>
             <div class="label">
               <div class="label-inner">
                 <button type="button" on:click={toggleShowOriginal}>
