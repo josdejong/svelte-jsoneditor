@@ -4,8 +4,6 @@ import { isEmpty, last } from 'lodash-es'
 const description = `
 <p>
   Enter a JavaScript function to filter, sort, or transform the data.
-</p>
-<p>
   You can use <a href="https://lodash.com" target="_blank" rel="noopener noreferrer">Lodash</a>
   functions like <code>_.map</code>, <code>_.filter</code>,
   <code>_.orderBy</code>, <code>_.sortBy</code>, <code>_.groupBy</code>,

@@ -1240,6 +1240,7 @@
         queryLanguages,
         queryLanguageId,
         onChangeQueryLanguage,
+        onRenderValue,
         onTransform: onTransform
           ? (operations) => {
               onTransform({

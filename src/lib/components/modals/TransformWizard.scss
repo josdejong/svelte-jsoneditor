@@ -5,6 +5,11 @@ table.transform-wizard {
   border-spacing: 0;
   width: 100%;
 
+  input {
+    font-family: inherit;
+    font-size: inherit;
+  }
+
   tr {
     th {
       font-weight: normal;

@@ -2,81 +2,174 @@
 @import 'Modal';
 
 .jsoneditor-modal.transform {
-  .description {
-    color: $dark-gray;
-
-    :global(p) {
-      margin: $padding 0;
-
-      &:first-child {
-        margin-top: 0;
-      }
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-
-    :global(code) {
-      background: $background-gray;
-      font-family: $font-family-mono;
-      font-size: $font-size-mono;
-    }
-  }
-
   .contents {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     color: $dark-gray;
+    min-height: 0;
+    padding: 0;
+
+    .main-contents {
+      flex: 1;
+      display: flex;
+      gap: 2 * $padding;
+      min-height: 0;
+      box-sizing: border-box;
+
+      padding: 2 * $padding;
+      padding-top: 0;
+      padding-bottom: $padding;
+
+      .query-contents {
+        flex: 3;
+        display: flex;
+        flex-direction: column;
+
+        .description {
+          color: $dark-gray;
+
+          :global(p) {
+            margin: $padding 0;
+
+            &:first-child {
+              margin-top: 0;
+            }
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
+
+          :global(code) {
+            background: $background-gray;
+            font-family: $font-family-mono;
+            font-size: $font-size-mono;
+          }
+        }
+
+        textarea.query {
+          flex: 1;
+          outline: none;
+          resize: vertical; // prevent resizing horizontally
+        }
+      }
+
+      .data-contents {
+        flex: 4;
+        display: flex;
+        flex-direction: row;
+        gap: 2 * $padding;
+
+        .original-data {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          min-height: 0;
+          box-sizing: border-box;
+
+          &.hide {
+            flex: none;
+          }
+        }
+
+        .preview-data {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          min-height: 0;
+          box-sizing: border-box;
+        }
+
+        @media screen and (max-width: 1600px) {
+          & {
+            flex: 3;
+            flex-direction: column;
+          }
+        }
+
+        &.hide-original-data {
+          flex-direction: column;
+          gap: 0;
+          margin-bottom: 0;
+        }
+      }
+
+      @media screen and (max-width: 1600px) {
+        .query-contents {
+          // This is an ugly trick to compensate for the padding of the labels in .preview-data
+          margin-bottom: -2 * $padding + 2px;
+        }
+      }
+    }
+
+    .actions {
+      padding: 2 * $padding;
+      padding-top: $padding;
+    }
+
+    @media screen and (max-width: 1200px) {
+      .main-contents {
+        flex-direction: column;
+        overflow: auto;
+
+        .query-contents {
+          textarea.query {
+            min-height: 150px;
+            flex: none;
+          }
+        }
+
+        .data-contents {
+          :global(.jsoneditor-main) {
+            height: 300px;
+            flex: none;
+          }
+        }
+      }
+    }
   }
 
   .label {
     font-weight: bold;
-    padding-top: $padding * 2;
-    padding-bottom: $padding-half;
     display: block;
+    box-sizing: border-box;
 
-    button {
-      @include jsoneditor-button;
-      font-weight: bold;
+    .label-inner {
+      margin-top: $padding * 2;
+      margin-bottom: $padding-half;
+      box-sizing: border-box;
+
+      button {
+        @include jsoneditor-button;
+        font-weight: bold;
+        padding: 0;
+      }
     }
   }
 
-  input.path,
-  textarea.query,
-  textarea.preview {
+  :global(.jsoneditor-main) {
+    flex: 1;
+    border: 1px solid $background-gray;
+    box-shadow: none;
+    box-sizing: border-box;
+    min-height: 300px;
+  }
+
+  :global(.jsoneditor-main.focus) {
+    border: 1px solid $theme-color;
+  }
+
+  input,
+  textarea {
     border: 1px solid $border-gray;
-    border-radius: $border-radius;
     outline: none;
     box-sizing: border-box;
     padding: $padding-half;
     font-family: $font-family-mono;
     font-size: $font-size-mono;
     color: $black;
-  }
 
-  input.path {
-    width: 100%;
-  }
-
-  textarea.query,
-  textarea.preview {
-    border: 1px solid $border-gray;
-    border-radius: $border-radius;
-    outline: none;
-    width: 100%;
-    height: 100px;
-    resize: vertical; // prevent resizing horizontally
-  }
-
-  textarea.preview {
-    height: 200px;
-
-    &.error {
-      color: $red;
-    }
-  }
-
-  input,
-  textarea {
     &:focus {
       border-color: $theme-color;
     }
@@ -84,5 +177,12 @@
     &:read-only {
       border-color: $background-gray;
     }
+  }
+
+  .preview.error {
+    flex: 1;
+    border: 1px solid $background-gray;
+    color: $red;
+    padding: $padding-half;
   }
 }
