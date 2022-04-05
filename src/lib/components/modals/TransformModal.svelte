@@ -45,6 +45,7 @@
 
   // showWizard is not stored inside a stateId
   let showWizard = transformModalState.showWizard !== false
+  let showOriginal = transformModalState.showOriginal !== false
 
   let queryOptions = state.queryOptions || {}
   let query =
@@ -141,6 +142,13 @@
     transformModalState.showWizard = showWizard
   }
 
+  function toggleShowOriginal() {
+    showOriginal = !showOriginal
+
+    // not stored inside a stateId
+    transformModalState.showOriginal = showOriginal
+  }
+
   function focus(element) {
     element.focus()
   }
@@ -197,17 +205,24 @@
           <textarea class="query" spellcheck="false" value={query} on:input={handleChangeQuery} />
         </div>
         <div class="column flex-4">
-          <div class="columns query-data">
-            <div class="column">
-              <div class="label">Original</div>
-              <JSONEditor
-                content={selectedContent}
-                readOnly={true}
-                mainMenuBar={false}
-                navigationBar={false}
-              />
+          <div class="columns query-data" class:hide-original={!showOriginal}>
+            <div class="column original" class:no-flex={!showOriginal}>
+              <div class="label">
+                <button type="button" on:click={toggleShowOriginal}>
+                  <Icon data={showOriginal ? faCaretDown : faCaretRight} />
+                  Original
+                </button>
+              </div>
+              {#if showOriginal}
+                <JSONEditor
+                  content={selectedContent}
+                  readOnly={true}
+                  mainMenuBar={false}
+                  navigationBar={false}
+                />
+              {/if}
             </div>
-            <div class="column">
+            <div class="column preview">
               <div class="label">Preview</div>
               {#if !previewError}
                 <JSONEditor

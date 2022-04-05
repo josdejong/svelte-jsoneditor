@@ -71,6 +71,10 @@
           flex: 4;
         }
 
+        &.no-flex {
+          flex: none;
+        }
+
         textarea.query {
           flex: 1;
         }
@@ -85,6 +89,14 @@
           :global(&:focus) {
             border: 1px solid $border-gray;
           }
+        }
+      }
+
+      &.query-data.hide-original {
+        flex-direction: column;
+
+        .column.preview .label {
+          padding-top: 0;
         }
       }
 
