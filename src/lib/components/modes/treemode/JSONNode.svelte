@@ -246,6 +246,10 @@
   }
 
   function handleDragSelectionStart(event) {
+    if (context.readOnly) {
+      return
+    }
+
     const fullSelection = context.getFullSelection()
     const selectionParentPath = initial(fullSelection.focusPath)
     if (!isEqual(path, selectionParentPath)) {
