@@ -175,14 +175,18 @@
       onChangeQueryLanguage={handleChangeQueryLanguage}
     />
     <div class="contents">
-      <div class="columns all">
-        <div class="column query flex-3">
-          <div class="label">Language</div>
+      <div class="main-contents">
+        <div class="query-contents">
+          <div class="label">
+            <div class="label-inner">Language</div>
+          </div>
           <div class="description">
             {@html getSelectedQueryLanguage(queryLanguageId).description}
           </div>
 
-          <div class="label">Path</div>
+          <div class="label">
+            <div class="label-inner">Path</div>
+          </div>
           <input
             class="path"
             type="text"
@@ -192,10 +196,12 @@
           />
 
           <div class="label">
-            <button type="button" on:click={toggleShowWizard}>
-              <Icon data={showWizard ? faCaretDown : faCaretRight} />
-              Wizard
-            </button>
+            <div class="label-inner">
+              <button type="button" on:click={toggleShowWizard}>
+                <Icon data={showWizard ? faCaretDown : faCaretRight} />
+                Wizard
+              </button>
+            </div>
           </div>
           {#if showWizard}
             {#if Array.isArray(selectedJson)}
@@ -205,45 +211,51 @@
             {/if}
           {/if}
 
-          <div class="label">Query</div>
+          <div class="label">
+            <div class="label-inner">Query</div>
+          </div>
           <textarea class="query" spellcheck="false" value={query} on:input={handleChangeQuery} />
         </div>
-        <div class="column flex-4">
-          <div class="columns query-data" class:hide-original={!showOriginal}>
-            <div class="column original" class:no-flex={!showOriginal}>
-              <div class="label">
+        <div class="data-contents">
+          <!--          <div class="query-data" class:hide-original={!showOriginal}>-->
+          <div class="original-data" class:no-flex={!showOriginal}>
+            <div class="label">
+              <div class="label-inner">
                 <button type="button" on:click={toggleShowOriginal}>
                   <Icon data={showOriginal ? faCaretDown : faCaretRight} />
                   Original
                 </button>
               </div>
-              {#if showOriginal}
-                <JSONEditor
-                  content={selectedContent}
-                  readOnly={true}
-                  mainMenuBar={false}
-                  navigationBar={false}
-                  {onRenderValue}
-                />
-              {/if}
             </div>
-            <div class="column preview">
-              <div class="label">Preview</div>
-              {#if !previewError}
-                <JSONEditor
-                  content={previewContent}
-                  readOnly={true}
-                  mainMenuBar={false}
-                  navigationBar={false}
-                  {onRenderValue}
-                />
-              {:else}
-                <div class="preview error">
-                  {previewError.toString()}
-                </div>
-              {/if}
-            </div>
+            {#if showOriginal}
+              <JSONEditor
+                content={selectedContent}
+                readOnly={true}
+                mainMenuBar={false}
+                navigationBar={false}
+                {onRenderValue}
+              />
+            {/if}
           </div>
+          <div class="preview-data">
+            <div class="label">
+              <div class="label-inner">Preview</div>
+            </div>
+            {#if !previewError}
+              <JSONEditor
+                content={previewContent}
+                readOnly={true}
+                mainMenuBar={false}
+                navigationBar={false}
+                {onRenderValue}
+              />
+            {:else}
+              <div class="preview error">
+                {previewError.toString()}
+              </div>
+            {/if}
+          </div>
+          <!--          </div>-->
         </div>
       </div>
 
