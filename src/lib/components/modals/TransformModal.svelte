@@ -172,12 +172,13 @@
       onChangeQueryLanguage={handleChangeQueryLanguage}
     />
     <div class="contents">
-      <div class="description">
-        {@html getSelectedQueryLanguage(queryLanguageId).description}
-      </div>
-
       <div class="columns all">
         <div class="column query flex-3">
+          <div class="label">Language</div>
+          <div class="description">
+            {@html getSelectedQueryLanguage(queryLanguageId).description}
+          </div>
+
           <div class="label">Path</div>
           <input
             class="path"
