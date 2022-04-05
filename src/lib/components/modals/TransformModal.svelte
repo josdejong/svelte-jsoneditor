@@ -31,6 +31,9 @@
   /** @type {(queryLanguageId: string) => void} */
   export let onChangeQueryLanguage
 
+  /** @type {(props: RenderValueProps) => RenderValueConstructor[]} */
+  export let onRenderValue
+
   export let onTransform
   export let indentation = 2
 
@@ -220,6 +223,7 @@
                   readOnly={true}
                   mainMenuBar={false}
                   navigationBar={false}
+                  {onRenderValue}
                 />
               {/if}
             </div>
@@ -231,6 +235,7 @@
                   readOnly={true}
                   mainMenuBar={false}
                   navigationBar={false}
+                  {onRenderValue}
                 />
               {:else}
                 <div class="preview error">
