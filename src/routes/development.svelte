@@ -18,22 +18,6 @@
 
   let content = {
     text: `{
-  "array": [
-    1,
-    2,
-    [
-      3,
-      4,
-      5
-    ],
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    10
-  ],
   "boolean": true,
   "color": "#82b92c",
   "html_code": "&quot;",
@@ -53,6 +37,22 @@
   "tab": "Hello\\tTab",
   "timestamp": 1534952749890,
   "url": "https://jsoneditoronline.org",
+  "array": [
+    1,
+    2,
+    [
+      3,
+      4,
+      5
+    ],
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
   "xss?": "<button onclick=alert('oopsie!!!')>test xss</button>",
   "xss array": [
     {
