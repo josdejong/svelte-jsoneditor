@@ -290,7 +290,6 @@
           id: id || transformModalId,
           json: json,
           selectedPath,
-          indentation,
           queryLanguages,
           queryLanguageId,
           onChangeQueryLanguage,

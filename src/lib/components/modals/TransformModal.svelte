@@ -35,7 +35,6 @@
   export let onRenderValue
 
   export let onTransform
-  export let indentation = 2
 
   $: selectedJson = getIn(json, selectedPath)
   $: selectedContent = { json: selectedJson }
