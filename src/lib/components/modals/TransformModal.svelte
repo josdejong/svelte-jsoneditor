@@ -6,15 +6,15 @@
   import { debounce, isEmpty } from 'lodash-es'
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
-  import { DEBOUNCE_DELAY, MAX_PREVIEW_CHARACTERS } from '../../constants.js'
+  import { DEBOUNCE_DELAY } from '../../constants.js'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { stringifyPath } from '../../utils/pathUtils.js'
-  import { truncate } from '../../utils/stringUtils.js'
   import { transformModalState } from './transformModalState.js'
   import TransformWizard from './TransformWizard.svelte'
   import TransformModalHeader from './TransformModalHeader.svelte'
   import AbsolutePopup from './popup/AbsolutePopup.svelte'
   import { createDebug } from '../../utils/debug'
+  import JSONEditor from '../JSONEditor.svelte'
 
   const debug = createDebug('jsoneditor:TransformModal')
 
@@ -31,10 +31,14 @@
   /** @type {(queryLanguageId: string) => void} */
   export let onChangeQueryLanguage
 
+  /** @type {(props: RenderValueProps) => RenderValueConstructor[]} */
+  export let onRenderValue
+
   export let onTransform
   export let indentation = 2
 
   $: selectedJson = getIn(json, selectedPath)
+  $: selectedContent = { json: selectedJson }
 
   const { close } = getContext('simple-modal')
 
@@ -44,6 +48,7 @@
 
   // showWizard is not stored inside a stateId
   let showWizard = transformModalState.showWizard !== false
+  let showOriginal = transformModalState.showOriginal !== false
 
   let queryOptions = state.queryOptions || {}
   let query =
@@ -52,8 +57,8 @@
       : getSelectedQueryLanguage(queryLanguageId).createQuery(json, state.queryOptions || {})
   let isManual = state.isManual || false
 
-  let previewHasError = false
-  let preview = ''
+  let previewError = undefined
+  let previewContent = { text: '' }
 
   function getSelectedQueryLanguage(queryLanguageId) {
     return queryLanguages.find((item) => item.id === queryLanguageId) || queryLanguages[0]
@@ -80,11 +85,11 @@
       })
       const jsonTransformed = getSelectedQueryLanguage(queryLanguageId).executeQuery(json, query)
 
-      preview = truncate(JSON.stringify(jsonTransformed, null, indentation), MAX_PREVIEW_CHARACTERS)
-      previewHasError = false
+      previewContent = { json: jsonTransformed }
+      previewError = undefined
     } catch (err) {
-      preview = err.toString()
-      previewHasError = true
+      previewContent = { text: '' }
+      previewError = err
     }
   }
 
@@ -128,8 +133,8 @@
       // this should never occur since we can only press the Transform
       // button when creating a preview was successful
       console.error(err)
-      preview = err.toString()
-      previewHasError = true
+      previewContent = { text: '' }
+      previewError = err.toString()
     }
   }
 
@@ -138,6 +143,13 @@
 
     // not stored inside a stateId
     transformModalState.showWizard = showWizard
+  }
+
+  function toggleShowOriginal() {
+    showOriginal = !showOriginal
+
+    // not stored inside a stateId
+    transformModalState.showOriginal = showOriginal
   }
 
   function focus(element) {
@@ -163,38 +175,89 @@
       onChangeQueryLanguage={handleChangeQueryLanguage}
     />
     <div class="contents">
-      <div class="description">
-        {@html getSelectedQueryLanguage(queryLanguageId).description}
+      <div class="main-contents">
+        <div class="query-contents">
+          <div class="label">
+            <div class="label-inner">Language</div>
+          </div>
+          <div class="description">
+            {@html getSelectedQueryLanguage(queryLanguageId).description}
+          </div>
+
+          <div class="label">
+            <div class="label-inner">Path</div>
+          </div>
+          <input
+            class="path"
+            type="text"
+            readonly
+            title="Selected path"
+            value={!isEmpty(selectedPath) ? stringifyPath(selectedPath) : '(whole document)'}
+          />
+
+          <div class="label">
+            <div class="label-inner">
+              <button type="button" on:click={toggleShowWizard}>
+                <Icon data={showWizard ? faCaretDown : faCaretRight} />
+                Wizard
+              </button>
+            </div>
+          </div>
+          {#if showWizard}
+            {#if Array.isArray(selectedJson)}
+              <TransformWizard {queryOptions} json={selectedJson} onChange={updateQueryByWizard} />
+            {:else}
+              (Only available for arrays, not for objects)
+            {/if}
+          {/if}
+
+          <div class="label">
+            <div class="label-inner">Query</div>
+          </div>
+          <textarea class="query" spellcheck="false" value={query} on:input={handleChangeQuery} />
+        </div>
+        <div class="data-contents" class:hide-original-data={!showOriginal}>
+          <!--          <div class="query-data" class:hide-original={!showOriginal}>-->
+          <div class="original-data" class:hide={!showOriginal}>
+            <div class="label">
+              <div class="label-inner">
+                <button type="button" on:click={toggleShowOriginal}>
+                  <Icon data={showOriginal ? faCaretDown : faCaretRight} />
+                  Original
+                </button>
+              </div>
+            </div>
+            {#if showOriginal}
+              <JSONEditor
+                content={selectedContent}
+                readOnly={true}
+                mainMenuBar={false}
+                navigationBar={false}
+                {onRenderValue}
+              />
+            {/if}
+          </div>
+          <div class="preview-data">
+            <div class="label">
+              <div class="label-inner">Preview</div>
+            </div>
+            {#if !previewError}
+              <JSONEditor
+                content={previewContent}
+                readOnly={true}
+                mainMenuBar={false}
+                navigationBar={false}
+                {onRenderValue}
+              />
+            {:else}
+              <div class="preview error">
+                {previewError.toString()}
+              </div>
+            {/if}
+          </div>
+          <!--          </div>-->
+        </div>
       </div>
-
-      <div class="label">Path</div>
-      <input
-        class="path"
-        type="text"
-        readonly
-        title="Selected path"
-        value={!isEmpty(selectedPath) ? stringifyPath(selectedPath) : '(whole document)'}
-      />
-
-      <div class="label">
-        <button type="button" on:click={toggleShowWizard}>
-          <Icon data={showWizard ? faCaretDown : faCaretRight} />
-          Wizard
-        </button>
-      </div>
-      {#if showWizard}
-        {#if Array.isArray(selectedJson)}
-          <TransformWizard {queryOptions} json={selectedJson} onChange={updateQueryByWizard} />
-        {:else}
-          (Only available for arrays, not for objects)
-        {/if}
-      {/if}
-
-      <div class="label">Query</div>
-      <textarea class="query" spellcheck="false" value={query} on:input={handleChangeQuery} />
-
-      <div class="label">Preview</div>
-      <textarea class="preview" class:error={previewHasError} bind:value={preview} readonly />
 
       <div class="actions">
         <button
@@ -202,7 +265,7 @@
           class="primary"
           on:click={handleTransform}
           use:focus
-          disabled={previewHasError}
+          disabled={!!previewError}
         >
           Transform
         </button>

@@ -5,8 +5,6 @@ const description = `
 <p>
   Enter a <a href="https://jmespath.org" target="_blank" rel="noopener noreferrer">JMESPath</a> query 
   to filter, sort, or transform the JSON data.
-</p>
-<p>
  To learn JMESPath, go to <a href="https://jmespath.org/tutorial.html" target="_blank" rel="noopener noreferrer">the interactive tutorial</a>.
 </p>
 `

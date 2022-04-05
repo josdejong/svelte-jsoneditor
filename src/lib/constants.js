@@ -61,7 +61,9 @@ export const TRANSFORM_MODAL_OPTIONS = {
   ...SIMPLE_MODAL_OPTIONS,
   styleWindow: {
     ...SIMPLE_MODAL_OPTIONS.styleWindow,
-    width: '700px'
+    width: '1900px',
+    height: '800px',
+    display: 'flex'
   }
 }
 

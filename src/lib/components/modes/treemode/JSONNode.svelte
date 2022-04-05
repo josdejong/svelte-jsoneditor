@@ -43,6 +43,7 @@
   import { forEachKey } from '../../../logic/documentState.js'
   import { onMoveSelection } from '../../../logic/dragging.js'
   import { forEachIndex } from '../../../utils/arrayUtils.js'
+  import { getDataPathFromTarget } from '../../../utils/domUtils.js'
 
   export let value
   export let path
@@ -267,13 +268,15 @@
     }
 
     dragging = {
+      initialTarget: event.target,
       initialClientY: event.clientY,
       initialContentTop: findContentTop(),
       updatedValue: undefined,
       updatedState: undefined,
       updatedSelection: undefined,
       items,
-      indexOffset: 0
+      indexOffset: 0,
+      didMoveItems: false // whether items have been moved during dragging or not
     }
     singleton.dragging = true
 
@@ -299,7 +302,8 @@
           updatedValue,
           updatedState,
           updatedSelection,
-          indexOffset
+          indexOffset,
+          didMoveItems: true
         }
       }
     }
@@ -318,6 +322,15 @@
 
       if (operations) {
         context.onPatch(operations, updatedFullSelection || context.getFullSelection())
+      } else {
+        // the user did click inside the selection and no contents have been dragged,
+        // select the clicked item
+        if (event.target === dragging.initialTarget && !dragging.didMoveItems) {
+          context.onSelect({
+            type: getSelectionTypeFromTarget(event.target),
+            path: getDataPathFromTarget(event.target)
+          })
+        }
       }
 
       dragging = undefined

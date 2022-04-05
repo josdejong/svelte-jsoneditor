@@ -305,6 +305,7 @@
             {validator}
             {queryLanguages}
             {queryLanguageId}
+            {onRenderValue}
             onChangeQueryLanguage={handleChangeQueryLanguage}
             onChange={handleChangeText}
             onSwitchToTreeMode={handleSwitchToTreeMode}

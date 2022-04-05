@@ -63,6 +63,9 @@
   /** @type {(queryLanguageId: string) => void} */
   export let onChangeQueryLanguage
 
+  /** @type {(props: RenderValueProps) => RenderValueConstructor[]} */
+  export let onRenderValue
+
   export let onSwitchToTreeMode = () => {}
   export let onError
   export let onFocus = () => {}
@@ -291,6 +294,7 @@
           queryLanguages,
           queryLanguageId,
           onChangeQueryLanguage,
+          onRenderValue,
           onTransform: onTransform
             ? (operations) => {
                 onTransform({
