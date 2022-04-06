@@ -24,10 +24,7 @@
  * @param {boolean} [enabled]
  * @returns {function (...args: any) : void}
  */
-export function createDebug(
-  namespace,
-  enabled = typeof window !== 'undefined' && window.localStorage['debug']
-) {
+export function createDebug(namespace, enabled = tryReadLocalStorage['debug']) {
   if (enabled) {
     const color = selectColor(namespace)
 
@@ -40,6 +37,22 @@ export function createDebug(
 }
 
 function noop() {}
+
+/**
+ * Try read a specific key from localStorage
+ * @param {string} key
+ * @returns {string | undefined}
+ */
+function tryReadLocalStorage(key) {
+  try {
+    if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
+      // reading local storage can fail for example because of security restrictions
+      return window.localStorage[key]
+    }
+  } catch (error) {
+    // we do nothing with the error, not needed in this specific case
+  }
+}
 
 /**
  * Selects a color for a debug namespace
