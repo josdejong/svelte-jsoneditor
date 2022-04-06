@@ -24,10 +24,8 @@
     SCROLL_DURATION,
     SEARCH_UPDATE_THROTTLE,
     SIMPLE_MODAL_OPTIONS,
-    SORT_MODAL_OPTIONS,
     STATE_ENFORCE_STRING,
-    STATE_EXPANDED,
-    TRANSFORM_MODAL_OPTIONS
+    STATE_EXPANDED
   } from '$lib/constants'
   import {
     createState,
@@ -88,8 +86,6 @@
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import CopyPasteModal from '../../modals/CopyPasteModal.svelte'
   import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
-  import SortModal from '../../modals/SortModal.svelte'
-  import TransformModal from '../../modals/TransformModal.svelte'
   import ContextMenu from './contextmenu/ContextMenu.svelte'
   import JSONNode from './JSONNode.svelte'
   import TreeMenu from './menu/TreeMenu.svelte'
@@ -124,15 +120,6 @@
   export let escapeUnicodeCharacters = false
   export let validator = null
 
-  /** @type {QueryLanguage[]} */
-  export let queryLanguages
-
-  /** @type {string} */
-  export let queryLanguageId
-
-  /** @type {(queryLanguageId: string) => void} */
-  export let onChangeQueryLanguage
-
   export let visible = true
   export let indentation = 2
   export let onError
@@ -151,6 +138,8 @@
   export let onClassName
   export let onFocus
   export let onBlur
+  export let onSortModal
+  export let onTransformModal
 
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
@@ -1179,34 +1168,29 @@
 
     modalOpen = true
 
-    open(
-      SortModal,
-      {
-        id: sortModalId,
-        json: json,
-        selectedPath,
-        onSort: async (operations) => {
-          debug('onSort', selectedPath, operations)
+    onSortModal({
+      id: sortModalId,
+      json,
+      selectedPath,
+      onSort: async (operations) => {
+        debug('onSort', selectedPath, operations)
 
-          const newSelection = createSelection(json, state, {
-            type: SELECTION_TYPE.VALUE,
-            path: selectedPath
-          })
-          handlePatch(operations, newSelection)
+        const newSelection = createSelection(json, state, {
+          type: SELECTION_TYPE.VALUE,
+          path: selectedPath
+        })
+        handlePatch(operations, newSelection)
 
-          // expand the newly replaced array
-          handleExpand(selectedPath, true)
-          // FIXME: because we apply expand *after* the patch, when doing undo/redo, the expanded state is not restored
-        }
+        // expand the newly replaced array
+        handleExpand(selectedPath, true)
+        // FIXME: because we apply expand *after* the patch, when doing undo/redo, the expanded state is not restored
       },
-      SORT_MODAL_OPTIONS,
-      {
-        onClose: () => {
-          modalOpen = false
-          focus()
-        }
-      }
-    )
+      onClose: () => {
+        modalOpen = false
+        focus()
+      },
+      open
+    })
   }
 
   function handleSortSelection() {
@@ -1223,56 +1207,32 @@
     openSortModal(selectedPath)
   }
 
-  export function openTransformModal({ id, selectedPath, onTransform, onClose }) {
-    if (readOnly) {
-      return
-    }
-
+  export function openTransformModal({ selectedPath }) {
     modalOpen = true
 
-    open(
-      TransformModal,
-      {
-        id: id || transformModalId,
-        json: json,
-        selectedPath,
-        queryLanguages,
-        queryLanguageId,
-        onChangeQueryLanguage,
-        onRenderValue,
-        onTransform: onTransform
-          ? (operations) => {
-              onTransform({
-                operations,
-                json,
-                transformedJson: immutableJSONPatch(json, operations)
-              })
-            }
-          : async (operations) => {
-              debug('onTransform', selectedPath, operations)
+    onTransformModal({
+      id: transformModalId,
+      json,
+      selectedPath,
+      onTransform: (operations) => {
+        debug('onTransform', selectedPath, operations)
 
-              const newSelection = createSelection(json, state, {
-                type: SELECTION_TYPE.VALUE,
-                path: selectedPath
-              })
-              handlePatch(operations, newSelection)
+        const newSelection = createSelection(json, state, {
+          type: SELECTION_TYPE.VALUE,
+          path: selectedPath
+        })
+        handlePatch(operations, newSelection)
 
-              // expand the newly replaced array
-              handleExpand(selectedPath, true)
-              // FIXME: because we apply expand *after* the patch, when doing undo/redo, the expanded state is not restored
-            }
+        // expand the newly replaced array
+        handleExpand(selectedPath, true)
+        // FIXME: because we apply expand *after* the patch, when doing undo/redo, the expanded state is not restored
       },
-      TRANSFORM_MODAL_OPTIONS,
-      {
-        onClose: () => {
-          modalOpen = false
-          focus()
-          if (onClose) {
-            onClose()
-          }
-        }
-      }
-    )
+      onClose: () => {
+        modalOpen = false
+        focus()
+      },
+      open
+    })
   }
 
   function handleTransformSelection() {

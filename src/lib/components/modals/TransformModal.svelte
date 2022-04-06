@@ -3,7 +3,7 @@
 <script>
   import { uniqueId } from '../../utils/uniqueId.js'
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
-  import { debounce, isEmpty } from 'lodash-es'
+  import { debounce, isEmpty, noop } from 'lodash-es'
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
   import { DEBOUNCE_DELAY } from '../../constants.js'
@@ -14,13 +14,16 @@
   import TransformModalHeader from './TransformModalHeader.svelte'
   import AbsolutePopup from './popup/AbsolutePopup.svelte'
   import { createDebug } from '../../utils/debug'
-  import JSONEditor from '../JSONEditor.svelte'
+  import TreeMode from '../modes/treemode/TreeMode.svelte'
 
   const debug = createDebug('jsoneditor:TransformModal')
 
   export let id = 'transform-modal-' + uniqueId()
   export let json
   export let selectedPath = []
+
+  export let escapeControlCharacters
+  export let escapeUnicodeCharacters
 
   /** @type {QueryLanguage[]} */
   export let queryLanguages
@@ -33,6 +36,7 @@
 
   /** @type {(props: RenderValueProps) => RenderValueConstructor[]} */
   export let onRenderValue
+  export let onClassName
 
   export let onTransform
 
@@ -227,12 +231,21 @@
               </div>
             </div>
             {#if showOriginal}
-              <JSONEditor
-                content={selectedContent}
+              <TreeMode
+                externalContent={selectedContent}
                 readOnly={true}
                 mainMenuBar={false}
                 navigationBar={false}
+                {escapeControlCharacters}
+                {escapeUnicodeCharacters}
                 {onRenderValue}
+                onError={console.error}
+                onChange={noop}
+                onFocus={noop}
+                onBlur={noop}
+                onSortModal={noop}
+                onTransformModal={noop}
+                {onClassName}
               />
             {/if}
           </div>
@@ -241,12 +254,21 @@
               <div class="label-inner">Preview</div>
             </div>
             {#if !previewError}
-              <JSONEditor
-                content={previewContent}
+              <TreeMode
+                externalContent={previewContent}
                 readOnly={true}
                 mainMenuBar={false}
                 navigationBar={false}
+                {escapeControlCharacters}
+                {escapeUnicodeCharacters}
                 {onRenderValue}
+                onError={console.error}
+                onChange={noop}
+                onFocus={noop}
+                onBlur={noop}
+                onSortModal={noop}
+                onTransformModal={noop}
+                {onClassName}
               />
             {:else}
               <div class="preview error">

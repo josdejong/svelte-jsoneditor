@@ -121,7 +121,7 @@
         }
 
         .data-contents {
-          :global(.jsoneditor-main) {
+          :global(.tree-mode) {
             height: 300px;
             flex: none;
           }
@@ -148,7 +148,7 @@
     }
   }
 
-  :global(.jsoneditor-main) {
+  :global(.tree-mode) {
     flex: 1;
     border: 1px solid $background-gray;
     box-shadow: none;
@@ -156,7 +156,7 @@
     min-height: 300px;
   }
 
-  :global(.jsoneditor-main.focus) {
+  :global(.tree-mode.focus) {
     border: 1px solid $theme-color;
   }
 

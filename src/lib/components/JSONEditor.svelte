@@ -4,7 +4,7 @@
   import { faCode } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '../utils/debug'
   import Modal from 'svelte-simple-modal'
-  import { MODE } from '../constants.js'
+  import { MODE, SORT_MODAL_OPTIONS, TRANSFORM_MODAL_OPTIONS } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
   import { isTextContent, validateContentType } from '../utils/jsonUtils'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
@@ -13,6 +13,8 @@
   import { javascriptQueryLanguage } from '../plugins/query/javascriptQueryLanguage.js'
   import { renderValue } from '$lib/plugins/value/renderValue'
   import { tick } from 'svelte'
+  import TransformModal from './modals/TransformModal.svelte'
+  import SortModal from './modals/SortModal.svelte'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
@@ -288,6 +290,57 @@
     queryLanguageId = newQueryLanguageId
     onChangeQueryLanguage(newQueryLanguageId)
   }
+
+  // The onTransformModal method is located in JSONEditor to prevent circular references:
+  //     TreeMode -> TransformModal -> TreeMode
+  // And `open` is passed along as parameter because we cannot define it in JSONEditor itself
+  export function onTransformModal({ id, json, selectedPath, onTransform, onClose, open }) {
+    if (readOnly) {
+      return
+    }
+
+    open(
+      TransformModal,
+      {
+        id,
+        json,
+        selectedPath,
+        escapeControlCharacters,
+        escapeUnicodeCharacters,
+        queryLanguages,
+        queryLanguageId,
+        onChangeQueryLanguage: handleChangeQueryLanguage,
+        onRenderValue,
+        onClassName,
+        onTransform
+      },
+      TRANSFORM_MODAL_OPTIONS,
+      {
+        onClose
+      }
+    )
+  }
+
+  // The onSortModal is positioned here for consistency with TransformModal
+  export function onSortModal({ id, json, selectedPath, onSort, onClose, open }) {
+    if (readOnly) {
+      return
+    }
+
+    open(
+      SortModal,
+      {
+        id,
+        json,
+        selectedPath,
+        onSort
+      },
+      SORT_MODAL_OPTIONS,
+      {
+        onClose
+      }
+    )
+  }
 </script>
 
 <Modal>
@@ -303,16 +356,14 @@
             {mainMenuBar}
             {escapeUnicodeCharacters}
             {validator}
-            {queryLanguages}
-            {queryLanguageId}
-            {onRenderValue}
-            onChangeQueryLanguage={handleChangeQueryLanguage}
             onChange={handleChangeText}
             onSwitchToTreeMode={handleSwitchToTreeMode}
             {onError}
             onFocus={handleFocus}
             onBlur={handleBlur}
             onRenderMenu={handleRenderMenu}
+            {onSortModal}
+            {onTransformModal}
           />
         {:else}
           <!-- mode === MODE.TREE -->
@@ -326,9 +377,6 @@
             {escapeControlCharacters}
             {escapeUnicodeCharacters}
             {validator}
-            {queryLanguages}
-            {queryLanguageId}
-            onChangeQueryLanguage={handleChangeQueryLanguage}
             {onError}
             onChange={handleChange}
             onRequestRepair={handleRequestRepair}
@@ -337,6 +385,8 @@
             onFocus={handleFocus}
             onBlur={handleBlur}
             onRenderMenu={handleRenderMenu}
+            {onSortModal}
+            {onTransformModal}
           />
         {/if}
       {/key}

@@ -13,9 +13,7 @@
     JSON_STATUS_REPAIRABLE,
     JSON_STATUS_VALID,
     MAX_AUTO_REPAIRABLE_SIZE,
-    MAX_DOCUMENT_SIZE_CODE_MODE,
-    SORT_MODAL_OPTIONS,
-    TRANSFORM_MODAL_OPTIONS
+    MAX_DOCUMENT_SIZE_CODE_MODE
   } from '$lib/constants'
   import {
     activeElementIsChildOf,
@@ -27,8 +25,6 @@
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
-  import SortModal from '../../modals/SortModal.svelte'
-  import TransformModal from '../../modals/TransformModal.svelte'
   import CodeMenu from './menu/CodeMenu.svelte'
   import { basicSetup, EditorState } from '@codemirror/basic-setup'
   import { EditorView, keymap } from '@codemirror/view'
@@ -54,23 +50,13 @@
   /** @type {((text: string, previousText: string) => void) | null} */
   export let onChange = null
 
-  /** @type {QueryLanguage[]} */
-  export let queryLanguages
-
-  /** @type {string} */
-  export let queryLanguageId
-
-  /** @type {(queryLanguageId: string) => void} */
-  export let onChangeQueryLanguage
-
-  /** @type {(props: RenderValueProps) => RenderValueConstructor[]} */
-  export let onRenderValue
-
   export let onSwitchToTreeMode = () => {}
   export let onError
   export let onFocus = () => {}
   export let onBlur = () => {}
   export let onRenderMenu = () => {}
+  export let onSortModal
+  export let onTransformModal
 
   const debug = createDebug('jsoneditor:CodeMode')
 
@@ -269,71 +255,20 @@
 
       modalOpen = true
 
-      open(
-        SortModal,
-        {
-          id: sortModalId,
-          json,
-          selectedPath: [],
-          onSort: async (operations) => {
-            debug('onSort', operations)
-            patch(operations)
-          }
+      onSortModal({
+        id: sortModalId,
+        json,
+        selectedPath: [],
+        onSort: async (operations) => {
+          debug('onSort', operations)
+          patch(operations)
         },
-        SORT_MODAL_OPTIONS,
-        {
-          onClose: () => {
-            modalOpen = false
-            focus()
-          }
-        }
-      )
-    } catch (err) {
-      onError(err)
-    }
-  }
-
-  export function openTransformModal({ id, selectedPath, onTransform, onClose }) {
-    try {
-      const json = JSON.parse(text)
-
-      modalOpen = true
-
-      open(
-        TransformModal,
-        {
-          id: id || transformModalId,
-          json: json,
-          selectedPath,
-          queryLanguages,
-          queryLanguageId,
-          onChangeQueryLanguage,
-          onRenderValue,
-          onTransform: onTransform
-            ? (operations) => {
-                onTransform({
-                  operations,
-                  json,
-                  transformedJson: immutableJSONPatch(json, operations)
-                })
-              }
-            : async (operations) => {
-                debug('onTransform', selectedPath, operations)
-
-                patch(operations)
-              }
+        onClose: () => {
+          modalOpen = false
+          focus()
         },
-        TRANSFORM_MODAL_OPTIONS,
-        {
-          onClose: () => {
-            modalOpen = false
-            focus()
-            if (onClose) {
-              onClose()
-            }
-          }
-        }
-      )
+        open
+      })
     } catch (err) {
       onError(err)
     }
@@ -344,9 +279,29 @@
       return
     }
 
-    openTransformModal({
-      selectedPath: []
-    })
+    try {
+      const json = JSON.parse(text)
+
+      modalOpen = true
+
+      onTransformModal({
+        id: transformModalId,
+        json,
+        selectedPath: [],
+        onTransform: async (operations) => {
+          debug('onTransform', operations)
+
+          patch(operations)
+        },
+        onClose: () => {
+          modalOpen = false
+          focus()
+        },
+        open
+      })
+    } catch (err) {
+      onError(err)
+    }
   }
 
   function handleToggleSearch() {
