@@ -26,9 +26,6 @@
         display: flex;
         flex-direction: column;
 
-        // This is an ugly trick to compensate for the padding of the labels in .preview-data
-        margin-bottom: -2 * $padding + 2px;
-
         .description {
           color: $dark-gray;
 
