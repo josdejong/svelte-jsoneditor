@@ -15,6 +15,7 @@
   import { tick } from 'svelte'
   import TransformModal from './modals/TransformModal.svelte'
   import SortModal from './modals/SortModal.svelte'
+  import ModalRef from './modals/ModalRef.svelte'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
@@ -83,6 +84,8 @@
   let refTreeMode
   let refCodeMode
 
+  let open // svelte-simple-modal context open(...)
+
   $: textForCodeMode = mode === MODE.CODE ? getText(content.json, content.text) : undefined
 
   export function get() {
@@ -150,6 +153,7 @@
   /**
    * @param {Object} options
    * @property {string} [id]
+   * @property {Path} [selectedPath]
    * @property {({ operations: JSONPatchDocument, json: JSON, transformedJson: JSON }) => void} [onTransform]
    * @property {() => void} [onClose]
    */
@@ -293,8 +297,7 @@
 
   // The onTransformModal method is located in JSONEditor to prevent circular references:
   //     TreeMode -> TransformModal -> TreeMode
-  // And `open` is passed along as parameter because we cannot define it in JSONEditor itself
-  export function onTransformModal({ id, json, selectedPath, onTransform, onClose, open }) {
+  export function onTransformModal({ id, json, selectedPath, onTransform, onClose }) {
     if (readOnly) {
       return
     }
@@ -322,7 +325,7 @@
   }
 
   // The onSortModal is positioned here for consistency with TransformModal
-  export function onSortModal({ id, json, selectedPath, onSort, onClose, open }) {
+  export function onSortModal({ id, json, selectedPath, onSort, onClose }) {
     if (readOnly) {
       return
     }
@@ -344,6 +347,7 @@
 </script>
 
 <Modal>
+  <ModalRef bind:open />
   <AbsolutePopup>
     <div class="jsoneditor-main" class:focus={hasFocus} bind:this={refJSONEditor}>
       {#key instanceId}

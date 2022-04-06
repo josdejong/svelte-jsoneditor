@@ -1188,8 +1188,7 @@
       onClose: () => {
         modalOpen = false
         focus()
-      },
-      open
+      }
     })
   }
 
@@ -1207,31 +1206,49 @@
     openSortModal(selectedPath)
   }
 
-  export function openTransformModal({ selectedPath }) {
+  /**
+   * This method is exposed via JSONEditor.transform
+   * @param {Object} options
+   * @property {string} [id]
+   * @property {Path} [selectedPath]
+   * @property {({ operations: JSONPatchDocument, json: JSON, transformedJson: JSON }) => void} [onTransform]
+   * @property {() => void} [onClose]
+   */
+  export function openTransformModal({ id, selectedPath, onTransform, onClose }) {
     modalOpen = true
 
     onTransformModal({
-      id: transformModalId,
+      id: id || transformModalId,
       json,
       selectedPath,
-      onTransform: (operations) => {
-        debug('onTransform', selectedPath, operations)
+      onTransform: onTransform
+        ? (operations) => {
+            onTransform({
+              operations,
+              json,
+              transformedJson: immutableJSONPatch(json, operations)
+            })
+          }
+        : (operations) => {
+            debug('onTransform', selectedPath, operations)
 
-        const newSelection = createSelection(json, state, {
-          type: SELECTION_TYPE.VALUE,
-          path: selectedPath
-        })
-        handlePatch(operations, newSelection)
+            const newSelection = createSelection(json, state, {
+              type: SELECTION_TYPE.VALUE,
+              path: selectedPath
+            })
+            handlePatch(operations, newSelection)
 
-        // expand the newly replaced array
-        handleExpand(selectedPath, true)
-        // FIXME: because we apply expand *after* the patch, when doing undo/redo, the expanded state is not restored
-      },
+            // expand the newly replaced array
+            handleExpand(selectedPath, true)
+            // FIXME: because we apply expand *after* the patch, when doing undo/redo, the expanded state is not restored
+          },
       onClose: () => {
         modalOpen = false
         focus()
-      },
-      open
+        if (onClose) {
+          onClose()
+        }
+      }
     })
   }
 

@@ -6,7 +6,7 @@
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
   import { debounce, uniqueId } from 'lodash-es'
-  import { getContext, onDestroy, onMount } from 'svelte'
+  import { onDestroy, onMount } from 'svelte'
   import {
     CODE_MODE_ONCHANGE_DELAY,
     JSON_STATUS_INVALID,
@@ -135,7 +135,6 @@
   let canUndo = false
   let canRedo = false
 
-  const { open } = getContext('simple-modal')
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
 
@@ -266,8 +265,50 @@
         onClose: () => {
           modalOpen = false
           focus()
-        },
-        open
+        }
+      })
+    } catch (err) {
+      onError(err)
+    }
+  }
+
+  /**
+   * This method is exposed via JSONEditor.transform
+   * @param {Object} options
+   * @property {string} [id]
+   * @property {Path} [selectedPath]
+   * @property {({ operations: JSONPatchDocument, json: JSON, transformedJson: JSON }) => void} [onTransform]
+   * @property {() => void} [onClose]
+   */
+  export function openTransformModal({ id, selectedPath, onTransform, onClose }) {
+    try {
+      const json = JSON.parse(text)
+
+      modalOpen = true
+
+      onTransformModal({
+        id: id || transformModalId,
+        json,
+        selectedPath,
+        onTransform: onTransform
+          ? (operations) => {
+              onTransform({
+                operations,
+                json,
+                transformedJson: immutableJSONPatch(json, operations)
+              })
+            }
+          : (operations) => {
+              debug('onTransform', operations)
+              patch(operations)
+            },
+        onClose: () => {
+          modalOpen = false
+          focus()
+          if (onClose) {
+            onClose()
+          }
+        }
       })
     } catch (err) {
       onError(err)
@@ -279,29 +320,9 @@
       return
     }
 
-    try {
-      const json = JSON.parse(text)
-
-      modalOpen = true
-
-      onTransformModal({
-        id: transformModalId,
-        json,
-        selectedPath: [],
-        onTransform: async (operations) => {
-          debug('onTransform', operations)
-
-          patch(operations)
-        },
-        onClose: () => {
-          modalOpen = false
-          focus()
-        },
-        open
-      })
-    } catch (err) {
-      onError(err)
-    }
+    openTransformModal({
+      selectedPath: []
+    })
   }
 
   function handleToggleSearch() {
