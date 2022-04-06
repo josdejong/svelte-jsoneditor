@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.30](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.29...v0.3.30) (2022-04-06)
+
+
+### Bug Fixes
+
+* be resilient against missing or disabled localStorage ([52f76b7](https://github.com/josdejong/svelte-jsoneditor/commit/52f76b73b8d26ffcfca4e8391a55273f5b1d9b22))
+* disable Search menu item when there is no contents ([e687229](https://github.com/josdejong/svelte-jsoneditor/commit/e687229a33518356c65850d57a729c2ea6e9637f))
+* do not show welcome options when editor is readOnly ([eb92d75](https://github.com/josdejong/svelte-jsoneditor/commit/eb92d75ad608aa6df05b7633dd7cba9bb5008876))
+* method `editor.transform()` broken (regression since v0.3.29) ([299dc78](https://github.com/josdejong/svelte-jsoneditor/commit/299dc78fdfce1c327cb54efc97d6dc8fd34f00d9))
+* styling tweaks in the TransformModal ([3983918](https://github.com/josdejong/svelte-jsoneditor/commit/3983918d125249535211a0228b9444cd6d9bc8f3))
+
 ### [0.3.29](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.28...v0.3.29) (2022-04-06)
 
 
