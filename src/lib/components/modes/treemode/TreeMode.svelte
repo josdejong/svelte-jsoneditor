@@ -2037,13 +2037,15 @@
         <Message
           type="error"
           message="The loaded JSON document is invalid and could not be repaired automatically."
-          actions={[
-            {
-              icon: faCode,
-              text: 'Repair manually',
-              onClick: onRequestRepair
-            }
-          ]}
+          actions={!readOnly
+            ? [
+                {
+                  icon: faCode,
+                  text: 'Repair manually',
+                  onClick: onRequestRepair
+                }
+              ]
+            : []}
         />
         <div class="preview">
           {text}
@@ -2103,18 +2105,20 @@
         <Message
           type="success"
           message="The loaded JSON document was invalid but is successfully repaired."
-          actions={[
-            {
-              icon: faCheck,
-              text: 'Ok',
-              onClick: handleApplyAutoRepair
-            },
-            {
-              icon: faCode,
-              text: 'Repair manually instead',
-              onClick: onRequestRepair
-            }
-          ]}
+          actions={!readOnly
+            ? [
+                {
+                  icon: faCheck,
+                  text: 'Ok',
+                  onClick: handleApplyAutoRepair
+                },
+                {
+                  icon: faCode,
+                  text: 'Repair manually instead',
+                  onClick: onRequestRepair
+                }
+              ]
+            : []}
         />
       {/if}
 

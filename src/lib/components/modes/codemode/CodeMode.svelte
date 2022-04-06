@@ -200,6 +200,11 @@
 
   function handleFormat() {
     debug('format')
+
+    if (readOnly) {
+      return
+    }
+
     try {
       const previousText = text
       const json = JSON.parse(text)
@@ -215,6 +220,11 @@
 
   function handleCompact() {
     debug('compact')
+
+    if (readOnly) {
+      return
+    }
+
     try {
       const previousText = text
       const json = JSON.parse(text)
@@ -230,6 +240,11 @@
 
   function handleRepair() {
     debug('repair')
+
+    if (readOnly) {
+      return
+    }
+
     try {
       const previousText = text
       text = jsonrepair(text)
@@ -346,6 +361,10 @@
   }
 
   function handleUndo() {
+    if (readOnly) {
+      return
+    }
+
     if (codeMirrorView) {
       undo(codeMirrorView)
       focus()
@@ -353,6 +372,10 @@
   }
 
   function handleRedo() {
+    if (readOnly) {
+      return
+    }
+
     if (codeMirrorView) {
       redo(codeMirrorView)
       focus()
@@ -497,14 +520,15 @@
       to: position || 0,
       severity: 'error',
       message,
-      actions: isRepairable
-        ? [
-            {
-              name: 'Auto repair',
-              apply: () => handleRepair()
-            }
-          ]
-        : null
+      actions:
+        isRepairable && !readOnly
+          ? [
+              {
+                name: 'Auto repair',
+                apply: () => handleRepair()
+              }
+            ]
+          : null
     }
   }
 
@@ -697,11 +721,12 @@
     forceUpdateText()
   }
 
-  // we pass unused argument to trigger the editor to update the diagnostics
-  $: triggerValidation(validator)
+  // we pass unused arguments to trigger the editor to update the diagnostics
+  // passing readOnly is to update the action buttons in case of invalid JSON
+  $: triggerValidation(validator, readOnly)
 
   $: repairActions =
-    jsonStatus === JSON_STATUS_REPAIRABLE
+    jsonStatus === JSON_STATUS_REPAIRABLE && !readOnly
       ? [
           {
             icon: faWrench,
