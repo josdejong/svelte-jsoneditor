@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.31](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.30...v0.3.31) (2022-04-06)
+
+
+### Bug Fixes
+
+* styling tweaks in the vertical sizing of the TransformModal ([3f87a8a](https://github.com/josdejong/svelte-jsoneditor/commit/3f87a8ab477d88e155697bc6edc047028da555f7))
+
 ### [0.3.30](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.29...v0.3.30) (2022-04-06)
 
 
