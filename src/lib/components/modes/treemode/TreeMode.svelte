@@ -1992,7 +1992,7 @@
     </label>
     {#if json === undefined}
       {#if text === '' || text === undefined}
-        <Welcome />
+        <Welcome {readOnly} />
       {:else}
         <Message
           type="error"
