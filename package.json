@@ -42,7 +42,7 @@
     "@fontsource/fira-mono": "4.5.7",
     "@fortawesome/free-regular-svg-icons": "^6.1.1",
     "@fortawesome/free-solid-svg-icons": "^6.1.1",
-    "ajv": "^8.11.0",
+    "ajv-dist": "^8.11.0",
     "classnames": "^2.3.1",
     "diff-sequences": "^27.5.1",
     "immutable-json-patch": "^1.1.2",

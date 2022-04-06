@@ -1,4 +1,4 @@
-import Ajv from 'ajv'
+import Ajv from 'ajv-dist'
 import { parseJSONPointerWithArrayIndices } from '../../utils/jsonPointer.js'
 
 /**
@@ -10,7 +10,7 @@ import { parseJSONPointerWithArrayIndices } from '../../utils/jsonPointer.js'
  * @return {function (json: JSON) : Array<Object>} Returns a validation function
  */
 export function createAjvValidator(schema, schemaDefinitions) {
-  const ajv = new (Ajv.default || Ajv)({
+  const ajv = new Ajv({
     allErrors: true,
     verbose: true,
     $data: true
