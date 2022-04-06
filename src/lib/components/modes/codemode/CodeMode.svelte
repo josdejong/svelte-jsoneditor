@@ -507,6 +507,8 @@
           insert: normalization.escapeValue(text)
         }
       })
+
+      updateCanUndoRedo()
     }
   }
 
