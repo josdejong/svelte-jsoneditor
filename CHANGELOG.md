@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.29](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.28...v0.3.29) (2022-04-06)
+
+
+### Features
+
+* reorganize Tranform modal, show original data alongside the preview ([#54](https://github.com/josdejong/svelte-jsoneditor/issues/54)) ([9b6b79e](https://github.com/josdejong/svelte-jsoneditor/commit/9b6b79e487d79057522ecbeca41fade01b7bbd79))
+
+
+### Bug Fixes
+
+* cannot select a key or value when clicking inside the selection ([331254a](https://github.com/josdejong/svelte-jsoneditor/commit/331254ad9a458ef9889ea22acc9c02cb6ef50e8a))
+* disable Auto repair buttons when the editor is readOnly ([0a5eca4](https://github.com/josdejong/svelte-jsoneditor/commit/0a5eca4c26bcb1818815bf1e24bc18e0888c9d02))
+* dragging selection not disabled in readOnly mode ([eac069a](https://github.com/josdejong/svelte-jsoneditor/commit/eac069ae0f0df2711bd5991778d4e25545f765a4))
+* solve circular dependency to TreeMode in the Transform modal ([71f3511](https://github.com/josdejong/svelte-jsoneditor/commit/71f3511ffc3cb6eab2ef2d6fd9f1abae18c2f3e4))
+* some styling fixes in the Sort modal ([4366a0f](https://github.com/josdejong/svelte-jsoneditor/commit/4366a0fa1d460def432b3a1900f530c0a63dc2d2))
+* undo/redo buttons in code mode not updated when contents changed externally ([5778540](https://github.com/josdejong/svelte-jsoneditor/commit/5778540560c3ce6b7d62346e4a9ef302881bc373))
+* use ajv-dist instead of ajv to solve rollup issues ([a663a1b](https://github.com/josdejong/svelte-jsoneditor/commit/a663a1bf7748b3332f9e8ddcd12c6c760e953f7f))
+
 ### [0.3.28](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.27...v0.3.28) (2022-04-04)
 
 
