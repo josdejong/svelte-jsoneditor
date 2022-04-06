@@ -66,7 +66,8 @@
     icon: faSearch,
     title: 'Search (Ctrl+F)',
     className: 'search',
-    onClick: handleToggleSearch
+    onClick: handleToggleSearch,
+    disabled: json === undefined
   }
 
   /* @type {MenuItem[]} */
