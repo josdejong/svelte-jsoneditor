@@ -24,7 +24,7 @@
  * @param {boolean} [enabled]
  * @returns {function (...args: any) : void}
  */
-export function createDebug(namespace, enabled = tryReadLocalStorage['debug']) {
+export function createDebug(namespace, enabled = tryReadLocalStorage('debug')) {
   if (enabled) {
     const color = selectColor(namespace)
 
