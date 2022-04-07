@@ -158,6 +158,13 @@ describe('jmespathQueryLanguage', () => {
     })
   })
 
+  it('should return null when property is not found', () => {
+    const query = '@.foo'
+    const data = {}
+    const result = executeQuery(data, query)
+    assert.deepStrictEqual(result, null)
+  })
+
   it('should parse a string', () => {
     assert.strictEqual(parseString('foo'), 'foo')
     assert.strictEqual(parseString('234foo'), '234foo')

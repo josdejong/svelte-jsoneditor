@@ -221,5 +221,12 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(result, ['Bob', 'Stuart'])
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
+
+    it('should return null when property is not found', () => {
+      const query = 'function query (data) {\n' + '  return data.foo\n' + '}'
+      const data = {}
+      const result = executeQuery(data, query)
+      assert.deepStrictEqual(result, null)
+    })
   })
 })
