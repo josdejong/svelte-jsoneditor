@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.33](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.32...v0.3.33) (2022-04-07)
+
+
+### Bug Fixes
+
+* make sure JavaScript and Lodash queries return null and never undefined ([73ae90c](https://github.com/josdejong/svelte-jsoneditor/commit/73ae90c4d3f50d500d47fc5cb87a0d0b91686301))
+
 ### [0.3.32](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.31...v0.3.32) (2022-04-06)
 
 ### [0.3.31](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.30...v0.3.31) (2022-04-06)
