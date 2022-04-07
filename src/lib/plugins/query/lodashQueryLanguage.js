@@ -79,5 +79,6 @@ function executeQuery(json, query) {
   // TODO: only import the most relevant subset of lodash instead of the full library?
   // eslint-disable-next-line no-new-func
   const queryFn = new Function('_', `'use strict'; return (${query})`)(_)
-  return queryFn(json)
+  const output = queryFn(json)
+  return output !== undefined ? output : null
 }
