@@ -521,7 +521,7 @@
     </div>
     {#if expanded}
       <div class="items">
-        {#if !context.readOnly}
+        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || selectedInside)}
           <div
             class="insert-area inside"
             class:hovered={hover === HOVER_INSERT_INSIDE}
@@ -641,7 +641,7 @@
     </div>
     {#if expanded}
       <div class="props">
-        {#if !context.readOnly}
+        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || selectedInside)}
           <div
             class="insert-area inside"
             class:hovered={hover === HOVER_INSERT_INSIDE}
@@ -729,7 +729,7 @@
       {/if}
     </div>
   {/if}
-  {#if !context.readOnly}
+  {#if !context.readOnly && (hover === HOVER_INSERT_AFTER || selectedAfter)}
     <div
       class="insert-area after"
       class:hovered={hover === HOVER_INSERT_AFTER}
