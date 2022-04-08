@@ -95,6 +95,7 @@
     </p>
     <p>
       <button id="scrollToPath">scrollTo /object/nested/name</button>
+      <button id="acceptAutoRepair">acceptAutoRepair</button>
     </p>
 
     <script type="module">
@@ -375,6 +376,11 @@
 
       document.getElementById('scrollToPath').onclick = () => {
         testEditor.scrollTo(['object', 'nested', 'name'])
+      }
+
+      document.getElementById('acceptAutoRepair').onclick = () => {
+        const content = testEditor.acceptAutoRepair()
+        console.log('acceptAutoRepair', content)
       }
     </script>
   </body>

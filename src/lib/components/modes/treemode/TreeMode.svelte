@@ -654,10 +654,12 @@
     }
   }
 
-  function handleApplyAutoRepair() {
-    if (json !== undefined) {
+  export function acceptAutoRepair() {
+    if (textIsRepaired && json !== undefined) {
       handleChangeJson(json)
     }
+
+    return { json, text }
   }
 
   async function handleCut(indent = true) {
@@ -2087,7 +2089,7 @@
                 {
                   icon: faCheck,
                   text: 'Ok',
-                  onClick: handleApplyAutoRepair
+                  onClick: acceptAutoRepair
                 },
                 {
                   icon: faCode,

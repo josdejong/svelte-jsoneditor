@@ -167,6 +167,26 @@
     }
   }
 
+  /**
+   * In tree mode, invalid JSON is automatically repaired when loaded. When the
+   * repair was successful, the repaired contents are rendered but not yet
+   * applied to the document itself until the user clicks "Ok" or starts editing
+   * the data. Instead of accepting the repair, the user can also click
+   * "Repair manually instead". Invoking `.acceptAutoRepair()` will
+   * programmatically accept the repair. This will trigger an update,
+   * and the method itself also returns the updated contents. In case of code
+   * mode or when the editor is not in an "accept auto repair" status, nothing
+   * will happen, and the contents will be returned as is.
+   * @returns {Content}
+   */
+  export function acceptAutoRepair() {
+    if (refTreeMode) {
+      return refTreeMode.acceptAutoRepair()
+    } else {
+      return content
+    }
+  }
+
   export function scrollTo(path) {
     if (refTreeMode) {
       return refTreeMode.scrollTo(path)
