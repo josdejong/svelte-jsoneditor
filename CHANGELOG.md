@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.34](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.33...v0.3.34) (2022-04-08)
+
+
+### Features
+
+* implement method `acceptAutoRepair` ([d037a7e](https://github.com/josdejong/svelte-jsoneditor/commit/d037a7e73869751bd408191a217c734b4fce9be0))
+
 ### [0.3.33](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.32...v0.3.33) (2022-04-07)
 
 
