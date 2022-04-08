@@ -15,6 +15,7 @@
   } from '$lib'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
+  import { tick } from 'svelte'
 
   let content = {
     text: `{
@@ -310,14 +311,14 @@
         reader.onload = function (event) {
           console.timeEnd('load file')
 
-          console.time('set JSON')
+          console.time('parse and render')
 
           content = {
             text: event.target.result,
             json: undefined
           }
 
-          console.timeEnd('set JSON')
+          tick().then(() => console.timeEnd('parse and render'))
         }
         reader.readAsText(file)
       }}

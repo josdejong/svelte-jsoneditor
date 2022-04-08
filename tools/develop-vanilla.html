@@ -275,9 +275,11 @@
           console.timeEnd('load file')
           const text = event.target.result
 
-          console.time('set JSON')
+          console.time('parse and render')
+
           testEditor.set({ text })
-          console.timeEnd('set JSON')
+
+          setTimeout(() => console.timeEnd('parse and render'))
         }
         reader.readAsText(file)
       }
