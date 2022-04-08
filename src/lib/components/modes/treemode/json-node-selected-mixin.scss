@@ -75,7 +75,6 @@
 
   .insert-area {
     &.selected {
-      display: flex;
       z-index: 2;
       outline-color: $insert-area-background;
     }

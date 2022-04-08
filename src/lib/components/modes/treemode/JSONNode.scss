@@ -111,7 +111,7 @@
     $height: 2px;
     $height-half: 0.5 * $height;
 
-    display: none;
+    display: flex;
     position: relative;
 
     max-width: 250px;
@@ -126,7 +126,6 @@
     }
 
     &.hovered {
-      display: flex;
       outline-color: $hovered-background-transparent;
     }
   }
