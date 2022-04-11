@@ -1,3 +1,5 @@
+import { memoize } from 'lodash-es'
+
 /**
  * Stringify a path like
  *
@@ -19,4 +21,14 @@ export function stringifyPath(path) {
       }
     })
     .join('')
+}
+
+/**
+ * Create a memoized function that will memoize the input path, and return
+ * the memoized instance of the path when the stringified version is the same.
+ *
+ * @returns {(path: Path) => Path}
+ */
+export function createMemoizePath() {
+  return memoize((path) => path, stringifyPath)
 }

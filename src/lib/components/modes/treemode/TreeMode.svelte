@@ -167,6 +167,7 @@
   let json
   let text
   let state = syncState({}, undefined, [], expandMinimal)
+  const rootPath = [] // create the array only once
 
   let selection = null
 
@@ -2050,7 +2051,7 @@
       <div class="contents" data-jsoneditor-scrollable-contents={true} bind:this={refContents}>
         <JSONNode
           value={json}
-          path={[]}
+          path={rootPath}
           {state}
           selection={recursiveSelection}
           searchResult={searchResult && searchResult.itemsWithActive}

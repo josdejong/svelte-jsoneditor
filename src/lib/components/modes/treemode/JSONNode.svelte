@@ -44,6 +44,7 @@
   import { onMoveSelection } from '../../../logic/dragging.js'
   import { forEachIndex } from '../../../utils/arrayUtils.js'
   import { getDataPathFromTarget } from '../../../utils/domUtils.js'
+  import { createMemoizePath } from '../../../utils/pathUtils.js'
 
   export let value
   export let path
@@ -85,6 +86,12 @@
   function getIndentationStyle(level) {
     return `margin-left: ${level * INDENTATION_WIDTH}px`
   }
+
+  $: indentationStyle = getIndentationStyle(path.length)
+
+  // important to prevent creating a new path for all children with every re-render,
+  // that would force all childs to re-render
+  const memoizePath = createMemoizePath()
 
   function toggleExpand(event) {
     event.stopPropagation()
@@ -442,8 +449,6 @@
     context.onSelect({ type: SELECTION_TYPE.AFTER, path })
     context.onContextMenu(props)
   }
-
-  $: indentationStyle = getIndentationStyle(path.length)
 </script>
 
 <div
@@ -537,10 +542,10 @@
           </div>
         {/if}
         {#each visibleSections as visibleSection, sectionIndex (sectionIndex)}
-          {#each resolvedValue.slice(visibleSection.start, Math.min(visibleSection.end, resolvedValue.length)) as item, itemIndex (resolvedState[visibleSection.start + itemIndex][STATE_ID])}
+          {#each resolvedValue.slice(visibleSection.start, Math.min(visibleSection.end, resolvedValue.length)) as item, itemIndex (itemIndex)}
             <svelte:self
               value={item}
-              path={path.concat(visibleSection.start + itemIndex)}
+              path={memoizePath(path.concat(visibleSection.start + itemIndex))}
               state={resolvedState[visibleSection.start + itemIndex]}
               selection={resolvedSelection
                 ? resolvedSelection[visibleSection.start + itemIndex]
@@ -659,7 +664,7 @@
         {#each keys as key (resolvedState[key][STATE_ID])}
           <svelte:self
             value={resolvedValue[key]}
-            path={path.concat(key)}
+            path={memoizePath(path.concat(key))}
             state={resolvedState[key]}
             selection={resolvedSelection ? resolvedSelection[key] : undefined}
             searchResult={searchResult ? searchResult[key] : undefined}
@@ -669,7 +674,7 @@
           >
             <div slot="identifier" class="identifier">
               <JSONKey
-                path={path.concat(key)}
+                path={memoizePath(path.concat(key))}
                 {key}
                 {context}
                 selection={resolvedSelection?.[key]?.[STATE_SELECTION]}
