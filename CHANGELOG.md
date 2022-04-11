@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.35](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.34...v0.3.35) (2022-04-11)
+
+
+### Bug Fixes
+
+* improve the rendering performance ([#58](https://github.com/josdejong/svelte-jsoneditor/issues/58)) ([84c6eb3](https://github.com/josdejong/svelte-jsoneditor/commit/84c6eb30e4df744670adbb92b8c3543d3a60bba5))
+
 ### [0.3.34](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.33...v0.3.34) (2022-04-08)
 
 
