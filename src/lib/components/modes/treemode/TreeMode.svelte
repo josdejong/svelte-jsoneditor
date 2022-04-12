@@ -865,8 +865,10 @@
     handlePatch(operations)
 
     if (isObjectOrArray(json)) {
+      const expandAllRecursive = !isLargeContent({ json }, MAX_DOCUMENT_SIZE_EXPAND_ALL)
+
       // expand extracted object/array
-      handleExpand([], true, false)
+      handleExpand([], true, expandAllRecursive)
 
       focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
     }
