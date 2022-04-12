@@ -3,7 +3,7 @@
 $color: $gray;
 $background-color: $background-gray;
 
-div.collapsed-items {
+div.jse-collapsed-items {
   font-family: $font-family;
   font-size: $font-size;
   color: $color;
@@ -29,16 +29,16 @@ div.collapsed-items {
 
   display: flex;
 
-  div.text,
-  button.expand-items {
+  div.jse-text,
+  button.jse-expand-items {
     margin: 0 $padding-half;
   }
 
-  div.text {
+  div.jse-text {
     display: inline;
   }
 
-  button.expand-items {
+  button.jse-expand-items {
     font-family: $font-family;
     font-size: $font-size;
     color: $color;

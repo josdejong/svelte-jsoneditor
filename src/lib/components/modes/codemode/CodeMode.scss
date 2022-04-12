@@ -1,20 +1,20 @@
 @import '../../../styles';
 
-.code-mode {
+.jse-code-mode {
   flex: 1;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   background: $white;
 
-  .contents {
+  .jse-contents {
     flex: 1;
     display: flex;
     overflow: hidden;
     min-width: 0;
     min-height: 0;
 
-    &:not(.visible) {
+    &:not(.jse-visible) {
       visibility: hidden;
     }
 
@@ -47,14 +47,24 @@
       :global(.cm-search button) {
         font-family: $font-family;
         font-size: $font-size-small;
+        color: $black;
+      }
+
+      :global(.cm-search button[name='close']) {
+        font-size: 24px;
+        color: $dark-gray;
+
+        &:hover {
+          color: $black;
+        }
       }
     }
 
-    .loading-space {
+    .jse-loading-space {
       flex: 1;
     }
 
-    .loading {
+    .jse-loading {
       flex: 2;
       text-align: center;
       color: $gray;

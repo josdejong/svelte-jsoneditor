@@ -1,17 +1,17 @@
 @import '../../../styles';
 
-.json-repair-component {
+.jse-json-repair-component {
   flex: 1;
   display: flex;
   flex-direction: column;
 
-  .menu {
-    .info {
+  .jse-menu {
+    .jse-info {
       padding: 0 $padding;
     }
   }
 
-  .json-text {
+  .jse-json-text {
     flex: 1;
     border: none;
     padding: $contents-padding;

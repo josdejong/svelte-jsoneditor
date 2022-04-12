@@ -39,16 +39,16 @@
 </script>
 
 <div
-  class="collapsed-items"
-  class:selected
+  class="jse-collapsed-items"
+  class:jse-selected={selected}
   on:mousemove={handleMouseMove}
   style={getIndentationStyle(path.length + 2)}
 >
   <div>
-    <div class="text">Items {startIndex}-{endIndex}</div>
+    <div class="jse-text">Items {startIndex}-{endIndex}</div>
     {#each expandItemsSections as expandItemsSection}<button
         type="button"
-        class="expand-items"
+        class="jse-expand-items"
         on:click={() => onExpandSection(path, expandItemsSection)}
       >
         show {expandItemsSection.start}-{expandItemsSection.end}

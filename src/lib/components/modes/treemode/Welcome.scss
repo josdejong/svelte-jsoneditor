@@ -1,6 +1,6 @@
 @import '../../../styles';
 
-.welcome {
+.jse-welcome {
   flex: 1;
   overflow: auto; // FIXME: overflow doesn't work (try giving editor 100px height)
   font-family: $font-family;
@@ -10,15 +10,15 @@
   flex-direction: column;
   align-items: center;
 
-  .space.before {
+  .jse-space.jse-before {
     flex: 1;
   }
 
-  .space.after {
+  .jse-space.jse-after {
     flex: 2;
   }
 
-  .contents {
+  .jse-contents {
     margin: 2em $padding 0;
     color: $gray;
 
@@ -32,7 +32,7 @@
       li {
         padding-left: $list-padding;
 
-        span.bold {
+        span.jse-bold {
           font-family: $font-family-mono;
           font-weight: bold;
         }

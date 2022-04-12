@@ -60,7 +60,7 @@
 </script>
 
 <button
-  class="jse-color"
+  class="jse-color-picker-button"
   style="background: {color}"
   title={!readOnly ? 'Click to open a color picker' : `Color ${value}`}
   on:click={openColorPicker}

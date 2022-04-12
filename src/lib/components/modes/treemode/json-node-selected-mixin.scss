@@ -4,41 +4,41 @@
 
 @mixin json-node-selected-mixin($selection-background, $insert-area-background) {
   // entry selected
-  &.selected {
-    .header,
-    .contents,
-    .meta,
-    .expand,
-    .footer,
-    :global(.key),
-    :global(.value) {
+  &.jse-selected {
+    .jse-header,
+    .jse-contents,
+    .jse-meta,
+    .jse-expand,
+    .jse-footer,
+    :global(.jse-key),
+    :global(.jse-value) {
       background-color: $selection-background !important;
       cursor: grab;
     }
 
-    .expand {
+    .jse-expand {
       cursor: pointer;
     }
   }
 
   // key selected
-  &.selected-key {
-    > .contents-outer > .contents > :global(.identifier) > :global(.key),
-    > .header-outer > .header > :global(.identifier) > :global(.key) {
+  &.jse-selected-key {
+    > .jse-contents-outer > .jse-contents > :global(.jse-identifier) > :global(.jse-key),
+    > .jse-header-outer > .jse-header > :global(.jse-identifier) > :global(.jse-key) {
       background-color: $selection-background;
       cursor: grab;
     }
   }
 
   // value selected (part 1)
-  &.selected-value > .contents-outer > .contents > :global(.value) {
+  &.jse-selected-value > .jse-contents-outer > .jse-contents > :global(.jse-value) {
     background-color: $selection-background;
     cursor: grab;
   }
 
-  :global(.collapsed-items.selected),
-  &.selected :global(.collapsed-items),
-  &.selected-value :global(.collapsed-items) {
+  :global(.jse-collapsed-items.jse-selected),
+  &.jse-selected :global(.jse-collapsed-items),
+  &.jse-selected-value :global(.jse-collapsed-items) {
     // TODO: this css is copied from CollapsedItems.scss. Figure out how to reuse this smartly with CSS or SASS
     background-color: $selection-background;
     cursor: grab;
@@ -52,44 +52,44 @@
   }
 
   // value selected (part 2)
-  &.selected-value {
-    .meta,
-    > .footer-outer > .footer,
-    .props .contents,
-    .props .header,
-    .props .footer,
-    .props .expand,
-    .items .contents,
-    .items .header,
-    .items .footer,
-    .items .expand {
+  &.jse-selected-value {
+    .jse-meta,
+    > .jse-footer-outer > .jse-footer,
+    .jse-props .jse-contents,
+    .jse-props .jse-header,
+    .jse-props .jse-footer,
+    .jse-props .jse-expand,
+    .jse-items .jse-contents,
+    .jse-items .jse-header,
+    .jse-items .jse-footer,
+    .jse-items .jse-expand {
       background-color: $selection-background !important;
 
-      :global(.key),
-      :global(.value) {
+      :global(.jse-key),
+      :global(.jse-value) {
         background-color: $selection-background !important;
         cursor: grab;
       }
     }
   }
 
-  .insert-area {
-    &.selected {
+  .jse-insert-area {
+    &.jse-selected {
       z-index: 2;
       outline-color: $insert-area-background;
     }
   }
 
-  .insert-area {
-    &.selected {
-      :global(.context-menu-button) {
+  .jse-insert-area {
+    &.jse-selected {
+      :global(.jse-context-menu-button) {
         background: $insert-area-background;
       }
     }
   }
 
-  .context-menu-button-anchor {
-    :global(.context-menu-button) {
+  .jse-context-menu-button-anchor {
+    :global(.jse-context-menu-button) {
       background: $insert-area-background;
     }
   }

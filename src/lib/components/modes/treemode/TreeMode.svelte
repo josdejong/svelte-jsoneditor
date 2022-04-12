@@ -1834,7 +1834,7 @@
     } else {
       // type === 'keydown' (from the quick key Ctrl+Q)
       // or target is hidden input -> context menu button on keyboard
-      const anchor = refContents.querySelector('.context-menu-button.selected')
+      const anchor = refContents.querySelector('.jse-context-menu-button.jse-selected')
       if (anchor) {
         openContextMenu({
           anchor,
@@ -1978,8 +1978,8 @@
 <svelte:window on:mousedown={handleWindowMouseDown} />
 
 <div
-  class="tree-mode"
-  class:visible
+  class="jse-tree-mode"
+  class:jse-visible={visible}
   on:keydown={handleKeyDown}
   on:mousedown={handleMouseDown}
   on:contextmenu={handleContextMenu}
@@ -2009,8 +2009,13 @@
   {/if}
 
   {#if !isSSR}
-    <label class="hidden-input-label">
-      <input class="hidden-input" tabindex="-1" bind:this={refHiddenInput} on:paste={handlePaste} />
+    <label class="jse-hidden-input-label">
+      <input
+        class="jse-hidden-input"
+        tabindex="-1"
+        bind:this={refHiddenInput}
+        on:paste={handlePaste}
+      />
     </label>
     {#if json === undefined}
       {#if text === '' || text === undefined}
@@ -2029,12 +2034,12 @@
               ]
             : []}
         />
-        <div class="preview">
+        <div class="jse-preview">
           {text}
         </div>
       {/if}
     {:else}
-      <div class="search-box-container">
+      <div class="jse-search-box-container">
         <SearchBox
           show={showSearch}
           resultCount={searchResult ? searchResult.count : 0}
@@ -2050,7 +2055,7 @@
           onClose={clearSearchResult}
         />
       </div>
-      <div class="contents" data-jsoneditor-scrollable-contents={true} bind:this={refContents}>
+      <div class="jse-contents" data-jsoneditor-scrollable-contents={true} bind:this={refContents}>
         <JSONNode
           value={json}
           path={rootPath}
@@ -2107,9 +2112,9 @@
       <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
     {/if}
   {:else}
-    <div class="contents">
-      <div class="loading-space" />
-      <div class="loading">loading...</div>
+    <div class="jse-contents">
+      <div class="jse-loading-space" />
+      <div class="jse-loading">loading...</div>
     </div>
   {/if}
 </div>

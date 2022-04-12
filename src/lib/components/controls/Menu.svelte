@@ -6,18 +6,18 @@
   export let items = []
 </script>
 
-<div class="menu">
+<div class="jse-menu">
   <slot name="left" />
 
   {#each items as item}
     {#if item.separator === true}
-      <div class="separator" />
+      <div class="jse-separator" />
     {:else if item.space === true}
-      <div class="space" />
+      <div class="jse-space" />
     {:else}
       <button
         type="button"
-        class="button {item.className}"
+        class="jse-button {item.className}"
         on:click={item.onClick}
         title={item.title}
         disabled={item.disabled || false}

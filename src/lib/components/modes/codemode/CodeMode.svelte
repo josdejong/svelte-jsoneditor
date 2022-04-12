@@ -719,7 +719,7 @@
       : []
 </script>
 
-<div class="code-mode" bind:this={domCodeMode}>
+<div class="jse-code-mode" bind:this={domCodeMode}>
   {#if mainMenuBar}
     <CodeMenu
       {readOnly}
@@ -773,7 +773,7 @@
       />
     {/if}
 
-    <div class="contents" class:visible={!codeEditorDisabled} bind:this={codeMirrorRef} />
+    <div class="jse-contents" class:jse-visible={!codeEditorDisabled} bind:this={codeMirrorRef} />
 
     {#if jsonParseError}
       <Message
@@ -787,9 +787,9 @@
 
     <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
   {:else}
-    <div class="contents" class:visible={true}>
-      <div class="loading-space" />
-      <div class="loading">loading...</div>
+    <div class="jse-contents" class:visible={true}>
+      <div class="jse-loading-space" />
+      <div class="jse-loading">loading...</div>
     </div>
   {/if}
 </div>

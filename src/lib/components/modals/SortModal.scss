@@ -1,8 +1,8 @@
 @import '../../styles';
 @import 'Modal';
 
-.jsoneditor-modal.sort {
-  .contents {
+.jse-modal.jse-sort {
+  .jse-contents {
   }
 
   table {
@@ -17,7 +17,7 @@
       font-weight: normal;
       padding-bottom: $padding;
 
-      input.path {
+      input.jse-path {
         width: 100%;
         box-sizing: border-box;
         padding: 6px 16px; // TODO: define variables for those props
@@ -39,7 +39,7 @@
     }
   }
 
-  .space {
+  .jse-space {
     height: 200px; // Trick for the property select box dropdown to be fully visible
   }
 }

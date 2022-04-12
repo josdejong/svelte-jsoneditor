@@ -12,18 +12,18 @@
   cursor: pointer;
   outline: none;
 
-  &.selected {
+  &.jse-selected {
     background: $selection-background;
     color: $selection-color;
   }
 
-  &.value:focus {
+  &.jse-value:focus {
     // override the color to black when editing
     color: $black;
   }
 }
 
-:global(.json-node.selected) {
+:global(.jse-json-node.jse-selected) {
   .jse-enum-value {
     background: transparent;
   }

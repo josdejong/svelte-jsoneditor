@@ -1,6 +1,6 @@
 @import '../../styles';
 
-.jsoneditor-modal {
+.jse-modal {
   // styling for the select box, svelte-select
   // see docs: https://github.com/rob-balfre/svelte-select#styling
   --height: 36px;
@@ -22,11 +22,11 @@
   font-size: $font-size;
   color: $black;
 
-  .contents {
+  .jse-contents {
     padding: 20px;
     overflow: auto;
 
-    .actions {
+    .jse-actions {
       display: flex;
       flex-direction: row;
       justify-content: flex-end;

@@ -29,8 +29,8 @@
   }
 
   function getKeyClass(key) {
-    return classnames('key', {
-      empty: key === ''
+    return classnames('jse-key', {
+      'jse-empty': key === ''
     })
   }
 

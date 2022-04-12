@@ -1,6 +1,6 @@
 @import '../../styles';
 
-.menu {
+.jse-menu {
   font-family: $font-family;
   font-size: $font-size;
   background: $theme-color;
@@ -12,7 +12,7 @@
   position: relative;
 
   // FIXME: should utilize the generic styling in styles.scss
-  .button {
+  .jse-button {
     width: $menu-button-size;
     height: $menu-button-size;
     border: none;
@@ -33,11 +33,11 @@
       background: transparent;
     }
 
-    &.group-button {
-      $group-button-border: 1px solid rgba(255, 255, 255, 0.5);
+    &.jse-group-button {
+      $group-button-color: $white;
 
-      border: $group-button-border;
-      &:not(.last) {
+      border: 1px solid $group-button-color;
+      &:not(.jse-last) {
         border-right: none;
       }
 
@@ -46,30 +46,31 @@
       height: $menu-button-size - 2 * $padding-half;
       width: 40px;
 
-      &.first {
+      &.jse-first {
         margin-left: $padding-half;
       }
 
-      &.last {
+      &.jse-last {
         margin-right: $padding-half;
       }
-    }
-
-    &.selected {
-      background: rgba(255, 255, 255, 0.3);
 
       &:hover,
       &:focus {
-        background: rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      &.jse-selected {
+        background: $group-button-color;
+        color: $theme-color;
       }
     }
   }
 
-  .space {
+  .jse-space {
     flex: 1;
   }
 
-  .separator {
+  .jse-separator {
     $margin: 3px;
 
     background: rgba(255, 255, 255, 0.15);

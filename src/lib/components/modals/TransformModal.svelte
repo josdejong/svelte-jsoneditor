@@ -170,36 +170,36 @@
   }
 </script>
 
-<div class="jsoneditor-modal transform">
+<div class="jse-modal jse-transform">
   <AbsolutePopup>
     <TransformModalHeader
       {queryLanguages}
       {queryLanguageId}
       onChangeQueryLanguage={handleChangeQueryLanguage}
     />
-    <div class="contents">
-      <div class="main-contents">
-        <div class="query-contents">
-          <div class="label">
-            <div class="label-inner">Language</div>
+    <div class="jse-contents">
+      <div class="jse-main-contents">
+        <div class="jse-query-contents">
+          <div class="jse-label">
+            <div class="jse-label-inner">Language</div>
           </div>
-          <div class="description">
+          <div class="jse-description">
             {@html getSelectedQueryLanguage(queryLanguageId).description}
           </div>
 
-          <div class="label">
-            <div class="label-inner">Path</div>
+          <div class="jse-label">
+            <div class="jse-label-inner">Path</div>
           </div>
           <input
-            class="path"
+            class="jse-path"
             type="text"
             readonly
             title="Selected path"
             value={!isEmpty(selectedPath) ? stringifyPath(selectedPath) : '(whole document)'}
           />
 
-          <div class="label">
-            <div class="label-inner">
+          <div class="jse-label">
+            <div class="jse-label-inner">
               <button type="button" on:click={toggleShowWizard}>
                 <Icon data={showWizard ? faCaretDown : faCaretRight} />
                 Wizard
@@ -214,16 +214,20 @@
             {/if}
           {/if}
 
-          <div class="label">
-            <div class="label-inner">Query</div>
+          <div class="jse-label">
+            <div class="jse-label-inner">Query</div>
           </div>
-          <textarea class="query" spellcheck="false" value={query} on:input={handleChangeQuery} />
+          <textarea
+            class="jse-query"
+            spellcheck="false"
+            value={query}
+            on:input={handleChangeQuery}
+          />
         </div>
-        <div class="data-contents" class:hide-original-data={!showOriginal}>
-          <!--          <div class="query-data" class:hide-original={!showOriginal}>-->
-          <div class="original-data" class:hide={!showOriginal}>
-            <div class="label">
-              <div class="label-inner">
+        <div class="jse-data-contents" class:jse-hide-original-data={!showOriginal}>
+          <div class="jse-original-data" class:jse-hide={!showOriginal}>
+            <div class="jse-label">
+              <div class="jse-label-inner">
                 <button type="button" on:click={toggleShowOriginal}>
                   <Icon data={showOriginal ? faCaretDown : faCaretRight} />
                   Original
@@ -249,9 +253,9 @@
               />
             {/if}
           </div>
-          <div class="preview-data">
-            <div class="label">
-              <div class="label-inner">Preview</div>
+          <div class="jse-preview-data">
+            <div class="jse-label">
+              <div class="jse-label-inner">Preview</div>
             </div>
             {#if !previewError}
               <TreeMode
@@ -271,7 +275,7 @@
                 {onClassName}
               />
             {:else}
-              <div class="preview error">
+              <div class="jse-preview jse-error">
                 {previewError.toString()}
               </div>
             {/if}
@@ -280,10 +284,10 @@
         </div>
       </div>
 
-      <div class="actions">
+      <div class="jse-actions">
         <button
           type="button"
-          class="primary"
+          class="jse-primary"
           on:click={handleTransform}
           use:focus
           disabled={!!previewError}

@@ -2,7 +2,7 @@
 @import '../../../components/controls/EditableDivShared';
 
 // TODO: also share most of the following styling with EditableDiv
-.value {
+.jse-value {
   line-height: $line-height;
   min-width: 16px;
   padding: 0 $input-padding;
@@ -19,7 +19,7 @@
     background: $hovered-background-transparent;
   }
 
-  &.empty {
+  &.jse-empty {
     min-width: 4em;
     outline: 1px dotted $light-gray-transparent;
     -moz-outline-radius: 2px;

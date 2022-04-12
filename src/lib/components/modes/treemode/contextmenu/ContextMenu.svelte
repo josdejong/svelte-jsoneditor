@@ -258,7 +258,7 @@
     },
     {
       icon: faCut,
-      text: 'Cut compact',
+      text: 'Cut compacted',
       title: 'Cut selected contents, without indentation (Ctrl+Shift+X)',
       onClick: handleCutCompact,
       disabled: !hasSelectionContents
@@ -275,7 +275,7 @@
     },
     {
       icon: faCopy,
-      text: 'Copy compact',
+      text: 'Copy compacted',
       title: 'Copy selected contents, without indentation (Ctrl+Shift+C)',
       onClick: handleCopyCompact,
       disabled: !hasSelectionContents
@@ -283,8 +283,8 @@
   ]
 </script>
 
-<div class="jsoneditor-contextmenu" bind:this={refContextMenu} on:keydown={handleKeyDown}>
-  <div class="row">
+<div class="jse-contextmenu" bind:this={refContextMenu} on:keydown={handleKeyDown}>
+  <div class="jse-row">
     <button
       type="button"
       title="Edit the key (Double-click on the key)"
@@ -311,8 +311,8 @@
       </button>
     </DropdownButton>
   </div>
-  <div class="separator" />
-  <div class="row">
+  <div class="jse-separator" />
+  <div class="jse-row">
     <DropdownButton width="150px" items={cutDropdownItems}>
       <button
         type="button"
@@ -357,9 +357,9 @@
       <Icon data={faPaste} /> Paste
     </button>
   </div>
-  <div class="separator" />
-  <div class="row">
-    <div class="column">
+  <div class="jse-separator" />
+  <div class="jse-row">
+    <div class="jse-column">
       <button
         type="button"
         title="Remove selected contents (Delete)"
@@ -421,8 +421,8 @@
         <Icon data={faFilter} /> Transform
       </button>
     </div>
-    <div class="column">
-      <div class="label">
+    <div class="jse-column">
+      <div class="jse-label">
         {insertText}:
       </div>
       <button
@@ -435,7 +435,7 @@
         data-left="duplicate"
         disabled={!hasSelection}
       >
-        <span class="insert"><span class="plus">{'+'}</span></span> Structure
+        <span class="jse-insert"><span class="jse-plus">{'+'}</span></span> Structure
       </button>
       <button
         type="button"
@@ -447,7 +447,7 @@
         data-left="extract"
         disabled={!hasSelection}
       >
-        <span class="insert">{'{}'}</span> Object
+        <span class="jse-insert">{'{}'}</span> Object
       </button>
       <button
         type="button"
@@ -459,7 +459,7 @@
         data-left="sort"
         disabled={!hasSelection}
       >
-        <span class="insert">[]</span> Array
+        <span class="jse-insert">[]</span> Array
       </button>
       <button
         type="button"
@@ -471,12 +471,12 @@
         data-left="transform"
         disabled={!hasSelection}
       >
-        <span class="insert"><span class="quote">"</span></span> Value
+        <span class="jse-insert"><span class="jse-quote">"</span></span> Value
       </button>
     </div>
   </div>
-  <div class="separator" />
-  <div class="row">
+  <div class="jse-separator" />
+  <div class="jse-row">
     <button
       type="button"
       title="Select area before current entry to insert or paste contents"

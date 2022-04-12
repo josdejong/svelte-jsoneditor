@@ -1,4 +1,4 @@
-.absolute-popup {
+.jse-absolute-popup {
   position: relative;
   left: 0;
   top: 0;
@@ -6,7 +6,7 @@
   height: 0;
   z-index: 1001;
 
-  .hidden-input {
+  .jse-hidden-input {
     position: absolute;
     left: 0;
     top: 0;
@@ -19,7 +19,7 @@
     overflow: hidden;
   }
 
-  .absolute-popup-content {
+  .jse-absolute-popup-content {
     position: absolute;
   }
 }

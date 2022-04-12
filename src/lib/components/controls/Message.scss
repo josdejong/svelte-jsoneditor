@@ -1,6 +1,6 @@
 @import '../../styles.scss';
 
-.message {
+.jse-message {
   font-family: $font-family-mono;
   font-size: $font-size-mono;
 
@@ -10,16 +10,16 @@
   flex-wrap: wrap;
   align-items: center;
 
-  &.success {
+  &.jse-success {
     background: $green;
     color: $white;
   }
 
-  .text {
+  .jse-text {
     flex: 1;
     min-width: 60%;
 
-    &.clickable {
+    &.jse-clickable {
       cursor: pointer;
 
       &:hover {
@@ -28,26 +28,26 @@
     }
   }
 
-  &.error {
+  &.jse-error {
     background: $red;
     color: $white;
   }
 
-  &.warning {
+  &.jse-warning {
     background: $warning-color;
     color: $white;
   }
 
-  &.info {
+  &.jse-info {
     background: $gray;
     color: $white;
   }
 
-  .actions {
+  .jse-actions {
     display: flex;
     gap: $padding;
 
-    button.action {
+    button.jse-action {
       @include jsoneditor-button;
 
       background: rgba(255, 255, 255, 0.2);

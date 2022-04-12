@@ -16,19 +16,19 @@
   }
 </script>
 
-<div class="message {type}">
-  <div class="text" class:clickable={onClick !== null} on:click={handleClick}>
+<div class="jse-message jse-{type}">
+  <div class="jse-text" class:jse-clickable={onClick !== null} on:click={handleClick}>
     {#if icon}
       <Icon data={icon} />
     {/if}
     {message}
   </div>
-  <div class="actions">
+  <div class="jse-actions">
     {#each actions as action}
       <button
         type="button"
         on:click={action.onClick}
-        class="button action primary"
+        class="jse-button jse-action jse-primary"
         title={action.title}
         disabled={action.disabled}
       >

@@ -31,8 +31,8 @@
 
 <button
   type="button"
-  class="context-menu-button"
-  class:selected
+  class="jse-context-menu-button"
+  class:jse-selected={selected}
   title={CONTEXT_MENU_EXPLANATION}
   on:click={handleClick}
 >

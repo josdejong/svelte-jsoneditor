@@ -139,13 +139,13 @@
 
 <div
   bind:this={refRootPopup}
-  class="absolute-popup"
+  class="jse-absolute-popup"
   on:mousedown={handleMouseDownInside}
   on:keydown={handleKeyDown}
 >
   {#if popupComponent && popupProps}
-    <div class="absolute-popup-content" style={calculateStyle()}>
-      <input bind:this={refHiddenInput} class="hidden-input" />
+    <div class="jse-absolute-popup-content" style={calculateStyle()}>
+      <input bind:this={refHiddenInput} class="jse-hidden-input" />
       <svelte:component this={popupComponent} {...popupProps} />
     </div>
   {/if}

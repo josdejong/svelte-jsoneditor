@@ -50,7 +50,7 @@
   $: expandMenuItem = {
     icon: faJSONEditorExpand,
     title: 'Expand all',
-    className: 'expand-all',
+    className: 'jse-expand-all',
     onClick: onExpandAll,
     disabled: !isObjectOrArray(json)
   }
@@ -58,14 +58,14 @@
   $: collapseMenuItem = {
     icon: faJSONEditorCollapse,
     title: 'Collapse all',
-    className: 'collapse-all',
+    className: 'jse-collapse-all',
     onClick: onCollapseAll,
     disabled: !isObjectOrArray(json)
   }
   $: searchMenuItem = {
     icon: faSearch,
     title: 'Search (Ctrl+F)',
-    className: 'search',
+    className: 'jse-search',
     onClick: handleToggleSearch,
     disabled: json === undefined
   }
@@ -81,14 +81,14 @@
         {
           icon: faSortAmountDownAlt,
           title: 'Sort',
-          className: 'sort',
+          className: 'jse-sort',
           onClick: onSort,
           disabled: readOnly || json === undefined
         },
         {
           icon: faFilter,
           title: 'Transform contents (filter, sort, project)',
-          className: 'transform',
+          className: 'jse-transform',
           onClick: onTransform,
           disabled: readOnly || json === undefined
         },
@@ -96,7 +96,7 @@
         {
           icon: faEllipsisV,
           title: CONTEXT_MENU_EXPLANATION,
-          className: 'contextmenu',
+          className: 'jse-contextmenu',
           onClick: onContextMenu
         },
         {
@@ -105,14 +105,14 @@
         {
           icon: faUndo,
           title: 'Undo (Ctrl+Z)',
-          className: 'undo',
+          className: 'jse-undo',
           onClick: onUndo,
           disabled: !historyState.canUndo
         },
         {
           icon: faRedo,
           title: 'Redo (Ctrl+Shift+Z)',
-          className: 'redo',
+          className: 'jse-redo',
           onClick: onRedo,
           disabled: !historyState.canRedo
         },
@@ -129,7 +129,7 @@
         {
           icon: faCopy,
           title: 'Copy (Ctrl+C)',
-          className: 'copy',
+          className: 'jse-copy',
           onClick: onCopy,
           disabled: !hasSelectionContents
         },

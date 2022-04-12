@@ -123,7 +123,7 @@
 </script>
 
 <div
-  class={classnames('jse-editable-div', valueClass, { shortText })}
+  class={classnames('jse-editable-div', valueClass, { 'jse-short-text': shortText })}
   contenteditable="true"
   spellcheck="false"
   on:input={handleValueInput}

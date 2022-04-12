@@ -43,14 +43,14 @@
   })
 </script>
 
-<div class="dropdown-button" {title} on:click={handleClick}>
+<div class="jse-dropdown-button" {title} on:click={handleClick}>
   <slot name="defaultItem" />
 
-  <button type="button" class="open-dropdown" class:visible on:click={toggleShow}>
+  <button type="button" class="jse-open-dropdown" class:jse-visible={visible} on:click={toggleShow}>
     <Icon data={faCaretDown} />
   </button>
 
-  <div class="items" class:visible style="width: {width};">
+  <div class="jse-dropdown-items" class:jse-visible={visible} style="width: {width};">
     <ul>
       {#each items as item}
         <li>

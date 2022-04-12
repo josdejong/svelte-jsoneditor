@@ -1,113 +1,113 @@
 @import '../../../styles';
 @import 'json-node-selected-mixin';
 
-.json-node {
+.jse-json-node {
   position: relative;
   font-family: $font-family-mono;
   font-size: $font-size-mono;
   color: $black;
 
-  &.root {
+  &.jse-root {
     min-height: 100%;
     padding-bottom: $contents-padding;
     box-sizing: border-box;
 
-    > .header-outer :global(.context-menu-button),
-    > .contents-outer > .contents :global(.context-menu-button) {
+    > .jse-header-outer :global(.jse-context-menu-button),
+    > .jse-contents-outer > .jse-contents :global(.jse-context-menu-button) {
       top: 0;
       right: -$context-menu-button-size - 2px;
     }
 
-    > .contents-outer > .contents {
+    > .jse-contents-outer > .jse-contents {
       padding-left: 0;
     }
   }
 
-  &.hovered {
-    > .header-outer > .header > .meta,
-    .props .header,
-    .items .header,
-    .props .contents,
-    .items .contents,
-    .footer {
+  &.jse-hovered {
+    > .jse-header-outer > .jse-header > .jse-meta,
+    .jse-props .jse-header,
+    .jse-items .jse-header,
+    .jse-props .jse-contents,
+    .jse-items .jse-contents,
+    .jse-footer {
       background-color: $hovered-background-transparent;
     }
   }
 
   $selector-height: 8px; // must be about half a line height
 
-  .props,
-  .items {
+  .jse-props,
+  .jse-items {
     position: relative;
   }
 
-  .header-outer,
-  .footer-outer {
+  .jse-header-outer,
+  .jse-footer-outer {
     display: flex;
   }
 
-  .header {
+  .jse-header {
     position: relative;
 
-    .meta {
-      > .meta-inner {
+    .jse-meta {
+      > .jse-meta-inner {
         display: flex;
         justify-content: center;
       }
     }
   }
 
-  .contents-outer {
+  .jse-contents-outer {
     display: flex;
   }
 
-  .header,
-  .contents {
+  .jse-header,
+  .jse-contents {
     display: flex;
     flex-direction: row;
 
     line-height: $line-height;
   }
 
-  .contents {
+  .jse-contents {
     min-height: $line-height;
     padding-left: $line-height; // must be the same as the width of the expand button
   }
 
-  .footer {
+  .jse-footer {
     display: inline-flex;
     padding-left: $line-height + $input-padding; // must be the same as the width of the expand button
   }
 
-  .insert-selection-area {
+  .jse-insert-selection-area {
     visibility: hidden;
     padding: 0 $padding-half;
     flex: 1; // must fill all left over space at the right side of the editor, so you can click there
 
-    &.inside {
+    &.jse-inside {
       display: inline-flex;
       align-items: center;
     }
 
-    &.after {
+    &.jse-after {
       display: flex;
       align-items: end;
       line-height: $line-height;
     }
   }
 
-  &:hover > .contents-outer .insert-selection-area:not(.selected),
-  .header-outer:hover > .insert-selection-area:not(.selected),
-  .footer-outer:hover .insert-selection-area:not(.selected) {
+  &:hover > .jse-contents-outer .jse-insert-selection-area:not(.jse-selected),
+  .jse-header-outer:hover > .jse-insert-selection-area:not(.jse-selected),
+  .jse-footer-outer:hover .jse-insert-selection-area:not(.jse-selected) {
     visibility: visible;
     z-index: 1;
   }
 
-  .context-menu-button-anchor {
+  .jse-context-menu-button-anchor {
     position: relative;
   }
 
-  .insert-area {
+  .jse-insert-area {
     $height: 2px;
     $height-half: 0.5 * $height;
 
@@ -120,12 +120,12 @@
     margin-right: $padding-half;
     outline: $height-half solid; // color depends on hovered/selected/inactive+selected
 
-    :global(.context-menu-button) {
+    :global(.jse-context-menu-button) {
       right: -$height-half;
       background: $selection-background;
     }
 
-    &.hovered {
+    &.jse-hovered {
       outline-color: $hovered-background-transparent;
     }
   }
@@ -134,13 +134,13 @@
 }
 
 // lighter selection color when the editor doesn't have focus
-:global(.jsoneditor-main:not(.focus)) {
-  .json-node {
+:global(.jse-jsoneditor-main:not(.jse-focus)) {
+  .jse-json-node {
     @include json-node-selected-mixin(lighten($selection-background, 10%), $selection-background);
   }
 }
 
-.expand {
+.jse-expand {
   width: $line-height;
   height: $line-height;
   padding: 1px 0 0;
@@ -157,27 +157,27 @@
   }
 }
 
-.meta,
-.separator,
-.index,
-.bracket {
+.jse-meta,
+.jse-separator,
+.jse-index,
+.jse-bracket {
   vertical-align: top;
   color: $meta-color;
 }
 
-.index {
+.jse-index {
   padding: 0 $padding-half;
 }
 
-.bracket {
+.jse-bracket {
   padding: 0 2px;
 
-  &.expanded {
+  &.jse-expanded {
     padding-right: $padding;
   }
 }
 
-.tag {
+.jse-tag {
   border: none;
   font-size: $font-size-smallest;
   font-family: $font-family;
@@ -198,19 +198,19 @@
     background: lighten($light-gray-transparent, 15%);
   }
 
-  &.readonly {
+  &.jse-readonly {
     color: $light-gray-transparent;
     background: $background-light-gray-transparent;
     cursor: inherit;
   }
 }
 
-.identifier {
+.jse-identifier {
   vertical-align: top;
   position: relative;
 }
 
-:global(.bubble.dark) {
+:global(.jse-bubble.jse-dark) {
   background: $dark-gray !important;
   color: $white;
   font-family: $font-family !important;

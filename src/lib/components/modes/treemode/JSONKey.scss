@@ -1,6 +1,6 @@
 @import '../../../styles';
 
-.key {
+.jse-key {
   display: inline-block;
   line-height: $line-height;
   min-width: 16px;
@@ -23,7 +23,7 @@
     background: $hovered-background-transparent;
   }
 
-  &.empty {
+  &.jse-empty {
     min-width: 3em;
     outline: 1px dotted $light-gray-transparent;
     -moz-outline-radius: 2px;

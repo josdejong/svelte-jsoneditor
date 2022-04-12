@@ -49,7 +49,7 @@
   <button
     type="button"
     class="jse-navigation-bar-button jse-navigation-bar-arrow"
-    class:open
+    class:jse-open={open}
     on:click={openDropdown}
   >
     <Icon data={faAngleRight} />

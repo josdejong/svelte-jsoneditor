@@ -1,6 +1,6 @@
 @import '../../../styles';
 
-.tree-mode {
+.jse-tree-mode {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -9,21 +9,21 @@
   min-width: 0;
   min-height: 0;
 
-  &:not(.visible) {
+  &:not(.jse-visible) {
     visibility: hidden;
     height: 0;
     width: 0;
     flex: unset;
   }
 
-  .hidden-input-label {
+  .jse-hidden-input-label {
     position: absolute;
     right: 0;
     top: 0;
     width: 0;
     height: 0;
 
-    .hidden-input {
+    .jse-hidden-input {
       width: 0;
       height: 0;
       padding: 0;
@@ -32,7 +32,7 @@
     }
   }
 
-  .search-box-container {
+  .jse-search-box-container {
     position: relative;
     height: 0;
     top: $padding;
@@ -42,7 +42,7 @@
     z-index: 3; // must be above the ContextMenuButton
   }
 
-  .contents {
+  .jse-contents {
     flex: 1;
     overflow: auto;
     background: $contents-background;
@@ -51,11 +51,11 @@
     display: flex;
     flex-direction: column;
 
-    .loading-space {
+    .jse-loading-space {
       flex: 1;
     }
 
-    .loading {
+    .jse-loading {
       flex: 2;
       text-align: center;
       color: $gray;
@@ -63,7 +63,7 @@
     }
   }
 
-  .preview {
+  .jse-preview {
     flex: 1;
     color: $gray;
     overflow: auto;

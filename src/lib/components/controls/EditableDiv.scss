@@ -15,7 +15,7 @@ div.jse-editable-div {
   white-space: pre-wrap; // important for rendering multiple consecutive spaces
   overflow-wrap: anywhere;
 
-  &.shortText {
+  &.jse-short-text {
     overflow-wrap: normal;
   }
 
@@ -27,7 +27,7 @@ div.jse-editable-div {
     z-index: 3; // must be on top of hovering the entry below it
   }
 
-  &.empty {
+  &.jse-empty {
     &:not(:focus) {
       outline: 1px dotted $light-gray-transparent;
       -moz-outline-radius: 2px;

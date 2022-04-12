@@ -10,35 +10,35 @@
   const ctrl = IS_MAC ? '⌘' : 'Ctrl'
 </script>
 
-<div class="jsoneditor-modal copy-paste">
+<div class="jse-jsoneditor-modal copy-paste">
   <Header title="Copying and pasting" />
 
-  <div class="contents">
+  <div class="jse-contents">
     <div>These actions are unavailable via the menu. Please use:</div>
 
-    <div class="shortcuts">
-      <div class="shortcut">
-        <div class="key">
+    <div class="jse-shortcuts">
+      <div class="jse-shortcut">
+        <div class="jse-key">
           {ctrl}+C
         </div>
         for copy
       </div>
-      <div class="shortcut">
-        <div class="key">
+      <div class="jse-shortcut">
+        <div class="jse-key">
           {ctrl}+X
         </div>
         for cut
       </div>
-      <div class="shortcut">
-        <div class="key">
+      <div class="jse-shortcut">
+        <div class="jse-key">
           {ctrl}+V
         </div>
         for paste
       </div>
     </div>
 
-    <div class="actions">
-      <button type="button" class="primary" on:click={close}> Close </button>
+    <div class="jse-actions">
+      <button type="button" class="jse-primary" on:click={close}> Close </button>
     </div>
   </div>
 </div>

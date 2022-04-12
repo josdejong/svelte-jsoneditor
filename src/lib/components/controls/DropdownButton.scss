@@ -1,6 +1,6 @@
 @import '../../styles';
 
-.dropdown-button {
+.jse-dropdown-button {
   $background: lighten($dark-gray, 5%);
   $background-highlight: lighten($background, 5%);
 
@@ -20,7 +20,7 @@
     }
   }
 
-  button.open-dropdown {
+  button.jse-open-dropdown {
     @include jsoneditor-button;
 
     padding: $padding;
@@ -29,7 +29,7 @@
 
     $gray-highlight: lighten($dark-gray, 5%);
 
-    &.visible {
+    &.jse-visible {
       background: $background;
     }
 
@@ -45,7 +45,7 @@
     border-radius: 0;
   }
 
-  .items {
+  .jse-dropdown-items {
     display: none;
     position: absolute;
     top: 100%;
@@ -55,7 +55,7 @@
     color: $white;
     box-shadow: $box-shadow;
 
-    &.visible {
+    &.jse-visible {
       display: block;
     }
 

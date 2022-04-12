@@ -56,7 +56,7 @@
 
 <select
   class={`jse-enum-value ${getValueClass(bindValue)}`}
-  class:selected={isSelected}
+  class:jse-selected={isSelected}
   bind:value={bindValue}
   bind:this={refSelect}
   on:change={handleSelect}
