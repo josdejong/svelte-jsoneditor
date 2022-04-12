@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.37](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.36...v0.3.37) (2022-04-12)
+
+
+### Bug Fixes
+
+* clicking a button to switch mode did toggle instead of selecting the clicked mode ([0451001](https://github.com/josdejong/svelte-jsoneditor/commit/045100141855a5f91c47205a8e735500584b3120))
+
 ### [0.3.36](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.35...v0.3.36) (2022-04-12)
 
 
