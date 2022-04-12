@@ -33,19 +33,30 @@
       background: transparent;
     }
 
+    &.group-button {
+      $group-button-border: 1px solid rgba(255, 255, 255, 0.5);
+
+      border: $group-button-border;
+      &:not(.last) {
+        border-right: none;
+      }
+
+      padding: 0;
+      margin: $padding-half 0;
+      height: $menu-button-size - 2 * $padding-half;
+      width: 40px;
+
+      &.first {
+        margin-left: $padding-half;
+      }
+
+      &.last {
+        margin-right: $padding-half;
+      }
+    }
+
     &.selected {
-      width: $menu-button-size - 2 * $pressed-button-margin;
-      height: $menu-button-size - 2 * $pressed-button-margin;
-      margin: $pressed-button-margin;
-      $p: $padding-half - $pressed-button-margin;
-      padding: ($p + 1px) ($p - 1px) ($p - 1px) ($p + 1px);
-
-      box-shadow: inset 1px 1px 2px #1d4075;
       background: rgba(255, 255, 255, 0.3);
-      border-radius: 1px;
-
-      color: white;
-      cursor: pointer;
 
       &:hover,
       &:focus {

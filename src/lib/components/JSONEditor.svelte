@@ -1,7 +1,6 @@
 <svelte:options accessors={false} immutable={true} />
 
 <script>
-  import { faCode } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '../utils/debug'
   import Modal from 'svelte-simple-modal'
   import { MODE, SORT_MODAL_OPTIONS, TRANSFORM_MODAL_OPTIONS } from '../constants.js'
@@ -287,9 +286,15 @@
   $: isCodeMode = mode === MODE.CODE
   $: modeMenuItems = [
     {
-      icon: faCode,
-      title: `Toggle code mode on/off (currently: ${isCodeMode ? 'on' : 'off'})`,
-      className: 'code-mode' + (isCodeMode ? ' selected' : ''),
+      text: 'code',
+      title: `Switch to code mode (current mode: ${mode})`,
+      className: 'group-button first' + (isCodeMode ? ' selected' : ''),
+      onClick: toggleCodeMode
+    },
+    {
+      text: 'tree',
+      title: `Switch to tree mode (current mode: ${mode})`,
+      className: 'group-button last' + (!isCodeMode ? ' selected' : ''),
       onClick: toggleCodeMode
     }
   ]
