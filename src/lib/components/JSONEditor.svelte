@@ -273,8 +273,11 @@
     }
   }
 
-  async function toggleCodeMode() {
-    const newMode = mode === MODE.CODE ? MODE.TREE : MODE.CODE
+  async function toggleMode(newMode) {
+    if (mode === newMode) {
+      return
+    }
+
     mode = newMode
 
     await tick()
@@ -289,13 +292,13 @@
       text: 'code',
       title: `Switch to code mode (current mode: ${mode})`,
       className: 'group-button first' + (isCodeMode ? ' selected' : ''),
-      onClick: toggleCodeMode
+      onClick: () => toggleMode(MODE.CODE)
     },
     {
       text: 'tree',
       title: `Switch to tree mode (current mode: ${mode})`,
       className: 'group-button last' + (!isCodeMode ? ' selected' : ''),
-      onClick: toggleCodeMode
+      onClick: () => toggleMode(MODE.TREE)
     }
   ]
 
