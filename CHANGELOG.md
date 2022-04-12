@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.36](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.35...v0.3.36) (2022-04-12)
+
+
+### Bug Fixes
+
+* change code mode toggle into group buttons [tree|code] (see [#59](https://github.com/josdejong/svelte-jsoneditor/issues/59)) ([ad33b26](https://github.com/josdejong/svelte-jsoneditor/commit/ad33b2671b08442f54daa477ec40dcb594f6afe8))
+* expand all extracted contents (when not too large) ([d4ae8f4](https://github.com/josdejong/svelte-jsoneditor/commit/d4ae8f473c66b1c912454d20590277a5b3503524))
+* position search box in code mode on top ([#62](https://github.com/josdejong/svelte-jsoneditor/issues/62)) ([f0a1feb](https://github.com/josdejong/svelte-jsoneditor/commit/f0a1feb28b034ce847abdf73890968759423847a))
+* update all devDependencies ([13331c7](https://github.com/josdejong/svelte-jsoneditor/commit/13331c7550a630fa26faa853d04394d6fdaf624a))
+
 ### [0.3.35](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.34...v0.3.35) (2022-04-11)
 
 
