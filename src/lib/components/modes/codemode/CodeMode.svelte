@@ -34,7 +34,7 @@
   import { indentUnit } from '@codemirror/language'
   import { highlightStyle } from './codemirror/codemirror-theme.js'
   import { Compartment } from '@codemirror/state'
-  import { closeSearchPanel, openSearchPanel } from '@codemirror/search'
+  import { closeSearchPanel, openSearchPanel, search } from '@codemirror/search'
   import { redo, redoDepth, undo, undoDepth } from '@codemirror/history'
   import { normalizeJsonParseError } from '../../../utils/jsonUtils.js'
   import { MAX_VALIDATABLE_SIZE } from '../../../constants.js'
@@ -441,6 +441,9 @@
           }
         }),
         jsonLang(),
+        search({
+          top: true
+        }),
         readOnlyCompartment.of(EditorState.readOnly.of(readOnly)),
         indentUnitCompartment.of(createIndentUnit(indentation)),
         EditorView.lineWrapping
