@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.38](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.37...v0.3.38) (2022-04-13)
+
+
+### Features
+
+* select contents within brackets using double-click ([#65](https://github.com/josdejong/svelte-jsoneditor/issues/65)) ([e73970f](https://github.com/josdejong/svelte-jsoneditor/commit/e73970ff9b168d57ad53b5d56ac25e98794abf56))
+
+
+### Bug Fixes
+
+* show `prop` and `item` instead of plural when there is only one property or item ([1f1725f](https://github.com/josdejong/svelte-jsoneditor/commit/1f1725feda64c70c5ba305f1aa02ad1468a0d226))
+
 ### [0.3.37](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.36...v0.3.37) (2022-04-12)
 
 
