@@ -262,7 +262,7 @@ export function isTextContent(content) {
 }
 
 /**
- * Returns true when the (estimated) size of the the contents exceeds the
+ * Returns true when the (estimated) size of the contents exceeds the
  * provided maxSize.
  * @param {Content} content
  * @param {number} maxSize  Maximum content size in bytes

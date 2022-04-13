@@ -39,6 +39,7 @@
   import { normalizeJsonParseError } from '../../../utils/jsonUtils.js'
   import { MAX_VALIDATABLE_SIZE } from '../../../constants.js'
   import { measure } from '../../../utils/timeUtils.js'
+  import jsonSourceMap from 'json-source-map'
 
   export let readOnly = false
   export let mainMenuBar = true
@@ -417,6 +418,30 @@
     }
   }
 
+  function handleDoubleClick(event, view) {
+    // When the user double-clicked right from a bracket [ or {,
+    // select the contents of the array or object
+    if (view.state.selection.ranges.length === 1) {
+      const range = view.state.selection.ranges[0]
+      const selectedText = text.slice(range.from, range.to)
+      if (selectedText === '{' || selectedText === '[') {
+        const jsmap = jsonSourceMap.parse(text)
+        const path = Object.keys(jsmap.pointers).find((path) => {
+          const pointer = jsmap.pointers[path]
+          return pointer.value?.pos === range.from
+        })
+        const pointer = jsmap.pointers[path]
+
+        if (path && pointer && pointer.value && pointer.valueEnd) {
+          debug('pointer found, selecting inner contents of path:', path, pointer)
+          const anchor = pointer.value.pos + 1
+          const head = pointer.valueEnd.pos - 1
+          setSelection(anchor, head)
+        }
+      }
+    }
+  }
+
   function createCodeMirrorView({ target, initialText, readOnly, indentation }) {
     debug('Create CodeMirror editor', { readOnly, indentation })
 
@@ -435,6 +460,9 @@
         lintGutter(),
         basicSetup,
         highlightStyle,
+        EditorView.domEventHandlers({
+          dblclick: handleDoubleClick
+        }),
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
             onChangeCodeMirrorValueDebounced()
