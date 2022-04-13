@@ -490,12 +490,14 @@
             {#if expanded}
               <div class="bracket">[</div>
               <span class="tag readonly">
-                {resolvedValue.length} items
+                {resolvedValue.length}
+                {resolvedValue.length === 1 ? 'item' : 'items'}
               </span>
             {:else}
               <div class="bracket">[</div>
               <button type="button" class="tag" on:click={handleExpand}>
-                {resolvedValue.length} items
+                {resolvedValue.length}
+                {resolvedValue.length === 1 ? 'item' : 'items'}
               </button>
               <div class="bracket">]</div>
             {/if}
@@ -615,7 +617,8 @@
             {:else}
               <div class="bracket">&lbrace;</div>
               <button type="button" class="tag" on:click={handleExpand}>
-                {Object.keys(resolvedValue).length} props
+                {Object.keys(resolvedValue).length}
+                {Object.keys(resolvedValue).length === 1 ? 'prop' : 'props'}
               </button>
               <div class="bracket">&rbrace;</div>
             {/if}
