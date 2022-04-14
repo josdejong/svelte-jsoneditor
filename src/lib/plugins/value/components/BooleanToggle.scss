@@ -3,7 +3,7 @@
 .jse-boolean-toggle {
   color: $value-color-boolean;
   position: relative;
-  display: flex;
-  top: 1px;
   padding-left: $padding-half;
+  padding-top: 1px;
+  height: var(--jse-line-height);
 }

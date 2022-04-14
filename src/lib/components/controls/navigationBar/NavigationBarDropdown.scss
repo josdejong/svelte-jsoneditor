@@ -5,7 +5,8 @@
   top: 100%;
   left: 0;
   z-index: 3; // above the floating ContextMenuButton
-  background: white;
+  background: var(--jse-panel-dropdown-background);
+  color: var(--jse-panel-dropdown-text-color);
   box-shadow: $box-shadow;
   display: flex;
   flex-direction: column;
@@ -18,7 +19,6 @@
     font-size: $font-size-mono;
     border: none;
     background: transparent;
-    color: var(--jse-panel-text-color);
     cursor: pointer;
     outline: none;
     text-align: left;
@@ -29,12 +29,12 @@
 
     &:focus,
     &:hover {
-      background: $background-gray;
+      background: var(--jse-panel-dropdown-background-highlight);
     }
 
     &.jse-selected {
-      background: var(--jse-panel-text-color);
-      color: white;
+      background: var(--jse-panel-dropdown-text-color);
+      color: var(--jse-panel-dropdown-background);
     }
   }
 }

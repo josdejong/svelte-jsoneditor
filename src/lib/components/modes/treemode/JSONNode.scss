@@ -3,8 +3,6 @@
 
 .jse-json-node {
   position: relative;
-  font-family: $font-family-mono;
-  font-size: $font-size-mono;
   color: var(--jse-text-color);
 
   &.jse-root {
@@ -15,7 +13,7 @@
     > .jse-header-outer :global(.jse-context-menu-button),
     > .jse-contents-outer > .jse-contents :global(.jse-context-menu-button) {
       top: 0;
-      right: -$context-menu-button-size - 2px;
+      right: calc(-2px - var(--jse-context-menu-button-size));
     }
 
     > .jse-contents-outer > .jse-contents {
@@ -30,7 +28,7 @@
     .jse-props .jse-contents,
     .jse-items .jse-contents,
     .jse-footer {
-      background-color: $hovered-background-transparent;
+      background: $hovered-background-transparent;
     }
   }
 
@@ -65,18 +63,15 @@
   .jse-contents {
     display: flex;
     flex-direction: row;
-
-    line-height: $line-height;
   }
 
   .jse-contents {
-    min-height: $line-height;
-    padding-left: $line-height; // must be the same as the width of the expand button
+    padding-left: var(--jse-indent-size);
   }
 
   .jse-footer {
     display: inline-flex;
-    padding-left: $line-height + $input-padding; // must be the same as the width of the expand button
+    padding-left: calc(var(--jse-indent-size) + $input-padding);
   }
 
   .jse-insert-selection-area {
@@ -92,7 +87,6 @@
     &.jse-after {
       display: flex;
       align-items: end;
-      line-height: $line-height;
     }
   }
 
@@ -122,7 +116,7 @@
 
     :global(.jse-context-menu-button) {
       right: -$height-half;
-      background: $selection-background;
+      background: var(--jse-selection-background-color);
     }
 
     &.jse-hovered {
@@ -130,7 +124,10 @@
     }
   }
 
-  @include json-node-selected-mixin($selection-background, $dark-gray);
+  @include json-node-selected-mixin(
+    var(--jse-selection-background-color),
+    var(--jse-selection-inline-color)
+  );
 }
 
 // lighter selection color when the editor doesn't have focus
@@ -144,16 +141,15 @@
 }
 
 .jse-expand {
-  width: $line-height;
-  height: $line-height;
-  padding: 1px 0 0;
+  width: var(--jse-indent-size);
+  padding: 0;
   margin: 0;
   border: none;
   cursor: pointer;
   background: transparent;
-  color: var(--jse-meta-color);
-  font-size: $font-size-mono;
-  line-height: $line-height;
+  color: var(--jse-delimiter-color);
+  font-size: var(--jse-font-size-mono);
+  line-height: var(--jse-line-height);
 
   &:hover {
     opacity: 0.8;
@@ -182,7 +178,7 @@
 
 .jse-tag {
   border: none;
-  font-size: $font-size-smallest;
+  font-size: 80%;
   font-family: $font-family;
   color: var(--jse-tag-text-color);
   background: var(--jse-tag-background);
@@ -190,12 +186,7 @@
   cursor: pointer;
   position: relative;
   display: inline-block;
-  padding: 0 4px 1px;
-  margin: 0 2px;
-  top: 1px;
-
-  height: $line-height - 2px;
-  line-height: $line-height - 2px;
+  padding: 0 4px;
 
   &:hover {
     opacity: 0.8;

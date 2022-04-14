@@ -1,22 +1,19 @@
 @import '../../../../styles';
 
 .jse-context-menu-button {
-  $context-menu-button-size-half: 0.5 * $context-menu-button-size;
-
   position: absolute;
-  top: -$context-menu-button-size-half;
-  right: -$context-menu-button-size-half;
-  width: $context-menu-button-size;
-  height: $context-menu-button-size;
+  top: calc(-0.5 * var(--jse-context-menu-button-size));
+  right: calc(-0.5 * var(--jse-context-menu-button-size));
+  width: var(--jse-context-menu-button-size);
+  height: var(--jse-context-menu-button-size);
   padding: 0;
   margin: 0;
   z-index: 2;
 
   cursor: pointer;
   background: transparent;
-  font-size: $font-size-mono;
-  line-height: $line-height;
 
+  border-radius: 2px;
   background: $dark-gray;
   color: $white;
   border: none;

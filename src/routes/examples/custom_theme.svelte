@@ -63,10 +63,14 @@
       --jse-menu-text-color: #e5e5e5;
 
       --jse-panel-background-color: #333333;
+      --jse-panel-background-highlight: #464646;
       --jse-panel-text-color: #d4d4d4;
       --jse-panel-text-color-readonly: #737373;
       --jse-panel-text-color-dark: #8d8d8d;
       --jse-panel-border: 1px solid #3c3c3c;
+      --jse-panel-dropdown-background: #656565;
+      --jse-panel-dropdown-background-highlight: #7e7e7e;
+      --jse-panel-dropdown-text-color: #d4d4d4;
 
       --jse-key-color: #9cdcfe;
       --jse-value-color: #d4d4d4;
@@ -75,7 +79,7 @@
       --jse-value-color-null: #569cd6;
       --jse-value-color-string: #ce9178;
       --jse-value-color-url: #ce9178;
-      --jse-meta-color: #575757;
+      --jse-delimiter-color: #575757;
 
       --jse-tag-background: #575757;
       --jse-tag-text-color: #d4d4d4;
@@ -92,16 +96,17 @@
       --jse-menu-color: #ff3e00;
       --jse-menu-color-light: #fd5e2d;
 
-      --jse-font-family: times new roman;
-      --jse-font-family-mono: Courier New;
+      --jse-font-family: courier New;
+      --jse-font-family-mono: courier New;
       --jse-font-size: 32px;
       --jse-font-size-small: 24px;
-      --jse-font-size-smallest: 18px;
       --jse-font-size-mono: 32px;
 
       --jse-button-primary-background: #ff3e00;
       --jse-button-primary-background-highlight: #e74c1c;
       --itemIsActiveBG: #fd5e2d;
+
+      --jse-context-menu-button-size: 32px;
 
       --jse-context-menu-background: #ff3e00;
       --jse-context-menu-background-highlight: #ea3600;

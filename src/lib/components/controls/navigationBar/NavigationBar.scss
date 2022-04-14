@@ -1,18 +1,17 @@
 @import '../../../styles';
 
 .jse-navigation-bar {
-  font-family: $font-family-mono;
-  font-size: $font-size-mono;
+  font-family: var(--jse-font-family-mono);
+  font-size: var(--jse-font-size-mono);
   background: var(--jse-panel-background-color);
-  color: var(--jse-panel-text-color);
+  color: var(--jse-panel-text-color-light);
   padding: 0;
   margin: 0;
   display: flex;
   overflow: hidden;
 
   .jse-navigation-bar-empty {
-    line-height: $font-size-mono;
     padding: $padding-half $padding;
-    color: var(--jse-panel-text-color-readonly);
+    color: var(--jse-panel-text-color-light);
   }
 }

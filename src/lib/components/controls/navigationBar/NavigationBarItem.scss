@@ -5,33 +5,30 @@
   display: flex;
 
   button.jse-navigation-bar-button {
-    font-family: $font-family-mono;
-    font-size: $font-size-mono;
+    font-family: inherit;
+    font-size: inherit;
     padding: $padding-half 2px;
     border: none;
     background: transparent;
     color: inherit;
     cursor: pointer;
     outline: none;
-    min-width: 24px;
+    min-width: 2em;
     white-space: nowrap;
 
     &:focus,
     &:hover {
-      background: darken($very-light-gray, 10%);
+      background: var(--jse-panel-background-highlight);
     }
 
     &.jse-navigation-bar-arrow {
-      // TODO: fix the height of the buttons for real, this is an ugly
-      //  trick to make the buttons have the same height.
-      //  when there is no selection, the navigation bar must have the same
-      //  height as when there is a selection
-      font-size: $font-size-mono - 8px;
-      line-height: $font-size-mono - 8px;
+      //font-size: $font-size-mono - 8px;
+      //font-size: unset;
       padding: $padding-half $padding;
 
       &.jse-open {
-        background: $white;
+        background: var(--jse-panel-dropdown-background);
+        color: var(--jse-panel-dropdown-text-color);
       }
     }
   }

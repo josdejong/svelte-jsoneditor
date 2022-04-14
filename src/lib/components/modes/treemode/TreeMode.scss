@@ -8,6 +8,10 @@
   background: var(--jse-background-color);
   min-width: 0;
   min-height: 0;
+  font-family: $font-family-mono;
+  font-size: $font-size-mono;
+  color: var(--jse-text-color);
+  line-height: var(--jse-line-height);
 
   &:not(.jse-visible) {
     visibility: hidden;
@@ -69,7 +73,6 @@
     white-space: pre-wrap;
     font-family: $font-family-mono;
     font-size: $font-size-mono;
-    line-height: $font-size-mono + 4px;
     padding: 2px;
   }
 }

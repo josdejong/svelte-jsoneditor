@@ -1,6 +1,7 @@
 @import '../../styles';
 
 .jse-dropdown-button {
+  flex: 1;
   $background: var(--jse-context-menu-background);
   $background-highlight: var(--jse-context-menu-background-highlight);
 
@@ -23,7 +24,7 @@
   button.jse-open-dropdown {
     @include jsoneditor-button;
 
-    padding: $padding;
+    width: 2em;
     background: var(--jse-context-menu-background);
     color: var(--jse-context-menu-text-color);
 

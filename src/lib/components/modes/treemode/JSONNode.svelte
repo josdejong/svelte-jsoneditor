@@ -10,7 +10,6 @@
     HOVER_COLLECTION,
     HOVER_INSERT_AFTER,
     HOVER_INSERT_INSIDE,
-    INDENTATION_WIDTH,
     INSERT_EXPLANATION,
     STATE_ENFORCE_STRING,
     STATE_EXPANDED,
@@ -84,7 +83,7 @@
   $: type = valueType(resolvedValue)
 
   function getIndentationStyle(level) {
-    return `margin-left: ${level * INDENTATION_WIDTH}px`
+    return `margin-left: calc(${level} * var(--jse-indent-size))`
   }
 
   $: indentationStyle = getIndentationStyle(path.length)

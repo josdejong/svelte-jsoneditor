@@ -2,10 +2,10 @@
 
 .jse-color-picker-button {
   $margin: 2px;
-  $size: $line-height - 2 * $margin;
+  font-size: var(--jse-font-size-mono);
 
-  width: $size;
-  height: $size;
+  width: var(--jse-color-picker-button-size);
+  height: var(--jse-color-picker-button-size);
   box-sizing: border-box;
   padding: 0;
   margin: $margin;

@@ -296,7 +296,7 @@
     >
       <Icon data={faPen} /> Edit key
     </button>
-    <DropdownButton width="150px" items={editValueDropdownItems}>
+    <DropdownButton width="11em" items={editValueDropdownItems}>
       <button
         type="button"
         slot="defaultItem"
@@ -328,7 +328,7 @@
         <Icon data={faCut} /> Cut
       </button>
     </DropdownButton>
-    <DropdownButton width="10em" items={copyDropdownItems}>
+    <DropdownButton width="12em" items={copyDropdownItems}>
       <button
         type="button"
         slot="defaultItem"

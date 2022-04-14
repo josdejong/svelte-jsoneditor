@@ -9,7 +9,10 @@
   --jse-font-size-mono: 14px;
   --jse-font-size: 16px;
   --jse-font-size-small: 13px;
-  --jse-font-size-smallest: 11px;
+  --jse-line-height: calc(1em + 4px);
+  --jse-indent-size: calc(1em + 4px);
+  --jse-color-picker-button-size: 1em;
+  --jse-context-menu-button-size: calc(1em + 4px);
 
   // over all colors
   --jse-background-color: #fff;
@@ -17,6 +20,7 @@
   --jse-selection-background-color: #d3d3d3;
   --jse-selection-background-dark-color: #c2c2c2;
   --jse-selection-background-light-color: #e8e8e8;
+  --jse-selection-inline-color: #656565;
   --jse-edit-outline: 2px solid #656565;
 
   // main menu, modal header
@@ -26,10 +30,15 @@
 
   // navigation bar, gutter, search box
   --jse-panel-background-color: #ebebeb;
+  --jse-panel-background-highlight: #e0e0e0;
   --jse-panel-text-color: #1a1a1a;
+  --jse-panel-text-color-light: #656565;
   --jse-panel-text-color-readonly: #b2b2b2;
   --jse-panel-text-color-dark: #1a1a1a;
   --jse-panel-border: 1px solid #d7d7d7;
+  --jse-panel-dropdown-background: #fff;
+  --jse-panel-dropdown-background-highlight: #e5e5e5;
+  --jse-panel-dropdown-text-color: #656565;
 
   // context menu
   --jse-context-menu-background: #656565;
@@ -46,8 +55,7 @@
   --jse-value-color-null: #004ed0;
   --jse-value-color-string: #008000;
   --jse-value-color-url: #008000;
-  --jse-meta-color: rgba(0, 0, 0, 0.38);
-  // TODO: better name for the variable --jse-meta-color (used for separators etc)
+  --jse-delimiter-color: rgba(0, 0, 0, 0.38);
 
   // inline tags inside the JSON document
   --jse-tag-background: rgba(0, 0, 0, 0.25);

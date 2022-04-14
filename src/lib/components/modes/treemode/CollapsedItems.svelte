@@ -1,7 +1,6 @@
 <svelte:options immutable={true} />
 
 <script>
-  import { INDENTATION_WIDTH } from '$lib/constants'
   import { getExpandItemsSections } from '$lib/logic/expandItemsSections'
   import { compileJSONPointer } from 'immutable-json-patch'
 
@@ -28,7 +27,7 @@
 
   // TODO: this is duplicated from the same function in JSONNode
   function getIndentationStyle(level) {
-    return `margin-left: ${level * INDENTATION_WIDTH}px`
+    return `margin-left: calc(${level} * var(--jse-indent-size))`
   }
 
   function handleMouseMove(event) {
