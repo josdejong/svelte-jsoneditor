@@ -1,8 +1,8 @@
 @import '../../styles';
 
 .jse-dropdown-button {
-  $background: lighten($dark-gray, 5%);
-  $background-highlight: lighten($background, 5%);
+  $background: var(--jse-context-menu-background);
+  $background-highlight: var(--jse-context-menu-background-highlight);
 
   @include jsoneditor-button;
   position: relative;
@@ -24,21 +24,19 @@
     @include jsoneditor-button;
 
     padding: $padding;
-    background: $dark-gray;
-    color: $white;
-
-    $gray-highlight: lighten($dark-gray, 5%);
+    background: var(--jse-context-menu-background);
+    color: var(--jse-context-menu-text-color);
 
     &.jse-visible {
       background: $background;
     }
 
     &:hover {
-      background: $gray-highlight;
+      background: var(--jse-context-menu-background-highlight);
     }
 
     &:disabled {
-      color: $gray;
+      color: var(--jse-context-menu-text-color-disabled);
       background: unset;
     }
 
@@ -52,7 +50,7 @@
     left: 0;
     z-index: 1;
     background: $background;
-    color: $white;
+    color: var(--jse-context-menu-text-color);
     box-shadow: $box-shadow;
 
     &.jse-visible {
@@ -72,7 +70,7 @@
       }
 
       &:disabled {
-        color: $gray;
+        color: var(--jse-context-menu-text-color-disabled);
         background: unset;
       }
     }

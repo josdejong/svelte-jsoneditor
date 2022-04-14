@@ -5,7 +5,7 @@
   position: relative;
   font-family: $font-family-mono;
   font-size: $font-size-mono;
-  color: $black;
+  color: var(--jse-text-color);
 
   &.jse-root {
     min-height: 100%;
@@ -126,7 +126,7 @@
     }
 
     &.jse-hovered {
-      outline-color: $hovered-background-transparent;
+      outline-color: var(--jse-selection-background-color);
     }
   }
 
@@ -136,7 +136,10 @@
 // lighter selection color when the editor doesn't have focus
 :global(.jse-jsoneditor-main:not(.jse-focus)) {
   .jse-json-node {
-    @include json-node-selected-mixin(lighten($selection-background, 10%), $selection-background);
+    @include json-node-selected-mixin(
+      --jse-selection-background-light-color,
+      $selection-background
+    );
   }
 }
 
@@ -148,12 +151,12 @@
   border: none;
   cursor: pointer;
   background: transparent;
-  color: $gray-transparent;
+  color: var(--jse-meta-color);
   font-size: $font-size-mono;
   line-height: $line-height;
 
   &:hover {
-    color: lighten($gray-transparent, 10%);
+    opacity: 0.8;
   }
 }
 
@@ -181,8 +184,8 @@
   border: none;
   font-size: $font-size-smallest;
   font-family: $font-family;
-  color: $white;
-  background: $light-gray-transparent;
+  color: var(--jse-tag-text-color);
+  background: var(--jse-tag-background);
   border-radius: 2px;
   cursor: pointer;
   position: relative;
@@ -192,15 +195,14 @@
   top: 1px;
 
   height: $line-height - 2px;
-  line-height: $line-height - 4px;
+  line-height: $line-height - 2px;
 
   &:hover {
-    background: lighten($light-gray-transparent, 15%);
+    opacity: 0.8;
   }
 
-  &.jse-readonly {
-    color: $light-gray-transparent;
-    background: $background-light-gray-transparent;
+  &.jse-expanded {
+    opacity: 0.7;
     cursor: inherit;
   }
 }

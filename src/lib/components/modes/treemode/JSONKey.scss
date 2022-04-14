@@ -3,13 +3,13 @@
 .jse-key {
   display: inline-block;
   line-height: $line-height;
-  min-width: 16px;
-  min-height: $line-height;
+  min-width: 2em;
   padding: 0 $input-padding;
   box-sizing: border-box;
   outline: none;
   border-radius: 1px;
   vertical-align: top;
+  color: var(--jse-key-color);
 
   word-break: normal;
   overflow-wrap: normal; // not anywhere as for JSONValue

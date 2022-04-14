@@ -21,15 +21,16 @@
         width: 100%;
         box-sizing: border-box;
         padding: 6px 16px; // TODO: define variables for those props
-        border: 1px solid $border-gray;
-        border-radius: $border-radius;
+        border: var(--jse-input-border);
+        border-radius: var(--jse-input-radius);
         font-family: $font-family;
         font-size: $font-size;
-        color: $black;
+        background: inherit;
+        color: inherit;
         outline: none;
 
         &:read-only {
-          border: 1px solid $background-gray;
+          border: var(--jse-input-border-readonly);
         }
       }
 

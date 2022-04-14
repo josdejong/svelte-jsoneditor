@@ -29,6 +29,9 @@
     <li>
       <a href="examples/json_schema_validation">JSON Schema validation</a>
     </li>
+    <li>
+      <a href="examples/custom_theme">Custom theming with CSS variables</a>
+    </li>
   </ul>
 
   <h2>Development</h2>

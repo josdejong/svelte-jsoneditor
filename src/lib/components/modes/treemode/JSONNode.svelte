@@ -493,7 +493,7 @@
           <div class="jse-meta-inner" data-type="selectable-value">
             {#if expanded}
               <div class="jse-bracket">[</div>
-              <span class="jse-tag jse-readonly">
+              <span class="jse-tag jse-expanded">
                 {resolvedValue.length} items
               </span>
             {:else}

@@ -54,9 +54,10 @@ table.jse-transform-wizard {
         .jse-filter-value {
           flex: 4;
           padding: 4px 8px;
-          border: 1px solid $border-gray;
-          border-radius: $border-radius;
+          border: var(--jse-input-border);
+          border-radius: var(--jse-input-radius);
           outline: none;
+          background: none;
 
           &:focus {
             border-color: $theme-color;

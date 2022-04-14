@@ -11,8 +11,8 @@
   --multiItemBorderRadius: 6px;
   --clearSelectTop: 2px;
   --clearSelectBottom: 2px;
-  --itemIsActiveBG: #3883fa; // theme-color
   --indicatorTop: 8px;
+  --background: none;
 
   flex: 1;
   display: flex;
@@ -20,7 +20,8 @@
 
   font-family: $font-family;
   font-size: $font-size;
-  color: $black;
+  background: var(--jse-background-color);
+  color: var(--jse-text-color);
 
   .jse-contents {
     padding: 20px;

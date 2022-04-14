@@ -12,7 +12,7 @@
     .jse-footer,
     :global(.jse-key),
     :global(.jse-value) {
-      background-color: $selection-background !important;
+      background: $selection-background !important;
       cursor: grab;
     }
 
@@ -25,14 +25,14 @@
   &.jse-selected-key {
     > .jse-contents-outer > .jse-contents > :global(.jse-identifier) > :global(.jse-key),
     > .jse-header-outer > .jse-header > :global(.jse-identifier) > :global(.jse-key) {
-      background-color: $selection-background;
+      background: var(--jse-selection-background-color);
       cursor: grab;
     }
   }
 
   // value selected (part 1)
   &.jse-selected-value > .jse-contents-outer > .jse-contents > :global(.jse-value) {
-    background-color: $selection-background;
+    background: var(--jse-selection-background-color);
     cursor: grab;
   }
 
@@ -43,7 +43,7 @@
     background-color: $selection-background;
     cursor: grab;
 
-    $shape-color: darken($selection-background, 5%);
+    $shape-color: var(--jse-selection-background-dark-color);
     background-image: linear-gradient($shape-color, $shape-color),
       linear-gradient(to bottom right, transparent 50.5%, $shape-color 50.5%),
       linear-gradient(to bottom left, transparent 50.5%, $shape-color 50.5%),
@@ -63,11 +63,11 @@
     .jse-items .jse-header,
     .jse-items .jse-footer,
     .jse-items .jse-expand {
-      background-color: $selection-background !important;
+      background: var(--jse-selection-background-color);
 
       :global(.jse-key),
       :global(.jse-value) {
-        background-color: $selection-background !important;
+        background: var(--jse-selection-background-color);
         cursor: grab;
       }
     }

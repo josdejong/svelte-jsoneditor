@@ -18,7 +18,7 @@
     font-size: $font-size-mono;
     border: none;
     background: transparent;
-    color: $dark-gray;
+    color: var(--jse-panel-text-color);
     cursor: pointer;
     outline: none;
     text-align: left;
@@ -33,7 +33,7 @@
     }
 
     &.jse-selected {
-      background: $dark-gray;
+      background: var(--jse-panel-text-color);
       color: white;
     }
   }

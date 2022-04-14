@@ -10,7 +10,7 @@
   const ctrl = IS_MAC ? '⌘' : 'Ctrl'
 </script>
 
-<div class="jse-jsoneditor-modal copy-paste">
+<div class="jse-modal jse-copy-paste">
   <Header title="Copying and pasting" />
 
   <div class="jse-contents">

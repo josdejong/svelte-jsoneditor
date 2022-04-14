@@ -313,7 +313,7 @@
   </div>
   <div class="jse-separator" />
   <div class="jse-row">
-    <DropdownButton width="150px" items={cutDropdownItems}>
+    <DropdownButton width="10em" items={cutDropdownItems}>
       <button
         type="button"
         slot="defaultItem"
@@ -328,7 +328,7 @@
         <Icon data={faCut} /> Cut
       </button>
     </DropdownButton>
-    <DropdownButton width="160px" items={copyDropdownItems}>
+    <DropdownButton width="10em" items={copyDropdownItems}>
       <button
         type="button"
         slot="defaultItem"

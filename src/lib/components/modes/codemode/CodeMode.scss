@@ -5,7 +5,7 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  background: $white;
+  background: var(--jse-background-color);
 
   .jse-contents {
     flex: 1;
@@ -26,11 +26,29 @@
         font-family: $font-family-mono;
         font-size: $font-size-mono;
         line-height: 1.3em;
-        color: $black;
+        color: var(--jse-text-color);
       }
 
       :global(.cm-gutters) {
-        background: $very-light-gray;
+        background: var(--jse-panel-background-color);
+        color: var(--jse-panel-text-color-readonly);
+        border-right: var(--jse-panel-border);
+      }
+
+      :global(.cm-activeLine),
+      :global(.cm-activeLineGutter) {
+        background: var(--jse-selection-background-color);
+      }
+
+      :global(.cm-selectionBackground) {
+        background: var(--jse-selection-background-color);
+      }
+
+      :global(.cm-foldPlaceholder) {
+        background: var(--jse-tag-background);
+        color: var(--jse-tag-text-color);
+        border: none;
+        padding: 0 $padding;
       }
 
       :global(.cm-diagnostic) {
@@ -38,8 +56,12 @@
         font-family: $font-family;
       }
 
+      :global(.cm-panels) {
+        border-bottom: var(--jse-panel-border);
+      }
+
       :global(.cm-search) {
-        background: $very-light-gray;
+        background: var(--jse-panel-background-color);
       }
 
       :global(.cm-search label),
@@ -47,15 +69,15 @@
       :global(.cm-search button) {
         font-family: $font-family;
         font-size: $font-size-small;
-        color: $black;
+        color: var(--jse-panel-text-color);
       }
 
       :global(.cm-search button[name='close']) {
         font-size: 24px;
-        color: $dark-gray;
+        color: var(--jse-panel-text-color);
 
         &:hover {
-          color: $black;
+          color: var(--jse-panel-text-color-dark);
         }
       }
     }
