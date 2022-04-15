@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.39](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.38...v0.3.39) (2022-04-15)
+
+
+### Bug Fixes
+
+* [#66](https://github.com/josdejong/svelte-jsoneditor/issues/66) import color picker dynamically since it cannot render server side ([b6041bb](https://github.com/josdejong/svelte-jsoneditor/commit/b6041bb3df4b8d74927cd65ef7343c63b04d8299))
+
 ### [0.3.38](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.37...v0.3.38) (2022-04-13)
 
 
