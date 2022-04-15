@@ -13,8 +13,6 @@
     // and that is not supported server side
     const VanillaPicker = (await import('vanilla-picker')).default
 
-    console.log('VanillaPicker', VanillaPicker)
-
     colorPicker = new VanillaPicker({
       parent: ref,
       color,
