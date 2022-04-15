@@ -11,7 +11,9 @@
   onMount(async () => {
     // Dynamically import VanillaPicker, because it requires `document` to be defined,
     // and that is not supported server side
-    const VanillaPicker = import('vanilla-picker')
+    const VanillaPicker = (await import('vanilla-picker')).default
+
+    console.log('VanillaPicker', VanillaPicker)
 
     colorPicker = new VanillaPicker({
       parent: ref,
