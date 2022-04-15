@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.40](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.39...v0.3.40) (2022-04-15)
+
+
+### Bug Fixes
+
+* importing vanilla-picker wrongly ([ddecbf1](https://github.com/josdejong/svelte-jsoneditor/commit/ddecbf1fd3d87a53e574374b581c1eabcd9c54b8))
+
 ### [0.3.39](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.38...v0.3.39) (2022-04-15)
 
 
