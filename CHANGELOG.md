@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.43](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.42...v0.3.43) (2022-04-20)
+
+
+### Bug Fixes
+
+* disable insert buttons in ContextMenu when root is selected (regression introduced in v0.3.41) ([1fe6f48](https://github.com/josdejong/svelte-jsoneditor/commit/1fe6f488ae7b7d8d83952e4f00ca2e55fa6a4a09))
+
 ### [0.3.42](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.41...v0.3.42) (2022-04-20)
 
 
