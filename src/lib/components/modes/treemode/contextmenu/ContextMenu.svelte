@@ -293,7 +293,7 @@
     },
     {
       icon: faCopy,
-      text: 'Copy compact',
+      text: 'Copy compacted',
       title: 'Copy selected contents, without indentation (Ctrl+Shift+C)',
       onClick: handleCopyCompact,
       disabled: !hasSelectionContents
