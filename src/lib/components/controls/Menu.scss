@@ -17,7 +17,7 @@
     height: $menu-button-size;
     border: none;
     background: transparent;
-    color: white;
+    color: inherit;
     cursor: pointer;
     padding: $padding-half;
     margin: 0;
@@ -36,7 +36,7 @@
     &.group-button {
       $group-button-border: 1px solid rgba(255, 255, 255, 0.5);
 
-      border: $group-button-border;
+      border: 1px solid white;
       &:not(.last) {
         border-right: none;
       }
@@ -53,14 +53,15 @@
       &.last {
         margin-right: $padding-half;
       }
-    }
-
-    &.selected {
-      background: rgba(255, 255, 255, 0.3);
 
       &:hover,
       &:focus {
-        background: rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      &.selected {
+        background: white;
+        color: $theme-color;
       }
     }
   }
