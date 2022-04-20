@@ -132,3 +132,21 @@ export function forEachIndex(start, end, iteratee) {
 export function limit(array, max) {
   return array.length > max ? array.slice(0, max) : array
 }
+
+/**
+ * @param {Array} array
+ * @returns {Object}
+ */
+export function arrayToObject(array) {
+  return {
+    ...array
+  }
+}
+
+/**
+ * @param {Object} object
+ * @returns {Array}
+ */
+export function objectToArray(object) {
+  return Object.values(object)
+}

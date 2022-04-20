@@ -1,6 +1,7 @@
-import { deepStrictEqual, strictEqual } from 'assert'
+import { deepStrictEqual, strictEqual, throws } from 'assert'
 import {
   calculatePosition,
+  convertValue,
   countCharacterOccurrences,
   estimateSerializedSize,
   isLargeContent,
@@ -177,5 +178,69 @@ describe('jsonUtils', () => {
     strictEqual(isTextContent({ text: '', json: [] }), true)
     strictEqual(isTextContent(1), false)
     strictEqual(isTextContent({}), false)
+  })
+
+  describe('convertValue', () => {
+    it('should convert an object to an array', () => {
+      deepStrictEqual(convertValue({ 2: 'c', 1: 'b', 0: 'a' }, 'array'), ['a', 'b', 'c'])
+    })
+
+    it('should convert an array to an array', () => {
+      const array = [1, 2, 3]
+      strictEqual(convertValue(array, 'array'), array)
+    })
+
+    it('should convert a stringified object to an array', () => {
+      deepStrictEqual(convertValue('{ "2": "c", "1": "b", "0": "a" }', 'array'), ['a', 'b', 'c'])
+    })
+
+    it('should convert a stringified array to an array', () => {
+      deepStrictEqual(convertValue('[1,2,3]', 'array'), [1, 2, 3])
+    })
+
+    it('should throw when impossible to convert to an array', () => {
+      throws(() => {
+        convertValue('no valid json text', 'array')
+      }, /SyntaxError/)
+    })
+
+    it('should convert an array to an object', () => {
+      deepStrictEqual(convertValue(['a', 'b', 'c'], 'object'), { 2: 'c', 1: 'b', 0: 'a' })
+    })
+
+    it('should convert an object to an object', () => {
+      const object = {
+        a: 1,
+        b: 2
+      }
+      strictEqual(convertValue(object, 'object'), object)
+    })
+
+    it('should convert a stringified object to an object', () => {
+      deepStrictEqual(convertValue('{"a":1,"b":2}', 'object'), { a: 1, b: 2 })
+    })
+
+    it('should convert a stringified array to an object', () => {
+      deepStrictEqual(convertValue('["a", "b", "c"]', 'object'), { 2: 'c', 1: 'b', 0: 'a' })
+    })
+
+    it('should throw when impossible to convert to an object', () => {
+      throws(() => {
+        convertValue('no valid json text', 'object')
+      }, /SyntaxError/)
+    })
+
+    it('should convert an array to a value', () => {
+      deepStrictEqual(convertValue([1, 2, 3], 'value'), '[1,2,3]')
+    })
+
+    it('should convert an object to a value', () => {
+      deepStrictEqual(convertValue({ a: 1, b: 2 }, 'value'), '{"a":1,"b":2}')
+    })
+
+    it('should convert a value to a value', () => {
+      strictEqual(convertValue('foo', 'value'), 'foo')
+      strictEqual(convertValue(true, 'value'), true)
+    })
   })
 })

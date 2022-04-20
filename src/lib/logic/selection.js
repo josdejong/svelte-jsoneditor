@@ -858,3 +858,23 @@ export function selectAll() {
     focusPath: []
   }
 }
+
+/**
+ * Test whether the current selection can be converted.
+ * That is the case when the selection is a key/value, or a multi selection with only one path
+ * @param {Selection} selection
+ * @return {boolean}
+ */
+export function canConvert(selection) {
+  if (!selection) {
+    return false
+  }
+
+  if (selection.type === SELECTION_TYPE.KEY || selection.type === SELECTION_TYPE.VALUE) {
+    return true
+  }
+
+  if (selection.type === SELECTION_TYPE.MULTI && selection.paths.length === 1) {
+    return true
+  }
+}

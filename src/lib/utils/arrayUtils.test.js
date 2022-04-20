@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { compareArrays, getNestedPaths } from './arrayUtils.js'
+import { arrayToObject, compareArrays, getNestedPaths, objectToArray } from './arrayUtils.js'
 
 describe('arrayUtils', () => {
   it('compareArrays', () => {
@@ -64,6 +64,21 @@ describe('arrayUtils', () => {
       assert.throws(() => getNestedPaths({ a: 2, b: { c: 3 } }), /TypeError: Array expected/)
       assert.throws(() => getNestedPaths('foo'), /TypeError: Array expected/)
       assert.throws(() => getNestedPaths(123), /TypeError: Array expected/)
+    })
+  })
+
+  describe('arrayToObject', () => {
+    it('should convert an array to an object', () => {
+      assert.deepStrictEqual(arrayToObject([1, 2, 3]), { 0: 1, 1: 2, 2: 3 })
+    })
+  })
+
+  describe('objectToArray', () => {
+    it('should convert an object to an array', () => {
+      assert.deepStrictEqual(objectToArray({ 0: 1, 1: 2, 2: 3 }), [1, 2, 3])
+      assert.deepStrictEqual(objectToArray({ 2: 3, 1: 2, 0: 1 }), [1, 2, 3])
+      assert.deepStrictEqual(objectToArray({ 0: 1, 2: 3 }), [1, 3])
+      assert.deepStrictEqual(objectToArray({ a: 1, b: 2 }), [1, 2])
     })
   })
 })

@@ -1,7 +1,8 @@
 import { compileJSONPointer } from 'immutable-json-patch'
 import jsonSourceMap from 'json-source-map'
 import jsonrepair from 'jsonrepair'
-import { isObject } from './typeUtils.js'
+import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
+import { arrayToObject, objectToArray } from './arrayUtils.js'
 
 /**
  * Parse the JSON. if this fails, try to repair and parse.
@@ -223,6 +224,72 @@ export function findTextLocation(text, path) {
   }
 
   return null
+}
+
+/**
+ * Convert a JSON object, array, or value to another type
+ * If it cannot be converted, an error is thrown
+ * @param {JSON} value
+ * @param {'value' | 'object' | 'array'} type
+ * @returns {JSON}
+ */
+export function convertValue(value, type) {
+  if (type === 'array') {
+    if (Array.isArray(value)) {
+      // nothing to do
+      return value
+    }
+
+    if (isObject(value)) {
+      return objectToArray(value)
+    }
+
+    if (typeof value === 'string') {
+      const parsedValue = JSON.parse(value)
+
+      if (Array.isArray(parsedValue)) {
+        return parsedValue
+      }
+
+      if (isObject(parsedValue)) {
+        return objectToArray(parsedValue)
+      }
+    }
+  }
+
+  if (type === 'object') {
+    if (Array.isArray(value)) {
+      return arrayToObject(value)
+    }
+
+    if (isObject(value)) {
+      // nothing to do
+      return value
+    }
+
+    if (typeof value === 'string') {
+      const parsedValue = JSON.parse(value)
+
+      if (isObject(parsedValue)) {
+        return parsedValue
+      }
+
+      if (Array.isArray(parsedValue)) {
+        return arrayToObject(parsedValue)
+      }
+    }
+  }
+
+  if (type === 'value') {
+    if (isObjectOrArray(value)) {
+      return JSON.stringify(value)
+    }
+
+    // nothing to do
+    return value
+  }
+
+  throw new Error(`Cannot convert ${valueType(value)} to ${type}`)
 }
 
 /**
