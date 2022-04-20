@@ -24,6 +24,8 @@
   import { isObjectOrArray } from '$lib/utils/typeUtils'
   import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
   import { STATE_ENFORCE_STRING } from '$lib/constants'
+  import { isObject } from '../../../../utils/typeUtils.js'
+  import { canConvert } from '../../../../logic/selection.js'
 
   export let json
   export let state
@@ -41,6 +43,7 @@
   export let onExtract
   export let onInsertBefore
   export let onInsert
+  export let onConvert
   export let onInsertAfter
   export let onSort
   export let onTransform
@@ -62,6 +65,7 @@
   $: hasJson = json !== undefined
   $: hasSelection = selection != null
   $: rootSelected = hasSelection && isEmpty(selection.focusPath)
+  $: focusValue = getIn(json, selection.focusPath)
 
   $: hasSelectionContents =
     hasJson &&
@@ -93,9 +97,18 @@
     (selection.type === SELECTION_TYPE.KEY ||
       selection.type === SELECTION_TYPE.VALUE ||
       (selection.type === SELECTION_TYPE.MULTI && selection.paths.length === 1)) &&
-    !isObjectOrArray(getIn(json, selection.focusPath))
+    !isObjectOrArray(focusValue)
 
-  $: insertText = hasSelectionContents ? 'Replace with' : 'Insert'
+  $: convertMode = hasSelectionContents
+  $: insertOrConvertText = convertMode ? 'Convert to' : 'Insert'
+  $: canInsertOrConvertStructure = !convertMode
+  $: canInsertOrConvertObject = convertMode ? canConvert(selection) && !isObject(focusValue) : true
+  $: canInsertOrConvertArray = convertMode
+    ? canConvert(selection) && !Array.isArray(focusValue)
+    : true
+  $: canInsertOrConvertValue = convertMode
+    ? canConvert(selection) && isObjectOrArray(focusValue)
+    : true
 
   $: enforceString =
     selection != null
@@ -157,9 +170,14 @@
     onExtract()
   }
 
-  function handleInsert(type) {
+  function handleInsertOrConvert(type) {
     onCloseContextMenu()
-    onInsert(type)
+
+    if (hasSelectionContents) {
+      onConvert(type)
+    } else {
+      onInsert(type)
+    }
   }
 
   function handleSort() {
@@ -423,53 +441,53 @@
     </div>
     <div class="jse-column">
       <div class="jse-label">
-        {insertText}:
+        {insertOrConvertText}:
       </div>
       <button
         type="button"
-        on:click={() => handleInsert('structure')}
-        title="{insertText} structure"
+        on:click={() => handleInsertOrConvert('structure')}
+        title="{insertOrConvertText} structure"
         data-name="insert-structure"
         data-up="paste,copy,cut"
         data-down="insert-object"
         data-left="duplicate"
-        disabled={!hasSelection}
+        disabled={!canInsertOrConvertStructure}
       >
         <span class="jse-insert"><span class="jse-plus">{'+'}</span></span> Structure
       </button>
       <button
         type="button"
-        on:click={() => handleInsert('object')}
-        title="{insertText} object"
+        on:click={() => handleInsertOrConvert('object')}
+        title="{insertOrConvertText} object"
         data-name="insert-object"
         data-up="insert-structure"
         data-down="insert-array"
         data-left="extract"
-        disabled={!hasSelection}
+        disabled={!canInsertOrConvertObject}
       >
         <span class="jse-insert">{'{}'}</span> Object
       </button>
       <button
         type="button"
-        on:click={() => handleInsert('array')}
-        title="{insertText} array"
+        on:click={() => handleInsertOrConvert('array')}
+        title="{insertOrConvertText} array"
         data-name="insert-array"
         data-up="insert-object"
         data-down="insert-value"
         data-left="sort"
-        disabled={!hasSelection}
+        disabled={!canInsertOrConvertArray}
       >
         <span class="jse-insert">[]</span> Array
       </button>
       <button
         type="button"
-        on:click={() => handleInsert('value')}
-        title="{insertText} value"
+        on:click={() => handleInsertOrConvert('value')}
+        title="{insertOrConvertText} value"
         data-name="insert-value"
         data-up="insert-array"
         data-down="insert-after"
         data-left="transform"
-        disabled={!hasSelection}
+        disabled={!canInsertOrConvertValue}
       >
         <span class="jse-insert"><span class="jse-quote">"</span></span> Value
       </button>

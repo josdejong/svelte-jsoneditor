@@ -1,6 +1,5 @@
 <script>
-  import { onDestroy, onMount, tick } from 'svelte'
-  import VanillaPicker from 'vanilla-picker'
+  import { onDestroy, onMount } from 'svelte'
 
   export let color
   export let onChange
@@ -10,7 +9,9 @@
   let colorPicker
 
   onMount(async () => {
-    await tick() // must render the DOM first
+    // Dynamically import VanillaPicker, because it requires `document` to be defined,
+    // and that is not supported server side
+    const VanillaPicker = (await import('vanilla-picker')).default
 
     colorPicker = new VanillaPicker({
       parent: ref,

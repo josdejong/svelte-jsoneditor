@@ -9,7 +9,6 @@ export function useLocalStorage(key, defaultValue) {
 
 function loadFromLocalStorage(key, defaultValue) {
   if (typeof localStorage === 'undefined') {
-    console.warn(`localStorage is undefined, cannot load from localStorage (key: ${key})`)
     return defaultValue
   }
 
@@ -24,7 +23,6 @@ function loadFromLocalStorage(key, defaultValue) {
 
 function saveToLocalStorage(key, value) {
   if (typeof localStorage === 'undefined') {
-    console.warn(`localStorage is undefined, cannot save to localStorage (key: ${key})`)
     return
   }
 

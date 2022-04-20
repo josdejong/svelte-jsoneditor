@@ -92,8 +92,9 @@
   import Welcome from './Welcome.svelte'
   import NavigationBar from '../../../components/controls/navigationBar/NavigationBar.svelte'
   import SearchBox from '../../../components/modes/treemode/menu/SearchBox.svelte'
-  import { isLargeContent } from '../../../utils/jsonUtils.js'
+  import { convertValue, isLargeContent } from '../../../utils/jsonUtils.js'
   import { MAX_DOCUMENT_SIZE_EXPAND_ALL } from '../../../constants.js'
+  import { canConvert } from '../../../logic/selection.js'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -965,6 +966,50 @@
     handleInsert(type)
   }
 
+  /**
+   * @param {'value' | 'object' | 'array'} type
+   */
+  function handleConvert(type) {
+    if (readOnly || !selection) {
+      return
+    }
+
+    if (!canConvert(selection)) {
+      onError(new Error(`Cannot convert current selection to ${type}`))
+      return
+    }
+
+    try {
+      const path = selection.anchorPath
+      const currentValue = getIn(json, path)
+      const convertedValue = convertValue(currentValue, type)
+      if (convertedValue === currentValue) {
+        // no change, do nothing
+        return
+      }
+
+      const operations = [{ op: 'replace', path: compileJSONPointer(path), value: convertedValue }]
+
+      debug('handleConvert', { selection, path, type, operations })
+
+      handlePatch(operations)
+
+      if (isObjectOrArray(convertedValue)) {
+        const expandAllRecursive = !isLargeContent(
+          { json: convertedValue },
+          MAX_DOCUMENT_SIZE_EXPAND_ALL
+        )
+
+        // expand converted object/array
+        handleExpand(selection.focusPath, true, expandAllRecursive)
+
+        focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
+      }
+    } catch (err) {
+      onError(err)
+    }
+  }
+
   function handleInsertBefore() {
     const selectionBefore = getSelectionUp(json, state, selection, false)
     const parentPath = initial(selection.focusPath)
@@ -1784,6 +1829,7 @@
 
       onInsertBefore: handleInsertBefore,
       onInsert: handleInsertFromContextMenu,
+      onConvert: handleConvert,
       onInsertAfter: handleInsertAfter,
 
       onSort: handleSortSelection,

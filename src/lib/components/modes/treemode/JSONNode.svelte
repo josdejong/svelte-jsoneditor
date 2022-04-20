@@ -493,12 +493,14 @@
             {#if expanded}
               <div class="jse-bracket">[</div>
               <span class="jse-tag jse-expanded">
-                {resolvedValue.length} items
+                {resolvedValue.length}
+                {resolvedValue.length === 1 ? 'item' : 'items'}
               </span>
             {:else}
               <div class="jse-bracket">[</div>
               <button type="button" class="jse-tag" on:click={handleExpand}>
-                {resolvedValue.length} items
+                {resolvedValue.length}
+                {resolvedValue.length === 1 ? 'item' : 'items'}
               </button>
               <div class="jse-bracket">]</div>
             {/if}
@@ -618,7 +620,8 @@
             {:else}
               <div class="jse-bracket">&lbrace;</div>
               <button type="button" class="jse-tag" on:click={handleExpand}>
-                {Object.keys(resolvedValue).length} props
+                {Object.keys(resolvedValue).length}
+                {Object.keys(resolvedValue).length === 1 ? 'prop' : 'props'}
               </button>
               <div class="jse-bracket">&rbrace;</div>
             {/if}

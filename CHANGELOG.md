@@ -2,6 +2,46 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.41](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.40...v0.3.41) (2022-04-20)
+
+
+### Features
+
+* change insert buttons into convert buttons, converting between objects/arrays/text (see [#61](https://github.com/josdejong/svelte-jsoneditor/issues/61)) ([f413066](https://github.com/josdejong/svelte-jsoneditor/commit/f413066509b9167af9751218df30922ae5d9ffac))
+
+
+### Bug Fixes
+
+* change button text to "Copy compacted" for consistency ([396a274](https://github.com/josdejong/svelte-jsoneditor/commit/396a274219cb20e682d5b83c9317b99b3346b098))
+* change styling of the mode toggle button (code/tree) ([28b9c6c](https://github.com/josdejong/svelte-jsoneditor/commit/28b9c6c671f282832ece219a7c2f60cc2b0c5fa5))
+* use flex-start and flex-end to fix warnings in environments like tailwindcss ([#43](https://github.com/josdejong/svelte-jsoneditor/issues/43)) ([e1e0ddd](https://github.com/josdejong/svelte-jsoneditor/commit/e1e0dddfc6593197bf618a87af94d5a19a8945f9))
+
+### [0.3.40](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.39...v0.3.40) (2022-04-15)
+
+
+### Bug Fixes
+
+* importing vanilla-picker wrongly ([ddecbf1](https://github.com/josdejong/svelte-jsoneditor/commit/ddecbf1fd3d87a53e574374b581c1eabcd9c54b8))
+
+### [0.3.39](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.38...v0.3.39) (2022-04-15)
+
+
+### Bug Fixes
+
+* [#66](https://github.com/josdejong/svelte-jsoneditor/issues/66) import color picker dynamically since it cannot render server side ([b6041bb](https://github.com/josdejong/svelte-jsoneditor/commit/b6041bb3df4b8d74927cd65ef7343c63b04d8299))
+
+### [0.3.38](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.37...v0.3.38) (2022-04-13)
+
+
+### Features
+
+* select contents within brackets using double-click ([#65](https://github.com/josdejong/svelte-jsoneditor/issues/65)) ([e73970f](https://github.com/josdejong/svelte-jsoneditor/commit/e73970ff9b168d57ad53b5d56ac25e98794abf56))
+
+
+### Bug Fixes
+
+* show `prop` and `item` instead of plural when there is only one property or item ([1f1725f](https://github.com/josdejong/svelte-jsoneditor/commit/1f1725feda64c70c5ba305f1aa02ad1468a0d226))
+
 ### [0.3.37](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.36...v0.3.37) (2022-04-12)
 
 
