@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.45](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.44...v0.3.45) (2022-04-21)
+
+
+### Bug Fixes
+
+* expose method `findElement(path)` ([3930137](https://github.com/josdejong/svelte-jsoneditor/commit/39301376ab2f0786a76c22c51c549de125ffa76f))
+
 ### [0.3.44](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.43...v0.3.44) (2022-04-21)
 
 
