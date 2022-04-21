@@ -1,10 +1,9 @@
-// css custom properties
 :root {
-  // over all fonts
+  /* over all fonts */
   --jse-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu,
     Cantarell, 'Helvetica Neue', sans-serif;
-  // "consolas" for Windows, "menlo" for Mac with fallback to "monaco", 'Ubuntu Mono' for Ubuntu
-  // (at Mac this font looks too large at 14px, but 13px is too small for the font on Windows)
+  /* "consolas" for Windows, "menlo" for Mac with fallback to "monaco", 'Ubuntu Mono' for Ubuntu */
+  /* (at Mac this font looks too large at 14px, but 13px is too small for the font on Windows) */
   --jse-font-family-mono: consolas, menlo, monaco, 'Ubuntu Mono', 'source-code-pro', monospace;
   --jse-font-size-mono: 14px;
   --jse-font-size: 16px;
@@ -14,7 +13,7 @@
   --jse-color-picker-button-size: 1em;
   --jse-context-menu-button-size: calc(1em + 4px);
 
-  // over all colors
+  /* over all colors */
   --jse-background-color: #fff;
   --jse-text-color: #1a1a1a;
   --jse-selection-background-color: #d3d3d3;
@@ -23,12 +22,12 @@
   --jse-selection-inline-color: #656565;
   --jse-edit-outline: 2px solid #656565;
 
-  // main menu, modal header
+  /* main menu, modal header */
   --jse-menu-color: #3883fa;
   --jse-menu-color-light: #5f9dff;
   --jse-menu-text-color: #fff;
 
-  // navigation bar, gutter, search box
+  /* navigation bar, gutter, search box */
   --jse-panel-background-color: #ebebeb;
   --jse-panel-background-highlight: #e0e0e0;
   --jse-panel-text-color: #1a1a1a;
@@ -40,14 +39,14 @@
   --jse-panel-dropdown-background-highlight: #e5e5e5;
   --jse-panel-dropdown-text-color: #656565;
 
-  // context menu
+  /* context menu */
   --jse-context-menu-background: #656565;
   --jse-context-menu-background-highlight: #7a7a7a;
   --jse-context-menu-text-color: #fff;
   --jse-context-menu-text-color-disabled: #9d9d9d;
   --jse-context-menu-separator-color: #7a7a7a;
 
-  // json key and values
+  /* json key and values */
   --jse-key-color: #1a1a1a;
   --jse-value-color: #1a1a1a;
   --jse-value-color-number: #ee422e;
@@ -57,23 +56,23 @@
   --jse-value-color-url: #008000;
   --jse-delimiter-color: rgba(0, 0, 0, 0.38);
 
-  // inline tags inside the JSON document
+  /* inline tags inside the JSON document */
   --jse-tag-background: rgba(0, 0, 0, 0.25);
   --jse-tag-text-color: #fff;
 
-  // input fields in modals
+  /* input fields in modals */
   --jse-input-border: 1px solid #d8dbdf;
   --jse-input-border-focus: 1px solid #3883fa;
   --jse-input-border-readonly: 1px solid #f5f5f5;
   --jse-input-radius: 3px;
 
-  // buttons in modals
+  /* buttons in modals */
   --jse-button-primary-background: #3883fa;
   --jse-button-primary-background-highlight: #5f9dff;
   --jse-button-primary-background-disabled: #9d9d9d;
   --jse-button-primary-text-color: #fff;
 
-  // svelte-select
+  /* svelte-select */
   --itemIsActiveBG: #3883fa;
   --border: 1px solid #d8dbdf;
   --borderRadius: 3px;

@@ -1,0 +1,40 @@
+.jse-theme-dark {
+  --jse-background-color: #1e1e1e;
+  --jse-text-color: #d4d4d4;
+  --jse-selection-background-color: #464646;
+  --jse-selection-background-dark-color: #343434;
+  --jse-edit-outline: 2px solid #d4d4d4;
+
+  --jse-menu-color: #3c3c3c;
+  --jse-menu-color-light: #565656;
+  --jse-menu-text-color: #e5e5e5;
+
+  --jse-panel-background-color: #333333;
+  --jse-panel-background-highlight: #464646;
+  --jse-panel-text-color: #d4d4d4;
+  --jse-panel-text-color-readonly: #737373;
+  --jse-panel-text-color-dark: #8d8d8d;
+  --jse-panel-border: 1px solid #3c3c3c;
+  --jse-panel-dropdown-background: #656565;
+  --jse-panel-dropdown-background-highlight: #7e7e7e;
+  --jse-panel-dropdown-text-color: #d4d4d4;
+
+  --jse-key-color: #9cdcfe;
+  --jse-value-color: #d4d4d4;
+  --jse-value-color-number: #b5cea8;
+  --jse-value-color-boolean: #569cd6;
+  --jse-value-color-null: #569cd6;
+  --jse-value-color-string: #ce9178;
+  --jse-value-color-url: #ce9178;
+  --jse-delimiter-color: #575757;
+
+  --jse-tag-background: #575757;
+  --jse-tag-text-color: #d4d4d4;
+
+  --jse-input-border: 1px solid #737373;
+  --jse-input-border-readonly: 1px solid #3f3f3f;
+  --jse-input-border-focus: 1px solid #3f3f3f;
+
+  /* svelte-select component */
+  --border: 1px solid #737373;
+}

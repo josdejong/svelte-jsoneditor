@@ -1,6 +1,6 @@
-@import '../variables';
+@import '../themes/jse-theme-default.css';
 @import '../styles';
-@import 'modes/treemode/json-node-selected-mixin.scss';
+@import 'modes/treemode/json-node-selected-mixin';
 
 .jse-main {
   width: 100%;
