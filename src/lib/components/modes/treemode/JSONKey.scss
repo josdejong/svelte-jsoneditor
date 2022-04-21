@@ -15,11 +15,11 @@
   white-space: pre-wrap; // important for rendering multiple consecutive spaces
 
   &:hover {
-    background: $hovered-background-transparent;
+    background: var(--jse-hover-background-color);
   }
 
   &:hover {
-    background: $hovered-background-transparent;
+    background: var(--jse-hover-background-color);
   }
 
   &.jse-empty {

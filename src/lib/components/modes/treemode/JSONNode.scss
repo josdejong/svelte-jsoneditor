@@ -28,7 +28,7 @@
     .jse-props .jse-contents,
     .jse-items .jse-contents,
     .jse-footer {
-      background: $hovered-background-transparent;
+      background: var(--jse-hover-background-color);
     }
   }
 

@@ -2,7 +2,7 @@
 @import '../../../components/controls/EditableDivShared';
 
 .jse-enum-value {
-  background: $hovered-background-transparent;
+  background: var(--jse-hover-background-color);
   border: none;
   padding: 0;
 

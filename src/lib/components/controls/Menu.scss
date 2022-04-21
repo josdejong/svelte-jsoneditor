@@ -13,8 +13,8 @@
 
   // FIXME: should utilize the generic styling in styles.scss
   .jse-button {
-    width: $menu-button-size;
-    height: $menu-button-size;
+    width: var(--jse-menu-button-size);
+    height: var(--jse-menu-button-size);
     border: none;
     background: transparent;
     color: inherit;
@@ -45,7 +45,7 @@
 
       padding: 0;
       margin: $padding-half 0;
-      height: $menu-button-size - 2 * $padding-half;
+      height: calc(var(--jse-menu-button-size) - 2 * $padding-half);
       width: 40px;
 
       &.jse-first {
@@ -79,7 +79,7 @@
     opacity: 0.3;
     box-sizing: border-box;
     width: 1px;
-    height: $menu-button-size - 2 * $margin;
+    height: calc(var(--jse-menu-button-size) - 2 * $margin);
     margin: $margin;
   }
 }

@@ -1,6 +1,7 @@
 .jse-theme-big {
   --jse-menu-color: #ff3e00;
   --jse-menu-color-light: #fd5e2d;
+  --jse-menu-button-size: 48px;
 
   --jse-font-family: courier New;
   --jse-font-family-mono: courier New;

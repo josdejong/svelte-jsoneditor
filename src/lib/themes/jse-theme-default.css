@@ -19,6 +19,7 @@
   --jse-selection-background-color: #d3d3d3;
   --jse-selection-background-dark-color: #c2c2c2;
   --jse-selection-background-light-color: #e8e8e8;
+  --jse-hover-background-color: rgba(0, 0, 0, 0.06);
   --jse-selection-inline-color: #656565;
   --jse-edit-outline: 2px solid #656565;
 
@@ -26,6 +27,7 @@
   --jse-menu-color: #3883fa;
   --jse-menu-color-light: #5f9dff;
   --jse-menu-text-color: #fff;
+  --jse-menu-button-size: 32px;
   --jse-modal-background: rgba(0, 0, 0, 0.3);
 
   /* navigation bar, gutter, search box */

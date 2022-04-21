@@ -37,14 +37,12 @@ $value-color-url: var(--jse-value-color-url);
 $selection-background: var(--jse-selection-background-color);
 $selection-color: $black;
 $hovered-background: rgb(240, 240, 240); // #f0f0f0
-$hovered-background-transparent: rgba(0, 0, 0, 0.06); // #f0f0f0, with transparency
 $background-gray: #f5f5f5;
 $background-light-gray-transparent: rgba(0, 0, 0, 0.06);
 $border-gray: #d8dbdf;
 $meta-color: var(--jse-delimiter-color);
 $edit-border-color: $dark-gray;
 
-$menu-button-size: 32px;
 $pressed-button-margin: 2px;
 $input-padding: 5px;
 $search-box-offset: 10px;
