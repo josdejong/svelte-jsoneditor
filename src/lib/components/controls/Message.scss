@@ -11,8 +11,8 @@
   align-items: center;
 
   &.jse-success {
-    background: $green;
-    color: $white;
+    background: var(--jse-message-success-background);
+    color: var(--jse-message-success-color);
   }
 
   .jse-text {
@@ -29,13 +29,13 @@
   }
 
   &.jse-error {
-    background: $red;
-    color: $white;
+    background: var(--jse-message-error-background);
+    color: var(--jse-message-error-color);
   }
 
   &.jse-warning {
-    background: $warning-color;
-    color: $white;
+    background: var(--jse-message-warning-background);
+    color: var(--jse-message-warning-color);
   }
 
   &.jse-info {
@@ -50,13 +50,13 @@
     button.jse-action {
       @include jsoneditor-button;
 
-      background: rgba(255, 255, 255, 0.2);
-      color: $white;
+      background: var(--jse-message-action-background);
+      color: inherit;
 
       padding: $padding-half $padding;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: var(--jse-message-action-background-highlight);
       }
     }
   }

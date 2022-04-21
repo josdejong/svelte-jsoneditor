@@ -3,8 +3,8 @@
 .jse-validation-errors-overview {
   font-family: $font-family-mono;
   font-size: $font-size-mono;
-  background: $warning-color;
-  color: $white;
+  background: var(--jse-message-warning-background);
+  color: var(--jse-message-warning-color);
   overflow: auto;
   max-height: $errors-overview-max-height;
 

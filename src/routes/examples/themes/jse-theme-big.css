@@ -13,8 +13,17 @@
   --jse-button-primary-background-highlight: #e74c1c;
   --itemIsActiveBG: #fd5e2d;
 
-  --jse-context-menu-button-size: 32px;
+  /* messages */
+  --jse-message-error-background: #f6c5c0;
+  --jse-message-error-color: #ee5341;
+  --jse-message-warning-background: #ffe198;
+  --jse-message-warning-color: #fdc539;
+  --jse-message-success-background: #cde3ac;
+  --jse-message-success-color: #9ac45d;
+  --jse-message-action-background: rgba(255, 255, 255, 0.2);
+  --jse-message-action-background-highlight: rgba(255, 255, 255, 0.3);
 
+  --jse-context-menu-button-size: 32px;
   --jse-context-menu-background: #ff3e00;
   --jse-context-menu-background-highlight: #ea3600;
   --jse-context-menu-text-color: #fff;

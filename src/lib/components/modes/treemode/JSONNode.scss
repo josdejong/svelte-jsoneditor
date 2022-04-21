@@ -149,7 +149,7 @@
   background: transparent;
   color: var(--jse-delimiter-color);
   font-size: var(--jse-font-size-mono);
-  line-height: var(--jse-line-height);
+  height: var(--jse-line-height);
 
   &:hover {
     opacity: 0.8;

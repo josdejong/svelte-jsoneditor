@@ -168,7 +168,7 @@
   .jse-preview.jse-error {
     flex: 1;
     border: 1px solid var(--jse-input-border-readonly);
-    color: $red;
+    color: var(--jse-error-text-color);
     padding: $padding-half;
   }
 }
