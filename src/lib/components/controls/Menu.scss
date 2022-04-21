@@ -1,10 +1,10 @@
 @import '../../styles';
 
 .jse-menu {
-  font-family: $font-family;
-  font-size: $font-size;
-  background: var(--jse-menu-color);
-  border-bottom: 1px solid var(--jse-menu-color);
+  font-family: var(--jse-font-family);
+  font-size: var(--jse-font-size);
+  background: var(--jse-menu-background);
+  border-bottom: 1px solid var(--jse-menu-background);
   color: var(--jse-menu-color);
   display: flex;
   flex-wrap: wrap;
@@ -25,7 +25,7 @@
 
     &:hover,
     &:focus {
-      background: var(--jse-menu-color-light);
+      background: var(--jse-menu-background-highlight);
     }
 
     &:disabled {
@@ -58,12 +58,12 @@
 
       &:hover,
       &:focus {
-        background: var(--jse-menu-color-light);
+        background: var(--jse-menu-background-highlight);
       }
 
       &.jse-selected {
         background: $group-button-color;
-        color: var(--jse-menu-color);
+        color: var(--jse-menu-background);
       }
     }
   }

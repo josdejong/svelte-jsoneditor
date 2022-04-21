@@ -1,16 +1,7 @@
-$font-family: var(--jse-font-family);
-$font-size: var(--jse-font-size);
-$font-size-small: var(--jse-font-size-small);
-
-$font-family-mono: var(--jse-font-family-mono) !default;
-$font-size-mono: var(--jse-font-size-mono);
-
 $white: #fff;
 $black: #1a1a1a;
 $red: #ee5341;
 $contentsMinHeight: 150px;
-$theme-color: var(--jse-menu-color);
-$theme-color-light: var(--jse-menu-color-light);
 
 $highlight-color: #ffe665;
 $highlight-hover-color: #f0f000;
@@ -19,24 +10,13 @@ $highlight-active-hover-color: #f3cd00;
 $dark-gray: #656565;
 $gray: rgb(157, 157, 157); // #9d9d9d
 $light-gray: rgb(192, 192, 192);
-$very-light-gray: #ebebeb;
 $light-gray-transparent: rgba(0, 0, 0, 0.25);
 
-$jse-menu-background-color: var(--jse-menu-color);
-
-$value-color-string: var(--jse-value-color-string);
-$value-color-number: var(--jse-value-color-number);
-$value-color-boolean: var(--jse-value-color-boolean);
-$value-color-null: var(--jse-value-color-null);
-$value-color-url: var(--jse-value-color-url);
-
-$selection-background: var(--jse-selection-background-color);
 $selection-color: $black;
 $hovered-background: rgb(240, 240, 240); // #f0f0f0
 $background-gray: #f5f5f5;
 $background-light-gray-transparent: rgba(0, 0, 0, 0.06);
 $border-gray: #d8dbdf;
-$meta-color: var(--jse-delimiter-color);
 $edit-border-color: $dark-gray;
 
 $pressed-button-margin: 2px;
@@ -57,15 +37,15 @@ $errors-overview-max-height: 25%;
 $icon-font-size: 18px; // independent of the font-size of the text
 
 $box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.24);
-$outline-shadow: 0 0 10px 0 $theme-color-light;
+$outline-shadow: 0 0 10px 0 var(--jse-menu-background-highlight);
 
 @mixin jsoneditor-button {
   border: none;
   background: transparent;
   color: inherit;
   cursor: pointer;
-  font-family: $font-family;
-  font-size: $font-size;
+  font-family: var(--jse-font-family);
+  font-size: var(--jse-font-size);
   padding: $menu-padding;
   margin: 0;
 }

@@ -24,8 +24,8 @@
       overflow: hidden;
 
       :global(.cm-scroller) {
-        font-family: $font-family-mono;
-        font-size: $font-size-mono;
+        font-family: var(--jse-font-family-mono);
+        font-size: var(--jse-font-size-mono);
         line-height: var(--jse-line-height);
         color: var(--jse-color);
       }
@@ -53,8 +53,8 @@
       }
 
       :global(.cm-diagnostic) {
-        font-size: $font-size;
-        font-family: $font-family;
+        font-size: var(--jse-font-size);
+        font-family: var(--jse-font-family);
       }
 
       :global(.cm-panels) {
@@ -68,8 +68,8 @@
       :global(.cm-search label),
       :global(.cm-search input),
       :global(.cm-search button) {
-        font-family: $font-family;
-        font-size: $font-size-small;
+        font-family: var(--jse-font-family);
+        font-size: var(--jse-font-size-small);
         color: var(--jse-panel-color);
       }
 

@@ -60,7 +60,7 @@ table.jse-transform-wizard {
           background: none;
 
           &:focus {
-            border-color: $theme-color;
+            border-color: var(--jse-menu-background);
           }
         }
       }

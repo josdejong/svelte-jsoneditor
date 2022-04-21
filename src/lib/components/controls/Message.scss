@@ -1,8 +1,8 @@
 @import '../../styles.scss';
 
 .jse-message {
-  font-family: $font-family-mono;
-  font-size: $font-size-mono;
+  font-family: var(--jse-font-family-mono);
+  font-size: var(--jse-font-size-mono);
 
   padding: $padding;
   display: flex;
@@ -39,8 +39,8 @@
   }
 
   &.jse-info {
-    background: $gray;
-    color: $white;
+    background: var(--jse-message-info-background);
+    color: var(--jse-message-info-color);
   }
 
   .jse-actions {

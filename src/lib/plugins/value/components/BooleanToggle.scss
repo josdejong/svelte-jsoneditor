@@ -1,7 +1,7 @@
 @import '../../../styles';
 
 .jse-boolean-toggle {
-  color: $value-color-boolean;
+  color: var(--jse-value-color-boolean);
   position: relative;
   padding-left: $padding-half;
   padding-top: 1px;

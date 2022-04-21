@@ -3,8 +3,8 @@
 .jse-welcome {
   flex: 1;
   overflow: auto; // FIXME: overflow doesn't work (try giving editor 100px height)
-  font-family: $font-family;
-  font-size: $font-size;
+  font-family: var(--jse-font-family);
+  font-size: var(--jse-font-size);
 
   display: flex;
   flex-direction: column;
@@ -33,7 +33,7 @@
         padding-left: $list-padding;
 
         span.jse-bold {
-          font-family: $font-family-mono;
+          font-family: var(--jse-font-family-mono);
           font-weight: bold;
         }
       }

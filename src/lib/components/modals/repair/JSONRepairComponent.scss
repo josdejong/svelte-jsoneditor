@@ -15,8 +15,8 @@
     flex: 1;
     border: none;
     padding: $contents-padding;
-    font-family: $font-family-mono;
-    font-size: $font-size-mono;
+    font-family: var(--jse-font-family-mono);
+    font-size: var(--jse-font-size-mono);
     color: $black;
 
     resize: none;

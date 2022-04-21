@@ -8,8 +8,8 @@
   background: var(--jse-background-color);
   min-width: 0;
   min-height: 0;
-  font-family: $font-family-mono;
-  font-size: $font-size-mono;
+  font-family: var(--jse-font-family-mono);
+  font-size: var(--jse-font-size-mono);
   color: var(--jse-color);
   line-height: var(--jse-line-height);
 
@@ -71,8 +71,8 @@
     color: $gray;
     overflow: auto;
     white-space: pre-wrap;
-    font-family: $font-family-mono;
-    font-size: $font-size-mono;
+    font-family: var(--jse-font-family-mono);
+    font-size: var(--jse-font-size-mono);
     padding: 2px;
   }
 }

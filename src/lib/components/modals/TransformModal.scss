@@ -43,8 +43,8 @@
 
           :global(code) {
             background: $background-gray;
-            font-family: $font-family-mono;
-            font-size: $font-size-mono;
+            font-family: var(--jse-font-family-mono);
+            font-size: var(--jse-font-size-mono);
           }
         }
 
@@ -151,8 +151,8 @@
     outline: none;
     box-sizing: border-box;
     padding: $padding-half;
-    font-family: $font-family-mono;
-    font-size: $font-size-mono;
+    font-family: var(--jse-font-family-mono);
+    font-size: var(--jse-font-size-mono);
     color: inherit;
     background: none;
 

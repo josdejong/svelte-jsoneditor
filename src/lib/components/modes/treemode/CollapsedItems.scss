@@ -4,8 +4,8 @@ $color: $gray;
 $background-color: $background-gray;
 
 div.jse-collapsed-items {
-  font-family: $font-family;
-  font-size: $font-size;
+  font-family: var(--jse-font-family);
+  font-size: var(--jse-font-size);
   color: $color;
 
   // https://sharkcoder.com/visual/borders
@@ -39,8 +39,8 @@ div.jse-collapsed-items {
   }
 
   button.jse-expand-items {
-    font-family: $font-family;
-    font-size: $font-size;
+    font-family: var(--jse-font-family);
+    font-size: var(--jse-font-size);
     color: $color;
 
     background: none;

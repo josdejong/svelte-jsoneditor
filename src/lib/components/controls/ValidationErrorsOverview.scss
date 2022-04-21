@@ -1,8 +1,8 @@
 @import '../../styles.scss';
 
 .jse-validation-errors-overview {
-  font-family: $font-family-mono;
-  font-size: $font-size-mono;
+  font-family: var(--jse-font-family-mono);
+  font-size: var(--jse-font-size-mono);
   background: var(--jse-message-warning-background);
   color: var(--jse-message-warning-color);
   overflow: auto;

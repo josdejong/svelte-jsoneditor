@@ -30,10 +30,12 @@
   --jse-message-warning-color: #fff;
   --jse-message-success-background: #9ac45d;
   --jse-message-success-color: #fff;
+  --jse-message-info-background: #9d9d9d;
+  --jse-message-info-color: #fff;
 
   /* main menu, modal header */
-  --jse-menu-color: #3883fa;
-  --jse-menu-color-light: #5f9dff;
+  --jse-menu-background: #3883fa;
+  --jse-menu-background-highlight: #5f9dff;
   --jse-menu-color: #fff;
   --jse-menu-button-size: 32px;
   --jse-modal-background: rgba(0, 0, 0, 0.3);

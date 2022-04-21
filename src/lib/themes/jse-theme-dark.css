@@ -8,8 +8,8 @@
   --jse-edit-outline: 2px solid #d4d4d4;
 
   /* main menu, modal header */
-  --jse-menu-color: #3c3c3c;
-  --jse-menu-color-light: #565656;
+  --jse-menu-background: #3c3c3c;
+  --jse-menu-background-highlight: #565656;
   --jse-menu-color: #e5e5e5;
   --jse-modal-background: rgba(255, 255, 255, 0.2);
 

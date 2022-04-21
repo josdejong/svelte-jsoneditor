@@ -2,25 +2,25 @@
 
 .jse-value {
   &.jse-string {
-    color: $value-color-string;
+    color: var(--jse-value-color-string);
   }
 
   &.jse-object,
   &.jse-array {
     min-width: 16px;
-    color: $meta-color;
+    color: var(--jse-delimiter-color);
   }
 
   &.jse-number {
-    color: $value-color-number;
+    color: var(--jse-value-color-number);
   }
 
   &.jse-boolean {
-    color: $value-color-boolean;
+    color: var(--jse-value-color-boolean);
   }
 
   &.jse-null {
-    color: $value-color-null;
+    color: var(--jse-value-color-null);
   }
 
   &.jse-invalid {
@@ -28,7 +28,7 @@
   }
 
   &.jse-url {
-    color: $value-color-url;
+    color: var(--jse-value-color-url);
     text-decoration: underline;
   }
 }

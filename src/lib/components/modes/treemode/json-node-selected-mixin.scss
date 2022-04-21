@@ -25,14 +25,14 @@
   &.jse-selected-key {
     > .jse-contents-outer > .jse-contents > :global(.jse-identifier) > :global(.jse-key),
     > .jse-header-outer > .jse-header > :global(.jse-identifier) > :global(.jse-key) {
-      background: var(--jse-selection-background-color);
+      background: $selection-background;
       cursor: grab;
     }
   }
 
   // value selected (part 1)
   &.jse-selected-value > .jse-contents-outer > .jse-contents > :global(.jse-value) {
-    background: var(--jse-selection-background-color);
+    background: $selection-background;
     cursor: grab;
   }
 
@@ -63,11 +63,11 @@
     .jse-items .jse-header,
     .jse-items .jse-footer,
     .jse-items .jse-expand {
-      background: var(--jse-selection-background-color);
+      background: $selection-background;
 
       :global(.jse-key),
       :global(.jse-value) {
-        background: var(--jse-selection-background-color);
+        background: $selection-background;
         cursor: grab;
       }
     }

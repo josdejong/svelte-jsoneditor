@@ -15,8 +15,8 @@
   min-width: 80px;
 
   button.jse-navigation-bar-dropdown-item {
-    font-family: $font-family-mono;
-    font-size: $font-size-mono;
+    font-family: var(--jse-font-family-mono);
+    font-size: var(--jse-font-size-mono);
     border: none;
     background: transparent;
     cursor: pointer;

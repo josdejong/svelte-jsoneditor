@@ -1,13 +1,13 @@
 .jse-theme-big {
-  --jse-menu-color: #ff3e00;
-  --jse-menu-color-light: #fd5e2d;
+  --jse-menu-background: #ff3e00;
+  --jse-menu-background-highlight: #fd5e2d;
   --jse-menu-button-size: 48px;
 
   --jse-font-family: courier New;
   --jse-font-family-mono: courier New;
-  --jse-font-size: 32px;
+  --jse-font-size: 28px;
   --jse-font-size-small: 24px;
-  --jse-font-size-mono: 32px;
+  --jse-font-size-mono: 28px;
 
   --jse-button-primary-background: #ff3e00;
   --jse-button-primary-background-highlight: #e74c1c;

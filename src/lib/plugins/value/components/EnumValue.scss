@@ -6,15 +6,15 @@
   border: none;
   padding: 0;
 
-  font-family: $font-family-mono;
-  font-size: $font-size-mono;
+  font-family: var(--jse-font-family-mono);
+  font-size: var(--jse-font-size-mono);
 
   cursor: pointer;
   outline: none;
 
   &.jse-selected {
-    background: $selection-background;
-    color: $selection-color;
+    background: var(--jse-selection-background-color);
+    color: inherit;
   }
 
   &.jse-value:focus {
