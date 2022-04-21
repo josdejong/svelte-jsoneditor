@@ -10,6 +10,7 @@
   --jse-menu-color: #3c3c3c;
   --jse-menu-color-light: #565656;
   --jse-menu-text-color: #e5e5e5;
+  --jse-modal-background: rgba(255, 255, 255, 0.2);
 
   /* navigation bar, gutter, search box */
   --jse-panel-background-color: #333333;

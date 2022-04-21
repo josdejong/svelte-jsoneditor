@@ -42,19 +42,38 @@
 }
 
 // custom styling for the modal.
-// FIXME: not neat to override global styles!
-:global(.bg) {
+:global(.bg.jse-modal-bg) {
   width: 100%;
   height: 100%;
-}
-:global(.bg .window-wrap) {
-  margin: 0;
-}
-:global(.bg .window) {
-  max-width: 90%;
-  margin: 4rem auto 2rem auto;
+  top: 0;
+  left: 0;
+  background: var(--jse-modal-background);
 }
 
-:global(.bg .content) {
+:global(.bg.jse-modal-bg .jse-modal-window-wrap) {
+  margin: 0;
+}
+
+:global(.bg.jse-modal-bg .jse-modal-window) {
+  max-width: 90%;
+  margin: 4rem auto 2rem auto;
+  border-radius: 2px;
+}
+
+:global(.bg.jse-modal-bg .jse-modal-window.jse-modal-window-sort) {
+  width: 400px;
+}
+
+:global(.bg.jse-modal-bg .jse-modal-window.jse-modal-window-transform) {
+  width: 1200px;
+  height: 1200px;
+  max-height: 80%;
+  display: flex;
+}
+
+:global(.bg.jse-modal-bg .jse-modal-content) {
+  flex: 1;
+  display: flex;
   max-height: calc(100vh - 6rem);
+  padding: 0;
 }
