@@ -160,12 +160,12 @@
       }
     } else {
       switch (anchorType) {
+        // intentional fall-through
         case SELECTION_TYPE.KEY:
-          context.onSelect({ type: SELECTION_TYPE.KEY, path })
-          break
-
         case SELECTION_TYPE.VALUE:
-          context.onSelect({ type: SELECTION_TYPE.VALUE, path })
+        case SELECTION_TYPE.AFTER:
+        case SELECTION_TYPE.INSIDE:
+          context.onSelect({ type: anchorType, path })
           break
 
         case SELECTION_TYPE.MULTI:
@@ -179,12 +179,6 @@
               focusPath: path
             })
           }
-          break
-
-        case SELECTION_TYPE.AFTER:
-        case SELECTION_TYPE.INSIDE:
-          // do nothing: event already handled by event listener on the element or component itself
-          // TODO: move the logic here instead of in separate event listeners
           break
       }
     }

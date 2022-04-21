@@ -1344,11 +1344,13 @@
   /**
    * Find the DOM element of a given path.
    * Note that the path can only be found when the node is expanded.
+   * @param {Path} path
+   * @return {HTMLElement | null}
    */
-  function findElement(path) {
+  export function findElement(path) {
     return refContents
       ? refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
-      : undefined
+      : null
   }
 
   /**

@@ -65,7 +65,7 @@
   $: hasJson = json !== undefined
   $: hasSelection = selection != null
   $: rootSelected = hasSelection && isEmpty(selection.focusPath)
-  $: focusValue = getIn(json, selection.focusPath)
+  $: focusValue = hasSelection ? getIn(json, selection.focusPath) : undefined
 
   $: hasSelectionContents =
     hasJson &&
@@ -101,14 +101,16 @@
 
   $: convertMode = hasSelectionContents
   $: insertOrConvertText = convertMode ? 'Convert to' : 'Insert'
-  $: canInsertOrConvertStructure = !convertMode
-  $: canInsertOrConvertObject = convertMode ? canConvert(selection) && !isObject(focusValue) : true
+  $: canInsertOrConvertStructure = convertMode ? false : hasSelection
+  $: canInsertOrConvertObject = convertMode
+    ? canConvert(selection) && !isObject(focusValue)
+    : hasSelection
   $: canInsertOrConvertArray = convertMode
     ? canConvert(selection) && !Array.isArray(focusValue)
-    : true
+    : hasSelection
   $: canInsertOrConvertValue = convertMode
     ? canConvert(selection) && isObjectOrArray(focusValue)
-    : true
+    : hasSelection
 
   $: enforceString =
     selection != null
