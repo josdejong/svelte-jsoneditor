@@ -22,9 +22,7 @@
     }
 
     &.jse-navigation-bar-arrow {
-      //font-size: $font-size-mono - 8px;
-      //font-size: unset;
-      padding: $padding-half $padding;
+      padding: 2px $padding 0;
 
       &.jse-open {
         background: var(--jse-panel-dropdown-background);

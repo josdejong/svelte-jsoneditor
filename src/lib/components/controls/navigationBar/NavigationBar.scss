@@ -8,9 +8,9 @@
   padding: 0;
   margin: 0;
   display: flex;
-  overflow: hidden;
+  overflow: auto;
 
-  .jse-navigation-bar-empty {
+  .jse-navigation-bar-space {
     padding: $padding-half $padding;
     color: var(--jse-panel-text-color-light);
   }
