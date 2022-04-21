@@ -14,8 +14,8 @@
 
   /* over all colors */
   --jse-background-color: #fff;
-  --jse-text-color: #1a1a1a;
-  --jse-error-text-color: #ee5341;
+  --jse-color: #1a1a1a;
+  --jse-error-color: #ee5341;
   --jse-selection-background-color: #d3d3d3;
   --jse-selection-background-dark-color: #c2c2c2;
   --jse-selection-background-light-color: #e8e8e8;
@@ -34,27 +34,27 @@
   /* main menu, modal header */
   --jse-menu-color: #3883fa;
   --jse-menu-color-light: #5f9dff;
-  --jse-menu-text-color: #fff;
+  --jse-menu-color: #fff;
   --jse-menu-button-size: 32px;
   --jse-modal-background: rgba(0, 0, 0, 0.3);
 
   /* navigation bar, gutter, search box */
   --jse-panel-background-color: #ebebeb;
   --jse-panel-background-highlight: #e0e0e0;
-  --jse-panel-text-color: #1a1a1a;
-  --jse-panel-text-color-light: #656565;
-  --jse-panel-text-color-readonly: #b2b2b2;
-  --jse-panel-text-color-highlight: #1a1a1a;
+  --jse-panel-color: #1a1a1a;
+  --jse-panel-color-light: #656565;
+  --jse-panel-color-readonly: #b2b2b2;
+  --jse-panel-color-highlight: #1a1a1a;
   --jse-panel-border: 1px solid #d7d7d7;
   --jse-panel-dropdown-background: #fff;
   --jse-panel-dropdown-background-highlight: #e5e5e5;
-  --jse-panel-dropdown-text-color: #656565;
+  --jse-panel-dropdown-color: #656565;
 
   /* context menu */
   --jse-context-menu-background: #656565;
   --jse-context-menu-background-highlight: #7a7a7a;
-  --jse-context-menu-text-color: #fff;
-  --jse-context-menu-text-color-disabled: #9d9d9d;
+  --jse-context-menu-color: #fff;
+  --jse-context-menu-color-disabled: #9d9d9d;
   --jse-context-menu-separator-color: #7a7a7a;
   --jse-context-menu-button-size: calc(1em + 4px);
 
@@ -70,7 +70,7 @@
 
   /* inline tags inside the JSON document */
   --jse-tag-background: rgba(0, 0, 0, 0.25);
-  --jse-tag-text-color: #fff;
+  --jse-tag-color: #fff;
 
   /* input fields in modals */
   --jse-input-border: 1px solid #d8dbdf;
@@ -81,11 +81,11 @@
   /* buttons in modals */
   --jse-button-background: #e0e0e0;
   --jse-button-background-highlight: #e7e7e7;
-  --jse-button-text-color: #1a1a1a;
+  --jse-button-color: #1a1a1a;
   --jse-button-primary-background: #3883fa;
   --jse-button-primary-background-highlight: #5f9dff;
   --jse-button-primary-background-disabled: #9d9d9d;
-  --jse-button-primary-text-color: #fff;
+  --jse-button-primary-color: #fff;
 
   /* svelte-select */
   --itemIsActiveBG: #3883fa;

@@ -4,7 +4,7 @@
   font-family: var(--jse-font-family-mono);
   font-size: var(--jse-font-size-mono);
   background: var(--jse-panel-background-color);
-  color: var(--jse-panel-text-color-light);
+  color: var(--jse-panel-color-light);
   padding: 0;
   margin: 0;
   display: flex;
@@ -12,6 +12,6 @@
 
   .jse-navigation-bar-space {
     padding: $padding-half $padding;
-    color: var(--jse-panel-text-color-light);
+    color: var(--jse-panel-color-light);
   }
 }

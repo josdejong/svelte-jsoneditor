@@ -26,7 +26,7 @@
   --jse-context-menu-button-size: 32px;
   --jse-context-menu-background: #ff3e00;
   --jse-context-menu-background-highlight: #ea3600;
-  --jse-context-menu-text-color: #fff;
-  --jse-context-menu-text-color-disabled: rgba(255, 255, 255, 0.4);
+  --jse-context-menu-color: #fff;
+  --jse-context-menu-color-disabled: rgba(255, 255, 255, 0.4);
   --jse-context-menu-separator-color: rgba(255, 255, 255, 0.2);
 }

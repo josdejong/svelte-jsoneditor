@@ -6,7 +6,7 @@
   left: 0;
   z-index: 3; // above the floating ContextMenuButton
   background: var(--jse-panel-dropdown-background);
-  color: var(--jse-panel-dropdown-text-color);
+  color: var(--jse-panel-dropdown-color);
   box-shadow: $box-shadow;
   display: flex;
   flex-direction: column;
@@ -33,7 +33,7 @@
     }
 
     &.jse-selected {
-      background: var(--jse-panel-dropdown-text-color);
+      background: var(--jse-panel-dropdown-color);
       color: var(--jse-panel-dropdown-background);
     }
   }

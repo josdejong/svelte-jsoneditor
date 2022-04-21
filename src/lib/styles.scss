@@ -74,7 +74,7 @@ $outline-shadow: 0 0 10px 0 $theme-color-light;
   @include jsoneditor-button;
 
   background: var(--jse-button-primary-background);
-  color: var(--jse-button-primary-text-color);
+  color: var(--jse-button-primary-color);
   padding: $padding 2 * $padding;
   border-radius: $border-radius;
 

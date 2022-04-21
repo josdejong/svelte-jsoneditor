@@ -10,7 +10,7 @@
   min-height: 0;
   font-family: $font-family-mono;
   font-size: $font-size-mono;
-  color: var(--jse-text-color);
+  color: var(--jse-color);
   line-height: var(--jse-line-height);
 
   &:not(.jse-visible) {

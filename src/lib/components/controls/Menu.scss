@@ -5,7 +5,7 @@
   font-size: $font-size;
   background: var(--jse-menu-color);
   border-bottom: 1px solid var(--jse-menu-color);
-  color: var(--jse-menu-text-color);
+  color: var(--jse-menu-color);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -29,14 +29,14 @@
     }
 
     &:disabled {
-      color: var(--jse-menu-text-color);
+      color: var(--jse-menu-color);
       opacity: 0.5;
 
       background: transparent;
     }
 
     &.jse-group-button {
-      $group-button-color: var(--jse-menu-text-color);
+      $group-button-color: var(--jse-menu-color);
 
       border: 1px solid $group-button-color;
       &:not(.jse-last) {
@@ -75,7 +75,7 @@
   .jse-separator {
     $margin: 3px;
 
-    background: var(--jse-menu-text-color);
+    background: var(--jse-menu-color);
     opacity: 0.3;
     box-sizing: border-box;
     width: 1px;

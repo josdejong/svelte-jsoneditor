@@ -17,12 +17,12 @@
 
   :global(.picker_editor input) {
     background: var(--jse-background-color);
-    color: var(--jse-text-color);
+    color: var(--jse-color);
   }
 
   :global(.picker_done button) {
     background: var(--jse-button-background);
-    color: var(--jse-button-text-color);
+    color: var(--jse-button-color);
   }
 
   :global(.picker_done button:hover) {

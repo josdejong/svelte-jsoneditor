@@ -26,7 +26,7 @@
 
     width: 2em;
     background: var(--jse-context-menu-background);
-    color: var(--jse-context-menu-text-color);
+    color: var(--jse-context-menu-color);
 
     &.jse-visible {
       background: $background;
@@ -37,7 +37,7 @@
     }
 
     &:disabled {
-      color: var(--jse-context-menu-text-color-disabled);
+      color: var(--jse-context-menu-color-disabled);
       background: unset;
     }
 
@@ -51,7 +51,7 @@
     left: 0;
     z-index: 1;
     background: $background;
-    color: var(--jse-context-menu-text-color);
+    color: var(--jse-context-menu-color);
     box-shadow: $box-shadow;
 
     &.jse-visible {
@@ -71,7 +71,7 @@
       }
 
       &:disabled {
-        color: var(--jse-context-menu-text-color-disabled);
+        color: var(--jse-context-menu-color-disabled);
         background: unset;
       }
     }

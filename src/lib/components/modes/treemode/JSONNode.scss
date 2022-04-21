@@ -3,7 +3,7 @@
 
 .jse-json-node {
   position: relative;
-  color: var(--jse-text-color);
+  color: var(--jse-color);
 
   &.jse-root {
     min-height: 100%;
@@ -180,7 +180,7 @@
   border: none;
   font-size: 80%;
   font-family: $font-family;
-  color: var(--jse-tag-text-color);
+  color: var(--jse-tag-color);
   background: var(--jse-tag-background);
   border-radius: 2px;
   cursor: pointer;

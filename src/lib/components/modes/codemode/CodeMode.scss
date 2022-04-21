@@ -27,12 +27,12 @@
         font-family: $font-family-mono;
         font-size: $font-size-mono;
         line-height: var(--jse-line-height);
-        color: var(--jse-text-color);
+        color: var(--jse-color);
       }
 
       :global(.cm-gutters) {
         background: var(--jse-panel-background-color);
-        color: var(--jse-panel-text-color-readonly);
+        color: var(--jse-panel-color-readonly);
         border-right: var(--jse-panel-border);
       }
 
@@ -47,7 +47,7 @@
 
       :global(.cm-foldPlaceholder) {
         background: var(--jse-tag-background);
-        color: var(--jse-tag-text-color);
+        color: var(--jse-tag-color);
         border: none;
         padding: 0 $padding;
       }
@@ -70,15 +70,15 @@
       :global(.cm-search button) {
         font-family: $font-family;
         font-size: $font-size-small;
-        color: var(--jse-panel-text-color);
+        color: var(--jse-panel-color);
       }
 
       :global(.cm-search button[name='close']) {
         font-size: 24px;
-        color: var(--jse-panel-text-color);
+        color: var(--jse-panel-color);
 
         &:hover {
-          color: var(--jse-panel-text-color-highlight);
+          color: var(--jse-panel-color-highlight);
         }
       }
     }

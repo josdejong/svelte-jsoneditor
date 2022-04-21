@@ -1,7 +1,7 @@
 .jse-theme-dark {
   /* over all colors */
   --jse-background-color: #1e1e1e;
-  --jse-text-color: #d4d4d4;
+  --jse-color: #d4d4d4;
   --jse-selection-background-color: #464646;
   --jse-selection-background-dark-color: #343434;
   --jse-hover-background-color: #343434;
@@ -10,19 +10,19 @@
   /* main menu, modal header */
   --jse-menu-color: #3c3c3c;
   --jse-menu-color-light: #565656;
-  --jse-menu-text-color: #e5e5e5;
+  --jse-menu-color: #e5e5e5;
   --jse-modal-background: rgba(255, 255, 255, 0.2);
 
   /* navigation bar, gutter, search box */
   --jse-panel-background-color: #333333;
   --jse-panel-background-highlight: #464646;
-  --jse-panel-text-color: #d4d4d4;
-  --jse-panel-text-color-readonly: #737373;
-  --jse-panel-text-color-highlight: #8d8d8d;
+  --jse-panel-color: #d4d4d4;
+  --jse-panel-color-readonly: #737373;
+  --jse-panel-color-highlight: #8d8d8d;
   --jse-panel-border: 1px solid #3c3c3c;
   --jse-panel-dropdown-background: #656565;
   --jse-panel-dropdown-background-highlight: #7e7e7e;
-  --jse-panel-dropdown-text-color: #d4d4d4;
+  --jse-panel-dropdown-color: #d4d4d4;
 
   /* json key and values */
   --jse-key-color: #9cdcfe;
@@ -36,7 +36,7 @@
 
   /* inline tags inside the JSON document */
   --jse-tag-background: #575757;
-  --jse-tag-text-color: #d4d4d4;
+  --jse-tag-color: #d4d4d4;
 
   /* input fields in modals */
   --jse-input-border: 1px solid #737373;
@@ -46,7 +46,7 @@
   /* buttons in modals */
   --jse-button-background: #808080;
   --jse-button-background-highlight: #7a7a7a;
-  --jse-button-text-color: #e0e0e0;
+  --jse-button-color: #e0e0e0;
 
   /* svelte-select component */
   --border: 1px solid #737373;
