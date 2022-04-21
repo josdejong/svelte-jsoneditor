@@ -67,6 +67,9 @@
   --jse-input-radius: 3px;
 
   /* buttons in modals */
+  --jse-button-background: #e0e0e0;
+  --jse-button-background-highlight: #e7e7e7;
+  --jse-button-text-color: #1a1a1a;
   --jse-button-primary-background: #3883fa;
   --jse-button-primary-background-highlight: #5f9dff;
   --jse-button-primary-background-disabled: #9d9d9d;
@@ -76,4 +79,8 @@
   --itemIsActiveBG: #3883fa;
   --border: 1px solid #d8dbdf;
   --borderRadius: 3px;
+
+  /* color picker */
+  --jse-color-picker-background: #ebebeb;
+  --jse-color-picker-border-box-shadow: #cbcbcb 0 0 0 1px;
 }

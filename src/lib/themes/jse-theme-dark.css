@@ -1,14 +1,17 @@
 .jse-theme-dark {
+  /* over all colors */
   --jse-background-color: #1e1e1e;
   --jse-text-color: #d4d4d4;
   --jse-selection-background-color: #464646;
   --jse-selection-background-dark-color: #343434;
   --jse-edit-outline: 2px solid #d4d4d4;
 
+  /* main menu, modal header */
   --jse-menu-color: #3c3c3c;
   --jse-menu-color-light: #565656;
   --jse-menu-text-color: #e5e5e5;
 
+  /* navigation bar, gutter, search box */
   --jse-panel-background-color: #333333;
   --jse-panel-background-highlight: #464646;
   --jse-panel-text-color: #d4d4d4;
@@ -19,6 +22,7 @@
   --jse-panel-dropdown-background-highlight: #7e7e7e;
   --jse-panel-dropdown-text-color: #d4d4d4;
 
+  /* json key and values */
   --jse-key-color: #9cdcfe;
   --jse-value-color: #d4d4d4;
   --jse-value-color-number: #b5cea8;
@@ -28,13 +32,24 @@
   --jse-value-color-url: #ce9178;
   --jse-delimiter-color: #575757;
 
+  /* inline tags inside the JSON document */
   --jse-tag-background: #575757;
   --jse-tag-text-color: #d4d4d4;
 
+  /* input fields in modals */
   --jse-input-border: 1px solid #737373;
   --jse-input-border-readonly: 1px solid #3f3f3f;
   --jse-input-border-focus: 1px solid #3f3f3f;
 
+  /* buttons in modals */
+  --jse-button-background: #808080;
+  --jse-button-background-highlight: #7a7a7a;
+  --jse-button-text-color: #e0e0e0;
+
   /* svelte-select component */
   --border: 1px solid #737373;
+
+  /* color picker */
+  --jse-color-picker-background: #656565;
+  --jse-color-picker-border-box-shadow: #8c8c8c 0 0 0 1px;
 }

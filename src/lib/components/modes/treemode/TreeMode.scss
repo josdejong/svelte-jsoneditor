@@ -76,10 +76,3 @@
     padding: 2px;
   }
 }
-
-// color picker styles
-:global(.picker_wrapper.popup),
-:global(.picker_wrapper.popup .picker_arrow::before),
-:global(.picker_wrapper.popup .picker_arrow::after) {
-  background: red !important; // FIXME
-}
