@@ -202,10 +202,3 @@
   vertical-align: top;
   position: relative;
 }
-
-:global(.jse-bubble.jse-dark) {
-  background: $dark-gray !important;
-  color: $white;
-  font-family: $font-family !important;
-  font-size: $font-size !important;
-}
