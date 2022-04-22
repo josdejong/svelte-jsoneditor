@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.46](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.45...v0.3.46) (2022-04-22)
+
+
+### Features
+
+* show tip in ContextMenu when it is opened via the ContextMenuButton or the main menu ([b9c38d2](https://github.com/josdejong/svelte-jsoneditor/commit/b9c38d275396ce00dcc61c4c34d4ecb523c9915c))
+
+
+### Bug Fixes
+
+* floating context menu button not rendered when a key is selected ([1ec4ed9](https://github.com/josdejong/svelte-jsoneditor/commit/1ec4ed9ba8af197856ce33e1e42b78dadf8de416))
+
 ### [0.3.45](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.44...v0.3.45) (2022-04-21)
 
 

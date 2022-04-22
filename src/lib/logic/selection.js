@@ -878,3 +878,18 @@ export function canConvert(selection) {
     return true
   }
 }
+
+/**
+ * @param {Path} path
+ * @param {string} key
+ * @param {RecursiveSelection} resolvedSelection
+ * @returns {boolean}
+ */
+// TODO: write unit test
+export function keyIsSelected(path, key, resolvedSelection) {
+  const keySelection = resolvedSelection?.[key]?.[STATE_SELECTION]
+
+  return keySelection && keySelection.type === SELECTION_TYPE.KEY && !keySelection.edit
+    ? isEqual(keySelection.focusPath, path.concat(key))
+    : false
+}

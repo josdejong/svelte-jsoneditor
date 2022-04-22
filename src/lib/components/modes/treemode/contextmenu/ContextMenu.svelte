@@ -22,7 +22,7 @@
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { isObjectOrArray } from '$lib/utils/typeUtils'
-  import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
+  import { faCheckSquare, faLightbulb, faSquare } from '@fortawesome/free-regular-svg-icons'
   import { STATE_ENFORCE_STRING } from '$lib/constants'
   import { isObject } from '../../../../utils/typeUtils.js'
   import { canConvert } from '../../../../logic/selection.js'
@@ -30,6 +30,8 @@
   export let json
   export let state
   export let selection
+
+  export let showTip
 
   export let onCloseContextMenu
   export let onEditKey
@@ -520,6 +522,16 @@
       <Icon data={faCaretSquareDown} /> Insert after
     </button>
   </div>
+  {#if showTip}
+    <div class="row">
+      <div class="tip">
+        <div>
+          <Icon data={faLightbulb} />
+        </div>
+        <div>Tip: you can open this context menu via right-click or with Ctrl+Q</div>
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style src="./ContextMenu.scss"></style>

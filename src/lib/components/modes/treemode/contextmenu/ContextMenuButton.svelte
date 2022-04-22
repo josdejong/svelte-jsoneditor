@@ -23,7 +23,8 @@
         anchor: buttonElem,
         width: CONTEXT_MENU_WIDTH,
         height: CONTEXT_MENU_HEIGHT,
-        offsetTop: 2
+        offsetTop: 2,
+        showTip: true
       })
     }
   }

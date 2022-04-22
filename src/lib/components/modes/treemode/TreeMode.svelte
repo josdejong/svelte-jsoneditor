@@ -1811,11 +1811,12 @@
   /**
    * @param {ContextMenuProps} contextMenuProps
    */
-  function openContextMenu({ anchor, left, top, width, height, offsetTop, offsetLeft }) {
+  function openContextMenu({ anchor, left, top, width, height, offsetTop, offsetLeft, showTip }) {
     const props = {
       json,
       state,
       selection,
+      showTip,
 
       onEditKey: handleEditKey,
       onEditValue: handleEditValue,
@@ -1877,7 +1878,8 @@
         left: event.clientX,
         top: event.clientY,
         width: CONTEXT_MENU_WIDTH,
-        height: CONTEXT_MENU_HEIGHT
+        height: CONTEXT_MENU_HEIGHT,
+        showTip: false
       })
     } else {
       // type === 'keydown' (from the quick key Ctrl+Q)
@@ -1888,7 +1890,8 @@
           anchor,
           offsetTop: 2,
           width: CONTEXT_MENU_WIDTH,
-          height: CONTEXT_MENU_HEIGHT
+          height: CONTEXT_MENU_HEIGHT,
+          showTip: false
         })
       } else {
         // fallback on just displaying the ContextMenu top left
@@ -1897,7 +1900,8 @@
           top: rect.top + 2,
           left: rect.left + 2,
           width: CONTEXT_MENU_WIDTH,
-          height: CONTEXT_MENU_HEIGHT
+          height: CONTEXT_MENU_HEIGHT,
+          showTip: false
         })
       }
     }
@@ -1914,7 +1918,8 @@
       anchor: findParentWithNodeName(event.target, 'BUTTON'),
       offsetTop: 0,
       width: CONTEXT_MENU_WIDTH,
-      height: CONTEXT_MENU_HEIGHT
+      height: CONTEXT_MENU_HEIGHT,
+      showTip: true
     })
   }
 
