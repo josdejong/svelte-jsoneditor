@@ -31,6 +31,26 @@
       color: $gray;
     }
 
+    div.tip {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.2);
+      color: $white;
+      margin: $padding-half;
+      padding: $padding-half $padding;
+      font-size: 80%;
+      line-height: 1.3em;
+
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: $padding;
+      border-radius: $border-radius;
+
+      div {
+        vertical-align: middle;
+      }
+    }
+
     button {
       flex: 1;
       white-space: nowrap;

@@ -290,11 +290,13 @@
  * @property {number} height
  * @property {number} offsetTop
  * @property {number} offsetLeft
+ * @property {boolean} showTip
  */
 
 /**
  * @typedef {Object} TreeModeContext
  * @property {boolean} readOnly
+ * @property {boolean} showTip
  * @property {ValueNormalization} normalization
  * @property {() => JSON} getFullJson
  * @property {() => JSON} getFullState
