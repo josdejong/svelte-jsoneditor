@@ -45,6 +45,7 @@
   import { forEachIndex } from '../../../utils/arrayUtils.js'
   import { getDataPathFromTarget } from '../../../utils/domUtils.js'
   import { createMemoizePath } from '../../../utils/pathUtils.js'
+  import { keyIsSelected } from '../../../logic/selection.js'
 
   export let value
   export let path
@@ -678,7 +679,7 @@
                 searchResult={searchResult?.[key]?.[STATE_SEARCH_PROPERTY]}
                 onUpdateKey={handleUpdateKey}
               />
-              {#if !context.readOnly && selectionObj && selectionObj.type === SELECTION_TYPE.KEY && !selectionObj.edit && isEqual(selectionObj.focusPath, path.concat(key))}
+              {#if !context.readOnly && keyIsSelected(path, key, resolvedSelection)}
                 <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
               {/if}
             </div>
