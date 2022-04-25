@@ -64,11 +64,13 @@
       :global(.cm-search) {
         background: var(--jse-panel-background-color);
         color: var(--jse-panel-color);
+        font-family: var(--jse-font-family);
+        font-size: var(--jse-font-size);
       }
 
       :global(.cm-search input) {
         font-family: var(--jse-font-family);
-        font-size: var(--jse-font-size-small);
+        font-size: var(--jse-font-size-code-mode-search);
         color: var(--jse-panel-color);
         border: var(--jse-panel-border);
         background: var(--jse-panel-input-background);
@@ -77,7 +79,7 @@
 
       :global(.cm-search button) {
         font-family: var(--jse-font-family);
-        font-size: var(--jse-font-size-small);
+        font-size: var(--jse-font-size-code-mode-search);
 
         color: var(--jse-panel-button-color);
         background: var(--jse-panel-button-background);
@@ -96,7 +98,7 @@
 
       :global(.cm-search label) {
         font-family: var(--jse-font-family);
-        font-size: var(--jse-font-size-small);
+        font-size: var(--jse-font-size-code-mode-search);
         padding-left: $padding;
       }
 

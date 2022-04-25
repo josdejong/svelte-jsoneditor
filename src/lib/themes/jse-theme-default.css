@@ -7,7 +7,7 @@
   --jse-font-family-mono: consolas, menlo, monaco, 'Ubuntu Mono', 'source-code-pro', monospace;
   --jse-font-size-mono: 14px;
   --jse-font-size: 16px;
-  --jse-font-size-small: 13px;
+  --jse-font-size-code-mode-search: 80%;
   --jse-line-height: calc(1em + 4px);
   --jse-indent-size: calc(1em + 4px);
   --jse-color-picker-button-size: 1em;
