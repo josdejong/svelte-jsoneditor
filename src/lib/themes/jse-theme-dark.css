@@ -36,6 +36,12 @@
   --jse-value-color-url: #ce9178;
   --jse-delimiter-color: #575757;
 
+  /* highlighting of search results */
+  --jse-search-match-color: #a16b37;
+  --jse-search-match-outline: 1px solid #c78748;
+  --jse-search-match-active-color: #d9934e;
+  --jse-search-match-active-outline: 1px solid #ecb783;
+
   /* inline tags inside the JSON document */
   --jse-tag-background: #575757;
   --jse-tag-color: #d4d4d4;
