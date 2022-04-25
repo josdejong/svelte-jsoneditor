@@ -13,13 +13,6 @@
   color: var(--jse-color);
   line-height: var(--jse-line-height);
 
-  &:not(.jse-visible) {
-    visibility: hidden;
-    height: 0;
-    width: 0;
-    flex: unset;
-  }
-
   .jse-hidden-input-label {
     position: absolute;
     right: 0;
@@ -63,6 +56,8 @@
       text-align: center;
       color: $gray;
       box-sizing: border-box;
+      font-family: var(--jse-font-family);
+      font-size: var(--jse-font-size);
     }
   }
 

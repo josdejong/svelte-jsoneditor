@@ -32,6 +32,8 @@
   --jse-message-success-color: #fff;
   --jse-message-info-background: #9d9d9d;
   --jse-message-info-color: #fff;
+  --jse-message-action-background: rgba(255, 255, 255, 0.2);
+  --jse-message-action-background-highlight: rgba(255, 255, 255, 0.3);
 
   /* main menu, modal header */
   --jse-menu-background: #3883fa;

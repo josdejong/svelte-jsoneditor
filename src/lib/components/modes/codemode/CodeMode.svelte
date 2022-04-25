@@ -801,7 +801,7 @@
       />
     {/if}
 
-    <div class="jse-contents" class:jse-visible={!codeEditorDisabled} bind:this={codeMirrorRef} />
+    <div class="jse-contents" class:jse-hidden={codeEditorDisabled} bind:this={codeMirrorRef} />
 
     {#if jsonParseError}
       <Message
@@ -815,7 +815,7 @@
 
     <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
   {:else}
-    <div class="jse-contents" class:visible={true}>
+    <div class="jse-contents">
       <div class="jse-loading-space" />
       <div class="jse-loading">loading...</div>
     </div>

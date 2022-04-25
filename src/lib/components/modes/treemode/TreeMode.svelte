@@ -121,7 +121,6 @@
   export let escapeUnicodeCharacters = false
   export let validator = null
 
-  export let visible = true
   export let indentation = 2
   export let onError
 
@@ -2032,7 +2031,6 @@
 
 <div
   class="jse-tree-mode"
-  class:jse-visible={visible}
   on:keydown={handleKeyDown}
   on:mousedown={handleMouseDown}
   on:contextmenu={handleContextMenu}

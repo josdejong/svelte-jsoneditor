@@ -15,7 +15,7 @@
     min-width: 0;
     min-height: 0;
 
-    &:not(.jse-visible) {
+    &.jse-hidden {
       visibility: hidden;
     }
 
@@ -96,6 +96,8 @@
       text-align: center;
       color: $gray;
       box-sizing: border-box;
+      font-family: var(--jse-font-family);
+      font-size: var(--jse-font-size);
     }
   }
 }

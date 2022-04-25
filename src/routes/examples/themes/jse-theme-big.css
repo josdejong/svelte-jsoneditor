@@ -20,8 +20,6 @@
   --jse-message-warning-color: #fdc539;
   --jse-message-success-background: #cde3ac;
   --jse-message-success-color: #9ac45d;
-  --jse-message-action-background: rgba(255, 255, 255, 0.2);
-  --jse-message-action-background-highlight: rgba(255, 255, 255, 0.3);
 
   --jse-context-menu-button-size: 32px;
   --jse-context-menu-background: #ff3e00;
