@@ -27,7 +27,7 @@
         font-family: var(--jse-font-family-mono);
         font-size: var(--jse-font-size-mono);
         line-height: var(--jse-line-height);
-        color: var(--jse-color);
+        color: var(--jse-key-color);
       }
 
       :global(.cm-gutters) {
@@ -63,23 +63,49 @@
 
       :global(.cm-search) {
         background: var(--jse-panel-background-color);
+        color: var(--jse-panel-color);
       }
 
-      :global(.cm-search label),
-      :global(.cm-search input),
-      :global(.cm-search button) {
+      :global(.cm-search input) {
         font-family: var(--jse-font-family);
         font-size: var(--jse-font-size-small);
         color: var(--jse-panel-color);
+        border: var(--jse-panel-border);
+        background: var(--jse-panel-input-background);
+        margin-right: 2px;
+      }
+
+      :global(.cm-search button) {
+        font-family: var(--jse-font-family);
+        font-size: var(--jse-font-size-small);
+
+        color: var(--jse-panel-button-color);
+        background: var(--jse-panel-button-background);
+
+        border: none;
+        cursor: pointer;
+        text-transform: capitalize;
+        padding: $padding-half $padding;
+        margin: 0;
+
+        &:hover {
+          color: var(--jse-panel-button-color-highlight);
+          background: var(--jse-panel-button-background-highlight);
+        }
+      }
+
+      :global(.cm-search label) {
+        font-family: var(--jse-font-family);
+        font-size: var(--jse-font-size-small);
+        padding-left: $padding;
+      }
+
+      :global(.cm-search label input) {
+        margin-right: 2px;
       }
 
       :global(.cm-search button[name='close']) {
         font-size: 24px;
-        color: var(--jse-panel-color);
-
-        &:hover {
-          color: var(--jse-panel-color-highlight);
-        }
       }
 
       :global(.cm-cursor-primary) {

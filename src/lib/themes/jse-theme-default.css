@@ -44,15 +44,18 @@
 
   /* navigation bar, gutter, search box */
   --jse-panel-background-color: #ebebeb;
-  --jse-panel-background-highlight: #e0e0e0;
   --jse-panel-color: #1a1a1a;
   --jse-panel-color-light: #656565;
   --jse-panel-color-readonly: #b2b2b2;
-  --jse-panel-color-highlight: #1a1a1a;
   --jse-panel-border: 1px solid #d7d7d7;
   --jse-panel-dropdown-background: #fff;
   --jse-panel-dropdown-background-highlight: #e5e5e5;
   --jse-panel-dropdown-color: #656565;
+  --jse-panel-input-background: #fff;
+  --jse-panel-button-color: inherit;
+  --jse-panel-button-background: transparent;
+  --jse-panel-button-color-highlight: #1a1a1a;
+  --jse-panel-button-background-highlight: #e0e0e0;
 
   /* context menu */
   --jse-context-menu-background: #656565;

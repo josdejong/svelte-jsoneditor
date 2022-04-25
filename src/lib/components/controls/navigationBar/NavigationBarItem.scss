@@ -18,7 +18,8 @@
 
     &:focus,
     &:hover {
-      background: var(--jse-panel-background-highlight);
+      background: var(--jse-panel-button-background-highlight);
+      color: var(--jse-panel-button-color-highlight);
     }
 
     &.jse-navigation-bar-arrow {
