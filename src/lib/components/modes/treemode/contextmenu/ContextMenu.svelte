@@ -523,8 +523,8 @@
     </button>
   </div>
   {#if showTip}
-    <div class="row">
-      <div class="tip">
+    <div class="jse-row">
+      <div class="jse-tip">
         <div>
           <Icon data={faLightbulb} />
         </div>

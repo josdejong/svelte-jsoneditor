@@ -30,10 +30,10 @@
       line-height: normal;
     }
 
-    div.tip {
+    div.jse-tip {
       flex: 1;
-      background: rgba(255, 255, 255, 0.2);
-      color: $white;
+      background: var(--jse-context-menu-tip-background);
+      color: var(--jse-context-menu-tip-color);
       margin: $padding-half;
       padding: $padding-half $padding;
       font-size: 80%;
