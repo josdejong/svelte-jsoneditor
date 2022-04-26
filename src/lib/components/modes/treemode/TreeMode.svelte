@@ -877,8 +877,6 @@
     }
   }
 
-  $: console.log('selection', selection)
-
   /**
    * @param {InsertType} type
    */
