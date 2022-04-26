@@ -62,6 +62,7 @@
   const debug = createDebug('jsoneditor:JSONNode')
 
   let hover = undefined
+  let hoverTimer = undefined
   let dragging = undefined
 
   $: resolvedValue = dragging?.updatedValue !== undefined ? dragging.updatedValue : value
@@ -412,12 +413,17 @@
     } else if (isChildOfAttribute(event.target, 'data-type', 'insert-selection-area-after')) {
       hover = HOVER_INSERT_AFTER
     }
+
+    clearTimeout(hoverTimer)
   }
 
   function handleMouseOut(event) {
     event.stopPropagation()
 
-    hover = undefined
+    // to prevent "flickering" in the hovering state when hovering on the edge
+    // of the insert area context menu button: it's visibility toggles when
+    // `hover` toggles, which will alternating mouseout and mouseover events
+    hoverTimer = setTimeout(() => (hover = undefined))
   }
 
   function handleInsertInside(event) {
