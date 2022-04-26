@@ -429,6 +429,12 @@
       }
     }
 
+    if (!selection && json === undefined && (text === '' || text === undefined)) {
+      // make sure there is a selection,
+      // else we cannot paste or insert in case of an empty document
+      selection = createDefaultSelection()
+    }
+
     addHistoryItem({
       previousJson,
       previousState,
@@ -870,6 +876,8 @@
       focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
     }
   }
+
+  $: console.log('selection', selection)
 
   /**
    * @param {InsertType} type
@@ -1795,6 +1803,10 @@
         if (!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) {
           // for example when clicking on the empty area in the main menu
           focus()
+
+          if (!selection && json === undefined && (text === '' || text === undefined)) {
+            selection = createDefaultSelection()
+          }
         }
       })
     })
