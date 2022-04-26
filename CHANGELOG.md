@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.47](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.46...v0.3.47) (2022-04-26)
+
+
+### Bug Fixes
+
+* allow defining multiple functions in the query of the Transform modal ([31e9b8b](https://github.com/josdejong/svelte-jsoneditor/commit/31e9b8b50ea35dfd6b58145c602ff01a59a66fc2))
+* be able to right-click on top of a property/item tag to open the context menu ([a033abf](https://github.com/josdejong/svelte-jsoneditor/commit/a033abf535c146ca76b38113ccce6a03917ab884))
+* context menu button of insert area sometimes flickering ([282e31d](https://github.com/josdejong/svelte-jsoneditor/commit/282e31d8a52bc43b8d2fba25347d7ec9f040ffc8))
+* full document being selected when clicking scrollbar or main menu when there is no selection ([5109de1](https://github.com/josdejong/svelte-jsoneditor/commit/5109de1bf4d5b7a9399b1180f7e09f8777f67447))
+* fully expand an inserted structure ([a22f405](https://github.com/josdejong/svelte-jsoneditor/commit/a22f405765692abb3b66deae9d92fb89f9a085a6))
+* improve the Javascript and Lodash queries generated via the wizard ([9666120](https://github.com/josdejong/svelte-jsoneditor/commit/9666120ce8cbad2508fe190926601772ae0ff741))
+* sort/transform the contents of the key instead of the parent when a key is selected ([e761a79](https://github.com/josdejong/svelte-jsoneditor/commit/e761a79a2a9bc5cf3615bfe49c2f9832c3569c22))
+
 ### [0.3.46](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.45...v0.3.46) (2022-04-22)
 
 
