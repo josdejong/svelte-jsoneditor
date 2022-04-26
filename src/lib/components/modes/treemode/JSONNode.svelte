@@ -120,7 +120,10 @@
 
   function handleMouseDown(event) {
     // check if the mouse down is not happening in the key or value input fields or on a button
-    if (isContentEditableDiv(event.target) || isChildOfNodeName(event.target, 'BUTTON')) {
+    if (
+      isContentEditableDiv(event.target) ||
+      (event.which === 1 && isChildOfNodeName(event.target, 'BUTTON')) // left mouse on a button
+    ) {
       return
     }
 
