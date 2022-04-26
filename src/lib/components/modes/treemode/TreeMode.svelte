@@ -428,7 +428,7 @@
       }
     }
 
-    if (!selection && (text === '' || text === undefined)) {
+    if (!selection && json === undefined && (text === '' || text === undefined)) {
       // make sure there is a selection,
       // else we cannot paste or insert in case of an empty document
       selection = createDefaultSelection()
@@ -705,7 +705,7 @@
   function handlePaste(event) {
     event.preventDefault()
 
-    if (readOnly || !selection) {
+    if (readOnly) {
       return
     }
 
@@ -740,13 +740,15 @@
 
   function doPaste(clipboardText) {
     if (json !== undefined) {
-      const operations = insert(json, state, selection, clipboardText)
+      const selectionOrDefault = selection || createDefaultSelection()
+
+      const operations = insert(json, state, selectionOrDefault, clipboardText)
       const expandAllRecursive = !isLargeContent(
         { text: clipboardText },
         MAX_DOCUMENT_SIZE_EXPAND_ALL
       )
 
-      debug('paste', { clipboardText, operations, selection, expandAllRecursive })
+      debug('paste', { clipboardText, operations, selectionOrDefault, expandAllRecursive })
 
       handlePatch(operations)
 
@@ -899,7 +901,7 @@
           const path = parseJSONPointerWithArrayIndices(patchedJson, operation.path)
 
           if (isObjectOrArray(newValue)) {
-            handleExpand(path, true)
+            handleExpand(path, true, true)
 
             return createSelection(patchedJson || {}, patchedState, {
               type: SELECTION_TYPE.INSIDE,
@@ -939,7 +941,7 @@
       handleChangeJson(newValue)
 
       const path = []
-      handleExpand(path, true)
+      handleExpand(path, true, true)
 
       selection = createSelection(json, state, {
         type: SELECTION_TYPE.INSIDE,
@@ -1799,7 +1801,7 @@
           // for example when clicking on the empty area in the main menu
           focus()
 
-          if (!selection) {
+          if (!selection && json === undefined && (text === '' || text === undefined)) {
             selection = createDefaultSelection()
           }
         }

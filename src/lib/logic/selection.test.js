@@ -176,6 +176,29 @@ describe('selection', () => {
       }),
       path2
     )
+
+    assert.deepStrictEqual(
+      findRootPath(json, {
+        type: SELECTION_TYPE.KEY,
+        path: path2,
+        anchorPath: path2,
+        focusPath: path2
+      }),
+      path2
+    )
+
+    assert.deepStrictEqual(
+      findRootPath(json, {
+        type: SELECTION_TYPE.MULTI,
+        anchorPath: ['a'],
+        focusPath: ['a'],
+        paths: [['a']],
+        pathsMap: {
+          '/a': true
+        }
+      }),
+      path2
+    )
   })
 
   describe('navigate', () => {

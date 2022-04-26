@@ -1,5 +1,6 @@
 import * as _ from 'lodash-es'
-import { isEmpty, last } from 'lodash-es'
+import { last } from 'lodash-es'
+import { createPropertySelector, stringifyPath } from '../../utils/pathUtils.js'
 
 const description = `
 <p>
@@ -32,9 +33,8 @@ function createQuery(json, queryOptions) {
   if (filter && filter.path && filter.relation && filter.value) {
     // Note that the comparisons embrace type coercion,
     // so a filter value like '5' (text) will match numbers like 5 too.
-    const getActualValue = !isEmpty(filter.path)
-      ? `item => _.get(item, ${JSON.stringify(filter.path)})`
-      : 'item => item'
+    const getActualValue = `item => item${createPropertySelector(filter.path)}`
+
     queryParts.push(
       `  data = _.filter(data, ${getActualValue} ${filter.relation} '${filter.value}')\n`
     )
@@ -42,7 +42,9 @@ function createQuery(json, queryOptions) {
 
   if (sort && sort.path && sort.direction) {
     queryParts.push(
-      `  data = _.orderBy(data, [${JSON.stringify(sort.path)}], ['${sort.direction}'])\n`
+      `  data = _.orderBy(data, ['${createLodashPropertySelector(sort.path)}'], ['${
+        sort.direction
+      }'])\n`
     )
   }
 
@@ -50,16 +52,15 @@ function createQuery(json, queryOptions) {
     // It is possible to make a util function "pickFlat"
     // and use that when building the query to make it more readable.
     if (projection.paths.length > 1) {
+      // Note that we do not use _.pick() here because this function doesn't flatten the results
       const paths = projection.paths.map((path) => {
         const name = last(path) || 'item' // 'item' in case of having selected the whole item
-        const item = !isEmpty(path) ? `_.get(item, ${JSON.stringify(path)})` : 'item'
-        return `    ${JSON.stringify(name)}: ${item}`
+        return `    ${JSON.stringify(name)}: item${createPropertySelector(path)}`
       })
-      queryParts.push(`  data = _.map(data, item => ({\n${paths.join(',\n')}})\n  )\n`)
+      queryParts.push(`  data = _.map(data, item => ({\n${paths.join(',\n')}\n  }))\n`)
     } else {
       const path = projection.paths[0]
-      const item = !isEmpty(path) ? `_.get(item, ${JSON.stringify(path)})` : 'item'
-      queryParts.push(`  data = _.map(data, item => ${item})\n`)
+      queryParts.push(`  data = _.map(data, item => item${createPropertySelector(path)})\n`)
     }
   }
 
@@ -78,7 +79,29 @@ function executeQuery(json, query) {
   //  As long as we don't persist or fetch queries, there is no security risk.
   // TODO: only import the most relevant subset of lodash instead of the full library?
   // eslint-disable-next-line no-new-func
-  const queryFn = new Function('_', `'use strict'; return (${query})`)(_)
+  const queryFn = new Function(
+    '_',
+    '"use strict";\n' +
+      '\n' +
+      query +
+      '\n' +
+      '\n' +
+      'if (typeof query !== "function") {\n' +
+      '  throw new Error("Cannot execute query: expecting a function named \'query\' but is undefined")\n' +
+      '}\n' +
+      '\n' +
+      'return query;\n'
+  )(_)
+
   const output = queryFn(json)
   return output !== undefined ? output : null
+}
+
+/**
+ * Create a Lodash string containing a path (without leading dot), like "users[2].name"
+ * @param {Path} path
+ * @returns {string}
+ */
+function createLodashPropertySelector(path) {
+  return stringifyPath(path).replace(/^\./, '') // remove any leading dot
 }
