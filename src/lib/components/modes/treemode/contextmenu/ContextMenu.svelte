@@ -25,7 +25,7 @@
   import { faCheckSquare, faLightbulb, faSquare } from '@fortawesome/free-regular-svg-icons'
   import { STATE_ENFORCE_STRING } from '$lib/constants'
   import { isObject } from '../../../../utils/typeUtils.js'
-  import { canConvert } from '../../../../logic/selection.js'
+  import { canConvert, singleItemSelected } from '../../../../logic/selection.js'
 
   export let json
   export let state
@@ -87,19 +87,12 @@
   $: canEditKey =
     hasJson &&
     selection != null &&
-    (selection.type === SELECTION_TYPE.KEY ||
-      selection.type === SELECTION_TYPE.VALUE ||
-      (selection.type === SELECTION_TYPE.MULTI && selection.paths.length === 1)) &&
+    singleItemSelected(selection) &&
     !rootSelected &&
     !Array.isArray(getIn(json, initial(selection.focusPath)))
 
   $: canEditValue =
-    hasJson &&
-    selection != null &&
-    (selection.type === SELECTION_TYPE.KEY ||
-      selection.type === SELECTION_TYPE.VALUE ||
-      (selection.type === SELECTION_TYPE.MULTI && selection.paths.length === 1)) &&
-    !isObjectOrArray(focusValue)
+    hasJson && selection != null && singleItemSelected(selection) && !isObjectOrArray(focusValue)
 
   $: convertMode = hasSelectionContents
   $: insertOrConvertText = convertMode ? 'Convert to' : 'Insert'

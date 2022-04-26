@@ -634,13 +634,25 @@ export function findSharedPath(path1, path2) {
 }
 
 /**
+ * @param {Selection} [selection]
+ * @returns {boolean}
+ */
+export function singleItemSelected(selection) {
+  return (
+    selection &&
+    (selection.type === SELECTION_TYPE.KEY ||
+      selection.type === SELECTION_TYPE.VALUE ||
+      (selection.type === SELECTION_TYPE.MULTI && selection.paths.length === 1))
+  )
+}
+
+/**
  * @param {JSON} json
  * @param {Selection} selection
  * @return {Path}
  */
 export function findRootPath(json, selection) {
-  return selection.type === SELECTION_TYPE.VALUE &&
-    isObjectOrArray(getIn(json, selection.focusPath))
+  return singleItemSelected(selection) && isObjectOrArray(getIn(json, selection.focusPath))
     ? selection.focusPath
     : initial(selection.focusPath) // the parent path of the paths
 }
