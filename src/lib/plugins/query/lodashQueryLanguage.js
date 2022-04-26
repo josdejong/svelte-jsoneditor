@@ -21,7 +21,7 @@ export const lodashQueryLanguage = {
   executeQuery
 }
 
-export function createLodashPropertySelector(path) {
+function createLodashPropertySelector(path) {
   return stringifyPath(path).replace(/^\./, '') // remove any leading dot
 }
 
