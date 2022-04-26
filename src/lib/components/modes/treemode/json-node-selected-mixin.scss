@@ -83,14 +83,12 @@
   .jse-insert-area {
     &.jse-selected {
       :global(.jse-context-menu-button) {
-        background: $insert-area-background;
-      }
-    }
-  }
+        background: var(--jse-context-menu-background);
 
-  .jse-context-menu-button-anchor {
-    :global(.jse-context-menu-button) {
-      background: $insert-area-background;
+        &:hover {
+          background: var(--jse-context-menu-background-highlight);
+        }
+      }
     }
   }
 }

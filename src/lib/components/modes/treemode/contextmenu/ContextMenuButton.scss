@@ -14,13 +14,12 @@
   background: transparent;
 
   border-radius: 2px;
-  background: $dark-gray;
-  color: $white;
+  background: var(--jse-context-menu-background);
+  color: var(--jse-context-menu-color);
   border: none;
   box-shadow: $box-shadow;
 
   &:hover {
-    background: lighten($dark-gray, 10%);
-    color: $white;
+    background: var(--jse-context-menu-background-highlight);
   }
 }
