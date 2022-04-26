@@ -32,7 +32,7 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.filter(item => item?.["user"]?.["name"] == \'Bob\')\n' +
+          "  data = data.filter(item => item?.user?.name == 'Bob')\n" +
           '  return data\n' +
           '}'
       )
@@ -42,7 +42,7 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original data
     })
 
-    it('should create and execute a filter query for a property with sepcial characters in the name', () => {
+    it('should create and execute a filter query for a property with special characters in the name', () => {
       const data = users.map((item) => ({ 'user name!': item.user.name }))
       const originalData = cloneDeep(data)
 
@@ -101,8 +101,8 @@ describe('javascriptQueryLanguage', () => {
         'function query (data) {\n' +
           '  data = data.slice().sort((a, b) => {\n' +
           '    // sort ascending\n' +
-          '    const valueA = a?.["user"]?.["age"]\n' +
-          '    const valueB = b?.["user"]?.["age"]\n' +
+          '    const valueA = a?.user?.age\n' +
+          '    const valueB = b?.user?.age\n' +
           '    return valueA > valueB ? 1 : valueA < valueB ? -1 : 0\n' +
           '  })\n' +
           '  return data\n' +
@@ -126,8 +126,8 @@ describe('javascriptQueryLanguage', () => {
         'function query (data) {\n' +
           '  data = data.slice().sort((a, b) => {\n' +
           '    // sort descending\n' +
-          '    const valueA = a?.["user"]?.["age"]\n' +
-          '    const valueB = b?.["user"]?.["age"]\n' +
+          '    const valueA = a?.user?.age\n' +
+          '    const valueB = b?.user?.age\n' +
           '    return valueA > valueB ? -1 : valueA < valueB ? 1 : 0\n' +
           '  })\n' +
           '  return data\n' +
@@ -149,7 +149,7 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.map(item => item?.["user"]?.["name"])\n' +
+          '  data = data.map(item => item?.user?.name)\n' +
           '  return data\n' +
           '}'
       )
@@ -170,8 +170,8 @@ describe('javascriptQueryLanguage', () => {
         query,
         'function query (data) {\n' +
           '  data = data.map(item => ({\n' +
-          '    "name": item?.["user"]?.["name"],\n' +
-          '    "_id": item?.["_id"]})\n' +
+          '    "name": item?.user?.name,\n' +
+          '    "_id": item?._id})\n' +
           '  )\n' +
           '  return data\n' +
           '}'
@@ -205,14 +205,14 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.filter(item => item?.["user"]?.["age"] <= \'7\')\n' +
+          "  data = data.filter(item => item?.user?.age <= '7')\n" +
           '  data = data.slice().sort((a, b) => {\n' +
           '    // sort ascending\n' +
-          '    const valueA = a?.["user"]?.["name"]\n' +
-          '    const valueB = b?.["user"]?.["name"]\n' +
+          '    const valueA = a?.user?.name\n' +
+          '    const valueB = b?.user?.name\n' +
           '    return valueA > valueB ? 1 : valueA < valueB ? -1 : 0\n' +
           '  })\n' +
-          '  data = data.map(item => item?.["user"]?.["name"])\n' +
+          '  data = data.map(item => item?.user?.name)\n' +
           '  return data\n' +
           '}'
       )

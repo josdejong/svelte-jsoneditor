@@ -1,3 +1,5 @@
+import { createPropertySelector } from '../../utils/pathUtils.js'
+
 const description = `
 <p>
   Enter a JavaScript function to filter, sort, or transform the data.
@@ -14,22 +16,6 @@ export const javascriptQueryLanguage = {
 }
 
 /**
- * Turn a path like:
- *
- *   ['location', 'latitude']
- *
- * into a JavaScript selector (string) like:
- *
- *   '?.["location"]?.["latitude"]'
- *
- * @param {Path} path
- * @returns {string}
- */
-function createPropertySelector(path) {
-  return path.map((f) => `?.[${JSON.stringify(f)}]`).join('')
-}
-
-/**
  * @param {JSON} json
  * @param {QueryLanguageOptions} queryOptions
  * @returns {string}
@@ -41,7 +27,7 @@ function createQuery(json, queryOptions) {
   if (filter && filter.path && filter.relation && filter.value) {
     // Note that the comparisons embrace type coercion,
     // so a filter value like '5' (text) will match numbers like 5 too.
-    const getActualValue = 'item => item' + createPropertySelector(filter.path)
+    const getActualValue = `item => item${createPropertySelector(filter.path)}`
 
     queryParts.push(
       `  data = data.filter(${getActualValue} ${filter.relation} '${filter.value}')\n`
@@ -77,13 +63,13 @@ function createQuery(json, queryOptions) {
     if (projection.paths.length > 1) {
       const paths = projection.paths.map((path) => {
         const name = path[path.length - 1] || 'item' // 'item' in case of having selected the whole item
-        const item = 'item' + createPropertySelector(path)
+        const item = `item${createPropertySelector(path)}`
         return `    ${JSON.stringify(name)}: ${item}`
       })
 
       queryParts.push(`  data = data.map(item => ({\n${paths.join(',\n')}})\n  )\n`)
     } else {
-      const item = 'item' + createPropertySelector(projection.paths[0])
+      const item = `item${createPropertySelector(projection.paths[0])}`
 
       queryParts.push(`  data = data.map(item => ${item})\n`)
     }

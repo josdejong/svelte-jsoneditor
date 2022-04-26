@@ -1,5 +1,6 @@
 import * as _ from 'lodash-es'
-import { isEmpty, last } from 'lodash-es'
+import { last } from 'lodash-es'
+import { createPropertySelector, stringifyPath } from '../../utils/pathUtils.js'
 
 const description = `
 <p>
@@ -20,6 +21,10 @@ export const lodashQueryLanguage = {
   executeQuery
 }
 
+export function createLodashPropertySelector(path) {
+  return stringifyPath(path).replace(/^\./, '') // remove any leading dot
+}
+
 /**
  * @param {JSON} json
  * @param {QueryLanguageOptions} queryOptions
@@ -32,9 +37,8 @@ function createQuery(json, queryOptions) {
   if (filter && filter.path && filter.relation && filter.value) {
     // Note that the comparisons embrace type coercion,
     // so a filter value like '5' (text) will match numbers like 5 too.
-    const getActualValue = !isEmpty(filter.path)
-      ? `item => _.get(item, ${JSON.stringify(filter.path)})`
-      : 'item => item'
+    const getActualValue = `item => item${createPropertySelector(filter.path)}`
+
     queryParts.push(
       `  data = _.filter(data, ${getActualValue} ${filter.relation} '${filter.value}')\n`
     )
@@ -42,7 +46,9 @@ function createQuery(json, queryOptions) {
 
   if (sort && sort.path && sort.direction) {
     queryParts.push(
-      `  data = _.orderBy(data, [${JSON.stringify(sort.path)}], ['${sort.direction}'])\n`
+      `  data = _.orderBy(data, ['${createLodashPropertySelector(sort.path)}'], ['${
+        sort.direction
+      }'])\n`
     )
   }
 
@@ -50,16 +56,15 @@ function createQuery(json, queryOptions) {
     // It is possible to make a util function "pickFlat"
     // and use that when building the query to make it more readable.
     if (projection.paths.length > 1) {
+      // Note that we do not use _.pick() here because this function doesn't flatten the results
       const paths = projection.paths.map((path) => {
         const name = last(path) || 'item' // 'item' in case of having selected the whole item
-        const item = !isEmpty(path) ? `_.get(item, ${JSON.stringify(path)})` : 'item'
-        return `    ${JSON.stringify(name)}: ${item}`
+        return `    ${JSON.stringify(name)}: item${createPropertySelector(path)}`
       })
-      queryParts.push(`  data = _.map(data, item => ({\n${paths.join(',\n')}})\n  )\n`)
+      queryParts.push(`  data = _.map(data, item => ({\n${paths.join(',\n')}\n  }))\n`)
     } else {
       const path = projection.paths[0]
-      const item = !isEmpty(path) ? `_.get(item, ${JSON.stringify(path)})` : 'item'
-      queryParts.push(`  data = _.map(data, item => ${item})\n`)
+      queryParts.push(`  data = _.map(data, item => item${createPropertySelector(path)})\n`)
     }
   }
 
