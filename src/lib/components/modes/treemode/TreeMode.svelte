@@ -900,7 +900,7 @@
           const path = parseJSONPointerWithArrayIndices(patchedJson, operation.path)
 
           if (isObjectOrArray(newValue)) {
-            handleExpand(path, true)
+            handleExpand(path, true, true)
 
             return createSelection(patchedJson || {}, patchedState, {
               type: SELECTION_TYPE.INSIDE,
@@ -940,7 +940,7 @@
       handleChangeJson(newValue)
 
       const path = []
-      handleExpand(path, true)
+      handleExpand(path, true, true)
 
       selection = createSelection(json, state, {
         type: SELECTION_TYPE.INSIDE,
