@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.48](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.47...v0.3.48) (2022-04-26)
+
+
+### Bug Fixes
+
+* quickkeys `[` and `{` not working in welcome screen (regression since v0.3.47) ([8a808a4](https://github.com/josdejong/svelte-jsoneditor/commit/8a808a412497e2bfbe4ba01f29eed363cdbc7303))
+
 ### [0.3.47](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.46...v0.3.47) (2022-04-26)
 
 
