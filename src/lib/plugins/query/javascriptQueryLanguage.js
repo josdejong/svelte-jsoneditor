@@ -104,7 +104,19 @@ function executeQuery(json, query) {
   //  As long as we don't persist or fetch queries, there is no security risk.
   // TODO: only import the most relevant subset of lodash instead of the full library?
   // eslint-disable-next-line no-new-func
-  const queryFn = new Function(`'use strict'; return (${query})`)()
+  const queryFn = new Function(
+    '"use strict";\n' +
+      '\n' +
+      query +
+      '\n' +
+      '\n' +
+      'if (typeof query !== "function") {\n' +
+      '  throw new Error("Cannot execute query: expecting a function named \'query\' but is undefined")\n' +
+      '}\n' +
+      '\n' +
+      'return query;\n'
+  )()
+
   const output = queryFn(json)
   return output !== undefined ? output : null
 }

@@ -222,6 +222,28 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
+    it('should allow defining multiple functions', () => {
+      const query =
+        'function square(x) {\n' +
+        '  return x*x;\n' +
+        '};\n' +
+        'function query(data) {\n' +
+        '  return square(data)\n' +
+        '};'
+      const data = 4
+      const result = executeQuery(data, query)
+      assert.deepStrictEqual(result, 16)
+    })
+
+    it('should throw an exception when function query is not defined in the query', () => {
+      assert.throws(() => {
+        const query = 'function test (data) { return 42 }'
+        const data = {}
+
+        executeQuery(data, query)
+      }, /Error: Cannot execute query: expecting a function named 'query' but is undefined/)
+    })
+
     it('should return null when property is not found', () => {
       const query = 'function query (data) {\n' + '  return data.foo\n' + '}'
       const data = {}
