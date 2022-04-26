@@ -21,10 +21,6 @@ export const lodashQueryLanguage = {
   executeQuery
 }
 
-function createLodashPropertySelector(path) {
-  return stringifyPath(path).replace(/^\./, '') // remove any leading dot
-}
-
 /**
  * @param {JSON} json
  * @param {QueryLanguageOptions} queryOptions
@@ -99,4 +95,13 @@ function executeQuery(json, query) {
 
   const output = queryFn(json)
   return output !== undefined ? output : null
+}
+
+/**
+ * Create a Lodash string containing a path (without leading dot), like "users[2].name"
+ * @param {Path} path
+ * @returns {string}
+ */
+function createLodashPropertySelector(path) {
+  return stringifyPath(path).replace(/^\./, '') // remove any leading dot
 }
