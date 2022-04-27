@@ -30,7 +30,6 @@
   "dependencies": {
     "@codemirror/basic-setup": "^0.19.3",
     "@codemirror/commands": "^0.19.8",
-    "@codemirror/gutter": "^0.19.9",
     "@codemirror/highlight": "^0.19.8",
     "@codemirror/history": "^0.19.2",
     "@codemirror/lang-json": "^0.19.2",
