@@ -10,8 +10,7 @@
     getIn,
     immutableJSONPatch,
     revertJSONPatch,
-    setIn,
-    updateIn
+    setIn
   } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
   import { initial, isEmpty, isEqual, last, throttle, uniqueId } from 'lodash-es'
@@ -24,8 +23,7 @@
     SCROLL_DURATION,
     SEARCH_UPDATE_THROTTLE,
     SIMPLE_MODAL_OPTIONS,
-    STATE_ENFORCE_STRING,
-    STATE_EXPANDED
+    STATE_ENFORCE_STRING
   } from '$lib/constants'
   import {
     createState,
@@ -53,7 +51,6 @@
   import {
     createRecursiveSelection,
     createSelection,
-    createSelectionFromOperations,
     findRootPath,
     getInitialSelection,
     getSelectionDown,
@@ -94,7 +91,8 @@
   import SearchBox from '../../../components/modes/treemode/menu/SearchBox.svelte'
   import { convertValue, isLargeContent } from '../../../utils/jsonUtils.js'
   import { MAX_DOCUMENT_SIZE_EXPAND_ALL } from '../../../constants.js'
-  import { canConvert } from '../../../logic/selection.js'
+  import { canConvert, createSelectionFromOperations } from '../../../logic/selection.js'
+  import { collapse, expandWithCallback } from '../../../logic/documentState.js'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -231,7 +229,7 @@
       activeItem
     )
 
-    handlePatch(operations, newSelection)
+    handlePatch(operations, () => ({ selection: newSelection }))
 
     await tick()
 
@@ -248,7 +246,7 @@
       replacementText
     )
 
-    handlePatch(operations, newSelection)
+    handlePatch(operations, () => ({ selection: newSelection }))
 
     await tick()
 
@@ -537,10 +535,10 @@
 
   /**
    * @param {JSONPatchDocument} operations
-   * @param {Selection | (json: JSON, state: JSON) => Selection} [newSelection]
+   * @param {AfterPatchCallback} [afterPatch]
    * @return {JSONPatchResult}
    */
-  export function patch(operations, newSelection) {
+  export function patch(operations, afterPatch) {
     if (json === undefined) {
       throw new Error('Cannot apply patch: no JSON')
     }
@@ -551,21 +549,26 @@
     const previousTextIsRepaired = textIsRepaired
     const previousSelection = selection
 
-    debug('patch', operations, newSelection)
+    debug('patch', operations, afterPatch)
 
     const undo = revertJSONPatch(json, operations)
-    const update = documentStatePatch(json, state, operations)
+    const patched = documentStatePatch(json, state, operations)
 
-    json = update.json
-    state = update.state
+    const callback =
+      typeof afterPatch === 'function'
+        ? afterPatch(patched.json, patched.state, selection)
+        : undefined
+
+    json = callback && callback.json !== undefined ? callback.json : patched.json
+    state = callback && callback.state !== undefined ? callback.state : patched.state
     text = undefined
     textIsRepaired = false
+    selection =
+      callback && callback.selection
+        ? callback.selection
+        : createSelectionFromOperations(previousJson, previousState, operations)
 
-    if (typeof newSelection === 'function') {
-      selection = newSelection(json, state)
-    } else if (newSelection) {
-      selection = newSelection
-    }
+    // ensure the selection is valid
     selection = clearSelectionWhenNotExisting(selection, json)
 
     history.add({
@@ -684,7 +687,10 @@
     }
 
     const { operations, newSelection } = createRemoveOperations(json, state, selection)
-    handlePatch(operations, newSelection)
+
+    handlePatch(operations, () => ({
+      selection: newSelection
+    }))
   }
 
   async function handleCopy(indent = true) {
@@ -744,31 +750,35 @@
       const selectionOrDefault = selection || createDefaultSelection()
 
       const operations = insert(json, state, selectionOrDefault, clipboardText)
-      const expandAllRecursive = !isLargeContent(
-        { text: clipboardText },
-        MAX_DOCUMENT_SIZE_EXPAND_ALL
-      )
 
-      debug('paste', { clipboardText, operations, selectionOrDefault, expandAllRecursive })
+      debug('paste', { clipboardText, operations, selectionOrDefault })
 
-      handlePatch(operations)
+      handlePatch(operations, (patchedJson, patchedState) => {
+        let updatedState = patchedState
 
-      // expand newly inserted object/array
-      operations
-        .filter((operation) => isObjectOrArray(operation.value))
-        .forEach(async (operation, index) => {
-          // keep the same behavior as the getDefaultExpand method
-          if (expandAllRecursive || index === 0) {
+        // expand newly inserted object/array
+        operations
+          .filter((operation) => isObjectOrArray(operation.value))
+          .forEach((operation) => {
             const path = parseJSONPointerWithArrayIndices(json, operation.path)
-            handleExpand(path, true, expandAllRecursive)
-          }
-        })
+            updatedState = expandRecursive(patchedJson, updatedState, path)
+          })
+
+        return {
+          state: updatedState
+        }
+      })
     } else {
-      debug('paste', { clipboardText })
+      debug('paste text', { clipboardText })
 
-      handleChangeText(clipboardText)
-
-      handleExpand([], true, false)
+      handleChangeText(clipboardText, (patchedJson, patchedState) => {
+        if (patchedJson) {
+          const path = []
+          return {
+            state: expandRecursive(patchedJson, patchedState, path)
+          }
+        }
+      })
     }
   }
 
@@ -831,7 +841,9 @@
 
       debug('remove', { operations, selection, newSelection })
 
-      handlePatch(operations, newSelection)
+      handlePatch(operations, () => ({
+        selection: newSelection
+      }))
     }
   }
 
@@ -865,16 +877,17 @@
 
     const operations = extract(json, state, selection)
 
-    handlePatch(operations)
+    handlePatch(operations, (patchedJson, patchedState) => {
+      if (isObjectOrArray(patchedJson)) {
+        // expand extracted object/array
+        const path = []
+        return {
+          state: expandRecursive(patchedJson, patchedState, path)
+        }
+      }
+    })
 
-    if (isObjectOrArray(json)) {
-      const expandAllRecursive = !isLargeContent({ json }, MAX_DOCUMENT_SIZE_EXPAND_ALL)
-
-      // expand extracted object/array
-      handleExpand([], true, expandAllRecursive)
-
-      focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
-    }
+    focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
   }
 
   /**
@@ -902,23 +915,26 @@
           const path = parseJSONPointerWithArrayIndices(patchedJson, operation.path)
 
           if (isObjectOrArray(newValue)) {
-            handleExpand(path, true, true)
-
-            return createSelection(patchedJson || {}, patchedState, {
-              type: SELECTION_TYPE.INSIDE,
-              path
-            })
+            return {
+              state: expandWithCallback(json, state, path, expandAll),
+              selection: createSelection(patchedJson || {}, patchedState, {
+                type: SELECTION_TYPE.INSIDE,
+                path
+              })
+            }
           }
 
           if (newValue === '') {
             // open the newly inserted value in edit mode
             const parent = !isEmpty(path) ? getIn(patchedJson, initial(path)) : null
 
-            return createSelection(patchedJson, patchedState, {
-              type: isObject(parent) ? SELECTION_TYPE.KEY : SELECTION_TYPE.VALUE,
-              path,
-              edit: true
-            })
+            return {
+              selection: createSelection(patchedJson, patchedState, {
+                type: isObject(parent) ? SELECTION_TYPE.KEY : SELECTION_TYPE.VALUE,
+                path,
+                edit: true
+              })
+            }
           }
 
           return undefined
@@ -939,15 +955,14 @@
       // document is empty or invalid (in that case it has text but no json)
       debug('handleInsert', { type, newValue })
 
-      handleChangeJson(newValue)
-
       const path = []
-      handleExpand(path, true, true)
-
-      selection = createSelection(json, state, {
-        type: SELECTION_TYPE.INSIDE,
-        path
-      })
+      handleChangeJson(newValue, (patchedJson, patchedState) => ({
+        state: expandRecursive(patchedJson, patchedState, path),
+        selection: createSelection(patchedJson, patchedState, {
+          type: SELECTION_TYPE.INSIDE,
+          path
+        })
+      }))
 
       focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
     }
@@ -994,19 +1009,14 @@
 
       debug('handleConvert', { selection, path, type, operations })
 
-      handlePatch(operations)
-
-      if (isObjectOrArray(convertedValue)) {
-        const expandAllRecursive = !isLargeContent(
-          { json: convertedValue },
-          MAX_DOCUMENT_SIZE_EXPAND_ALL
-        )
-
+      handlePatch(operations, (patchedJson, patchedState) => {
         // expand converted object/array
-        handleExpand(selection.focusPath, true, expandAllRecursive)
+        return {
+          state: expandRecursive(patchedJson, patchedState, selection.focusPath)
+        }
+      })
 
-        focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
-      }
+      focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
     } catch (err) {
       onError(err)
     }
@@ -1227,15 +1237,14 @@
       onSort: async (operations) => {
         debug('onSort', selectedPath, operations)
 
-        const newSelection = createSelection(json, state, {
-          type: SELECTION_TYPE.VALUE,
-          path: selectedPath
-        })
-        handlePatch(operations, newSelection)
-
-        // expand the newly replaced array
-        handleExpand(selectedPath, true)
-        // FIXME: because we apply expand *after* the patch, when doing undo/redo, the expanded state is not restored
+        handlePatch(operations, (patchedJson, patchedState) => ({
+          // expand the newly replaced array and select it
+          state: expandRecursive(patchedJson, patchedState, selectedPath),
+          selection: createSelection(patchedJson, patchedState, {
+            type: SELECTION_TYPE.VALUE,
+            path: selectedPath
+          })
+        }))
       },
       onClose: () => {
         modalOpen = false
@@ -1284,15 +1293,14 @@
         : (operations) => {
             debug('onTransform', selectedPath, operations)
 
-            const newSelection = createSelection(json, state, {
-              type: SELECTION_TYPE.VALUE,
-              path: selectedPath
-            })
-            handlePatch(operations, newSelection)
-
-            // expand the newly replaced array
-            handleExpand(selectedPath, true)
-            // FIXME: because we apply expand *after* the patch, when doing undo/redo, the expanded state is not restored
+            handlePatch(operations, (patchedJson, patchedState) => ({
+              // expand the newly replaced array and select it
+              state: expandRecursive(patchedJson, patchedState, selectedPath),
+              selection: createSelection(patchedJson, patchedState, {
+                type: SELECTION_TYPE.VALUE,
+                path: selectedPath
+              })
+            }))
           },
       onClose: () => {
         modalOpen = false
@@ -1407,22 +1415,17 @@
 
   /**
    * @param {JSONPatchDocument} operations
-   * @param {Selection} [newSelection] If no new selection is provided,
-   *                                   The new selection will be determined
-   *                                   based on the operations.
+   * @param {AfterPatchCallback} [afterPatch]
    */
-  function handlePatch(
-    operations,
-    newSelection = createSelectionFromOperations(json, state, operations)
-  ) {
+  function handlePatch(operations, afterPatch) {
     if (readOnly) {
       return
     }
 
-    debug('handlePatch', operations, newSelection)
+    debug('handlePatch', operations, afterPatch)
 
     const previousContent = { json, text }
-    const patchResult = patch(operations, newSelection)
+    const patchResult = patch(operations, afterPatch)
 
     pastedJson = undefined
 
@@ -1431,7 +1434,11 @@
     return patchResult
   }
 
-  function handleChangeJson(updatedJson) {
+  /**
+   * @param {JSON} updatedJson
+   * @param {AfterPatchCallback} [afterPatch]
+   */
+  function handleChangeJson(updatedJson, afterPatch) {
     const previousState = state
     const previousJson = json
     const previousText = text
@@ -1439,10 +1446,20 @@
     const previousTextIsRepaired = textIsRepaired
     const previousSelection = selection
 
-    json = updatedJson
-    state = syncState(json, previousState, [], expandMinimal)
+    const updatedState = syncState(updatedJson, previousState, [], expandMinimal)
+
+    const callback =
+      typeof afterPatch === 'function'
+        ? afterPatch(updatedJson, updatedState, selection)
+        : undefined
+
+    json = callback && callback.json !== undefined ? callback.json : updatedJson
+    state = callback && callback.state !== undefined ? callback.state : updatedState
     text = undefined
     textIsRepaired = false
+    selection = callback && callback.selection ? callback.selection : selection
+
+    // make sure the selection is valid
     selection = clearSelectionWhenNotExisting(selection, json)
 
     addHistoryItem({
@@ -1459,7 +1476,11 @@
     emitOnChange(previousContent, patchResult)
   }
 
-  function handleChangeText(updatedText) {
+  /**
+   * @param {string} updatedText
+   * @param {AfterPatchCallback} [afterPatch]
+   */
+  function handleChangeText(updatedText, afterPatch) {
     const previousState = state
     const previousJson = json
     const previousText = text
@@ -1470,25 +1491,33 @@
     try {
       json = JSON.parse(updatedText)
       state = syncState(json, previousState, [], expandMinimal)
-      text = updatedText
+      text = undefined
       textIsRepaired = false
-      selection = clearSelectionWhenNotExisting(selection, json)
     } catch (err) {
       try {
         json = JSON.parse(jsonrepair(updatedText))
         state = syncState(json, previousState, [], expandMinimal)
         text = updatedText
         textIsRepaired = true
-        selection = clearSelectionWhenNotExisting(selection, json)
       } catch (err) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
         state = syncState(json, createState(json), [], expandMinimal)
         text = updatedText
         textIsRepaired = false
-        selection = clearSelectionWhenNotExisting(selection, json)
       }
     }
+
+    if (typeof afterPatch === 'function') {
+      const callback = afterPatch(json, state, selection)
+
+      json = callback && callback.json ? callback.json : json
+      state = callback && callback.state ? callback.state : state
+      selection = callback && callback.selection ? callback.selection : selection
+    }
+
+    // ensure the selection is valid
+    selection = clearSelectionWhenNotExisting(selection, json)
 
     addHistoryItem({
       previousJson,
@@ -1505,23 +1534,35 @@
   }
 
   /**
+   * Expand recursively when the expanded contents is small enough,
+   * else expand in a minimalistic way
+   * @param json
+   * @param state
+   * @param path
+   * @returns {JSON}
+   */
+  function expandRecursive(json, state, path) {
+    const expandContents = getIn(json, path)
+    const expandAllRecursive = !isLargeContent(
+      { json: expandContents },
+      MAX_DOCUMENT_SIZE_EXPAND_ALL
+    )
+    const expandCallback = expandAllRecursive ? expandAll : expandMinimal
+
+    return expandWithCallback(json, state, path, expandCallback)
+  }
+
+  /**
    * Toggle expanded state of a node
    * @param {Path} path
    * @param {boolean} expanded  True to expand, false to collapse
    * @param {boolean} [recursive=false]  Only applicable when expanding
    */
   function handleExpand(path, expanded, recursive = false) {
-    // TODO: move this function into documentState.js
-    if (recursive) {
-      state = updateIn(state, path, (childState) => {
-        return syncState(getIn(json, path), childState, [], () => expanded, true)
-      })
+    if (expanded) {
+      state = expandWithCallback(json, state, path, recursive ? expandAll : expandMinimal)
     } else {
-      state = setIn(state, path.concat(STATE_EXPANDED), expanded, true)
-
-      state = updateIn(state, path, (childState) => {
-        return syncState(getIn(json, path), childState, [], expandMinimal, false)
-      })
+      state = collapse(json, state, path)
     }
 
     if (selection && !expanded) {
@@ -1937,15 +1978,19 @@
     await tick()
 
     // replace the value with the JSON object/array
-    handlePatch([
+    const operations = [
       {
         op: 'replace',
         path: compileJSONPointer(path),
         value: contents
       }
-    ])
+    ]
 
-    handleExpand(path, true)
+    handlePatch(operations, (patchedJson, patchedState) => {
+      return {
+        state: expandRecursive(patchedJson, patchedState, path)
+      }
+    })
   }
 
   function handleClearPastedJson() {
@@ -1963,8 +2008,10 @@
     // with just .focus(), sometimes the input doesn't react on onpaste events
     // in Chrome when having a large document open and then doing cut/paste.
     // Calling both .focus() and .select() did solve this issue.
-    refHiddenInput.focus()
-    refHiddenInput.select()
+    if (refHiddenInput) {
+      refHiddenInput.focus()
+      refHiddenInput.select()
+    }
   }
 
   function handleWindowMouseDown(event) {
@@ -1974,7 +2021,7 @@
         debug('click outside the editor, stop edit mode')
         selection = { ...selection, edit: false }
 
-        if (hasFocus) {
+        if (hasFocus && refHiddenInput) {
           refHiddenInput.focus()
           refHiddenInput.blur()
         }
@@ -1985,7 +2032,9 @@
         // TODO: find a better solution
         tick().then(() => {
           setTimeout(() => {
-            refHiddenInput.blur()
+            if (refHiddenInput) {
+              refHiddenInput.blur()
+            }
           })
         })
       }

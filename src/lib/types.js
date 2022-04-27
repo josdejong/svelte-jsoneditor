@@ -69,6 +69,10 @@
  */
 
 /**
+ * @typedef {(patchedJson: JSON, patchedJson: JSON, selection: Selection) => {json?: JSON, state?: JSON, selection?: Selection}} AfterPatchCallback
+ */
+
+/**
  * @typedef {{
  *   type: 'multi',
  *   paths: Path[],

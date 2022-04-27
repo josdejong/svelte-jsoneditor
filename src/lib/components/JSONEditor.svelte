@@ -120,7 +120,7 @@
     content = updatedContent
   }
 
-  export function patch(operations, newSelection) {
+  export function patch(operations) {
     if (content.json === undefined) {
       try {
         content = {
@@ -133,7 +133,9 @@
     }
 
     if (refTreeMode) {
-      return refTreeMode.patch(operations, newSelection)
+      // Note that tree mode has an optional afterPatch callback.
+      // right now we don's support this in the public API.
+      return refTreeMode.patch(operations)
     }
 
     if (refCodeMode) {
