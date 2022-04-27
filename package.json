@@ -16,7 +16,7 @@
     "preview": "svelte-kit preview",
     "build": "npm run package",
     "build:watch": "npm run package -- --watch",
-    "package": "svelte-kit package && rollup --config rollup.config.bundle.js",
+    "package": "svelte-kit sync && svelte-kit package && rollup --config rollup.config.bundle.js",
     "test": "mocha",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
