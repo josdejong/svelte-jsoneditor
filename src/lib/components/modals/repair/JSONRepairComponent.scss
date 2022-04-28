@@ -4,6 +4,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  background: var(--jse-background-color);
+  color: var(--jse-color);
 
   .jse-menu {
     .jse-info {
@@ -17,7 +19,8 @@
     padding: $contents-padding;
     font-family: var(--jse-font-family-mono);
     font-size: var(--jse-font-size-mono);
-    color: $black;
+    background: var(--jse-background-color);
+    color: var(--jse-color);
 
     resize: none;
     outline: none;

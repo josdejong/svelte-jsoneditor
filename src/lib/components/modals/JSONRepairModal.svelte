@@ -24,13 +24,17 @@
   }
 </script>
 
-<JSONRepairComponent
-  bind:text
-  {onParse}
-  {onRepair}
-  onApply={handleApply}
-  onCancel={handleCancel}
-  {onFocus}
-  {onBlur}
-  {onRenderMenu}
-/>
+<div class="jse-modal jse-repair">
+  <JSONRepairComponent
+    bind:text
+    {onParse}
+    {onRepair}
+    onApply={handleApply}
+    onCancel={handleCancel}
+    {onFocus}
+    {onBlur}
+    {onRenderMenu}
+  />
+</div>
+
+<style src="./JSONRepairModal.scss"></style>
