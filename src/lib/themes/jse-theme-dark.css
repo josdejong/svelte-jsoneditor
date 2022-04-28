@@ -15,6 +15,7 @@
   --jse-menu-background-highlight: #565656;
   --jse-menu-color: #e5e5e5;
   --jse-modal-background: rgba(255, 255, 255, 0.2);
+  --jse-modal-code-background: #2f2f2f;
 
   /* navigation bar, gutter, search box */
   --jse-panel-background-color: #333333;

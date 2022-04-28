@@ -40,7 +40,7 @@
           }
 
           :global(code) {
-            background: rgba(0, 0, 0, 0.05); // TODO: this is not visible in dark theme
+            background: var(--jse-modal-code-background);
             font-family: var(--jse-font-family-mono);
             font-size: var(--jse-font-size-mono);
           }

@@ -44,6 +44,7 @@
   --jse-menu-color: #fff;
   --jse-menu-button-size: 32px;
   --jse-modal-background: rgba(0, 0, 0, 0.3);
+  --jse-modal-code-background: rgba(0, 0, 0, 0.05);
 
   /* navigation bar, gutter, search box */
   --jse-panel-background-color: #ebebeb;
