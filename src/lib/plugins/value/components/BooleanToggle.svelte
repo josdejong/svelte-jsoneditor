@@ -17,16 +17,13 @@
       return
     }
 
-    onPatch(
-      [
-        {
-          op: 'replace',
-          path: compileJSONPointer(path),
-          value: !value
-        }
-      ],
-      null
-    )
+    onPatch([
+      {
+        op: 'replace',
+        path: compileJSONPointer(path),
+        value: !value
+      }
+    ])
   }
 </script>
 

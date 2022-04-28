@@ -22,16 +22,13 @@
   }
 
   function handleChangeValue(newValue, updateSelection) {
-    onPatch(
-      [
-        {
-          op: 'replace',
-          path: compileJSONPointer(path),
-          value: convert(normalization.unescapeValue(newValue))
-        }
-      ],
-      null
-    )
+    onPatch([
+      {
+        op: 'replace',
+        path: compileJSONPointer(path),
+        value: convert(normalization.unescapeValue(newValue))
+      }
+    ])
 
     if (updateSelection === UPDATE_SELECTION.NEXT_INSIDE) {
       onSelect({

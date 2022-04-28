@@ -916,7 +916,7 @@
 
           if (isObjectOrArray(newValue)) {
             return {
-              state: expandWithCallback(json, state, path, expandAll),
+              state: expandWithCallback(patchedJson, patchedState, path, expandAll),
               selection: createSelection(patchedJson || {}, patchedState, {
                 type: SELECTION_TYPE.INSIDE,
                 path
