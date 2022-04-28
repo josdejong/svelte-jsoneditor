@@ -1,14 +1,9 @@
 import { HighlightStyle, tags } from '@codemirror/highlight'
 
-// Note that these colors must correspond with the colors in styles.scss
-const colorBoolean = 'var(--jse-value-color-boolean)'
-const colorNull = 'var(--jse-value-color-null)'
-const colorNumber = 'var(--jse-value-color-number)'
-const colorString = 'var(--jse-value-color-string)'
-
 export const highlightStyle = HighlightStyle.define([
-  { tag: tags.number, color: colorNumber },
-  { tag: tags.bool, color: colorBoolean },
-  { tag: tags.string, color: colorString },
-  { tag: tags.keyword, color: colorNull } // null
+  { tag: tags.propertyName, color: 'var(--jse-key-color)' }, // keys
+  { tag: tags.number, color: 'var(--jse-value-color-number)' },
+  { tag: tags.bool, color: 'var(--jse-value-color-boolean)' },
+  { tag: tags.string, color: 'var(--jse-value-color-string)' },
+  { tag: tags.keyword, color: 'var(--jse-value-color-null)' } // null
 ])
