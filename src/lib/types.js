@@ -69,6 +69,10 @@
  */
 
 /**
+ * @typedef {(patchedJson: JSON, patchedJson: JSON, selection: Selection) => {json?: JSON, state?: JSON, selection?: Selection}} AfterPatchCallback
+ */
+
+/**
  * @typedef {{
  *   type: 'multi',
  *   paths: Path[],
@@ -237,7 +241,7 @@
  * @property {boolean} isSelected
  * @property {boolean} isEditing
  * @property {ValueNormalization} normalization
- * @property {(patch: JSONPatchDocument, newSelection: Selection | null) => void} onPatch
+ * @property {(patch: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void} onPatch
  * @property {(pastedJson: { path: Path, contents: JSON }) => void} onPasteJson
  * @property {(selection: Selection) => void} onSelect
  */
@@ -302,7 +306,7 @@
  * @property {() => JSON} getFullState
  * @property {() => Selection} getFullSelection
  * @property {(path: Path) => Element | null} findElement
- * @property {(operations: JSONPatchDocument, newSelection?: Selection) => void} onPatch
+ * @property {(operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void} onPatch
  * @property {(type: InsertType) => void} onInsert
  * @property {(path: Path, expanded: boolean, recursive?: boolean = false) => void} onExpand
  * @property {{selectionSchema: SelectionSchema, options?: { ensureFocus?: boolean }}} onSelect

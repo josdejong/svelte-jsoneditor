@@ -17,16 +17,13 @@
   $: color = getColorCSS(value)
 
   function onChange(color) {
-    onPatch(
-      [
-        {
-          op: 'replace',
-          path: compileJSONPointer(path),
-          value: color
-        }
-      ],
-      null
-    )
+    onPatch([
+      {
+        op: 'replace',
+        path: compileJSONPointer(path),
+        value: color
+      }
+    ])
   }
 
   function openColorPicker(event) {

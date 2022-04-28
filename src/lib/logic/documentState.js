@@ -229,6 +229,36 @@ export function expandPath(json, state, path) {
 }
 
 /**
+ * Expand a node, end expand it's childs according to the provided callback
+ * @param {JSON} json
+ * @param {JSON} state
+ * @param {Path} path
+ * @param {(path: Path) => boolean} expandedCallback
+ * @returns {JSON} Returns the updated state
+ */
+// TODO: write unit tests
+export function expandWithCallback(json, state, path, expandedCallback) {
+  const updatedState = setIn(state, path.concat(STATE_EXPANDED), true, true)
+
+  return updateIn(updatedState, path, (childState) => {
+    return syncState(getIn(json, path), childState, [], expandedCallback, false)
+  })
+}
+
+/**
+ * @param {JSON} json
+ * @param {JSON} state
+ * @param {Path} path
+ * @returns {JSON} Returns the updated state
+ */
+// TODO: write unit tests
+export function collapse(json, state, path) {
+  return updateIn(state, path, (childState) => {
+    return syncState(getIn(json, path), childState, [], () => false, true)
+  })
+}
+
+/**
  * If needed, enlarge the expanded sections such that the search result becomes visible in the array
  * @param {JSON} state
  * @param {Path} path
