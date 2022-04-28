@@ -3,10 +3,11 @@
 .jse-tooltip {
   font-family: var(--jse-font-family);
   font-size: var(--jse-font-size);
+  line-height: normal;
   padding: $padding-half $padding;
   border-radius: $border-radius;
-  background: $dark-gray;
-  color: white;
+  background: var(--jse-context-menu-background);
+  color: var(--jse-context-menu-color);
   white-space: nowrap;
   box-shadow: $box-shadow;
 }

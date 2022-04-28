@@ -20,12 +20,12 @@
 
   &.jse-empty {
     min-width: 4em;
-    outline: 1px dotted $light-gray-transparent;
+    outline: 1px dotted var(--jse-tag-background);
     -moz-outline-radius: 2px;
 
     &::after {
       pointer-events: none;
-      color: $light-gray-transparent;
+      color: var(--jse-tag-background);
       content: 'value';
     }
   }

@@ -54,7 +54,7 @@
     .jse-loading {
       flex: 2;
       text-align: center;
-      color: $gray;
+      color: var(--jse-panel-color-readonly);
       box-sizing: border-box;
       font-family: var(--jse-font-family);
       font-size: var(--jse-font-size);
@@ -63,7 +63,7 @@
 
   .jse-preview {
     flex: 1;
-    color: $gray;
+    color: var(--jse-panel-color-readonly);
     overflow: auto;
     white-space: pre-wrap;
     font-family: var(--jse-font-family-mono);

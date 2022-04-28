@@ -28,13 +28,13 @@ div.jse-editable-div {
 
   &.jse-empty {
     &:not(:focus) {
-      outline: 1px dotted $light-gray-transparent;
+      outline: 1px dotted var(--jse-tag-background);
       -moz-outline-radius: 2px;
     }
 
     &::after {
       pointer-events: none;
-      color: $light-gray-transparent;
+      color: var(--jse-tag-background);
     }
   }
 }

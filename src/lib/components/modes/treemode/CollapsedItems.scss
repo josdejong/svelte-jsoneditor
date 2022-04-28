@@ -1,9 +1,9 @@
 @import '../../../styles';
 
-$color: $gray;
-$background-color: $background-gray;
-
 div.jse-collapsed-items {
+  $color: var(--jse-delimiter-color);
+  $background-color: $background-gray;
+
   font-family: var(--jse-font-family);
   font-size: var(--jse-font-size);
   color: $color;

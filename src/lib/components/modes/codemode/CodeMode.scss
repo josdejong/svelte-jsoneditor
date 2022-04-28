@@ -132,7 +132,7 @@
     .jse-loading {
       flex: 2;
       text-align: center;
-      color: $gray;
+      color: var(--jse-panel-color-readonly);
       box-sizing: border-box;
       font-family: var(--jse-font-family);
       font-size: var(--jse-font-size);

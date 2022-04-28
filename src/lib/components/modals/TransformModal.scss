@@ -27,8 +27,6 @@
         flex-direction: column;
 
         .jse-description {
-          color: $dark-gray;
-
           :global(p) {
             margin: $padding 0;
 
@@ -42,7 +40,7 @@
           }
 
           :global(code) {
-            background: $background-gray;
+            background: rgba(0, 0, 0, 0.05); // TODO: this is not visible in dark theme
             font-family: var(--jse-font-family-mono);
             font-size: var(--jse-font-size-mono);
           }

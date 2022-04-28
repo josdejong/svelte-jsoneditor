@@ -18,13 +18,11 @@
       text-align: left;
       padding: $padding 2 * $padding;
       white-space: nowrap;
-      color: white;
-      background: $dark-gray;
-
-      $gray-highlight: lighten($dark-gray, 5%);
+      color: var(--jse-context-menu-color);
+      background: var(--jse-context-menu-background);
 
       &:hover {
-        background: $gray-highlight;
+        background: var(--jse-context-menu-background-highlight);
       }
     }
   }

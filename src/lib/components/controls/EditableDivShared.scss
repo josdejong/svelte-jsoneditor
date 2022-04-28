@@ -24,7 +24,7 @@
   }
 
   &.jse-invalid {
-    color: $black;
+    color: var(--jse-color);
   }
 
   &.jse-url {

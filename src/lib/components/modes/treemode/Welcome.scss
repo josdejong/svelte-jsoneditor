@@ -20,7 +20,7 @@
 
   .jse-contents {
     margin: 2em $padding 0;
-    color: $gray;
+    color: var(--jse-panel-color-readonly);
 
     ul {
       $list-padding: 10px;
