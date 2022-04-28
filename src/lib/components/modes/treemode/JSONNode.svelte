@@ -330,7 +330,9 @@
       })
 
       if (operations) {
-        context.onPatch(operations, updatedFullSelection || context.getFullSelection())
+        context.onPatch(operations, () => ({
+          selection: updatedFullSelection || context.getFullSelection()
+        }))
       } else {
         // the user did click inside the selection and no contents have been dragged,
         // select the clicked item

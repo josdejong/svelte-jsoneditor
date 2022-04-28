@@ -77,6 +77,11 @@
       onNext()
     }
 
+    if (combo === 'Shift+Enter') {
+      event.preventDefault()
+      onPrevious()
+    }
+
     if (combo === 'Ctrl+Enter' || combo === 'Command+Enter') {
       event.preventDefault()
 
@@ -167,7 +172,7 @@
           <button
             type="button"
             class="jse-search-previous"
-            title="Go to previous search result"
+            title="Go to previous search result (Shift+Enter)"
             on:click={onPrevious}
           >
             <Icon data={faChevronUp} />
