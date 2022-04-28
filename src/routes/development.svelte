@@ -437,7 +437,7 @@ See https://github.com/sveltejs/kit/issues/981
 -->
 {#if false}<slot />{/if}
 
-<style>
+<style lang="scss">
   @import '../lib/themes/jse-theme-dark.css';
   @import 'examples/themes/jse-theme-big.css';
 
@@ -454,10 +454,12 @@ See https://github.com/sveltejs/kit/issues/981
     min-width: 0;
   }
 
-  .tree-editor {
-  }
-
+  .tree-editor,
   .code-editor {
+    // some styling to try out if it doesn't break the styling of the editor
+    line-height: 72px;
+    font-size: 72px;
+    font-family: 'Comic Sans MS', 'Courier New', serif;
   }
 
   .data {
