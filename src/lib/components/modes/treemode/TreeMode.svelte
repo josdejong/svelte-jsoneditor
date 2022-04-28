@@ -1906,7 +1906,7 @@
   }
 
   function handleContextMenu(event) {
-    if (readOnly || !selection || selection.edit || !refContents) {
+    if (readOnly || selection?.edit) {
       return
     }
 
@@ -1927,7 +1927,7 @@
     } else {
       // type === 'keydown' (from the quick key Ctrl+Q)
       // or target is hidden input -> context menu button on keyboard
-      const anchor = refContents.querySelector('.context-menu-button.selected')
+      const anchor = refContents?.querySelector('.context-menu-button.selected')
       if (anchor) {
         openContextMenu({
           anchor,
@@ -1938,14 +1938,16 @@
         })
       } else {
         // fallback on just displaying the ContextMenu top left
-        const rect = refContents.getBoundingClientRect()
-        openContextMenu({
-          top: rect.top + 2,
-          left: rect.left + 2,
-          width: CONTEXT_MENU_WIDTH,
-          height: CONTEXT_MENU_HEIGHT,
-          showTip: false
-        })
+        const rect = refContents?.getBoundingClientRect()
+        if (rect) {
+          openContextMenu({
+            top: rect.top + 2,
+            left: rect.left + 2,
+            width: CONTEXT_MENU_WIDTH,
+            height: CONTEXT_MENU_HEIGHT,
+            showTip: false
+          })
+        }
       }
     }
 
