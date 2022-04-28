@@ -19,7 +19,7 @@
 
   &.jse-value:focus {
     // override the color to black when editing
-    color: $black;
+    color: var(--jse-color);
   }
 }
 
