@@ -1,6 +1,5 @@
 <script>
   import { JSONEditor } from 'svelte-jsoneditor'
-  import { useLocalStorage } from '../../lib/utils/localStorageUtils.js'
 
   const themes = [
     { value: 'jse-theme-default', label: 'default' },
@@ -8,7 +7,7 @@
     { value: 'jse-theme-big', label: 'big' }
   ]
 
-  let selectedTheme = useLocalStorage('svelte-jsoneditor-custom-theme', 'dark')
+  let selectedTheme = themes[1].value
 
   let content = {
     text: undefined, // used when in code mode
@@ -30,13 +29,13 @@
   <title>Custom theme with CSS variables | svelte-jsoneditor</title>
 </svelte:head>
 
-<div class="page {$selectedTheme}">
+<div class="page {selectedTheme}">
   <h1>Custom theme with CSS variables</h1>
 
   <p>You can customize the styling of the editor using CSS variables</p>
 
   <p>
-    Theme: <select bind:value={$selectedTheme}>
+    Theme: <select bind:value={selectedTheme}>
       {#each themes as theme}
         <option value={theme.value}>{theme.label}</option>
       {/each}

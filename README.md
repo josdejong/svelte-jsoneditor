@@ -369,6 +369,44 @@ type RenderValueConstructor = {
 }
 ```
 
+## Styling
+
+The editor can be styled using the available CSS variables. A full list with all variables can be found here:
+
+https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/themes/jse-theme-default.css
+
+The editor comes with a built-in dark theme. To use this theme:
+
+- Load the css file of the dark theme: `themes/jse-theme-dark.css`
+- Add the class name `jse-theme-dark` of the dark theme to the HTML container element where the editor is loaded.
+
+It is possible to load styling of multiple themes, and toggle them by changing the class name (like `jse-theme-dark`) attached to the HTML container element.
+
+Full Svelte example:
+
+```html
+<script>
+  import { JSONEditor } from 'svelte-jsoneditor'
+
+  let content = {
+    text: undefined, // used when in code mode
+    json: {
+      string: 'Hello dark theme :)'
+    }
+  }
+</script>
+
+<!-- use a theme by adding its name to the container class -->
+<div class="my-jsone-editor jse-theme-dark">
+  <JSONEditor bind:content />
+</div>
+
+<style>
+  /* load one or multiple themes */
+  @import 'svelte-jsoneditor/themes/jse-theme-dark.css';
+</style>
+```
+
 ## Develop
 
 Clone the git repository
