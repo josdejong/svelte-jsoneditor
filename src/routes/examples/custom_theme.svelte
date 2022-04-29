@@ -7,7 +7,14 @@
     { value: 'jse-theme-big', label: 'big' }
   ]
 
+  const fontSizes = [
+    { value: 'jse-font-small', label: 'small' },
+    { value: 'jse-font-normal', label: 'normal' },
+    { value: 'jse-font-large', label: 'large' }
+  ]
+
   let selectedTheme = themes[1].value
+  let selectedFontSize = fontSizes[1].value
 
   let content = {
     text: undefined, // used when in code mode
@@ -29,7 +36,7 @@
   <title>Custom theme with CSS variables | svelte-jsoneditor</title>
 </svelte:head>
 
-<div class="page {selectedTheme}">
+<div class="page {selectedTheme} {selectedFontSize}">
   <h1>Custom theme with CSS variables</h1>
 
   <p>You can customize the styling of the editor using CSS variables</p>
@@ -38,6 +45,14 @@
     Theme: <select bind:value={selectedTheme}>
       {#each themes as theme}
         <option value={theme.value}>{theme.label}</option>
+      {/each}
+    </select>
+  </p>
+  <p>
+    Font size:
+    <select bind:value={selectedFontSize}>
+      {#each fontSizes as fontSize}
+        <option value={fontSize.value}>{fontSize.label}</option>
       {/each}
     </select>
   </p>
@@ -73,6 +88,18 @@
 
     &.jse-theme-big {
       background: #ffe2d8;
+    }
+
+    &.jse-font-small {
+      --jse-font-size-mono: 12px;
+    }
+
+    &.jse-font-normal {
+      --jse-font-size-mono: 16px;
+    }
+
+    &.jse-font-large {
+      --jse-font-size-mono: 20px;
     }
 
     .editor {
