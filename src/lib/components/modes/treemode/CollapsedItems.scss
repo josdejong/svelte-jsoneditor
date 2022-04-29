@@ -39,8 +39,8 @@ div.jse-collapsed-items {
   }
 
   button.jse-expand-items {
-    font-family: var(--jse-font-family);
-    font-size: var(--jse-font-size);
+    font-family: inherit;
+    font-size: inherit;
     color: $color;
 
     background: none;

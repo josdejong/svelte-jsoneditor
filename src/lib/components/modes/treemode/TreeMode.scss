@@ -33,7 +33,7 @@
     position: relative;
     height: 0;
     top: $padding;
-    margin-right: $padding + 20px;
+    margin-right: calc(var(--jse-padding) + 20px);
     margin-left: $padding;
     text-align: right;
     z-index: 3; // must be above the ContextMenuButton

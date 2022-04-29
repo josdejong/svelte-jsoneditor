@@ -23,8 +23,8 @@
         padding: 6px 16px; // TODO: define variables for those props
         border: var(--jse-input-border);
         border-radius: var(--jse-input-radius);
-        font-family: var(--jse-font-family);
-        font-size: var(--jse-font-size);
+        font-family: inherit;
+        font-size: inherit;
         background: inherit;
         color: inherit;
         outline: none;

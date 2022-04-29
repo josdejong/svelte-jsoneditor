@@ -8,6 +8,8 @@ $padding-section-left: 32px;
   border: var(--jse-panel-border);
   border-radius: $border-radius;
 
+  font-family: var(--jse-font-family);
+  font-size: var(--jse-font-size);
   background: var(--jse-panel-background-color);
   color: var(--jse-panel-color-readonly);
   box-shadow: $box-shadow;
@@ -20,9 +22,13 @@ $padding-section-left: 32px;
     display: flex;
     align-items: stretch;
 
+    button,
+    input {
+      font-family: inherit;
+      font-size: inherit;
+    }
+
     button {
-      font-family: var(--jse-font-family);
-      font-size: var(--jse-font-size);
       display: block;
       text-align: center;
       border: none;
@@ -40,8 +46,6 @@ $padding-section-left: 32px;
     }
 
     input {
-      font-family: var(--jse-font-family);
-      font-size: var(--jse-font-size);
       color: var(--jse-panel-color);
       border: var(--jse-panel-border);
       border-radius: $border-radius;
