@@ -5,8 +5,9 @@ $navigation-bar-height: 27px; // TODO: having this hardcoded is ugly
 $search-box-offset-navigation-bar: $search-box-offset + $navigation-bar-height;
 $border-radius: 3px;
 
-$padding: 10px;
-$padding-half: 0.5 * $padding;
+$padding: var(--jse-padding);
+$padding-half: calc(0.5 * var(--jse-padding));
+$padding-double: calc(2 * var(--jse-padding));
 $menu-padding: 5px;
 $bottom-height: 5px;
 $contents-padding: 2px;
@@ -32,7 +33,7 @@ $outline-shadow: 0 0 10px 0 var(--jse-menu-background-highlight);
 
   background: var(--jse-button-primary-background);
   color: var(--jse-button-primary-color);
-  padding: $padding 2 * $padding;
+  padding: $padding $padding-double;
   border-radius: $border-radius;
 
   &:hover {

@@ -45,7 +45,7 @@
 
       padding: 0;
       margin: $padding-half 0;
-      height: calc(var(--jse-menu-button-size) - 2 * $padding-half);
+      height: calc(var(--jse-menu-button-size) - var(--jse-padding));
       width: 40px;
 
       &.jse-first {

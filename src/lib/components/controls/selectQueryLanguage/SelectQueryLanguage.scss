@@ -16,7 +16,7 @@
       @include jsoneditor-button;
 
       text-align: left;
-      padding: $padding 2 * $padding;
+      padding: $padding $padding-double;
       white-space: nowrap;
       color: var(--jse-context-menu-color);
       background: var(--jse-context-menu-background);

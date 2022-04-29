@@ -1,5 +1,5 @@
 :root {
-  /* over all fonts */
+  /* over all fonts and sizes */
   --jse-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu,
     Cantarell, 'Helvetica Neue', sans-serif;
   /* "consolas" for Windows, "menlo" for Mac with fallback to "monaco", 'Ubuntu Mono' for Ubuntu */
@@ -11,6 +11,7 @@
   --jse-line-height: calc(1em + 4px);
   --jse-indent-size: calc(1em + 4px);
   --jse-color-picker-button-size: 1em;
+  --jse-padding: 10px;
 
   /* over all colors */
   --jse-background-color: #fff;
