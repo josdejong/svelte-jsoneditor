@@ -241,7 +241,7 @@ export function expandWithCallback(json, state, path, expandedCallback) {
   const updatedState = setIn(state, path.concat(STATE_EXPANDED), true, true)
 
   return updateIn(updatedState, path, (childState) => {
-    return syncState(getIn(json, path), childState, [], expandedCallback, false)
+    return syncState(getIn(json, path), childState, [], expandedCallback, true)
   })
 }
 
