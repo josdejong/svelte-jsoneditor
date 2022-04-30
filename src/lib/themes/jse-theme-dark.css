@@ -63,6 +63,9 @@
 
   /* svelte-select component */
   --border: 1px solid #737373;
+  --listBackground: #333333;
+  --itemHoverBG: #505050;
+  --multiItemBG: #3b3b3b;
 
   /* color picker */
   --jse-color-picker-background: #656565;
