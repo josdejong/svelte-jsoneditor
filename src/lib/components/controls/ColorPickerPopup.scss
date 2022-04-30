@@ -5,6 +5,7 @@
   :global(.picker_wrapper.popup .picker_arrow::before),
   :global(.picker_wrapper.popup .picker_arrow::after) {
     background: var(--jse-color-picker-background);
+    line-height: normal;
   }
 
   :global(.picker_slider),
