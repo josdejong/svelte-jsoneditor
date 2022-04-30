@@ -89,7 +89,7 @@
   --jse-search-match-active-outline: 1px solid #e1be00;
 
   /* inline tags inside the JSON document */
-  --jse-tag-background: rgba(0, 0, 0, 0.25);
+  --jse-tag-background: rgba(0, 0, 0, 0.2);
   --jse-tag-color: #fff;
 
   /* input fields in modals */

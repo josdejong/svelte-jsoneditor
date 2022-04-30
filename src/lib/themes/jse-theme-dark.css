@@ -48,8 +48,8 @@
   --jse-search-match-active-outline: 1px solid #ecb783;
 
   /* inline tags inside the JSON document */
-  --jse-tag-background: #575757;
-  --jse-tag-color: #d4d4d4;
+  --jse-tag-background: #444444;
+  --jse-tag-color: #bdbdbd;
 
   /* input fields in modals */
   --jse-input-border: 1px solid #737373;

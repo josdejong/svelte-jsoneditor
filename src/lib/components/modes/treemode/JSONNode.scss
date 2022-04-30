@@ -187,6 +187,8 @@
   position: relative;
   display: inline-block;
   padding: 0 4px;
+  line-height: normal;
+  margin: 1px 0;
 
   &:hover {
     opacity: 0.8;

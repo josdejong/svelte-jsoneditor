@@ -54,6 +54,7 @@
   // value selected (part 2)
   &.jse-selected-value {
     .jse-meta,
+    > .jse-header-outer > .jse-header > .jse-meta,
     > .jse-footer-outer > .jse-footer,
     .jse-props .jse-contents,
     .jse-props .jse-header,
@@ -63,7 +64,7 @@
     .jse-items .jse-header,
     .jse-items .jse-footer,
     .jse-items .jse-expand {
-      background: $selection-background;
+      background: $selection-background !important;
 
       :global(.jse-key),
       :global(.jse-value) {
