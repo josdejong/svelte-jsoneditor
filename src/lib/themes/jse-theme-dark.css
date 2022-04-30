@@ -35,6 +35,12 @@
   --jse-panel-button-color-highlight: #e5e5e5;
   --jse-panel-button-background-highlight: #464646;
 
+  /* context menu */
+  --jse-context-menu-background: #4b4b4b;
+  --jse-context-menu-background-highlight: #595959;
+  --jse-context-menu-separator-color: #595959;
+  --jse-context-menu-color: #d4d4d4;
+
   /* json key and values */
   --jse-key-color: #9cdcfe;
   --jse-value-color: #d4d4d4;
