@@ -12,7 +12,6 @@
   --clearSelectTop: 2px;
   --clearSelectBottom: 2px;
   --indicatorTop: 8px;
-  --background: none;
 
   flex: 1;
   display: flex;
@@ -21,7 +20,7 @@
   font-family: var(--jse-font-family);
   font-size: var(--jse-font-size);
   line-height: normal;
-  background: var(--jse-background-color);
+  background: var(--jse-modal-background-color);
   color: var(--jse-color);
 
   .jse-contents {
@@ -48,7 +47,7 @@
   height: 100%;
   top: 0;
   left: 0;
-  background: var(--jse-modal-background);
+  background: var(--jse-modal-overlay-background);
 }
 
 :global(.bg.jse-modal-bg .jse-modal-window-wrap) {

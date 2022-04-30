@@ -30,7 +30,7 @@
         outline: none;
 
         &:read-only {
-          border: var(--jse-input-border-readonly);
+          background: var(--jse-input-background-readonly);
         }
       }
 

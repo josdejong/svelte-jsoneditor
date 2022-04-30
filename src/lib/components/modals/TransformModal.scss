@@ -131,7 +131,8 @@
 
   :global(.jse-tree-mode) {
     flex: 1;
-    border: var(--jse-input-border-readonly);
+    background: var(--jse-input-background-readonly);
+    border: var(--jse-input-border);
     box-shadow: none;
     box-sizing: border-box;
   }
@@ -149,20 +150,20 @@
     font-family: var(--jse-font-family-mono);
     font-size: var(--jse-font-size-mono);
     color: inherit;
-    background: none;
+    background: var(--jse-modal-input-background);
 
     &:focus {
       border: var(--jse-input-border-focus);
     }
 
     &:read-only {
-      border: var(--jse-input-border-readonly);
+      background: var(--jse-input-background-readonly);
     }
   }
 
   .jse-preview.jse-error {
     flex: 1;
-    border: 1px solid var(--jse-input-border-readonly);
+    background: var(--jse-input-background-readonly);
     color: var(--jse-error-color);
     padding: $padding-half;
   }

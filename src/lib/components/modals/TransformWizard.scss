@@ -57,10 +57,11 @@ table.jse-transform-wizard {
           border: var(--jse-input-border);
           border-radius: var(--jse-input-radius);
           outline: none;
-          background: none;
+          background: var(--jse-modal-input-background);
+          color: inherit;
 
           &:focus {
-            border-color: var(--jse-menu-background);
+            border: var(--jse-input-border-focus);
           }
         }
       }

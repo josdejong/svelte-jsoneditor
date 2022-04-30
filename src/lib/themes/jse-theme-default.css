@@ -44,8 +44,10 @@
   --jse-menu-background-highlight: #5f9dff;
   --jse-menu-color: #fff;
   --jse-menu-button-size: 32px;
-  --jse-modal-background: rgba(0, 0, 0, 0.3);
+  --jse-modal-background-color: #f5f5f5;
+  --jse-modal-overlay-background: rgba(0, 0, 0, 0.3);
   --jse-modal-code-background: rgba(0, 0, 0, 0.05);
+  --jse-modal-input-background: #fff;
 
   /* navigation bar, gutter, search box */
   --jse-panel-background-color: #ebebeb;
@@ -95,7 +97,7 @@
   /* input fields in modals */
   --jse-input-border: 1px solid #d8dbdf;
   --jse-input-border-focus: 1px solid #3883fa;
-  --jse-input-border-readonly: 1px solid #f5f5f5;
+  --jse-input-background-readonly: transparent;
   --jse-input-radius: 3px;
 
   /* buttons in modals */
@@ -111,6 +113,7 @@
   --itemIsActiveBG: #3883fa;
   --border: 1px solid #d8dbdf;
   --borderRadius: 3px;
+  --background: #fff;
 
   /* color picker */
   --jse-color-picker-background: #ebebeb;
