@@ -131,10 +131,10 @@
 }
 
 // lighter selection color when the editor doesn't have focus
-:global(.jse-jsoneditor-main:not(.jse-focus)) {
+:global(.jse-main:not(.jse-focus)) {
   .jse-json-node {
     @include json-node-selected-mixin(
-      --jse-selection-background-light-color,
+      var(--jse-selection-background-light-color),
       var(--jse-selection-background-color)
     );
   }
