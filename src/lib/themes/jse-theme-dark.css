@@ -70,10 +70,12 @@
   --jse-button-color: #e0e0e0;
 
   /* svelte-select component */
-  --border: 1px solid #737373;
+  --border: 1px solid #4f4f4f;
   --listBackground: #333333;
   --itemHoverBG: #505050;
-  --multiItemBG: #3b3b3b;
+  --multiItemBG: #5b5b5b;
+  --inputColor: #d4d4d4;
+  --multiClearBG: #8a8a8a;
 
   /* color picker */
   --jse-color-picker-background: #656565;
