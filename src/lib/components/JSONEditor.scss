@@ -1,4 +1,4 @@
-@import '../themes/jse-theme-default.css';
+@import '../themes/jse-theme-default'; // do not put the .css extension here, else the file will not be bundled
 @import '../styles';
 @import 'modes/treemode/json-node-selected-mixin';
 
