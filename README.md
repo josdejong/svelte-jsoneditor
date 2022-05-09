@@ -391,13 +391,13 @@ For example, to change the default blue theme color to anthracite:
   }
 </script>
 
-<!-- use a theme by adding its name to the container class -->
 <div class="my-json-editor">
   <JSONEditor bind:content />
 </div>
 
 <style>
   .my-json-editor {
+    /* define a custom theme color */
     --jse-menu-background: #383e42;
     --jse-menu-background-highlight: #687177;
   }
