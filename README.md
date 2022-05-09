@@ -375,6 +375,37 @@ The editor can be styled using the available CSS variables. A full list with all
 
 https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/themes/jse-theme-default.css
 
+### Custom theme color
+
+For example, to change the default blue theme color to anthracite:
+
+```html
+<script>
+  import { JSONEditor } from 'svelte-jsoneditor'
+
+  let content = {
+    text: undefined, // used when in code mode
+    json: {
+      string: 'Hello custom theme color :)'
+    }
+  }
+</script>
+
+<!-- use a theme by adding its name to the container class -->
+<div class="my-json-editor">
+  <JSONEditor bind:content />
+</div>
+
+<style>
+  .my-json-editor {
+    --jse-menu-background: #383e42;
+    --jse-menu-background-highlight: #687177;
+  }
+</style>
+```
+
+### Dark theme
+
 The editor comes with a built-in dark theme. To use this theme:
 
 - Load the css file of the dark theme: `themes/jse-theme-dark.css`
@@ -397,7 +428,7 @@ Full Svelte example:
 </script>
 
 <!-- use a theme by adding its name to the container class -->
-<div class="my-jsone-editor jse-theme-dark">
+<div class="my-json-editor jse-theme-dark">
   <JSONEditor bind:content />
 </div>
 

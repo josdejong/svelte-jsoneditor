@@ -30,7 +30,10 @@
       <a href="examples/json_schema_validation">JSON Schema validation</a>
     </li>
     <li>
-      <a href="examples/custom_theme">Custom theming with CSS variables</a>
+      <a href="examples/custom_theme_color">Custom theme color</a>
+    </li>
+    <li>
+      <a href="examples/switch_themes">Switch themes (dark theme)</a>
     </li>
   </ul>
 

@@ -33,11 +33,11 @@
 </script>
 
 <svelte:head>
-  <title>Custom theme with CSS variables | svelte-jsoneditor</title>
+  <title>Switch themes and font size with CSS variables | svelte-jsoneditor</title>
 </svelte:head>
 
 <div class="page {selectedTheme} {selectedFontSize}">
-  <h1>Custom theme with CSS variables</h1>
+  <h1>Switch themes and font size with CSS variables</h1>
 
   <p>You can customize the styling of the editor using CSS variables</p>
 
@@ -95,7 +95,7 @@
     }
 
     &.jse-font-normal {
-      --jse-font-size-mono: 16px;
+      --jse-font-size-mono: 14px;
     }
 
     &.jse-font-large {
