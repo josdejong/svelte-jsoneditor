@@ -407,6 +407,25 @@ Full Svelte example:
 </style>
 ```
 
+## Differences between `josdejong/svelte-jsoneditor` and `josdejong/jsoneditor`
+
+This library [`josdejong/svelte-jsoneditor`](https://github.com/josdejong/svelte-jsoneditor/) is the successor of [`josdejong/jsoneditor`](https://github.com/josdejong/jsoneditor). The main differences are:
+
+|              | `josdejong/jsoneditor`                                                                                               | `josdejong/svelte-jsoneditor`                                                                                                                                                                                         |
+| ------------ | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Creation     | Orginal (first published in 2011)                                                                                    | Successor (first published in 2021)                                                                                                                                                                                   |
+| Framework    | Implemented in plain JavaScript, using low level DOM operations                                                      | Uses [Svelte](https://svelte.dev/)                                                                                                                                                                                    |
+| Tree mode    | A tree view having context menu buttons on the left of every line. The keys and values are always in editable state. | A tree view utilizing right-click to open the context menu, and double-click to start editing a key or value (more similar to a Spreadsheet or text editor). It supports copy/paste from and to the system clipboard. |
+| Code mode    | Powered by [Ace editor](https://ace.c9.io/)                                                                          | Powered by [Code Mirror 6](https://codemirror.net/6/)                                                                                                                                                                 |
+| Preview mode | Used to preview large documents                                                                                      | Not needed, both Tree mode and Code mode can handle large documents                                                                                                                                                   |
+
+The main reasons to create a new library instead of extending the existing one are:
+
+- The codebase had become hard to maintain, the architecture needed a big overhaul. The codebase uses plain JavaScript to create and update the DOM based on changes in the state of the application. This is complex. Letting a framework like Svelte do this for you makes the code base much simpler.
+- Performance limitations in the old editor.
+- Tree mode: the classic tree mode of `josdejong/jsoneditor` is simple and straightforward, but also limited. The new tree mode of `josdejong/svelte-jsoneditor` allows for much more streamlined editing and interaction. It works quite similar to a Spreadsheet or text editor. Navigate and select using the Arrow and Shift+Arrow keys or by dragging with the mouse. Double-click (or press Enter) to start editing a key or value. Open the context menu by right-clicking on the item or selection you want to operate on. Use cut/copy/paste to move parts of the JSON around and interoperate with other applications.
+- Code mode: the Ace editor library is using an outdated module system (AMD) and the way it is bundled and published is hard to integrate in modern JavaScript projects. Code Mirror 6 is very straightforward to integrate, has much better performance, and is very extensible (paving the way for future features).
+
 ## Develop
 
 Clone the git repository
