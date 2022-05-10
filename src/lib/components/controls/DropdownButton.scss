@@ -2,6 +2,8 @@
 
 .jse-dropdown-button {
   flex: 1;
+  line-height: normal;
+
   $background: var(--jse-context-menu-background);
   $background-highlight: var(--jse-context-menu-background-highlight);
 
