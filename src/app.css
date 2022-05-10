@@ -20,16 +20,16 @@ body {
 #svelte {
   width: 100%;
   height: 100%;
-  padding: 0;
   margin: 0;
+  padding: 0;
   overflow: hidden;
 }
 
 #svelte main {
   width: 100%;
   height: 100%;
-  padding: 10px;
   margin: 0;
+  padding: 10px;
   overflow: auto;
   box-sizing: border-box;
 }

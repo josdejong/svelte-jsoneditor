@@ -16,8 +16,8 @@
 <h1>Custom theme color</h1>
 
 <p>
-  With CSS variables you can change the theme color of the editor, in this case from blue to
-  anthracite.
+  With CSS variables you can change the theme color of the editor, in this case from the default
+  blue color to deep pink.
 </p>
 
 <div class="my-json-editor">
@@ -25,10 +25,14 @@
 </div>
 
 <style>
+  h1 {
+    color: #ec1897;
+  }
+
   .my-json-editor {
     /* define a custom theme color */
-    --jse-theme-color: #383e42;
-    --jse-theme-color-highlight: #4b5257;
+    --jse-theme-color: #ec1897;
+    --jse-theme-color-highlight: #f553b5;
 
     width: 500px;
     height: 300px;

@@ -70,15 +70,11 @@
   @import '../../lib/themes/jse-theme-dark.css';
   @import 'themes/jse-theme-big.css';
 
-  :global(#svelte main) {
-    padding: 0;
-  }
-
   .page {
     width: 100%;
     height: 100%;
     padding: 10px;
-    box-sizing: border-box;
+    margin: -10px; // compensate for the padding of the root element
     overflow: auto;
 
     &.jse-theme-dark {

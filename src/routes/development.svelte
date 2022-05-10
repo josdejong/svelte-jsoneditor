@@ -118,7 +118,7 @@
     'svelte-jsoneditor-demo-multipleQueryLanguages',
     true
   )
-  const selectedTheme = useLocalStorage('svelte-jsoneditor-demo-theme', 'default')
+  const selectedTheme = useLocalStorage('svelte-jsoneditor-demo-theme', themes[0].value)
 
   $: queryLanguages = $multipleQueryLanguages
     ? [javascriptQueryLanguage, lodashQueryLanguage, jmespathQueryLanguage]
@@ -440,6 +440,22 @@ See https://github.com/sveltejs/kit/issues/981
 <style lang="scss">
   @import '../lib/themes/jse-theme-dark.css';
   @import 'examples/themes/jse-theme-big.css';
+
+  .demo-app {
+    margin: -10px; // compensate for the padding of the root element
+    padding: 10px;
+    height: 100%;
+    overflow: auto;
+
+    &.jse-theme-dark {
+      background: #4d4d4d;
+      color: #fff;
+    }
+
+    &.jse-theme-big {
+      background: #ffe2d8;
+    }
+  }
 
   .columns {
     display: flex;
