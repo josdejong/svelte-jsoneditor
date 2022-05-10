@@ -1,5 +1,7 @@
 .jse-theme-dark {
   /* over all colors */
+  --jse-theme-color: #3883fa;
+  --jse-theme-color-highlight: #5f9dff;
   --jse-background-color: #1e1e1e;
   --jse-color: #d4d4d4;
   --jse-selection-background-color: #464646;
@@ -12,11 +14,9 @@
   --jse-edit-outline: 2px solid #d4d4d4;
 
   /* main menu, modal header */
-  --jse-theme-color: #3c3c3c;
-  --jse-theme-color-highlight: #565656;
-  --jse-menu-color: #d4d4d4;
+  --jse-menu-color: #fff;
   --jse-modal-background-color: #2f2f2f;
-  --jse-modal-overlay-background: rgba(255, 255, 255, 0.2);
+  --jse-modal-overlay-background: rgba(0, 0, 0, 0.5);
   --jse-modal-code-background: #2f2f2f;
   --jse-modal-input-background: #3d3d3d;
   --background: #3d3d3d;
