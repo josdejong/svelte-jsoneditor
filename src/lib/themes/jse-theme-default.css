@@ -14,6 +14,8 @@
   --jse-padding: 10px;
 
   /* over all colors */
+  --jse-theme-color: #3883fa;
+  --jse-theme-color-highlight: #5f9dff;
   --jse-background-color: #fff;
   --jse-color: #1a1a1a;
   --jse-error-color: #ee5341;
@@ -40,8 +42,6 @@
   --jse-message-action-background-highlight: rgba(255, 255, 255, 0.3);
 
   /* main menu, modal header */
-  --jse-menu-background: #3883fa;
-  --jse-menu-background-highlight: #5f9dff;
   --jse-menu-color: #fff;
   --jse-menu-button-size: 32px;
   --jse-modal-background-color: #f5f5f5;

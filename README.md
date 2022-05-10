@@ -398,8 +398,8 @@ For example, to change the default blue theme color to anthracite:
 <style>
   .my-json-editor {
     /* define a custom theme color */
-    --jse-menu-background: #383e42;
-    --jse-menu-background-highlight: #687177;
+    --jse-theme-color: #383e42;
+    --jse-theme-color-highlight: #687177;
   }
 </style>
 ```

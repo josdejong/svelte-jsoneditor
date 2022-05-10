@@ -27,8 +27,8 @@
 <style>
   .my-json-editor {
     /* define a custom theme color */
-    --jse-menu-background: #383e42;
-    --jse-menu-background-highlight: #4b5257;
+    --jse-theme-color: #383e42;
+    --jse-theme-color-highlight: #4b5257;
 
     width: 500px;
     height: 300px;

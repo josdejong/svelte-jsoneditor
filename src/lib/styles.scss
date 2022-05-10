@@ -15,7 +15,7 @@ $contents-min-height: 150px;
 $errors-overview-max-height: 25%;
 
 $box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.24);
-$outline-shadow: 0 0 10px 0 var(--jse-menu-background-highlight);
+$outline-shadow: 0 0 10px 0 var(--jse-theme-color-highlight);
 
 @mixin jsoneditor-button {
   border: none;
