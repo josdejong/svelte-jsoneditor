@@ -165,4 +165,12 @@
     color: var(--jse-error-color);
     padding: $padding-half;
   }
+
+  :global(a) {
+    color: var(--jse-a-color);
+  }
+
+  :global(a:hover) {
+    color: var(--jse-a-color-highlight);
+  }
 }

@@ -47,11 +47,3 @@ h2 {
   font-size: 1em;
   font-weight: 400;
 }
-
-a {
-  color: var(--jse-a-color);
-}
-
-a:hover {
-  color: var(--jse-a-color-highlight);
-}
