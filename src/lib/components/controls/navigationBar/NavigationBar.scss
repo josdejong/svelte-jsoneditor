@@ -10,6 +10,9 @@
   display: flex;
   overflow: auto;
 
+  border-left: var(--jse-border);
+  border-right: var(--jse-border);
+
   .jse-navigation-bar-space {
     padding: $padding-half $padding;
     color: var(--jse-panel-color-light);

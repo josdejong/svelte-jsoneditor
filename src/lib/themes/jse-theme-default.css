@@ -18,6 +18,7 @@
   --jse-theme-color-highlight: #5f9dff;
   --jse-background-color: #fff;
   --jse-color: #4d4d4d;
+  --jse-border: 1px solid #d7d7d7;
   --jse-error-color: #ee5341;
   --jse-selection-background-color: #d3d3d3;
   --jse-selection-background-dark-color: #c2c2c2;
@@ -28,6 +29,7 @@
   --jse-collapsed-items-link-color: rgba(0, 0, 0, 0.38);
   --jse-collapsed-items-link-color-highlight: #ee5341;
   --jse-edit-outline: 2px solid #656565;
+  --jse-controls-box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.24);
 
   /* messages */
   --jse-message-error-background: #ee5341;

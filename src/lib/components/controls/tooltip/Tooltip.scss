@@ -9,5 +9,5 @@
   background: var(--jse-context-menu-background);
   color: var(--jse-context-menu-color);
   white-space: nowrap;
-  box-shadow: $box-shadow;
+  box-shadow: var(--jse-controls-box-shadow);
 }

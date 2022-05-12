@@ -40,6 +40,13 @@
   }
 
   .jse-contents {
+    border-left: var(--jse-border);
+    border-right: var(--jse-border);
+
+    &:last-child {
+      border-bottom: var(--jse-border);
+    }
+
     flex: 1;
     overflow: auto;
     position: relative;

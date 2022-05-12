@@ -12,7 +12,7 @@ $padding-section-left: 32px;
   font-size: var(--jse-font-size);
   background: var(--jse-panel-background-color);
   color: var(--jse-panel-color-readonly);
-  box-shadow: $box-shadow;
+  box-shadow: var(--jse-controls-box-shadow);
   display: inline-block;
   width: 400px;
   max-width: 100%;

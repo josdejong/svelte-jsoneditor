@@ -54,7 +54,7 @@
     z-index: 1;
     background: $background;
     color: var(--jse-context-menu-color);
-    box-shadow: $box-shadow;
+    box-shadow: var(--jse-controls-box-shadow);
 
     &.jse-visible {
       display: block;

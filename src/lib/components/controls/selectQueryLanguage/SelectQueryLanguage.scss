@@ -10,7 +10,7 @@
     right: 0;
     display: flex;
     flex-direction: column;
-    box-shadow: $box-shadow;
+    box-shadow: var(--jse-controls-box-shadow);
 
     .jse-query-language {
       @include jsoneditor-button;

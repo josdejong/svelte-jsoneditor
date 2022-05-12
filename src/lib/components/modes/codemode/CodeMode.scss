@@ -15,6 +15,13 @@
     min-width: 0;
     min-height: 0;
 
+    border-left: var(--jse-border);
+    border-right: var(--jse-border);
+
+    &:last-child {
+      border-bottom: var(--jse-border);
+    }
+
     &.jse-hidden {
       visibility: hidden;
     }

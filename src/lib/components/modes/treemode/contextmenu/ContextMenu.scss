@@ -1,7 +1,7 @@
 @import '../../../../styles.scss';
 
 .jse-contextmenu {
-  box-shadow: $box-shadow;
+  box-shadow: var(--jse-controls-box-shadow);
 
   font-family: var(--jse-font-family);
   font-size: var(--jse-font-size);

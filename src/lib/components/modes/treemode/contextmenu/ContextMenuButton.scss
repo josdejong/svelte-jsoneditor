@@ -17,7 +17,7 @@
   background: var(--jse-context-menu-background);
   color: var(--jse-context-menu-color);
   border: none;
-  box-shadow: $box-shadow;
+  box-shadow: var(--jse-controls-box-shadow);
 
   &:hover {
     background: var(--jse-context-menu-background-highlight);

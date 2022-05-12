@@ -10,12 +10,10 @@
   font-family: var(--jse-font-family);
   font-size: var(--jse-font-size);
   line-height: normal;
-  border: 1px solid var(--jse-theme-color);
   position: relative;
   display: flex;
   flex-direction: row;
 
   &.jse-focus {
-    box-shadow: $outline-shadow;
   }
 }
