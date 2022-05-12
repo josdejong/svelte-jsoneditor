@@ -49,9 +49,9 @@ h2 {
 }
 
 a {
-  color: #156fc5;
+  color: var(--jse-a-color);
 }
 
 a:hover {
-  color: #0f508d;
+  color: var(--jse-a-color-highlight);
 }

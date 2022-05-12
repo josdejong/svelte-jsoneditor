@@ -13,6 +13,8 @@
   --jse-collapsed-items-link-color-highlight: #ec8477;
   --jse-hover-background-color: #343434;
   --jse-edit-outline: 2px solid #d4d4d4;
+  --jse-a-color: #55abff;
+  --jse-a-color-highlight: #4387c9;
 
   /* main menu, modal header */
   --jse-menu-color: #fff;

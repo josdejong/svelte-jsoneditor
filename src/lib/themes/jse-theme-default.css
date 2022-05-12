@@ -12,6 +12,8 @@
   --jse-indent-size: calc(1em + 4px);
   --jse-color-picker-button-size: 1em;
   --jse-padding: 10px;
+  --jse-a-color: #156fc5;
+  --jse-a-color-highlight: #0f508d;
 
   /* over all colors */
   --jse-theme-color: #3883fa;
