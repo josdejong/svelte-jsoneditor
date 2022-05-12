@@ -128,7 +128,13 @@
       }
 
       :global(.cm-search button[name='close']) {
+        width: 32px;
+        height: 32px;
         font-size: 24px;
+        line-height: 24px;
+        padding: 0;
+        right: 0;
+        top: -4px;
       }
 
       :global(.cm-cursor-primary) {
