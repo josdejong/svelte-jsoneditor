@@ -747,7 +747,7 @@
       : []
 </script>
 
-<div class="jse-code-mode" bind:this={domCodeMode}>
+<div class="jse-code-mode" class:no-main-menu={!mainMenuBar} bind:this={domCodeMode}>
   {#if mainMenuBar}
     <CodeMenu
       {readOnly}

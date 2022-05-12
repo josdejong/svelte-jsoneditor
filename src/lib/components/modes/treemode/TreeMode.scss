@@ -39,6 +39,10 @@
     z-index: 3; // must be above the ContextMenuButton
   }
 
+  &.no-main-menu {
+    border-top: var(--jse-border);
+  }
+
   .jse-contents {
     border-left: var(--jse-border);
     border-right: var(--jse-border);

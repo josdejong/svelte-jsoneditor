@@ -7,6 +7,10 @@
   flex-direction: column;
   background: var(--jse-background-color);
 
+  &.no-main-menu {
+    border-top: var(--jse-border);
+  }
+
   .jse-contents {
     flex: 1;
     display: flex;

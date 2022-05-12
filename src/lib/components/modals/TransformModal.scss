@@ -132,13 +132,8 @@
   :global(.jse-tree-mode) {
     flex: 1;
     background: var(--jse-input-background-readonly);
-    border: var(--jse-input-border);
     box-shadow: none;
     box-sizing: border-box;
-  }
-
-  :global(.jse-tree-mode.jse-focus) {
-    border: var(--jse-input-border-focus);
   }
 
   input,

@@ -2084,6 +2084,7 @@
 
 <div
   class="jse-tree-mode"
+  class:no-main-menu={!mainMenuBar}
   on:keydown={handleKeyDown}
   on:mousedown={handleMouseDown}
   on:contextmenu={handleContextMenu}
