@@ -134,6 +134,8 @@
     background: var(--jse-input-background-readonly);
     box-shadow: none;
     box-sizing: border-box;
+
+    --jse-border: var(--jse-input-border);
   }
 
   input,
