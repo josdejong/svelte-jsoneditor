@@ -17,7 +17,7 @@
   --jse-theme-color: #3883fa;
   --jse-theme-color-highlight: #5f9dff;
   --jse-background-color: #fff;
-  --jse-color: #1a1a1a;
+  --jse-color: #4d4d4d;
   --jse-error-color: #ee5341;
   --jse-selection-background-color: #d3d3d3;
   --jse-selection-background-dark-color: #c2c2c2;
@@ -51,7 +51,7 @@
 
   /* navigation bar, gutter, search box */
   --jse-panel-background-color: #ebebeb;
-  --jse-panel-color: #1a1a1a;
+  --jse-panel-color: #4d4d4d;
   --jse-panel-color-light: #656565;
   --jse-panel-color-readonly: #b2b2b2;
   --jse-panel-border: 1px solid #d7d7d7;
@@ -103,7 +103,7 @@
   /* buttons in modals */
   --jse-button-background: #e0e0e0;
   --jse-button-background-highlight: #e7e7e7;
-  --jse-button-color: #1a1a1a;
+  --jse-button-color: #4d4d4d;
   --jse-button-primary-background: #3883fa;
   --jse-button-primary-background-highlight: #5f9dff;
   --jse-button-primary-background-disabled: #9d9d9d;
