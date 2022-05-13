@@ -79,11 +79,12 @@
   /* svelte-select */
   --background: #3d3d3d;
   --border: 1px solid #4f4f4f;
-  --listBackground: #333333;
+  --listBackground: #3d3d3d;
   --itemHoverBG: #505050;
   --multiItemBG: #5b5b5b;
   --inputColor: #d4d4d4;
   --multiClearBG: #8a8a8a;
+  --listShadow: 0 2px 6px 0 rgba(0, 0, 0, 0.24);
 
   /* color picker */
   --jse-color-picker-background: #656565;
