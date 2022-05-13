@@ -9,7 +9,7 @@
   --jse-font-size-mono: 28px;
   --jse-padding: 10px;
 
-  --jse-button-primary-background: #ff3e00;
+  --jse-button-primary-background: var(--jse-theme-color);
   --jse-button-primary-background-highlight: #e74c1c;
   --itemIsActiveBG: #fd5e2d;
 
@@ -22,7 +22,7 @@
   --jse-message-success-color: #9ac45d;
 
   --jse-context-menu-button-size: 32px;
-  --jse-context-menu-background: #ff3e00;
+  --jse-context-menu-background: var(--jse-theme-color);
   --jse-context-menu-background-highlight: #ea3600;
   --jse-context-menu-button-background: var(--jse-context-menu-background);
   --jse-context-menu-button-background-highlight: var(--jse-context-menu-background-highlight);
