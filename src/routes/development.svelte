@@ -297,6 +297,22 @@
     <button
       on:click={() => {
         content = {
+          text: undefined,
+          json: [...new Array(1000)].map((value, index) => {
+            return {
+              id: index,
+              name: 'Item ' + index,
+              random: Math.round(Math.random() * 1000)
+            }
+          })
+        }
+      }}
+    >
+      Set long array with objects
+    </button>
+    <button
+      on:click={() => {
+        content = {
           text: 'abc',
           json: undefined
         }
