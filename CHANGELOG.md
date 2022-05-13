@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [0.3.49](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.48...v0.3.49) (2022-05-13)
 
+### Features
+
+* Support for custom styling using css variables 
 
 ### Bug Fixes
 
