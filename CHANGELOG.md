@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.49](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.48...v0.3.49) (2022-05-13)
+
+
+### Bug Fixes
+
+* [#69](https://github.com/josdejong/svelte-jsoneditor/issues/69) cannot build the library after a clean install ([32a9b73](https://github.com/josdejong/svelte-jsoneditor/commit/32a9b737db60a9aee35d276b65f5d5b54bd5cd0c))
+* [#70](https://github.com/josdejong/svelte-jsoneditor/issues/70) implement quickkey Shift+Enter to go to the previous search result ([8f1917f](https://github.com/josdejong/svelte-jsoneditor/commit/8f1917fc5b100eaa7dfadd0f88f765a70de7bd4c))
+* [#71](https://github.com/josdejong/svelte-jsoneditor/issues/71) describe the differences with josdejong/jsoneditor in the README.md ([b9a54e9](https://github.com/josdejong/svelte-jsoneditor/commit/b9a54e974daa0a1e9a6575ddfcb5658e45bbc2ae))
+* context menu button jumping around whilst selecting multiple expanded objects ([d4a3cbf](https://github.com/josdejong/svelte-jsoneditor/commit/d4a3cbfc44ea14b36a0c1d8df2b36495d1f8d2d9))
+* exception thrown when clicking left from a selection ([e7e8094](https://github.com/josdejong/svelte-jsoneditor/commit/e7e8094ad34c4d8ecc9a3d855fe315a448e3bf20))
+* expandAll not working ([37c6256](https://github.com/josdejong/svelte-jsoneditor/commit/37c6256dd4ad60400f7c0ebad75b3d2f534db9e7))
+* right click in welcome screen did not open the context menu ([7934e9a](https://github.com/josdejong/svelte-jsoneditor/commit/7934e9ac7184a84e17d8bcbdfdaa48e9aa210bb7))
+* selection and expanded state not always stored correctly in history ([#73](https://github.com/josdejong/svelte-jsoneditor/issues/73)) ([702fba1](https://github.com/josdejong/svelte-jsoneditor/commit/702fba1d07620008d33f7c0c2ad00e05cbd5954f))
+
 ### [0.3.48](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.47...v0.3.48) (2022-04-26)
 
 
