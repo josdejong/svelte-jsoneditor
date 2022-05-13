@@ -6,9 +6,9 @@
   --jse-color: #d4d4d4;
   --jse-border: 1px solid #4f4f4f;
   --jse-selection-background-color: #464646;
-  --jse-selection-background-dark-color: #343434;
   --jse-selection-background-light-color: #333333;
-  --jse-collapsed-items-background: #565656;
+  --jse-collapsed-items-background-color: #333333;
+  --jse-collapsed-items-selected-background-color: #565656;
   --jse-collapsed-items-link-color: #b2b2b2;
   --jse-collapsed-items-link-color-highlight: #ec8477;
   --jse-hover-background-color: #343434;

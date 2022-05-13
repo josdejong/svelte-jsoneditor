@@ -23,11 +23,11 @@
   --jse-border: 1px solid #d7d7d7;
   --jse-error-color: #ee5341;
   --jse-selection-background-color: #d3d3d3;
-  --jse-selection-background-dark-color: #c2c2c2;
   --jse-selection-background-light-color: #e8e8e8;
   --jse-hover-background-color: rgba(0, 0, 0, 0.06);
   --jse-selection-inline-color: #656565;
-  --jse-collapsed-items-background: #f5f5f5;
+  --jse-collapsed-items-background-color: #f5f5f5;
+  --jse-collapsed-items-selected-background-color: #c2c2c2;
   --jse-collapsed-items-link-color: rgba(0, 0, 0, 0.38);
   --jse-collapsed-items-link-color-highlight: #ee5341;
   --jse-edit-outline: 2px solid #656565;

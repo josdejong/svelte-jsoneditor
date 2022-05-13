@@ -43,7 +43,7 @@
     background-color: $selection-background;
     cursor: grab;
 
-    $shape-color: var(--jse-selection-background-dark-color);
+    $shape-color: var(--jse-collapsed-items-selected-background-color);
     background-image: linear-gradient($shape-color, $shape-color),
       linear-gradient(to bottom right, transparent 50.5%, $shape-color 50.5%),
       linear-gradient(to bottom left, transparent 50.5%, $shape-color 50.5%),
