@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   background: var(--jse-background-color);
-  color: var(--jse-color);
+  color: var(--jse-text-color);
 
   .jse-menu {
     .jse-info {
@@ -20,7 +20,7 @@
     font-family: var(--jse-font-family-mono);
     font-size: var(--jse-font-size-mono);
     background: var(--jse-background-color);
-    color: var(--jse-color);
+    color: var(--jse-text-color);
 
     resize: none;
     outline: none;

@@ -18,7 +18,7 @@
 
   :global(.picker_editor input) {
     background: var(--jse-background-color);
-    color: var(--jse-color);
+    color: var(--jse-text-color);
   }
 
   :global(.picker_done button) {

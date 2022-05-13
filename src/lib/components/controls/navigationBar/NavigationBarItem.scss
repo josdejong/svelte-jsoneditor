@@ -26,8 +26,8 @@
       padding: 2px $padding 0;
 
       &.jse-open {
-        background: var(--jse-panel-dropdown-background);
-        color: var(--jse-panel-dropdown-color);
+        background: var(--jse-navigation-bar-background);
+        color: var(--jse-navigation-bar-dropdown-color);
       }
     }
   }

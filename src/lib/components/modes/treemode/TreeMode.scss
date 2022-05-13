@@ -10,7 +10,7 @@
   min-height: 0;
   font-family: var(--jse-font-family-mono);
   font-size: var(--jse-font-size-mono);
-  color: var(--jse-color);
+  color: var(--jse-text-color);
   line-height: var(--jse-line-height);
 
   .jse-hidden-input-label {
@@ -40,15 +40,15 @@
   }
 
   &.no-main-menu {
-    border-top: var(--jse-border);
+    border-top: var(--jse-main-border);
   }
 
   .jse-contents {
-    border-left: var(--jse-border);
-    border-right: var(--jse-border);
+    border-left: var(--jse-main-border);
+    border-right: var(--jse-main-border);
 
     &:last-child {
-      border-bottom: var(--jse-border);
+      border-bottom: var(--jse-main-border);
     }
 
     flex: 1;

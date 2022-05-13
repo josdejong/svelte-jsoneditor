@@ -135,7 +135,7 @@
     box-shadow: none;
     box-sizing: border-box;
 
-    --jse-border: var(--jse-input-border);
+    --jse-main-border: var(--jse-input-border);
   }
 
   input,
@@ -147,7 +147,7 @@
     font-family: var(--jse-font-family-mono);
     font-size: var(--jse-font-size-mono);
     color: inherit;
-    background: var(--jse-modal-input-background);
+    background: var(--jse-input-background);
 
     &:focus {
       border: var(--jse-input-border-focus);

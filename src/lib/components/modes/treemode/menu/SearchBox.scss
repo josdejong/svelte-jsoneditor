@@ -10,7 +10,7 @@ $padding-section-left: 32px;
 
   font-family: var(--jse-font-family);
   font-size: var(--jse-font-size);
-  background: var(--jse-panel-background-color);
+  background: var(--jse-panel-background);
   color: var(--jse-panel-color-readonly);
   box-shadow: var(--jse-controls-box-shadow);
   display: inline-block;
@@ -47,9 +47,9 @@ $padding-section-left: 32px;
 
     input {
       color: var(--jse-panel-color);
-      border: var(--jse-panel-border);
+      border: var(--jse-input-border);
       border-radius: $border-radius;
-      background: var(--jse-panel-input-background);
+      background: var(--jse-input-background);
       height: $search-size;
       padding: 0 $input-padding;
       margin: 0;

@@ -3,18 +3,18 @@
 .jse-navigation-bar {
   font-family: var(--jse-font-family-mono);
   font-size: var(--jse-font-size-mono);
-  background: var(--jse-panel-background-color);
-  color: var(--jse-panel-color-light);
+  background: var(--jse-panel-background);
+  color: var(--jse-navigation-bar-color);
   padding: 0;
   margin: 0;
   display: flex;
   overflow: auto;
 
-  border-left: var(--jse-border);
-  border-right: var(--jse-border);
+  border-left: var(--jse-main-border);
+  border-right: var(--jse-main-border);
 
   .jse-navigation-bar-space {
     padding: $padding-half $padding;
-    color: var(--jse-panel-color-light);
+    color: var(--jse-navigation-bar-color);
   }
 }

@@ -8,7 +8,7 @@
   background: var(--jse-background-color);
 
   &.no-main-menu {
-    border-top: var(--jse-border);
+    border-top: var(--jse-main-border);
   }
 
   .jse-contents {
@@ -19,11 +19,11 @@
     min-width: 0;
     min-height: 0;
 
-    border-left: var(--jse-border);
-    border-right: var(--jse-border);
+    border-left: var(--jse-main-border);
+    border-right: var(--jse-main-border);
 
     &:last-child {
-      border-bottom: var(--jse-border);
+      border-bottom: var(--jse-main-border);
     }
 
     &.jse-hidden {
@@ -42,7 +42,7 @@
       }
 
       :global(.cm-gutters) {
-        background: var(--jse-panel-background-color);
+        background: var(--jse-panel-background);
         color: var(--jse-panel-color-readonly);
         border-right: var(--jse-panel-border);
       }
@@ -83,7 +83,7 @@
       }
 
       :global(.cm-search) {
-        background: var(--jse-panel-background-color);
+        background: var(--jse-panel-background);
         color: var(--jse-panel-color);
         font-family: var(--jse-font-family);
         font-size: var(--jse-font-size);
@@ -92,9 +92,9 @@
       :global(.cm-search input) {
         font-family: var(--jse-font-family);
         font-size: var(--jse-font-size-code-mode-search);
-        color: var(--jse-panel-color);
-        border: var(--jse-panel-border);
-        background: var(--jse-panel-input-background);
+        color: var(--jse-input-color);
+        border: var(--jse-input-border);
+        background: var(--jse-input-background);
         margin-right: 2px;
       }
 
@@ -138,7 +138,7 @@
       }
 
       :global(.cm-cursor-primary) {
-        border-color: var(--jse-color);
+        border-color: var(--jse-text-color);
       }
     }
 
