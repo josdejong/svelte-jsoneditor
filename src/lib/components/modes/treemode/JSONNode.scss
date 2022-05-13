@@ -126,7 +126,8 @@
 
   @include json-node-selected-mixin(
     var(--jse-selection-background-color),
-    var(--jse-selection-inline-color)
+    var(--jse-context-menu-button-background),
+    var(--jse-context-menu-button-background-highlight)
   );
 }
 
@@ -135,6 +136,7 @@
   .jse-json-node {
     @include json-node-selected-mixin(
       var(--jse-selection-background-light-color),
+      var(--jse-selection-background-color),
       var(--jse-selection-background-color)
     );
   }

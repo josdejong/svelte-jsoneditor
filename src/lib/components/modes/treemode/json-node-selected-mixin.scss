@@ -2,7 +2,11 @@
 
 // TODO: simplify the CSS needed to correctly highlight the selection
 
-@mixin json-node-selected-mixin($selection-background, $insert-area-background) {
+@mixin json-node-selected-mixin(
+  $selection-background,
+  $insert-area-background,
+  $insert-area-background-highlight
+) {
   // entry selected
   &.jse-selected {
     .jse-header,
@@ -84,10 +88,10 @@
   .jse-insert-area {
     &.jse-selected {
       :global(.jse-context-menu-button) {
-        background: var(--jse-context-menu-background);
+        background: $insert-area-background;
 
         &:hover {
-          background: var(--jse-context-menu-background-highlight);
+          background: $insert-area-background-highlight;
         }
       }
     }
