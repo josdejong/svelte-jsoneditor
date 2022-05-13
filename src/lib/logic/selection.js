@@ -752,6 +752,15 @@ export function createSelection(json, state, selectionSchema) {
       anchorPath: path,
       focusPath: path
     }
+  } else if (type === SELECTION_TYPE.MULTI && path) {
+    const paths = [path]
+    return {
+      type: SELECTION_TYPE.MULTI,
+      anchorPath: path,
+      focusPath: path,
+      paths: paths,
+      pathsMap: createPathsMap(paths)
+    }
   } else if (anchorPath && focusPath) {
     const paths = expandSelection(json, state, anchorPath, focusPath)
 
