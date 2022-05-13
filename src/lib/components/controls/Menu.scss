@@ -1,20 +1,18 @@
 @import '../../styles';
 
-.menu {
-  font-family: $font-family;
-  font-size: $font-size;
-  background: $theme-color;
-  border-bottom: 1px solid $theme-color;
-  color: $white;
+.jse-menu {
+  background: var(--jse-theme-color);
+  border-bottom: 1px solid var(--jse-theme-color);
+  color: var(--jse-menu-color);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   position: relative;
 
   // FIXME: should utilize the generic styling in styles.scss
-  .button {
-    width: $menu-button-size;
-    height: $menu-button-size;
+  .jse-button {
+    width: var(--jse-menu-button-size);
+    height: var(--jse-menu-button-size);
     border: none;
     background: transparent;
     color: inherit;
@@ -25,58 +23,61 @@
 
     &:hover,
     &:focus {
-      background: rgba(255, 255, 255, 0.3);
+      background: var(--jse-theme-color-highlight);
     }
 
     &:disabled {
-      color: rgba(255, 255, 255, 0.5);
+      color: var(--jse-menu-color);
+      opacity: 0.5;
+
       background: transparent;
     }
 
-    &.group-button {
-      $group-button-border: 1px solid rgba(255, 255, 255, 0.5);
+    &.jse-group-button {
+      $group-button-color: var(--jse-menu-color);
 
-      border: 1px solid white;
-      &:not(.last) {
+      border: 1px solid $group-button-color;
+      &:not(.jse-last) {
         border-right: none;
       }
 
       padding: 0;
       margin: $padding-half 0;
-      height: $menu-button-size - 2 * $padding-half;
+      height: calc(var(--jse-menu-button-size) - var(--jse-padding));
       width: 40px;
 
-      &.first {
+      &.jse-first {
         margin-left: $padding-half;
       }
 
-      &.last {
+      &.jse-last {
         margin-right: $padding-half;
       }
 
       &:hover,
       &:focus {
-        background: rgba(255, 255, 255, 0.3);
+        background: var(--jse-theme-color-highlight);
       }
 
-      &.selected {
-        background: white;
-        color: $theme-color;
+      &.jse-selected {
+        background: $group-button-color;
+        color: var(--jse-theme-color);
       }
     }
   }
 
-  .space {
+  .jse-space {
     flex: 1;
   }
 
-  .separator {
+  .jse-separator {
     $margin: 3px;
 
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--jse-menu-color);
+    opacity: 0.3;
     box-sizing: border-box;
     width: 1px;
-    height: $menu-button-size - 2 * $margin;
+    height: calc(var(--jse-menu-button-size) - 2 * $margin);
     margin: $margin;
   }
 }

@@ -1,34 +1,30 @@
 @import '../../styles';
 @import 'Modal';
 
-.jsoneditor-modal.transform {
-  .contents {
+.jse-modal.jse-transform {
+  .jse-contents {
     flex: 1;
     display: flex;
     flex-direction: column;
-    color: $dark-gray;
+    color: inherit;
     min-height: 0;
     padding: 0;
 
-    .main-contents {
+    .jse-main-contents {
       flex: 1;
       display: flex;
-      gap: 2 * $padding;
+      gap: $padding-double;
       min-height: 0;
       box-sizing: border-box;
 
-      padding: 2 * $padding;
-      padding-top: 0;
-      padding-bottom: $padding;
+      padding: 0 $padding-double $padding;
 
-      .query-contents {
+      .jse-query-contents {
         flex: 1;
         display: flex;
         flex-direction: column;
 
-        .description {
-          color: $dark-gray;
-
+        .jse-description {
           :global(p) {
             margin: $padding 0;
 
@@ -42,38 +38,38 @@
           }
 
           :global(code) {
-            background: $background-gray;
-            font-family: $font-family-mono;
-            font-size: $font-size-mono;
+            background: var(--jse-modal-code-background);
+            font-family: var(--jse-font-family-mono);
+            font-size: var(--jse-font-size-mono);
           }
         }
 
-        textarea.query {
+        textarea.jse-query {
           flex: 1;
           outline: none;
           resize: vertical; // prevent resizing horizontally
         }
       }
 
-      .data-contents {
+      .jse-data-contents {
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 2 * $padding;
+        gap: $padding-double;
 
-        .original-data {
+        .jse-original-data {
           flex: 1;
           display: flex;
           flex-direction: column;
           min-height: 0;
           box-sizing: border-box;
 
-          &.hide {
+          &.jse-hide {
             flex: none;
           }
         }
 
-        .preview-data {
+        .jse-preview-data {
           flex: 1;
           display: flex;
           flex-direction: column;
@@ -81,7 +77,7 @@
           box-sizing: border-box;
         }
 
-        &.hide-original-data {
+        &.jse-hide-original-data {
           flex-direction: column;
           gap: 0;
           margin-bottom: 0;
@@ -89,25 +85,24 @@
       }
     }
 
-    .actions {
-      padding: 2 * $padding;
-      padding-top: $padding;
+    .jse-actions {
+      padding: $padding $padding-double $padding-double;
     }
 
     @media screen and (max-width: 1200px) {
-      .main-contents {
+      .jse-main-contents {
         flex-direction: column;
         overflow: auto;
 
-        .query-contents {
-          textarea.query {
+        .jse-query-contents {
+          textarea.jse-query {
             min-height: 150px;
             flex: none;
           }
         }
 
-        .data-contents {
-          :global(.tree-mode) {
+        .jse-data-contents {
+          :global(.jse-tree-mode) {
             height: 300px;
             flex: none;
           }
@@ -116,13 +111,13 @@
     }
   }
 
-  .label {
+  .jse-label {
     font-weight: bold;
     display: block;
     box-sizing: border-box;
 
-    .label-inner {
-      margin-top: $padding * 2;
+    .jse-label-inner {
+      margin-top: $padding-double;
       margin-bottom: $padding-half;
       box-sizing: border-box;
 
@@ -134,40 +129,48 @@
     }
   }
 
-  :global(.tree-mode) {
+  :global(.jse-tree-mode) {
     flex: 1;
-    border: 1px solid $background-gray;
+    background: var(--jse-input-background-readonly);
     box-shadow: none;
     box-sizing: border-box;
-  }
 
-  :global(.tree-mode.focus) {
-    border: 1px solid $theme-color;
+    --jse-main-border: var(--jse-input-border);
   }
 
   input,
   textarea {
-    border: 1px solid $border-gray;
+    border: var(--jse-input-border);
     outline: none;
     box-sizing: border-box;
     padding: $padding-half;
-    font-family: $font-family-mono;
-    font-size: $font-size-mono;
-    color: $black;
+    font-family: var(--jse-font-family-mono);
+    font-size: var(--jse-font-size-mono);
+    color: inherit;
+    background: var(--jse-input-background);
 
     &:focus {
-      border-color: $theme-color;
+      border: var(--jse-input-border-focus);
     }
 
     &:read-only {
-      border-color: $background-gray;
+      background: var(--jse-input-background-readonly);
     }
   }
 
-  .preview.error {
+  .jse-preview.jse-error {
     flex: 1;
-    border: 1px solid $background-gray;
-    color: $red;
+    background: var(--jse-input-background-readonly);
+    border: var(--jse-input-border);
+    color: var(--jse-error-color);
     padding: $padding-half;
+  }
+
+  :global(a) {
+    color: var(--jse-a-color);
+  }
+
+  :global(a:hover) {
+    color: var(--jse-a-color-highlight);
   }
 }

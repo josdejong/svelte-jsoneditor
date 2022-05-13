@@ -96,10 +96,10 @@
   }
 </script>
 
-<div class="jsoneditor-modal sort">
+<div class="jse-modal jse-sort">
   <Header title={jsonIsArray ? 'Sort array items' : 'Sort object keys'} />
 
-  <div class="contents">
+  <div class="jse-contents">
     <table>
       <colgroup>
         <col width="25%" />
@@ -110,7 +110,7 @@
           <th>Path</th>
           <td>
             <input
-              class="path"
+              class="jse-path"
               type="text"
               readonly
               title="Selected path"
@@ -130,7 +130,6 @@
           <th>Direction</th>
           <td>
             <Select
-              containerClasses="test-class"
               showIndicator
               items={directions}
               bind:value={selectedDirection}
@@ -141,12 +140,12 @@
       </tbody>
     </table>
 
-    <div class="space" />
+    <div class="jse-space" />
 
-    <div class="actions">
+    <div class="jse-actions">
       <button
         type="button"
-        class="primary"
+        class="jse-primary"
         on:click={handleSort}
         use:focus
         disabled={jsonIsArray ? !selectedProperty : false}

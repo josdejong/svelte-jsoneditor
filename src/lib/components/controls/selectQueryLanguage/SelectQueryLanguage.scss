@@ -10,21 +10,19 @@
     right: 0;
     display: flex;
     flex-direction: column;
-    box-shadow: $box-shadow;
+    box-shadow: var(--jse-controls-box-shadow);
 
     .jse-query-language {
       @include jsoneditor-button;
 
       text-align: left;
-      padding: $padding 2 * $padding;
+      padding: $padding $padding-double;
       white-space: nowrap;
-      color: white;
-      background: $dark-gray;
-
-      $gray-highlight: lighten($dark-gray, 5%);
+      color: var(--jse-context-menu-color);
+      background: var(--jse-context-menu-background);
 
       &:hover {
-        background: $gray-highlight;
+        background: var(--jse-context-menu-background-highlight);
       }
     }
   }

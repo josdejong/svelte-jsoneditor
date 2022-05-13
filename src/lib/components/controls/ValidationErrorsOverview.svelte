@@ -32,19 +32,19 @@
 </script>
 
 {#if !isEmpty(validationErrors)}
-  <div class="validation-errors-overview">
+  <div class="jse-validation-errors-overview">
     {#if expanded || validationErrors.length === 1}
       <table>
         <tbody>
           {#each validationErrors as validationError, index}
             <tr
-              class="validation-error"
+              class="jse-validation-error"
               on:click={() => {
                 // trigger on the next tick to prevent the editor not getting focus
                 setTimeout(() => selectError(validationError))
               }}
             >
-              <td class="validation-error-icon">
+              <td class="jse-validation-error-icon">
                 <Icon data={faExclamationTriangle} />
               </td>
               <td>
@@ -53,11 +53,11 @@
               <td>
                 {validationError.message}
               </td>
-              <td class="validation-error-action">
+              <td class="jse-validation-error-action">
                 {#if index === 0 && validationErrors.length > 1}
                   <button
                     type="button"
-                    class="validation-errors-collapse"
+                    class="jse-validation-errors-collapse"
                     on:click|stopPropagation={collapse}
                     title="Collapse validation errors"
                   >
@@ -72,13 +72,13 @@
     {:else}
       <table>
         <tbody>
-          <tr class="validation-error" on:click={expand}>
-            <td class="validation-error-icon">
+          <tr class="jse-validation-error" on:click={expand}>
+            <td class="jse-validation-error-icon">
               <Icon data={faExclamationTriangle} />
             </td>
             <td>
               {validationErrors.length} validation errors
-              <div class="validation-errors-expand">
+              <div class="jse-validation-errors-expand">
                 <Icon data={faAngleRight} />
               </div>
             </td>

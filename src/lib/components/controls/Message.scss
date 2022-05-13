@@ -1,8 +1,8 @@
 @import '../../styles.scss';
 
-.message {
-  font-family: $font-family-mono;
-  font-size: $font-size-mono;
+.jse-message {
+  font-family: var(--jse-font-family-mono);
+  font-size: var(--jse-font-size-mono);
 
   padding: $padding;
   display: flex;
@@ -10,16 +10,16 @@
   flex-wrap: wrap;
   align-items: center;
 
-  &.success {
-    background: $green;
-    color: $white;
+  &.jse-success {
+    background: var(--jse-message-success-background);
+    color: var(--jse-message-success-color);
   }
 
-  .text {
+  .jse-text {
     flex: 1;
     min-width: 60%;
 
-    &.clickable {
+    &.jse-clickable {
       cursor: pointer;
 
       &:hover {
@@ -28,35 +28,35 @@
     }
   }
 
-  &.error {
-    background: $red;
-    color: $white;
+  &.jse-error {
+    background: var(--jse-message-error-background);
+    color: var(--jse-message-error-color);
   }
 
-  &.warning {
-    background: $warning-color;
-    color: $white;
+  &.jse-warning {
+    background: var(--jse-message-warning-background);
+    color: var(--jse-message-warning-color);
   }
 
-  &.info {
-    background: $gray;
-    color: $white;
+  &.jse-info {
+    background: var(--jse-message-info-background);
+    color: var(--jse-message-info-color);
   }
 
-  .actions {
+  .jse-actions {
     display: flex;
     gap: $padding;
 
-    button.action {
+    button.jse-action {
       @include jsoneditor-button;
 
-      background: rgba(255, 255, 255, 0.2);
-      color: $white;
+      background: var(--jse-message-action-background);
+      color: inherit;
 
       padding: $padding-half $padding;
 
       &:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: var(--jse-message-action-background-highlight);
       }
     }
   }

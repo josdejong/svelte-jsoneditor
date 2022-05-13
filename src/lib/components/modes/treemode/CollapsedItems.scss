@@ -1,11 +1,12 @@
 @import '../../../styles';
 
-$color: $gray;
-$background-color: $background-gray;
+div.jse-collapsed-items {
+  $transparent-color: transparent;
+  $background-color: var(--jse-collapsed-items-background-color);
+  $color: var(--jse-collapsed-items-link-color);
 
-div.collapsed-items {
-  font-family: $font-family;
-  font-size: $font-size;
+  font-family: var(--jse-font-family);
+  font-size: var(--jse-font-size);
   color: $color;
 
   // https://sharkcoder.com/visual/borders
@@ -13,13 +14,12 @@ div.collapsed-items {
   padding: $padding-half;
   border: $size solid transparent;
   border-width: $size 0;
-  background-color: $background-color;
-  background-color: hsla(0, 0%, 0%, 0);
+  background-color: $transparent-color;
   background-image: linear-gradient($background-color, $background-color),
-    linear-gradient(to bottom right, transparent 50.5%, $background-color 50.5%),
-    linear-gradient(to bottom left, transparent 50.5%, $background-color 50.5%),
-    linear-gradient(to top right, transparent 50.5%, $background-color 50.5%),
-    linear-gradient(to top left, transparent 50.5%, $background-color 50.5%);
+    linear-gradient(to bottom right, $transparent-color 50.5%, $background-color 50.5%),
+    linear-gradient(to bottom left, $transparent-color 50.5%, $background-color 50.5%),
+    linear-gradient(to top right, $transparent-color 50.5%, $background-color 50.5%),
+    linear-gradient(to top left, $transparent-color 50.5%, $background-color 50.5%);
   background-repeat: repeat, repeat-x, repeat-x, repeat-x, repeat-x;
   background-position: 0 0, $size 0, $size 0, $size 100%, $size 100%;
   background-size: auto auto, 2 * $size 2 * $size, 2 * $size 2 * $size, 2 * $size 2 * $size,
@@ -29,18 +29,18 @@ div.collapsed-items {
 
   display: flex;
 
-  div.text,
-  button.expand-items {
+  div.jse-text,
+  button.jse-expand-items {
     margin: 0 $padding-half;
   }
 
-  div.text {
+  div.jse-text {
     display: inline;
   }
 
-  button.expand-items {
-    font-family: $font-family;
-    font-size: $font-size;
+  button.jse-expand-items {
+    font-family: inherit;
+    font-size: inherit;
     color: $color;
 
     background: none;
@@ -51,7 +51,7 @@ div.collapsed-items {
 
     &:hover,
     &:focus {
-      color: $red;
+      color: var(--jse-collapsed-items-link-color-highlight);
     }
   }
 }

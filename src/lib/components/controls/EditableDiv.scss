@@ -3,8 +3,7 @@
 
 // for key and value
 div.jse-editable-div {
-  line-height: $line-height;
-  min-width: 16px;
+  min-width: 2em;
   padding: 0 $input-padding;
   box-sizing: border-box;
   outline: none;
@@ -15,27 +14,27 @@ div.jse-editable-div {
   white-space: pre-wrap; // important for rendering multiple consecutive spaces
   overflow-wrap: anywhere;
 
-  &.shortText {
+  &.jse-short-text {
     overflow-wrap: normal;
   }
 
   &[contenteditable='true'] {
-    outline: 2px solid $edit-border-color;
-    background: $white !important;
+    outline: var(--jse-edit-outline);
+    background: inherit !important;
     position: relative;
     border-radius: 0;
     z-index: 3; // must be on top of hovering the entry below it
   }
 
-  &.empty {
+  &.jse-empty {
     &:not(:focus) {
-      outline: 1px dotted $light-gray-transparent;
+      outline: 1px dotted var(--jse-tag-background);
       -moz-outline-radius: 2px;
     }
 
     &::after {
       pointer-events: none;
-      color: $light-gray-transparent;
+      color: var(--jse-tag-background);
     }
   }
 }

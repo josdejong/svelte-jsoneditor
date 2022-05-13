@@ -1,113 +1,107 @@
 @import '../../../styles';
 @import 'json-node-selected-mixin';
 
-.json-node {
+.jse-json-node {
   position: relative;
-  font-family: $font-family-mono;
-  font-size: $font-size-mono;
-  color: $black;
+  color: var(--jse-text-color);
 
-  &.root {
+  &.jse-root {
     min-height: 100%;
     padding-bottom: $contents-padding;
     box-sizing: border-box;
 
-    > .header-outer :global(.context-menu-button),
-    > .contents-outer > .contents :global(.context-menu-button) {
+    > .jse-header-outer :global(.jse-context-menu-button),
+    > .jse-contents-outer > .jse-contents :global(.jse-context-menu-button) {
       top: 0;
-      right: -$context-menu-button-size - 2px;
+      right: calc(-2px - var(--jse-context-menu-button-size));
     }
 
-    > .contents-outer > .contents {
+    > .jse-contents-outer > .jse-contents {
       padding-left: 0;
     }
   }
 
-  &.hovered {
-    > .header-outer > .header > .meta,
-    .props .header,
-    .items .header,
-    .props .contents,
-    .items .contents,
-    .footer {
-      background-color: $hovered-background-transparent;
+  &.jse-hovered {
+    > .jse-header-outer > .jse-header > .jse-meta,
+    .jse-props .jse-header,
+    .jse-items .jse-header,
+    .jse-props .jse-contents,
+    .jse-items .jse-contents,
+    .jse-footer {
+      background: var(--jse-hover-background-color);
     }
   }
 
   $selector-height: 8px; // must be about half a line height
 
-  .props,
-  .items {
+  .jse-props,
+  .jse-items {
     position: relative;
   }
 
-  .header-outer,
-  .footer-outer {
+  .jse-header-outer,
+  .jse-footer-outer {
     display: flex;
   }
 
-  .header {
+  .jse-header {
     position: relative;
 
-    .meta {
-      > .meta-inner {
+    .jse-meta {
+      > .jse-meta-inner {
         display: flex;
         justify-content: center;
       }
     }
   }
 
-  .contents-outer {
+  .jse-contents-outer {
     display: flex;
   }
 
-  .header,
-  .contents {
+  .jse-header,
+  .jse-contents {
     display: flex;
     flex-direction: row;
-
-    line-height: $line-height;
   }
 
-  .contents {
-    min-height: $line-height;
-    padding-left: $line-height; // must be the same as the width of the expand button
+  .jse-contents {
+    padding-left: var(--jse-indent-size);
   }
 
-  .footer {
+  .jse-footer {
     display: inline-flex;
-    padding-left: $line-height + $input-padding; // must be the same as the width of the expand button
+    padding-left: calc(var(--jse-indent-size) + $input-padding);
   }
 
-  .insert-selection-area {
+  .jse-insert-selection-area {
     visibility: hidden;
     padding: 0 $padding-half;
     flex: 1; // must fill all left over space at the right side of the editor, so you can click there
 
-    &.inside {
+    &.jse-inside {
       display: inline-flex;
       align-items: center;
     }
 
-    &.after {
+    &.jse-after {
       display: flex;
       align-items: flex-end;
-      line-height: $line-height;
     }
   }
 
-  &:hover > .contents-outer .insert-selection-area:not(.selected),
-  .header-outer:hover > .insert-selection-area:not(.selected),
-  .footer-outer:hover .insert-selection-area:not(.selected) {
+  &:hover > .jse-contents-outer .jse-insert-selection-area:not(.jse-selected),
+  .jse-header-outer:hover > .jse-insert-selection-area:not(.jse-selected),
+  .jse-footer-outer:hover .jse-insert-selection-area:not(.jse-selected) {
     visibility: visible;
     z-index: 1;
   }
 
-  .context-menu-button-anchor {
+  .jse-context-menu-button-anchor {
     position: relative;
   }
 
-  .insert-area {
+  .jse-insert-area {
     $height: 2px;
     $height-half: 0.5 * $height;
 
@@ -120,99 +114,95 @@
     margin-right: $padding-half;
     outline: $height-half solid; // color depends on hovered/selected/inactive+selected
 
-    :global(.context-menu-button) {
+    :global(.jse-context-menu-button) {
       right: -$height-half;
-      background: $selection-background;
+      background: var(--jse-selection-background-color);
     }
 
-    &.hovered {
-      outline-color: $hovered-background-transparent;
+    &.jse-hovered {
+      outline-color: var(--jse-selection-background-color);
     }
   }
 
-  @include json-node-selected-mixin($selection-background, $dark-gray);
+  @include json-node-selected-mixin(
+    var(--jse-selection-background-color),
+    var(--jse-context-menu-button-background),
+    var(--jse-context-menu-button-background-highlight)
+  );
 }
 
 // lighter selection color when the editor doesn't have focus
-:global(.jsoneditor-main:not(.focus)) {
-  .json-node {
-    @include json-node-selected-mixin(lighten($selection-background, 10%), $selection-background);
+:global(.jse-main:not(.jse-focus)) {
+  .jse-json-node {
+    @include json-node-selected-mixin(
+      var(--jse-selection-background-light-color),
+      var(--jse-selection-background-color),
+      var(--jse-selection-background-color)
+    );
   }
 }
 
-.expand {
-  width: $line-height;
-  height: $line-height;
-  padding: 1px 0 0;
+.jse-expand {
+  width: var(--jse-indent-size);
+  padding: 0;
   margin: 0;
   border: none;
   cursor: pointer;
   background: transparent;
-  color: $gray-transparent;
-  font-size: $font-size-mono;
-  line-height: $line-height;
+  color: var(--jse-delimiter-color);
+  font-size: var(--jse-font-size-mono);
+  height: var(--jse-line-height);
 
   &:hover {
-    color: lighten($gray-transparent, 10%);
+    opacity: 0.8;
   }
 }
 
-.meta,
-.separator,
-.index,
-.bracket {
+.jse-meta,
+.jse-separator,
+.jse-index,
+.jse-bracket {
   vertical-align: top;
-  color: $meta-color;
+  color: var(--jse-delimiter-color);
 }
 
-.index {
+.jse-index {
   padding: 0 $padding-half;
 }
 
-.bracket {
+.jse-bracket {
   padding: 0 2px;
 
-  &.expanded {
+  &.jse-expanded {
     padding-right: $padding;
   }
 }
 
-.tag {
+.jse-tag {
   border: none;
-  font-size: $font-size-smallest;
-  font-family: $font-family;
-  color: $white;
-  background: $light-gray-transparent;
+  font-size: 80%;
+  font-family: var(--jse-font-family);
+  color: var(--jse-tag-color);
+  background: var(--jse-tag-background);
   border-radius: 2px;
   cursor: pointer;
   position: relative;
   display: inline-block;
-  padding: 0 4px 1px;
-  margin: 0 2px;
-  top: 1px;
-
-  height: $line-height - 2px;
-  line-height: $line-height - 4px;
+  padding: 0 4px;
+  line-height: normal;
+  margin: 1px 0;
 
   &:hover {
-    background: lighten($light-gray-transparent, 15%);
+    opacity: 0.8;
   }
 
-  &.readonly {
-    color: $light-gray-transparent;
-    background: $background-light-gray-transparent;
+  &.jse-expanded {
+    opacity: 0.7;
     cursor: inherit;
   }
 }
 
-.identifier {
+.jse-identifier {
   vertical-align: top;
   position: relative;
-}
-
-:global(.bubble.dark) {
-  background: $dark-gray !important;
-  color: $white;
-  font-family: $font-family !important;
-  font-size: $font-size !important;
 }

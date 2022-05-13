@@ -121,7 +121,7 @@
     {
       icon: faTimes,
       title: 'Cancel repair',
-      className: 'cancel',
+      className: 'jse-cancel',
       onClick: onCancel
     }
   ]
@@ -155,9 +155,9 @@
   ]
 </script>
 
-<div class="json-repair-component" bind:this={domJsonRepair}>
+<div class="jse-json-repair-component" bind:this={domJsonRepair}>
   <Menu {items}>
-    <div slot="left" class="info">Repair invalid JSON, then click apply</div>
+    <div slot="left" class="jse-info">Repair invalid JSON, then click apply</div>
   </Menu>
 
   {#if error}
@@ -179,7 +179,7 @@
     value={text}
     on:input={handleChange}
     readonly={readOnly}
-    class="json-text"
+    class="jse-json-text"
     autocomplete="off"
     autocapitalize="off"
     spellcheck="false"

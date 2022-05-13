@@ -85,6 +85,12 @@
     required: ['foo']
   }
 
+  const themes = [
+    { value: 'jse-theme-default', label: 'default' },
+    { value: 'jse-theme-dark', label: 'dark' },
+    { value: 'jse-theme-big', label: 'big' }
+  ]
+
   const validator = createAjvValidator(schema)
 
   const showTreeEditor = useLocalStorage('svelte-jsoneditor-demo-showTreeEditor', true)
@@ -112,6 +118,7 @@
     'svelte-jsoneditor-demo-multipleQueryLanguages',
     true
   )
+  const selectedTheme = useLocalStorage('svelte-jsoneditor-demo-theme', themes[0].value)
 
   $: queryLanguages = $multipleQueryLanguages
     ? [javascriptQueryLanguage, lodashQueryLanguage, jmespathQueryLanguage]
@@ -181,7 +188,7 @@
   <title>development application | svelte-jsoneditor</title>
 </svelte:head>
 
-<div class="demo-app">
+<div class="demo-app {$selectedTheme}">
   <h1>svelte-jsoneditor development application</h1>
   <p>
     <label>
@@ -189,6 +196,13 @@
     </label>
     <label>
       Height: <input type="text" bind:value={height} />
+    </label>
+    <label>
+      Theme: <select bind:value={$selectedTheme}>
+        {#each themes as theme}
+          <option value={theme.value}>{theme.label}</option>
+        {/each}
+      </select>
     </label>
   </p>
   <p>
@@ -423,7 +437,26 @@ See https://github.com/sveltejs/kit/issues/981
 -->
 {#if false}<slot />{/if}
 
-<style>
+<style lang="scss">
+  @import '../lib/themes/jse-theme-dark.css';
+  @import 'examples/themes/jse-theme-big.css';
+
+  .demo-app {
+    margin: -10px; // compensate for the padding of the root element
+    padding: 10px;
+    height: 100%;
+    overflow: auto;
+
+    &.jse-theme-dark {
+      background: #4d4d4d;
+      color: #fff;
+    }
+
+    &.jse-theme-big {
+      background: #ffe2d8;
+    }
+  }
+
   .columns {
     display: flex;
     gap: 20px;
@@ -437,10 +470,12 @@ See https://github.com/sveltejs/kit/issues/981
     min-width: 0;
   }
 
-  .tree-editor {
-  }
-
+  .tree-editor,
   .code-editor {
+    // some styling to try out if it doesn't break the styling of the editor
+    line-height: 72px;
+    font-size: 72px;
+    font-family: 'Comic Sans MS', 'Courier New', serif;
   }
 
   .data {
@@ -456,8 +491,10 @@ See https://github.com/sveltejs/kit/issues/981
   }
 
   button,
-  input {
-    font-size: 11pt;
+  input,
+  select {
+    font-size: inherit;
+    font-family: inherit;
   }
 
   label {

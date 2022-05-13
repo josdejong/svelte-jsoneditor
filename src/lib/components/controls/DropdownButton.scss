@@ -1,8 +1,11 @@
 @import '../../styles';
 
-.dropdown-button {
-  $background: lighten($dark-gray, 5%);
-  $background-highlight: lighten($background, 5%);
+.jse-dropdown-button {
+  flex: 1;
+  line-height: normal;
+
+  $background: var(--jse-context-menu-background);
+  $background-highlight: var(--jse-context-menu-background-highlight);
 
   @include jsoneditor-button;
   position: relative;
@@ -20,42 +23,40 @@
     }
   }
 
-  button.open-dropdown {
+  button.jse-open-dropdown {
     @include jsoneditor-button;
 
-    padding: $padding;
-    background: $dark-gray;
-    color: $white;
+    width: 2em;
+    background: var(--jse-context-menu-background);
+    color: var(--jse-context-menu-color);
 
-    $gray-highlight: lighten($dark-gray, 5%);
-
-    &.visible {
+    &.jse-visible {
       background: $background;
     }
 
     &:hover {
-      background: $gray-highlight;
+      background: var(--jse-context-menu-background-highlight);
     }
 
     &:disabled {
-      color: $gray;
+      color: var(--jse-context-menu-color-disabled);
       background: unset;
     }
 
     border-radius: 0;
   }
 
-  .items {
+  .jse-dropdown-items {
     display: none;
     position: absolute;
     top: 100%;
     left: 0;
     z-index: 1;
     background: $background;
-    color: $white;
-    box-shadow: $box-shadow;
+    color: var(--jse-context-menu-color);
+    box-shadow: var(--jse-controls-box-shadow);
 
-    &.visible {
+    &.jse-visible {
       display: block;
     }
 
@@ -72,7 +73,7 @@
       }
 
       &:disabled {
-        color: $gray;
+        color: var(--jse-context-menu-color-disabled);
         background: unset;
       }
     }

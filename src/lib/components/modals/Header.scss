@@ -1,11 +1,11 @@
 @import '../../styles';
 
-.header {
+.jse-header {
   display: flex;
-  background: $theme-color;
-  color: $white;
+  background: var(--jse-theme-color);
+  color: var(--jse-menu-color);
 
-  .title {
+  .jse-title {
     flex: 1;
     padding: $input-padding;
     vertical-align: middle;

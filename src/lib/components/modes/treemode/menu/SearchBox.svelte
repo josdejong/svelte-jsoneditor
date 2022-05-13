@@ -153,6 +153,7 @@
               class="jse-search-input"
               title="Enter text to search"
               type="text"
+              placeholder="Find"
               bind:value={text}
               use:initSearchInput
             />
@@ -191,6 +192,7 @@
               class="jse-replace-input"
               title="Enter replacement text"
               type="text"
+              placeholder="Replace"
               bind:value={replaceText}
             />
             <button

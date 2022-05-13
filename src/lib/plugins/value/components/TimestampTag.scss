@@ -1,13 +1,10 @@
 @import '../../../styles';
 
 .jse-timestamp {
-  font-family: $font-family;
-  font-size: 10pt;
-  height: $line-height;
-  line-height: $line-height;
   padding: 0;
-  margin: 0 $padding-half 0 0;
+  margin: 0;
+  height: var(--jse-line-height);
 
-  color: $red;
+  color: var(--jse-value-color-number);
   border-radius: $border-radius;
 }

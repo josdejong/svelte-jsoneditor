@@ -40,20 +40,20 @@
   }
 </script>
 
-<div class="header">
-  <div class="title">Transform</div>
+<div class="jse-header">
+  <div class="jse-title">Transform</div>
   {#if queryLanguages.length > 1}
     <button
       type="button"
       bind:this={refConfigButton}
-      class="config"
+      class="jse-config"
       on:click={openConfig}
       title="Select a query language"
     >
       <Icon data={faCog} />
     </button>
   {/if}
-  <button type="button" class="close" on:click={close}>
+  <button type="button" class="jse-close" on:click={close}>
     <Icon data={faTimes} />
   </button>
 </div>

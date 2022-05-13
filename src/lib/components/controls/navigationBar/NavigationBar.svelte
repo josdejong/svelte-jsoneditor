@@ -77,9 +77,10 @@
   {#if hasNextItem}
     <NavigationBarItem {getItems} {path} index={undefined} onSelect={handleSelect} />
   {/if}
-  {#if !isObjectOrArray(json)}
-    <div class="jse-navigation-bar-empty">Navigation bar</div>
-  {/if}
+  <div class="jse-navigation-bar-space">
+    <!-- ensure the right height (arrows have less height than the text) -->
+    {!isObjectOrArray(json) ? 'Navigation bar' : '\u00A0'}
+  </div>
 </div>
 
 <style src="./NavigationBar.scss"></style>

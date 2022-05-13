@@ -10,11 +10,11 @@
   const { close } = getContext('simple-modal')
 </script>
 
-<div class="header">
-  <div class="title">
+<div class="jse-header">
+  <div class="jse-title">
     {title}
   </div>
-  <button type="button" class="close" on:click={close}>
+  <button type="button" class="jse-close" on:click={close}>
     <Icon data={faTimes} />
   </button>
 </div>

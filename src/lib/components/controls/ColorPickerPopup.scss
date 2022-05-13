@@ -1,1 +1,32 @@
 @import '../../styles';
+
+.jse-color-picker-popup {
+  :global(.picker_wrapper.popup),
+  :global(.picker_wrapper.popup .picker_arrow::before),
+  :global(.picker_wrapper.popup .picker_arrow::after) {
+    background: var(--jse-color-picker-background);
+    line-height: normal;
+  }
+
+  :global(.picker_slider),
+  :global(.picker_sl),
+  :global(.picker_editor input),
+  :global(.picker_sample),
+  :global(.picker_done button) {
+    box-shadow: var(--jse-color-picker-border-box-shadow);
+  }
+
+  :global(.picker_editor input) {
+    background: var(--jse-background-color);
+    color: var(--jse-text-color);
+  }
+
+  :global(.picker_done button) {
+    background: var(--jse-button-background);
+    color: var(--jse-button-color);
+  }
+
+  :global(.picker_done button:hover) {
+    background: var(--jse-button-background-highlight);
+  }
+}

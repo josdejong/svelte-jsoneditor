@@ -5,8 +5,9 @@
   top: 100%;
   left: 0;
   z-index: 3; // above the floating ContextMenuButton
-  background: white;
-  box-shadow: $box-shadow;
+  background: var(--jse-navigation-bar-background);
+  color: var(--jse-navigation-bar-dropdown-color);
+  box-shadow: var(--jse-controls-box-shadow);
   display: flex;
   flex-direction: column;
   max-height: 300px;
@@ -14,11 +15,11 @@
   min-width: 80px;
 
   button.jse-navigation-bar-dropdown-item {
-    font-family: $font-family-mono;
-    font-size: $font-size-mono;
+    font-family: var(--jse-font-family-mono);
+    font-size: var(--jse-font-size-mono);
     border: none;
     background: transparent;
-    color: $dark-gray;
+    color: inherit;
     cursor: pointer;
     outline: none;
     text-align: left;
@@ -29,12 +30,12 @@
 
     &:focus,
     &:hover {
-      background: $background-gray;
+      background: var(--jse-navigation-bar-background-highlight);
     }
 
-    &.selected {
-      background: $dark-gray;
-      color: white;
+    &.jse-selected {
+      background: var(--jse-navigation-bar-dropdown-color);
+      color: var(--jse-navigation-bar-background);
     }
   }
 }

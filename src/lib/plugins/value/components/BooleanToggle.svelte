@@ -28,7 +28,7 @@
 </script>
 
 <div
-  class="boolean-toggle"
+  class="jse-boolean-toggle"
   on:mousedown={toggleBooleanValue}
   title={!readOnly ? 'Click to toggle this boolean value' : `Boolean value ${value}`}
 >

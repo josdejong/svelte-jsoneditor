@@ -1,12 +1,13 @@
 @import '../../../styles';
 
 .jse-tooltip {
-  font-family: $font-family;
-  font-size: $font-size;
+  font-family: var(--jse-font-family);
+  font-size: var(--jse-font-size);
+  line-height: normal;
   padding: $padding-half $padding;
   border-radius: $border-radius;
-  background: $dark-gray;
-  color: white;
+  background: var(--jse-context-menu-background);
+  color: var(--jse-context-menu-color);
   white-space: nowrap;
-  box-shadow: $box-shadow;
+  box-shadow: var(--jse-controls-box-shadow);
 }

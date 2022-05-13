@@ -30,42 +30,22 @@ export const MAX_AUTO_REPAIRABLE_SIZE = 1024 * 1024 // 1 MB
 export const MAX_DOCUMENT_SIZE_CODE_MODE = 10 * 1024 * 1024 // 10 MB
 export const MAX_DOCUMENT_SIZE_EXPAND_ALL = 10 * 1024 // 10 KB
 
-export const INDENTATION_WIDTH = 18 // pixels IMPORTANT: keep in sync with sass constant $indentation-width
-
 export const SIMPLE_MODAL_OPTIONS = {
   closeButton: false,
-  styleBg: {
-    top: 0,
-    left: 0,
-    background: 'rgba(0, 0, 0, 0.3)'
-  },
-  styleWindow: {
-    borderRadius: '2px'
-  },
-  styleContent: {
-    flex: 1,
-    display: 'flex',
-    padding: '0px'
-  }
+  classBg: 'jse-modal-bg',
+  classWindow: 'jse-modal-window',
+  classWindowWrap: 'jse-modal-window-wrap',
+  classContent: 'jse-modal-content'
 }
 
 export const SORT_MODAL_OPTIONS = {
   ...SIMPLE_MODAL_OPTIONS,
-  styleWindow: {
-    ...SIMPLE_MODAL_OPTIONS.styleWindow,
-    width: '400px'
-  }
+  classWindow: 'jse-modal-window jse-modal-window-sort'
 }
 
 export const TRANSFORM_MODAL_OPTIONS = {
   ...SIMPLE_MODAL_OPTIONS,
-  styleWindow: {
-    ...SIMPLE_MODAL_OPTIONS.styleWindow,
-    width: '1200px',
-    height: '1200px',
-    maxHeight: '80%',
-    display: 'flex'
-  }
+  classWindow: 'jse-modal-window jse-modal-window-transform'
 }
 
 export const INSERT_EXPLANATION =

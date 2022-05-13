@@ -33,14 +33,14 @@
         {
           icon: faJSONEditorFormat,
           title: 'Format JSON: add proper indentation and new lines (Ctrl+I)',
-          className: 'format',
+          className: 'jse-format',
           onClick: onFormat,
           disabled: readOnly || !canFormat
         },
         {
           icon: faJSONEditorCompact,
           title: 'Compact JSON: remove all white spacing and new lines (Ctrl+Shift+I)',
-          className: 'compact',
+          className: 'jse-compact',
           onClick: onCompact,
           disabled: readOnly || !canCompact
         },
@@ -50,21 +50,21 @@
         {
           icon: faSortAmountDownAlt,
           title: 'Sort',
-          className: 'sort',
+          className: 'jse-sort',
           onClick: onSort,
           disabled: readOnly || !canSort
         },
         {
           icon: faFilter,
           title: 'Transform contents (filter, sort, project)',
-          className: 'transform',
+          className: 'jse-transform',
           onClick: onTransform,
           disabled: readOnly || !canTransform
         },
         {
           icon: faSearch,
           title: 'Search (Ctrl+F)',
-          className: 'search',
+          className: 'jse-search',
           onClick: onToggleSearch
         },
         {
@@ -73,14 +73,14 @@
         {
           icon: faUndo,
           title: 'Undo (Ctrl+Z)',
-          className: 'undo',
+          className: 'jse-undo',
           onClick: onUndo,
           disabled: !canUndo
         },
         {
           icon: faRedo,
           title: 'Redo (Ctrl+Shift+Z)',
-          className: 'redo',
+          className: 'jse-redo',
           onClick: onRedo,
           disabled: !canRedo
         },
@@ -98,7 +98,7 @@
 </script>
 
 <Menu {items}>
-  <div slot="right" class="powered-by">
+  <div slot="right" class="jse-powered-by">
     <a
       href="https://codemirror.net/6/"
       target="_blank"

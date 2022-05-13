@@ -1,6 +1,6 @@
 @import '../../styles';
 
-.jsoneditor-modal {
+.jse-modal {
   // styling for the select box, svelte-select
   // see docs: https://github.com/rob-balfre/svelte-select#styling
   --height: 36px;
@@ -11,22 +11,23 @@
   --multiItemBorderRadius: 6px;
   --clearSelectTop: 2px;
   --clearSelectBottom: 2px;
-  --itemIsActiveBG: #3883fa; // theme-color
   --indicatorTop: 8px;
 
   flex: 1;
   display: flex;
   flex-direction: column;
 
-  font-family: $font-family;
-  font-size: $font-size;
-  color: $black;
+  font-family: var(--jse-font-family);
+  font-size: var(--jse-font-size);
+  line-height: normal;
+  background: var(--jse-modal-background);
+  color: var(--jse-text-color);
 
-  .contents {
+  .jse-contents {
     padding: 20px;
     overflow: auto;
 
-    .actions {
+    .jse-actions {
       display: flex;
       flex-direction: row;
       justify-content: flex-end;
@@ -41,19 +42,38 @@
 }
 
 // custom styling for the modal.
-// FIXME: not neat to override global styles!
-:global(.bg) {
+:global(.bg.jse-modal-bg) {
   width: 100%;
   height: 100%;
-}
-:global(.bg .window-wrap) {
-  margin: 0;
-}
-:global(.bg .window) {
-  max-width: 90%;
-  margin: 4rem auto 2rem auto;
+  top: 0;
+  left: 0;
+  background: var(--jse-modal-overlay-background);
 }
 
-:global(.bg .content) {
+:global(.bg.jse-modal-bg .jse-modal-window-wrap) {
+  margin: 0;
+}
+
+:global(.bg.jse-modal-bg .jse-modal-window) {
+  max-width: 90%;
+  margin: 4rem auto 2rem auto;
+  border-radius: 2px;
+}
+
+:global(.bg.jse-modal-bg .jse-modal-window.jse-modal-window-sort) {
+  width: 400px;
+}
+
+:global(.bg.jse-modal-bg .jse-modal-window.jse-modal-window-transform) {
+  width: 1200px;
+  height: 1200px;
+  max-height: 80%;
+  display: flex;
+}
+
+:global(.bg.jse-modal-bg .jse-modal-content) {
+  flex: 1;
+  display: flex;
   max-height: calc(100vh - 6rem);
+  padding: 0;
 }

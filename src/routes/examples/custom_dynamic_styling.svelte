@@ -47,11 +47,11 @@
     height: 400px;
   }
 
-  :global(.json-node.custom-class-highlight .contents) {
+  :global(.jse-json-node.custom-class-highlight .jse-contents) {
     background: #bfff66;
   }
 
-  :global(.json-node.custom-class-boolean .value) {
+  :global(.jse-json-node.custom-class-boolean .jse-value) {
     background: #ffb5c2;
   }
 </style>

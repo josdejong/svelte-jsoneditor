@@ -1,23 +1,26 @@
 @import '../../../styles';
 
-.json-repair-component {
+.jse-json-repair-component {
   flex: 1;
   display: flex;
   flex-direction: column;
+  background: var(--jse-background-color);
+  color: var(--jse-text-color);
 
-  .menu {
-    .info {
+  .jse-menu {
+    .jse-info {
       padding: 0 $padding;
     }
   }
 
-  .json-text {
+  .jse-json-text {
     flex: 1;
     border: none;
     padding: $contents-padding;
-    font-family: $font-family-mono;
-    font-size: $font-size-mono;
-    color: $black;
+    font-family: var(--jse-font-family-mono);
+    font-size: var(--jse-font-size-mono);
+    background: var(--jse-background-color);
+    color: var(--jse-text-color);
 
     resize: none;
     outline: none;

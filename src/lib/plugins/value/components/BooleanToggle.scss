@@ -1,9 +1,9 @@
 @import '../../../styles';
 
-.boolean-toggle {
-  color: $value-color-boolean;
+.jse-boolean-toggle {
+  color: var(--jse-value-color-boolean);
   position: relative;
-  display: flex;
-  top: 1px;
   padding-left: $padding-half;
+  padding-top: 1px;
+  height: var(--jse-line-height);
 }

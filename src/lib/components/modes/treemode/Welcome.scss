@@ -1,26 +1,26 @@
 @import '../../../styles';
 
-.welcome {
+.jse-welcome {
   flex: 1;
   overflow: auto; // FIXME: overflow doesn't work (try giving editor 100px height)
-  font-family: $font-family;
-  font-size: $font-size;
+  font-family: var(--jse-font-family);
+  font-size: var(--jse-font-size);
 
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  .space.before {
+  .jse-space.jse-before {
     flex: 1;
   }
 
-  .space.after {
+  .jse-space.jse-after {
     flex: 2;
   }
 
-  .contents {
+  .jse-contents {
     margin: 2em $padding 0;
-    color: $gray;
+    color: var(--jse-panel-color-readonly);
 
     ul {
       $list-padding: 10px;
@@ -32,8 +32,8 @@
       li {
         padding-left: $list-padding;
 
-        span.bold {
-          font-family: $font-family-mono;
+        span.jse-bold {
+          font-family: var(--jse-font-family-mono);
           font-weight: bold;
         }
       }

@@ -1,34 +1,34 @@
 @import '../../styles';
 
-.value {
-  &.string {
-    color: $value-color-string;
+.jse-value {
+  &.jse-string {
+    color: var(--jse-value-color-string);
   }
 
-  &.object,
-  &.array {
+  &.jse-object,
+  &.jse-array {
     min-width: 16px;
-    color: $meta-color;
+    color: var(--jse-delimiter-color);
   }
 
-  &.number {
-    color: $value-color-number;
+  &.jse-number {
+    color: var(--jse-value-color-number);
   }
 
-  &.boolean {
-    color: $value-color-boolean;
+  &.jse-boolean {
+    color: var(--jse-value-color-boolean);
   }
 
-  &.null {
-    color: $value-color-null;
+  &.jse-null {
+    color: var(--jse-value-color-null);
   }
 
-  &.invalid {
-    color: $black;
+  &.jse-invalid {
+    color: var(--jse-text-color);
   }
 
-  &.url {
-    color: $value-color-url;
+  &.jse-url {
+    color: var(--jse-value-color-url);
     text-decoration: underline;
   }
 }

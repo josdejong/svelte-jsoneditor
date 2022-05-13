@@ -1,6 +1,6 @@
 @import '../../styles';
 
-table.transform-wizard {
+table.jse-transform-wizard {
   border-collapse: collapse;
   border-spacing: 0;
   width: 100%;
@@ -18,32 +18,32 @@ table.transform-wizard {
     }
 
     td {
-      .horizontal {
+      .jse-horizontal {
         width: 100%;
         display: flex;
         flex-direction: row;
         margin-bottom: $padding-half;
 
-        :global(.selectContainer.filter-path) {
+        :global(.selectContainer.jse-filter-path) {
           flex: 4;
           margin-right: $padding-half;
         }
 
-        :global(.selectContainer.filter-relation) {
+        :global(.selectContainer.jse-filter-relation) {
           flex: 1.5;
           margin-right: $padding-half;
         }
 
-        :global(.selectContainer.sort-path) {
+        :global(.selectContainer.jse-sort-path) {
           flex: 3;
           margin-right: $padding-half;
         }
 
-        :global(.selectContainer.sort-direction) {
+        :global(.selectContainer.jse-sort-direction) {
           flex: 1;
         }
 
-        :global(.selectContainer.projection-paths) {
+        :global(.selectContainer.jse-projection-paths) {
           flex: 1;
         }
 
@@ -51,15 +51,17 @@ table.transform-wizard {
           box-sizing: border-box;
         }
 
-        .filter-value {
+        .jse-filter-value {
           flex: 4;
           padding: 4px 8px;
-          border: 1px solid $border-gray;
-          border-radius: $border-radius;
+          border: var(--jse-input-border);
+          border-radius: var(--jse-input-radius);
           outline: none;
+          background: var(--jse-input-background);
+          color: inherit;
 
           &:focus {
-            border-color: $theme-color;
+            border: var(--jse-input-border-focus);
           }
         }
       }

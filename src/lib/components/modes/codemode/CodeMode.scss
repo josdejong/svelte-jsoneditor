@@ -1,13 +1,17 @@
 @import '../../../styles';
 
-.code-mode {
+.jse-code-mode {
   flex: 1;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  background: $white;
+  background: var(--jse-background-color);
 
-  .contents {
+  &.no-main-menu {
+    border-top: var(--jse-main-border);
+  }
+
+  .jse-contents {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -15,7 +19,14 @@
     min-width: 0;
     min-height: 0;
 
-    &:not(.visible) {
+    border-left: var(--jse-main-border);
+    border-right: var(--jse-main-border);
+
+    &:last-child {
+      border-bottom: var(--jse-main-border);
+    }
+
+    &.jse-hidden {
       visibility: hidden;
     }
 
@@ -24,42 +35,124 @@
       overflow: hidden;
 
       :global(.cm-scroller) {
-        font-family: $font-family-mono;
-        font-size: $font-size-mono;
-        line-height: 1.3em;
-        color: $black;
+        font-family: var(--jse-font-family-mono);
+        font-size: var(--jse-font-size-mono);
+        line-height: var(--jse-line-height);
+        color: var(--jse-delimiter-color);
       }
 
       :global(.cm-gutters) {
-        background: $very-light-gray;
+        background: var(--jse-panel-background);
+        color: var(--jse-panel-color-readonly);
+        border-right: var(--jse-panel-border);
+      }
+
+      :global(.cm-activeLine),
+      :global(.cm-activeLineGutter) {
+        background: var(--jse-selection-background-color);
+      }
+
+      :global(.cm-selectionBackground) {
+        background: var(--jse-selection-background-color);
+      }
+
+      :global(.cm-searchMatch) {
+        background-color: var(--jse-search-match-color);
+        outline: var(--jse-search-match-outline);
+      }
+
+      :global(.cm-searchMatch.cm-searchMatch-selected) {
+        background-color: var(--jse-search-match-active-color);
+        outline: var(--jse-search-match-active-outline);
+      }
+
+      :global(.cm-foldPlaceholder) {
+        background: var(--jse-tag-background);
+        color: var(--jse-tag-color);
+        border: none;
+        padding: 0 $padding;
       }
 
       :global(.cm-diagnostic) {
-        font-size: $font-size;
-        font-family: $font-family;
+        font-size: var(--jse-font-size);
+        font-family: var(--jse-font-family);
+      }
+
+      :global(.cm-panels) {
+        border-bottom: var(--jse-panel-border);
       }
 
       :global(.cm-search) {
-        background: $very-light-gray;
+        background: var(--jse-panel-background);
+        color: var(--jse-panel-color);
+        font-family: var(--jse-font-family);
+        font-size: var(--jse-font-size);
       }
 
-      :global(.cm-search label),
-      :global(.cm-search input),
+      :global(.cm-search input) {
+        font-family: var(--jse-font-family);
+        font-size: var(--jse-font-size-code-mode-search);
+        color: var(--jse-input-color);
+        border: var(--jse-input-border);
+        background: var(--jse-input-background);
+        margin-right: 2px;
+      }
+
       :global(.cm-search button) {
-        font-family: $font-family;
-        font-size: $font-size-small;
+        font-family: var(--jse-font-family);
+        font-size: var(--jse-font-size-code-mode-search);
+
+        color: var(--jse-panel-button-color);
+        background: var(--jse-panel-button-background);
+
+        border: none;
+        cursor: pointer;
+        text-transform: capitalize;
+        padding: $padding-half $padding;
+        margin: 0;
+
+        &:hover {
+          color: var(--jse-panel-button-color-highlight);
+          background: var(--jse-panel-button-background-highlight);
+        }
+      }
+
+      :global(.cm-search label) {
+        font-family: var(--jse-font-family);
+        font-size: var(--jse-font-size-code-mode-search);
+        padding-left: $padding;
+      }
+
+      :global(.cm-search label input) {
+        margin-right: 2px;
+      }
+
+      :global(.cm-search button[name='close']) {
+        width: 32px;
+        height: 32px;
+        font-size: 24px;
+        line-height: 24px;
+        padding: 0;
+        right: 0;
+        top: -4px;
+      }
+
+      :global(.cm-cursor-primary) {
+        border-color: var(--jse-text-color);
       }
     }
 
-    .loading-space {
+    .jse-loading-space {
       flex: 1;
     }
 
-    .loading {
+    .jse-loading {
       flex: 2;
       text-align: center;
-      color: $gray;
+      color: var(--jse-panel-color-readonly);
       box-sizing: border-box;
+      font-family: var(--jse-font-family);
+      font-size: var(--jse-font-size);
     }
   }
 }

@@ -10,7 +10,6 @@
     HOVER_COLLECTION,
     HOVER_INSERT_AFTER,
     HOVER_INSERT_INSIDE,
-    INDENTATION_WIDTH,
     INSERT_EXPLANATION,
     STATE_ENFORCE_STRING,
     STATE_EXPANDED,
@@ -86,7 +85,7 @@
   $: type = valueType(resolvedValue)
 
   function getIndentationStyle(level) {
-    return `margin-left: ${level * INDENTATION_WIDTH}px`
+    return `margin-left: calc(${level} * var(--jse-indent-size))`
   }
 
   $: indentationStyle = getIndentationStyle(path.length)
@@ -458,13 +457,17 @@
 </script>
 
 <div
-  class={classnames('json-node', { expanded }, context.onClassName(path, resolvedValue))}
+  class={classnames(
+    'jse-json-node',
+    { 'jse-expanded': expanded },
+    context.onClassName(path, resolvedValue)
+  )}
   data-path={encodeDataPath(path)}
-  class:root
-  class:selected
-  class:selected-key={selectedKey}
-  class:selected-value={selectedValue}
-  class:hovered={hover === HOVER_COLLECTION}
+  class:jse-root={root}
+  class:jse-selected={selected}
+  class:jse-selected-key={selectedKey}
+  class:jse-selected-value={selectedValue}
+  class:jse-hovered={hover === HOVER_COLLECTION}
   on:mousedown={handleMouseDown}
   on:mousemove={handleMouseMove}
   on:mouseover={handleMouseOver}
@@ -473,11 +476,11 @@
   on:blur={undefined}
 >
   {#if type === 'array'}
-    <div class="header-outer" style={indentationStyle}>
-      <div class="header">
+    <div class="jse-header-outer" style={indentationStyle}>
+      <div class="jse-header">
         <button
           type="button"
-          class="expand"
+          class="jse-expand"
           on:click={toggleExpand}
           title="Expand or collapse this array (Ctrl+Click to expand/collapse recursively)"
         >
@@ -489,28 +492,28 @@
         </button>
         <slot name="identifier" />
         {#if !root}
-          <div class="separator">:</div>
+          <div class="jse-separator">:</div>
         {/if}
-        <div class="meta">
-          <div class="meta-inner" data-type="selectable-value">
+        <div class="jse-meta">
+          <div class="jse-meta-inner" data-type="selectable-value">
             {#if expanded}
-              <div class="bracket">[</div>
-              <span class="tag readonly">
+              <div class="jse-bracket">[</div>
+              <span class="jse-tag jse-expanded">
                 {resolvedValue.length}
                 {resolvedValue.length === 1 ? 'item' : 'items'}
               </span>
             {:else}
-              <div class="bracket">[</div>
-              <button type="button" class="tag" on:click={handleExpand}>
+              <div class="jse-bracket">[</div>
+              <button type="button" class="jse-tag" on:click={handleExpand}>
                 {resolvedValue.length}
                 {resolvedValue.length === 1 ? 'item' : 'items'}
               </button>
-              <div class="bracket">]</div>
+              <div class="jse-bracket">]</div>
             {/if}
           </div>
         </div>
         {#if !context.readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
-          <div class="context-menu-button-anchor">
+          <div class="jse-context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
@@ -520,25 +523,25 @@
       {/if}
       {#if expanded}
         <div
-          class="insert-selection-area inside"
+          class="jse-insert-selection-area jse-inside"
           data-type="insert-selection-area-inside"
           on:click={handleInsertInside}
         />
       {:else}
         <div
-          class="insert-selection-area after"
+          class="jse-insert-selection-area jse-after"
           data-type="insert-selection-area-after"
           on:click={handleInsertAfter}
         />
       {/if}
     </div>
     {#if expanded}
-      <div class="items">
+      <div class="jse-items">
         {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || selectedInside)}
           <div
-            class="insert-area inside"
-            class:hovered={hover === HOVER_INSERT_INSIDE}
-            class:selected={selectedInside}
+            class="jse-insert-area jse-inside"
+            class:jse-hovered={hover === HOVER_INSERT_INSIDE}
+            class:jse-selected={selectedInside}
             data-type="insert-selection-area-inside"
             style={getIndentationStyle(path.length + 1)}
             title={INSERT_EXPLANATION}
@@ -567,8 +570,8 @@
               {context}
               onDragSelectionStart={handleDragSelectionStart}
             >
-              <div slot="identifier" class="identifier">
-                <div class="index">{visibleSection.start + itemIndex}</div>
+              <div slot="identifier" class="jse-identifier">
+                <div class="jse-index">{visibleSection.start + itemIndex}</div>
               </div>
             </svelte:self>
           {/each}
@@ -584,13 +587,13 @@
           {/if}
         {/each}
       </div>
-      <div class="footer-outer" style={indentationStyle}>
-        <div data-type="selectable-value" class="footer">
-          <span class="bracket">]</span>
+      <div class="jse-footer-outer" style={indentationStyle}>
+        <div data-type="selectable-value" class="jse-footer">
+          <span class="jse-bracket">]</span>
         </div>
         {#if !root}
           <div
-            class="insert-selection-area after"
+            class="jse-insert-selection-area jse-after"
             data-type="insert-selection-area-after"
             on:click={handleInsertAfter}
           />
@@ -598,11 +601,11 @@
       </div>
     {/if}
   {:else if type === 'object'}
-    <div class="header-outer" style={indentationStyle}>
-      <div class="header">
+    <div class="jse-header-outer" style={indentationStyle}>
+      <div class="jse-header">
         <button
           type="button"
-          class="expand"
+          class="jse-expand"
           on:click={toggleExpand}
           title="Expand or collapse this object (Ctrl+Click to expand/collapse recursively)"
         >
@@ -614,24 +617,24 @@
         </button>
         <slot name="identifier" />
         {#if !root}
-          <div class="separator">:</div>
+          <div class="jse-separator">:</div>
         {/if}
-        <div class="meta" data-type="selectable-value">
-          <div class="meta-inner">
+        <div class="jse-meta" data-type="selectable-value">
+          <div class="jse-meta-inner">
             {#if expanded}
-              <div class="bracket expanded">&lbrace;</div>
+              <div class="jse-bracket jse-expanded">&lbrace;</div>
             {:else}
-              <div class="bracket">&lbrace;</div>
-              <button type="button" class="tag" on:click={handleExpand}>
+              <div class="jse-bracket">&lbrace;</div>
+              <button type="button" class="jse-tag" on:click={handleExpand}>
                 {Object.keys(resolvedValue).length}
                 {Object.keys(resolvedValue).length === 1 ? 'prop' : 'props'}
               </button>
-              <div class="bracket">&rbrace;</div>
+              <div class="jse-bracket">&rbrace;</div>
             {/if}
           </div>
         </div>
         {#if !context.readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
-          <div class="context-menu-button-anchor">
+          <div class="jse-context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
@@ -641,25 +644,25 @@
       {/if}
       {#if expanded}
         <div
-          class="insert-selection-area inside"
+          class="jse-insert-selection-area jse-inside"
           data-type="insert-selection-area-inside"
           on:click={handleInsertInside}
         />
       {:else if !root}
         <div
-          class="insert-selection-area after"
+          class="jse-insert-selection-area jse-after"
           data-type="insert-selection-area-after"
           on:click={handleInsertAfter}
         />
       {/if}
     </div>
     {#if expanded}
-      <div class="props">
+      <div class="jse-props">
         {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || selectedInside)}
           <div
-            class="insert-area inside"
-            class:hovered={hover === HOVER_INSERT_INSIDE}
-            class:selected={selectedInside}
+            class="jse-insert-area jse-inside"
+            class:jse-hovered={hover === HOVER_INSERT_INSIDE}
+            class:jse-selected={selectedInside}
             data-type="insert-selection-area-inside"
             style={getIndentationStyle(path.length + 1)}
             title={INSERT_EXPLANATION}
@@ -681,7 +684,7 @@
             {context}
             onDragSelectionStart={handleDragSelectionStart}
           >
-            <div slot="identifier" class="identifier">
+            <div slot="identifier" class="jse-identifier">
               <JSONKey
                 path={memoizePath(path.concat(key))}
                 {key}
@@ -697,13 +700,13 @@
           </svelte:self>
         {/each}
       </div>
-      <div class="footer-outer" style={indentationStyle}>
-        <div data-type="selectable-value" class="footer">
-          <div class="bracket">&rbrace;</div>
+      <div class="jse-footer-outer" style={indentationStyle}>
+        <div data-type="selectable-value" class="jse-footer">
+          <div class="jse-bracket">&rbrace;</div>
         </div>
         {#if !root}
           <div
-            class="insert-selection-area after"
+            class="jse-insert-selection-area jse-after"
             data-type="insert-selection-area-after"
             on:click={handleInsertAfter}
           />
@@ -711,11 +714,11 @@
       </div>
     {/if}
   {:else}
-    <div class="contents-outer" style={indentationStyle}>
-      <div class="contents">
+    <div class="jse-contents-outer" style={indentationStyle}>
+      <div class="jse-contents">
         <slot name="identifier" />
         {#if !root}
-          <div class="separator">:</div>
+          <div class="jse-separator">:</div>
         {/if}
         <JSONValue
           {path}
@@ -726,7 +729,7 @@
           {context}
         />
         {#if !context.readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
-          <div class="context-menu-button-anchor">
+          <div class="jse-context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
@@ -736,7 +739,7 @@
       {/if}
       {#if !root}
         <div
-          class="insert-selection-area after"
+          class="jse-insert-selection-area jse-after"
           data-type="insert-selection-area-after"
           on:click={handleInsertAfter}
         />
@@ -745,9 +748,9 @@
   {/if}
   {#if !context.readOnly && (hover === HOVER_INSERT_AFTER || selectedAfter)}
     <div
-      class="insert-area after"
-      class:hovered={hover === HOVER_INSERT_AFTER}
-      class:selected={selectedAfter}
+      class="jse-insert-area jse-after"
+      class:jse-hovered={hover === HOVER_INSERT_AFTER}
+      class:jse-selected={selectedAfter}
       data-type="insert-selection-area-after"
       style={indentationStyle}
       title={INSERT_EXPLANATION}

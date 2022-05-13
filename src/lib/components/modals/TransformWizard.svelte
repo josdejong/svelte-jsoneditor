@@ -116,39 +116,39 @@
   $: changeProjectionPaths(projectionPaths ? projectionPaths.map((item) => item.value) : null)
 </script>
 
-<table class="transform-wizard">
+<table class="jse-transform-wizard">
   <tr>
     <th>Filter</th>
     <td>
-      <div class="horizontal">
+      <div class="jse-horizontal">
         <Select
-          containerClasses="filter-path"
+          containerClasses="jse-filter-path"
           showIndicator
           items={fieldOptions}
           bind:value={filterPath}
         />
         <Select
-          containerClasses="filter-relation"
+          containerClasses="jse-filter-relation"
           showIndicator
           items={filterRelationOptions}
           bind:value={filterRelation}
         />
-        <input class="filter-value" bind:value={filterValue} />
+        <input class="jse-filter-value" bind:value={filterValue} />
       </div>
     </td>
   </tr>
   <tr>
     <th>Sort</th>
     <td>
-      <div class="horizontal">
+      <div class="jse-horizontal">
         <Select
-          containerClasses="sort-path"
+          containerClasses="jse-sort-path"
           showIndicator
           items={fieldOptions}
           bind:value={sortPath}
         />
         <Select
-          containerClasses="sort-direction"
+          containerClasses="jse-sort-direction"
           showIndicator
           items={sortDirectionOptions}
           bind:value={sortDirection}
@@ -159,9 +159,9 @@
   <tr>
     <th>Pick</th>
     <td>
-      <div class="horizontal">
+      <div class="jse-horizontal">
         <Select
-          containerClasses="projection-paths"
+          containerClasses="jse-projection-paths"
           isMulti
           showIndicator
           items={projectionOptions}

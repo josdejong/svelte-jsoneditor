@@ -2,9 +2,8 @@
 @import '../../../components/controls/EditableDivShared';
 
 // TODO: also share most of the following styling with EditableDiv
-.value {
-  line-height: $line-height;
-  min-width: 16px;
+.jse-value {
+  min-width: 2em;
   padding: 0 $input-padding;
   box-sizing: border-box;
   outline: none;
@@ -16,17 +15,17 @@
   white-space: pre-wrap; // important for rendering multiple consecutive spaces
 
   &:hover {
-    background: $hovered-background-transparent;
+    background: var(--jse-hover-background-color);
   }
 
-  &.empty {
+  &.jse-empty {
     min-width: 4em;
-    outline: 1px dotted $light-gray-transparent;
+    outline: 1px dotted var(--jse-tag-background);
     -moz-outline-radius: 2px;
 
     &::after {
       pointer-events: none;
-      color: $light-gray-transparent;
+      color: var(--jse-tag-background);
       content: 'value';
     }
   }

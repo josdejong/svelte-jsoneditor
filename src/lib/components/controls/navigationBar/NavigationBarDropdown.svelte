@@ -17,7 +17,7 @@
     <button
       type="button"
       class="jse-navigation-bar-dropdown-item"
-      class:selected={item === selectedItem}
+      class:jse-selected={item === selectedItem}
       on:click|stopPropagation={() => onSelect(item)}
       title={item}
     >

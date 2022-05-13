@@ -301,13 +301,13 @@
     {
       text: 'code',
       title: `Switch to code mode (current mode: ${mode})`,
-      className: 'group-button first' + (isCodeMode ? ' selected' : ''),
+      className: 'jse-group-button jse-first' + (isCodeMode ? ' jse-selected' : ''),
       onClick: () => toggleMode(MODE.CODE)
     },
     {
       text: 'tree',
       title: `Switch to tree mode (current mode: ${mode})`,
-      className: 'group-button last' + (!isCodeMode ? ' selected' : ''),
+      className: 'jse-group-button jse-last' + (!isCodeMode ? ' jse-selected' : ''),
       onClick: () => toggleMode(MODE.TREE)
     }
   ]
@@ -387,7 +387,7 @@
 <Modal>
   <ModalRef bind:open />
   <AbsolutePopup>
-    <div class="jsoneditor-main" class:focus={hasFocus} bind:this={refJSONEditor}>
+    <div class="jse-main" class:jse-focus={hasFocus} bind:this={refJSONEditor}>
       {#key instanceId}
         {#if mode === MODE.CODE}
           <CodeMode

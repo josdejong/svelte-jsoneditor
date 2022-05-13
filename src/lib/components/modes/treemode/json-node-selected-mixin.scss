@@ -2,48 +2,52 @@
 
 // TODO: simplify the CSS needed to correctly highlight the selection
 
-@mixin json-node-selected-mixin($selection-background, $insert-area-background) {
+@mixin json-node-selected-mixin(
+  $selection-background,
+  $insert-area-background,
+  $insert-area-background-highlight
+) {
   // entry selected
-  &.selected {
-    .header,
-    .contents,
-    .meta,
-    .expand,
-    .footer,
-    :global(.key),
-    :global(.value) {
-      background-color: $selection-background !important;
+  &.jse-selected {
+    .jse-header,
+    .jse-contents,
+    .jse-meta,
+    .jse-expand,
+    .jse-footer,
+    :global(.jse-key),
+    :global(.jse-value) {
+      background: $selection-background !important;
       cursor: grab;
     }
 
-    .expand {
+    .jse-expand {
       cursor: pointer;
     }
   }
 
   // key selected
-  &.selected-key {
-    > .contents-outer > .contents > :global(.identifier) > :global(.key),
-    > .header-outer > .header > :global(.identifier) > :global(.key) {
-      background-color: $selection-background;
+  &.jse-selected-key {
+    > .jse-contents-outer > .jse-contents > :global(.jse-identifier) > :global(.jse-key),
+    > .jse-header-outer > .jse-header > :global(.jse-identifier) > :global(.jse-key) {
+      background: $selection-background;
       cursor: grab;
     }
   }
 
   // value selected (part 1)
-  &.selected-value > .contents-outer > .contents > :global(.value) {
-    background-color: $selection-background;
+  &.jse-selected-value > .jse-contents-outer > .jse-contents > :global(.jse-value) {
+    background: $selection-background;
     cursor: grab;
   }
 
-  :global(.collapsed-items.selected),
-  &.selected :global(.collapsed-items),
-  &.selected-value :global(.collapsed-items) {
+  :global(.jse-collapsed-items.jse-selected),
+  &.jse-selected :global(.jse-collapsed-items),
+  &.jse-selected-value :global(.jse-collapsed-items) {
     // TODO: this css is copied from CollapsedItems.scss. Figure out how to reuse this smartly with CSS or SASS
     background-color: $selection-background;
     cursor: grab;
 
-    $shape-color: darken($selection-background, 5%);
+    $shape-color: var(--jse-collapsed-items-selected-background-color);
     background-image: linear-gradient($shape-color, $shape-color),
       linear-gradient(to bottom right, transparent 50.5%, $shape-color 50.5%),
       linear-gradient(to bottom left, transparent 50.5%, $shape-color 50.5%),
@@ -52,45 +56,44 @@
   }
 
   // value selected (part 2)
-  &.selected-value {
-    .meta,
-    > .footer-outer > .footer,
-    .props .contents,
-    .props .header,
-    .props .footer,
-    .props .expand,
-    .items .contents,
-    .items .header,
-    .items .footer,
-    .items .expand {
-      background-color: $selection-background !important;
+  &.jse-selected-value {
+    .jse-meta,
+    > .jse-header-outer > .jse-header > .jse-meta,
+    > .jse-footer-outer > .jse-footer,
+    .jse-props .jse-contents,
+    .jse-props .jse-header,
+    .jse-props .jse-footer,
+    .jse-props .jse-expand,
+    .jse-items .jse-contents,
+    .jse-items .jse-header,
+    .jse-items .jse-footer,
+    .jse-items .jse-expand {
+      background: $selection-background !important;
 
-      :global(.key),
-      :global(.value) {
-        background-color: $selection-background !important;
+      :global(.jse-key),
+      :global(.jse-value) {
+        background: $selection-background;
         cursor: grab;
       }
     }
   }
 
-  .insert-area {
-    &.selected {
+  .jse-insert-area {
+    &.jse-selected {
       z-index: 2;
       outline-color: $insert-area-background;
     }
   }
 
-  .insert-area {
-    &.selected {
-      :global(.context-menu-button) {
+  .jse-insert-area {
+    &.jse-selected {
+      :global(.jse-context-menu-button) {
         background: $insert-area-background;
-      }
-    }
-  }
 
-  .context-menu-button-anchor {
-    :global(.context-menu-button) {
-      background: $insert-area-background;
+        &:hover {
+          background: $insert-area-background-highlight;
+        }
+      }
     }
   }
 }

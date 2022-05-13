@@ -1,40 +1,39 @@
 @import '../../../../styles.scss';
 
-.jsoneditor-contextmenu {
-  box-shadow: $box-shadow;
+.jse-contextmenu {
+  box-shadow: var(--jse-controls-box-shadow);
 
-  font-family: $font-family;
-  font-size: $font-size;
-  background: $dark-gray;
-  color: $white;
-
-  $gray-highlight: lighten($dark-gray, 5%);
+  font-family: var(--jse-font-family);
+  font-size: var(--jse-font-size);
+  background: var(--jse-context-menu-background);
+  color: var(--jse-context-menu-color);
 
   button {
     @include jsoneditor-button;
 
     &:focus {
-      background: $gray-highlight;
+      background: var(--jse-context-menu-background-highlight);
     }
   }
 
-  .row {
+  .jse-row {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
     justify-content: stretch;
 
-    div.label {
+    div.jse-label {
       flex: 1;
       white-space: nowrap;
       padding: $padding;
-      color: $gray;
+      color: var(--jse-context-menu-color-disabled);
+      line-height: normal;
     }
 
-    div.tip {
+    div.jse-tip {
       flex: 1;
-      background: rgba(255, 255, 255, 0.2);
-      color: $white;
+      background: var(--jse-context-menu-tip-background);
+      color: var(--jse-context-menu-tip-color);
       margin: $padding-half;
       padding: $padding-half $padding;
       font-size: 80%;
@@ -58,15 +57,15 @@
       color: inherit;
 
       &:hover {
-        background: $gray-highlight;
+        background: var(--jse-context-menu-background-highlight);
       }
 
       &:disabled {
-        color: $gray;
+        color: var(--jse-context-menu-color-disabled);
         background: unset;
       }
 
-      .insert {
+      .jse-insert {
         $size: 18px;
 
         display: inline-block;
@@ -74,11 +73,12 @@
         width: $size;
         height: $size;
 
-        font-family: $font-family-mono;
+        font-family: var(--jse-font-family-mono);
         font-weight: bold;
+        font-size: 16px; // fixed, to stay the same as the icons
 
-        .quote,
-        .plus {
+        .jse-quote,
+        .jse-plus {
           position: absolute;
           top: -4px;
           left: 2px;
@@ -88,14 +88,14 @@
     }
   }
 
-  .column {
+  .jse-column {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: stretch;
 
     &:not(:last-child) {
-      border-right: 1px solid $gray-highlight;
+      border-right: 1px solid var(--jse-context-menu-separator-color);
     }
 
     button {
@@ -104,9 +104,9 @@
     }
   }
 
-  .separator {
+  .jse-separator {
     width: 100%;
     height: 1px;
-    background: $gray-highlight;
+    background: var(--jse-context-menu-separator-color);
   }
 }

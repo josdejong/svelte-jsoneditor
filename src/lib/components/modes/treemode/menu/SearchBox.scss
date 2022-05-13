@@ -5,11 +5,14 @@ $button-width: 20px;
 $padding-section-left: 32px;
 
 .jse-search-box {
-  border: 1px solid $gray;
+  border: var(--jse-panel-border);
   border-radius: $border-radius;
 
-  background: $background-gray;
-  box-shadow: $box-shadow;
+  font-family: var(--jse-font-family);
+  font-size: var(--jse-font-size);
+  background: var(--jse-panel-background);
+  color: var(--jse-panel-color-readonly);
+  box-shadow: var(--jse-controls-box-shadow);
   display: inline-block;
   width: 400px;
   max-width: 100%;
@@ -19,31 +22,34 @@ $padding-section-left: 32px;
     display: flex;
     align-items: stretch;
 
+    button,
+    input {
+      font-family: inherit;
+      font-size: inherit;
+    }
+
     button {
-      font-family: $font-family;
-      font-size: $font-size;
-      color: $light-gray;
       display: block;
       text-align: center;
-      background: transparent;
       border: none;
       padding: 0 $input-padding;
       margin: 0;
       cursor: pointer;
 
-      &:hover,
-      &:active {
-        color: $gray;
-        background: $hovered-background;
+      color: var(--jse-panel-button-color);
+      background: var(--jse-panel-button-background);
+
+      &:hover {
+        color: var(--jse-panel-button-color-highlight);
+        background: var(--jse-panel-button-background-highlight);
       }
     }
 
     input {
-      font-family: $font-family;
-      font-size: $font-size;
-      color: $black;
-      border: 1px solid $border-gray;
+      color: var(--jse-panel-color);
+      border: var(--jse-input-border);
       border-radius: $border-radius;
+      background: var(--jse-input-background);
       height: $search-size;
       padding: 0 $input-padding;
       margin: 0;
@@ -54,13 +60,7 @@ $padding-section-left: 32px;
     .jse-replace-toggle {
       padding: $padding $padding-half;
       min-width: 20px;
-      background: darken($background-gray, 3%);
-
-      &:hover,
-      &:active {
-        color: $gray;
-        background: darken($background-gray, 5%);
-      }
+      background: var(--jse-panel-button-background-highlight);
     }
 
     .jse-search-contents {
@@ -78,7 +78,7 @@ $padding-section-left: 32px;
         padding-left: $padding-section-left;
 
         .jse-search-icon {
-          color: $light-gray;
+          color: inherit;
           cursor: inherit;
           background: inherit;
           position: absolute;
@@ -92,8 +92,8 @@ $padding-section-left: 32px;
         }
 
         .jse-search-count {
-          color: $light-gray;
-          font-size: $font-size-smallest;
+          color: inherit;
+          font-size: 80%;
           visibility: hidden;
           padding: 0 $input-padding;
           min-width: 36px;
