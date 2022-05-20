@@ -34,7 +34,7 @@ export function renderValue({
   if (!isEditing && isColor(value)) {
     renderers.push({
       component: ColorPicker,
-      props: { path, value, readOnly, onPatch }
+      props: { path, value, readOnly, onPatch, onSelect }
     })
   }
 

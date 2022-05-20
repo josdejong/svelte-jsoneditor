@@ -6,6 +6,7 @@
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getContext } from 'svelte'
   import ColorPickerPopup from '../../../components/controls/ColorPickerPopup.svelte'
+  import { SELECTION_TYPE } from '../../../logic/selection.js'
 
   const { openAbsolutePopup } = getContext('absolute-popup')
 
@@ -13,6 +14,7 @@
   export let value
   export let readOnly
   export let onPatch
+  export let onSelect
 
   $: color = getColorCSS(value)
 
@@ -24,6 +26,8 @@
         value: color
       }
     ])
+
+    onSelect({ type: SELECTION_TYPE.VALUE, path })
   }
 
   function openColorPicker(event) {
