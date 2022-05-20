@@ -27,10 +27,12 @@
 
   function scrollToLastItem() {
     setTimeout(() => {
-      const lastItem = refNavigationBar && refNavigationBar.querySelector('div:last-child')
-      if (lastItem && lastItem.scrollIntoView) {
-        // debug('scroll to lastItem', path)
-        lastItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      if (refNavigationBar && refNavigationBar.scrollTo) {
+        const left = refNavigationBar.scrollWidth - refNavigationBar.clientWidth
+        if (left > 0) {
+          debug('scrollTo ', left)
+          refNavigationBar.scrollTo({ left, behavior: 'smooth' })
+        }
       }
     })
   }
