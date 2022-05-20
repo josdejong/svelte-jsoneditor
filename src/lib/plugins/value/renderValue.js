@@ -27,7 +27,7 @@ export function renderValue({
   if (!isEditing && isBoolean(value)) {
     renderers.push({
       component: BooleanToggle,
-      props: { path, value, readOnly, onPatch }
+      props: { path, value, readOnly, onPatch, onSelect }
     })
   }
 

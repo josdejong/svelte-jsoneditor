@@ -516,4 +516,8 @@ See https://github.com/sveltejs/kit/issues/981
   label {
     white-space: nowrap;
   }
+
+  :global(.jse-main.jse-focus) {
+    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.24);
+  }
 </style>
