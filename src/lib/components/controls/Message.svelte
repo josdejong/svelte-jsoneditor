@@ -28,6 +28,7 @@
       <button
         type="button"
         on:click={action.onClick}
+        on:mousedown={action.onMouseDown}
         class="jse-button jse-action jse-primary"
         title={action.title}
         disabled={action.disabled}

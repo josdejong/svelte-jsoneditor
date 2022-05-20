@@ -1968,6 +1968,7 @@
   }
 
   async function handleParsePastedJson() {
+    debug('apply pasted json', pastedJson)
     const { path, contents } = pastedJson
 
     // exit edit mode
@@ -1995,6 +1996,7 @@
   }
 
   function handleClearPastedJson() {
+    debug('clear pasted json')
     pastedJson = undefined
   }
 
@@ -2184,7 +2186,11 @@
             {
               icon: faWrench,
               text: 'Paste as JSON instead',
-              onClick: handleParsePastedJson
+              // We use mousedown here instead of click: this message pops up
+              // whilst the user is editing a value. When clicking this button,
+              // the actual value is applied and the event is not propagated
+              // and an onClick on this button never happens.
+              onMouseDown: handleParsePastedJson
             },
             {
               text: 'Leave as is',
