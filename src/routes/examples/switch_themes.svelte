@@ -29,6 +29,11 @@
     }
   }
 
+  let editorRef
+  function handleChangeFontSize() {
+    editorRef.refresh()
+  }
+
   $: console.log('contents changed:', content)
 </script>
 
@@ -50,7 +55,7 @@
   </p>
   <p>
     Font size:
-    <select bind:value={selectedFontSize}>
+    <select bind:value={selectedFontSize} on:change={handleChangeFontSize}>
       {#each fontSizes as fontSize}
         <option value={fontSize.value}>{fontSize.label}</option>
       {/each}
@@ -58,7 +63,7 @@
   </p>
 
   <div class="editor">
-    <JSONEditor bind:content />
+    <JSONEditor bind:content bind:this={editorRef} />
   </div>
 </div>
 

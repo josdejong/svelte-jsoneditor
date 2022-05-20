@@ -564,6 +564,24 @@
     }
   }
 
+  /**
+   * Force refreshing the editor, for example after changing the font size
+   * to update the positioning of the line numbers in the gutter
+   */
+  export function refresh() {
+    debug('refresh')
+    const index = codeMirrorView.state.doc.length
+
+    // a trick to force Code Mirror to re-render the gutter values:
+    // insert a space at the end and then remove it again
+    codeMirrorView.dispatch({
+      changes: { from: index, to: index, insert: ' ' }
+    })
+    codeMirrorView.dispatch({
+      changes: { from: index, to: index + 1, insert: '' }
+    })
+  }
+
   function forceUpdateText() {
     debug('forceUpdateText', { escapeUnicodeCharacters })
 

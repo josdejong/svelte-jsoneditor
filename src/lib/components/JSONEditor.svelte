@@ -214,6 +214,14 @@
     }
   }
 
+  export function refresh() {
+    if (refCodeMode) {
+      refCodeMode.refresh()
+    } else {
+      throw new Error(`Method refresh is not available in mode "${mode}"`)
+    }
+  }
+
   export function updateProps(props) {
     this.$set(props)
   }

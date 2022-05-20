@@ -277,6 +277,7 @@ const editor = new JSONEditor({
 - `scrollTo(path: Path)` Scroll the editor vertically such that the specified path comes into view. The path will be expanded when needed.
 - `findElement(path: Path)` Find the DOM element of a given path. Returns `null` when not found.
 - `acceptAutoRepair(): Content` In tree mode, invalid JSON is automatically repaired when loaded. When the repair was successful, the repaired contents are rendered but not yet applied to the document itself until the user clicks "Ok" or starts editing the data. Instead of accepting the repair, the user can also click "Repair manually instead". Invoking `.acceptAutoRepair()` will programmatically accept the repair. This will trigger an update, and the method itself also returns the updated contents. In case of code mode or when the editor is not in an "accept auto repair" status, nothing will happen, and the contents will be returned as is.
+- `refresh()`. Refresh rendering of the contents, for example after changing the font size. This is only available in `code` mode.
 - `focus()`. Give the editor focus.
 - `destroy()`. Destroy the editor, remove it from the DOM.
 
