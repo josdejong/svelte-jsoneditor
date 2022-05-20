@@ -1,14 +1,14 @@
 import assert from 'assert'
-import { jmespathQueryLanguage, parseString } from './jmespathQueryLanguage.js'
+import { jmespathQueryLanguage } from './jmespathQueryLanguage.js'
 import { cloneDeep } from 'lodash-es'
 
 const { createQuery, executeQuery } = jmespathQueryLanguage
 
 describe('jmespathQueryLanguage', () => {
   describe('createQuery and executeQuery', () => {
-    const user1 = { _id: '1', user: { name: 'Stuart', age: 6 } }
-    const user3 = { _id: '3', user: { name: 'Kevin', age: 8 } }
-    const user2 = { _id: '2', user: { name: 'Bob', age: 7 } }
+    const user1 = { _id: '1', user: { name: 'Stuart', age: 6, registered: true } }
+    const user3 = { _id: '3', user: { name: 'Kevin', age: 8, registered: false } }
+    const user2 = { _id: '2', user: { name: 'Bob', age: 7, registered: true, extra: true } }
 
     const users = [user1, user3, user2]
     const originalUsers = cloneDeep([user1, user3, user2])
@@ -70,6 +70,36 @@ describe('jmespathQueryLanguage', () => {
       const result = executeQuery(data, query)
       assert.deepStrictEqual(result, [1])
       assert.deepStrictEqual(data, originalData) // must not touch the original data
+    })
+
+    it('should create and execute a filter with booleans', () => {
+      const query = createQuery(users, {
+        filter: {
+          path: ['user', 'registered'],
+          relation: '==',
+          value: 'true'
+        }
+      })
+      assert.deepStrictEqual(query, '[? user.registered == `true`]')
+
+      const result = executeQuery(users, query)
+      assert.deepStrictEqual(result, [user1, user2])
+      assert.deepStrictEqual(users, originalUsers) // must not touch the original users
+    })
+
+    it('should create and execute a filter with null', () => {
+      const query = createQuery(users, {
+        filter: {
+          path: ['user', 'extra'],
+          relation: '!=',
+          value: 'null'
+        }
+      })
+      assert.deepStrictEqual(query, '[? user.extra != `null`]')
+
+      const result = executeQuery(users, query)
+      assert.deepStrictEqual(result, [user2])
+      assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
     it('should create and execute a sort query in ascending direction', () => {
@@ -163,22 +193,5 @@ describe('jmespathQueryLanguage', () => {
     const data = {}
     const result = executeQuery(data, query)
     assert.deepStrictEqual(result, null)
-  })
-
-  it('should parse a string', () => {
-    assert.strictEqual(parseString('foo'), 'foo')
-    assert.strictEqual(parseString('234foo'), '234foo')
-    assert.strictEqual(parseString('  234'), 234)
-    assert.strictEqual(parseString('234  '), 234)
-    assert.strictEqual(parseString('2.3'), 2.3)
-    assert.strictEqual(parseString('null'), null)
-    assert.strictEqual(parseString('true'), true)
-    assert.strictEqual(parseString('false'), false)
-    assert.strictEqual(parseString('+1'), 1)
-    assert.strictEqual(parseString(' '), ' ')
-    assert.strictEqual(parseString(''), '')
-    assert.strictEqual(parseString('"foo"'), '"foo"')
-    assert.strictEqual(parseString('"2"'), '"2"')
-    assert.strictEqual(parseString("'foo'"), "'foo'")
   })
 })

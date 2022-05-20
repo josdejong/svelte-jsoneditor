@@ -65,3 +65,37 @@ export function truncate(text, maxLength) {
 
   return text.length > maxLength ? text.substr(0, maxTextLength) + ellipsis : text
 }
+
+/**
+ * Cast contents of a string to the correct type.
+ * This can be a string, a number, a boolean, null, undefined, etc
+ * @param {string} str
+ * @return {string | number | boolean | null | undefined} parsed string
+ */
+export function parseString(str) {
+  if (str === '') {
+    return ''
+  }
+
+  const lower = str.toLowerCase()
+  if (lower === 'null') {
+    return null
+  }
+  if (lower === 'true') {
+    return true
+  }
+  if (lower === 'false') {
+    return false
+  }
+  if (lower === 'undefined') {
+    return undefined
+  }
+
+  const num = Number(str) // will nicely fail with '123ab'
+  const numFloat = parseFloat(str) // will nicely fail with '  '
+  if (!isNaN(num) && !isNaN(numFloat)) {
+    return num
+  }
+
+  return str
+}

@@ -1,6 +1,7 @@
 import * as _ from 'lodash-es'
 import { last } from 'lodash-es'
 import { createPropertySelector, stringifyPath } from '../../utils/pathUtils.js'
+import { parseString } from '../../utils/stringUtils.js'
 
 const description = `
 <p>
@@ -33,10 +34,13 @@ function createQuery(json, queryOptions) {
   if (filter && filter.path && filter.relation && filter.value) {
     // Note that the comparisons embrace type coercion,
     // so a filter value like '5' (text) will match numbers like 5 too.
-    const getActualValue = `item => item${createPropertySelector(filter.path)}`
+    const actualValueGetter = `item => item${createPropertySelector(filter.path)}`
+
+    const filterValueStr =
+      typeof parseString(filter.value) === 'string' ? `'${filter.value}'` : filter.value
 
     queryParts.push(
-      `  data = _.filter(data, ${getActualValue} ${filter.relation} '${filter.value}')\n`
+      `  data = _.filter(data, ${actualValueGetter} ${filter.relation} ${filterValueStr})\n`
     )
   }
 

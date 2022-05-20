@@ -3,6 +3,7 @@ import {
   compareStrings,
   duplicateInText,
   findUniqueName,
+  parseString,
   toCapital,
   truncate
 } from './stringUtils.js'
@@ -56,5 +57,23 @@ describe('stringUtils', () => {
     assert.deepStrictEqual(truncate(text, 11), text)
     assert.deepStrictEqual(truncate(text, 10), 'Hello w...')
     assert.deepStrictEqual(truncate(text, 8), 'Hello...')
+  })
+
+  it('should parse a string', () => {
+    assert.strictEqual(parseString('foo'), 'foo')
+    assert.strictEqual(parseString('234foo'), '234foo')
+    assert.strictEqual(parseString('  234'), 234)
+    assert.strictEqual(parseString('234  '), 234)
+    assert.strictEqual(parseString('2.3'), 2.3)
+    assert.strictEqual(parseString('null'), null)
+    assert.strictEqual(parseString('true'), true)
+    assert.strictEqual(parseString('false'), false)
+    assert.strictEqual(parseString('undefined'), undefined)
+    assert.strictEqual(parseString('+1'), 1)
+    assert.strictEqual(parseString(' '), ' ')
+    assert.strictEqual(parseString(''), '')
+    assert.strictEqual(parseString('"foo"'), '"foo"')
+    assert.strictEqual(parseString('"2"'), '"2"')
+    assert.strictEqual(parseString("'foo'"), "'foo'")
   })
 })

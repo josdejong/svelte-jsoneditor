@@ -1,5 +1,6 @@
 import jmespath from 'jmespath'
 import { getIn } from 'immutable-json-patch'
+import { parseString } from '../../utils/stringUtils.js'
 
 const description = `
 <p>
@@ -33,7 +34,11 @@ function createQuery(json, queryOptions) {
   if (filter && filter.path && filter.relation && filter.value) {
     const examplePath = ['0'].concat(filter.path)
     const exampleValue = getIn(json, examplePath)
-    const value1 = typeof exampleValue === 'string' ? filter.value : parseString(filter.value)
+    const filterValue = parseString(filter.value)
+    const filterValueStr =
+      typeof exampleValue === 'string' && filterValue !== null && filterValue !== undefined
+        ? JSON.stringify(filter.value)
+        : JSON.stringify(filterValue)
 
     query +=
       '[? ' +
@@ -42,7 +47,7 @@ function createQuery(json, queryOptions) {
       filter.relation +
       ' ' +
       '`' +
-      JSON.stringify(value1) +
+      filterValueStr +
       '`' +
       ']'
   } else {
@@ -96,38 +101,6 @@ function createQuery(json, queryOptions) {
  */
 function executeQuery(json, query) {
   return jmespath.search(json, query)
-}
-
-/**
- * Cast contents of a string to the correct type.
- * This can be a string, a number, a boolean, etc
- * @param {String} str
- * @return {*} castedStr
- * @private
- */
-export function parseString(str) {
-  if (str === '') {
-    return ''
-  }
-
-  const lower = str.toLowerCase()
-  if (lower === 'null') {
-    return null
-  }
-  if (lower === 'true') {
-    return true
-  }
-  if (lower === 'false') {
-    return false
-  }
-
-  const num = Number(str) // will nicely fail with '123ab'
-  const numFloat = parseFloat(str) // will nicely fail with '  '
-  if (!isNaN(num) && !isNaN(numFloat)) {
-    return num
-  }
-
-  return str
 }
 
 /**

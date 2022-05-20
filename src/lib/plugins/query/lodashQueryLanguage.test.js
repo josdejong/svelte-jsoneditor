@@ -4,9 +4,9 @@ import { cloneDeep } from 'lodash-es'
 
 const { createQuery, executeQuery } = lodashQueryLanguage
 
-const user1 = { _id: '1', user: { name: 'Stuart', age: 6 } }
-const user3 = { _id: '3', user: { name: 'Kevin', age: 8 } }
-const user2 = { _id: '2', user: { name: 'Bob', age: 7 } }
+const user1 = { _id: '1', user: { name: 'Stuart', age: 6, registered: true } }
+const user3 = { _id: '3', user: { name: 'Kevin', age: 8, registered: false } }
+const user2 = { _id: '2', user: { name: 'Bob', age: 7, registered: true, extra: true } }
 
 const users = [user1, user3, user2]
 const originalUsers = cloneDeep([user1, user3, user2])
@@ -82,7 +82,7 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          "  data = _.filter(data, item => item == '1')\n" +
+          '  data = _.filter(data, item => item == 1)\n' +
           '  return data\n' +
           '}'
       )
@@ -90,6 +90,69 @@ describe('lodashQueryLanguage', () => {
       const result = executeQuery(data, query)
       assert.deepStrictEqual(result, [1])
       assert.deepStrictEqual(data, originalData) // must not touch the original data
+    })
+
+    it('should create and execute a filter with booleans', () => {
+      const query = createQuery(users, {
+        filter: {
+          path: ['user', 'registered'],
+          relation: '==',
+          value: 'true'
+        }
+      })
+      assert.deepStrictEqual(
+        query,
+        'function query (data) {\n' +
+          '  data = _.filter(data, item => item?.user?.registered == true)\n' +
+          '  return data\n' +
+          '}'
+      )
+
+      const result = executeQuery(users, query)
+      assert.deepStrictEqual(result, [user1, user2])
+      assert.deepStrictEqual(users, originalUsers) // must not touch the original users
+    })
+
+    it('should create and execute a filter with null', () => {
+      const query = createQuery(users, {
+        filter: {
+          path: ['user', 'extra'],
+          relation: '!=',
+          value: 'null'
+        }
+      })
+      assert.deepStrictEqual(
+        query,
+        'function query (data) {\n' +
+          '  data = _.filter(data, item => item?.user?.extra != null)\n' +
+          '  return data\n' +
+          '}'
+      )
+
+      const result = executeQuery(users, query)
+      assert.deepStrictEqual(result, [user2])
+      assert.deepStrictEqual(users, originalUsers) // must not touch the original users
+    })
+
+    it('should create and execute a filter with undefined', () => {
+      const query = createQuery(users, {
+        filter: {
+          path: ['user', 'extra'],
+          relation: '!=',
+          value: 'undefined'
+        }
+      })
+      assert.deepStrictEqual(
+        query,
+        'function query (data) {\n' +
+          '  data = _.filter(data, item => item?.user?.extra != undefined)\n' +
+          '  return data\n' +
+          '}'
+      )
+
+      const result = executeQuery(users, query)
+      assert.deepStrictEqual(result, [user2])
+      assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
     it('should create and execute a sort query in ascending direction', () => {
@@ -197,7 +260,7 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          "  data = _.filter(data, item => item?.user?.age <= '7')\n" +
+          '  data = _.filter(data, item => item?.user?.age <= 7)\n' +
           "  data = _.orderBy(data, ['user.name'], ['asc'])\n" +
           '  data = _.map(data, item => item?.user?.name)\n' +
           '  return data\n' +
