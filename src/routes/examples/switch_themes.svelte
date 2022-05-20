@@ -31,6 +31,7 @@
 
   let editorRef
   function handleChangeFontSize() {
+    // call refresh to make sure the line numbers in the gutter are resized too
     editorRef.refresh()
   }
 
