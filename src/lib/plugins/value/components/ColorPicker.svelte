@@ -27,6 +27,10 @@
       }
     ])
 
+    onClose()
+  }
+
+  function onClose() {
     onSelect({ type: SELECTION_TYPE.VALUE, path })
   }
 
@@ -53,6 +57,7 @@
     openAbsolutePopup(ColorPickerPopup, props, {
       anchor: event.target,
       closeOnOuterClick: true,
+      onClose,
       offsetTop: 18,
       offsetLeft: -8,
       height
