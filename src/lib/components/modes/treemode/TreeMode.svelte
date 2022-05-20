@@ -263,8 +263,9 @@
     if (activeItem) {
       const path = activeItem.path
       state = expandPath(json, state, path)
+      selection = null // navigation path of current selection would be confusing
       await tick()
-      scrollTo(path)
+      await scrollTo(path)
     }
   }
 
