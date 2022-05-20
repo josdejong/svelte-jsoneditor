@@ -1133,7 +1133,7 @@
     const parent = getIn(json, initial(path))
     selection = createSelection(json, state, {
       type:
-        Array.isArray(parent) || selection.type === SELECTION_TYPE.VALUE
+        Array.isArray(parent) || !parent || selection.type === SELECTION_TYPE.VALUE
           ? SELECTION_TYPE.VALUE
           : SELECTION_TYPE.KEY,
       path,
