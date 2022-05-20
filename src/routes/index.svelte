@@ -33,7 +33,7 @@
       <a href="examples/custom_theme_color">Custom theme color</a>
     </li>
     <li>
-      <a href="examples/switch_themes">Switch themes (dark theme)</a>
+      <a href="examples/switch_themes">Switch themes (dark theme) and font size</a>
     </li>
   </ul>
 
