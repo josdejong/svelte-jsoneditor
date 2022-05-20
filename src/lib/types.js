@@ -306,6 +306,7 @@
  * @property {() => JSON} getFullState
  * @property {() => Selection} getFullSelection
  * @property {(path: Path) => Element | null} findElement
+ * @property {() => void} focus
  * @property {(operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void} onPatch
  * @property {(type: InsertType) => void} onInsert
  * @property {(path: Path, expanded: boolean, recursive?: boolean = false) => void} onExpand

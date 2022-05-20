@@ -141,6 +141,7 @@
     // when left-clicking inside the current selection, do nothing: it can be the start of dragging
     if (isPathInsideSelection(context.getFullSelection(), path, anchorType)) {
       if (event.button === 0) {
+        context.focus()
         onDragSelectionStart(event)
       }
 

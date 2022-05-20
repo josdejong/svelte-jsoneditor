@@ -2061,6 +2061,7 @@
     getFullState,
     getFullSelection,
     findElement,
+    focus,
     onPatch: handlePatch,
     onInsert: handleInsert,
     onExpand: handleExpand,
