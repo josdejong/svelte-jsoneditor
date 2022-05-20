@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.50](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.49...v0.3.50) (2022-05-20)
+
+
+### Bug Fixes
+
+* [#79](https://github.com/josdejong/svelte-jsoneditor/issues/79) browser scrolling the editor into view on load ([42fe818](https://github.com/josdejong/svelte-jsoneditor/commit/42fe8188e9248a0191d39e8e991217d5dec5a54c))
+* [#81](https://github.com/josdejong/svelte-jsoneditor/issues/81) clear navigation path when iterating through search results ([434c66d](https://github.com/josdejong/svelte-jsoneditor/commit/434c66d7abc92b6d0f1a38e454a0e7ab9d6c8450))
+* cannot start typing characters to insert a value from the welcome screen ([2bc34e2](https://github.com/josdejong/svelte-jsoneditor/commit/2bc34e224a33219c0ea73515bc04d569d832a0a9))
+* editor losing focus after selecting a color with the color picker ([8cb912a](https://github.com/josdejong/svelte-jsoneditor/commit/8cb912a55d77dca9d298ba9a6bf41d44b0262064))
+* editor losing focus after toggling a boolean value ([ea52484](https://github.com/josdejong/svelte-jsoneditor/commit/ea524847db5927d7c7283d5a8b2aaa3703bf025a))
+* give editor focus when the user starts dragging the selection ([9bd28db](https://github.com/josdejong/svelte-jsoneditor/commit/9bd28dbfb6f5a2bc3ee9ad30d50bd8521ade9b40))
+* give navigation bar text a brighter color in dark theme ([42be0e7](https://github.com/josdejong/svelte-jsoneditor/commit/42be0e7fdd2e7315980e235d43e92cae57cfea7e))
+* improve Transform Wizard to work better with numbers, booleans, and null ([ebc076a](https://github.com/josdejong/svelte-jsoneditor/commit/ebc076a80abc7e561b5518373c2b8530d0413e92))
+* keep focus in editor when closing color picker via ESC ([0b75001](https://github.com/josdejong/svelte-jsoneditor/commit/0b7500171df513fd804051eefc6a7abbbe28ffb4))
+* paste as JSON helper message not working ([0f803b2](https://github.com/josdejong/svelte-jsoneditor/commit/0f803b21a7fc4eaab6e0bb04a108f51d8c0f69a6))
+
 ### [0.3.49](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.48...v0.3.49) (2022-05-13)
 
 ### Features
