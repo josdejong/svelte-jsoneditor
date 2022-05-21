@@ -5,7 +5,7 @@
   import { getContext } from 'svelte'
   import Select from 'svelte-select'
   import Header from './Header.svelte'
-  import { getNestedPaths } from '../../utils/arrayUtils.js'
+  import { getNestedPaths } from '../../utils/arrayUtils.ts'
   import { isObject } from '../../utils/typeUtils.js'
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { sortArray, sortObjectKeys } from '../../logic/sort.js'

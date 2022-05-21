@@ -1,6 +1,6 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import { isEqual } from 'lodash-es'
 

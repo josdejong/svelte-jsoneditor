@@ -15,6 +15,7 @@
   import { normalizeJsonParseError } from '../../../utils/jsonUtils.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Menu from '../../controls/Menu.svelte'
+  import { noop } from 'lodash-es'
 
   export let text = ''
   export let readOnly = false
@@ -25,7 +26,7 @@
   export let onCancel
   export let onFocus
   export let onBlur
-  export let onRenderMenu = () => {}
+  export let onRenderMenu = noop
 
   const debug = createDebug('jsoneditor:JSONRepair')
 

@@ -15,7 +15,7 @@ import {
   STATE_KEYS,
   STATE_VISIBLE_SECTIONS
 } from '../constants.js'
-import { forEachIndex } from '../utils/arrayUtils.js'
+import { forEachIndex } from '../utils/arrayUtils.ts'
 import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
 import { isObject, isStringContainingPrimitiveValue } from '../utils/typeUtils.js'
 import {

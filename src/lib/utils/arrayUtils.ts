@@ -9,12 +9,8 @@ const EMPTY_ARRAY = []
  *
  * Usage:
  *     [4,2,5].sort(compareAsc)    // [2,4,5]
- *
- * @param a
- * @param b
- * @return {number}
  */
-export function compareAsc(a, b) {
+export function compareAsc<T>(a: T, b: T): number {
   return a > b ? 1 : a < b ? -1 : 0
 }
 
@@ -23,21 +19,15 @@ export function compareAsc(a, b) {
  *
  * Usage:
  *     [4,2,5].sort(compareDesc)   // [5,4,2]
- *
- * @param a
- * @param b
- * @return {number}
  */
-export function compareDesc(a, b) {
+export function compareDesc<T>(a: T, b: T): number {
   return a > b ? -1 : a < b ? 1 : 0
 }
 
 /**
  * Test whether all items of an array are strictly equal
- * @param {Array} a
- * @param {Array} b
  */
-export function strictShallowEqual(a, b) {
+export function strictShallowEqual<T>(a: Array<T>, b: Array<T>): boolean {
   if (a.length !== b.length) {
     return false
   }
@@ -51,7 +41,7 @@ export function strictShallowEqual(a, b) {
   return true
 }
 
-export function compareArrays(a, b) {
+export function compareArrays<T>(a: Array<T>, b: Array<T>): number {
   const minLength = Math.min(a.length, b.length)
 
   for (let i = 0; i < minLength; i++) {
@@ -107,12 +97,12 @@ export function getNestedPaths(array, includeObjects = false) {
 
 /**
  * Invoke the callback with
- * @param {number} start   Included start index
- * @param {number} end       Excluded end index. End must be larger or equal to start
- * @param {function (index: number) : void} iteratee
+ * @param start   Included start index
+ * @param end       Excluded end index. End must be larger or equal to start
+ * @param iteratee
  */
 // TODO: write tests
-export function forEachIndex(start, end, iteratee) {
+export function forEachIndex(start: number, end: number, iteratee: (index: number) => void) {
   if (end <= start) {
     return
   }
@@ -124,29 +114,24 @@ export function forEachIndex(start, end, iteratee) {
 
 /**
  * Limit the number of items in an array
- * @param {Array} array
- * @param {number} max
- * @returns {Array}
  */
 // TODO: write unit test
-export function limit(array, max) {
+export function limit<T>(array: Array<T>, max: number): Array<T> {
   return array.length > max ? array.slice(0, max) : array
 }
 
 /**
- * @param {Array} array
- * @returns {Object}
+ * Convert an array into an object having the array indices as keys
  */
-export function arrayToObject(array) {
+export function arrayToObject<T>(array: Array<T>): { [key: number]: T } {
   return {
     ...array
   }
 }
 
 /**
- * @param {Object} object
- * @returns {Array}
+ * Get the values of an object as an array
  */
-export function objectToArray(object) {
+export function objectToArray<T>(object: { [key: string]: T }): Array<T> {
   return Object.values(object)
 }

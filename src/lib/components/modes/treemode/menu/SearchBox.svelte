@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script>
-  import { debounce } from 'lodash-es'
+  import { debounce, noop } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
     faCaretDown,
@@ -21,12 +21,12 @@
   export let activeIndex = 0
   export let showReplace = false
   export let readOnly = false
-  export let onChange = () => {}
-  export let onPrevious = () => {}
-  export let onNext = () => {}
-  export let onReplace = () => {}
-  export let onReplaceAll = () => {}
-  export let onClose = () => {}
+  export let onChange = noop
+  export let onPrevious = noop
+  export let onNext = noop
+  export let onReplace = noop
+  export let onReplaceAll = noop
+  export let onClose = noop
 
   let text = ''
   let previousText = ''

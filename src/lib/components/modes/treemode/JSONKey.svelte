@@ -1,6 +1,6 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import classnames from 'classnames'
   import { initial } from 'lodash-es'
   import { SELECTION_TYPE } from '$lib/logic/selection'

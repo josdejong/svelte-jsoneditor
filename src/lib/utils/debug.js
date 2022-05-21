@@ -36,7 +36,9 @@ export function createDebug(namespace, enabled = tryReadLocalStorage('debug')) {
   }
 }
 
-function noop() {}
+function noop() {
+  // no operation
+}
 
 /**
  * Try read a specific key from localStorage

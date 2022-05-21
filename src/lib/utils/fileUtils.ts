@@ -1,12 +1,12 @@
 /**
  * Return a human readable document size
  * For example formatSize(7570718) outputs '7.6 MB'
- * @param {number} size
- * @param {number} [kilo=1000] Is 1000 by default, you can specify 1024 if you
+ * @param size
+ * @param kilo Is 1000 by default, you can specify 1024 if you
  *                             want the output in KiB
- * @return {string} Returns a human readable size
+ * @return Returns a human readable size
  */
-export function formatSize(size, kilo = 1000) {
+export function formatSize(size: number, kilo = 1000): string {
   if (size < 0.9 * kilo) {
     return size.toFixed() + ' B'
   }

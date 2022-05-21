@@ -2,7 +2,7 @@ import { compileJSONPointer } from 'immutable-json-patch'
 import jsonSourceMap from 'json-source-map'
 import jsonrepair from 'jsonrepair'
 import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
-import { arrayToObject, objectToArray } from './arrayUtils.js'
+import { arrayToObject, objectToArray } from './arrayUtils.ts'
 
 /**
  * Parse the JSON. if this fails, try to repair and parse.

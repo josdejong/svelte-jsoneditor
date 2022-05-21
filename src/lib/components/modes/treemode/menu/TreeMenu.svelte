@@ -15,6 +15,7 @@
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import { isObjectOrArray } from '$lib/utils/typeUtils'
   import Menu from '../../../controls/Menu.svelte'
+  import { noop } from 'lodash-es'
 
   export let json
   export let selection
@@ -32,7 +33,7 @@
   export let onContextMenu
   export let onCopy
 
-  export let onRenderMenu = () => {}
+  export let onRenderMenu = noop
 
   function handleToggleSearch() {
     showSearch = !showSearch

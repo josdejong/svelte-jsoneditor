@@ -2,7 +2,7 @@
 
 <script>
   import Select from 'svelte-select'
-  import { getNestedPaths } from '../../utils/arrayUtils.js'
+  import { getNestedPaths } from '../../utils/arrayUtils.ts'
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { createDebug } from '../../utils/debug.js'
   import { isEmpty, isEqual } from 'lodash-es'

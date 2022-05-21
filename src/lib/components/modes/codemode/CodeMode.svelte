@@ -5,7 +5,7 @@
   import { createDebug } from '$lib/utils/debug'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
-  import { debounce, uniqueId } from 'lodash-es'
+  import { debounce, noop, uniqueId } from 'lodash-es'
   import { onDestroy, onMount } from 'svelte'
   import {
     CODE_MODE_ONCHANGE_DELAY,
@@ -51,11 +51,11 @@
   /** @type {((text: string, previousText: string) => void) | null} */
   export let onChange = null
 
-  export let onSwitchToTreeMode = () => {}
+  export let onSwitchToTreeMode = noop
   export let onError
-  export let onFocus = () => {}
-  export let onBlur = () => {}
-  export let onRenderMenu = () => {}
+  export let onFocus = noop
+  export let onBlur = noop
+  export let onRenderMenu = noop
   export let onSortModal
   export let onTransformModal
 

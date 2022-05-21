@@ -10,6 +10,7 @@
   } from '@fortawesome/free-solid-svg-icons'
   import { faJSONEditorCompact, faJSONEditorFormat } from '$lib/img/customFontawesomeIcons'
   import Menu from '../../../controls/Menu.svelte'
+  import { noop } from 'lodash-es'
 
   export let readOnly = false
   export let onFormat
@@ -25,7 +26,7 @@
   export let canCompact
   export let canSort
   export let canTransform
-  export let onRenderMenu = () => {}
+  export let onRenderMenu = noop
 
   /* @type {MenuItem[]} */
   $: defaultItems = !readOnly

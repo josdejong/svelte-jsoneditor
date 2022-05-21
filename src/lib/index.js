@@ -11,7 +11,7 @@ import _TimestampTag from './plugins/value/components/TimestampTag.svelte'
 export const JSONEditor = _JSONEditor
 
 // value plugins
-export { renderValue } from './plugins/value/renderValue.js'
+export { renderValue } from './plugins/value/renderValue.ts'
 export { renderJSONSchemaEnum } from './plugins/value/renderJSONSchemaEnum.js'
 export const BooleanToggle = _BooleanToggle
 export const ColorPicker = _ColorPicker

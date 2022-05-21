@@ -13,7 +13,7 @@
     setIn
   } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
-  import { initial, isEmpty, isEqual, last, throttle, uniqueId } from 'lodash-es'
+  import { initial, isEmpty, isEqual, last, noop, throttle, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
   import { createJump } from '$lib/assets/jump.js/src/jump'
   import {
@@ -127,10 +127,8 @@
 
   /** @type {(props: RenderValueProps) => RenderValueConstructor[]} */
   export let onRenderValue
-  export let onRequestRepair = () => {}
-  export let onRenderMenu = () => {}
-
-  function noop() {}
+  export let onRequestRepair = noop
+  export let onRenderMenu = noop
 
   /** @type {function (path: Path, value: *) : string} */
   export let onClassName

@@ -1,6 +1,6 @@
 {
   "extension": ["js"],
-  "require": "ts-node/register",
-  "spec": ["src/**/*.test.js"],
+  "loader": "ts-node/esm",
+  "spec": ["src/**/*.test.{js,ts}"],
   "reporter": "dot"
 }
