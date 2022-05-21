@@ -17,7 +17,7 @@ import {
 } from '../constants.js'
 import { forEachIndex } from '../utils/arrayUtils.ts'
 import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
-import { isObject, isStringContainingPrimitiveValue } from '../utils/typeUtils.js'
+import { isObject, isStringContainingPrimitiveValue } from '../utils/typeUtils.ts'
 import {
   currentRoundNumber,
   inVisibleSection,

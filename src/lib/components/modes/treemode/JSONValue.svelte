@@ -3,18 +3,18 @@
 <script lang="ts">
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import { isEqual } from 'lodash-es'
+  import type { SearchResultItem, Selection, TreeModeContext, Path } from '../../../types'
 
-  export let path
-  export let value
+  export let path: Path
+  export let value: JSON
 
   /** @type {TreeModeContext} */
   export let context
 
-  export let enforceString
-  export let selection
+  export let enforceString: boolean
+  export let selection: Selection | undefined
 
-  /** @type {SearchResultItem | undefined} */
-  export let searchResult
+  export let searchResult: SearchResultItem | undefined
 
   $: isSelected =
     selection && selection.type === SELECTION_TYPE.VALUE

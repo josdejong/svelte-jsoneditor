@@ -1,4 +1,4 @@
-import { isUrl, valueType } from '../../../../utils/typeUtils.js'
+import { isUrl, valueType } from '../../../../utils/typeUtils.ts'
 import classnames from 'classnames'
 
 export function getValueClass(value) {

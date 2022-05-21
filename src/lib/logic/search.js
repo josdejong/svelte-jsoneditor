@@ -9,26 +9,7 @@ import {
 import { getKeys } from './documentState.js'
 import { createSelectionFromOperations } from './selection.js'
 import { rename } from './operations.js'
-import { stringConvert } from '../utils/typeUtils.js'
-
-/**
- * @typedef {Object} SearchResult
- * @property {Object} items
- * @property {Object} itemsWithActive
- * @property {Path[]} flatItems
- * @property {Path} activeItem
- * @property {number} activeIndex
- * @property {number} count
- */
-
-/**
- * @typedef {Object} SearchResultItem
- * @property {Path} path
- * @property {Symbol} field
- * @property {number} fieldIndex
- * @property {number} start
- * @property {number} end
- */
+import { stringConvert } from '../utils/typeUtils.ts'
 
 // TODO: comment
 export function updateSearchResult(json, flatResults, previousResult) {

@@ -1,16 +1,16 @@
+import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer } from 'immutable-json-patch'
 import jsonSourceMap from 'json-source-map'
 import jsonrepair from 'jsonrepair'
 import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
-import { arrayToObject, objectToArray } from './arrayUtils.ts'
+import { arrayToObject, objectToArray } from './arrayUtils.js'
+import type { Content, NormalizedParseError, Path, TextLocation, JSON, TextContent } from '../types'
 
 /**
  * Parse the JSON. if this fails, try to repair and parse.
  * Throws an exception when the JSON is invalid and could not be parsed.
- * @param {string} jsonText
- * @returns {JSON}
  */
-export function parseAndRepair(jsonText) {
+export function parseAndRepair(jsonText: string): JSON {
   try {
     return JSON.parse(jsonText)
   } catch (err) {
@@ -22,10 +22,8 @@ export function parseAndRepair(jsonText) {
 /**
  * Parse the JSON and if needed repair it.
  * When not valid, undefined is returned.
- * @param {string} partialJson
- * @returns {undefined|JSON}
  */
-export function parseAndRepairOrUndefined(partialJson) {
+export function parseAndRepairOrUndefined(partialJson: string): JSON | undefined {
   try {
     return parseAndRepair(partialJson)
   } catch (err) {
@@ -33,13 +31,8 @@ export function parseAndRepairOrUndefined(partialJson) {
   }
 }
 
-/**
- * @param {string} partialJson
- * @param {function} [parse=JSON.parse]
- * @return {JSON}
- */
 // TODO: deduplicate the logic in repairPartialJson and parseAndRepairPartialJson ?
-export function parsePartialJson(partialJson, parse = JSON.parse) {
+export function parsePartialJson(partialJson: string, parse = JSON.parse): JSON {
   // for now: dumb brute force approach: simply try out a few things...
 
   // remove trailing comma
@@ -68,10 +61,8 @@ export function parsePartialJson(partialJson, parse = JSON.parse) {
 
 /**
  * Repair partial JSON
- * @param {string} partialJson
- * @returns {string}
  */
-export function repairPartialJson(partialJson) {
+export function repairPartialJson(partialJson: string): string {
   // for now: dumb brute force approach: simply try out a few things...
 
   // remove trailing comma
@@ -112,17 +103,11 @@ const END_WITH_COMMA_AND_OPTIONAL_WHITESPACES_REGEX = /,\s*$/
  *
  * Note that the returned line and column number in the object are zero-based,
  * and in the message are one based (human readable)
- *
- * @param {string} jsonText
- * @param {string} parseErrorMessage
- * @return {{
- *   position: number | null,
- *   line: number | null,
- *   column: number | null,
- *   message: string
- * }}
  */
-export function normalizeJsonParseError(jsonText, parseErrorMessage) {
+export function normalizeJsonParseError(
+  jsonText: string,
+  parseErrorMessage: string
+): NormalizedParseError {
   const positionMatch = POSITION_REGEX.exec(parseErrorMessage)
 
   if (positionMatch) {
@@ -166,12 +151,11 @@ export function normalizeJsonParseError(jsonText, parseErrorMessage) {
 
 /**
  * Calculate the position in the text based on a line and column number
- * @param {string} text
- * @param {number} line     Zero-based line number
- * @param {number} column   Zero-based column number
- * @returns {number | null}
+ * @param text
+ * @param line     Zero-based line number
+ * @param column   Zero-based column number
  */
-export function calculatePosition(text, line, column) {
+export function calculatePosition(text: string, line: number, column: number): number | null {
   let index = text.indexOf('\n')
   let i = 1
 
@@ -185,7 +169,12 @@ export function calculatePosition(text, line, column) {
     : null
 }
 
-export function countCharacterOccurrences(text, character, start = 0, end = text.length) {
+export function countCharacterOccurrences(
+  text: string,
+  character: string,
+  start = 0,
+  end = text.length
+) {
   let count = 0
 
   for (let i = start; i < end; i++) {
@@ -199,16 +188,13 @@ export function countCharacterOccurrences(text, character, start = 0, end = text
 
 /**
  * Find the text location of a JSON path
- * @param {string} text
- * @param {Path} path
- * @return {{path: Path, line: number, column: number, from: number, to: number} | null}
  */
 // TODO: write unit tests
-export function findTextLocation(text, path) {
+export function findTextLocation(text: string, path: Path): TextLocation | null {
   try {
     const jsmap = jsonSourceMap.parse(text)
 
-    const pointerName = compileJSONPointer(path)
+    const pointerName = compileJSONPointer(path as JSONPath)
     const pointer = jsmap.pointers[pointerName]
     if (pointer) {
       return {
@@ -229,11 +215,9 @@ export function findTextLocation(text, path) {
 /**
  * Convert a JSON object, array, or value to another type
  * If it cannot be converted, an error is thrown
- * @param {JSON} value
- * @param {'value' | 'object' | 'array'} type
- * @returns {JSON}
  */
-export function convertValue(value, type) {
+export function convertValue(value: JSON, type: 'value' | 'object' | 'array'): JSON {
+  // FIXME: improve the TypeScript here, there are a couple of conversions
   if (type === 'array') {
     if (Array.isArray(value)) {
       // nothing to do
@@ -252,6 +236,8 @@ export function convertValue(value, type) {
       }
 
       if (isObject(parsedValue)) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         return objectToArray(parsedValue)
       }
     }
@@ -271,7 +257,7 @@ export function convertValue(value, type) {
       const parsedValue = JSON.parse(value)
 
       if (isObject(parsedValue)) {
-        return parsedValue
+        return parsedValue as JSON
       }
 
       if (Array.isArray(parsedValue)) {
@@ -293,11 +279,11 @@ export function convertValue(value, type) {
 }
 
 /**
- * @param {any} content
- * @return {string | null} Returns a string with validation error message when
- *                         there is an issue, or null otherwise
+ * Check whether provided value is valid a content type for JSONEditor
+ * Returns a string with validation error message when there is an issue,
+ * or null otherwise
  */
-export function validateContentType(content) {
+export function validateContentType(content: unknown): string | null {
   if (!isObject(content)) {
     return 'Content must be an object'
   }
@@ -321,21 +307,18 @@ export function validateContentType(content) {
 
 /**
  * Check whether content contains text (and not JSON)
- * @param {Content} content
- * @return {boolean}
  */
-export function isTextContent(content) {
-  return typeof content.text === 'string'
+export function isTextContent(content: Content): content is TextContent {
+  return typeof (content as Record<string, unknown>).text === 'string'
 }
 
 /**
  * Returns true when the (estimated) size of the contents exceeds the
  * provided maxSize.
- * @param {Content} content
- * @param {number} maxSize  Maximum content size in bytes
- * @return {boolean}
+ * @param content
+ * @param maxSize  Maximum content size in bytes
  */
-export function isLargeContent(content, maxSize) {
+export function isLargeContent(content: Content, maxSize: number): boolean {
   return estimateSerializedSize(content, maxSize) > maxSize
 }
 
@@ -343,14 +326,11 @@ export function isLargeContent(content, maxSize) {
  * A rough, fast estimation on whether a document is larger than given size
  * when serialized.
  *
- * @param {Content} content
- * @param {number} [maxSize]  Optional max size in bytes. When reached,
- *                            size estimation will be cancelled. This is useful
- *                            when you're only interested in knowing whether
- *                            the size exceeds a certain maximum size.
- * @return {number}
+ * maxSize is an optional max size in bytes. When reached, size estimation will
+ * be cancelled. This is useful when you're only interested in knowing whether
+ * the size exceeds a certain maximum size.
  */
-export function estimateSerializedSize(content, maxSize = Infinity) {
+export function estimateSerializedSize(content: Content, maxSize = Infinity): number {
   if (isTextContent(content)) {
     return content.text.length
   }

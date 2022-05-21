@@ -1,8 +1,8 @@
 import { cloneDeepWith, first, initial, isEmpty, last, times } from 'lodash-es'
 import { compileJSONPointer, getIn } from 'immutable-json-patch'
-import { parseAndRepair, parseAndRepairOrUndefined, parsePartialJson } from '../utils/jsonUtils.js'
+import { parseAndRepair, parseAndRepairOrUndefined, parsePartialJson } from '../utils/jsonUtils.ts'
 import { findUniqueName } from '../utils/stringUtils.js'
-import { isObject, isObjectOrArray } from '../utils/typeUtils.js'
+import { isObject, isObjectOrArray } from '../utils/typeUtils.ts'
 import { getKeys, getNextKeys } from './documentState.js'
 import {
   createSelection,

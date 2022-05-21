@@ -1,4 +1,5 @@
 import { isObject } from './typeUtils.js'
+import type { JSON } from '../types'
 import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 
 const MAX_ITEM_PATHS_COLLECTION = 10000
@@ -123,15 +124,15 @@ export function limit<T>(array: Array<T>, max: number): Array<T> {
 /**
  * Convert an array into an object having the array indices as keys
  */
-export function arrayToObject<T>(array: Array<T>): { [key: number]: T } {
+export function arrayToObject(array: JSON[]): { [key: string]: JSON } {
   return {
     ...array
-  }
+  } as unknown as { [key: string]: JSON }
 }
 
 /**
  * Get the values of an object as an array
  */
-export function objectToArray<T>(object: { [key: string]: T }): Array<T> {
-  return Object.values(object)
+export function objectToArray(object: { [key: string]: JSON }): JSON[] {
+  return Object.values(object) as unknown as Array<JSON>
 }

@@ -176,7 +176,11 @@ describe('jsonUtils', () => {
     strictEqual(isTextContent({ text: '' }), true)
     strictEqual(isTextContent({ json: [] }), false)
     strictEqual(isTextContent({ text: '', json: [] }), true)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     strictEqual(isTextContent(1), false)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     strictEqual(isTextContent({}), false)
   })
 

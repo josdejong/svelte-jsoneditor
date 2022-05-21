@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script>
-  import { isUrl } from '$lib/utils/typeUtils.js'
+  import { isUrl } from '$lib/utils/typeUtils'
   import { SELECTION_TYPE } from '$lib/logic/selection.js'
   import SearchResultHighlighter from '../../../components/modes/treemode/highlight/SearchResultHighlighter.svelte'
   import { getValueClass } from './utils/getValueClass'
