@@ -4,13 +4,20 @@ import jsonSourceMap from 'json-source-map'
 import jsonrepair from 'jsonrepair'
 import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
 import { arrayToObject, objectToArray } from './arrayUtils.js'
-import type { Content, NormalizedParseError, Path, TextLocation, JSON, TextContent } from '../types'
+import type {
+  Content,
+  NormalizedParseError,
+  Path,
+  TextLocation,
+  JSONData,
+  TextContent
+} from '../types'
 
 /**
  * Parse the JSON. if this fails, try to repair and parse.
  * Throws an exception when the JSON is invalid and could not be parsed.
  */
-export function parseAndRepair(jsonText: string): JSON {
+export function parseAndRepair(jsonText: string): JSONData {
   try {
     return JSON.parse(jsonText)
   } catch (err) {
@@ -23,7 +30,7 @@ export function parseAndRepair(jsonText: string): JSON {
  * Parse the JSON and if needed repair it.
  * When not valid, undefined is returned.
  */
-export function parseAndRepairOrUndefined(partialJson: string): JSON | undefined {
+export function parseAndRepairOrUndefined(partialJson: string): JSONData | undefined {
   try {
     return parseAndRepair(partialJson)
   } catch (err) {
@@ -32,7 +39,7 @@ export function parseAndRepairOrUndefined(partialJson: string): JSON | undefined
 }
 
 // TODO: deduplicate the logic in repairPartialJson and parseAndRepairPartialJson ?
-export function parsePartialJson(partialJson: string, parse = JSON.parse): JSON {
+export function parsePartialJson(partialJson: string, parse = JSON.parse): JSONData {
   // for now: dumb brute force approach: simply try out a few things...
 
   // remove trailing comma
@@ -216,7 +223,7 @@ export function findTextLocation(text: string, path: Path): TextLocation | null 
  * Convert a JSON object, array, or value to another type
  * If it cannot be converted, an error is thrown
  */
-export function convertValue(value: JSON, type: 'value' | 'object' | 'array'): JSON {
+export function convertValue(value: JSONData, type: 'value' | 'object' | 'array'): JSONData {
   // FIXME: improve the TypeScript here, there are a couple of conversions
   if (type === 'array') {
     if (Array.isArray(value)) {
@@ -257,7 +264,7 @@ export function convertValue(value: JSON, type: 'value' | 'object' | 'array'): J
       const parsedValue = JSON.parse(value)
 
       if (isObject(parsedValue)) {
-        return parsedValue as JSON
+        return parsedValue as JSONData
       }
 
       if (Array.isArray(parsedValue)) {

@@ -1270,7 +1270,7 @@
    * @param {Object} options
    * @property {string} [id]
    * @property {Path} [selectedPath]
-   * @property {({ operations: JSONPatchDocument, json: JSON, transformedJson: JSON }) => void} [onTransform]
+   * @property {({ operations: JSONPatchDocument, json: JSONData, transformedJson: JSONData }) => void} [onTransform]
    * @property {() => void} [onClose]
    */
   export function openTransformModal({ id, selectedPath, onTransform, onClose }) {
@@ -1433,7 +1433,7 @@
   }
 
   /**
-   * @param {JSON} updatedJson
+   * @param {JSONData} updatedJson
    * @param {AfterPatchCallback} [afterPatch]
    */
   function handleChangeJson(updatedJson, afterPatch) {
@@ -1537,7 +1537,7 @@
    * @param json
    * @param state
    * @param path
-   * @returns {JSON}
+   * @returns {JSONData}
    */
   function expandRecursive(json, state, path) {
     const expandContents = getIn(json, path)

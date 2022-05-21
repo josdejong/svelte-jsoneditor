@@ -1,5 +1,5 @@
 import { isObject } from './typeUtils.js'
-import type { JSON } from '../types'
+import type { JSONData } from '../types'
 import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 
 const MAX_ITEM_PATHS_COLLECTION = 10000
@@ -60,7 +60,7 @@ export function compareArrays<T>(a: Array<T>, b: Array<T>): number {
 
 /**
  * Get the paths of all nested properties in the items of an array
- * @param {JSON} array
+ * @param {JSONData} array
  * @param {boolean} [includeObjects=false] If true, object and array paths are returned as well
  * @return {Path[]}
  */
@@ -124,15 +124,15 @@ export function limit<T>(array: Array<T>, max: number): Array<T> {
 /**
  * Convert an array into an object having the array indices as keys
  */
-export function arrayToObject(array: JSON[]): { [key: string]: JSON } {
+export function arrayToObject(array: JSONData[]): { [key: string]: JSONData } {
   return {
     ...array
-  } as unknown as { [key: string]: JSON }
+  } as unknown as { [key: string]: JSONData }
 }
 
 /**
  * Get the values of an object as an array
  */
-export function objectToArray(object: { [key: string]: JSON }): JSON[] {
-  return Object.values(object) as unknown as Array<JSON>
+export function objectToArray(object: { [key: string]: JSONData }): JSONData[] {
+  return Object.values(object) as unknown as Array<JSONData>
 }

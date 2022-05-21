@@ -155,7 +155,7 @@
    * @param {Object} options
    * @property {string} [id]
    * @property {Path} [selectedPath]
-   * @property {({ operations: JSONPatchDocument, json: JSON, transformedJson: JSON }) => void} [onTransform]
+   * @property {({ operations: JSONPatchDocument, json: JSONData, transformedJson: JSONData }) => void} [onTransform]
    * @property {() => void} [onClose]
    */
   export function transform(options) {

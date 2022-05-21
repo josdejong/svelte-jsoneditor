@@ -1,8 +1,8 @@
-export type JSON = { [key: string]: JSON } | JSON[] | string | number | boolean | null
+export type JSONData = { [key: string]: JSONData } | JSONData[] | string | number | boolean | null
 
 export type TextContent = { text: string } | { json: undefined; text: string }
 
-export type JSONContent = { json: JSON } | { json: JSON; text: undefined }
+export type JSONContent = { json: JSONData } | { json: JSONData; text: undefined }
 
 export type Content = JSONContent | TextContent
 
@@ -24,38 +24,42 @@ export interface JSONPatchOperation {
   op: 'add' | 'remove' | 'replace' | 'copy' | 'move' | 'test'
   path: string
   from?: string
-  value?: JSON
+  value?: JSONData
 }
 
 export interface PreprocessedJSONPatchOperation {
   op: 'add' | 'remove' | 'replace' | 'copy' | 'move' | 'test'
   path: Path
   from?: Path
-  value?: JSON
+  value?: JSONData
 }
 
 export type JSONPatchDocument = JSONPatchOperation[]
 
 export interface JSONPatchResult {
-  json: JSON
-  previousJson: JSON
+  json: JSONData
+  previousJson: JSONData
   undo: JSONPatchDocument
   redo: JSONPatchDocument
 }
 
 export interface JSONPatchOptions {
   before?: (
-    json: JSON,
+    json: JSONData,
     operation: PreprocessedJSONPatchOperation
-  ) => { json?: JSON; operation?: PreprocessedJSONPatchOperation } | undefined
-  after?: (json: JSON, operation: PreprocessedJSONPatchOperation, previousJson: JSON) => JSON
+  ) => { json?: JSONData; operation?: PreprocessedJSONPatchOperation } | undefined
+  after?: (
+    json: JSONData,
+    operation: PreprocessedJSONPatchOperation,
+    previousJson: JSONData
+  ) => JSONData
 }
 
 export type AfterPatchCallback = (
-  patchedJson: JSON,
-  patchedState: JSON,
+  patchedJson: JSONData,
+  patchedState: JSONData,
   selection: Selection
-) => { json?: JSON; state?: JSON; selection?: Selection }
+) => { json?: JSONData; state?: JSONData; selection?: Selection }
 
 export interface MultiSelection {
   type: 'multi'
@@ -138,7 +142,7 @@ export type SelectionSchema =
   | KeySelectionSchema
   | ValueSelectionSchema
 
-export type ClipboardValues = Array<{ key: string; value: JSON }>
+export type ClipboardValues = Array<{ key: string; value: JSONData }>
 
 export interface FontAwesomeIcon {
   prefix: string
@@ -221,8 +225,8 @@ export interface QueryLanguage {
   id: string
   name: string
   description: string
-  createQuery: (json: JSON, queryOptions: QueryLanguageOptions) => string
-  executeQuery: (json: JSON, query: string) => JSON
+  createQuery: (json: JSONData, queryOptions: QueryLanguageOptions) => string
+  executeQuery: (json: JSONData, query: string) => JSONData
 }
 
 export interface QueryLanguageOptions {
@@ -264,7 +268,7 @@ export interface ValueNormalization {
   unescapeValue: (escapedValue: string) => string
 }
 
-export type EscapeValue = (value: JSON) => string
+export type EscapeValue = (value: JSONData) => string
 
 export type UnescapeValue = (escapedValue: string) => string
 
@@ -300,8 +304,8 @@ export interface TreeModeContext {
   readOnly: boolean
   showTip: boolean
   normalization: ValueNormalization
-  getFullJson: () => JSON
-  getFullState: () => JSON
+  getFullJson: () => JSONData
+  getFullState: () => JSONData
   getFullSelection: () => Selection
   findElement: (path: Path) => Element | null
   focus: () => void
@@ -313,14 +317,14 @@ export interface TreeModeContext {
   onExpandSection: (path: Path, section: Section) => void
   onRenderValue: (props: RenderValueProps) => RenderValueConstructor[]
   onContextMenu: (contextMenuProps: ContextMenuProps) => void
-  onClassName: (path: Path, value: JSON) => string
+  onClassName: (path: Path, value: JSONData) => string
   onDrag: (event: Event) => void
   onDragEnd: (event: Event) => void
 }
 
 export interface RenderValueProps {
   path: Path
-  value: JSON
+  value: JSONData
   readOnly: boolean
   enforceString: boolean | undefined
   selection: Selection | undefined
@@ -329,7 +333,7 @@ export interface RenderValueProps {
   isEditing: boolean
   normalization: ValueNormalization
   onPatch: TreeModeContext['onPatch']
-  onPasteJson: (pastedJson: { path: Path; contents: JSON }) => void
+  onPasteJson: (pastedJson: { path: Path; contents: JSONData }) => void
   onSelect: (selection: Selection) => void
   onFind: (findAndReplace: boolean) => void
 }
