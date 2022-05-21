@@ -21,12 +21,12 @@ export const ReadonlyValue = _ReadonlyValue
 export const TimestampTag = _TimestampTag
 
 // validator plugins
-export { createAjvValidator } from './plugins/validator/createAjvValidator.js'
+export { createAjvValidator } from './plugins/validator/createAjvValidator.ts'
 
 // query plugins
-export { lodashQueryLanguage } from './plugins/query/lodashQueryLanguage.js'
-export { javascriptQueryLanguage } from './plugins/query/javascriptQueryLanguage.js'
-export { jmespathQueryLanguage } from './plugins/query/jmespathQueryLanguage.js'
+export { lodashQueryLanguage } from './plugins/query/lodashQueryLanguage.ts'
+export { javascriptQueryLanguage } from './plugins/query/javascriptQueryLanguage.ts'
+export { jmespathQueryLanguage } from './plugins/query/jmespathQueryLanguage.ts'
 
 // utils
 export const SortModal = _SortModal

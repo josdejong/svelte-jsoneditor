@@ -1,15 +1,16 @@
 import Ajv from 'ajv-dist'
 import { parseJSONPointerWithArrayIndices } from '../../utils/jsonPointer.js'
+import type { JSONData, ValidationError } from '../../types'
 
 /**
  * Create a JSON Schema validator powered by Ajv.
- * @param {JSON} schema
- * @param {JSON} [schemaDefinitions=undefined]
+ * @param schema
+ * @param [schemaDefinitions=undefined]
  *                    An object containing JSON Schema definitions
  *                    which can be referenced using $ref
- * @return {function (json: JSON) : Array<Object>} Returns a validation function
+ * @return Returns a validation function
  */
-export function createAjvValidator(schema, schemaDefinitions) {
+export function createAjvValidator(schema: JSONData, schemaDefinitions: JSONData = undefined) {
   const ajv = new Ajv({
     allErrors: true,
     verbose: true,
@@ -24,7 +25,7 @@ export function createAjvValidator(schema, schemaDefinitions) {
 
   const validateAjv = ajv.compile(schema)
 
-  return function validate(json) {
+  return function validate(json: JSONData): ValidationError[] {
     validateAjv(json)
     const ajvErrors = validateAjv.errors || []
 
@@ -37,7 +38,7 @@ export function createAjvValidator(schema, schemaDefinitions) {
  * @param {Object} ajvError
  * @return {ValidationError}
  */
-function normalizeAjvError(json, ajvError) {
+function normalizeAjvError(json: JSONData, ajvError) {
   return {
     path: parseJSONPointerWithArrayIndices(json, ajvError.instancePath),
     message: ajvError.message

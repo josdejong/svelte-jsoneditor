@@ -1,6 +1,7 @@
 import jmespath from 'jmespath'
 import { getIn } from 'immutable-json-patch'
 import { parseString } from '../../utils/stringUtils.js'
+import type { JSONData, Path, QueryLanguage, QueryLanguageOptions } from '../../types'
 
 const description = `
 <p>
@@ -10,8 +11,7 @@ const description = `
 </p>
 `
 
-/** @type {QueryLanguage} */
-export const jmespathQueryLanguage = {
+export const jmespathQueryLanguage: QueryLanguage = {
   id: 'jmespath',
   name: 'JMESPath',
   description: description,
@@ -21,13 +21,13 @@ export const jmespathQueryLanguage = {
 
 /**
  * Build a JMESPath query based on query options coming from the wizard
- * @param {JSON} json   The JSON document for which to build the query.
+ * @param json   The JSON document for which to build the query.
  *                      Used for context information like determining
  *                      the type of values (string or number)
- * @param {QueryLanguageOptions} queryOptions
- * @return {string} Returns a query (as string)
+ * @param queryOptions
+ * @return Returns a query (as string)
  */
-function createQuery(json, queryOptions) {
+function createQuery(json: JSONData, queryOptions: QueryLanguageOptions): string {
   const { sort, filter, projection } = queryOptions
   let query = ''
 
@@ -94,22 +94,15 @@ function createQuery(json, queryOptions) {
 }
 
 /**
- * Execute a JMESPath query
- * @param {JSON} json
- * @param {string} query
- * @return {JSON} Returns the transformed JSON
+ * Execute a JMESPath query, returns the transformed JSON
  */
-function executeQuery(json, query) {
+function executeQuery(json: JSONData, query: string): JSONData {
   return jmespath.search(json, query)
 }
 
-/**
- * @param {string[]} path
- * @returns {string}
- */
 // TODO: unit test stringifyPathForJmespath
 // TODO: Isn't there a helper function exposed by the JMESPath library?
-export function stringifyPathForJmespath(path) {
+export function stringifyPathForJmespath(path: Path): string {
   if (path.length === 0) {
     return '@'
   }
@@ -118,10 +111,10 @@ export function stringifyPathForJmespath(path) {
     .map((prop) => {
       if (typeof prop === 'number') {
         return '[' + prop + ']'
-      } else if (typeof prop === 'string' && prop.match(/^[A-Za-z0-9_$]+$/)) {
+      } else if (typeof prop === 'string' && prop.match(/^[A-Za-z\d_$]+$/)) {
         return '.' + prop
       } else {
-        return '."' + prop + '"'
+        return '."' + String(prop) + '"'
       }
     })
     .join('')

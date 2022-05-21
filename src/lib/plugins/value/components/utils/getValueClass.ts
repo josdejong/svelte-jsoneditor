@@ -1,7 +1,7 @@
-import { isUrl, valueType } from '../../../../utils/typeUtils.ts'
+import { isUrl, valueType } from '../../../../utils/typeUtils'
 import classnames from 'classnames'
 
-export function getValueClass(value) {
+export function getValueClass(value: unknown): string {
   const type = valueType(value)
 
   return classnames('jse-value', 'jse-' + type, {

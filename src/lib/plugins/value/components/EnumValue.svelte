@@ -3,7 +3,7 @@
 <script>
   import { compileJSONPointer } from 'immutable-json-patch'
   import { SELECTION_TYPE } from '$lib/logic/selection.js'
-  import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass.js'
+  import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
 
   export let path
   export let value

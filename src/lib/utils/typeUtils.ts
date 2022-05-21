@@ -113,7 +113,7 @@ export function valueType(value: unknown): string {
  * with 'http://*' or 'https://*' and has no whitespace characters)
  */
 const isUrlRegex = /^https?:\/\/\S+$/
-export function isUrl(text: string): boolean {
+export function isUrl(text: unknown): boolean {
   return typeof text === 'string' && isUrlRegex.test(text)
 }
 

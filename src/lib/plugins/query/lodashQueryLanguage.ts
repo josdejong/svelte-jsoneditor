@@ -1,27 +1,28 @@
-import { createPropertySelector } from '../../utils/pathUtils.js'
+import * as _ from 'lodash-es'
+import { last } from 'lodash-es'
+import { createPropertySelector, stringifyPath } from '../../utils/pathUtils.js'
 import { parseString } from '../../utils/stringUtils.js'
+import type { JSONData, Path, QueryLanguage, QueryLanguageOptions } from '../../types'
 
 const description = `
 <p>
   Enter a JavaScript function to filter, sort, or transform the data.
+  You can use <a href="https://lodash.com" target="_blank" rel="noopener noreferrer">Lodash</a>
+  functions like <code>_.map</code>, <code>_.filter</code>,
+  <code>_.orderBy</code>, <code>_.sortBy</code>, <code>_.groupBy</code>,
+  <code>_.pick</code>, <code>_.uniq</code>, <code>_.get</code>, etcetera.
 </p>
 `
 
-/** @type {QueryLanguage} */
-export const javascriptQueryLanguage = {
-  id: 'javascript',
-  name: 'JavaScript',
+export const lodashQueryLanguage: QueryLanguage = {
+  id: 'lodash',
+  name: 'Lodash',
   description,
   createQuery,
   executeQuery
 }
 
-/**
- * @param {JSON} json
- * @param {QueryLanguageOptions} queryOptions
- * @returns {string}
- */
-function createQuery(json, queryOptions) {
+function createQuery(json: JSONData, queryOptions: QueryLanguageOptions): string {
   const { filter, sort, projection } = queryOptions
   const queryParts = []
 
@@ -34,48 +35,31 @@ function createQuery(json, queryOptions) {
       typeof parseString(filter.value) === 'string' ? `'${filter.value}'` : filter.value
 
     queryParts.push(
-      `  data = data.filter(${actualValueGetter} ${filter.relation} ${filterValueStr})\n`
+      `  data = _.filter(data, ${actualValueGetter} ${filter.relation} ${filterValueStr})\n`
     )
   }
 
   if (sort && sort.path && sort.direction) {
-    if (sort.direction === 'desc') {
-      queryParts.push(
-        `  data = data.slice().sort((a, b) => {\n` +
-          `    // sort descending\n` +
-          `    const valueA = a${createPropertySelector(sort.path)}\n` +
-          `    const valueB = b${createPropertySelector(sort.path)}\n` +
-          `    return valueA > valueB ? -1 : valueA < valueB ? 1 : 0\n` +
-          `  })\n`
-      )
-    } else {
-      // sort direction 'asc'
-      queryParts.push(
-        `  data = data.slice().sort((a, b) => {\n` +
-          `    // sort ascending\n` +
-          `    const valueA = a${createPropertySelector(sort.path)}\n` +
-          `    const valueB = b${createPropertySelector(sort.path)}\n` +
-          `    return valueA > valueB ? 1 : valueA < valueB ? -1 : 0\n` +
-          `  })\n`
-      )
-    }
+    queryParts.push(
+      `  data = _.orderBy(data, ['${createLodashPropertySelector(sort.path)}'], ['${
+        sort.direction
+      }'])\n`
+    )
   }
 
   if (projection && projection.paths) {
     // It is possible to make a util function "pickFlat"
     // and use that when building the query to make it more readable.
     if (projection.paths.length > 1) {
+      // Note that we do not use _.pick() here because this function doesn't flatten the results
       const paths = projection.paths.map((path) => {
-        const name = path[path.length - 1] || 'item' // 'item' in case of having selected the whole item
-        const item = `item${createPropertySelector(path)}`
-        return `    ${JSON.stringify(name)}: ${item}`
+        const name = last(path) || 'item' // 'item' in case of having selected the whole item
+        return `    ${JSON.stringify(name)}: item${createPropertySelector(path)}`
       })
-
-      queryParts.push(`  data = data.map(item => ({\n${paths.join(',\n')}})\n  )\n`)
+      queryParts.push(`  data = _.map(data, item => ({\n${paths.join(',\n')}\n  }))\n`)
     } else {
-      const item = `item${createPropertySelector(projection.paths[0])}`
-
-      queryParts.push(`  data = data.map(item => ${item})\n`)
+      const path = projection.paths[0]
+      queryParts.push(`  data = _.map(data, item => item${createPropertySelector(path)})\n`)
     }
   }
 
@@ -84,17 +68,13 @@ function createQuery(json, queryOptions) {
   return `function query (data) {\n${queryParts.join('')}}`
 }
 
-/**
- * @param {JSON} json
- * @param {string} query
- * @returns {JSON}
- */
-function executeQuery(json, query) {
+function executeQuery(json: JSONData, query: string): JSONData {
   // FIXME: replace unsafe new Function with a JS based query language
   //  As long as we don't persist or fetch queries, there is no security risk.
   // TODO: only import the most relevant subset of lodash instead of the full library?
   // eslint-disable-next-line no-new-func
   const queryFn = new Function(
+    '_',
     '"use strict";\n' +
       '\n' +
       query +
@@ -105,8 +85,15 @@ function executeQuery(json, query) {
       '}\n' +
       '\n' +
       'return query;\n'
-  )()
+  )(_)
 
   const output = queryFn(json)
   return output !== undefined ? output : null
+}
+
+/**
+ * Create a Lodash string containing a path (without leading dot), like "users[2].name"
+ */
+function createLodashPropertySelector(path: Path): string {
+  return stringifyPath(path).replace(/^\./, '') // remove any leading dot
 }
