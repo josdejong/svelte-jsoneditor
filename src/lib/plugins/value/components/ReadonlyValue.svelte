@@ -5,7 +5,7 @@
   import { SELECTION_TYPE } from '$lib/logic/selection.js'
   import SearchResultHighlighter from '../../../components/modes/treemode/highlight/SearchResultHighlighter.svelte'
   import { getValueClass } from './utils/getValueClass'
-  import { addNewLineSuffix } from '$lib/utils/domUtils.js'
+  import { addNewLineSuffix } from '$lib/utils/domUtils'
 
   export let path
   export let value

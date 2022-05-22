@@ -1,6 +1,6 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import {
     faCaretSquareDown,
     faCaretSquareUp,
@@ -26,6 +26,7 @@
   import { STATE_ENFORCE_STRING } from '$lib/constants'
   import { isObject } from '../../../../utils/typeUtils.ts'
   import { canConvert, singleItemSelected } from '../../../../logic/selection.js'
+  import { findNearestElement } from '../../../../utils/domUtils'
 
   export let json
   export let state
@@ -200,49 +201,16 @@
   function handleKeyDown(event) {
     const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
 
-    /**
-     * Find first enabled sibling button.
-     * Uses hints from the button attributes itself: data-name, data-up,
-     * data-down, data-left, data-right.
-     * @param {Element} currentButton
-     * @param {'left' | 'right' | 'up' | 'down'} direction
-     */
-    function findNextButton(currentButton, direction) {
-      const optionsString = currentButton.getAttribute('data-' + direction)
-      if (optionsString) {
-        const options = optionsString.split(',')
-
-        // Step 1: find exact match
-        for (const option of options) {
-          const match = refContextMenu.querySelector(`button[data-name="${option}"]`)
-          if (match && !match.disabled) {
-            return match
-          }
-        }
-
-        // Step 2: recurse over multiple buttons to find an enabled one
-        for (const option of options) {
-          const match = refContextMenu.querySelector(`button[data-name="${option}"]`)
-          if (match && match.disabled) {
-            const match2 = findNextButton(match, direction)
-            if (match2) {
-              return match2
-            }
-          }
-        }
-      }
-    }
-
-    function focusNextButton(currentButton, direction) {
-      const next = findNextButton(currentButton, direction)
-      if (next) {
-        next.focus()
-      }
-    }
-
     if (combo === 'Up' || combo === 'Down' || combo === 'Left' || combo === 'Right') {
       event.preventDefault()
-      focusNextButton(event.target, combo.toLowerCase())
+
+      const buttons: HTMLButtonElement[] = Array.from(
+        refContextMenu.querySelectorAll('button:not([disabled])')
+      )
+      const nearest = findNearestElement(buttons, event.target, combo)
+      if (nearest) {
+        nearest.focus()
+      }
     }
   }
 
@@ -303,9 +271,6 @@
     <button
       type="button"
       title="Edit the key (Double-click on the key)"
-      data-name="edit-key"
-      data-down="cut,copy,paste"
-      data-right="edit-value"
       on:click={handleEditKey}
       disabled={!canEditKey}
     >
@@ -316,9 +281,6 @@
         type="button"
         slot="defaultItem"
         title="Edit the value (Double-click on the value)"
-        data-name="edit-value"
-        data-down="paste,copy,cut"
-        data-left="edit-key"
         on:click={handleEditValue}
         disabled={!canEditValue}
       >
@@ -333,10 +295,6 @@
         type="button"
         slot="defaultItem"
         title="Cut selected contents, formatted with indentation (Ctrl+X)"
-        data-name="cut"
-        data-up="edit-key,edit-value"
-        data-down="remove"
-        data-right="copy"
         on:click={handleCut}
         disabled={!hasSelectionContents}
       >
@@ -348,11 +306,6 @@
         type="button"
         slot="defaultItem"
         title="Copy selected contents, formatted with indentation (Ctrl+C)"
-        data-name="copy"
-        data-up="edit-key,edit-value"
-        data-down="insert-structure"
-        data-left="cut"
-        data-right="paste"
         on:click={handleCopy}
         disabled={!hasSelectionContents}
       >
@@ -362,10 +315,6 @@
     <button
       type="button"
       title="Paste clipboard contents (Ctrl+V)"
-      data-name="paste"
-      data-up="edit-value,edit-key"
-      data-down="insert-structure"
-      data-left="copy"
       on:click={handlePaste}
       disabled={!hasSelection}
     >
@@ -378,10 +327,6 @@
       <button
         type="button"
         title="Remove selected contents (Delete)"
-        data-name="remove"
-        data-up="cut,copy,paste"
-        data-down="duplicate"
-        data-right="insert-structure"
         on:click={handleRemove}
         disabled={!hasSelectionContents}
       >
@@ -390,10 +335,6 @@
       <button
         type="button"
         title="Duplicate selected contents (Ctrl+D)"
-        data-name="duplicate"
-        data-up="remove"
-        data-down="extract"
-        data-right="insert-structure"
         on:click={handleDuplicate}
         disabled={!canDuplicate}
       >
@@ -402,10 +343,6 @@
       <button
         type="button"
         title="Extract selected contents"
-        data-name="extract"
-        data-up="duplicate"
-        data-down="sort"
-        data-right="insert-object"
         on:click={handleExtract}
         disabled={!canExtract}
       >
@@ -414,10 +351,6 @@
       <button
         type="button"
         title="Sort array or object contents"
-        data-name="sort"
-        data-up="extract"
-        data-down="transform"
-        data-right="insert-array"
         on:click={handleSort}
         disabled={!hasSelectionContents}
       >
@@ -426,10 +359,6 @@
       <button
         type="button"
         title="Transform array or object contents (filter, sort, project)"
-        data-name="transform"
-        data-up="sort"
-        data-down="insert-before"
-        data-right="insert-value"
         on:click={handleTransform}
         disabled={!hasSelectionContents}
       >
@@ -444,10 +373,6 @@
         type="button"
         on:click={() => handleInsertOrConvert('structure')}
         title="{insertOrConvertText} structure"
-        data-name="insert-structure"
-        data-up="paste,copy,cut"
-        data-down="insert-object"
-        data-left="duplicate"
         disabled={!canInsertOrConvertStructure}
       >
         <span class="jse-insert"><span class="jse-plus">{'+'}</span></span> Structure
@@ -456,10 +381,6 @@
         type="button"
         on:click={() => handleInsertOrConvert('object')}
         title="{insertOrConvertText} object"
-        data-name="insert-object"
-        data-up="insert-structure"
-        data-down="insert-array"
-        data-left="extract"
         disabled={!canInsertOrConvertObject}
       >
         <span class="jse-insert">{'{}'}</span> Object
@@ -468,10 +389,6 @@
         type="button"
         on:click={() => handleInsertOrConvert('array')}
         title="{insertOrConvertText} array"
-        data-name="insert-array"
-        data-up="insert-object"
-        data-down="insert-value"
-        data-left="sort"
         disabled={!canInsertOrConvertArray}
       >
         <span class="jse-insert">[]</span> Array
@@ -480,10 +397,6 @@
         type="button"
         on:click={() => handleInsertOrConvert('value')}
         title="{insertOrConvertText} value"
-        data-name="insert-value"
-        data-up="insert-array"
-        data-down="insert-after"
-        data-left="transform"
         disabled={!canInsertOrConvertValue}
       >
         <span class="jse-insert"><span class="jse-quote">"</span></span> Value
@@ -495,9 +408,6 @@
     <button
       type="button"
       title="Select area before current entry to insert or paste contents"
-      data-name="insert-before"
-      data-up="transform"
-      data-right="insert-after"
       disabled={!hasSelectionContents || rootSelected}
       on:click={handleInsertBefore}
     >
@@ -506,9 +416,6 @@
     <button
       type="button"
       title="Select area after current entry to insert or paste contents"
-      data-name="insert-after"
-      data-up="insert-value"
-      data-left="insert-before"
       disabled={!hasSelectionContents || rootSelected}
       on:click={handleInsertAfter}
     >

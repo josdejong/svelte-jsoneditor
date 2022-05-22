@@ -6,7 +6,7 @@
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
-  import { addNewLineSuffix } from '$lib/utils/domUtils'
+  import { addNewLineSuffix } from '../../../utils/domUtils'
   import { UPDATE_SELECTION } from '../../../constants.js'
 
   export let path

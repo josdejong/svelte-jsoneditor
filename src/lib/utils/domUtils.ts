@@ -1,4 +1,5 @@
 import { SELECTION_TYPE } from '../logic/selection.js'
+import { map, maxBy, minBy } from 'lodash-es'
 
 /**
  * Create serialization functions to escape and stringify text,
@@ -297,4 +298,93 @@ export function getDataPathFromTarget(target) {
   })
 
   return parent ? decodeDataPath(parent.getAttribute('data-path')) : null
+}
+
+/**
+ * Find the nearest element in a given context menu with buttons or inputs
+ */
+export function findNearestElement<T extends Element>(
+  allElements: T[],
+  currentElement: T,
+  direction: 'Up' | 'Down' | 'Left' | 'Right',
+  margin = 10
+): T | undefined {
+  const all = map(allElements.filter(isVisible), calculateCenter)
+  const current = calculateCenter(currentElement)
+
+  interface CenterLocation {
+    x: number
+    y: number
+    element: T
+  }
+
+  function isVisible(element: T): boolean {
+    const rect = element.getBoundingClientRect()
+    return rect.width > 0 && rect.height > 0
+  }
+
+  function calculateCenter(element: T): CenterLocation {
+    const rect = element.getBoundingClientRect()
+    return {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+      element
+    }
+  }
+
+  function approxEqualY(a: CenterLocation, b: CenterLocation): boolean {
+    return Math.abs(a.y - b.y) < margin
+  }
+
+  function smallerX(a: CenterLocation, b: CenterLocation): boolean {
+    return a.x + margin < b.x
+  }
+
+  function largerX(a: CenterLocation, b: CenterLocation): boolean {
+    return a.x > b.x + margin
+  }
+
+  function smallerY(a: CenterLocation, b: CenterLocation): boolean {
+    return a.y + margin < b.y
+  }
+
+  function largerY(a: CenterLocation, b: CenterLocation): boolean {
+    return a.y > b.y + margin
+  }
+
+  function distance(a: CenterLocation, b: CenterLocation): number {
+    const diffX = a.x - b.x
+    const diffY = a.y - b.y
+    return Math.sqrt(diffX * diffX + diffY * diffY)
+  }
+
+  if (direction === 'Left') {
+    const candidates = all.filter(
+      (button) => approxEqualY(button, current) && smallerX(button, current)
+    )
+    return maxBy(candidates, (candidate) => candidate.x)?.element
+    // TODO: if no element is found, find the closest element that is not on the same row
+  }
+
+  if (direction === 'Right') {
+    const candidates = all.filter(
+      (button) => approxEqualY(button, current) && largerX(button, current)
+    )
+    return minBy(candidates, (candidate) => candidate.x)?.element
+    // TODO: if no element is found, find the closest element that is not on the same row
+  }
+
+  if (direction === 'Up') {
+    // TODO: give dropdown buttons less precedence when moving up/down
+    const candidates = all.filter((button) => smallerY(button, current))
+    return minBy(candidates, (candidate) => distance(candidate, current))?.element
+  }
+
+  if (direction === 'Down') {
+    // TODO: give dropdown buttons less precedence when moving up/down
+    const candidates = all.filter((button) => largerY(button, current))
+    return minBy(candidates, (candidate) => distance(candidate, current))?.element
+  }
+
+  return undefined
 }
