@@ -21,9 +21,10 @@
   import DropdownButton from '../../../../components/controls/DropdownButton.svelte'
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
-  import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
+  import { isObjectOrArray } from '$lib/utils/typeUtils'
   import { faCheckSquare, faLightbulb, faSquare } from '@fortawesome/free-regular-svg-icons'
   import { STATE_ENFORCE_STRING } from '$lib/constants'
+  import { isObject } from '../../../../utils/typeUtils.ts'
   import { canConvert, singleItemSelected } from '../../../../logic/selection.js'
   import { findNearestElement } from '../../../../utils/domUtils'
 

@@ -2,7 +2,7 @@ import { compileJSONPointer, existsIn, getIn, setIn } from 'immutable-json-patch
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import { STATE_EXPANDED, STATE_KEYS, STATE_SELECTION } from '../constants.js'
 import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
-import { isObject, isObjectOrArray } from '../utils/typeUtils.js'
+import { isObject, isObjectOrArray } from '../utils/typeUtils.ts'
 import {
   getNextVisiblePath,
   getPreviousVisiblePath,

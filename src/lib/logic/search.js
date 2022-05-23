@@ -9,7 +9,7 @@ import {
 import { getKeys } from './documentState.js'
 import { createSelectionFromOperations } from './selection.js'
 import { rename } from './operations.js'
-import { stringConvert } from '../utils/typeUtils.js'
+import { stringConvert } from '../utils/typeUtils.ts'
 
 // TODO: comment
 export function updateSearchResult(json, flatResults, previousResult) {

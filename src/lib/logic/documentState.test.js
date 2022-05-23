@@ -9,7 +9,7 @@ import {
   STATE_KEYS,
   STATE_VISIBLE_SECTIONS
 } from '../constants.js'
-import { isObject } from '../utils/typeUtils.js'
+import { isObject } from '../utils/typeUtils.ts'
 import {
   CARET_POSITION,
   collapseSinglePath,

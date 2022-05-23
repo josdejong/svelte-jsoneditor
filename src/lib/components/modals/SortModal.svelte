@@ -5,13 +5,13 @@
   import { getContext } from 'svelte'
   import Select from 'svelte-select'
   import Header from './Header.svelte'
-  import { getNestedPaths } from '../../utils/arrayUtils.js'
-  import { isObject } from '../../utils/typeUtils.js'
+  import { getNestedPaths } from '../../utils/arrayUtils.ts'
+  import { isObject } from '../../utils/typeUtils.ts'
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { sortArray, sortObjectKeys } from '../../logic/sort.js'
   import { sortModalState } from './sortModalState.js'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
-  import { createDebug } from '$lib/utils/debug'
+  import { createDebug } from '$lib/utils/debug.js'
 
   const debug = createDebug('jsoneditor:SortModal')
 
