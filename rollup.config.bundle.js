@@ -17,7 +17,7 @@ const sourcemapFile = file + '.map'
 addBundleExports(packageFolder, file, sourcemapFile)
 
 export default {
-  input: 'src/lib/index.js',
+  input: 'src/lib/index.ts',
   output: [
     {
       file,

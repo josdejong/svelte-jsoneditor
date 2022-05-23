@@ -11,7 +11,7 @@ import _TimestampTag from './plugins/value/components/TimestampTag.svelte'
 export const JSONEditor = _JSONEditor
 
 // value plugins
-export { renderValue } from './plugins/value/renderValue.ts'
+export { renderValue } from './plugins/value/renderValue.js'
 export { renderJSONSchemaEnum } from './plugins/value/renderJSONSchemaEnum.js'
 export const BooleanToggle = _BooleanToggle
 export const ColorPicker = _ColorPicker
@@ -21,19 +21,19 @@ export const ReadonlyValue = _ReadonlyValue
 export const TimestampTag = _TimestampTag
 
 // validator plugins
-export { createAjvValidator } from './plugins/validator/createAjvValidator.ts'
+export { createAjvValidator } from './plugins/validator/createAjvValidator.js'
 
 // query plugins
-export { lodashQueryLanguage } from './plugins/query/lodashQueryLanguage.ts'
-export { javascriptQueryLanguage } from './plugins/query/javascriptQueryLanguage.ts'
-export { jmespathQueryLanguage } from './plugins/query/jmespathQueryLanguage.ts'
+export { lodashQueryLanguage } from './plugins/query/lodashQueryLanguage.js'
+export { javascriptQueryLanguage } from './plugins/query/javascriptQueryLanguage.js'
+export { jmespathQueryLanguage } from './plugins/query/jmespathQueryLanguage.js'
 
 // utils
 export const SortModal = _SortModal
 export const TransformModal = _TransformModal
 export { getJSONSchemaOptions, findSchema, findEnum } from './utils/jsonSchemaUtils.js'
 export { parseJSONPointerWithArrayIndices } from './utils/jsonPointer.js'
-export { isTextContent, isLargeContent, estimateSerializedSize } from './utils/jsonUtils.ts'
+export { isTextContent, isLargeContent, estimateSerializedSize } from './utils/jsonUtils.js'
 export {
   parseJSONPointer,
   compileJSONPointer,
