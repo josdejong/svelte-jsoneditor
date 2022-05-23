@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.51](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.50...v0.3.51) (2022-05-23)
+
+
+### Features
+
+* implement a method `.refresh()` to force rerendering of the code editor ([545426a](https://github.com/josdejong/svelte-jsoneditor/commit/545426aa7d8718e05f57cb83c71d035f37b33dc8))
+
+
+### Bug Fixes
+
+* improve the behavior of the arrow quickkeys to navigate the context menu ([#83](https://github.com/josdejong/svelte-jsoneditor/issues/83)) ([76b177f](https://github.com/josdejong/svelte-jsoneditor/commit/76b177f03b68097c7e521bf07ed753a5a1acf931))
+* maintain the enforceString status after replacing a value ([4d1e9e3](https://github.com/josdejong/svelte-jsoneditor/commit/4d1e9e3b8eb57215650a586740f59d6390bf0981))
+
 ### [0.3.50](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.49...v0.3.50) (2022-05-20)
 
 
