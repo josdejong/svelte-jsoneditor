@@ -3,7 +3,7 @@
 <script lang="ts">
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import { isEqual } from 'lodash-es'
-  import type { SearchResultItem, Selection, TreeModeContext, Path } from '../../../types'
+  import type { SearchResultItem, Selection, Path } from '../../../types'
 
   export let path: Path
   export let value: JSON

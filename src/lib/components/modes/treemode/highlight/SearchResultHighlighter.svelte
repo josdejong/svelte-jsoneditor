@@ -1,6 +1,6 @@
 <script>
   import { splitValue } from '$lib/logic/search'
-  import { addNewLineSuffix } from '$lib/utils/domUtils.js'
+  import { addNewLineSuffix } from '$lib/utils/domUtils'
 
   /** @type {string} */
   export let text

@@ -11,7 +11,7 @@
   import { createDebug } from '../../../utils/debug'
   import Message from '../../controls/Message.svelte'
   import { onDestroy, onMount } from 'svelte'
-  import { activeElementIsChildOf, getWindow } from '../../../utils/domUtils.js'
+  import { activeElementIsChildOf, getWindow } from '../../../utils/domUtils'
   import { normalizeJsonParseError } from '../../../utils/jsonUtils.ts'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Menu from '../../controls/Menu.svelte'

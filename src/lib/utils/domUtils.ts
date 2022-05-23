@@ -1,4 +1,5 @@
 import { SELECTION_TYPE } from '../logic/selection.js'
+import { map, minBy } from 'lodash-es'
 
 /**
  * Create serialization functions to escape and stringify text,
@@ -297,4 +298,91 @@ export function getDataPathFromTarget(target) {
   })
 
   return parent ? decodeDataPath(parent.getAttribute('data-path')) : null
+}
+
+/**
+ * Find the nearest element in a given context menu with buttons or inputs
+ */
+// TODO: unit test
+export function findNearestElement<T extends Element>({
+  allElements,
+  currentElement,
+  direction,
+  hasPrio = () => true,
+  margin = 10
+}: {
+  allElements: T[]
+  currentElement: T
+  direction: 'Up' | 'Down' | 'Left' | 'Right'
+  margin?: number
+  hasPrio?: (element: T) => boolean
+}): T | undefined {
+  const all = map(allElements.filter(isVisible), calculateCenter)
+  const current = calculateCenter(currentElement)
+
+  interface CenterLocation {
+    x: number
+    y: number
+    rect: DOMRect
+    element: T
+  }
+
+  function isVisible(element: T): boolean {
+    const rect = element.getBoundingClientRect()
+    return rect.width > 0 && rect.height > 0
+  }
+
+  function calculateCenter(element: T): CenterLocation {
+    const rect = element.getBoundingClientRect()
+    return {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+      rect,
+      element
+    }
+  }
+
+  const isOnSameRow = (a: CenterLocation, b: CenterLocation) => Math.abs(a.y - b.y) < margin
+  const isLeft = (a: CenterLocation, b: CenterLocation) => a.rect.left + margin < b.rect.left
+  const isRight = (a: CenterLocation, b: CenterLocation) => a.rect.right > b.rect.right + margin
+  const isAbove = (a: CenterLocation, b: CenterLocation) => a.y + margin < b.y
+  const isBelow = (a: CenterLocation, b: CenterLocation) => a.y > b.y + margin
+
+  function distance(a: CenterLocation, b: CenterLocation, weightY = 1): number {
+    const diffX = a.x - b.x
+    const diffY = (a.y - b.y) * weightY
+    return Math.sqrt(diffX * diffX + diffY * diffY)
+  }
+  const distanceToCurrent = (candidate) => distance(candidate, current)
+  const distanceToCurrentWeighted = (candidate) => distance(candidate, current, 10)
+
+  if (direction === 'Left' || direction === 'Right') {
+    // First we find the first button left from the current button on the same row
+    // if not found, search the closest button left/right from current button
+    const candidatesLeft =
+      direction === 'Left'
+        ? all.filter((button) => isLeft(button, current))
+        : all.filter((button) => isRight(button, current))
+    const candidatesLeftOnRow = candidatesLeft.filter((button) => isOnSameRow(button, current))
+    const nearest =
+      minBy(candidatesLeftOnRow, distanceToCurrent) ||
+      minBy(candidatesLeft, distanceToCurrentWeighted)
+
+    return nearest?.element
+  }
+
+  if (direction === 'Up' || direction === 'Down') {
+    // first we only search through the prio buttons
+    // if there were no matching prio buttons, search all matching buttons
+    const candidates =
+      direction === 'Up'
+        ? all.filter((button) => isAbove(button, current))
+        : all.filter((button) => isBelow(button, current))
+    const prioCandidates = candidates.filter((button) => hasPrio(button.element))
+    const nearest = minBy(prioCandidates, distanceToCurrent) || minBy(candidates, distanceToCurrent)
+
+    return nearest?.element
+  }
+
+  return undefined
 }

@@ -42,7 +42,7 @@
   import { forEachKey } from '../../../logic/documentState.js'
   import { onMoveSelection } from '../../../logic/dragging.js'
   import { forEachIndex } from '../../../utils/arrayUtils.ts'
-  import { getDataPathFromTarget } from '../../../utils/domUtils.js'
+  import { getDataPathFromTarget } from '../../../utils/domUtils'
   import { createMemoizePath } from '../../../utils/pathUtils.js'
   import { keyIsSelected } from '../../../logic/selection.js'
 
