@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.53](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.52...v0.3.53) (2022-05-23)
+
+
+### Bug Fixes
+
+* index.js files containing broken imports to ts files ([0c4a9f0](https://github.com/josdejong/svelte-jsoneditor/commit/0c4a9f0c2dea2a45aa5dd5b2176ad7802a4e5206))
+
 ### [0.3.52](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.51...v0.3.52) (2022-05-23)
 
 
