@@ -506,7 +506,7 @@ export function documentStatePatch(json, state, operations) {
     }
   }
 
-  function after(state, operation) {
+  function after(state, operation, previousState) {
     const { op, path } = operation
 
     let updatedState = state
@@ -515,6 +515,14 @@ export function documentStatePatch(json, state, operations) {
       // copying state will introduce duplicate id's -> replace with a new id
       if (existsIn(updatedState, path.concat([STATE_ID]))) {
         updatedState = setIn(updatedState, path.concat([STATE_ID]), uniqueId())
+      }
+    }
+
+    if (op === 'replace') {
+      // copy the old enforceString state after replacing a value
+      const enforceString = getIn(previousState, path.concat([STATE_ENFORCE_STRING]))
+      if (typeof enforceString === 'boolean') {
+        updatedState = setIn(updatedState, path.concat([STATE_ENFORCE_STRING]), enforceString)
       }
     }
 

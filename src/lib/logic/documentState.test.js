@@ -545,6 +545,16 @@ describe('documentState', () => {
       assert.strictEqual(typeof updatedState.c[STATE_ID], 'string')
     })
 
+    it('replace: should keep enforceString state', () => {
+      const json = '42'
+      const state = syncState(json, undefined, [], () => false)
+      assert.strictEqual(state[STATE_ENFORCE_STRING], true)
+
+      const operations = [{ op: 'replace', path: '', value: 'forty two' }]
+      const updatedState = documentStatePatch(json, state, operations).state
+      assert.deepStrictEqual(updatedState[STATE_ENFORCE_STRING], true)
+    })
+
     it('add: should override a value in an object', () => {
       // TODO
     })
