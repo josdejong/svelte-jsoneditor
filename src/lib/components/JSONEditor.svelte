@@ -218,7 +218,8 @@
     if (refCodeMode) {
       refCodeMode.refresh()
     } else {
-      throw new Error(`Method refresh is not available in mode "${mode}"`)
+      // nothing to do in tree mode (also: don't throw an exception or so,
+      // that annoying having to reckon with that when using .refresh()).
     }
   }
 
