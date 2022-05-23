@@ -326,19 +326,23 @@ describe('documentState', () => {
   it('should update enforce string in syncState', () => {
     const json1 = 42
     const state1 = syncState(json1, undefined, [], () => false)
+    assert.strictEqual(state1[STATE_ENFORCE_STRING], undefined)
 
     const json2 = '42'
     const state2 = syncState(json2, state1, [], () => false)
+    assert.strictEqual(state2[STATE_ENFORCE_STRING], true)
+
+    // should keep the enforceString also when not needed anymore
+    const json3 = 'forty two'
+    const state3 = syncState(json3, state2, [], () => false)
+    assert.strictEqual(state3[STATE_ENFORCE_STRING], true)
 
     // should not override when containing a boolean false
-    const json3 = '42'
-    const state3 = { ...state2, [STATE_ENFORCE_STRING]: false }
-    const state3updated = syncState(json3, state3, [], () => false)
-
-    assert.strictEqual(state1[STATE_ENFORCE_STRING], undefined)
-    assert.strictEqual(state2[STATE_ENFORCE_STRING], true)
-    assert.strictEqual(state3[STATE_ENFORCE_STRING], false)
-    assert.strictEqual(state3updated[STATE_ENFORCE_STRING], false)
+    const json4 = '42'
+    const state4 = { ...state2, [STATE_ENFORCE_STRING]: false }
+    const state4updated = syncState(json4, state4, [], () => false)
+    assert.strictEqual(state4[STATE_ENFORCE_STRING], false)
+    assert.strictEqual(state4updated[STATE_ENFORCE_STRING], false)
   })
 
   describe('createState', () => {
