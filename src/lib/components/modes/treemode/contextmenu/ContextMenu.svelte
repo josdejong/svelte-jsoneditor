@@ -207,7 +207,14 @@
       const buttons: HTMLButtonElement[] = Array.from(
         refContextMenu.querySelectorAll('button:not([disabled])')
       )
-      const nearest = findNearestElement(buttons, event.target, combo)
+      const nearest = findNearestElement({
+        allElements: buttons,
+        currentElement: event.target,
+        direction: combo,
+        hasPrio: (element: HTMLButtonElement) => {
+          return element.getAttribute('data-type') !== 'jse-open-dropdown'
+        }
+      })
       if (nearest) {
         nearest.focus()
       }

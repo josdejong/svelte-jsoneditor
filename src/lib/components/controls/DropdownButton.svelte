@@ -46,7 +46,13 @@
 <div class="jse-dropdown-button" {title} on:click={handleClick}>
   <slot name="defaultItem" />
 
-  <button type="button" class="jse-open-dropdown" class:jse-visible={visible} on:click={toggleShow}>
+  <button
+    type="button"
+    class="jse-open-dropdown"
+    data-type="jse-open-dropdown"
+    class:jse-visible={visible}
+    on:click={toggleShow}
+  >
     <Icon data={faCaretDown} />
   </button>
 
