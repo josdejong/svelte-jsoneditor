@@ -41,7 +41,7 @@
   import { createDebug } from '$lib/utils/debug'
   import { forEachKey } from '../../../logic/documentState.js'
   import { onMoveSelection } from '../../../logic/dragging.js'
-  import { forEachIndex } from '../../../utils/arrayUtils.ts'
+  import { forEachIndex } from '../../../utils/arrayUtils.js'
   import { getDataPathFromTarget } from '../../../utils/domUtils'
   import { createMemoizePath } from '../../../utils/pathUtils.js'
   import { keyIsSelected } from '../../../logic/selection.js'

@@ -89,7 +89,7 @@
   import Welcome from './Welcome.svelte'
   import NavigationBar from '../../../components/controls/navigationBar/NavigationBar.svelte'
   import SearchBox from '../../../components/modes/treemode/menu/SearchBox.svelte'
-  import { convertValue, isLargeContent } from '../../../utils/jsonUtils.ts'
+  import { convertValue, isLargeContent } from '../../../utils/jsonUtils.js'
   import { MAX_DOCUMENT_SIZE_EXPAND_ALL } from '../../../constants.js'
   import { canConvert, createSelectionFromOperations } from '../../../logic/selection.js'
   import { collapse, expandWithCallback } from '../../../logic/documentState.js'

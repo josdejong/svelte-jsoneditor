@@ -15,9 +15,9 @@ import {
   STATE_KEYS,
   STATE_VISIBLE_SECTIONS
 } from '../constants.js'
-import { forEachIndex } from '../utils/arrayUtils.ts'
+import { forEachIndex } from '../utils/arrayUtils.js'
 import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
-import { isObject, isStringContainingPrimitiveValue } from '../utils/typeUtils.ts'
+import { isObject, isStringContainingPrimitiveValue } from '../utils/typeUtils.js'
 import {
   currentRoundNumber,
   inVisibleSection,

@@ -36,7 +36,7 @@
   import { Compartment } from '@codemirror/state'
   import { closeSearchPanel, openSearchPanel, search } from '@codemirror/search'
   import { redo, redoDepth, undo, undoDepth } from '@codemirror/history'
-  import { normalizeJsonParseError } from '../../../utils/jsonUtils.ts'
+  import { normalizeJsonParseError } from '../../../utils/jsonUtils.js'
   import { MAX_VALIDATABLE_SIZE } from '../../../constants.js'
   import { measure } from '../../../utils/timeUtils.js'
   import jsonSourceMap from 'json-source-map'
