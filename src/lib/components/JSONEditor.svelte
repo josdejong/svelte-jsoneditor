@@ -1,6 +1,6 @@
 <svelte:options accessors={false} immutable={true} />
 
-<script>
+<script lang="ts">
   import { createDebug } from '../utils/debug'
   import Modal from 'svelte-simple-modal'
   import { MODE, SORT_MODAL_OPTIONS, TRANSFORM_MODAL_OPTIONS } from '../constants.js'
@@ -15,64 +15,84 @@
   import TransformModal from './modals/TransformModal.svelte'
   import SortModal from './modals/SortModal.svelte'
   import ModalRef from './modals/ModalRef.svelte'
+  import type {
+    Content,
+    JSONPatchDocument,
+    JSONPatchResult,
+    MenuItem,
+    MenuSeparatorItem,
+    OnBlur,
+    OnChange,
+    OnChangeMode,
+    OnChangeQueryLanguage,
+    OnClassName,
+    OnError,
+    OnFocus,
+    OnRenderMenu,
+    OnRenderValue,
+    Path,
+    QueryLanguage,
+    SortModalCallback,
+    TransformModalCallback,
+    TransformModalOptions,
+    Validator
+  } from '../types'
+  import { isMenuSpaceItem } from '../types'
+  import { noop } from 'lodash-es'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
 
-  // eslint-disable-next-line no-undef-init
-  export let content = { text: '' }
-
-  $: {
-    const contentError = validateContentType(content)
-    if (contentError) {
-      console.error('Error: ' + contentError)
-    }
-  }
+  export let content: Content = { text: '' }
 
   export let readOnly = false
   export let indentation = 2
-  export let mode = MODE.TREE
+  export let mode: 'tree' | 'code' = MODE.TREE
   export let mainMenuBar = true
   export let navigationBar = true
   export let escapeControlCharacters = false
   export let escapeUnicodeCharacters = false
-  export let validator = null
+  export let validator: Validator | null = null
 
-  /** @type {QueryLanguage[]} */
-  export let queryLanguages = [javascriptQueryLanguage]
+  export let queryLanguages: QueryLanguage[] = [javascriptQueryLanguage]
+  export let queryLanguageId: string = queryLanguages[0].id
 
-  /** @type {string} */
-  export let queryLanguageId = queryLanguages[0].id
-
-  /** @type {(queryLanguageId: string) => void} */
-  export let onChangeQueryLanguage = () => {
-    // no op by default
-  }
-
-  /** @type {((content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void) | null} */
-  export let onChange = null
-
-  /** @type {(props: RenderValueProps) => RenderValueConstructor[]} */
-  export let onRenderValue = renderValue
-
-  export let onClassName = () => {
-    // no op by default
-  }
-  export let onRenderMenu = () => {
-    // no op by default
-  }
-  export let onChangeMode = () => {
-    // no op by default
-  }
-  export let onError = (err) => {
+  export let onChangeQueryLanguage: OnChangeQueryLanguage = noop
+  export let onChange: OnChange = null
+  export let onRenderValue: OnRenderValue = renderValue
+  export let onClassName: OnClassName = noop
+  export let onRenderMenu: OnRenderMenu = noop
+  export let onChangeMode: OnChangeMode = noop
+  export let onError: OnError = (err) => {
     console.error(err)
     alert(err.toString()) // TODO: create a nice alert modal
   }
-  export let onFocus = () => {
-    // no op by default
-  }
-  export let onBlur = () => {
-    // no op by default
+  export let onFocus: OnFocus = noop
+  export let onBlur: OnBlur = noop
+
+  export interface OptionalJSONEditorProps {
+    content?: Content
+    readOnly?: boolean
+    indentation?: number
+    mode?: 'tree' | 'code'
+    mainMenuBar?: boolean
+    navigationBar?: boolean
+    escapeControlCharacters?: boolean
+    escapeUnicodeCharacters?: boolean
+    validator?: Validator
+
+    queryLanguages?: QueryLanguage[]
+    queryLanguageId?: string
+
+    onChangeQueryLanguage?: OnChangeQueryLanguage
+    onChange?: OnChange
+    onRenderValue?: OnRenderValue
+    onClassName?: OnClassName
+    onRenderMenu?: OnRenderMenu
+    onChangeMode?: OnChangeMode
+    onError?: OnError
+    onFocus?: OnFocus
+    onBlur?: OnBlur
   }
 
   let instanceId = uniqueId()
@@ -85,17 +105,22 @@
 
   let open // svelte-simple-modal context open(...)
 
-  $: textForCodeMode = mode === MODE.CODE ? getText(content.json, content.text) : undefined
+  $: {
+    const contentError = validateContentType(content)
+    if (contentError) {
+      console.error('Error: ' + contentError)
+    }
+  }
 
-  export function get() {
+  export function get(): Content {
     return content
   }
 
-  function getText() {
+  function getText(content: Content) {
     return isTextContent(content) ? content.text : JSON.stringify(content.json, null, indentation)
   }
 
-  export function set(newContent) {
+  export function set(newContent: Content) {
     debug('set')
 
     const contentError = validateContentType(newContent)
@@ -109,7 +134,7 @@
     content = newContent
   }
 
-  export function update(updatedContent) {
+  export function update(updatedContent: Content) {
     debug('update')
 
     const contentError = validateContentType(updatedContent)
@@ -120,8 +145,8 @@
     content = updatedContent
   }
 
-  export function patch(operations) {
-    if (content.json === undefined) {
+  export function patch(operations: JSONPatchDocument): void {
+    if (isTextContent(content)) {
       try {
         content = {
           json: JSON.parse(content.text),
@@ -143,7 +168,7 @@
     }
   }
 
-  export function expand(callback) {
+  export function expand(callback?: (path: Path) => boolean): void {
     if (refTreeMode) {
       return refTreeMode.expand(callback)
     } else {
@@ -152,13 +177,9 @@
   }
 
   /**
-   * @param {Object} options
-   * @property {string} [id]
-   * @property {Path} [selectedPath]
-   * @property {({ operations: JSONPatchDocument, json: JSONData, transformedJson: JSONData }) => void} [onTransform]
-   * @property {() => void} [onClose]
+   * Open the transform modal
    */
-  export function transform(options) {
+  export function transform(options: TransformModalOptions): void {
     if (refCodeMode) {
       refCodeMode.openTransformModal(options)
     } else if (refTreeMode) {
@@ -178,9 +199,8 @@
    * and the method itself also returns the updated contents. In case of code
    * mode or when the editor is not in an "accept auto repair" status, nothing
    * will happen, and the contents will be returned as is.
-   * @returns {Content}
    */
-  export function acceptAutoRepair() {
+  export function acceptAutoRepair(): Content {
     if (refTreeMode) {
       return refTreeMode.acceptAutoRepair()
     } else {
@@ -188,7 +208,7 @@
     }
   }
 
-  export function scrollTo(path) {
+  export function scrollTo(path: Path): void {
     if (refTreeMode) {
       return refTreeMode.scrollTo(path)
     } else {
@@ -198,7 +218,7 @@
     }
   }
 
-  export function findElement(path) {
+  export function findElement(path: Path): Element {
     if (refTreeMode) {
       return refTreeMode.findElement(path)
     } else {
@@ -223,7 +243,7 @@
     }
   }
 
-  export function updateProps(props) {
+  export function updateProps(props: OptionalJSONEditorProps) {
     this.$set(props)
   }
 
@@ -231,12 +251,11 @@
     this.$destroy()
   }
 
-  /**
-   * @param {Content} updatedContent
-   * @param {Content} previousContent
-   * @param {JSONPatchResult | null} patchResult
-   */
-  function handleChange(updatedContent, previousContent, patchResult) {
+  function handleChange(
+    updatedContent: Content,
+    previousContent: Content,
+    patchResult: JSONPatchResult | null
+  ) {
     content = updatedContent
 
     if (onChange) {
@@ -244,11 +263,7 @@
     }
   }
 
-  /**
-   * @param {string} updatedText
-   * @param {string} previousText
-   */
-  function handleChangeText(updatedText, previousText) {
+  function handleChangeText(updatedText: string, previousText: string) {
     const updatedContent = {
       text: updatedText,
       json: undefined
@@ -292,7 +307,7 @@
     }
   }
 
-  async function toggleMode(newMode) {
+  async function toggleMode(newMode: 'tree' | 'code') {
     if (mode === newMode) {
       return
     }
@@ -306,6 +321,8 @@
   }
 
   $: isCodeMode = mode === MODE.CODE
+
+  let modeMenuItems: MenuItem[]
   $: modeMenuItems = [
     {
       text: 'code',
@@ -321,14 +338,14 @@
     }
   ]
 
-  const separatorMenuItem = {
+  const separatorMenuItem: MenuSeparatorItem = {
     separator: true
   }
 
-  function handleRenderMenu(mode, items) {
+  function handleRenderMenu(mode: 'tree' | 'code' | 'repair', items: MenuItem[]) {
     const updatedItems =
       mode === MODE.TREE || mode === MODE.CODE
-        ? items[0].space === true
+        ? isMenuSpaceItem(items[0])
           ? modeMenuItems.concat(items) // menu is empty, readOnly mode
           : modeMenuItems.concat([separatorMenuItem], items)
         : items
@@ -336,7 +353,7 @@
     return onRenderMenu(mode, updatedItems) || updatedItems
   }
 
-  function handleChangeQueryLanguage(newQueryLanguageId) {
+  function handleChangeQueryLanguage(newQueryLanguageId: string) {
     debug('handleChangeQueryLanguage', newQueryLanguageId)
     queryLanguageId = newQueryLanguageId
     onChangeQueryLanguage(newQueryLanguageId)
@@ -344,7 +361,15 @@
 
   // The onTransformModal method is located in JSONEditor to prevent circular references:
   //     TreeMode -> TransformModal -> TreeMode
-  export function onTransformModal({ id, json, selectedPath, onTransform, onClose }) {
+  function onTransformModal({
+    id,
+    json,
+    selectedPath,
+    onTransform,
+    onClose
+  }: TransformModalCallback) {
+    console.log('json', json)
+
     if (readOnly) {
       return
     }
@@ -372,7 +397,7 @@
   }
 
   // The onSortModal is positioned here for consistency with TransformModal
-  export function onSortModal({ id, json, selectedPath, onSort, onClose }) {
+  function onSortModal({ id, json, selectedPath, onSort, onClose }: SortModalCallback) {
     if (readOnly) {
       return
     }
@@ -401,7 +426,7 @@
         {#if mode === MODE.CODE}
           <CodeMode
             bind:this={refCodeMode}
-            text={textForCodeMode}
+            text={getText(content)}
             {readOnly}
             {indentation}
             {mainMenuBar}

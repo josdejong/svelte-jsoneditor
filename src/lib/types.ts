@@ -174,6 +174,10 @@ export interface MenuSpaceItem {
   space: true
 }
 
+export function isMenuSpaceItem(item: unknown): item is MenuSpaceItem {
+  return item && item['space'] === true && Object.keys(item).length === 1
+}
+
 export type MenuItem = MenuButtonItem | MenuSeparatorItem | MenuSpaceItem
 
 export interface ValidationError {
@@ -181,6 +185,8 @@ export interface ValidationError {
   message: string
   isChildError?: boolean
 }
+
+export type Validator = (json: JSONData) => ValidationError[]
 
 export interface ParseError {
   position: number | null
@@ -243,6 +249,21 @@ export interface QueryLanguageOptions {
     paths?: string[][]
   }
 }
+
+export type OnChangeQueryLanguage = (queryLanguageId: string) => void
+export type OnChange =
+  | ((content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void)
+  | null
+export type OnRenderValue = (props: RenderValueProps) => RenderValueConstructor[]
+export type OnClassName = (path: Path, value: JSONData) => string | undefined | void
+export type OnChangeMode = (mode: 'tree' | 'code') => void
+export type OnRenderMenu = (
+  mode: 'tree' | 'code' | 'repair',
+  items: MenuItem[]
+) => MenuItem[] | undefined | void
+export type OnError = (error: Error) => void
+export type OnFocus = () => void
+export type OnBlur = () => void
 
 export type RecursiveSearchResult = { [key: string]: RecursiveSearchResult }
 
@@ -339,9 +360,40 @@ export interface RenderValueProps {
 }
 
 export interface RenderValueConstructor {
-  // TODO: fix type definition
+  // FIXME: fix type definition of RenderValueConstructor
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   component: SvelteComponentConstructor
   props: unknown
+}
+
+export interface TransformModalOptions {
+  id?: string
+  selectedPath?: Path
+  onTransform?: (state: {
+    operations: JSONPatchDocument
+    json: JSONData
+    transformedJson: JSONData
+  }) => void
+  onClose?: () => void
+}
+
+export interface TransformModalCallback extends TransformModalOptions {
+  id: string
+  selectedPath: Path
+  json: JSONData
+  onTransform: (state: {
+    operations: JSONPatchDocument
+    json: JSONData
+    transformedJson: JSONData
+  }) => void
+  onClose: () => void
+}
+
+export interface SortModalCallback {
+  id: string
+  json: JSONData
+  selectedPath: Path
+  onSort: (operations: JSONPatchDocument) => void
+  onClose: () => void
 }

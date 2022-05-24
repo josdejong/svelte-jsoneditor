@@ -163,7 +163,7 @@ const editor = new JSONEditor({
 - `indentation: number` Number of spaces use for indentation when stringifying JSON.
 - `escapeControlCharacters: boolean`. False by default. When `true`, control characters like newline and tab are rendered as escaped characters `\n` and `\t`. Only applicable for `'tree'` mode, in `'code'` mode control characters are always escaped.
 - `escapeUnicodeCharacters: boolean`. False by default. When `true`, unicode characters like ☎ and 😀 are rendered escaped like `\u260e` and `\ud83d\ude00`.
-- `validator: function (json): ValidationError[]`. Validate the JSON document.
+- `validator: function (json: JSONData): ValidationError[]`. Validate the JSON document.
   For example use the built-in JSON Schema validator powered by Ajv:
 
   ```js
@@ -175,7 +175,7 @@ const editor = new JSONEditor({
 - `onError(err: Error)`.
   Callback fired when an error occurs. Default implementation is to log an error in the console and show a simple alert message to the user.
 - `onChange(content: Content, previousContent: Content, patchResult: JSONPatchResult | null)`. The callback which is invoked on every change made in the JSON document. The parameter `patchResult` is only available in `tree` mode, and not in `text` mode, since a change in arbitrary text cannot be expressed as a JSON Patch document.
-- `onChangeMode(mode: string)`. Invoked when the mode is changed.
+- `onChangeMode(mode: 'tree' | 'code')`. Invoked when the mode is changed.
 - `onClassName(path: Path, value: any): string | undefined`.
   Add a custom class name to specific nodes, based on their path and/or value.
 - `onRenderValue(props: RenderValueProps) : RenderValueConstructor[]`
@@ -195,12 +195,12 @@ const editor = new JSONEditor({
   }
   ```
 
-- `onRenderMenu(mode: string, items: Array) : Array | undefined`.
+- `onRenderMenu(mode: 'tree' | 'code', items: MenuItem[]) : MenuItem[] | undefined`.
   Callback which can be used to make changes to the menu items. New items can
   be added, or existing items can be removed or reorganized. When the function
   returns `undefined`, the original `items` will be applied.
 
-  A menu item can be one of the following types:
+  A menu item `MenuItem` can be one of the following types:
 
   - Button:
 

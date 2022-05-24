@@ -1,3 +1,4 @@
+// TODO: change MODE into an enum
 export const MODE = {
   TREE: 'tree',
   CODE: 'code'
