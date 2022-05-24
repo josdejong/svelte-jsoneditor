@@ -4,7 +4,7 @@ import ColorPicker from './components/ColorPicker.svelte'
 import EditableValue from './components/EditableValue.svelte'
 import ReadonlyValue from './components/ReadonlyValue.svelte'
 import TimestampTag from './components/TimestampTag.svelte'
-import type { RenderValueConstructor, RenderValueProps } from '../../types'
+import type { RenderValueComponentDescription, RenderValueProps } from '../../types'
 
 export function renderValue({
   path,
@@ -18,7 +18,7 @@ export function renderValue({
   onPasteJson,
   onSelect,
   onFind
-}: RenderValueProps): RenderValueConstructor[] {
+}: RenderValueProps): RenderValueComponentDescription[] {
   const renderers = []
 
   if (!isEditing && isBoolean(value)) {

@@ -1,3 +1,5 @@
+import type { SvelteComponent } from 'svelte'
+
 export type JSONData = { [key: string]: JSONData } | JSONData[] | string | number | boolean | null
 
 export type TextContent = { text: string } | { json: undefined; text: string }
@@ -254,7 +256,7 @@ export type OnChangeQueryLanguage = (queryLanguageId: string) => void
 export type OnChange =
   | ((content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void)
   | null
-export type OnRenderValue = (props: RenderValueProps) => RenderValueConstructor[]
+export type OnRenderValue = (props: RenderValueProps) => RenderValueComponentDescription[]
 export type OnClassName = (path: Path, value: JSONData) => string | undefined | void
 export type OnChangeMode = (mode: 'tree' | 'code') => void
 export type OnRenderMenu = (
@@ -336,14 +338,30 @@ export interface TreeModeContext {
   onSelect: { selectionSchema: SelectionSchema; options?: { ensureFocus?: boolean } }
   onFind: (findAndReplace: boolean) => void
   onExpandSection: (path: Path, section: Section) => void
-  onRenderValue: (props: RenderValueProps) => RenderValueConstructor[]
+  onRenderValue: (props: RenderValueProps) => RenderValueComponentDescription[]
   onContextMenu: (contextMenuProps: ContextMenuProps) => void
   onClassName: (path: Path, value: JSONData) => string
   onDrag: (event: Event) => void
   onDragEnd: (event: Event) => void
 }
 
-export interface RenderValueProps {
+export interface RenderValuePropsOptional {
+  path?: Path
+  value?: JSONData
+  readOnly?: boolean
+  enforceString?: boolean
+  selection?: Selection
+  searchResult?: SearchResultItem
+  isSelected?: boolean
+  isEditing?: boolean
+  normalization?: ValueNormalization
+  onPatch?: TreeModeContext['onPatch']
+  onPasteJson?: (pastedJson: { path: Path; contents: JSONData }) => void
+  onSelect?: (selection: Selection) => void
+  onFind?: (findAndReplace: boolean) => void
+}
+
+export interface RenderValueProps extends RenderValuePropsOptional {
   path: Path
   value: JSONData
   readOnly: boolean
@@ -359,12 +377,9 @@ export interface RenderValueProps {
   onFind: (findAndReplace: boolean) => void
 }
 
-export interface RenderValueConstructor {
-  // FIXME: fix type definition of RenderValueConstructor
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  component: SvelteComponentConstructor
-  props: unknown
+export interface RenderValueComponentDescription {
+  component: SvelteComponent
+  props: RenderValuePropsOptional
 }
 
 export interface TransformModalOptions {

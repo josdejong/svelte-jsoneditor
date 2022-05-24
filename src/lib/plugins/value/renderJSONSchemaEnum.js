@@ -8,7 +8,7 @@ import { getJSONSchemaOptions } from '../../utils/jsonSchemaUtils.js'
  * @param {RenderValueProps} props
  * @param {JSON} schema
  * @param {JSON} schemaDefinitions
- * @return {RenderValueConstructor[]}
+ * @return {RenderValueComponentDescription[]}
  */
 export function renderJSONSchemaEnum(props, schema, schemaDefinitions) {
   const enumValues = getJSONSchemaOptions(schema, schemaDefinitions, props.path)

@@ -34,7 +34,7 @@
   /** @type {(queryLanguageId: string) => void} */
   export let onChangeQueryLanguage
 
-  /** @type {(props: RenderValueProps) => RenderValueConstructor[]} */
+  /** @type {(props: RenderValueProps) => RenderValueComponentDescription[]} */
   export let onRenderValue
   export let onClassName
 

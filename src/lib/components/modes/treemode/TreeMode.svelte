@@ -125,7 +125,7 @@
   /** @type {(content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void} */
   export let onChange
 
-  /** @type {(props: RenderValueProps) => RenderValueConstructor[]} */
+  /** @type {(props: RenderValueProps) => RenderValueComponentDescription[]} */
   export let onRenderValue
   export let onRequestRepair = noop
   export let onRenderMenu = noop
