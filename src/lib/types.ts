@@ -377,9 +377,10 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   onFind: (findAndReplace: boolean) => void
 }
 
+// TODO: can we define proper generic types here?
 export interface RenderValueComponentDescription {
   component: SvelteComponent
-  props: RenderValuePropsOptional
+  props: Record<string, unknown>
 }
 
 export interface TransformModalOptions {
