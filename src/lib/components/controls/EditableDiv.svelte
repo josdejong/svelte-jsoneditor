@@ -1,25 +1,26 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { onDestroy, onMount } from 'svelte'
   import { addNewLineSuffix, removeNewLineSuffix, setCursorToEnd } from '$lib/utils/domUtils'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings'
-  import { createDebug } from '$lib/utils/debug'
+  import { keyComboFromEvent } from '../../utils/keyBindings'
+  import { createDebug } from '../../utils/debug'
   import classnames from 'classnames'
   import { noop } from 'lodash-es'
   import { UPDATE_SELECTION } from '../../constants.js'
+  import type { OnFind, OnPaste } from '../../types'
 
   const debug = createDebug('jsoneditor:EditableDiv')
 
-  export let value
+  export let value: string
   export let shortText = false
-  export let onChange
-  export let onCancel
-  export let onFind
-  export let onPaste = noop
-  export let onValueClass = () => ''
+  export let onChange: (newValue: string, updateSelection: string) => void
+  export let onCancel: () => void
+  export let onFind: OnFind
+  export let onPaste: OnPaste = noop
+  export let onValueClass: (value: string) => string = () => ''
 
-  let domValue
+  let domValue: HTMLDivElement | undefined
   let valueClass = onValueClass(value)
   let closed = false
 
@@ -41,11 +42,11 @@
     }
   })
 
-  function getDomValue() {
+  function getDomValue(): string {
     return removeNewLineSuffix(domValue.innerText)
   }
 
-  function setDomValue(updatedValue) {
+  function setDomValue(updatedValue: string) {
     domValue.innerText = addNewLineSuffix(updatedValue)
   }
 
@@ -92,7 +93,7 @@
     }
   }
 
-  function handleValuePaste(event) {
+  function handleValuePaste(event: ClipboardEvent) {
     if (!onPaste) {
       return
     }

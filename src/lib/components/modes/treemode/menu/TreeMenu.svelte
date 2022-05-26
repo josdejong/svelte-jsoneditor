@@ -1,6 +1,6 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import {
     faCopy,
     faEllipsisV,
@@ -10,17 +10,18 @@
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
-  import { CONTEXT_MENU_EXPLANATION } from '$lib/constants'
-  import { faJSONEditorCollapse, faJSONEditorExpand } from '$lib/img/customFontawesomeIcons'
-  import { SELECTION_TYPE } from '$lib/logic/selection'
+  import { CONTEXT_MENU_EXPLANATION } from '../../../../constants'
+  import { faJSONEditorCollapse, faJSONEditorExpand } from '../../../../img/customFontawesomeIcons'
+  import { SELECTION_TYPE } from '../../../../logic/selection'
   import { isObjectOrArray } from '$lib/utils/typeUtils'
   import Menu from '../../../controls/Menu.svelte'
   import { noop } from 'lodash-es'
+  import type { JSONData, OnRenderMenu } from '../../../../types'
 
-  export let json
-  export let selection
+  export let json: JSONData
+  export let selection: Selection | undefined
 
-  export let readOnly
+  export let readOnly: boolean
   export let showSearch = false
   export let historyState
 
@@ -33,7 +34,7 @@
   export let onContextMenu
   export let onCopy
 
-  export let onRenderMenu = noop
+  export let onRenderMenu: OnRenderMenu = noop
 
   function handleToggleSearch() {
     showSearch = !showSearch

@@ -1,17 +1,13 @@
-<script>
+<script lang="ts">
   import Icon from 'svelte-awesome'
   import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
+  import type { QueryLanguage, OnChangeQueryLanguage } from '../../../types'
 
-  /** @type {QueryLanguage[]} */
-  export let queryLanguages
+  export let queryLanguages: QueryLanguage[]
+  export let queryLanguageId: string
+  export let onChangeQueryLanguage: OnChangeQueryLanguage
 
-  /** @type {string} */
-  export let queryLanguageId
-
-  /** @type {(queryLanguageId: string) => void} */
-  export let onChangeQueryLanguage
-
-  function handleChangeQueryLanguage(newQueryLanguageId) {
+  function handleChangeQueryLanguage(newQueryLanguageId: string) {
     queryLanguageId = newQueryLanguageId
     onChangeQueryLanguage(newQueryLanguageId)
   }

@@ -1,4 +1,5 @@
 import { memoize } from 'lodash-es'
+import type { Path } from '../types'
 
 /**
  * Stringify a path like
@@ -9,7 +10,7 @@ import { memoize } from 'lodash-es'
  *
  *     ".data[2].nested.property"
  */
-export function stringifyPath(path) {
+export function stringifyPath(path: Path): string {
   return path
     .map((prop) => {
       if (typeof prop === 'number') {
@@ -17,7 +18,7 @@ export function stringifyPath(path) {
       } else if (typeof prop === 'string' && prop.match(/^[A-Za-z0-9_$]+$/)) {
         return '.' + prop
       } else {
-        return '["' + prop + '"]'
+        return '["' + String(prop) + '"]'
       }
     })
     .join('')
@@ -35,14 +36,12 @@ export function stringifyPath(path) {
  *
  *   '?.location?.latitude'
  *   '?.address?.["full name"]'
- *
- * @param {Path} path
- * @returns {string}
  */
-export function createPropertySelector(path) {
+export function createPropertySelector(path: Path): string {
   return path
     .map((prop) => {
-      return javaScriptPropertyRegex.test(prop) ? `?.${prop}` : `?.[${JSON.stringify(prop)}]`
+      const propStr = String(prop)
+      return javaScriptPropertyRegex.test(propStr) ? `?.${propStr}` : `?.[${JSON.stringify(prop)}]`
     })
     .join('')
 }
@@ -55,9 +54,7 @@ const javaScriptPropertyRegex = /^[A-z$_][A-z$_\d]*$/i
 /**
  * Create a memoized function that will memoize the input path, and return
  * the memoized instance of the path when the stringified version is the same.
- *
- * @returns {(path: Path) => Path}
  */
-export function createMemoizePath() {
+export function createMemoizePath(): (path: Path) => Path {
   return memoize((path) => path, stringifyPath)
 }

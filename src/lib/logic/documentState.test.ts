@@ -9,7 +9,7 @@ import {
   STATE_KEYS,
   STATE_VISIBLE_SECTIONS
 } from '../constants.js'
-import { isObject } from '../utils/typeUtils.ts'
+import { isObject } from '../utils/typeUtils.js'
 import {
   CARET_POSITION,
   collapseSinglePath,
@@ -25,6 +25,7 @@ import {
   syncKeys,
   syncState
 } from './documentState.js'
+import type { JSONPatchDocument } from '../types'
 
 describe('documentState', () => {
   it('syncState', () => {
@@ -48,35 +49,35 @@ describe('documentState', () => {
     expectedState[STATE_EXPANDED] = true
     expectedState[STATE_ID] = state[STATE_ID] || throwUndefinedId()
     expectedState[STATE_KEYS] = ['array', 'object', 'value']
-    expectedState.array = [
+    expectedState['array'] = [
       {
-        [STATE_ID]: state.array[0][STATE_ID] || throwUndefinedId()
+        [STATE_ID]: state['array'][0][STATE_ID] || throwUndefinedId()
       },
       {
-        [STATE_ID]: state.array[1][STATE_ID] || throwUndefinedId()
+        [STATE_ID]: state['array'][1][STATE_ID] || throwUndefinedId()
       },
       {
-        [STATE_ID]: state.array[2][STATE_ID] || throwUndefinedId(),
+        [STATE_ID]: state['array'][2][STATE_ID] || throwUndefinedId(),
         [STATE_EXPANDED]: false,
         [STATE_KEYS]: ['c'] // FIXME: keys should not be created because node is not expanded
       }
     ]
-    expectedState.array[STATE_ID] = state.array[STATE_ID] || throwUndefinedId()
-    expectedState.array[STATE_EXPANDED] = true
-    expectedState.array[STATE_VISIBLE_SECTIONS] = DEFAULT_VISIBLE_SECTIONS
-    expectedState.object = {
-      [STATE_ID]: state.object[STATE_ID] || throwUndefinedId(),
+    expectedState['array'][STATE_ID] = state['array'][STATE_ID] || throwUndefinedId()
+    expectedState['array'][STATE_EXPANDED] = true
+    expectedState['array'][STATE_VISIBLE_SECTIONS] = DEFAULT_VISIBLE_SECTIONS
+    expectedState['object'] = {
+      [STATE_ID]: state['object'][STATE_ID] || throwUndefinedId(),
       [STATE_EXPANDED]: true,
       [STATE_KEYS]: ['a', 'b'],
       a: {
-        [STATE_ID]: state.object.a[STATE_ID] || throwUndefinedId()
+        [STATE_ID]: state['object']['a'][STATE_ID] || throwUndefinedId()
       },
       b: {
-        [STATE_ID]: state.object.b[STATE_ID] || throwUndefinedId()
+        [STATE_ID]: state['object']['b'][STATE_ID] || throwUndefinedId()
       }
     }
-    expectedState.value = {
-      [STATE_ID]: state.value[STATE_ID] || throwUndefinedId()
+    expectedState['value'] = {
+      [STATE_ID]: state['value'][STATE_ID] || throwUndefinedId()
     }
 
     assert.deepStrictEqual(state, expectedState)
@@ -339,7 +340,7 @@ describe('documentState', () => {
 
     // should not override when containing a boolean false
     const json4 = '42'
-    const state4 = { ...state2, [STATE_ENFORCE_STRING]: false }
+    const state4 = { ...(state2 as object), [STATE_ENFORCE_STRING]: false }
     const state4updated = syncState(json4, state4, [], () => false)
     assert.strictEqual(state4[STATE_ENFORCE_STRING], false)
     assert.strictEqual(state4updated[STATE_ENFORCE_STRING], false)
@@ -401,9 +402,9 @@ describe('documentState', () => {
       expected[STATE_ID] = state[STATE_ID]
       expected[STATE_EXPANDED] = true
       expected[STATE_KEYS] = ['a', 'b']
-      expected.a = { [STATE_ID]: state.a[STATE_ID] }
-      expected.b = {
-        [STATE_ID]: state.b[STATE_ID],
+      expected['a'] = { [STATE_ID]: state['a'][STATE_ID] }
+      expected['b'] = {
+        [STATE_ID]: state['b'][STATE_ID],
         [STATE_EXPANDED]: false,
         [STATE_KEYS]: ['bb']
       }
@@ -417,13 +418,13 @@ describe('documentState', () => {
       expected2[STATE_ID] = state[STATE_ID]
       expected2[STATE_EXPANDED] = true
       expected2[STATE_KEYS] = ['a', 'b']
-      expected2.a = { [STATE_ID]: state.a[STATE_ID] }
-      expected2.b = {
-        [STATE_ID]: state.b[STATE_ID],
+      expected2['a'] = { [STATE_ID]: state['a'][STATE_ID] }
+      expected2['b'] = {
+        [STATE_ID]: state['b'][STATE_ID],
         [STATE_EXPANDED]: true,
         [STATE_KEYS]: ['bb'],
         bb: {
-          [STATE_ID]: state2.b.bb[STATE_ID]
+          [STATE_ID]: state2['b'].bb[STATE_ID]
         }
       }
 
@@ -467,8 +468,8 @@ describe('documentState', () => {
       const json = { a: 2, b: { bb: 3 } }
       const state = expandSinglePath(json, createState(json), [])
       assert.strictEqual(state[STATE_EXPANDED], true)
-      assert.notStrictEqual(state.a, undefined)
-      assert.notStrictEqual(state.b, undefined)
+      assert.notStrictEqual(state['a'], undefined)
+      assert.notStrictEqual(state['b'], undefined)
 
       const collapsedState = collapseSinglePath(json, state, [])
 
@@ -482,7 +483,7 @@ describe('documentState', () => {
     it('should collapse an array', () => {
       const json = [1, 2, 3]
       const state = createState(json)
-      assert.strictEqual(state.length, 0)
+      assert.strictEqual(state['length'], 0)
       assert.strictEqual(state[1], undefined)
       assert.strictEqual(state[2], undefined)
       assert.strictEqual(state[2], undefined)
@@ -498,7 +499,7 @@ describe('documentState', () => {
       const collapsedState = collapseSinglePath(json, expandedState, [])
       assert.deepStrictEqual(collapsedState, state)
       assert.deepStrictEqual(collapsedState[STATE_VISIBLE_SECTIONS], DEFAULT_VISIBLE_SECTIONS)
-      assert.strictEqual(collapsedState.length, 0)
+      assert.strictEqual(collapsedState['length'], 0)
       assert.strictEqual(collapsedState[1], undefined)
       assert.strictEqual(collapsedState[2], undefined)
       assert.strictEqual(collapsedState[2], undefined)
@@ -527,8 +528,10 @@ describe('documentState', () => {
 
       assert.deepStrictEqual(updatedState[STATE_EXPANDED], false)
       assert.deepStrictEqual(updatedState[STATE_KEYS], ['a', 'b', 'c'])
-      assert(isObject(updatedState.c))
-      assert.strictEqual(typeof updatedState.c[STATE_ID], 'string')
+      assert(isObject(updatedState['c']))
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      assert.strictEqual(typeof updatedState['c'][STATE_ID], 'string')
     })
 
     it('add: should add a value to an object (expanded)', () => {
@@ -541,8 +544,10 @@ describe('documentState', () => {
 
       assert.deepStrictEqual(updatedState[STATE_EXPANDED], true)
       assert.deepStrictEqual(updatedState[STATE_KEYS], ['a', 'b', 'c'])
-      assert(isObject(updatedState.c))
-      assert.strictEqual(typeof updatedState.c[STATE_ID], 'string')
+      assert(isObject(updatedState['c']))
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      assert.strictEqual(typeof updatedState['c'][STATE_ID], 'string')
     })
 
     it('replace: should keep enforceString state', () => {
@@ -550,7 +555,7 @@ describe('documentState', () => {
       const state = syncState(json, undefined, [], () => false)
       assert.strictEqual(state[STATE_ENFORCE_STRING], true)
 
-      const operations = [{ op: 'replace', path: '', value: 'forty two' }]
+      const operations: JSONPatchDocument = [{ op: 'replace', path: '', value: 'forty two' }]
       const updatedState = documentStatePatch(json, state, operations).state
       assert.deepStrictEqual(updatedState[STATE_ENFORCE_STRING], true)
     })
@@ -592,11 +597,11 @@ describe('documentState', () => {
 
       assert.deepStrictEqual(state[STATE_KEYS], ['a', 'b'])
       assert.deepStrictEqual(state[STATE_EXPANDED], true)
-      assert.strictEqual(typeof state.a, 'object')
-      assert.strictEqual(typeof state.b, 'object')
-      assert.strictEqual(typeof state.d, 'undefined')
+      assert.strictEqual(typeof state['a'], 'object')
+      assert.strictEqual(typeof state['b'], 'object')
+      assert.strictEqual(typeof state['d'], 'undefined')
 
-      const operations = [
+      const operations: JSONPatchDocument = [
         {
           op: 'replace',
           path: '',
@@ -607,9 +612,9 @@ describe('documentState', () => {
 
       assert.deepStrictEqual(updatedState[STATE_KEYS], ['d'])
       assert.deepStrictEqual(updatedState[STATE_EXPANDED], false)
-      assert.strictEqual(typeof updatedState.a, 'undefined')
-      assert.strictEqual(typeof updatedState.b, 'undefined')
-      assert.strictEqual(typeof updatedState.d, 'undefined') // not expanded
+      assert.strictEqual(typeof updatedState['a'], 'undefined')
+      assert.strictEqual(typeof updatedState['b'], 'undefined')
+      assert.strictEqual(typeof updatedState['d'], 'undefined') // not expanded
     })
 
     it('copy: should copy a value into an object', () => {
@@ -719,79 +724,79 @@ describe('documentState', () => {
     it('should have non expanded initial state', () => {
       assert.deepStrictEqual(state[STATE_EXPANDED], false)
       assert.deepStrictEqual(state[STATE_KEYS], ['array', 'object', 'value'])
-      assert.deepStrictEqual(state.array, undefined)
-      assert.deepStrictEqual(state.object, undefined)
-      assert.deepStrictEqual(state.value, undefined)
+      assert.deepStrictEqual(state['array'], undefined)
+      assert.deepStrictEqual(state['object'], undefined)
+      assert.deepStrictEqual(state['value'], undefined)
     })
 
     it('should initialize nested state for operation add', () => {
       const operations = [{ op: 'add', path: '/array/2/d', value: 7 }]
       const updatedState = initializeState(json, state, operations)
 
-      assert.deepStrictEqual(Array.isArray(updatedState.array), true)
-      assert.deepStrictEqual(updatedState.array[STATE_EXPANDED], false)
-      assert.deepStrictEqual(typeof updatedState.array[2], 'object')
-      assert.deepStrictEqual(updatedState.array[2][STATE_EXPANDED], false)
-      assert.deepStrictEqual(updatedState.array[0], undefined)
-      assert.deepStrictEqual(updatedState.array[1], undefined)
-      assert.deepStrictEqual(updatedState.array[2].d, undefined)
+      assert.deepStrictEqual(Array.isArray(updatedState['array']), true)
+      assert.deepStrictEqual(updatedState['array'][STATE_EXPANDED], false)
+      assert.deepStrictEqual(typeof updatedState['array'][2], 'object')
+      assert.deepStrictEqual(updatedState['array'][2][STATE_EXPANDED], false)
+      assert.deepStrictEqual(updatedState['array'][0], undefined)
+      assert.deepStrictEqual(updatedState['array'][1], undefined)
+      assert.deepStrictEqual(updatedState['array'][2].d, undefined)
     })
 
     it('should initialize nested state for operation move', () => {
       const operations = [{ op: 'move', from: '/object/a', path: '/array/0' }]
       const updatedState = initializeState(json, state, operations)
 
-      assert.deepStrictEqual(typeof updatedState.object, 'object')
-      assert.deepStrictEqual(updatedState.object[STATE_EXPANDED], false)
-      assert.deepStrictEqual(typeof updatedState.object.a, 'object')
+      assert.deepStrictEqual(typeof updatedState['object'], 'object')
+      assert.deepStrictEqual(updatedState['object'][STATE_EXPANDED], false)
+      assert.deepStrictEqual(typeof updatedState['object']['a'], 'object')
 
-      assert.deepStrictEqual(Array.isArray(updatedState.array), true)
-      assert.deepStrictEqual(updatedState.array[STATE_EXPANDED], false)
-      assert.deepStrictEqual(updatedState.array[0], undefined)
-      assert.deepStrictEqual(updatedState.array[1], undefined)
-      assert.deepStrictEqual(updatedState.array[2], undefined)
+      assert.deepStrictEqual(Array.isArray(updatedState['array']), true)
+      assert.deepStrictEqual(updatedState['array'][STATE_EXPANDED], false)
+      assert.deepStrictEqual(updatedState['array'][0], undefined)
+      assert.deepStrictEqual(updatedState['array'][1], undefined)
+      assert.deepStrictEqual(updatedState['array'][2], undefined)
     })
 
     it('should initialize nested state for operation copy', () => {
       const operations = [{ op: 'copy', from: '/object/a', path: '/array/0' }]
       const updatedState = initializeState(json, state, operations)
 
-      assert.deepStrictEqual(typeof updatedState.object, 'object')
-      assert.deepStrictEqual(updatedState.object[STATE_EXPANDED], false)
-      assert.deepStrictEqual(typeof updatedState.object.a, 'object')
+      assert.deepStrictEqual(typeof updatedState['object'], 'object')
+      assert.deepStrictEqual(updatedState['object'][STATE_EXPANDED], false)
+      assert.deepStrictEqual(typeof updatedState['object']['a'], 'object')
 
-      assert.deepStrictEqual(Array.isArray(updatedState.array), true)
-      assert.deepStrictEqual(updatedState.array[STATE_EXPANDED], false)
-      assert.deepStrictEqual(updatedState.array[0], undefined)
-      assert.deepStrictEqual(updatedState.array[1], undefined)
-      assert.deepStrictEqual(updatedState.array[2], undefined)
+      assert.deepStrictEqual(Array.isArray(updatedState['array']), true)
+      assert.deepStrictEqual(updatedState['array'][STATE_EXPANDED], false)
+      assert.deepStrictEqual(updatedState['array'][0], undefined)
+      assert.deepStrictEqual(updatedState['array'][1], undefined)
+      assert.deepStrictEqual(updatedState['array'][2], undefined)
     })
 
     it('should initialize nested state for operation remove', () => {
       const operations = [{ op: 'remove', path: '/object/a' }]
       const updatedState = initializeState(json, state, operations)
 
-      assert.deepStrictEqual(typeof updatedState.object, 'object')
-      assert.deepStrictEqual(updatedState.object[STATE_EXPANDED], false)
-      assert.deepStrictEqual(typeof updatedState.object.a, 'object')
+      assert.deepStrictEqual(typeof updatedState['object'], 'object')
+      assert.deepStrictEqual(updatedState['object'][STATE_EXPANDED], false)
+      assert.deepStrictEqual(typeof updatedState['object']['a'], 'object')
     })
 
     it('should initialize nested state for operation replace', () => {
       const operations = [{ op: 'replace', path: '/object/a', value: 42 }]
       const updatedState = initializeState(json, state, operations)
 
-      assert.deepStrictEqual(typeof updatedState.object, 'object')
-      assert.deepStrictEqual(updatedState.object[STATE_EXPANDED], false)
-      assert.deepStrictEqual(typeof updatedState.object.a, 'object')
+      assert.deepStrictEqual(typeof updatedState['object'], 'object')
+      assert.deepStrictEqual(updatedState['object'][STATE_EXPANDED], false)
+      assert.deepStrictEqual(typeof updatedState['object']['a'], 'object')
     })
 
     it('should initialize nested state for operation test', () => {
       const operations = [{ op: 'test', path: '/object/a', value: 42 }]
       const updatedState = initializeState(json, state, operations)
 
-      assert.deepStrictEqual(typeof updatedState.object, 'object')
-      assert.deepStrictEqual(updatedState.object[STATE_EXPANDED], false)
-      assert.deepStrictEqual(typeof updatedState.object.a, 'object')
+      assert.deepStrictEqual(typeof updatedState['object'], 'object')
+      assert.deepStrictEqual(updatedState['object'][STATE_EXPANDED], false)
+      assert.deepStrictEqual(typeof updatedState['object']['a'], 'object')
     })
 
     it('should not initialize nested state when not existing in json itself', () => {

@@ -182,6 +182,15 @@ export function isMenuSpaceItem(item: unknown): item is MenuSpaceItem {
 
 export type MenuItem = MenuButtonItem | MenuSeparatorItem | MenuSpaceItem
 
+export interface MessageAction {
+  text: string
+  title: string
+  icon?: FontAwesomeIcon
+  onClick?: () => void
+  onMouseDown?: () => void
+  disabled?: boolean
+}
+
 export interface ValidationError {
   path: Path
   message: string
@@ -256,9 +265,19 @@ export type OnChangeQueryLanguage = (queryLanguageId: string) => void
 export type OnChange =
   | ((content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void)
   | null
+export type OnSelect = (
+  selectionSchema: SelectionSchema,
+  options?: { ensureFocus?: boolean }
+) => void
+export type OnPatch = (operations: JSONPatchDocument) => void
+export type OnSort = (operations: JSONPatchDocument) => void
+export type OnFind = (findAndReplace: boolean) => void
+export type OnPaste = (pastedText: string) => void
+export type OnPasteJson = (pastedJson: { path: Path; contents: JSONData }) => void
 export type OnRenderValue = (props: RenderValueProps) => RenderValueComponentDescription[]
 export type OnClassName = (path: Path, value: JSONData) => string | undefined | void
 export type OnChangeMode = (mode: 'tree' | 'code') => void
+export type OnContextMenu = (contextMenuProps: ContextMenuProps) => void
 export type OnRenderMenu = (
   mode: 'tree' | 'code' | 'repair',
   items: MenuItem[]
@@ -284,6 +303,7 @@ export interface SearchResultItem {
   fieldIndex: number
   start: number
   end: number
+  active: boolean
 }
 
 export interface ValueNormalization {
@@ -335,11 +355,11 @@ export interface TreeModeContext {
   onPatch: (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
   onInsert: (type: InsertType) => void
   onExpand: (path: Path, expanded: boolean, recursive?: boolean) => void
-  onSelect: { selectionSchema: SelectionSchema; options?: { ensureFocus?: boolean } }
-  onFind: (findAndReplace: boolean) => void
+  onSelect: OnSelect
+  onFind: OnFind
   onExpandSection: (path: Path, section: Section) => void
   onRenderValue: (props: RenderValueProps) => RenderValueComponentDescription[]
-  onContextMenu: (contextMenuProps: ContextMenuProps) => void
+  onContextMenu: OnContextMenu
   onClassName: (path: Path, value: JSONData) => string
   onDrag: (event: Event) => void
   onDragEnd: (event: Event) => void
@@ -356,9 +376,9 @@ export interface RenderValuePropsOptional {
   isEditing?: boolean
   normalization?: ValueNormalization
   onPatch?: TreeModeContext['onPatch']
-  onPasteJson?: (pastedJson: { path: Path; contents: JSONData }) => void
-  onSelect?: (selection: Selection) => void
-  onFind?: (findAndReplace: boolean) => void
+  onPasteJson?: OnPasteJson
+  onSelect?: OnSelect
+  onFind?: OnFind
 }
 
 export interface RenderValueProps extends RenderValuePropsOptional {
@@ -372,9 +392,9 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   isEditing: boolean
   normalization: ValueNormalization
   onPatch: TreeModeContext['onPatch']
-  onPasteJson: (pastedJson: { path: Path; contents: JSONData }) => void
-  onSelect: (selection: Selection) => void
-  onFind: (findAndReplace: boolean) => void
+  onPasteJson: OnPasteJson
+  onSelect: OnSelect
+  onFind: OnFind
 }
 
 // TODO: can we define proper generic types here?
@@ -410,6 +430,6 @@ export interface SortModalCallback {
   id: string
   json: JSONData
   selectedPath: Path
-  onSort: (operations: JSONPatchDocument) => void
+  onSort: OnSort
   onClose: () => void
 }

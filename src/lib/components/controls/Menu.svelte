@@ -1,9 +1,10 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import Icon from 'svelte-awesome'
+  import type { MenuItem } from '../../types'
 
-  export let items = []
+  export let items: MenuItem[] = []
 </script>
 
 <div class="jse-menu">

@@ -1,8 +1,8 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { faExclamationTriangle, faWrench } from '@fortawesome/free-solid-svg-icons'
-  import { createDebug } from '$lib/utils/debug'
+  import { createDebug } from '../../../utils/debug'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
   import { debounce, noop, uniqueId } from 'lodash-es'
@@ -14,7 +14,7 @@
     JSON_STATUS_VALID,
     MAX_AUTO_REPAIRABLE_SIZE,
     MAX_DOCUMENT_SIZE_CODE_MODE
-  } from '$lib/constants'
+  } from '../../../constants'
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
@@ -36,7 +36,7 @@
   import { Compartment } from '@codemirror/state'
   import { closeSearchPanel, openSearchPanel, search } from '@codemirror/search'
   import { redo, redoDepth, undo, undoDepth } from '@codemirror/history'
-  import { normalizeJsonParseError } from '../../../utils/jsonUtils.ts'
+  import { normalizeJsonParseError } from '../../../utils/jsonUtils.js'
   import { MAX_VALIDATABLE_SIZE } from '../../../constants.js'
   import { measure } from '../../../utils/timeUtils.js'
   import jsonSourceMap from 'json-source-map'

@@ -1,21 +1,17 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
   import { faCog, faTimes } from '@fortawesome/free-solid-svg-icons'
   import SelectQueryLanguage from '../controls/selectQueryLanguage/SelectQueryLanguage.svelte'
+  import type { OnChangeQueryLanguage, QueryLanguage } from '../../types'
 
-  /** @type {QueryLanguage[]} */
-  export let queryLanguages
+  export let queryLanguages: QueryLanguage[]
+  export let queryLanguageId: string
+  export let onChangeQueryLanguage: OnChangeQueryLanguage
 
-  /** @type {string} */
-  export let queryLanguageId
-
-  /** @type {(queryLanguageId: string) => void} */
-  export let onChangeQueryLanguage
-
-  let refConfigButton
+  let refConfigButton: HTMLButtonElement | undefined
 
   const { close } = getContext('simple-modal')
   const { openAbsolutePopup, closeAbsolutePopup } = getContext('absolute-popup')

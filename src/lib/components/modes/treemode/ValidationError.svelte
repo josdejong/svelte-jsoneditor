@@ -1,13 +1,14 @@
-<script>
+<script lang="ts">
   import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
   import Icon from 'svelte-awesome'
   import { getContext } from 'svelte'
   import { tooltip } from '../../controls/tooltip/tooltip'
+  import type { ValidationError } from '../../../types'
 
   const absolutePopupContext = getContext('absolute-popup')
 
-  export let validationError
-  export let onExpand
+  export let validationError: ValidationError
+  export let onExpand: (event: Event) => void
 
   $: text = validationError.isChildError ? 'Contains invalid data' : validationError.message
 </script>

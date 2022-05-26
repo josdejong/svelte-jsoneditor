@@ -1,5 +1,5 @@
-<script>
-  export let text
+<script lang="ts">
+  export let text: string
 </script>
 
 <div class="jse-tooltip">

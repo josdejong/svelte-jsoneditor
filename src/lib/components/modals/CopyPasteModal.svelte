@@ -1,6 +1,6 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { getContext } from 'svelte'
   import { IS_MAC } from '../../utils/navigatorUtils.js'
   import Header from './Header.svelte'

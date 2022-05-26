@@ -1,22 +1,19 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import Select from 'svelte-select'
-  import { getNestedPaths } from '../../utils/arrayUtils.ts'
+  import { getNestedPaths } from '../../utils/arrayUtils.js'
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { createDebug } from '../../utils/debug.js'
   import { isEmpty, isEqual } from 'lodash-es'
   import { setIn } from 'immutable-json-patch'
+  import type { JSONData, Path, QueryLanguageOptions } from '../../types'
 
   const debug = createDebug('jsoneditor:TransformWizard')
 
-  export let json
-
-  /** @type {QueryLanguageOptions} */
-  export let queryOptions = {}
-
-  /** @type {(queryOptions: QueryLanguageOptions) => void} */
-  export let onChange
+  export let json: JSONData
+  export let queryOptions: QueryLanguageOptions = {}
+  export let onChange: (queryOptions: QueryLanguageOptions) => void
 
   // options
   $: jsonIsArray = Array.isArray(json)
@@ -60,7 +57,7 @@
     }
   }
 
-  function changeFilterPath(path) {
+  function changeFilterPath(path: Path) {
     if (!isEqual(queryOptions?.filter?.path, path)) {
       debug('changeFilterPath', path)
       queryOptions = setIn(queryOptions, ['filter', 'path'], path, true)

@@ -9,7 +9,7 @@
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import CodeMode from './modes/codemode/CodeMode.svelte'
   import TreeMode from './modes/treemode/TreeMode.svelte'
-  import { javascriptQueryLanguage } from '../plugins/query/javascriptQueryLanguage.ts'
+  import { javascriptQueryLanguage } from '../plugins/query/javascriptQueryLanguage.js'
   import { renderValue } from '$lib/plugins/value/renderValue'
   import { tick } from 'svelte'
   import TransformModal from './modals/TransformModal.svelte'

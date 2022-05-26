@@ -1,13 +1,14 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import Icon from 'svelte-awesome'
+  import type { FontAwesomeIcon, MessageAction } from '../../types'
 
-  export let type = 'success' // 'success' or 'error'
-  export let icon = null
-  export let message = null
-  export let actions = []
-  export let onClick = null
+  export let type: 'success' | 'error' = 'success' // 'success' or 'error'
+  export let icon: FontAwesomeIcon = undefined
+  export let message: string | undefined = undefined
+  export let actions: MessageAction[] = []
+  export let onClick: () => void | undefined = undefined
 
   function handleClick() {
     if (onClick) {
@@ -27,8 +28,8 @@
     {#each actions as action}
       <button
         type="button"
-        on:click={action.onClick}
-        on:mousedown={action.onMouseDown}
+        on:click={() => action.onClick()}
+        on:mousedown={() => action.onMouseDown()}
         class="jse-button jse-action jse-primary"
         title={action.title}
         disabled={action.disabled}

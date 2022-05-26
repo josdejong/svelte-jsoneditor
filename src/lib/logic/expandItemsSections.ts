@@ -1,15 +1,12 @@
 import { sortBy } from 'lodash-es'
 import { ARRAY_SECTION_SIZE } from '../constants.js'
+import type { Section } from '../types'
 
 /**
  * Create sections that can be expanded.
  * Used to display a button like "Show items 100-200"
- *
- * @param {number} startIndex
- * @param {number} endIndex
- * @return {Section[]}
  */
-export function getExpandItemsSections(startIndex, endIndex) {
+export function getExpandItemsSections(startIndex: number, endIndex: number): Section[] {
   // expand the start of the section
   const section1 = {
     start: startIndex,
@@ -48,10 +45,8 @@ export function getExpandItemsSections(startIndex, endIndex) {
 
 /**
  * Sort and merge a list with sections
- * @param {Section[]} sections
- * @return {Section[]}
  */
-export function mergeSections(sections) {
+export function mergeSections(sections: Section[]): Section[] {
   const sortedSections = sortBy(sections, (section) => section.start)
 
   const mergedSections = [sortedSections[0]]
@@ -77,16 +72,16 @@ export function mergeSections(sections) {
 }
 
 // TODO: write unit test
-export function inVisibleSection(sections, index) {
+export function inVisibleSection(sections: Section[], index: number): boolean {
   return sections.some((section) => {
     return index >= section.start && index < section.end
   })
 }
 
-export function nextRoundNumber(index) {
+export function nextRoundNumber(index: number): number {
   return currentRoundNumber(index) + ARRAY_SECTION_SIZE
 }
 
-export function currentRoundNumber(index) {
+export function currentRoundNumber(index: number): number {
   return Math.floor(index / ARRAY_SECTION_SIZE) * ARRAY_SECTION_SIZE
 }

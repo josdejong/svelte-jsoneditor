@@ -1,14 +1,17 @@
+import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, existsIn, getIn, setIn } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
-import { STATE_EXPANDED, STATE_KEYS, STATE_SELECTION } from '../constants.js'
+import { STATE_EXPANDED, STATE_SELECTION } from '../constants.js'
 import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
-import { isObject, isObjectOrArray } from '../utils/typeUtils.ts'
+import { isObject, isObjectOrArray } from '../utils/typeUtils.js'
 import {
+  getKeys,
   getNextVisiblePath,
   getPreviousVisiblePath,
   getVisibleCaretPositions,
   getVisiblePaths
 } from './documentState.js'
+import type { JSONData, JSONPatchDocument, Selection } from '../types'
 
 export const SELECTION_TYPE = {
   AFTER: 'after',
@@ -46,7 +49,7 @@ export function expandSelection(json, state, anchorPath, focusPath) {
     const value = getIn(json, sharedPath)
 
     if (isObject(value)) {
-      const keys = getIn(state, sharedPath.concat(STATE_KEYS))
+      const keys = getKeys(state, sharedPath)
       const anchorIndex = keys.indexOf(anchorKey)
       const focusIndex = keys.indexOf(focusKey)
 
@@ -210,7 +213,7 @@ export function getSelectionUp(
   }
 
   if (selection.type === SELECTION_TYPE.KEY) {
-    const parentPath = initial(previousPath)
+    const parentPath: JSONPath = initial(previousPath)
     const parent = getIn(json, parentPath)
     if (Array.isArray(parent) || isEmpty(previousPath)) {
       // switch to value selection: array has no keys, and root object also not
@@ -265,7 +268,7 @@ export function getSelectionDown(
   selection,
   keepAnchorPath = false,
   useFocusPath = false
-) {
+): Selection | null {
   // TODO: this function is too large, break it down in two separate functions: one for keepAnchorPath = true, and one for keepAnchorPath = false?
   const path = !useFocusPath && selection.paths ? last(selection.paths) : selection.focusPath
   const nextPath = getNextVisiblePath(json, state, path)
@@ -314,17 +317,23 @@ export function getSelectionDown(
   }
 
   if (selection.type === SELECTION_TYPE.KEY) {
-    const parentPath = initial(nextPath)
+    const parentPath: JSONPath = initial(nextPath)
     const parent = getIn(json, parentPath)
     if (Array.isArray(parent)) {
       // switch to value selection: array has no keys
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       return { type: SELECTION_TYPE.VALUE, anchorPath, focusPath }
     } else {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       return { type: SELECTION_TYPE.KEY, anchorPath, focusPath }
     }
   }
 
   if (selection.type === SELECTION_TYPE.VALUE) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     return { type: SELECTION_TYPE.VALUE, anchorPath, focusPath }
   }
 
@@ -356,7 +365,7 @@ export function getSelectionDown(
 export function getSelectionNextInside(json, state, selection) {
   // TODO: write unit tests for getSelectionNextInside
   const path = selection.focusPath
-  const parentPath = initial(path)
+  const parentPath: JSONPath = initial(path)
   const childPath = [last(path)]
 
   const nextPathInside = getNextVisiblePath(
@@ -442,7 +451,7 @@ export function getSelectionLeft(
     })
   }
 
-  const parentPath = initial(selection.focusPath)
+  const parentPath: JSONPath = initial(selection.focusPath)
   const parent = getIn(json, parentPath)
 
   if (selection.type === SELECTION_TYPE.VALUE && Array.isArray(parent)) {
@@ -533,13 +542,11 @@ export function getInitialSelection(json, state) {
     : { type: SELECTION_TYPE.KEY, anchorPath: path, focusPath: path }
 }
 
-/**
- * @param {JSON} json
- * @param {JSON} state
- * @param {JSONPatchDocument} operations
- * @returns {Selection | null}
- */
-export function createSelectionFromOperations(json, state, operations) {
+export function createSelectionFromOperations(
+  json: JSONData,
+  state: JSONData,
+  operations: JSONPatchDocument
+): Selection | null {
   if (operations.length === 1) {
     const operation = first(operations)
     if (operation.op === 'replace' || operation.op === 'move') {
@@ -547,6 +554,8 @@ export function createSelectionFromOperations(json, state, operations) {
       const path = parseJSONPointerWithArrayIndices(json, operation.path)
 
       return {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         type: SELECTION_TYPE.VALUE,
         anchorPath: path,
         focusPath: path,
@@ -567,6 +576,8 @@ export function createSelectionFromOperations(json, state, operations) {
       const path = parseJSONPointerWithArrayIndices(json, firstOp.path)
 
       return {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         type: SELECTION_TYPE.KEY,
         anchorPath: path,
         focusPath: path,
@@ -593,6 +604,8 @@ export function createSelectionFromOperations(json, state, operations) {
   // TODO: make this function robust against operations which do not have consecutive paths or have wrongly ordered paths
 
   return {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     type: SELECTION_TYPE.MULTI,
     paths,
     anchorPath: first(paths),
@@ -700,7 +713,7 @@ export function removeEditModeFromSelection(selection) {
  * @return {Selection}
  */
 // TODO: write unit tests
-export function createSelection(json, state, selectionSchema) {
+export function createSelection(json, state, selectionSchema): Selection {
   // TODO: remove next from SelectionSchema, pass it as a separate argument
   const {
     type,
@@ -727,7 +740,9 @@ export function createSelection(json, state, selectionSchema) {
     }
     return selection
   } else if (type === SELECTION_TYPE.VALUE) {
-    let selection = {
+    let selection: Selection = {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       type: SELECTION_TYPE.VALUE,
       anchorPath: path,
       focusPath: path,
@@ -755,6 +770,8 @@ export function createSelection(json, state, selectionSchema) {
   } else if (type === SELECTION_TYPE.MULTI && path) {
     const paths = [path]
     return {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       type: SELECTION_TYPE.MULTI,
       anchorPath: path,
       focusPath: path,
@@ -771,6 +788,8 @@ export function createSelection(json, state, selectionSchema) {
       pathStartsWith(focusPath, last(paths)) || pathStartsWith(anchorPath, first(paths))
 
     return {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       type: SELECTION_TYPE.MULTI,
       anchorPath: focusPathLast ? first(paths) : last(paths),
       focusPath: focusPathLast ? last(paths) : first(paths),

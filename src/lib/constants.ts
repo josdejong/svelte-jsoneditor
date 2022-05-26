@@ -1,4 +1,6 @@
 // TODO: change MODE into an enum
+import type { Section } from './types'
+
 export const MODE = {
   TREE: 'tree',
   CODE: 'code'
@@ -24,7 +26,7 @@ export const AUTO_SCROLL_SPEED_NORMAL = 400 // pixels per second
 export const AUTO_SCROLL_SPEED_FAST = 1200 // pixels per second
 export const MAX_SEARCH_RESULTS = 1000
 export const ARRAY_SECTION_SIZE = 100
-export const DEFAULT_VISIBLE_SECTIONS = [{ start: 0, end: ARRAY_SECTION_SIZE }]
+export const DEFAULT_VISIBLE_SECTIONS: Section[] = [{ start: 0, end: ARRAY_SECTION_SIZE }]
 export const MAX_PREVIEW_CHARACTERS = 20e3 // characters
 export const MAX_VALIDATABLE_SIZE = 100 * 1024 * 1024 // 1 MB
 export const MAX_AUTO_REPAIRABLE_SIZE = 1024 * 1024 // 1 MB
@@ -73,6 +75,7 @@ export const JSON_STATUS_INVALID = 'invalid'
 export const CONTEXT_MENU_HEIGHT = (40 + 2) * 8 // px
 export const CONTEXT_MENU_WIDTH = 260 // px
 
+// TODO: change UPDATE_SELECTION into an enum
 export const UPDATE_SELECTION = {
   NO: 'NO',
   SELF: 'SELF',

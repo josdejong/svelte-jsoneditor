@@ -1,26 +1,26 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { compileJSONPointer } from 'immutable-json-patch'
-  import { SELECTION_TYPE } from '$lib/logic/selection.js'
+  import { SELECTION_TYPE } from '../../../logic/selection'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
+  import type { JSONData, OnPatch, OnSelect, Path } from '../../../types'
 
-  export let path
-  export let value
-  export let readOnly
-  export let isSelected
-  export let onPatch
-  export let onSelect
+  export let path: Path
+  export let value: JSONData
+  export let readOnly: boolean
+  export let isSelected: boolean
+  export let onPatch: OnPatch
+  export let onSelect: OnSelect
 
-  /** @type {Array<{value: any, text: string}>} */
-  export let options
+  export let options: Array<{ value: unknown; text: string }>
 
-  let refSelect
+  let refSelect: HTMLSelectElement | undefined
 
-  let bindValue = value
+  let bindValue: JSONData = value
   $: bindValue = value
 
-  function applyFocus(isSelected) {
+  function applyFocus(isSelected: boolean) {
     if (isSelected) {
       if (refSelect) {
         refSelect.focus()

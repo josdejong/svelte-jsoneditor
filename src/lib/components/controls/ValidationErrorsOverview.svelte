@@ -1,6 +1,6 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import {
     faAngleDown,
     faAngleRight,
@@ -9,16 +9,10 @@
   import { isEmpty } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import { stringifyPath } from '../../utils/pathUtils.js'
+  import type { ValidationError } from '../../types'
 
-  /**
-   * @type {ValidationError[]}
-   **/
-  export let validationErrors
-
-  /**
-   * @type {function(error: ValidationError)}
-   */
-  export let selectError
+  export let validationErrors: ValidationError[]
+  export let selectError: (error: ValidationError) => void
 
   let expanded = true
 

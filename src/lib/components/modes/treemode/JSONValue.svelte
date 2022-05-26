@@ -1,15 +1,14 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { SELECTION_TYPE } from '$lib/logic/selection'
+  import { SELECTION_TYPE } from '../../../logic/selection'
   import { isEqual } from 'lodash-es'
-  import type { SearchResultItem, Selection, Path } from '../../../types'
+  import type { SearchResultItem, Selection, Path, TreeModeContext } from '../../../types'
 
   export let path: Path
   export let value: JSON
 
-  /** @type {TreeModeContext} */
-  export let context
+  export let context: TreeModeContext
 
   export let enforceString: boolean
   export let selection: Selection | undefined

@@ -13,7 +13,7 @@
     EditableValue,
     ReadonlyValue
   } from '$lib'
-  import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
+  import { useLocalStorage } from '../lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
   import { tick } from 'svelte'
 

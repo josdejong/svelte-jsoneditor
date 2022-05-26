@@ -6,6 +6,7 @@
   "svelte": "index.js",
   "module": "dist/jsoneditor.js",
   "main": "dist/jsoneditor.js",
+  "types": "index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/josdejong/svelte-jsoneditor.git"

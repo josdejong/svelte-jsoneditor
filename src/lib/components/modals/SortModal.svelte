@@ -1,24 +1,25 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { isEmpty } from 'lodash-es'
   import { getContext } from 'svelte'
   import Select from 'svelte-select'
   import Header from './Header.svelte'
-  import { getNestedPaths } from '../../utils/arrayUtils.ts'
-  import { isObject } from '../../utils/typeUtils.ts'
+  import { getNestedPaths } from '../../utils/arrayUtils.js'
+  import { isObject } from '../../utils/typeUtils.js'
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { sortArray, sortObjectKeys } from '../../logic/sort.js'
   import { sortModalState } from './sortModalState.js'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
-  import { createDebug } from '$lib/utils/debug.js'
+  import { createDebug } from '../../utils/debug'
+  import type { JSONData, OnSort, Path } from '../../types'
 
   const debug = createDebug('jsoneditor:SortModal')
 
-  export let id
-  export let json // the whole document
-  export let selectedPath
-  export let onSort
+  export let id: string
+  export let json: JSONData // the whole document
+  export let selectedPath: Path
+  export let onSort: OnSort
 
   const { close } = getContext('simple-modal')
 
@@ -61,7 +62,7 @@
     debug('store state in memory', stateId, sortModalState[stateId])
   }
 
-  function pathToOption(path) {
+  function pathToOption(path: Path): { value: Path; label: string } {
     return {
       value: path,
       label: isEmpty(path) ? '(whole item)' : stringifyPath(path)
@@ -91,7 +92,7 @@
     close()
   }
 
-  function focus(element) {
+  function focus(element: HTMLElement) {
     element.focus()
   }
 </script>

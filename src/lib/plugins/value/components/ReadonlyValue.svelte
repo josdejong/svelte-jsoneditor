@@ -1,25 +1,31 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { isUrl } from '$lib/utils/typeUtils'
-  import { SELECTION_TYPE } from '$lib/logic/selection.js'
+  import { SELECTION_TYPE } from '../../../logic/selection'
   import SearchResultHighlighter from '../../../components/modes/treemode/highlight/SearchResultHighlighter.svelte'
   import { getValueClass } from './utils/getValueClass'
   import { addNewLineSuffix } from '$lib/utils/domUtils'
+  import type {
+    JSONData,
+    OnSelect,
+    Path,
+    SearchResultItem,
+    ValueNormalization
+  } from '../../../types'
 
-  export let path
-  export let value
-  export let readOnly
-  export let normalization
-  export let onSelect
+  export let path: Path
+  export let value: JSONData
+  export let readOnly: boolean
+  export let normalization: ValueNormalization
+  export let onSelect: OnSelect
 
-  /** @type {SearchResultItem | undefined} */
-  export let searchResult
+  export let searchResult: SearchResultItem | undefined
 
   $: valueIsUrl = isUrl(value)
 
   function handleValueClick(event) {
-    if (valueIsUrl && event.ctrlKey) {
+    if (typeof value === 'string' && valueIsUrl && event.ctrlKey) {
       event.preventDefault()
       event.stopPropagation()
 

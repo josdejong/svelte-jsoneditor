@@ -1,11 +1,11 @@
-<script>
+<script lang="ts">
   import { onDestroy, onMount } from 'svelte'
 
-  export let color
-  export let onChange
-  export let showOnTop
+  export let color: string
+  export let onChange: (newColor: string) => void
+  export let showOnTop: boolean
 
-  let ref
+  let ref: Element | undefined
   let colorPicker
 
   onMount(async () => {

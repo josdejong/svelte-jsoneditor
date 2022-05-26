@@ -16,14 +16,14 @@ export function parseJSONPointerWithArrayIndices(json, path) {
   for (let i = 0; i < parsedPath.length; i++) {
     const section = parsedPath[i]
 
-    if (ARRAY_INDEX_REGEX.exec(section)) {
+    if (ARRAY_INDEX_REGEX.exec(section as string)) {
       // this path part contains a number.
       // See if the document actually contains an array
       const parentPath = parsedPath.slice(0, i)
       const parent = getIn(json, parentPath)
 
       if (Array.isArray(parent)) {
-        parsedPath[i] = parseInt(section)
+        parsedPath[i] = parseInt(section as string)
       }
     }
   }

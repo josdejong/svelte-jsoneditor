@@ -1,6 +1,6 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
   import { parseJSONPointer } from 'immutable-json-patch'
@@ -20,10 +20,10 @@
     STATE_SELECTION,
     STATE_VISIBLE_SECTIONS,
     VALIDATION_ERROR
-  } from '$lib/constants'
-  import { getVisibleCaretPositions } from '$lib/logic/documentState'
-  import { rename } from '$lib/logic/operations'
-  import { isPathInsideSelection, SELECTION_TYPE } from '$lib/logic/selection'
+  } from '../../../constants'
+  import { getVisibleCaretPositions } from '../../../logic/documentState'
+  import { rename } from '../../../logic/operations'
+  import { isPathInsideSelection, SELECTION_TYPE } from '../../../logic/selection'
   import {
     encodeDataPath,
     getSelectionTypeFromTarget,
@@ -38,23 +38,23 @@
   import JSONValue from './JSONValue.svelte'
   import { singleton } from './singleton.js'
   import ValidationError from './ValidationError.svelte'
-  import { createDebug } from '$lib/utils/debug'
+  import { createDebug } from '../../../utils/debug'
   import { forEachKey } from '../../../logic/documentState.js'
   import { onMoveSelection } from '../../../logic/dragging.js'
-  import { forEachIndex } from '../../../utils/arrayUtils.ts'
+  import { forEachIndex } from '../../../utils/arrayUtils.js'
   import { getDataPathFromTarget } from '../../../utils/domUtils'
   import { createMemoizePath } from '../../../utils/pathUtils.js'
   import { keyIsSelected } from '../../../logic/selection.js'
+  import type { JSONData, Path, SearchResultItem, TreeModeContext } from '../../../types'
 
-  export let value
-  export let path
-  export let state
-  export let selection
-  export let searchResult
-  export let validationErrors
+  export let value: JSONData
+  export let path: Path
+  export let state: JSONData
+  export let selection: Selection | undefined
+  export let searchResult: SearchResultItem[]
+  export let validationErrors: ValidationError[]
 
-  /** @type {TreeModeContext} */
-  export let context
+  export let context: TreeModeContext
 
   export let onDragSelectionStart
 

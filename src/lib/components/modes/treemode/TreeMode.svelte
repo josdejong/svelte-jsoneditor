@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
-<script>
-  import { createAutoScrollHandler } from '$lib/components/controls/createAutoScrollHandler'
+<script lang="ts">
+  import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '../../../utils/debug.js'
   import {
@@ -24,22 +24,22 @@
     SEARCH_UPDATE_THROTTLE,
     SIMPLE_MODAL_OPTIONS,
     STATE_ENFORCE_STRING
-  } from '$lib/constants'
+  } from '../../../constants'
   import {
     createState,
     documentStatePatch,
     expandPath,
     expandSection,
     syncState
-  } from '$lib/logic/documentState'
-  import { createHistory } from '$lib/logic/history'
+  } from '../../../logic/documentState'
+  import { createHistory } from '../../../logic/history'
   import {
     createNewValue,
     createRemoveOperations,
     duplicate,
     extract,
     insert
-  } from '$lib/logic/operations'
+  } from '../../../logic/operations'
   import {
     createSearchAndReplaceAllOperations,
     createSearchAndReplaceOperations,
@@ -47,7 +47,7 @@
     searchNext,
     searchPrevious,
     updateSearchResult
-  } from '$lib/logic/search'
+  } from '../../../logic/search'
   import {
     createRecursiveSelection,
     createSelection,
@@ -62,8 +62,8 @@
     selectAll,
     SELECTION_TYPE,
     selectionToPartialJson
-  } from '$lib/logic/selection'
-  import { mapValidationErrors } from '$lib/logic/validation'
+  } from '../../../logic/selection'
+  import { mapValidationErrors } from '../../../logic/validation'
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
@@ -74,9 +74,9 @@
     isChildOfNodeName,
     setCursorToEnd
   } from '$lib/utils/domUtils'
-  import { parseJSONPointerWithArrayIndices } from '$lib/utils/jsonPointer'
+  import { parseJSONPointerWithArrayIndices } from '../../../utils/jsonPointer'
   import { parsePartialJson, repairPartialJson } from '$lib/utils/jsonUtils'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings'
+  import { keyComboFromEvent } from '../../../utils/keyBindings'
   import { isObject, isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
@@ -89,10 +89,11 @@
   import Welcome from './Welcome.svelte'
   import NavigationBar from '../../../components/controls/navigationBar/NavigationBar.svelte'
   import SearchBox from '../../../components/modes/treemode/menu/SearchBox.svelte'
-  import { convertValue, isLargeContent } from '../../../utils/jsonUtils.ts'
+  import { convertValue, isLargeContent } from '../../../utils/jsonUtils.js'
   import { MAX_DOCUMENT_SIZE_EXPAND_ALL } from '../../../constants.js'
   import { canConvert, createSelectionFromOperations } from '../../../logic/selection.js'
   import { collapse, expandWithCallback } from '../../../logic/documentState.js'
+  import type { Validator } from '../../../types'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -117,7 +118,7 @@
   export let navigationBar = true
   export let escapeControlCharacters = false
   export let escapeUnicodeCharacters = false
-  export let validator = null
+  export let validator: Validator = null
 
   export let indentation = 2
   export let onError

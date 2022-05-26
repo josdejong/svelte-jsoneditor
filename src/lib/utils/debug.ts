@@ -19,12 +19,11 @@
  * The actual value of 'debug' is not used. You can choose other conditions to
  * enable/disable debugging if you want, for example some flag determining
  * whether in development or production.
- *
- * @param {string} namespace
- * @param {boolean} [enabled]
- * @returns {function (...args: any) : void}
  */
-export function createDebug(namespace, enabled = tryReadLocalStorage('debug')) {
+export function createDebug(
+  namespace: string,
+  enabled = !!tryReadLocalStorage('debug')
+): (...args: unknown[]) => void {
   if (enabled) {
     const color = selectColor(namespace)
 
@@ -42,10 +41,8 @@ function noop() {
 
 /**
  * Try read a specific key from localStorage
- * @param {string} key
- * @returns {string | undefined}
  */
-function tryReadLocalStorage(key) {
+function tryReadLocalStorage(key: string): string | undefined {
   try {
     if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
       // reading local storage can fail for example because of security restrictions
@@ -61,10 +58,10 @@ function tryReadLocalStorage(key) {
  *
  * Code is copied from the following source: https://github.com/visionmedia/debug
  *
- * @param {string} namespace The namespace string for the debug instance to be colored
- * @return {string} An ANSI color code for the given namespace
+ * @param namespace The namespace string for the debug instance to be colored
+ * @return An ANSI color code for the given namespace
  */
-function selectColor(namespace) {
+function selectColor(namespace: string): string {
   let hash = 0
 
   for (let i = 0; i < namespace.length; i++) {
