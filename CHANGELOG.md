@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.54](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.53...v0.3.54) (2022-05-27)
+
+
+### Bug Fixes
+
+* do not throw an exception when using `.refresh()` in tree mode ([6d5646d](https://github.com/josdejong/svelte-jsoneditor/commit/6d5646d9562d76a88e26ed19d4fd714597d209fe))
+* improve typescript definitions ([#86](https://github.com/josdejong/svelte-jsoneditor/issues/86)) ([a7d759a](https://github.com/josdejong/svelte-jsoneditor/commit/a7d759a6c3fca6cf28ad9f440c5ddcbbdd1dc362))
+
 ### [0.3.53](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.52...v0.3.53) (2022-05-23)
 
 
