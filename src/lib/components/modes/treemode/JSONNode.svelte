@@ -20,12 +20,13 @@
     STATE_SELECTION,
     STATE_VISIBLE_SECTIONS,
     VALIDATION_ERROR
-  } from '../../../constants'
-  import { getVisibleCaretPositions } from '../../../logic/documentState'
-  import { rename } from '../../../logic/operations'
-  import { isPathInsideSelection, SELECTION_TYPE } from '../../../logic/selection'
+  } from '$lib/constants'
+  import { getVisibleCaretPositions } from '$lib/logic/documentState'
+  import { rename } from '$lib/logic/operations'
+  import { isPathInsideSelection, SELECTION_TYPE } from '$lib/logic/selection'
   import {
     encodeDataPath,
+    getDataPathFromTarget,
     getSelectionTypeFromTarget,
     isChildOfAttribute,
     isChildOfNodeName,
@@ -38,14 +39,13 @@
   import JSONValue from './JSONValue.svelte'
   import { singleton } from './singleton.js'
   import ValidationError from './ValidationError.svelte'
-  import { createDebug } from '../../../utils/debug'
-  import { forEachKey } from '../../../logic/documentState.js'
-  import { onMoveSelection } from '../../../logic/dragging.js'
-  import { forEachIndex } from '../../../utils/arrayUtils.js'
-  import { getDataPathFromTarget } from '../../../utils/domUtils'
-  import { createMemoizePath } from '../../../utils/pathUtils.js'
-  import { keyIsSelected } from '../../../logic/selection.js'
-  import type { JSONData, Path, SearchResultItem, TreeModeContext } from '../../../types'
+  import { createDebug } from '$lib/utils/debug'
+  import { forEachKey } from '$lib/logic/documentState.js'
+  import { onMoveSelection } from '$lib/logic/dragging.js'
+  import { forEachIndex } from '$lib/utils/arrayUtils.js'
+  import { createMemoizePath } from '$lib/utils/pathUtils.js'
+  import { keyIsSelected } from '$lib/logic/selection.js'
+  import type { JSONData, Path, SearchResultItem, TreeModeContext } from '$lib/types'
 
   export let value: JSONData
   export let path: Path

@@ -1,5 +1,5 @@
 // used by JSONNode during dragging
-import type { Path } from '../../../types'
+import type { Path } from '$lib/types'
 
 export const singleton: Singleton = {
   selecting: false,

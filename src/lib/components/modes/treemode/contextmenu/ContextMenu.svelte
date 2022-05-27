@@ -18,15 +18,15 @@
   import { initial, isEmpty } from 'lodash-es'
   import { onMount } from 'svelte'
   import Icon from 'svelte-awesome'
-  import DropdownButton from '../../../../components/controls/DropdownButton.svelte'
-  import { SELECTION_TYPE } from '../../../../logic/selection'
-  import { keyComboFromEvent } from '../../../../utils/keyBindings'
+  import DropdownButton from '$lib/components/controls/DropdownButton.svelte'
+  import { SELECTION_TYPE } from '$lib/logic/selection'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { isObjectOrArray } from '$lib/utils/typeUtils'
   import { faCheckSquare, faLightbulb, faSquare } from '@fortawesome/free-regular-svg-icons'
-  import { STATE_ENFORCE_STRING } from '../../../../constants'
-  import { isObject } from '../../../../utils/typeUtils.js'
-  import { canConvert, singleItemSelected } from '../../../../logic/selection.js'
-  import { findNearestElement } from '../../../../utils/domUtils'
+  import { STATE_ENFORCE_STRING } from '$lib/constants'
+  import { isObject } from '$lib/utils/typeUtils.js'
+  import { canConvert, singleItemSelected } from '$lib/logic/selection.js'
+  import { findNearestElement } from '$lib/utils/domUtils'
 
   export let json
   export let state

@@ -3,12 +3,12 @@
 <script lang="ts">
   import classnames from 'classnames'
   import { initial } from 'lodash-es'
-  import { SELECTION_TYPE } from '../../../logic/selection'
+  import { SELECTION_TYPE } from '$lib/logic/selection'
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
-  import { addNewLineSuffix } from '../../../utils/domUtils'
-  import { UPDATE_SELECTION } from '../../../constants.js'
-  import type { Selection, Path, TreeModeContext } from '../../../types'
+  import { addNewLineSuffix } from '$lib/utils/domUtils'
+  import { UPDATE_SELECTION } from '$lib/constants.js'
+  import type { Selection, Path, TreeModeContext } from '$lib/types'
 
   export let path: Path
   export let key: string

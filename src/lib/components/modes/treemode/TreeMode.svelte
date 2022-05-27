@@ -3,7 +3,7 @@
 <script lang="ts">
   import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
-  import { createDebug } from '../../../utils/debug.js'
+  import { createDebug } from '$lib/utils/debug.js'
   import {
     compileJSONPointer,
     existsIn,
@@ -24,22 +24,22 @@
     SEARCH_UPDATE_THROTTLE,
     SIMPLE_MODAL_OPTIONS,
     STATE_ENFORCE_STRING
-  } from '../../../constants'
+  } from '$lib/constants'
   import {
     createState,
     documentStatePatch,
     expandPath,
     expandSection,
     syncState
-  } from '../../../logic/documentState'
-  import { createHistory } from '../../../logic/history'
+  } from '$lib/logic/documentState'
+  import { createHistory } from '$lib/logic/history'
   import {
     createNewValue,
     createRemoveOperations,
     duplicate,
     extract,
     insert
-  } from '../../../logic/operations'
+  } from '$lib/logic/operations'
   import {
     createSearchAndReplaceAllOperations,
     createSearchAndReplaceOperations,
@@ -47,7 +47,7 @@
     searchNext,
     searchPrevious,
     updateSearchResult
-  } from '../../../logic/search'
+  } from '$lib/logic/search'
   import {
     createRecursiveSelection,
     createSelection,
@@ -62,8 +62,8 @@
     selectAll,
     SELECTION_TYPE,
     selectionToPartialJson
-  } from '../../../logic/selection'
-  import { mapValidationErrors } from '../../../logic/validation'
+  } from '$lib/logic/selection'
+  import { mapValidationErrors } from '$lib/logic/validation'
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
@@ -74,9 +74,9 @@
     isChildOfNodeName,
     setCursorToEnd
   } from '$lib/utils/domUtils'
-  import { parseJSONPointerWithArrayIndices } from '../../../utils/jsonPointer'
+  import { parseJSONPointerWithArrayIndices } from '$lib/utils/jsonPointer'
   import { parsePartialJson, repairPartialJson } from '$lib/utils/jsonUtils'
-  import { keyComboFromEvent } from '../../../utils/keyBindings'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { isObject, isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
@@ -87,13 +87,13 @@
   import JSONNode from './JSONNode.svelte'
   import TreeMenu from './menu/TreeMenu.svelte'
   import Welcome from './Welcome.svelte'
-  import NavigationBar from '../../../components/controls/navigationBar/NavigationBar.svelte'
-  import SearchBox from '../../../components/modes/treemode/menu/SearchBox.svelte'
-  import { convertValue, isLargeContent } from '../../../utils/jsonUtils.js'
-  import { MAX_DOCUMENT_SIZE_EXPAND_ALL } from '../../../constants.js'
-  import { canConvert, createSelectionFromOperations } from '../../../logic/selection.js'
-  import { collapse, expandWithCallback } from '../../../logic/documentState.js'
-  import type { Validator } from '../../../types'
+  import NavigationBar from '$lib/components/controls/navigationBar/NavigationBar.svelte'
+  import SearchBox from '$lib/components/modes/treemode/menu/SearchBox.svelte'
+  import { convertValue, isLargeContent } from '$lib/utils/jsonUtils.js'
+  import { MAX_DOCUMENT_SIZE_EXPAND_ALL } from '$lib/constants.js'
+  import { canConvert, createSelectionFromOperations } from '$lib/logic/selection.js'
+  import { collapse, expandWithCallback } from '$lib/logic/documentState.js'
+  import type { Validator } from '$lib/types'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
