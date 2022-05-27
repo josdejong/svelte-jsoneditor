@@ -18,7 +18,7 @@
   import { initial, isEmpty } from 'lodash-es'
   import { onMount } from 'svelte'
   import Icon from 'svelte-awesome'
-  import DropdownButton from '$lib/components/controls/DropdownButton.svelte'
+  import DropdownButton from '../../../controls/DropdownButton.svelte'
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { isObjectOrArray } from '$lib/utils/typeUtils'
