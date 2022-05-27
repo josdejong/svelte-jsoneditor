@@ -65,7 +65,7 @@ Or one-way binding:
   }
 
   function handleChange(updatedContent, previousContent, patchResult) {
-    // content is an object { json: JSON } | { text: string }
+    // content is an object { json: JSONData } | { text: string }
     console.log('onChange: ', updatedContent, previousContent, patchResult)
     content = updatedContent
   }
@@ -106,7 +106,7 @@ Browser example loading the ES module:
         props: {
           content,
           onChange: (updatedContent, previousContent, patchResult) => {
-            // content is an object { json: JSON } | { text: string }
+            // content is an object { json: JSONData } | { text: string }
             console.log('onChange', updatedContent, previousContent, patchResult)
             content = updatedContent
           }
@@ -146,7 +146,7 @@ const editor = new JSONEditor({
   props: {
     content,
     onChange: (updatedContent, previousContent, patchResult) => {
-      // content is an object { json: JSON } | { text: string }
+      // content is an object { json: JSONData } | { text: string }
       console.log('onChange', updatedContent, previousContent, patchResult)
     }
   }
@@ -163,7 +163,7 @@ const editor = new JSONEditor({
 - `indentation: number` Number of spaces use for indentation when stringifying JSON.
 - `escapeControlCharacters: boolean`. False by default. When `true`, control characters like newline and tab are rendered as escaped characters `\n` and `\t`. Only applicable for `'tree'` mode, in `'code'` mode control characters are always escaped.
 - `escapeUnicodeCharacters: boolean`. False by default. When `true`, unicode characters like ☎ and 😀 are rendered escaped like `\u260e` and `\ud83d\ude00`.
-- `validator: function (json): ValidationError[]`. Validate the JSON document.
+- `validator: function (json: JSONData): ValidationError[]`. Validate the JSON document.
   For example use the built-in JSON Schema validator powered by Ajv:
 
   ```js
@@ -175,10 +175,10 @@ const editor = new JSONEditor({
 - `onError(err: Error)`.
   Callback fired when an error occurs. Default implementation is to log an error in the console and show a simple alert message to the user.
 - `onChange(content: Content, previousContent: Content, patchResult: JSONPatchResult | null)`. The callback which is invoked on every change made in the JSON document. The parameter `patchResult` is only available in `tree` mode, and not in `text` mode, since a change in arbitrary text cannot be expressed as a JSON Patch document.
-- `onChangeMode(mode: string)`. Invoked when the mode is changed.
+- `onChangeMode(mode: 'tree' | 'code')`. Invoked when the mode is changed.
 - `onClassName(path: Path, value: any): string | undefined`.
   Add a custom class name to specific nodes, based on their path and/or value.
-- `onRenderValue(props: RenderValueProps) : RenderValueConstructor[]`
+- `onRenderValue(props: RenderValueProps) : RenderValueComponentDescription[]`
 
   _EXPERIMENTAL! This API will most likely change in future versions._
 
@@ -195,12 +195,12 @@ const editor = new JSONEditor({
   }
   ```
 
-- `onRenderMenu(mode: string, items: Array) : Array | undefined`.
+- `onRenderMenu(mode: 'tree' | 'code', items: MenuItem[]) : MenuItem[] | undefined`.
   Callback which can be used to make changes to the menu items. New items can
   be added, or existing items can be removed or reorganized. When the function
   returns `undefined`, the original `items` will be applied.
 
-  A menu item can be one of the following types:
+  A menu item `MenuItem` can be one of the following types:
 
   - Button:
 
@@ -273,7 +273,7 @@ const editor = new JSONEditor({
   - `editor.expand(path => true)` expand all
   - `editor.expand(path => false)` collapse all
   - `editor.expand(path => path.length < 2)` expand all paths up to 2 levels deep
-- `transform({ id?: string, selectedPath?: [], onTransform?: ({ operations: JSONPatchDocument, json: JSON, transformedJson: JSON }) => void, onClose?: () => void })` programmatically trigger clicking of the transform button in the main menu, opening the transform model. If a callback `onTransform` is provided, it will replace the build-in logic to apply a transform, allowing you to process the transform operations in an alternative way. If provided, `onClose` callback will trigger when the transform modal closes, both after the user clicked apply or cancel. If an `id` is provided, the transform modal will load the previous status of this `id` instead of the status of the editors transform modal.
+- `transform({ id?: string, selectedPath?: [], onTransform?: ({ operations: JSONPatchDocument, json: JSONData, transformedJson: JSONData }) => void, onClose?: () => void })` programmatically trigger clicking of the transform button in the main menu, opening the transform model. If a callback `onTransform` is provided, it will replace the build-in logic to apply a transform, allowing you to process the transform operations in an alternative way. If provided, `onClose` callback will trigger when the transform modal closes, both after the user clicked apply or cancel. If an `id` is provided, the transform modal will load the previous status of this `id` instead of the status of the editors transform modal.
 - `scrollTo(path: Path)` Scroll the editor vertically such that the specified path comes into view. The path will be expanded when needed.
 - `findElement(path: Path)` Find the DOM element of a given path. Returns `null` when not found.
 - `acceptAutoRepair(): Content` In tree mode, invalid JSON is automatically repaired when loaded. When the repair was successful, the repaired contents are rendered but not yet applied to the document itself until the user clicks "Ok" or starts editing the data. Instead of accepting the repair, the user can also click "Repair manually instead". Invoking `.acceptAutoRepair()` will programmatically accept the repair. This will trigger an update, and the method itself also returns the updated contents. In case of code mode or when the editor is not in an "accept auto repair" status, nothing will happen, and the contents will be returned as is.
@@ -284,11 +284,13 @@ const editor = new JSONEditor({
 ### Types
 
 ```ts
-type JSON = Object<string, JSON> | Array<JSON> | string | number | boolean | null
+type JSONData = { [key: string]: JSONData } | JSONData[] | string | number | boolean | null
 
-type Content = { json: JSON; text: undefined } | { json: undefined; text: string }
+type TextContent = { text: string } | { json: undefined; text: string }
+type JSONContent = { json: JSONData } | { json: JSONData; text: undefined }
+type Content = JSONContent | TextContent
 
-type Path = Array<string | number>
+type Path = Array<string | number | symbol>
 
 type JSONPatchDocument = JSONPatchOperation[]
 
@@ -296,12 +298,12 @@ type JSONPatchOperation = {
   op: 'add' | 'remove' | 'replace' | 'copy' | 'move' | 'test'
   path: string
   from?: string
-  value?: JSON
+  value?: JSONData
 }
 
 type JSONPatchResult = {
-  json: JSON
-  previousJson: JSON
+  json: JSONData
+  previousJson: JSONData
   undo: JSONPatchDocument
   redo: JSONPatchDocument
 }
@@ -316,8 +318,8 @@ type QueryLanguage = {
   id: string
   name: string
   description: string
-  createQuery: (json: JSON, queryOptions: QueryLanguageOptions) => string
-  executeQuery: (json: JSON, query: string) => JSON
+  createQuery: (json: JSONData, queryOptions: QueryLanguageOptions) => string
+  executeQuery: (json: JSONData, query: string) => JSONData
 }
 
 type QueryLanguageOptions = {
@@ -335,18 +337,34 @@ type QueryLanguageOptions = {
   }
 }
 
-type RenderValueProps = {
-  path: Path
-  value: JSON
-  readOnly: boolean
+interface RenderValuePropsOptional {
+  path?: Path
+  value?: JSONData
+  readOnly?: boolean
   enforceString?: boolean
   selection?: Selection
   searchResult?: SearchResultItem
+  isSelected?: boolean
+  isEditing?: boolean
+  normalization?: ValueNormalization
+  onPatch?: TreeModeContext['onPatch']
+  onPasteJson?: (pastedJson: { path: Path; contents: JSONData }) => void
+  onSelect?: (selection: Selection) => void
+  onFind?: (findAndReplace: boolean) => void
+}
+
+interface RenderValueProps extends RenderValuePropsOptional {
+  path: Path
+  value: JSONData
+  readOnly: boolean
+  enforceString: boolean | undefined
+  selection: Selection | undefined
+  searchResult: SearchResultItem | undefined
   isSelected: boolean
   isEditing: boolean
   normalization: ValueNormalization
   onPatch: (patch: JSONPatchDocument) => void
-  onPasteJson: (pastedJson: { path: Path; contents: JSON }) => void
+  onPasteJson: (pastedJson: { path: Path; contents: JSONData }) => void
   onSelect: (selection: Selection) => void
   onFind: (findAndReplace: boolean) => void
 }
@@ -364,9 +382,9 @@ type SearchResultItem = {
   end: number
 }
 
-type RenderValueConstructor = {
-  component: SvelteComponentConstructor
-  props: Object
+interface RenderValueComponentDescription {
+  component: SvelteComponent
+  props: RenderValuePropsOptional
 }
 ```
 

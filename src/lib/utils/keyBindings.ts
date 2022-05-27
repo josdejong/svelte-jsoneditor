@@ -11,10 +11,8 @@ import { IS_MAC } from './navigatorUtils.js'
  * For example:
  *     keyFromCode(65) returns 'A'
  *     keyFromCode(13) returns 'Enter'
- * @param {string} code
- * @return {string}
  */
-export function nameFromKeyCode(code) {
+export function nameFromKeyCode(code: string): string {
   return codes[code] || ''
 }
 

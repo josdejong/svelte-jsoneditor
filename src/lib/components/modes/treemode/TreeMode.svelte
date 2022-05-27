@@ -1,9 +1,9 @@
 <svelte:options immutable={true} />
 
-<script>
-  import { createAutoScrollHandler } from '$lib/components/controls/createAutoScrollHandler'
+<script lang="ts">
+  import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
-  import { createDebug } from '../../../utils/debug.js'
+  import { createDebug } from '$lib/utils/debug.js'
   import {
     compileJSONPointer,
     existsIn,
@@ -87,12 +87,13 @@
   import JSONNode from './JSONNode.svelte'
   import TreeMenu from './menu/TreeMenu.svelte'
   import Welcome from './Welcome.svelte'
-  import NavigationBar from '../../../components/controls/navigationBar/NavigationBar.svelte'
-  import SearchBox from '../../../components/modes/treemode/menu/SearchBox.svelte'
-  import { convertValue, isLargeContent } from '../../../utils/jsonUtils.ts'
-  import { MAX_DOCUMENT_SIZE_EXPAND_ALL } from '../../../constants.js'
-  import { canConvert, createSelectionFromOperations } from '../../../logic/selection.js'
-  import { collapse, expandWithCallback } from '../../../logic/documentState.js'
+  import NavigationBar from '../../controls/navigationBar/NavigationBar.svelte'
+  import SearchBox from './menu/SearchBox.svelte'
+  import { convertValue, isLargeContent } from '$lib/utils/jsonUtils.js'
+  import { MAX_DOCUMENT_SIZE_EXPAND_ALL } from '$lib/constants.js'
+  import { canConvert, createSelectionFromOperations } from '$lib/logic/selection.js'
+  import { collapse, expandWithCallback } from '$lib/logic/documentState.js'
+  import type { Validator } from '$lib/types'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -117,7 +118,7 @@
   export let navigationBar = true
   export let escapeControlCharacters = false
   export let escapeUnicodeCharacters = false
-  export let validator = null
+  export let validator: Validator = null
 
   export let indentation = 2
   export let onError
@@ -125,7 +126,7 @@
   /** @type {(content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void} */
   export let onChange
 
-  /** @type {(props: RenderValueProps) => RenderValueConstructor[]} */
+  /** @type {(props: RenderValueProps) => RenderValueComponentDescription[]} */
   export let onRenderValue
   export let onRequestRepair = noop
   export let onRenderMenu = noop

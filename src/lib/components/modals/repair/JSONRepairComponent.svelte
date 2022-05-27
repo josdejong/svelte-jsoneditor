@@ -1,6 +1,6 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import {
     faArrowDown,
     faCheck,
@@ -12,7 +12,7 @@
   import Message from '../../controls/Message.svelte'
   import { onDestroy, onMount } from 'svelte'
   import { activeElementIsChildOf, getWindow } from '../../../utils/domUtils'
-  import { normalizeJsonParseError } from '../../../utils/jsonUtils.ts'
+  import { normalizeJsonParseError } from '../../../utils/jsonUtils.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Menu from '../../controls/Menu.svelte'
   import { noop } from 'lodash-es'

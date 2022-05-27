@@ -1,17 +1,16 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { getExpandItemsSections } from '$lib/logic/expandItemsSections'
   import { compileJSONPointer } from 'immutable-json-patch'
+  import type { Path, Section, Selection, VisibleSection } from '$lib/types'
 
-  export let visibleSections
-  export let sectionIndex
-  export let total
-  export let path
-  export let selection
-
-  /** @type {function (path: Path, section: Section)} */
-  export let onExpandSection
+  export let visibleSections: VisibleSection[]
+  export let sectionIndex: number
+  export let total: number
+  export let path: Path
+  export let selection: Selection | undefined
+  export let onExpandSection: (path: Path, section: Section) => void
 
   $: visibleSection = visibleSections[sectionIndex]
 

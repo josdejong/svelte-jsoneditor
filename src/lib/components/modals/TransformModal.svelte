@@ -1,6 +1,6 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { uniqueId } from '../../utils/uniqueId.js'
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import { debounce, isEmpty, noop } from 'lodash-es'
@@ -15,30 +15,34 @@
   import AbsolutePopup from './popup/AbsolutePopup.svelte'
   import { createDebug } from '../../utils/debug'
   import TreeMode from '../modes/treemode/TreeMode.svelte'
+  import type {
+    Content,
+    JSONData,
+    OnChangeQueryLanguage,
+    OnClassName,
+    OnPatch,
+    OnRenderValue,
+    Path,
+    QueryLanguage
+  } from '../../types'
 
   const debug = createDebug('jsoneditor:TransformModal')
 
   export let id = 'transform-modal-' + uniqueId()
-  export let json
-  export let selectedPath = []
+  export let json: JSONData
+  export let selectedPath: Path = []
 
-  export let escapeControlCharacters
-  export let escapeUnicodeCharacters
+  export let escapeControlCharacters: boolean
+  export let escapeUnicodeCharacters: boolean
 
-  /** @type {QueryLanguage[]} */
-  export let queryLanguages
+  export let queryLanguages: QueryLanguage[]
+  export let queryLanguageId: string
+  export let onChangeQueryLanguage: OnChangeQueryLanguage
 
-  /** @type {string} */
-  export let queryLanguageId
+  export let onRenderValue: OnRenderValue
+  export let onClassName: OnClassName
 
-  /** @type {(queryLanguageId: string) => void} */
-  export let onChangeQueryLanguage
-
-  /** @type {(props: RenderValueProps) => RenderValueConstructor[]} */
-  export let onRenderValue
-  export let onClassName
-
-  export let onTransform
+  export let onTransform: OnPatch
 
   $: selectedJson = getIn(json, selectedPath)
   $: selectedContent = { json: selectedJson }
@@ -61,9 +65,9 @@
   let isManual = state.isManual || false
 
   let previewError = undefined
-  let previewContent = { text: '' }
+  let previewContent: Content = { text: '' }
 
-  function getSelectedQueryLanguage(queryLanguageId) {
+  function getSelectedQueryLanguage(queryLanguageId: string): QueryLanguage {
     return queryLanguages.find((item) => item.id === queryLanguageId) || queryLanguages[0]
   }
 
@@ -81,7 +85,7 @@
     debug('handleChangeQuery', { query, isManual })
   }
 
-  function previewTransform(json, query) {
+  function previewTransform(json: JSONData, query: string) {
     try {
       debug('previewTransform', {
         query
@@ -155,11 +159,11 @@
     transformModalState.showOriginal = showOriginal
   }
 
-  function focus(element) {
+  function focus(element: HTMLElement) {
     element.focus()
   }
 
-  function handleChangeQueryLanguage(newQueryLanguageId) {
+  function handleChangeQueryLanguage(newQueryLanguageId: string) {
     debug('handleChangeQueryLanguage', newQueryLanguageId)
     queryLanguageId = newQueryLanguageId
     onChangeQueryLanguage(newQueryLanguageId)

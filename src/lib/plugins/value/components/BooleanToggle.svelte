@@ -1,18 +1,19 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
   import { compileJSONPointer } from 'immutable-json-patch'
   import Icon from 'svelte-awesome'
   import { SELECTION_TYPE } from '../../../logic/selection.js'
+  import type { JSONData, Path } from '../../../types'
 
-  export let path
-  export let value
+  export let path: Path
+  export let value: JSONData
   export let readOnly
   export let onPatch
   export let onSelect
 
-  function toggleBooleanValue(event) {
+  function toggleBooleanValue(event: MouseEvent) {
     event.stopPropagation()
 
     if (readOnly) {

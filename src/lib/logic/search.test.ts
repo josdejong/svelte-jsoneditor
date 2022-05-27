@@ -117,7 +117,7 @@ describe('search', () => {
     }
 
     const state = syncState(json, undefined, [], () => true)
-    state.data[STATE_KEYS] = ['text2', 'text1'] // reverse the order of the keys
+    state['data'][STATE_KEYS] = ['text2', 'text1'] // reverse the order of the keys
 
     const results = search('foo', json, state)
     assert.deepStrictEqual(results, [
@@ -179,18 +179,18 @@ describe('search', () => {
     const actual = createRecursiveSearchResults(json, flatResults)
     const expected = {}
 
-    expected.b = {}
-    expected.b.c = {}
-    expected.b.c[STATE_SEARCH_VALUE] = [flatResults[0]]
-    expected.a = []
-    expected.a[STATE_SEARCH_PROPERTY] = [flatResults[1]]
-    expected.a[0] = {}
-    expected.a[0].a = {}
-    expected.a[0].a[STATE_SEARCH_PROPERTY] = [flatResults[2]]
-    expected.a[0].c = {}
-    expected.a[0].c[STATE_SEARCH_VALUE] = [flatResults[3]]
-    expected.a[2] = {}
-    expected.a[2][STATE_SEARCH_VALUE] = [flatResults[4], flatResults[5]]
+    expected['b'] = {}
+    expected['b'].c = {}
+    expected['b'].c[STATE_SEARCH_VALUE] = [flatResults[0]]
+    expected['a'] = []
+    expected['a'][STATE_SEARCH_PROPERTY] = [flatResults[1]]
+    expected['a'][0] = {}
+    expected['a'][0]['a'] = {}
+    expected['a'][0]['a'][STATE_SEARCH_PROPERTY] = [flatResults[2]]
+    expected['a'][0].c = {}
+    expected['a'][0].c[STATE_SEARCH_VALUE] = [flatResults[3]]
+    expected['a'][2] = {}
+    expected['a'][2][STATE_SEARCH_VALUE] = [flatResults[4], flatResults[5]]
 
     assert.deepStrictEqual(actual, expected)
   })

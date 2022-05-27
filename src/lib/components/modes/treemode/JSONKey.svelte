@@ -6,20 +6,20 @@
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
-  import { addNewLineSuffix } from '../../../utils/domUtils'
-  import { UPDATE_SELECTION } from '../../../constants.js'
+  import { addNewLineSuffix } from '$lib/utils/domUtils'
+  import { UPDATE_SELECTION } from '$lib/constants.js'
+  import type { Selection, Path, TreeModeContext } from '$lib/types'
 
-  export let path
-  export let key
-  export let onUpdateKey
-  export let selection
+  export let path: Path
+  export let key: string
+  export let onUpdateKey: (oldKey: string, newKey: string) => string
+  export let selection: Selection | undefined
   export let searchResult
 
-  /** @type {TreeModeContext} */
-  export let context
+  export let context: TreeModeContext
 
   $: selectedKey = selection && selection.type === SELECTION_TYPE.KEY
-  $: editKey = !context.readOnly && selectedKey && selection && selection.edit === true
+  $: editKey = !context.readOnly && selectedKey && selection && selection['edit'] === true
 
   function handleKeyDoubleClick(event) {
     if (!editKey && !context.readOnly) {

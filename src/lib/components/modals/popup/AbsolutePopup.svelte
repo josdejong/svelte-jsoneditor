@@ -1,10 +1,10 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { createDebug } from '../../../utils/debug'
   import { setContext, tick } from 'svelte'
   import { isChildOf } from '$lib/utils/domUtils'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings'
+  import { keyComboFromEvent } from '../../../utils/keyBindings'
 
   const debug = createDebug('jsoneditor:AbsolutePopup')
 

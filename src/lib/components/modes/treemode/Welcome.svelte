@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
-<script>
-  export let readOnly
+<script lang="ts">
+  export let readOnly: boolean
 </script>
 
 <div class="jse-welcome">

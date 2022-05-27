@@ -6,13 +6,12 @@ const MAX_HISTORY_ITEMS = 1000
  * @property {Object} redo
  */
 
-/**
- * @param {Object} [options]
- * @property {number} [maxItems]
- * @property {onChange} [({canUndo: boolean, canRedo: boolean, length: number}) => void]
- * @returns {Object}
- */
-export function createHistory(options = {}) {
+export interface HistoryOptions {
+  maxItems?: number
+  onChange?: (props: { canUndo: boolean; canRedo: boolean; length: number }) => void
+}
+
+export function createHistory(options: HistoryOptions = {}) {
   const maxItems = options.maxItems || MAX_HISTORY_ITEMS
 
   /**

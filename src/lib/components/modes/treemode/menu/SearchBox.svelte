@@ -1,6 +1,6 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { debounce, noop } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
@@ -16,17 +16,17 @@
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
 
   export let show = false
-  export let searching
+  export let searching: boolean
   export let resultCount = 0
   export let activeIndex = 0
   export let showReplace = false
   export let readOnly = false
-  export let onChange = noop
-  export let onPrevious = noop
-  export let onNext = noop
-  export let onReplace = noop
-  export let onReplaceAll = noop
-  export let onClose = noop
+  export let onChange: (search: string) => void = noop
+  export let onPrevious: () => void = noop
+  export let onNext: () => void = noop
+  export let onReplace: (text: string, replaceText: string) => void = noop
+  export let onReplaceAll: (text: string, replaceText: string) => void = noop
+  export let onClose: () => void = noop
 
   let text = ''
   let previousText = ''
@@ -165,7 +165,7 @@
             type="button"
             class="jse-search-next"
             title="Go to next search result (Enter)"
-            on:click={onNext}
+            on:click={() => onNext()}
           >
             <Icon data={faChevronDown} />
           </button>
@@ -173,7 +173,7 @@
             type="button"
             class="jse-search-previous"
             title="Go to previous search result (Shift+Enter)"
-            on:click={onPrevious}
+            on:click={() => onPrevious()}
           >
             <Icon data={faChevronUp} />
           </button>
@@ -181,7 +181,7 @@
             type="button"
             class="jse-search-clear"
             title="Close search box (Esc)"
-            on:click={onClose}
+            on:click={() => onClose()}
           >
             <Icon data={faTimes} />
           </button>

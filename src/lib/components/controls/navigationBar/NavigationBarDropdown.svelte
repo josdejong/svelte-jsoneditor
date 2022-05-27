@@ -1,12 +1,12 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { limit } from '../../../utils/arrayUtils'
   import { truncate } from '../../../utils/stringUtils'
 
-  export let items
-  export let selectedItem
-  export let onSelect
+  export let items: (string | number)[]
+  export let selectedItem: string | number
+  export let onSelect: (item: string | number) => void
 
   const MAX_ITEMS = 100
   const MAX_ITEM_CHARACTERS = 30

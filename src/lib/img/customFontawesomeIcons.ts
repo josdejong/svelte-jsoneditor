@@ -1,4 +1,6 @@
-export const faJSONEditorExpand = {
+import type { FontAwesomeIcon } from '../types'
+
+export const faJSONEditorExpand: FontAwesomeIcon = {
   prefix: 'fas',
   iconName: 'jsoneditor-expand',
   icon: [
@@ -13,7 +15,7 @@ export const faJSONEditorExpand = {
   ]
 }
 
-export const faJSONEditorCollapse = {
+export const faJSONEditorCollapse: FontAwesomeIcon = {
   prefix: 'fas',
   iconName: 'jsoneditor-collapse',
   icon: [
@@ -25,7 +27,7 @@ export const faJSONEditorCollapse = {
   ]
 }
 
-export const faJSONEditorFormat = {
+export const faJSONEditorFormat: FontAwesomeIcon = {
   prefix: 'fas',
   iconName: 'jsoneditor-format',
   icon: [
@@ -40,7 +42,7 @@ export const faJSONEditorFormat = {
   ]
 }
 
-export const faJSONEditorCompact = {
+export const faJSONEditorCompact: FontAwesomeIcon = {
   prefix: 'fas',
   iconName: 'jsoneditor-compact',
   icon: [

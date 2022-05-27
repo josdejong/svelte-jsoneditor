@@ -1,3 +1,5 @@
+import type { SvelteComponent } from 'svelte'
+
 export type JSONData = { [key: string]: JSONData } | JSONData[] | string | number | boolean | null
 
 export type TextContent = { text: string } | { json: undefined; text: string }
@@ -174,13 +176,28 @@ export interface MenuSpaceItem {
   space: true
 }
 
+export function isMenuSpaceItem(item: unknown): item is MenuSpaceItem {
+  return item && item['space'] === true && Object.keys(item).length === 1
+}
+
 export type MenuItem = MenuButtonItem | MenuSeparatorItem | MenuSpaceItem
+
+export interface MessageAction {
+  text: string
+  title: string
+  icon?: FontAwesomeIcon
+  onClick?: () => void
+  onMouseDown?: () => void
+  disabled?: boolean
+}
 
 export interface ValidationError {
   path: Path
   message: string
   isChildError?: boolean
 }
+
+export type Validator = (json: JSONData) => ValidationError[]
 
 export interface ParseError {
   position: number | null
@@ -244,6 +261,31 @@ export interface QueryLanguageOptions {
   }
 }
 
+export type OnChangeQueryLanguage = (queryLanguageId: string) => void
+export type OnChange =
+  | ((content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void)
+  | null
+export type OnSelect = (
+  selectionSchema: SelectionSchema,
+  options?: { ensureFocus?: boolean }
+) => void
+export type OnPatch = (operations: JSONPatchDocument) => void
+export type OnSort = (operations: JSONPatchDocument) => void
+export type OnFind = (findAndReplace: boolean) => void
+export type OnPaste = (pastedText: string) => void
+export type OnPasteJson = (pastedJson: { path: Path; contents: JSONData }) => void
+export type OnRenderValue = (props: RenderValueProps) => RenderValueComponentDescription[]
+export type OnClassName = (path: Path, value: JSONData) => string | undefined | void
+export type OnChangeMode = (mode: 'tree' | 'code') => void
+export type OnContextMenu = (contextMenuProps: ContextMenuProps) => void
+export type OnRenderMenu = (
+  mode: 'tree' | 'code' | 'repair',
+  items: MenuItem[]
+) => MenuItem[] | undefined | void
+export type OnError = (error: Error) => void
+export type OnFocus = () => void
+export type OnBlur = () => void
+
 export type RecursiveSearchResult = { [key: string]: RecursiveSearchResult }
 
 export interface SearchResult {
@@ -261,6 +303,7 @@ export interface SearchResultItem {
   fieldIndex: number
   start: number
   end: number
+  active: boolean
 }
 
 export interface ValueNormalization {
@@ -312,17 +355,33 @@ export interface TreeModeContext {
   onPatch: (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
   onInsert: (type: InsertType) => void
   onExpand: (path: Path, expanded: boolean, recursive?: boolean) => void
-  onSelect: { selectionSchema: SelectionSchema; options?: { ensureFocus?: boolean } }
-  onFind: (findAndReplace: boolean) => void
+  onSelect: OnSelect
+  onFind: OnFind
   onExpandSection: (path: Path, section: Section) => void
-  onRenderValue: (props: RenderValueProps) => RenderValueConstructor[]
-  onContextMenu: (contextMenuProps: ContextMenuProps) => void
+  onRenderValue: (props: RenderValueProps) => RenderValueComponentDescription[]
+  onContextMenu: OnContextMenu
   onClassName: (path: Path, value: JSONData) => string
   onDrag: (event: Event) => void
   onDragEnd: (event: Event) => void
 }
 
-export interface RenderValueProps {
+export interface RenderValuePropsOptional {
+  path?: Path
+  value?: JSONData
+  readOnly?: boolean
+  enforceString?: boolean
+  selection?: Selection
+  searchResult?: SearchResultItem
+  isSelected?: boolean
+  isEditing?: boolean
+  normalization?: ValueNormalization
+  onPatch?: TreeModeContext['onPatch']
+  onPasteJson?: OnPasteJson
+  onSelect?: OnSelect
+  onFind?: OnFind
+}
+
+export interface RenderValueProps extends RenderValuePropsOptional {
   path: Path
   value: JSONData
   readOnly: boolean
@@ -333,15 +392,44 @@ export interface RenderValueProps {
   isEditing: boolean
   normalization: ValueNormalization
   onPatch: TreeModeContext['onPatch']
-  onPasteJson: (pastedJson: { path: Path; contents: JSONData }) => void
-  onSelect: (selection: Selection) => void
-  onFind: (findAndReplace: boolean) => void
+  onPasteJson: OnPasteJson
+  onSelect: OnSelect
+  onFind: OnFind
 }
 
-export interface RenderValueConstructor {
-  // TODO: fix type definition
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  component: SvelteComponentConstructor
-  props: unknown
+// TODO: can we define proper generic types here?
+export interface RenderValueComponentDescription {
+  component: SvelteComponent
+  props: Record<string, unknown>
+}
+
+export interface TransformModalOptions {
+  id?: string
+  selectedPath?: Path
+  onTransform?: (state: {
+    operations: JSONPatchDocument
+    json: JSONData
+    transformedJson: JSONData
+  }) => void
+  onClose?: () => void
+}
+
+export interface TransformModalCallback extends TransformModalOptions {
+  id: string
+  selectedPath: Path
+  json: JSONData
+  onTransform: (state: {
+    operations: JSONPatchDocument
+    json: JSONData
+    transformedJson: JSONData
+  }) => void
+  onClose: () => void
+}
+
+export interface SortModalCallback {
+  id: string
+  json: JSONData
+  selectedPath: Path
+  onSort: OnSort
+  onClose: () => void
 }

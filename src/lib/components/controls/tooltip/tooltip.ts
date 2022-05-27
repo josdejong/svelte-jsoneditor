@@ -1,6 +1,6 @@
 import Tooltip from './Tooltip.svelte'
 
-export function tooltip(node, { text, openAbsolutePopup, closeAbsolutePopup }) {
+export function tooltip(node: Element, { text, openAbsolutePopup, closeAbsolutePopup }) {
   function handleMouseOver() {
     const props = {
       text //: validationError.isChildError ? 'Contains invalid data' : validationError.message

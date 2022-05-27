@@ -1,16 +1,18 @@
 import EnumValue from './components/EnumValue.svelte'
 import { getJSONSchemaOptions } from '../../utils/jsonSchemaUtils.js'
+import type { JSONData, RenderValueComponentDescription, RenderValueProps } from '../../types'
+import type { SvelteComponent } from 'svelte'
 
 /**
  * Search the JSON schema for enums defined at given props.path. If found,
  * return an EnumValue renderer. If not found, return null. In that case you
  * have to fallback on the default valueRender function
- * @param {RenderValueProps} props
- * @param {JSON} schema
- * @param {JSON} schemaDefinitions
- * @return {RenderValueConstructor[]}
  */
-export function renderJSONSchemaEnum(props, schema, schemaDefinitions) {
+export function renderJSONSchemaEnum(
+  props: RenderValueProps,
+  schema: JSONData,
+  schemaDefinitions: JSONData
+): RenderValueComponentDescription[] {
   const enumValues = getJSONSchemaOptions(schema, schemaDefinitions, props.path)
 
   if (enumValues) {
@@ -29,7 +31,7 @@ export function renderJSONSchemaEnum(props, schema, schemaDefinitions) {
 
     return [
       {
-        component: EnumValue,
+        component: EnumValue as unknown as SvelteComponent, // TODO: casting should not be needed
         props: {
           value,
           path,

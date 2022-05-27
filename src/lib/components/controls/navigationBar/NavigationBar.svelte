@@ -1,6 +1,6 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { getIn } from 'immutable-json-patch'
   import { range } from 'lodash-es'
   import { isObject, isObjectOrArray } from '../../../utils/typeUtils'
@@ -9,18 +9,16 @@
   import { createDebug } from '../../../utils/debug'
   import NavigationBarItem from '../../../components/controls/navigationBar/NavigationBarItem.svelte'
   import { caseInsensitiveNaturalCompare } from '../../../logic/sort'
+  import type { JSONData, OnSelect, Path } from '../../../types'
 
   const debug = createDebug('jsoneditor:NavigationBar')
 
-  export let json
-  export let state
+  export let json: JSONData
+  export let state: JSONData
+  export let selection: Selection | undefined
+  export let onSelect: OnSelect
 
-  /** @type {Selection | undefined} */
-  export let selection
-
-  export let onSelect
-
-  let refNavigationBar
+  let refNavigationBar: Element | undefined
 
   $: path = selection ? selection.focusPath : []
   $: hasNextItem = isObjectOrArray(getIn(json, path))
@@ -40,14 +38,14 @@
   // trigger scrollToLastItem when path changes
   $: scrollToLastItem(path)
 
-  function getItems(path) {
+  function getItems(path: Path): (string | number)[] {
     debug('get items for path', path)
 
     const node = getIn(json, path)
     if (Array.isArray(node)) {
       return range(0, node.length)
     } else if (isObject(node)) {
-      const keys = getIn(state, path.concat(STATE_KEYS)) || Object.keys(node)
+      const keys = (getIn(state, path.concat(STATE_KEYS)) || Object.keys(node)) as string[]
 
       const sortedKeys = keys.slice(0)
       sortedKeys.sort(caseInsensitiveNaturalCompare)
@@ -59,7 +57,7 @@
     }
   }
 
-  function handleSelect(path) {
+  function handleSelect(path: Path) {
     debug('select path', JSON.stringify(path))
 
     const newSelection = createSelection(json, state, {

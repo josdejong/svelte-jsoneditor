@@ -1,3 +1,4 @@
+import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, existsIn, getIn, setIn } from 'immutable-json-patch'
 import { forEachRight, initial, isEqual, last } from 'lodash-es'
 import {
@@ -9,7 +10,14 @@ import {
 import { getKeys } from './documentState.js'
 import { createSelectionFromOperations } from './selection.js'
 import { rename } from './operations.js'
-import { stringConvert } from '../utils/typeUtils.ts'
+import { stringConvert } from '../utils/typeUtils.js'
+import type {
+  JSONData,
+  JSONPatchDocument,
+  JSONPatchOperation,
+  SearchResultItem,
+  Selection
+} from '../types'
 
 // TODO: comment
 export function updateSearchResult(json, flatResults, previousResult) {
@@ -245,16 +253,20 @@ export function replaceAllText(text, replacementText, occurrences) {
  * @param {JSON} state
  * @param {string} replacementText
  * @param {SearchResultItem} searchResultItem
- * @returns {{newSelection: Selection, operations: JSONPatchDocument}}
  */
-export function createSearchAndReplaceOperations(json, state, replacementText, searchResultItem) {
+export function createSearchAndReplaceOperations(
+  json,
+  state,
+  replacementText,
+  searchResultItem
+): { newSelection: Selection; operations: JSONPatchDocument } {
   const { field, path, start, end } = searchResultItem
 
   if (field === STATE_SEARCH_PROPERTY) {
     // replace a key
     const parentPath = initial(path)
     const oldKey = last(path)
-    const keys = getKeys(state, parentPath)
+    const keys = getKeys(state, parentPath as JSONPath)
     const newKey = replaceText(oldKey, replacementText, start, end)
 
     const operations = rename(parentPath, keys, oldKey, newKey)
@@ -276,7 +288,7 @@ export function createSearchAndReplaceOperations(json, state, replacementText, s
 
     const value = replaceText(currentValueText, replacementText, start, end)
 
-    const operations = [
+    const operations: JSONPatchOperation[] = [
       {
         op: 'replace',
         path: compileJSONPointer(path),
@@ -295,14 +307,12 @@ export function createSearchAndReplaceOperations(json, state, replacementText, s
   }
 }
 
-/**
- * @param {JSON} json
- * @param {JSON} state
- * @param {string} searchText
- * @param {string} replacementText
- * @returns {{newSelection: Selection, operations: JSONPatchDocument}}
- */
-export function createSearchAndReplaceAllOperations(json, state, searchText, replacementText) {
+export function createSearchAndReplaceAllOperations(
+  json: JSONData,
+  state: JSONData,
+  searchText: string,
+  replacementText
+): { newSelection: Selection; operations: JSONPatchDocument } {
   // TODO: to improve performance, we could reuse existing search results (except when hitting a maxResult limit)
   const searchResultItems = search(searchText, json, state, Infinity /* maxResults */)
 
@@ -351,7 +361,7 @@ export function createSearchAndReplaceAllOperations(json, state, searchText, rep
       // replace a key
       const parentPath = initial(path)
       const oldKey = last(path)
-      const keys = getKeys(state, parentPath)
+      const keys = getKeys(state, parentPath as JSONPath)
       const newKey = replaceAllText(oldKey, replacementText, items)
 
       const operations = rename(parentPath, keys, oldKey, newKey)
@@ -371,7 +381,7 @@ export function createSearchAndReplaceAllOperations(json, state, searchText, rep
 
       const value = replaceAllText(currentValueText, replacementText, items)
 
-      const operations = [
+      const operations: JSONPatchOperation[] = [
         {
           op: 'replace',
           path: compileJSONPointer(path),
@@ -395,11 +405,11 @@ export function createSearchAndReplaceAllOperations(json, state, searchText, rep
 /**
  * Split the text into separate parts for each search result and the text
  * in between.
- * @param {string} text
- * @param {SearchResultItem[]} matches
- * @return {Array<{text: string, type: 'normal' | 'highlight', active: boolean}>}
  */
-export function splitValue(text, matches) {
+export function splitValue(
+  text: string,
+  matches: SearchResultItem[]
+): Array<{ text: string; type: 'normal' | 'highlight'; active: boolean }> {
   const parts = []
 
   let previousEnd = 0

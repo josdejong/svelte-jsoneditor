@@ -1,16 +1,17 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
   import Icon from 'svelte-awesome'
   import {
     CONTEXT_MENU_EXPLANATION,
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH
-  } from '$lib/constants.js'
+  } from '../../../../constants.js'
+  import type { OnContextMenu } from '../../../../types'
 
-  export let selected
-  export let onContextMenu
+  export let selected: boolean
+  export let onContextMenu: OnContextMenu
 
   function handleClick(event) {
     let buttonElem = event.target
@@ -21,9 +22,12 @@
     if (buttonElem) {
       onContextMenu({
         anchor: buttonElem,
+        left: 0,
+        top: 0,
         width: CONTEXT_MENU_WIDTH,
         height: CONTEXT_MENU_HEIGHT,
         offsetTop: 2,
+        offsetLeft: 0,
         showTip: true
       })
     }

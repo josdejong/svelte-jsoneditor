@@ -1,24 +1,25 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import { getColorCSS } from '$lib/utils/typeUtils'
   import { getWindow } from '$lib/utils/domUtils'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getContext } from 'svelte'
   import ColorPickerPopup from '../../../components/controls/ColorPickerPopup.svelte'
   import { SELECTION_TYPE } from '../../../logic/selection.js'
+  import type { OnPatch, OnSelect, Path } from '../../../types'
 
   const { openAbsolutePopup } = getContext('absolute-popup')
 
-  export let path
-  export let value
-  export let readOnly
-  export let onPatch
-  export let onSelect
+  export let path: Path
+  export let value: string
+  export let readOnly: boolean
+  export let onPatch: OnPatch
+  export let onSelect: OnSelect
 
   $: color = getColorCSS(value)
 
-  function onChange(color) {
+  function onChange(color: string) {
     onPatch([
       {
         op: 'replace',

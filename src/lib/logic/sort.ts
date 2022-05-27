@@ -1,8 +1,10 @@
 import diffSequence from '../generated/diffSequence.js'
+import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, getIn, setIn } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import naturalCompare from 'natural-compare-lite'
 import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
+import type { JSONData, Path } from '../types'
 
 export function caseInsensitiveNaturalCompare(a, b) {
   const aLower = typeof a === 'string' ? a.toLowerCase() : a
@@ -58,7 +60,7 @@ export function sortArray(json, rootPath = [], propertyPath = [], direction = 1)
   const comparator = createObjectComparator(propertyPath, direction)
 
   // TODO: make the mechanism to sort configurable? Like use sortOperationsMove and sortOperationsMoveAdvanced
-  const array = getIn(json, rootPath)
+  const array: JSONData[] = getIn(json, rootPath) as JSONData[]
   return [
     {
       op: 'replace',
@@ -234,13 +236,13 @@ export function fastPatchSort(json, operations) {
   }
 
   // parse all paths
-  const parsedOperations = operations.map((operation) => ({
+  const parsedOperations: Array<{ from: Path; path: Path }> = operations.map((operation) => ({
     from: parseJSONPointerWithArrayIndices(json, operation.from),
     path: parseJSONPointerWithArrayIndices(json, operation.path)
   }))
 
   // validate whether the move actions take place in an array
-  const arrayPath = initial(first(parsedOperations).path)
+  const arrayPath: JSONPath = initial(first(parsedOperations).path) as JSONPath
   const array = getIn(json, arrayPath)
   if (!Array.isArray(array)) {
     throw new Error(
@@ -269,8 +271,8 @@ export function fastPatchSort(json, operations) {
   // apply the actual operations on the same array. Only copy the only array once
   const updatedArray = array.slice(0)
   parsedOperations.forEach((parsedOperation) => {
-    const fromIndex = last(parsedOperation.from)
-    const toIndex = last(parsedOperation.path)
+    const fromIndex = last(parsedOperation.from) as number
+    const toIndex = last(parsedOperation.path) as number
 
     const value = updatedArray.splice(fromIndex, 1)[0]
     updatedArray.splice(toIndex, 0, value)

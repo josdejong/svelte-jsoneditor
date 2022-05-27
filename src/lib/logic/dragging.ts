@@ -8,6 +8,7 @@ import {
 import { documentStatePatch } from './documentState.js'
 import { initial, isEqual, last } from 'lodash-es'
 import { getIn } from 'immutable-json-patch'
+import type { JSONPath } from 'immutable-json-patch'
 import { moveInsideParent } from './operations.js'
 
 /**
@@ -52,7 +53,7 @@ export function onMoveSelection({ fullJson, fullState, fullSelection, deltaY, it
   //  changing the operations into relative operations.
   const update = documentStatePatch(fullJson, fullState, operations)
 
-  const path = initial(getStartPath(fullSelection))
+  const path: JSONPath = initial(getStartPath(fullSelection)) as JSONPath
   const value = getIn(fullJson, path)
   if (Array.isArray(value)) {
     const updatedFullSelection = createUpdatedArraySelection({

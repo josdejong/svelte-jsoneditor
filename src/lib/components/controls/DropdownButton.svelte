@@ -1,14 +1,14 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import Icon from 'svelte-awesome'
   import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
   import { onDestroy, onMount } from 'svelte'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings'
+  import { keyComboFromEvent } from '../../utils/keyBindings'
+  import type { DropdownButtonItem } from '../../types'
 
-  /** @type {DropdownButtonItem[]} */
-  export let items = []
-  export let title = null
+  export let items: DropdownButtonItem[] = []
+  export let title: string | undefined = undefined
   export let width = '120px'
 
   let visible = false
@@ -24,7 +24,7 @@
     visible = false
   }
 
-  function handleKeyDown(event) {
+  function handleKeyDown(event: KeyboardEvent) {
     const combo = keyComboFromEvent(event)
     if (combo === 'Escape') {
       event.preventDefault()

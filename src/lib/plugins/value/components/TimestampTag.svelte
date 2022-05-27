@@ -1,14 +1,14 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import Icon from 'svelte-awesome'
   import { faClock } from '@fortawesome/free-regular-svg-icons'
   import { getContext } from 'svelte'
-  import { tooltip } from '../../../components/controls/tooltip/tooltip'
+  import { tooltip } from '../../../components/controls/tooltip/tooltip.js'
 
   const absolutePopupContext = getContext('absolute-popup')
 
-  export let value
+  export let value: number
 
   $: text = `Time: ${new Date(value).toString()}`
 </script>

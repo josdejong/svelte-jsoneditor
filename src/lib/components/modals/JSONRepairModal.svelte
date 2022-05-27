@@ -1,6 +1,6 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="js">
   import { getContext } from 'svelte'
   import JSONRepairComponent from './repair/JSONRepairComponent.svelte'
 
