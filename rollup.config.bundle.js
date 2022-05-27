@@ -2,6 +2,7 @@ import commonjs from '@rollup/plugin-commonjs'
 import json from '@rollup/plugin-json'
 import resolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
+import { getBabelOutputPlugin } from '@rollup/plugin-babel'
 import path from 'path'
 import fs from 'fs'
 import svelte from 'rollup-plugin-svelte'
@@ -51,6 +52,9 @@ export default {
     json(),
 
     typescript(),
+    getBabelOutputPlugin({
+      presets: ['@babel/preset-env']
+    }),
 
     // minify
     production && terser()
