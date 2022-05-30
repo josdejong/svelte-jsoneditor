@@ -28,7 +28,7 @@ export default {
     {
       file,
       format: 'es',
-      sourcemap: true,
+      sourcemap: false, // FIXME: enable sourcemap (generated source map has issues right now)
       inlineDynamicImports: true
     }
   ],
