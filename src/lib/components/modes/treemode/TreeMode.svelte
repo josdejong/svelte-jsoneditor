@@ -368,7 +368,7 @@
     const previousSelection = selection
 
     json = updatedJson
-    state = syncState(json, previousState, [], getDefaultExpand(json), true)
+    state = syncState(json, previousState, [], getDefaultExpand(json), false)
     text = undefined
     textIsRepaired = false
     selection = clearSelectionWhenNotExisting(selection, json)
@@ -405,21 +405,21 @@
 
     try {
       json = JSON.parse(updatedText)
-      state = syncState(json, previousState, [], getDefaultExpand(json), true)
+      state = syncState(json, previousState, [], getDefaultExpand(json), false)
       text = updatedText
       textIsRepaired = false
       selection = clearSelectionWhenNotExisting(selection, json)
     } catch (err) {
       try {
         json = JSON.parse(jsonrepair(updatedText))
-        state = syncState(json, previousState, [], getDefaultExpand(json), true)
+        state = syncState(json, previousState, [], getDefaultExpand(json), false)
         text = updatedText
         textIsRepaired = true
         selection = clearSelectionWhenNotExisting(selection, json)
       } catch (err) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
-        state = createState(json)
+        state = undefined
         text = externalContent.text
         textIsRepaired = false
         selection = clearSelectionWhenNotExisting(selection, json)
@@ -829,7 +829,7 @@
 
     if (isEmpty(selection.focusPath)) {
       // root selected -> clear complete document
-      debug('remove', { selection })
+      debug('remove root', { selection })
 
       const patchResult = null
 
