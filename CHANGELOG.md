@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.56](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.55...v0.3.56) (2022-05-30)
+
+
+### Bug Fixes
+
+* disable broken sourcemap for the time being ([8239683](https://github.com/josdejong/svelte-jsoneditor/commit/82396830d781c3e2246636c5ac73893fccecc4fb))
+
 ### [0.3.55](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.54...v0.3.55) (2022-05-30)
 
 
