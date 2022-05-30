@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.55](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.54...v0.3.55) (2022-05-30)
+
+
+### Bug Fixes
+
+* editor not having a border when welcome screen is displayed ([87e5da9](https://github.com/josdejong/svelte-jsoneditor/commit/87e5da92b67e82e5e6fca7594fdd1ff5d8760a74))
+* expanded state being reset when updating the contents ([27f61f2](https://github.com/josdejong/svelte-jsoneditor/commit/27f61f2f66b7b572e2d4bc8276bb79b3640c83ed))
+
 ### [0.3.54](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.53...v0.3.54) (2022-05-27)
 
 
