@@ -24,8 +24,8 @@
   import { isObjectOrArray } from '$lib/utils/typeUtils'
   import { faCheckSquare, faLightbulb, faSquare } from '@fortawesome/free-regular-svg-icons'
   import { STATE_ENFORCE_STRING } from '$lib/constants'
-  import { isObject } from '$lib/utils/typeUtils.js'
-  import { canConvert, singleItemSelected } from '$lib/logic/selection.js'
+  import { isObject } from '$lib/utils/typeUtils'
+  import { canConvert, singleItemSelected } from '$lib/logic/selection'
   import { findNearestElement } from '$lib/utils/domUtils'
 
   export let json

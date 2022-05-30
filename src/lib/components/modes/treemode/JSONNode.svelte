@@ -40,11 +40,11 @@
   import { singleton } from './singleton.js'
   import ValidationError from './ValidationError.svelte'
   import { createDebug } from '$lib/utils/debug'
-  import { forEachKey } from '$lib/logic/documentState.js'
-  import { onMoveSelection } from '$lib/logic/dragging.js'
-  import { forEachIndex } from '$lib/utils/arrayUtils.js'
-  import { createMemoizePath } from '$lib/utils/pathUtils.js'
-  import { keyIsSelected } from '$lib/logic/selection.js'
+  import { forEachKey } from '$lib/logic/documentState'
+  import { onMoveSelection } from '$lib/logic/dragging'
+  import { forEachIndex } from '$lib/utils/arrayUtils'
+  import { createMemoizePath } from '$lib/utils/pathUtils'
+  import { keyIsSelected } from '$lib/logic/selection'
   import type { JSONData, Path, SearchResultItem, TreeModeContext } from '$lib/types'
 
   export let value: JSONData

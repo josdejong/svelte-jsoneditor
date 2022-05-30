@@ -3,7 +3,7 @@
 <script lang="ts">
   import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
-  import { createDebug } from '$lib/utils/debug.js'
+  import { createDebug } from '$lib/utils/debug'
   import {
     compileJSONPointer,
     existsIn,
@@ -89,10 +89,10 @@
   import Welcome from './Welcome.svelte'
   import NavigationBar from '../../controls/navigationBar/NavigationBar.svelte'
   import SearchBox from './menu/SearchBox.svelte'
-  import { convertValue, isLargeContent } from '$lib/utils/jsonUtils.js'
-  import { MAX_DOCUMENT_SIZE_EXPAND_ALL } from '$lib/constants.js'
-  import { canConvert, createSelectionFromOperations } from '$lib/logic/selection.js'
-  import { collapse, expandWithCallback } from '$lib/logic/documentState.js'
+  import { convertValue, isLargeContent } from '$lib/utils/jsonUtils'
+  import { MAX_DOCUMENT_SIZE_EXPAND_ALL } from '$lib/constants'
+  import { canConvert, createSelectionFromOperations } from '$lib/logic/selection'
+  import { collapse, expandWithCallback } from '$lib/logic/documentState'
   import type { Validator } from '$lib/types'
 
   const debug = createDebug('jsoneditor:TreeMode')

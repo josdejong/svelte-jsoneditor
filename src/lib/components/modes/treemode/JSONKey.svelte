@@ -7,8 +7,8 @@
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
   import { addNewLineSuffix } from '$lib/utils/domUtils'
-  import { UPDATE_SELECTION } from '$lib/constants.js'
-  import type { Selection, Path, TreeModeContext } from '$lib/types'
+  import { UPDATE_SELECTION } from '$lib/constants'
+  import type { Path, Selection, TreeModeContext } from '$lib/types'
 
   export let path: Path
   export let key: string
