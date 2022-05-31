@@ -1,0 +1,24 @@
+@import '../../../styles';
+
+.jse-status-bar {
+  background: var(--jse-panel-background);
+  color: var(--jse-panel-color-readonly);
+  font-family: var(--jse-font-family-mono);
+  font-size: var(--jse-font-size-mono);
+  margin: 0;
+
+  border-top: var(--jse-panel-border);
+  border-left: var(--jse-main-border);
+  border-right: var(--jse-main-border);
+
+  &:last-child {
+    border-bottom: var(--jse-main-border);
+  }
+
+  display: flex;
+  gap: var(--jse-padding);
+
+  .jse-status-bar-info {
+    padding: 2px;
+  }
+}

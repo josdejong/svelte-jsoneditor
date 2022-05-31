@@ -50,6 +50,7 @@
   export let mode: 'tree' | 'code' = MODE.TREE
   export let mainMenuBar = true
   export let navigationBar = true
+  export let statusBar = true
   export let escapeControlCharacters = false
   export let escapeUnicodeCharacters = false
   export let validator: Validator | null = null
@@ -77,6 +78,7 @@
     mode?: 'tree' | 'code'
     mainMenuBar?: boolean
     navigationBar?: boolean
+    statusBar?: boolean
     escapeControlCharacters?: boolean
     escapeUnicodeCharacters?: boolean
     validator?: Validator
@@ -430,6 +432,7 @@
             {readOnly}
             {indentation}
             {mainMenuBar}
+            {statusBar}
             {escapeUnicodeCharacters}
             {validator}
             onChange={handleChangeText}

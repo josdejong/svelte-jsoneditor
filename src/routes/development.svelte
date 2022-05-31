@@ -102,6 +102,7 @@
   const readOnly = useLocalStorage('svelte-jsoneditor-demo-readOnly', false)
   const mainMenuBar = useLocalStorage('svelte-jsoneditor-demo-mainMenuBar', true)
   const navigationBar = useLocalStorage('svelte-jsoneditor-demo-navigationBar', true)
+  const statusBar = useLocalStorage('svelte-jsoneditor-demo-statusBar', true)
   const escapeControlCharacters = useLocalStorage(
     'svelte-jsoneditor-demo-escapeControlCharacters',
     false
@@ -214,6 +215,9 @@
     </label>
     <label>
       <input type="checkbox" bind:checked={$navigationBar} /> navigationBar
+    </label>
+    <label>
+      <input type="checkbox" bind:checked={$statusBar} /> statusBar
     </label>
     <label>
       <input type="checkbox" bind:checked={$escapeControlCharacters} /> escapeControlCharacters
@@ -374,6 +378,7 @@
             bind:content
             mainMenuBar={$mainMenuBar}
             navigationBar={$navigationBar}
+            statusBar={$statusBar}
             escapeControlCharacters={$escapeControlCharacters}
             escapeUnicodeCharacters={$escapeUnicodeCharacters}
             readOnly={$readOnly}
@@ -414,6 +419,7 @@
             bind:content
             mainMenuBar={$mainMenuBar}
             navigationBar={$navigationBar}
+            statusBar={$statusBar}
             escapeControlCharacters={$escapeControlCharacters}
             escapeUnicodeCharacters={$escapeUnicodeCharacters}
             readOnly={$readOnly}

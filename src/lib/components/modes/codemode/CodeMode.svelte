@@ -27,7 +27,7 @@
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import CodeMenu from './menu/CodeMenu.svelte'
   import { basicSetup, EditorState } from '@codemirror/basic-setup'
-  import { EditorView, keymap } from '@codemirror/view'
+  import { EditorView, keymap, ViewUpdate } from '@codemirror/view'
   import { indentWithTab } from '@codemirror/commands'
   import { linter, lintGutter } from '@codemirror/lint'
   import { json as jsonLang } from '@codemirror/lang-json'
@@ -40,9 +40,11 @@
   import { MAX_VALIDATABLE_SIZE } from '../../../constants.js'
   import { measure } from '../../../utils/timeUtils.js'
   import jsonSourceMap from 'json-source-map'
+  import StatusBar from './StatusBar.svelte'
 
   export let readOnly = false
   export let mainMenuBar = true
+  export let statusBar = true
   export let text = ''
   export let indentation = 2
   export let escapeUnicodeCharacters = false
@@ -75,6 +77,7 @@
   let codeMirrorView
   let codeMirrorText
   let domCodeMode
+  let editorState: EditorState
 
   let onChangeDisabled = false
   let acceptTooLarge = false
@@ -463,7 +466,9 @@
         EditorView.domEventHandlers({
           dblclick: handleDoubleClick
         }),
-        EditorView.updateListener.of((update) => {
+        EditorView.updateListener.of((update: ViewUpdate) => {
+          editorState = update.state
+
           if (update.docChanged) {
             onChangeCodeMirrorValueDebounced()
           }
@@ -832,6 +837,10 @@
     {/if}
 
     <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
+
+    {#if statusBar}
+      <StatusBar {editorState} />
+    {/if}
   {:else}
     <div class="jse-contents">
       <div class="jse-loading-space" />
