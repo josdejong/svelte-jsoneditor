@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.57](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.56...v0.3.57) (2022-05-31)
+
+
+### Bug Fixes
+
+* make active line color a lighter than the selection color in code mode ([1d26fc7](https://github.com/josdejong/svelte-jsoneditor/commit/1d26fc7a4ee95be7f3698c3b0894a85800557f71))
+
 ### [0.3.56](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.55...v0.3.56) (2022-05-30)
 
 
