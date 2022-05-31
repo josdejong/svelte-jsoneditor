@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.58](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.57...v0.3.58) (2022-05-31)
+
+
+### Features
+
+* implement StatusBar in code mode ([4bf271a](https://github.com/josdejong/svelte-jsoneditor/commit/4bf271a32ea24fb069bc91cf567a5102ee29e5d2))
+
 ### [0.3.57](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.56...v0.3.57) (2022-05-31)
 
 
