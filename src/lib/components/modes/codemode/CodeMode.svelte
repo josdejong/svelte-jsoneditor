@@ -826,6 +826,10 @@
 
     <div class="jse-contents" class:jse-hidden={codeEditorDisabled} bind:this={codeMirrorRef} />
 
+    {#if statusBar}
+      <StatusBar {editorState} />
+    {/if}
+
     {#if jsonParseError}
       <Message
         type="error"
@@ -837,10 +841,6 @@
     {/if}
 
     <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
-
-    {#if statusBar}
-      <StatusBar {editorState} />
-    {/if}
   {:else}
     <div class="jse-contents">
       <div class="jse-loading-space" />
