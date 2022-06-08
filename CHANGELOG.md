@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.59](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.58...v0.3.59) (2022-06-08)
+
+
+### Bug Fixes
+
+* [#91](https://github.com/josdejong/svelte-jsoneditor/issues/91) interface OptionalJSONEditorProps missing in npm package ([23bd690](https://github.com/josdejong/svelte-jsoneditor/commit/23bd690265dd213775e4163e28b79380aeb0a119))
+* invert the color of warning text to make it better readable ([410d91e](https://github.com/josdejong/svelte-jsoneditor/commit/410d91eb21700f55c8ac914486e62b500929d24d))
+* render the status bar of code mode above parse errors and validation warnings ([d765cb0](https://github.com/josdejong/svelte-jsoneditor/commit/d765cb02851bb2b89bc648d21582a313106f9cfa))
+* update dependencies and devDependencies ([9aa49b6](https://github.com/josdejong/svelte-jsoneditor/commit/9aa49b6ee63f92712241ab6aa8c6da7987e1b607))
+
 ### [0.3.58](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.57...v0.3.58) (2022-05-31)
 
 
