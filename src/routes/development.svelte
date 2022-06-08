@@ -183,6 +183,18 @@
     console.log('onChangeQueryLanguage', newQueryLanguageId)
     queryLanguageId = newQueryLanguageId
   }
+
+  function openInWindow() {
+    const popupWindow = window.open(
+      '',
+      '_blank',
+      `location=no,toolbar=no,menubar=no,status=no,directories=no,width=${500},height=${600},left=${0},top=${0},editorWind=yes`
+    )
+    window['popupEditor'] = new JSONEditor({
+      target: popupWindow.document.body,
+      props: {}
+    })
+  }
 </script>
 
 <svelte:head>
@@ -448,6 +460,10 @@
       {/if}
     </div>
   </div>
+
+  <p>
+    <button on:click={openInWindow}>Open editor in new window</button>
+  </p>
 </div>
 
 <!--

@@ -97,6 +97,9 @@
       <button id="scrollToPath">scrollTo /object/nested/name</button>
       <button id="acceptAutoRepair">acceptAutoRepair</button>
     </p>
+    <p>
+      <button id="openInWindow">open in new window</button>
+    </p>
 
     <script type="module">
       import {
@@ -383,6 +386,18 @@
       document.getElementById('acceptAutoRepair').onclick = () => {
         const content = testEditor.acceptAutoRepair()
         console.log('acceptAutoRepair', content)
+      }
+
+      document.getElementById('openInWindow').onclick = () => {
+        const popupWindow = window.open(
+          '',
+          '_blank',
+          `location=no,toolbar=no,menubar=no,status=no,directories=no,width=${1000},height=${600},left=${0},top=${0},editorWind=yes`
+        )
+        window['popupEditor'] = new JSONEditor({
+          target: popupWindow.document.body,
+          props: {}
+        })
       }
     </script>
   </body>
