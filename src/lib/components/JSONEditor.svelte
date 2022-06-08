@@ -17,6 +17,7 @@
   import ModalRef from './modals/ModalRef.svelte'
   import type {
     Content,
+    JSONEditorPropsOptional,
     JSONPatchDocument,
     JSONPatchResult,
     MenuItem,
@@ -70,32 +71,6 @@
   }
   export let onFocus: OnFocus = noop
   export let onBlur: OnBlur = noop
-
-  export interface OptionalJSONEditorProps {
-    content?: Content
-    readOnly?: boolean
-    indentation?: number
-    mode?: 'tree' | 'code'
-    mainMenuBar?: boolean
-    navigationBar?: boolean
-    statusBar?: boolean
-    escapeControlCharacters?: boolean
-    escapeUnicodeCharacters?: boolean
-    validator?: Validator
-
-    queryLanguages?: QueryLanguage[]
-    queryLanguageId?: string
-
-    onChangeQueryLanguage?: OnChangeQueryLanguage
-    onChange?: OnChange
-    onRenderValue?: OnRenderValue
-    onClassName?: OnClassName
-    onRenderMenu?: OnRenderMenu
-    onChangeMode?: OnChangeMode
-    onError?: OnError
-    onFocus?: OnFocus
-    onBlur?: OnBlur
-  }
 
   let instanceId = uniqueId()
 
@@ -245,7 +220,7 @@
     }
   }
 
-  export function updateProps(props: OptionalJSONEditorProps) {
+  export function updateProps(props: JSONEditorPropsOptional) {
     this.$set(props)
   }
 

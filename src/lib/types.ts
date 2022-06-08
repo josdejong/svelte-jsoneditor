@@ -343,6 +343,32 @@ export interface ContextMenuProps {
   showTip: boolean
 }
 
+export interface JSONEditorPropsOptional {
+  content?: Content
+  readOnly?: boolean
+  indentation?: number
+  mode?: 'tree' | 'code'
+  mainMenuBar?: boolean
+  navigationBar?: boolean
+  statusBar?: boolean
+  escapeControlCharacters?: boolean
+  escapeUnicodeCharacters?: boolean
+  validator?: Validator
+
+  queryLanguages?: QueryLanguage[]
+  queryLanguageId?: string
+
+  onChangeQueryLanguage?: OnChangeQueryLanguage
+  onChange?: OnChange
+  onRenderValue?: OnRenderValue
+  onClassName?: OnClassName
+  onRenderMenu?: OnRenderMenu
+  onChangeMode?: OnChangeMode
+  onError?: OnError
+  onFocus?: OnFocus
+  onBlur?: OnBlur
+}
+
 export interface TreeModeContext {
   readOnly: boolean
   showTip: boolean
