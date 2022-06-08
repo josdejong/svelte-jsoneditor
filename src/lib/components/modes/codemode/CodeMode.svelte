@@ -26,21 +26,21 @@
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import CodeMenu from './menu/CodeMenu.svelte'
-  import { basicSetup, EditorState } from '@codemirror/basic-setup'
-  import { EditorView, keymap, ViewUpdate } from '@codemirror/view'
-  import { indentWithTab } from '@codemirror/commands'
+  import { basicSetup, EditorView } from 'codemirror'
+  import { Compartment, EditorState } from '@codemirror/state'
+  import { keymap, ViewUpdate } from '@codemirror/view'
+  import { indentWithTab, redo, redoDepth, undo, undoDepth } from '@codemirror/commands'
   import { linter, lintGutter } from '@codemirror/lint'
+  import type { Diagnostic } from '@codemirror/lint'
   import { json as jsonLang } from '@codemirror/lang-json'
   import { indentUnit } from '@codemirror/language'
-  import { highlightStyle } from './codemirror/codemirror-theme.js'
-  import { Compartment } from '@codemirror/state'
   import { closeSearchPanel, openSearchPanel, search } from '@codemirror/search'
-  import { redo, redoDepth, undo, undoDepth } from '@codemirror/history'
   import { normalizeJsonParseError } from '../../../utils/jsonUtils.js'
   import { MAX_VALIDATABLE_SIZE } from '../../../constants.js'
   import { measure } from '../../../utils/timeUtils.js'
   import jsonSourceMap from 'json-source-map'
   import StatusBar from './StatusBar.svelte'
+  import { highlighter } from './codemirror/codemirror-theme'
 
   export let readOnly = false
   export let mainMenuBar = true
@@ -462,7 +462,7 @@
         ),
         lintGutter(),
         basicSetup,
-        highlightStyle,
+        highlighter,
         EditorView.domEventHandlers({
           dblclick: handleDoubleClick
         }),
@@ -683,7 +683,7 @@
   /**
    * @returns {Diagnostic[]}
    */
-  function validate() {
+  function validate(): Diagnostic[] {
     debug('validate')
     jsonStatus = JSON_STATUS_VALID
     jsonParseError = null

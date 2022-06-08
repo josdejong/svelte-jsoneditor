@@ -101,7 +101,7 @@
 <Menu {items}>
   <div slot="right" class="jse-powered-by">
     <a
-      href="https://codemirror.net/6/"
+      href="https://codemirror.net"
       target="_blank"
       rel="noopener noreferrer"
       title="Code mode is powered by CodeMirror"
