@@ -346,7 +346,8 @@ export interface ContextMenuProps {
 export interface JSONEditorPropsOptional {
   content?: Content
   readOnly?: boolean
-  indentation?: number
+  indentation?: number | string
+  tabSize?: number
   mode?: 'tree' | 'code'
   mainMenuBar?: boolean
   navigationBar?: boolean

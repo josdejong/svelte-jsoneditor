@@ -46,7 +46,8 @@
   export let mainMenuBar = true
   export let statusBar = true
   export let text = ''
-  export let indentation = 2
+  export let indentation: number | string = 2
+  export let tabSize = 4
   export let escapeUnicodeCharacters = false
   export let validator = null
 
@@ -86,6 +87,7 @@
   let validationErrors = []
   const readOnlyCompartment = new Compartment()
   const indentUnitCompartment = new Compartment()
+  const tabSizeCompartment = new Compartment()
 
   $: isNewDocument = text.length === 0
   $: tooLarge = text && text.length > MAX_DOCUMENT_SIZE_CODE_MODE
@@ -98,6 +100,7 @@
 
   $: setCodeMirrorValue(text)
   $: updateIndentation(indentation)
+  $: updateTabSize(tabSize)
   $: updateReadOnly(readOnly)
 
   // force updating the text when escapeUnicodeCharacters changes
@@ -478,6 +481,7 @@
           top: true
         }),
         readOnlyCompartment.of(EditorState.readOnly.of(readOnly)),
+        tabSizeCompartment.of(EditorState.tabSize.of(tabSize)),
         indentUnitCompartment.of(createIndentUnit(indentation)),
         EditorView.lineWrapping
       ]
@@ -629,6 +633,16 @@
     }
   }
 
+  function updateTabSize(tabSize: number) {
+    if (codeMirrorView) {
+      debug('updateTabSize', tabSize)
+
+      codeMirrorView.dispatch({
+        effects: tabSizeCompartment.reconfigure(EditorState.tabSize.of(tabSize))
+      })
+    }
+  }
+
   function updateReadOnly(readOnly) {
     if (codeMirrorView) {
       debug('updateReadOnly', readOnly)
@@ -640,11 +654,11 @@
   }
 
   /**
-   * @param {number} indentation
+   * @param {number | string} indentation
    * @returns {Extension}
    */
   function createIndentUnit(indentation) {
-    return indentUnit.of(' '.repeat(indentation))
+    return indentUnit.of(typeof indentation === 'number' ? ' '.repeat(indentation) : indentation)
   }
 
   function updateCanUndoRedo() {

@@ -120,7 +120,7 @@
   export let escapeUnicodeCharacters = false
   export let validator: Validator = null
 
-  export let indentation = 2
+  export let indentation: number | string = 2
   export let onError
 
   /** @type {(content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void} */

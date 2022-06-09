@@ -91,12 +91,20 @@
     { value: 'jse-theme-big', label: 'big' }
   ]
 
+  const indentations = [
+    { value: 2, label: '2 spaces' },
+    { value: 3, label: '3 spaces' },
+    { value: '    ', label: '4 spaces' }, // equivalent to value: 4
+    { value: 6, label: '6 spaces' },
+    { value: 8, label: '8 spaces' },
+    { value: '\t', label: '1 tab' }
+  ]
+
   const validator = createAjvValidator(schema)
 
   const showTreeEditor = useLocalStorage('svelte-jsoneditor-demo-showTreeEditor', true)
   const showCodeEditor = useLocalStorage('svelte-jsoneditor-demo-showCodeEditor', true)
   const showRawContents = useLocalStorage('svelte-jsoneditor-demo-showRawContents', true)
-  let indentation = 2
   let height = '400px'
   const validate = useLocalStorage('svelte-jsoneditor-demo-validate', true)
   const readOnly = useLocalStorage('svelte-jsoneditor-demo-readOnly', false)
@@ -120,6 +128,11 @@
     true
   )
   const selectedTheme = useLocalStorage('svelte-jsoneditor-demo-theme', themes[0].value)
+  const selectedIndentation = useLocalStorage(
+    'svelte-jsoneditor-demo-indentation',
+    indentations[0].value
+  )
+  const tabSize = useLocalStorage('svelte-jsoneditor-demo-tabSize', indentations[0].value)
 
   $: queryLanguages = $multipleQueryLanguages
     ? [javascriptQueryLanguage, lodashQueryLanguage, jmespathQueryLanguage]
@@ -205,7 +218,14 @@
   <h1>svelte-jsoneditor development application</h1>
   <p>
     <label>
-      Indentation: <input type="number" bind:value={indentation} />
+      Indentation: <select bind:value={$selectedIndentation}>
+        {#each indentations as indentation}
+          <option value={indentation.value}>{indentation.label}</option>
+        {/each}
+      </select>
+    </label>
+    <label>
+      tabSize: <input type="number" bind:value={$tabSize} />
     </label>
     <label>
       Height: <input type="text" bind:value={height} />
@@ -394,7 +414,8 @@
             escapeControlCharacters={$escapeControlCharacters}
             escapeUnicodeCharacters={$escapeUnicodeCharacters}
             readOnly={$readOnly}
-            {indentation}
+            indentation={$selectedIndentation}
+            tabSize={$tabSize}
             validator={$validate ? validator : undefined}
             {queryLanguages}
             bind:queryLanguageId
@@ -435,7 +456,8 @@
             escapeControlCharacters={$escapeControlCharacters}
             escapeUnicodeCharacters={$escapeUnicodeCharacters}
             readOnly={$readOnly}
-            {indentation}
+            indentation={$selectedIndentation}
+            tabSize={$tabSize}
             validator={$validate ? validator : undefined}
             {queryLanguages}
             {queryLanguageId}

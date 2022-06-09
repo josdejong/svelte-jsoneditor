@@ -47,7 +47,8 @@
   export let content: Content = { text: '' }
 
   export let readOnly = false
-  export let indentation = 2
+  export let indentation: number | string = 2
+  export let tabSize = 4
   export let mode: 'tree' | 'code' = MODE.TREE
   export let mainMenuBar = true
   export let navigationBar = true
@@ -406,6 +407,7 @@
             text={getText(content)}
             {readOnly}
             {indentation}
+            {tabSize}
             {mainMenuBar}
             {statusBar}
             {escapeUnicodeCharacters}
