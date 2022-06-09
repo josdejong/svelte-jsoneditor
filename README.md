@@ -22,7 +22,8 @@ npm install svelte-jsoneditor
 
 - Svelte examples: [/src/routes/examples](/src/routes/examples)
 - Plain JavaScript examples: [/examples/browser](/examples/browser)
-- React example: [https://codesandbox.io/s/svelte-jsoneditor-react-59wxz](https://codesandbox.io/s/svelte-jsoneditor-react-59wxz)
+- React example: https://codesandbox.io/s/svelte-jsoneditor-react-59wxz
+- Vue example: https://codesandbox.io/s/svelte-jsoneditor-vue-toln3w
 
 ### Svelte usage
 
