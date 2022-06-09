@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.3.60](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.59...v0.3.60) (2022-06-09)
+
+
+### Bug Fixes
+
+* [#55](https://github.com/josdejong/svelte-jsoneditor/issues/55) support tabs for indentation, introduce new option `tabSize` ([7e96e9a](https://github.com/josdejong/svelte-jsoneditor/commit/7e96e9a231a0fd69c28b7825423a21d9c94a15bc))
+
 ### [0.3.59](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.58...v0.3.59) (2022-06-08)
 
 
