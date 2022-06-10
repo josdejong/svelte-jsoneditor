@@ -80,7 +80,7 @@
   let validationError: ValidationError | undefined
   $: validationError = derived(
     context.documentStateStore,
-    (state) => state.validationErrors[pathStr]
+    (state) => state.validationErrorsMap[pathStr]
   )
   $: root = path.length === 0
 

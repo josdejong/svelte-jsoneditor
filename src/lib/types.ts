@@ -25,7 +25,8 @@ export interface CaretPosition {
 
 export interface DocumentState {
   expanded: { [pathStr: string]: boolean }
-  validationErrors: { [pathStr: string]: ValidationError[] }
+  validationErrors: ValidationError[]
+  validationErrorsMap: { [pathStr: string]: ValidationError }
 }
 
 export interface JSONPatchOperation {

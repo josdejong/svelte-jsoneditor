@@ -100,7 +100,7 @@
   import Welcome from './Welcome.svelte'
   import NavigationBar from '../../controls/navigationBar/NavigationBar.svelte'
   import SearchBox from './menu/SearchBox.svelte'
-  import type { DocumentState, Validator } from '$lib/types'
+  import type { DocumentState, JSONData, ValidationError, Validator } from '$lib/types'
   import { writable } from 'svelte/store'
 
   const debug = createDebug('jsoneditor:TreeMode')
@@ -341,11 +341,18 @@
   let textIsRepaired = false
   $: textIsUnrepairable = text !== undefined && json === undefined
 
-  $: {
-    documentStateStore.update((state) => ({
-      ...state,
-      validationErrors: mapValidationErrors(validator ? validator(json) : [])
-    }))
+  $: updateValidationErrors(json, validator)
+
+  function updateValidationErrors(json: JSONData, validator: Validator | null) {
+    const validationErrors: ValidationError[] = validator ? validator(json) : []
+
+    if (!isEqual(validationErrors, $documentStateStore.validationErrors)) {
+      documentStateStore.update((state) => ({
+        ...state,
+        validationErrors,
+        validationErrorsMap: mapValidationErrors(validationErrors)
+      }))
+    }
   }
 
   export function get() {
@@ -2258,9 +2265,7 @@
       {/if}
 
       <ValidationErrorsOverview
-        validationErrors={values($documentStateStore.validationErrors).filter(
-          (validationError) => !validationError.isChildError
-        )}
+        validationErrors={$documentStateStore.validationErrors}
         selectError={handleSelectValidationError}
       />
     {/if}

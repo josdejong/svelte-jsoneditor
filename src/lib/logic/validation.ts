@@ -9,7 +9,7 @@ import { stringifyPath } from '../utils/pathUtils.js'
  * Returns a nested object containing the validation errors
  */
 export function mapValidationErrors(validationErrors: ValidationError[]): {
-  [pathStr: string]: ValidationError[]
+  [pathStr: string]: ValidationError
 } {
   const map = {}
 
