@@ -1,4 +1,5 @@
 import type { SvelteComponent } from 'svelte'
+import type { Readable } from 'svelte/store'
 
 export type JSONData = { [key: string]: JSONData } | JSONData[] | string | number | boolean | null
 
@@ -20,6 +21,10 @@ export interface VisibleSection {
 export interface CaretPosition {
   path: Path
   type: CaretType
+}
+
+export interface DocumentState {
+  expanded: { [path: string]: boolean }
 }
 
 export interface JSONPatchOperation {
@@ -371,6 +376,7 @@ export interface JSONEditorPropsOptional {
 }
 
 export interface TreeModeContext {
+  documentStateStore: Readable<DocumentState>
   readOnly: boolean
   showTip: boolean
   normalization: ValueNormalization

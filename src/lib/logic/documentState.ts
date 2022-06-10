@@ -24,8 +24,13 @@ import {
   mergeSections,
   nextRoundNumber
 } from './expandItemsSections.js'
-import type { JSONData, JSONPatchDocument, Path, Section } from '../types'
+import type { DocumentState, JSONData, JSONPatchDocument, Path, Section } from '../types'
+import { stringifyPath } from '../utils/pathUtils.js'
+import { traverse } from '../utils/objectUtils.js'
+import { createDebug } from '../utils/debug.js'
 import type { JSONPath } from 'immutable-json-patch'
+
+const debug = createDebug('jsoneditor:documentState')
 
 /**
  * Sync a state object with the json it belongs to: update keys, limit, and expanded state
@@ -131,6 +136,12 @@ export function createState(json) {
   return state
 }
 
+export function createDocumentState(json: JSONData): DocumentState {
+  return {
+    expanded: {}
+  }
+}
+
 /**
  * Expand a node
  * @param {JSON} json
@@ -234,38 +245,54 @@ export function expandPath(json, state, path) {
 
 /**
  * Expand a node, end expand it's childs according to the provided callback
- * @param {JSON} json
- * @param {JSON} state
- * @param {Path} path
- * @param {(path: Path) => boolean} expandedCallback
- * @returns {JSON} Returns the updated state
  */
 // TODO: write unit tests
-export function expandWithCallback(json, state, path, expandedCallback) {
-  const updatedState = setIn(state, path.concat(STATE_EXPANDED), true, true)
+export function expandWithCallback(
+  json: JSONData,
+  state: DocumentState,
+  path: Path,
+  expandedCallback: (path: Path) => boolean
+): DocumentState {
+  const expanded = { ...state.expanded }
 
-  return updateIn(updatedState, path, (childState) => {
-    return syncState(
-      getIn(json, path) as JSONData,
-      childState as JSONData,
-      [],
-      expandedCallback,
-      true
-    )
+  expanded[stringifyPath(path)] = true
+
+  // FIXME: also initialize other state like object keys of nested objects etc?
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const contents: JSONData = getIn(json, path)
+  traverse(contents, (value, nestedPath) => {
+    if (expandedCallback(nestedPath)) {
+      expanded[stringifyPath(nestedPath)] = true
+    } else {
+      return false
+    }
   })
+
+  return {
+    ...state,
+    expanded
+  }
 }
 
-/**
- * @param {JSON} json
- * @param {JSON} state
- * @param {Path} path
- * @returns {JSON} Returns the updated state
- */
 // TODO: write unit tests
-export function collapse(json, state, path) {
-  return updateIn(state, path, (childState) => {
-    return syncState(getIn(json, path) as JSONData, childState as JSONData, [], () => false, true)
-  })
+export function collapse(json: JSONData, state: DocumentState, path: Path): DocumentState {
+  const pathStr = stringifyPath(path)
+
+  const expanded = { ...state.expanded }
+
+  // delete the expanded state of the path and all it's nested paths
+  for (const key of Object.keys(expanded)) {
+    if (key.startsWith(pathStr) && key in expanded) {
+      delete expanded[key]
+    }
+  }
+
+  return {
+    ...state,
+    expanded
+  }
 }
 
 /**

@@ -11,17 +11,20 @@ import type { Path } from '../types'
  *     ".data[2].nested.property"
  */
 export function stringifyPath(path: Path): string {
-  return path
-    .map((prop) => {
-      if (typeof prop === 'number') {
-        return '[' + prop + ']'
-      } else if (typeof prop === 'string' && prop.match(/^[A-Za-z0-9_$]+$/)) {
-        return '.' + prop
-      } else {
-        return '["' + String(prop) + '"]'
-      }
-    })
-    .join('')
+  return path.map(stringifyPathProp).join('')
+}
+
+/**
+ * Stringify a single property of a path. See also stringifyPath
+ */
+export function stringifyPathProp(prop: string | number): string {
+  if (typeof prop === 'number') {
+    return '[' + prop + ']'
+  } else if (typeof prop === 'string' && prop.match(/^[A-Za-z0-9_$]+$/)) {
+    return '.' + prop
+  } else {
+    return '["' + String(prop) + '"]'
+  }
 }
 
 /**

@@ -12,7 +12,6 @@
     HOVER_INSERT_INSIDE,
     INSERT_EXPLANATION,
     STATE_ENFORCE_STRING,
-    STATE_EXPANDED,
     STATE_ID,
     STATE_KEYS,
     STATE_SEARCH_PROPERTY,
@@ -21,9 +20,9 @@
     STATE_VISIBLE_SECTIONS,
     VALIDATION_ERROR
   } from '$lib/constants'
-  import { getVisibleCaretPositions } from '$lib/logic/documentState'
+  import { forEachKey, getVisibleCaretPositions } from '$lib/logic/documentState'
   import { rename } from '$lib/logic/operations'
-  import { isPathInsideSelection, SELECTION_TYPE } from '$lib/logic/selection'
+  import { isPathInsideSelection, keyIsSelected, SELECTION_TYPE } from '$lib/logic/selection'
   import {
     encodeDataPath,
     getDataPathFromTarget,
@@ -40,12 +39,13 @@
   import { singleton } from './singleton.js'
   import ValidationError from './ValidationError.svelte'
   import { createDebug } from '$lib/utils/debug'
-  import { forEachKey } from '$lib/logic/documentState'
   import { onMoveSelection } from '$lib/logic/dragging'
   import { forEachIndex } from '$lib/utils/arrayUtils'
-  import { createMemoizePath } from '$lib/utils/pathUtils'
-  import { keyIsSelected } from '$lib/logic/selection'
+  import { createMemoizePath, stringifyPath } from '$lib/utils/pathUtils'
   import type { JSONData, Path, SearchResultItem, TreeModeContext } from '$lib/types'
+  import { beforeUpdate } from 'svelte'
+  import type { Readable } from 'svelte/store'
+  import { derived } from 'svelte/store'
 
   export let value: JSONData
   export let path: Path
@@ -76,13 +76,18 @@
   $: selectedKey = !!(selectionObj && selectionObj.type === SELECTION_TYPE.KEY)
   $: selectedValue = !!(selectionObj && selectionObj.type === SELECTION_TYPE.VALUE)
 
-  $: expanded = resolvedState[STATE_EXPANDED]
   $: visibleSections = resolvedState[STATE_VISIBLE_SECTIONS]
   $: keys = resolvedState[STATE_KEYS]
   $: validationError = validationErrors && validationErrors[VALIDATION_ERROR]
   $: root = path.length === 0
 
   $: type = valueType(resolvedValue)
+  $: pathStr = stringifyPath(path)
+
+  beforeUpdate(() => debug('beforeUpdate', path)) // FIXME: cleanup
+
+  let expanded: Readable<boolean>
+  $: expanded = derived(context.documentStateStore, (state) => !!state.expanded[pathStr])
 
   function getIndentationStyle(level) {
     return `margin-left: calc(${level} * var(--jse-indent-size))`
@@ -98,7 +103,7 @@
     event.stopPropagation()
 
     const recursive = event.ctrlKey
-    context.onExpand(path, !expanded, recursive)
+    context.onExpand(path, !$expanded, recursive)
   }
 
   function handleExpand(event) {
@@ -460,7 +465,7 @@
 <div
   class={classnames(
     'jse-json-node',
-    { 'jse-expanded': expanded },
+    { 'jse-expanded': $expanded },
     context.onClassName(path, resolvedValue)
   )}
   data-path={encodeDataPath(path)}
@@ -485,7 +490,7 @@
           on:click={toggleExpand}
           title="Expand or collapse this array (Ctrl+Click to expand/collapse recursively)"
         >
-          {#if expanded}
+          {#if $expanded}
             <Icon data={faCaretDown} />
           {:else}
             <Icon data={faCaretRight} />
@@ -497,7 +502,7 @@
         {/if}
         <div class="jse-meta">
           <div class="jse-meta-inner" data-type="selectable-value">
-            {#if expanded}
+            {#if $expanded}
               <div class="jse-bracket">[</div>
               <span class="jse-tag jse-expanded">
                 {resolvedValue.length}
@@ -519,10 +524,10 @@
           </div>
         {/if}
       </div>
-      {#if validationError && (!expanded || !validationError.isChildError)}
+      {#if validationError && (!$expanded || !validationError.isChildError)}
         <ValidationError {validationError} onExpand={handleExpand} />
       {/if}
-      {#if expanded}
+      {#if $expanded}
         <div
           class="jse-insert-selection-area jse-inside"
           data-type="insert-selection-area-inside"
@@ -536,7 +541,7 @@
         />
       {/if}
     </div>
-    {#if expanded}
+    {#if $expanded}
       <div class="jse-items">
         {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || selectedInside)}
           <div
@@ -610,7 +615,7 @@
           on:click={toggleExpand}
           title="Expand or collapse this object (Ctrl+Click to expand/collapse recursively)"
         >
-          {#if expanded}
+          {#if $expanded}
             <Icon data={faCaretDown} />
           {:else}
             <Icon data={faCaretRight} />
@@ -622,7 +627,7 @@
         {/if}
         <div class="jse-meta" data-type="selectable-value">
           <div class="jse-meta-inner">
-            {#if expanded}
+            {#if $expanded}
               <div class="jse-bracket jse-expanded">&lbrace;</div>
             {:else}
               <div class="jse-bracket">&lbrace;</div>
@@ -640,10 +645,10 @@
           </div>
         {/if}
       </div>
-      {#if validationError && (!expanded || !validationError.isChildError)}
+      {#if validationError && (!$expanded || !validationError.isChildError)}
         <ValidationError {validationError} onExpand={handleExpand} />
       {/if}
-      {#if expanded}
+      {#if $expanded}
         <div
           class="jse-insert-selection-area jse-inside"
           data-type="insert-selection-area-inside"
@@ -657,7 +662,7 @@
         />
       {/if}
     </div>
-    {#if expanded}
+    {#if $expanded}
       <div class="jse-props">
         {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || selectedInside)}
           <div

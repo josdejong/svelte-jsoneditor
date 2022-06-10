@@ -19,6 +19,7 @@
   import {
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
+    MAX_DOCUMENT_SIZE_EXPAND_ALL,
     MAX_SEARCH_RESULTS,
     SCROLL_DURATION,
     SEARCH_UPDATE_THROTTLE,
@@ -26,10 +27,13 @@
     STATE_ENFORCE_STRING
   } from '$lib/constants'
   import {
+    collapse,
+    createDocumentState,
     createState,
     documentStatePatch,
     expandPath,
     expandSection,
+    expandWithCallback,
     syncState
   } from '$lib/logic/documentState'
   import { createHistory } from '$lib/logic/history'
@@ -49,8 +53,10 @@
     updateSearchResult
   } from '$lib/logic/search'
   import {
+    canConvert,
     createRecursiveSelection,
     createSelection,
+    createSelectionFromOperations,
     findRootPath,
     getInitialSelection,
     getSelectionDown,
@@ -75,7 +81,12 @@
     setCursorToEnd
   } from '$lib/utils/domUtils'
   import { parseJSONPointerWithArrayIndices } from '$lib/utils/jsonPointer'
-  import { parsePartialJson, repairPartialJson } from '$lib/utils/jsonUtils'
+  import {
+    convertValue,
+    isLargeContent,
+    parsePartialJson,
+    repairPartialJson
+  } from '$lib/utils/jsonUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { isObject, isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
@@ -89,11 +100,8 @@
   import Welcome from './Welcome.svelte'
   import NavigationBar from '../../controls/navigationBar/NavigationBar.svelte'
   import SearchBox from './menu/SearchBox.svelte'
-  import { convertValue, isLargeContent } from '$lib/utils/jsonUtils'
-  import { MAX_DOCUMENT_SIZE_EXPAND_ALL } from '$lib/constants'
-  import { canConvert, createSelectionFromOperations } from '$lib/logic/selection'
-  import { collapse, expandWithCallback } from '$lib/logic/documentState'
-  import type { Validator } from '$lib/types'
+  import type { DocumentState, Validator } from '$lib/types'
+  import { writable } from 'svelte/store'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -168,6 +176,12 @@
 
   let selection = null
 
+  const documentStateStore = writable<DocumentState>(
+    expandWithCallback(json, createDocumentState(json), rootPath, expandMinimal)
+  )
+
+  $: debug('documentState', $documentStateStore)
+
   $: normalization = createNormalizationFunctions({
     escapeControlCharacters,
     escapeUnicodeCharacters
@@ -178,6 +192,7 @@
   let pastedJson
 
   function expandMinimal(path) {
+    console.log('expandMinimal?', path, path.length < 1 ? true : path.length === 1 && path[0] === 0)
     return path.length < 1 ? true : path.length === 1 && path[0] === 0 // first item of an array
   }
 
@@ -316,7 +331,8 @@
   let historyState = history.getState()
 
   export function expand(callback = () => true) {
-    state = syncState(json, state, [], callback, true)
+    state = syncState(json, state, [], callback, true) // TODO: cleanup
+    documentStateStore.update((state) => expandWithCallback(json, state, rootPath, callback))
   }
 
   // two-way binding of externalContent and internal json and text (
@@ -368,7 +384,10 @@
     const previousSelection = selection
 
     json = updatedJson
-    state = syncState(json, previousState, [], getDefaultExpand(json), false)
+    state = syncState(json, previousState, [], getDefaultExpand(json), false) // TODO: cleanup
+    documentStateStore.update((state) =>
+      expandWithCallback(json, state, rootPath, getDefaultExpand(json))
+    )
     text = undefined
     textIsRepaired = false
     selection = clearSelectionWhenNotExisting(selection, json)
@@ -405,14 +424,20 @@
 
     try {
       json = JSON.parse(updatedText)
-      state = syncState(json, previousState, [], getDefaultExpand(json), false)
+      state = syncState(json, previousState, [], getDefaultExpand(json), false) // TODO: cleanup
+      documentStateStore.update((state) =>
+        expandWithCallback(json, state, rootPath, getDefaultExpand(json))
+      )
       text = updatedText
       textIsRepaired = false
       selection = clearSelectionWhenNotExisting(selection, json)
     } catch (err) {
       try {
         json = JSON.parse(jsonrepair(updatedText))
-        state = syncState(json, previousState, [], getDefaultExpand(json), false)
+        state = syncState(json, previousState, [], getDefaultExpand(json), false) // TODO: cleanup
+        documentStateStore.update((state) =>
+          expandWithCallback(json, state, rootPath, getDefaultExpand(json))
+        )
         text = updatedText
         textIsRepaired = true
         selection = clearSelectionWhenNotExisting(selection, json)
@@ -1445,7 +1470,8 @@
     const previousTextIsRepaired = textIsRepaired
     const previousSelection = selection
 
-    const updatedState = syncState(updatedJson, previousState, [], expandMinimal)
+    const updatedState = syncState(updatedJson, previousState, [], expandMinimal) // TODO: cleanup
+    documentStateStore.update((state) => expandWithCallback(json, state, rootPath, expandMinimal))
 
     const callback =
       typeof afterPatch === 'function'
@@ -1489,19 +1515,26 @@
 
     try {
       json = JSON.parse(updatedText)
-      state = syncState(json, previousState, [], expandMinimal)
+      state = syncState(json, previousState, [], expandMinimal) // TODO: cleanup
+      documentStateStore.update((state) => expandWithCallback(json, state, rootPath, expandMinimal))
       text = undefined
       textIsRepaired = false
     } catch (err) {
       try {
         json = JSON.parse(jsonrepair(updatedText))
-        state = syncState(json, previousState, [], expandMinimal)
+        state = syncState(json, previousState, [], expandMinimal) // TODO: cleanup
+        documentStateStore.update((state) =>
+          expandWithCallback(json, state, rootPath, expandMinimal)
+        )
         text = updatedText
         textIsRepaired = true
       } catch (err) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
-        state = syncState(json, createState(json), [], expandMinimal)
+        state = syncState(json, createState(json), [], expandMinimal) // TODO: cleanup
+        documentStateStore.set(
+          expandWithCallback(json, createDocumentState(json), rootPath, expandMinimal)
+        )
         text = updatedText
         textIsRepaired = false
       }
@@ -1559,9 +1592,11 @@
    */
   function handleExpand(path, expanded, recursive = false) {
     if (expanded) {
-      state = expandWithCallback(json, state, path, recursive ? expandAll : expandMinimal)
+      documentStateStore.update((state) =>
+        expandWithCallback(json, state, path, recursive ? expandAll : expandMinimal)
+      )
     } else {
-      state = collapse(json, state, path)
+      documentStateStore.update((state) => collapse(json, state, path))
     }
 
     if (selection && !expanded) {
@@ -2057,6 +2092,7 @@
   }
 
   $: context = {
+    documentStateStore,
     readOnly,
     normalization,
     getFullJson,
