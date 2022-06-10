@@ -17,8 +17,7 @@
     STATE_SEARCH_PROPERTY,
     STATE_SEARCH_VALUE,
     STATE_SELECTION,
-    STATE_VISIBLE_SECTIONS,
-    VALIDATION_ERROR
+    STATE_VISIBLE_SECTIONS
   } from '$lib/constants'
   import { forEachKey, getVisibleCaretPositions } from '$lib/logic/documentState'
   import { rename } from '$lib/logic/operations'
@@ -52,7 +51,6 @@
   export let state: JSONData
   export let selection: Selection | undefined
   export let searchResult: SearchResultItem[]
-  export let validationErrors: ValidationError[]
 
   export let context: TreeModeContext
 
@@ -78,7 +76,12 @@
 
   $: visibleSections = resolvedState[STATE_VISIBLE_SECTIONS]
   $: keys = resolvedState[STATE_KEYS]
-  $: validationError = validationErrors && validationErrors[VALIDATION_ERROR]
+
+  let validationError: ValidationError | undefined
+  $: validationError = derived(
+    context.documentStateStore,
+    (state) => state.validationErrors[pathStr]
+  )
   $: root = path.length === 0
 
   $: type = valueType(resolvedValue)
@@ -524,8 +527,8 @@
           </div>
         {/if}
       </div>
-      {#if validationError && (!$expanded || !validationError.isChildError)}
-        <ValidationError {validationError} onExpand={handleExpand} />
+      {#if $validationError && (!$expanded || !$validationError.isChildError)}
+        <ValidationError validationError={$validationError} onExpand={handleExpand} />
       {/if}
       {#if $expanded}
         <div
@@ -569,9 +572,6 @@
                 : undefined}
               searchResult={searchResult
                 ? searchResult[visibleSection.start + itemIndex]
-                : undefined}
-              validationErrors={validationErrors
-                ? validationErrors[visibleSection.start + itemIndex]
                 : undefined}
               {context}
               onDragSelectionStart={handleDragSelectionStart}
@@ -645,8 +645,8 @@
           </div>
         {/if}
       </div>
-      {#if validationError && (!$expanded || !validationError.isChildError)}
-        <ValidationError {validationError} onExpand={handleExpand} />
+      {#if $validationError && (!$expanded || !$validationError.isChildError)}
+        <ValidationError validationError={$validationError} onExpand={handleExpand} />
       {/if}
       {#if $expanded}
         <div
@@ -686,7 +686,6 @@
             state={resolvedState[key]}
             selection={resolvedSelection ? resolvedSelection[key] : undefined}
             searchResult={searchResult ? searchResult[key] : undefined}
-            validationErrors={validationErrors ? validationErrors[key] : undefined}
             {context}
             onDragSelectionStart={handleDragSelectionStart}
           >
@@ -740,8 +739,8 @@
           </div>
         {/if}
       </div>
-      {#if validationError}
-        <ValidationError {validationError} onExpand={handleExpand} />
+      {#if $validationError}
+        <ValidationError validationError={$validationError} onExpand={handleExpand} />
       {/if}
       {#if !root}
         <div

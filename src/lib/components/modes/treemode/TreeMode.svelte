@@ -13,7 +13,7 @@
     setIn
   } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
-  import { initial, isEmpty, isEqual, last, noop, throttle, uniqueId } from 'lodash-es'
+  import { initial, isEmpty, isEqual, last, noop, throttle, uniqueId, values } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
   import { createJump } from '$lib/assets/jump.js/src/jump'
   import {
@@ -341,10 +341,12 @@
   let textIsRepaired = false
   $: textIsUnrepairable = text !== undefined && json === undefined
 
-  // TODO: debounce JSON schema validation
-  /** @type{ValidationError[]} */
-  $: validationErrors = validator ? validator(json) : []
-  $: validationErrorsMap = mapValidationErrors(validationErrors)
+  $: {
+    documentStateStore.update((state) => ({
+      ...state,
+      validationErrors: mapValidationErrors(validator ? validator(json) : [])
+    }))
+  }
 
   export function get() {
     return json
@@ -2205,7 +2207,6 @@
           {state}
           selection={recursiveSelection}
           searchResult={searchResult && searchResult.itemsWithActive}
-          validationErrors={validationErrorsMap}
           {context}
           onDragSelectionStart={noop}
         />
@@ -2256,7 +2257,12 @@
         />
       {/if}
 
-      <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
+      <ValidationErrorsOverview
+        validationErrors={values($documentStateStore.validationErrors).filter(
+          (validationError) => !validationError.isChildError
+        )}
+        selectError={handleSelectValidationError}
+      />
     {/if}
   {:else}
     <div class="jse-contents">
