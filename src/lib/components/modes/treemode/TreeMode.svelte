@@ -192,7 +192,6 @@
   let pastedJson
 
   function expandMinimal(path) {
-    console.log('expandMinimal?', path, path.length < 1 ? true : path.length === 1 && path[0] === 0)
     return path.length < 1 ? true : path.length === 1 && path[0] === 0 // first item of an array
   }
 
