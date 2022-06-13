@@ -25,6 +25,8 @@ export interface CaretPosition {
 
 export interface DocumentState {
   expanded: { [pathStr: string]: boolean }
+  selection: Selection | null
+  selectionMap: SelectionMap
   validationErrors: ValidationError[]
   validationErrorsMap: { [pathStr: string]: ValidationError }
 }
@@ -50,18 +52,6 @@ export interface JSONPatchResult {
   previousJson: JSONData
   undo: JSONPatchDocument
   redo: JSONPatchDocument
-}
-
-export interface JSONPatchOptions {
-  before?: (
-    json: JSONData,
-    operation: PreprocessedJSONPatchOperation
-  ) => { json?: JSONData; operation?: PreprocessedJSONPatchOperation } | undefined
-  after?: (
-    json: JSONData,
-    operation: PreprocessedJSONPatchOperation,
-    previousJson: JSONData
-  ) => JSONData
 }
 
 export type AfterPatchCallback = (
@@ -110,6 +100,8 @@ export type Selection =
   | InsideSelection
   | KeySelection
   | ValueSelection
+
+export type SelectionMap = { [pathStr: string]: Selection }
 
 export type RecursiveSelection = { [key: string]: RecursiveSelection } | Array<RecursiveSelection>
 

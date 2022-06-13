@@ -139,6 +139,8 @@ export function createState(json) {
 export function createDocumentState(json: JSONData): DocumentState {
   return {
     expanded: {},
+    selection: null,
+    selectionMap: {},
     validationErrors: [],
     validationErrorsMap: {}
   }

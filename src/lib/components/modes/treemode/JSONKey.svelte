@@ -8,21 +8,28 @@
   import EditableDiv from '../../controls/EditableDiv.svelte'
   import { addNewLineSuffix } from '$lib/utils/domUtils'
   import { UPDATE_SELECTION } from '$lib/constants'
-  import type { Path, Selection, TreeModeContext } from '$lib/types'
+  import type { Path, TreeModeContext } from '$lib/types'
+  import { derived } from 'svelte/store'
+  import { stringifyPath } from '../../../utils/pathUtils'
+  import { isKeySelection } from '../../../logic/selection.js'
+  import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
 
   export let path: Path
   export let key: string
   export let onUpdateKey: (oldKey: string, newKey: string) => string
-  export let selection: Selection | undefined
   export let searchResult
 
   export let context: TreeModeContext
 
-  $: selectedKey = selection && selection.type === SELECTION_TYPE.KEY
-  $: editKey = !context.readOnly && selectedKey && selection && selection['edit'] === true
+  $: pathStr = stringifyPath(path)
+  $: selection = derived(context.documentStateStore, (state) => state.selectionMap[pathStr])
+  $: isEditingKey = derived(selection, ($selection) => {
+    const selectedKey = $selection && $selection.type === SELECTION_TYPE.KEY
+    return !context.readOnly && selectedKey && $selection && $selection['edit'] === true
+  })
 
   function handleKeyDoubleClick(event) {
-    if (!editKey && !context.readOnly) {
+    if (!$isEditingKey && !context.readOnly) {
       event.preventDefault()
       context.onSelect({ type: SELECTION_TYPE.KEY, path, edit: true })
     }
@@ -62,7 +69,7 @@
   }
 </script>
 
-{#if editKey}
+{#if $isEditingKey}
   <EditableDiv
     value={context.normalization.escapeValue(key)}
     shortText
@@ -78,6 +85,9 @@
       {addNewLineSuffix(context.normalization.escapeValue(key))}
     {/if}
   </div>
+{/if}
+{#if !context.readOnly && isKeySelection($selection)}
+  <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
 {/if}
 
 <style src="./JSONKey.scss"></style>

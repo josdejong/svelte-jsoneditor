@@ -16,12 +16,11 @@
     STATE_KEYS,
     STATE_SEARCH_PROPERTY,
     STATE_SEARCH_VALUE,
-    STATE_SELECTION,
     STATE_VISIBLE_SECTIONS
   } from '$lib/constants'
   import { forEachKey, getVisibleCaretPositions } from '$lib/logic/documentState'
   import { rename } from '$lib/logic/operations'
-  import { isPathInsideSelection, keyIsSelected, SELECTION_TYPE } from '$lib/logic/selection'
+  import { isPathInsideSelection, SELECTION_TYPE } from '$lib/logic/selection'
   import {
     encodeDataPath,
     getDataPathFromTarget,
@@ -41,15 +40,14 @@
   import { onMoveSelection } from '$lib/logic/dragging'
   import { forEachIndex } from '$lib/utils/arrayUtils'
   import { createMemoizePath, stringifyPath } from '$lib/utils/pathUtils'
-  import type { JSONData, Path, SearchResultItem, TreeModeContext } from '$lib/types'
-  import { beforeUpdate } from 'svelte'
+  import type { DocumentState, JSONData, Path, SearchResultItem, TreeModeContext } from '$lib/types'
+  import { beforeUpdate, onDestroy } from 'svelte'
   import type { Readable } from 'svelte/store'
   import { derived } from 'svelte/store'
 
   export let value: JSONData
   export let path: Path
   export let state: JSONData
-  export let selection: Selection | undefined
   export let searchResult: SearchResultItem[]
 
   export let context: TreeModeContext
@@ -62,17 +60,20 @@
   let hoverTimer = undefined
   let dragging = undefined
 
+  $: root = path.length === 0
+  $: type = valueType(resolvedValue)
+  $: pathStr = stringifyPath(path)
+
   $: resolvedValue = dragging?.updatedValue !== undefined ? dragging.updatedValue : value
   $: resolvedState = dragging?.updatedState !== undefined ? dragging.updatedState : state
-  $: resolvedSelection = dragging?.updatedSelection != null ? dragging.updatedSelection : selection
+  $: resolvedSelection =
+    dragging?.updatedSelection != undefined ? dragging.updatedSelection : selection
 
-  $: selectionObj = resolvedSelection && resolvedSelection[STATE_SELECTION]
-
-  $: selected = !!(selectionObj && selectionObj.pathsMap)
-  $: selectedAfter = !!(selectionObj && selectionObj.type === SELECTION_TYPE.AFTER)
-  $: selectedInside = !!(selectionObj && selectionObj.type === SELECTION_TYPE.INSIDE)
-  $: selectedKey = !!(selectionObj && selectionObj.type === SELECTION_TYPE.KEY)
-  $: selectedValue = !!(selectionObj && selectionObj.type === SELECTION_TYPE.VALUE)
+  $: selected = !!(resolvedSelection && resolvedSelection.pathsMap)
+  $: selectedAfter = !!(resolvedSelection && resolvedSelection.type === SELECTION_TYPE.AFTER)
+  $: selectedInside = !!(resolvedSelection && resolvedSelection.type === SELECTION_TYPE.INSIDE)
+  $: selectedKey = !!(resolvedSelection && resolvedSelection.type === SELECTION_TYPE.KEY)
+  $: selectedValue = !!(resolvedSelection && resolvedSelection.type === SELECTION_TYPE.VALUE)
 
   $: visibleSections = resolvedState[STATE_VISIBLE_SECTIONS]
   $: keys = resolvedState[STATE_KEYS]
@@ -82,10 +83,34 @@
     context.documentStateStore,
     (state) => state.validationErrorsMap[pathStr]
   )
-  $: root = path.length === 0
 
-  $: type = valueType(resolvedValue)
-  $: pathStr = stringifyPath(path)
+  let selection: Selection | undefined
+
+  let unsubscribe
+  $: subscribe(context.documentStateStore)
+
+  // TODO: can we simplify this?
+  function subscribe(documentStateStore: Readable<DocumentState> | undefined) {
+    if (unsubscribe) {
+      unsubscribe()
+    }
+
+    if (!documentStateStore) {
+      return
+    }
+
+    unsubscribe = documentStateStore.subscribe((state) => {
+      if (!isEqual(selection, state.selectionMap[pathStr])) {
+        selection = state.selectionMap[pathStr]
+      }
+    })
+  }
+
+  onDestroy(() => {
+    if (unsubscribe) {
+      unsubscribe()
+    }
+  })
 
   beforeUpdate(() => debug('beforeUpdate', path)) // FIXME: cleanup
 
@@ -521,7 +546,7 @@
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
+        {#if !context.readOnly && resolvedSelection && (resolvedSelection.type === SELECTION_TYPE.VALUE || resolvedSelection.type === SELECTION_TYPE.MULTI) && !resolvedSelection.edit && isEqual(resolvedSelection.focusPath, path)}
           <div class="jse-context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -567,9 +592,6 @@
               value={item}
               path={memoizePath(path.concat(visibleSection.start + itemIndex))}
               state={resolvedState[visibleSection.start + itemIndex]}
-              selection={resolvedSelection
-                ? resolvedSelection[visibleSection.start + itemIndex]
-                : undefined}
               searchResult={searchResult
                 ? searchResult[visibleSection.start + itemIndex]
                 : undefined}
@@ -588,7 +610,7 @@
               total={resolvedValue.length}
               {path}
               onExpandSection={context.onExpandSection}
-              selection={selectionObj}
+              selection={resolvedSelection}
             />
           {/if}
         {/each}
@@ -639,7 +661,7 @@
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
+        {#if !context.readOnly && resolvedSelection && (resolvedSelection.type === SELECTION_TYPE.VALUE || resolvedSelection.type === SELECTION_TYPE.MULTI) && !resolvedSelection.edit && isEqual(resolvedSelection.focusPath, path)}
           <div class="jse-context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -684,7 +706,6 @@
             value={resolvedValue[key]}
             path={memoizePath(path.concat(key))}
             state={resolvedState[key]}
-            selection={resolvedSelection ? resolvedSelection[key] : undefined}
             searchResult={searchResult ? searchResult[key] : undefined}
             {context}
             onDragSelectionStart={handleDragSelectionStart}
@@ -694,13 +715,9 @@
                 path={memoizePath(path.concat(key))}
                 {key}
                 {context}
-                selection={resolvedSelection?.[key]?.[STATE_SELECTION]}
                 searchResult={searchResult?.[key]?.[STATE_SEARCH_PROPERTY]}
                 onUpdateKey={handleUpdateKey}
               />
-              {#if !context.readOnly && keyIsSelected(path, key, resolvedSelection)}
-                <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
-              {/if}
             </div>
           </svelte:self>
         {/each}
@@ -729,11 +746,11 @@
           {path}
           {value}
           enforceString={resolvedState ? resolvedState[STATE_ENFORCE_STRING] : undefined}
-          selection={selectionObj}
+          selection={resolvedSelection}
           searchResult={searchResult ? searchResult[STATE_SEARCH_VALUE] : undefined}
           {context}
         />
-        {#if !context.readOnly && selectionObj && (selectionObj.type === SELECTION_TYPE.VALUE || selectionObj.type === SELECTION_TYPE.MULTI) && !selectionObj.edit && isEqual(selectionObj.focusPath, path)}
+        {#if !context.readOnly && resolvedSelection && (resolvedSelection.type === SELECTION_TYPE.VALUE || resolvedSelection.type === SELECTION_TYPE.MULTI) && !resolvedSelection.edit && isEqual(resolvedSelection.focusPath, path)}
           <div class="jse-context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
           </div>

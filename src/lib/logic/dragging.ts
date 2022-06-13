@@ -1,10 +1,4 @@
-import {
-  createRecursiveSelection,
-  createSelection,
-  getEndPath,
-  getStartPath,
-  SELECTION_TYPE
-} from './selection.js'
+import { createSelection, getEndPath, getStartPath, SELECTION_TYPE } from './selection.js'
 import { documentStatePatch } from './documentState.js'
 import { initial, isEqual, last } from 'lodash-es'
 import { getIn } from 'immutable-json-patch'
@@ -64,7 +58,8 @@ export function onMoveSelection({ fullJson, fullState, fullSelection, deltaY, it
       indexOffset: dragInsideAction.indexOffset
     })
 
-    const recursiveSelection = createRecursiveSelection(fullJson, updatedFullSelection)
+    // FIXME: dragging, recursiveSelection
+    const recursiveSelection = {} //createRecursiveSelection(fullJson, updatedFullSelection)
     const updatedRecursiveSelection = getIn(recursiveSelection, path)
 
     return {
