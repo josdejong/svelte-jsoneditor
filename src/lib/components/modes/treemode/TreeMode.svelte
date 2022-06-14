@@ -238,30 +238,41 @@
   let showReplace = false
   let searching = false
   let searchText = ''
-  let searchResult
 
   async function handleSearchText(text) {
     debug('search text updated', text)
     searchText = text
     await tick() // await for the search results to be updated
-    await focusActiveSearchResult(searchResult && searchResult.activeItem)
+    await focusActiveSearchResult()
   }
 
   async function handleNextSearchResult() {
-    searchResult = searchResult ? searchNext(searchResult) : searchResult
-    await focusActiveSearchResult(searchResult && searchResult.activeItem)
+    documentStateStore.update((state) => {
+      return {
+        ...state,
+        searchResult: state.searchResult ? searchNext(state.searchResult) : undefined
+      }
+    })
+
+    await focusActiveSearchResult()
   }
 
   async function handlePreviousSearchResult() {
-    searchResult = searchResult ? searchPrevious(searchResult) : searchResult
-    await focusActiveSearchResult(searchResult && searchResult.activeItem)
+    documentStateStore.update((state) => {
+      return {
+        ...state,
+        searchResult: state.searchResult ? searchPrevious(state.searchResult) : undefined
+      }
+    })
+
+    await focusActiveSearchResult()
   }
 
   async function handleReplace(text, replacementText) {
-    const activeItem = searchResult.activeItem
+    const activeItem = $documentStateStore.searchResult?.activeItem
     debug('handleReplace', { replacementText, activeItem })
 
-    if (!searchResult || !activeItem) {
+    if (!activeItem) {
       return
     }
 
@@ -276,7 +287,7 @@
 
     await tick()
 
-    await focusActiveSearchResult(searchResult && searchResult.activeItem)
+    await focusActiveSearchResult()
   }
 
   async function handleReplaceAll(text, replacementText) {
@@ -293,7 +304,7 @@
 
     await tick()
 
-    await focusActiveSearchResult(searchResult && searchResult.activeItem)
+    await focusActiveSearchResult()
   }
 
   function clearSearchResult() {
@@ -303,7 +314,11 @@
     focus()
   }
 
-  async function focusActiveSearchResult(activeItem) {
+  async function focusActiveSearchResult() {
+    const activeItem = $documentStateStore.searchResult?.activeItem
+
+    debug('focusActiveSearchResult', $documentStateStore.searchResult)
+
     if (activeItem) {
       const path = activeItem.path
       state = expandPath(json, state, path)
@@ -315,7 +330,12 @@
 
   function applySearch() {
     if (searchText === '') {
-      searchResult = undefined
+      documentStateStore.update((state) => {
+        return {
+          ...state,
+          searchResult: undefined
+        }
+      })
       return
     }
 
@@ -326,8 +346,13 @@
       debug('searching...', searchText)
 
       // console.time('search') // TODO: cleanup
-      const flatResults = search(searchText, json, state, MAX_SEARCH_RESULTS)
-      searchResult = updateSearchResult(json, flatResults, searchResult)
+      const newResultItems = search(searchText, json, state, MAX_SEARCH_RESULTS)
+      documentStateStore.update((state) => {
+        return {
+          ...state,
+          searchResult: updateSearchResult(json, newResultItems, state.searchResult)
+        }
+      })
       // console.timeEnd('search') // TODO: cleanup
 
       searching = false
@@ -2261,8 +2286,8 @@
       <div class="jse-search-box-container">
         <SearchBox
           show={showSearch}
-          resultCount={searchResult ? searchResult.count : 0}
-          activeIndex={searchResult ? searchResult.activeIndex : 0}
+          resultCount={$documentStateStore.searchResult?.itemsList?.length || 0}
+          activeIndex={$documentStateStore.searchResult?.activeIndex || 0}
           {showReplace}
           {searching}
           {readOnly}
@@ -2275,14 +2300,7 @@
         />
       </div>
       <div class="jse-contents" data-jsoneditor-scrollable-contents={true} bind:this={refContents}>
-        <JSONNode
-          value={json}
-          path={rootPath}
-          {state}
-          searchResult={searchResult && searchResult.itemsWithActive}
-          {context}
-          onDragSelectionStart={noop}
-        />
+        <JSONNode value={json} path={rootPath} {state} {context} onDragSelectionStart={noop} />
       </div>
 
       {#if pastedJson}

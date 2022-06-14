@@ -14,8 +14,6 @@
     STATE_ENFORCE_STRING,
     STATE_ID,
     STATE_KEYS,
-    STATE_SEARCH_PROPERTY,
-    STATE_SEARCH_VALUE,
     STATE_VISIBLE_SECTIONS
   } from '$lib/constants'
   import { forEachKey, getVisibleCaretPositions } from '$lib/logic/documentState'
@@ -40,7 +38,7 @@
   import { onMoveSelection } from '$lib/logic/dragging'
   import { forEachIndex } from '$lib/utils/arrayUtils'
   import { createMemoizePath, stringifyPath } from '$lib/utils/pathUtils'
-  import type { DocumentState, JSONData, Path, SearchResultItem, TreeModeContext } from '$lib/types'
+  import type { DocumentState, JSONData, Path, TreeModeContext } from '$lib/types'
   import { beforeUpdate, onDestroy } from 'svelte'
   import type { Readable } from 'svelte/store'
   import { derived } from 'svelte/store'
@@ -48,7 +46,6 @@
   export let value: JSONData
   export let path: Path
   export let state: JSONData
-  export let searchResult: SearchResultItem[]
 
   export let context: TreeModeContext
 
@@ -592,9 +589,6 @@
               value={item}
               path={memoizePath(path.concat(visibleSection.start + itemIndex))}
               state={resolvedState[visibleSection.start + itemIndex]}
-              searchResult={searchResult
-                ? searchResult[visibleSection.start + itemIndex]
-                : undefined}
               {context}
               onDragSelectionStart={handleDragSelectionStart}
             >
@@ -706,7 +700,6 @@
             value={resolvedValue[key]}
             path={memoizePath(path.concat(key))}
             state={resolvedState[key]}
-            searchResult={searchResult ? searchResult[key] : undefined}
             {context}
             onDragSelectionStart={handleDragSelectionStart}
           >
@@ -715,7 +708,6 @@
                 path={memoizePath(path.concat(key))}
                 {key}
                 {context}
-                searchResult={searchResult?.[key]?.[STATE_SEARCH_PROPERTY]}
                 onUpdateKey={handleUpdateKey}
               />
             </div>
@@ -747,7 +739,6 @@
           {value}
           enforceString={resolvedState ? resolvedState[STATE_ENFORCE_STRING] : undefined}
           selection={resolvedSelection}
-          searchResult={searchResult ? searchResult[STATE_SEARCH_VALUE] : undefined}
           {context}
         />
         {#if !context.readOnly && resolvedSelection && (resolvedSelection.type === SELECTION_TYPE.VALUE || resolvedSelection.type === SELECTION_TYPE.MULTI) && !resolvedSelection.edit && isEqual(resolvedSelection.focusPath, path)}

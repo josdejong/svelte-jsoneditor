@@ -2,22 +2,22 @@
 
 <script lang="ts">
   import classnames from 'classnames'
-  import { initial } from 'lodash-es'
+  import { initial, isEmpty } from 'lodash-es'
   import { SELECTION_TYPE } from '$lib/logic/selection'
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
   import { addNewLineSuffix } from '$lib/utils/domUtils'
   import { UPDATE_SELECTION } from '$lib/constants'
-  import type { Path, TreeModeContext } from '$lib/types'
+  import type { DocumentState, Path, SearchResultItem, TreeModeContext } from '$lib/types'
   import { derived } from 'svelte/store'
   import { stringifyPath } from '../../../utils/pathUtils'
   import { isKeySelection } from '../../../logic/selection.js'
   import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
+  import { SearchField } from '$lib/types'
 
   export let path: Path
   export let key: string
   export let onUpdateKey: (oldKey: string, newKey: string) => string
-  export let searchResult
 
   export let context: TreeModeContext
 
@@ -26,6 +26,14 @@
   $: isEditingKey = derived(selection, ($selection) => {
     const selectedKey = $selection && $selection.type === SELECTION_TYPE.KEY
     return !context.readOnly && selectedKey && $selection && $selection['edit'] === true
+  })
+
+  $: searchResultItems = derived(context.documentStateStore, (state: DocumentState) => {
+    const items: SearchResultItem[] = state.searchResult?.itemsMap[pathStr]?.filter(
+      (item: SearchResultItem) => item.field === SearchField.key
+    )
+
+    return !isEmpty(items) ? items : undefined
   })
 
   function handleKeyDoubleClick(event) {
@@ -79,8 +87,11 @@
   />
 {:else}
   <div data-type="selectable-key" class={getKeyClass(key)} on:dblclick={handleKeyDoubleClick}>
-    {#if searchResult}
-      <SearchResultHighlighter text={context.normalization.escapeValue(key)} {searchResult} />
+    {#if $searchResultItems}
+      <SearchResultHighlighter
+        text={context.normalization.escapeValue(key)}
+        searchResultItems={$searchResultItems}
+      />
     {:else}
       {addNewLineSuffix(context.normalization.escapeValue(key))}
     {/if}

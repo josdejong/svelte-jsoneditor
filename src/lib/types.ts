@@ -24,11 +24,12 @@ export interface CaretPosition {
 }
 
 export interface DocumentState {
-  expanded: { [pathStr: string]: boolean }
-  selection: Selection | null
-  selectionMap: SelectionMap
+  expanded: PathsMap<boolean>
+  selection: Selection | undefined
+  selectionMap: PathsMap<Selection>
+  searchResult: SearchResult | undefined
   validationErrors: ValidationError[]
-  validationErrorsMap: { [pathStr: string]: ValidationError }
+  validationErrorsMap: PathsMap<ValidationError>
 }
 
 export interface JSONPatchOperation {
@@ -101,7 +102,7 @@ export type Selection =
   | KeySelection
   | ValueSelection
 
-export type SelectionMap = { [pathStr: string]: Selection }
+export type PathsMap<T> = { [pathStr: string]: T }
 
 export type RecursiveSelection = { [key: string]: RecursiveSelection } | Array<RecursiveSelection>
 
@@ -285,23 +286,27 @@ export type OnError = (error: Error) => void
 export type OnFocus = () => void
 export type OnBlur = () => void
 
-export type RecursiveSearchResult = { [key: string]: RecursiveSearchResult }
-
 export interface SearchResult {
-  items: RecursiveSearchResult
-  itemsWithActive: RecursiveSearchResult
-  flatItems: Path[]
-  activeItem: Path
-  activeIndex: number
-  count: number
+  itemsList: ExtendedSearchResultItem[] // TODO: rename itemsList to items
+  itemsMap: PathsMap<ExtendedSearchResultItem[]>
+  activeItem: ExtendedSearchResultItem | undefined
+  activeIndex: number | -1
+}
+
+export enum SearchField {
+  key = 'key',
+  value = 'value'
 }
 
 export interface SearchResultItem {
   path: Path
-  field: symbol
+  field: SearchField
   fieldIndex: number
   start: number
   end: number
+}
+
+export interface ExtendedSearchResultItem extends SearchResultItem {
   active: boolean
 }
 
@@ -398,7 +403,7 @@ export interface RenderValuePropsOptional {
   readOnly?: boolean
   enforceString?: boolean
   selection?: Selection
-  searchResult?: SearchResultItem
+  searchResultItems?: SearchResultItem[]
   isSelected?: boolean
   isEditing?: boolean
   normalization?: ValueNormalization
@@ -414,7 +419,7 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   readOnly: boolean
   enforceString: boolean | undefined
   selection: Selection | undefined
-  searchResult: SearchResultItem | undefined
+  searchResultItems: SearchResultItem[] | undefined
   isSelected: boolean
   isEditing: boolean
   normalization: ValueNormalization

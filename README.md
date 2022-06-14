@@ -346,7 +346,7 @@ interface RenderValuePropsOptional {
   readOnly?: boolean
   enforceString?: boolean
   selection?: Selection
-  searchResult?: SearchResultItem
+  searchResultItems?: SearchResultItem[]
   isSelected?: boolean
   isEditing?: boolean
   normalization?: ValueNormalization
@@ -362,7 +362,7 @@ interface RenderValueProps extends RenderValuePropsOptional {
   readOnly: boolean
   enforceString: boolean | undefined
   selection: Selection | undefined
-  searchResult: SearchResultItem | undefined
+  searchResultItems: SearchResultItem[] | undefined
   isSelected: boolean
   isEditing: boolean
   normalization: ValueNormalization

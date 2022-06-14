@@ -145,7 +145,7 @@
     value,
     readOnly,
     normalization,
-    searchResult,
+    searchResultItems,
     isEditing,
     onPatch,
     onPasteJson,
@@ -163,7 +163,7 @@
     if (!isEditing) {
       renderers.push({
         component: ReadonlyValue,
-        props: { path, value, readOnly, normalization, searchResult, onSelect }
+        props: { path, value, readOnly, normalization, searchResultItems, onSelect }
       })
     }
 

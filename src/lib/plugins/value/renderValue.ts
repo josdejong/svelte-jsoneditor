@@ -12,7 +12,7 @@ export function renderValue({
   value,
   readOnly,
   enforceString,
-  searchResult,
+  searchResultItems,
   isEditing,
   normalization,
   onPatch,
@@ -46,7 +46,7 @@ export function renderValue({
   if (!isEditing) {
     renderers.push({
       component: ReadonlyValue as unknown as SvelteComponent, // TODO: casting should not be needed
-      props: { path, value, readOnly, normalization, searchResult, onSelect }
+      props: { path, value, readOnly, normalization, searchResultItems, onSelect }
     })
   }
 

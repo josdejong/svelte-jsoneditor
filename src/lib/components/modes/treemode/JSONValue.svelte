@@ -2,8 +2,11 @@
 
 <script lang="ts">
   import { SELECTION_TYPE } from '../../../logic/selection'
-  import { isEqual } from 'lodash-es'
-  import type { SearchResultItem, Selection, Path, TreeModeContext } from '../../../types'
+  import { isEmpty, isEqual } from 'lodash-es'
+  import type { Path, SearchResultItem, Selection, TreeModeContext } from '../../../types'
+  import { SearchField } from '../../../types'
+  import { stringifyPath } from '../../../utils/pathUtils'
+  import { onDestroy } from 'svelte'
 
   export let path: Path
   export let value: JSON
@@ -13,7 +16,23 @@
   export let enforceString: boolean
   export let selection: Selection | undefined
 
-  export let searchResult: SearchResultItem | undefined
+  $: pathStr = stringifyPath(path)
+
+  let searchResultItems: SearchResultItem[] | undefined = undefined
+  const unsubscribe = context.documentStateStore.subscribe((state) => {
+    const items: SearchResultItem[] = state.searchResult?.itemsMap[pathStr]?.filter(
+      (item: SearchResultItem) => item.field === SearchField.value
+    )
+    const nonEmptyItems = !isEmpty(items) ? items : undefined
+
+    if (!isEqual(nonEmptyItems, searchResultItems)) {
+      searchResultItems = nonEmptyItems
+    }
+  })
+
+  onDestroy(() => {
+    unsubscribe()
+  })
 
   $: isSelected =
     selection && selection.type === SELECTION_TYPE.VALUE
@@ -31,7 +50,7 @@
     isEditing,
     normalization: context.normalization,
     selection,
-    searchResult,
+    searchResultItems,
     onPatch: context.onPatch,
     onPasteJson: context.onPasteJson,
     onSelect: context.onSelect,

@@ -1,9 +1,8 @@
 import assert from 'assert'
 import { immutableJSONPatch } from 'immutable-json-patch'
-import { STATE_KEYS, STATE_SEARCH_PROPERTY, STATE_SEARCH_VALUE } from '../constants.js'
+import { STATE_KEYS } from '../constants.js'
 import { syncState } from './documentState.js'
 import {
-  createRecursiveSearchResults,
   createSearchAndReplaceAllOperations,
   createSearchAndReplaceOperations,
   findCaseInsensitiveMatches,
@@ -11,6 +10,8 @@ import {
   search,
   splitValue
 } from './search.js'
+import type { ExtendedSearchResultItem, Path, SearchResultItem } from '../types.js'
+import { SearchField } from '../types.js'
 
 describe('search', () => {
   it('search in JSON', () => {
@@ -24,43 +25,38 @@ describe('search', () => {
     assert.deepStrictEqual(results, [
       {
         path: ['b', 'c'],
-        field: STATE_SEARCH_VALUE,
+        field: SearchField.value,
         fieldIndex: 0,
         start: 0,
-        end: 1,
-        active: false
+        end: 1
       },
       {
         path: ['a'],
-        field: STATE_SEARCH_PROPERTY,
+        field: SearchField.key,
         fieldIndex: 0,
         start: 0,
-        end: 1,
-        active: false
+        end: 1
       },
       {
         path: ['a', 0, 'a'],
-        field: STATE_SEARCH_PROPERTY,
+        field: SearchField.key,
         fieldIndex: 0,
         start: 0,
-        end: 1,
-        active: false
+        end: 1
       },
       {
         path: ['a', 0, 'c'],
-        field: STATE_SEARCH_VALUE,
+        field: SearchField.value,
         fieldIndex: 0,
         start: 0,
-        end: 1,
-        active: false
+        end: 1
       },
       {
         path: ['a', 2],
-        field: STATE_SEARCH_VALUE,
+        field: SearchField.value,
         fieldIndex: 0,
         start: 0,
-        end: 1,
-        active: false
+        end: 1
       }
     ])
   })
@@ -75,35 +71,31 @@ describe('search', () => {
     assert.deepStrictEqual(results, [
       {
         path: ['hello world'],
-        field: STATE_SEARCH_PROPERTY,
+        field: SearchField.key,
         fieldIndex: 0,
         start: 6,
-        end: 11,
-        active: false
+        end: 11
       },
       {
         path: ['hello world'],
-        field: STATE_SEARCH_VALUE,
+        field: SearchField.value,
         fieldIndex: 0,
         start: 6,
-        end: 11,
-        active: false
+        end: 11
       },
       {
         path: ['hello world'],
-        field: STATE_SEARCH_VALUE,
+        field: SearchField.value,
         fieldIndex: 1,
         start: 19,
-        end: 24,
-        active: false
+        end: 24
       },
       {
         path: ['hello world'],
-        field: STATE_SEARCH_VALUE,
+        field: SearchField.value,
         fieldIndex: 2,
         start: 26,
-        end: 31,
-        active: false
+        end: 31
       }
     ])
   })
@@ -123,19 +115,17 @@ describe('search', () => {
     assert.deepStrictEqual(results, [
       {
         path: ['data', 'text2'],
-        field: STATE_SEARCH_VALUE,
+        field: SearchField.value,
         fieldIndex: 0,
         start: 0,
-        end: 3,
-        active: false
+        end: 3
       },
       {
         path: ['data', 'text1'],
-        field: STATE_SEARCH_VALUE,
+        field: SearchField.value,
         fieldIndex: 0,
         start: 0,
-        end: 3,
-        active: false
+        end: 3
       }
     ])
   })
@@ -166,55 +156,26 @@ describe('search', () => {
     )
   })
 
-  it('should generate recursive search results from flat results', () => {
-    // Based on document:
-    const json = {
-      b: { c: 'a' },
-      a: [{ a: 'b', c: 'a' }, 'e', 'a a']
-    }
-
-    // search results for 'a':
-    const flatResults = search('a', json, undefined)
-
-    const actual = createRecursiveSearchResults(json, flatResults)
-    const expected = {}
-
-    expected['b'] = {}
-    expected['b'].c = {}
-    expected['b'].c[STATE_SEARCH_VALUE] = [flatResults[0]]
-    expected['a'] = []
-    expected['a'][STATE_SEARCH_PROPERTY] = [flatResults[1]]
-    expected['a'][0] = {}
-    expected['a'][0]['a'] = {}
-    expected['a'][0]['a'][STATE_SEARCH_PROPERTY] = [flatResults[2]]
-    expected['a'][0].c = {}
-    expected['a'][0].c[STATE_SEARCH_VALUE] = [flatResults[3]]
-    expected['a'][2] = {}
-    expected['a'][2][STATE_SEARCH_VALUE] = [flatResults[4], flatResults[5]]
-
-    assert.deepStrictEqual(actual, expected)
-  })
-
   it('should find all case insensitive matches', () => {
     const path = []
-    const field = STATE_SEARCH_VALUE
+    const field = SearchField.value
 
     assert.deepStrictEqual(
       findAndCollectCaseInsensitiveMatches('hello world, Hello world', 'hello', path, field),
       [
-        { path, field, fieldIndex: 0, start: 0, end: 5, active: false },
-        { path, field, fieldIndex: 1, start: 13, end: 18, active: false }
+        { path, field, fieldIndex: 0, start: 0, end: 5 },
+        { path, field, fieldIndex: 1, start: 13, end: 18 }
       ]
     )
 
     assert.deepStrictEqual(findAndCollectCaseInsensitiveMatches('hahaha', 'haha', path, field), [
-      { path, field, fieldIndex: 0, start: 0, end: 4, active: false }
+      { path, field, fieldIndex: 0, start: 0, end: 4 }
     ])
     assert.deepStrictEqual(
       findAndCollectCaseInsensitiveMatches('hahahahaha', 'haha', path, field),
       [
-        { path, field, fieldIndex: 0, start: 0, end: 4, active: false },
-        { path, field, fieldIndex: 1, start: 4, end: 8, active: false }
+        { path, field, fieldIndex: 0, start: 0, end: 4 },
+        { path, field, fieldIndex: 1, start: 4, end: 8 }
       ]
     )
 
@@ -228,15 +189,21 @@ describe('search', () => {
     const text = 'hello world, HELLO!'
     const searchTextLowerCase = 'hello'
     const path = []
-    const field = STATE_SEARCH_VALUE
+    const field = SearchField.value
     const searchResults = findAndCollectCaseInsensitiveMatches(
       text,
       searchTextLowerCase,
       path,
       field
     )
+    const extendedSearchResults: ExtendedSearchResultItem[] = searchResults.map((item, index) => {
+      return {
+        ...item,
+        active: index === 1
+      }
+    })
 
-    const parts = splitValue(text, searchResults)
+    const parts = splitValue(text, extendedSearchResults)
 
     assert.deepStrictEqual(parts, [
       {
@@ -252,7 +219,7 @@ describe('search', () => {
       {
         type: 'highlight',
         text: 'HELLO',
-        active: false
+        active: true
       },
       {
         type: 'normal',
@@ -541,14 +508,16 @@ describe('search', () => {
       value: 4
     })
   })
-
-  // TODO: test searchNext
-  // TODO: test searchPrevious
 })
 
 // helper function to collect matches
-function findAndCollectCaseInsensitiveMatches(text, searchTextLowerCase, path, field) {
-  const matches = []
+function findAndCollectCaseInsensitiveMatches(
+  text: string,
+  searchTextLowerCase: string,
+  path: Path,
+  field: SearchField
+): SearchResultItem[] {
+  const matches: SearchResultItem[] = []
 
   findCaseInsensitiveMatches(text, searchTextLowerCase, path, field, (match) => matches.push(match))
 

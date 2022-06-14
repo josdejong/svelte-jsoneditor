@@ -1,5 +1,5 @@
 import { initial } from 'lodash-es'
-import type { ValidationError } from '../types'
+import type { PathsMap, ValidationError } from '../types'
 import { stringifyPath } from '../utils/pathUtils.js'
 
 /**
@@ -8,9 +8,9 @@ import { stringifyPath } from '../utils/pathUtils.js'
  *
  * Returns a nested object containing the validation errors
  */
-export function mapValidationErrors(validationErrors: ValidationError[]): {
-  [pathStr: string]: ValidationError
-} {
+export function mapValidationErrors(
+  validationErrors: ValidationError[]
+): PathsMap<ValidationError> {
   const map = {}
 
   // first generate a map with the errors themselves

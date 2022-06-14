@@ -7,10 +7,10 @@
   import { getValueClass } from './utils/getValueClass'
   import { addNewLineSuffix } from '$lib/utils/domUtils'
   import type {
+    ExtendedSearchResultItem,
     JSONData,
     OnSelect,
     Path,
-    SearchResultItem,
     ValueNormalization
   } from '../../../types'
 
@@ -20,7 +20,7 @@
   export let normalization: ValueNormalization
   export let onSelect: OnSelect
 
-  export let searchResult: SearchResultItem | undefined
+  export let searchResultItems: ExtendedSearchResultItem[] | undefined
 
   $: valueIsUrl = isUrl(value)
 
@@ -48,8 +48,8 @@
   on:dblclick={handleValueDoubleClick}
   title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : null}
 >
-  {#if searchResult}
-    <SearchResultHighlighter text={normalization.escapeValue(value)} {searchResult} />
+  {#if searchResultItems}
+    <SearchResultHighlighter text={normalization.escapeValue(value)} {searchResultItems} />
   {:else}
     {addNewLineSuffix(normalization.escapeValue(value))}
   {/if}

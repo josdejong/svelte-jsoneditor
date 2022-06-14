@@ -19,8 +19,8 @@ import type {
   KeySelection,
   MultiSelection,
   Path,
+  PathsMap,
   Selection,
-  SelectionMap,
   ValueSelection
 } from '../types'
 import { stringifyPath } from '../utils/pathUtils.js'
@@ -912,7 +912,7 @@ export function selectionToPartialJson(json, selection, indentation = 2) {
 }
 
 // TODO: write unit tests
-export function createSelectionMap(selection: Selection): SelectionMap {
+export function createSelectionMap(selection: Selection): PathsMap<Selection> {
   if (!selection) {
     return {}
   }
