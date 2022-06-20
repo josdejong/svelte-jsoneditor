@@ -32,7 +32,7 @@ describe('objectUtils', () => {
     ])
   })
 
-  it('break traversing by returning false', () => {
+  it('stop traversing deeper by returning false', () => {
     const json = {
       a: [1, 2],
       b: {
@@ -46,7 +46,7 @@ describe('objectUtils', () => {
     traverse(json, (value, path, context) => {
       strictEqual(context, json)
 
-      if (isEqual(path, ['a', 1])) {
+      if (isEqual(path, ['a'])) {
         return false
       }
 
@@ -55,8 +55,10 @@ describe('objectUtils', () => {
 
     deepStrictEqual(logs, [
       { value: json, path: [] },
-      { value: json.a, path: ['a'] },
-      { value: json.a[0], path: ['a', 0] }
+      { value: json.b, path: ['b'] },
+      { value: json.b.c, path: ['b', 'c'] },
+      { value: json.b.d, path: ['b', 'd'] },
+      { value: json.e, path: ['e'] }
     ])
   })
 })

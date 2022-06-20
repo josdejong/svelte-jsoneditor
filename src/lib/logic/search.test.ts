@@ -1,7 +1,6 @@
 import assert from 'assert'
 import { immutableJSONPatch } from 'immutable-json-patch'
-import { STATE_KEYS } from '../constants.js'
-import { syncState } from './documentState.js'
+import { createDocumentState, createExpandedDocumentState, syncState } from './documentState.js'
 import {
   createSearchAndReplaceAllOperations,
   createSearchAndReplaceOperations,
@@ -12,6 +11,7 @@ import {
 } from './search.js'
 import type { ExtendedSearchResultItem, Path, SearchResultItem } from '../types.js'
 import { SearchField } from '../types.js'
+import { stringifyPath } from '../utils/pathUtils.js'
 
 describe('search', () => {
   it('search in JSON', () => {
@@ -20,7 +20,8 @@ describe('search', () => {
       a: [{ a: 'b', c: 'a' }, 'e', 'a']
     }
 
-    const results = search('a', json, undefined)
+    const documentState = createDocumentState()
+    const results = search('a', json, documentState)
 
     assert.deepStrictEqual(results, [
       {
@@ -66,7 +67,8 @@ describe('search', () => {
       'hello world': 'hello world, hello WORLD, world'
     }
 
-    const results = search('world', json, undefined)
+    const documentState = createDocumentState()
+    const results = search('world', json, documentState)
 
     assert.deepStrictEqual(results, [
       {
@@ -108,10 +110,10 @@ describe('search', () => {
       }
     }
 
-    const state = syncState(json, undefined, [], () => true)
-    state['data'][STATE_KEYS] = ['text2', 'text1'] // reverse the order of the keys
+    const documentState = createExpandedDocumentState(json, () => true)
+    documentState.keysMap[stringifyPath(['data'])] = ['text2', 'text1'] // reverse the order of the keys
 
-    const results = search('foo', json, state)
+    const results = search('foo', json, documentState)
     assert.deepStrictEqual(results, [
       {
         path: ['data', 'text2'],
@@ -146,12 +148,13 @@ describe('search', () => {
     const maxResults = 4
 
     assert.deepStrictEqual(
-      search('ha', { greeting: 'ha ha ha ha ha ha' }, undefined, maxResults).length,
+      search('ha', { greeting: 'ha ha ha ha ha ha' }, createDocumentState(), maxResults).length,
       maxResults
     )
 
     assert.deepStrictEqual(
-      search('ha', { 'ha ha ha ha ha ha': 'ha ha ha ha ha ha' }, undefined, maxResults).length,
+      search('ha', { 'ha ha ha ha ha ha': 'ha ha ha ha ha ha' }, createDocumentState(), maxResults)
+        .length,
       maxResults
     )
   })
@@ -240,12 +243,14 @@ describe('search', () => {
       after: 'text'
     }
     const state = syncState(json, undefined, [], () => true)
+    const documentState = createExpandedDocumentState(json, () => true)
 
-    const results = search('world', json, state)
+    const results = search('world', json, documentState)
 
     const { operations, newSelection } = createSearchAndReplaceOperations(
       json,
       state,
+      documentState,
       '*',
       results[2]
     )
@@ -280,12 +285,14 @@ describe('search', () => {
       after: 'text'
     }
     const state = syncState(json, undefined, [], () => true)
+    const documentState = createExpandedDocumentState(json, () => true)
 
-    const results = search('world', json, state)
+    const results = search('world', json, documentState)
 
     const { operations, newSelection } = createSearchAndReplaceOperations(
       json,
       state,
+      documentState,
       '*',
       results[0]
     )
@@ -315,10 +322,17 @@ describe('search', () => {
       value: 2
     }
     const state = syncState(json, undefined, [], () => true)
+    const documentState = createExpandedDocumentState(json, () => true)
 
-    const results = search('2', json, state)
+    const results = search('2', json, documentState)
 
-    const { operations } = createSearchAndReplaceOperations(json, state, '4', results[0])
+    const { operations } = createSearchAndReplaceOperations(
+      json,
+      state,
+      documentState,
+      '4',
+      results[0]
+    )
 
     assert.deepStrictEqual(operations, [
       {
@@ -339,10 +353,17 @@ describe('search', () => {
       value: 2
     }
     const state = syncState(json, undefined, [], () => true)
+    const documentState = createExpandedDocumentState(json, () => true)
 
-    const results = search('2', json, state)
+    const results = search('2', json, documentState)
 
-    const { operations } = createSearchAndReplaceOperations(json, state, 'true', results[0])
+    const { operations } = createSearchAndReplaceOperations(
+      json,
+      state,
+      documentState,
+      'true',
+      results[0]
+    )
 
     assert.deepStrictEqual(operations, [
       {
@@ -363,10 +384,17 @@ describe('search', () => {
       value: 2
     }
     const state = syncState(json, undefined, [], () => true)
+    const documentState = createExpandedDocumentState(json, () => true)
 
-    const results = search('2', json, state)
+    const results = search('2', json, documentState)
 
-    const { operations } = createSearchAndReplaceOperations(json, state, 'null', results[0])
+    const { operations } = createSearchAndReplaceOperations(
+      json,
+      state,
+      documentState,
+      'null',
+      results[0]
+    )
 
     assert.deepStrictEqual(operations, [
       {
@@ -387,10 +415,17 @@ describe('search', () => {
       value: 2
     }
     const state = syncState(json, undefined, [], () => true)
+    const documentState = createExpandedDocumentState(json, () => true)
 
-    const results = search('2', json, state)
+    const results = search('2', json, documentState)
 
-    const { operations } = createSearchAndReplaceOperations(json, state, '*', results[0])
+    const { operations } = createSearchAndReplaceOperations(
+      json,
+      state,
+      documentState,
+      '*',
+      results[0]
+    )
 
     assert.deepStrictEqual(operations, [{ op: 'replace', path: '/value', value: '*' }])
 
@@ -409,12 +444,14 @@ describe('search', () => {
       after: 'text'
     }
     const state = syncState(json, undefined, [], () => true)
+    const documentState = createExpandedDocumentState(json, () => true)
 
     const searchText = 'world'
     const replacementText = '*'
     const { operations, newSelection } = createSearchAndReplaceAllOperations(
       json,
       state,
+      documentState,
       searchText,
       replacementText
     )
@@ -456,12 +493,14 @@ describe('search', () => {
       value: 2
     }
     const state = syncState(json, undefined, [], () => true)
+    const documentState = createExpandedDocumentState(json, () => true)
 
     const searchText = '2'
     const replacementText = '*'
     const { operations } = createSearchAndReplaceAllOperations(
       json,
       state,
+      documentState,
       searchText,
       replacementText
     )
@@ -485,12 +524,14 @@ describe('search', () => {
       value: 2
     }
     const state = syncState(json, undefined, [], () => true)
+    const documentState = createExpandedDocumentState(json, () => true)
 
     const searchText = '2'
     const replacementText = '4'
     const { operations } = createSearchAndReplaceAllOperations(
       json,
       state,
+      documentState,
       searchText,
       replacementText
     )

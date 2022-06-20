@@ -4,21 +4,17 @@
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
   import { parseJSONPointer } from 'immutable-json-patch'
-  import { first, initial, isEqual, last } from 'lodash-es'
+  import { initial, isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
     HOVER_COLLECTION,
     HOVER_INSERT_AFTER,
     HOVER_INSERT_INSIDE,
-    INSERT_EXPLANATION,
-    STATE_ENFORCE_STRING,
-    STATE_ID,
-    STATE_KEYS,
-    STATE_VISIBLE_SECTIONS
+    INSERT_EXPLANATION
   } from '$lib/constants'
-  import { forEachKey, getVisibleCaretPositions } from '$lib/logic/documentState'
+  import { getKeys, getVisibleCaretPositions, getVisibleSections } from '$lib/logic/documentState'
   import { rename } from '$lib/logic/operations'
-  import { isPathInsideSelection, SELECTION_TYPE } from '$lib/logic/selection'
+  import { getEndPath, isPathInsideSelection, SELECTION_TYPE } from '$lib/logic/selection'
   import {
     encodeDataPath,
     getDataPathFromTarget,
@@ -38,14 +34,21 @@
   import { onMoveSelection } from '$lib/logic/dragging'
   import { forEachIndex } from '$lib/utils/arrayUtils'
   import { createMemoizePath, stringifyPath } from '$lib/utils/pathUtils'
-  import type { DocumentState, JSONData, Path, TreeModeContext } from '$lib/types'
+  import type {
+    DocumentState,
+    JSONData,
+    JSONObject,
+    Path,
+    TreeModeContext,
+    VisibleSection
+  } from '$lib/types'
   import { beforeUpdate, onDestroy } from 'svelte'
   import type { Readable } from 'svelte/store'
-  import { derived } from 'svelte/store'
+  import { derived, get } from 'svelte/store'
+  import { getStartPath } from '../../../logic/selection'
 
   export let value: JSONData
   export let path: Path
-  export let state: JSONData
 
   export let context: TreeModeContext
 
@@ -62,7 +65,6 @@
   $: pathStr = stringifyPath(path)
 
   $: resolvedValue = dragging?.updatedValue !== undefined ? dragging.updatedValue : value
-  $: resolvedState = dragging?.updatedState !== undefined ? dragging.updatedState : state
   $: resolvedSelection =
     dragging?.updatedSelection != undefined ? dragging.updatedSelection : selection
 
@@ -72,8 +74,13 @@
   $: selectedKey = !!(resolvedSelection && resolvedSelection.type === SELECTION_TYPE.KEY)
   $: selectedValue = !!(resolvedSelection && resolvedSelection.type === SELECTION_TYPE.VALUE)
 
-  $: visibleSections = resolvedState[STATE_VISIBLE_SECTIONS]
-  $: keys = resolvedState[STATE_KEYS]
+  let visibleSections: Readable<VisibleSection[]>
+  $: visibleSections = derived(context.documentStateStore, (state) =>
+    getVisibleSections(state, pathStr)
+  )
+  $: keys = derived(context.documentStateStore, (state) => {
+    return getKeys(value as JSONObject, state, pathStr)
+  })
 
   let validationError: ValidationError | undefined
   $: validationError = derived(
@@ -112,7 +119,7 @@
   beforeUpdate(() => debug('beforeUpdate', path)) // FIXME: cleanup
 
   let expanded: Readable<boolean>
-  $: expanded = derived(context.documentStateStore, (state) => !!state.expanded[pathStr])
+  $: expanded = derived(context.documentStateStore, (state) => !!state.expandedMap[pathStr])
 
   function getIndentationStyle(level) {
     return `margin-left: calc(${level} * var(--jse-indent-size))`
@@ -138,7 +145,7 @@
   }
 
   function handleUpdateKey(oldKey, newKey) {
-    const operations = rename(path, keys, oldKey, newKey)
+    const operations = rename(path, $keys, oldKey, newKey)
     context.onPatch(operations)
 
     // It is possible that the applied key differs from newKey,
@@ -206,7 +213,9 @@
 
         case SELECTION_TYPE.MULTI:
           if (root && event.target.hasAttribute('data-path')) {
-            const lastCaretPosition = last(getVisibleCaretPositions(resolvedValue, resolvedState))
+            const lastCaretPosition = last(
+              getVisibleCaretPositions(resolvedValue, get(context.documentStateStore))
+            )
             context.onSelect(lastCaretPosition)
           } else {
             context.onSelect({
@@ -330,6 +339,7 @@
       const { updatedValue, updatedState, updatedSelection, indexOffset } = onMoveSelection({
         fullJson: context.getFullJson(),
         fullState: context.getFullState(),
+        documentState: get(context.documentStateStore),
         fullSelection: context.getFullSelection(),
         deltaY,
         items: dragging.items
@@ -356,6 +366,7 @@
         fullJson: context.getFullJson(),
         fullState: context.getFullState(),
         fullSelection: context.getFullSelection(),
+        documentState: get(context.documentStateStore),
         deltaY,
         items: dragging.items
       })
@@ -404,8 +415,8 @@
     }
 
     if (Array.isArray(value)) {
-      const startPath = first(fullSelection.paths) || fullSelection.focusPath
-      const endPath = last(fullSelection.paths) || fullSelection.focusPath
+      const startPath = getStartPath(fullSelection)
+      const endPath = getEndPath(fullSelection)
       const startIndex = last(startPath)
       const endIndex = last(endPath)
 
@@ -413,7 +424,7 @@
       // if the selection is spread over multiple visible sections,
       // we will not return any items, so dragging will not work there.
       // We do this to keep things simple for now.
-      const currentSection = state[STATE_VISIBLE_SECTIONS].find((visibleSection) => {
+      const currentSection = $visibleSections.find((visibleSection) => {
         return startIndex >= visibleSection.start && endIndex <= visibleSection.end
       })
 
@@ -425,7 +436,7 @@
       forEachIndex(start, Math.min(value.length, end), addHeight)
     } else {
       // value is Object
-      forEachKey(state, addHeight)
+      getKeys(value as JSONObject, get(context.documentStateStore), pathStr).forEach(addHeight)
     }
 
     return items
@@ -583,12 +594,11 @@
             />
           </div>
         {/if}
-        {#each visibleSections as visibleSection, sectionIndex (sectionIndex)}
+        {#each $visibleSections as visibleSection, sectionIndex (sectionIndex)}
           {#each resolvedValue.slice(visibleSection.start, Math.min(visibleSection.end, resolvedValue.length)) as item, itemIndex (itemIndex)}
             <svelte:self
               value={item}
               path={memoizePath(path.concat(visibleSection.start + itemIndex))}
-              state={resolvedState[visibleSection.start + itemIndex]}
               {context}
               onDragSelectionStart={handleDragSelectionStart}
             >
@@ -599,7 +609,7 @@
           {/each}
           {#if visibleSection.end < resolvedValue.length}
             <CollapsedItems
-              {visibleSections}
+              visibleSections={$visibleSections}
               {sectionIndex}
               total={resolvedValue.length}
               {path}
@@ -695,11 +705,10 @@
             />
           </div>
         {/if}
-        {#each keys as key (resolvedState[key][STATE_ID])}
+        {#each keys as key}
           <svelte:self
             value={resolvedValue[key]}
             path={memoizePath(path.concat(key))}
-            state={resolvedState[key]}
             {context}
             onDragSelectionStart={handleDragSelectionStart}
           >
@@ -737,7 +746,7 @@
         <JSONValue
           {path}
           {value}
-          enforceString={resolvedState ? resolvedState[STATE_ENFORCE_STRING] : undefined}
+          enforceString={get(context.documentStateStore).enforceStringMap[pathStr]}
           selection={resolvedSelection}
           {context}
         />

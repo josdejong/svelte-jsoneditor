@@ -1,23 +1,25 @@
 import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, getIn } from 'immutable-json-patch'
 import { forEachRight, groupBy, initial, isEqual, last } from 'lodash-es'
-import { STATE_ENFORCE_STRING, STATE_KEYS } from '../constants.js'
-import { getKeys } from './documentState.js'
+import { getEnforceString, getKeys } from './documentState.js'
 import { createSelectionFromOperations } from './selection.js'
 import { rename } from './operations.js'
 import { stringConvert } from '../utils/typeUtils.js'
 import type {
+  DocumentState,
+  ExtendedSearchResultItem,
   JSONData,
+  JSONObject,
   JSONPatchDocument,
   JSONPatchOperation,
   Path,
   SearchResult,
   SearchResultItem,
-  Selection,
-  ExtendedSearchResultItem
+  Selection
 } from '../types'
 import { SearchField } from '../types.js'
 import { stringifyPath } from '../utils/pathUtils.js'
+import { isJSONArray, isJSONObject } from '../utils/jsonUtils.js'
 
 // TODO: comment
 // TODO: unit test
@@ -105,7 +107,7 @@ export function searchPrevious(searchResult: SearchResult): SearchResult {
 export function search(
   searchText: string,
   json: JSONData,
-  state, // FIXME: pass new state with keys here
+  documentState: DocumentState,
   maxResults = Infinity
 ): SearchResultItem[] {
   const results = []
@@ -117,15 +119,15 @@ export function search(
     }
   }
 
-  function searchRecursive(searchTextLowerCase: string, json: JSONData, state) {
-    if (Array.isArray(json)) {
+  function searchRecursive(searchTextLowerCase: string, value: JSONData) {
+    if (isJSONArray(value)) {
       const level = path.length
       path.push(0)
 
-      for (let i = 0; i < json.length; i++) {
+      for (let i = 0; i < value.length; i++) {
         path[level] = i
 
-        searchRecursive(searchTextLowerCase, json[i], state ? state[i] : undefined)
+        searchRecursive(searchTextLowerCase, value[i])
 
         if (results.length >= maxResults) {
           return
@@ -133,18 +135,18 @@ export function search(
       }
 
       path.pop()
-    } else if (json !== null && typeof json === 'object') {
+    } else if (isJSONObject(value)) {
+      const keys = getKeys(value, documentState, stringifyPath(path))
       const level = path.length
-      path.push(0)
 
-      const keys = state ? state[STATE_KEYS] : Object.keys(json)
+      path.push('')
 
       for (const key of keys) {
         path[level] = key
 
         findCaseInsensitiveMatches(key, searchTextLowerCase, path, SearchField.key, onMatch)
 
-        searchRecursive(searchTextLowerCase, json[key], state ? state[key] : undefined)
+        searchRecursive(searchTextLowerCase, value[key])
 
         if (results.length >= maxResults) {
           return
@@ -155,7 +157,7 @@ export function search(
     } else {
       // type is a value
       findCaseInsensitiveMatches(
-        String(json),
+        String(value),
         searchTextLowerCase,
         path,
         SearchField.value,
@@ -166,7 +168,7 @@ export function search(
 
   if (typeof searchText === 'string' && searchText !== '') {
     const searchTextLowerCase = searchText.toLowerCase()
-    searchRecursive(searchTextLowerCase, json, state)
+    searchRecursive(searchTextLowerCase, json)
   }
 
   return results
@@ -231,15 +233,10 @@ export function replaceAllText(
   return updatedText
 }
 
-/**
- * @param {JSON} json
- * @param {JSON} state
- * @param {string} replacementText
- * @param {SearchResultItem} searchResultItem
- */
 export function createSearchAndReplaceOperations(
   json: JSONData,
   state: JSONData,
+  documentState: DocumentState,
   replacementText: string,
   searchResultItem: SearchResultItem
 ): { newSelection: Selection; operations: JSONPatchDocument } {
@@ -248,12 +245,13 @@ export function createSearchAndReplaceOperations(
   if (field === SearchField.key) {
     // replace a key
     const parentPath = initial(path)
+    const parent = getIn(json, parentPath)
     const oldKey: string = last(path) as string
-    const keys = getKeys(state, parentPath as JSONPath)
+    const keys = getKeys(parent as JSONObject, documentState, stringifyPath(parentPath))
     const newKey = replaceText(oldKey, replacementText, start, end)
 
     const operations = rename(parentPath, keys, oldKey, newKey)
-    const newSelection = createSelectionFromOperations(json, state, operations)
+    const newSelection = createSelectionFromOperations(json, operations)
 
     return {
       newSelection,
@@ -267,7 +265,8 @@ export function createSearchAndReplaceOperations(
     }
     const currentValueText = typeof currentValue === 'string' ? currentValue : String(currentValue)
 
-    const enforceString = getIn(state, path.concat([STATE_ENFORCE_STRING]) as JSONPath) || false
+    const pathStr = stringifyPath(path)
+    const enforceString = getEnforceString(json, documentState, pathStr)
 
     const value = replaceText(currentValueText, replacementText, start, end)
 
@@ -279,7 +278,7 @@ export function createSearchAndReplaceOperations(
       }
     ]
 
-    const newSelection = createSelectionFromOperations(json, state, operations)
+    const newSelection = createSelectionFromOperations(json, operations)
 
     return {
       newSelection,
@@ -293,15 +292,22 @@ export function createSearchAndReplaceOperations(
 export function createSearchAndReplaceAllOperations(
   json: JSONData,
   state: JSONData,
+  documentState: DocumentState,
   searchText: string,
   replacementText
 ): { newSelection: Selection; operations: JSONPatchDocument } {
   // TODO: to improve performance, we could reuse existing search results (except when hitting a maxResult limit)
-  const searchResultItems = search(searchText, json, state, Infinity /* maxResults */)
+  const searchResultItems = search(searchText, json, documentState, Infinity /* maxResults */)
+
+  interface Match {
+    path: Path
+    field: string
+    items: SearchResultItem[]
+  }
 
   // step 1: deduplicate matches inside the same field/value
   // (filter, map, and group)
-  const deduplicatedMatches = []
+  const deduplicatedMatches: Match[] = []
   for (let i = 0; i < searchResultItems.length; i++) {
     const previousItem = searchResultItems[i - 1]
     const item = searchResultItems[i]
@@ -343,14 +349,15 @@ export function createSearchAndReplaceAllOperations(
     if (field === SearchField.key) {
       // replace a key
       const parentPath = initial(path)
-      const oldKey: string = last(path)
-      const keys = getKeys(state, parentPath as JSONPath)
+      const parent = getIn(json, parentPath)
+      const oldKey = last(path) as string
+      const keys = getKeys(parent as JSONObject, documentState, stringifyPath(parentPath))
       const newKey = replaceAllText(oldKey, replacementText, items)
 
       const operations = rename(parentPath, keys, oldKey, newKey)
       allOperations = allOperations.concat(operations)
 
-      lastNewSelection = createSelectionFromOperations(json, state, operations)
+      lastNewSelection = createSelectionFromOperations(json, operations)
     } else if (field === SearchField.value) {
       // replace a value
       const currentValue = getIn(json, path)
@@ -360,7 +367,8 @@ export function createSearchAndReplaceAllOperations(
       const currentValueText =
         typeof currentValue === 'string' ? currentValue : String(currentValue)
 
-      const enforceString = getIn(state, path.concat([STATE_ENFORCE_STRING])) || false
+      const pathStr = stringifyPath(path)
+      const enforceString = getEnforceString(json, documentState, pathStr)
 
       const value = replaceAllText(currentValueText, replacementText, items)
 
@@ -373,7 +381,7 @@ export function createSearchAndReplaceAllOperations(
       ]
       allOperations = allOperations.concat(operations)
 
-      lastNewSelection = createSelectionFromOperations(json, state, operations)
+      lastNewSelection = createSelectionFromOperations(json, operations)
     } else {
       throw new Error(`Cannot replace: unknown type of search result field ${field}`)
     }
@@ -434,17 +442,4 @@ export function splitValue(
  */
 function getSearchResultPath(searchResultItem: SearchResultItem): Path {
   return searchResultItem.path.concat(searchResultItem.field, searchResultItem.fieldIndex)
-}
-
-/**
- * @param {SearchResultItem} a
- * @param {SearchResultItem} b
- * @return {boolean}
- */
-function hasEqualSearchResultItemPointer(a, b) {
-  // we must NOT compare .fieldIndex or .active
-  // TODO: refactor the data models so fieldIndex is not part of it?
-
-  // we also don't compare end, so we will keep the search result focus whilst typing in the search box
-  return a.start === b.start && a.field === b.field && isEqual(a.path, b.path)
 }

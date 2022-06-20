@@ -1,7 +1,13 @@
 import assert from 'assert'
 import { clipboardToValues, createNewValue, moveInsideParent } from './operations.js'
-import { createSelection, SELECTION_TYPE } from './selection.js'
-import { createState, documentStatePatch, getKeys, syncState } from './documentState.js'
+import { createMultiSelection, SELECTION_TYPE } from './selection.js'
+import {
+  createDocumentState,
+  createExpandedDocumentState,
+  createState,
+  documentStatePatch,
+  syncState
+} from './documentState.js'
 
 describe('operations', () => {
   describe('createNewValue', () => {
@@ -102,80 +108,88 @@ describe('operations', () => {
     it('should move a selection up inside an array', () => {
       const json = { array: [0, 1, 2, 3, 4, 5] }
       const state = createState(json)
-      const selection = createSelection(json, state, {
-        type: SELECTION_TYPE.MULTI,
-        anchorPath: ['array', 3],
-        focusPath: ['array', 4]
-      })
+      const documentState = createDocumentState()
+      const selection = createMultiSelection(json, documentState, ['array', 3], ['array', 4])
       const path = ['array', 1]
-      const operations = moveInsideParent(json, state, selection, { beforePath: path })
+      const operations = moveInsideParent(json, state, documentState, selection, {
+        beforePath: path,
+        indexOffset: 0
+      })
       assert.deepStrictEqual(operations, [
         { op: 'move', from: '/array/3', path: '/array/1' },
         { op: 'move', from: '/array/4', path: '/array/2' }
       ])
 
-      const updatedJson = documentStatePatch(json, state, operations).json
+      const updatedJson = documentStatePatch(json, documentState, operations).json
       assert.deepStrictEqual(updatedJson, { array: [0, 3, 4, 1, 2, 5] })
     })
 
     it('should move a selection down inside an array', () => {
       const json = { array: [0, 1, 2, 3, 4, 5] }
       const state = createState(json)
-      const selection = createSelection(json, state, {
-        type: SELECTION_TYPE.MULTI,
-        anchorPath: ['array', 1],
-        focusPath: ['array', 2]
-      })
+      const documentState = createDocumentState()
+      const selection = createMultiSelection(json, documentState, ['array', 1], ['array', 2])
       const path = ['array', 4]
-      const operations = moveInsideParent(json, state, selection, { beforePath: path })
+      const operations = moveInsideParent(json, state, documentState, selection, {
+        beforePath: path,
+        indexOffset: 0
+      })
       assert.deepStrictEqual(operations, [
         { op: 'move', from: '/array/1', path: '/array/4' },
         { op: 'move', from: '/array/1', path: '/array/4' }
       ])
 
-      const updatedJson = documentStatePatch(json, state, operations).json
+      const updatedJson = documentStatePatch(json, documentState, operations).json
       assert.deepStrictEqual(updatedJson, { array: [0, 3, 4, 1, 2, 5] })
     })
 
     it('should move a selection up inside an object', () => {
       const json = { object: { a: 'a', b: 'b', c: 'c', d: 'd', e: 'e' } }
       const state = syncState(json, undefined, [], () => true)
-      const selection = createSelection(json, state, {
-        type: SELECTION_TYPE.MULTI,
-        anchorPath: ['object', 'c'],
-        focusPath: ['object', 'd']
-      })
+      const documentState = createExpandedDocumentState(json, () => true)
+      const selection = createMultiSelection(json, documentState, ['object', 'c'], ['object', 'd'])
       const path = ['object', 'b']
-      const operations = moveInsideParent(json, state, selection, { beforePath: path })
+      const operations = moveInsideParent(json, state, documentState, selection, {
+        beforePath: path,
+        indexOffset: 0
+      })
       assert.deepStrictEqual(operations, [
         { op: 'move', from: '/object/b', path: '/object/b' },
         { op: 'move', from: '/object/e', path: '/object/e' }
       ])
 
-      const { json: updatedJson, state: updatedState } = documentStatePatch(json, state, operations)
-      assert.deepStrictEqual(getKeys(updatedState, ['object']), ['a', 'c', 'd', 'b', 'e'])
+      const { json: updatedJson, documentState: updatedDocumentState } = documentStatePatch(
+        json,
+        documentState,
+        operations
+      )
       assert.deepStrictEqual(updatedJson, { object: { a: 'a', c: 'c', d: 'd', b: 'b', e: 'e' } })
+      assert.deepStrictEqual(updatedDocumentState, ['a', 'c', 'd', 'b', 'e']) // FIXME
     })
 
     it('should move a selection down inside an object', () => {
       const json = { object: { a: 'a', b: 'b', c: 'c', d: 'd', e: 'e' } }
       const state = syncState(json, undefined, [], () => true)
-      const selection = createSelection(json, state, {
-        type: SELECTION_TYPE.MULTI,
-        anchorPath: ['object', 'b'],
-        focusPath: ['object', 'c']
-      })
+      const documentState = createExpandedDocumentState(json, () => true)
+      const selection = createMultiSelection(json, documentState, ['object', 'b'], ['object', 'c'])
       const path = ['object', 'e']
-      const operations = moveInsideParent(json, state, selection, { beforePath: path })
+      const operations = moveInsideParent(json, state, documentState, selection, {
+        beforePath: path,
+        indexOffset: 0
+      })
       assert.deepStrictEqual(operations, [
         { op: 'move', from: '/object/b', path: '/object/b' },
         { op: 'move', from: '/object/c', path: '/object/c' },
         { op: 'move', from: '/object/e', path: '/object/e' }
       ])
 
-      const { json: updatedJson, state: updatedState } = documentStatePatch(json, state, operations)
-      assert.deepStrictEqual(getKeys(updatedState, ['object']), ['a', 'd', 'b', 'c', 'e'])
+      const { json: updatedJson, documentState: updatedDocumentState } = documentStatePatch(
+        json,
+        documentState,
+        operations
+      )
       assert.deepStrictEqual(updatedJson, { object: { a: 'a', d: 'd', b: 'b', c: 'c', e: 'e' } })
+      assert.deepStrictEqual(updatedDocumentState, ['a', 'd', 'b', 'c', 'e']) // FIXME
     })
 
     // TODO: test append, moving to bottom of an array

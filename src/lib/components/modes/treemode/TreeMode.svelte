@@ -10,8 +10,7 @@
     existsIn,
     getIn,
     immutableJSONPatch,
-    revertJSONPatch,
-    setIn
+    revertJSONPatch
   } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
   import { initial, isEmpty, isEqual, last, noop, throttle, uniqueId } from 'lodash-es'
@@ -24,17 +23,18 @@
     MAX_SEARCH_RESULTS,
     SCROLL_DURATION,
     SEARCH_UPDATE_THROTTLE,
-    SIMPLE_MODAL_OPTIONS,
-    STATE_ENFORCE_STRING
+    SIMPLE_MODAL_OPTIONS
   } from '$lib/constants'
   import {
-    collapse,
-    createDocumentState,
+    collapsePath,
+    createExpandedDocumentState,
     createState,
     documentStatePatch,
     expandPath,
     expandSection,
     expandWithCallback,
+    getEnforceString,
+    setEnforceString,
     syncState
   } from '$lib/logic/documentState'
   import { createHistory } from '$lib/logic/history'
@@ -109,15 +109,19 @@
   import NavigationBar from '../../controls/navigationBar/NavigationBar.svelte'
   import SearchBox from './menu/SearchBox.svelte'
   import type {
+    AfterPatchCallback,
     DocumentState,
     JSONData,
+    JSONPatchDocument,
+    JSONPatchResult,
     Path,
     Selection,
     ValidationError,
     Validator
   } from '$lib/types'
-  import { writable } from 'svelte/store'
+  import { get, writable } from 'svelte/store'
   import { isAfterSelection, isInsideSelection, isKeySelection } from '../../../logic/selection'
+  import { stringifyPath } from '../../../utils/pathUtils'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -210,7 +214,7 @@
   }
 
   const documentStateStore = writable<DocumentState>(
-    expandWithCallback(json, createDocumentState(json), rootPath, expandMinimal)
+    createExpandedDocumentState(json, expandMinimal)
   )
 
   $: debug('documentState', $documentStateStore)
@@ -321,7 +325,7 @@
 
     if (activeItem) {
       const path = activeItem.path
-      state = expandPath(json, state, path)
+      documentStateStore.update((state) => expandPath(json, state, path))
       updateSelection(undefined) // navigation path of current selection would be confusing // TODO: clenaup
       await tick()
       await scrollTo(path)
@@ -405,7 +409,7 @@
     }
   }
 
-  export function get() {
+  export function getJson() {
     return json
   }
 
@@ -633,16 +637,14 @@
     return
   }
 
-  /**
-   * @param {JSONPatchDocument} operations
-   * @param {AfterPatchCallback} [afterPatch]
-   * @return {JSONPatchResult}
-   */
-  export function patch(operations, afterPatch) {
+  export function patch(
+    operations: JSONPatchDocument,
+    afterPatch?: AfterPatchCallback
+  ): JSONPatchResult {
     if (json === undefined) {
       throw new Error('Cannot apply patch: no JSON')
     }
-    const selection = $documentStateStore.selection
+    const selection = get(documentStateStore).selection
 
     const previousJson = json
     const previousState = state
@@ -653,21 +655,23 @@
     debug('patch', operations, afterPatch)
 
     const undo = revertJSONPatch(json, operations)
-    const patched = documentStatePatch(json, state, operations)
+    const patched = documentStatePatch(json, state, get(documentStateStore), operations)
 
     const callback =
       typeof afterPatch === 'function'
-        ? afterPatch(patched.json, patched.state, selection)
+        ? afterPatch(patched.json, patched.documentState, selection)
         : undefined
 
     json = callback && callback.json !== undefined ? callback.json : patched.json
-    state = callback && callback.state !== undefined ? callback.state : patched.state
+    documentStateStore.set(
+      callback && callback.state !== undefined ? callback.state : patched.documentState
+    )
     text = undefined
     textIsRepaired = false
     updateSelection(
       callback && callback.selection
         ? callback.selection
-        : createSelectionFromOperations(previousJson, previousState, operations)
+        : createSelectionFromOperations(previousJson, operations)
     )
 
     // ensure the selection is valid
@@ -728,17 +732,19 @@
   }
 
   function handleToggleEnforceString() {
-    const selection = $documentStateStore.selection
+    const documentState = get(documentStateStore)
+    const selection = documentState.selection
 
     if (readOnly || !isValueSelection(selection)) {
       return
     }
 
     const path = selection.focusPath
-    const statePath = path.concat(STATE_ENFORCE_STRING)
-    const enforceString = !getIn(state, statePath)
+    const pathStr = stringifyPath(path)
+    const enforceString = !getEnforceString(json, documentState, pathStr)
 
-    state = setIn(state, statePath, enforceString, true)
+    const updatedDocumentState = setEnforceString(documentState, pathStr, enforceString)
+    documentStateStore.set(updatedDocumentState)
 
     const value = getIn(json, path)
     const updatedValue = enforceString ? String(value) : stringConvert(value)
@@ -1440,7 +1446,7 @@
    * @param {Path} path
    */
   export async function scrollTo(path) {
-    state = expandPath(json, state, path)
+    documentStateStore.update((state) => expandPath(json, state, path))
     await tick()
 
     const elem = findElement(path)
@@ -1519,11 +1525,10 @@
     }
   }
 
-  /**
-   * @param {JSONPatchDocument} operations
-   * @param {AfterPatchCallback} [afterPatch]
-   */
-  function handlePatch(operations, afterPatch) {
+  function handlePatch(
+    operations: JSONPatchDocument,
+    afterPatch?: AfterPatchCallback
+  ): JSONPatchResult {
     if (readOnly) {
       return
     }
@@ -1616,9 +1621,7 @@
         // no valid JSON, will show empty document or invalid json
         json = undefined
         state = syncState(json, createState(json), [], expandMinimal) // TODO: cleanup
-        documentStateStore.set(
-          expandWithCallback(json, createDocumentState(json), rootPath, expandMinimal)
-        )
+        documentStateStore.set(createExpandedDocumentState(json, expandMinimal))
         text = updatedText
         textIsRepaired = false
       }
@@ -1682,7 +1685,7 @@
         expandWithCallback(json, state, path, recursive ? expandAll : expandMinimal)
       )
     } else {
-      documentStateStore.update((state) => collapse(json, state, path))
+      documentStateStore.update((state) => collapsePath(state, path))
     }
 
     const selection = $documentStateStore.selection
@@ -1973,12 +1976,9 @@
    * @param {ContextMenuProps} contextMenuProps
    */
   function openContextMenu({ anchor, left, top, width, height, offsetTop, offsetLeft, showTip }) {
-    const selection = $documentStateStore.selection
-
     const props = {
       json,
-      state,
-      selection,
+      documentState: get(documentStateStore),
       showTip,
 
       onEditKey: handleEditKey,
@@ -2247,7 +2247,7 @@
     <NavigationBar
       {json}
       {state}
-      selection={$documentStateStore.selection}
+      documentState={$documentStateStore}
       onSelect={handleNavigationBarSelect}
     />
   {/if}
@@ -2300,7 +2300,7 @@
         />
       </div>
       <div class="jse-contents" data-jsoneditor-scrollable-contents={true} bind:this={refContents}>
-        <JSONNode value={json} path={rootPath} {state} {context} onDragSelectionStart={noop} />
+        <JSONNode value={json} path={rootPath} {context} onDragSelectionStart={noop} />
       </div>
 
       {#if pastedJson}

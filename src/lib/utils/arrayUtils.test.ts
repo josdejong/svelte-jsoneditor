@@ -1,5 +1,11 @@
 import assert from 'assert'
-import { arrayToObject, compareArrays, getNestedPaths, objectToArray } from './arrayUtils.js'
+import {
+  arrayStartsWith,
+  arrayToObject,
+  compareArrays,
+  getNestedPaths,
+  objectToArray
+} from './arrayUtils.js'
 
 describe('arrayUtils', () => {
   it('compareArrays', () => {
@@ -79,6 +85,33 @@ describe('arrayUtils', () => {
       assert.deepStrictEqual(objectToArray({ 2: 3, 1: 2, 0: 1 }), [1, 2, 3])
       assert.deepStrictEqual(objectToArray({ 0: 1, 2: 3 }), [1, 3])
       assert.deepStrictEqual(objectToArray({ a: 1, b: 2 }), [1, 2])
+    })
+  })
+
+  describe('arrayStartsWith', () => {
+    it('should test whether an array starts with the specified sub array', () => {
+      assert.strictEqual(arrayStartsWith([1, 2, 3], [1, 2]), true)
+      assert.strictEqual(arrayStartsWith([1, 2], [1, 2]), true)
+      assert.strictEqual(arrayStartsWith([1], [1, 2]), false)
+
+      assert.strictEqual(
+        arrayStartsWith([{ id: 1 }, { id: 2 }, { id: 3 }], [{ id: 1 }, { id: 2 }]),
+        true
+      )
+      assert.strictEqual(
+        arrayStartsWith([{ id: 1 }, { id: 42 }, { id: 3 }], [{ id: 1 }, { id: 2 }]),
+        false
+      )
+    })
+
+    it('should use custom equality check in arrayStartsWith', () => {
+      type User = { id: number; name?: string }
+      const users: User[] = [{ id: 1 }, { id: 2, name: 'Joe' }, { id: 3 }]
+      const equalUserId = (a: User, b: User) => a.id === b.id
+      const searchArray = [{ id: 1 }, { id: 2 }]
+
+      assert.strictEqual(arrayStartsWith(users, searchArray), false)
+      assert.strictEqual(arrayStartsWith(users, searchArray, equalUserId), true)
     })
   })
 })

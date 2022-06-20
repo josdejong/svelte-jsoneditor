@@ -7,10 +7,10 @@ export function traverse(
 ) {
   const currentPath: Path = []
 
-  function recurse(value: JSONData): void | boolean {
+  function recurse(value: JSONData) {
     const res = callback(value, currentPath, json)
     if (res === false) {
-      return false
+      return
     }
 
     const pathIndex = currentPath.length
@@ -18,18 +18,12 @@ export function traverse(
     if (Array.isArray(value)) {
       for (let index = 0; index < value.length; index++) {
         currentPath[pathIndex] = index
-        const res = recurse(value[index])
-        if (res === false) {
-          return false
-        }
+        recurse(value[index])
       }
     } else if (isObject(value)) {
       for (const key of Object.keys(value)) {
         currentPath[pathIndex] = key
-        const res = recurse(value[key])
-        if (res === false) {
-          return false
-        }
+        recurse(value[key])
       }
     }
 

@@ -4,23 +4,24 @@
   import { getIn } from 'immutable-json-patch'
   import { range } from 'lodash-es'
   import { isObject, isObjectOrArray } from '../../../utils/typeUtils'
-  import { STATE_KEYS } from '../../../constants'
-  import { createSelection, SELECTION_TYPE } from '../../../logic/selection'
+  import { createMultiSelection } from '../../../logic/selection'
   import { createDebug } from '../../../utils/debug'
   import NavigationBarItem from '../../../components/controls/navigationBar/NavigationBarItem.svelte'
   import { caseInsensitiveNaturalCompare } from '../../../logic/sort'
-  import type { JSONData, OnSelect, Path } from '../../../types'
+  import type { DocumentState, JSONData, JSONObject, OnSelect, Path } from '../../../types'
+  import { getKeys } from '../../../logic/documentState'
+  import { stringifyPath } from '../../../utils/pathUtils'
 
   const debug = createDebug('jsoneditor:NavigationBar')
 
   export let json: JSONData
   export let state: JSONData
-  export let selection: Selection | undefined
+  export let documentState: DocumentState
   export let onSelect: OnSelect
 
   let refNavigationBar: Element | undefined
 
-  $: path = selection ? selection.focusPath : []
+  $: path = documentState.selection ? documentState.selection.focusPath : []
   $: hasNextItem = isObjectOrArray(getIn(json, path))
 
   function scrollToLastItem() {
@@ -45,7 +46,7 @@
     if (Array.isArray(node)) {
       return range(0, node.length)
     } else if (isObject(node)) {
-      const keys = (getIn(state, path.concat(STATE_KEYS)) || Object.keys(node)) as string[]
+      const keys = getKeys(node as JSONObject, documentState, stringifyPath(path))
 
       const sortedKeys = keys.slice(0)
       sortedKeys.sort(caseInsensitiveNaturalCompare)
@@ -60,11 +61,7 @@
   function handleSelect(path: Path) {
     debug('select path', JSON.stringify(path))
 
-    const newSelection = createSelection(json, state, {
-      type: SELECTION_TYPE.MULTI,
-      anchorPath: path,
-      focusPath: path
-    })
+    const newSelection = createMultiSelection(json, state, path, path)
 
     onSelect(newSelection)
   }

@@ -1,6 +1,7 @@
 import { isObject } from './typeUtils.js'
-import type { JSONData } from '../types'
+import type { JSONArray, JSONObject } from '../types'
 import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
+import { isEqual } from 'lodash-es'
 
 const MAX_ITEM_PATHS_COLLECTION = 10000
 const EMPTY_ARRAY = []
@@ -124,15 +125,32 @@ export function limit<T>(array: Array<T>, max: number): Array<T> {
 /**
  * Convert an array into an object having the array indices as keys
  */
-export function arrayToObject(array: JSONData[]): { [key: string]: JSONData } {
+export function arrayToObject(array: JSONArray): JSONObject {
   return {
     ...array
-  } as unknown as { [key: string]: JSONData }
+  } as unknown as JSONObject
 }
 
 /**
  * Get the values of an object as an array
  */
-export function objectToArray(object: { [key: string]: JSONData }): JSONData[] {
-  return Object.values(object) as unknown as Array<JSONData>
+export function objectToArray(object: JSONObject): JSONArray {
+  return Object.values(object) as unknown as JSONArray
+}
+
+/**
+ * Test whether an array starts with a sub array
+ */
+export function arrayStartsWith<T>(
+  array: T[],
+  searchArray: T[],
+  equal: (a: T, b: T) => boolean = isEqual
+): boolean {
+  for (let i = 0; i < searchArray.length; i++) {
+    if (!equal(array[i], searchArray[i])) {
+      return false
+    }
+  }
+
+  return true
 }

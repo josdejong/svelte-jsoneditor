@@ -1,5 +1,5 @@
-import { notStrictEqual, strictEqual } from 'assert'
-import { createMemoizePath, createPropertySelector, stringifyPath } from './pathUtils.js'
+import { deepStrictEqual, notStrictEqual, strictEqual } from 'assert'
+import { createMemoizePath, createPropertySelector, parsePath, stringifyPath } from './pathUtils.js'
 
 describe('pathUtils', () => {
   it('stringifyPath', () => {
@@ -13,6 +13,21 @@ describe('pathUtils', () => {
     strictEqual(stringifyPath([2]), '[2]')
     strictEqual(stringifyPath(['foo', 'prop-with-hyphens']), '.foo["prop-with-hyphens"]')
     strictEqual(stringifyPath(['foo', 'prop with spaces']), '.foo["prop with spaces"]')
+    strictEqual(stringifyPath(['foo', 'prop with ".[']), '.foo["prop with \\".["]')
+  })
+
+  it('parsePath', () => {
+    deepStrictEqual(parsePath(''), [])
+    deepStrictEqual(parsePath('[""]'), [''])
+    deepStrictEqual(parsePath('.foo'), ['foo'])
+    deepStrictEqual(parsePath('.foo.bar'), ['foo', 'bar'])
+    deepStrictEqual(parsePath('.foo[2]'), ['foo', 2])
+    deepStrictEqual(parsePath('.foo[2].bar'), ['foo', 2, 'bar'])
+    deepStrictEqual(parsePath('.foo[2].bar_baz'), ['foo', 2, 'bar_baz'])
+    deepStrictEqual(parsePath('[2]'), [2])
+    deepStrictEqual(parsePath('.foo["prop-with-hyphens"]'), ['foo', 'prop-with-hyphens'])
+    deepStrictEqual(parsePath('.foo["prop with spaces"]'), ['foo', 'prop with spaces'])
+    deepStrictEqual(parsePath('.foo["prop with \\".["]'), ['foo', 'prop with ".['])
   })
 
   it('createPropertySelector', () => {

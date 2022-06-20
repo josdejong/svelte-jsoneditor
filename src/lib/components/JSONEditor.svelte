@@ -38,7 +38,7 @@
     TransformModalOptions,
     Validator
   } from '../types'
-  import { isMenuSpaceItem } from '../types'
+  import { isMenuSpaceItem } from '../typeguards'
   import { noop } from 'lodash-es'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload

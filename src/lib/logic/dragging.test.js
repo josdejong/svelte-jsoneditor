@@ -1,5 +1,5 @@
-import { createSelection, SELECTION_TYPE } from './selection.js'
-import { syncState } from './documentState.js'
+import { createMultiSelection } from './selection.js'
+import { createExpandedDocumentState, syncState } from './documentState.js'
 import { onMoveSelection } from './dragging.js'
 import { deepStrictEqual, strictEqual } from 'assert'
 import { isEqual } from 'lodash-es'
@@ -11,16 +11,13 @@ describe('dragging', () => {
       array: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     }
     const fullState = syncState(fullJson, undefined, [], () => true)
+    const documentState = createExpandedDocumentState(fullJson, () => true)
     const allItems = fullJson.array.map((item, index) => ({
       path: ['array', index],
       height: itemHeight
     }))
 
-    const fullSelection = createSelection(fullJson, fullState, {
-      type: SELECTION_TYPE.MULTI,
-      anchorPath: ['array', 3],
-      focusPath: ['array', 5]
-    })
+    const fullSelection = createMultiSelection(fullJson, documentState, ['array', 3], ['array', 5])
 
     function doMoveSelection({ deltaY, items = allItems }) {
       return onMoveSelection({
@@ -129,21 +126,24 @@ describe('dragging', () => {
       object: { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6 }
     }
     const fullState = syncState(fullJson, undefined, [], () => true)
+    const documentState = createExpandedDocumentState(fullJson, () => true)
     const allItems = Object.keys(fullJson.object).map((key) => ({
       path: ['object', key],
       height: itemHeight
     }))
 
-    const fullSelection = createSelection(fullJson, fullState, {
-      type: SELECTION_TYPE.MULTI,
-      anchorPath: ['object', 'c'],
-      focusPath: ['object', 'e']
-    })
+    const fullSelection = createMultiSelection(
+      fullJson,
+      documentState,
+      ['object', 'c'],
+      ['object', 'e']
+    )
 
     function doMoveSelection({ deltaY, items = allItems }) {
       return onMoveSelection({
         fullJson,
         fullState,
+        documentState,
         fullSelection,
         deltaY,
         items

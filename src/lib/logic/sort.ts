@@ -4,7 +4,7 @@ import { compileJSONPointer, getIn, setIn } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import naturalCompare from 'natural-compare-lite'
 import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
-import type { JSONData, Path } from '../types'
+import type { JSONArray, Path } from '../types'
 
 export function caseInsensitiveNaturalCompare(a, b) {
   const aLower = typeof a === 'string' ? a.toLowerCase() : a
@@ -60,7 +60,7 @@ export function sortArray(json, rootPath = [], propertyPath = [], direction = 1)
   const comparator = createObjectComparator(propertyPath, direction)
 
   // TODO: make the mechanism to sort configurable? Like use sortOperationsMove and sortOperationsMoveAdvanced
-  const array: JSONData[] = getIn(json, rootPath) as JSONData[]
+  const array: JSONArray = getIn(json, rootPath) as JSONArray
   return [
     {
       op: 'replace',

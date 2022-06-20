@@ -6,12 +6,22 @@ import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
 import { arrayToObject, objectToArray } from './arrayUtils.js'
 import type {
   Content,
+  JSONArray,
+  JSONData,
+  JSONObject,
   NormalizedParseError,
   Path,
-  TextLocation,
-  JSONData,
-  TextContent
+  TextContent,
+  TextLocation
 } from '../types'
+
+export function isJSONObject(value: unknown): value is JSONObject {
+  return isObject(value)
+}
+
+export function isJSONArray(value: unknown): value is JSONArray {
+  return Array.isArray(value)
+}
 
 /**
  * Parse the JSON. if this fails, try to repair and parse.

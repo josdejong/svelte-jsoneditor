@@ -1,7 +1,9 @@
 import type { SvelteComponent } from 'svelte'
 import type { Readable } from 'svelte/store'
 
-export type JSONData = { [key: string]: JSONData } | JSONData[] | string | number | boolean | null
+export type JSONObject = { [key: string]: JSONData }
+export type JSONArray = JSONData[]
+export type JSONData = JSONObject | JSONArray | string | number | boolean | null
 
 export type TextContent = { text: string } | { json: undefined; text: string }
 
@@ -9,13 +11,20 @@ export type JSONContent = { json: JSONData } | { json: JSONData; text: undefined
 
 export type Content = JSONContent | TextContent
 
-export type Path = Array<string | number | symbol>
+export type Path = Array<string | number>
 
-export type CaretType = 'after' | 'key' | 'value' | 'append'
+export type PathStr = string // a Path stringified with stringifyPath(...)
 
 export interface VisibleSection {
   start: number
   end: number
+}
+
+export enum CaretType {
+  after = 'after',
+  key = 'key',
+  value = 'value',
+  inside = 'inside'
 }
 
 export interface CaretPosition {
@@ -24,7 +33,12 @@ export interface CaretPosition {
 }
 
 export interface DocumentState {
-  expanded: PathsMap<boolean>
+  // TODO: merge expandedMap, enforceStringMap, keysMap, and visibleSectionsMap into a single stateMap
+  expandedMap: PathsMap<boolean>
+  enforceStringMap: PathsMap<boolean>
+  keysMap: PathsMap<string[]>
+  visibleSectionsMap: PathsMap<VisibleSection[]>
+
   selection: Selection | undefined
   selectionMap: PathsMap<Selection>
   searchResult: SearchResult | undefined
@@ -32,19 +46,48 @@ export interface DocumentState {
   validationErrorsMap: PathsMap<ValidationError>
 }
 
-export interface JSONPatchOperation {
-  op: 'add' | 'remove' | 'replace' | 'copy' | 'move' | 'test'
+export interface JSONPatchAdd {
+  op: 'add'
   path: string
-  from?: string
-  value?: JSONData
+  value: JSONData
 }
 
-export interface PreprocessedJSONPatchOperation {
-  op: 'add' | 'remove' | 'replace' | 'copy' | 'move' | 'test'
-  path: Path
-  from?: Path
-  value?: JSONData
+export interface JSONPatchRemove {
+  op: 'remove'
+  path: string
 }
+
+export interface JSONPatchReplace {
+  op: 'replace'
+  path: string
+  value: JSONData
+}
+
+export interface JSONPatchCopy {
+  op: 'copy'
+  path: string
+  from: string
+}
+
+export interface JSONPatchMove {
+  op: 'move'
+  path: string
+  from: string
+}
+
+export interface JSONPatchTest {
+  op: 'test'
+  path: string
+  value: JSONData
+}
+
+export type JSONPatchOperation =
+  | JSONPatchAdd
+  | JSONPatchRemove
+  | JSONPatchReplace
+  | JSONPatchCopy
+  | JSONPatchMove
+  | JSONPatchTest
 
 export type JSONPatchDocument = JSONPatchOperation[]
 
@@ -57,9 +100,9 @@ export interface JSONPatchResult {
 
 export type AfterPatchCallback = (
   patchedJson: JSONData,
-  patchedState: JSONData,
+  patchedState: DocumentState,
   selection: Selection
-) => { json?: JSONData; state?: JSONData; selection?: Selection }
+) => { json?: JSONData; state?: DocumentState; selection?: Selection }
 
 export interface MultiSelection {
   type: 'multi'
@@ -102,7 +145,7 @@ export type Selection =
   | KeySelection
   | ValueSelection
 
-export type PathsMap<T> = { [pathStr: string]: T }
+export type PathsMap<T> = { [pathStr: PathStr]: T }
 
 export type RecursiveSelection = { [key: string]: RecursiveSelection } | Array<RecursiveSelection>
 
@@ -174,10 +217,6 @@ export interface MenuSeparatorItem {
 
 export interface MenuSpaceItem {
   space: true
-}
-
-export function isMenuSpaceItem(item: unknown): item is MenuSpaceItem {
-  return item && item['space'] === true && Object.keys(item).length === 1
 }
 
 export type MenuItem = MenuButtonItem | MenuSeparatorItem | MenuSpaceItem

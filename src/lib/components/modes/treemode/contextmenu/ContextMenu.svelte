@@ -19,18 +19,16 @@
   import { onMount } from 'svelte'
   import Icon from 'svelte-awesome'
   import DropdownButton from '../../../controls/DropdownButton.svelte'
-  import { SELECTION_TYPE } from '$lib/logic/selection'
+  import { canConvert, SELECTION_TYPE, singleItemSelected } from '$lib/logic/selection'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
-  import { isObjectOrArray } from '$lib/utils/typeUtils'
+  import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
   import { faCheckSquare, faLightbulb, faSquare } from '@fortawesome/free-regular-svg-icons'
-  import { STATE_ENFORCE_STRING } from '$lib/constants'
-  import { isObject } from '$lib/utils/typeUtils'
-  import { canConvert, singleItemSelected } from '$lib/logic/selection'
   import { findNearestElement } from '$lib/utils/domUtils'
+  import type { DocumentState, JSONData } from '../../../../types'
+  import { stringifyPath } from '../../../../utils/pathUtils'
 
-  export let json
-  export let state
-  export let selection
+  export let json: JSONData
+  export let documentState: DocumentState
 
   export let showTip
 
@@ -64,6 +62,8 @@
       }
     })
   })
+
+  $: selection = documentState.selection
 
   $: hasJson = json !== undefined
   $: hasSelection = selection != null
@@ -110,7 +110,7 @@
 
   $: enforceString =
     selection != null
-      ? getIn(state, selection.focusPath.concat(STATE_ENFORCE_STRING)) === true
+      ? documentState.enforceStringMap[stringifyPath(selection.focusPath)] === true
       : false
 
   function handleEditKey() {
