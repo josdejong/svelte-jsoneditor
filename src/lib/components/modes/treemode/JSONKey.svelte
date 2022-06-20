@@ -14,6 +14,7 @@
   import { isKeySelection } from '../../../logic/selection.js'
   import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
   import { SearchField } from '$lib/types'
+  import { compileJSONPointer } from 'immutable-json-patch'
 
   export let path: Path
   export let key: string
@@ -21,15 +22,15 @@
 
   export let context: TreeModeContext
 
-  $: pathStr = stringifyPath(path)
-  $: selection = derived(context.documentStateStore, (state) => state.selectionMap[pathStr])
+  $: pointer = compileJSONPointer(path)
+  $: selection = derived(context.documentStateStore, (state) => state.selectionMap[pointer])
   $: isEditingKey = derived(selection, ($selection) => {
     const selectedKey = $selection && $selection.type === SELECTION_TYPE.KEY
     return !context.readOnly && selectedKey && $selection && $selection['edit'] === true
   })
 
   $: searchResultItems = derived(context.documentStateStore, (state: DocumentState) => {
-    const items: SearchResultItem[] = state.searchResult?.itemsMap[pathStr]?.filter(
+    const items: SearchResultItem[] = state.searchResult?.itemsMap[pointer]?.filter(
       (item: SearchResultItem) => item.field === SearchField.key
     )
 

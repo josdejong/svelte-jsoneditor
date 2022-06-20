@@ -65,7 +65,7 @@
   function pathToOption(path: Path): { value: Path; label: string } {
     return {
       value: path,
-      label: isEmpty(path) ? '(whole item)' : stringifyPath(path)
+      label: isEmpty(path) ? '(whole item)' : compileJSONPointer(path)
     }
   }
 

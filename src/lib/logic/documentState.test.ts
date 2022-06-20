@@ -27,8 +27,7 @@ import {
   type PathsMap,
   type VisibleSection
 } from '../types.js'
-import { stringifyPath } from '../utils/pathUtils.js'
-import { deleteIn, setIn } from 'immutable-json-patch'
+import { compileJSONPointer, deleteIn, setIn } from 'immutable-json-patch'
 
 describe('documentState', () => {
   it('syncKeys should append new keys and remove old keys', () => {
@@ -51,9 +50,9 @@ describe('documentState', () => {
         expandWithCallback(json, createDocumentState(), [], () => true).expandedMap,
         {
           '': true,
-          '.array': true,
-          '.array[2]': true,
-          '.object': true
+          '/array': true,
+          '/array/2': true,
+          '/object': true
         }
       )
     })
@@ -63,8 +62,8 @@ describe('documentState', () => {
         expandWithCallback(json, createDocumentState(), [], (path) => path.length <= 1).expandedMap,
         {
           '': true,
-          '.array': true,
-          '.object': true
+          '/array': true,
+          '/object': true
         }
       )
     })
@@ -89,7 +88,7 @@ describe('documentState', () => {
     it('should leave already expanded nodes as is', () => {
       const expandedMap = {
         '': true,
-        '.array': true
+        '/array': true
       }
       const documentState = {
         ...createDocumentState(),
@@ -166,7 +165,7 @@ describe('documentState', () => {
     // create a visible section from 200-300 (in addition to the visible section 0-100)
     const start = 2 * ARRAY_SECTION_SIZE
     const end = 3 * ARRAY_SECTION_SIZE
-    const documentState2 = expandSection(json, documentState1, stringifyPath(['array']), {
+    const documentState2 = expandSection(json, documentState1, compileJSONPointer(['array']), {
       start,
       end
     })
@@ -309,7 +308,7 @@ describe('documentState', () => {
     // create a visible section from 200-300 (in addition to the visible section 0-100)
     const start = 2 * ARRAY_SECTION_SIZE
     const end = 3 * ARRAY_SECTION_SIZE
-    const documentState2 = expandSection(json, documentState1, stringifyPath(['array']), {
+    const documentState2 = expandSection(json, documentState1, compileJSONPointer(['array']), {
       start,
       end
     })
@@ -344,11 +343,11 @@ describe('documentState', () => {
   it('should update enforce string in syncState', () => {
     const json1 = 42
     const documentState1 = createDocumentState()
-    assert.strictEqual(getEnforceString(json1, documentState1, stringifyPath([])), false)
+    assert.strictEqual(getEnforceString(json1, documentState1, compileJSONPointer([])), false)
 
     const json2 = '42'
     const documentState2 = createDocumentState()
-    assert.strictEqual(getEnforceString(json2, documentState2, stringifyPath([])), true)
+    assert.strictEqual(getEnforceString(json2, documentState2, compileJSONPointer([])), true)
 
     // FIXME: test getEnforceString and setEnforceString
     // // should keep the enforceString also when not needed anymore
@@ -385,14 +384,14 @@ describe('documentState', () => {
         ...createExpandedDocumentState(json, () => true),
         keysMap: {
           '': ['members', 'group'],
-          '.members[0]': ['id', 'name'],
-          '.members[1]': ['id', 'name'],
-          '.members[2]': ['id', 'name'],
-          '.group': ['name', 'location'],
-          '.group.details': ['description']
+          '/members/0': ['id', 'name'],
+          '/members/1': ['id', 'name'],
+          '/members/2': ['id', 'name'],
+          '/group': ['name', 'location'],
+          '/group/details': ['description']
         },
         visibleSectionsMap: {
-          '.members': [{ start: 0, end: 2 }]
+          '/members': [{ start: 0, end: 2 }]
         }
       }
 
@@ -473,23 +472,23 @@ describe('documentState', () => {
         ...documentState,
         expandedMap: {
           '': true,
-          '.group': true,
-          '.group.details': true,
-          '.members': true,
-          '.members[0]': true,
-          '.members[2]': true,
-          '.members[3]': true
+          '/group': true,
+          '/group/details': true,
+          '/members': true,
+          '/members/0': true,
+          '/members/2': true,
+          '/members/3': true
         },
         keysMap: {
           '': ['members', 'group'],
-          '.members[0]': ['id', 'name'],
-          '.members[2]': ['id', 'name'],
-          '.members[3]': ['id', 'name'],
-          '.group': ['name', 'location'],
-          '.group.details': ['description']
+          '/members/0': ['id', 'name'],
+          '/members/2': ['id', 'name'],
+          '/members/3': ['id', 'name'],
+          '/group': ['name', 'location'],
+          '/group/details': ['description']
         },
         visibleSectionsMap: {
-          '.members': [{ start: 0, end: 3 }]
+          '/members': [{ start: 0, end: 3 }]
         }
       })
     })
@@ -518,12 +517,12 @@ describe('documentState', () => {
           '': true
         }
       }
-      const pathStr = stringifyPath([])
-      assert.strictEqual(getEnforceString(json, documentState, pathStr), true)
+      const pointer = compileJSONPointer([])
+      assert.strictEqual(getEnforceString(json, documentState, pointer), true)
 
       const operations: JSONPatchDocument = [{ op: 'replace', path: '', value: 'forty two' }]
       const res = documentStatePatch(json, documentState, operations)
-      assert.deepStrictEqual(getEnforceString(res.json, res.documentState, pathStr), true)
+      assert.deepStrictEqual(getEnforceString(res.json, res.documentState, pointer), true)
     })
 
     it('remove: should remove a value from an object', () => {
@@ -538,7 +537,7 @@ describe('documentState', () => {
         ...documentState,
         keysMap: {
           ...documentState.keysMap,
-          '.group': ['name']
+          '/group': ['name']
         }
       })
     })
@@ -550,10 +549,10 @@ describe('documentState', () => {
       assert.deepStrictEqual(res.json, deleteIn(json, ['members', 1]))
       assert.deepStrictEqual(res.documentState, {
         ...documentState,
-        expandedMap: deleteIn(documentState.expandedMap, ['.members[2]']), // [2] is moved to [1]
-        keysMap: deleteIn(documentState.keysMap, ['.members[2]']), // [2] is moved to [1]
+        expandedMap: deleteIn(documentState.expandedMap, ['/members/2']), // [2] is moved to [1]
+        keysMap: deleteIn(documentState.keysMap, ['/members/2']), // [2] is moved to [1]
         visibleSectionsMap: {
-          '.members': [{ start: 0, end: 1 }]
+          '/members': [{ start: 0, end: 1 }]
         }
       })
     })
@@ -568,10 +567,10 @@ describe('documentState', () => {
       assert.deepStrictEqual(res.json, deleteIn(json, ['members', 1]))
       assert.deepStrictEqual(res.documentState, {
         ...documentState,
-        expandedMap: deleteIn(documentState.expandedMap, ['.members[2]']), // [2] is moved to [1]
-        keysMap: deleteIn(documentState.keysMap, ['.members[2]']), // [2] is moved to [1]
+        expandedMap: deleteIn(documentState.expandedMap, ['/members/2']), // [2] is moved to [1]
+        keysMap: deleteIn(documentState.keysMap, ['/members/2']), // [2] is moved to [1]
         visibleSectionsMap: {
-          '.members': [{ start: 0, end: 1 }]
+          '/members': [{ start: 0, end: 1 }]
         }
       })
     })
@@ -588,16 +587,16 @@ describe('documentState', () => {
         ...documentState,
         expandedMap: {
           '': true,
-          '.members': true,
-          '.members[0]': true,
-          '.members[1]': true,
-          '.members[2]': true
+          '/members': true,
+          '/members/0': true,
+          '/members/1': true,
+          '/members/2': true
         },
         keysMap: {
           '': ['members', 'group'],
-          '.members[0]': ['id', 'name'],
-          '.members[1]': ['id', 'name'],
-          '.members[2]': ['id', 'name']
+          '/members/0': ['id', 'name'],
+          '/members/1': ['id', 'name'],
+          '/members/2': ['id', 'name']
         }
       })
     })
@@ -614,24 +613,23 @@ describe('documentState', () => {
         ...documentState,
         expandedMap: {
           '': true,
-          '.group': true,
-          '.members': true,
-          '.members[0]': true,
-          '.members[1]': true,
-          '.members[2]': true
+          '/group': true,
+          '/members': true,
+          '/members/0': true,
+          '/members/1': true,
+          '/members/2': true
         },
         keysMap: {
           '': ['members', 'group'],
-          '.members[0]': ['id', 'name'],
-          '.members[1]': ['id', 'name'],
-          '.members[2]': ['id', 'name'],
-          '.group': ['groupId']
+          '/members/0': ['id', 'name'],
+          '/members/1': ['id', 'name'],
+          '/members/2': ['id', 'name'],
+          '/group': ['groupId']
         }
       })
     })
 
-    // FIXME: will work after refactoring from PathStr to JSONPointer
-    it.skip('replace: should replace a value in an array', () => {
+    it('replace: should replace a value in an array', () => {
       const { json, documentState } = createJsonAndState()
 
       const res = documentStatePatch(json, documentState, [
@@ -641,8 +639,8 @@ describe('documentState', () => {
       assert.deepStrictEqual(res.json, setIn(json, ['members', 1], 42))
       assert.deepStrictEqual(res.documentState, {
         ...documentState,
-        expandedMap: deleteIn(documentState.expandedMap, ['.members[1]']),
-        keysMap: deleteIn(documentState.keysMap, ['.members[1]'])
+        expandedMap: deleteIn(documentState.expandedMap, ['/members/1']),
+        keysMap: deleteIn(documentState.keysMap, ['/members/1'])
       })
     })
 
@@ -658,13 +656,13 @@ describe('documentState', () => {
         ...documentState,
         expandedMap: {
           '': true,
-          '.group': true,
-          '.group.details': true
+          '/group': true,
+          '/group/details': true
         },
         keysMap: {
           '': ['members', 'group'],
-          '.group': ['name', 'location'],
-          '.group.details': ['description']
+          '/group': ['name', 'location'],
+          '/group/details': ['description']
         },
         visibleSectionsMap: {}
       })
@@ -697,18 +695,17 @@ describe('documentState', () => {
       const res = documentStatePatch(json, documentState, operations)
 
       // syncKeys
-      assert.deepStrictEqual(res.documentState.keysMap[stringifyPath([])], ['b', 'a', 'd'])
+      assert.deepStrictEqual(res.documentState.keysMap[compileJSONPointer([])], ['b', 'a', 'd'])
 
       // keep expanded state of existing keys
-      assert.strictEqual(res.documentState.expandedMap[stringifyPath([])], true)
-      assert.strictEqual(res.documentState.expandedMap[stringifyPath(['b'])], true)
+      assert.strictEqual(res.documentState.expandedMap[compileJSONPointer([])], true)
+      assert.strictEqual(res.documentState.expandedMap[compileJSONPointer(['b'])], true)
 
       // remove expanded state of removed keys
-      assert.strictEqual(res.documentState.expandedMap[stringifyPath(['c'])], undefined)
+      assert.strictEqual(res.documentState.expandedMap[compileJSONPointer(['c'])], undefined)
     })
 
-    // FIXME: will work after refactoring PathStr to JSONPointer
-    it.skip('copy: should copy a value into an object', () => {
+    it('copy: should copy a value into an object', () => {
       const { json, documentState } = createJsonAndState()
 
       const res = documentStatePatch(json, documentState, [
@@ -720,18 +717,17 @@ describe('documentState', () => {
         ...documentState,
         expandedMap: {
           ...documentState.expandedMap,
-          '.group.user': true
+          '/group/user': true
         },
         keysMap: {
           ...documentState.keysMap,
-          '.group': ['name', 'location', 'user'],
-          '.group.user': ['id', 'name']
+          '/group': ['name', 'location', 'user'],
+          '/group/user': ['id', 'name']
         }
       })
     })
 
-    // FIXME: will work after refactoring PathStr to JSONPointer
-    it.skip('copy: should copy a value into an array', () => {
+    it('copy: should copy a value into an array', () => {
       const { json, documentState } = createJsonAndState()
 
       const res = documentStatePatch(json, documentState, [
@@ -752,16 +748,16 @@ describe('documentState', () => {
         ...documentState,
         expandedMap: {
           ...documentState.expandedMap,
-          '.members[3]': true
+          '/members/3': true
         },
         keysMap: {
           ...documentState.keysMap,
-          '.members[1]': ['description'],
-          '.members[2]': ['id', 'name'],
-          '.members[3]': ['id', 'name']
+          '/members/1': ['description'],
+          '/members/2': ['id', 'name'],
+          '/members/3': ['id', 'name']
         },
         visibleSectionsMap: {
-          '.members': [{ start: 0, end: 3 }]
+          '/members': [{ start: 0, end: 3 }]
         }
       })
     })
@@ -787,20 +783,20 @@ describe('documentState', () => {
         ...documentState,
         expandedMap: {
           '': true,
-          '.group': true,
-          '.details': true,
-          '.members': true,
-          '.members[0]': true,
-          '.members[1]': true,
-          '.members[2]': true
+          '/group': true,
+          '/details': true,
+          '/members': true,
+          '/members/0': true,
+          '/members/1': true,
+          '/members/2': true
         },
         keysMap: {
           '': ['members', 'group', 'details'],
-          '.members[0]': ['id', 'name'],
-          '.members[1]': ['id', 'name'],
-          '.members[2]': ['id', 'name'],
-          '.group': ['name', 'location'],
-          '.details': ['description']
+          '/members/0': ['id', 'name'],
+          '/members/1': ['id', 'name'],
+          '/members/2': ['id', 'name'],
+          '/group': ['name', 'location'],
+          '/details': ['description']
         }
       })
     })
@@ -817,7 +813,7 @@ describe('documentState', () => {
         ...documentState,
         keysMap: {
           ...documentState.keysMap,
-          '.group': ['location', 'name']
+          '/group': ['location', 'name']
         }
       })
     })
@@ -842,24 +838,23 @@ describe('documentState', () => {
         ...documentState,
         expandedMap: {
           '': true,
-          '.group': true,
-          '.group.details': true,
-          '.members': true,
-          '.members[1]': true,
-          '.members[2]': true
+          '/group': true,
+          '/group/details': true,
+          '/members': true,
+          '/members/1': true,
+          '/members/2': true
         },
         keysMap: {
           '': ['members', 'group'],
-          '.members[1]': ['id', 'name'],
-          '.members[2]': ['id', 'name'],
-          '.group': ['name', 'location'],
-          '.group.details': ['description']
+          '/members/1': ['id', 'name'],
+          '/members/2': ['id', 'name'],
+          '/group': ['name', 'location'],
+          '/group/details': ['description']
         }
       })
     })
 
-    // FIXME: will work after refactoring PathStr to JSONPointer
-    it.skip('move: should move a value from array to array (down)', () => {
+    it('move: should move a value from array to array (down)', () => {
       // we collapse the member we're going to move, so we can see whether the state is correctly switched
       const jsonAndState = createJsonAndState()
       const json = jsonAndState.json
@@ -879,24 +874,23 @@ describe('documentState', () => {
         ...documentState,
         expandedMap: {
           '': true,
-          '.group': true,
-          '.group.details': true,
-          '.members': true,
-          '.members[0]': true,
-          '.members[2]': true
+          '/group': true,
+          '/group/details': true,
+          '/members': true,
+          '/members/0': true,
+          '/members/2': true
         },
         keysMap: {
           '': ['members', 'group'],
-          '.members[0]': ['id', 'name'],
-          '.members[2]': ['id', 'name'],
-          '.group': ['name', 'location'],
-          '.group.details': ['description']
+          '/members/0': ['id', 'name'],
+          '/members/2': ['id', 'name'],
+          '/group': ['name', 'location'],
+          '/group/details': ['description']
         }
       })
     })
 
-    // FIXME: will work after refactoring PathStr to JSONPointer
-    it.skip('move: should move a value from object to array', () => {
+    it('move: should move a value from object to array', () => {
       const jsonAndState = createJsonAndState()
       const json = jsonAndState.json
       const documentState = collapsePath(jsonAndState.documentState, ['members', 1])
@@ -925,27 +919,26 @@ describe('documentState', () => {
         ...documentState,
         expandedMap: {
           '': true,
-          '.group': true,
-          '.members': true,
-          '.members[0]': true,
-          '.members[1]': true,
-          '.members[3]': true
+          '/group': true,
+          '/members': true,
+          '/members/0': true,
+          '/members/1': true,
+          '/members/3': true
         },
         keysMap: {
           '': ['members', 'group'],
-          '.members[0]': ['id', 'name'],
-          '.members[1]': ['description'],
-          '.members[3]': ['id', 'name'],
-          '.group': ['name', 'location']
+          '/members/0': ['id', 'name'],
+          '/members/1': ['description'],
+          '/members/3': ['id', 'name'],
+          '/group': ['name', 'location']
         },
         visibleSectionsMap: {
-          '.members': [{ start: 0, end: 3 }]
+          '/members': [{ start: 0, end: 3 }]
         }
       })
     })
 
-    // should be fixed after refactoring PathStr to JSONPointer
-    it.skip('move: should move a value from array to object', () => {
+    it('move: should move a value from array to object', () => {
       const { json, documentState } = createJsonAndState()
 
       const res = documentStatePatch(json, documentState, [
@@ -965,23 +958,23 @@ describe('documentState', () => {
         ...documentState,
         expandedMap: {
           '': true,
-          '.group': true,
-          '.group.details': true,
-          '.group.user': true,
-          '.members': true,
-          '.members[0]': true,
-          '.members[1]': true
+          '/group': true,
+          '/group/details': true,
+          '/group/user': true,
+          '/members': true,
+          '/members/0': true,
+          '/members/1': true
         },
         keysMap: {
           '': ['members', 'group'],
-          '.group': ['name', 'location', 'user'],
-          '.group.details': ['description'],
-          '.group.user': ['id', 'name'],
-          '.members[0]': ['id', 'name'],
-          '.members[1]': ['id', 'name']
+          '/group': ['name', 'location', 'user'],
+          '/group/details': ['description'],
+          '/group/user': ['id', 'name'],
+          '/members/0': ['id', 'name'],
+          '/members/1': ['id', 'name']
         },
         visibleSectionsMap: {
-          '.members': [{ start: 0, end: 1 }]
+          '/members': [{ start: 0, end: 1 }]
         }
       })
     })
@@ -1057,29 +1050,29 @@ describe('documentState', () => {
     it('should expand an array', () => {
       assert.deepStrictEqual(expandPath(json, createDocumentState(), ['array']).expandedMap, {
         '': true,
-        '.array': true
+        '/array': true
       })
     })
 
     it('should expand an object inside an array', () => {
       assert.deepStrictEqual(expandPath(json, createDocumentState(), ['array', 2]).expandedMap, {
         '': true,
-        '.array': true,
-        '.array[2]': true
+        '/array': true,
+        '/array/2': true
       })
     })
 
     it('should not expand a value (only objects and arrays)', () => {
       assert.deepStrictEqual(expandPath(json, createDocumentState(), ['array', 0]).expandedMap, {
         '': true,
-        '.array': true
+        '/array': true
       })
     })
 
     it('should expand an object', () => {
       assert.deepStrictEqual(expandPath(json, createDocumentState(), ['object']).expandedMap, {
         '': true,
-        '.object': true
+        '/object': true
       })
     })
 
@@ -1092,10 +1085,10 @@ describe('documentState', () => {
         ...createDocumentState(),
         expandedMap: {
           '': true,
-          '.largeArray': true
+          '/largeArray': true
         },
         visibleSectionsMap: {
-          '.largeArray': [{ start: 0, end: 200 }]
+          '/largeArray': [{ start: 0, end: 200 }]
         }
       })
     })
@@ -1103,99 +1096,94 @@ describe('documentState', () => {
 
   describe('shiftPath', () => {
     const expandedPaths: PathsMap<number> = {
-      '.array': 1,
-      '.array[0]': 2,
-      '.array[0].name': 3,
-      '.array[2]': 4,
-      '.array[2].name': 5,
-      '.array[3]': 6,
-      '.array[3].name': 7,
-      '.obj': 8
+      '/array': 1,
+      '/array/0': 2,
+      '/array/0/name': 3,
+      '/array/2': 4,
+      '/array/2/name': 5,
+      '/array/3': 6,
+      '/array/3/name': 7,
+      '/obj': 8
     }
 
     it('should shift entries one up', () => {
       deepStrictEqual(shiftPath(expandedPaths, ['array'], 2, -1), {
-        '.array': 1,
-        '.array[0]': 2,
-        '.array[0].name': 3,
-        '.array[1]': 4,
-        '.array[1].name': 5,
-        '.array[2]': 6,
-        '.array[2].name': 7,
-        '.obj': 8
+        '/array': 1,
+        '/array/0': 2,
+        '/array/0/name': 3,
+        '/array/1': 4,
+        '/array/1/name': 5,
+        '/array/2': 6,
+        '/array/2/name': 7,
+        '/obj': 8
       })
     })
 
     it('should shift entries one down', () => {
       deepStrictEqual(shiftPath(expandedPaths, ['array'], 2, 1), {
-        '.array': 1,
-        '.array[0]': 2,
-        '.array[0].name': 3,
-        '.array[3]': 4,
-        '.array[3].name': 5,
-        '.array[4]': 6,
-        '.array[4].name': 7,
-        '.obj': 8
+        '/array': 1,
+        '/array/0': 2,
+        '/array/0/name': 3,
+        '/array/3': 4,
+        '/array/3/name': 5,
+        '/array/4': 6,
+        '/array/4/name': 7,
+        '/obj': 8
       })
     })
   })
 
   describe('deletePath', () => {
-    const json: JSONData = {
-      array: [2, 3, { name: 'Joe' }],
-      obj: {}
-    }
-
     const myStateMap: PathsMap<number> = {
-      '.array': 1,
-      '.array[0]': 2,
-      '.array[1]': 3,
-      '.array[2]': 4,
-      '.array[2].name': 5,
-      '.obj': 6
+      '/array': 1,
+      '/array/0': 2,
+      '/array/1': 3,
+      '/array/2': 4,
+      '/array/2/name': 5,
+      '/obj': 6
     }
 
     it('should delete an object path from a PathsMap', () => {
-      deepStrictEqual(deletePath(json, myStateMap, ['obj']), [
+      deepStrictEqual(deletePath(myStateMap, ['obj']), [
         {
-          '.array': 1,
-          '.array[0]': 2,
-          '.array[1]': 3,
-          '.array[2]': 4,
-          '.array[2].name': 5
+          '/array': 1,
+          '/array/0': 2,
+          '/array/1': 3,
+          '/array/2': 4,
+          '/array/2/name': 5
         },
         {
-          '.obj': 6
+          '/obj': 6
         }
       ])
     })
 
     it('should delete an array item from a PathsMap', () => {
-      deepStrictEqual(deletePath(json, myStateMap, ['array', 1]), [
+      deepStrictEqual(deletePath(myStateMap, ['array', 1]), [
         {
-          '.array': 1,
-          '.array[0]': 2,
-          '.array[2]': 4,
-          '.array[2].name': 5,
-          '.obj': 6
+          '/array': 1,
+          '/array/0': 2,
+          '/array/2': 4,
+          '/array/2/name': 5,
+          '/obj': 6
         },
         {
-          '.array[1]': 3
+          '/array/1': 3
         }
       ])
     })
 
     it('should delete nested paths from a PathsMap', () => {
-      deepStrictEqual(deletePath(json, myStateMap, ['array']), [
+      deepStrictEqual(deletePath(myStateMap, ['array']), [
         {
-          '.obj': 6
+          '/obj': 6
         },
         {
-          '.array': 1,
-          '.array[0]': 2,
-          '.array[1]': 3,
-          '.array[2]': 4,
-          '.array[2].name': 5
+          '/array': 1,
+          '/array/0': 2,
+          '/array/1': 3,
+          '/array/2': 4,
+          '/array/2/name': 5
         }
       ])
     })
@@ -1203,33 +1191,33 @@ describe('documentState', () => {
 
   describe('filterPath', () => {
     const expandedPaths: PathsMap<number> = {
-      '.array': 1,
-      '.array[0]': 2,
-      '.array[1]': 3,
-      '.array[2]': 4,
-      '.array[2].name': 5,
-      '.obj': 6
+      '/array': 1,
+      '/array/0': 2,
+      '/array/1': 3,
+      '/array/2': 4,
+      '/array/2/name': 5,
+      '/obj': 6
     }
 
     it('should filter an object path from a PathsMap', () => {
-      deepStrictEqual(filterPath(expandedPaths, ['obj']), {
-        '.obj': 6
+      deepStrictEqual(filterPath(expandedPaths, '/obj'), {
+        '/obj': 6
       })
     })
 
     it('should filter an array item from a PathsMap', () => {
-      deepStrictEqual(filterPath(expandedPaths, ['array', 1]), {
-        '.array[1]': 3
+      deepStrictEqual(filterPath(expandedPaths, '/array/1'), {
+        '/array/1': 3
       })
     })
 
     it('should delete nested paths from a PathsMap', () => {
-      deepStrictEqual(filterPath(expandedPaths, ['array']), {
-        '.array': 1,
-        '.array[0]': 2,
-        '.array[1]': 3,
-        '.array[2]': 4,
-        '.array[2].name': 5
+      deepStrictEqual(filterPath(expandedPaths, '/array'), {
+        '/array': 1,
+        '/array/0': 2,
+        '/array/1': 3,
+        '/array/2': 4,
+        '/array/2/name': 5
       })
     })
   })

@@ -740,10 +740,10 @@
     }
 
     const path = selection.focusPath
-    const pathStr = stringifyPath(path)
-    const enforceString = !getEnforceString(json, documentState, pathStr)
+    const pointer = compileJSONPointer(path)
+    const enforceString = !getEnforceString(json, documentState, pointer)
 
-    const updatedDocumentState = setEnforceString(documentState, pathStr, enforceString)
+    const updatedDocumentState = setEnforceString(documentState, pointer, enforceString)
     documentStateStore.set(updatedDocumentState)
 
     const value = getIn(json, path)

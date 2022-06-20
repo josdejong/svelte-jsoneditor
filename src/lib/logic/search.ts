@@ -18,7 +18,6 @@ import type {
   Selection
 } from '../types'
 import { SearchField } from '../types.js'
-import { stringifyPath } from '../utils/pathUtils.js'
 import { isJSONArray, isJSONObject } from '../utils/jsonUtils.js'
 
 // TODO: comment
@@ -53,7 +52,7 @@ export function updateSearchResult(
 
   return {
     itemsList: items,
-    itemsMap: groupBy(items, (item) => stringifyPath(item.path)),
+    itemsMap: groupBy(items, (item) => compileJSONPointer(item.path)),
     activeItem,
     activeIndex
   }
@@ -77,7 +76,7 @@ export function searchNext(searchResult: SearchResult): SearchResult {
   return {
     ...searchResult,
     itemsList: items,
-    itemsMap: groupBy(items, (item) => stringifyPath(item.path)),
+    itemsMap: groupBy(items, (item) => compileJSONPointer(item.path)),
     activeItem: nextActiveItem,
     activeIndex: nextActiveIndex
   }
@@ -97,7 +96,7 @@ export function searchPrevious(searchResult: SearchResult): SearchResult {
   return {
     ...searchResult,
     itemsList: items,
-    itemsMap: groupBy(items, (item) => stringifyPath(item.path)),
+    itemsMap: groupBy(items, (item) => compileJSONPointer(item.path)),
     activeItem: previousActiveItem,
     activeIndex: previousActiveIndex
   }
@@ -136,7 +135,7 @@ export function search(
 
       path.pop()
     } else if (isJSONObject(value)) {
-      const keys = getKeys(value, documentState, stringifyPath(path))
+      const keys = getKeys(value, documentState, compileJSONPointer(path))
       const level = path.length
 
       path.push('')
@@ -247,7 +246,7 @@ export function createSearchAndReplaceOperations(
     const parentPath = initial(path)
     const parent = getIn(json, parentPath)
     const oldKey: string = last(path) as string
-    const keys = getKeys(parent as JSONObject, documentState, stringifyPath(parentPath))
+    const keys = getKeys(parent as JSONObject, documentState, compileJSONPointer(parentPath))
     const newKey = replaceText(oldKey, replacementText, start, end)
 
     const operations = rename(parentPath, keys, oldKey, newKey)
@@ -265,8 +264,8 @@ export function createSearchAndReplaceOperations(
     }
     const currentValueText = typeof currentValue === 'string' ? currentValue : String(currentValue)
 
-    const pathStr = stringifyPath(path)
-    const enforceString = getEnforceString(json, documentState, pathStr)
+    const pointer = compileJSONPointer(path)
+    const enforceString = getEnforceString(json, documentState, pointer)
 
     const value = replaceText(currentValueText, replacementText, start, end)
 
@@ -351,7 +350,7 @@ export function createSearchAndReplaceAllOperations(
       const parentPath = initial(path)
       const parent = getIn(json, parentPath)
       const oldKey = last(path) as string
-      const keys = getKeys(parent as JSONObject, documentState, stringifyPath(parentPath))
+      const keys = getKeys(parent as JSONObject, documentState, compileJSONPointer(parentPath))
       const newKey = replaceAllText(oldKey, replacementText, items)
 
       const operations = rename(parentPath, keys, oldKey, newKey)
@@ -367,8 +366,8 @@ export function createSearchAndReplaceAllOperations(
       const currentValueText =
         typeof currentValue === 'string' ? currentValue : String(currentValue)
 
-      const pathStr = stringifyPath(path)
-      const enforceString = getEnforceString(json, documentState, pathStr)
+      const pointer = compileJSONPointer(path)
+      const enforceString = getEnforceString(json, documentState, pointer)
 
       const value = replaceAllText(currentValueText, replacementText, items)
 

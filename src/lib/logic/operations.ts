@@ -37,7 +37,6 @@ import type {
   Path,
   Selection
 } from '../types'
-import { stringifyPath } from '../utils/pathUtils.js'
 
 /**
  * Create a JSONPatch for an insert operation.
@@ -70,7 +69,7 @@ export function insertBefore(
   } else if (isJSONObject(parent)) {
     // 'object'
     const afterKey = last(path)
-    const keys = getKeys(parent, documentState, stringifyPath(parentPath))
+    const keys = getKeys(parent, documentState, compileJSONPointer(parentPath))
     const nextKeys = getNextKeys(keys, afterKey, true)
 
     return [
@@ -202,7 +201,7 @@ export function replace(
     const lastPath: JSONPath = last(paths)
     const parentPath = initial(lastPath)
     const beforeKey = last(lastPath)
-    const keys: string[] = getKeys(parent, documentState, stringifyPath(parentPath))
+    const keys: string[] = getKeys(parent, documentState, compileJSONPointer(parentPath))
     const nextKeys = getNextKeys(keys, beforeKey, false)
     const removeKeys = new Set(paths.map((path) => last(path)))
     const filteredKeys = keys.filter((key) => !removeKeys.has(key))
@@ -272,7 +271,7 @@ export function duplicate(
     ]
   } else if (isJSONObject(parent)) {
     // 'object'
-    const keys = getKeys(parent, documentState, stringifyPath(parentPath))
+    const keys = getKeys(parent, documentState, compileJSONPointer(parentPath))
     const nextKeys = getNextKeys(keys, beforeKey, false)
 
     return [
@@ -371,7 +370,7 @@ export function insert(
     const clipboard = parseAndRepairOrUndefined(clipboardText)
     const parentPath = initial(selection.focusPath)
     const parent = getIn(json, parentPath)
-    const keys = getKeys(parent as JSONObject, documentState, stringifyPath(parentPath))
+    const keys = getKeys(parent as JSONObject, documentState, compileJSONPointer(parentPath))
     const oldKey = last(selection.focusPath)
     const newKey = typeof clipboard === 'string' ? clipboard : clipboardText
 
@@ -423,7 +422,7 @@ export function insert(
     } else if (isJSONObject(parent)) {
       // value is an Object
       const key = String(last(path))
-      const keys: string[] = getKeys(parent, documentState, stringifyPath(parentPath))
+      const keys: string[] = getKeys(parent, documentState, compileJSONPointer(parentPath))
       if (isEmpty(keys) || last(keys) === key) {
         return append(json, parentPath, newValues)
       } else {
@@ -448,7 +447,7 @@ export function insert(
       return insertBefore(json, state, documentState, firstItemPath, newValues)
     } else if (isJSONObject(value)) {
       // value is an Object
-      const keys: string[] = getKeys(value, documentState, stringifyPath(path))
+      const keys: string[] = getKeys(value, documentState, compileJSONPointer(path))
       if (isEmpty(keys)) {
         return append(json, path, newValues)
       } else {
@@ -493,7 +492,7 @@ export function moveInsideParent(
   const toKey = beforePath ? beforePath[parentPath.length] : undefined
 
   if (isJSONObject(parent)) {
-    const keys = getKeys(parent, documentState, stringifyPath(parentPath))
+    const keys = getKeys(parent, documentState, compileJSONPointer(parentPath))
     const startIndex = keys.indexOf(startKey as string)
     const endIndex = keys.indexOf(endKey as string)
     const toIndex = append ? keys.length : keys.indexOf(toKey)
@@ -663,7 +662,7 @@ export function createRemoveOperations(
     // FIXME: DOESN'T work yet
     const parentPath = initial(selection.focusPath)
     const parent = getIn(json, parentPath)
-    const keys = getKeys(parent as JSONObject, documentState, stringifyPath(parentPath))
+    const keys = getKeys(parent as JSONObject, documentState, compileJSONPointer(parentPath))
     const oldKey = last(selection.focusPath)
     const newKey = ''
 
@@ -712,7 +711,7 @@ export function createRemoveOperations(
       return { operations, newSelection }
     } else if (isJSONObject(parent)) {
       // parent is object
-      const keys = getKeys(parent, documentState, stringifyPath(parentPath))
+      const keys = getKeys(parent, documentState, compileJSONPointer(parentPath))
       const firstPath: JSONPath = first(selection.paths)
       const key: string = last(firstPath) as string
       const index = keys.indexOf(key)

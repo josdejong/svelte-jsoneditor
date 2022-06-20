@@ -3,7 +3,7 @@
 <script lang="ts">
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
-  import { parseJSONPointer } from 'immutable-json-patch'
+  import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
   import { initial, isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
@@ -33,7 +33,7 @@
   import { createDebug } from '$lib/utils/debug'
   import { onMoveSelection } from '$lib/logic/dragging'
   import { forEachIndex } from '$lib/utils/arrayUtils'
-  import { createMemoizePath, stringifyPath } from '$lib/utils/pathUtils'
+  import { createMemoizePath } from '$lib/utils/pathUtils'
   import type {
     DocumentState,
     JSONData,
@@ -62,7 +62,7 @@
 
   $: root = path.length === 0
   $: type = valueType(resolvedValue)
-  $: pathStr = stringifyPath(path)
+  $: pointer = compileJSONPointer(path)
 
   $: resolvedValue = dragging?.updatedValue !== undefined ? dragging.updatedValue : value
   $: resolvedSelection =
@@ -76,16 +76,16 @@
 
   let visibleSections: Readable<VisibleSection[]>
   $: visibleSections = derived(context.documentStateStore, (state) =>
-    getVisibleSections(state, pathStr)
+    getVisibleSections(state, pointer)
   )
   $: keys = derived(context.documentStateStore, (state) => {
-    return getKeys(value as JSONObject, state, pathStr)
+    return getKeys(value as JSONObject, state, pointer)
   })
 
   let validationError: ValidationError | undefined
   $: validationError = derived(
     context.documentStateStore,
-    (state) => state.validationErrorsMap[pathStr]
+    (state) => state.validationErrorsMap[pointer]
   )
 
   let selection: Selection | undefined
@@ -104,8 +104,8 @@
     }
 
     unsubscribe = documentStateStore.subscribe((state) => {
-      if (!isEqual(selection, state.selectionMap[pathStr])) {
-        selection = state.selectionMap[pathStr]
+      if (!isEqual(selection, state.selectionMap[pointer])) {
+        selection = state.selectionMap[pointer]
       }
     })
   }
@@ -119,7 +119,7 @@
   beforeUpdate(() => debug('beforeUpdate', path)) // FIXME: cleanup
 
   let expanded: Readable<boolean>
-  $: expanded = derived(context.documentStateStore, (state) => !!state.expandedMap[pathStr])
+  $: expanded = derived(context.documentStateStore, (state) => !!state.expandedMap[pointer])
 
   function getIndentationStyle(level) {
     return `margin-left: calc(${level} * var(--jse-indent-size))`
@@ -436,7 +436,7 @@
       forEachIndex(start, Math.min(value.length, end), addHeight)
     } else {
       // value is Object
-      getKeys(value as JSONObject, get(context.documentStateStore), pathStr).forEach(addHeight)
+      getKeys(value as JSONObject, get(context.documentStateStore), pointer).forEach(addHeight)
     }
 
     return items
@@ -746,7 +746,7 @@
         <JSONValue
           {path}
           {value}
-          enforceString={get(context.documentStateStore).enforceStringMap[pathStr]}
+          enforceString={get(context.documentStateStore).enforceStringMap[pointer]}
           selection={resolvedSelection}
           {context}
         />

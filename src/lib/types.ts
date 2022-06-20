@@ -1,9 +1,10 @@
 import type { SvelteComponent } from 'svelte'
 import type { Readable } from 'svelte/store'
 
+export type JSONValue = string | number | boolean | null
 export type JSONObject = { [key: string]: JSONData }
 export type JSONArray = JSONData[]
-export type JSONData = JSONObject | JSONArray | string | number | boolean | null
+export type JSONData = JSONObject | JSONArray | JSONValue
 
 export type TextContent = { text: string } | { json: undefined; text: string }
 
@@ -13,7 +14,7 @@ export type Content = JSONContent | TextContent
 
 export type Path = Array<string | number>
 
-export type PathStr = string // a Path stringified with stringifyPath(...)
+export type JSONPointer = string // a Path stringified with compileJSONPointer(...)
 
 export interface VisibleSection {
   start: number
@@ -145,7 +146,7 @@ export type Selection =
   | KeySelection
   | ValueSelection
 
-export type PathsMap<T> = { [pathStr: PathStr]: T }
+export type PathsMap<T> = { [pointer: JSONPointer]: T }
 
 export type RecursiveSelection = { [key: string]: RecursiveSelection } | Array<RecursiveSelection>
 

@@ -6,6 +6,7 @@ import {
   createExpandedDocumentState,
   createState,
   documentStatePatch,
+  getKeys,
   syncState
 } from './documentState.js'
 
@@ -164,7 +165,14 @@ describe('operations', () => {
         operations
       )
       assert.deepStrictEqual(updatedJson, { object: { a: 'a', c: 'c', d: 'd', b: 'b', e: 'e' } })
-      assert.deepStrictEqual(updatedDocumentState, ['a', 'c', 'd', 'b', 'e']) // FIXME
+      assert.deepStrictEqual(updatedDocumentState, documentState)
+      assert.deepStrictEqual(getKeys(updatedJson.object, updatedDocumentState, '/object'), [
+        'a',
+        'c',
+        'd',
+        'b',
+        'e'
+      ])
     })
 
     it('should move a selection down inside an object', () => {
@@ -189,7 +197,14 @@ describe('operations', () => {
         operations
       )
       assert.deepStrictEqual(updatedJson, { object: { a: 'a', d: 'd', b: 'b', c: 'c', e: 'e' } })
-      assert.deepStrictEqual(updatedDocumentState, ['a', 'd', 'b', 'c', 'e']) // FIXME
+      assert.deepStrictEqual(updatedDocumentState, documentState)
+      assert.deepStrictEqual(getKeys(updatedJson.object, updatedDocumentState, '/object'), [
+        'a',
+        'd',
+        'b',
+        'c',
+        'e'
+      ])
     })
 
     // TODO: test append, moving to bottom of an array

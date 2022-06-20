@@ -18,18 +18,18 @@ describe('validation', () => {
         path: [],
         message: message3
       },
-      '.pupils': {
+      '/pupils': {
         isChildError: true,
         path: ['pupils'],
         message: message3
       },
-      '.pupils[2]': {
+      '/pupils/2': {
         isChildError: true,
         path: ['pupils', 2],
         message: message3
       },
-      '.pupils[2].age': error1,
-      '.year': error2
+      '/pupils/2/age': error1,
+      '/year': error2
     })
   })
 })

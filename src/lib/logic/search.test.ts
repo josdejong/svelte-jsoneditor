@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { immutableJSONPatch } from 'immutable-json-patch'
+import { compileJSONPointer, immutableJSONPatch } from 'immutable-json-patch'
 import { createDocumentState, createExpandedDocumentState, syncState } from './documentState.js'
 import {
   createSearchAndReplaceAllOperations,
@@ -11,7 +11,6 @@ import {
 } from './search.js'
 import type { ExtendedSearchResultItem, Path, SearchResultItem } from '../types.js'
 import { SearchField } from '../types.js'
-import { stringifyPath } from '../utils/pathUtils.js'
 
 describe('search', () => {
   it('search in JSON', () => {
@@ -111,7 +110,7 @@ describe('search', () => {
     }
 
     const documentState = createExpandedDocumentState(json, () => true)
-    documentState.keysMap[stringifyPath(['data'])] = ['text2', 'text1'] // reverse the order of the keys
+    documentState.keysMap[compileJSONPointer(['data'])] = ['text2', 'text1'] // reverse the order of the keys
 
     const results = search('foo', json, documentState)
     assert.deepStrictEqual(results, [

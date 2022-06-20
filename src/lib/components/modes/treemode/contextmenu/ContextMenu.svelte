@@ -14,7 +14,7 @@
     faSortAmountDownAlt,
     faTimes
   } from '@fortawesome/free-solid-svg-icons'
-  import { getIn } from 'immutable-json-patch'
+  import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { initial, isEmpty } from 'lodash-es'
   import { onMount } from 'svelte'
   import Icon from 'svelte-awesome'
@@ -110,7 +110,7 @@
 
   $: enforceString =
     selection != null
-      ? documentState.enforceStringMap[stringifyPath(selection.focusPath)] === true
+      ? documentState.enforceStringMap[compileJSONPointer(selection.focusPath)] === true
       : false
 
   function handleEditKey() {

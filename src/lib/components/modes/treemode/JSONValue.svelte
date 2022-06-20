@@ -5,8 +5,8 @@
   import { isEmpty, isEqual } from 'lodash-es'
   import type { Path, SearchResultItem, Selection, TreeModeContext } from '../../../types'
   import { SearchField } from '../../../types'
-  import { stringifyPath } from '../../../utils/pathUtils'
   import { onDestroy } from 'svelte'
+  import { compileJSONPointer } from 'immutable-json-patch'
 
   export let path: Path
   export let value: JSON
@@ -16,11 +16,11 @@
   export let enforceString: boolean
   export let selection: Selection | undefined
 
-  $: pathStr = stringifyPath(path)
+  $: pointer = compileJSONPointer(path)
 
   let searchResultItems: SearchResultItem[] | undefined = undefined
   const unsubscribe = context.documentStateStore.subscribe((state) => {
-    const items: SearchResultItem[] = state.searchResult?.itemsMap[pathStr]?.filter(
+    const items: SearchResultItem[] = state.searchResult?.itemsMap[pointer]?.filter(
       (item: SearchResultItem) => item.field === SearchField.value
     )
     const nonEmptyItems = !isEmpty(items) ? items : undefined

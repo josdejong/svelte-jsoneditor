@@ -1,6 +1,6 @@
 import { initial } from 'lodash-es'
 import type { PathsMap, ValidationError } from '../types'
-import { stringifyPath } from '../utils/pathUtils.js'
+import { compileJSONPointer } from 'immutable-json-patch'
 
 /**
  * Create a flat map with validation errors, where the key is the stringified path
@@ -15,7 +15,7 @@ export function mapValidationErrors(
 
   // first generate a map with the errors themselves
   validationErrors.forEach((validationError) => {
-    map[stringifyPath(validationError.path)] = validationError
+    map[compileJSONPointer(validationError.path)] = validationError
   })
 
   // create error entries for all parent nodes (displayed when the node is collapsed)
@@ -24,10 +24,10 @@ export function mapValidationErrors(
 
     while (parentPath.length > 0) {
       parentPath = initial(parentPath)
-      const parentPathStr = stringifyPath(parentPath)
+      const parentPointer = compileJSONPointer(parentPath)
 
-      if (!(parentPathStr in map)) {
-        map[parentPathStr] = {
+      if (!(parentPointer in map)) {
+        map[parentPointer] = {
           isChildError: true,
           path: parentPath,
           message: 'Contains invalid data'

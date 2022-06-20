@@ -26,7 +26,6 @@ import type {
   SelectionSchema,
   ValueSelection
 } from '../types'
-import { stringifyPath } from '../utils/pathUtils.js'
 import { isJSONArray, isJSONObject } from '../utils/jsonUtils.js'
 import { isJSONPatchCopy, isJSONPatchMove } from '../typeguards.js'
 
@@ -92,7 +91,7 @@ export function expandSelection(
     const value = getIn(json, sharedPath)
 
     if (isJSONObject(value)) {
-      const keys = getKeys(value, documentState, stringifyPath(sharedPath))
+      const keys = getKeys(value, documentState, compileJSONPointer(sharedPath))
       const anchorIndex = keys.indexOf(anchorKey as string)
       const focusIndex = keys.indexOf(focusKey as string)
 
@@ -820,7 +819,7 @@ export function createSelectionMap(selection: Selection): PathsMap<Selection> {
   const paths = isMultiSelection(selection) ? selection.paths : [selection.focusPath]
 
   paths.forEach((path) => {
-    map[stringifyPath(path)] = selection
+    map[compileJSONPointer(path)] = selection
   })
 
   return map
