@@ -1,29 +1,29 @@
 import { createMultiSelection } from './selection.js'
-import { createExpandedDocumentState, syncState } from './documentState.js'
 import { onMoveSelection } from './dragging.js'
 import { deepStrictEqual, strictEqual } from 'assert'
 import { isEqual } from 'lodash-es'
+import { createDocumentState } from './documentState.js'
 
 describe('dragging', () => {
   describe('onMoveSelection: array', () => {
     const itemHeight = 18
-    const fullJson = {
+    const json = {
       array: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     }
-    const fullState = syncState(fullJson, undefined, [], () => true)
-    const documentState = createExpandedDocumentState(fullJson, () => true)
-    const allItems = fullJson.array.map((item, index) => ({
+    let documentState = createDocumentState({ json, expand: () => true })
+    documentState = {
+      ...documentState,
+      selection: createMultiSelection(json, documentState, ['array', 3], ['array', 5])
+    }
+
+    const allItems = json.array.map((item, index) => ({
       path: ['array', index],
       height: itemHeight
     }))
 
-    const fullSelection = createMultiSelection(fullJson, documentState, ['array', 3], ['array', 5])
-
     function doMoveSelection({ deltaY, items = allItems }) {
       return onMoveSelection({
-        fullJson,
-        fullState,
-        fullSelection,
+        fullJson: json,
         documentState,
         deltaY,
         items
@@ -123,29 +123,23 @@ describe('dragging', () => {
 
   describe('onMoveSelection: object', () => {
     const itemHeight = 18
-    const fullJson = {
+    const json = {
       object: { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6 }
     }
-    const fullState = syncState(fullJson, undefined, [], () => true)
-    const documentState = createExpandedDocumentState(fullJson, () => true)
-    const allItems = Object.keys(fullJson.object).map((key) => ({
+    const documentState = createDocumentState({
+      json,
+      expand: () => true,
+      select: (json, state) => createMultiSelection(json, state, ['object', 'c'], ['object', 'e'])
+    })
+    const allItems = Object.keys(json.object).map((key) => ({
       path: ['object', key],
       height: itemHeight
     }))
 
-    const fullSelection = createMultiSelection(
-      fullJson,
-      documentState,
-      ['object', 'c'],
-      ['object', 'e']
-    )
-
     function doMoveSelection({ deltaY, items = allItems }) {
       return onMoveSelection({
-        fullJson,
-        fullState,
+        fullJson: json,
         documentState,
-        fullSelection,
         deltaY,
         items
       })

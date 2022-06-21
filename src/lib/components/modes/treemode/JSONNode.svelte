@@ -40,12 +40,13 @@
     JSONObject,
     Path,
     TreeModeContext,
-    VisibleSection
+    VisibleSection,
+    Selection
   } from '$lib/types'
   import { beforeUpdate, onDestroy } from 'svelte'
   import type { Readable } from 'svelte/store'
   import { derived, get } from 'svelte/store'
-  import { getStartPath } from '../../../logic/selection'
+  import { getStartPath, isMultiSelection } from '../../../logic/selection'
 
   export let value: JSONData
   export let path: Path
@@ -65,10 +66,11 @@
   $: pointer = compileJSONPointer(path)
 
   $: resolvedValue = dragging?.updatedValue !== undefined ? dragging.updatedValue : value
+  let resolvedSelection: Selection | undefined
   $: resolvedSelection =
     dragging?.updatedSelection != undefined ? dragging.updatedSelection : selection
 
-  $: selected = !!(resolvedSelection && resolvedSelection.pathsMap)
+  $: selected = !!(isMultiSelection(resolvedSelection) && resolvedSelection.pathsMap)
   $: selectedAfter = !!(resolvedSelection && resolvedSelection.type === SELECTION_TYPE.AFTER)
   $: selectedInside = !!(resolvedSelection && resolvedSelection.type === SELECTION_TYPE.INSIDE)
   $: selectedKey = !!(resolvedSelection && resolvedSelection.type === SELECTION_TYPE.KEY)
@@ -176,7 +178,8 @@
 
     // when right-clicking inside the current selection, do nothing: context menu will open
     // when left-clicking inside the current selection, do nothing: it can be the start of dragging
-    if (isPathInsideSelection(context.getFullSelection(), path, anchorType)) {
+    const selection = get(context.documentStateStore).selection
+    if (isPathInsideSelection(selection, path, anchorType)) {
       if (event.button === 0) {
         context.focus()
         onDragSelectionStart(event)
@@ -193,11 +196,11 @@
 
     if (event.shiftKey) {
       // Shift+Click will select multiple entries
-      const fullSelection = context.getFullSelection()
-      if (fullSelection) {
+      const selection = get(context.documentStateStore).selection
+      if (selection) {
         context.onSelect({
           type: SELECTION_TYPE.MULTI,
-          anchorPath: fullSelection.anchorPath,
+          anchorPath: selection.anchorPath,
           focusPath: path
         })
       }
@@ -295,8 +298,8 @@
       return
     }
 
-    const fullSelection = context.getFullSelection()
-    const selectionParentPath = initial(fullSelection.focusPath)
+    const selection = get(context.documentStateStore).selection
+    const selectionParentPath = initial(selection.focusPath)
     if (!isEqual(path, selectionParentPath)) {
       // pass to parent
       onDragSelectionStart(event)
@@ -307,9 +310,9 @@
     // note that the returned items will be of one section only,
     // and when the selection is spread over multiple sections,
     // no items will be returned: this is not (yet) supported
-    const items = getVisibleItemsWithHeights(fullSelection)
+    const items = getVisibleItemsWithHeights(selection)
 
-    debug('dragSelectionStart', { fullSelection, items })
+    debug('dragSelectionStart', { selection, items })
 
     if (!items) {
       debug('Cannot drag the current selection (probably spread over multiple sections)')
@@ -338,9 +341,7 @@
       const deltaY = calculateDeltaY(dragging, event)
       const { updatedValue, updatedState, updatedSelection, indexOffset } = onMoveSelection({
         fullJson: context.getFullJson(),
-        fullState: context.getFullState(),
         documentState: get(context.documentStateStore),
-        fullSelection: context.getFullSelection(),
         deltaY,
         items: dragging.items
       })
@@ -364,8 +365,6 @@
       const deltaY = calculateDeltaY(dragging, event)
       const { operations, updatedFullSelection } = onMoveSelection({
         fullJson: context.getFullJson(),
-        fullState: context.getFullState(),
-        fullSelection: context.getFullSelection(),
         documentState: get(context.documentStateStore),
         deltaY,
         items: dragging.items
@@ -373,7 +372,7 @@
 
       if (operations) {
         context.onPatch(operations, () => ({
-          selection: updatedFullSelection || context.getFullSelection()
+          selection: updatedFullSelection || get(context.documentStateStore).selection
         }))
       } else {
         // the user did click inside the selection and no contents have been dragged,

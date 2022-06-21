@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { compileJSONPointer, immutableJSONPatch } from 'immutable-json-patch'
-import { createDocumentState, createExpandedDocumentState, syncState } from './documentState.js'
+import { createDocumentState } from './documentState.js'
 import {
   createSearchAndReplaceAllOperations,
   createSearchAndReplaceOperations,
@@ -109,7 +109,7 @@ describe('search', () => {
       }
     }
 
-    const documentState = createExpandedDocumentState(json, () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
     documentState.keysMap[compileJSONPointer(['data'])] = ['text2', 'text1'] // reverse the order of the keys
 
     const results = search('foo', json, documentState)
@@ -241,14 +241,12 @@ describe('search', () => {
       'hello world': 'hello world, hello WORLD, world',
       after: 'text'
     }
-    const state = syncState(json, undefined, [], () => true)
-    const documentState = createExpandedDocumentState(json, () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
     const results = search('world', json, documentState)
 
     const { operations, newSelection } = createSearchAndReplaceOperations(
       json,
-      state,
       documentState,
       '*',
       results[2]
@@ -283,14 +281,12 @@ describe('search', () => {
       'hello world': 'hello world, hello WORLD, world',
       after: 'text'
     }
-    const state = syncState(json, undefined, [], () => true)
-    const documentState = createExpandedDocumentState(json, () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
     const results = search('world', json, documentState)
 
     const { operations, newSelection } = createSearchAndReplaceOperations(
       json,
-      state,
       documentState,
       '*',
       results[0]
@@ -320,18 +316,11 @@ describe('search', () => {
     const json = {
       value: 2
     }
-    const state = syncState(json, undefined, [], () => true)
-    const documentState = createExpandedDocumentState(json, () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
     const results = search('2', json, documentState)
 
-    const { operations } = createSearchAndReplaceOperations(
-      json,
-      state,
-      documentState,
-      '4',
-      results[0]
-    )
+    const { operations } = createSearchAndReplaceOperations(json, documentState, '4', results[0])
 
     assert.deepStrictEqual(operations, [
       {
@@ -351,18 +340,11 @@ describe('search', () => {
     const json = {
       value: 2
     }
-    const state = syncState(json, undefined, [], () => true)
-    const documentState = createExpandedDocumentState(json, () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
     const results = search('2', json, documentState)
 
-    const { operations } = createSearchAndReplaceOperations(
-      json,
-      state,
-      documentState,
-      'true',
-      results[0]
-    )
+    const { operations } = createSearchAndReplaceOperations(json, documentState, 'true', results[0])
 
     assert.deepStrictEqual(operations, [
       {
@@ -382,18 +364,11 @@ describe('search', () => {
     const json = {
       value: 2
     }
-    const state = syncState(json, undefined, [], () => true)
-    const documentState = createExpandedDocumentState(json, () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
     const results = search('2', json, documentState)
 
-    const { operations } = createSearchAndReplaceOperations(
-      json,
-      state,
-      documentState,
-      'null',
-      results[0]
-    )
+    const { operations } = createSearchAndReplaceOperations(json, documentState, 'null', results[0])
 
     assert.deepStrictEqual(operations, [
       {
@@ -413,18 +388,11 @@ describe('search', () => {
     const json = {
       value: 2
     }
-    const state = syncState(json, undefined, [], () => true)
-    const documentState = createExpandedDocumentState(json, () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
     const results = search('2', json, documentState)
 
-    const { operations } = createSearchAndReplaceOperations(
-      json,
-      state,
-      documentState,
-      '*',
-      results[0]
-    )
+    const { operations } = createSearchAndReplaceOperations(json, documentState, '*', results[0])
 
     assert.deepStrictEqual(operations, [{ op: 'replace', path: '/value', value: '*' }])
 
@@ -442,14 +410,12 @@ describe('search', () => {
       },
       after: 'text'
     }
-    const state = syncState(json, undefined, [], () => true)
-    const documentState = createExpandedDocumentState(json, () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
     const searchText = 'world'
     const replacementText = '*'
     const { operations, newSelection } = createSearchAndReplaceAllOperations(
       json,
-      state,
       documentState,
       searchText,
       replacementText
@@ -491,14 +457,12 @@ describe('search', () => {
     const json = {
       value: 2
     }
-    const state = syncState(json, undefined, [], () => true)
-    const documentState = createExpandedDocumentState(json, () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
     const searchText = '2'
     const replacementText = '*'
     const { operations } = createSearchAndReplaceAllOperations(
       json,
-      state,
       documentState,
       searchText,
       replacementText
@@ -522,14 +486,12 @@ describe('search', () => {
     const json = {
       value: 2
     }
-    const state = syncState(json, undefined, [], () => true)
-    const documentState = createExpandedDocumentState(json, () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
     const searchText = '2'
     const replacementText = '4'
     const { operations } = createSearchAndReplaceAllOperations(
       json,
-      state,
       documentState,
       searchText,
       replacementText

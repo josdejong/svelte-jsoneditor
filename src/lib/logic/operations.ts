@@ -23,8 +23,7 @@ import {
   isKeySelection,
   isMultiSelection,
   isValueSelection,
-  pathStartsWith,
-  SELECTION_TYPE
+  pathStartsWith
 } from './selection.js'
 import type {
   ClipboardValues,
@@ -48,7 +47,6 @@ import type {
 // TODO: write tests
 export function insertBefore(
   json: JSONData,
-  state: JSONData,
   documentState: DocumentState,
   path: Path,
   values: ClipboardValues
@@ -165,7 +163,6 @@ export function rename(parentPath, keys, oldKey, newKey) {
  */
 export function replace(
   json: JSONData,
-  state: JSONData,
   documentState: DocumentState,
   paths: Path[],
   values: ClipboardValues
@@ -238,7 +235,6 @@ export function replace(
  */
 export function duplicate(
   json: JSONData,
-  state: JSONData,
   documentState: DocumentState,
   paths: Path[]
 ): JSONPatchDocument {
@@ -300,12 +296,7 @@ export function duplicate(
  * Create a JSONPatch for an extract action.
  */
 // TODO: write unit tests
-export function extract(
-  json: JSONData,
-  state: JSONData,
-  documentState: DocumentState,
-  selection: Selection
-): JSONPatchDocument {
+export function extract(json: JSONData, selection: Selection): JSONPatchDocument {
   if (isValueSelection(selection)) {
     return [
       {
@@ -360,12 +351,12 @@ export function extract(
 // TODO: write unit tests
 export function insert(
   json: JSONData,
-  state: JSONData,
   documentState: DocumentState,
-  selection: Selection,
   clipboardText: string
 ): JSONPatchDocument {
-  if (selection.type === SELECTION_TYPE.KEY) {
+  const selection = documentState.selection
+
+  if (isKeySelection(selection)) {
     // rename key
     const clipboard = parseAndRepairOrUndefined(clipboardText)
     const parentPath = initial(selection.focusPath)
@@ -405,7 +396,7 @@ export function insert(
   if (isMultiSelection(selection)) {
     const newValues = clipboardToValues(clipboardText)
 
-    return replace(json, state, documentState, selection.paths, newValues)
+    return replace(json, documentState, selection.paths, newValues)
   }
 
   if (isAfterSelection(selection)) {
@@ -418,7 +409,7 @@ export function insert(
       const index = last(path)
       const nextItemPath = parentPath.concat([(index as number) + 1])
 
-      return insertBefore(json, state, documentState, nextItemPath, newValues)
+      return insertBefore(json, documentState, nextItemPath, newValues)
     } else if (isJSONObject(parent)) {
       // value is an Object
       const key = String(last(path))
@@ -430,7 +421,7 @@ export function insert(
         const nextKey = keys[index + 1]
         const nextKeyPath = parentPath.concat([nextKey])
 
-        return insertBefore(json, state, documentState, nextKeyPath, newValues)
+        return insertBefore(json, documentState, nextKeyPath, newValues)
       }
     } else {
       throw new Error('Cannot create insert operations: parent must be an Object or Array')
@@ -444,7 +435,7 @@ export function insert(
 
     if (isJSONArray(value)) {
       const firstItemPath = path.concat([0])
-      return insertBefore(json, state, documentState, firstItemPath, newValues)
+      return insertBefore(json, documentState, firstItemPath, newValues)
     } else if (isJSONObject(value)) {
       // value is an Object
       const keys: string[] = getKeys(value, documentState, compileJSONPointer(path))
@@ -454,7 +445,7 @@ export function insert(
         const firstKey = first(keys)
         const firstKeyPath = path.concat([firstKey])
 
-        return insertBefore(json, state, documentState, firstKeyPath, newValues)
+        return insertBefore(json, documentState, firstKeyPath, newValues)
       }
     } else {
       throw new Error('Cannot create insert operations: parent must be an Object or Array')
@@ -467,15 +458,13 @@ export function insert(
 
 export function moveInsideParent(
   json: JSONData,
-  state: JSONData,
   documentState: DocumentState,
-  selection: Selection,
   dragInsideAction: DragInsideAction
 ): JSONPatchDocument {
   const beforePath = dragInsideAction['beforePath']
   const append = dragInsideAction['append']
 
-  const parentPath: Path = initial(selection.focusPath)
+  const parentPath: Path = initial(documentState.selection.focusPath)
   const parent = getIn(json, parentPath as JSONPath)
 
   if (
@@ -485,8 +474,8 @@ export function moveInsideParent(
     return []
   }
 
-  const startPath = getStartPath(selection)
-  const endPath = getEndPath(selection)
+  const startPath = getStartPath(documentState.selection)
+  const endPath = getEndPath(documentState.selection)
   const startKey: string | number = last(startPath)
   const endKey: string | number = last(endPath)
   const toKey = beforePath ? beforePath[parentPath.length] : undefined

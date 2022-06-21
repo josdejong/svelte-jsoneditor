@@ -25,7 +25,6 @@
   import { faCheckSquare, faLightbulb, faSquare } from '@fortawesome/free-regular-svg-icons'
   import { findNearestElement } from '$lib/utils/domUtils'
   import type { DocumentState, JSONData } from '../../../../types'
-  import { stringifyPath } from '../../../../utils/pathUtils'
 
   export let json: JSONData
   export let documentState: DocumentState

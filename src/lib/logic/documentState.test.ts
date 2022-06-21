@@ -4,7 +4,6 @@ import { ARRAY_SECTION_SIZE } from '../constants.js'
 import {
   collapsePath,
   createDocumentState,
-  createExpandedDocumentState,
   deletePath,
   documentStatePatch,
   expandPath,
@@ -44,22 +43,20 @@ describe('documentState', () => {
       object: { a: 4, b: 5 },
       value: 'hello'
     }
+    const state = createDocumentState()
 
     it('should fully expand a json document', () => {
-      assert.deepStrictEqual(
-        expandWithCallback(json, createDocumentState(), [], () => true).expandedMap,
-        {
-          '': true,
-          '/array': true,
-          '/array/2': true,
-          '/object': true
-        }
-      )
+      assert.deepStrictEqual(expandWithCallback(json, state, [], () => true).expandedMap, {
+        '': true,
+        '/array': true,
+        '/array/2': true,
+        '/object': true
+      })
     })
 
     it('should partially expand a json document', () => {
       assert.deepStrictEqual(
-        expandWithCallback(json, createDocumentState(), [], (path) => path.length <= 1).expandedMap,
+        expandWithCallback(json, state, [], (path) => path.length <= 1).expandedMap,
         {
           '': true,
           '/array': true,
@@ -70,8 +67,7 @@ describe('documentState', () => {
 
     it('should expand the root of a json document', () => {
       assert.deepStrictEqual(
-        expandWithCallback(json, createDocumentState(), [], (path) => path.length === 0)
-          .expandedMap,
+        expandWithCallback(json, state, [], (path) => path.length === 0).expandedMap,
         {
           '': true
         }
@@ -80,7 +76,7 @@ describe('documentState', () => {
 
     it('should not traverse non-expanded nodes', () => {
       assert.deepStrictEqual(
-        expandWithCallback(json, createDocumentState(), [], (path) => path.length > 0).expandedMap,
+        expandWithCallback(json, state, [], (path) => path.length > 0).expandedMap,
         {}
       )
     })
@@ -90,13 +86,13 @@ describe('documentState', () => {
         '': true,
         '/array': true
       }
-      const documentState = {
-        ...createDocumentState(),
+      const stateWithExpanded = {
+        ...state,
         expandedMap
       }
 
       assert.deepStrictEqual(
-        expandWithCallback(json, documentState, [], () => false).expandedMap,
+        expandWithCallback(json, stateWithExpanded, [], () => false).expandedMap,
         expandedMap
       )
     })
@@ -112,7 +108,7 @@ describe('documentState', () => {
     const documentState = createDocumentState()
     assert.deepStrictEqual(getVisiblePaths(json, documentState), [[]])
 
-    const documentState0 = createExpandedDocumentState(json, (path) => path.length <= 0)
+    const documentState0 = createDocumentState({ json, expand: (path) => path.length <= 0 })
     assert.deepStrictEqual(getVisiblePaths(json, documentState0), [
       [],
       ['array'],
@@ -120,7 +116,7 @@ describe('documentState', () => {
       ['value']
     ])
 
-    const documentState1 = createExpandedDocumentState(json, (path) => path.length <= 1)
+    const documentState1 = createDocumentState({ json, expand: (path) => path.length <= 1 })
     assert.deepStrictEqual(getVisiblePaths(json, documentState1), [
       [],
       ['array'],
@@ -133,7 +129,7 @@ describe('documentState', () => {
       ['value']
     ])
 
-    const documentState2 = createExpandedDocumentState(json, (path) => path.length <= 2)
+    const documentState2 = createDocumentState({ json, expand: (path) => path.length <= 2 })
     assert.deepStrictEqual(getVisiblePaths(json, documentState2), [
       [],
       ['array'],
@@ -155,7 +151,7 @@ describe('documentState', () => {
     }
 
     // by default, should have a visible section from 0-100 only (so 100-500 is invisible)
-    const documentState1 = createExpandedDocumentState(json, (path) => path.length <= 1)
+    const documentState1 = createDocumentState({ json, expand: (path) => path.length <= 1 })
     assert.deepStrictEqual(getVisiblePaths(json, documentState1), [
       [],
       ['array'],
@@ -184,12 +180,12 @@ describe('documentState', () => {
       value: 'hello'
     }
 
-    const documentState = createExpandedDocumentState(json, () => false)
+    const documentState = createDocumentState({ json, expand: () => false })
     assert.deepStrictEqual(getVisibleCaretPositions(json, documentState), [
       { path: [], type: CaretType.value }
     ])
 
-    const documentState0 = createExpandedDocumentState(json, (path) => path.length <= 0)
+    const documentState0 = createDocumentState({ json, expand: (path) => path.length <= 0 })
     assert.deepStrictEqual(getVisibleCaretPositions(json, documentState0), [
       { path: [], type: CaretType.value },
       { path: [], type: CaretType.inside },
@@ -213,7 +209,7 @@ describe('documentState', () => {
       { path: ['value'], type: CaretType.value }
     ])
 
-    const documentState1 = createExpandedDocumentState(json, (path) => path.length <= 1)
+    const documentState1 = createDocumentState({ json, expand: (path) => path.length <= 1 })
     assert.deepStrictEqual(getVisibleCaretPositions(json, documentState1), [
       { path: [], type: CaretType.value },
       { path: [], type: CaretType.inside },
@@ -242,7 +238,7 @@ describe('documentState', () => {
       { path: ['value'], type: CaretType.after }
     ])
 
-    const documentState2 = createExpandedDocumentState(json, (path) => path.length <= 2)
+    const documentState2 = createDocumentState({ json, expand: (path) => path.length <= 2 })
     assert.deepStrictEqual(getVisibleCaretPositions(json, documentState2), [
       { path: [], type: CaretType.value },
       { path: [], type: CaretType.inside },
@@ -283,7 +279,7 @@ describe('documentState', () => {
     }
 
     // by default, should have a visible section from 0-100 only (so 100-500 is invisible)
-    const documentState1 = createExpandedDocumentState(json, (path) => path.length <= 1)
+    const documentState1 = createDocumentState({ json, expand: (path) => path.length <= 1 })
     assert.deepStrictEqual(
       getVisibleCaretPositions(json, documentState1),
       flatMap([
@@ -381,7 +377,7 @@ describe('documentState', () => {
       }
 
       const documentState: DocumentState = {
-        ...createExpandedDocumentState(json, () => true),
+        ...createDocumentState({ json, expand: () => true }),
         keysMap: {
           '': ['members', 'group'],
           '/members/0': ['id', 'name'],
@@ -679,7 +675,7 @@ describe('documentState', () => {
         }
       }
       const documentState = {
-        ...createExpandedDocumentState(json, () => true),
+        ...createDocumentState({ json, expand: () => true }),
         keysMap: {
           '': ['c', 'b', 'a']
         }

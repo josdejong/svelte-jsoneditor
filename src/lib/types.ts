@@ -317,7 +317,7 @@ export type OnPasteJson = (pastedJson: { path: Path; contents: JSONData }) => vo
 export type OnRenderValue = (props: RenderValueProps) => RenderValueComponentDescription[]
 export type OnClassName = (path: Path, value: JSONData) => string | undefined | void
 export type OnChangeMode = (mode: 'tree' | 'code') => void
-export type OnContextMenu = (contextMenuProps: ContextMenuProps) => void
+export type OnContextMenu = (contextMenuProps: AbsolutePopupOptions) => void
 export type OnRenderMenu = (
   mode: 'tree' | 'code' | 'repair',
   items: MenuItem[]
@@ -355,6 +355,8 @@ export interface ValueNormalization {
   unescapeValue: (escapedValue: string) => string
 }
 
+export type PastedJson = { contents: JSONData; path: Path } | undefined
+
 export type EscapeValue = (value: JSONData) => string
 
 export type UnescapeValue = (escapedValue: string) => string
@@ -374,17 +376,37 @@ export interface RenderedItem {
   height: number
 }
 
+// FIXME: split HistoryItem into multiple union types
+export interface HistoryItem {
+  undo: {
+    patch: JSONPatchDocument | undefined
+    json: JSONData | undefined
+    text: string | undefined
+    state: DocumentState
+    textIsRepaired: boolean
+  }
+  redo: {
+    patch: JSONPatchDocument | undefined
+    json: JSONData | undefined
+    text: string | undefined
+    state: DocumentState
+    textIsRepaired: boolean
+  }
+}
+
 export type InsertType = 'value' | 'object' | 'array' | 'structure'
 
-export interface ContextMenuProps {
-  anchor: Element
-  left: number
-  top: number
-  width: number
-  height: number
-  offsetTop: number
-  offsetLeft: number
-  showTip: boolean
+export interface AbsolutePopupOptions {
+  anchor?: Element
+  left?: number
+  top?: number
+  width?: number
+  height?: number
+  offsetTop?: number
+  offsetLeft?: number
+  showTip?: boolean
+  closeOnOuterClick?: boolean
+  onClose?: () => void
 }
 
 export interface JSONEditorPropsOptional {
@@ -417,22 +439,20 @@ export interface JSONEditorPropsOptional {
 export interface TreeModeContext {
   documentStateStore: Readable<DocumentState>
   readOnly: boolean
-  showTip: boolean
   normalization: ValueNormalization
   getFullJson: () => JSONData
-  getFullState: () => JSONData
-  getFullSelection: () => Selection
   findElement: (path: Path) => Element | null
   focus: () => void
-  onPatch: (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
+  onPatch: (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => JSONPatchResult
   onInsert: (type: InsertType) => void
   onExpand: (path: Path, expanded: boolean, recursive?: boolean) => void
   onSelect: OnSelect
   onFind: OnFind
   onExpandSection: (path: Path, section: Section) => void
-  onRenderValue: (props: RenderValueProps) => RenderValueComponentDescription[]
+  onPasteJson: (newPastedJson: PastedJson) => void
+  onRenderValue: OnRenderValue
   onContextMenu: OnContextMenu
-  onClassName: (path: Path, value: JSONData) => string
+  onClassName: OnClassName
   onDrag: (event: Event) => void
   onDragEnd: (event: Event) => void
 }

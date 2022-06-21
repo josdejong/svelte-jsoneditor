@@ -18,8 +18,6 @@ import type {
 
 interface MoveSelectionProps {
   fullJson: JSONData
-  fullState: JSONData
-  fullSelection: Selection
   documentState: DocumentState
   deltaY: number
   items: RenderedItem[]
@@ -35,12 +33,11 @@ interface MoveSelectionResult {
 
 export function onMoveSelection({
   fullJson,
-  fullState,
   documentState,
-  fullSelection,
   deltaY,
   items
 }: MoveSelectionProps): MoveSelectionResult {
+  const fullSelection = documentState.selection
   const dragInsideAction =
     deltaY < 0
       ? findSwapPathUp({ fullSelection, deltaY, items })
@@ -56,13 +53,7 @@ export function onMoveSelection({
     }
   }
 
-  const operations = moveInsideParent(
-    fullJson,
-    fullState,
-    documentState,
-    fullSelection,
-    dragInsideAction
-  )
+  const operations = moveInsideParent(fullJson, documentState, dragInsideAction)
 
   // TODO: documentStatePatch is relatively slow for large documents
   //  This is for example noticeable in a large array where we drag a few

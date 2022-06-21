@@ -11,35 +11,39 @@ export interface HistoryOptions {
   onChange?: (props: { canUndo: boolean; canRedo: boolean; length: number }) => void
 }
 
-export function createHistory(options: HistoryOptions = {}) {
+export interface HistoryState {
+  canUndo: boolean
+  canRedo: boolean
+  length: number
+}
+
+export interface History<T> {
+  add: (item: T) => void
+  clear: () => void
+  getState: () => HistoryState
+  undo: () => T | undefined
+  redo: () => T | undefined
+}
+
+export function createHistory<T>(options: HistoryOptions = {}): History<T> {
   const maxItems = options.maxItems || MAX_HISTORY_ITEMS
 
   /**
    * items in history are sorted from newest first to oldest last
-   * @type {HistoryItem[]}
    */
-  let items = []
+  let items: T[] = []
 
-  /**
-   * @type {number}
-   */
   let index = 0
 
-  /**
-   * @return {boolean}
-   */
-  function canUndo() {
+  function canUndo(): boolean {
     return index < items.length
   }
 
-  /**
-   * @return {boolean}
-   */
-  function canRedo() {
+  function canRedo(): boolean {
     return index > 0
   }
 
-  function getState() {
+  function getState(): HistoryState {
     return {
       canUndo: canUndo(),
       canRedo: canRedo(),
@@ -53,10 +57,7 @@ export function createHistory(options: HistoryOptions = {}) {
     }
   }
 
-  /**
-   * @param {HistoryItem} item
-   */
-  function add(item) {
+  function add(item: T) {
     items = [item].concat(items.slice(index)).slice(0, maxItems)
 
     index = 0
@@ -71,10 +72,7 @@ export function createHistory(options: HistoryOptions = {}) {
     handleChange()
   }
 
-  /**
-   * @return {HistoryItem | undefined}
-   */
-  function undo() {
+  function undo(): T | undefined {
     if (canUndo()) {
       const item = items[index]
       index += 1
@@ -87,10 +85,7 @@ export function createHistory(options: HistoryOptions = {}) {
     return undefined
   }
 
-  /**
-   * @return {HistoryItem | undefined}
-   */
-  function redo() {
+  function redo(): T | undefined {
     if (canRedo()) {
       index -= 1
 

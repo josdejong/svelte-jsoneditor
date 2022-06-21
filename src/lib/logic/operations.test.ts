@@ -1,14 +1,7 @@
 import assert from 'assert'
 import { clipboardToValues, createNewValue, moveInsideParent } from './operations.js'
 import { createMultiSelection, SELECTION_TYPE } from './selection.js'
-import {
-  createDocumentState,
-  createExpandedDocumentState,
-  createState,
-  documentStatePatch,
-  getKeys,
-  syncState
-} from './documentState.js'
+import { createDocumentState, documentStatePatch, getKeys } from './documentState.js'
 
 describe('operations', () => {
   describe('createNewValue', () => {
@@ -108,11 +101,12 @@ describe('operations', () => {
   describe('moveInsideParent', () => {
     it('should move a selection up inside an array', () => {
       const json = { array: [0, 1, 2, 3, 4, 5] }
-      const state = createState(json)
-      const documentState = createDocumentState()
-      const selection = createMultiSelection(json, documentState, ['array', 3], ['array', 4])
+      const documentState = createDocumentState({
+        json,
+        select: (json, state) => createMultiSelection(json, state, ['array', 3], ['array', 4])
+      })
       const path = ['array', 1]
-      const operations = moveInsideParent(json, state, documentState, selection, {
+      const operations = moveInsideParent(json, documentState, {
         beforePath: path,
         indexOffset: 0
       })
@@ -127,11 +121,12 @@ describe('operations', () => {
 
     it('should move a selection down inside an array', () => {
       const json = { array: [0, 1, 2, 3, 4, 5] }
-      const state = createState(json)
-      const documentState = createDocumentState()
-      const selection = createMultiSelection(json, documentState, ['array', 1], ['array', 2])
+      const documentState = createDocumentState({
+        json,
+        select: (json, state) => createMultiSelection(json, state, ['array', 1], ['array', 2])
+      })
       const path = ['array', 4]
-      const operations = moveInsideParent(json, state, documentState, selection, {
+      const operations = moveInsideParent(json, documentState, {
         beforePath: path,
         indexOffset: 0
       })
@@ -146,11 +141,14 @@ describe('operations', () => {
 
     it('should move a selection up inside an object', () => {
       const json = { object: { a: 'a', b: 'b', c: 'c', d: 'd', e: 'e' } }
-      const state = syncState(json, undefined, [], () => true)
-      const documentState = createExpandedDocumentState(json, () => true)
-      const selection = createMultiSelection(json, documentState, ['object', 'c'], ['object', 'd'])
+      const documentState = createDocumentState({
+        json,
+        select: (json, state) =>
+          createMultiSelection(json, state, ['object', 'c'], ['object', 'd']),
+        expand: () => true
+      })
       const path = ['object', 'b']
-      const operations = moveInsideParent(json, state, documentState, selection, {
+      const operations = moveInsideParent(json, documentState, {
         beforePath: path,
         indexOffset: 0
       })
@@ -177,11 +175,14 @@ describe('operations', () => {
 
     it('should move a selection down inside an object', () => {
       const json = { object: { a: 'a', b: 'b', c: 'c', d: 'd', e: 'e' } }
-      const state = syncState(json, undefined, [], () => true)
-      const documentState = createExpandedDocumentState(json, () => true)
-      const selection = createMultiSelection(json, documentState, ['object', 'b'], ['object', 'c'])
+      const documentState = createDocumentState({
+        json,
+        select: (json, state) =>
+          createMultiSelection(json, state, ['object', 'b'], ['object', 'c']),
+        expand: () => true
+      })
       const path = ['object', 'e']
-      const operations = moveInsideParent(json, state, documentState, selection, {
+      const operations = moveInsideParent(json, documentState, {
         beforePath: path,
         indexOffset: 0
       })

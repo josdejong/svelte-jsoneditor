@@ -234,7 +234,6 @@ export function replaceAllText(
 
 export function createSearchAndReplaceOperations(
   json: JSONData,
-  state: JSONData,
   documentState: DocumentState,
   replacementText: string,
   searchResultItem: SearchResultItem
@@ -290,7 +289,6 @@ export function createSearchAndReplaceOperations(
 
 export function createSearchAndReplaceAllOperations(
   json: JSONData,
-  state: JSONData,
   documentState: DocumentState,
   searchText: string,
   replacementText

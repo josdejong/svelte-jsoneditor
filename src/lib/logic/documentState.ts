@@ -3,14 +3,13 @@ import {
   existsIn,
   getIn,
   immutableJSONPatch,
-  parseJSONPointer,
-  setIn
+  parseJSONPointer
 } from 'immutable-json-patch'
 import { initial, isEqual, last } from 'lodash-es'
 import { DEFAULT_VISIBLE_SECTIONS } from '../constants.js'
 import { forEachIndex } from '../utils/arrayUtils.js'
 import { parseJSONPointerWithArrayIndices, pointerStartsWith } from '../utils/jsonPointer.js'
-import { isObject, isObjectOrArray, isStringContainingPrimitiveValue } from '../utils/typeUtils.js'
+import { isObjectOrArray, isStringContainingPrimitiveValue } from '../utils/typeUtils.js'
 import {
   currentRoundNumber,
   inVisibleSection,
@@ -33,10 +32,10 @@ import type {
   Path,
   PathsMap,
   Section,
+  Selection,
   VisibleSection
 } from '../types'
 import { traverse } from '../utils/objectUtils.js'
-import { createDebug } from '../utils/debug.js'
 import { CaretType } from '../types.js'
 import { isJSONArray, isJSONObject } from '../utils/jsonUtils.js'
 import {
@@ -47,114 +46,17 @@ import {
   isJSONPatchReplace
 } from '../typeguards.js'
 
-const debug = createDebug('jsoneditor:documentState')
+type CreateSelection = (json: JSONData, documentState: DocumentState) => Selection
 
-/**
- * Sync a state object with the json it belongs to: update keys, limit, and expanded state
- *
- * When forceRefresh=true, force refreshing the expanded state
- */
-// TODO: refactor syncState so we don't have to pass path=[] all the time, this is only used internally for recursiveness
-export function syncState(
-  json: JSONData,
-  state: JSONData,
-  path: Path,
-  expand: (path: Path) => boolean,
-  forceRefresh = false
-): JSONData {
-  // TODO: this function can be made way more efficient if we pass prevState:
-  //  when immutable, we can simply be done already when the state === prevState
-
-  const updatedState = Array.isArray(json) ? [] : {}
-
-  // updatedState[STATE_ID] = state && state[STATE_ID] ? state[STATE_ID] : uniqueId()
-  //
-  // if (isObject(json)) {
-  //   updatedState[STATE_KEYS] = syncKeys(json, state && state[STATE_KEYS])
-  //
-  //   updatedState[STATE_EXPANDED] = state && !forceRefresh ? state[STATE_EXPANDED] : expand(path)
-  //
-  //   if (updatedState[STATE_EXPANDED]) {
-  //     Object.keys(json).forEach((key) => {
-  //       const childJson = json[key]
-  //       const childState = state && state[key]
-  //       updatedState[key] = syncState(childJson, childState, path.concat(key), expand, forceRefresh)
-  //     })
-  //   }
-  //
-  //   // FIXME: must create new id's in case of duplicate id's
-  // } else if (Array.isArray(json)) {
-  //   updatedState[STATE_EXPANDED] = state && !forceRefresh ? state[STATE_EXPANDED] : expand(path)
-  //
-  //   // note that we reset the visible items when the state is not expanded
-  //   updatedState[STATE_VISIBLE_SECTIONS] =
-  //     state && updatedState[STATE_EXPANDED]
-  //       ? state[STATE_VISIBLE_SECTIONS] || DEFAULT_VISIBLE_SECTIONS
-  //       : DEFAULT_VISIBLE_SECTIONS
-  //
-  //   if (updatedState[STATE_EXPANDED]) {
-  //     updatedState[STATE_VISIBLE_SECTIONS].forEach(({ start, end }) => {
-  //       forEachIndex(start, Math.min(json.length, end), (index) => {
-  //         const childJson = json[index]
-  //         const childState = state && state[index]
-  //         updatedState[index] = syncState(
-  //           childJson,
-  //           childState,
-  //           path.concat(index),
-  //           expand,
-  //           forceRefresh
-  //         )
-  //       })
-  //     })
-  //   }
-  // } else {
-  //   // primitive value (string, number, boolean, null)
-  //   if (state && state[STATE_ENFORCE_STRING] !== undefined) {
-  //     // keep as is
-  //     updatedState[STATE_ENFORCE_STRING] = state[STATE_ENFORCE_STRING]
-  //   } else if (isStringContainingPrimitiveValue(json)) {
-  //     // set to true when needed (else, leave undefined)
-  //     updatedState[STATE_ENFORCE_STRING] = true
-  //   }
-  // }
-
-  return updatedState
+export type CreateDocumentStateProps = {
+  json: JSONData
+  expand?: (path: Path) => boolean
+  select?: CreateSelection
 }
 
-export function createState(json) {
-  if (Array.isArray(json)) {
-    const state = []
-
-    // state[STATE_ID] = uniqueId()
-    // state[STATE_EXPANDED] = false
-    // state[STATE_VISIBLE_SECTIONS] = DEFAULT_VISIBLE_SECTIONS
-
-    return state
-  }
-
-  if (isObject(json)) {
-    const state = {}
-
-    // state[STATE_ID] = uniqueId()
-    // state[STATE_EXPANDED] = false
-    // state[STATE_KEYS] = Object.keys(json)
-
-    return state
-  }
-
-  // primitive value
-  const state = {
-    // [STATE_ID]: uniqueId()
-  }
-  // if (isStringContainingPrimitiveValue(json)) {
-  //   state[STATE_ENFORCE_STRING] = true
-  // }
-
-  return state
-}
-
-export function createDocumentState(): DocumentState {
-  return {
+// TODO: write unit tests
+export function createDocumentState(props?: CreateDocumentStateProps): DocumentState {
+  let documentState = {
     expandedMap: {},
     enforceStringMap: {},
     keysMap: {},
@@ -165,11 +67,19 @@ export function createDocumentState(): DocumentState {
     validationErrors: [],
     validationErrorsMap: {}
   }
-}
 
-// TODO: write unit test
-export function createExpandedDocumentState(json, expandedCallback: (path: Path) => boolean) {
-  return expandWithCallback(json, createDocumentState(), [], expandedCallback)
+  if (props?.select) {
+    documentState = {
+      ...documentState,
+      selection: props.select(props.json, documentState)
+    }
+  }
+
+  if (props?.expand) {
+    documentState = expandWithCallback(props.json, documentState, [], props.expand)
+  }
+
+  return documentState
 }
 
 export function getVisibleSections(
@@ -978,6 +888,7 @@ export function updateInPathsMap<T>(
  * When the path exists, the callback will be invoked.
  * When the path does not exist, the callback is not invoked.
  */
+// TODO: cleanup transformPathsMap if not needed
 export function transformPathsMap<T>(
   map: PathsMap<T>,
   callback: (pointer: JSONPointer, value: T) => T
@@ -991,60 +902,6 @@ export function transformPathsMap<T>(
   // TODO: make the function immutable when there are no actual changes
 
   return transformedMap
-}
-
-/**
- * Initialize the state needed to perform the JSON patch operations.
- * For example to a change in a nested object which is not expanded and
- * hence has no state initialize, we need to create this nested state
- * @param {JSON} json
- * @param {JSON} state
- * @param {JSONPatchDocument} operations
- */
-export function initializeState(json, state, operations) {
-  let updatedState = state
-
-  function initializePath(json, state, path) {
-    let updatedState = state
-
-    if (existsIn(json, path) && !existsIn(updatedState, path)) {
-      // first make sure the parent is initialized
-      if (path.length > 0) {
-        updatedState = initializePath(json, updatedState, initial(path))
-      }
-
-      // then initialize the state itself
-      updatedState = setIn(updatedState, path, createState(getIn(json, path)))
-    }
-
-    return updatedState
-  }
-
-  operations.forEach((operation) => {
-    const from =
-      typeof operation.from === 'string'
-        ? parseJSONPointerWithArrayIndices(json, operation.from)
-        : null
-    const path =
-      typeof operation.path === 'string'
-        ? parseJSONPointerWithArrayIndices(json, operation.path)
-        : null
-
-    if (operation.op === 'add') {
-      updatedState = initializePath(json, updatedState, initial(path)) // initialize parent only
-    }
-
-    if (operation.op === 'copy' || operation.op === 'move') {
-      updatedState = initializePath(json, updatedState, from)
-      updatedState = initializePath(json, updatedState, initial(path)) // initialize parent only
-    }
-
-    if (operation.op === 'remove' || operation.op === 'replace' || operation.op === 'test') {
-      updatedState = initializePath(json, updatedState, path)
-    }
-  })
-
-  return updatedState
 }
 
 /**
