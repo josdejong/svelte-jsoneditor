@@ -45,15 +45,7 @@
   import { onMoveSelection } from '$lib/logic/dragging'
   import { forEachIndex } from '$lib/utils/arrayUtils'
   import { createMemoizePath } from '$lib/utils/pathUtils'
-  import type {
-    DocumentState,
-    JSONData,
-    JSONObject,
-    Path,
-    Selection,
-    TreeModeContext,
-    VisibleSection
-  } from '$lib/types'
+  import type { JSONData, JSONObject, Path, Selection, TreeModeContext } from '$lib/types'
   import { SelectionType } from '$lib/types'
   import { beforeUpdate, onDestroy } from 'svelte'
   import type { Readable } from 'svelte/store'
@@ -69,6 +61,7 @@
 
   const debug = createDebug('jsoneditor:JSONNode')
 
+  let selection: Selection | undefined
   let hover = undefined
   let hoverTimer = undefined
   let dragging = undefined
@@ -88,49 +81,31 @@
   $: selectedKey = isKeySelection(resolvedSelection)
   $: selectedValue = isValueSelection(resolvedSelection)
 
-  let visibleSections: Readable<VisibleSection[]>
-  $: visibleSections = derived(context.documentStateStore, (state) =>
+  const visibleSections = derived(context.documentStateStore, (state) =>
     getVisibleSections(state, pointer)
   )
-  $: keys = derived(context.documentStateStore, (state) => {
+  const keys = derived(context.documentStateStore, (state) => {
     return getKeys(value as JSONObject, state, pointer)
   })
 
-  let validationError: ValidationError | undefined
-  $: validationError = derived(
+  const validationError: ValidationError | undefined = derived(
     context.documentStateStore,
     (state) => state.validationErrorsMap[pointer]
   )
 
-  let selection: Selection | undefined
-
-  let unsubscribe
-  $: subscribe(context.documentStateStore)
-
-  // TODO: can we simplify this?
-  function subscribe(documentStateStore: Readable<DocumentState> | undefined) {
-    if (unsubscribe) {
-      unsubscribe()
-    }
-
-    if (!documentStateStore) {
-      return
-    }
-
-    unsubscribe = documentStateStore.subscribe((state) => {
-      if (!isEqual(selection, state.selectionMap[pointer])) {
-        selection = state.selectionMap[pointer]
-      }
-    })
-  }
-
-  onDestroy(() => {
-    if (unsubscribe) {
-      unsubscribe()
+  const unsubscribe = context.documentStateStore.subscribe((state) => {
+    if (!isEqual(selection, state.selectionMap[pointer])) {
+      selection = state.selectionMap[pointer]
     }
   })
 
-  beforeUpdate(() => debug('beforeUpdate', path)) // FIXME: cleanup
+  onDestroy(() => {
+    unsubscribe()
+  })
+
+  beforeUpdate(() =>
+    debug('beforeUpdate', { type, path, keys: get(keys), visibleSections: get(visibleSections) })
+  ) // FIXME: cleanup
 
   let expanded: Readable<boolean>
   $: expanded = derived(context.documentStateStore, (state) => !!state.expandedMap[pointer])
@@ -706,7 +681,7 @@
             />
           </div>
         {/if}
-        {#each keys as key}
+        {#each $keys as key}
           <svelte:self
             value={resolvedValue[key]}
             path={memoizePath(path.concat(key))}

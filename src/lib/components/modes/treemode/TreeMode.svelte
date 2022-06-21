@@ -647,7 +647,8 @@
     if (json === undefined) {
       throw new Error('Cannot apply patch: no JSON')
     }
-    const selection = get(documentStateStore).selection
+    const state = get(documentStateStore)
+    const selection = state.selection
 
     const previousJson = json
     const previousState = state
@@ -666,8 +667,9 @@
         : undefined
 
     json = callback && callback.json !== undefined ? callback.json : patched.json
-    const state = callback && callback.state !== undefined ? callback.state : patched.documentState
-    documentStateStore.set(state)
+    const newState =
+      callback && callback.state !== undefined ? callback.state : patched.documentState
+    documentStateStore.set(newState)
     text = undefined
     textIsRepaired = false
     updateSelection(
@@ -690,7 +692,7 @@
       redo: {
         patch: operations,
         json: undefined,
-        state: removeEditModeFromSelection(state),
+        state: removeEditModeFromSelection(newState),
         text,
         textIsRepaired
       }

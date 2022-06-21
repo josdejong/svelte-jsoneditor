@@ -109,8 +109,12 @@ describe('search', () => {
       }
     }
 
-    const documentState = createDocumentState({ json, expand: () => true })
-    documentState.keysMap[compileJSONPointer(['data'])] = ['text2', 'text1'] // reverse the order of the keys
+    const documentState = {
+      ...createDocumentState({ json, expand: () => true }),
+      keysMap: {
+        '/data': ['text2', 'text1'] // reverse the order of the keys
+      }
+    }
 
     const results = search('foo', json, documentState)
     assert.deepStrictEqual(results, [

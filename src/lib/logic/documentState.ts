@@ -925,7 +925,7 @@ export function getKeys(
   documentState: DocumentState,
   pointer: JSONPointer
 ): string[] {
-  return documentState.keysMap[pointer] || Object.keys(object)
+  return documentState.keysMap[pointer] || (object ? Object.keys(object) : [])
 }
 
 export function getEnforceString(
