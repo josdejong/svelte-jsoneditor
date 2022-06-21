@@ -6,16 +6,6 @@ export const MODE = {
   CODE: 'code'
 }
 
-export const STATE_ID = Symbol('id')
-export const STATE_EXPANDED = Symbol('expanded')
-export const STATE_VISIBLE_SECTIONS = Symbol('visible sections')
-export const STATE_KEYS = Symbol('keys')
-export const STATE_SEARCH_PROPERTY = Symbol('search:property')
-export const STATE_SEARCH_VALUE = Symbol('search:value')
-export const STATE_ENFORCE_STRING = Symbol('enforce string')
-export const STATE_SELECTION = Symbol('selection')
-export const VALIDATION_ERROR = Symbol('validation:error')
-
 export const SCROLL_DURATION = 300 // ms
 export const DEBOUNCE_DELAY = 300 // ms
 export const CODE_MODE_ONCHANGE_DELAY = 300 // ms
