@@ -1,8 +1,8 @@
-import { createMultiSelection, getEndPath, getStartPath } from './selection.js'
+import { createMultiSelection, createSelectionMap, getEndPath, getStartPath } from './selection.js'
 import { documentStatePatch } from './documentState.js'
 import { initial, isEqual, last } from 'lodash-es'
 import type { JSONPath } from 'immutable-json-patch'
-import { getIn } from 'immutable-json-patch'
+import { compileJSONPointer, getIn } from 'immutable-json-patch'
 import { moveInsideParent } from './operations.js'
 import type {
   DocumentState,
@@ -11,7 +11,6 @@ import type {
   JSONData,
   JSONPatchDocument,
   MultiSelection,
-  RecursiveSelection,
   RenderedItem,
   Selection
 } from '../types'
@@ -26,7 +25,7 @@ interface MoveSelectionProps {
 interface MoveSelectionResult {
   operations: JSONPatchDocument | undefined
   updatedValue: JSONData | undefined
-  updatedSelection: RecursiveSelection | undefined
+  updatedSelection: Selection | undefined
   updatedFullSelection: Selection | undefined
   indexOffset: number
 }
@@ -64,6 +63,7 @@ export function onMoveSelection({
   const update = documentStatePatch(fullJson, documentState, operations)
 
   const path: JSONPath = initial(getStartPath(fullSelection)) as JSONPath
+  const pointer = compileJSONPointer(path)
   const value = getIn(fullJson, path)
   if (Array.isArray(value)) {
     const updatedFullSelection = createUpdatedArraySelection({
@@ -74,14 +74,13 @@ export function onMoveSelection({
       indexOffset: dragInsideAction.indexOffset
     })
 
-    // FIXME: dragging, recursiveSelection
-    const recursiveSelection = {} //createRecursiveSelection(fullJson, updatedFullSelection)
-    const updatedRecursiveSelection = getIn(recursiveSelection, path) as RecursiveSelection
+    const updatedSelectionMap = createSelectionMap(updatedFullSelection)
+    const updatedSelection = updatedSelectionMap[pointer]
 
     return {
       operations,
       updatedValue: getIn(update.json, path) as JSONData,
-      updatedSelection: updatedRecursiveSelection,
+      updatedSelection,
       updatedFullSelection: updatedFullSelection,
       indexOffset: dragInsideAction.indexOffset
     }

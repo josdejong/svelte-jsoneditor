@@ -156,8 +156,6 @@ export type Selection =
 
 export type PathsMap<T> = { [pointer: JSONPointer]: T }
 
-export type RecursiveSelection = { [key: string]: RecursiveSelection } | Array<RecursiveSelection>
-
 export type ClipboardValues = Array<{ key: string; value: JSONData }>
 
 export interface FontAwesomeIcon {
