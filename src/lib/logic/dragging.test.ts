@@ -24,6 +24,7 @@ describe('dragging', () => {
         fullJson,
         fullState,
         fullSelection,
+        documentState,
         deltaY,
         items
       })
