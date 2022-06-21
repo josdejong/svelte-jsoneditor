@@ -57,7 +57,6 @@
     createInsideSelection,
     createKeySelection,
     createMultiSelection,
-    createSelection,
     createSelectionFromOperations,
     createSelectionMap,
     createValueSelection,
@@ -65,6 +64,7 @@
     getInitialSelection,
     getSelectionDown,
     getSelectionLeft,
+    getSelectionNextInside,
     getSelectionPaths,
     getSelectionRight,
     getSelectionUp,
@@ -74,7 +74,6 @@
     isValueSelection,
     removeEditModeFromSelection,
     selectAll,
-    SELECTION_TYPE,
     selectionToPartialJson
   } from '$lib/logic/selection'
   import { mapValidationErrors } from '$lib/logic/validation'
@@ -124,7 +123,6 @@
     Path,
     Section,
     Selection,
-    SelectionSchema,
     TransformModalOptions,
     TreeModeContext,
     ValidationError,
@@ -1039,10 +1037,7 @@
           if (isObjectOrArray(newValue)) {
             return {
               state: expandWithCallback(patchedJson, patchedState, path, expandAll),
-              selection: createSelection(patchedJson || {}, patchedState, {
-                type: SELECTION_TYPE.INSIDE,
-                path
-              })
+              selection: createInsideSelection(path)
             }
           }
 
@@ -1078,10 +1073,7 @@
       const path = []
       handleChangeJson(newValue, (patchedJson, patchedState) => ({
         state: expandRecursive(patchedJson, patchedState, path),
-        selection: createSelection(patchedJson, patchedState, {
-          type: SELECTION_TYPE.INSIDE,
-          path
-        })
+        selection: createInsideSelection(path)
       }))
 
       focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
@@ -1366,10 +1358,7 @@
         handlePatch(operations, (patchedJson, patchedState) => ({
           // expand the newly replaced array and select it
           state: expandRecursive(patchedJson, patchedState, selectedPath),
-          selection: createSelection(patchedJson, patchedState, {
-            type: SELECTION_TYPE.VALUE,
-            path: selectedPath
-          })
+          selection: createInsideSelection(selectedPath)
         }))
       },
       onClose: () => {
@@ -1716,12 +1705,14 @@
   }
 
   function handleSelect(
-    selectionSchema: SelectionSchema,
-    options?: { ensureFocus?: boolean }
+    selection: Selection,
+    options?: { ensureFocus?: boolean; nextInside?: boolean }
   ): void {
-    const state = get(documentStateStore)
-
-    updateSelection(selectionSchema ? createSelection(json, state, selectionSchema) : undefined)
+    updateSelection(
+      options?.nextInside
+        ? getSelectionNextInside(json, get(documentStateStore), selection.focusPath)
+        : selection
+    )
 
     // set focus to the hidden input, so we can capture quick keys like Ctrl+X, Ctrl+C, Ctrl+V
     // we do this after a setTimeout in case the selection was made by clicking a button
@@ -2205,7 +2196,7 @@
     onPasteJson: handlePasteJson,
     onRenderValue,
     onContextMenu: openContextMenu,
-    onClassName: onClassName || noop,
+    onClassName,
     onDrag: autoScrollHandler.onDrag,
     onDragEnd: autoScrollHandler.onDragEnd
   }

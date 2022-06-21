@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import { isUrl } from '$lib/utils/typeUtils'
-  import { SELECTION_TYPE } from '../../../logic/selection'
+  import { createValueSelection } from '../../../logic/selection'
   import SearchResultHighlighter from '../../../components/modes/treemode/highlight/SearchResultHighlighter.svelte'
   import { getValueClass } from './utils/getValueClass'
   import { addNewLineSuffix } from '$lib/utils/domUtils'
@@ -36,7 +36,7 @@
   function handleValueDoubleClick(event) {
     if (!readOnly) {
       event.preventDefault()
-      onSelect({ type: SELECTION_TYPE.VALUE, path, edit: true })
+      onSelect(createValueSelection(path, true))
     }
   }
 </script>

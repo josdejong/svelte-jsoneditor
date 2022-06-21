@@ -23,45 +23,30 @@ import type {
   Path,
   PathsMap,
   Selection,
-  SelectionSchema,
   ValueSelection
-} from '../types'
+} from '../types.js'
+import { CaretType, SelectionType } from '../types.js'
 import { isJSONArray, isJSONObject } from '../utils/jsonUtils.js'
 import { isJSONPatchCopy, isJSONPatchMove } from '../typeguards.js'
 
-type AFTER = 'after'
-type INSIDE = 'inside'
-type KEY = 'key'
-type VALUE = 'value'
-type MULTI = 'multi'
-
-// TODO: change SELECTION_TYPE into enum
-export const SELECTION_TYPE = {
-  AFTER: 'after' as AFTER,
-  INSIDE: 'inside' as INSIDE,
-  KEY: 'key' as KEY,
-  VALUE: 'value' as VALUE,
-  MULTI: 'multi' as MULTI
-}
-
 export function isAfterSelection(selection: Selection | undefined): selection is AfterSelection {
-  return selection !== undefined && selection.type === SELECTION_TYPE.AFTER
+  return selection !== undefined && selection.type === SelectionType.after
 }
 
 export function isInsideSelection(selection: Selection | undefined): selection is InsideSelection {
-  return selection !== undefined && selection.type === SELECTION_TYPE.INSIDE
+  return selection !== undefined && selection.type === SelectionType.inside
 }
 
 export function isKeySelection(selection: Selection | undefined): selection is KeySelection {
-  return selection !== undefined && selection.type === SELECTION_TYPE.KEY
+  return selection !== undefined && selection.type === SelectionType.key
 }
 
 export function isValueSelection(selection: Selection | undefined): selection is ValueSelection {
-  return selection !== undefined && selection.type === SELECTION_TYPE.VALUE
+  return selection !== undefined && selection.type === SelectionType.value
 }
 
 export function isMultiSelection(selection: Selection | undefined): selection is MultiSelection {
-  return selection !== undefined && selection.type === SELECTION_TYPE.MULTI
+  return selection !== undefined && selection.type === SelectionType.multi
 }
 
 /**
@@ -178,20 +163,20 @@ export function isPathInsideSelection(selection, path, anchorType) {
   }
 
   if (isKeySelection(selection)) {
-    return anchorType === SELECTION_TYPE.KEY && isEqual(selection.focusPath, path)
+    return anchorType === SelectionType.key && isEqual(selection.focusPath, path)
   }
 
   if (isValueSelection(selection)) {
-    if (anchorType === SELECTION_TYPE.VALUE && isEqual(selection.focusPath, path)) {
+    if (anchorType === SelectionType.value && isEqual(selection.focusPath, path)) {
       return true
     }
 
     if (
       pathStartsWith(path, selection.focusPath) &&
       path.length > selection.focusPath.length &&
-      (anchorType === SELECTION_TYPE.KEY ||
-        anchorType === SELECTION_TYPE.VALUE ||
-        anchorType === SELECTION_TYPE.MULTI)
+      (anchorType === SelectionType.key ||
+        anchorType === SelectionType.value ||
+        anchorType === SelectionType.multi)
     ) {
       return true
     }
@@ -232,14 +217,14 @@ export function getSelectionUp(
     const parent = getIn(json, parentPath)
     if (Array.isArray(parent) || isEmpty(previousPath)) {
       // switch to value selection: array has no keys, and root object also not
-      return { type: SELECTION_TYPE.VALUE, anchorPath, focusPath }
+      return { type: SelectionType.value, anchorPath, focusPath }
     } else {
-      return { type: SELECTION_TYPE.KEY, anchorPath, focusPath }
+      return { type: SelectionType.key, anchorPath, focusPath }
     }
   }
 
   if (isValueSelection(selection)) {
-    return { type: SELECTION_TYPE.VALUE, anchorPath, focusPath }
+    return { type: SelectionType.value, anchorPath, focusPath }
   }
 
   if (isAfterSelection(selection)) {
@@ -332,10 +317,9 @@ export function getSelectionDown(
 export function getSelectionNextInside(
   json: JSONData,
   documentState: DocumentState,
-  selection: Selection
+  path: Path
 ): Selection | null {
   // TODO: write unit tests for getSelectionNextInside
-  const path = selection.focusPath
   const parentPath = initial(path)
   const childPath = [last(path)]
 
@@ -365,7 +349,7 @@ export function findCaretAndSiblings(
   const visibleCaretPositions = getVisibleCaretPositions(json, documentState, includeInside)
 
   const index = visibleCaretPositions.findIndex((caret) => {
-    return isEqual(caret.path, selection.focusPath) && caret.type === selection.type
+    return isEqual(caret.path, selection.focusPath) && String(caret.type) === String(selection.type)
   })
 
   return {
@@ -398,10 +382,7 @@ export function getSelectionLeft(
   }
 
   if (caret && previous) {
-    return createSelection(json, documentState, {
-      type: previous.type,
-      path: previous.path
-    })
+    return fromCaretPosition(previous)
   }
 
   const parentPath: JSONPath = initial(selection.focusPath)
@@ -436,10 +417,7 @@ export function getSelectionRight(
   }
 
   if (caret && next) {
-    return createSelection(json, documentState, {
-      type: next.type,
-      path: next.path
-    })
+    return fromCaretPosition(next)
   }
 
   if (isMultiSelection(selection)) {
@@ -466,8 +444,8 @@ export function getInitialSelection(json: JSONData, documentState: DocumentState
 
   const path = visiblePaths[index]
   return path.length === 0 || Array.isArray(getIn(json, initial(path)))
-    ? { type: SELECTION_TYPE.VALUE, anchorPath: path, focusPath: path } // Array items and root object/array do not have a key, so select value in that case
-    : { type: SELECTION_TYPE.KEY, anchorPath: path, focusPath: path }
+    ? { type: SelectionType.value, anchorPath: path, focusPath: path } // Array items and root object/array do not have a key, so select value in that case
+    : { type: SelectionType.key, anchorPath: path, focusPath: path }
 }
 
 export function createSelectionFromOperations(
@@ -483,7 +461,7 @@ export function createSelectionFromOperations(
       return {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        type: SELECTION_TYPE.VALUE,
+        type: SelectionType.value,
         anchorPath: path,
         focusPath: path,
         edit: false
@@ -506,7 +484,7 @@ export function createSelectionFromOperations(
       return {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        type: SELECTION_TYPE.KEY,
+        type: SelectionType.key,
         anchorPath: path,
         focusPath: path,
         edit: false
@@ -534,7 +512,7 @@ export function createSelectionFromOperations(
   return {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    type: SELECTION_TYPE.MULTI,
+    type: SelectionType.multi,
     paths,
     anchorPath: first(paths),
     focusPath: last(paths),
@@ -634,7 +612,7 @@ export function removeEditModeFromSelection(documentState: DocumentState): Docum
 
 export function createKeySelection(path: Path, edit: boolean): KeySelection {
   return {
-    type: SELECTION_TYPE.KEY,
+    type: SelectionType.key,
     anchorPath: path,
     focusPath: path,
     edit
@@ -643,7 +621,7 @@ export function createKeySelection(path: Path, edit: boolean): KeySelection {
 
 export function createValueSelection(path: Path, edit: boolean): ValueSelection {
   return {
-    type: SELECTION_TYPE.VALUE,
+    type: SelectionType.value,
     anchorPath: path,
     focusPath: path,
     edit
@@ -652,7 +630,7 @@ export function createValueSelection(path: Path, edit: boolean): ValueSelection 
 
 export function createInsideSelection(path: Path): InsideSelection {
   return {
-    type: SELECTION_TYPE.INSIDE,
+    type: SelectionType.inside,
     anchorPath: path,
     focusPath: path
   }
@@ -660,7 +638,7 @@ export function createInsideSelection(path: Path): InsideSelection {
 
 export function createAfterSelection(path: Path): AfterSelection {
   return {
-    type: SELECTION_TYPE.AFTER,
+    type: SelectionType.after,
     anchorPath: path,
     focusPath: path
   }
@@ -681,72 +659,11 @@ export function createMultiSelection(
     pathStartsWith(focusPath, last(paths)) || pathStartsWith(anchorPath, first(paths))
 
   return {
-    type: SELECTION_TYPE.MULTI,
+    type: SelectionType.multi,
     anchorPath: focusPathLast ? first(paths) : last(paths),
     focusPath: focusPathLast ? last(paths) : first(paths),
     paths,
     pathsMap: createPathsMap(paths)
-  }
-}
-
-// TODO: write unit tests
-export function createSelection(
-  json: JSONData,
-  documentState: DocumentState,
-  selectionSchema: SelectionSchema
-): Selection {
-  // TODO: remove next from SelectionSchema, pass it as a separate argument
-  const {
-    type,
-    anchorPath,
-    focusPath,
-    path,
-    edit = false,
-    next = false,
-    nextInside = false
-  } = selectionSchema as {
-    type: string
-    anchorPath: Path
-    focusPath: Path
-    path: Path
-    edit: boolean
-    next: boolean
-    nextInside: boolean
-  } // FIXME: fix types
-
-  // TODO: refactor to use type guards here
-  if (type === SELECTION_TYPE.KEY) {
-    if (!next) {
-      return createKeySelection(path, edit)
-    } else {
-      return createValueSelection(path, edit)
-    }
-  } else if (type === SELECTION_TYPE.VALUE) {
-    let selection: Selection = createValueSelection(path, edit)
-    if (next) {
-      selection = getSelectionDown(json, documentState) || selection
-    }
-    if (nextInside) {
-      selection = getSelectionNextInside(json, documentState, selection) || selection
-    }
-    return selection
-  } else if (type === SELECTION_TYPE.AFTER) {
-    return createAfterSelection(path)
-  } else if (type === SELECTION_TYPE.INSIDE) {
-    return createInsideSelection(path)
-  } else if (type === SELECTION_TYPE.MULTI && path) {
-    const paths = [path]
-    return {
-      type: SELECTION_TYPE.MULTI,
-      anchorPath: path,
-      focusPath: path,
-      paths: paths,
-      pathsMap: createPathsMap(paths)
-    }
-  } else if (anchorPath && focusPath) {
-    return createMultiSelection(json, documentState, anchorPath, focusPath)
-  } else {
-    throw new TypeError(`Unknown type of selection ${JSON.stringify(selectionSchema)}`)
   }
 }
 
@@ -835,7 +752,7 @@ export function createSelectionMap(selection: Selection): PathsMap<Selection> {
 // TODO: write tests
 export function selectAll(): Selection {
   return {
-    type: SELECTION_TYPE.VALUE,
+    type: SelectionType.value,
     anchorPath: [],
     focusPath: []
   }
@@ -858,5 +775,40 @@ export function canConvert(selection) {
 
   if (isMultiSelection(selection) && selection.paths.length === 1) {
     return true
+  }
+}
+
+// TODO: unit test
+export function fromCaretPosition(caretPosition: CaretPosition): Selection {
+  switch (caretPosition.type) {
+    case CaretType.key:
+      return createKeySelection(caretPosition.path, false)
+    case CaretType.value:
+      return createValueSelection(caretPosition.path, false)
+    case CaretType.after:
+      return createAfterSelection(caretPosition.path)
+    case CaretType.inside:
+      return createInsideSelection(caretPosition.path)
+  }
+}
+
+// TODO: unit test
+export function fromSelectionType(
+  json: JSONData,
+  documentState: DocumentState,
+  selectionType: SelectionType,
+  path: Path
+): Selection {
+  switch (selectionType) {
+    case SelectionType.key:
+      return createKeySelection(path, false)
+    case SelectionType.value:
+      return createValueSelection(path, false)
+    case SelectionType.after:
+      return createAfterSelection(path)
+    case SelectionType.inside:
+      return createInsideSelection(path)
+    case SelectionType.multi:
+      return createMultiSelection(json, documentState, path, path)
   }
 }

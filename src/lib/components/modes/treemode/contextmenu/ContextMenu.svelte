@@ -19,12 +19,13 @@
   import { onMount } from 'svelte'
   import Icon from 'svelte-awesome'
   import DropdownButton from '../../../controls/DropdownButton.svelte'
-  import { canConvert, SELECTION_TYPE, singleItemSelected } from '$lib/logic/selection'
+  import { canConvert, singleItemSelected } from '$lib/logic/selection'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
   import { faCheckSquare, faLightbulb, faSquare } from '@fortawesome/free-regular-svg-icons'
   import { findNearestElement } from '$lib/utils/domUtils'
   import type { DocumentState, JSONData } from '../../../../types'
+  import { isKeySelection, isMultiSelection, isValueSelection } from '../../../../logic/selection'
 
   export let json: JSONData
   export let documentState: DocumentState
@@ -71,17 +72,14 @@
 
   $: hasSelectionContents =
     hasJson &&
-    selection != null &&
-    (selection.type === SELECTION_TYPE.MULTI ||
-      selection.type === SELECTION_TYPE.KEY ||
-      selection.type === SELECTION_TYPE.VALUE)
+    (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))
 
   $: canDuplicate = hasJson && hasSelectionContents && !rootSelected // must not be root
 
   $: canExtract =
     hasJson &&
     selection != null &&
-    (selection.type === SELECTION_TYPE.MULTI || selection.type === SELECTION_TYPE.VALUE) &&
+    (isMultiSelection(selection) || isValueSelection(selection)) &&
     !rootSelected // must not be root
 
   $: canEditKey =

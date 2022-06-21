@@ -1,4 +1,4 @@
-import { SELECTION_TYPE } from '../logic/selection.js'
+import { type Path, SelectionType } from '../types.js'
 import { map, minBy } from 'lodash-es'
 
 /**
@@ -249,24 +249,24 @@ export function findParentWithNodeName(element, nodeName) {
  * @param {HTMLElement} target
  * @returns {string | null}
  */
-export function getSelectionTypeFromTarget(target) {
+export function getSelectionTypeFromTarget(target: HTMLElement): SelectionType {
   if (isChildOfAttribute(target, 'data-type', 'selectable-key')) {
-    return SELECTION_TYPE.KEY
+    return SelectionType.key
   }
 
   if (isChildOfAttribute(target, 'data-type', 'selectable-value')) {
-    return SELECTION_TYPE.VALUE
+    return SelectionType.value
   }
 
   if (isChildOfAttribute(target, 'data-type', 'insert-selection-area-inside')) {
-    return SELECTION_TYPE.INSIDE
+    return SelectionType.inside
   }
 
   if (isChildOfAttribute(target, 'data-type', 'insert-selection-area-after')) {
-    return SELECTION_TYPE.AFTER
+    return SelectionType.after
   }
 
-  return SELECTION_TYPE.MULTI
+  return SelectionType.multi
 }
 
 /**
@@ -289,10 +289,8 @@ export function decodeDataPath(pathStr) {
 
 /**
  * Find the data path of the given element. Traverses the parent nodes until find
- * @param {HTMLElement} target
- * @returns {Path | null}
  */
-export function getDataPathFromTarget(target) {
+export function getDataPathFromTarget(target: HTMLElement): Path | null {
   const parent = findParent(target, (element) => {
     return element.hasAttribute('data-path')
   })

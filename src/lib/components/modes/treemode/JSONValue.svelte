@@ -1,18 +1,16 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { SELECTION_TYPE } from '../../../logic/selection'
   import { isEmpty, isEqual } from 'lodash-es'
-  import type { Path, SearchResultItem, Selection, TreeModeContext } from '../../../types'
+  import type { JSONData, Path, SearchResultItem, Selection, TreeModeContext } from '../../../types'
   import { SearchField } from '../../../types'
   import { onDestroy } from 'svelte'
   import { compileJSONPointer } from 'immutable-json-patch'
+  import { isEditingSelection, isValueSelection } from '../../../logic/selection'
 
   export let path: Path
-  export let value: JSON
-
+  export let value: JSONData
   export let context: TreeModeContext
-
   export let enforceString: boolean
   export let selection: Selection | undefined
 
@@ -34,12 +32,9 @@
     unsubscribe()
   })
 
-  $: isSelected =
-    selection && selection.type === SELECTION_TYPE.VALUE
-      ? isEqual(selection.focusPath, path)
-      : false
+  $: isSelected = isValueSelection(selection) ? isEqual(selection.focusPath, path) : false
 
-  $: isEditing = !context.readOnly && isSelected && selection && selection.edit === true
+  $: isEditing = !context.readOnly && isEditingSelection(selection)
 
   $: renderers = context.onRenderValue({
     path,

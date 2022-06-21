@@ -31,6 +31,14 @@ export { getJSONSchemaOptions, findSchema, findEnum } from './utils/jsonSchemaUt
 export { parseJSONPointerWithArrayIndices } from './utils/jsonPointer.js'
 export { isTextContent, isLargeContent, estimateSerializedSize } from './utils/jsonUtils.js'
 export {
+  isValueSelection,
+  isKeySelection,
+  isInsideSelection,
+  isAfterSelection,
+  isMultiSelection,
+  isEditingSelection
+} from './logic/selection.js'
+export {
   parseJSONPointer,
   compileJSONPointer,
   getIn,

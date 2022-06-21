@@ -3,11 +3,19 @@
 <script lang="ts">
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils'
-  import { SELECTION_TYPE } from '../../../logic/selection'
+  import { createValueSelection } from '../../../logic/selection'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
   import EditableDiv from '../../../components/controls/EditableDiv.svelte'
   import { UPDATE_SELECTION } from '../../../constants.js'
-  import type { JSONData, OnPasteJson, OnPatch, Path, ValueNormalization } from '../../../types'
+  import type {
+    JSONData,
+    OnFind,
+    OnPasteJson,
+    OnPatch,
+    OnSelect,
+    Path,
+    ValueNormalization
+  } from '../../../types'
 
   export let path: Path
   export let value: JSONData
@@ -15,8 +23,8 @@
   export let enforceString: boolean
   export let onPatch: OnPatch
   export let onPasteJson: OnPasteJson
-  export let onSelect
-  export let onFind
+  export let onSelect: OnSelect
+  export let onFind: OnFind
 
   function convert(value: string) {
     return enforceString ? value : stringConvert(value)
@@ -32,26 +40,16 @@
     ])
 
     if (updateSelection === UPDATE_SELECTION.NEXT_INSIDE) {
-      onSelect({
-        type: SELECTION_TYPE.VALUE,
-        path,
-        nextInside: true
-      })
+      onSelect(createValueSelection(path, false), { nextInside: true })
     }
 
     if (updateSelection === UPDATE_SELECTION.SELF) {
-      onSelect(
-        {
-          type: SELECTION_TYPE.VALUE,
-          path
-        },
-        { ensureFocus: false }
-      )
+      onSelect(createValueSelection(path, false), { ensureFocus: false })
     }
   }
 
   function handleCancelChange() {
-    onSelect({ type: SELECTION_TYPE.VALUE, path })
+    onSelect(createValueSelection(path, false))
   }
 
   function handlePaste(pastedText: string): void {

@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import { compileJSONPointer } from 'immutable-json-patch'
-  import { SELECTION_TYPE } from '../../../logic/selection'
+  import { createValueSelection } from '../../../logic/selection'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
   import type { JSONData, OnPatch, OnSelect, Path } from '../../../types'
 
@@ -45,7 +45,7 @@
       }
     ])
 
-    onSelect({ type: SELECTION_TYPE.VALUE, path })
+    onSelect(createValueSelection(path, false))
   }
 
   function handleMouseDown(event) {

@@ -21,6 +21,14 @@ export interface VisibleSection {
   end: number
 }
 
+export enum SelectionType {
+  after = 'after',
+  inside = 'inside',
+  key = 'key',
+  value = 'value',
+  multi = 'multi'
+}
+
 export enum CaretType {
   after = 'after',
   key = 'key',
@@ -30,7 +38,7 @@ export enum CaretType {
 
 export interface CaretPosition {
   path: Path
-  type: CaretType
+  type: CaretType // TODO: refactor this to use SelectionType here, then we can simplify the util functions to turn this into a selection
 }
 
 export interface DocumentState {
@@ -106,7 +114,7 @@ export type AfterPatchCallback = (
 ) => { json?: JSONData; state?: DocumentState; selection?: Selection }
 
 export interface MultiSelection {
-  type: 'multi'
+  type: SelectionType.multi
   paths: Path[]
   anchorPath: Path
   focusPath: Path
@@ -114,26 +122,26 @@ export interface MultiSelection {
 }
 
 export interface AfterSelection {
-  type: 'after'
+  type: SelectionType.after
   anchorPath: Path
   focusPath: Path
 }
 
 export interface InsideSelection {
-  type: 'inside'
+  type: SelectionType.inside
   anchorPath: Path
   focusPath: Path
 }
 
 export interface KeySelection {
-  type: 'key'
+  type: SelectionType.key
   anchorPath: Path
   focusPath: Path
   edit?: boolean
 }
 
 export interface ValueSelection {
-  type: 'value'
+  type: SelectionType.value
   anchorPath: Path
   focusPath: Path
   edit?: boolean
@@ -149,44 +157,6 @@ export type Selection =
 export type PathsMap<T> = { [pointer: JSONPointer]: T }
 
 export type RecursiveSelection = { [key: string]: RecursiveSelection } | Array<RecursiveSelection>
-
-export interface AfterSelectionSchema {
-  type: 'after'
-  path: Path
-}
-
-export interface InsideSelectionSchema {
-  type: 'inside'
-  path: Path
-}
-
-export interface KeySelectionSchema {
-  type: 'key'
-  path: Path
-  edit?: boolean
-  next?: boolean
-}
-
-export interface ValueSelectionSchema {
-  type: 'value'
-  path: Path
-  edit?: boolean
-  next?: boolean
-  nextInside?: boolean
-}
-
-export interface MultiSelectionSchema {
-  type: 'multi'
-  anchorPath: Path
-  focusPath: Path
-}
-
-export type SelectionSchema =
-  | MultiSelectionSchema
-  | AfterSelectionSchema
-  | InsideSelectionSchema
-  | KeySelectionSchema
-  | ValueSelectionSchema
 
 export type ClipboardValues = Array<{ key: string; value: JSONData }>
 
@@ -306,8 +276,8 @@ export type OnChange =
   | ((content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void)
   | null
 export type OnSelect = (
-  selectionSchema: SelectionSchema,
-  options?: { ensureFocus?: boolean }
+  selection: Selection,
+  options?: { ensureFocus?: boolean; nextInside?: boolean }
 ) => void
 export type OnPatch = (operations: JSONPatchDocument) => void
 export type OnSort = (operations: JSONPatchDocument) => void
@@ -315,7 +285,7 @@ export type OnFind = (findAndReplace: boolean) => void
 export type OnPaste = (pastedText: string) => void
 export type OnPasteJson = (pastedJson: { path: Path; contents: JSONData }) => void
 export type OnRenderValue = (props: RenderValueProps) => RenderValueComponentDescription[]
-export type OnClassName = (path: Path, value: JSONData) => string | undefined | void
+export type OnClassName = (path: Path, value: JSONData) => string | undefined
 export type OnChangeMode = (mode: 'tree' | 'code') => void
 export type OnContextMenu = (contextMenuProps: AbsolutePopupOptions) => void
 export type OnRenderMenu = (
@@ -454,7 +424,7 @@ export interface TreeModeContext {
   onContextMenu: OnContextMenu
   onClassName: OnClassName
   onDrag: (event: Event) => void
-  onDragEnd: (event: Event) => void
+  onDragEnd: () => void
 }
 
 export interface RenderValuePropsOptional {

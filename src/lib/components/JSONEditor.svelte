@@ -63,7 +63,7 @@
   export let onChangeQueryLanguage: OnChangeQueryLanguage = noop
   export let onChange: OnChange = null
   export let onRenderValue: OnRenderValue = renderValue
-  export let onClassName: OnClassName = noop
+  export let onClassName: OnClassName = () => undefined
   export let onRenderMenu: OnRenderMenu = noop
   export let onChangeMode: OnChangeMode = noop
   export let onError: OnError = (err) => {

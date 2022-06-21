@@ -3,17 +3,16 @@
 <script lang="ts">
   import classnames from 'classnames'
   import { initial, isEmpty } from 'lodash-es'
-  import { SELECTION_TYPE } from '$lib/logic/selection'
+  import { createKeySelection, createValueSelection } from '$lib/logic/selection'
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
   import { addNewLineSuffix } from '$lib/utils/domUtils'
   import { UPDATE_SELECTION } from '$lib/constants'
   import type { DocumentState, Path, SearchResultItem, TreeModeContext } from '$lib/types'
+  import { SearchField } from '$lib/types'
   import { derived } from 'svelte/store'
-  import { stringifyPath } from '../../../utils/pathUtils'
   import { isKeySelection } from '../../../logic/selection.js'
   import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
-  import { SearchField } from '$lib/types'
   import { compileJSONPointer } from 'immutable-json-patch'
 
   export let path: Path
@@ -25,7 +24,7 @@
   $: pointer = compileJSONPointer(path)
   $: selection = derived(context.documentStateStore, (state) => state.selectionMap[pointer])
   $: isEditingKey = derived(selection, ($selection) => {
-    const selectedKey = $selection && $selection.type === SELECTION_TYPE.KEY
+    const selectedKey = isKeySelection($selection)
     return !context.readOnly && selectedKey && $selection && $selection['edit'] === true
   })
 
@@ -40,7 +39,7 @@
   function handleKeyDoubleClick(event) {
     if (!$isEditingKey && !context.readOnly) {
       event.preventDefault()
-      context.onSelect({ type: SELECTION_TYPE.KEY, path, edit: true })
+      context.onSelect(createKeySelection(path, true))
     }
   }
 
@@ -55,26 +54,16 @@
     const updatedPath = initial(path).concat(updatedKey)
 
     if (updateSelection === UPDATE_SELECTION.NEXT_INSIDE) {
-      context.onSelect({
-        type: SELECTION_TYPE.KEY,
-        path: updatedPath,
-        next: true
-      })
+      context.onSelect(createValueSelection(updatedPath, false))
     }
 
     if (updateSelection === UPDATE_SELECTION.SELF) {
-      context.onSelect(
-        {
-          type: SELECTION_TYPE.KEY,
-          path: updatedPath
-        },
-        { ensureFocus: false }
-      )
+      context.onSelect(createKeySelection(path, false), { ensureFocus: false })
     }
   }
 
   function handleCancelChange() {
-    context.onSelect({ type: SELECTION_TYPE.KEY, path })
+    context.onSelect(createKeySelection(path, false))
   }
 </script>
 

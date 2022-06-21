@@ -336,7 +336,7 @@ describe('documentState', () => {
     )
   })
 
-  it('should update enforce string in syncState', () => {
+  it('should keep/update enforce string', () => {
     const json1 = 42
     const documentState1 = createDocumentState()
     assert.strictEqual(getEnforceString(json1, documentState1, compileJSONPointer([])), false)

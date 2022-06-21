@@ -14,7 +14,18 @@
   } from '$lib/constants'
   import { getKeys, getVisibleCaretPositions, getVisibleSections } from '$lib/logic/documentState'
   import { rename } from '$lib/logic/operations'
-  import { getEndPath, isPathInsideSelection, SELECTION_TYPE } from '$lib/logic/selection'
+  import {
+    createAfterSelection,
+    createInsideSelection,
+    createMultiSelection,
+    fromCaretPosition,
+    fromSelectionType,
+    getEndPath,
+    isInsideSelection,
+    isKeySelection,
+    isPathInsideSelection,
+    isValueSelection
+  } from '$lib/logic/selection'
   import {
     encodeDataPath,
     getDataPathFromTarget,
@@ -39,14 +50,15 @@
     JSONData,
     JSONObject,
     Path,
+    Selection,
     TreeModeContext,
-    VisibleSection,
-    Selection
+    VisibleSection
   } from '$lib/types'
+  import { SelectionType } from '$lib/types'
   import { beforeUpdate, onDestroy } from 'svelte'
   import type { Readable } from 'svelte/store'
   import { derived, get } from 'svelte/store'
-  import { getStartPath, isMultiSelection } from '../../../logic/selection'
+  import { getStartPath, isAfterSelection, isMultiSelection } from '../../../logic/selection'
 
   export let value: JSONData
   export let path: Path
@@ -70,11 +82,11 @@
   $: resolvedSelection =
     dragging?.updatedSelection != undefined ? dragging.updatedSelection : selection
 
-  $: selected = !!(isMultiSelection(resolvedSelection) && resolvedSelection.pathsMap)
-  $: selectedAfter = !!(resolvedSelection && resolvedSelection.type === SELECTION_TYPE.AFTER)
-  $: selectedInside = !!(resolvedSelection && resolvedSelection.type === SELECTION_TYPE.INSIDE)
-  $: selectedKey = !!(resolvedSelection && resolvedSelection.type === SELECTION_TYPE.KEY)
-  $: selectedValue = !!(resolvedSelection && resolvedSelection.type === SELECTION_TYPE.VALUE)
+  $: selected = isMultiSelection(resolvedSelection)
+  $: selectedAfter = isAfterSelection(resolvedSelection)
+  $: selectedInside = isInsideSelection(resolvedSelection)
+  $: selectedKey = isKeySelection(resolvedSelection)
+  $: selectedValue = isValueSelection(resolvedSelection)
 
   let visibleSections: Readable<VisibleSection[]>
   $: visibleSections = derived(context.documentStateStore, (state) =>
@@ -175,10 +187,12 @@
     document.addEventListener('mouseup', handleMouseUpGlobal)
 
     const anchorType = getSelectionTypeFromTarget(event.target)
+    const json = context.getFullJson()
+    const state = get(context.documentStateStore)
 
     // when right-clicking inside the current selection, do nothing: context menu will open
     // when left-clicking inside the current selection, do nothing: it can be the start of dragging
-    const selection = get(context.documentStateStore).selection
+    const selection = state.selection
     if (isPathInsideSelection(selection, path, anchorType)) {
       if (event.button === 0) {
         context.focus()
@@ -198,36 +212,20 @@
       // Shift+Click will select multiple entries
       const selection = get(context.documentStateStore).selection
       if (selection) {
-        context.onSelect({
-          type: SELECTION_TYPE.MULTI,
-          anchorPath: selection.anchorPath,
-          focusPath: path
-        })
+        context.onSelect(createMultiSelection(json, state, selection.anchorPath, path))
       }
     } else {
-      switch (anchorType) {
-        // intentional fall-through
-        case SELECTION_TYPE.KEY:
-        case SELECTION_TYPE.VALUE:
-        case SELECTION_TYPE.AFTER:
-        case SELECTION_TYPE.INSIDE:
-          context.onSelect({ type: anchorType, path })
-          break
-
-        case SELECTION_TYPE.MULTI:
-          if (root && event.target.hasAttribute('data-path')) {
-            const lastCaretPosition = last(
-              getVisibleCaretPositions(resolvedValue, get(context.documentStateStore))
-            )
-            context.onSelect(lastCaretPosition)
-          } else {
-            context.onSelect({
-              type: SELECTION_TYPE.MULTI,
-              anchorPath: path,
-              focusPath: path
-            })
-          }
-          break
+      if (anchorType === SelectionType.multi) {
+        if (root && event.target.hasAttribute('data-path')) {
+          const lastCaretPosition = last(
+            getVisibleCaretPositions(resolvedValue, get(context.documentStateStore))
+          )
+          context.onSelect(fromCaretPosition(lastCaretPosition))
+        } else {
+          context.onSelect(createMultiSelection(json, state, path, path))
+        }
+      } else {
+        context.onSelect(fromSelectionType(json, state, anchorType, path))
       }
     }
   }
@@ -253,10 +251,11 @@
       ) {
         singleton.selectionFocus = path
 
-        context.onSelect({
-          anchorPath: singleton.selectionAnchor,
-          focusPath: singleton.selectionFocus
-        })
+        const json = context.getFullJson()
+        const state = get(context.documentStateStore)
+        context.onSelect(
+          createMultiSelection(json, state, singleton.selectionAnchor, singleton.selectionFocus)
+        )
       }
     }
   }
@@ -362,10 +361,12 @@
 
   function handleDragSelectionEnd(event) {
     if (dragging) {
+      const json = context.getFullJson()
+      const documentState = get(context.documentStateStore)
       const deltaY = calculateDeltaY(dragging, event)
       const { operations, updatedFullSelection } = onMoveSelection({
-        fullJson: context.getFullJson(),
-        documentState: get(context.documentStateStore),
+        fullJson: json,
+        documentState,
         deltaY,
         items: dragging.items
       })
@@ -378,10 +379,11 @@
         // the user did click inside the selection and no contents have been dragged,
         // select the clicked item
         if (event.target === dragging.initialTarget && !dragging.didMoveItems) {
-          context.onSelect({
-            type: getSelectionTypeFromTarget(event.target),
-            path: getDataPathFromTarget(event.target)
-          })
+          const selectionType = getSelectionTypeFromTarget(event.target)
+          const path = getDataPathFromTarget(event.target)
+          if (path) {
+            context.onSelect(fromSelectionType(json, documentState, selectionType, path))
+          }
         }
       }
 
@@ -473,7 +475,7 @@
       event.stopPropagation()
       event.preventDefault()
 
-      context.onSelect({ type: SELECTION_TYPE.INSIDE, path })
+      context.onSelect(createInsideSelection(path))
     }
   }
 
@@ -482,17 +484,17 @@
       event.stopPropagation()
       event.preventDefault()
 
-      context.onSelect({ type: SELECTION_TYPE.AFTER, path })
+      context.onSelect(createAfterSelection(path))
     }
   }
 
   function handleInsertInsideOpenContextMenu(props) {
-    context.onSelect({ type: SELECTION_TYPE.INSIDE, path })
+    context.onSelect(createInsideSelection(path))
     context.onContextMenu(props)
   }
 
   function handleInsertAfterOpenContextMenu(props) {
-    context.onSelect({ type: SELECTION_TYPE.AFTER, path })
+    context.onSelect(createAfterSelection(path))
     context.onContextMenu(props)
   }
 </script>
@@ -553,7 +555,7 @@
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && resolvedSelection && (resolvedSelection.type === SELECTION_TYPE.VALUE || resolvedSelection.type === SELECTION_TYPE.MULTI) && !resolvedSelection.edit && isEqual(resolvedSelection.focusPath, path)}
+        {#if !context.readOnly && resolvedSelection && (isValueSelection(resolvedSelection) || isMultiSelection(resolvedSelection)) && !resolvedSelection.edit && isEqual(resolvedSelection.focusPath, path)}
           <div class="jse-context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -664,7 +666,7 @@
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && resolvedSelection && (resolvedSelection.type === SELECTION_TYPE.VALUE || resolvedSelection.type === SELECTION_TYPE.MULTI) && !resolvedSelection.edit && isEqual(resolvedSelection.focusPath, path)}
+        {#if !context.readOnly && resolvedSelection && (isValueSelection(resolvedSelection) || isMultiSelection(resolvedSelection)) && !resolvedSelection.edit && isEqual(resolvedSelection.focusPath, path)}
           <div class="jse-context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -749,7 +751,7 @@
           selection={resolvedSelection}
           {context}
         />
-        {#if !context.readOnly && resolvedSelection && (resolvedSelection.type === SELECTION_TYPE.VALUE || resolvedSelection.type === SELECTION_TYPE.MULTI) && !resolvedSelection.edit && isEqual(resolvedSelection.focusPath, path)}
+        {#if !context.readOnly && resolvedSelection && (isValueSelection(resolvedSelection) || isMultiSelection(resolvedSelection)) && !resolvedSelection.edit && isEqual(resolvedSelection.focusPath, path)}
           <div class="jse-context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
           </div>

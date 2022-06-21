@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { clipboardToValues, createNewValue, moveInsideParent } from './operations.js'
-import { createMultiSelection, SELECTION_TYPE } from './selection.js'
+import { createMultiSelection } from './selection.js'
 import { createDocumentState, documentStatePatch, getKeys } from './documentState.js'
 
 describe('operations', () => {
@@ -18,10 +18,12 @@ describe('operations', () => {
     })
 
     it('should create a simple value via type "structure"', () => {
-      assert.deepStrictEqual(
-        createNewValue([1, 2, 3], { type: SELECTION_TYPE.MULTI, paths: [[0]] }, 'structure'),
-        ''
-      )
+      const json = [1, 2, 3]
+      const documentState = createDocumentState()
+      const path = [0]
+      const selection = createMultiSelection(json, documentState, path, path)
+
+      assert.deepStrictEqual(createNewValue(json, selection, 'structure'), '')
     })
 
     it('should create a nested object via type "structure"', () => {
@@ -34,17 +36,17 @@ describe('operations', () => {
           d: [1, 2, 3]
         }
       ]
+      const documentState = createDocumentState()
+      const path = [0]
+      const selection = createMultiSelection(json, documentState, path, path)
 
-      assert.deepStrictEqual(
-        createNewValue(json, { type: SELECTION_TYPE.MULTI, paths: [[0]] }, 'structure'),
-        {
-          a: '',
-          b: {
-            c: ''
-          },
-          d: []
-        }
-      )
+      assert.deepStrictEqual(createNewValue(json, selection, 'structure'), {
+        a: '',
+        b: {
+          c: ''
+        },
+        d: []
+      })
     })
   })
 

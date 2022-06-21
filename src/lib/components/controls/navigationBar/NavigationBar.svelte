@@ -59,9 +59,7 @@
   function handleSelect(path: Path) {
     debug('select path', JSON.stringify(path))
 
-    const newSelection = createMultiSelection(json, documentState, path, path)
-
-    onSelect(newSelection)
+    onSelect(createMultiSelection(json, documentState, path, path))
   }
 </script>
 

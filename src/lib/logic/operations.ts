@@ -534,16 +534,20 @@ export function moveInsideParent(
   }
 }
 
-export function createNewValue(json, selection, type) {
-  if (type === 'object') {
+export function createNewValue(
+  json: JSONData,
+  selection: Selection,
+  valueType: 'object' | 'array' | 'structure' | 'value'
+) {
+  if (valueType === 'object') {
     return {}
   }
 
-  if (type === 'array') {
+  if (valueType === 'array') {
     return []
   }
 
-  if (type === 'structure') {
+  if (valueType === 'structure') {
     const parentPath = getParentPath(selection)
     const parent = getIn(json, parentPath)
 
