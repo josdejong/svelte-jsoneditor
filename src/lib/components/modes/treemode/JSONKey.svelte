@@ -8,9 +8,15 @@
   import EditableDiv from '../../controls/EditableDiv.svelte'
   import { addNewLineSuffix } from '$lib/utils/domUtils'
   import { UPDATE_SELECTION } from '$lib/constants'
-  import type { DocumentState, Path, SearchResultItem, TreeModeContext } from '$lib/types'
+  import type {
+    DocumentState,
+    Path,
+    SearchResultItem,
+    TreeModeContext,
+    Selection
+  } from '$lib/types'
   import { SearchField } from '$lib/types'
-  import { derived } from 'svelte/store'
+  import { derived, get, type Readable } from 'svelte/store'
   import { isKeySelection } from '../../../logic/selection.js'
   import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
   import { compileJSONPointer } from 'immutable-json-patch'
@@ -22,13 +28,16 @@
   export let context: TreeModeContext
 
   $: pointer = compileJSONPointer(path)
-  $: selection = derived(context.documentStateStore, (state) => state.selectionMap[pointer])
-  $: isEditingKey = derived(selection, ($selection) => {
-    const selectedKey = isKeySelection($selection)
-    return !context.readOnly && selectedKey && $selection && $selection['edit'] === true
+  const selectionStore: Readable<Selection | undefined> = derived(
+    context.documentStateStore,
+    (state) => state.selectionMap[pointer]
+  )
+  const isEditingKeyStore = derived(selectionStore, (selection) => {
+    const selectedKey = isKeySelection(selection)
+    return !context.readOnly && selectedKey && $selectionStore && $selectionStore['edit'] === true
   })
 
-  $: searchResultItems = derived(context.documentStateStore, (state: DocumentState) => {
+  const searchResultItemsStore = derived(context.documentStateStore, (state: DocumentState) => {
     const items: SearchResultItem[] = state.searchResult?.itemsMap[pointer]?.filter(
       (item: SearchResultItem) => item.field === SearchField.key
     )
@@ -37,7 +46,7 @@
   })
 
   function handleKeyDoubleClick(event) {
-    if (!$isEditingKey && !context.readOnly) {
+    if (!get(isEditingKeyStore) && !context.readOnly) {
       event.preventDefault()
       context.onSelect(createKeySelection(path, true))
     }
@@ -67,7 +76,7 @@
   }
 </script>
 
-{#if $isEditingKey}
+{#if $isEditingKeyStore}
   <EditableDiv
     value={context.normalization.escapeValue(key)}
     shortText
@@ -77,17 +86,17 @@
   />
 {:else}
   <div data-type="selectable-key" class={getKeyClass(key)} on:dblclick={handleKeyDoubleClick}>
-    {#if $searchResultItems}
+    {#if $searchResultItemsStore}
       <SearchResultHighlighter
         text={context.normalization.escapeValue(key)}
-        searchResultItems={$searchResultItems}
+        searchResultItems={$searchResultItemsStore}
       />
     {:else}
       {addNewLineSuffix(context.normalization.escapeValue(key))}
     {/if}
   </div>
 {/if}
-{#if !context.readOnly && isKeySelection($selection)}
+{#if !context.readOnly && isKeySelection($selectionStore)}
   <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
 {/if}
 

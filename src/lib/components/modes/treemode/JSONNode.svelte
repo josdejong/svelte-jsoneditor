@@ -75,22 +75,21 @@
   $: resolvedSelection =
     dragging?.updatedSelection != undefined ? dragging.updatedSelection : selection
 
-  $: selected = isMultiSelection(resolvedSelection)
-  $: selectedAfter = isAfterSelection(resolvedSelection)
-  $: selectedInside = isInsideSelection(resolvedSelection)
-  $: selectedKey = isKeySelection(resolvedSelection)
-  $: selectedValue = isValueSelection(resolvedSelection)
-
-  const visibleSections = derived(context.documentStateStore, (state) =>
+  const visibleSectionsStore = derived(context.documentStateStore, (state) =>
     getVisibleSections(state, pointer)
   )
-  const keys = derived(context.documentStateStore, (state) => {
+  const keysStore = derived(context.documentStateStore, (state) => {
     return getKeys(value as JSONObject, state, pointer)
   })
 
-  const validationError: ValidationError | undefined = derived(
+  const validationErrorStore: ValidationError | undefined = derived(
     context.documentStateStore,
     (state) => state.validationErrorsMap[pointer]
+  )
+
+  const expandedStore: Readable<boolean> = derived(
+    context.documentStateStore,
+    (state) => !!state.expandedMap[pointer]
   )
 
   const unsubscribe = context.documentStateStore.subscribe((state) => {
@@ -104,11 +103,13 @@
   })
 
   beforeUpdate(() =>
-    debug('beforeUpdate', { type, path, keys: get(keys), visibleSections: get(visibleSections) })
+    debug('beforeUpdate', {
+      type,
+      path,
+      keys: get(keysStore),
+      visibleSections: get(visibleSectionsStore)
+    })
   ) // FIXME: cleanup
-
-  let expanded: Readable<boolean>
-  $: expanded = derived(context.documentStateStore, (state) => !!state.expandedMap[pointer])
 
   function getIndentationStyle(level) {
     return `margin-left: calc(${level} * var(--jse-indent-size))`
@@ -124,7 +125,7 @@
     event.stopPropagation()
 
     const recursive = event.ctrlKey
-    context.onExpand(path, !$expanded, recursive)
+    context.onExpand(path, !get(expandedStore), recursive)
   }
 
   function handleExpand(event) {
@@ -134,7 +135,7 @@
   }
 
   function handleUpdateKey(oldKey, newKey) {
-    const operations = rename(path, $keys, oldKey, newKey)
+    const operations = rename(path, get(keysStore), oldKey, newKey)
     context.onPatch(operations)
 
     // It is possible that the applied key differs from newKey,
@@ -400,7 +401,7 @@
       // if the selection is spread over multiple visible sections,
       // we will not return any items, so dragging will not work there.
       // We do this to keep things simple for now.
-      const currentSection = $visibleSections.find((visibleSection) => {
+      const currentSection = get(visibleSectionsStore).find((visibleSection) => {
         return startIndex >= visibleSection.start && endIndex <= visibleSection.end
       })
 
@@ -477,14 +478,14 @@
 <div
   class={classnames(
     'jse-json-node',
-    { 'jse-expanded': $expanded },
+    { 'jse-expanded': $expandedStore },
     context.onClassName(path, resolvedValue)
   )}
   data-path={encodeDataPath(path)}
   class:jse-root={root}
-  class:jse-selected={selected}
-  class:jse-selected-key={selectedKey}
-  class:jse-selected-value={selectedValue}
+  class:jse-selected={isMultiSelection(resolvedSelection)}
+  class:jse-selected-key={isKeySelection(resolvedSelection)}
+  class:jse-selected-value={isValueSelection(resolvedSelection)}
   class:jse-hovered={hover === HOVER_COLLECTION}
   on:mousedown={handleMouseDown}
   on:mousemove={handleMouseMove}
@@ -502,7 +503,7 @@
           on:click={toggleExpand}
           title="Expand or collapse this array (Ctrl+Click to expand/collapse recursively)"
         >
-          {#if $expanded}
+          {#if $expandedStore}
             <Icon data={faCaretDown} />
           {:else}
             <Icon data={faCaretRight} />
@@ -514,7 +515,7 @@
         {/if}
         <div class="jse-meta">
           <div class="jse-meta-inner" data-type="selectable-value">
-            {#if $expanded}
+            {#if $expandedStore}
               <div class="jse-bracket">[</div>
               <span class="jse-tag jse-expanded">
                 {resolvedValue.length}
@@ -536,10 +537,10 @@
           </div>
         {/if}
       </div>
-      {#if $validationError && (!$expanded || !$validationError.isChildError)}
-        <ValidationError validationError={$validationError} onExpand={handleExpand} />
+      {#if $validationErrorStore && (!$expandedStore || !$validationErrorStore.isChildError)}
+        <ValidationError validationError={$validationErrorStore} onExpand={handleExpand} />
       {/if}
-      {#if $expanded}
+      {#if $expandedStore}
         <div
           class="jse-insert-selection-area jse-inside"
           data-type="insert-selection-area-inside"
@@ -553,24 +554,24 @@
         />
       {/if}
     </div>
-    {#if $expanded}
+    {#if $expandedStore}
       <div class="jse-items">
-        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || selectedInside)}
+        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || isInsideSelection(resolvedSelection))}
           <div
             class="jse-insert-area jse-inside"
             class:jse-hovered={hover === HOVER_INSERT_INSIDE}
-            class:jse-selected={selectedInside}
+            class:jse-selected={isInsideSelection(resolvedSelection)}
             data-type="insert-selection-area-inside"
             style={getIndentationStyle(path.length + 1)}
             title={INSERT_EXPLANATION}
           >
             <ContextMenuButton
-              selected={selectedInside}
+              selected={isInsideSelection(resolvedSelection)}
               onContextMenu={handleInsertInsideOpenContextMenu}
             />
           </div>
         {/if}
-        {#each $visibleSections as visibleSection, sectionIndex (sectionIndex)}
+        {#each $visibleSectionsStore as visibleSection, sectionIndex (sectionIndex)}
           {#each resolvedValue.slice(visibleSection.start, Math.min(visibleSection.end, resolvedValue.length)) as item, itemIndex (itemIndex)}
             <svelte:self
               value={item}
@@ -585,7 +586,7 @@
           {/each}
           {#if visibleSection.end < resolvedValue.length}
             <CollapsedItems
-              visibleSections={$visibleSections}
+              visibleSections={$visibleSectionsStore}
               {sectionIndex}
               total={resolvedValue.length}
               {path}
@@ -617,7 +618,7 @@
           on:click={toggleExpand}
           title="Expand or collapse this object (Ctrl+Click to expand/collapse recursively)"
         >
-          {#if $expanded}
+          {#if $expandedStore}
             <Icon data={faCaretDown} />
           {:else}
             <Icon data={faCaretRight} />
@@ -629,7 +630,7 @@
         {/if}
         <div class="jse-meta" data-type="selectable-value">
           <div class="jse-meta-inner">
-            {#if $expanded}
+            {#if $expandedStore}
               <div class="jse-bracket jse-expanded">&lbrace;</div>
             {:else}
               <div class="jse-bracket">&lbrace;</div>
@@ -647,10 +648,10 @@
           </div>
         {/if}
       </div>
-      {#if $validationError && (!$expanded || !$validationError.isChildError)}
-        <ValidationError validationError={$validationError} onExpand={handleExpand} />
+      {#if $validationErrorStore && (!$expandedStore || !$validationErrorStore.isChildError)}
+        <ValidationError validationError={$validationErrorStore} onExpand={handleExpand} />
       {/if}
-      {#if $expanded}
+      {#if $expandedStore}
         <div
           class="jse-insert-selection-area jse-inside"
           data-type="insert-selection-area-inside"
@@ -664,24 +665,24 @@
         />
       {/if}
     </div>
-    {#if $expanded}
+    {#if $expandedStore}
       <div class="jse-props">
-        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || selectedInside)}
+        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || isInsideSelection(resolvedSelection))}
           <div
             class="jse-insert-area jse-inside"
             class:jse-hovered={hover === HOVER_INSERT_INSIDE}
-            class:jse-selected={selectedInside}
+            class:jse-selected={isInsideSelection(resolvedSelection)}
             data-type="insert-selection-area-inside"
             style={getIndentationStyle(path.length + 1)}
             title={INSERT_EXPLANATION}
           >
             <ContextMenuButton
-              selected={selectedInside}
+              selected={isInsideSelection(resolvedSelection)}
               onContextMenu={handleInsertInsideOpenContextMenu}
             />
           </div>
         {/if}
-        {#each $keys as key}
+        {#each $keysStore as key}
           <svelte:self
             value={resolvedValue[key]}
             path={memoizePath(path.concat(key))}
@@ -732,8 +733,8 @@
           </div>
         {/if}
       </div>
-      {#if $validationError}
-        <ValidationError validationError={$validationError} onExpand={handleExpand} />
+      {#if $validationErrorStore}
+        <ValidationError validationError={$validationErrorStore} onExpand={handleExpand} />
       {/if}
       {#if !root}
         <div
@@ -744,17 +745,17 @@
       {/if}
     </div>
   {/if}
-  {#if !context.readOnly && (hover === HOVER_INSERT_AFTER || selectedAfter)}
+  {#if !context.readOnly && (hover === HOVER_INSERT_AFTER || isAfterSelection(resolvedSelection))}
     <div
       class="jse-insert-area jse-after"
       class:jse-hovered={hover === HOVER_INSERT_AFTER}
-      class:jse-selected={selectedAfter}
+      class:jse-selected={isAfterSelection(resolvedSelection)}
       data-type="insert-selection-area-after"
       style={indentationStyle}
       title={INSERT_EXPLANATION}
     >
       <ContextMenuButton
-        selected={selectedAfter}
+        selected={isAfterSelection(resolvedSelection)}
         onContextMenu={handleInsertAfterOpenContextMenu}
       />
     </div>
