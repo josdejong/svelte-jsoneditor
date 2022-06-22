@@ -35,7 +35,7 @@
 
   $: isSelected = isValueSelection(selection) ? isEqual(selection.focusPath, path) : false
 
-  $: isEditing = !context.readOnly && isEditingSelection(selection)
+  $: isEditing = !context.readOnly && isValueSelection(selection) && isEditingSelection(selection)
 
   $: renderers = context.onRenderValue({
     path,

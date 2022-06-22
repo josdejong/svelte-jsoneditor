@@ -107,7 +107,7 @@
     {/if}
   </div>
 {/if}
-{#if !context.readOnly && isSelected}
+{#if !context.readOnly && isSelected && !isEditingKey}
   <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
 {/if}
 
