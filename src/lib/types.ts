@@ -42,7 +42,7 @@ export interface CaretPosition {
 }
 
 export interface DocumentState {
-  // TODO: merge expandedMap, enforceStringMap, keysMap, and visibleSectionsMap into a single stateMap
+  // TODO: merge expandedMap, enforceStringMap, keysMap, and visibleSectionsMap into a single stateMap?
   expandedMap: PathsMap<boolean>
   enforceStringMap: PathsMap<boolean>
   keysMap: PathsMap<string[]>

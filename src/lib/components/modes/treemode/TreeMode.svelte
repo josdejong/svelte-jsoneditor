@@ -31,6 +31,7 @@
     documentStatePatch,
     expandPath,
     expandSection,
+    expandSingleItem,
     expandWithCallback,
     getEnforceString,
     setEnforceString
@@ -200,6 +201,8 @@
   function updateSelection(
     selection: Selection | undefined | ((selection: Selection | undefined) => Selection | undefined)
   ) {
+    debug('updateSelection', selection)
+
     documentStateStore.update((state) => {
       const updatedSelection =
         typeof selection === 'function' ? selection(state.selection) : selection
@@ -217,10 +220,10 @@
   }
 
   const documentStateStore = writable<DocumentState>(
-    createDocumentState({ json, expand: expandMinimal })
+    createDocumentState({ json, expand: getDefaultExpand(json) })
   )
 
-  $: debug('documentState', get(documentStateStore))
+  $: debug('documentState', $documentStateStore)
 
   let normalization: ValueNormalization
   $: normalization = createNormalizationFunctions({
@@ -338,12 +341,17 @@
 
   function applySearch() {
     if (searchText === '') {
-      documentStateStore.update((state) => {
-        return {
-          ...state,
-          searchResult: undefined
-        }
-      })
+      debug('clearing search result')
+
+      if (get(documentStateStore).searchResult !== undefined) {
+        documentStateStore.update((state) => {
+          return {
+            ...state,
+            searchResult: undefined
+          }
+        })
+      }
+
       return
     }
 
@@ -388,6 +396,7 @@
   let historyState = history.getState()
 
   export function expand(callback = () => true) {
+    debug('expand')
     documentStateStore.update((state) => expandWithCallback(json, state, rootPath, callback))
   }
 
@@ -404,6 +413,8 @@
     const validationErrors: ValidationError[] = validator ? validator(json) : []
 
     if (!isEqual(validationErrors, get(documentStateStore).validationErrors)) {
+      debug('updateValidationErrors', validationErrors)
+
       documentStateStore.update((state) => ({
         ...state,
         validationErrors,
@@ -535,16 +546,20 @@
   }
 
   function clearSelectionWhenNotExisting(json) {
-    documentStateStore.update((state) => {
-      if (
-        state.selection &&
-        existsIn(json, state.selection.anchorPath as JSONPath) &&
-        existsIn(json, state.selection.focusPath as JSONPath)
-      ) {
-        return state
-      }
+    if ($documentStateStore.selection === undefined) {
+      return
+    }
 
-      debug('clearing selection: path does not exist anymore')
+    if (
+      $documentStateStore.selection &&
+      existsIn(json, $documentStateStore.selection.anchorPath as JSONPath) &&
+      existsIn(json, $documentStateStore.selection.focusPath as JSONPath)
+    ) {
+      return
+    }
+
+    documentStateStore.update((state) => {
+      debug('clearing selection: path does not exist anymore', state.selection)
 
       return { ...state, selection: undefined }
     })
@@ -632,6 +647,8 @@
   }
 
   function createDefaultSelection() {
+    debug('createDefaultSelection')
+
     documentStateStore.update((state) => {
       return {
         ...state,
@@ -644,6 +661,8 @@
     operations: JSONPatchDocument,
     afterPatch?: AfterPatchCallback
   ): JSONPatchResult {
+    debug('patch', operations)
+
     if (json === undefined) {
       throw new Error('Cannot apply patch: no JSON')
     }
@@ -736,6 +755,7 @@
   }
 
   function handleToggleEnforceString() {
+    debug('handleToggleEnforceString')
     const documentState = get(documentStateStore)
     const selection = documentState.selection
 
@@ -1666,6 +1686,11 @@
     return expandWithCallback(json, documentState, path, expandCallback)
   }
 
+  // FIXME: cleanup
+  documentStateStore.subscribe((documentState) => {
+    debug('documentState', documentState)
+  })
+
   /**
    * Toggle expanded state of a node
    * @param path The path to be expanded
@@ -1673,10 +1698,14 @@
    * @param [recursive=false]  Only applicable when expanding
    */
   function handleExpand(path: Path, expanded: boolean, recursive = false): void {
+    debug('expand', { path, expanded, recursive })
+
     if (expanded) {
-      documentStateStore.update((state) =>
-        expandWithCallback(json, state, path, recursive ? expandAll : expandMinimal)
-      )
+      if (recursive) {
+        documentStateStore.update((state) => expandWithCallback(json, state, path, expandAll))
+      } else {
+        documentStateStore.update((state) => expandSingleItem(state, path))
+      }
     } else {
       documentStateStore.update((state) => collapsePath(state, path))
     }
@@ -2181,6 +2210,22 @@
     return json
   }
 
+  $: autoScrollHandler = refContents ? createAutoScrollHandler(refContents) : undefined
+
+  function handleDrag(event) {
+    if (autoScrollHandler) {
+      autoScrollHandler.onDrag(event)
+    }
+  }
+
+  function handleDragEnd() {
+    if (autoScrollHandler) {
+      autoScrollHandler.onDragEnd()
+    }
+  }
+
+  // Note that we want the context to change as little as possible since it forces all nodes to re-render,
+  // it should only change when a config option like readOnly or onClassName is changed
   let context: TreeModeContext
   $: context = {
     documentStateStore,
@@ -2199,13 +2244,11 @@
     onRenderValue,
     onContextMenu: openContextMenu,
     onClassName,
-    onDrag: autoScrollHandler.onDrag,
-    onDragEnd: autoScrollHandler.onDragEnd
+    onDrag: handleDrag,
+    onDragEnd: handleDragEnd
   }
 
   $: debug('context changed', context)
-
-  $: autoScrollHandler = createAutoScrollHandler(refContents)
 </script>
 
 <svelte:window on:mousedown={handleWindowMouseDown} />

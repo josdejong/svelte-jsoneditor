@@ -17,12 +17,13 @@
   $: pointer = compileJSONPointer(path)
 
   let searchResultItems: SearchResultItem[] | undefined = undefined
+
   const unsubscribe = context.documentStateStore.subscribe((state) => {
+    // search results
     const items: SearchResultItem[] = state.searchResult?.itemsMap[pointer]?.filter(
       (item: SearchResultItem) => item.field === SearchField.value
     )
     const nonEmptyItems = !isEmpty(items) ? items : undefined
-
     if (!isEqual(nonEmptyItems, searchResultItems)) {
       searchResultItems = nonEmptyItems
     }

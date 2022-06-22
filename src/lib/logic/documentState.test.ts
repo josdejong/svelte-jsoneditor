@@ -1,5 +1,5 @@
 import assert, { deepStrictEqual } from 'assert'
-import { flatMap, range, times } from 'lodash-es'
+import { flatMap, isEqual, range, times } from 'lodash-es'
 import { ARRAY_SECTION_SIZE } from '../constants.js'
 import {
   collapsePath,
@@ -51,6 +51,22 @@ describe('documentState', () => {
         '/array': true,
         '/array/2': true,
         '/object': true
+      })
+    })
+
+    it('should expand a nested item of a json document', () => {
+      assert.deepStrictEqual(
+        expandWithCallback(json, state, ['array'], (path) => isEqual(path, ['array'])).expandedMap,
+        {
+          '/array': true
+        }
+      )
+    })
+
+    it('should expand a part of a json document recursively', () => {
+      assert.deepStrictEqual(expandWithCallback(json, state, ['array'], () => true).expandedMap, {
+        '/array': true,
+        '/array/2': true
       })
     })
 

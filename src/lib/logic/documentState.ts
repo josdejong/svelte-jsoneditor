@@ -145,7 +145,7 @@ export function expandPath(
 }
 
 /**
- * Expand a node, end expand it's childs according to the provided callback
+ * Expand a node, end expand its children according to the provided callback
  * Nodes that are already expanded will be left untouched
  */
 export function expandWithCallback(
@@ -154,23 +154,36 @@ export function expandWithCallback(
   path: Path,
   expandedCallback: (path: Path) => boolean
 ): DocumentState {
-  const expanded = { ...state.expandedMap }
+  const expandedMap = { ...state.expandedMap }
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const contents: JSONData = getIn(json, path)
-  traverse(contents, (value, nestedPath) => {
+  traverse(contents, (value, relativePath) => {
+    const nestedPath = path.concat(relativePath)
+
     if (isObjectOrArray(value) && expandedCallback(nestedPath)) {
-      expanded[compileJSONPointer(nestedPath)] = true
+      expandedMap[compileJSONPointer(nestedPath)] = true
     } else {
-      // do not iterate over the childs of this object or array
+      // do not iterate over the children of this object or array
       return false
     }
   })
 
   return {
     ...state,
-    expandedMap: expanded
+    expandedMap
+  }
+}
+
+// TODO: write unit tests
+export function expandSingleItem(state: DocumentState, path: Path): DocumentState {
+  return {
+    ...state,
+    expandedMap: {
+      ...state.expandedMap,
+      [compileJSONPointer(path)]: true
+    }
   }
 }
 
