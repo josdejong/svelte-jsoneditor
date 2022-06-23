@@ -2345,7 +2345,7 @@
         />
       </div>
       <div class="jse-contents" data-jsoneditor-scrollable-contents={true} bind:this={refContents}>
-        <JSONNode value={json} path={rootPath} {context} onDragSelectionStart={noop} />
+        <JSONNode value={json} pointer={''} {context} onDragSelectionStart={noop} />
       </div>
 
       {#if pastedJson}

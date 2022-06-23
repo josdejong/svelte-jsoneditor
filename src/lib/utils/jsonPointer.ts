@@ -1,4 +1,4 @@
-import { parseJSONPointer, getIn } from 'immutable-json-patch'
+import { parseJSONPointer, getIn, compileJSONPointer } from 'immutable-json-patch'
 import type { JSONData, JSONPointer, Path } from '../types'
 
 /**
@@ -37,4 +37,13 @@ export function pointerStartsWith(pointer: JSONPointer, searchPointer: JSONPoint
     pointer.startsWith(searchPointer) &&
     (pointer.length === searchPointer.length || pointer[searchPointer.length] === '/')
   )
+}
+
+export function appendToPointer(pointer: JSONPointer, indexOrKey: string | number): JSONPointer {
+  return pointer + compileJSONPointerProp(indexOrKey)
+}
+
+// TODO: export this util function from the immutable-json-patch library
+export function compileJSONPointerProp(p: string | number) {
+  return '/' + String(p).replace(/~/g, '~0').replace(/\//g, '~1')
 }

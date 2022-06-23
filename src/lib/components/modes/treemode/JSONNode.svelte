@@ -3,7 +3,7 @@
 <script lang="ts">
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
-  import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
+  import { parseJSONPointer } from 'immutable-json-patch'
   import { initial, isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
@@ -45,12 +45,11 @@
   import { createDebug } from '$lib/utils/debug'
   import { onMoveSelection } from '$lib/logic/dragging'
   import { forEachIndex } from '$lib/utils/arrayUtils'
-  import { createMemoizePath } from '$lib/utils/pathUtils'
   import type {
     DocumentState,
     JSONData,
     JSONObject,
-    Path,
+    JSONPointer,
     Selection,
     TreeModeContext,
     VisibleSection
@@ -59,12 +58,11 @@
   import { beforeUpdate, onDestroy } from 'svelte'
   import { get } from 'svelte/store'
   import { getStartPath, isAfterSelection, isMultiSelection } from '../../../logic/selection'
+  import { appendToPointer } from '../../../utils/jsonPointer.js'
 
   export let value: JSONData
-  export let path: Path
-
+  export let pointer: JSONPointer
   export let context: TreeModeContext
-
   export let onDragSelectionStart
 
   const debug = createDebug('jsoneditor:JSONNode')
@@ -81,8 +79,7 @@
   $: root = path.length === 0
   $: type = valueType(resolvedValue)
 
-  let pointer = compileJSONPointer(path) // Important, else it's undefined the during mount
-  $: pointer = compileJSONPointer(path)
+  $: path = parseJSONPointer(pointer)
 
   $: resolvedValue = dragging?.updatedValue !== undefined ? dragging.updatedValue : value
   let resolvedSelection: Selection | undefined
@@ -129,10 +126,6 @@
   }
 
   $: indentationStyle = getIndentationStyle(path.length)
-
-  // important to prevent creating a new path for all children with every re-render,
-  // that would force all childs to re-render
-  const memoizePath = createMemoizePath()
 
   function toggleExpand(event) {
     event.stopPropagation()
@@ -588,7 +581,7 @@
           {#each resolvedValue.slice(visibleSection.start, Math.min(visibleSection.end, resolvedValue.length)) as item, itemIndex (itemIndex)}
             <svelte:self
               value={item}
-              path={memoizePath(path.concat(visibleSection.start + itemIndex))}
+              pointer={appendToPointer(pointer, visibleSection.start + itemIndex)}
               {context}
               onDragSelectionStart={handleDragSelectionStart}
             >
@@ -602,7 +595,7 @@
               visibleSections={visibleSections || DEFAULT_VISIBLE_SECTIONS}
               {sectionIndex}
               total={resolvedValue.length}
-              {path}
+              {pointer}
               onExpandSection={context.onExpandSection}
               selection={resolvedSelection}
             />
@@ -698,13 +691,13 @@
         {#each keys || Object.keys(value) as key}
           <svelte:self
             value={resolvedValue[key]}
-            path={memoizePath(path.concat(key))}
+            pointer={appendToPointer(pointer, key)}
             {context}
             onDragSelectionStart={handleDragSelectionStart}
           >
             <div slot="identifier" class="jse-identifier">
               <JSONKey
-                path={memoizePath(path.concat(key))}
+                pointer={appendToPointer(pointer, key)}
                 {key}
                 {context}
                 onUpdateKey={handleUpdateKey}
@@ -734,7 +727,7 @@
           <div class="jse-separator">:</div>
         {/if}
         <JSONValue
-          {path}
+          {pointer}
           {value}
           enforceString={get(context.documentStateStore).enforceStringMap[pointer]}
           selection={resolvedSelection}

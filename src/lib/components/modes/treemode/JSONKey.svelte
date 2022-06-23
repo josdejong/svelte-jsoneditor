@@ -12,20 +12,18 @@
   import EditableDiv from '../../controls/EditableDiv.svelte'
   import { addNewLineSuffix } from '$lib/utils/domUtils'
   import { UPDATE_SELECTION } from '$lib/constants'
-  import type { Path, SearchResultItem, TreeModeContext } from '$lib/types'
+  import type { JSONPointer, SearchResultItem, TreeModeContext } from '$lib/types'
   import { SearchField } from '$lib/types'
   import { isKeySelection } from '../../../logic/selection.js'
   import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
-  import { compileJSONPointer } from 'immutable-json-patch'
+  import { parseJSONPointer } from 'immutable-json-patch'
   import { onDestroy } from 'svelte'
 
-  export let path: Path
+  export let pointer: JSONPointer
   export let key: string
   export let onUpdateKey: (oldKey: string, newKey: string) => string
 
   export let context: TreeModeContext
-
-  $: pointer = compileJSONPointer(path)
 
   let isSelected = false
   let isEditingKey = false
@@ -62,6 +60,7 @@
   function handleKeyDoubleClick(event) {
     if (!isEditingKey && !context.readOnly) {
       event.preventDefault()
+      const path = parseJSONPointer(pointer)
       context.onSelect(createKeySelection(path, true))
     }
   }
@@ -73,6 +72,7 @@
   }
 
   function handleChangeValue(newKey, updateSelection) {
+    const path = parseJSONPointer(pointer)
     const updatedKey = onUpdateKey(key, context.normalization.unescapeValue(newKey))
     const updatedPath = initial(path).concat(updatedKey)
 
@@ -86,6 +86,7 @@
   }
 
   function handleCancelChange() {
+    const path = parseJSONPointer(pointer)
     context.onSelect(createKeySelection(path, false))
   }
 </script>
