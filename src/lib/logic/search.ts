@@ -12,6 +12,8 @@ import type {
   JSONObject,
   JSONPatchDocument,
   JSONPatchOperation,
+  JSONPointer,
+  JSONPointerMap,
   Path,
   SearchResult,
   SearchResultItem,
@@ -439,4 +441,32 @@ export function splitValue(
  */
 function getSearchResultPath(searchResultItem: SearchResultItem): Path {
   return searchResultItem.path.concat(searchResultItem.field, searchResultItem.fieldIndex)
+}
+
+// TODO: write unit tests
+export function filterKeySearchResults(
+  map: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
+  pointer: JSONPointer
+): ExtendedSearchResultItem[] | undefined {
+  const items = map?.[pointer]?.filter((item: SearchResultItem) => item.field === SearchField.key)
+
+  if (!items || items.length === 0) {
+    return undefined
+  }
+
+  return items
+}
+
+// TODO: write unit tests
+export function filterValueSearchResults(
+  map: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
+  pointer: JSONPointer
+): ExtendedSearchResultItem[] | undefined {
+  const items = map?.[pointer]?.filter((item: SearchResultItem) => item.field === SearchField.value)
+
+  if (!items || items.length === 0) {
+    return undefined
+  }
+
+  return items
 }

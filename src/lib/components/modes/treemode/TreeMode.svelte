@@ -214,8 +214,7 @@
 
       return {
         ...state,
-        selection: updatedSelection,
-        selectionMap: updatedSelection ? createSelectionMap(updatedSelection) : {}
+        selection: updatedSelection
       }
     })
   }
@@ -2345,7 +2344,19 @@
         />
       </div>
       <div class="jse-contents" data-jsoneditor-scrollable-contents={true} bind:this={refContents}>
-        <JSONNode value={json} pointer={''} {context} onDragSelectionStart={noop} />
+        <JSONNode
+          value={json}
+          pointer={''}
+          expandedMap={$documentStateStore.expandedMap}
+          enforceStringMap={$documentStateStore.enforceStringMap}
+          keysMap={$documentStateStore.keysMap}
+          visibleSectionsMap={$documentStateStore.visibleSectionsMap}
+          validationErrorsMap={$documentStateStore.validationErrorsMap}
+          searchResultItemsMap={$documentStateStore.searchResult?.itemsMap}
+          selection={$documentStateStore.selection}
+          {context}
+          onDragSelectionStart={noop}
+        />
       </div>
 
       {#if pastedJson}

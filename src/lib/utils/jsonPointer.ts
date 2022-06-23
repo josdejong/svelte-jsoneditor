@@ -1,5 +1,5 @@
-import { parseJSONPointer, getIn, compileJSONPointer } from 'immutable-json-patch'
-import type { JSONData, JSONPointer, Path } from '../types'
+import { getIn, parseJSONPointer } from 'immutable-json-patch'
+import type { JSONData, JSONPointer, JSONPointerMap, Path } from '../types'
 
 /**
  * Parse a JSONPointer, and turn array indices into numeric values.
@@ -46,4 +46,32 @@ export function appendToPointer(pointer: JSONPointer, indexOrKey: string | numbe
 // TODO: export this util function from the immutable-json-patch library
 export function compileJSONPointerProp(p: string | number) {
   return '/' + String(p).replace(/~/g, '~0').replace(/\//g, '~1')
+}
+
+// TODO: write unit tests
+export function filterMapOrUndefined<T>(
+  map: JSONPointerMap<T> | undefined,
+  filter: (pointer: JSONPointer, value: T) => boolean
+): JSONPointerMap<T> | undefined {
+  if (!map) {
+    return undefined
+  }
+
+  const filteredMap = {}
+
+  for (const p of Object.keys(map)) {
+    if (filter(p, map[p])) {
+      filteredMap[p] = map[p]
+    }
+  }
+
+  return Object.keys(filteredMap).length > 0 ? filteredMap : undefined
+}
+
+// TODO: write unit tests
+export function filterPointerOrUndefined<T>(
+  map: JSONPointerMap<T> | undefined,
+  pointer: JSONPointer
+): JSONPointerMap<T> | undefined {
+  return filterMapOrUndefined(map, (p) => pointerStartsWith(p, pointer))
 }

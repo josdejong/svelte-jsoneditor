@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import classnames from 'classnames'
-  import { initial, isEmpty, isEqual } from 'lodash-es'
+  import { initial } from 'lodash-es'
   import {
     createKeySelection,
     createValueSelection,
@@ -12,50 +12,24 @@
   import EditableDiv from '../../controls/EditableDiv.svelte'
   import { addNewLineSuffix } from '$lib/utils/domUtils'
   import { UPDATE_SELECTION } from '$lib/constants'
-  import type { JSONPointer, SearchResultItem, TreeModeContext } from '$lib/types'
-  import { SearchField } from '$lib/types'
+  import type { ExtendedSearchResultItem, JSONPointer, TreeModeContext } from '$lib/types'
+  import { type Selection } from '$lib/types'
   import { isKeySelection } from '../../../logic/selection.js'
   import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
   import { parseJSONPointer } from 'immutable-json-patch'
-  import { onDestroy } from 'svelte'
 
   export let pointer: JSONPointer
   export let key: string
+  export let selection: Selection | undefined
+  export let searchResultItems: ExtendedSearchResultItem[] | undefined
   export let onUpdateKey: (oldKey: string, newKey: string) => string
 
   export let context: TreeModeContext
 
-  let isSelected = false
-  let isEditingKey = false
-  let searchResultItems: SearchResultItem[] | undefined = undefined
-
-  const unsubscribe = context.documentStateStore.subscribe((state) => {
-    // search results
-    const items: SearchResultItem[] = state.searchResult?.itemsMap[pointer]?.filter(
-      (item: SearchResultItem) => item.field === SearchField.key
-    )
-    const nonEmptyItems = !isEmpty(items) ? items : undefined
-    if (!isEqual(nonEmptyItems, searchResultItems)) {
-      searchResultItems = nonEmptyItems
-    }
-
-    // selection
-    const selection = state.selectionMap[pointer]
-    const selected = isKeySelection(selection)
-    if (isSelected !== selected) {
-      isSelected = selected
-    }
-
-    // editing
-    const editingKey = !context.readOnly && isSelected && isEditingSelection(selection)
-    if (isEditingKey !== editingKey) {
-      isEditingKey = editingKey
-    }
-  })
-
-  onDestroy(() => {
-    unsubscribe()
-  })
+  $: isSelected = selection
+    ? selection.pointersMap[pointer] === true && isKeySelection(selection)
+    : undefined
+  $: isEditingKey = isSelected && isEditingSelection(selection)
 
   function handleKeyDoubleClick(event) {
     if (!isEditingKey && !context.readOnly) {

@@ -23,7 +23,7 @@
   $: endIndex = visibleSections[sectionIndex + 1] ? visibleSections[sectionIndex + 1].start : total
 
   $: selected = isMultiSelection(selection)
-    ? selection.pathsMap[appendToPointer(pointer, startIndex)] === true
+    ? selection.pointersMap[appendToPointer(pointer, startIndex)] === true
     : false
 
   $: expandItemsSections = getExpandItemsSections(startIndex, endIndex)

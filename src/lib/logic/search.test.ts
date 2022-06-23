@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { compileJSONPointer, immutableJSONPatch } from 'immutable-json-patch'
+import { immutableJSONPatch } from 'immutable-json-patch'
 import { createDocumentState } from './documentState.js'
 import {
   createSearchAndReplaceAllOperations,
@@ -11,6 +11,7 @@ import {
 } from './search.js'
 import type { ExtendedSearchResultItem, Path, SearchResultItem } from '../types.js'
 import { SearchField } from '../types.js'
+import { createKeySelection, createValueSelection } from './selection.js'
 
 describe('search', () => {
   it('search in JSON', () => {
@@ -264,12 +265,7 @@ describe('search', () => {
       }
     ])
 
-    assert.deepStrictEqual(newSelection, {
-      type: 'value',
-      anchorPath: ['hello world'],
-      focusPath: ['hello world'],
-      edit: false
-    })
+    assert.deepStrictEqual(newSelection, createValueSelection(['hello world'], false))
 
     const updatedJson = immutableJSONPatch(json, operations)
     assert.deepStrictEqual(updatedJson, {
@@ -301,12 +297,7 @@ describe('search', () => {
       { op: 'move', from: '/after', path: '/after' }
     ])
 
-    assert.deepStrictEqual(newSelection, {
-      type: 'key',
-      anchorPath: ['hello *'],
-      focusPath: ['hello *'],
-      edit: false
-    })
+    assert.deepStrictEqual(newSelection, createKeySelection(['hello *'], false))
 
     const updatedJson = immutableJSONPatch(json, operations)
     assert.deepStrictEqual(updatedJson, {
@@ -440,12 +431,7 @@ describe('search', () => {
       { op: 'move', from: '/after', path: '/after' }
     ])
 
-    assert.deepStrictEqual(newSelection, {
-      anchorPath: ['hello *'],
-      edit: false,
-      focusPath: ['hello *'],
-      type: 'key'
-    })
+    assert.deepStrictEqual(newSelection, createKeySelection(['hello *'], false))
 
     const updatedJson = immutableJSONPatch(json, operations)
     assert.deepStrictEqual(updatedJson, {

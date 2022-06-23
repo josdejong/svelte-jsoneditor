@@ -1,7 +1,6 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { isEmpty, isEqual } from 'lodash-es'
   import type {
     JSONData,
     JSONPointer,
@@ -9,8 +8,6 @@
     Selection,
     TreeModeContext
   } from '../../../types'
-  import { SearchField } from '../../../types'
-  import { onDestroy } from 'svelte'
   import { parseJSONPointer } from 'immutable-json-patch'
   import { isEditingSelection, isValueSelection } from '../../../logic/selection'
 
@@ -19,27 +16,13 @@
   export let context: TreeModeContext
   export let enforceString: boolean
   export let selection: Selection | undefined
+  export let searchResultItems: SearchResultItem[] | undefined
 
   $: path = parseJSONPointer(pointer)
 
-  let searchResultItems: SearchResultItem[] | undefined = undefined
-
-  const unsubscribe = context.documentStateStore.subscribe((state) => {
-    // search results
-    const items: SearchResultItem[] = state.searchResult?.itemsMap[pointer]?.filter(
-      (item: SearchResultItem) => item.field === SearchField.value
-    )
-    const nonEmptyItems = !isEmpty(items) ? items : undefined
-    if (!isEqual(nonEmptyItems, searchResultItems)) {
-      searchResultItems = nonEmptyItems
-    }
-  })
-
-  onDestroy(() => {
-    unsubscribe()
-  })
-
-  $: isSelected = isValueSelection(selection) ? isEqual(selection.focusPath, path) : false
+  $: isSelected = selection
+    ? selection.pointersMap[pointer] === true && isValueSelection(selection)
+    : undefined
 
   $: isEditing = !context.readOnly && isValueSelection(selection) && isEditingSelection(selection)
 

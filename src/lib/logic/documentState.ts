@@ -9,7 +9,7 @@ import { initial, isEqual, last } from 'lodash-es'
 import { DEFAULT_VISIBLE_SECTIONS } from '../constants.js'
 import { forEachIndex } from '../utils/arrayUtils.js'
 import { parseJSONPointerWithArrayIndices, pointerStartsWith } from '../utils/jsonPointer.js'
-import { isObjectOrArray, isStringContainingPrimitiveValue } from '../utils/typeUtils.js'
+import { isObject, isObjectOrArray, isStringContainingPrimitiveValue } from '../utils/typeUtils.js'
 import {
   currentRoundNumber,
   inVisibleSection,
@@ -62,7 +62,6 @@ export function createDocumentState(props?: CreateDocumentStateProps): DocumentS
     keysMap: {},
     visibleSectionsMap: {},
     selection: undefined,
-    selectionMap: {},
     searchResult: undefined,
     validationErrors: [],
     validationErrorsMap: {}
@@ -110,8 +109,8 @@ export function expandPath(
   documentState: DocumentState,
   path: Path
 ): DocumentState {
-  const expanded: JSONPointerMap<boolean> = { ...documentState.expandedMap }
-  const visibleSections = { ...documentState.visibleSectionsMap }
+  const expandedMap: JSONPointerMap<boolean> = { ...documentState.expandedMap }
+  const visibleSectionsMap = { ...documentState.visibleSectionsMap }
 
   for (let i = 0; i <= path.length; i++) {
     const partialPath = path.slice(0, i)
@@ -120,27 +119,27 @@ export function expandPath(
     const value = getIn(json, partialPath)
 
     if (isObjectOrArray(value)) {
-      expanded[partialPointer] = true
+      expandedMap[partialPointer] = true
     }
 
     // if needed, enlarge the expanded sections such that the search result becomes visible in the array
     if (Array.isArray(value) && i < path.length) {
-      const sections = visibleSections[partialPointer] || DEFAULT_VISIBLE_SECTIONS
+      const sections = visibleSectionsMap[partialPointer] || DEFAULT_VISIBLE_SECTIONS
       const index = path[i] as number
 
       if (!inVisibleSection(sections, index)) {
         const start = currentRoundNumber(index)
         const end = nextRoundNumber(start)
         const newSection = { start, end }
-        visibleSections[partialPointer] = mergeSections(sections.concat(newSection))
+        visibleSectionsMap[partialPointer] = mergeSections(sections.concat(newSection))
       }
     }
   }
 
   return {
     ...documentState,
-    expandedMap: expanded,
-    visibleSectionsMap: visibleSections
+    expandedMap,
+    visibleSectionsMap
   }
 }
 
@@ -156,19 +155,44 @@ export function expandWithCallback(
 ): DocumentState {
   const expandedMap = { ...state.expandedMap }
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const contents: JSONData = getIn(json, path)
-  traverse(contents, (value, relativePath) => {
-    const nestedPath = path.concat(relativePath)
+  function recurse(value: JSONData) {
+    const pathIndex = currentPath.length
 
-    if (isObjectOrArray(value) && expandedCallback(nestedPath)) {
-      expandedMap[compileJSONPointer(nestedPath)] = true
-    } else {
-      // do not iterate over the children of this object or array
-      return false
+    if (Array.isArray(value)) {
+      if (expandedCallback(currentPath)) {
+        const pointer = compileJSONPointer(currentPath)
+        expandedMap[pointer] = true
+
+        if (value.length > 0) {
+          const visibleSections = getVisibleSections(state, pointer)
+
+          forEachVisibleIndex(value, visibleSections, (index) => {
+            currentPath[pathIndex] = index
+            recurse(value[index])
+          })
+
+          currentPath.pop()
+        }
+      }
+    } else if (isObject(value)) {
+      if (expandedCallback(currentPath)) {
+        expandedMap[compileJSONPointer(currentPath)] = true
+
+        const keys = Object.keys(value)
+        if (keys.length > 0) {
+          for (const key of keys) {
+            currentPath[pathIndex] = key
+            recurse(value[key])
+          }
+
+          currentPath.pop()
+        }
+      }
     }
-  })
+  }
+
+  const currentPath: Path = path.slice()
+  recurse(getIn(json, path) as JSONData)
 
   return {
     ...state,

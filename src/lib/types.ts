@@ -49,7 +49,6 @@ export interface DocumentState {
   visibleSectionsMap: JSONPointerMap<VisibleSection[]>
 
   selection: Selection | undefined
-  selectionMap: JSONPointerMap<Selection>
   searchResult: SearchResult | undefined
   validationErrors: ValidationError[]
   validationErrorsMap: JSONPointerMap<ValidationError>
@@ -118,25 +117,28 @@ export interface MultiSelection {
   paths: Path[]
   anchorPath: Path
   focusPath: Path
-  pathsMap: { [key: string]: boolean }
+  pointersMap: { [pointer: JSONPointer]: boolean }
 }
 
 export interface AfterSelection {
   type: SelectionType.after
   anchorPath: Path
   focusPath: Path
+  pointersMap: { [pointer: JSONPointer]: boolean }
 }
 
 export interface InsideSelection {
   type: SelectionType.inside
   anchorPath: Path
   focusPath: Path
+  pointersMap: { [pointer: JSONPointer]: boolean }
 }
 
 export interface KeySelection {
   type: SelectionType.key
   anchorPath: Path
   focusPath: Path
+  pointersMap: { [pointer: JSONPointer]: boolean }
   edit?: boolean
 }
 
@@ -144,6 +146,7 @@ export interface ValueSelection {
   type: SelectionType.value
   anchorPath: Path
   focusPath: Path
+  pointersMap: { [pointer: JSONPointer]: boolean }
   edit?: boolean
 }
 

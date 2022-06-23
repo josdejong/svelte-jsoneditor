@@ -66,7 +66,7 @@ export function compareArrays<T>(a: Array<T>, b: Array<T>): number {
  * @return {Path[]}
  */
 export function getNestedPaths(array, includeObjects = false) {
-  const pathsMap = {}
+  const pointersMap = {}
 
   if (!Array.isArray(array)) {
     throw new TypeError('Array expected')
@@ -76,7 +76,7 @@ export function getNestedPaths(array, includeObjects = false) {
     const isValue = !Array.isArray(obj) && !isObject(obj)
 
     if (isValue || (includeObjects && path.length > 0)) {
-      pathsMap[compileJSONPointer(path)] = true
+      pointersMap[compileJSONPointer(path)] = true
     }
 
     if (isObject(obj)) {
@@ -92,7 +92,7 @@ export function getNestedPaths(array, includeObjects = false) {
     recurseNestedPaths(item, EMPTY_ARRAY)
   }
 
-  const pathsArray = Object.keys(pathsMap).sort()
+  const pathsArray = Object.keys(pointersMap).sort()
 
   return pathsArray.map(parseJSONPointer)
 }
