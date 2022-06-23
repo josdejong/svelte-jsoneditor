@@ -45,7 +45,6 @@ import {
   isJSONPatchRemove,
   isJSONPatchReplace
 } from '../typeguards.js'
-import { createSelectionFromOperations, updateSelectionInDocumentState } from './selection.js'
 
 type CreateSelection = (json: JSONData, documentState: DocumentState) => Selection
 

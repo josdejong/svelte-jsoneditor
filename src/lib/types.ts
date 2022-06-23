@@ -109,8 +109,9 @@ export interface JSONPatchResult {
 
 export type AfterPatchCallback = (
   patchedJson: JSONData,
-  patchedState: DocumentState
-) => { json?: JSONData; state?: DocumentState }
+  patchedState: DocumentState,
+  selection: Selection
+) => { json?: JSONData; state?: DocumentState; selection?: Selection }
 
 export interface MultiSelection {
   type: SelectionType.multi
