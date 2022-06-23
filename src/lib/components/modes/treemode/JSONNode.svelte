@@ -89,11 +89,7 @@
   $: resolvedSelection =
     dragging?.updatedSelection != undefined ? dragging.updatedSelection : selection
 
-  $: debug('path changed', path)
-  $: debug('pointer changed', pointer)
-
   function updateState(state: DocumentState) {
-    debug('updating state', pointer)
     if (!isEqual(expanded, state.expandedMap[pointer])) {
       expanded = state.expandedMap[pointer]
     }
@@ -500,9 +496,9 @@
   )}
   data-path={encodeDataPath(path)}
   class:jse-root={root}
-  class:jse-selected={isMultiSelection(resolvedSelection)}
-  class:jse-selected-key={isKeySelection(resolvedSelection)}
-  class:jse-selected-value={isValueSelection(resolvedSelection)}
+  class:jse-selected={isMultiSelection(selection)}
+  class:jse-selected-key={isKeySelection(selection)}
+  class:jse-selected-value={isValueSelection(selection)}
   class:jse-hovered={hover === HOVER_COLLECTION}
   on:mousedown={handleMouseDown}
   on:mousemove={handleMouseMove}
