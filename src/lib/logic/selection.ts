@@ -21,7 +21,7 @@ import type {
   KeySelection,
   MultiSelection,
   Path,
-  PathsMap,
+  JSONPointerMap,
   Selection,
   ValueSelection
 } from '../types.js'
@@ -728,7 +728,7 @@ export function isEditingSelection(selection: Selection): boolean {
 }
 
 // TODO: write unit tests
-export function createSelectionMap(selection: Selection): PathsMap<Selection> {
+export function createSelectionMap(selection: Selection): JSONPointerMap<Selection> {
   if (!selection) {
     return {}
   }

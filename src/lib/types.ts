@@ -43,16 +43,16 @@ export interface CaretPosition {
 
 export interface DocumentState {
   // TODO: merge expandedMap, enforceStringMap, keysMap, and visibleSectionsMap into a single stateMap?
-  expandedMap: PathsMap<boolean>
-  enforceStringMap: PathsMap<boolean>
-  keysMap: PathsMap<string[]>
-  visibleSectionsMap: PathsMap<VisibleSection[]>
+  expandedMap: JSONPointerMap<boolean>
+  enforceStringMap: JSONPointerMap<boolean>
+  keysMap: JSONPointerMap<string[]>
+  visibleSectionsMap: JSONPointerMap<VisibleSection[]>
 
   selection: Selection | undefined
-  selectionMap: PathsMap<Selection>
+  selectionMap: JSONPointerMap<Selection>
   searchResult: SearchResult | undefined
   validationErrors: ValidationError[]
-  validationErrorsMap: PathsMap<ValidationError>
+  validationErrorsMap: JSONPointerMap<ValidationError>
 }
 
 export interface JSONPatchAdd {
@@ -154,7 +154,7 @@ export type Selection =
   | KeySelection
   | ValueSelection
 
-export type PathsMap<T> = { [pointer: JSONPointer]: T }
+export type JSONPointerMap<T> = { [pointer: JSONPointer]: T }
 
 export type ClipboardValues = Array<{ key: string; value: JSONData }>
 
@@ -296,7 +296,7 @@ export type OnBlur = () => void
 
 export interface SearchResult {
   itemsList: ExtendedSearchResultItem[] // TODO: rename itemsList to items
-  itemsMap: PathsMap<ExtendedSearchResultItem[]>
+  itemsMap: JSONPointerMap<ExtendedSearchResultItem[]>
   activeItem: ExtendedSearchResultItem | undefined
   activeIndex: number | -1
 }

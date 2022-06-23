@@ -30,7 +30,7 @@ import type {
   JSONPatchReplace,
   JSONPointer,
   Path,
-  PathsMap,
+  JSONPointerMap,
   Section,
   Selection,
   VisibleSection
@@ -110,7 +110,7 @@ export function expandPath(
   documentState: DocumentState,
   path: Path
 ): DocumentState {
-  const expanded: PathsMap<boolean> = { ...documentState.expandedMap }
+  const expanded: JSONPointerMap<boolean> = { ...documentState.expandedMap }
   const visibleSections = { ...documentState.visibleSectionsMap }
 
   for (let i = 0; i <= path.length; i++) {
@@ -570,11 +570,11 @@ export function documentStateMove(
  * IMPORTANT: will NOT shift array items when an array item is removed, use shiftPath for that
  */
 export function deletePath<T>(
-  map: PathsMap<T>,
+  map: JSONPointerMap<T>,
   path: Path
-): [updatedMap: PathsMap<T>, deletedMap: PathsMap<T>] {
-  const updatedMap: PathsMap<T> = {}
-  const deletedMap: PathsMap<T> = {}
+): [updatedMap: JSONPointerMap<T>, deletedMap: JSONPointerMap<T>] {
+  const updatedMap: JSONPointerMap<T> = {}
+  const deletedMap: JSONPointerMap<T> = {}
   const pointer = compileJSONPointer(path)
 
   // partition the contents of the map
@@ -590,8 +590,8 @@ export function deletePath<T>(
 }
 
 // TODO: unit test
-export function filterPath<T>(map: PathsMap<T>, pointer: JSONPointer): PathsMap<T> {
-  const filteredMap: PathsMap<T> = {}
+export function filterPath<T>(map: JSONPointerMap<T>, pointer: JSONPointer): JSONPointerMap<T> {
+  const filteredMap: JSONPointerMap<T> = {}
 
   Object.keys(map).forEach((itemPointer) => {
     if (pointerStartsWith(itemPointer, pointer)) {
@@ -603,16 +603,16 @@ export function filterPath<T>(map: PathsMap<T>, pointer: JSONPointer): PathsMap<
 }
 
 // TODO: unit test
-export function mergePaths<T>(a: PathsMap<T>, b: PathsMap<T>): PathsMap<T> {
+export function mergePaths<T>(a: JSONPointerMap<T>, b: JSONPointerMap<T>): JSONPointerMap<T> {
   return { ...a, ...b }
 }
 
 // TODO: unit test
 export function movePath<T>(
-  map: PathsMap<T>,
+  map: JSONPointerMap<T>,
   changePointer: (pointer: JSONPointer) => JSONPointer
-): PathsMap<T> {
-  const movedMap: PathsMap<T> = {}
+): JSONPointerMap<T> {
+  const movedMap: JSONPointerMap<T> = {}
 
   Object.keys(map).forEach((oldPointer) => {
     const newPointer = changePointer(oldPointer)
@@ -623,11 +623,11 @@ export function movePath<T>(
 }
 
 export function shiftPath<T>(
-  map: PathsMap<T>,
+  map: JSONPointerMap<T>,
   path: Path,
   index: number,
   offset: number
-): PathsMap<T> {
+): JSONPointerMap<T> {
   const indexPathPos = path.length
   const pointer = compileJSONPointer(path)
 
@@ -673,10 +673,10 @@ export function shiftPath<T>(
 
 // TODO: unit test
 export function addKey(
-  keysMap: PathsMap<string[]>,
+  keysMap: JSONPointerMap<string[]>,
   parentPointer: JSONPointer,
   key: string
-): PathsMap<string[]> {
+): JSONPointerMap<string[]> {
   return updateKeys(keysMap, parentPointer, (keys) => {
     return !keys.includes(key) ? keys.concat([key]) : keys
   })
@@ -684,10 +684,10 @@ export function addKey(
 
 // TODO: unit test
 export function removeKey(
-  keysMap: PathsMap<string[]>,
+  keysMap: JSONPointerMap<string[]>,
   parentPointer: JSONPointer,
   key: string
-): PathsMap<string[]> {
+): JSONPointerMap<string[]> {
   const updatedKeysMap = updateInPathsMap(keysMap, parentPointer, (keys) =>
     keys.includes(key) ? keys.filter((k) => k !== key) : keys
   )
@@ -697,10 +697,10 @@ export function removeKey(
 
 // TODO: unit test
 export function updateKeys(
-  keysMap: PathsMap<string[]>,
+  keysMap: JSONPointerMap<string[]>,
   pointer: JSONPointer,
   callback: (keys: string[]) => string[]
-): PathsMap<string[]> {
+): JSONPointerMap<string[]> {
   const updatedKeysMap = updateInPathsMap(keysMap, pointer, callback)
 
   // we can do a cheap strict equality check here
@@ -708,7 +708,10 @@ export function updateKeys(
 }
 
 // TODO: unit test
-export function cleanupNonExistingPaths<T>(json: JSONData, map: PathsMap<T>): PathsMap<T> {
+export function cleanupNonExistingPaths<T>(
+  json: JSONData,
+  map: JSONPointerMap<T>
+): JSONPointerMap<T> {
   const updatedMap = {}
 
   // TODO: for optimization, we could pass a filter callback which allows you to filter paths
@@ -729,7 +732,7 @@ export function cleanupNonExistingPaths<T>(json: JSONData, map: PathsMap<T>): Pa
  * When the path does not exist, the callback is not invoked.
  */
 export function updateInPathsMap<T>(
-  map: PathsMap<T>,
+  map: JSONPointerMap<T>,
   pointer: JSONPointer,
   callback: (value: T) => T
 ) {
@@ -760,9 +763,9 @@ export function updateInPathsMap<T>(
  */
 // TODO: cleanup transformPathsMap if not needed
 export function transformPathsMap<T>(
-  map: PathsMap<T>,
+  map: JSONPointerMap<T>,
   callback: (pointer: JSONPointer, value: T) => T
-): PathsMap<T> {
+): JSONPointerMap<T> {
   const transformedMap = {}
 
   Object.keys(map).forEach((pointer) => {

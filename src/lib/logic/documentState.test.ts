@@ -23,7 +23,7 @@ import {
   type DocumentState,
   type JSONData,
   type JSONPatchDocument,
-  type PathsMap,
+  type JSONPointerMap,
   type VisibleSection
 } from '../types.js'
 import { compileJSONPointer, deleteIn, setIn } from 'immutable-json-patch'
@@ -1107,7 +1107,7 @@ describe('documentState', () => {
   })
 
   describe('shiftPath', () => {
-    const expandedPaths: PathsMap<number> = {
+    const expandedPaths: JSONPointerMap<number> = {
       '/array': 1,
       '/array/0': 2,
       '/array/0/name': 3,
@@ -1146,7 +1146,7 @@ describe('documentState', () => {
   })
 
   describe('deletePath', () => {
-    const myStateMap: PathsMap<number> = {
+    const myStateMap: JSONPointerMap<number> = {
       '/array': 1,
       '/array/0': 2,
       '/array/1': 3,
@@ -1202,7 +1202,7 @@ describe('documentState', () => {
   })
 
   describe('filterPath', () => {
-    const expandedPaths: PathsMap<number> = {
+    const expandedPaths: JSONPointerMap<number> = {
       '/array': 1,
       '/array/0': 2,
       '/array/1': 3,
