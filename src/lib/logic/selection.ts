@@ -510,8 +510,6 @@ export function createSelectionFromOperations(
   // TODO: make this function robust against operations which do not have consecutive paths or have wrongly ordered paths
 
   return {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     type: SelectionType.multi,
     paths,
     anchorPath: first(paths),
@@ -744,6 +742,22 @@ export function createSelectionMap(selection: Selection): PathsMap<Selection> {
   })
 
   return map
+}
+
+export function updateSelectionInDocumentState(
+  documentState: DocumentState,
+  selection: Selection | undefined,
+  replaceIfUndefined = true
+): DocumentState {
+  if (selection === undefined && !replaceIfUndefined) {
+    return documentState
+  }
+
+  return {
+    ...documentState,
+    selection,
+    selectionMap: createSelectionMap(selection)
+  }
 }
 
 /**

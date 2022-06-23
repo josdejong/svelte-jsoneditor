@@ -45,6 +45,7 @@ import {
   isJSONPatchRemove,
   isJSONPatchReplace
 } from '../typeguards.js'
+import { createSelectionFromOperations, updateSelectionInDocumentState } from './selection.js'
 
 type CreateSelection = (json: JSONData, documentState: DocumentState) => Selection
 
@@ -300,10 +301,8 @@ export function documentStatePatch(
     return updatingState
   }, documentState)
 
-  // FIXME: can we refresh selection, search, and validation in one go too for documentState?
-
   return {
-    json: updatedJson as JSONData,
+    json: updatedJson,
     documentState: updatedDocumentState
   }
 }

@@ -47,6 +47,7 @@
   import { forEachIndex } from '$lib/utils/arrayUtils'
   import { createMemoizePath } from '$lib/utils/pathUtils'
   import type {
+    DocumentState,
     JSONData,
     JSONObject,
     Path,
@@ -88,7 +89,11 @@
   $: resolvedSelection =
     dragging?.updatedSelection != undefined ? dragging.updatedSelection : selection
 
-  const unsubscribe = context.documentStateStore.subscribe((state) => {
+  $: debug('path changed', path)
+  $: debug('pointer changed', pointer)
+
+  function updateState(state: DocumentState) {
+    debug('updating state', pointer)
     if (!isEqual(expanded, state.expandedMap[pointer])) {
       expanded = state.expandedMap[pointer]
     }
@@ -110,11 +115,10 @@
     if (!isEqual(validationError, state.validationErrorsMap[pointer])) {
       validationError = state.validationErrorsMap[pointer]
     }
-  })
+  }
 
-  onDestroy(() => {
-    unsubscribe()
-  })
+  const unsubscribe = context.documentStateStore.subscribe(updateState)
+  onDestroy(unsubscribe)
 
   // FIXME: cleanup logging
   beforeUpdate(() =>

@@ -279,7 +279,7 @@
       </select>
     </p>
   {/if}
-  <p>
+  <p class="buttons">
     <button
       on:click={() => {
         content = {
@@ -366,6 +366,7 @@
     >
       Set unrepairable text
     </button>
+    <button on:click={openInWindow}>Open editor in new window</button>
     <input
       type="file"
       on:change={(event) => {
@@ -482,10 +483,6 @@
       {/if}
     </div>
   </div>
-
-  <p>
-    <button on:click={openInWindow}>Open editor in new window</button>
-  </p>
 </div>
 
 <!--
@@ -548,6 +545,12 @@ See https://github.com/sveltejs/kit/issues/981
 
   p {
     max-width: none;
+
+    &.buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
   }
 
   button,

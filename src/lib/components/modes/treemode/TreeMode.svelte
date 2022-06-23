@@ -75,7 +75,8 @@
     isValueSelection,
     removeEditModeFromSelection,
     selectAll,
-    selectionToPartialJson
+    selectionToPartialJson,
+    updateSelectionInDocumentState
   } from '$lib/logic/selection'
   import { mapValidationErrors } from '$lib/logic/validation'
   import {
@@ -546,23 +547,25 @@
   }
 
   function clearSelectionWhenNotExisting(json) {
-    if ($documentStateStore.selection === undefined) {
+    const selection = $documentStateStore.selection
+
+    if (selection === undefined) {
       return
     }
 
     if (
-      $documentStateStore.selection &&
-      existsIn(json, $documentStateStore.selection.anchorPath as JSONPath) &&
-      existsIn(json, $documentStateStore.selection.focusPath as JSONPath)
+      selection &&
+      existsIn(json, selection.anchorPath as JSONPath) &&
+      existsIn(json, selection.focusPath as JSONPath)
     ) {
       return
     }
 
-    documentStateStore.update((state) => {
-      debug('clearing selection: path does not exist anymore', state.selection)
-
-      return { ...state, selection: undefined }
-    })
+    debug('clearing selection: path does not exist anymore', selection)
+    $documentStateStore = {
+      ...get(documentStateStore),
+      selection: undefined
+    }
   }
 
   function addHistoryItem({
@@ -661,7 +664,7 @@
     operations: JSONPatchDocument,
     afterPatch?: AfterPatchCallback
   ): JSONPatchResult {
-    debug('patch', operations)
+    debug('patch', operations, afterPatch)
 
     if (json === undefined) {
       throw new Error('Cannot apply patch: no JSON')
@@ -675,27 +678,33 @@
     const previousTextIsRepaired = textIsRepaired
     const previousSelection = selection
 
-    debug('patch', operations, afterPatch)
-
+    // execute the patch operations
     const undo: JSONPatchDocument = revertJSONPatch(json, operations) as JSONPatchDocument
     const patched = documentStatePatch(json, get(documentStateStore), operations)
 
+    // update the selection based on the operations
+    const updatedSelection = createSelectionFromOperations(json, operations)
+    const patchedDocumentState = updateSelectionInDocumentState(
+      patched.documentState,
+      updatedSelection,
+      false
+    )
+    debug('patch updatedSelection', updatedSelection)
+
     const callback =
-      typeof afterPatch === 'function'
-        ? afterPatch(patched.json, patched.documentState, selection)
-        : undefined
+      typeof afterPatch === 'function' ? afterPatch(patched.json, patchedDocumentState) : undefined
 
     json = callback && callback.json !== undefined ? callback.json : patched.json
     const newState =
-      callback && callback.state !== undefined ? callback.state : patched.documentState
-    documentStateStore.set(newState)
+      callback && callback.state !== undefined ? callback.state : patchedDocumentState
+    $documentStateStore = newState
+    // FIXME: cleanup after solved
+    // setTimeout(() => {
+    //   // FIXME: this is a workaround to trigger all listeners to refresh *after* re-rendering
+    //   $documentStateStore = $documentStateStore
+    // })
     text = undefined
     textIsRepaired = false
-    updateSelection(
-      callback && callback.selection
-        ? callback.selection
-        : createSelectionFromOperations(previousJson, operations)
-    )
 
     // ensure the selection is valid
     clearSelectionWhenNotExisting(json)
