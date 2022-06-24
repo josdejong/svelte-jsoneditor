@@ -59,7 +59,6 @@
     createKeySelection,
     createMultiSelection,
     createSelectionFromOperations,
-    createSelectionMap,
     createValueSelection,
     findRootPath,
     getInitialSelection,
@@ -123,6 +122,7 @@
     OnRenderValue,
     PastedJson,
     Path,
+    SearchResult,
     Section,
     Selection,
     TransformModalOptions,
@@ -134,6 +134,7 @@
   import { get, writable } from 'svelte/store'
   import { isAfterSelection, isInsideSelection, isKeySelection } from '../../../logic/selection'
   import { isJSONPatchAdd, isJSONPatchReplace } from '../../../typeguards'
+  import { JSONPointerMap } from '$lib/types'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -222,6 +223,10 @@
   const documentStateStore = writable<DocumentState>(
     createDocumentState({ json, expand: getDefaultExpand(json) })
   )
+  let searchResult: SearchResult | undefined
+  let validationErrors: ValidationError[]
+  let validationErrorsMap: JSONPointerMap<ValidationError>
+  $: validationErrorsMap = mapValidationErrors(validationErrors)
 
   $: debug('documentState', $documentStateStore)
 
@@ -258,29 +263,19 @@
   }
 
   async function handleNextSearchResult() {
-    documentStateStore.update((state) => {
-      return {
-        ...state,
-        searchResult: state.searchResult ? searchNext(state.searchResult) : undefined
-      }
-    })
+    searchResult = searchResult ? searchNext(searchResult) : undefined
 
     await focusActiveSearchResult()
   }
 
   async function handlePreviousSearchResult() {
-    documentStateStore.update((state) => {
-      return {
-        ...state,
-        searchResult: state.searchResult ? searchPrevious(state.searchResult) : undefined
-      }
-    })
+    searchResult = searchResult ? searchPrevious(searchResult) : undefined
 
     await focusActiveSearchResult()
   }
 
   async function handleReplace(text, replacementText) {
-    const activeItem = get(documentStateStore).searchResult?.activeItem
+    const activeItem = searchResult?.activeItem
     debug('handleReplace', { replacementText, activeItem })
 
     if (!activeItem) {
@@ -326,9 +321,9 @@
   }
 
   async function focusActiveSearchResult() {
-    const activeItem = get(documentStateStore).searchResult?.activeItem
+    const activeItem = searchResult?.activeItem
 
-    debug('focusActiveSearchResult', get(documentStateStore).searchResult)
+    debug('focusActiveSearchResult', searchResult)
 
     if (activeItem) {
       const path = activeItem.path
@@ -343,13 +338,8 @@
     if (searchText === '') {
       debug('clearing search result')
 
-      if (get(documentStateStore).searchResult !== undefined) {
-        documentStateStore.update((state) => {
-          return {
-            ...state,
-            searchResult: undefined
-          }
-        })
+      if (searchResult !== undefined) {
+        searchResult = undefined
       }
 
       return
@@ -363,12 +353,7 @@
 
       // console.time('search') // TODO: cleanup
       const newResultItems = search(searchText, json, get(documentStateStore), MAX_SEARCH_RESULTS)
-      documentStateStore.update((state) => {
-        return {
-          ...state,
-          searchResult: updateSearchResult(json, newResultItems, state.searchResult)
-        }
-      })
+      searchResult = updateSearchResult(json, newResultItems, searchResult)
       // console.timeEnd('search') // TODO: cleanup
 
       searching = false
@@ -410,16 +395,12 @@
   $: updateValidationErrors(json, validator)
 
   function updateValidationErrors(json: JSONData, validator: Validator | null) {
-    const validationErrors: ValidationError[] = validator ? validator(json) : []
+    const newValidationErrors: ValidationError[] = validator ? validator(json) : []
 
-    if (!isEqual(validationErrors, get(documentStateStore).validationErrors)) {
-      debug('updateValidationErrors', validationErrors)
+    if (!isEqual(newValidationErrors, validationErrors)) {
+      debug('updateValidationErrors', newValidationErrors)
 
-      documentStateStore.update((state) => ({
-        ...state,
-        validationErrors,
-        validationErrorsMap: mapValidationErrors(validationErrors)
-      }))
+      validationErrors = newValidationErrors
     }
   }
 
@@ -2330,8 +2311,8 @@
       <div class="jse-search-box-container">
         <SearchBox
           show={showSearch}
-          resultCount={$documentStateStore.searchResult?.itemsList?.length || 0}
-          activeIndex={$documentStateStore.searchResult?.activeIndex || 0}
+          resultCount={searchResult?.itemsList?.length || 0}
+          activeIndex={searchResult?.activeIndex || 0}
           {showReplace}
           {searching}
           {readOnly}
@@ -2351,8 +2332,8 @@
           enforceStringMap={$documentStateStore.enforceStringMap}
           keysMap={$documentStateStore.keysMap}
           visibleSectionsMap={$documentStateStore.visibleSectionsMap}
-          validationErrorsMap={$documentStateStore.validationErrorsMap}
-          searchResultItemsMap={$documentStateStore.searchResult?.itemsMap}
+          {validationErrorsMap}
+          searchResultItemsMap={searchResult?.itemsMap}
           selection={$documentStateStore.selection}
           {context}
           onDragSelectionStart={noop}
@@ -2404,10 +2385,7 @@
         />
       {/if}
 
-      <ValidationErrorsOverview
-        validationErrors={$documentStateStore.validationErrors}
-        selectError={handleSelectValidationError}
-      />
+      <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
     {/if}
   {:else}
     <div class="jse-contents">

@@ -56,15 +56,12 @@ export type CreateDocumentStateProps = {
 
 // TODO: write unit tests
 export function createDocumentState(props?: CreateDocumentStateProps): DocumentState {
-  let documentState = {
+  let documentState: DocumentState = {
     expandedMap: {},
     enforceStringMap: {},
     keysMap: {},
     visibleSectionsMap: {},
-    selection: undefined,
-    searchResult: undefined,
-    validationErrors: [],
-    validationErrorsMap: {}
+    selection: undefined
   }
 
   if (props?.select) {

@@ -47,11 +47,7 @@ export interface DocumentState {
   enforceStringMap: JSONPointerMap<boolean>
   keysMap: JSONPointerMap<string[]>
   visibleSectionsMap: JSONPointerMap<VisibleSection[]>
-
   selection: Selection | undefined
-  searchResult: SearchResult | undefined
-  validationErrors: ValidationError[]
-  validationErrorsMap: JSONPointerMap<ValidationError>
 }
 
 export interface JSONPatchAdd {

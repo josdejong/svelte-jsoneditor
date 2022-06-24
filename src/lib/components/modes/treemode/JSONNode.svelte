@@ -247,6 +247,8 @@
         // First move event, no selection yet.
         // Clear the default selection of the browser
         if (window.getSelection) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           window.getSelection().empty()
         }
       }
