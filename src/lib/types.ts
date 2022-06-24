@@ -1,5 +1,4 @@
 import type { SvelteComponent } from 'svelte'
-import type { Readable } from 'svelte/store'
 
 export type JSONValue = string | number | boolean | null
 export type JSONObject = { [key: string]: JSONData }

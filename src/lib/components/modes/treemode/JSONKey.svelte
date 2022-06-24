@@ -12,12 +12,12 @@
   import EditableDiv from '../../controls/EditableDiv.svelte'
   import { addNewLineSuffix } from '$lib/utils/domUtils'
   import { UPDATE_SELECTION } from '$lib/constants'
-  import type { ExtendedSearchResultItem, JSONPointer, TreeModeContext } from '$lib/types'
+  import type { ExtendedSearchResultItem, JSONPointer, Path, TreeModeContext } from '$lib/types'
   import { type Selection } from '$lib/types'
   import { isKeySelection } from '../../../logic/selection.js'
   import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
-  import { parseJSONPointer } from 'immutable-json-patch'
 
+  export let path: Path
   export let pointer: JSONPointer
   export let key: string
   export let selection: Selection | undefined
@@ -34,7 +34,6 @@
   function handleKeyDoubleClick(event) {
     if (!isEditingKey && !context.readOnly) {
       event.preventDefault()
-      const path = parseJSONPointer(pointer)
       context.onSelect(createKeySelection(path, true))
     }
   }
@@ -46,7 +45,6 @@
   }
 
   function handleChangeValue(newKey, updateSelection) {
-    const path = parseJSONPointer(pointer)
     const updatedKey = onUpdateKey(key, context.normalization.unescapeValue(newKey))
     const updatedPath = initial(path).concat(updatedKey)
 
@@ -60,7 +58,6 @@
   }
 
   function handleCancelChange() {
-    const path = parseJSONPointer(pointer)
     context.onSelect(createKeySelection(path, false))
   }
 </script>

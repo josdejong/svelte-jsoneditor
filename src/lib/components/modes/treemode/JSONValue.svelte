@@ -4,21 +4,20 @@
   import type {
     JSONData,
     JSONPointer,
+    Path,
     SearchResultItem,
     Selection,
     TreeModeContext
   } from '../../../types'
-  import { parseJSONPointer } from 'immutable-json-patch'
   import { isEditingSelection, isValueSelection } from '../../../logic/selection'
 
+  export let path: Path
   export let pointer: JSONPointer
   export let value: JSONData
   export let context: TreeModeContext
   export let enforceString: boolean
   export let selection: Selection | undefined
   export let searchResultItems: SearchResultItem[] | undefined
-
-  $: path = parseJSONPointer(pointer)
 
   $: isSelected = selection
     ? selection.pointersMap[pointer] === true && isValueSelection(selection)

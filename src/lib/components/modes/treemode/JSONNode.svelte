@@ -3,7 +3,7 @@
 <script lang="ts">
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
-  import { parseJSONPointer } from 'immutable-json-patch'
+  import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
   import { initial, isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
@@ -52,6 +52,7 @@
     JSONObject,
     JSONPointer,
     JSONPointerMap,
+    Path,
     Selection,
     TreeModeContext,
     VisibleSection
@@ -66,9 +67,10 @@
   } from '../../../logic/selection'
   import { appendToPointer, filterPointerOrUndefined } from '../../../utils/jsonPointer.js'
   import { filterKeySearchResults, filterValueSearchResults } from '../../../logic/search.js'
+  import { createMemoizePath } from '../../../utils/pathUtils'
 
   export let value: JSONData
-  export let pointer: JSONPointer
+  export let path: Path
   export let expandedMap: JSONPointerMap<boolean>
   export let enforceStringMap: JSONPointerMap<boolean>
   export let keysMap: JSONPointerMap<string[]>
@@ -85,8 +87,14 @@
   let hoverTimer = undefined
   let dragging = undefined
 
+  // important to prevent creating a new path for all children with every re-render,
+  // that would force all childs to re-render
+  const memoizePath = createMemoizePath()
+
   $: root = path.length === 0
   $: type = valueType(resolvedValue)
+  let pointer: JSONPointer
+  $: pointer = compileJSONPointer(path)
 
   let isSelected: boolean
   $: isSelected = selection ? selection.pointersMap[pointer] === true : false
@@ -105,8 +113,6 @@
 
   let validationError: ValidationError | undefined
   $: validationError = validationErrorsMap ? validationErrorsMap[pointer] : undefined
-
-  $: path = parseJSONPointer(pointer)
 
   $: resolvedValue = dragging?.updatedValue !== undefined ? dragging.updatedValue : value
   let resolvedSelection: Selection | undefined
@@ -131,6 +137,7 @@
     return (keys || Object.keys(object)).map((key) => ({
       key,
       value: object[key],
+      path: memoizePath(path.concat([key])),
       pointer: appendToPointer(pointer, key)
     }))
   }
@@ -147,6 +154,7 @@
       items.push({
         index,
         value: array[index],
+        path: memoizePath(path.concat([index])),
         pointer: appendToPointer(pointer, index)
       })
     }
@@ -614,7 +622,7 @@
           {#each getItems(resolvedValue, visibleSection) as item (item.index)}
             <svelte:self
               value={item.value}
-              pointer={item.pointer}
+              path={item.path}
               expandedMap={filterPointerOrUndefined(expandedMap, item.pointer)}
               enforceStringMap={filterPointerOrUndefined(enforceStringMap, item.pointer)}
               keysMap={filterPointerOrUndefined(keysMap, item.pointer)}
@@ -635,6 +643,7 @@
               visibleSections={visibleSections || DEFAULT_VISIBLE_SECTIONS}
               {sectionIndex}
               total={resolvedValue.length}
+              {path}
               {pointer}
               onExpandSection={context.onExpandSection}
               selection={resolvedSelection}
@@ -731,7 +740,7 @@
         {#each getProps(resolvedValue) as prop}
           <svelte:self
             value={prop.value}
-            pointer={prop.pointer}
+            path={prop.path}
             expandedMap={filterPointerOrUndefined(expandedMap, prop.pointer)}
             enforceStringMap={filterPointerOrUndefined(enforceStringMap, prop.pointer)}
             keysMap={filterPointerOrUndefined(keysMap, prop.pointer)}
@@ -744,6 +753,7 @@
           >
             <div slot="identifier" class="jse-identifier">
               <JSONKey
+                path={prop.path}
                 pointer={prop.pointer}
                 key={prop.key}
                 selection={selectionIfOverlapping(selection, prop.pointer)}
@@ -776,6 +786,7 @@
           <div class="jse-separator">:</div>
         {/if}
         <JSONValue
+          {path}
           {pointer}
           {value}
           {enforceString}

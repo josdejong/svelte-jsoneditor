@@ -2291,7 +2291,7 @@
       <div class="jse-contents" data-jsoneditor-scrollable-contents={true} bind:this={refContents}>
         <JSONNode
           value={json}
-          pointer={''}
+          path={rootPath}
           expandedMap={documentState.expandedMap}
           enforceStringMap={documentState.enforceStringMap}
           keysMap={documentState.keysMap}
