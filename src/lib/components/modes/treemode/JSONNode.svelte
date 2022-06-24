@@ -58,7 +58,6 @@
   } from '$lib/types'
   import { SelectionType } from '$lib/types'
   import { beforeUpdate } from 'svelte'
-  import { get } from 'svelte/store'
   import {
     getStartPath,
     isAfterSelection,
@@ -197,8 +196,8 @@
     document.addEventListener('mouseup', handleMouseUpGlobal)
 
     const anchorType = getSelectionTypeFromTarget(event.target)
-    const json = context.getFullJson()
-    const state = get(context.documentStateStore)
+    const json = context.getJson()
+    const documentState = context.getDocumentState()
 
     // when right-clicking inside the current selection, do nothing: context menu will open
     // when left-clicking inside the current selection, do nothing: it can be the start of dragging
@@ -220,20 +219,18 @@
     if (event.shiftKey) {
       // Shift+Click will select multiple entries
       if (selection) {
-        context.onSelect(createMultiSelection(json, state, selection.anchorPath, path))
+        context.onSelect(createMultiSelection(json, documentState, selection.anchorPath, path))
       }
     } else {
       if (anchorType === SelectionType.multi) {
         if (root && event.target.hasAttribute('data-path')) {
-          const lastCaretPosition = last(
-            getVisibleCaretPositions(resolvedValue, get(context.documentStateStore))
-          )
+          const lastCaretPosition = last(getVisibleCaretPositions(resolvedValue, documentState))
           context.onSelect(fromCaretPosition(lastCaretPosition))
         } else {
-          context.onSelect(createMultiSelection(json, state, path, path))
+          context.onSelect(createMultiSelection(json, documentState, path, path))
         }
       } else {
-        context.onSelect(fromSelectionType(json, state, anchorType, path))
+        context.onSelect(fromSelectionType(json, documentState, anchorType, path))
       }
     }
   }
@@ -262,10 +259,15 @@
         singleton.selectionFocus = path
         singleton.selectionAnchorType = selectionType // TODO: this is a bit ugly
 
-        const json = context.getFullJson()
-        const state = get(context.documentStateStore)
+        const json = context.getJson()
+        const documentState = context.getDocumentState()
         context.onSelect(
-          createMultiSelection(json, state, singleton.selectionAnchor, singleton.selectionFocus)
+          createMultiSelection(
+            json,
+            documentState,
+            singleton.selectionAnchor,
+            singleton.selectionFocus
+          )
         )
       }
     }
@@ -349,8 +351,8 @@
     if (dragging) {
       const deltaY = calculateDeltaY(dragging, event)
       const { updatedValue, updatedState, updatedSelection, indexOffset } = onMoveSelection({
-        fullJson: context.getFullJson(),
-        documentState: get(context.documentStateStore),
+        fullJson: context.getJson(),
+        documentState: context.getDocumentState(),
         deltaY,
         items: dragging.items
       })
@@ -371,8 +373,8 @@
 
   function handleDragSelectionEnd(event) {
     if (dragging) {
-      const json = context.getFullJson()
-      const documentState = get(context.documentStateStore)
+      const json = context.getJson()
+      const documentState = context.getDocumentState()
       const deltaY = calculateDeltaY(dragging, event)
       const { operations, updatedFullSelection } = onMoveSelection({
         fullJson: json,
@@ -382,8 +384,11 @@
       })
 
       if (operations) {
-        context.onPatch(operations, () => ({
-          selection: updatedFullSelection || selection
+        context.onPatch(operations, (patchedJson, patchedState) => ({
+          state: {
+            ...patchedState,
+            selection: updatedFullSelection || selection
+          }
         }))
       } else {
         // the user did click inside the selection and no contents have been dragged,
@@ -447,7 +452,7 @@
       forEachIndex(start, Math.min(value.length, end), addHeight)
     } else {
       // value is Object
-      getKeys(value as JSONObject, get(context.documentStateStore), pointer).forEach(addHeight)
+      getKeys(value as JSONObject, context.getDocumentState(), pointer).forEach(addHeight)
     }
 
     return items

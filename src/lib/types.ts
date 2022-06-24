@@ -403,10 +403,10 @@ export interface JSONEditorPropsOptional {
 }
 
 export interface TreeModeContext {
-  documentStateStore: Readable<DocumentState>
   readOnly: boolean
   normalization: ValueNormalization
-  getFullJson: () => JSONData
+  getJson: () => JSONData
+  getDocumentState: () => DocumentState
   findElement: (path: Path) => Element | null
   focus: () => void
   onPatch: (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => JSONPatchResult

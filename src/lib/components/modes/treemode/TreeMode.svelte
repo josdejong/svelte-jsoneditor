@@ -132,7 +132,6 @@
     Validator,
     ValueNormalization
   } from '$lib/types'
-  import { get, writable } from 'svelte/store'
   import { isAfterSelection, isInsideSelection, isKeySelection } from '../../../logic/selection'
   import { isJSONPatchAdd, isJSONPatchReplace } from '../../../typeguards'
 
@@ -205,27 +204,21 @@
   ) {
     debug('updateSelection', selection)
 
-    documentStateStore.update((state) => {
-      const updatedSelection =
-        typeof selection === 'function' ? selection(state.selection) : selection
+    const updatedSelection =
+      typeof selection === 'function' ? selection(documentState.selection) : selection
 
-      if (isEqual(updatedSelection, state.selection)) {
-        return state
-      }
-
-      return {
-        ...state,
+    if (!isEqual(updatedSelection, documentState.selection)) {
+      documentState = {
+        ...documentState,
         selection: updatedSelection
       }
-    })
+    }
   }
 
-  const documentStateStore = writable<DocumentState>(
-    createDocumentState({ json, expand: getDefaultExpand(json) })
-  )
+  let documentState = createDocumentState({ json, expand: getDefaultExpand(json) })
   let searchResult: SearchResult | undefined
 
-  $: debug('documentState', $documentStateStore)
+  $: debug('documentState', documentState)
 
   let normalization: ValueNormalization
   $: normalization = createNormalizationFunctions({
@@ -281,7 +274,7 @@
 
     const { operations, newSelection } = createSearchAndReplaceOperations(
       json,
-      get(documentStateStore),
+      documentState,
       replacementText,
       activeItem
     )
@@ -300,7 +293,7 @@
 
     const { operations, newSelection } = createSearchAndReplaceAllOperations(
       json,
-      get(documentStateStore),
+      documentState,
       text,
       replacementText
     )
@@ -328,8 +321,8 @@
 
     if (activeItem) {
       const path = activeItem.path
-      documentStateStore.update((state) => expandPath(json, state, path))
-      updateSelection(undefined) // navigation path of current selection would be confusing // TODO: clenaup
+      documentState = expandPath(json, documentState, path)
+      updateSelection(undefined) // navigation path of current selection would be confusing // TODO: cleanup
       await tick()
       await scrollTo(path)
     }
@@ -353,7 +346,7 @@
       debug('searching...', searchText)
 
       // console.time('search') // TODO: cleanup
-      const newResultItems = search(searchText, json, get(documentStateStore), MAX_SEARCH_RESULTS)
+      const newResultItems = search(searchText, json, documentState, MAX_SEARCH_RESULTS)
       searchResult = updateSearchResult(json, newResultItems, searchResult)
       // console.timeEnd('search') // TODO: cleanup
 
@@ -383,7 +376,7 @@
 
   export function expand(callback = () => true) {
     debug('expand')
-    documentStateStore.update((state) => expandWithCallback(json, state, rootPath, callback))
+    documentState = expandWithCallback(json, documentState, rootPath, callback)
   }
 
   // two-way binding of externalContent and internal json and text (
@@ -413,6 +406,10 @@
     return json
   }
 
+  function getDocumentState(): DocumentState {
+    return documentState
+  }
+
   function applyExternalContent(updatedContent) {
     if (updatedContent.json !== undefined) {
       applyExternalJson(updatedContent.json)
@@ -439,16 +436,13 @@
       return
     }
 
-    const previousState = get(documentStateStore)
+    const previousState = documentState
     const previousJson = json
     const previousText = text
     const previousTextIsRepaired = textIsRepaired
-    const previousSelection = previousState.selection
 
     json = updatedJson
-    documentStateStore.update((state) =>
-      expandWithCallback(json, state, rootPath, getDefaultExpand(json))
-    )
+    documentState = expandWithCallback(json, documentState, rootPath, getDefaultExpand(json))
     text = undefined
     textIsRepaired = false
     clearSelectionWhenNotExisting(json)
@@ -457,8 +451,7 @@
       previousJson,
       previousState,
       previousText,
-      previousTextIsRepaired,
-      previousSelection
+      previousTextIsRepaired
     })
 
     // TODO: triggering applySearchThrottled() here should not be needed
@@ -478,25 +471,20 @@
     debug('update external text')
 
     const previousJson = json
-    const previousState = get(documentStateStore)
+    const previousState = documentState
     const previousText = text
     const previousTextIsRepaired = textIsRepaired
-    const previousSelection = previousState.selection
 
     try {
       json = JSON.parse(updatedText)
-      documentStateStore.update((state) =>
-        expandWithCallback(json, state, rootPath, getDefaultExpand(json))
-      )
+      documentState = expandWithCallback(json, documentState, rootPath, getDefaultExpand(json))
       text = updatedText
       textIsRepaired = false
       clearSelectionWhenNotExisting(json)
     } catch (err) {
       try {
         json = JSON.parse(jsonrepair(updatedText))
-        documentStateStore.update((state) =>
-          expandWithCallback(json, state, rootPath, getDefaultExpand(json))
-        )
+        documentState = expandWithCallback(json, documentState, rootPath, getDefaultExpand(json))
         text = updatedText
         textIsRepaired = true
         clearSelectionWhenNotExisting(json)
@@ -509,11 +497,7 @@
       }
     }
 
-    if (
-      !get(documentStateStore).selection &&
-      json === undefined &&
-      (text === '' || text === undefined)
-    ) {
+    if (!documentState.selection && json === undefined && (text === '' || text === undefined)) {
       // make sure there is a selection,
       // else we cannot paste or insert in case of an empty document
       createDefaultSelection()
@@ -523,8 +507,7 @@
       previousJson,
       previousState,
       previousText,
-      previousTextIsRepaired,
-      previousSelection
+      previousTextIsRepaired
     })
 
     // TODO: triggering applySearchThrottled() here should not be needed
@@ -532,7 +515,7 @@
   }
 
   function clearSelectionWhenNotExisting(json) {
-    const selection = $documentStateStore.selection
+    const selection = documentState.selection
 
     if (selection === undefined) {
       return
@@ -547,8 +530,8 @@
     }
 
     debug('clearing selection: path does not exist anymore', selection)
-    $documentStateStore = {
-      ...get(documentStateStore),
+    documentState = {
+      ...documentState,
       selection: undefined
     }
   }
@@ -557,16 +540,14 @@
     previousJson,
     previousState,
     previousText,
-    previousTextIsRepaired,
-    previousSelection
+    previousTextIsRepaired
   }: {
     previousJson: JSONData | undefined
     previousText: string | undefined
     previousState: DocumentState
     previousTextIsRepaired: boolean
-    previousSelection: Selection | undefined
   }) {
-    const state = get(documentStateStore)
+    const state = documentState
 
     if (previousJson === undefined && previousText === undefined) {
       // initialization -> do not create a history item
@@ -637,12 +618,10 @@
   function createDefaultSelection() {
     debug('createDefaultSelection')
 
-    documentStateStore.update((state) => {
-      return {
-        ...state,
-        selection: createMultiSelection(json || {}, state, [], [])
-      }
-    })
+    documentState = {
+      ...documentState,
+      selection: createMultiSelection(json || {}, documentState, [], [])
+    }
   }
 
   export function patch(
@@ -654,18 +633,17 @@
     if (json === undefined) {
       throw new Error('Cannot apply patch: no JSON')
     }
-    const state = get(documentStateStore)
+    const state = documentState
     const selection = state.selection
 
     const previousJson = json
     const previousState = state
     const previousText = text
     const previousTextIsRepaired = textIsRepaired
-    const previousSelection = selection
 
     // execute the patch operations
     const undo: JSONPatchDocument = revertJSONPatch(json, operations) as JSONPatchDocument
-    const patched = documentStatePatch(json, get(documentStateStore), operations)
+    const patched = documentStatePatch(json, documentState, operations)
 
     // update the selection based on the operations
     const updatedSelection = createSelectionFromOperations(json, operations)
@@ -682,11 +660,11 @@
     json = callback && callback.json !== undefined ? callback.json : patched.json
     const newState =
       callback && callback.state !== undefined ? callback.state : patchedDocumentState
-    $documentStateStore = newState
+    documentState = newState
     // FIXME: cleanup after solved
     // setTimeout(() => {
     //   // FIXME: this is a workaround to trigger all listeners to refresh *after* re-rendering
-    //   $documentStateStore = $documentStateStore
+    //   documentState = documentState
     // })
     text = undefined
     textIsRepaired = false
@@ -729,7 +707,7 @@
   }
 
   function handleEditKey() {
-    const selection = get(documentStateStore).selection
+    const selection = documentState.selection
 
     if (readOnly || !selection) {
       return
@@ -739,7 +717,7 @@
   }
 
   function handleEditValue() {
-    const selection = get(documentStateStore).selection
+    const selection = documentState.selection
 
     if (readOnly || !selection) {
       return
@@ -750,19 +728,15 @@
 
   function handleToggleEnforceString() {
     debug('handleToggleEnforceString')
-    const documentState = get(documentStateStore)
-    const selection = documentState.selection
-
-    if (readOnly || !isValueSelection(selection)) {
+    if (readOnly || !isValueSelection(documentState.selection)) {
       return
     }
 
-    const path = selection.focusPath
+    const path = documentState.selection.focusPath
     const pointer = compileJSONPointer(path)
     const enforceString = !getEnforceString(json, documentState, pointer)
 
-    const updatedDocumentState = setEnforceString(documentState, pointer, enforceString)
-    documentStateStore.set(updatedDocumentState)
+    documentState = setEnforceString(documentState, pointer, enforceString)
 
     const value = getIn(json, path)
     const updatedValue = enforceString ? String(value) : stringConvert(String(value))
@@ -787,7 +761,7 @@
   }
 
   async function handleCut(indent = true) {
-    const selection = get(documentStateStore).selection
+    const selection = documentState.selection
 
     if (readOnly || !hasSelectionContents(selection)) {
       return
@@ -807,11 +781,7 @@
       onError(err)
     }
 
-    const { operations, newSelection } = createRemoveOperations(
-      json,
-      get(documentStateStore),
-      selection
-    )
+    const { operations, newSelection } = createRemoveOperations(json, documentState, selection)
 
     handlePatch(operations, (patchedJson, patchedState) => ({
       state: {
@@ -822,7 +792,7 @@
   }
 
   async function handleCopy(indent = true) {
-    const selection = get(documentStateStore).selection
+    const selection = documentState.selection
     const copyIndentation = indent ? indentation : null
     const clipboard = selectionToPartialJson(json, selection, copyIndentation)
     if (clipboard == null) {
@@ -875,11 +845,11 @@
 
   function doPaste(clipboardText) {
     if (json !== undefined) {
-      if (!get(documentStateStore).selection) {
+      if (!documentState.selection) {
         createDefaultSelection()
       }
 
-      const state = get(documentStateStore)
+      const state = documentState
       const operations = insert(json, state, clipboardText)
 
       debug('paste', { clipboardText, operations, selection: state.selection })
@@ -947,7 +917,7 @@
   }
 
   function handleRemove() {
-    const state = get(documentStateStore)
+    const state = documentState
     const selection = state.selection
 
     if (readOnly || !selection) {
@@ -984,7 +954,7 @@
   }
 
   function handleDuplicate() {
-    const state = get(documentStateStore)
+    const state = documentState
     const selection = state.selection
 
     if (
@@ -1003,7 +973,7 @@
   }
 
   function handleExtract() {
-    const state = get(documentStateStore)
+    const state = documentState
     const selection = state.selection
 
     if (
@@ -1033,7 +1003,7 @@
   }
 
   function handleInsert(type: InsertType): void {
-    const state = get(documentStateStore)
+    const state = documentState
     const selection = state.selection
 
     if (readOnly || !selection) {
@@ -1113,7 +1083,7 @@
    * @param {'value' | 'object' | 'array' | 'structure'} type
    */
   function handleInsertFromContextMenu(type) {
-    const selection = get(documentStateStore).selection
+    const selection = documentState.selection
 
     if (isKeySelection(selection)) {
       // in this case, we do not want to rename the key, but replace the property
@@ -1127,7 +1097,7 @@
    * @param {'value' | 'object' | 'array'} type
    */
   function handleConvert(type) {
-    const selection = get(documentStateStore).selection
+    const selection = documentState.selection
 
     if (readOnly || !selection) {
       return
@@ -1167,7 +1137,7 @@
   }
 
   function handleInsertBefore() {
-    const state = get(documentStateStore)
+    const state = documentState
     const selection = state.selection
     const selectionBefore = getSelectionUp(json, state, false)
     const parentPath: Path = initial(selection.focusPath)
@@ -1187,7 +1157,7 @@
   }
 
   function handleInsertAfter() {
-    const selection = get(documentStateStore).selection
+    const selection = documentState.selection
 
     const path: Path = isMultiSelection(selection) ? last(selection.paths) : selection.focusPath
 
@@ -1213,7 +1183,7 @@
   }
 
   async function handleInsertCharacter(char) {
-    const selection = get(documentStateStore).selection
+    const selection = documentState.selection
 
     // a regular key like a, A, _, etc is entered.
     // Replace selected contents with a new value having this first character as text
@@ -1259,7 +1229,7 @@
   }
 
   async function handleInsertValueWithCharacter(char) {
-    const selection = get(documentStateStore).selection
+    const selection = documentState.selection
 
     if (readOnly || !selection) {
       return
@@ -1352,7 +1322,7 @@
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired
 
-    const selection = get(documentStateStore).selection
+    const selection = documentState.selection
     debug('redo', { item, json, state, selection })
 
     const patchResult = {
@@ -1400,7 +1370,7 @@
   }
 
   function handleSortSelection() {
-    const selection = get(documentStateStore).selection
+    const selection = documentState.selection
 
     if (!selection) {
       return
@@ -1460,7 +1430,7 @@
   }
 
   function handleTransformSelection() {
-    const selection = get(documentStateStore).selection
+    const selection = documentState.selection
 
     if (!selection) {
       return
@@ -1482,7 +1452,7 @@
    * Scroll the window vertically to the node with given path
    */
   export async function scrollTo(path: Path) {
-    documentStateStore.update((state) => expandPath(json, state, path))
+    documentState = expandPath(json, documentState, path)
     await tick()
 
     const elem = findElement(path)
@@ -1579,21 +1549,19 @@
   }
 
   function handleChangeJson(updatedJson: JSONData, afterPatch?: AfterPatchCallback) {
-    const previousState = get(documentStateStore)
+    const previousState = documentState
     const previousJson = json
     const previousText = text
     const previousContent = { json, text }
     const previousTextIsRepaired = textIsRepaired
-    const previousSelection = previousState.selection
 
-    const state = get(documentStateStore)
-    const updatedState = expandWithCallback(json, state, rootPath, expandMinimal)
+    const updatedState = expandWithCallback(json, documentState, rootPath, expandMinimal)
 
     const callback =
       typeof afterPatch === 'function' ? afterPatch(updatedJson, updatedState) : undefined
 
     json = callback && callback.json !== undefined ? callback.json : updatedJson
-    documentStateStore.set(callback && callback.state !== undefined ? callback.state : updatedState)
+    documentState = callback && callback.state !== undefined ? callback.state : updatedState
     text = undefined
     textIsRepaired = false
 
@@ -1604,8 +1572,7 @@
       previousJson,
       previousState,
       previousText,
-      previousTextIsRepaired,
-      previousSelection
+      previousTextIsRepaired
     })
 
     // TODO: work out the patchResult when fully replacing json (is just a replace of the root)
@@ -1615,41 +1582,37 @@
   }
 
   function handleChangeText(updatedText: string, afterPatch?: AfterPatchCallback) {
-    const state = get(documentStateStore)
-    const previousState = state
+    const previousState = documentState
     const previousJson = json
     const previousText = text
     const previousContent = { json, text }
     const previousTextIsRepaired = textIsRepaired
-    const previousSelection = previousState.selection
 
     try {
       json = JSON.parse(updatedText)
-      documentStateStore.update((state) => expandWithCallback(json, state, rootPath, expandMinimal))
+      documentState = expandWithCallback(json, documentState, rootPath, expandMinimal)
       text = undefined
       textIsRepaired = false
     } catch (err) {
       try {
         json = JSON.parse(jsonrepair(updatedText))
-        documentStateStore.update((state) =>
-          expandWithCallback(json, state, rootPath, expandMinimal)
-        )
+        documentState = expandWithCallback(json, documentState, rootPath, expandMinimal)
         text = updatedText
         textIsRepaired = true
       } catch (err) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
-        documentStateStore.set(createDocumentState({ json, expand: expandMinimal }))
+        documentState = createDocumentState({ json, expand: expandMinimal })
         text = updatedText
         textIsRepaired = false
       }
     }
 
     if (typeof afterPatch === 'function') {
-      const callback = afterPatch(json, state)
+      const callback = afterPatch(json, documentState)
 
       json = callback && callback.json ? callback.json : json
-      documentStateStore.set(callback && callback.state ? callback.state : state)
+      documentState = callback && callback.state ? callback.state : documentState
     }
 
     // ensure the selection is valid
@@ -1659,8 +1622,7 @@
       previousJson,
       previousState,
       previousText,
-      previousTextIsRepaired,
-      previousSelection
+      previousTextIsRepaired
     })
 
     // no JSON patch actions available in text mode
@@ -1689,9 +1651,7 @@
   }
 
   // FIXME: cleanup
-  documentStateStore.subscribe((documentState) => {
-    debug('documentState', documentState)
-  })
+  $: debug('documentState', documentState)
 
   /**
    * Toggle expanded state of a node
@@ -1704,18 +1664,17 @@
 
     if (expanded) {
       if (recursive) {
-        documentStateStore.update((state) => expandWithCallback(json, state, path, expandAll))
+        documentState = expandWithCallback(json, documentState, path, expandAll)
       } else {
-        documentStateStore.update((state) => expandSingleItem(state, path))
+        documentState = expandSingleItem(documentState, path)
       }
     } else {
-      documentStateStore.update((state) => collapsePath(state, path))
+      documentState = collapsePath(documentState, path)
     }
 
-    const selection = get(documentStateStore).selection
-    if (selection && !expanded) {
+    if (documentState.selection && !expanded) {
       // check whether the selection is still visible and not collapsed
-      if (isSelectionInsidePath(selection, path)) {
+      if (isSelectionInsidePath(documentState.selection, path)) {
         // remove selection when not visible anymore
         updateSelection(undefined)
       }
@@ -1743,7 +1702,7 @@
   ): void {
     updateSelection(
       options?.nextInside
-        ? getSelectionNextInside(json, get(documentStateStore), selection.focusPath)
+        ? getSelectionNextInside(json, documentState, selection.focusPath)
         : selection
     )
 
@@ -1771,7 +1730,7 @@
     debug('handleExpandSection', path, section)
 
     const pointer = compileJSONPointer(path)
-    documentStateStore.update((state) => expandSection(json, state, pointer, section))
+    documentState = expandSection(json, documentState, pointer, section)
   }
 
   function handlePasteJson(newPastedJson: PastedJson) {
@@ -1784,7 +1743,7 @@
     // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
     const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
     const keepAnchorPath = event.shiftKey
-    const state = get(documentStateStore)
+    const state = documentState
     const selection = state.selection
 
     if (combo === 'Ctrl+X') {
@@ -1989,7 +1948,7 @@
           focus()
 
           if (
-            !get(documentStateStore).selection &&
+            !documentState.selection &&
             json === undefined &&
             (text === '' || text === undefined)
           ) {
@@ -2012,7 +1971,7 @@
   }: AbsolutePopupOptions) {
     const props = {
       json,
-      documentState: get(documentStateStore),
+      documentState: documentState,
       showTip,
 
       onEditKey: handleEditKey,
@@ -2060,7 +2019,7 @@
   }
 
   function handleContextMenu(event) {
-    const selection = get(documentStateStore).selection
+    const selection = documentState.selection
 
     if (readOnly || isEditingSelection(selection)) {
       return
@@ -2174,7 +2133,7 @@
   function handleWindowMouseDown(event) {
     const outsideEditor = !isChildOf(event.target, (element) => element === refJsonEditor)
     if (outsideEditor) {
-      const selection = get(documentStateStore).selection
+      const selection = documentState.selection
 
       if (isEditingSelection(selection)) {
         debug('click outside the editor, stop edit mode')
@@ -2208,10 +2167,6 @@
     }
   }
 
-  function getFullJson(): JSONData {
-    return json
-  }
-
   $: autoScrollHandler = refContents ? createAutoScrollHandler(refContents) : undefined
 
   function handleDrag(event) {
@@ -2230,10 +2185,10 @@
   // it should only change when a config option like readOnly or onClassName is changed
   let context: TreeModeContext
   $: context = {
-    documentStateStore,
     readOnly,
     normalization,
-    getFullJson,
+    getJson,
+    getDocumentState,
     findElement,
     focus,
     onPatch: handlePatch,
@@ -2266,7 +2221,7 @@
   {#if mainMenuBar}
     <TreeMenu
       {json}
-      selection={$documentStateStore.selection}
+      selection={documentState.selection}
       {readOnly}
       {historyState}
       bind:showSearch
@@ -2283,11 +2238,7 @@
   {/if}
 
   {#if navigationBar}
-    <NavigationBar
-      {json}
-      documentState={$documentStateStore}
-      onSelect={handleNavigationBarSelect}
-    />
+    <NavigationBar {json} {documentState} onSelect={handleNavigationBarSelect} />
   {/if}
 
   {#if !isSSR}
@@ -2341,13 +2292,13 @@
         <JSONNode
           value={json}
           pointer={''}
-          expandedMap={$documentStateStore.expandedMap}
-          enforceStringMap={$documentStateStore.enforceStringMap}
-          keysMap={$documentStateStore.keysMap}
-          visibleSectionsMap={$documentStateStore.visibleSectionsMap}
+          expandedMap={documentState.expandedMap}
+          enforceStringMap={documentState.enforceStringMap}
+          keysMap={documentState.keysMap}
+          visibleSectionsMap={documentState.visibleSectionsMap}
           {validationErrorsMap}
           searchResultItemsMap={searchResult?.itemsMap}
-          selection={$documentStateStore.selection}
+          selection={documentState.selection}
           {context}
           onDragSelectionStart={noop}
         />
