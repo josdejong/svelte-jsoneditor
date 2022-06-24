@@ -117,6 +117,7 @@
     JSONData,
     JSONPatchDocument,
     JSONPatchResult,
+    JSONPointerMap,
     OnChange,
     OnClassName,
     OnRenderValue,
@@ -134,7 +135,6 @@
   import { get, writable } from 'svelte/store'
   import { isAfterSelection, isInsideSelection, isKeySelection } from '../../../logic/selection'
   import { isJSONPatchAdd, isJSONPatchReplace } from '../../../typeguards'
-  import { JSONPointerMap } from '$lib/types'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -224,9 +224,6 @@
     createDocumentState({ json, expand: getDefaultExpand(json) })
   )
   let searchResult: SearchResult | undefined
-  let validationErrors: ValidationError[]
-  let validationErrorsMap: JSONPointerMap<ValidationError>
-  $: validationErrorsMap = mapValidationErrors(validationErrors)
 
   $: debug('documentState', $documentStateStore)
 
@@ -289,7 +286,9 @@
       activeItem
     )
 
-    handlePatch(operations, () => ({ selection: newSelection }))
+    handlePatch(operations, (patchedJson, patchedState) => ({
+      state: { ...patchedState, selection: newSelection }
+    }))
 
     await tick()
 
@@ -306,7 +305,9 @@
       replacementText
     )
 
-    handlePatch(operations, () => ({ selection: newSelection }))
+    handlePatch(operations, (patchedJson, patchedState) => ({
+      state: { ...patchedState, selection: newSelection }
+    }))
 
     await tick()
 
@@ -392,7 +393,11 @@
   let textIsRepaired = false
   $: textIsUnrepairable = text !== undefined && json === undefined
 
+  let validationErrors: ValidationError[] = []
   $: updateValidationErrors(json, validator)
+
+  let validationErrorsMap: JSONPointerMap<ValidationError>
+  $: validationErrorsMap = mapValidationErrors(validationErrors)
 
   function updateValidationErrors(json: JSONData, validator: Validator | null) {
     const newValidationErrors: ValidationError[] = validator ? validator(json) : []
@@ -808,8 +813,11 @@
       selection
     )
 
-    handlePatch(operations, () => ({
-      selection: newSelection
+    handlePatch(operations, (patchedJson, patchedState) => ({
+      state: {
+        ...patchedState,
+        selection: newSelection
+      }
     }))
   }
 
@@ -966,8 +974,11 @@
 
       debug('remove', { operations, selection, newSelection })
 
-      handlePatch(operations, () => ({
-        selection: newSelection
+      handlePatch(operations, (patchedJson, patchedState) => ({
+        state: {
+          ...patchedState,
+          selection: newSelection
+        }
       }))
     }
   }
@@ -1047,8 +1058,10 @@
 
           if (isObjectOrArray(newValue)) {
             return {
-              state: expandWithCallback(patchedJson, patchedState, path, expandAll),
-              selection: createInsideSelection(path)
+              state: {
+                ...expandWithCallback(patchedJson, patchedState, path, expandAll),
+                selection: createInsideSelection(path)
+              }
             }
           }
 
@@ -1057,9 +1070,12 @@
             const parent = !isEmpty(path) ? getIn(patchedJson, initial(path)) : null
 
             return {
-              selection: isObject(parent)
-                ? createKeySelection(path, true)
-                : createValueSelection(path, true)
+              state: {
+                ...state,
+                selection: isObject(parent)
+                  ? createKeySelection(path, true)
+                  : createValueSelection(path, true)
+              }
             }
           }
 
@@ -1083,8 +1099,10 @@
 
       const path = []
       handleChangeJson(newValue, (patchedJson, patchedState) => ({
-        state: expandRecursive(patchedJson, patchedState, path),
-        selection: createInsideSelection(path)
+        state: {
+          ...expandRecursive(patchedJson, patchedState, path),
+          selection: createInsideSelection(path)
+        }
       }))
 
       focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
@@ -1368,8 +1386,10 @@
 
         handlePatch(operations, (patchedJson, patchedState) => ({
           // expand the newly replaced array and select it
-          state: expandRecursive(patchedJson, patchedState, selectedPath),
-          selection: createInsideSelection(selectedPath)
+          state: {
+            ...expandRecursive(patchedJson, patchedState, selectedPath),
+            selection: createInsideSelection(selectedPath)
+          }
         }))
       },
       onClose: () => {
@@ -1423,8 +1443,10 @@
 
             handlePatch(operations, (patchedJson, patchedState) => ({
               // expand the newly replaced array and select it
-              state: expandRecursive(patchedJson, patchedState, selectedPath),
-              selection: createValueSelection(selectedPath, false)
+              state: {
+                ...expandRecursive(patchedJson, patchedState, selectedPath),
+                selection: createValueSelection(selectedPath, false)
+              }
             }))
           },
       onClose: () => {
@@ -1565,21 +1587,15 @@
     const previousSelection = previousState.selection
 
     const state = get(documentStateStore)
-    const selection = state.selection
     const updatedState = expandWithCallback(json, state, rootPath, expandMinimal)
 
     const callback =
-      typeof afterPatch === 'function'
-        ? afterPatch(updatedJson, updatedState, selection)
-        : undefined
+      typeof afterPatch === 'function' ? afterPatch(updatedJson, updatedState) : undefined
 
     json = callback && callback.json !== undefined ? callback.json : updatedJson
     documentStateStore.set(callback && callback.state !== undefined ? callback.state : updatedState)
     text = undefined
     textIsRepaired = false
-    if (callback && callback.selection) {
-      updateSelection(callback.selection)
-    }
 
     // make sure the selection is valid
     clearSelectionWhenNotExisting(json)
@@ -1630,13 +1646,10 @@
     }
 
     if (typeof afterPatch === 'function') {
-      const callback = afterPatch(json, state, get(documentStateStore).selection)
+      const callback = afterPatch(json, state)
 
       json = callback && callback.json ? callback.json : json
       documentStateStore.set(callback && callback.state ? callback.state : state)
-      if (callback && callback.selection) {
-        updateSelection(callback.selection)
-      }
     }
 
     // ensure the selection is valid
