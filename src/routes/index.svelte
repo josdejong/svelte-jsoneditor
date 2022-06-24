@@ -15,6 +15,9 @@
       <a href="examples/basic_usage_two_way_binding">Basic usage (two-way binding)</a>
     </li>
     <li>
+      <a href="examples/use_methods">Use methods</a>
+    </li>
+    <li>
       <a href="examples/custom_dynamic_styling">Custom, dynamic styling</a>
     </li>
     <li>
