@@ -543,8 +543,6 @@
     previousState: DocumentState
     previousTextIsRepaired: boolean
   }) {
-    const state = documentState
-
     if (previousJson === undefined && previousText === undefined) {
       // initialization -> do not create a history item
       return
@@ -563,7 +561,7 @@
           },
           redo: {
             patch: [{ op: 'replace', path: '', value: json }],
-            state: removeEditModeFromSelection(state),
+            state: removeEditModeFromSelection(documentState),
             json: undefined,
             text,
             textIsRepaired
@@ -581,7 +579,7 @@
           redo: {
             patch: undefined,
             json,
-            state: removeEditModeFromSelection(state),
+            state: removeEditModeFromSelection(documentState),
             text,
             textIsRepaired
           }
@@ -602,7 +600,7 @@
             json: undefined,
             text,
             textIsRepaired,
-            state: removeEditModeFromSelection(state)
+            state: removeEditModeFromSelection(documentState)
           }
         })
       } else {
@@ -840,10 +838,9 @@
         createDefaultSelection()
       }
 
-      const state = documentState
-      const operations = insert(json, state, clipboardText)
+      const operations = insert(json, documentState, clipboardText)
 
-      debug('paste', { clipboardText, operations, selection: state.selection })
+      debug('paste', { clipboardText, operations, selection: documentState.selection })
 
       handlePatch(operations, (patchedJson, patchedState) => {
         let updatedState = patchedState
@@ -1249,11 +1246,11 @@
     json = item.undo.patch
       ? (immutableJSONPatch(json, item.undo.patch) as JSONData)
       : item.undo.json
-    const state = item.undo.state
+    documentState = item.undo.state
     text = item.undo.text
     textIsRepaired = item.undo.textIsRepaired
 
-    debug('undo', { item, json, state, selection: documentState.selection })
+    debug('undo', { item, json, documentState })
 
     const patchResult = {
       json,
@@ -1290,11 +1287,11 @@
     json = item.redo.patch
       ? (immutableJSONPatch(json, item.redo.patch) as JSONData)
       : item.redo.json
-    const state = item.redo.state
+    documentState = item.redo.state
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired
 
-    debug('redo', { item, json, state, selection: documentState.selection })
+    debug('redo', { item, json, documentState })
 
     const patchResult = {
       json,
@@ -1693,7 +1690,6 @@
     // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
     const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
     const keepAnchorPath = event.shiftKey
-    const state = documentState
 
     if (combo === 'Ctrl+X') {
       // cut formatted
@@ -1741,42 +1737,44 @@
     if (combo === 'Up' || combo === 'Shift+Up') {
       event.preventDefault()
 
-      documentState.selection = documentState.selection
-        ? getSelectionUp(json, state, keepAnchorPath, true) || documentState.selection
-        : getInitialSelection(json, state)
+      const newSelection = documentState.selection
+        ? getSelectionUp(json, documentState, keepAnchorPath, true) || documentState.selection
+        : getInitialSelection(json, documentState)
 
-      updateSelection(documentState.selection)
-      scrollIntoView(documentState.selection.focusPath)
+      updateSelection(newSelection)
+      scrollIntoView(newSelection.focusPath)
     }
     if (combo === 'Down' || combo === 'Shift+Down') {
       event.preventDefault()
 
-      documentState.selection = documentState.selection
-        ? getSelectionDown(json, state, keepAnchorPath, true) || documentState.selection
-        : getInitialSelection(json, state)
+      const newSelection = documentState.selection
+        ? getSelectionDown(json, documentState, keepAnchorPath, true) || documentState.selection
+        : getInitialSelection(json, documentState)
 
-      updateSelection(documentState.selection)
-      scrollIntoView(documentState.selection.focusPath)
+      updateSelection(newSelection)
+      scrollIntoView(newSelection.focusPath)
     }
     if (combo === 'Left' || combo === 'Shift+Left') {
       event.preventDefault()
 
-      documentState.selection = documentState.selection
-        ? getSelectionLeft(json, state, keepAnchorPath, !readOnly) || documentState.selection
-        : getInitialSelection(json, state)
+      const newSelection = documentState.selection
+        ? getSelectionLeft(json, documentState, keepAnchorPath, !readOnly) ||
+          documentState.selection
+        : getInitialSelection(json, documentState)
 
-      updateSelection(documentState.selection)
-      scrollIntoView(documentState.selection.focusPath)
+      updateSelection(newSelection)
+      scrollIntoView(newSelection.focusPath)
     }
     if (combo === 'Right' || combo === 'Shift+Right') {
       event.preventDefault()
 
-      documentState.selection = documentState.selection
-        ? getSelectionRight(json, state, keepAnchorPath, !readOnly) || documentState.selection
-        : getInitialSelection(json, state)
+      const newSelection = documentState.selection
+        ? getSelectionRight(json, documentState, keepAnchorPath, !readOnly) ||
+          documentState.selection
+        : getInitialSelection(json, documentState)
 
-      updateSelection(documentState.selection)
-      scrollIntoView(documentState.selection.focusPath)
+      updateSelection(newSelection)
+      scrollIntoView(newSelection.focusPath)
     }
 
     if (combo === 'Enter' && documentState.selection) {
