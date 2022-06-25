@@ -211,7 +211,6 @@
     // when left-clicking inside the current selection, do nothing: it can be the start of dragging
     if (isPathInsideSelection(selection, path, anchorType)) {
       if (event.button === 0) {
-        context.focus()
         onDragSelectionStart(event)
       }
 
@@ -241,6 +240,9 @@
         context.onSelect(fromSelectionType(json, documentState, anchorType, path))
       }
     }
+
+    // make sure the editor has focus
+    context.focus()
   }
 
   function handleMouseMove(event) {

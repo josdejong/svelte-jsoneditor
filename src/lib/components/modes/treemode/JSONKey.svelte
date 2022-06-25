@@ -48,17 +48,20 @@
     const updatedKey = onUpdateKey(key, context.normalization.unescapeValue(newKey))
     const updatedPath = initial(path).concat(updatedKey)
 
-    if (updateSelection === UPDATE_SELECTION.NEXT_INSIDE) {
-      context.onSelect(createValueSelection(updatedPath, false))
-    }
+    context.onSelect(
+      updateSelection === UPDATE_SELECTION.NEXT_INSIDE
+        ? createValueSelection(updatedPath, false)
+        : createKeySelection(updatedPath, false)
+    )
 
-    if (updateSelection === UPDATE_SELECTION.SELF) {
-      context.onSelect(createKeySelection(path, false), { ensureFocus: false })
+    if (updateSelection !== UPDATE_SELECTION.SELF) {
+      context.focus()
     }
   }
 
   function handleCancelChange() {
     context.onSelect(createKeySelection(path, false))
+    context.focus()
   }
 </script>
 

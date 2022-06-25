@@ -64,7 +64,6 @@
     getInitialSelection,
     getSelectionDown,
     getSelectionLeft,
-    getSelectionNextInside,
     getSelectionPaths,
     getSelectionRight,
     getSelectionUp,
@@ -364,7 +363,6 @@
 
     updateSelection(createValueSelection(error.path, false))
     scrollTo(error.path)
-    focus()
   }
 
   const history = createHistory<HistoryItem>({
@@ -973,8 +971,7 @@
   }
 
   function handleExtract() {
-    const state = documentState
-    const selection = state.selection
+    const selection = documentState.selection
 
     if (
       readOnly ||
@@ -998,8 +995,6 @@
         }
       }
     })
-
-    focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
   }
 
   function handleInsert(type: InsertType): void {
@@ -1054,8 +1049,6 @@
       })
 
       if (operation) {
-        focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
-
         if (newValue === '') {
           // open the newly inserted value in edit mode
           tick().then(() => {
@@ -1074,8 +1067,6 @@
           selection: createInsideSelection(path)
         }
       }))
-
-      focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
     }
   }
 
@@ -1129,8 +1120,6 @@
           state: expandRecursive(patchedJson, patchedState, selection.focusPath)
         }
       })
-
-      focus() // TODO: find a more robust way to keep focus than sprinkling focus() everywhere
     } catch (err) {
       onError(err)
     }
@@ -1696,23 +1685,6 @@
     handleExpand([], false, true)
   }
 
-  function handleSelect(
-    selection: Selection,
-    options?: { ensureFocus?: boolean; nextInside?: boolean }
-  ): void {
-    updateSelection(
-      options?.nextInside
-        ? getSelectionNextInside(json, documentState, selection.focusPath)
-        : selection
-    )
-
-    // set focus to the hidden input, so we can capture quick keys like Ctrl+X, Ctrl+C, Ctrl+V
-    // we do this after a setTimeout in case the selection was made by clicking a button
-    if (options?.ensureFocus !== false) {
-      setTimeout(() => focus())
-    }
-  }
-
   function openFind(findAndReplace: boolean): void {
     debug('openFind', { findAndReplace })
 
@@ -2121,6 +2093,7 @@
   }
 
   export function focus() {
+    debug('focus')
     // with just .focus(), sometimes the input doesn't react on onpaste events
     // in Chrome when having a large document open and then doing cut/paste.
     // Calling both .focus() and .select() did solve this issue.
@@ -2194,7 +2167,7 @@
     onPatch: handlePatch,
     onInsert: handleInsert,
     onExpand: handleExpand,
-    onSelect: handleSelect,
+    onSelect: updateSelection,
     onFind: openFind,
     onExpandSection: handleExpandSection,
     onPasteJson: handlePasteJson,

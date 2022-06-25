@@ -38,7 +38,8 @@
     onPatch: context.onPatch,
     onPasteJson: context.onPasteJson,
     onSelect: context.onSelect,
-    onFind: context.onFind
+    onFind: context.onFind,
+    focus: context.focus
   })
 </script>
 

@@ -4,14 +4,13 @@
   import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
   import { compileJSONPointer } from 'immutable-json-patch'
   import Icon from 'svelte-awesome'
-  import { createValueSelection } from '../../../logic/selection.js'
-  import type { JSONData, OnPatch, OnSelect, Path } from '../../../types'
+  import type { JSONData, OnPatch, Path } from '../../../types'
 
   export let path: Path
   export let value: JSONData
   export let readOnly: boolean
   export let onPatch: OnPatch
-  export let onSelect: OnSelect
+  export let focus: () => void
 
   function toggleBooleanValue(event: MouseEvent) {
     event.stopPropagation()
@@ -28,7 +27,7 @@
       }
     ])
 
-    onSelect(createValueSelection(path, false))
+    setTimeout(focus)
   }
 </script>
 

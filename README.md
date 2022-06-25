@@ -354,6 +354,7 @@ interface RenderValuePropsOptional {
   onPasteJson?: (pastedJson: { path: Path; contents: JSONData }) => void
   onSelect?: (selection: Selection) => void
   onFind?: (findAndReplace: boolean) => void
+  focus?: () => void
 }
 
 interface RenderValueProps extends RenderValuePropsOptional {
@@ -370,6 +371,7 @@ interface RenderValueProps extends RenderValuePropsOptional {
   onPasteJson: (pastedJson: { path: Path; contents: JSONData }) => void
   onSelect: (selection: Selection) => void
   onFind: (findAndReplace: boolean) => void
+  focus: () => void
 }
 
 type ValueNormalization = {

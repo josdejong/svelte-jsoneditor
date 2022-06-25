@@ -3,7 +3,7 @@
 <script lang="ts">
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils'
-  import { createValueSelection } from '../../../logic/selection'
+  import { createValueSelection, getSelectionNextInside } from '../../../logic/selection'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
   import EditableDiv from '../../../components/controls/EditableDiv.svelte'
   import { UPDATE_SELECTION } from '../../../constants.js'
@@ -25,31 +25,44 @@
   export let onPasteJson: OnPasteJson
   export let onSelect: OnSelect
   export let onFind: OnFind
+  export let focus: () => void
 
   function convert(value: string) {
     return enforceString ? value : stringConvert(value)
   }
 
   function handleChangeValue(newValue: string, updateSelection: string) {
-    onPatch([
-      {
-        op: 'replace',
-        path: compileJSONPointer(path),
-        value: convert(normalization.unescapeValue(newValue))
+    onPatch(
+      [
+        {
+          op: 'replace',
+          path: compileJSONPointer(path),
+          value: convert(normalization.unescapeValue(newValue))
+        }
+      ],
+      (patchedJson, patchedState) => {
+        const selection =
+          updateSelection === UPDATE_SELECTION.NEXT_INSIDE
+            ? getSelectionNextInside(patchedJson, patchedState, path) || patchedState.selection
+            : createValueSelection(path, false)
+
+        return {
+          state: {
+            ...patchedState,
+            selection
+          }
+        }
       }
-    ])
+    )
 
-    if (updateSelection === UPDATE_SELECTION.NEXT_INSIDE) {
-      onSelect(createValueSelection(path, false), { nextInside: true })
-    }
-
-    if (updateSelection === UPDATE_SELECTION.SELF) {
-      onSelect(createValueSelection(path, false), { ensureFocus: false })
+    if (updateSelection !== UPDATE_SELECTION.SELF) {
+      focus()
     }
   }
 
   function handleCancelChange() {
     onSelect(createValueSelection(path, false))
+    focus()
   }
 
   function handlePaste(pastedText: string): void {

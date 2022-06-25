@@ -270,11 +270,8 @@ export type OnChangeQueryLanguage = (queryLanguageId: string) => void
 export type OnChange =
   | ((content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void)
   | null
-export type OnSelect = (
-  selection: Selection,
-  options?: { ensureFocus?: boolean; nextInside?: boolean }
-) => void
-export type OnPatch = (operations: JSONPatchDocument) => void
+export type OnSelect = (selection: Selection) => void
+export type OnPatch = (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
 export type OnSort = (operations: JSONPatchDocument) => void
 export type OnFind = (findAndReplace: boolean) => void
 export type OnPaste = (pastedText: string) => void
@@ -436,6 +433,7 @@ export interface RenderValuePropsOptional {
   onPasteJson?: OnPasteJson
   onSelect?: OnSelect
   onFind?: OnFind
+  focus?: () => void
 }
 
 export interface RenderValueProps extends RenderValuePropsOptional {
@@ -452,6 +450,7 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   onPasteJson: OnPasteJson
   onSelect: OnSelect
   onFind: OnFind
+  focus: () => void
 }
 
 // TODO: can we define proper generic types here?
