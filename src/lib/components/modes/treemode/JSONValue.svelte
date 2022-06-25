@@ -1,27 +1,16 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type {
-    JSONData,
-    JSONPointer,
-    Path,
-    SearchResultItem,
-    Selection,
-    TreeModeContext
-  } from '../../../types'
+  import type { JSONData, Path, SearchResultItem, Selection, TreeModeContext } from '../../../types'
   import { isEditingSelection, isValueSelection } from '../../../logic/selection'
 
   export let path: Path
-  export let pointer: JSONPointer
   export let value: JSONData
   export let context: TreeModeContext
   export let enforceString: boolean
+  export let isSelected: boolean
   export let selection: Selection | undefined
   export let searchResultItems: SearchResultItem[] | undefined
-
-  $: isSelected = selection
-    ? selection.pointersMap[pointer] === true && isValueSelection(selection)
-    : undefined
 
   $: isEditing = !context.readOnly && isValueSelection(selection) && isEditingSelection(selection)
 
