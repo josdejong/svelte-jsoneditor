@@ -1716,7 +1716,6 @@
     const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
     const keepAnchorPath = event.shiftKey
     const state = documentState
-    const selection = state.selection
 
     if (combo === 'Ctrl+X') {
       // cut formatted
@@ -1763,46 +1762,48 @@
 
     if (combo === 'Up' || combo === 'Shift+Up') {
       event.preventDefault()
-      updateSelection((selection) =>
-        selection
-          ? getSelectionUp(json, state, keepAnchorPath, true) || selection
-          : getInitialSelection(json, state)
-      )
 
+      const selection = documentState.selection
+        ? getSelectionUp(json, state, keepAnchorPath, true) || documentState.selection
+        : getInitialSelection(json, state)
+
+      updateSelection(selection)
       scrollIntoView(selection.focusPath)
     }
     if (combo === 'Down' || combo === 'Shift+Down') {
       event.preventDefault()
-      updateSelection((selection) =>
-        selection
-          ? getSelectionDown(json, state, keepAnchorPath, true) || selection
-          : getInitialSelection(json, state)
-      )
 
+      const selection = documentState.selection
+        ? getSelectionDown(json, state, keepAnchorPath, true) || documentState.selection
+        : getInitialSelection(json, state)
+
+      updateSelection(selection)
       scrollIntoView(selection.focusPath)
     }
     if (combo === 'Left' || combo === 'Shift+Left') {
       event.preventDefault()
-      updateSelection((selection) =>
-        selection
-          ? getSelectionLeft(json, state, keepAnchorPath, !readOnly) || selection
-          : getInitialSelection(json, state)
-      )
 
-      scrollIntoView(selection.focusPath)
+      const selection = documentState.selection
+        ? getSelectionLeft(json, state, keepAnchorPath, !readOnly) || documentState.selection
+        : getInitialSelection(json, state)
+
+      updateSelection(selection)
+      scrollIntoView(documentState.selection.focusPath)
     }
     if (combo === 'Right' || combo === 'Shift+Right') {
       event.preventDefault()
-      updateSelection((selection) =>
-        selection
-          ? getSelectionRight(json, state, keepAnchorPath, !readOnly) || selection
-          : getInitialSelection(json, state)
-      )
 
+      const selection = documentState.selection
+        ? getSelectionRight(json, state, keepAnchorPath, !readOnly) || documentState.selection
+        : getInitialSelection(json, state)
+
+      updateSelection(selection)
       scrollIntoView(selection.focusPath)
     }
 
-    if (combo === 'Enter' && selection) {
+    if (combo === 'Enter' && documentState.selection) {
+      const selection = documentState.selection
+
       // when the selection consists of a single Array item, change selection to editing its value
       if (!readOnly && isMultiSelection(selection) && selection.paths.length === 1) {
         const path = selection.focusPath
@@ -1835,7 +1836,7 @@
       }
     }
 
-    if (combo.length === (combo.startsWith('Shift+') ? 7 : 1) && selection) {
+    if (combo.length === (combo.startsWith('Shift+') ? 7 : 1) && documentState.selection) {
       // a regular key like a, A, _, etc is entered.
       // Replace selected contents with a new value having this first character as text
       event.preventDefault()
@@ -1843,15 +1844,18 @@
       return
     }
 
-    if (combo === 'Enter' && (isAfterSelection(selection) || isInsideSelection(selection))) {
+    if (
+      combo === 'Enter' &&
+      (isAfterSelection(documentState.selection) || isInsideSelection(documentState.selection))
+    ) {
       // Enter on an insert area -> open the area in edit mode
       event.preventDefault()
       handleInsertCharacter('')
       return
     }
 
-    if (combo === 'Ctrl+Enter' && isValueSelection(selection)) {
-      const value = getIn(json, selection.focusPath as JSONPath)
+    if (combo === 'Ctrl+Enter' && isValueSelection(documentState.selection)) {
+      const value = getIn(json, documentState.selection.focusPath as JSONPath)
 
       if (isUrl(value)) {
         // open url in new page
@@ -1859,7 +1863,7 @@
       }
     }
 
-    if (combo === 'Escape' && selection) {
+    if (combo === 'Escape' && documentState.selection) {
       event.preventDefault()
       updateSelection(undefined)
     }
