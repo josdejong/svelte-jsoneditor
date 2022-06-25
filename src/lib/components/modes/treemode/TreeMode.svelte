@@ -513,21 +513,19 @@
   }
 
   function clearSelectionWhenNotExisting(json) {
-    const selection = documentState.selection
-
-    if (selection === undefined) {
+    if (documentState.selection === undefined) {
       return
     }
 
     if (
-      selection &&
-      existsIn(json, selection.anchorPath as JSONPath) &&
-      existsIn(json, selection.focusPath as JSONPath)
+      documentState.selection &&
+      existsIn(json, documentState.selection.anchorPath as JSONPath) &&
+      existsIn(json, documentState.selection.focusPath as JSONPath)
     ) {
       return
     }
 
-    debug('clearing selection: path does not exist anymore', selection)
+    debug('clearing selection: path does not exist anymore', documentState.selection)
     documentState = {
       ...documentState,
       selection: undefined
@@ -631,11 +629,9 @@
     if (json === undefined) {
       throw new Error('Cannot apply patch: no JSON')
     }
-    const state = documentState
-    const selection = state.selection
 
     const previousJson = json
-    const previousState = state
+    const previousState = documentState
     const previousText = text
     const previousTextIsRepaired = textIsRepaired
 
@@ -705,23 +701,19 @@
   }
 
   function handleEditKey() {
-    const selection = documentState.selection
-
-    if (readOnly || !selection) {
+    if (readOnly || !documentState.selection) {
       return
     }
 
-    updateSelection(createKeySelection(selection.focusPath, true))
+    updateSelection(createKeySelection(documentState.selection.focusPath, true))
   }
 
   function handleEditValue() {
-    const selection = documentState.selection
-
-    if (readOnly || !selection) {
+    if (readOnly || !documentState.selection) {
       return
     }
 
-    updateSelection(createValueSelection(selection.focusPath, true))
+    updateSelection(createValueSelection(documentState.selection.focusPath, true))
   }
 
   function handleToggleEnforceString() {
@@ -759,19 +751,17 @@
   }
 
   async function handleCut(indent = true) {
-    const selection = documentState.selection
-
-    if (readOnly || !hasSelectionContents(selection)) {
+    if (readOnly || !hasSelectionContents(documentState.selection)) {
       return
     }
 
     const cutIndentation = indent ? indentation : null
-    const clipboard = selectionToPartialJson(json, selection, cutIndentation)
+    const clipboard = selectionToPartialJson(json, documentState.selection, cutIndentation)
     if (clipboard == null) {
       return
     }
 
-    debug('cut', { selection, clipboard, indent })
+    debug('cut', { selection: documentState.selection, clipboard, indent })
 
     try {
       await navigator.clipboard.writeText(clipboard)
@@ -779,7 +769,11 @@
       onError(err)
     }
 
-    const { operations, newSelection } = createRemoveOperations(json, documentState, selection)
+    const { operations, newSelection } = createRemoveOperations(
+      json,
+      documentState,
+      documentState.selection
+    )
 
     handlePatch(operations, (patchedJson, patchedState) => ({
       state: {
@@ -790,9 +784,8 @@
   }
 
   async function handleCopy(indent = true) {
-    const selection = documentState.selection
     const copyIndentation = indent ? indentation : null
-    const clipboard = selectionToPartialJson(json, selection, copyIndentation)
+    const clipboard = selectionToPartialJson(json, documentState.selection, copyIndentation)
     if (clipboard == null) {
       return
     }
@@ -915,32 +908,38 @@
   }
 
   function handleRemove() {
-    const state = documentState
-    const selection = state.selection
-
-    if (readOnly || !selection) {
+    if (readOnly || !documentState.selection) {
       return
     }
 
     // in case of a selected key or value, we change the selection to the whole
     // entry to remove this, we do not want to clear a key or value only.
     const removeSelection =
-      isKeySelection(selection) || isValueSelection(selection)
-        ? createMultiSelection(json, state, selection.anchorPath, selection.focusPath)
-        : selection
+      isKeySelection(documentState.selection) || isValueSelection(documentState.selection)
+        ? createMultiSelection(
+            json,
+            documentState,
+            documentState.selection.anchorPath,
+            documentState.selection.focusPath
+          )
+        : documentState.selection
 
-    if (isEmpty(selection.focusPath)) {
+    if (isEmpty(documentState.selection.focusPath)) {
       // root selected -> clear complete document
-      debug('remove root', { selection })
+      debug('remove root', { selection: documentState.selection })
 
       const patchResult = null
 
       onChange({ text: '', json: undefined }, { text, json }, patchResult)
     } else {
       // remove selection
-      const { operations, newSelection } = createRemoveOperations(json, state, removeSelection)
+      const { operations, newSelection } = createRemoveOperations(
+        json,
+        documentState,
+        removeSelection
+      )
 
-      debug('remove', { operations, selection, newSelection })
+      debug('remove', { operations, selection: documentState.selection, newSelection })
 
       handlePatch(operations, (patchedJson, patchedState) => ({
         state: {
@@ -952,39 +951,34 @@
   }
 
   function handleDuplicate() {
-    const state = documentState
-    const selection = state.selection
-
     if (
       readOnly ||
-      !hasSelectionContents(selection) ||
-      isEmpty(selection.focusPath) // root selected, cannot duplicate
+      !hasSelectionContents(documentState.selection) ||
+      isEmpty(documentState.selection.focusPath) // root selected, cannot duplicate
     ) {
       return
     }
 
-    debug('duplicate', { selection })
+    debug('duplicate', { selection: documentState.selection })
 
-    const operations = duplicate(json, state, getSelectionPaths(selection))
+    const operations = duplicate(json, documentState, getSelectionPaths(documentState.selection))
 
     handlePatch(operations)
   }
 
   function handleExtract() {
-    const selection = documentState.selection
-
     if (
       readOnly ||
-      !selection ||
-      (!isMultiSelection(selection) && !isValueSelection(selection)) ||
-      isEmpty(selection.focusPath) // root selected, cannot extract
+      !documentState.selection ||
+      (!isMultiSelection(documentState.selection) && !isValueSelection(documentState.selection)) ||
+      isEmpty(documentState.selection.focusPath) // root selected, cannot extract
     ) {
       return
     }
 
-    debug('extract', { selection })
+    debug('extract', { selection: documentState.selection })
 
-    const operations = extract(json, selection)
+    const operations = extract(json, documentState.selection)
 
     handlePatch(operations, (patchedJson, patchedState) => {
       if (isObjectOrArray(patchedJson)) {
@@ -998,18 +992,15 @@
   }
 
   function handleInsert(type: InsertType): void {
-    const state = documentState
-    const selection = state.selection
-
-    if (readOnly || !selection) {
+    if (readOnly || !documentState.selection) {
       return
     }
 
-    const newValue = createNewValue(json, selection, type)
+    const newValue = createNewValue(json, documentState.selection, type)
 
     if (json !== undefined) {
       const data = JSON.stringify(newValue)
-      const operations = insert(json, state, data)
+      const operations = insert(json, documentState, data)
       debug('handleInsert', { type, operations, newValue, data })
 
       const operation = last(
@@ -1034,9 +1025,10 @@
             // open the newly inserted value in edit mode
             const parent = !isEmpty(path) ? getIn(patchedJson, initial(path)) : null
 
+            debug('test A', path, createInsideSelection(path))
             return {
               state: {
-                ...state,
+                ...documentState,
                 selection: isObject(parent)
                   ? createKeySelection(path, true)
                   : createValueSelection(path, true)
@@ -1047,6 +1039,8 @@
           return undefined
         }
       })
+
+      debug('after patch')
 
       if (operation) {
         if (newValue === '') {
@@ -1074,11 +1068,9 @@
    * @param {'value' | 'object' | 'array' | 'structure'} type
    */
   function handleInsertFromContextMenu(type) {
-    const selection = documentState.selection
-
-    if (isKeySelection(selection)) {
+    if (isKeySelection(documentState.selection)) {
       // in this case, we do not want to rename the key, but replace the property
-      updateSelection(createValueSelection(selection.focusPath, false))
+      updateSelection(createValueSelection(documentState.selection.focusPath, false))
     }
 
     handleInsert(type)
@@ -1088,19 +1080,17 @@
    * @param {'value' | 'object' | 'array'} type
    */
   function handleConvert(type) {
-    const selection = documentState.selection
-
-    if (readOnly || !selection) {
+    if (readOnly || !documentState.selection) {
       return
     }
 
-    if (!canConvert(selection)) {
+    if (!canConvert(documentState.selection)) {
       onError(new Error(`Cannot convert current selection to ${type}`))
       return
     }
 
     try {
-      const path = selection.anchorPath
+      const path = documentState.selection.anchorPath
       const currentValue: JSONData = getIn(json, path) as JSONData
       const convertedValue = convertValue(currentValue, type)
       if (convertedValue === currentValue) {
@@ -1112,12 +1102,12 @@
         { op: 'replace', path: compileJSONPointer(path), value: convertedValue }
       ]
 
-      debug('handleConvert', { selection, path, type, operations })
+      debug('handleConvert', { selection: documentState.selection, path, type, operations })
 
       handlePatch(operations, (patchedJson, patchedState) => {
         // expand converted object/array
         return {
-          state: expandRecursive(patchedJson, patchedState, selection.focusPath)
+          state: expandRecursive(patchedJson, patchedState, documentState.selection.focusPath)
         }
       })
     } catch (err) {
@@ -1126,10 +1116,8 @@
   }
 
   function handleInsertBefore() {
-    const state = documentState
-    const selection = state.selection
-    const selectionBefore = getSelectionUp(json, state, false)
-    const parentPath: Path = initial(selection.focusPath)
+    const selectionBefore = getSelectionUp(json, documentState, false)
+    const parentPath: Path = initial(documentState.selection.focusPath)
 
     if (
       !isEmpty(selectionBefore.focusPath) &&
@@ -1140,15 +1128,15 @@
       updateSelection(createInsideSelection(parentPath))
     }
 
-    debug('insert before', { selection, selectionBefore, parentPath })
+    debug('insert before', { selection: documentState.selection, selectionBefore, parentPath })
 
     tick().then(handleContextMenu)
   }
 
   function handleInsertAfter() {
-    const selection = documentState.selection
-
-    const path: Path = isMultiSelection(selection) ? last(selection.paths) : selection.focusPath
+    const path: Path = isMultiSelection(documentState.selection)
+      ? last(documentState.selection.paths)
+      : documentState.selection.focusPath
 
     debug('insert after', path)
 
@@ -1172,20 +1160,18 @@
   }
 
   async function handleInsertCharacter(char) {
-    const selection = documentState.selection
-
     // a regular key like a, A, _, etc is entered.
     // Replace selected contents with a new value having this first character as text
-    if (readOnly || !selection) {
+    if (readOnly || !documentState.selection) {
       return
     }
 
-    if (isKeySelection(selection)) {
+    if (isKeySelection(documentState.selection)) {
       // only replace contents when not yet in edit mode (can happen when entering
       // multiple characters very quickly after each other due to the async handling)
-      const replaceContents = !selection.edit
+      const replaceContents = !documentState.selection.edit
 
-      updateSelection({ ...selection, edit: true })
+      updateSelection({ ...documentState.selection, edit: true })
       await tick()
       setTimeout(() => insertActiveElementContents(char, replaceContents))
       return
@@ -1196,13 +1182,13 @@
     } else if (char === '[') {
       handleInsert('array')
     } else {
-      if (isValueSelection(selection)) {
-        if (!isObjectOrArray(getIn(json, selection.focusPath as JSONPath))) {
+      if (isValueSelection(documentState.selection)) {
+        if (!isObjectOrArray(getIn(json, documentState.selection.focusPath as JSONPath))) {
           // only replace contents when not yet in edit mode (can happen when entering
           // multiple characters very quickly after each other due to the async handling)
-          const replaceContents = !selection.edit
+          const replaceContents = !documentState.selection.edit
 
-          updateSelection({ ...selection, edit: true })
+          updateSelection({ ...documentState.selection, edit: true })
           await tick()
           setTimeout(() => insertActiveElementContents(char, replaceContents))
         } else {
@@ -1218,9 +1204,7 @@
   }
 
   async function handleInsertValueWithCharacter(char) {
-    const selection = documentState.selection
-
-    if (readOnly || !selection) {
+    if (readOnly || !documentState.selection) {
       return
     }
 
@@ -1229,13 +1213,13 @@
 
     // only replace contents when not yet in edit mode (can happen when entering
     // multiple characters very quickly after each other due to the async handling)
-    const replaceContents = !isEditingSelection(selection)
+    const replaceContents = !isEditingSelection(documentState.selection)
 
     // next, open the new value in edit mode and apply the current character
-    const path = selection.focusPath
+    const path = documentState.selection.focusPath
     const parent = getIn(json, initial(path) as JSONPath)
 
-    if (Array.isArray(parent) || !parent || isValueSelection(selection)) {
+    if (Array.isArray(parent) || !parent || isValueSelection(documentState.selection)) {
       updateSelection(createValueSelection(path, true))
     } else {
       updateSelection(createKeySelection(path, true))
@@ -1269,8 +1253,7 @@
     text = item.undo.text
     textIsRepaired = item.undo.textIsRepaired
 
-    const selection = state.selection
-    debug('undo', { item, json, state, selection })
+    debug('undo', { item, json, state, selection: documentState.selection })
 
     const patchResult = {
       json,
@@ -1282,8 +1265,8 @@
     emitOnChange(previousContent, patchResult)
 
     focus()
-    if (selection) {
-      scrollTo(selection.focusPath)
+    if (documentState.selection) {
+      scrollTo(documentState.selection.focusPath)
     }
   }
 
@@ -1311,8 +1294,7 @@
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired
 
-    const selection = documentState.selection
-    debug('redo', { item, json, state, selection })
+    debug('redo', { item, json, state, selection: documentState.selection })
 
     const patchResult = {
       json,
@@ -1324,8 +1306,8 @@
     emitOnChange(previousContent, patchResult)
 
     focus()
-    if (selection) {
-      scrollTo(selection.focusPath)
+    if (documentState.selection) {
+      scrollTo(documentState.selection.focusPath)
     }
   }
 
@@ -1359,13 +1341,11 @@
   }
 
   function handleSortSelection() {
-    const selection = documentState.selection
-
-    if (!selection) {
+    if (!documentState.selection) {
       return
     }
 
-    const selectedPath = findRootPath(json, selection)
+    const selectedPath = findRootPath(json, documentState.selection)
     openSortModal(selectedPath)
   }
 
@@ -1419,13 +1399,11 @@
   }
 
   function handleTransformSelection() {
-    const selection = documentState.selection
-
-    if (!selection) {
+    if (!documentState.selection) {
       return
     }
 
-    const selectedPath = findRootPath(json, selection)
+    const selectedPath = findRootPath(json, documentState.selection)
     openTransformModal({
       selectedPath
     })
@@ -1763,50 +1741,52 @@
     if (combo === 'Up' || combo === 'Shift+Up') {
       event.preventDefault()
 
-      const selection = documentState.selection
+      documentState.selection = documentState.selection
         ? getSelectionUp(json, state, keepAnchorPath, true) || documentState.selection
         : getInitialSelection(json, state)
 
-      updateSelection(selection)
-      scrollIntoView(selection.focusPath)
+      updateSelection(documentState.selection)
+      scrollIntoView(documentState.selection.focusPath)
     }
     if (combo === 'Down' || combo === 'Shift+Down') {
       event.preventDefault()
 
-      const selection = documentState.selection
+      documentState.selection = documentState.selection
         ? getSelectionDown(json, state, keepAnchorPath, true) || documentState.selection
         : getInitialSelection(json, state)
 
-      updateSelection(selection)
-      scrollIntoView(selection.focusPath)
+      updateSelection(documentState.selection)
+      scrollIntoView(documentState.selection.focusPath)
     }
     if (combo === 'Left' || combo === 'Shift+Left') {
       event.preventDefault()
 
-      const selection = documentState.selection
+      documentState.selection = documentState.selection
         ? getSelectionLeft(json, state, keepAnchorPath, !readOnly) || documentState.selection
         : getInitialSelection(json, state)
 
-      updateSelection(selection)
+      updateSelection(documentState.selection)
       scrollIntoView(documentState.selection.focusPath)
     }
     if (combo === 'Right' || combo === 'Shift+Right') {
       event.preventDefault()
 
-      const selection = documentState.selection
+      documentState.selection = documentState.selection
         ? getSelectionRight(json, state, keepAnchorPath, !readOnly) || documentState.selection
         : getInitialSelection(json, state)
 
-      updateSelection(selection)
-      scrollIntoView(selection.focusPath)
+      updateSelection(documentState.selection)
+      scrollIntoView(documentState.selection.focusPath)
     }
 
     if (combo === 'Enter' && documentState.selection) {
-      const selection = documentState.selection
-
       // when the selection consists of a single Array item, change selection to editing its value
-      if (!readOnly && isMultiSelection(selection) && selection.paths.length === 1) {
-        const path = selection.focusPath
+      if (
+        !readOnly &&
+        isMultiSelection(documentState.selection) &&
+        documentState.selection.paths.length === 1
+      ) {
+        const path = documentState.selection.focusPath
         const parent = getIn(json, initial(path))
         if (Array.isArray(parent)) {
           // change into selection of the value
@@ -1814,23 +1794,23 @@
         }
       }
 
-      if (!readOnly && isKeySelection(selection)) {
+      if (!readOnly && isKeySelection(documentState.selection)) {
         // go to key edit mode
         event.preventDefault()
-        updateSelection({ ...selection, edit: true })
+        updateSelection({ ...documentState.selection, edit: true })
       }
 
-      if (isValueSelection(selection)) {
+      if (isValueSelection(documentState.selection)) {
         event.preventDefault()
 
-        const value = getIn(json, selection.focusPath as JSONPath)
+        const value = getIn(json, documentState.selection.focusPath as JSONPath)
         if (isObjectOrArray(value)) {
           // expand object/array
-          handleExpand(selection.focusPath, true)
+          handleExpand(documentState.selection.focusPath, true)
         } else {
           if (!readOnly) {
             // go to value edit mode
-            updateSelection({ ...selection, edit: true })
+            updateSelection({ ...documentState.selection, edit: true })
           }
         }
       }
@@ -1995,9 +1975,7 @@
   }
 
   function handleContextMenu(event) {
-    const selection = documentState.selection
-
-    if (readOnly || isEditingSelection(selection)) {
+    if (readOnly || isEditingSelection(documentState.selection)) {
       return
     }
 
@@ -2110,9 +2088,7 @@
   function handleWindowMouseDown(event) {
     const outsideEditor = !isChildOf(event.target, (element) => element === refJsonEditor)
     if (outsideEditor) {
-      const selection = documentState.selection
-
-      if (isEditingSelection(selection)) {
+      if (isEditingSelection(documentState.selection)) {
         debug('click outside the editor, stop edit mode')
         updateSelection((selection) => {
           if (isKeySelection(selection)) {
