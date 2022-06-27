@@ -23,7 +23,7 @@ describe('dragging', () => {
 
     function doMoveSelection({ deltaY, items = allItems }) {
       return onMoveSelection({
-        fullJson: json,
+        json,
         documentState,
         deltaY,
         items
@@ -138,7 +138,7 @@ describe('dragging', () => {
 
     function doMoveSelection({ deltaY, items = allItems }) {
       return onMoveSelection({
-        fullJson: json,
+        json,
         documentState,
         deltaY,
         items

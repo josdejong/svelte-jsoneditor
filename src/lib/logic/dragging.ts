@@ -1,8 +1,8 @@
-import { createMultiSelection, createSelectionMap, getEndPath, getStartPath } from './selection.js'
+import { createMultiSelection, getEndPath, getStartPath } from './selection.js'
 import { documentStatePatch } from './documentState.js'
 import { initial, isEqual, last } from 'lodash-es'
 import type { JSONPath } from 'immutable-json-patch'
-import { compileJSONPointer, getIn } from 'immutable-json-patch'
+import { getIn } from 'immutable-json-patch'
 import { moveInsideParent } from './operations.js'
 import type {
   DocumentState,
@@ -16,7 +16,7 @@ import type {
 } from '../types'
 
 interface MoveSelectionProps {
-  fullJson: JSONData
+  json: JSONData
   documentState: DocumentState
   deltaY: number
   items: RenderedItem[]
@@ -26,33 +26,31 @@ interface MoveSelectionResult {
   operations: JSONPatchDocument | undefined
   updatedValue: JSONData | undefined
   updatedSelection: Selection | undefined
-  updatedFullSelection: Selection | undefined
   indexOffset: number
 }
 
 export function onMoveSelection({
-  fullJson,
+  json,
   documentState,
   deltaY,
   items
 }: MoveSelectionProps): MoveSelectionResult {
-  const fullSelection = documentState.selection
+  const selection = documentState.selection
   const dragInsideAction =
     deltaY < 0
-      ? findSwapPathUp({ fullSelection, deltaY, items })
-      : findSwapPathDown({ fullSelection, deltaY, items })
+      ? findSwapPathUp({ selection, deltaY, items })
+      : findSwapPathDown({ selection, deltaY, items })
 
   if (!dragInsideAction || dragInsideAction.indexOffset === 0) {
     return {
       operations: undefined,
       updatedValue: undefined,
       updatedSelection: undefined,
-      updatedFullSelection: undefined,
       indexOffset: 0
     }
   }
 
-  const operations = moveInsideParent(fullJson, documentState.selection, dragInsideAction)
+  const operations = moveInsideParent(json, documentState.selection, dragInsideAction)
 
   // TODO: documentStatePatch is relatively slow for large documents
   //  This is for example noticeable in a large array where we drag a few
@@ -60,27 +58,22 @@ export function onMoveSelection({
   //  not need the full document, only the nested changes. So we can optimize
   //  performance here by taking only the relative, nested json and state, and
   //  changing the operations into relative operations.
-  const update = documentStatePatch(fullJson, documentState, operations)
+  const update = documentStatePatch(json, documentState, operations)
 
-  const path: JSONPath = initial(getStartPath(fullSelection)) as JSONPath
-  const pointer = compileJSONPointer(path)
-  const value = getIn(fullJson, path)
+  const path: JSONPath = initial(getStartPath(selection)) as JSONPath
+  const value = getIn(json, path)
   if (Array.isArray(value)) {
-    const updatedFullSelection = createUpdatedArraySelection({
+    const updatedSelection = createUpdatedArraySelection({
       items,
-      fullJson,
-      fullSelection,
+      json,
+      selection,
       indexOffset: dragInsideAction.indexOffset
     })
-
-    const updatedSelectionMap = createSelectionMap(updatedFullSelection)
-    const updatedSelection = updatedSelectionMap[pointer]
 
     return {
       operations,
       updatedValue: getIn(update.json, path) as JSONData,
       updatedSelection,
-      updatedFullSelection: updatedFullSelection,
       indexOffset: dragInsideAction.indexOffset
     }
   } else {
@@ -89,7 +82,6 @@ export function onMoveSelection({
       operations,
       updatedValue: getIn(update.json, path) as JSONData,
       updatedSelection: undefined,
-      updatedFullSelection: undefined,
       indexOffset: dragInsideAction.indexOffset
     }
   }
@@ -97,10 +89,10 @@ export function onMoveSelection({
 
 function findSwapPathUp({
   items,
-  fullSelection,
+  selection,
   deltaY
 }: DragInsideProps): DragInsideAction | undefined {
-  const initialPath = getStartPath(fullSelection)
+  const initialPath = getStartPath(selection)
   const initialIndex = items.findIndex((item) => isEqual(item.path, initialPath))
 
   const prevHeight = () => items[index - 1]?.height
@@ -123,10 +115,10 @@ function findSwapPathUp({
 
 function findSwapPathDown({
   items,
-  fullSelection,
+  selection,
   deltaY
 }: DragInsideProps): DragInsideAction | undefined {
-  const initialPath = getEndPath(fullSelection)
+  const initialPath = getEndPath(selection)
   const initialIndex = items.findIndex((item) => isEqual(item.path, initialPath))
 
   const nextHeight = () => items[index + 1]?.height
@@ -149,19 +141,19 @@ function findSwapPathDown({
 
 interface UpdatedArraySelectionProps {
   items: RenderedItem[]
-  fullJson: JSONData
-  fullSelection: Selection
+  json: JSONData
+  selection: Selection
   indexOffset: number
 }
 
 function createUpdatedArraySelection({
   items,
-  fullJson,
-  fullSelection,
+  json,
+  selection,
   indexOffset
 }: UpdatedArraySelectionProps): MultiSelection {
-  const startPath = getStartPath(fullSelection)
-  const endPath = getEndPath(fullSelection)
+  const startPath = getStartPath(selection)
+  const endPath = getEndPath(selection)
 
   const startIndex = items.findIndex((item) => isEqual(item.path, startPath))
   const endIndex = items.findIndex((item) => isEqual(item.path, endPath))
@@ -169,5 +161,5 @@ function createUpdatedArraySelection({
   const anchorPath = items[startIndex + indexOffset]?.path
   const focusPath = items[endIndex + indexOffset]?.path
 
-  return createMultiSelection(fullJson, anchorPath, focusPath)
+  return createMultiSelection(json, anchorPath, focusPath)
 }

@@ -95,9 +95,6 @@
   let pointer: JSONPointer
   $: pointer = compileJSONPointer(path)
 
-  let isSelected: boolean
-  $: isSelected = selection ? selection.pointersMap[pointer] === true : false
-
   let expanded: boolean
   $: expanded = expandedMap ? expandedMap[pointer] === true : false
 
@@ -114,6 +111,9 @@
   let resolvedSelection: Selection | undefined
   $: resolvedSelection =
     dragging?.updatedSelection != undefined ? dragging.updatedSelection : selection
+
+  let isSelected: boolean
+  $: isSelected = resolvedSelection ? resolvedSelection.pointersMap[pointer] === true : false
 
   // FIXME: cleanup logging
   beforeUpdate(() =>
@@ -351,7 +351,7 @@
     if (dragging) {
       const deltaY = calculateDeltaY(dragging, event)
       const { updatedValue, updatedState, updatedSelection, indexOffset } = onMoveSelection({
-        fullJson: context.getJson(),
+        json: context.getJson(),
         documentState: context.getDocumentState(),
         deltaY,
         items: dragging.items
@@ -377,7 +377,7 @@
       const documentState = context.getDocumentState()
       const deltaY = calculateDeltaY(dragging, event)
       const { operations, updatedFullSelection } = onMoveSelection({
-        fullJson: json,
+        json,
         documentState,
         deltaY,
         items: dragging.items
@@ -522,9 +522,9 @@
   )}
   data-path={encodeDataPath(path)}
   class:jse-root={root}
-  class:jse-selected={isSelected && isMultiSelection(selection)}
-  class:jse-selected-key={isSelected && isKeySelection(selection)}
-  class:jse-selected-value={isSelected && isValueSelection(selection)}
+  class:jse-selected={isSelected && isMultiSelection(resolvedSelection)}
+  class:jse-selected-key={isSelected && isKeySelection(resolvedSelection)}
+  class:jse-selected-value={isSelected && isValueSelection(resolvedSelection)}
   class:jse-hovered={hover === HOVER_COLLECTION}
   on:mousedown={handleMouseDown}
   on:mousemove={handleMouseMove}
@@ -620,7 +620,7 @@
               visibleSectionsMap={filterPointerOrUndefined(visibleSectionsMap, item.pointer)}
               validationErrorsMap={filterPointerOrUndefined(validationErrorsMap, item.pointer)}
               searchResultItemsMap={filterPointerOrUndefined(searchResultItemsMap, item.pointer)}
-              selection={selectionIfOverlapping(selection, item.pointer)}
+              selection={selectionIfOverlapping(resolvedSelection, item.pointer)}
               {context}
               onDragSelectionStart={handleDragSelectionStart}
             >
@@ -737,7 +737,7 @@
             visibleSectionsMap={filterPointerOrUndefined(visibleSectionsMap, prop.pointer)}
             validationErrorsMap={filterPointerOrUndefined(validationErrorsMap, prop.pointer)}
             searchResultItemsMap={filterPointerOrUndefined(searchResultItemsMap, prop.pointer)}
-            selection={selectionIfOverlapping(selection, prop.pointer)}
+            selection={selectionIfOverlapping(resolvedSelection, prop.pointer)}
             {context}
             onDragSelectionStart={handleDragSelectionStart}
           >
@@ -746,7 +746,7 @@
                 path={prop.path}
                 pointer={prop.pointer}
                 key={prop.key}
-                selection={selectionIfOverlapping(selection, prop.pointer)}
+                selection={selectionIfOverlapping(resolvedSelection, prop.pointer)}
                 searchResultItems={filterKeySearchResults(searchResultItemsMap, prop.pointer)}
                 {context}
                 onUpdateKey={handleUpdateKey}
