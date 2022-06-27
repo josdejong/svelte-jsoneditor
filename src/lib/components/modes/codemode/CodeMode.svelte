@@ -283,7 +283,7 @@
    * This method is exposed via JSONEditor.transform
    * @param {Object} options
    * @property {string} [id]
-   * @property {Path} [selectedPath]
+   * @property {JSONPath} [selectedPath]
    * @property {({ operations: JSONPatchDocument, json: JSONData, transformedJson: JSONData }) => void} [onTransform]
    * @property {() => void} [onClose]
    */

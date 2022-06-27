@@ -18,7 +18,6 @@
   import type {
     Content,
     JSONEditorPropsOptional,
-    JSONPatchDocument,
     JSONPatchResult,
     MenuItem,
     MenuSeparatorItem,
@@ -31,13 +30,13 @@
     OnFocus,
     OnRenderMenu,
     OnRenderValue,
-    Path,
     QueryLanguage,
     SortModalCallback,
     TransformModalCallback,
     TransformModalOptions,
     Validator
   } from '../types'
+  import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { isMenuSpaceItem } from '../typeguards'
   import { noop } from 'lodash-es'
 
@@ -146,7 +145,7 @@
     }
   }
 
-  export function expand(callback?: (path: Path) => boolean): void {
+  export function expand(callback?: (path: JSONPath) => boolean): void {
     if (refTreeMode) {
       return refTreeMode.expand(callback)
     } else {
@@ -186,7 +185,7 @@
     }
   }
 
-  export function scrollTo(path: Path): void {
+  export function scrollTo(path: JSONPath): void {
     if (refTreeMode) {
       return refTreeMode.scrollTo(path)
     } else {
@@ -196,7 +195,7 @@
     }
   }
 
-  export function findElement(path: Path): Element {
+  export function findElement(path: JSONPath): Element {
     if (refTreeMode) {
       return refTreeMode.findElement(path)
     } else {

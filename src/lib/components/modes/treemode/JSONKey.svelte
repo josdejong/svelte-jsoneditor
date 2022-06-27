@@ -12,12 +12,13 @@
   import EditableDiv from '../../controls/EditableDiv.svelte'
   import { addNewLineSuffix } from '$lib/utils/domUtils'
   import { UPDATE_SELECTION } from '$lib/constants'
-  import type { ExtendedSearchResultItem, JSONPointer, Path, TreeModeContext } from '$lib/types'
+  import type { ExtendedSearchResultItem, TreeModeContext } from '$lib/types'
   import { type Selection } from '$lib/types'
+  import type { JSONPath, JSONPointer } from 'immutable-json-patch'
   import { isKeySelection } from '../../../logic/selection.js'
   import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
 
-  export let path: Path
+  export let path: JSONPath
   export let pointer: JSONPointer
   export let key: string
   export let selection: Selection | undefined

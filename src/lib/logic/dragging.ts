@@ -1,14 +1,13 @@
 import { createMultiSelection, getEndPath, getStartPath } from './selection.js'
 import { documentStatePatch } from './documentState.js'
 import { initial, isEqual, last } from 'lodash-es'
+import type { JSONData, JSONPatchDocument } from 'immutable-json-patch'
 import { getIn } from 'immutable-json-patch'
 import { moveInsideParent } from './operations.js'
 import type {
   DocumentState,
   DragInsideAction,
   DragInsideProps,
-  JSONData,
-  JSONPatchDocument,
   MultiSelection,
   RenderedItem,
   Selection
@@ -71,7 +70,7 @@ export function onMoveSelection({
 
     return {
       operations,
-      updatedValue: getIn(update.json, path) as JSONData,
+      updatedValue: getIn(update.json, path),
       updatedSelection,
       indexOffset: dragInsideAction.indexOffset
     }
@@ -79,7 +78,7 @@ export function onMoveSelection({
     // object
     return {
       operations,
-      updatedValue: getIn(update.json, path) as JSONData,
+      updatedValue: getIn(update.json, path),
       updatedSelection: undefined,
       indexOffset: dragInsideAction.indexOffset
     }

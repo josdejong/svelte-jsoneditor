@@ -81,7 +81,7 @@
     isChildOfNodeName,
     setCursorToEnd
   } from '$lib/utils/domUtils'
-  import { parseJSONPointerWithArrayIndices } from '$lib/utils/jsonPointer'
+  import { parseJSONPointerWithArrayIndices } from 'immutable-json-patch'
   import {
     convertValue,
     isLargeContent,
@@ -101,21 +101,19 @@
   import Welcome from './Welcome.svelte'
   import NavigationBar from '../../controls/navigationBar/NavigationBar.svelte'
   import SearchBox from './menu/SearchBox.svelte'
+  import type { JSONData, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import type {
     AbsolutePopupOptions,
     AfterPatchCallback,
     DocumentState,
     HistoryItem,
     InsertType,
-    JSONData,
-    JSONPatchDocument,
     JSONPatchResult,
     JSONPointerMap,
     OnChange,
     OnClassName,
     OnRenderValue,
     PastedJson,
-    Path,
     SearchResult,
     Section,
     Selection,
@@ -721,7 +719,7 @@
 
     const path = documentState.selection.focusPath
     const pointer = compileJSONPointer(path)
-    const value = getIn(json, path) as JSONData
+    const value = getIn(json, path)
     const enforceString = !getEnforceString(value, documentState.enforceStringMap, pointer)
     const updatedValue = enforceString ? String(value) : stringConvert(String(value))
 
@@ -1082,7 +1080,7 @@
 
     try {
       const path = documentState.selection.anchorPath
-      const currentValue: JSONData = getIn(json, path) as JSONData
+      const currentValue: JSONData = getIn(json, path)
       const convertedValue = convertValue(currentValue, type)
       if (convertedValue === currentValue) {
         // no change, do nothing
@@ -1108,7 +1106,7 @@
 
   function handleInsertBefore() {
     const selectionBefore = getSelectionUp(json, documentState, false)
-    const parentPath: Path = initial(documentState.selection.focusPath)
+    const parentPath: JSONPath = initial(documentState.selection.focusPath)
 
     if (
       !isEmpty(selectionBefore.focusPath) &&
@@ -1125,7 +1123,7 @@
   }
 
   function handleInsertAfter() {
-    const path: Path = isMultiSelection(documentState.selection)
+    const path: JSONPath = isMultiSelection(documentState.selection)
       ? last(documentState.selection.paths)
       : documentState.selection.focusPath
 
@@ -1239,9 +1237,7 @@
     // Note: from the documentState, we only undo the selection and enforceStringMap,
     // not the expandedMap or visibleSectionsMap. At the end, we scroll to the selection
     // and will expand that if needed
-    json = item.undo.patch
-      ? (immutableJSONPatch(json, item.undo.patch) as JSONData)
-      : item.undo.json
+    json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
     documentState = {
       ...documentState,
       enforceStringMap: item.undo.state.enforceStringMap,
@@ -1286,9 +1282,7 @@
     // Note: from the documentState, we only redo the selection and enforceStringMap,
     // not the expandedMap or visibleSectionsMap. At the end, we scroll to the selection
     // and will expand that if needed
-    json = item.redo.patch
-      ? (immutableJSONPatch(json, item.redo.patch) as JSONData)
-      : item.redo.json
+    json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
     documentState = {
       ...documentState,
       enforceStringMap: item.redo.state.enforceStringMap,
@@ -1377,7 +1371,7 @@
             onTransform({
               operations,
               json,
-              transformedJson: immutableJSONPatch(json, operations) as JSONData
+              transformedJson: immutableJSONPatch(json, operations)
             })
           }
         : (operations) => {
@@ -1421,7 +1415,7 @@
   /**
    * Scroll the window vertically to the node with given path
    */
-  export async function scrollTo(path: Path) {
+  export async function scrollTo(path: JSONPath) {
     documentState = expandPath(json, documentState, path)
     await tick()
 
@@ -1443,7 +1437,7 @@
    * Find the DOM element of a given path.
    * Note that the path can only be found when the node is expanded.
    */
-  export function findElement(path: Path): Element | null {
+  export function findElement(path: JSONPath): Element | null {
     return refContents
       ? refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
       : null
@@ -1453,7 +1447,7 @@
    * If given path is outside the visible viewport, scroll up/down.
    * When the path is already in view, nothing is done
    */
-  function scrollIntoView(path: Path) {
+  function scrollIntoView(path: JSONPath) {
     const elem = findElement(path)
 
     if (!elem || !refContents) {
@@ -1610,9 +1604,9 @@
   function expandRecursive(
     json: JSONData,
     documentState: DocumentState,
-    path: Path
+    path: JSONPath
   ): DocumentState {
-    const expandContents = getIn(json, path) as JSONData
+    const expandContents = getIn(json, path)
     const expandAllRecursive = !isLargeContent(
       { json: expandContents },
       MAX_DOCUMENT_SIZE_EXPAND_ALL
@@ -1628,7 +1622,7 @@
    * @param expanded  True to expand, false to collapse
    * @param [recursive=false]  Only applicable when expanding
    */
-  function handleExpand(path: Path, expanded: boolean, recursive = false): void {
+  function handleExpand(path: JSONPath, expanded: boolean, recursive = false): void {
     debug('expand', { path, expanded, recursive })
 
     if (expanded) {
@@ -1678,7 +1672,7 @@
     })
   }
 
-  function handleExpandSection(path: Path, section: Section) {
+  function handleExpandSection(path: JSONPath, section: Section) {
     debug('handleExpandSection', path, section)
 
     const pointer = compileJSONPointer(path)

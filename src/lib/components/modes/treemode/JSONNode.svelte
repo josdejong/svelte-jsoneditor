@@ -3,7 +3,8 @@
 <script lang="ts">
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
-  import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
+  import type { JSONArray, JSONData, JSONObject, JSONPath, JSONPointer } from 'immutable-json-patch'
+  import { appendToJSONPointer, compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
   import { initial, isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
@@ -47,12 +48,7 @@
   import { forEachIndex } from '$lib/utils/arrayUtils'
   import type {
     ExtendedSearchResultItem,
-    JSONArray,
-    JSONData,
-    JSONObject,
-    JSONPointer,
     JSONPointerMap,
-    Path,
     Selection,
     TreeModeContext,
     VisibleSection
@@ -64,13 +60,13 @@
     isMultiSelection,
     selectionIfOverlapping
   } from '../../../logic/selection'
-  import { appendToPointer, filterPointerOrUndefined } from '../../../utils/jsonPointer.js'
+  import { filterPointerOrUndefined } from '../../../utils/jsonPointer.js'
   import { filterKeySearchResults, filterValueSearchResults } from '../../../logic/search.js'
   import { createMemoizePath } from '../../../utils/pathUtils'
   import { getEnforceString } from '../../../logic/documentState'
 
   export let value: JSONData
-  export let path: Path
+  export let path: JSONPath
   export let expandedMap: JSONPointerMap<boolean>
   export let enforceStringMap: JSONPointerMap<boolean>
   export let visibleSectionsMap: JSONPointerMap<VisibleSection[]>
@@ -126,7 +122,7 @@
       key,
       value: object[key],
       path: memoizePath(path.concat([key])),
-      pointer: appendToPointer(pointer, key)
+      pointer: appendToJSONPointer(pointer, key)
     }))
   }
 
@@ -143,7 +139,7 @@
         index,
         value: array[index],
         path: memoizePath(path.concat([index])),
-        pointer: appendToPointer(pointer, index)
+        pointer: appendToJSONPointer(pointer, index)
       })
     }
 

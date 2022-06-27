@@ -3,9 +3,9 @@
 <script lang="ts">
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
-  import type { JSONData, OnPatch, Path } from '../../../types'
+  import type { JSONData, OnPatch, JSONPath } from '../../../types'
 
-  export let path: Path
+  export let path: JSONPath
   export let value: JSONData
   export let readOnly: boolean
   export let isSelected: boolean

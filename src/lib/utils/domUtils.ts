@@ -1,4 +1,5 @@
-import { type Path, SelectionType } from '../types.js'
+import { SelectionType } from '../types.js'
+import type { JSONPath } from 'immutable-json-patch'
 import { map, minBy } from 'lodash-es'
 
 /**
@@ -271,7 +272,7 @@ export function getSelectionTypeFromTarget(target: HTMLElement): SelectionType {
 
 /**
  * Encode a path into a string that can be used as attribute in HTML
- * @param {Path} path
+ * @param {JSONPath} path
  * @returns {string}
  */
 export function encodeDataPath(path) {
@@ -281,7 +282,7 @@ export function encodeDataPath(path) {
 /**
  * Decode a path that was stringified for use as an HTML attribute
  * @param {string} pathStr
- * @returns {Path}
+ * @returns {JSONPath}
  */
 export function decodeDataPath(pathStr) {
   return JSON.parse(decodeURIComponent(pathStr))
@@ -290,7 +291,7 @@ export function decodeDataPath(pathStr) {
 /**
  * Find the data path of the given element. Traverses the parent nodes until find
  */
-export function getDataPathFromTarget(target: HTMLElement): Path | null {
+export function getDataPathFromTarget(target: HTMLElement): JSONPath | null {
   const parent = findParent(target, (element) => {
     return element.hasAttribute('data-path')
   })

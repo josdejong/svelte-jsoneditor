@@ -1,5 +1,5 @@
 // used by JSONNode during dragging
-import type { Path } from '$lib/types'
+import type { JSONPath } from 'immutable-json-patch'
 
 export const singleton: Singleton = {
   selecting: false,
@@ -12,8 +12,8 @@ export const singleton: Singleton = {
 
 interface Singleton {
   selecting: boolean
-  selectionAnchor: Path | null
+  selectionAnchor: JSONPath | null
   selectionAnchorType: string | null
-  selectionFocus: Path | null
+  selectionFocus: JSONPath | null
   dragging: boolean
 }

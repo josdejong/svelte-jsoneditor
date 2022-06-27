@@ -1,11 +1,11 @@
 import { cloneDeepWith, first, flatMap, initial, isEmpty, last, times } from 'lodash-es'
-import {
-  compileJSONPointer,
-  getIn,
-  type JSONPath,
-  parseJSONPointer,
-  revertJSONPatch
+import type {
+  JSONData,
+  JSONPatchDocument,
+  JSONPatchOperation,
+  JSONPath
 } from 'immutable-json-patch'
+import { compileJSONPointer, getIn, parseJSONPointer, revertJSONPatch } from 'immutable-json-patch'
 import {
   isJSONArray,
   isJSONObject,
@@ -31,15 +31,7 @@ import {
   isValueSelection,
   pathStartsWith
 } from './selection.js'
-import type {
-  ClipboardValues,
-  DragInsideAction,
-  JSONData,
-  JSONPatchDocument,
-  JSONPatchOperation,
-  Path,
-  Selection
-} from '../types'
+import type { ClipboardValues, DragInsideAction, Selection } from '../types'
 import { isJSONPatchMove, isJSONPatchRemove } from '../typeguards.js'
 
 /**
@@ -52,7 +44,7 @@ import { isJSONPatchMove, isJSONPatchRemove } from '../typeguards.js'
 // TODO: write tests
 export function insertBefore(
   json: JSONData,
-  path: Path,
+  path: JSONPath,
   values: ClipboardValues
 ): JSONPatchDocument {
   const parentPath: JSONPath = initial(path)
@@ -127,7 +119,7 @@ export function append(json: JSONData, path: JSONPath, values: ClipboardValues):
  * Rename an object key
  * Not applicable to arrays
  *
- * @param {Path} parentPath
+ * @param {JSONPath} parentPath
  * @param {string[]} keys
  * @param {string} oldKey
  * @param {string} newKey
@@ -158,7 +150,11 @@ export function rename(parentPath, keys, oldKey, newKey) {
  * a unique property name for the inserted node in case of duplicating
  * and object property
  */
-export function replace(json: JSONData, paths: Path[], values: ClipboardValues): JSONPatchDocument {
+export function replace(
+  json: JSONData,
+  paths: JSONPath[],
+  values: ClipboardValues
+): JSONPatchDocument {
   const firstPath: JSONPath = first(paths)
   const parentPath = initial(firstPath)
   const parent = getIn(json, parentPath)
@@ -224,7 +220,7 @@ export function replace(json: JSONData, paths: Path[], values: ClipboardValues):
  * a unique property name for the duplicated node in case of duplicating
  * and object property
  */
-export function duplicate(json: JSONData, paths: Path[]): JSONPatchDocument {
+export function duplicate(json: JSONData, paths: JSONPath[]): JSONPatchDocument {
   // FIXME: here we assume selection.paths is sorted correctly, that's a dangerous assumption
   const lastPath: JSONPath = last(paths)
 
@@ -449,7 +445,7 @@ export function moveInsideParent(
   const beforePath = dragInsideAction['beforePath']
   const append = dragInsideAction['append']
 
-  const parentPath: Path = initial(selection.focusPath)
+  const parentPath: JSONPath = initial(selection.focusPath)
   const parent = getIn(json, parentPath)
 
   if (
@@ -562,7 +558,7 @@ export function createNewValue(
 /**
  * Create a JSONPatch for a remove operation
  */
-export function remove(path: Path): JSONPatchDocument {
+export function remove(path: JSONPath): JSONPatchDocument {
   return [
     {
       op: 'remove',
@@ -574,7 +570,7 @@ export function remove(path: Path): JSONPatchDocument {
 /**
  * Create a JSONPatch for a multiple remove operation
  */
-export function removeAll(paths: Path[]): JSONPatchDocument {
+export function removeAll(paths: JSONPath[]): JSONPatchDocument {
   return paths
     .map((path) => {
       const operation: JSONPatchOperation = {
@@ -589,7 +585,7 @@ export function removeAll(paths: Path[]): JSONPatchDocument {
 
 // helper function to move a key down in an object,
 // so another key can get positioned before the moved down keys
-function moveDown(parentPath: Path, key: string): JSONPatchOperation {
+function moveDown(parentPath: JSONPath, key: string): JSONPatchOperation {
   return {
     op: 'move',
     from: compileJSONPointer(parentPath.concat(key)),
@@ -729,7 +725,7 @@ export function revertJSONPatchWithMoveOperations(
   })
 }
 
-function createRevertMoveOperations(json: JSONData, path: Path): JSONPatchOperation[] {
+function createRevertMoveOperations(json: JSONData, path: JSONPath): JSONPatchOperation[] {
   const parentPath = initial(path)
   const afterKey = last(path)
   const parent = getIn(json, parentPath)

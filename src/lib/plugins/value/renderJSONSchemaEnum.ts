@@ -1,6 +1,7 @@
 import EnumValue from './components/EnumValue.svelte'
 import { getJSONSchemaOptions } from '../../utils/jsonSchemaUtils.js'
-import type { JSONData, RenderValueComponentDescription, RenderValueProps } from '../../types'
+import type { RenderValueComponentDescription, RenderValueProps } from '../../types'
+import type { JSONData } from 'immutable-json-patch'
 import type { SvelteComponent } from 'svelte'
 
 /**

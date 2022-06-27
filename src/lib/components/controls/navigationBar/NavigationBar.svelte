@@ -8,7 +8,7 @@
   import { createDebug } from '../../../utils/debug'
   import NavigationBarItem from '../../../components/controls/navigationBar/NavigationBarItem.svelte'
   import { caseInsensitiveNaturalCompare } from '../../../logic/sort'
-  import type { DocumentState, JSONData, OnSelect, Path } from '../../../types'
+  import type { DocumentState, JSONData, OnSelect, JSONPath } from '../../../types'
 
   const debug = createDebug('jsoneditor:NavigationBar')
 
@@ -36,7 +36,7 @@
   // trigger scrollToLastItem when path changes
   $: scrollToLastItem(path)
 
-  function getItems(path: Path): (string | number)[] {
+  function getItems(path: JSONPath): (string | number)[] {
     debug('get items for path', path)
 
     const node = getIn(json, path)
@@ -55,7 +55,7 @@
     }
   }
 
-  function handleSelect(path: Path) {
+  function handleSelect(path: JSONPath) {
     debug('select path', JSON.stringify(path))
 
     onSelect(createMultiSelection(json, path, path))

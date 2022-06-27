@@ -7,8 +7,8 @@ import {
 } from './operations.js'
 import { createMultiSelection } from './selection.js'
 import { createDocumentState, documentStatePatch } from './documentState.js'
+import type { JSONPatchOperation } from 'immutable-json-patch'
 import { immutableJSONPatch } from 'immutable-json-patch'
-import type { JSONPatchOperation } from '../types'
 
 describe('operations', () => {
   describe('createNewValue', () => {

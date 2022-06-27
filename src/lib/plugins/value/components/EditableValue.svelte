@@ -13,11 +13,11 @@
     OnPasteJson,
     OnPatch,
     OnSelect,
-    Path,
+    JSONPath,
     ValueNormalization
   } from '../../../types'
 
-  export let path: Path
+  export let path: JSONPath
   export let value: JSONData
   export let normalization: ValueNormalization
   export let enforceString: boolean

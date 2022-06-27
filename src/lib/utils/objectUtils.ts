@@ -1,11 +1,11 @@
-import type { JSONData, Path } from '../types'
+import type { JSONData, JSONPath } from 'immutable-json-patch'
 import { isObject } from './typeUtils.js'
 
 export function traverse(
   json: JSONData,
-  callback: (value: JSONData, path: Path, json: JSONData) => boolean | void
+  callback: (value: JSONData, path: JSONPath, json: JSONData) => boolean | void
 ) {
-  const currentPath: Path = []
+  const currentPath: JSONPath = []
 
   function recurse(value: JSONData) {
     const res = callback(value, currentPath, json)

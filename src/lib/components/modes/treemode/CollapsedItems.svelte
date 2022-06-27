@@ -2,17 +2,18 @@
 
 <script lang="ts">
   import { getExpandItemsSections } from '$lib/logic/expandItemsSections'
-  import type { JSONPointer, Path, Section, Selection, VisibleSection } from '$lib/types'
-  import { appendToPointer } from '../../../utils/jsonPointer'
+  import type { Section, Selection, VisibleSection } from '$lib/types'
+  import type { JSONPath, JSONPointer } from 'immutable-json-patch'
+  import { appendToJSONPointer } from 'immutable-json-patch'
   import { isMultiSelection } from '../../../logic/selection'
 
   export let visibleSections: VisibleSection[]
   export let sectionIndex: number
   export let total: number
-  export let path: Path
+  export let path: JSONPath
   export let pointer: JSONPointer
   export let selection: Selection | undefined
-  export let onExpandSection: (path: Path, section: Section) => void
+  export let onExpandSection: (path: JSONPath, section: Section) => void
 
   $: visibleSection = visibleSections[sectionIndex]
 
@@ -20,7 +21,7 @@
   $: endIndex = visibleSections[sectionIndex + 1] ? visibleSections[sectionIndex + 1].start : total
 
   $: selected = isMultiSelection(selection)
-    ? selection.pointersMap[appendToPointer(pointer, startIndex)] === true
+    ? selection.pointersMap[appendToJSONPointer(pointer, startIndex)] === true
     : false
 
   $: expandItemsSections = getExpandItemsSections(startIndex, endIndex)

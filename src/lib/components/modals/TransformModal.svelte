@@ -22,7 +22,7 @@
     OnClassName,
     OnPatch,
     OnRenderValue,
-    Path,
+    JSONPath,
     QueryLanguage
   } from '../../types'
 
@@ -30,7 +30,7 @@
 
   export let id = 'transform-modal-' + uniqueId()
   export let json: JSONData
-  export let selectedPath: Path = []
+  export let selectedPath: JSONPath = []
 
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean

@@ -12,13 +12,13 @@
   import { sortModalState } from './sortModalState.js'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { createDebug } from '../../utils/debug'
-  import type { JSONData, OnSort, Path } from '../../types'
+  import type { JSONData, OnSort, JSONPath } from '../../types'
 
   const debug = createDebug('jsoneditor:SortModal')
 
   export let id: string
   export let json: JSONData // the whole document
-  export let selectedPath: Path
+  export let selectedPath: JSONPath
   export let onSort: OnSort
 
   const { close } = getContext('simple-modal')
@@ -62,7 +62,7 @@
     debug('store state in memory', stateId, sortModalState[stateId])
   }
 
-  function pathToOption(path: Path): { value: Path; label: string } {
+  function pathToOption(path: JSONPath): { value: JSONPath; label: string } {
     return {
       value: path,
       label: isEmpty(path) ? '(whole item)' : compileJSONPointer(path)

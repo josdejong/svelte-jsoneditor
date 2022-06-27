@@ -6,11 +6,11 @@
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getContext } from 'svelte'
   import ColorPickerPopup from '../../../components/controls/ColorPickerPopup.svelte'
-  import type { OnPatch, Path } from '../../../types'
+  import type { OnPatch, JSONPath } from '../../../types'
 
   const { openAbsolutePopup } = getContext('absolute-popup')
 
-  export let path: Path
+  export let path: JSONPath
   export let value: string
   export let readOnly: boolean
   export let onPatch: OnPatch

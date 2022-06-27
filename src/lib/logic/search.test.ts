@@ -1,4 +1,5 @@
 import assert from 'assert'
+import type { JSONPath } from 'immutable-json-patch'
 import { immutableJSONPatch } from 'immutable-json-patch'
 import { createDocumentState } from './documentState.js'
 import {
@@ -9,7 +10,7 @@ import {
   search,
   splitValue
 } from './search.js'
-import type { ExtendedSearchResultItem, Path, SearchResultItem } from '../types.js'
+import type { ExtendedSearchResultItem, SearchResultItem } from '../types.js'
 import { SearchField } from '../types.js'
 import { createKeySelection, createValueSelection } from './selection.js'
 
@@ -503,7 +504,7 @@ describe('search', () => {
 function findAndCollectCaseInsensitiveMatches(
   text: string,
   searchTextLowerCase: string,
-  path: Path,
+  path: JSONPath,
   field: SearchField
 ): SearchResultItem[] {
   const matches: SearchResultItem[] = []

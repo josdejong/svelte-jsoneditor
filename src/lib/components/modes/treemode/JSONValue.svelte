@@ -1,10 +1,11 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONData, Path, SearchResultItem, Selection, TreeModeContext } from '../../../types'
+  import type { SearchResultItem, Selection, TreeModeContext } from '../../../types'
+  import type { JSONData, JSONPath } from 'immutable-json-patch'
   import { isEditingSelection, isValueSelection } from '../../../logic/selection'
 
-  export let path: Path
+  export let path: JSONPath
   export let value: JSONData
   export let context: TreeModeContext
   export let isSelected: boolean

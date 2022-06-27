@@ -1,18 +1,10 @@
 import { compileJSONPointer } from 'immutable-json-patch'
+import type { JSONArray, JSONData, JSONObject, JSONPath } from 'immutable-json-patch'
 import jsonSourceMap from 'json-source-map'
 import jsonrepair from 'jsonrepair'
 import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
 import { arrayToObject, objectToArray } from './arrayUtils.js'
-import type {
-  Content,
-  JSONArray,
-  JSONData,
-  JSONObject,
-  NormalizedParseError,
-  Path,
-  TextContent,
-  TextLocation
-} from '../types'
+import type { Content, NormalizedParseError, TextContent, TextLocation } from '../types'
 
 export function isJSONObject(value: unknown): value is JSONObject {
   return isObject(value)
@@ -206,7 +198,7 @@ export function countCharacterOccurrences(
  * Find the text location of a JSON path
  */
 // TODO: write unit tests
-export function findTextLocation(text: string, path: Path): TextLocation | null {
+export function findTextLocation(text: string, path: JSONPath): TextLocation | null {
   try {
     const jsmap = jsonSourceMap.parse(text)
 
@@ -273,7 +265,7 @@ export function convertValue(value: JSONData, type: 'value' | 'object' | 'array'
       const parsedValue = JSON.parse(value)
 
       if (isObject(parsedValue)) {
-        return parsedValue as JSONData
+        return parsedValue as JSONObject
       }
 
       if (Array.isArray(parsedValue)) {

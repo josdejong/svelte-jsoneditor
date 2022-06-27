@@ -1,6 +1,7 @@
 import Ajv from 'ajv-dist'
-import { parseJSONPointerWithArrayIndices } from '../../utils/jsonPointer.js'
-import type { JSONData, ValidationError } from '../../types'
+import type { JSONData } from 'immutable-json-patch'
+import { parseJSONPointerWithArrayIndices } from 'immutable-json-patch'
+import type { ValidationError } from '../../types'
 
 /**
  * Create a JSON Schema validator powered by Ajv.

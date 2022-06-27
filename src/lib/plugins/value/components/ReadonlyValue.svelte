@@ -10,11 +10,11 @@
     ExtendedSearchResultItem,
     JSONData,
     OnSelect,
-    Path,
+    JSONPath,
     ValueNormalization
   } from '../../../types'
 
-  export let path: Path
+  export let path: JSONPath
   export let value: JSONData
   export let readOnly: boolean
   export let normalization: ValueNormalization

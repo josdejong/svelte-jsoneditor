@@ -1,3 +1,10 @@
+import type {
+  JSONData,
+  JSONPatchDocument,
+  JSONPatchOperation,
+  JSONPath,
+  JSONPointer
+} from 'immutable-json-patch'
 import { compileJSONPointer, getIn } from 'immutable-json-patch'
 import { forEachRight, groupBy, initial, isEqual, last } from 'lodash-es'
 import { getEnforceString } from './documentState.js'
@@ -7,12 +14,7 @@ import { stringConvert } from '../utils/typeUtils.js'
 import type {
   DocumentState,
   ExtendedSearchResultItem,
-  JSONData,
-  JSONPatchDocument,
-  JSONPatchOperation,
-  JSONPointer,
   JSONPointerMap,
-  Path,
   SearchResult,
   SearchResultItem,
   Selection
@@ -179,7 +181,7 @@ export function search(
 export function findCaseInsensitiveMatches(
   text: string,
   searchTextLowerCase: string,
-  path: Path,
+  path: JSONPath,
   field: SearchField,
   onMatch: (searchResultItem: SearchResultItem) => void
 ): void {
@@ -257,7 +259,7 @@ export function createSearchAndReplaceOperations(
     }
   } else if (field === SearchField.value) {
     // replace a value
-    const currentValue = getIn(json, path) as JSONData
+    const currentValue = getIn(json, path)
     if (currentValue === undefined) {
       throw new Error(`Cannot replace: path not found ${compileJSONPointer(path)}`)
     }
@@ -297,7 +299,7 @@ export function createSearchAndReplaceAllOperations(
   const searchResultItems = search(searchText, json, documentState, Infinity /* maxResults */)
 
   interface Match {
-    path: Path
+    path: JSONPath
     field: string
     items: SearchResultItem[]
   }
@@ -357,7 +359,7 @@ export function createSearchAndReplaceAllOperations(
       lastNewSelection = createSelectionFromOperations(json, operations)
     } else if (field === SearchField.value) {
       // replace a value
-      const currentValue = getIn(json, path) as JSONData
+      const currentValue = getIn(json, path)
       if (currentValue === undefined) {
         throw new Error(`Cannot replace: path not found ${compileJSONPointer(path)}`)
       }
@@ -437,7 +439,7 @@ export function splitValue(
 /**
  * Get the path of the search result property on a nested search result
  */
-function getSearchResultPath(searchResultItem: SearchResultItem): Path {
+function getSearchResultPath(searchResultItem: SearchResultItem): JSONPath {
   return searchResultItem.path.concat(searchResultItem.field, searchResultItem.fieldIndex)
 }
 

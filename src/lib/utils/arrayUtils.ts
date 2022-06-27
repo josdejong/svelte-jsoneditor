@@ -1,5 +1,5 @@
 import { isObject } from './typeUtils.js'
-import type { JSONArray, JSONObject } from '../types'
+import type { JSONArray, JSONObject } from 'immutable-json-patch'
 import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 import { isEqual } from 'lodash-es'
 
