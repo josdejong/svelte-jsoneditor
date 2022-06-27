@@ -143,11 +143,11 @@ export function expandPath(
  */
 export function expandWithCallback(
   json: JSONData,
-  state: DocumentState,
+  documentState: DocumentState,
   path: Path,
   expandedCallback: (path: Path) => boolean
 ): DocumentState {
-  const expandedMap = { ...state.expandedMap }
+  const expandedMap = { ...documentState.expandedMap }
 
   function recurse(value: JSONData) {
     const pathIndex = currentPath.length
@@ -158,7 +158,7 @@ export function expandWithCallback(
         expandedMap[pointer] = true
 
         if (value.length > 0) {
-          const visibleSections = getVisibleSections(state, pointer)
+          const visibleSections = getVisibleSections(documentState, pointer)
 
           forEachVisibleIndex(value, visibleSections, (index) => {
             currentPath[pathIndex] = index
@@ -189,17 +189,17 @@ export function expandWithCallback(
   recurse(getIn(json, path) as JSONData)
 
   return {
-    ...state,
+    ...documentState,
     expandedMap
   }
 }
 
 // TODO: write unit tests
-export function expandSingleItem(state: DocumentState, path: Path): DocumentState {
+export function expandSingleItem(documentState: DocumentState, path: Path): DocumentState {
   return {
-    ...state,
+    ...documentState,
     expandedMap: {
-      ...state.expandedMap,
+      ...documentState.expandedMap,
       [compileJSONPointer(path)]: true
     }
   }
@@ -222,29 +222,29 @@ export function collapsePath(documentState: DocumentState, path: Path): Document
 
 // TODO: write unit tests
 export function setEnforceString(
-  state: DocumentState,
+  documentState: DocumentState,
   pointer: JSONPointer,
   enforceString: boolean
 ): DocumentState {
   if (enforceString) {
-    const updatedEnforceString = { ...state.enforceStringMap }
+    const updatedEnforceString = { ...documentState.enforceStringMap }
     updatedEnforceString[pointer] = enforceString
 
     return {
-      ...state,
+      ...documentState,
       enforceStringMap: updatedEnforceString
     }
   } else {
     // remove if defined
-    if (typeof state.enforceStringMap[pointer] === 'boolean') {
-      const updatedEnforceString = { ...state.enforceStringMap }
+    if (typeof documentState.enforceStringMap[pointer] === 'boolean') {
+      const updatedEnforceString = { ...documentState.enforceStringMap }
       delete updatedEnforceString[pointer]
       return {
-        ...state,
+        ...documentState,
         enforceStringMap: updatedEnforceString
       }
     } else {
-      return state
+      return documentState
     }
   }
 }
@@ -254,15 +254,15 @@ export function setEnforceString(
  */
 export function expandSection(
   json: JSONData,
-  state: DocumentState,
+  documentState: DocumentState,
   pointer: JSONPointer,
   section: Section
 ): DocumentState {
   return {
-    ...state,
+    ...documentState,
     visibleSectionsMap: {
-      ...state.visibleSectionsMap,
-      [pointer]: mergeSections(getVisibleSections(state, pointer).concat(section))
+      ...documentState.visibleSectionsMap,
+      [pointer]: mergeSections(getVisibleSections(documentState, pointer).concat(section))
     }
   }
 }
