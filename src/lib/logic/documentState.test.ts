@@ -366,19 +366,6 @@ describe('documentState', () => {
       getEnforceString(json2, documentState2.enforceStringMap, compileJSONPointer([])),
       true
     )
-
-    // FIXME: test getEnforceString and setEnforceString
-    // // should keep the enforceString also when not needed anymore
-    // const json3 = 'forty two'
-    // const state3 = syncState(json3, state2, [], () => false)
-    // assert.strictEqual(state3[STATE_ENFORCE_STRING], true)
-    //
-    // // should not override when containing a boolean false
-    // const json4 = '42'
-    // const state4 = { ...(state2 as object), [STATE_ENFORCE_STRING]: false }
-    // const state4updated = syncState(json4, state4, [], () => false)
-    // assert.strictEqual(state4[STATE_ENFORCE_STRING], false)
-    // assert.strictEqual(state4updated[STATE_ENFORCE_STRING], false)
   })
 
   describe('documentStatePatch', () => {

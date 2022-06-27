@@ -287,7 +287,7 @@ export type OnFocus = () => void
 export type OnBlur = () => void
 
 export interface SearchResult {
-  itemsList: ExtendedSearchResultItem[] // TODO: rename itemsList to items
+  items: ExtendedSearchResultItem[]
   itemsMap: JSONPointerMap<ExtendedSearchResultItem[]>
   activeItem: ExtendedSearchResultItem | undefined
   activeIndex: number | -1
@@ -336,7 +336,6 @@ export interface RenderedItem {
   height: number
 }
 
-// FIXME: split HistoryItem into multiple union types
 export interface HistoryItem {
   undo: {
     patch: JSONPatchDocument | undefined

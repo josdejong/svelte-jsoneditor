@@ -55,7 +55,6 @@ export function insertBefore(
   path: Path,
   values: ClipboardValues
 ): JSONPatchDocument {
-  // TODO: find a better name and define datastructure for values
   const parentPath: JSONPath = initial(path)
   const parent = getIn(json, parentPath)
 
@@ -100,14 +99,8 @@ export function insertBefore(
  * This function needs the current data in order to be able to determine
  * a unique property name for the inserted node in case of duplicating
  * and object property
- *
- * @param {JSON} json
- * @param {Path} path
- * @param {ClipboardValues} values
- * @return {JSONPatchDocument}
  */
-export function append(json, path, values) {
-  // TODO: find a better name and define data structure for values
+export function append(json: JSONData, path: JSONPath, values: ClipboardValues): JSONPatchDocument {
   const parent = getIn(json, path)
 
   if (Array.isArray(parent)) {
@@ -166,7 +159,6 @@ export function rename(parentPath, keys, oldKey, newKey) {
  * and object property
  */
 export function replace(json: JSONData, paths: Path[], values: ClipboardValues): JSONPatchDocument {
-  // TODO: find a better name and define data structure for values
   const firstPath: JSONPath = first(paths)
   const parentPath = initial(firstPath)
   const parent = getIn(json, parentPath)

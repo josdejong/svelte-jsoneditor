@@ -314,8 +314,10 @@
 
     if (activeItem) {
       const path = activeItem.path
-      documentState = expandPath(json, documentState, path)
-      updateSelection(undefined) // navigation path of current selection would be confusing // TODO: cleanup
+      documentState = {
+        ...expandPath(json, documentState, path),
+        selection: undefined // navigation path of current selection would be confusing
+      }
       await tick()
       await scrollTo(path)
     }
@@ -650,11 +652,6 @@
     const newState =
       callback && callback.state !== undefined ? callback.state : patchedDocumentState
     documentState = newState
-    // FIXME: cleanup after solved
-    // setTimeout(() => {
-    //   // FIXME: this is a workaround to trigger all listeners to refresh *after* re-rendering
-    //   documentState = documentState
-    // })
     text = undefined
     textIsRepaired = false
 
@@ -2229,7 +2226,7 @@
       <div class="jse-search-box-container">
         <SearchBox
           show={showSearch}
-          resultCount={searchResult?.itemsList?.length || 0}
+          resultCount={searchResult?.items?.length || 0}
           activeIndex={searchResult?.activeIndex || 0}
           {showReplace}
           {searching}

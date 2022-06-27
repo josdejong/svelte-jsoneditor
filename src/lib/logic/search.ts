@@ -51,7 +51,7 @@ export function updateSearchResult(
   const activeItem = items[activeIndex]
 
   return {
-    itemsList: items,
+    items,
     itemsMap: groupBy(items, (item) => compileJSONPointer(item.path)),
     activeItem,
     activeIndex
@@ -61,21 +61,21 @@ export function updateSearchResult(
 // TODO: unit test
 export function searchNext(searchResult: SearchResult): SearchResult {
   const nextActiveIndex =
-    searchResult.activeIndex < searchResult.itemsList.length - 1
+    searchResult.activeIndex < searchResult.items.length - 1
       ? searchResult.activeIndex + 1
-      : searchResult.itemsList.length > 0
+      : searchResult.items.length > 0
       ? 0
       : -1
 
-  const nextActiveItem = searchResult.itemsList[nextActiveIndex]
+  const nextActiveItem = searchResult.items[nextActiveIndex]
 
-  const items: ExtendedSearchResultItem[] = searchResult.itemsList.map((item, index) => {
+  const items: ExtendedSearchResultItem[] = searchResult.items.map((item, index) => {
     return { ...item, active: index === nextActiveIndex }
   })
 
   return {
     ...searchResult,
-    itemsList: items,
+    items,
     itemsMap: groupBy(items, (item) => compileJSONPointer(item.path)),
     activeItem: nextActiveItem,
     activeIndex: nextActiveIndex
@@ -85,17 +85,17 @@ export function searchNext(searchResult: SearchResult): SearchResult {
 // TODO: unit test
 export function searchPrevious(searchResult: SearchResult): SearchResult {
   const previousActiveIndex =
-    searchResult.activeIndex > 0 ? searchResult.activeIndex - 1 : searchResult.itemsList.length - 1
+    searchResult.activeIndex > 0 ? searchResult.activeIndex - 1 : searchResult.items.length - 1
 
-  const previousActiveItem = searchResult.itemsList[previousActiveIndex]
+  const previousActiveItem = searchResult.items[previousActiveIndex]
 
-  const items: ExtendedSearchResultItem[] = searchResult.itemsList.map((item, index) => {
+  const items: ExtendedSearchResultItem[] = searchResult.items.map((item, index) => {
     return { ...item, active: index === previousActiveIndex }
   })
 
   return {
     ...searchResult,
-    itemsList: items,
+    items,
     itemsMap: groupBy(items, (item) => compileJSONPointer(item.path)),
     activeItem: previousActiveItem,
     activeIndex: previousActiveIndex
