@@ -1,7 +1,14 @@
 import assert from 'assert'
-import { clipboardToValues, createNewValue, moveInsideParent } from './operations.js'
+import {
+  clipboardToValues,
+  createNewValue,
+  moveInsideParent,
+  revertJSONPatchWithMoveOperations
+} from './operations.js'
 import { createMultiSelection } from './selection.js'
 import { createDocumentState, documentStatePatch, getKeys } from './documentState.js'
+import { immutableJSONPatch } from 'immutable-json-patch'
+import type { JSONPatchOperation } from '../types'
 
 describe('operations', () => {
   describe('createNewValue', () => {
@@ -214,6 +221,58 @@ describe('operations', () => {
     // TODO: test append, moving to bottom of an object
     // TODO: test moving up from the bottom of an array
     // TODO: test moving up from the bottom of an object
+  })
+
+  describe('revertJSONPatchWithMoveOperations', () => {
+    it('should restore key order when reverting a remove operation ', () => {
+      const json = {
+        a: 2,
+        b: 3,
+        c: 4
+      }
+      assert.deepStrictEqual(Object.keys(json), ['a', 'b', 'c'])
+
+      const operations: JSONPatchOperation[] = [{ op: 'remove', path: '/b' }]
+      const updatedJson = immutableJSONPatch(json, operations)
+      assert.deepStrictEqual(updatedJson, { a: 2, c: 4 })
+      assert.deepStrictEqual(Object.keys(updatedJson), ['a', 'c'])
+
+      const revertOperations = revertJSONPatchWithMoveOperations(json, operations)
+      assert.deepStrictEqual(revertOperations, [
+        { op: 'add', path: '/b', value: 3 },
+        { op: 'move', from: '/c', path: '/c' }
+      ])
+
+      const revertedJson = immutableJSONPatch(updatedJson, revertOperations)
+      assert.deepStrictEqual(revertedJson, json)
+      assert.deepStrictEqual(Object.keys(revertedJson), ['a', 'b', 'c'])
+    })
+
+    it('should restore key order when reverting a move operation ', () => {
+      const json = {
+        a: 2,
+        b: 3,
+        c: 4,
+        nested: {}
+      }
+      assert.deepStrictEqual(Object.keys(json), ['a', 'b', 'c', 'nested'])
+
+      const operations: JSONPatchOperation[] = [{ op: 'move', from: '/b', path: '/nested/b' }]
+      const updatedJson = immutableJSONPatch(json, operations)
+      assert.deepStrictEqual(updatedJson, { a: 2, c: 4, nested: { b: 3 } })
+      assert.deepStrictEqual(Object.keys(updatedJson), ['a', 'c', 'nested'])
+
+      const revertOperations = revertJSONPatchWithMoveOperations(json, operations)
+      assert.deepStrictEqual(revertOperations, [
+        { op: 'move', from: '/nested/b', path: '/b' },
+        { op: 'move', from: '/c', path: '/c' },
+        { op: 'move', from: '/nested', path: '/nested' }
+      ])
+
+      const revertedJson = immutableJSONPatch(updatedJson, revertOperations)
+      assert.deepStrictEqual(revertedJson, json)
+      assert.deepStrictEqual(Object.keys(revertedJson), ['a', 'b', 'c', 'nested'])
+    })
   })
 
   // TODO: write tests for all operations

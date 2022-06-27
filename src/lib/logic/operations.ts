@@ -1,5 +1,11 @@
-import { cloneDeepWith, first, initial, isEmpty, last, times } from 'lodash-es'
-import { compileJSONPointer, getIn, type JSONPath } from 'immutable-json-patch'
+import { cloneDeepWith, first, flatMap, initial, isEmpty, last, times } from 'lodash-es'
+import {
+  compileJSONPointer,
+  getIn,
+  type JSONPath,
+  parseJSONPointer,
+  revertJSONPatch
+} from 'immutable-json-patch'
 import {
   isJSONArray,
   isJSONObject,
@@ -36,6 +42,7 @@ import type {
   Path,
   Selection
 } from '../types'
+import { isJSONPatchMove, isJSONPatchRemove } from '../typeguards.js'
 
 /**
  * Create a JSONPatch for an insert operation.
@@ -218,7 +225,7 @@ export function replace(
       }),
 
       // move down operations
-      // move all lower down keys so the renamed key will maintain it's position
+      // move all lower down keys so the renamed key will maintain its position
       ...nextKeys.map((key) => moveDown(parentPath, key))
     ]
   } else {
@@ -722,4 +729,40 @@ export function createRemoveOperations(
 
   // this should never happen
   throw new Error('Cannot remove: unsupported type of selection ' + JSON.stringify(selection))
+}
+
+export function revertJSONPatchWithMoveOperations(
+  json: JSONData,
+  operations: JSONPatchDocument
+): JSONPatchDocument {
+  return flatMap(operations, (operation) => {
+    const undo: JSONPatchDocument = revertJSONPatch(json, [operation]) as JSONPatchDocument
+
+    if (isJSONPatchRemove(operation)) {
+      const path = parseJSONPointer(operation.path)
+      return [...undo, ...createRevertMoveOperations(json, path)]
+    }
+
+    if (isJSONPatchMove(operation)) {
+      const path = parseJSONPointer(operation.from)
+      return [...undo, ...createRevertMoveOperations(json, path)]
+    }
+
+    return undo
+  })
+}
+
+function createRevertMoveOperations(json: JSONData, path: Path): JSONPatchOperation[] {
+  const parentPath = initial(path)
+  const afterKey = last(path)
+  const parent = getIn(json, parentPath)
+  if (isJSONObject(parent)) {
+    const keys = Object.keys(parent)
+    const nextKeys = getNextKeys(keys, afterKey, false)
+
+    // move all lower down keys so the inserted key will maintain its position
+    return nextKeys.map((key) => moveDown(parentPath, key))
+  }
+
+  return []
 }

@@ -5,13 +5,7 @@
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '$lib/utils/debug'
   import type { JSONPath } from 'immutable-json-patch'
-  import {
-    compileJSONPointer,
-    existsIn,
-    getIn,
-    immutableJSONPatch,
-    revertJSONPatch
-  } from 'immutable-json-patch'
+  import { compileJSONPointer, existsIn, getIn, immutableJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
   import { initial, isEmpty, isEqual, last, noop, throttle, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
@@ -42,7 +36,8 @@
     createRemoveOperations,
     duplicate,
     extract,
-    insert
+    insert,
+    revertJSONPatchWithMoveOperations
   } from '$lib/logic/operations'
   import {
     createSearchAndReplaceAllOperations,
@@ -634,7 +629,10 @@
     const previousTextIsRepaired = textIsRepaired
 
     // execute the patch operations
-    const undo: JSONPatchDocument = revertJSONPatch(json, operations) as JSONPatchDocument
+    const undo: JSONPatchDocument = revertJSONPatchWithMoveOperations(
+      json,
+      operations
+    ) as JSONPatchDocument
     const patched = documentStatePatch(json, documentState, operations)
 
     // update the selection based on the operations
