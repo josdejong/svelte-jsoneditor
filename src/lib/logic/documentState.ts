@@ -208,9 +208,9 @@ export function expandSingleItem(documentState: DocumentState, path: Path): Docu
 // TODO: write unit tests
 export function collapsePath(documentState: DocumentState, path: Path): DocumentState {
   // delete the expanded state of the path and all it's nested paths
-  const [expandedMap] = deletePath(documentState.expandedMap, path)
-  const [enforceStringMap] = deletePath(documentState.enforceStringMap, path)
-  const [visibleSectionsMap] = deletePath(documentState.visibleSectionsMap, path)
+  const expandedMap = deletePath(documentState.expandedMap, path)
+  const enforceStringMap = deletePath(documentState.enforceStringMap, path)
+  const visibleSectionsMap = deletePath(documentState.visibleSectionsMap, path)
 
   return {
     ...documentState,
@@ -372,9 +372,9 @@ export function documentStateRemove(
   let { expandedMap, enforceStringMap, visibleSectionsMap } = documentState
 
   // delete the path itself and its children
-  expandedMap = deletePath(expandedMap, path)[0]
-  enforceStringMap = deletePath(enforceStringMap, path)[0]
-  visibleSectionsMap = deletePath(visibleSectionsMap, path)[0]
+  expandedMap = deletePath(expandedMap, path)
+  enforceStringMap = deletePath(enforceStringMap, path)
+  visibleSectionsMap = deletePath(visibleSectionsMap, path)
 
   if (isJSONArray(parent)) {
     const index = last(path) as number
@@ -527,24 +527,18 @@ export function documentStateMove(
  * Delete a path from a PathsMap. Will delete the path and its child paths
  * IMPORTANT: will NOT shift array items when an array item is removed, use shiftPath for that
  */
-export function deletePath<T>(
-  map: JSONPointerMap<T>,
-  path: Path
-): [updatedMap: JSONPointerMap<T>, deletedMap: JSONPointerMap<T>] {
+export function deletePath<T>(map: JSONPointerMap<T>, path: Path): JSONPointerMap<T> {
   const updatedMap: JSONPointerMap<T> = {}
-  const deletedMap: JSONPointerMap<T> = {}
   const pointer = compileJSONPointer(path)
 
   // partition the contents of the map
   Object.keys(map).forEach((itemPointer) => {
     if (!pointerStartsWith(itemPointer, pointer)) {
       updatedMap[itemPointer] = map[itemPointer]
-    } else {
-      deletedMap[itemPointer] = map[itemPointer]
     }
   })
 
-  return [updatedMap, deletedMap]
+  return updatedMap
 }
 
 // TODO: unit test

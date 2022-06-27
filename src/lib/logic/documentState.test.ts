@@ -1038,48 +1038,29 @@ describe('documentState', () => {
     }
 
     it('should delete an object path from a PathsMap', () => {
-      deepStrictEqual(deletePath(myStateMap, ['obj']), [
-        {
-          '/array': 1,
-          '/array/0': 2,
-          '/array/1': 3,
-          '/array/2': 4,
-          '/array/2/name': 5
-        },
-        {
-          '/obj': 6
-        }
-      ])
+      deepStrictEqual(deletePath(myStateMap, ['obj']), {
+        '/array': 1,
+        '/array/0': 2,
+        '/array/1': 3,
+        '/array/2': 4,
+        '/array/2/name': 5
+      })
     })
 
     it('should delete an array item from a PathsMap', () => {
-      deepStrictEqual(deletePath(myStateMap, ['array', 1]), [
-        {
-          '/array': 1,
-          '/array/0': 2,
-          '/array/2': 4,
-          '/array/2/name': 5,
-          '/obj': 6
-        },
-        {
-          '/array/1': 3
-        }
-      ])
+      deepStrictEqual(deletePath(myStateMap, ['array', 1]), {
+        '/array': 1,
+        '/array/0': 2,
+        '/array/2': 4,
+        '/array/2/name': 5,
+        '/obj': 6
+      })
     })
 
     it('should delete nested paths from a PathsMap', () => {
-      deepStrictEqual(deletePath(myStateMap, ['array']), [
-        {
-          '/obj': 6
-        },
-        {
-          '/array': 1,
-          '/array/0': 2,
-          '/array/1': 3,
-          '/array/2': 4,
-          '/array/2/name': 5
-        }
-      ])
+      deepStrictEqual(deletePath(myStateMap, ['array']), {
+        '/obj': 6
+      })
     })
   })
 
