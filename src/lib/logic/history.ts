@@ -1,4 +1,8 @@
+import { createDebug } from '../utils/debug'
+
 const MAX_HISTORY_ITEMS = 1000
+
+const debug = createDebug('jsoneditor:History')
 
 /**
  * @typedef {*} HistoryItem
@@ -58,6 +62,8 @@ export function createHistory<T>(options: HistoryOptions = {}): History<T> {
   }
 
   function add(item: T) {
+    debug('add', item)
+
     items = [item].concat(items.slice(index)).slice(0, maxItems)
 
     index = 0
@@ -66,6 +72,8 @@ export function createHistory<T>(options: HistoryOptions = {}): History<T> {
   }
 
   function clear() {
+    debug('clear')
+
     items = []
     index = 0
 
@@ -76,6 +84,8 @@ export function createHistory<T>(options: HistoryOptions = {}): History<T> {
     if (canUndo()) {
       const item = items[index]
       index += 1
+
+      debug('undo', item)
 
       handleChange()
 
@@ -88,6 +98,8 @@ export function createHistory<T>(options: HistoryOptions = {}): History<T> {
   function redo(): T | undefined {
     if (canRedo()) {
       index -= 1
+
+      debug('redo', items[index])
 
       handleChange()
 
