@@ -68,6 +68,7 @@
   import { appendToPointer, filterPointerOrUndefined } from '../../../utils/jsonPointer.js'
   import { filterKeySearchResults, filterValueSearchResults } from '../../../logic/search.js'
   import { createMemoizePath } from '../../../utils/pathUtils'
+  import { getEnforceString } from '../../../logic/documentState'
 
   export let value: JSONData
   export let path: Path
@@ -98,8 +99,8 @@
   let expanded: boolean
   $: expanded = expandedMap ? expandedMap[pointer] === true : false
 
-  let enforceString: boolean
-  $: enforceString = enforceStringMap ? enforceStringMap[pointer] === true : false
+  let enforceString: boolean | undefined
+  $: enforceString = getEnforceString(value, enforceStringMap, pointer)
 
   let visibleSections: VisibleSection[] | undefined
   $: visibleSections = visibleSectionsMap ? visibleSectionsMap[pointer] : undefined

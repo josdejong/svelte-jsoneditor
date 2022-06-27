@@ -265,7 +265,7 @@ export function createSearchAndReplaceOperations(
     const currentValueText = typeof currentValue === 'string' ? currentValue : String(currentValue)
 
     const pointer = compileJSONPointer(path)
-    const enforceString = getEnforceString(json, documentState, pointer)
+    const enforceString = getEnforceString(json, documentState.enforceStringMap, pointer)
 
     const value = replaceText(currentValueText, replacementText, start, end)
 
@@ -366,7 +366,7 @@ export function createSearchAndReplaceAllOperations(
         typeof currentValue === 'string' ? currentValue : String(currentValue)
 
       const pointer = compileJSONPointer(path)
-      const enforceString = getEnforceString(json, documentState, pointer)
+      const enforceString = getEnforceString(json, documentState.enforceStringMap, pointer)
 
       const value = replaceAllText(currentValueText, replacementText, items)
 

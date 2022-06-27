@@ -26,6 +26,7 @@
   import { findNearestElement } from '$lib/utils/domUtils'
   import type { DocumentState, JSONData } from '../../../../types'
   import { isKeySelection, isMultiSelection, isValueSelection } from '../../../../logic/selection'
+  import { getEnforceString } from '../../../../logic/documentState'
 
   export let json: JSONData
   export let documentState: DocumentState
@@ -107,7 +108,11 @@
 
   $: enforceString =
     selection != null
-      ? documentState.enforceStringMap[compileJSONPointer(selection.focusPath)] === true
+      ? getEnforceString(
+          focusValue,
+          documentState.enforceStringMap,
+          compileJSONPointer(selection.focusPath)
+        )
       : false
 
   function handleEditKey() {

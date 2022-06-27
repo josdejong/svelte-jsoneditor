@@ -713,28 +713,36 @@
   }
 
   function handleToggleEnforceString() {
-    debug('handleToggleEnforceString')
     if (readOnly || !isValueSelection(documentState.selection)) {
       return
     }
 
     const path = documentState.selection.focusPath
     const pointer = compileJSONPointer(path)
-    const enforceString = !getEnforceString(json, documentState, pointer)
-
-    documentState = setEnforceString(documentState, pointer, enforceString)
-
-    const value = getIn(json, path)
+    const value = getIn(json, path) as JSONData
+    const enforceString = !getEnforceString(value, documentState.enforceStringMap, pointer)
     const updatedValue = enforceString ? String(value) : stringConvert(String(value))
 
+    debug('handleToggleEnforceString', { enforceString, value, updatedValue })
+
     if (updatedValue !== value) {
-      handlePatch([
-        {
-          op: 'replace',
-          path: compileJSONPointer(path),
-          value: updatedValue
+      handlePatch(
+        [
+          {
+            op: 'replace',
+            path: compileJSONPointer(path),
+            value: updatedValue
+          }
+        ],
+        (patchedJson, patchedState) => {
+          return {
+            state: setEnforceString(patchedState, pointer, enforceString)
+          }
         }
-      ])
+      )
+    } else {
+      // TODO: add entry to history?
+      documentState = setEnforceString(documentState, pointer, enforceString)
     }
   }
 

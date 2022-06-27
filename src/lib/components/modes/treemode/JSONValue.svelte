@@ -7,8 +7,8 @@
   export let path: Path
   export let value: JSONData
   export let context: TreeModeContext
-  export let enforceString: boolean
   export let isSelected: boolean
+  export let enforceString: boolean
   export let selection: Selection | undefined
   export let searchResultItems: SearchResultItem[] | undefined
 

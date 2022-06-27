@@ -438,7 +438,7 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   path: Path
   value: JSONData
   readOnly: boolean
-  enforceString: boolean | undefined
+  enforceString: boolean
   selection: Selection | undefined
   searchResultItems: SearchResultItem[] | undefined
   isSelected: boolean
