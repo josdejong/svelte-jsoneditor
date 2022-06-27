@@ -370,7 +370,15 @@
 
   export function expand(callback = () => true) {
     debug('expand')
-    documentState = expandWithCallback(json, documentState, rootPath, callback)
+
+    // clear the expanded state and visible sections (else you can't collapse anything)
+    const cleanDocumentState = {
+      ...documentState,
+      expandedMap: {},
+      visibleSectionsMap: {}
+    }
+
+    documentState = expandWithCallback(json, cleanDocumentState, rootPath, callback)
   }
 
   // two-way binding of externalContent and internal json and text (
