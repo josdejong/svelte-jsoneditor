@@ -724,25 +724,20 @@
 
     debug('handleToggleEnforceString', { enforceString, value, updatedValue })
 
-    if (updatedValue !== value) {
-      handlePatch(
-        [
-          {
-            op: 'replace',
-            path: compileJSONPointer(path),
-            value: updatedValue
-          }
-        ],
-        (patchedJson, patchedState) => {
-          return {
-            state: setEnforceString(patchedState, pointer, enforceString)
-          }
+    handlePatch(
+      [
+        {
+          op: 'replace',
+          path: compileJSONPointer(path),
+          value: updatedValue
         }
-      )
-    } else {
-      // TODO: add entry to history?
-      documentState = setEnforceString(documentState, pointer, enforceString)
-    }
+      ],
+      (patchedJson, patchedState) => {
+        return {
+          state: setEnforceString(patchedState, pointer, enforceString)
+        }
+      }
+    )
   }
 
   export function acceptAutoRepair() {
