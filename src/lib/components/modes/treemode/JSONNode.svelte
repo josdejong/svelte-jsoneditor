@@ -13,7 +13,7 @@
     HOVER_INSERT_INSIDE,
     INSERT_EXPLANATION
   } from '$lib/constants'
-  import { getKeys, getVisibleCaretPositions } from '$lib/logic/documentState'
+  import { getVisibleCaretPositions } from '$lib/logic/documentState'
   import { rename } from '$lib/logic/operations'
   import {
     createAfterSelection,
@@ -73,7 +73,6 @@
   export let path: Path
   export let expandedMap: JSONPointerMap<boolean>
   export let enforceStringMap: JSONPointerMap<boolean>
-  export let keysMap: JSONPointerMap<string[]>
   export let visibleSectionsMap: JSONPointerMap<VisibleSection[]>
   export let validationErrorsMap: JSONPointerMap<ValidationError>
   export let searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]>
@@ -88,7 +87,7 @@
   let dragging = undefined
 
   // important to prevent creating a new path for all children with every re-render,
-  // that would force all childs to re-render
+  // that would force all children to re-render
   const memoizePath = createMemoizePath()
 
   $: root = path.length === 0
@@ -104,9 +103,6 @@
 
   let enforceString: boolean
   $: enforceString = enforceStringMap ? enforceStringMap[pointer] === true : false
-
-  let keys: string[] | undefined
-  $: keys = keysMap ? keysMap[pointer] : undefined
 
   let visibleSections: VisibleSection[] | undefined
   $: visibleSections = visibleSectionsMap ? visibleSectionsMap[pointer] : undefined
@@ -134,7 +130,7 @@
   $: indentationStyle = getIndentationStyle(path.length)
 
   function getProps(object: JSONObject): { key: string; value: JSONData; pointer: JSONPointer }[] {
-    return (keys || Object.keys(object)).map((key) => ({
+    return Object.keys(object).map((key) => ({
       key,
       value: object[key],
       path: memoizePath(path.concat([key])),
@@ -176,7 +172,7 @@
   }
 
   function handleUpdateKey(oldKey, newKey) {
-    const operations = rename(path, keys || Object.keys(value), oldKey, newKey)
+    const operations = rename(path, Object.keys(value), oldKey, newKey)
     context.onPatch(operations)
 
     // It is possible that the applied key differs from newKey,
@@ -226,7 +222,7 @@
     if (event.shiftKey) {
       // Shift+Click will select multiple entries
       if (selection) {
-        context.onSelect(createMultiSelection(json, documentState, selection.anchorPath, path))
+        context.onSelect(createMultiSelection(json, selection.anchorPath, path))
       }
     } else {
       if (anchorType === SelectionType.multi) {
@@ -234,10 +230,10 @@
           const lastCaretPosition = last(getVisibleCaretPositions(resolvedValue, documentState))
           context.onSelect(fromCaretPosition(lastCaretPosition))
         } else {
-          context.onSelect(createMultiSelection(json, documentState, path, path))
+          context.onSelect(createMultiSelection(json, path, path))
         }
       } else {
-        context.onSelect(fromSelectionType(json, documentState, anchorType, path))
+        context.onSelect(fromSelectionType(json, anchorType, path))
       }
     }
 
@@ -270,14 +266,8 @@
         singleton.selectionAnchorType = selectionType // TODO: this is a bit ugly
 
         const json = context.getJson()
-        const documentState = context.getDocumentState()
         context.onSelect(
-          createMultiSelection(
-            json,
-            documentState,
-            singleton.selectionAnchor,
-            singleton.selectionFocus
-          )
+          createMultiSelection(json, singleton.selectionAnchor, singleton.selectionFocus)
         )
       }
     }
@@ -407,7 +397,7 @@
           const selectionType = getSelectionTypeFromTarget(event.target)
           const path = getDataPathFromTarget(event.target)
           if (path) {
-            context.onSelect(fromSelectionType(json, documentState, selectionType, path))
+            context.onSelect(fromSelectionType(json, selectionType, path))
           }
         }
       }
@@ -462,7 +452,7 @@
       forEachIndex(start, Math.min(value.length, end), addHeight)
     } else {
       // value is Object
-      getKeys(value as JSONObject, context.getDocumentState(), pointer).forEach(addHeight)
+      Object.keys(value).forEach(addHeight)
     }
 
     return items
@@ -627,7 +617,6 @@
               path={item.path}
               expandedMap={filterPointerOrUndefined(expandedMap, item.pointer)}
               enforceStringMap={filterPointerOrUndefined(enforceStringMap, item.pointer)}
-              keysMap={filterPointerOrUndefined(keysMap, item.pointer)}
               visibleSectionsMap={filterPointerOrUndefined(visibleSectionsMap, item.pointer)}
               validationErrorsMap={filterPointerOrUndefined(validationErrorsMap, item.pointer)}
               searchResultItemsMap={filterPointerOrUndefined(searchResultItemsMap, item.pointer)}
@@ -745,7 +734,6 @@
             path={prop.path}
             expandedMap={filterPointerOrUndefined(expandedMap, prop.pointer)}
             enforceStringMap={filterPointerOrUndefined(enforceStringMap, prop.pointer)}
-            keysMap={filterPointerOrUndefined(keysMap, prop.pointer)}
             visibleSectionsMap={filterPointerOrUndefined(visibleSectionsMap, prop.pointer)}
             validationErrorsMap={filterPointerOrUndefined(validationErrorsMap, prop.pointer)}
             searchResultItemsMap={filterPointerOrUndefined(searchResultItemsMap, prop.pointer)}

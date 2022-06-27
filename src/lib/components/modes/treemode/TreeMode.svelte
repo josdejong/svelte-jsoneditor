@@ -609,7 +609,7 @@
 
     documentState = {
       ...documentState,
-      selection: createMultiSelection(json || {}, documentState, [], [])
+      selection: createMultiSelection(json || {}, [], [])
     }
   }
 
@@ -765,11 +765,7 @@
       onError(err)
     }
 
-    const { operations, newSelection } = createRemoveOperations(
-      json,
-      documentState,
-      documentState.selection
-    )
+    const { operations, newSelection } = createRemoveOperations(json, documentState.selection)
 
     handlePatch(operations, (patchedJson, patchedState) => ({
       state: {
@@ -836,7 +832,7 @@
         createDefaultSelection()
       }
 
-      const operations = insert(json, documentState, clipboardText)
+      const operations = insert(json, documentState.selection, clipboardText)
 
       debug('paste', { clipboardText, operations, selection: documentState.selection })
 
@@ -913,7 +909,6 @@
       isKeySelection(documentState.selection) || isValueSelection(documentState.selection)
         ? createMultiSelection(
             json,
-            documentState,
             documentState.selection.anchorPath,
             documentState.selection.focusPath
           )
@@ -928,11 +923,7 @@
       onChange({ text: '', json: undefined }, { text, json }, patchResult)
     } else {
       // remove selection
-      const { operations, newSelection } = createRemoveOperations(
-        json,
-        documentState,
-        removeSelection
-      )
+      const { operations, newSelection } = createRemoveOperations(json, removeSelection)
 
       debug('remove', { operations, selection: documentState.selection, newSelection })
 
@@ -956,7 +947,7 @@
 
     debug('duplicate', { selection: documentState.selection })
 
-    const operations = duplicate(json, documentState, getSelectionPaths(documentState.selection))
+    const operations = duplicate(json, getSelectionPaths(documentState.selection))
 
     handlePatch(operations)
   }
@@ -995,7 +986,7 @@
 
     if (json !== undefined) {
       const data = JSON.stringify(newValue)
-      const operations = insert(json, documentState, data)
+      const operations = insert(json, documentState.selection, data)
       debug('handleInsert', { type, operations, newValue, data })
 
       const operation = last(
@@ -2243,7 +2234,6 @@
           path={rootPath}
           expandedMap={documentState.expandedMap}
           enforceStringMap={documentState.enforceStringMap}
-          keysMap={documentState.keysMap}
           visibleSectionsMap={documentState.visibleSectionsMap}
           {validationErrorsMap}
           searchResultItemsMap={searchResult?.itemsMap}

@@ -15,7 +15,7 @@ import {
 } from '../utils/jsonUtils.js'
 import { findUniqueName } from '../utils/stringUtils.js'
 import { isObject, isObjectOrArray } from '../utils/typeUtils.js'
-import { getKeys, getNextKeys } from './documentState.js'
+import { getNextKeys } from './documentState.js'
 import {
   createAfterSelection,
   createInsideSelection,
@@ -33,10 +33,8 @@ import {
 } from './selection.js'
 import type {
   ClipboardValues,
-  DocumentState,
   DragInsideAction,
   JSONData,
-  JSONObject,
   JSONPatchDocument,
   JSONPatchOperation,
   Path,
@@ -54,7 +52,6 @@ import { isJSONPatchMove, isJSONPatchRemove } from '../typeguards.js'
 // TODO: write tests
 export function insertBefore(
   json: JSONData,
-  documentState: DocumentState,
   path: Path,
   values: ClipboardValues
 ): JSONPatchDocument {
@@ -74,7 +71,7 @@ export function insertBefore(
   } else if (isJSONObject(parent)) {
     // 'object'
     const afterKey = last(path)
-    const keys = getKeys(parent, documentState, compileJSONPointer(parentPath))
+    const keys = Object.keys(parent)
     const nextKeys = getNextKeys(keys, afterKey, true)
 
     return [
@@ -168,12 +165,7 @@ export function rename(parentPath, keys, oldKey, newKey) {
  * a unique property name for the inserted node in case of duplicating
  * and object property
  */
-export function replace(
-  json: JSONData,
-  documentState: DocumentState,
-  paths: Path[],
-  values: ClipboardValues
-): JSONPatchDocument {
+export function replace(json: JSONData, paths: Path[], values: ClipboardValues): JSONPatchDocument {
   // TODO: find a better name and define data structure for values
   const firstPath: JSONPath = first(paths)
   const parentPath = initial(firstPath)
@@ -205,7 +197,7 @@ export function replace(
     const lastPath: JSONPath = last(paths)
     const parentPath = initial(lastPath)
     const beforeKey = last(lastPath)
-    const keys: string[] = getKeys(parent, documentState, compileJSONPointer(parentPath))
+    const keys: string[] = Object.keys(parent)
     const nextKeys = getNextKeys(keys, beforeKey, false)
     const removeKeys = new Set(paths.map((path) => last(path)))
     const filteredKeys = keys.filter((key) => !removeKeys.has(key))
@@ -240,11 +232,7 @@ export function replace(
  * a unique property name for the duplicated node in case of duplicating
  * and object property
  */
-export function duplicate(
-  json: JSONData,
-  documentState: DocumentState,
-  paths: Path[]
-): JSONPatchDocument {
+export function duplicate(json: JSONData, paths: Path[]): JSONPatchDocument {
   // FIXME: here we assume selection.paths is sorted correctly, that's a dangerous assumption
   const lastPath: JSONPath = last(paths)
 
@@ -274,7 +262,7 @@ export function duplicate(
     ]
   } else if (isJSONObject(parent)) {
     // 'object'
-    const keys = getKeys(parent, documentState, compileJSONPointer(parentPath))
+    const keys = Object.keys(parent)
     const nextKeys = getNextKeys(keys, beforeKey, false)
 
     return [
@@ -358,17 +346,15 @@ export function extract(json: JSONData, selection: Selection): JSONPatchDocument
 // TODO: write unit tests
 export function insert(
   json: JSONData,
-  documentState: DocumentState,
+  selection: Selection | undefined,
   clipboardText: string
 ): JSONPatchDocument {
-  const selection = documentState.selection
-
   if (isKeySelection(selection)) {
     // rename key
     const clipboard = parseAndRepairOrUndefined(clipboardText)
     const parentPath = initial(selection.focusPath)
     const parent = getIn(json, parentPath)
-    const keys = getKeys(parent as JSONObject, documentState, compileJSONPointer(parentPath))
+    const keys = Object.keys(parent)
     const oldKey = last(selection.focusPath)
     const newKey = typeof clipboard === 'string' ? clipboard : clipboardText
 
@@ -403,7 +389,7 @@ export function insert(
   if (isMultiSelection(selection)) {
     const newValues = clipboardToValues(clipboardText)
 
-    return replace(json, documentState, selection.paths, newValues)
+    return replace(json, selection.paths, newValues)
   }
 
   if (isAfterSelection(selection)) {
@@ -416,11 +402,11 @@ export function insert(
       const index = last(path)
       const nextItemPath = parentPath.concat([(index as number) + 1])
 
-      return insertBefore(json, documentState, nextItemPath, newValues)
+      return insertBefore(json, nextItemPath, newValues)
     } else if (isJSONObject(parent)) {
       // value is an Object
       const key = String(last(path))
-      const keys: string[] = getKeys(parent, documentState, compileJSONPointer(parentPath))
+      const keys: string[] = Object.keys(parent)
       if (isEmpty(keys) || last(keys) === key) {
         return append(json, parentPath, newValues)
       } else {
@@ -428,7 +414,7 @@ export function insert(
         const nextKey = keys[index + 1]
         const nextKeyPath = parentPath.concat([nextKey])
 
-        return insertBefore(json, documentState, nextKeyPath, newValues)
+        return insertBefore(json, nextKeyPath, newValues)
       }
     } else {
       throw new Error('Cannot create insert operations: parent must be an Object or Array')
@@ -442,17 +428,17 @@ export function insert(
 
     if (isJSONArray(value)) {
       const firstItemPath = path.concat([0])
-      return insertBefore(json, documentState, firstItemPath, newValues)
+      return insertBefore(json, firstItemPath, newValues)
     } else if (isJSONObject(value)) {
       // value is an Object
-      const keys: string[] = getKeys(value, documentState, compileJSONPointer(path))
+      const keys = Object.keys(value)
       if (isEmpty(keys)) {
         return append(json, path, newValues)
       } else {
         const firstKey = first(keys)
         const firstKeyPath = path.concat([firstKey])
 
-        return insertBefore(json, documentState, firstKeyPath, newValues)
+        return insertBefore(json, firstKeyPath, newValues)
       }
     } else {
       throw new Error('Cannot create insert operations: parent must be an Object or Array')
@@ -465,13 +451,13 @@ export function insert(
 
 export function moveInsideParent(
   json: JSONData,
-  documentState: DocumentState,
+  selection: Selection,
   dragInsideAction: DragInsideAction
 ): JSONPatchDocument {
   const beforePath = dragInsideAction['beforePath']
   const append = dragInsideAction['append']
 
-  const parentPath: Path = initial(documentState.selection.focusPath)
+  const parentPath: Path = initial(selection.focusPath)
   const parent = getIn(json, parentPath as JSONPath)
 
   if (
@@ -481,14 +467,14 @@ export function moveInsideParent(
     return []
   }
 
-  const startPath = getStartPath(documentState.selection)
-  const endPath = getEndPath(documentState.selection)
+  const startPath = getStartPath(selection)
+  const endPath = getEndPath(selection)
   const startKey: string | number = last(startPath)
   const endKey: string | number = last(endPath)
   const toKey = beforePath ? beforePath[parentPath.length] : undefined
 
   if (isJSONObject(parent)) {
-    const keys = getKeys(parent, documentState, compileJSONPointer(parentPath))
+    const keys = Object.keys(parent)
     const startIndex = keys.indexOf(startKey as string)
     const endIndex = keys.indexOf(endKey as string)
     const toIndex = append ? keys.length : keys.indexOf(toKey)
@@ -655,14 +641,13 @@ export function clipboardToValues(clipboardText: string): ClipboardValues {
 // TODO: write unit tests
 export function createRemoveOperations(
   json: JSONData,
-  documentState: DocumentState,
   selection: Selection
 ): { newSelection: Selection; operations: JSONPatchDocument } {
   if (isKeySelection(selection)) {
     // FIXME: DOESN'T work yet
     const parentPath = initial(selection.focusPath)
     const parent = getIn(json, parentPath)
-    const keys = getKeys(parent as JSONObject, documentState, compileJSONPointer(parentPath))
+    const keys = Object.keys(parent)
     const oldKey = last(selection.focusPath)
     const newKey = ''
 
@@ -711,7 +696,7 @@ export function createRemoveOperations(
       return { operations, newSelection }
     } else if (isJSONObject(parent)) {
       // parent is object
-      const keys = getKeys(parent, documentState, compileJSONPointer(parentPath))
+      const keys = Object.keys(parent)
       const firstPath: JSONPath = first(selection.paths)
       const key: string = last(firstPath) as string
       const index = keys.indexOf(key)

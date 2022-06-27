@@ -6,7 +6,7 @@ import {
   revertJSONPatchWithMoveOperations
 } from './operations.js'
 import { createMultiSelection } from './selection.js'
-import { createDocumentState, documentStatePatch, getKeys } from './documentState.js'
+import { createDocumentState, documentStatePatch } from './documentState.js'
 import { immutableJSONPatch } from 'immutable-json-patch'
 import type { JSONPatchOperation } from '../types'
 
@@ -26,9 +26,8 @@ describe('operations', () => {
 
     it('should create a simple value via type "structure"', () => {
       const json = [1, 2, 3]
-      const documentState = createDocumentState()
       const path = [0]
-      const selection = createMultiSelection(json, documentState, path, path)
+      const selection = createMultiSelection(json, path, path)
 
       assert.deepStrictEqual(createNewValue(json, selection, 'structure'), '')
     })
@@ -43,9 +42,8 @@ describe('operations', () => {
           d: [1, 2, 3]
         }
       ]
-      const documentState = createDocumentState()
       const path = [0]
-      const selection = createMultiSelection(json, documentState, path, path)
+      const selection = createMultiSelection(json, path, path)
 
       assert.deepStrictEqual(createNewValue(json, selection, 'structure'), {
         a: '',
@@ -112,10 +110,10 @@ describe('operations', () => {
       const json = { array: [0, 1, 2, 3, 4, 5] }
       const documentState = createDocumentState({
         json,
-        select: (json, state) => createMultiSelection(json, state, ['array', 3], ['array', 4])
+        select: (json) => createMultiSelection(json, ['array', 3], ['array', 4])
       })
       const path = ['array', 1]
-      const operations = moveInsideParent(json, documentState, {
+      const operations = moveInsideParent(json, documentState.selection, {
         beforePath: path,
         indexOffset: 0
       })
@@ -132,10 +130,10 @@ describe('operations', () => {
       const json = { array: [0, 1, 2, 3, 4, 5] }
       const documentState = createDocumentState({
         json,
-        select: (json, state) => createMultiSelection(json, state, ['array', 1], ['array', 2])
+        select: (json) => createMultiSelection(json, ['array', 1], ['array', 2])
       })
       const path = ['array', 4]
-      const operations = moveInsideParent(json, documentState, {
+      const operations = moveInsideParent(json, documentState.selection, {
         beforePath: path,
         indexOffset: 0
       })
@@ -152,12 +150,11 @@ describe('operations', () => {
       const json = { object: { a: 'a', b: 'b', c: 'c', d: 'd', e: 'e' } }
       const documentState = createDocumentState({
         json,
-        select: (json, state) =>
-          createMultiSelection(json, state, ['object', 'c'], ['object', 'd']),
+        select: (json) => createMultiSelection(json, ['object', 'c'], ['object', 'd']),
         expand: () => true
       })
       const path = ['object', 'b']
-      const operations = moveInsideParent(json, documentState, {
+      const operations = moveInsideParent(json, documentState.selection, {
         beforePath: path,
         indexOffset: 0
       })
@@ -173,25 +170,18 @@ describe('operations', () => {
       )
       assert.deepStrictEqual(updatedJson, { object: { a: 'a', c: 'c', d: 'd', b: 'b', e: 'e' } })
       assert.deepStrictEqual(updatedDocumentState, documentState)
-      assert.deepStrictEqual(getKeys(updatedJson.object, updatedDocumentState, '/object'), [
-        'a',
-        'c',
-        'd',
-        'b',
-        'e'
-      ])
+      assert.deepStrictEqual(Object.keys(updatedJson.object), ['a', 'c', 'd', 'b', 'e'])
     })
 
     it('should move a selection down inside an object', () => {
       const json = { object: { a: 'a', b: 'b', c: 'c', d: 'd', e: 'e' } }
       const documentState = createDocumentState({
         json,
-        select: (json, state) =>
-          createMultiSelection(json, state, ['object', 'b'], ['object', 'c']),
+        select: (json) => createMultiSelection(json, ['object', 'b'], ['object', 'c']),
         expand: () => true
       })
       const path = ['object', 'e']
-      const operations = moveInsideParent(json, documentState, {
+      const operations = moveInsideParent(json, documentState.selection, {
         beforePath: path,
         indexOffset: 0
       })
@@ -208,13 +198,7 @@ describe('operations', () => {
       )
       assert.deepStrictEqual(updatedJson, { object: { a: 'a', d: 'd', b: 'b', c: 'c', e: 'e' } })
       assert.deepStrictEqual(updatedDocumentState, documentState)
-      assert.deepStrictEqual(getKeys(updatedJson.object, updatedDocumentState, '/object'), [
-        'a',
-        'd',
-        'b',
-        'c',
-        'e'
-      ])
+      assert.deepStrictEqual(Object.keys(updatedJson.object), ['a', 'd', 'b', 'c', 'e'])
     })
 
     // TODO: test append, moving to bottom of an array

@@ -52,7 +52,7 @@ export function onMoveSelection({
     }
   }
 
-  const operations = moveInsideParent(fullJson, documentState, dragInsideAction)
+  const operations = moveInsideParent(fullJson, documentState.selection, dragInsideAction)
 
   // TODO: documentStatePatch is relatively slow for large documents
   //  This is for example noticeable in a large array where we drag a few
@@ -69,7 +69,6 @@ export function onMoveSelection({
     const updatedFullSelection = createUpdatedArraySelection({
       items,
       fullJson,
-      documentState,
       fullSelection,
       indexOffset: dragInsideAction.indexOffset
     })
@@ -151,7 +150,6 @@ function findSwapPathDown({
 interface UpdatedArraySelectionProps {
   items: RenderedItem[]
   fullJson: JSONData
-  documentState: DocumentState
   fullSelection: Selection
   indexOffset: number
 }
@@ -159,7 +157,6 @@ interface UpdatedArraySelectionProps {
 function createUpdatedArraySelection({
   items,
   fullJson,
-  documentState,
   fullSelection,
   indexOffset
 }: UpdatedArraySelectionProps): MultiSelection {
@@ -172,5 +169,5 @@ function createUpdatedArraySelection({
   const anchorPath = items[startIndex + indexOffset]?.path
   const focusPath = items[endIndex + indexOffset]?.path
 
-  return createMultiSelection(fullJson, documentState, anchorPath, focusPath)
+  return createMultiSelection(fullJson, anchorPath, focusPath)
 }

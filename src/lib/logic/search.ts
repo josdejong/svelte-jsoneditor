@@ -1,7 +1,7 @@
 import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, getIn } from 'immutable-json-patch'
 import { forEachRight, groupBy, initial, isEqual, last } from 'lodash-es'
-import { getEnforceString, getKeys } from './documentState.js'
+import { getEnforceString } from './documentState.js'
 import { createSelectionFromOperations } from './selection.js'
 import { rename } from './operations.js'
 import { stringConvert } from '../utils/typeUtils.js'
@@ -9,7 +9,6 @@ import type {
   DocumentState,
   ExtendedSearchResultItem,
   JSONData,
-  JSONObject,
   JSONPatchDocument,
   JSONPatchOperation,
   JSONPointer,
@@ -137,7 +136,7 @@ export function search(
 
       path.pop()
     } else if (isJSONObject(value)) {
-      const keys = getKeys(value, documentState, compileJSONPointer(path))
+      const keys = Object.keys(value)
       const level = path.length
 
       path.push('')
@@ -247,7 +246,7 @@ export function createSearchAndReplaceOperations(
     const parentPath = initial(path)
     const parent = getIn(json, parentPath)
     const oldKey: string = last(path) as string
-    const keys = getKeys(parent as JSONObject, documentState, compileJSONPointer(parentPath))
+    const keys = Object.keys(parent)
     const newKey = replaceText(oldKey, replacementText, start, end)
 
     const operations = rename(parentPath, keys, oldKey, newKey)
@@ -350,7 +349,7 @@ export function createSearchAndReplaceAllOperations(
       const parentPath = initial(path)
       const parent = getIn(json, parentPath)
       const oldKey = last(path) as string
-      const keys = getKeys(parent as JSONObject, documentState, compileJSONPointer(parentPath))
+      const keys = Object.keys(parent)
       const newKey = replaceAllText(oldKey, replacementText, items)
 
       const operations = rename(parentPath, keys, oldKey, newKey)

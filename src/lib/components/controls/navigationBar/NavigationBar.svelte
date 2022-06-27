@@ -1,15 +1,14 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { compileJSONPointer, getIn } from 'immutable-json-patch'
+  import { getIn } from 'immutable-json-patch'
   import { range } from 'lodash-es'
   import { isObject, isObjectOrArray } from '../../../utils/typeUtils'
   import { createMultiSelection } from '../../../logic/selection'
   import { createDebug } from '../../../utils/debug'
   import NavigationBarItem from '../../../components/controls/navigationBar/NavigationBarItem.svelte'
   import { caseInsensitiveNaturalCompare } from '../../../logic/sort'
-  import type { DocumentState, JSONData, JSONObject, OnSelect, Path } from '../../../types'
-  import { getKeys } from '../../../logic/documentState'
+  import type { DocumentState, JSONData, OnSelect, Path } from '../../../types'
 
   const debug = createDebug('jsoneditor:NavigationBar')
 
@@ -44,7 +43,7 @@
     if (Array.isArray(node)) {
       return range(0, node.length)
     } else if (isObject(node)) {
-      const keys = getKeys(node as JSONObject, documentState, compileJSONPointer(path))
+      const keys = Object.keys(node)
 
       const sortedKeys = keys.slice(0)
       sortedKeys.sort(caseInsensitiveNaturalCompare)
@@ -59,7 +58,7 @@
   function handleSelect(path: Path) {
     debug('select path', JSON.stringify(path))
 
-    onSelect(createMultiSelection(json, documentState, path, path))
+    onSelect(createMultiSelection(json, path, path))
   }
 </script>
 

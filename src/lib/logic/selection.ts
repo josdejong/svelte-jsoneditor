@@ -5,7 +5,6 @@ import { parseJSONPointerWithArrayIndices, pointerStartsWith } from '../utils/js
 import { isObjectOrArray } from '../utils/typeUtils.js'
 import {
   collapsePath,
-  getKeys,
   getNextVisiblePath,
   getPreviousVisiblePath,
   getVisibleCaretPositions,
@@ -54,12 +53,7 @@ export function isMultiSelection(selection: Selection | undefined): selection is
  * Expand a selection start and end into an array containing all paths
  * between (and including) start and end
  */
-export function expandSelection(
-  json: JSONData,
-  documentState: DocumentState,
-  anchorPath: Path,
-  focusPath: Path
-): Path[] {
+export function expandSelection(json: JSONData, anchorPath: Path, focusPath: Path): Path[] {
   if (isEqual(anchorPath, focusPath)) {
     // just a single node
     return [anchorPath]
@@ -77,7 +71,7 @@ export function expandSelection(
     const value = getIn(json, sharedPath)
 
     if (isJSONObject(value)) {
-      const keys = getKeys(value, documentState, compileJSONPointer(sharedPath))
+      const keys = Object.keys(value)
       const anchorIndex = keys.indexOf(anchorKey as string)
       const focusIndex = keys.indexOf(focusKey as string)
 
@@ -207,10 +201,10 @@ export function getSelectionUp(
   if (keepAnchorPath) {
     // multi selection
     if (isAfterSelection(selection) || isInsideSelection(selection)) {
-      return createMultiSelection(json, documentState, selection.anchorPath, selection.anchorPath)
+      return createMultiSelection(json, selection.anchorPath, selection.anchorPath)
     }
 
-    return createMultiSelection(json, documentState, selection.anchorPath, focusPath)
+    return createMultiSelection(json, selection.anchorPath, focusPath)
   }
 
   if (isKeySelection(selection)) {
@@ -231,16 +225,16 @@ export function getSelectionUp(
   if (isAfterSelection(selection)) {
     // select the node itself, not the previous node,
     // FIXME: when after an expanded object/array, should go to the last item inside the object/array
-    return createMultiSelection(json, documentState, path, path)
+    return createMultiSelection(json, path, path)
   }
 
   if (isInsideSelection(selection)) {
     // select the node itself, not the previous node,
-    return createMultiSelection(json, documentState, path, path)
+    return createMultiSelection(json, path, path)
   }
 
   // multi selection -> select previous node
-  return createMultiSelection(json, documentState, anchorPath, focusPath)
+  return createMultiSelection(json, anchorPath, focusPath)
 }
 
 export function getSelectionDown(
@@ -276,14 +270,14 @@ export function getSelectionDown(
     }
 
     if (isAfterSelection(selection)) {
-      return createMultiSelection(json, documentState, nextPathAfter, nextPathAfter)
+      return createMultiSelection(json, nextPathAfter, nextPathAfter)
     }
 
     if (isInsideSelection(selection)) {
-      return createMultiSelection(json, documentState, anchorPath, focusPath)
+      return createMultiSelection(json, anchorPath, focusPath)
     }
 
-    return createMultiSelection(json, documentState, selection.anchorPath, nextPathAfter)
+    return createMultiSelection(json, selection.anchorPath, nextPathAfter)
   }
 
   if (isKeySelection(selection)) {
@@ -303,11 +297,11 @@ export function getSelectionDown(
 
   // TODO: simplify, this is redundant, same as next
   if (isInsideSelection(selection)) {
-    return createMultiSelection(json, documentState, anchorPath, focusPath)
+    return createMultiSelection(json, anchorPath, focusPath)
   }
 
   // selection type MULTI or AFTER
-  return createMultiSelection(json, documentState, nextPath, nextPath)
+  return createMultiSelection(json, nextPath, nextPath)
 }
 
 /**
@@ -376,7 +370,7 @@ export function getSelectionLeft(
 
   if (keepAnchorPath) {
     if (!isMultiSelection(selection)) {
-      return createMultiSelection(json, documentState, selection.anchorPath, selection.focusPath)
+      return createMultiSelection(json, selection.anchorPath, selection.focusPath)
     }
 
     return null
@@ -390,7 +384,7 @@ export function getSelectionLeft(
   const parent = getIn(json, parentPath)
 
   if (isValueSelection(selection) && Array.isArray(parent)) {
-    return createMultiSelection(json, documentState, selection.focusPath, selection.focusPath)
+    return createMultiSelection(json, selection.focusPath, selection.focusPath)
   }
 
   if (isMultiSelection(selection) && !Array.isArray(parent)) {
@@ -411,7 +405,7 @@ export function getSelectionRight(
 
   if (keepAnchorPath) {
     if (!isMultiSelection(selection)) {
-      return createMultiSelection(json, documentState, selection.anchorPath, selection.focusPath)
+      return createMultiSelection(json, selection.anchorPath, selection.focusPath)
     }
 
     return null
@@ -638,11 +632,10 @@ export function createAfterSelection(path: Path): AfterSelection {
 
 export function createMultiSelection(
   json: JSONData,
-  documentState: DocumentState,
   anchorPath: Path,
   focusPath: Path
 ): MultiSelection {
-  const paths = expandSelection(json, documentState, anchorPath, focusPath)
+  const paths = expandSelection(json, anchorPath, focusPath)
 
   // the original anchorPath or focusPath may be somewhere inside the
   // returned paths: when one of the two paths is inside an object and the
@@ -798,7 +791,6 @@ export function fromCaretPosition(caretPosition: CaretPosition): Selection {
 // TODO: unit test
 export function fromSelectionType(
   json: JSONData,
-  documentState: DocumentState,
   selectionType: SelectionType,
   path: Path
 ): Selection {
@@ -812,7 +804,7 @@ export function fromSelectionType(
     case SelectionType.inside:
       return createInsideSelection(path)
     case SelectionType.multi:
-      return createMultiSelection(json, documentState, path, path)
+      return createMultiSelection(json, path, path)
   }
 }
 

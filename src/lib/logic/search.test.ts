@@ -105,16 +105,13 @@ describe('search', () => {
   it('should respect order of keys in document state in search', () => {
     const json = {
       data: {
-        text1: 'foo',
-        text2: 'foo'
+        text2: 'foo',
+        text1: 'foo'
       }
     }
 
     const documentState = {
-      ...createDocumentState({ json, expand: () => true }),
-      keysMap: {
-        '/data': ['text2', 'text1'] // reverse the order of the keys
-      }
+      ...createDocumentState({ json, expand: () => true })
     }
 
     const results = search('foo', json, documentState)

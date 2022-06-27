@@ -41,10 +41,8 @@ export interface CaretPosition {
 }
 
 export interface DocumentState {
-  // TODO: merge expandedMap, enforceStringMap, keysMap, and visibleSectionsMap into a single stateMap?
   expandedMap: JSONPointerMap<boolean>
   enforceStringMap: JSONPointerMap<boolean>
-  keysMap: JSONPointerMap<string[]>
   visibleSectionsMap: JSONPointerMap<VisibleSection[]>
   selection: Selection | undefined
 }

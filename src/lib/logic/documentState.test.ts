@@ -394,14 +394,6 @@ describe('documentState', () => {
 
       const documentState: DocumentState = {
         ...createDocumentState({ json, expand: () => true }),
-        keysMap: {
-          '': ['members', 'group'],
-          '/members/0': ['id', 'name'],
-          '/members/1': ['id', 'name'],
-          '/members/2': ['id', 'name'],
-          '/group': ['name', 'location'],
-          '/group/details': ['description']
-        },
         visibleSectionsMap: {
           '/members': [{ start: 0, end: 2 }]
         }
@@ -426,21 +418,13 @@ describe('documentState', () => {
         ...createDocumentState(),
         expandedMap: {
           '': true
-        },
-        keysMap: {
-          '': ['a', 'b']
         }
       }
 
       const res = documentStatePatch(json, documentState, [{ op: 'add', path: '/c', value: 42 }])
 
       assert.deepStrictEqual(res.json, { a: 2, b: 3, c: 42 })
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        keysMap: {
-          '': ['a', 'b', 'c']
-        }
-      })
+      assert.deepStrictEqual(res.documentState, documentState)
     })
 
     it('add: should override a value in an object', () => {
@@ -449,9 +433,6 @@ describe('documentState', () => {
         ...createDocumentState(),
         expandedMap: {
           '': true
-        },
-        keysMap: {
-          '': ['a', 'b']
         }
       }
 
@@ -459,10 +440,7 @@ describe('documentState', () => {
 
       assert.deepStrictEqual(res.json, { a: 42, b: 3 })
       assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        keysMap: {
-          '': ['a', 'b']
-        }
+        ...documentState
       })
     })
 
@@ -490,14 +468,6 @@ describe('documentState', () => {
           '/members/0': true,
           '/members/2': true,
           '/members/3': true
-        },
-        keysMap: {
-          '': ['members', 'group'],
-          '/members/0': ['id', 'name'],
-          '/members/2': ['id', 'name'],
-          '/members/3': ['id', 'name'],
-          '/group': ['name', 'location'],
-          '/group/details': ['description']
         },
         visibleSectionsMap: {
           '/members': [{ start: 0, end: 3 }]
@@ -545,13 +515,7 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, deleteIn(json, ['group', 'location']))
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        keysMap: {
-          ...documentState.keysMap,
-          '/group': ['name']
-        }
-      })
+      assert.deepStrictEqual(res.documentState, documentState)
     })
 
     it('remove: should remove a value from an array', () => {
@@ -562,7 +526,6 @@ describe('documentState', () => {
       assert.deepStrictEqual(res.documentState, {
         ...documentState,
         expandedMap: deleteIn(documentState.expandedMap, ['/members/2']), // [2] is moved to [1]
-        keysMap: deleteIn(documentState.keysMap, ['/members/2']), // [2] is moved to [1]
         visibleSectionsMap: {
           '/members': [{ start: 0, end: 1 }]
         }
@@ -580,7 +543,6 @@ describe('documentState', () => {
       assert.deepStrictEqual(res.documentState, {
         ...documentState,
         expandedMap: deleteIn(documentState.expandedMap, ['/members/2']), // [2] is moved to [1]
-        keysMap: deleteIn(documentState.keysMap, ['/members/2']), // [2] is moved to [1]
         visibleSectionsMap: {
           '/members': [{ start: 0, end: 1 }]
         }
@@ -603,12 +565,6 @@ describe('documentState', () => {
           '/members/0': true,
           '/members/1': true,
           '/members/2': true
-        },
-        keysMap: {
-          '': ['members', 'group'],
-          '/members/0': ['id', 'name'],
-          '/members/1': ['id', 'name'],
-          '/members/2': ['id', 'name']
         }
       })
     })
@@ -630,13 +586,6 @@ describe('documentState', () => {
           '/members/0': true,
           '/members/1': true,
           '/members/2': true
-        },
-        keysMap: {
-          '': ['members', 'group'],
-          '/members/0': ['id', 'name'],
-          '/members/1': ['id', 'name'],
-          '/members/2': ['id', 'name'],
-          '/group': ['groupId']
         }
       })
     })
@@ -651,8 +600,7 @@ describe('documentState', () => {
       assert.deepStrictEqual(res.json, setIn(json, ['members', 1], 42))
       assert.deepStrictEqual(res.documentState, {
         ...documentState,
-        expandedMap: deleteIn(documentState.expandedMap, ['/members/1']),
-        keysMap: deleteIn(documentState.keysMap, ['/members/1'])
+        expandedMap: deleteIn(documentState.expandedMap, ['/members/1'])
       })
     })
 
@@ -671,30 +619,22 @@ describe('documentState', () => {
           '/group': true,
           '/group/details': true
         },
-        keysMap: {
-          '': ['members', 'group'],
-          '/group': ['name', 'location'],
-          '/group/details': ['description']
-        },
         visibleSectionsMap: {}
       })
     })
 
     it('replace: should replace the root document itself', () => {
       const json = {
-        a: 2,
+        c: {
+          cc: 4
+        },
         b: {
           bb: 3
         },
-        c: {
-          cc: 4
-        }
+        a: 2
       }
       const documentState = {
-        ...createDocumentState({ json, expand: () => true }),
-        keysMap: {
-          '': ['c', 'b', 'a']
-        }
+        ...createDocumentState({ json, expand: () => true })
       }
 
       const operations: JSONPatchDocument = [
@@ -706,8 +646,8 @@ describe('documentState', () => {
       ]
       const res = documentStatePatch(json, documentState, operations)
 
-      // syncKeys
-      assert.deepStrictEqual(res.documentState.keysMap[compileJSONPointer([])], ['b', 'a', 'd'])
+      // check order of keys
+      assert.deepStrictEqual(Object.keys(res.json), ['a', 'b', 'd'])
 
       // keep expanded state of existing keys
       assert.strictEqual(res.documentState.expandedMap[compileJSONPointer([])], true)
@@ -730,11 +670,6 @@ describe('documentState', () => {
         expandedMap: {
           ...documentState.expandedMap,
           '/group/user': true
-        },
-        keysMap: {
-          ...documentState.keysMap,
-          '/group': ['name', 'location', 'user'],
-          '/group/user': ['id', 'name']
         }
       })
     })
@@ -761,12 +696,6 @@ describe('documentState', () => {
         expandedMap: {
           ...documentState.expandedMap,
           '/members/3': true
-        },
-        keysMap: {
-          ...documentState.keysMap,
-          '/members/1': ['description'],
-          '/members/2': ['id', 'name'],
-          '/members/3': ['id', 'name']
         },
         visibleSectionsMap: {
           '/members': [{ start: 0, end: 3 }]
@@ -801,14 +730,6 @@ describe('documentState', () => {
           '/members/0': true,
           '/members/1': true,
           '/members/2': true
-        },
-        keysMap: {
-          '': ['members', 'group', 'details'],
-          '/members/0': ['id', 'name'],
-          '/members/1': ['id', 'name'],
-          '/members/2': ['id', 'name'],
-          '/group': ['name', 'location'],
-          '/details': ['description']
         }
       })
     })
@@ -821,13 +742,7 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, json)
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        keysMap: {
-          ...documentState.keysMap,
-          '/group': ['location', 'name']
-        }
-      })
+      assert.deepStrictEqual(res.documentState, documentState)
     })
 
     it('move: should move a value from array to array (up)', () => {
@@ -855,13 +770,6 @@ describe('documentState', () => {
           '/members': true,
           '/members/1': true,
           '/members/2': true
-        },
-        keysMap: {
-          '': ['members', 'group'],
-          '/members/1': ['id', 'name'],
-          '/members/2': ['id', 'name'],
-          '/group': ['name', 'location'],
-          '/group/details': ['description']
         }
       })
     })
@@ -891,13 +799,6 @@ describe('documentState', () => {
           '/members': true,
           '/members/0': true,
           '/members/2': true
-        },
-        keysMap: {
-          '': ['members', 'group'],
-          '/members/0': ['id', 'name'],
-          '/members/2': ['id', 'name'],
-          '/group': ['name', 'location'],
-          '/group/details': ['description']
         }
       })
     })
@@ -937,13 +838,6 @@ describe('documentState', () => {
           '/members/1': true,
           '/members/3': true
         },
-        keysMap: {
-          '': ['members', 'group'],
-          '/members/0': ['id', 'name'],
-          '/members/1': ['description'],
-          '/members/3': ['id', 'name'],
-          '/group': ['name', 'location']
-        },
         visibleSectionsMap: {
           '/members': [{ start: 0, end: 3 }]
         }
@@ -976,14 +870,6 @@ describe('documentState', () => {
           '/members': true,
           '/members/0': true,
           '/members/1': true
-        },
-        keysMap: {
-          '': ['members', 'group'],
-          '/group': ['name', 'location', 'user'],
-          '/group/details': ['description'],
-          '/group/user': ['id', 'name'],
-          '/members/0': ['id', 'name'],
-          '/members/1': ['id', 'name']
         },
         visibleSectionsMap: {
           '/members': [{ start: 0, end: 1 }]
