@@ -211,8 +211,6 @@
   let documentState = createDocumentState({ json, expand: getDefaultExpand(json) })
   let searchResult: SearchResult | undefined
 
-  $: debug('documentState', documentState)
-
   let normalization: ValueNormalization
   $: normalization = createNormalizationFunctions({
     escapeControlCharacters,
@@ -1554,6 +1552,8 @@
   }
 
   function handleChangeText(updatedText: string, afterPatch?: AfterPatchCallback) {
+    debug('handleChangeText')
+
     const previousState = documentState
     const previousJson = json
     const previousText = text
@@ -1621,9 +1621,6 @@
 
     return expandWithCallback(json, documentState, path, expandCallback)
   }
-
-  // FIXME: cleanup
-  $: debug('documentState', documentState)
 
   /**
    * Toggle expanded state of a node

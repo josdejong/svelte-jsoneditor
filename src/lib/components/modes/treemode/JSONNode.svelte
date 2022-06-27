@@ -58,7 +58,6 @@
     VisibleSection
   } from '$lib/types'
   import { SelectionType } from '$lib/types'
-  import { beforeUpdate } from 'svelte'
   import {
     getStartPath,
     isAfterSelection,
@@ -115,14 +114,6 @@
 
   let isSelected: boolean
   $: isSelected = resolvedSelection ? resolvedSelection.pointersMap[pointer] === true : false
-
-  // FIXME: cleanup logging
-  beforeUpdate(() =>
-    debug('beforeUpdate', {
-      pointer,
-      type
-    })
-  )
 
   function getIndentationStyle(level) {
     return `margin-left: calc(${level} * var(--jse-indent-size))`
