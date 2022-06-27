@@ -458,7 +458,7 @@ export function moveInsideParent(
   const append = dragInsideAction['append']
 
   const parentPath: Path = initial(selection.focusPath)
-  const parent = getIn(json, parentPath as JSONPath)
+  const parent = getIn(json, parentPath)
 
   if (
     !append &&
@@ -508,8 +508,8 @@ export function moveInsideParent(
       return times(count, (offset) => {
         return {
           op: 'move',
-          from: compileJSONPointer(parentPath.concat(startIndex + offset) as JSONPath),
-          path: compileJSONPointer(parentPath.concat(toIndex + offset) as JSONPath)
+          from: compileJSONPointer(parentPath.concat(startIndex + offset)),
+          path: compileJSONPointer(parentPath.concat(toIndex + offset))
         }
       })
     } else {
@@ -517,8 +517,8 @@ export function moveInsideParent(
       return times(count, () => {
         return {
           op: 'move',
-          from: compileJSONPointer(parentPath.concat(startIndex) as JSONPath),
-          path: compileJSONPointer(parentPath.concat(toIndex) as JSONPath)
+          from: compileJSONPointer(parentPath.concat(startIndex)),
+          path: compileJSONPointer(parentPath.concat(toIndex))
         }
       })
     }

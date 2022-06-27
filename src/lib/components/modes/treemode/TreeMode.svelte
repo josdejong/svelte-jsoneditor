@@ -4,7 +4,6 @@
   import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '$lib/utils/debug'
-  import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, existsIn, getIn, immutableJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
   import { initial, isEmpty, isEqual, last, noop, throttle, uniqueId } from 'lodash-es'
@@ -514,8 +513,8 @@
 
     if (
       documentState.selection &&
-      existsIn(json, documentState.selection.anchorPath as JSONPath) &&
-      existsIn(json, documentState.selection.focusPath as JSONPath)
+      existsIn(json, documentState.selection.anchorPath) &&
+      existsIn(json, documentState.selection.focusPath)
     ) {
       return
     }
@@ -1177,7 +1176,7 @@
       handleInsert('array')
     } else {
       if (isValueSelection(documentState.selection)) {
-        if (!isObjectOrArray(getIn(json, documentState.selection.focusPath as JSONPath))) {
+        if (!isObjectOrArray(getIn(json, documentState.selection.focusPath))) {
           // only replace contents when not yet in edit mode (can happen when entering
           // multiple characters very quickly after each other due to the async handling)
           const replaceContents = !documentState.selection.edit
@@ -1211,7 +1210,7 @@
 
     // next, open the new value in edit mode and apply the current character
     const path = documentState.selection.focusPath
-    const parent = getIn(json, initial(path) as JSONPath)
+    const parent = getIn(json, initial(path))
 
     if (Array.isArray(parent) || !parent || isValueSelection(documentState.selection)) {
       updateSelection(createValueSelection(path, true))
@@ -1798,7 +1797,7 @@
       if (isValueSelection(documentState.selection)) {
         event.preventDefault()
 
-        const value = getIn(json, documentState.selection.focusPath as JSONPath)
+        const value = getIn(json, documentState.selection.focusPath)
         if (isObjectOrArray(value)) {
           // expand object/array
           handleExpand(documentState.selection.focusPath, true)
@@ -1830,7 +1829,7 @@
     }
 
     if (combo === 'Ctrl+Enter' && isValueSelection(documentState.selection)) {
-      const value = getIn(json, documentState.selection.focusPath as JSONPath)
+      const value = getIn(json, documentState.selection.focusPath)
 
       if (isUrl(value)) {
         // open url in new page

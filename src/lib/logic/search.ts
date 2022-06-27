@@ -1,4 +1,3 @@
-import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, getIn } from 'immutable-json-patch'
 import { forEachRight, groupBy, initial, isEqual, last } from 'lodash-es'
 import { getEnforceString } from './documentState.js'
@@ -258,9 +257,9 @@ export function createSearchAndReplaceOperations(
     }
   } else if (field === SearchField.value) {
     // replace a value
-    const currentValue = getIn(json, path as JSONPath) as JSONData
+    const currentValue = getIn(json, path) as JSONData
     if (currentValue === undefined) {
-      throw new Error(`Cannot replace: path not found ${compileJSONPointer(path as JSONPath)}`)
+      throw new Error(`Cannot replace: path not found ${compileJSONPointer(path)}`)
     }
     const currentValueText = typeof currentValue === 'string' ? currentValue : String(currentValue)
 
@@ -272,7 +271,7 @@ export function createSearchAndReplaceOperations(
     const operations: JSONPatchOperation[] = [
       {
         op: 'replace',
-        path: compileJSONPointer(path as JSONPath),
+        path: compileJSONPointer(path),
         value: enforceString ? value : stringConvert(value)
       }
     ]

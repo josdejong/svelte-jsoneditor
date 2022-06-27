@@ -1,4 +1,3 @@
-import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer } from 'immutable-json-patch'
 import jsonSourceMap from 'json-source-map'
 import jsonrepair from 'jsonrepair'
@@ -211,7 +210,7 @@ export function findTextLocation(text: string, path: Path): TextLocation | null 
   try {
     const jsmap = jsonSourceMap.parse(text)
 
-    const pointerName = compileJSONPointer(path as JSONPath)
+    const pointerName = compileJSONPointer(path)
     const pointer = jsmap.pointers[pointerName]
     if (pointer) {
       return {
