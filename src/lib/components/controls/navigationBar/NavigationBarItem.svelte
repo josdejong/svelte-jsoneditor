@@ -5,7 +5,7 @@
   import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
   import NavigationBarDropdown from '../../../components/controls/navigationBar/NavigationBarDropdown.svelte'
   import { getContext } from 'svelte'
-  import type { JSONPath } from '../../../types'
+  import type { JSONPath } from 'immutable-json-patch'
 
   const { openAbsolutePopup, closeAbsolutePopup } = getContext('absolute-popup')
 

@@ -3,10 +3,11 @@
 <script lang="ts">
   import { getColorCSS } from '$lib/utils/typeUtils'
   import { getWindow } from '$lib/utils/domUtils'
+  import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getContext } from 'svelte'
   import ColorPickerPopup from '../../../components/controls/ColorPickerPopup.svelte'
-  import type { OnPatch, JSONPath } from '../../../types'
+  import type { OnPatch } from '../../../types'
 
   const { openAbsolutePopup } = getContext('absolute-popup')
 

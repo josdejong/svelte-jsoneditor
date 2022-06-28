@@ -1,21 +1,14 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
+  import type { JSONData, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils'
   import { createValueSelection, getSelectionNextInside } from '../../../logic/selection'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
   import EditableDiv from '../../../components/controls/EditableDiv.svelte'
   import { UPDATE_SELECTION } from '../../../constants.js'
-  import type {
-    JSONData,
-    OnFind,
-    OnPasteJson,
-    OnPatch,
-    OnSelect,
-    JSONPath,
-    ValueNormalization
-  } from '../../../types'
+  import type { OnFind, OnPasteJson, OnPatch, OnSelect, ValueNormalization } from '../../../types'
 
   export let path: JSONPath
   export let value: JSONData

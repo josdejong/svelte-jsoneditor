@@ -2,9 +2,10 @@
 
 <script lang="ts">
   import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
+  import type { JSONData, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import Icon from 'svelte-awesome'
-  import type { JSONData, OnPatch, JSONPath } from '../../../types'
+  import type { OnPatch } from '../../../types'
 
   export let path: JSONPath
   export let value: JSONData

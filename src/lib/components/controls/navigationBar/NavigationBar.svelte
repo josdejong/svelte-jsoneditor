@@ -1,6 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
+  import type { JSONData, JSONPath } from 'immutable-json-patch'
   import { getIn } from 'immutable-json-patch'
   import { range } from 'lodash-es'
   import { isObject, isObjectOrArray } from '../../../utils/typeUtils'
@@ -8,7 +9,7 @@
   import { createDebug } from '../../../utils/debug'
   import NavigationBarItem from '../../../components/controls/navigationBar/NavigationBarItem.svelte'
   import { caseInsensitiveNaturalCompare } from '../../../logic/sort'
-  import type { DocumentState, JSONData, OnSelect, JSONPath } from '../../../types'
+  import type { DocumentState, OnSelect } from '../../../types'
 
   const debug = createDebug('jsoneditor:NavigationBar')
 

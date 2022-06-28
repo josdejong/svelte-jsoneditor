@@ -15,7 +15,8 @@
   import { isObjectOrArray } from '$lib/utils/typeUtils'
   import Menu from '../../../controls/Menu.svelte'
   import { noop } from 'lodash-es'
-  import type { Selection, JSONData, OnRenderMenu } from '$lib/types'
+  import type { OnRenderMenu, Selection } from '$lib/types'
+  import type { JSONData } from 'immutable-json-patch'
   import { isKeySelection, isMultiSelection, isValueSelection } from '../../../../logic/selection'
   import type { HistoryState } from '../../../../logic/history'
 
