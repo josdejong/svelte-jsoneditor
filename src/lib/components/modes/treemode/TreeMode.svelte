@@ -1106,7 +1106,7 @@
 
   function handleInsertBefore() {
     const selectionBefore = getSelectionUp(json, documentState, false)
-    const parentPath: JSONPath = initial(documentState.selection.focusPath)
+    const parentPath = initial(documentState.selection.focusPath)
 
     if (
       !isEmpty(selectionBefore.focusPath) &&
@@ -1123,7 +1123,7 @@
   }
 
   function handleInsertAfter() {
-    const path: JSONPath = isMultiSelection(documentState.selection)
+    const path = isMultiSelection(documentState.selection)
       ? last(documentState.selection.paths)
       : documentState.selection.focusPath
 

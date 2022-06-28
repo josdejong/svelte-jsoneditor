@@ -188,7 +188,7 @@ export function expandWithCallback(
     }
   }
 
-  const currentPath: JSONPath = path.slice()
+  const currentPath = path.slice()
   recurse(getIn(json, path))
 
   return {

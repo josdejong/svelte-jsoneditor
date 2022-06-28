@@ -47,7 +47,7 @@ export function insertBefore(
   path: JSONPath,
   values: ClipboardValues
 ): JSONPatchDocument {
-  const parentPath: JSONPath = initial(path)
+  const parentPath = initial(path)
   const parent = getIn(json, parentPath)
 
   if (isJSONArray(parent)) {
@@ -155,12 +155,12 @@ export function replace(
   paths: JSONPath[],
   values: ClipboardValues
 ): JSONPatchDocument {
-  const firstPath: JSONPath = first(paths)
+  const firstPath = first(paths)
   const parentPath = initial(firstPath)
   const parent = getIn(json, parentPath)
 
   if (isJSONArray(parent)) {
-    const firstPath: JSONPath = first(paths)
+    const firstPath = first(paths)
     const offset = firstPath ? parseInt(last(firstPath) as string, 10) : 0
 
     return [
@@ -182,7 +182,7 @@ export function replace(
     // parent is Object
     // if we're going to replace an existing object with key "a" with a new
     // key "a", we must not create a new unique name "a (copy)".
-    const lastPath: JSONPath = last(paths)
+    const lastPath = last(paths)
     const parentPath = initial(lastPath)
     const beforeKey = last(lastPath)
     const keys: string[] = Object.keys(parent)
@@ -222,7 +222,7 @@ export function replace(
  */
 export function duplicate(json: JSONData, paths: JSONPath[]): JSONPatchDocument {
   // FIXME: here we assume selection.paths is sorted correctly, that's a dangerous assumption
-  const lastPath: JSONPath = last(paths)
+  const lastPath = last(paths)
 
   if (isEmpty(lastPath)) {
     throw new Error('Cannot duplicate root object')
@@ -233,7 +233,7 @@ export function duplicate(json: JSONData, paths: JSONPath[]): JSONPatchDocument 
   const parent = getIn(json, parentPath)
 
   if (isJSONArray(parent)) {
-    const lastPath: JSONPath = last(paths)
+    const lastPath = last(paths)
     const offset = lastPath ? parseInt(last(lastPath) as string, 10) + 1 : 0
 
     return [
@@ -291,7 +291,7 @@ export function extract(json: JSONData, selection: Selection): JSONPatchDocument
   }
 
   if (isMultiSelection(selection)) {
-    const parentPath: JSONPath = initial(selection.focusPath)
+    const parentPath = initial(selection.focusPath)
     const parent = getIn(json, parentPath)
 
     if (isJSONArray(parent)) {
@@ -383,7 +383,7 @@ export function insert(
   if (isAfterSelection(selection)) {
     const newValues = clipboardToValues(clipboardText)
     const path = selection.focusPath
-    const parentPath: JSONPath = initial(path)
+    const parentPath = initial(path)
     const parent = getIn(json, parentPath)
 
     if (isJSONArray(parent)) {
@@ -445,7 +445,7 @@ export function moveInsideParent(
   const beforePath = dragInsideAction['beforePath']
   const append = dragInsideAction['append']
 
-  const parentPath: JSONPath = initial(selection.focusPath)
+  const parentPath = initial(selection.focusPath)
   const parent = getIn(json, parentPath)
 
   if (
@@ -659,7 +659,7 @@ export function createRemoveOperations(
 
   if (isMultiSelection(selection)) {
     const operations = removeAll(selection.paths)
-    const lastPath: JSONPath = last(selection.paths)
+    const lastPath = last(selection.paths)
 
     if (isEmpty(lastPath)) {
       // there is no parent, this is the root document
@@ -674,7 +674,7 @@ export function createRemoveOperations(
     const parent = getIn(json, parentPath)
 
     if (isJSONArray(parent)) {
-      const firstPath: JSONPath = first(selection.paths)
+      const firstPath = first(selection.paths)
       const index: number = last(firstPath) as number
       const newSelection =
         index === 0
@@ -685,7 +685,7 @@ export function createRemoveOperations(
     } else if (isJSONObject(parent)) {
       // parent is object
       const keys = Object.keys(parent)
-      const firstPath: JSONPath = first(selection.paths)
+      const firstPath = first(selection.paths)
       const key: string = last(firstPath) as string
       const index = keys.indexOf(key)
       const previousKey = keys[index - 1]

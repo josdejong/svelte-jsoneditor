@@ -212,7 +212,7 @@ export function getSelectionUp(
   }
 
   if (isKeySelection(selection)) {
-    const parentPath: JSONPath = initial(previousPath)
+    const parentPath = initial(previousPath)
     const parent = getIn(json, parentPath)
     if (Array.isArray(parent) || isEmpty(previousPath)) {
       // switch to value selection: array has no keys, and root object also not
@@ -285,7 +285,7 @@ export function getSelectionDown(
   }
 
   if (isKeySelection(selection)) {
-    const parentPath: JSONPath = initial(nextPath)
+    const parentPath = initial(nextPath)
     const parent = getIn(json, parentPath)
     if (Array.isArray(parent)) {
       // switch to value selection: array has no keys
@@ -380,7 +380,7 @@ export function getSelectionLeft(
     return fromCaretPosition(previous)
   }
 
-  const parentPath: JSONPath = initial(selection.focusPath)
+  const parentPath = initial(selection.focusPath)
   const parent = getIn(json, parentPath)
 
   if (isValueSelection(selection) && Array.isArray(parent)) {

@@ -256,7 +256,7 @@ export function fastPatchSort(json, operations) {
   )
 
   // validate whether the move actions take place in an array
-  const arrayPath: JSONPath = initial(first(parsedOperations).path)
+  const arrayPath = initial(first(parsedOperations).path)
   const array = getIn(json, arrayPath)
   if (!Array.isArray(array)) {
     throw new Error(
