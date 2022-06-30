@@ -1,4 +1,4 @@
-import { cloneDeepWith, first, flatMap, initial, isEmpty, last, times } from 'lodash-es'
+import { cloneDeepWith, first, initial, isEmpty, last, times } from 'lodash-es'
 import type {
   JSONData,
   JSONPatchDocument,
@@ -708,20 +708,24 @@ export function revertJSONPatchWithMoveOperations(
   json: JSONData,
   operations: JSONPatchDocument
 ): JSONPatchDocument {
-  return flatMap(operations, (operation) => {
-    const undo: JSONPatchDocument = revertJSONPatch(json, [operation]) as JSONPatchDocument
+  return revertJSONPatch(json, operations, {
+    before: (json, operation, revertOperations) => {
+      if (isJSONPatchRemove(operation)) {
+        const path = parseJSONPointer(operation.path)
+        return {
+          revertOperations: [...revertOperations, ...createRevertMoveOperations(json, path)]
+        }
+      }
 
-    if (isJSONPatchRemove(operation)) {
-      const path = parseJSONPointer(operation.path)
-      return [...undo, ...createRevertMoveOperations(json, path)]
+      if (isJSONPatchMove(operation)) {
+        const from = parseJSONPointer(operation.from)
+        return {
+          revertOperations: [...revertOperations, ...createRevertMoveOperations(json, from)]
+        }
+      }
+
+      return { revertOperations }
     }
-
-    if (isJSONPatchMove(operation)) {
-      const path = parseJSONPointer(operation.from)
-      return [...undo, ...createRevertMoveOperations(json, path)]
-    }
-
-    return undo
   })
 }
 

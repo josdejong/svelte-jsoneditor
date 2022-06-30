@@ -257,6 +257,29 @@ describe('operations', () => {
       assert.deepStrictEqual(revertedJson, json)
       assert.deepStrictEqual(Object.keys(revertedJson), ['a', 'b', 'c', 'nested'])
     })
+
+    it('should restore correctly revert multiple remove operations in an array', () => {
+      const json = [0, 1, 2, 3, 4]
+
+      const operations: JSONPatchOperation[] = [
+        { op: 'remove', path: '/4' },
+        { op: 'remove', path: '/3' },
+        { op: 'remove', path: '/2' }
+      ]
+
+      const updatedJson = immutableJSONPatch(json, operations)
+      assert.deepStrictEqual(updatedJson, [0, 1])
+
+      const revertOperations = revertJSONPatchWithMoveOperations(json, operations)
+      assert.deepStrictEqual(revertOperations, [
+        { op: 'add', path: '/2', value: 2 },
+        { op: 'add', path: '/3', value: 3 },
+        { op: 'add', path: '/4', value: 4 }
+      ])
+
+      const revertedJson = immutableJSONPatch(updatedJson, revertOperations)
+      assert.deepStrictEqual(revertedJson, json)
+    })
   })
 
   // TODO: write tests for all operations
