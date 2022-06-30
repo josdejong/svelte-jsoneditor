@@ -135,9 +135,9 @@ describe('documentState', () => {
     assert.deepStrictEqual(getVisiblePaths(json, documentState1), [
       [],
       ['array'],
-      ['array', 0],
-      ['array', 1],
-      ['array', 2],
+      ['array', '0'],
+      ['array', '1'],
+      ['array', '2'],
       ['object'],
       ['object', 'a'],
       ['object', 'b'],
@@ -148,10 +148,10 @@ describe('documentState', () => {
     assert.deepStrictEqual(getVisiblePaths(json, documentState2), [
       [],
       ['array'],
-      ['array', 0],
-      ['array', 1],
-      ['array', 2],
-      ['array', 2, 'c'],
+      ['array', '0'],
+      ['array', '1'],
+      ['array', '2'],
+      ['array', '2', 'c'],
       ['object'],
       ['object', 'a'],
       ['object', 'b'],
@@ -170,7 +170,7 @@ describe('documentState', () => {
     assert.deepStrictEqual(getVisiblePaths(json, documentState1), [
       [],
       ['array'],
-      ...times(ARRAY_SECTION_SIZE, (index) => ['array', index])
+      ...times(ARRAY_SECTION_SIZE, (index) => ['array', String(index)])
     ])
 
     // create a visible section from 200-300 (in addition to the visible section 0-100)
@@ -183,8 +183,8 @@ describe('documentState', () => {
     assert.deepStrictEqual(getVisiblePaths(json, documentState2), [
       [],
       ['array'],
-      ...times(ARRAY_SECTION_SIZE, (index) => ['array', index]),
-      ...times(end - start, (index) => ['array', index + start])
+      ...times(ARRAY_SECTION_SIZE, (index) => ['array', String(index)]),
+      ...times(end - start, (index) => ['array', String(index + start)])
     ])
   })
 
@@ -231,12 +231,12 @@ describe('documentState', () => {
       { path: ['array'], type: CaretType.key },
       { path: ['array'], type: CaretType.value },
       { path: ['array'], type: CaretType.inside },
-      { path: ['array', 0], type: CaretType.value },
-      { path: ['array', 0], type: CaretType.after },
-      { path: ['array', 1], type: CaretType.value },
-      { path: ['array', 1], type: CaretType.after },
-      { path: ['array', 2], type: CaretType.value },
-      { path: ['array', 2], type: CaretType.after },
+      { path: ['array', '0'], type: CaretType.value },
+      { path: ['array', '0'], type: CaretType.after },
+      { path: ['array', '1'], type: CaretType.value },
+      { path: ['array', '1'], type: CaretType.after },
+      { path: ['array', '2'], type: CaretType.value },
+      { path: ['array', '2'], type: CaretType.after },
       { path: ['array'], type: CaretType.after },
       { path: ['object'], type: CaretType.key },
       { path: ['object'], type: CaretType.value },
@@ -260,16 +260,16 @@ describe('documentState', () => {
       { path: ['array'], type: CaretType.key },
       { path: ['array'], type: CaretType.value },
       { path: ['array'], type: CaretType.inside },
-      { path: ['array', 0], type: CaretType.value },
-      { path: ['array', 0], type: CaretType.after },
-      { path: ['array', 1], type: CaretType.value },
-      { path: ['array', 1], type: CaretType.after },
-      { path: ['array', 2], type: CaretType.value },
-      { path: ['array', 2], type: CaretType.inside },
-      { path: ['array', 2, 'c'], type: CaretType.key },
-      { path: ['array', 2, 'c'], type: CaretType.value },
-      { path: ['array', 2, 'c'], type: CaretType.after },
-      { path: ['array', 2], type: CaretType.after },
+      { path: ['array', '0'], type: CaretType.value },
+      { path: ['array', '0'], type: CaretType.after },
+      { path: ['array', '1'], type: CaretType.value },
+      { path: ['array', '1'], type: CaretType.after },
+      { path: ['array', '2'], type: CaretType.value },
+      { path: ['array', '2'], type: CaretType.inside },
+      { path: ['array', '2', 'c'], type: CaretType.key },
+      { path: ['array', '2', 'c'], type: CaretType.value },
+      { path: ['array', '2', 'c'], type: CaretType.after },
+      { path: ['array', '2'], type: CaretType.after },
       { path: ['array'], type: CaretType.after },
       { path: ['object'], type: CaretType.key },
       { path: ['object'], type: CaretType.value },
@@ -307,8 +307,8 @@ describe('documentState', () => {
 
         ...times(ARRAY_SECTION_SIZE, (index) => {
           return [
-            { path: ['array', index], type: CaretType.value },
-            { path: ['array', index], type: CaretType.after }
+            { path: ['array', String(index)], type: CaretType.value },
+            { path: ['array', String(index)], type: CaretType.after }
           ]
         }),
 
@@ -335,15 +335,15 @@ describe('documentState', () => {
 
         ...times(ARRAY_SECTION_SIZE, (index) => {
           return [
-            { path: ['array', index], type: CaretType.value },
-            { path: ['array', index], type: CaretType.after }
+            { path: ['array', String(index)], type: CaretType.value },
+            { path: ['array', String(index)], type: CaretType.after }
           ]
         }),
 
         ...times(end - start, (index) => {
           return [
-            { path: ['array', index + start], type: CaretType.value },
-            { path: ['array', index + start], type: CaretType.after }
+            { path: ['array', String(index + start)], type: CaretType.value },
+            { path: ['array', String(index + start)], type: CaretType.after }
           ]
         }),
         { path: ['array'], type: CaretType.after }
@@ -517,7 +517,7 @@ describe('documentState', () => {
       const { json, documentState } = createJsonAndState()
       const res = documentStatePatch(json, documentState, [{ op: 'remove', path: '/members/1' }])
 
-      assert.deepStrictEqual(res.json, deleteIn(json, ['members', 1]))
+      assert.deepStrictEqual(res.json, deleteIn(json, ['members', '1']))
       assert.deepStrictEqual(res.documentState, {
         ...documentState,
         expandedMap: deleteIn(documentState.expandedMap, ['/members/2']), // [2] is moved to [1]
@@ -530,11 +530,11 @@ describe('documentState', () => {
     it('remove: should remove a value from an array (2)', () => {
       // verify that the maps indices are shifted
       const { json, documentState } = createJsonAndState()
-      const documentState2 = collapsePath(documentState, ['members', 1])
+      const documentState2 = collapsePath(documentState, ['members', '1'])
 
       const res = documentStatePatch(json, documentState2, [{ op: 'remove', path: '/members/1' }])
 
-      assert.deepStrictEqual(res.json, deleteIn(json, ['members', 1]))
+      assert.deepStrictEqual(res.json, deleteIn(json, ['members', '1']))
       assert.deepStrictEqual(res.documentState, {
         ...documentState,
         expandedMap: deleteIn(documentState.expandedMap, ['/members/2']), // [2] is moved to [1]
@@ -592,7 +592,7 @@ describe('documentState', () => {
         { op: 'replace', path: '/members/1', value: 42 }
       ])
 
-      assert.deepStrictEqual(res.json, setIn(json, ['members', 1], 42))
+      assert.deepStrictEqual(res.json, setIn(json, ['members', '1'], 42))
       assert.deepStrictEqual(res.documentState, {
         ...documentState,
         expandedMap: deleteIn(documentState.expandedMap, ['/members/1'])
@@ -744,7 +744,7 @@ describe('documentState', () => {
       // we collapse the member we're going to move, so we can see whether the state is correctly switched
       const jsonAndState = createJsonAndState()
       const json = jsonAndState.json
-      const documentState = collapsePath(jsonAndState.documentState, ['members', 1])
+      const documentState = collapsePath(jsonAndState.documentState, ['members', '1'])
 
       const res = documentStatePatch(json, documentState, [
         { op: 'move', from: '/members/1', path: '/members/0' }
@@ -773,7 +773,7 @@ describe('documentState', () => {
       // we collapse the member we're going to move, so we can see whether the state is correctly switched
       const jsonAndState = createJsonAndState()
       const json = jsonAndState.json
-      const documentState = collapsePath(jsonAndState.documentState, ['members', 0])
+      const documentState = collapsePath(jsonAndState.documentState, ['members', '0'])
 
       const res = documentStatePatch(json, documentState, [
         { op: 'move', from: '/members/0', path: '/members/1' }
@@ -801,7 +801,7 @@ describe('documentState', () => {
     it('move: should move a value from object to array', () => {
       const jsonAndState = createJsonAndState()
       const json = jsonAndState.json
-      const documentState = collapsePath(jsonAndState.documentState, ['members', 1])
+      const documentState = collapsePath(jsonAndState.documentState, ['members', '1'])
 
       const res = documentStatePatch(json, documentState, [
         { op: 'move', from: '/group/details', path: '/members/1' }
@@ -948,7 +948,7 @@ describe('documentState', () => {
     })
 
     it('should expand an object inside an array', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState(), ['array', 2]).expandedMap, {
+      assert.deepStrictEqual(expandPath(json, createDocumentState(), ['array', '2']).expandedMap, {
         '': true,
         '/array': true,
         '/array/2': true
@@ -956,7 +956,7 @@ describe('documentState', () => {
     })
 
     it('should not expand a value (only objects and arrays)', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState(), ['array', 0]).expandedMap, {
+      assert.deepStrictEqual(expandPath(json, createDocumentState(), ['array', '0']).expandedMap, {
         '': true,
         '/array': true
       })
@@ -974,7 +974,7 @@ describe('documentState', () => {
         largeArray: range(0, 500)
       }
 
-      assert.deepStrictEqual(expandPath(json, createDocumentState(), ['largeArray', 120]), {
+      assert.deepStrictEqual(expandPath(json, createDocumentState(), ['largeArray', '120']), {
         ...createDocumentState(),
         expandedMap: {
           '': true,
@@ -1047,7 +1047,7 @@ describe('documentState', () => {
     })
 
     it('should delete an array item from a PathsMap', () => {
-      deepStrictEqual(deletePath(myStateMap, ['array', 1]), {
+      deepStrictEqual(deletePath(myStateMap, ['array', '1']), {
         '/array': 1,
         '/array/0': 2,
         '/array/2': 4,

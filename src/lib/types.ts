@@ -269,6 +269,7 @@ export type EscapeValue = (value: JSONData) => string
 export type UnescapeValue = (escapedValue: string) => string
 
 export interface DragInsideProps {
+  json: JSONData
   selection: Selection
   deltaY: number
   items: Array<{ path: JSONPath; height: number }>

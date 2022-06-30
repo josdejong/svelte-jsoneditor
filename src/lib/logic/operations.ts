@@ -33,6 +33,7 @@ import {
 } from './selection.js'
 import type { ClipboardValues, DragInsideAction, Selection } from '../types'
 import { isJSONPatchMove, isJSONPatchRemove } from '../typeguards.js'
+import { int } from '../utils/numberUtils.js'
 
 /**
  * Create a JSONPatch for an insert operation.
@@ -53,10 +54,10 @@ export function insertBefore(
   if (isJSONArray(parent)) {
     // the path is parsed from a JSONPatch operation,
     // so array indices are a string which we have to parse into a number
-    const offset = parseInt(String(last(path)), 10)
+    const offset = int(last(path))
     return values.map((entry, index) => ({
       op: 'add',
-      path: compileJSONPointer(parentPath.concat(offset + index)),
+      path: compileJSONPointer(parentPath.concat(String(offset + index))),
       value: entry.value
     }))
   } else if (isJSONObject(parent)) {
@@ -99,7 +100,7 @@ export function append(json: JSONData, path: JSONPath, values: ClipboardValues):
     const offset = parent.length
     return values.map((entry, index) => ({
       op: 'add',
-      path: compileJSONPointer(path.concat(offset + index)),
+      path: compileJSONPointer(path.concat(String(offset + index))),
       value: entry.value
     }))
   } else {
@@ -118,14 +119,13 @@ export function append(json: JSONData, path: JSONPath, values: ClipboardValues):
 /**
  * Rename an object key
  * Not applicable to arrays
- *
- * @param {JSONPath} parentPath
- * @param {string[]} keys
- * @param {string} oldKey
- * @param {string} newKey
- * @returns {JSONPatchDocument}
  */
-export function rename(parentPath, keys, oldKey, newKey) {
+export function rename(
+  parentPath: JSONPath,
+  keys: string[],
+  oldKey: string,
+  newKey: string
+): JSONPatchDocument {
   const filteredKeys = keys.filter((key) => key !== oldKey)
   const newKeyUnique = findUniqueName(newKey, filteredKeys)
   const nextKeys = getNextKeys(keys, oldKey, false)
@@ -161,7 +161,7 @@ export function replace(
 
   if (isJSONArray(parent)) {
     const firstPath = first(paths)
-    const offset = firstPath ? parseInt(last(firstPath) as string, 10) : 0
+    const offset = firstPath ? int(last(firstPath)) : 0
 
     return [
       // remove operations
@@ -171,7 +171,7 @@ export function replace(
       ...values.map((entry, index) => {
         const operation: JSONPatchOperation = {
           op: 'add',
-          path: compileJSONPointer(parentPath.concat(index + offset)),
+          path: compileJSONPointer(parentPath.concat(String(index + offset))),
           value: entry.value
         }
 
@@ -234,7 +234,7 @@ export function duplicate(json: JSONData, paths: JSONPath[]): JSONPatchDocument 
 
   if (isJSONArray(parent)) {
     const lastPath = last(paths)
-    const offset = lastPath ? parseInt(last(lastPath) as string, 10) + 1 : 0
+    const offset = lastPath ? int(last(lastPath)) + 1 : 0
 
     return [
       // copy operations
@@ -242,7 +242,7 @@ export function duplicate(json: JSONData, paths: JSONPath[]): JSONPatchDocument 
         const operation: JSONPatchOperation = {
           op: 'copy',
           from: compileJSONPointer(path),
-          path: compileJSONPointer(parentPath.concat(index + offset))
+          path: compileJSONPointer(parentPath.concat(String(index + offset)))
         }
 
         return operation
@@ -296,7 +296,7 @@ export function extract(json: JSONData, selection: Selection): JSONPatchDocument
 
     if (isJSONArray(parent)) {
       const value = selection.paths.map((path) => {
-        const index = parseInt(String(last(path)), 10)
+        const index = int(last(path))
         return parent[index]
       })
 
@@ -387,8 +387,8 @@ export function insert(
     const parent = getIn(json, parentPath)
 
     if (isJSONArray(parent)) {
-      const index = last(path)
-      const nextItemPath = parentPath.concat([(index as number) + 1])
+      const index = int(last(path))
+      const nextItemPath = parentPath.concat(String(index + 1))
 
       return insertBefore(json, nextItemPath, newValues)
     } else if (isJSONObject(parent)) {
@@ -400,7 +400,7 @@ export function insert(
       } else {
         const index = keys.indexOf(key)
         const nextKey = keys[index + 1]
-        const nextKeyPath = parentPath.concat([nextKey])
+        const nextKeyPath = parentPath.concat(nextKey)
 
         return insertBefore(json, nextKeyPath, newValues)
       }
@@ -415,7 +415,7 @@ export function insert(
     const value = getIn(json, path)
 
     if (isJSONArray(value)) {
-      const firstItemPath = path.concat([0])
+      const firstItemPath = path.concat('0')
       return insertBefore(json, firstItemPath, newValues)
     } else if (isJSONObject(value)) {
       // value is an Object
@@ -424,7 +424,7 @@ export function insert(
         return append(json, path, newValues)
       } else {
         const firstKey = first(keys)
-        const firstKeyPath = path.concat([firstKey])
+        const firstKeyPath = path.concat(firstKey)
 
         return insertBefore(json, firstKeyPath, newValues)
       }
@@ -442,7 +442,7 @@ export function moveInsideParent(
   selection: Selection,
   dragInsideAction: DragInsideAction
 ): JSONPatchDocument {
-  const beforePath = dragInsideAction['beforePath']
+  const beforePath: JSONPath = dragInsideAction['beforePath']
   const append = dragInsideAction['append']
 
   const parentPath = initial(selection.focusPath)
@@ -457,14 +457,14 @@ export function moveInsideParent(
 
   const startPath = getStartPath(selection)
   const endPath = getEndPath(selection)
-  const startKey: string | number = last(startPath)
-  const endKey: string | number = last(endPath)
-  const toKey = beforePath ? beforePath[parentPath.length] : undefined
+  const startKey = last(startPath)
+  const endKey = last(endPath)
+  const toKey: string | undefined = beforePath ? beforePath[parentPath.length] : undefined
 
   if (isJSONObject(parent)) {
     const keys = Object.keys(parent)
-    const startIndex = keys.indexOf(startKey as string)
-    const endIndex = keys.indexOf(endKey as string)
+    const startIndex = keys.indexOf(startKey)
+    const endIndex = keys.indexOf(endKey)
     const toIndex = append ? keys.length : keys.indexOf(toKey)
 
     if (startIndex !== -1 && endIndex !== -1 && toIndex !== -1) {
@@ -486,9 +486,9 @@ export function moveInsideParent(
     }
   } else if (isJSONArray(parent)) {
     // array
-    const startIndex: number = startKey as number
-    const endIndex: number = endKey as number
-    const toIndex = toKey
+    const startIndex = int(startKey)
+    const endIndex = int(endKey)
+    const toIndex = toKey !== undefined ? int(toKey) : parent.length
     const count = endIndex - startIndex + 1
 
     if (toIndex < startIndex) {
@@ -496,8 +496,8 @@ export function moveInsideParent(
       return times(count, (offset) => {
         return {
           op: 'move',
-          from: compileJSONPointer(parentPath.concat(startIndex + offset)),
-          path: compileJSONPointer(parentPath.concat(toIndex + offset))
+          from: compileJSONPointer(parentPath.concat(String(startIndex + offset))),
+          path: compileJSONPointer(parentPath.concat(String(toIndex + offset)))
         }
       })
     } else {
@@ -505,8 +505,8 @@ export function moveInsideParent(
       return times(count, () => {
         return {
           op: 'move',
-          from: compileJSONPointer(parentPath.concat(startIndex)),
-          path: compileJSONPointer(parentPath.concat(toIndex))
+          from: compileJSONPointer(parentPath.concat(String(startIndex))),
+          path: compileJSONPointer(parentPath.concat(String(toIndex)))
         }
       })
     }
@@ -675,24 +675,24 @@ export function createRemoveOperations(
 
     if (isJSONArray(parent)) {
       const firstPath = first(selection.paths)
-      const index: number = last(firstPath) as number
+      const index = int(last(firstPath))
       const newSelection =
         index === 0
           ? createInsideSelection(parentPath)
-          : createAfterSelection(parentPath.concat([index - 1]))
+          : createAfterSelection(parentPath.concat(String(index - 1)))
 
       return { operations, newSelection }
     } else if (isJSONObject(parent)) {
       // parent is object
       const keys = Object.keys(parent)
       const firstPath = first(selection.paths)
-      const key: string = last(firstPath) as string
+      const key = last(firstPath)
       const index = keys.indexOf(key)
       const previousKey = keys[index - 1]
       const newSelection =
         index === 0
           ? createInsideSelection(parentPath)
-          : createAfterSelection(parentPath.concat([previousKey]))
+          : createAfterSelection(parentPath.concat(previousKey))
 
       return { operations, newSelection }
     } else {

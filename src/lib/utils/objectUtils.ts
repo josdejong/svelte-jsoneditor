@@ -17,7 +17,7 @@ export function traverse(
 
     if (Array.isArray(value)) {
       for (let index = 0; index < value.length; index++) {
-        currentPath[pathIndex] = index
+        currentPath[pathIndex] = String(index)
         recurse(value[index])
       }
     } else if (isObject(value)) {

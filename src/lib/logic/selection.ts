@@ -1,10 +1,11 @@
-import type { JSONData, JSONPatchDocument, JSONPath, JSONPointer } from 'immutable-json-patch'
 import {
-  compileJSONPointer,
-  getIn,
-  parseJSONPointerWithArrayIndices,
-  startsWithJSONPointer
+  parsePath,
+  type JSONData,
+  type JSONPatchDocument,
+  type JSONPath,
+  type JSONPointer
 } from 'immutable-json-patch'
+import { compileJSONPointer, getIn, startsWithJSONPointer } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import { isObjectOrArray } from '../utils/typeUtils.js'
 import {
@@ -28,6 +29,7 @@ import type {
 import { CaretType, SelectionType } from '../types.js'
 import { isJSONArray, isJSONObject } from '../utils/jsonUtils.js'
 import { isJSONPatchCopy, isJSONPatchMove } from '../typeguards.js'
+import { int } from '../utils/numberUtils.js'
 
 export function isAfterSelection(selection: Selection | undefined): selection is AfterSelection {
   return selection && selection.type === SelectionType.after
@@ -76,8 +78,8 @@ export function expandSelection(
 
     if (isJSONObject(value)) {
       const keys = Object.keys(value)
-      const anchorIndex = keys.indexOf(anchorKey as string)
-      const focusIndex = keys.indexOf(focusKey as string)
+      const anchorIndex = keys.indexOf(anchorKey)
+      const focusIndex = keys.indexOf(focusKey)
 
       if (anchorIndex !== -1 && focusIndex !== -1) {
         const startIndex = Math.min(anchorIndex, focusIndex)
@@ -93,12 +95,12 @@ export function expandSelection(
     }
 
     if (isJSONArray(value)) {
-      const startIndex = Math.min(anchorKey as number, focusKey as number)
-      const endIndex = Math.max(anchorKey as number, focusKey as number)
+      const startIndex = Math.min(int(anchorKey), int(focusKey))
+      const endIndex = Math.max(int(anchorKey), int(focusKey))
       const paths = []
 
       for (let i = startIndex; i <= endIndex; i++) {
-        paths.push(sharedPath.concat(i))
+        paths.push(sharedPath.concat(String(i)))
       }
 
       return paths
@@ -124,27 +126,20 @@ export function getEndPath(selection: Selection): JSONPath {
   return isMultiSelection(selection) ? last(selection.paths) : selection.focusPath
 }
 
-/**
- * @param {Selection} selection
- * @param {JSONPath} path
- * @return boolean
- */
 // TODO: write unit test
-export function isSelectionInsidePath(selection, path) {
+export function isSelectionInsidePath(selection: Selection, path: JSONPath): boolean {
   return (
     pathStartsWith(selection.focusPath, path) &&
     (selection.focusPath.length > path.length || isInsideSelection(selection))
   )
 }
 
-/**
- * @param {Selection} selection
- * @param {JSONPath} path
- * @param {string} anchorType
- * @return boolean
- */
 // TODO: write unit test
-export function isPathInsideSelection(selection, path, anchorType) {
+export function isPathInsideSelection(
+  selection: Selection,
+  path: JSONPath,
+  anchorType: string
+): boolean {
   if (!selection) {
     return false
   }
@@ -451,7 +446,7 @@ export function createSelectionFromOperations(
     const operation = first(operations)
     if (operation.op === 'replace' || operation.op === 'move') {
       // replaced value
-      const path = parseJSONPointerWithArrayIndices(json, operation.path)
+      const path = parsePath(json, operation.path)
 
       return createValueSelection(path, false)
     }
@@ -467,7 +462,7 @@ export function createSelectionFromOperations(
       otherOps.every((op) => (isJSONPatchCopy(op) || isJSONPatchMove(op)) && op.from === op.path)
     ) {
       // a renamed key
-      const path = parseJSONPointerWithArrayIndices(json, firstOp.path)
+      const path = parsePath(json, firstOp.path)
 
       return createKeySelection(path, false)
     }
@@ -482,7 +477,7 @@ export function createSelectionFromOperations(
         typeof operation.path === 'string'
       )
     })
-    .map((operation) => parseJSONPointerWithArrayIndices(json, operation.path))
+    .map((operation) => parsePath(json, operation.path))
 
   if (isEmpty(paths)) {
     return null
@@ -520,12 +515,9 @@ export function createSinglePointersMap(path: JSONPath): { [pointer: JSONPointer
 /**
  * Find the common path of two paths.
  * For example findCommonRoot(['arr', '1', 'name'], ['arr', '1', 'address', 'contact']) returns ['arr', '1']
- * @param {JSONPath} path1
- * @param {JSONPath} path2
- * @return {JSONPath}
  */
 // TODO: write unit tests for findSharedPath
-export function findSharedPath(path1, path2) {
+export function findSharedPath(path1: JSONPath, path2: JSONPath): JSONPath {
   let i = 0
   while (i < path1.length && i < path2.length && path1[i] === path2[i]) {
     i++
@@ -534,11 +526,7 @@ export function findSharedPath(path1, path2) {
   return path1.slice(0, i)
 }
 
-/**
- * @param {Selection} [selection]
- * @returns {boolean}
- */
-export function singleItemSelected(selection) {
+export function singleItemSelected(selection: Selection | undefined): boolean {
   return (
     selection &&
     (isKeySelection(selection) ||
@@ -547,24 +535,14 @@ export function singleItemSelected(selection) {
   )
 }
 
-/**
- * @param {JSON} json
- * @param {Selection} selection
- * @return {JSONPath}
- */
-export function findRootPath(json, selection) {
+export function findRootPath(json: JSONData, selection: Selection): JSONPath {
   return singleItemSelected(selection) && isObjectOrArray(getIn(json, selection.focusPath))
     ? selection.focusPath
     : initial(selection.focusPath) // the parent path of the paths
 }
 
-/**
- * @param {JSONPath} path
- * @param {JSONPath} parentPath
- * @return boolean
- */
 // TODO: unit test
-export function pathStartsWith(path, parentPath) {
+export function pathStartsWith(path: JSONPath, parentPath: JSONPath): boolean {
   if (path.length < parentPath.length) {
     return false
   }
@@ -757,10 +735,8 @@ export function selectAll(): Selection {
 /**
  * Test whether the current selection can be converted.
  * That is the case when the selection is a key/value, or a multi selection with only one path
- * @param {Selection} selection
- * @return {boolean}
  */
-export function canConvert(selection) {
+export function canConvert(selection: Selection): boolean {
   if (!selection) {
     return false
   }

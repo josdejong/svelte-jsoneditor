@@ -4,7 +4,7 @@ import {
   getIn,
   immutableJSONPatch,
   parseJSONPointer,
-  parseJSONPointerWithArrayIndices,
+  parsePath,
   startsWithJSONPointer
 } from 'immutable-json-patch'
 import type {
@@ -46,6 +46,7 @@ import {
   isJSONPatchRemove,
   isJSONPatchReplace
 } from '../typeguards.js'
+import { int } from '../utils/numberUtils.js'
 
 type CreateSelection = (json: JSONData, documentState: DocumentState) => Selection
 
@@ -122,7 +123,7 @@ export function expandPath(
     // if needed, enlarge the expanded sections such that the search result becomes visible in the array
     if (Array.isArray(value) && i < path.length) {
       const sections = visibleSectionsMap[partialPointer] || DEFAULT_VISIBLE_SECTIONS
-      const index = path[i] as number
+      const index = int(path[i])
 
       if (!inVisibleSection(sections, index)) {
         const start = currentRoundNumber(index)
@@ -164,7 +165,7 @@ export function expandWithCallback(
           const visibleSections = getVisibleSections(documentState, pointer)
 
           forEachVisibleIndex(value, visibleSections, (index) => {
-            currentPath[pathIndex] = index
+            currentPath[pathIndex] = String(index)
             recurse(value[index])
           })
 
@@ -330,7 +331,7 @@ export function documentStateAdd(
   documentState: DocumentState,
   operation: JSONPatchAdd
 ): DocumentState {
-  const path = parseJSONPointerWithArrayIndices(json, operation.path)
+  const path = parsePath(json, operation.path)
   const parentPath = initial(path)
   const parentPointer = compileJSONPointer(parentPath)
   const parent = getIn(json, parentPath)
@@ -338,7 +339,7 @@ export function documentStateAdd(
   // FIXME: expand the newly inserted value
 
   if (isJSONArray(parent)) {
-    const index = last(path) as number
+    const index = int(last(path))
 
     // shift all paths of the relevant parts of the state
     const expandedMap = shiftPath(documentState.expandedMap, parentPath, index, 1)
@@ -367,7 +368,7 @@ export function documentStateRemove(
   documentState: DocumentState,
   operation: JSONPatchRemove
 ): DocumentState {
-  const path = parseJSONPointerWithArrayIndices(updatedJson, operation.path)
+  const path = parsePath(updatedJson, operation.path)
   const parentPath = initial(path)
   const parentPointer = compileJSONPointer(parentPath)
   const parent = getIn(updatedJson, parentPath)
@@ -380,7 +381,7 @@ export function documentStateRemove(
   visibleSectionsMap = deletePath(visibleSectionsMap, path)
 
   if (isJSONArray(parent)) {
-    const index = last(path) as number
+    const index = int(last(path))
 
     // shift all paths of the relevant parts of the state
     expandedMap = shiftPath(expandedMap, parentPath, index, -1)
@@ -591,10 +592,10 @@ export function shiftPath<T>(
   for (const itemPointer of Object.keys(map)) {
     if (startsWithJSONPointer(itemPointer, pointer)) {
       const itemPath: JSONPath = parseJSONPointer(itemPointer)
-      const pathIndex = parseInt(itemPath[indexPathPos] as string, 10)
+      const pathIndex = int(itemPath[indexPathPos])
 
       if (pathIndex >= index) {
-        itemPath[indexPathPos] = pathIndex + offset
+        itemPath[indexPathPos] = String(pathIndex + offset)
 
         matches.push({
           oldPointer: itemPointer,
@@ -637,7 +638,7 @@ export function cleanupNonExistingPaths<T>(
   //  starting with a specific, so you don't need to invoke parseJSONPointer and existsIn for largest part
 
   Object.keys(map)
-    .filter((pointer) => existsIn(json, parseJSONPointerWithArrayIndices(json, pointer)))
+    .filter((pointer) => existsIn(json, parsePath(json, pointer)))
     .forEach((pointer) => {
       updatedMap[pointer] = map[pointer]
     })
@@ -730,7 +731,7 @@ export function getVisiblePaths(json: JSONData, documentState: DocumentState): J
       if (isJSONArray(value)) {
         const visibleSections = getVisibleSections(documentState, pointer)
         forEachVisibleIndex(value, visibleSections, (index) => {
-          _recurse(value[index], path.concat(index))
+          _recurse(value[index], path.concat(String(index)))
         })
       }
 
@@ -771,7 +772,7 @@ export function getVisibleCaretPositions(
       if (isJSONArray(value)) {
         const visibleSections = getVisibleSections(documentState, pointer)
         forEachVisibleIndex(value, visibleSections, (index) => {
-          const itemPath = path.concat(index)
+          const itemPath = path.concat(String(index))
 
           _recurse(value[index], itemPath)
 

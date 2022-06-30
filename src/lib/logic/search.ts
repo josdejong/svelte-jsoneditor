@@ -246,7 +246,7 @@ export function createSearchAndReplaceOperations(
     // replace a key
     const parentPath = initial(path)
     const parent = getIn(json, parentPath)
-    const oldKey: string = last(path) as string
+    const oldKey = last(path)
     const keys = Object.keys(parent)
     const newKey = replaceText(oldKey, replacementText, start, end)
 
@@ -349,7 +349,7 @@ export function createSearchAndReplaceAllOperations(
       // replace a key
       const parentPath = initial(path)
       const parent = getIn(json, parentPath)
-      const oldKey = last(path) as string
+      const oldKey = last(path)
       const keys = Object.keys(parent)
       const newKey = replaceAllText(oldKey, replacementText, items)
 
@@ -440,7 +440,7 @@ export function splitValue(
  * Get the path of the search result property on a nested search result
  */
 function getSearchResultPath(searchResultItem: SearchResultItem): JSONPath {
-  return searchResultItem.path.concat(searchResultItem.field, searchResultItem.fieldIndex)
+  return searchResultItem.path.concat(searchResultItem.field, String(searchResultItem.fieldIndex))
 }
 
 // TODO: write unit tests

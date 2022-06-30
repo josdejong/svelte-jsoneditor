@@ -4,7 +4,14 @@
   import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '$lib/utils/debug'
-  import { compileJSONPointer, existsIn, getIn, immutableJSONPatch } from 'immutable-json-patch'
+  import type { JSONData, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
+  import {
+    compileJSONPointer,
+    existsIn,
+    getIn,
+    immutableJSONPatch,
+    parsePath
+  } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
   import { initial, isEmpty, isEqual, last, noop, throttle, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
@@ -81,7 +88,6 @@
     isChildOfNodeName,
     setCursorToEnd
   } from '$lib/utils/domUtils'
-  import { parseJSONPointerWithArrayIndices } from 'immutable-json-patch'
   import {
     convertValue,
     isLargeContent,
@@ -101,7 +107,6 @@
   import Welcome from './Welcome.svelte'
   import NavigationBar from '../../controls/navigationBar/NavigationBar.svelte'
   import SearchBox from './menu/SearchBox.svelte'
-  import type { JSONData, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import type {
     AbsolutePopupOptions,
     AfterPatchCallback,
@@ -850,7 +855,7 @@
               isObjectOrArray(operation.value)
           )
           .forEach((operation) => {
-            const path = parseJSONPointerWithArrayIndices(json, operation.path)
+            const path = parsePath(json, operation.path)
             updatedState = expandRecursive(patchedJson, updatedState, path)
           })
 
@@ -999,7 +1004,7 @@
       handlePatch(operations, (patchedJson, patchedState) => {
         // TODO: extract determining the newSelection in a separate function
         if (operation) {
-          const path = parseJSONPointerWithArrayIndices(patchedJson, operation.path)
+          const path = parsePath(patchedJson, operation.path)
 
           if (isObjectOrArray(newValue)) {
             return {

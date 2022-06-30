@@ -7,7 +7,7 @@ describe('validation', () => {
     const message2 = 'Year in the past expected'
     const message3 = 'Contains invalid data'
 
-    const error1 = { path: ['pupils', 2, 'age'], message: message1 }
+    const error1 = { path: ['pupils', '2', 'age'], message: message1 }
     const error2 = { path: ['year'], message: message2 }
 
     const validationErrors = [error1, error2]
@@ -25,7 +25,7 @@ describe('validation', () => {
       },
       '/pupils/2': {
         isChildError: true,
-        path: ['pupils', 2],
+        path: ['pupils', '2'],
         message: message3
       },
       '/pupils/2/age': error1,

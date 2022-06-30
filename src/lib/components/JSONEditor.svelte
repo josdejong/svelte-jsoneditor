@@ -324,7 +324,7 @@
       mode === MODE.TREE || mode === MODE.CODE
         ? isMenuSpaceItem(items[0])
           ? modeMenuItems.concat(items) // menu is empty, readOnly mode
-          : modeMenuItems.concat([separatorMenuItem], items)
+          : modeMenuItems.concat(separatorMenuItem, items)
         : items
 
     return onRenderMenu(mode, updatedItems) || updatedItems
@@ -345,8 +345,6 @@
     onTransform,
     onClose
   }: TransformModalCallback) {
-    console.log('json', json)
-
     if (readOnly) {
       return
     }

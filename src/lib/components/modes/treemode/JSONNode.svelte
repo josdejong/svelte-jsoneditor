@@ -49,6 +49,7 @@
   import type {
     ExtendedSearchResultItem,
     JSONPointerMap,
+    RenderedItem,
     Selection,
     TreeModeContext,
     VisibleSection
@@ -121,7 +122,7 @@
     return Object.keys(object).map((key) => ({
       key,
       value: object[key],
-      path: memoizePath(path.concat([key])),
+      path: memoizePath(path.concat(key)),
       pointer: appendToJSONPointer(pointer, key)
     }))
   }
@@ -138,7 +139,7 @@
       items.push({
         index,
         value: array[index],
-        path: memoizePath(path.concat([index])),
+        path: memoizePath(path.concat(String(index))),
         pointer: appendToJSONPointer(pointer, index)
       })
     }
@@ -323,7 +324,6 @@
       initialClientY: event.clientY,
       initialContentTop: findContentTop(),
       updatedValue: undefined,
-      updatedState: undefined,
       updatedSelection: undefined,
       items,
       indexOffset: 0,
@@ -338,7 +338,7 @@
   function handleDragSelection(event) {
     if (dragging) {
       const deltaY = calculateDeltaY(dragging, event)
-      const { updatedValue, updatedState, updatedSelection, indexOffset } = onMoveSelection({
+      const { updatedValue, updatedSelection, indexOffset } = onMoveSelection({
         json: context.getJson(),
         documentState: context.getDocumentState(),
         deltaY,
@@ -350,7 +350,6 @@
         dragging = {
           ...dragging,
           updatedValue,
-          updatedState,
           updatedSelection,
           indexOffset,
           didMoveItems: true
@@ -364,7 +363,7 @@
       const json = context.getJson()
       const documentState = context.getDocumentState()
       const deltaY = calculateDeltaY(dragging, event)
-      const { operations, updatedFullSelection } = onMoveSelection({
+      const { operations, updatedSelection } = onMoveSelection({
         json,
         documentState,
         deltaY,
@@ -375,7 +374,7 @@
         context.onPatch(operations, (patchedJson, patchedState) => ({
           state: {
             ...patchedState,
-            selection: updatedFullSelection || selection
+            selection: updatedSelection || selection
           }
         }))
       } else {
@@ -401,14 +400,12 @@
   /**
    * Get a list with all visible items and their rendered heights inside
    * this object or array
-   * @param {Selection} fullSelection
-   * @returns {RenderedItem[] | null}
    */
-  function getVisibleItemsWithHeights(fullSelection) {
+  function getVisibleItemsWithHeights(selection: Selection): RenderedItem[] | null {
     const items = []
 
-    function addHeight(keyOrIndex) {
-      const itemPath = path.concat(keyOrIndex)
+    function addHeight(prop: string) {
+      const itemPath = path.concat(prop)
       const element = context.findElement(itemPath)
       if (element != null) {
         items.push({
@@ -419,8 +416,8 @@
     }
 
     if (Array.isArray(value)) {
-      const startPath = getStartPath(fullSelection)
-      const endPath = getEndPath(fullSelection)
+      const startPath = getStartPath(selection)
+      const endPath = getEndPath(selection)
       const startIndex = last(startPath)
       const endIndex = last(endPath)
 
@@ -437,7 +434,7 @@
       }
 
       const { start, end } = currentSection
-      forEachIndex(start, Math.min(value.length, end), addHeight)
+      forEachIndex(start, Math.min(value.length, end), (index) => addHeight(String(index)))
     } else {
       // value is Object
       Object.keys(value).forEach(addHeight)

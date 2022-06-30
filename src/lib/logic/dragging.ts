@@ -1,6 +1,6 @@
 import { createMultiSelection, getEndPath, getStartPath } from './selection.js'
 import { documentStatePatch } from './documentState.js'
-import { initial, isEqual, last } from 'lodash-es'
+import { initial, isEqual } from 'lodash-es'
 import type { JSONData, JSONPatchDocument } from 'immutable-json-patch'
 import { getIn } from 'immutable-json-patch'
 import { moveInsideParent } from './operations.js'
@@ -36,8 +36,8 @@ export function onMoveSelection({
   const selection = documentState.selection
   const dragInsideAction =
     deltaY < 0
-      ? findSwapPathUp({ selection, deltaY, items })
-      : findSwapPathDown({ selection, deltaY, items })
+      ? findSwapPathUp({ json, selection, deltaY, items })
+      : findSwapPathDown({ json, selection, deltaY, items })
 
   if (!dragInsideAction || dragInsideAction.indexOffset === 0) {
     return {
@@ -112,6 +112,7 @@ function findSwapPathUp({
 }
 
 function findSwapPathDown({
+  json,
   items,
   selection,
   deltaY
@@ -119,17 +120,19 @@ function findSwapPathDown({
   const initialPath = getEndPath(selection)
   const initialIndex = items.findIndex((item) => isEqual(item.path, initialPath))
 
-  const nextHeight = () => items[index + 1]?.height
-
   let cumulativeHeight = 0
   let index = initialIndex
+
+  const nextHeight = () => items[index + 1]?.height
 
   while (nextHeight() !== undefined && Math.abs(deltaY) > cumulativeHeight + nextHeight() / 2) {
     cumulativeHeight += nextHeight()
     index += 1
   }
 
-  const isArray = typeof last(initialPath) === 'number'
+  const parentPath = initial(initialPath)
+  const parent = getIn(json, parentPath)
+  const isArray = Array.isArray(parent)
   const beforeIndex = isArray ? index : index + 1
   const beforePath = items[beforeIndex]?.path
   const indexOffset = index - initialIndex

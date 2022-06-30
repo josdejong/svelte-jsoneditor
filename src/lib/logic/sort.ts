@@ -1,13 +1,9 @@
 import diffSequence from '../generated/diffSequence.js'
 import type { JSONArray, JSONData, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-import {
-  compileJSONPointer,
-  getIn,
-  parseJSONPointerWithArrayIndices,
-  setIn
-} from 'immutable-json-patch'
+import { compileJSONPointer, getIn, parseFrom, parsePath, setIn } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import naturalCompare from 'natural-compare-lite'
+import { int } from '../utils/numberUtils.js'
 
 export function caseInsensitiveNaturalCompare(a, b) {
   const aLower = typeof a === 'string' ? a.toLowerCase() : a
@@ -84,10 +80,8 @@ export function sortArray(
 
 /**
  * Create a comparator function to compare nested properties in an array
- * @param {JSONPath} propertyPath
- * @param {1 | -1} direction
  */
-function createObjectComparator(propertyPath, direction) {
+function createObjectComparator(propertyPath: JSONPath, direction: 1 | -1) {
   return function comparator(a, b) {
     const valueA = getIn(a, propertyPath)
     const valueB = getIn(b, propertyPath)
@@ -250,8 +244,8 @@ export function fastPatchSort(json, operations) {
   // parse all paths
   const parsedOperations: Array<{ from: JSONPath; path: JSONPath }> = operations.map(
     (operation) => ({
-      from: parseJSONPointerWithArrayIndices(json, operation.from),
-      path: parseJSONPointerWithArrayIndices(json, operation.path)
+      from: parseFrom(operation.from),
+      path: parsePath(json, operation.path)
     })
   )
 
@@ -285,8 +279,8 @@ export function fastPatchSort(json, operations) {
   // apply the actual operations on the same array. Only copy the only array once
   const updatedArray = array.slice(0)
   parsedOperations.forEach((parsedOperation) => {
-    const fromIndex = last(parsedOperation.from) as number
-    const toIndex = last(parsedOperation.path) as number
+    const fromIndex = int(last(parsedOperation.from))
+    const toIndex = int(last(parsedOperation.path))
 
     const value = updatedArray.splice(fromIndex, 1)[0]
     updatedArray.splice(toIndex, 0, value)

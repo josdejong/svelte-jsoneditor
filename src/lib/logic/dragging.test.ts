@@ -3,6 +3,7 @@ import { onMoveSelection } from './dragging.js'
 import { deepStrictEqual, strictEqual } from 'assert'
 import { isEqual } from 'lodash-es'
 import { createDocumentState } from './documentState.js'
+import type { RenderedItem } from '../types'
 
 describe('dragging', () => {
   describe('onMoveSelection: array', () => {
@@ -13,15 +14,21 @@ describe('dragging', () => {
     let documentState = createDocumentState({ json, expand: () => true })
     documentState = {
       ...documentState,
-      selection: createMultiSelection(json, ['array', 3], ['array', 5])
+      selection: createMultiSelection(json, ['array', '3'], ['array', '5'])
     }
 
-    const allItems = json.array.map((item, index) => ({
-      path: ['array', index],
+    const allItems: RenderedItem[] = json.array.map((item, index) => ({
+      path: ['array', String(index)],
       height: itemHeight
     }))
 
-    function doMoveSelection({ deltaY, items = allItems }) {
+    function doMoveSelection({
+      deltaY,
+      items = allItems
+    }: {
+      deltaY: number
+      items?: RenderedItem[]
+    }) {
       return onMoveSelection({
         json,
         documentState,
@@ -54,7 +61,7 @@ describe('dragging', () => {
     it('move down (recon with height)', () => {
       const largeItemHeight = 3 * itemHeight
       const items = allItems.map((item) => {
-        return isEqual(item.path, ['array', 6])
+        return isEqual(item.path, ['array', '6'])
           ? { path: item.path, height: largeItemHeight }
           : item
       })
@@ -99,7 +106,7 @@ describe('dragging', () => {
     it('move up (recon with height)', () => {
       const largeItemHeight = 3 * itemHeight
       const items = allItems.map((item) => {
-        return isEqual(item.path, ['array', 2])
+        return isEqual(item.path, ['array', '2'])
           ? { path: item.path, height: largeItemHeight }
           : item
       })

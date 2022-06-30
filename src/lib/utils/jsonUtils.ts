@@ -5,6 +5,7 @@ import jsonrepair from 'jsonrepair'
 import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
 import { arrayToObject, objectToArray } from './arrayUtils.js'
 import type { Content, NormalizedParseError, TextContent, TextLocation } from '../types'
+import { int } from './numberUtils.js'
 
 export function isJSONObject(value: unknown): value is JSONObject {
   return isObject(value)
@@ -120,7 +121,7 @@ export function normalizeJsonParseError(
 
   if (positionMatch) {
     // a message from Chrome, like "Unexpected token i in JSON at line 2 column 3"
-    const position = parseInt(positionMatch[2], 10)
+    const position = int(positionMatch[2])
 
     const line = countCharacterOccurrences(jsonText, '\n', 0, position)
     const lastIndex = jsonText.lastIndexOf('\n', position)
@@ -137,11 +138,11 @@ export function normalizeJsonParseError(
   } else {
     // a message from Firefox, like "JSON.parse: expected property name or '}' at line 2 column 3 of the JSON data"
     const lineMatch = LINE_REGEX.exec(parseErrorMessage)
-    const lineOneBased = lineMatch ? parseInt(lineMatch[1], 10) : null
+    const lineOneBased = lineMatch ? int(lineMatch[1]) : null
     const line = lineOneBased !== null ? lineOneBased - 1 : null
 
     const columnMatch = COLUMN_REGEX.exec(parseErrorMessage)
-    const columnOneBased = columnMatch ? parseInt(columnMatch[1], 10) : null
+    const columnOneBased = columnMatch ? int(columnMatch[1]) : null
     const column = columnOneBased !== null ? columnOneBased - 1 : null
 
     const position =

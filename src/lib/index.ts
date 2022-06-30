@@ -28,7 +28,6 @@ export { jmespathQueryLanguage } from './plugins/query/jmespathQueryLanguage.js'
 // utils
 export { SortModal, TransformModal }
 export { getJSONSchemaOptions, findSchema, findEnum } from './utils/jsonSchemaUtils.js'
-export { parseJSONPointerWithArrayIndices } from 'immutable-json-patch'
 export { isTextContent, isLargeContent, estimateSerializedSize } from './utils/jsonUtils.js'
 export {
   isValueSelection,
@@ -45,7 +44,10 @@ export {
 } from './logic/selection.js'
 export {
   parseJSONPointer,
+  parsePath,
+  parseFrom,
   compileJSONPointer,
+  compileJSONPointerProp,
   getIn,
   setIn,
   updateIn,
