@@ -354,11 +354,6 @@
     })
   }
 
-  const applySearchThrottled = throttle(applySearch, SEARCH_UPDATE_THROTTLE)
-
-  // we pass non-used arguments searchText and json to trigger search when these variables change
-  $: applySearchThrottled(searchText, json)
-
   function handleSelectValidationError(error: ValidationError) {
     debug('select validation error', error)
 
@@ -389,6 +384,10 @@
   // two-way binding of externalContent and internal json and text (
   // when receiving an updated prop, we have to update state for example
   $: applyExternalContent(externalContent)
+
+  // we pass non-used arguments searchText and json to trigger search when these variables change
+  const applySearchThrottled = throttle(applySearch, SEARCH_UPDATE_THROTTLE)
+  $: applySearchThrottled(searchText, json)
 
   let textIsRepaired = false
   $: textIsUnrepairable = text !== undefined && json === undefined
@@ -459,9 +458,6 @@
       previousText,
       previousTextIsRepaired
     })
-
-    // TODO: triggering applySearchThrottled() here should not be needed
-    applySearchThrottled()
   }
 
   function applyExternalText(updatedText) {
@@ -509,9 +505,6 @@
       previousText,
       previousTextIsRepaired
     })
-
-    // TODO: triggering applySearchThrottled() here should not be needed
-    applySearchThrottled()
   }
 
   function clearSelectionWhenNotExisting(json) {
