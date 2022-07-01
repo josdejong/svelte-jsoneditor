@@ -23,6 +23,7 @@ interface MoveSelectionProps {
 interface MoveSelectionResult {
   operations: JSONPatchDocument | undefined
   updatedValue: JSONData | undefined
+  updatedState: DocumentState | undefined
   updatedSelection: JSONSelection | undefined
   indexOffset: number
 }
@@ -43,6 +44,7 @@ export function onMoveSelection({
     return {
       operations: undefined,
       updatedValue: undefined,
+      updatedState: undefined,
       updatedSelection: undefined,
       indexOffset: 0
     }
@@ -71,6 +73,7 @@ export function onMoveSelection({
     return {
       operations,
       updatedValue: getIn(update.json, path),
+      updatedState: update.documentState,
       updatedSelection,
       indexOffset: dragInsideAction.indexOffset
     }
@@ -79,6 +82,7 @@ export function onMoveSelection({
     return {
       operations,
       updatedValue: getIn(update.json, path),
+      updatedState: undefined,
       updatedSelection: undefined,
       indexOffset: dragInsideAction.indexOffset
     }

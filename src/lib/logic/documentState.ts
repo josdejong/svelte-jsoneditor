@@ -38,8 +38,8 @@ import type {
   CaretPosition,
   DocumentState,
   JSONPointerMap,
-  Section,
   JSONSelection,
+  Section,
   VisibleSection
 } from '../types'
 import { CaretType } from '../types.js'
@@ -307,12 +307,9 @@ export function documentStatePatch(
     if (isJSONPatchReplace(operation)) {
       return documentStateReplace(updatedJson, updatingState, operation)
     }
-    if (isJSONPatchCopy(operation)) {
-      return documentStateCopy(updatedJson, updatingState, operation)
-    }
 
-    if (isJSONPatchMove(operation)) {
-      return documentStateMove(updatedJson, updatingState, operation)
+    if (isJSONPatchCopy(operation) || isJSONPatchMove(operation)) {
+      return documentStateMoveOrCopy(updatedJson, updatingState, operation)
     }
 
     return updatingState
@@ -405,7 +402,6 @@ export function documentStateReplace(
   documentState: DocumentState,
   operation: JSONPatchReplace
 ): DocumentState {
-  // FIXME: simplify this function
   const pointer = operation.path
 
   // cleanup state from paths that are removed now
@@ -432,55 +428,12 @@ export function documentStateReplace(
   }
 }
 
-export function documentStateCopy(
+export function documentStateMoveOrCopy(
   updatedJson: JSONData,
   documentState: DocumentState,
-  operation: JSONPatchCopy
+  operation: JSONPatchCopy | JSONPatchMove
 ): DocumentState {
-  // FIXME: simplify this function
-
-  // get a copy of the state that we will duplicate
-  const expandedMapCopy = filterPath(documentState.expandedMap, operation.from)
-  const enforceStringMapCopy = filterPath(documentState.enforceStringMap, operation.from)
-  const visibleSectionsMapCopy = filterPath(documentState.visibleSectionsMap, operation.from)
-
-  let { expandedMap, enforceStringMap, visibleSectionsMap } = documentStateAdd(
-    updatedJson,
-    documentState,
-    {
-      op: 'add',
-      path: operation.path,
-      value: undefined // just a fake value, we will not use this
-    }
-  )
-
-  const renamePointer = (pointer) => {
-    return operation.path + pointer.substring(operation.from.length)
-  }
-
-  // move and merge the copied state
-  expandedMap = mergePaths(expandedMap, movePath(expandedMapCopy, renamePointer))
-  enforceStringMap = mergePaths(enforceStringMap, movePath(enforceStringMapCopy, renamePointer))
-  visibleSectionsMap = mergePaths(
-    visibleSectionsMap,
-    movePath(visibleSectionsMapCopy, renamePointer)
-  )
-
-  return {
-    ...documentState,
-    expandedMap,
-    enforceStringMap,
-    visibleSectionsMap
-  }
-}
-
-export function documentStateMove(
-  updatedJson: JSONData,
-  documentState: DocumentState,
-  operation: JSONPatchMove
-): DocumentState {
-  // FIXME: simplify this function
-  if (operation.from === operation.path) {
+  if (isJSONPatchMove(operation) && operation.from === operation.path) {
     // nothing to do
     return documentState
   }
@@ -490,26 +443,26 @@ export function documentStateMove(
   const enforceStringMapCopy = filterPath(documentState.enforceStringMap, operation.from)
   const visibleSectionsMapCopy = filterPath(documentState.visibleSectionsMap, operation.from)
 
-  const updatedDocumentState1 = documentStateRemove(updatedJson, documentState, {
-    op: 'remove',
-    path: operation.from
+  // patch the document state: use the remove and add operations to apply a move or copy
+  // note that `value` is just a fake value, we do not use this for real
+  let updatedDocumentState = documentState
+  if (isJSONPatchMove(operation)) {
+    updatedDocumentState = documentStateRemove(updatedJson, updatedDocumentState, {
+      op: 'remove',
+      path: operation.from
+    })
+  }
+  updatedDocumentState = documentStateAdd(updatedJson, updatedDocumentState, {
+    op: 'add',
+    path: operation.path,
+    value: null
   })
+  let { expandedMap, enforceStringMap, visibleSectionsMap } = updatedDocumentState
 
-  let { expandedMap, enforceStringMap, visibleSectionsMap } = documentStateAdd(
-    updatedJson,
-    updatedDocumentState1,
-    {
-      op: 'add',
-      path: operation.path,
-      value: undefined // just a fake value, we will not use this
-    }
-  )
-
+  // move and merge the copied state
   const renamePointer = (pointer) => {
     return operation.path + pointer.substring(operation.from.length)
   }
-
-  // move and merge the copied state
   expandedMap = mergePaths(expandedMap, movePath(expandedMapCopy, renamePointer))
   enforceStringMap = mergePaths(enforceStringMap, movePath(enforceStringMapCopy, renamePointer))
   visibleSectionsMap = mergePaths(
