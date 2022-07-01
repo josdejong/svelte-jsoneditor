@@ -1,11 +1,15 @@
 import {
-  parsePath,
+  compileJSONPointer,
+  getIn,
+  isJSONPatchCopy,
+  isJSONPatchMove,
   type JSONData,
   type JSONPatchDocument,
   type JSONPath,
-  type JSONPointer
+  type JSONPointer,
+  parsePath,
+  startsWithJSONPointer
 } from 'immutable-json-patch'
-import { compileJSONPointer, getIn, startsWithJSONPointer } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import { isObjectOrArray } from '../utils/typeUtils.js'
 import {
@@ -28,7 +32,6 @@ import type {
 } from '../types.js'
 import { CaretType, SelectionType } from '../types.js'
 import { isJSONArray, isJSONObject } from '../utils/jsonUtils.js'
-import { isJSONPatchCopy, isJSONPatchMove } from '../typeguards.js'
 import { int } from '../utils/numberUtils.js'
 
 export function isAfterSelection(selection: Selection | undefined): selection is AfterSelection {

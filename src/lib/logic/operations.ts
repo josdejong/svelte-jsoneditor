@@ -5,7 +5,14 @@ import type {
   JSONPatchOperation,
   JSONPath
 } from 'immutable-json-patch'
-import { compileJSONPointer, getIn, parseJSONPointer, revertJSONPatch } from 'immutable-json-patch'
+import {
+  compileJSONPointer,
+  getIn,
+  isJSONPatchMove,
+  isJSONPatchRemove,
+  parseJSONPointer,
+  revertJSONPatch
+} from 'immutable-json-patch'
 import {
   isJSONArray,
   isJSONObject,
@@ -32,7 +39,6 @@ import {
   pathStartsWith
 } from './selection.js'
 import type { ClipboardValues, DragInsideAction, Selection } from '../types'
-import { isJSONPatchMove, isJSONPatchRemove } from '../typeguards.js'
 import { int } from '../utils/numberUtils.js'
 
 /**

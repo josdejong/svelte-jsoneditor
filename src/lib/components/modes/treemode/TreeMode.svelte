@@ -10,6 +10,8 @@
     existsIn,
     getIn,
     immutableJSONPatch,
+    isJSONPatchAdd,
+    isJSONPatchReplace,
     parsePath
   } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
@@ -129,7 +131,6 @@
     ValueNormalization
   } from '$lib/types'
   import { isAfterSelection, isInsideSelection, isKeySelection } from '../../../logic/selection'
-  import { isJSONPatchAdd, isJSONPatchReplace } from '../../../typeguards'
 
   const debug = createDebug('jsoneditor:TreeMode')
 

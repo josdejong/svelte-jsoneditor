@@ -1,23 +1,28 @@
-import {
-  compileJSONPointer,
-  existsIn,
-  getIn,
-  immutableJSONPatch,
-  parseJSONPointer,
-  parsePath,
-  startsWithJSONPointer
-} from 'immutable-json-patch'
 import type {
   JSONArray,
   JSONData,
-  JSONPath,
-  JSONPointer,
   JSONPatchAdd,
   JSONPatchCopy,
   JSONPatchDocument,
   JSONPatchMove,
   JSONPatchRemove,
-  JSONPatchReplace
+  JSONPatchReplace,
+  JSONPath,
+  JSONPointer
+} from 'immutable-json-patch'
+import {
+  compileJSONPointer,
+  existsIn,
+  getIn,
+  immutableJSONPatch,
+  isJSONPatchAdd,
+  isJSONPatchCopy,
+  isJSONPatchMove,
+  isJSONPatchRemove,
+  isJSONPatchReplace,
+  parseJSONPointer,
+  parsePath,
+  startsWithJSONPointer
 } from 'immutable-json-patch'
 import { initial, isEqual, last } from 'lodash-es'
 import { DEFAULT_VISIBLE_SECTIONS } from '../constants.js'
@@ -39,13 +44,6 @@ import type {
 } from '../types'
 import { CaretType } from '../types.js'
 import { isJSONArray, isJSONObject } from '../utils/jsonUtils.js'
-import {
-  isJSONPatchAdd,
-  isJSONPatchCopy,
-  isJSONPatchMove,
-  isJSONPatchRemove,
-  isJSONPatchReplace
-} from '../typeguards.js'
 import { int } from '../utils/numberUtils.js'
 
 type CreateSelection = (json: JSONData, documentState: DocumentState) => Selection
