@@ -38,7 +38,7 @@ import {
   isValueSelection,
   pathStartsWith
 } from './selection.js'
-import type { ClipboardValues, DragInsideAction, Selection } from '../types'
+import type { ClipboardValues, DragInsideAction, JSONSelection } from '../types'
 import { int } from '../utils/numberUtils.js'
 
 /**
@@ -285,7 +285,7 @@ export function duplicate(json: JSONData, paths: JSONPath[]): JSONPatchDocument 
  * Create a JSONPatch for an extract action.
  */
 // TODO: write unit tests
-export function extract(json: JSONData, selection: Selection): JSONPatchDocument {
+export function extract(json: JSONData, selection: JSONSelection): JSONPatchDocument {
   if (isValueSelection(selection)) {
     return [
       {
@@ -340,7 +340,7 @@ export function extract(json: JSONData, selection: Selection): JSONPatchDocument
 // TODO: write unit tests
 export function insert(
   json: JSONData,
-  selection: Selection | undefined,
+  selection: JSONSelection | undefined,
   clipboardText: string
 ): JSONPatchDocument {
   if (isKeySelection(selection)) {
@@ -445,7 +445,7 @@ export function insert(
 
 export function moveInsideParent(
   json: JSONData,
-  selection: Selection,
+  selection: JSONSelection,
   dragInsideAction: DragInsideAction
 ): JSONPatchDocument {
   const beforePath: JSONPath = dragInsideAction['beforePath']
@@ -523,7 +523,7 @@ export function moveInsideParent(
 
 export function createNewValue(
   json: JSONData,
-  selection: Selection,
+  selection: JSONSelection,
   valueType: 'object' | 'array' | 'structure' | 'value'
 ) {
   if (valueType === 'object') {
@@ -635,8 +635,8 @@ export function clipboardToValues(clipboardText: string): ClipboardValues {
 // TODO: write unit tests
 export function createRemoveOperations(
   json: JSONData,
-  selection: Selection
-): { newSelection: Selection; operations: JSONPatchDocument } {
+  selection: JSONSelection
+): { newSelection: JSONSelection; operations: JSONPatchDocument } {
   if (isKeySelection(selection)) {
     // FIXME: DOESN'T work yet
     const parentPath = initial(selection.focusPath)

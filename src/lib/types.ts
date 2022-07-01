@@ -36,7 +36,7 @@ export interface DocumentState {
   expandedMap: JSONPointerMap<boolean>
   enforceStringMap: JSONPointerMap<boolean>
   visibleSectionsMap: JSONPointerMap<VisibleSection[]>
-  selection: Selection | undefined
+  selection: JSONSelection | undefined
 }
 
 export interface JSONPatchResult {
@@ -89,7 +89,7 @@ export interface ValueSelection {
   edit?: boolean
 }
 
-export type Selection =
+export type JSONSelection =
   | MultiSelection
   | AfterSelection
   | InsideSelection
@@ -215,7 +215,7 @@ export type OnChangeQueryLanguage = (queryLanguageId: string) => void
 export type OnChange =
   | ((content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void)
   | null
-export type OnSelect = (selection: Selection) => void
+export type OnSelect = (selection: JSONSelection) => void
 export type OnPatch = (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
 export type OnSort = (operations: JSONPatchDocument) => void
 export type OnFind = (findAndReplace: boolean) => void
@@ -270,7 +270,7 @@ export type UnescapeValue = (escapedValue: string) => string
 
 export interface DragInsideProps {
   json: JSONData
-  selection: Selection
+  selection: JSONSelection
   deltaY: number
   items: Array<{ path: JSONPath; height: number }>
 }
@@ -369,7 +369,7 @@ export interface RenderValuePropsOptional {
   value?: JSONData
   readOnly?: boolean
   enforceString?: boolean
-  selection?: Selection
+  selection?: JSONSelection
   searchResultItems?: SearchResultItem[]
   isSelected?: boolean
   isEditing?: boolean
@@ -386,7 +386,7 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   value: JSONData
   readOnly: boolean
   enforceString: boolean
-  selection: Selection | undefined
+  selection: JSONSelection | undefined
   searchResultItems: SearchResultItem[] | undefined
   isSelected: boolean
   isEditing: boolean

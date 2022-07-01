@@ -123,7 +123,7 @@
     PastedJson,
     SearchResult,
     Section,
-    Selection,
+    JSONSelection,
     TransformModalOptions,
     TreeModeContext,
     ValidationError,
@@ -197,7 +197,10 @@
   const rootPath = [] // create the array only once
 
   function updateSelection(
-    selection: Selection | undefined | ((selection: Selection | undefined) => Selection | undefined)
+    selection:
+      | JSONSelection
+      | undefined
+      | ((selection: JSONSelection | undefined) => JSONSelection | undefined)
   ) {
     debug('updateSelection', selection)
 
@@ -698,7 +701,7 @@
   // $: debug('state', state)
   // $: debug('selection', selection)
 
-  function hasSelectionContents(selection: Selection | undefined): boolean {
+  function hasSelectionContents(selection: JSONSelection | undefined): boolean {
     return isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection)
   }
 
@@ -2070,7 +2073,7 @@
     pastedJson = undefined
   }
 
-  function handleNavigationBarSelect(newSelection: Selection) {
+  function handleNavigationBarSelect(newSelection: JSONSelection) {
     updateSelection(newSelection)
 
     focus()

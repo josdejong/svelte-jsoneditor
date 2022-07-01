@@ -50,7 +50,7 @@
     ExtendedSearchResultItem,
     JSONPointerMap,
     RenderedItem,
-    Selection,
+    JSONSelection,
     TreeModeContext,
     VisibleSection
   } from '$lib/types'
@@ -73,7 +73,7 @@
   export let visibleSectionsMap: JSONPointerMap<VisibleSection[]>
   export let validationErrorsMap: JSONPointerMap<ValidationError>
   export let searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]>
-  export let selection: Selection | undefined
+  export let selection: JSONSelection | undefined
   export let context: TreeModeContext
   export let onDragSelectionStart
 
@@ -105,7 +105,7 @@
   $: validationError = validationErrorsMap ? validationErrorsMap[pointer] : undefined
 
   $: resolvedValue = dragging?.updatedValue !== undefined ? dragging.updatedValue : value
-  let resolvedSelection: Selection | undefined
+  let resolvedSelection: JSONSelection | undefined
   $: resolvedSelection =
     dragging?.updatedSelection != undefined ? dragging.updatedSelection : selection
 
@@ -401,7 +401,7 @@
    * Get a list with all visible items and their rendered heights inside
    * this object or array
    */
-  function getVisibleItemsWithHeights(selection: Selection): RenderedItem[] | null {
+  function getVisibleItemsWithHeights(selection: JSONSelection): RenderedItem[] | null {
     const items = []
 
     function addHeight(prop: string) {

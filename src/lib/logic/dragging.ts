@@ -10,7 +10,7 @@ import type {
   DragInsideProps,
   MultiSelection,
   RenderedItem,
-  Selection
+  JSONSelection
 } from '../types'
 
 interface MoveSelectionProps {
@@ -23,7 +23,7 @@ interface MoveSelectionProps {
 interface MoveSelectionResult {
   operations: JSONPatchDocument | undefined
   updatedValue: JSONData | undefined
-  updatedSelection: Selection | undefined
+  updatedSelection: JSONSelection | undefined
   indexOffset: number
 }
 
@@ -143,7 +143,7 @@ function findSwapPathDown({
 interface UpdatedArraySelectionProps {
   items: RenderedItem[]
   json: JSONData
-  selection: Selection
+  selection: JSONSelection
   indexOffset: number
 }
 

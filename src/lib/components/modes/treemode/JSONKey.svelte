@@ -13,7 +13,7 @@
   import { addNewLineSuffix } from '$lib/utils/domUtils'
   import { UPDATE_SELECTION } from '$lib/constants'
   import type { ExtendedSearchResultItem, TreeModeContext } from '$lib/types'
-  import { type Selection } from '$lib/types'
+  import { type JSONSelection } from '$lib/types'
   import type { JSONPath, JSONPointer } from 'immutable-json-patch'
   import { isKeySelection } from '../../../logic/selection.js'
   import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
@@ -21,7 +21,7 @@
   export let path: JSONPath
   export let pointer: JSONPointer
   export let key: string
-  export let selection: Selection | undefined
+  export let selection: JSONSelection | undefined
   export let searchResultItems: ExtendedSearchResultItem[] | undefined
   export let onUpdateKey: (oldKey: string, newKey: string) => string
 

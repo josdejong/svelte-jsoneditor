@@ -17,7 +17,7 @@ import {
   selectionToPartialJson
 } from './selection.js'
 import { createDocumentState } from './documentState.js'
-import { type DocumentState, type Selection, SelectionType } from '../types.js'
+import { type DocumentState, type JSONSelection, SelectionType } from '../types.js'
 
 describe('selection', () => {
   const json = {
@@ -147,7 +147,7 @@ describe('selection', () => {
       expand: () => true
     })
 
-    function withSelection(documentState: DocumentState, selection: Selection): DocumentState {
+    function withSelection(documentState: DocumentState, selection: JSONSelection): DocumentState {
       return {
         ...documentState,
         selection

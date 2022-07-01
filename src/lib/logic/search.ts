@@ -17,7 +17,7 @@ import type {
   JSONPointerMap,
   SearchResult,
   SearchResultItem,
-  Selection
+  JSONSelection
 } from '../types'
 import { SearchField } from '../types.js'
 import { isJSONArray, isJSONObject } from '../utils/jsonUtils.js'
@@ -239,7 +239,7 @@ export function createSearchAndReplaceOperations(
   documentState: DocumentState,
   replacementText: string,
   searchResultItem: SearchResultItem
-): { newSelection: Selection; operations: JSONPatchDocument } {
+): { newSelection: JSONSelection; operations: JSONPatchDocument } {
   const { field, path, start, end } = searchResultItem
 
   if (field === SearchField.key) {
@@ -294,7 +294,7 @@ export function createSearchAndReplaceAllOperations(
   documentState: DocumentState,
   searchText: string,
   replacementText
-): { newSelection: Selection; operations: JSONPatchDocument } {
+): { newSelection: JSONSelection; operations: JSONPatchDocument } {
   // TODO: to improve performance, we could reuse existing search results (except when hitting a maxResult limit)
   const searchResultItems = search(searchText, json, documentState, Infinity /* maxResults */)
 

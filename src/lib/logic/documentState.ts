@@ -39,14 +39,14 @@ import type {
   DocumentState,
   JSONPointerMap,
   Section,
-  Selection,
+  JSONSelection,
   VisibleSection
 } from '../types'
 import { CaretType } from '../types.js'
 import { isJSONArray, isJSONObject } from '../utils/jsonUtils.js'
 import { int } from '../utils/numberUtils.js'
 
-type CreateSelection = (json: JSONData, documentState: DocumentState) => Selection
+type CreateSelection = (json: JSONData, documentState: DocumentState) => JSONSelection
 
 export type CreateDocumentStateProps = {
   json: JSONData
