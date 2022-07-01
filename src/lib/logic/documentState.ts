@@ -460,9 +460,7 @@ export function documentStateMoveOrCopy(
   let { expandedMap, enforceStringMap, visibleSectionsMap } = updatedDocumentState
 
   // move and merge the copied state
-  const renamePointer = (pointer) => {
-    return operation.path + pointer.substring(operation.from.length)
-  }
+  const renamePointer = (pointer) => operation.path + pointer.substring(operation.from.length)
   expandedMap = mergePaths(expandedMap, movePath(expandedMapCopy, renamePointer))
   enforceStringMap = mergePaths(enforceStringMap, movePath(enforceStringMapCopy, renamePointer))
   visibleSectionsMap = mergePaths(
