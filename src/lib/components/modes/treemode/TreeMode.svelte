@@ -434,9 +434,8 @@
 
     // TODO: this is inefficient. Make an optional flag promising that the updates are immutable so we don't have to do a deep equality check? First do some profiling!
     const isChanged = !isEqual(json, updatedJson)
-    const isText = json === undefined
 
-    debug('update external json', { isChanged, isText })
+    debug('update external json', { isChanged, currentlyText: json === undefined })
 
     if (!isChanged) {
       // no actual change, don't do anything
@@ -502,12 +501,6 @@
         textIsRepaired = false
         clearSelectionWhenNotExisting(json)
       }
-    }
-
-    if (!documentState.selection && json === undefined && (text === '' || text === undefined)) {
-      // make sure there is a selection,
-      // else we cannot paste or insert in case of an empty document
-      createDefaultSelection()
     }
 
     addHistoryItem({

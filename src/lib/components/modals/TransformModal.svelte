@@ -7,6 +7,7 @@
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
   import { DEBOUNCE_DELAY } from '../../constants.js'
+  import type { JSONData, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { transformModalState } from './transformModalState.js'
@@ -17,12 +18,10 @@
   import TreeMode from '../modes/treemode/TreeMode.svelte'
   import type {
     Content,
-    JSONData,
     OnChangeQueryLanguage,
     OnClassName,
     OnPatch,
     OnRenderValue,
-    JSONPath,
     QueryLanguage
   } from '../../types'
 
@@ -284,7 +283,6 @@
               </div>
             {/if}
           </div>
-          <!--          </div>-->
         </div>
       </div>
 
