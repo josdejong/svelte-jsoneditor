@@ -276,8 +276,8 @@ export interface DragInsideProps {
 }
 
 export type DragInsideAction =
-  | { beforePath: JSONPath; indexOffset: number }
-  | { append: true; indexOffset: number }
+  | { beforePath: JSONPath; offset: number }
+  | { append: true; offset: number }
 
 export interface RenderedItem {
   path: JSONPath
@@ -429,8 +429,8 @@ export interface DraggingState {
   initialTarget: Element
   initialClientY: number
   initialContentTop: number
-  initialIndex: number
-  count: number
+  selectionStartIndex: number
+  selectionItemsCount: number
   items: RenderedItem[] | null
   offset: number
   didMoveItems: boolean

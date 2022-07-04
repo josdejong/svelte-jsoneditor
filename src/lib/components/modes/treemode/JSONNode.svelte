@@ -150,10 +150,12 @@
 
     // reorder the props when dragging
     if (dragging && dragging.offset !== 0) {
-      // TODO: calculate the number of items in the selection only once
-      const count = getSelectionPaths(selection).length
-
-      props = moveItems(props, dragging.initialIndex, count, dragging.offset)
+      props = moveItems(
+        props,
+        dragging.selectionStartIndex,
+        dragging.selectionItemsCount,
+        dragging.offset
+      )
     }
 
     return props
@@ -195,10 +197,12 @@
 
     // reorder the items when dragging
     if (dragging && dragging.offset !== 0) {
-      // TODO: calculate the number of items in the selection only once
-      const count = getSelectionPaths(selection).length
-
-      items = moveItems(items, dragging.initialIndex, count, dragging.offset)
+      items = moveItems(
+        items,
+        dragging.selectionStartIndex,
+        dragging.selectionItemsCount,
+        dragging.offset
+      )
 
       items.forEach((item, index) => {
         item.index = index
@@ -373,7 +377,7 @@
     // no items will be returned: this is not (yet) supported
     const items = getVisibleItemsWithHeights(selection)
     const initialPath = getStartPath(selection)
-    const initialIndex = items.findIndex((item) => isEqual(item.path, initialPath))
+    const selectionStartIndex = items.findIndex((item) => isEqual(item.path, initialPath))
 
     debug('dragSelectionStart', { selection, items })
 
@@ -384,7 +388,7 @@
 
     const json = context.getJson()
     const documentState = context.getDocumentState()
-    const { indexOffset } = onMoveSelection({
+    const { offset } = onMoveSelection({
       json,
       documentState,
       deltaY: 0,
@@ -395,10 +399,10 @@
       initialTarget: event.target,
       initialClientY: event.clientY,
       initialContentTop: findContentTop(),
-      initialIndex,
-      count: items.length,
+      selectionStartIndex,
+      selectionItemsCount: getSelectionPaths(selection).length,
       items,
-      offset: indexOffset,
+      offset,
       didMoveItems: false // whether items have been moved during dragging or not
     }
     singleton.dragging = true
@@ -413,19 +417,19 @@
       const documentState = context.getDocumentState()
 
       const deltaY = calculateDeltaY(dragging, event)
-      const { updatedSelection, indexOffset } = onMoveSelection({
+      const { offset } = onMoveSelection({
         json,
         documentState,
         deltaY,
         items: dragging.items
       })
 
-      if (indexOffset !== dragging.offset) {
-        debug('drag selection', indexOffset, deltaY, updatedSelection)
+      if (offset !== dragging.offset) {
+        debug('drag selection', offset, deltaY)
 
         dragging = {
           ...dragging,
-          offset: indexOffset,
+          offset,
           didMoveItems: true
         }
       }

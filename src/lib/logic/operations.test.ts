@@ -115,7 +115,7 @@ describe('operations', () => {
       const path = ['array', '1']
       const operations = moveInsideParent(json, documentState.selection, {
         beforePath: path,
-        indexOffset: 0
+        offset: 0
       })
       assert.deepStrictEqual(operations, [
         { op: 'move', from: '/array/3', path: '/array/1' },
@@ -135,7 +135,7 @@ describe('operations', () => {
       const path = ['array', '4']
       const operations = moveInsideParent(json, documentState.selection, {
         beforePath: path,
-        indexOffset: 0
+        offset: 0
       })
       assert.deepStrictEqual(operations, [
         { op: 'move', from: '/array/1', path: '/array/4' },
@@ -156,7 +156,7 @@ describe('operations', () => {
       const path = ['object', 'b']
       const operations = moveInsideParent(json, documentState.selection, {
         beforePath: path,
-        indexOffset: 0
+        offset: 0
       })
       assert.deepStrictEqual(operations, [
         { op: 'move', from: '/object/b', path: '/object/b' },
@@ -183,7 +183,7 @@ describe('operations', () => {
       const path = ['object', 'e']
       const operations = moveInsideParent(json, documentState.selection, {
         beforePath: path,
-        indexOffset: 0
+        offset: 0
       })
       assert.deepStrictEqual(operations, [
         { op: 'move', from: '/object/b', path: '/object/b' },

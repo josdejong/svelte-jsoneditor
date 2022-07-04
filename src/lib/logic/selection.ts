@@ -25,9 +25,9 @@ import type {
   DocumentState,
   InsideSelection,
   JSONPointerMap,
+  JSONSelection,
   KeySelection,
   MultiSelection,
-  JSONSelection,
   ValueSelection
 } from '../types.js'
 import { CaretType, SelectionType } from '../types.js'

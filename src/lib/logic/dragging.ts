@@ -1,5 +1,4 @@
 import { createMultiSelection, getEndPath, getStartPath } from './selection.js'
-import { documentStatePatch } from './documentState.js'
 import { initial, isEqual } from 'lodash-es'
 import type { JSONData, JSONPatchDocument } from 'immutable-json-patch'
 import { getIn } from 'immutable-json-patch'
@@ -8,24 +7,22 @@ import type {
   DocumentState,
   DragInsideAction,
   DragInsideProps,
+  JSONSelection,
   MultiSelection,
-  RenderedItem,
-  JSONSelection
+  RenderedItem
 } from '../types'
 
-interface MoveSelectionProps {
+export interface MoveSelectionProps {
   json: JSONData
   documentState: DocumentState
   deltaY: number
   items: RenderedItem[]
 }
 
-interface MoveSelectionResult {
+export interface MoveSelectionResult {
   operations: JSONPatchDocument | undefined
-  updatedValue: JSONData | undefined
-  updatedState: DocumentState | undefined
   updatedSelection: JSONSelection | undefined
-  indexOffset: number
+  offset: number
 }
 
 export function onMoveSelection({
@@ -40,25 +37,15 @@ export function onMoveSelection({
       ? findSwapPathUp({ json, selection, deltaY, items })
       : findSwapPathDown({ json, selection, deltaY, items })
 
-  if (!dragInsideAction || dragInsideAction.indexOffset === 0) {
+  if (!dragInsideAction || dragInsideAction.offset === 0) {
     return {
       operations: undefined,
-      updatedValue: undefined,
-      updatedState: undefined,
       updatedSelection: undefined,
-      indexOffset: 0
+      offset: 0
     }
   }
 
   const operations = moveInsideParent(json, documentState.selection, dragInsideAction)
-
-  // TODO: documentStatePatch is relatively slow for large documents
-  //  This is for example noticeable in a large array where we drag a few
-  //  properties inside one of the nested objects. In this case we know we do
-  //  not need the full document, only the nested changes. So we can optimize
-  //  performance here by taking only the relative, nested json and state, and
-  //  changing the operations into relative operations.
-  const update = documentStatePatch(json, documentState, operations)
 
   const path = initial(getStartPath(selection))
   const value = getIn(json, path)
@@ -67,24 +54,20 @@ export function onMoveSelection({
       items,
       json,
       selection,
-      indexOffset: dragInsideAction.indexOffset
+      offset: dragInsideAction.offset
     })
 
     return {
       operations,
-      updatedValue: getIn(update.json, path),
-      updatedState: update.documentState,
       updatedSelection,
-      indexOffset: dragInsideAction.indexOffset
+      offset: dragInsideAction.offset
     }
   } else {
     // object
     return {
       operations,
-      updatedValue: getIn(update.json, path),
-      updatedState: undefined,
       updatedSelection: undefined,
-      indexOffset: dragInsideAction.indexOffset
+      offset: dragInsideAction.offset
     }
   }
 }
@@ -108,11 +91,9 @@ function findSwapPathUp({
   }
 
   const beforePath = items[index].path
-  const indexOffset = index - initialIndex
+  const offset = index - initialIndex
 
-  return index !== initialIndex && items[index] !== undefined
-    ? { beforePath, indexOffset }
-    : undefined
+  return index !== initialIndex && items[index] !== undefined ? { beforePath, offset } : undefined
 }
 
 function findSwapPathDown({
@@ -139,23 +120,23 @@ function findSwapPathDown({
   const isArray = Array.isArray(parent)
   const beforeIndex = isArray ? index : index + 1
   const beforePath = items[beforeIndex]?.path
-  const indexOffset = index - initialIndex
+  const offset = index - initialIndex
 
-  return beforePath ? { beforePath, indexOffset } : { append: true, indexOffset }
+  return beforePath ? { beforePath, offset } : { append: true, offset }
 }
 
 interface UpdatedArraySelectionProps {
   items: RenderedItem[]
   json: JSONData
   selection: JSONSelection
-  indexOffset: number
+  offset: number
 }
 
 function createUpdatedArraySelection({
   items,
   json,
   selection,
-  indexOffset
+  offset
 }: UpdatedArraySelectionProps): MultiSelection {
   const startPath = getStartPath(selection)
   const endPath = getEndPath(selection)
@@ -163,8 +144,8 @@ function createUpdatedArraySelection({
   const startIndex = items.findIndex((item) => isEqual(item.path, startPath))
   const endIndex = items.findIndex((item) => isEqual(item.path, endPath))
 
-  const anchorPath = items[startIndex + indexOffset]?.path
-  const focusPath = items[endIndex + indexOffset]?.path
+  const anchorPath = items[startIndex + offset]?.path
+  const focusPath = items[endIndex + offset]?.path
 
   return createMultiSelection(json, anchorPath, focusPath)
 }
