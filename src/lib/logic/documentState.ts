@@ -331,8 +331,6 @@ export function documentStateAdd(
   const parentPointer = compileJSONPointer(parentPath)
   const parent = getIn(json, parentPath)
 
-  // FIXME: expand the newly inserted value
-
   if (isJSONArray(parent)) {
     const index = int(last(path))
 

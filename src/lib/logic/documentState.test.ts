@@ -1024,6 +1024,10 @@ describe('documentState', () => {
         '/obj': 8
       })
     })
+
+    it('should shift entries an offset 0 (do nothing)', () => {
+      deepStrictEqual(shiftPath(expandedPaths, ['array'], 2, 0), expandedPaths)
+    })
   })
 
   describe('deletePath', () => {

@@ -14,7 +14,7 @@
     HOVER_INSERT_INSIDE,
     INSERT_EXPLANATION
   } from '$lib/constants'
-  import { getVisibleCaretPositions } from '$lib/logic/documentState'
+  import { documentStatePatch, getVisibleCaretPositions } from '$lib/logic/documentState'
   import { rename } from '$lib/logic/operations'
   import {
     createAfterSelection,
@@ -42,16 +42,17 @@
   import JSONKey from './JSONKey.svelte'
   import JSONValue from './JSONValue.svelte'
   import { singleton } from './singleton.js'
-  import ValidationError from './ValidationError.svelte'
   import { createDebug } from '$lib/utils/debug'
   import { onMoveSelection } from '$lib/logic/dragging'
   import { forEachIndex } from '$lib/utils/arrayUtils'
   import type {
+    DraggingState,
     ExtendedSearchResultItem,
     JSONPointerMap,
-    RenderedItem,
     JSONSelection,
+    RenderedItem,
     TreeModeContext,
+    ValidationError,
     VisibleSection
   } from '$lib/types'
   import { SelectionType } from '$lib/types'
@@ -65,14 +66,15 @@
   import { filterKeySearchResults, filterValueSearchResults } from '../../../logic/search.js'
   import { createMemoizePath } from '../../../utils/pathUtils'
   import { getEnforceString } from '../../../logic/documentState'
+  import ValidationErrorIcon from './ValidationErrorIcon.svelte'
 
   export let value: JSONData
   export let path: JSONPath
-  export let expandedMap: JSONPointerMap<boolean>
-  export let enforceStringMap: JSONPointerMap<boolean>
-  export let visibleSectionsMap: JSONPointerMap<VisibleSection[]>
-  export let validationErrorsMap: JSONPointerMap<ValidationError>
-  export let searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]>
+  export let expandedMap: JSONPointerMap<boolean> | undefined
+  export let enforceStringMap: JSONPointerMap<boolean> | undefined
+  export let visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
+  export let validationErrorsMap: JSONPointerMap<ValidationError> | undefined
+  export let searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
   export let selection: JSONSelection | undefined
   export let context: TreeModeContext
   export let onDragSelectionStart
@@ -81,36 +83,54 @@
 
   let hover = undefined
   let hoverTimer = undefined
-  let dragging = undefined
+  let dragging: DraggingState | undefined = undefined
 
   // important to prevent creating a new path for all children with every re-render,
   // that would force all children to re-render
   const memoizePath = createMemoizePath()
 
-  $: root = path.length === 0
-  $: type = valueType(resolvedValue)
   let pointer: JSONPointer
   $: pointer = compileJSONPointer(path)
 
+  let resolvedValue: JSONData
+  $: resolvedValue = dragging ? dragging.value : value
+  let resolvedSelection: JSONSelection | undefined
+  $: resolvedSelection = dragging ? dragging.selection : selection
+
+  let resolvedExpandedMap: JSONPointerMap<boolean> | undefined
+  $: resolvedExpandedMap = dragging ? dragging.expandedMap : expandedMap
+
+  let resolvedEnforceStringMap: JSONPointerMap<boolean> | undefined
+  $: resolvedEnforceStringMap = dragging ? dragging.enforceStringMap : enforceStringMap
+
+  let resolvedVisibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
+  $: resolvedVisibleSectionsMap = dragging ? dragging.visibleSectionsMap : visibleSectionsMap
+
+  let resolvedValidationErrorsMap: JSONPointerMap<ValidationError> | undefined
+  $: resolvedValidationErrorsMap = dragging ? dragging.validationErrorsMap : validationErrorsMap
+
+  let resolvedSearchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
+  $: resolvedSearchResultItemsMap = dragging ? dragging.searchResultItemsMap : searchResultItemsMap
+
   let expanded: boolean
-  $: expanded = expandedMap ? expandedMap[pointer] === true : false
+  $: expanded = resolvedExpandedMap ? resolvedExpandedMap[pointer] === true : false
 
   let enforceString: boolean | undefined
-  $: enforceString = getEnforceString(value, enforceStringMap, pointer)
+  $: enforceString = getEnforceString(value, resolvedEnforceStringMap, pointer)
 
   let visibleSections: VisibleSection[] | undefined
-  $: visibleSections = visibleSectionsMap ? visibleSectionsMap[pointer] : undefined
+  $: visibleSections = resolvedVisibleSectionsMap ? resolvedVisibleSectionsMap[pointer] : undefined
 
   let validationError: ValidationError | undefined
-  $: validationError = validationErrorsMap ? validationErrorsMap[pointer] : undefined
-
-  $: resolvedValue = dragging?.updatedValue !== undefined ? dragging.updatedValue : value
-  let resolvedSelection: JSONSelection | undefined
-  $: resolvedSelection =
-    dragging?.updatedSelection != undefined ? dragging.updatedSelection : selection
+  $: validationError = resolvedValidationErrorsMap
+    ? resolvedValidationErrorsMap[pointer]
+    : undefined
 
   let isSelected: boolean
   $: isSelected = resolvedSelection ? resolvedSelection.pointersMap[pointer] === true : false
+
+  $: root = path.length === 0
+  $: type = valueType(resolvedValue)
 
   function getIndentationStyle(level) {
     return `margin-left: calc(${level} * var(--jse-indent-size))`
@@ -283,7 +303,7 @@
     return context.findElement([])?.getBoundingClientRect()?.top || 0
   }
 
-  function calculateDeltaY(dragging, event) {
+  function calculateDeltaY(dragging: DraggingState, event: MouseEvent) {
     // calculate the contentOffset, this changes when scrolling
     const contentTop = findContentTop()
     const contentOffset = contentTop - dragging.initialContentTop
@@ -323,8 +343,16 @@
       initialTarget: event.target,
       initialClientY: event.clientY,
       initialContentTop: findContentTop(),
-      updatedValue: undefined,
-      updatedSelection: undefined,
+      value,
+      selection,
+      expandedMap,
+      enforceStringMap,
+      visibleSectionsMap,
+      // FIXME: right now, when dragging inside an array, we turn off validation errors and search results
+      //  in the future, we should update these maps whilst dragging (requires a more flexible
+      //  documentStatePatch, or putting validationErrorsMap and searchResultItemsMap inside the documentState)
+      validationErrorsMap: Array.isArray(value) ? {} : validationErrorsMap,
+      searchResultItemsMap: Array.isArray(value) ? {} : searchResultItemsMap,
       items,
       indexOffset: 0,
       didMoveItems: false // whether items have been moved during dragging or not
@@ -335,22 +363,31 @@
     document.addEventListener('mouseup', handleDragSelectionEnd)
   }
 
-  function handleDragSelection(event) {
+  function handleDragSelection(event: MouseEvent) {
     if (dragging) {
+      const json = context.getJson()
+      const documentState = context.getDocumentState()
+
       const deltaY = calculateDeltaY(dragging, event)
-      const { updatedValue, updatedSelection, indexOffset } = onMoveSelection({
-        json: context.getJson(),
-        documentState: context.getDocumentState(),
+      const { operations, updatedValue, updatedSelection, indexOffset } = onMoveSelection({
+        json,
+        documentState,
         deltaY,
         items: dragging.items
       })
 
       if (indexOffset !== dragging.indexOffset) {
         debug('drag selection', indexOffset, deltaY, updatedSelection)
+
+        const patchResult = operations
+          ? documentStatePatch(json, documentState, operations)
+          : { json, documentState }
+
         dragging = {
           ...dragging,
-          updatedValue,
-          updatedSelection,
+          value: updatedValue || value,
+          selection: updatedSelection || selection,
+          expandedMap: filterPointerOrUndefined(patchResult.documentState.expandedMap, pointer),
           indexOffset,
           didMoveItems: true
         }
@@ -562,7 +599,7 @@
         {/if}
       </div>
       {#if validationError && (!expanded || !validationError.isChildError)}
-        <ValidationError {validationError} onExpand={handleExpand} />
+        <ValidationErrorIcon {validationError} onExpand={handleExpand} />
       {/if}
       {#if expanded}
         <div
@@ -600,11 +637,20 @@
             <svelte:self
               value={item.value}
               path={item.path}
-              expandedMap={filterPointerOrUndefined(expandedMap, item.pointer)}
-              enforceStringMap={filterPointerOrUndefined(enforceStringMap, item.pointer)}
-              visibleSectionsMap={filterPointerOrUndefined(visibleSectionsMap, item.pointer)}
-              validationErrorsMap={filterPointerOrUndefined(validationErrorsMap, item.pointer)}
-              searchResultItemsMap={filterPointerOrUndefined(searchResultItemsMap, item.pointer)}
+              expandedMap={filterPointerOrUndefined(resolvedExpandedMap, item.pointer)}
+              enforceStringMap={filterPointerOrUndefined(resolvedEnforceStringMap, item.pointer)}
+              visibleSectionsMap={filterPointerOrUndefined(
+                resolvedVisibleSectionsMap,
+                item.pointer
+              )}
+              validationErrorsMap={filterPointerOrUndefined(
+                resolvedValidationErrorsMap,
+                item.pointer
+              )}
+              searchResultItemsMap={filterPointerOrUndefined(
+                resolvedSearchResultItemsMap,
+                item.pointer
+              )}
               selection={selectionIfOverlapping(resolvedSelection, item.pointer)}
               {context}
               onDragSelectionStart={handleDragSelectionStart}
@@ -680,7 +726,7 @@
         {/if}
       </div>
       {#if validationError && (!expanded || !validationError.isChildError)}
-        <ValidationError {validationError} onExpand={handleExpand} />
+        <ValidationErrorIcon {validationError} onExpand={handleExpand} />
       {/if}
       {#if expanded}
         <div
@@ -717,11 +763,17 @@
           <svelte:self
             value={prop.value}
             path={prop.path}
-            expandedMap={filterPointerOrUndefined(expandedMap, prop.pointer)}
-            enforceStringMap={filterPointerOrUndefined(enforceStringMap, prop.pointer)}
-            visibleSectionsMap={filterPointerOrUndefined(visibleSectionsMap, prop.pointer)}
-            validationErrorsMap={filterPointerOrUndefined(validationErrorsMap, prop.pointer)}
-            searchResultItemsMap={filterPointerOrUndefined(searchResultItemsMap, prop.pointer)}
+            expandedMap={filterPointerOrUndefined(resolvedExpandedMap, prop.pointer)}
+            enforceStringMap={filterPointerOrUndefined(resolvedEnforceStringMap, prop.pointer)}
+            visibleSectionsMap={filterPointerOrUndefined(resolvedVisibleSectionsMap, prop.pointer)}
+            validationErrorsMap={filterPointerOrUndefined(
+              resolvedValidationErrorsMap,
+              prop.pointer
+            )}
+            searchResultItemsMap={filterPointerOrUndefined(
+              resolvedSearchResultItemsMap,
+              prop.pointer
+            )}
             selection={selectionIfOverlapping(resolvedSelection, prop.pointer)}
             {context}
             onDragSelectionStart={handleDragSelectionStart}
@@ -732,7 +784,10 @@
                 pointer={prop.pointer}
                 key={prop.key}
                 selection={selectionIfOverlapping(resolvedSelection, prop.pointer)}
-                searchResultItems={filterKeySearchResults(searchResultItemsMap, prop.pointer)}
+                searchResultItems={filterKeySearchResults(
+                  resolvedSearchResultItemsMap,
+                  prop.pointer
+                )}
                 {context}
                 onUpdateKey={handleUpdateKey}
               />
@@ -766,7 +821,7 @@
           {enforceString}
           {isSelected}
           selection={isSelected ? resolvedSelection : undefined}
-          searchResultItems={filterValueSearchResults(searchResultItemsMap, pointer)}
+          searchResultItems={filterValueSearchResults(resolvedSearchResultItemsMap, pointer)}
           {context}
         />
         {#if !context.readOnly && isSelected && resolvedSelection && (isValueSelection(resolvedSelection) || isMultiSelection(resolvedSelection)) && !resolvedSelection.edit && isEqual(resolvedSelection.focusPath, path)}
@@ -776,7 +831,7 @@
         {/if}
       </div>
       {#if validationError}
-        <ValidationError {validationError} onExpand={handleExpand} />
+        <ValidationErrorIcon {validationError} onExpand={handleExpand} />
       {/if}
       {#if !root}
         <div

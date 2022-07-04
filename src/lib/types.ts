@@ -398,6 +398,22 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   focus: () => void
 }
 
+export interface DraggingState {
+  initialTarget: Element
+  initialClientY: number
+  initialContentTop: number
+  value: JSONData
+  selection: JSONSelection | undefined
+  expandedMap: JSONPointerMap<boolean> | undefined
+  enforceStringMap: JSONPointerMap<boolean> | undefined
+  visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
+  validationErrorsMap: JSONPointerMap<ValidationError> | undefined
+  searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
+  items: RenderedItem[] | null
+  indexOffset: number
+  didMoveItems: boolean
+}
+
 // TODO: can we define proper generic types here?
 export interface RenderValueComponentDescription {
   component: SvelteComponent
