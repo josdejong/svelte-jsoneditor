@@ -398,19 +398,41 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   focus: () => void
 }
 
-export interface DraggingState {
-  initialTarget: Element
-  initialClientY: number
-  initialContentTop: number
+export interface JSONNodeProp {
+  key: string
   value: JSONData
+  path: JSONPath
+  pointer: JSONPointer
+  expandedMap: JSONPointerMap<boolean> | undefined
+  enforceStringMap: JSONPointerMap<boolean> | undefined
+  visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
+  validationErrorsMap: JSONPointerMap<ValidationError> | undefined
+  keySearchResultItemsMap: ExtendedSearchResultItem[] | undefined
+  valueSearchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
   selection: JSONSelection | undefined
+}
+
+export interface JSONNodeItem {
+  index: number
+  value: JSONData
+  path: JSONPath
+  pointer: JSONPointer
   expandedMap: JSONPointerMap<boolean> | undefined
   enforceStringMap: JSONPointerMap<boolean> | undefined
   visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
   validationErrorsMap: JSONPointerMap<ValidationError> | undefined
   searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
+  selection: JSONSelection | undefined
+}
+
+export interface DraggingState {
+  initialTarget: Element
+  initialClientY: number
+  initialContentTop: number
+  initialIndex: number
+  count: number
   items: RenderedItem[] | null
-  indexOffset: number
+  offset: number
   didMoveItems: boolean
 }
 

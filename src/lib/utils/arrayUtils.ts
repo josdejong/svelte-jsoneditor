@@ -154,3 +154,16 @@ export function arrayStartsWith<T>(
 
   return true
 }
+
+/**
+ * Move a set of items inside an array
+ */
+export function moveItems<T>(array: T[], index: number, count: number, offset: number): T[] {
+  // TODO: check boundaries: index+offset >= 0, index+offset+count<array.length, index+count<array.length, etc
+  const copy = array.slice(0)
+  const moving: T[] = copy.splice(index, count)
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  copy.splice.apply(copy, [index + offset, 0, ...moving])
+  return copy
+}

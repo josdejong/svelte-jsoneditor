@@ -14,7 +14,7 @@
     HOVER_INSERT_INSIDE,
     INSERT_EXPLANATION
   } from '$lib/constants'
-  import { documentStatePatch, getVisibleCaretPositions } from '$lib/logic/documentState'
+  import { getVisibleCaretPositions } from '$lib/logic/documentState'
   import { rename } from '$lib/logic/operations'
   import {
     createAfterSelection,
@@ -23,6 +23,7 @@
     fromCaretPosition,
     fromSelectionType,
     getEndPath,
+    getSelectionPaths,
     isInsideSelection,
     isKeySelection,
     isPathInsideSelection,
@@ -44,10 +45,12 @@
   import { singleton } from './singleton.js'
   import { createDebug } from '$lib/utils/debug'
   import { onMoveSelection } from '$lib/logic/dragging'
-  import { forEachIndex } from '$lib/utils/arrayUtils'
+  import { forEachIndex, moveItems } from '$lib/utils/arrayUtils'
   import type {
     DraggingState,
     ExtendedSearchResultItem,
+    JSONNodeItem,
+    JSONNodeProp,
     JSONPointerMap,
     JSONSelection,
     RenderedItem,
@@ -92,45 +95,23 @@
   let pointer: JSONPointer
   $: pointer = compileJSONPointer(path)
 
-  let resolvedValue: JSONData
-  $: resolvedValue = dragging ? dragging.value : value
-  let resolvedSelection: JSONSelection | undefined
-  $: resolvedSelection = dragging ? dragging.selection : selection
-
-  let resolvedExpandedMap: JSONPointerMap<boolean> | undefined
-  $: resolvedExpandedMap = dragging ? dragging.expandedMap : expandedMap
-
-  let resolvedEnforceStringMap: JSONPointerMap<boolean> | undefined
-  $: resolvedEnforceStringMap = dragging ? dragging.enforceStringMap : enforceStringMap
-
-  let resolvedVisibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
-  $: resolvedVisibleSectionsMap = dragging ? dragging.visibleSectionsMap : visibleSectionsMap
-
-  let resolvedValidationErrorsMap: JSONPointerMap<ValidationError> | undefined
-  $: resolvedValidationErrorsMap = dragging ? dragging.validationErrorsMap : validationErrorsMap
-
-  let resolvedSearchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
-  $: resolvedSearchResultItemsMap = dragging ? dragging.searchResultItemsMap : searchResultItemsMap
-
   let expanded: boolean
-  $: expanded = resolvedExpandedMap ? resolvedExpandedMap[pointer] === true : false
+  $: expanded = expandedMap ? expandedMap[pointer] === true : false
 
   let enforceString: boolean | undefined
-  $: enforceString = getEnforceString(value, resolvedEnforceStringMap, pointer)
+  $: enforceString = getEnforceString(value, enforceStringMap, pointer)
 
   let visibleSections: VisibleSection[] | undefined
-  $: visibleSections = resolvedVisibleSectionsMap ? resolvedVisibleSectionsMap[pointer] : undefined
+  $: visibleSections = visibleSectionsMap ? visibleSectionsMap[pointer] : undefined
 
   let validationError: ValidationError | undefined
-  $: validationError = resolvedValidationErrorsMap
-    ? resolvedValidationErrorsMap[pointer]
-    : undefined
+  $: validationError = validationErrorsMap ? validationErrorsMap[pointer] : undefined
 
   let isSelected: boolean
-  $: isSelected = resolvedSelection ? resolvedSelection.pointersMap[pointer] === true : false
+  $: isSelected = selection ? selection.pointersMap[pointer] === true : false
 
   $: root = path.length === 0
-  $: type = valueType(resolvedValue)
+  $: type = valueType(value)
 
   function getIndentationStyle(level) {
     return `margin-left: calc(${level} * var(--jse-indent-size))`
@@ -138,29 +119,89 @@
 
   $: indentationStyle = getIndentationStyle(path.length)
 
-  function getProps(object: JSONObject): { key: string; value: JSONData; pointer: JSONPointer }[] {
-    return Object.keys(object).map((key) => ({
-      key,
-      value: object[key],
-      path: memoizePath(path.concat(key)),
-      pointer: appendToJSONPointer(pointer, key)
-    }))
+  // TODO: extract getProps into a separate function
+  function getProps(
+    path: JSONPath,
+    object: JSONObject,
+    expandedMap: JSONPointerMap<boolean> | undefined,
+    enforceStringMap: JSONPointerMap<boolean> | undefined,
+    visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined,
+    validationErrorsMap: JSONPointerMap<ValidationError> | undefined,
+    searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
+    selection: JSONSelection | undefined,
+    dragging: DraggingState
+  ): JSONNodeProp[] {
+    let props = Object.keys(object).map((key) => {
+      const keyPointer = appendToJSONPointer(pointer, key)
+      return {
+        key,
+        value: object[key],
+        path: memoizePath(path.concat(key)),
+        pointer: keyPointer,
+        expandedMap: filterPointerOrUndefined(expandedMap, keyPointer),
+        enforceStringMap: filterPointerOrUndefined(enforceStringMap, keyPointer),
+        visibleSectionsMap: filterPointerOrUndefined(visibleSectionsMap, keyPointer),
+        validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, keyPointer),
+        keySearchResultItemsMap: filterKeySearchResults(searchResultItemsMap, keyPointer),
+        valueSearchResultItemsMap: filterPointerOrUndefined(searchResultItemsMap, keyPointer),
+        selection: selectionIfOverlapping(selection, keyPointer)
+      }
+    })
+
+    // reorder the props when dragging
+    if (dragging && dragging.offset !== 0) {
+      // TODO: calculate the number of items in the selection only once
+      const count = getSelectionPaths(selection).length
+
+      props = moveItems(props, dragging.initialIndex, count, dragging.offset)
+    }
+
+    return props
   }
 
+  // TODO: extract getItems into a separate function
   function getItems(
+    path: JSONPath,
     array: JSONArray,
-    visibleSection: VisibleSection
-  ): { index: number; value: JSONData; pointer: JSONPointer }[] {
+    visibleSection: VisibleSection,
+    expandedMap: JSONPointerMap<boolean> | undefined,
+    enforceStringMap: JSONPointerMap<boolean> | undefined,
+    visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined,
+    validationErrorsMap: JSONPointerMap<ValidationError> | undefined,
+    searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
+    selection: JSONSelection | undefined,
+    dragging: DraggingState
+  ): JSONNodeItem[] {
     const start = visibleSection.start
     const end = Math.min(visibleSection.end, array.length)
-    const items = []
+    let items: JSONNodeItem[] = []
 
     for (let index = start; index < end; index++) {
+      const itemPointer = appendToJSONPointer(pointer, index)
+
       items.push({
         index,
         value: array[index],
         path: memoizePath(path.concat(String(index))),
-        pointer: appendToJSONPointer(pointer, index)
+        pointer: itemPointer,
+        expandedMap: filterPointerOrUndefined(expandedMap, itemPointer),
+        enforceStringMap: filterPointerOrUndefined(enforceStringMap, itemPointer),
+        visibleSectionsMap: filterPointerOrUndefined(visibleSectionsMap, itemPointer),
+        validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, itemPointer),
+        searchResultItemsMap: filterPointerOrUndefined(searchResultItemsMap, itemPointer),
+        selection: selectionIfOverlapping(selection, itemPointer)
+      })
+    }
+
+    // reorder the items when dragging
+    if (dragging && dragging.offset !== 0) {
+      // TODO: calculate the number of items in the selection only once
+      const count = getSelectionPaths(selection).length
+
+      items = moveItems(items, dragging.initialIndex, count, dragging.offset)
+
+      items.forEach((item, index) => {
+        item.index = index
       })
     }
 
@@ -236,7 +277,7 @@
     } else {
       if (anchorType === SelectionType.multi) {
         if (root && event.target.hasAttribute('data-path')) {
-          const lastCaretPosition = last(getVisibleCaretPositions(resolvedValue, documentState))
+          const lastCaretPosition = last(getVisibleCaretPositions(value, documentState))
           context.onSelect(fromCaretPosition(lastCaretPosition))
         } else {
           context.onSelect(createMultiSelection(json, path, path))
@@ -331,6 +372,8 @@
     // and when the selection is spread over multiple sections,
     // no items will be returned: this is not (yet) supported
     const items = getVisibleItemsWithHeights(selection)
+    const initialPath = getStartPath(selection)
+    const initialIndex = items.findIndex((item) => isEqual(item.path, initialPath))
 
     debug('dragSelectionStart', { selection, items })
 
@@ -339,22 +382,23 @@
       return
     }
 
+    const json = context.getJson()
+    const documentState = context.getDocumentState()
+    const { indexOffset } = onMoveSelection({
+      json,
+      documentState,
+      deltaY: 0,
+      items
+    })
+
     dragging = {
       initialTarget: event.target,
       initialClientY: event.clientY,
       initialContentTop: findContentTop(),
-      value,
-      selection,
-      expandedMap,
-      enforceStringMap,
-      visibleSectionsMap,
-      // FIXME: right now, when dragging inside an array, we turn off validation errors and search results
-      //  in the future, we should update these maps whilst dragging (requires a more flexible
-      //  documentStatePatch, or putting validationErrorsMap and searchResultItemsMap inside the documentState)
-      validationErrorsMap: Array.isArray(value) ? {} : validationErrorsMap,
-      searchResultItemsMap: Array.isArray(value) ? {} : searchResultItemsMap,
+      initialIndex,
+      count: items.length,
       items,
-      indexOffset: 0,
+      offset: indexOffset,
       didMoveItems: false // whether items have been moved during dragging or not
     }
     singleton.dragging = true
@@ -369,26 +413,19 @@
       const documentState = context.getDocumentState()
 
       const deltaY = calculateDeltaY(dragging, event)
-      const { operations, updatedValue, updatedSelection, indexOffset } = onMoveSelection({
+      const { updatedSelection, indexOffset } = onMoveSelection({
         json,
         documentState,
         deltaY,
         items: dragging.items
       })
 
-      if (indexOffset !== dragging.indexOffset) {
+      if (indexOffset !== dragging.offset) {
         debug('drag selection', indexOffset, deltaY, updatedSelection)
-
-        const patchResult = operations
-          ? documentStatePatch(json, documentState, operations)
-          : { json, documentState }
 
         dragging = {
           ...dragging,
-          value: updatedValue || value,
-          selection: updatedSelection || selection,
-          expandedMap: filterPointerOrUndefined(patchResult.documentState.expandedMap, pointer),
-          indexOffset,
+          offset: indexOffset,
           didMoveItems: true
         }
       }
@@ -540,13 +577,13 @@
   class={classnames(
     'jse-json-node',
     { 'jse-expanded': expanded },
-    context.onClassName(path, resolvedValue)
+    context.onClassName(path, value)
   )}
   data-path={encodeDataPath(path)}
   class:jse-root={root}
-  class:jse-selected={isSelected && isMultiSelection(resolvedSelection)}
-  class:jse-selected-key={isSelected && isKeySelection(resolvedSelection)}
-  class:jse-selected-value={isSelected && isValueSelection(resolvedSelection)}
+  class:jse-selected={isSelected && isMultiSelection(selection)}
+  class:jse-selected-key={isSelected && isKeySelection(selection)}
+  class:jse-selected-value={isSelected && isValueSelection(selection)}
   class:jse-hovered={hover === HOVER_COLLECTION}
   on:mousedown={handleMouseDown}
   on:mousemove={handleMouseMove}
@@ -579,20 +616,20 @@
             {#if expanded}
               <div class="jse-bracket">[</div>
               <span class="jse-tag jse-expanded">
-                {resolvedValue.length}
-                {resolvedValue.length === 1 ? 'item' : 'items'}
+                {value.length}
+                {value.length === 1 ? 'item' : 'items'}
               </span>
             {:else}
               <div class="jse-bracket">[</div>
               <button type="button" class="jse-tag" on:click={handleExpand}>
-                {resolvedValue.length}
-                {resolvedValue.length === 1 ? 'item' : 'items'}
+                {value.length}
+                {value.length === 1 ? 'item' : 'items'}
               </button>
               <div class="jse-bracket">]</div>
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && isSelected && resolvedSelection && (isValueSelection(resolvedSelection) || isMultiSelection(resolvedSelection)) && !resolvedSelection.edit && isEqual(resolvedSelection.focusPath, path)}
+        {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="jse-context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -617,41 +654,32 @@
     </div>
     {#if expanded}
       <div class="jse-items">
-        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || (isSelected && isInsideSelection(resolvedSelection)))}
+        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || (isSelected && isInsideSelection(selection)))}
           <div
             class="jse-insert-area jse-inside"
             class:jse-hovered={hover === HOVER_INSERT_INSIDE}
-            class:jse-selected={isSelected && isInsideSelection(resolvedSelection)}
+            class:jse-selected={isSelected && isInsideSelection(selection)}
             data-type="insert-selection-area-inside"
             style={getIndentationStyle(path.length + 1)}
             title={INSERT_EXPLANATION}
           >
             <ContextMenuButton
-              selected={isSelected && isInsideSelection(resolvedSelection)}
+              selected={isSelected && isInsideSelection(selection)}
               onContextMenu={handleInsertInsideOpenContextMenu}
             />
           </div>
         {/if}
         {#each visibleSections || DEFAULT_VISIBLE_SECTIONS as visibleSection, sectionIndex (sectionIndex)}
-          {#each getItems(resolvedValue, visibleSection) as item (item.index)}
+          {#each getItems(path, value, visibleSection, expandedMap, enforceStringMap, visibleSectionsMap, validationErrorsMap, searchResultItemsMap, selection, dragging) as item (item.index)}
             <svelte:self
               value={item.value}
               path={item.path}
-              expandedMap={filterPointerOrUndefined(resolvedExpandedMap, item.pointer)}
-              enforceStringMap={filterPointerOrUndefined(resolvedEnforceStringMap, item.pointer)}
-              visibleSectionsMap={filterPointerOrUndefined(
-                resolvedVisibleSectionsMap,
-                item.pointer
-              )}
-              validationErrorsMap={filterPointerOrUndefined(
-                resolvedValidationErrorsMap,
-                item.pointer
-              )}
-              searchResultItemsMap={filterPointerOrUndefined(
-                resolvedSearchResultItemsMap,
-                item.pointer
-              )}
-              selection={selectionIfOverlapping(resolvedSelection, item.pointer)}
+              expandedMap={item.expandedMap}
+              enforceStringMap={item.enforceStringMap}
+              visibleSectionsMap={item.visibleSectionsMap}
+              validationErrorsMap={item.validationErrorsMap}
+              searchResultItemsMap={item.searchResultItemsMap}
+              selection={item.selection}
               {context}
               onDragSelectionStart={handleDragSelectionStart}
             >
@@ -660,15 +688,15 @@
               </div>
             </svelte:self>
           {/each}
-          {#if visibleSection.end < resolvedValue.length}
+          {#if visibleSection.end < value.length}
             <CollapsedItems
               visibleSections={visibleSections || DEFAULT_VISIBLE_SECTIONS}
               {sectionIndex}
-              total={resolvedValue.length}
+              total={value.length}
               {path}
               {pointer}
               onExpandSection={context.onExpandSection}
-              selection={resolvedSelection}
+              {selection}
             />
           {/if}
         {/each}
@@ -712,14 +740,14 @@
             {:else}
               <div class="jse-bracket">&lbrace;</div>
               <button type="button" class="jse-tag" on:click={handleExpand}>
-                {Object.keys(resolvedValue).length}
-                {Object.keys(resolvedValue).length === 1 ? 'prop' : 'props'}
+                {Object.keys(value).length}
+                {Object.keys(value).length === 1 ? 'prop' : 'props'}
               </button>
               <div class="jse-bracket">&rbrace;</div>
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && isSelected && resolvedSelection && (isValueSelection(resolvedSelection) || isMultiSelection(resolvedSelection)) && !resolvedSelection.edit && isEqual(resolvedSelection.focusPath, path)}
+        {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="jse-context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -744,37 +772,31 @@
     </div>
     {#if expanded}
       <div class="jse-props">
-        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || (isSelected && isInsideSelection(resolvedSelection)))}
+        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || (isSelected && isInsideSelection(selection)))}
           <div
             class="jse-insert-area jse-inside"
             class:jse-hovered={hover === HOVER_INSERT_INSIDE}
-            class:jse-selected={isSelected && isInsideSelection(resolvedSelection)}
+            class:jse-selected={isSelected && isInsideSelection(selection)}
             data-type="insert-selection-area-inside"
             style={getIndentationStyle(path.length + 1)}
             title={INSERT_EXPLANATION}
           >
             <ContextMenuButton
-              selected={isSelected && isInsideSelection(resolvedSelection)}
+              selected={isSelected && isInsideSelection(selection)}
               onContextMenu={handleInsertInsideOpenContextMenu}
             />
           </div>
         {/if}
-        {#each getProps(resolvedValue) as prop}
+        {#each getProps(path, value, expandedMap, enforceStringMap, visibleSectionsMap, validationErrorsMap, searchResultItemsMap, selection, dragging) as prop}
           <svelte:self
             value={prop.value}
             path={prop.path}
-            expandedMap={filterPointerOrUndefined(resolvedExpandedMap, prop.pointer)}
-            enforceStringMap={filterPointerOrUndefined(resolvedEnforceStringMap, prop.pointer)}
-            visibleSectionsMap={filterPointerOrUndefined(resolvedVisibleSectionsMap, prop.pointer)}
-            validationErrorsMap={filterPointerOrUndefined(
-              resolvedValidationErrorsMap,
-              prop.pointer
-            )}
-            searchResultItemsMap={filterPointerOrUndefined(
-              resolvedSearchResultItemsMap,
-              prop.pointer
-            )}
-            selection={selectionIfOverlapping(resolvedSelection, prop.pointer)}
+            expandedMap={prop.expandedMap}
+            enforceStringMap={prop.enforceStringMap}
+            visibleSectionsMap={prop.visibleSectionsMap}
+            validationErrorsMap={prop.validationErrorsMap}
+            searchResultItemsMap={prop.valueSearchResultItemsMap}
+            selection={prop.selection}
             {context}
             onDragSelectionStart={handleDragSelectionStart}
           >
@@ -783,11 +805,8 @@
                 path={prop.path}
                 pointer={prop.pointer}
                 key={prop.key}
-                selection={selectionIfOverlapping(resolvedSelection, prop.pointer)}
-                searchResultItems={filterKeySearchResults(
-                  resolvedSearchResultItemsMap,
-                  prop.pointer
-                )}
+                selection={prop.selection}
+                searchResultItems={prop.keySearchResultItemsMap}
                 {context}
                 onUpdateKey={handleUpdateKey}
               />
@@ -820,11 +839,11 @@
           {value}
           {enforceString}
           {isSelected}
-          selection={isSelected ? resolvedSelection : undefined}
-          searchResultItems={filterValueSearchResults(resolvedSearchResultItemsMap, pointer)}
+          selection={isSelected ? selection : undefined}
+          searchResultItems={filterValueSearchResults(searchResultItemsMap, pointer)}
           {context}
         />
-        {#if !context.readOnly && isSelected && resolvedSelection && (isValueSelection(resolvedSelection) || isMultiSelection(resolvedSelection)) && !resolvedSelection.edit && isEqual(resolvedSelection.focusPath, path)}
+        {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="jse-context-menu-button-anchor">
             <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -842,17 +861,17 @@
       {/if}
     </div>
   {/if}
-  {#if !context.readOnly && (hover === HOVER_INSERT_AFTER || (isSelected && isAfterSelection(resolvedSelection)))}
+  {#if !context.readOnly && (hover === HOVER_INSERT_AFTER || (isSelected && isAfterSelection(selection)))}
     <div
       class="jse-insert-area jse-after"
       class:jse-hovered={hover === HOVER_INSERT_AFTER}
-      class:jse-selected={isSelected && isAfterSelection(resolvedSelection)}
+      class:jse-selected={isSelected && isAfterSelection(selection)}
       data-type="insert-selection-area-after"
       style={indentationStyle}
       title={INSERT_EXPLANATION}
     >
       <ContextMenuButton
-        selected={isSelected && isAfterSelection(resolvedSelection)}
+        selected={isSelected && isAfterSelection(selection)}
         onContextMenu={handleInsertAfterOpenContextMenu}
       />
     </div>

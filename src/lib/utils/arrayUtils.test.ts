@@ -4,6 +4,7 @@ import {
   arrayToObject,
   compareArrays,
   getNestedPaths,
+  moveItems,
   objectToArray
 } from './arrayUtils.js'
 
@@ -112,6 +113,20 @@ describe('arrayUtils', () => {
 
       assert.strictEqual(arrayStartsWith(users, searchArray), false)
       assert.strictEqual(arrayStartsWith(users, searchArray, equalUserId), true)
+    })
+  })
+
+  describe('moveItems', () => {
+    it('should move array items up', () => {
+      assert.deepStrictEqual(moveItems([1, 2, 3, 4, 5], 2, 1, -1), [1, 3, 2, 4, 5])
+      assert.deepStrictEqual(moveItems([1, 2, 3, 4, 5], 2, 2, -1), [1, 3, 4, 2, 5])
+      assert.deepStrictEqual(moveItems([1, 2, 3, 4, 5], 2, 2, -2), [3, 4, 1, 2, 5])
+    })
+
+    it('should move array items down', () => {
+      assert.deepStrictEqual(moveItems([1, 2, 3, 4, 5], 1, 1, 1), [1, 3, 2, 4, 5])
+      assert.deepStrictEqual(moveItems([1, 2, 3, 4, 5], 1, 2, 1), [1, 4, 2, 3, 5])
+      assert.deepStrictEqual(moveItems([1, 2, 3, 4, 5], 1, 2, 2), [1, 4, 5, 2, 3])
     })
   })
 })
