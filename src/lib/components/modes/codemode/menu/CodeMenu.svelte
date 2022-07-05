@@ -98,17 +98,6 @@
   $: items = onRenderMenu('code', defaultItems) || defaultItems
 </script>
 
-<Menu {items}>
-  <div slot="right" class="jse-powered-by">
-    <a
-      href="https://codemirror.net"
-      target="_blank"
-      rel="noopener noreferrer"
-      title="Code mode is powered by CodeMirror"
-    >
-      powered by CodeMirror
-    </a>
-  </div>
-</Menu>
+<Menu {items} />
 
 <style src="./CodeMenu.scss"></style>
