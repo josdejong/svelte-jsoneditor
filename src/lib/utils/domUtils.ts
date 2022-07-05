@@ -1,5 +1,7 @@
-import { SELECTION_TYPE } from '../logic/selection.js'
+import { SelectionType } from '../types.js'
+import type { JSONPath } from 'immutable-json-patch'
 import { map, minBy } from 'lodash-es'
+import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 
 /**
  * Create serialization functions to escape and stringify text,
@@ -249,50 +251,48 @@ export function findParentWithNodeName(element, nodeName) {
  * @param {HTMLElement} target
  * @returns {string | null}
  */
-export function getSelectionTypeFromTarget(target) {
+export function getSelectionTypeFromTarget(target: HTMLElement): SelectionType {
   if (isChildOfAttribute(target, 'data-type', 'selectable-key')) {
-    return SELECTION_TYPE.KEY
+    return SelectionType.key
   }
 
   if (isChildOfAttribute(target, 'data-type', 'selectable-value')) {
-    return SELECTION_TYPE.VALUE
+    return SelectionType.value
   }
 
   if (isChildOfAttribute(target, 'data-type', 'insert-selection-area-inside')) {
-    return SELECTION_TYPE.INSIDE
+    return SelectionType.inside
   }
 
   if (isChildOfAttribute(target, 'data-type', 'insert-selection-area-after')) {
-    return SELECTION_TYPE.AFTER
+    return SelectionType.after
   }
 
-  return SELECTION_TYPE.MULTI
+  return SelectionType.multi
 }
 
 /**
  * Encode a path into a string that can be used as attribute in HTML
- * @param {Path} path
+ * @param {JSONPath} path
  * @returns {string}
  */
 export function encodeDataPath(path) {
-  return encodeURIComponent(JSON.stringify(path))
+  return encodeURIComponent(compileJSONPointer(path))
 }
 
 /**
  * Decode a path that was stringified for use as an HTML attribute
  * @param {string} pathStr
- * @returns {Path}
+ * @returns {JSONPath}
  */
 export function decodeDataPath(pathStr) {
-  return JSON.parse(decodeURIComponent(pathStr))
+  return parseJSONPointer(decodeURIComponent(pathStr))
 }
 
 /**
  * Find the data path of the given element. Traverses the parent nodes until find
- * @param {HTMLElement} target
- * @returns {Path | null}
  */
-export function getDataPathFromTarget(target) {
+export function getDataPathFromTarget(target: HTMLElement): JSONPath | null {
   const parent = findParent(target, (element) => {
     return element.hasAttribute('data-path')
   })

@@ -7,6 +7,7 @@
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
   import { DEBOUNCE_DELAY } from '../../constants.js'
+  import type { JSONData, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { transformModalState } from './transformModalState.js'
@@ -17,12 +18,10 @@
   import TreeMode from '../modes/treemode/TreeMode.svelte'
   import type {
     Content,
-    JSONData,
     OnChangeQueryLanguage,
     OnClassName,
     OnPatch,
     OnRenderValue,
-    Path,
     QueryLanguage
   } from '../../types'
 
@@ -30,7 +29,7 @@
 
   export let id = 'transform-modal-' + uniqueId()
   export let json: JSONData
-  export let selectedPath: Path = []
+  export let selectedPath: JSONPath = []
 
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
@@ -284,7 +283,6 @@
               </div>
             {/if}
           </div>
-          <!--          </div>-->
         </div>
       </div>
 

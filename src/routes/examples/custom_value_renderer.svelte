@@ -46,7 +46,6 @@
             path,
             readOnly,
             onPatch,
-            onSelect,
             isSelected,
             options: genderOptions
           }

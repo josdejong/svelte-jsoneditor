@@ -5,14 +5,14 @@
   import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
   import NavigationBarDropdown from '../../../components/controls/navigationBar/NavigationBarDropdown.svelte'
   import { getContext } from 'svelte'
-  import type { Path } from '../../../types'
+  import type { JSONPath } from 'immutable-json-patch'
 
   const { openAbsolutePopup, closeAbsolutePopup } = getContext('absolute-popup')
 
-  export let path: Path
+  export let path: JSONPath
   export let index: number
-  export let onSelect: (path: Path) => void
-  export let getItems: (path: Path) => (string | number)[]
+  export let onSelect: (path: JSONPath) => void
+  export let getItems: (path: JSONPath) => string[]
 
   let refNavigationBarItem: Element | undefined
   let open = false

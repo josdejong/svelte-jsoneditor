@@ -12,41 +12,52 @@ export function renderValue({
   value,
   readOnly,
   enforceString,
-  searchResult,
+  searchResultItems,
   isEditing,
   normalization,
   onPatch,
   onPasteJson,
   onSelect,
-  onFind
+  onFind,
+  focus
 }: RenderValueProps): RenderValueComponentDescription[] {
   const renderers: RenderValueComponentDescription[] = []
 
   if (!isEditing && isBoolean(value)) {
     renderers.push({
       component: BooleanToggle as unknown as SvelteComponent, // TODO: casting should not be needed
-      props: { path, value, readOnly, onPatch, onSelect }
+      props: { path, value, readOnly, onPatch, focus }
     })
   }
 
   if (!isEditing && isColor(value)) {
     renderers.push({
       component: ColorPicker as unknown as SvelteComponent, // TODO: casting should not be needed
-      props: { path, value, readOnly, onPatch, onSelect }
+      props: { path, value, readOnly, onPatch, focus }
     })
   }
 
   if (isEditing) {
     renderers.push({
       component: EditableValue as unknown as SvelteComponent, // TODO: casting should not be needed
-      props: { path, value, enforceString, normalization, onPatch, onPasteJson, onSelect, onFind }
+      props: {
+        path,
+        value,
+        enforceString,
+        normalization,
+        onPatch,
+        onPasteJson,
+        onSelect,
+        onFind,
+        focus
+      }
     })
   }
 
   if (!isEditing) {
     renderers.push({
       component: ReadonlyValue as unknown as SvelteComponent, // TODO: casting should not be needed
-      props: { path, value, readOnly, normalization, searchResult, onSelect }
+      props: { path, value, readOnly, normalization, searchResultItems, onSelect }
     })
   }
 

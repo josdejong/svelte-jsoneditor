@@ -1,17 +1,19 @@
-import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer } from 'immutable-json-patch'
+import type { JSONArray, JSONData, JSONObject, JSONPath } from 'immutable-json-patch'
 import jsonSourceMap from 'json-source-map'
 import jsonrepair from 'jsonrepair'
 import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
 import { arrayToObject, objectToArray } from './arrayUtils.js'
-import type {
-  Content,
-  NormalizedParseError,
-  Path,
-  TextLocation,
-  JSONData,
-  TextContent
-} from '../types'
+import type { Content, NormalizedParseError, TextContent, TextLocation } from '../types'
+import { int } from './numberUtils.js'
+
+export function isJSONObject(value: unknown): value is JSONObject {
+  return isObject(value)
+}
+
+export function isJSONArray(value: unknown): value is JSONArray {
+  return Array.isArray(value)
+}
 
 /**
  * Parse the JSON. if this fails, try to repair and parse.
@@ -119,7 +121,7 @@ export function normalizeJsonParseError(
 
   if (positionMatch) {
     // a message from Chrome, like "Unexpected token i in JSON at line 2 column 3"
-    const position = parseInt(positionMatch[2], 10)
+    const position = int(positionMatch[2])
 
     const line = countCharacterOccurrences(jsonText, '\n', 0, position)
     const lastIndex = jsonText.lastIndexOf('\n', position)
@@ -136,11 +138,11 @@ export function normalizeJsonParseError(
   } else {
     // a message from Firefox, like "JSON.parse: expected property name or '}' at line 2 column 3 of the JSON data"
     const lineMatch = LINE_REGEX.exec(parseErrorMessage)
-    const lineOneBased = lineMatch ? parseInt(lineMatch[1], 10) : null
+    const lineOneBased = lineMatch ? int(lineMatch[1]) : null
     const line = lineOneBased !== null ? lineOneBased - 1 : null
 
     const columnMatch = COLUMN_REGEX.exec(parseErrorMessage)
-    const columnOneBased = columnMatch ? parseInt(columnMatch[1], 10) : null
+    const columnOneBased = columnMatch ? int(columnMatch[1]) : null
     const column = columnOneBased !== null ? columnOneBased - 1 : null
 
     const position =
@@ -197,11 +199,11 @@ export function countCharacterOccurrences(
  * Find the text location of a JSON path
  */
 // TODO: write unit tests
-export function findTextLocation(text: string, path: Path): TextLocation | null {
+export function findTextLocation(text: string, path: JSONPath): TextLocation | null {
   try {
     const jsmap = jsonSourceMap.parse(text)
 
-    const pointerName = compileJSONPointer(path as JSONPath)
+    const pointerName = compileJSONPointer(path)
     const pointer = jsmap.pointers[pointerName]
     if (pointer) {
       return {
@@ -264,7 +266,7 @@ export function convertValue(value: JSONData, type: 'value' | 'object' | 'array'
       const parsedValue = JSON.parse(value)
 
       if (isObject(parsedValue)) {
-        return parsedValue as JSONData
+        return parsedValue as JSONObject
       }
 
       if (Array.isArray(parsedValue)) {

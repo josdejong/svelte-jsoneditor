@@ -22,4 +22,4 @@
   <Icon data={faExclamationTriangle} />
 </button>
 
-<style src="./ValidationError.scss"></style>
+<style src="./ValidationErrorIcon.scss"></style>

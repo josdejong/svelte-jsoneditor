@@ -1,10 +1,9 @@
 import diffSequence from '../generated/diffSequence.js'
-import type { JSONPath } from 'immutable-json-patch'
-import { compileJSONPointer, getIn, setIn } from 'immutable-json-patch'
+import type { JSONArray, JSONData, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
+import { compileJSONPointer, getIn, parseFrom, parsePath, setIn } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import naturalCompare from 'natural-compare-lite'
-import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
-import type { JSONData, Path } from '../types'
+import { int } from '../utils/numberUtils.js'
 
 export function caseInsensitiveNaturalCompare(a, b) {
   const aLower = typeof a === 'string' ? a.toLowerCase() : a
@@ -15,14 +14,18 @@ export function caseInsensitiveNaturalCompare(a, b) {
 
 /**
  * Sort the keys of an object
- * @param {JSON} json             The the JSON containg the (optionally nested)
- *                                object to be sorted
- * @param {Path} [rootPath=[]]    Relative path when the array was located
- * @param {1 | -1} [direction=1]  Pass 1 to sort ascending, -1 to sort descending
- * @return {JSONPatchDocument}    Returns a JSONPatch document with move operation
- *                                to get the array sorted.
+ * @param json           The the JSON containg the (optionally nested)
+ *                       object to be sorted
+ * @param [rootPath=[]]  Relative path when the array was located
+ * @param [direction=1]  Pass 1 to sort ascending, -1 to sort descending
+ * @return               Returns a JSONPatch document with move operation
+ *                       to get the array sorted.
  */
-export function sortObjectKeys(json, rootPath = [], direction = 1) {
+export function sortObjectKeys(
+  json: JSONData,
+  rootPath: JSONPath = [],
+  direction: 1 | -1 = 1
+): JSONPatchDocument {
   const object = getIn(json, rootPath)
   const keys = Object.keys(object)
   const sortedKeys = keys.slice()
@@ -48,19 +51,24 @@ export function sortObjectKeys(json, rootPath = [], direction = 1) {
 
 /**
  * Sort the items of an array
- * @param {JSON} json                The document containing (optionally nested)
- *                                  the array to be sorted.
- * @param {Path} [rootPath=[]]      Relative path when the array was located
- * @param {Path} [propertyPath=[]]  Nested path to the property on which to sort the contents
- * @param {1 | -1} [direction=1]    Pass 1 to sort ascending, -1 to sort descending
- * @return {JSONPatchDocument}      Returns a JSONPatch document with move operation
- *                                  to get the array sorted.
+ * @param json               The document containing (optionally nested)
+ *                           the array to be sorted.
+ * @param [rootPath=[]]      Relative path when the array was located
+ * @param [propertyPath=[]]  Nested path to the property on which to sort the contents
+ * @param [direction=1]      Pass 1 to sort ascending, -1 to sort descending
+ * @return                   Returns a JSONPatch document with move operation
+ *                           to get the array sorted.
  */
-export function sortArray(json, rootPath = [], propertyPath = [], direction = 1) {
+export function sortArray(
+  json: JSONData,
+  rootPath: JSONPath = [],
+  propertyPath: JSONPath = [],
+  direction: 1 | -1 = 1
+) {
   const comparator = createObjectComparator(propertyPath, direction)
 
   // TODO: make the mechanism to sort configurable? Like use sortOperationsMove and sortOperationsMoveAdvanced
-  const array: JSONData[] = getIn(json, rootPath) as JSONData[]
+  const array: JSONArray = getIn(json, rootPath) as JSONArray
   return [
     {
       op: 'replace',
@@ -72,10 +80,8 @@ export function sortArray(json, rootPath = [], propertyPath = [], direction = 1)
 
 /**
  * Create a comparator function to compare nested properties in an array
- * @param {Path} propertyPath
- * @param {1 | -1} direction
  */
-function createObjectComparator(propertyPath, direction) {
+function createObjectComparator(propertyPath: JSONPath, direction: 1 | -1) {
   return function comparator(a, b) {
     const valueA = getIn(a, propertyPath)
     const valueB = getIn(b, propertyPath)
@@ -236,13 +242,15 @@ export function fastPatchSort(json, operations) {
   }
 
   // parse all paths
-  const parsedOperations: Array<{ from: Path; path: Path }> = operations.map((operation) => ({
-    from: parseJSONPointerWithArrayIndices(json, operation.from),
-    path: parseJSONPointerWithArrayIndices(json, operation.path)
-  }))
+  const parsedOperations: Array<{ from: JSONPath; path: JSONPath }> = operations.map(
+    (operation) => ({
+      from: parseFrom(operation.from),
+      path: parsePath(json, operation.path)
+    })
+  )
 
   // validate whether the move actions take place in an array
-  const arrayPath: JSONPath = initial(first(parsedOperations).path) as JSONPath
+  const arrayPath = initial(first(parsedOperations).path)
   const array = getIn(json, arrayPath)
   if (!Array.isArray(array)) {
     throw new Error(
@@ -271,8 +279,8 @@ export function fastPatchSort(json, operations) {
   // apply the actual operations on the same array. Only copy the only array once
   const updatedArray = array.slice(0)
   parsedOperations.forEach((parsedOperation) => {
-    const fromIndex = last(parsedOperation.from) as number
-    const toIndex = last(parsedOperation.path) as number
+    const fromIndex = int(last(parsedOperation.from))
+    const toIndex = int(last(parsedOperation.path))
 
     const value = updatedArray.splice(fromIndex, 1)[0]
     updatedArray.splice(toIndex, 0, value)

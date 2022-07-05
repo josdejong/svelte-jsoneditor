@@ -1,6 +1,7 @@
 import { isObject } from './typeUtils.js'
-import type { JSONData } from '../types'
+import type { JSONArray, JSONObject } from 'immutable-json-patch'
 import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
+import { isEqual } from 'lodash-es'
 
 const MAX_ITEM_PATHS_COLLECTION = 10000
 const EMPTY_ARRAY = []
@@ -65,7 +66,7 @@ export function compareArrays<T>(a: Array<T>, b: Array<T>): number {
  * @return {Path[]}
  */
 export function getNestedPaths(array, includeObjects = false) {
-  const pathsMap = {}
+  const pointersMap = {}
 
   if (!Array.isArray(array)) {
     throw new TypeError('Array expected')
@@ -75,7 +76,7 @@ export function getNestedPaths(array, includeObjects = false) {
     const isValue = !Array.isArray(obj) && !isObject(obj)
 
     if (isValue || (includeObjects && path.length > 0)) {
-      pathsMap[compileJSONPointer(path)] = true
+      pointersMap[compileJSONPointer(path)] = true
     }
 
     if (isObject(obj)) {
@@ -91,7 +92,7 @@ export function getNestedPaths(array, includeObjects = false) {
     recurseNestedPaths(item, EMPTY_ARRAY)
   }
 
-  const pathsArray = Object.keys(pathsMap).sort()
+  const pathsArray = Object.keys(pointersMap).sort()
 
   return pathsArray.map(parseJSONPointer)
 }
@@ -124,15 +125,45 @@ export function limit<T>(array: Array<T>, max: number): Array<T> {
 /**
  * Convert an array into an object having the array indices as keys
  */
-export function arrayToObject(array: JSONData[]): { [key: string]: JSONData } {
+export function arrayToObject(array: JSONArray): JSONObject {
   return {
     ...array
-  } as unknown as { [key: string]: JSONData }
+  } as unknown as JSONObject
 }
 
 /**
  * Get the values of an object as an array
  */
-export function objectToArray(object: { [key: string]: JSONData }): JSONData[] {
-  return Object.values(object) as unknown as Array<JSONData>
+export function objectToArray(object: JSONObject): JSONArray {
+  return Object.values(object) as unknown as JSONArray
+}
+
+/**
+ * Test whether an array starts with a sub array
+ */
+export function arrayStartsWith<T>(
+  array: T[],
+  searchArray: T[],
+  equal: (a: T, b: T) => boolean = isEqual
+): boolean {
+  for (let i = 0; i < searchArray.length; i++) {
+    if (!equal(array[i], searchArray[i])) {
+      return false
+    }
+  }
+
+  return true
+}
+
+/**
+ * Move a set of items inside an array
+ */
+export function moveItems<T>(array: T[], index: number, count: number, offset: number): T[] {
+  // TODO: check boundaries: index+offset >= 0, index+offset+count<array.length, index+count<array.length, etc
+  const copy = array.slice(0)
+  const moving: T[] = copy.splice(index, count)
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  copy.splice.apply(copy, [index + offset, 0, ...moving])
+  return copy
 }

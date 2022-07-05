@@ -14,23 +14,23 @@
     faSortAmountDownAlt,
     faTimes
   } from '@fortawesome/free-solid-svg-icons'
-  import { getIn } from 'immutable-json-patch'
+  import type { JSONData } from 'immutable-json-patch'
+  import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { initial, isEmpty } from 'lodash-es'
   import { onMount } from 'svelte'
   import Icon from 'svelte-awesome'
   import DropdownButton from '../../../controls/DropdownButton.svelte'
-  import { SELECTION_TYPE } from '$lib/logic/selection'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings'
-  import { isObjectOrArray } from '$lib/utils/typeUtils'
-  import { faCheckSquare, faLightbulb, faSquare } from '@fortawesome/free-regular-svg-icons'
-  import { STATE_ENFORCE_STRING } from '$lib/constants'
-  import { isObject } from '$lib/utils/typeUtils'
   import { canConvert, singleItemSelected } from '$lib/logic/selection'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings'
+  import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
+  import { faCheckSquare, faLightbulb, faSquare } from '@fortawesome/free-regular-svg-icons'
   import { findNearestElement } from '$lib/utils/domUtils'
+  import type { DocumentState } from '../../../../types'
+  import { isKeySelection, isMultiSelection, isValueSelection } from '../../../../logic/selection'
+  import { getEnforceString } from '../../../../logic/documentState'
 
-  export let json
-  export let state
-  export let selection
+  export let json: JSONData
+  export let documentState: DocumentState
 
   export let showTip
 
@@ -65,6 +65,8 @@
     })
   })
 
+  $: selection = documentState.selection
+
   $: hasJson = json !== undefined
   $: hasSelection = selection != null
   $: rootSelected = hasSelection && isEmpty(selection.focusPath)
@@ -72,17 +74,14 @@
 
   $: hasSelectionContents =
     hasJson &&
-    selection != null &&
-    (selection.type === SELECTION_TYPE.MULTI ||
-      selection.type === SELECTION_TYPE.KEY ||
-      selection.type === SELECTION_TYPE.VALUE)
+    (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))
 
   $: canDuplicate = hasJson && hasSelectionContents && !rootSelected // must not be root
 
   $: canExtract =
     hasJson &&
     selection != null &&
-    (selection.type === SELECTION_TYPE.MULTI || selection.type === SELECTION_TYPE.VALUE) &&
+    (isMultiSelection(selection) || isValueSelection(selection)) &&
     !rootSelected // must not be root
 
   $: canEditKey =
@@ -110,7 +109,11 @@
 
   $: enforceString =
     selection != null
-      ? getIn(state, selection.focusPath.concat(STATE_ENFORCE_STRING)) === true
+      ? getEnforceString(
+          focusValue,
+          documentState.enforceStringMap,
+          compileJSONPointer(selection.focusPath)
+        )
       : false
 
   function handleEditKey() {

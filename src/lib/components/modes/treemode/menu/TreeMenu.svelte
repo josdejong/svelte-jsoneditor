@@ -12,18 +12,20 @@
   } from '@fortawesome/free-solid-svg-icons'
   import { CONTEXT_MENU_EXPLANATION } from '$lib/constants'
   import { faJSONEditorCollapse, faJSONEditorExpand } from '$lib/img/customFontawesomeIcons'
-  import { SELECTION_TYPE } from '$lib/logic/selection'
   import { isObjectOrArray } from '$lib/utils/typeUtils'
   import Menu from '../../../controls/Menu.svelte'
   import { noop } from 'lodash-es'
-  import type { JSONData, OnRenderMenu } from '$lib/types'
+  import type { OnRenderMenu, JSONSelection } from '$lib/types'
+  import type { JSONData } from 'immutable-json-patch'
+  import { isKeySelection, isMultiSelection, isValueSelection } from '../../../../logic/selection'
+  import type { HistoryState } from '../../../../logic/history'
 
   export let json: JSONData
-  export let selection: Selection | undefined
+  export let selection: JSONSelection | undefined
 
   export let readOnly: boolean
   export let showSearch = false
-  export let historyState
+  export let historyState: HistoryState
 
   export let onExpandAll
   export let onCollapseAll
@@ -44,10 +46,7 @@
   $: hasSelection = selection != null
   $: hasSelectionContents =
     hasJson &&
-    selection != null &&
-    (selection.type === SELECTION_TYPE.MULTI ||
-      selection.type === SELECTION_TYPE.KEY ||
-      selection.type === SELECTION_TYPE.VALUE)
+    (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))
 
   $: expandMenuItem = {
     icon: faJSONEditorExpand,

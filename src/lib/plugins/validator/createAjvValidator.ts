@@ -1,6 +1,7 @@
 import Ajv from 'ajv-dist'
-import { parseJSONPointerWithArrayIndices } from '../../utils/jsonPointer.js'
-import type { JSONData, ValidationError } from '../../types'
+import type { JSONData } from 'immutable-json-patch'
+import { parsePath } from 'immutable-json-patch'
+import type { ValidationError } from '../../types'
 
 /**
  * Create a JSON Schema validator powered by Ajv.
@@ -33,14 +34,9 @@ export function createAjvValidator(schema: JSONData, schemaDefinitions: JSONData
   }
 }
 
-/**
- * @param {JSON} json
- * @param {Object} ajvError
- * @return {ValidationError}
- */
-function normalizeAjvError(json: JSONData, ajvError) {
+function normalizeAjvError(json: JSONData, ajvError): ValidationError {
   return {
-    path: parseJSONPointerWithArrayIndices(json, ajvError.instancePath),
+    path: parsePath(json, ajvError.instancePath),
     message: ajvError.message
   }
 }

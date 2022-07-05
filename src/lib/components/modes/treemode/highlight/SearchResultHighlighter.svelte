@@ -1,12 +1,12 @@
 <script lang="ts">
   import { splitValue } from '$lib/logic/search'
   import { addNewLineSuffix } from '$lib/utils/domUtils'
-  import type { SearchResultItem } from '$lib/types'
+  import type { ExtendedSearchResultItem } from '$lib/types'
 
   export let text: string
-  export let searchResult: SearchResultItem[]
+  export let searchResultItems: ExtendedSearchResultItem[]
 
-  $: parts = splitValue(String(text), searchResult)
+  $: parts = splitValue(String(text), searchResultItems)
 </script>
 
 {#each parts as part}

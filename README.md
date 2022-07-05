@@ -346,7 +346,7 @@ interface RenderValuePropsOptional {
   readOnly?: boolean
   enforceString?: boolean
   selection?: Selection
-  searchResult?: SearchResultItem
+  searchResultItems?: SearchResultItem[]
   isSelected?: boolean
   isEditing?: boolean
   normalization?: ValueNormalization
@@ -354,6 +354,7 @@ interface RenderValuePropsOptional {
   onPasteJson?: (pastedJson: { path: Path; contents: JSONData }) => void
   onSelect?: (selection: Selection) => void
   onFind?: (findAndReplace: boolean) => void
+  focus?: () => void
 }
 
 interface RenderValueProps extends RenderValuePropsOptional {
@@ -362,7 +363,7 @@ interface RenderValueProps extends RenderValuePropsOptional {
   readOnly: boolean
   enforceString: boolean | undefined
   selection: Selection | undefined
-  searchResult: SearchResultItem | undefined
+  searchResultItems: SearchResultItem[] | undefined
   isSelected: boolean
   isEditing: boolean
   normalization: ValueNormalization
@@ -370,6 +371,7 @@ interface RenderValueProps extends RenderValuePropsOptional {
   onPasteJson: (pastedJson: { path: Path; contents: JSONData }) => void
   onSelect: (selection: Selection) => void
   onFind: (findAndReplace: boolean) => void
+  focus: () => void
 }
 
 type ValueNormalization = {

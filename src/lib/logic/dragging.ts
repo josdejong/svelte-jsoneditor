@@ -1,99 +1,83 @@
-import {
-  createRecursiveSelection,
-  createSelection,
-  getEndPath,
-  getStartPath,
-  SELECTION_TYPE
-} from './selection.js'
-import { documentStatePatch } from './documentState.js'
-import { initial, isEqual, last } from 'lodash-es'
+import { createMultiSelection, getEndPath, getStartPath } from './selection.js'
+import { initial, isEqual } from 'lodash-es'
+import type { JSONData, JSONPatchDocument } from 'immutable-json-patch'
 import { getIn } from 'immutable-json-patch'
-import type { JSONPath } from 'immutable-json-patch'
 import { moveInsideParent } from './operations.js'
+import type {
+  DocumentState,
+  DragInsideAction,
+  DragInsideProps,
+  JSONSelection,
+  MultiSelection,
+  RenderedItem
+} from '../types'
 
-/**
- * @param {JSON} fullJson
- * @param {JSON} fullState
- * @param {Selection} fullSelection
- * @param {number} deltaY
- * @param {RenderedItem[]} items
- *
- * @returns {Object}
- * @property {JSONPatchDocument | undefined} operations
- * @property {JSON | undefined} updatedValue
- * @property {JSON | undefined} updatedState
- * @property {RecursiveSelection | undefined} updatedSelection
- * @property {Selection | undefined} updatedFullSelection
- * @property {number} indexOffset
- */
-export function onMoveSelection({ fullJson, fullState, fullSelection, deltaY, items }) {
+export interface MoveSelectionProps {
+  json: JSONData
+  documentState: DocumentState
+  deltaY: number
+  items: RenderedItem[]
+}
+
+export interface MoveSelectionResult {
+  operations: JSONPatchDocument | undefined
+  updatedSelection: JSONSelection | undefined
+  offset: number
+}
+
+export function onMoveSelection({
+  json,
+  documentState,
+  deltaY,
+  items
+}: MoveSelectionProps): MoveSelectionResult {
+  const selection = documentState.selection
   const dragInsideAction =
     deltaY < 0
-      ? findSwapPathUp({ fullSelection, deltaY, items })
-      : findSwapPathDown({ fullSelection, deltaY, items })
+      ? findSwapPathUp({ json, selection, deltaY, items })
+      : findSwapPathDown({ json, selection, deltaY, items })
 
-  if (!dragInsideAction || dragInsideAction.indexOffset === 0) {
+  if (!dragInsideAction || dragInsideAction.offset === 0) {
     return {
       operations: undefined,
-      updatedValue: undefined,
-      updatedState: undefined,
       updatedSelection: undefined,
-      updatedFullSelection: undefined,
-      indexOffset: 0
+      offset: 0
     }
   }
 
-  const operations = moveInsideParent(fullJson, fullState, fullSelection, dragInsideAction)
+  const operations = moveInsideParent(json, documentState.selection, dragInsideAction)
 
-  // TODO: documentStatePatch is relatively slow for large documents
-  //  This is for example noticeable in a large array where we drag a few
-  //  properties inside one of the nested objects. In this case we know we do
-  //  not need the full document, only the nested changes. So we can optimize
-  //  performance here by taking only the relative, nested json and state, and
-  //  changing the operations into relative operations.
-  const update = documentStatePatch(fullJson, fullState, operations)
-
-  const path: JSONPath = initial(getStartPath(fullSelection)) as JSONPath
-  const value = getIn(fullJson, path)
+  const path = initial(getStartPath(selection))
+  const value = getIn(json, path)
   if (Array.isArray(value)) {
-    const updatedFullSelection = createUpdatedArraySelection({
+    const updatedSelection = createUpdatedArraySelection({
       items,
-      fullJson,
-      fullState,
-      fullSelection,
-      indexOffset: dragInsideAction.indexOffset
+      json,
+      selection,
+      offset: dragInsideAction.offset
     })
-
-    const recursiveSelection = createRecursiveSelection(fullJson, updatedFullSelection)
-    const updatedRecursiveSelection = getIn(recursiveSelection, path)
 
     return {
       operations,
-      updatedValue: getIn(update.json, path),
-      updatedState: getIn(update.state, path),
-      updatedSelection: updatedRecursiveSelection,
-      updatedFullSelection: updatedFullSelection,
-      indexOffset: dragInsideAction.indexOffset
+      updatedSelection,
+      offset: dragInsideAction.offset
     }
   } else {
     // object
     return {
       operations,
-      updatedValue: getIn(update.json, path),
-      updatedState: getIn(update.state, path),
       updatedSelection: undefined,
-      updatedFullSelection: undefined,
-      indexOffset: dragInsideAction.indexOffset
+      offset: dragInsideAction.offset
     }
   }
 }
 
-/**
- * @param {DragInsideProps} props
- * @returns {DragInsideAction | undefined}
- */
-function findSwapPathUp({ items, fullSelection, deltaY }) {
-  const initialPath = getStartPath(fullSelection)
+function findSwapPathUp({
+  items,
+  selection,
+  deltaY
+}: DragInsideProps): DragInsideAction | undefined {
+  const initialPath = getStartPath(selection)
   const initialIndex = items.findIndex((item) => isEqual(item.path, initialPath))
 
   const prevHeight = () => items[index - 1]?.height
@@ -107,60 +91,61 @@ function findSwapPathUp({ items, fullSelection, deltaY }) {
   }
 
   const beforePath = items[index].path
-  const indexOffset = index - initialIndex
+  const offset = index - initialIndex
 
-  return index !== initialIndex && items[index] !== undefined
-    ? { beforePath, indexOffset }
-    : undefined
+  return index !== initialIndex && items[index] !== undefined ? { beforePath, offset } : undefined
 }
 
-/**
- * @param {DragInsideProps} props
- * @returns {DragInsideAction | undefined}
- */
-function findSwapPathDown({ items, fullSelection, deltaY }) {
-  const initialPath = getEndPath(fullSelection)
+function findSwapPathDown({
+  json,
+  items,
+  selection,
+  deltaY
+}: DragInsideProps): DragInsideAction | undefined {
+  const initialPath = getEndPath(selection)
   const initialIndex = items.findIndex((item) => isEqual(item.path, initialPath))
-
-  const nextHeight = () => items[index + 1]?.height
 
   let cumulativeHeight = 0
   let index = initialIndex
+
+  const nextHeight = () => items[index + 1]?.height
 
   while (nextHeight() !== undefined && Math.abs(deltaY) > cumulativeHeight + nextHeight() / 2) {
     cumulativeHeight += nextHeight()
     index += 1
   }
 
-  const isArray = typeof last(initialPath) === 'number'
+  const parentPath = initial(initialPath)
+  const parent = getIn(json, parentPath)
+  const isArray = Array.isArray(parent)
   const beforeIndex = isArray ? index : index + 1
   const beforePath = items[beforeIndex]?.path
-  const indexOffset = index - initialIndex
+  const offset = index - initialIndex
 
-  return beforePath ? { beforePath, indexOffset } : { append: true, indexOffset }
+  return beforePath ? { beforePath, offset } : { append: true, offset }
 }
 
-/**
- * @param {RenderedItem[]} items
- * @param {JSON} fullJson
- * @param {JSON} fullState
- * @param {Selection} fullSelection
- * @param {number} indexOffset
- * @returns {Selection}
- */
-function createUpdatedArraySelection({ items, fullJson, fullState, fullSelection, indexOffset }) {
-  const startPath = getStartPath(fullSelection)
-  const endPath = getEndPath(fullSelection)
+interface UpdatedArraySelectionProps {
+  items: RenderedItem[]
+  json: JSONData
+  selection: JSONSelection
+  offset: number
+}
+
+function createUpdatedArraySelection({
+  items,
+  json,
+  selection,
+  offset
+}: UpdatedArraySelectionProps): MultiSelection {
+  const startPath = getStartPath(selection)
+  const endPath = getEndPath(selection)
 
   const startIndex = items.findIndex((item) => isEqual(item.path, startPath))
   const endIndex = items.findIndex((item) => isEqual(item.path, endPath))
 
-  const anchorPath = items[startIndex + indexOffset]?.path
-  const focusPath = items[endIndex + indexOffset]?.path
+  const anchorPath = items[startIndex + offset]?.path
+  const focusPath = items[endIndex + offset]?.path
 
-  return createSelection(fullJson, fullState, {
-    type: SELECTION_TYPE.MULTI,
-    anchorPath,
-    focusPath
-  })
+  return createMultiSelection(json, anchorPath, focusPath)
 }

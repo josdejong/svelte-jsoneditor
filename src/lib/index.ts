@@ -28,11 +28,26 @@ export { jmespathQueryLanguage } from './plugins/query/jmespathQueryLanguage.js'
 // utils
 export { SortModal, TransformModal }
 export { getJSONSchemaOptions, findSchema, findEnum } from './utils/jsonSchemaUtils.js'
-export { parseJSONPointerWithArrayIndices } from './utils/jsonPointer.js'
 export { isTextContent, isLargeContent, estimateSerializedSize } from './utils/jsonUtils.js'
 export {
+  isValueSelection,
+  isKeySelection,
+  isInsideSelection,
+  isAfterSelection,
+  isMultiSelection,
+  isEditingSelection,
+  createValueSelection,
+  createKeySelection,
+  createInsideSelection,
+  createAfterSelection,
+  createMultiSelection
+} from './logic/selection.js'
+export {
   parseJSONPointer,
+  parsePath,
+  parseFrom,
   compileJSONPointer,
+  compileJSONPointerProp,
   getIn,
   setIn,
   updateIn,

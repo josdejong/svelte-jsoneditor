@@ -1,6 +1,5 @@
+import type { JSONData, JSONPatchDocument, JSONPath, JSONPointer } from 'immutable-json-patch'
 import type { SvelteComponent } from 'svelte'
-
-export type JSONData = { [key: string]: JSONData } | JSONData[] | string | number | boolean | null
 
 export type TextContent = { text: string } | { json: undefined; text: string }
 
@@ -8,35 +7,37 @@ export type JSONContent = { json: JSONData } | { json: JSONData; text: undefined
 
 export type Content = JSONContent | TextContent
 
-export type Path = Array<string | number | symbol>
-
-export type CaretType = 'after' | 'key' | 'value' | 'append'
-
 export interface VisibleSection {
   start: number
   end: number
 }
 
+export enum SelectionType {
+  after = 'after',
+  inside = 'inside',
+  key = 'key',
+  value = 'value',
+  multi = 'multi'
+}
+
+export enum CaretType {
+  after = 'after',
+  key = 'key',
+  value = 'value',
+  inside = 'inside'
+}
+
 export interface CaretPosition {
-  path: Path
-  type: CaretType
+  path: JSONPath
+  type: CaretType // TODO: refactor this to use SelectionType here, then we can simplify the util functions to turn this into a selection
 }
 
-export interface JSONPatchOperation {
-  op: 'add' | 'remove' | 'replace' | 'copy' | 'move' | 'test'
-  path: string
-  from?: string
-  value?: JSONData
+export interface DocumentState {
+  expandedMap: JSONPointerMap<boolean>
+  enforceStringMap: JSONPointerMap<boolean>
+  visibleSectionsMap: JSONPointerMap<VisibleSection[]>
+  selection: JSONSelection | undefined
 }
-
-export interface PreprocessedJSONPatchOperation {
-  op: 'add' | 'remove' | 'replace' | 'copy' | 'move' | 'test'
-  path: Path
-  from?: Path
-  value?: JSONData
-}
-
-export type JSONPatchDocument = JSONPatchOperation[]
 
 export interface JSONPatchResult {
   json: JSONData
@@ -45,104 +46,57 @@ export interface JSONPatchResult {
   redo: JSONPatchDocument
 }
 
-export interface JSONPatchOptions {
-  before?: (
-    json: JSONData,
-    operation: PreprocessedJSONPatchOperation
-  ) => { json?: JSONData; operation?: PreprocessedJSONPatchOperation } | undefined
-  after?: (
-    json: JSONData,
-    operation: PreprocessedJSONPatchOperation,
-    previousJson: JSONData
-  ) => JSONData
-}
-
 export type AfterPatchCallback = (
   patchedJson: JSONData,
-  patchedState: JSONData,
-  selection: Selection
-) => { json?: JSONData; state?: JSONData; selection?: Selection }
+  patchedState: DocumentState
+) => { json?: JSONData; state?: DocumentState }
 
 export interface MultiSelection {
-  type: 'multi'
-  paths: Path[]
-  anchorPath: Path
-  focusPath: Path
-  pathsMap: { [key: string]: boolean }
+  type: SelectionType.multi
+  paths: JSONPath[]
+  anchorPath: JSONPath
+  focusPath: JSONPath
+  pointersMap: { [pointer: JSONPointer]: boolean }
 }
 
 export interface AfterSelection {
-  type: 'after'
-  anchorPath: Path
-  focusPath: Path
+  type: SelectionType.after
+  anchorPath: JSONPath
+  focusPath: JSONPath
+  pointersMap: { [pointer: JSONPointer]: boolean }
 }
 
 export interface InsideSelection {
-  type: 'inside'
-  anchorPath: Path
-  focusPath: Path
+  type: SelectionType.inside
+  anchorPath: JSONPath
+  focusPath: JSONPath
+  pointersMap: { [pointer: JSONPointer]: boolean }
 }
 
 export interface KeySelection {
-  type: 'key'
-  anchorPath: Path
-  focusPath: Path
+  type: SelectionType.key
+  anchorPath: JSONPath
+  focusPath: JSONPath
+  pointersMap: { [pointer: JSONPointer]: boolean }
   edit?: boolean
 }
 
 export interface ValueSelection {
-  type: 'value'
-  anchorPath: Path
-  focusPath: Path
+  type: SelectionType.value
+  anchorPath: JSONPath
+  focusPath: JSONPath
+  pointersMap: { [pointer: JSONPointer]: boolean }
   edit?: boolean
 }
 
-export type Selection =
+export type JSONSelection =
   | MultiSelection
   | AfterSelection
   | InsideSelection
   | KeySelection
   | ValueSelection
 
-export type RecursiveSelection = { [key: string]: RecursiveSelection } | Array<RecursiveSelection>
-
-export interface AfterSelectionSchema {
-  type: 'after'
-  path: Path
-}
-
-export interface InsideSelectionSchema {
-  type: 'inside'
-  path: Path
-}
-
-export interface KeySelectionSchema {
-  type: 'key'
-  path: Path
-  edit?: boolean
-  next?: boolean
-}
-
-export interface ValueSelectionSchema {
-  type: 'value'
-  path: Path
-  edit?: boolean
-  next?: boolean
-  nextInside?: boolean
-}
-
-export interface MultiSelectionSchema {
-  type: 'multi'
-  anchorPath: Path
-  focusPath: Path
-}
-
-export type SelectionSchema =
-  | MultiSelectionSchema
-  | AfterSelectionSchema
-  | InsideSelectionSchema
-  | KeySelectionSchema
-  | ValueSelectionSchema
+export type JSONPointerMap<T> = { [pointer: JSONPointer]: T }
 
 export type ClipboardValues = Array<{ key: string; value: JSONData }>
 
@@ -176,10 +130,6 @@ export interface MenuSpaceItem {
   space: true
 }
 
-export function isMenuSpaceItem(item: unknown): item is MenuSpaceItem {
-  return item && item['space'] === true && Object.keys(item).length === 1
-}
-
 export type MenuItem = MenuButtonItem | MenuSeparatorItem | MenuSpaceItem
 
 export interface MessageAction {
@@ -192,7 +142,7 @@ export interface MessageAction {
 }
 
 export interface ValidationError {
-  path: Path
+  path: JSONPath
   message: string
   isChildError?: boolean
 }
@@ -214,7 +164,7 @@ export interface NormalizedParseError {
 }
 
 export interface RichValidationError {
-  path?: Path
+  path?: JSONPath
   isChildError?: boolean
   line?: number
   column?: number
@@ -226,7 +176,7 @@ export interface RichValidationError {
 }
 
 export interface TextLocation {
-  path: Path
+  path: JSONPath
   line: number
   column: number
   from: number
@@ -265,19 +215,16 @@ export type OnChangeQueryLanguage = (queryLanguageId: string) => void
 export type OnChange =
   | ((content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void)
   | null
-export type OnSelect = (
-  selectionSchema: SelectionSchema,
-  options?: { ensureFocus?: boolean }
-) => void
-export type OnPatch = (operations: JSONPatchDocument) => void
+export type OnSelect = (selection: JSONSelection) => void
+export type OnPatch = (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
 export type OnSort = (operations: JSONPatchDocument) => void
 export type OnFind = (findAndReplace: boolean) => void
 export type OnPaste = (pastedText: string) => void
-export type OnPasteJson = (pastedJson: { path: Path; contents: JSONData }) => void
+export type OnPasteJson = (pastedJson: { path: JSONPath; contents: JSONData }) => void
 export type OnRenderValue = (props: RenderValueProps) => RenderValueComponentDescription[]
-export type OnClassName = (path: Path, value: JSONData) => string | undefined | void
+export type OnClassName = (path: JSONPath, value: JSONData) => string | undefined
 export type OnChangeMode = (mode: 'tree' | 'code') => void
-export type OnContextMenu = (contextMenuProps: ContextMenuProps) => void
+export type OnContextMenu = (contextMenuProps: AbsolutePopupOptions) => void
 export type OnRenderMenu = (
   mode: 'tree' | 'code' | 'repair',
   items: MenuItem[]
@@ -286,23 +233,27 @@ export type OnError = (error: Error) => void
 export type OnFocus = () => void
 export type OnBlur = () => void
 
-export type RecursiveSearchResult = { [key: string]: RecursiveSearchResult }
-
 export interface SearchResult {
-  items: RecursiveSearchResult
-  itemsWithActive: RecursiveSearchResult
-  flatItems: Path[]
-  activeItem: Path
-  activeIndex: number
-  count: number
+  items: ExtendedSearchResultItem[]
+  itemsMap: JSONPointerMap<ExtendedSearchResultItem[]>
+  activeItem: ExtendedSearchResultItem | undefined
+  activeIndex: number | -1
+}
+
+export enum SearchField {
+  key = 'key',
+  value = 'value'
 }
 
 export interface SearchResultItem {
-  path: Path
-  field: symbol
+  path: JSONPath
+  field: SearchField
   fieldIndex: number
   start: number
   end: number
+}
+
+export interface ExtendedSearchResultItem extends SearchResultItem {
   active: boolean
 }
 
@@ -311,36 +262,58 @@ export interface ValueNormalization {
   unescapeValue: (escapedValue: string) => string
 }
 
+export type PastedJson = { contents: JSONData; path: JSONPath } | undefined
+
 export type EscapeValue = (value: JSONData) => string
 
 export type UnescapeValue = (escapedValue: string) => string
 
 export interface DragInsideProps {
-  fullSelection: Selection
+  json: JSONData
+  selection: JSONSelection
   deltaY: number
-  items: Array<{ path: Path; height: number }>
+  items: Array<{ path: JSONPath; height: number }>
 }
 
 export type DragInsideAction =
-  | { beforePath: Path; indexOffset: number }
-  | { append: true; indexOffset: number }
+  | { beforePath: JSONPath; offset: number }
+  | { append: true; offset: number }
 
 export interface RenderedItem {
-  path: Path
+  path: JSONPath
   height: number
+}
+
+export interface HistoryItem {
+  undo: {
+    patch: JSONPatchDocument | undefined
+    json: JSONData | undefined
+    text: string | undefined
+    state: DocumentState
+    textIsRepaired: boolean
+  }
+  redo: {
+    patch: JSONPatchDocument | undefined
+    json: JSONData | undefined
+    text: string | undefined
+    state: DocumentState
+    textIsRepaired: boolean
+  }
 }
 
 export type InsertType = 'value' | 'object' | 'array' | 'structure'
 
-export interface ContextMenuProps {
-  anchor: Element
-  left: number
-  top: number
-  width: number
-  height: number
-  offsetTop: number
-  offsetLeft: number
-  showTip: boolean
+export interface AbsolutePopupOptions {
+  anchor?: Element
+  left?: number
+  top?: number
+  width?: number
+  height?: number
+  offsetTop?: number
+  offsetLeft?: number
+  showTip?: boolean
+  closeOnOuterClick?: boolean
+  onClose?: () => void
 }
 
 export interface JSONEditorPropsOptional {
@@ -372,33 +345,32 @@ export interface JSONEditorPropsOptional {
 
 export interface TreeModeContext {
   readOnly: boolean
-  showTip: boolean
   normalization: ValueNormalization
-  getFullJson: () => JSONData
-  getFullState: () => JSONData
-  getFullSelection: () => Selection
-  findElement: (path: Path) => Element | null
+  getJson: () => JSONData
+  getDocumentState: () => DocumentState
+  findElement: (path: JSONPath) => Element | null
   focus: () => void
-  onPatch: (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
+  onPatch: (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => JSONPatchResult
   onInsert: (type: InsertType) => void
-  onExpand: (path: Path, expanded: boolean, recursive?: boolean) => void
+  onExpand: (path: JSONPath, expanded: boolean, recursive?: boolean) => void
   onSelect: OnSelect
   onFind: OnFind
-  onExpandSection: (path: Path, section: Section) => void
-  onRenderValue: (props: RenderValueProps) => RenderValueComponentDescription[]
+  onExpandSection: (path: JSONPath, section: Section) => void
+  onPasteJson: (newPastedJson: PastedJson) => void
+  onRenderValue: OnRenderValue
   onContextMenu: OnContextMenu
-  onClassName: (path: Path, value: JSONData) => string
+  onClassName: OnClassName
   onDrag: (event: Event) => void
-  onDragEnd: (event: Event) => void
+  onDragEnd: () => void
 }
 
 export interface RenderValuePropsOptional {
-  path?: Path
+  path?: JSONPath
   value?: JSONData
   readOnly?: boolean
   enforceString?: boolean
-  selection?: Selection
-  searchResult?: SearchResultItem
+  selection?: JSONSelection
+  searchResultItems?: SearchResultItem[]
   isSelected?: boolean
   isEditing?: boolean
   normalization?: ValueNormalization
@@ -406,15 +378,16 @@ export interface RenderValuePropsOptional {
   onPasteJson?: OnPasteJson
   onSelect?: OnSelect
   onFind?: OnFind
+  focus?: () => void
 }
 
 export interface RenderValueProps extends RenderValuePropsOptional {
-  path: Path
+  path: JSONPath
   value: JSONData
   readOnly: boolean
-  enforceString: boolean | undefined
-  selection: Selection | undefined
-  searchResult: SearchResultItem | undefined
+  enforceString: boolean
+  selection: JSONSelection | undefined
+  searchResultItems: SearchResultItem[] | undefined
   isSelected: boolean
   isEditing: boolean
   normalization: ValueNormalization
@@ -422,6 +395,45 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   onPasteJson: OnPasteJson
   onSelect: OnSelect
   onFind: OnFind
+  focus: () => void
+}
+
+export interface JSONNodeProp {
+  key: string
+  value: JSONData
+  path: JSONPath
+  pointer: JSONPointer
+  expandedMap: JSONPointerMap<boolean> | undefined
+  enforceStringMap: JSONPointerMap<boolean> | undefined
+  visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
+  validationErrorsMap: JSONPointerMap<ValidationError> | undefined
+  keySearchResultItemsMap: ExtendedSearchResultItem[] | undefined
+  valueSearchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
+  selection: JSONSelection | undefined
+}
+
+export interface JSONNodeItem {
+  index: number
+  value: JSONData
+  path: JSONPath
+  pointer: JSONPointer
+  expandedMap: JSONPointerMap<boolean> | undefined
+  enforceStringMap: JSONPointerMap<boolean> | undefined
+  visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
+  validationErrorsMap: JSONPointerMap<ValidationError> | undefined
+  searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
+  selection: JSONSelection | undefined
+}
+
+export interface DraggingState {
+  initialTarget: Element
+  initialClientY: number
+  initialContentTop: number
+  selectionStartIndex: number
+  selectionItemsCount: number
+  items: RenderedItem[] | null
+  offset: number
+  didMoveItems: boolean
 }
 
 // TODO: can we define proper generic types here?
@@ -432,7 +444,7 @@ export interface RenderValueComponentDescription {
 
 export interface TransformModalOptions {
   id?: string
-  selectedPath?: Path
+  selectedPath?: JSONPath
   onTransform?: (state: {
     operations: JSONPatchDocument
     json: JSONData
@@ -443,7 +455,7 @@ export interface TransformModalOptions {
 
 export interface TransformModalCallback extends TransformModalOptions {
   id: string
-  selectedPath: Path
+  selectedPath: JSONPath
   json: JSONData
   onTransform: (state: {
     operations: JSONPatchDocument
@@ -456,7 +468,7 @@ export interface TransformModalCallback extends TransformModalOptions {
 export interface SortModalCallback {
   id: string
   json: JSONData
-  selectedPath: Path
+  selectedPath: JSONPath
   onSort: OnSort
   onClose: () => void
 }

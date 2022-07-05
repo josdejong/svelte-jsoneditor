@@ -2,25 +2,25 @@
 
 <script lang="ts">
   import { isUrl } from '$lib/utils/typeUtils'
-  import { SELECTION_TYPE } from '../../../logic/selection'
+  import { createValueSelection } from '../../../logic/selection'
   import SearchResultHighlighter from '../../../components/modes/treemode/highlight/SearchResultHighlighter.svelte'
   import { getValueClass } from './utils/getValueClass'
   import { addNewLineSuffix } from '$lib/utils/domUtils'
   import type {
+    ExtendedSearchResultItem,
     JSONData,
     OnSelect,
-    Path,
-    SearchResultItem,
+    JSONPath,
     ValueNormalization
   } from '../../../types'
 
-  export let path: Path
+  export let path: JSONPath
   export let value: JSONData
   export let readOnly: boolean
   export let normalization: ValueNormalization
   export let onSelect: OnSelect
 
-  export let searchResult: SearchResultItem | undefined
+  export let searchResultItems: ExtendedSearchResultItem[] | undefined
 
   $: valueIsUrl = isUrl(value)
 
@@ -36,7 +36,7 @@
   function handleValueDoubleClick(event) {
     if (!readOnly) {
       event.preventDefault()
-      onSelect({ type: SELECTION_TYPE.VALUE, path, edit: true })
+      onSelect(createValueSelection(path, true))
     }
   }
 </script>
@@ -48,8 +48,8 @@
   on:dblclick={handleValueDoubleClick}
   title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : null}
 >
-  {#if searchResult}
-    <SearchResultHighlighter text={normalization.escapeValue(value)} {searchResult} />
+  {#if searchResultItems}
+    <SearchResultHighlighter text={normalization.escapeValue(value)} {searchResultItems} />
   {:else}
     {addNewLineSuffix(normalization.escapeValue(value))}
   {/if}

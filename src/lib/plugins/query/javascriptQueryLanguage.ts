@@ -1,6 +1,7 @@
 import { createPropertySelector } from '../../utils/pathUtils.js'
 import { parseString } from '../../utils/stringUtils.js'
-import type { JSONData, QueryLanguage, QueryLanguageOptions } from '../../types'
+import type { QueryLanguage, QueryLanguageOptions } from '../../types'
+import type { JSONData } from 'immutable-json-patch'
 
 const description = `
 <p>
