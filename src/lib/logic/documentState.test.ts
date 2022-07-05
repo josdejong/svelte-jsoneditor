@@ -483,6 +483,28 @@ describe('documentState', () => {
       assert.deepStrictEqual(res.documentState, documentState)
     })
 
+    it('add: extend the visibleSection when appending a value to an array', () => {
+      const json = [0, 1, 2, 3]
+      const documentState = {
+        ...createDocumentState(),
+        expandedMap: {
+          '': true
+        },
+        visibleSectionsMap: {
+          '': [{ start: 0, end: 4 }]
+        }
+      }
+
+      const res = documentStatePatch(json, documentState, [{ op: 'add', path: '/4', value: 4 }])
+
+      assert.deepStrictEqual(res.documentState, {
+        ...documentState,
+        visibleSectionsMap: {
+          '': [{ start: 0, end: 5 }]
+        }
+      })
+    })
+
     it('replace: should keep enforceString state', () => {
       const json = '42'
       const documentState = {

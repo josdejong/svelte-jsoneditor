@@ -1009,12 +1009,17 @@
 
             debug('test A', path, createInsideSelection(path))
             return {
-              state: {
-                ...documentState,
-                selection: isObject(parent)
-                  ? createKeySelection(path, true)
-                  : createValueSelection(path, true)
-              }
+              // expandPath is invoked to make sure that visibleSections is extended when needed
+              state: expandPath(
+                patchedJson,
+                {
+                  ...documentState,
+                  selection: isObject(parent)
+                    ? createKeySelection(path, true)
+                    : createValueSelection(path, true)
+                },
+                path
+              )
             }
           }
 
