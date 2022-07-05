@@ -573,7 +573,10 @@ export function removeEditModeFromSelection(documentState: DocumentState): Docum
   if ((isKeySelection(selection) || isValueSelection(selection)) && selection.edit) {
     return {
       ...documentState,
-      selection: createKeySelection(selection.focusPath, false)
+      selection: {
+        ...selection,
+        edit: false
+      }
     }
   }
 
