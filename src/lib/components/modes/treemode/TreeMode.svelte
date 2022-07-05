@@ -1321,7 +1321,7 @@
           // expand the newly replaced array and select it
           state: {
             ...expandRecursive(patchedJson, patchedState, selectedPath),
-            selection: createInsideSelection(selectedPath)
+            selection: createValueSelection(selectedPath, false)
           }
         }))
       },
