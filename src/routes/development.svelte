@@ -144,19 +144,32 @@
     path,
     value,
     readOnly,
-    normalization,
+    enforceString,
     searchResultItems,
     isEditing,
+    normalization,
     onPatch,
     onPasteJson,
-    onSelect
+    onSelect,
+    onFind,
+    focus
   }) {
     const renderers = []
 
     if (isEditing) {
       renderers.push({
         component: EditableValue,
-        props: { path, value, normalization, onPatch, onPasteJson, onSelect }
+        props: {
+          path,
+          value,
+          enforceString,
+          normalization,
+          onPatch,
+          onPasteJson,
+          onSelect,
+          onFind,
+          focus
+        }
       })
     }
 
@@ -492,7 +505,9 @@ Workaround for the console warning:
 
 See https://github.com/sveltejs/kit/issues/981
 -->
-{#if false}<slot />{/if}
+{#if false}
+  <slot />
+{/if}
 
 <style lang="scss">
   @import '../lib/themes/jse-theme-dark.css';
