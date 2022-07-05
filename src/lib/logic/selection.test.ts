@@ -14,6 +14,7 @@ import {
   getSelectionLeft,
   getSelectionRight,
   getSelectionUp,
+  selectionIfOverlapping,
   selectionToPartialJson
 } from './selection.js'
 import { createDocumentState } from './documentState.js'
@@ -751,6 +752,24 @@ describe('selection', () => {
         createSelectionFromOperations(json, [{ op: 'replace', path: '', value: 'test' }]),
         createValueSelection([], false)
       )
+    })
+  })
+
+  describe('selectionIfOverlapping', () => {
+    it('should determine whether a selection is relevant for given pointer', () => {
+      const selection = createMultiSelection(json, ['obj', 'arr', '0'], ['obj', 'arr', '2'])
+
+      assert.deepStrictEqual(selectionIfOverlapping(selection, ''), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, '/obj'), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, '/obj/arr'), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, '/obj/arr/0'), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, '/obj/arr/1'), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, '/obj/arr/2'), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, '/obj/arr/2/first'), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, '/obj/arr/2/last'), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, '/str'), undefined)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, '/nill'), undefined)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, '/bool'), undefined)
     })
   })
 })

@@ -24,7 +24,6 @@ import type {
   CaretPosition,
   DocumentState,
   InsideSelection,
-  JSONPointerMap,
   JSONSelection,
   KeySelection,
   MultiSelection,
@@ -703,23 +702,6 @@ export function isEditingSelection(selection: JSONSelection): boolean {
   return (isKeySelection(selection) || isValueSelection(selection)) && selection.edit
 }
 
-// TODO: write unit tests
-export function createSelectionMap(selection: JSONSelection): JSONPointerMap<JSONSelection> {
-  if (!selection) {
-    return {}
-  }
-
-  const map = {}
-
-  const paths = getSelectionPaths(selection)
-
-  paths.forEach((path) => {
-    map[compileJSONPointer(path)] = selection
-  })
-
-  return map
-}
-
 export function updateSelectionInDocumentState(
   documentState: DocumentState,
   selection: JSONSelection | undefined,
@@ -795,7 +777,6 @@ export function fromSelectionType(
   }
 }
 
-// TODO: unit test
 export function selectionIfOverlapping(
   selection: JSONSelection | undefined,
   pointer: JSONPointer
@@ -804,7 +785,9 @@ export function selectionIfOverlapping(
     return undefined
   }
 
-  return Object.keys(selection.pointersMap).some((p) => startsWithJSONPointer(p, pointer))
+  return Object.keys(selection.pointersMap).some(
+    (p) => startsWithJSONPointer(p, pointer) || startsWithJSONPointer(pointer, p)
+  )
     ? selection
     : undefined
 }
