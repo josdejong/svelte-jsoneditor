@@ -1252,7 +1252,7 @@
 
     focus()
     if (documentState.selection) {
-      scrollTo(documentState.selection.focusPath)
+      scrollTo(documentState.selection.focusPath, false)
     }
   }
 
@@ -1297,7 +1297,7 @@
 
     focus()
     if (documentState.selection) {
-      scrollTo(documentState.selection.focusPath)
+      scrollTo(documentState.selection.focusPath, false)
     }
   }
 
@@ -1406,17 +1406,27 @@
   }
 
   /**
-   * Scroll the window vertically to the node with given path
+   * Scroll the window vertically to the node with given path.
+   * Expand the path when needed.
    */
-  export async function scrollTo(path: JSONPath) {
-    documentState = expandPath(json, documentState, path)
+  export async function scrollTo(path: JSONPath, scrollToWhenVisible = true) {
+    documentState = expandPath(json, documentState, initial(path))
     await tick()
 
     const elem = findElement(path)
     if (elem) {
       debug('scrollTo', { path, elem, refContents })
 
-      const offset = -(refContents.getBoundingClientRect().height / 4)
+      const viewPortRect = refContents.getBoundingClientRect()
+      const elemRect = elem.getBoundingClientRect()
+      if (!scrollToWhenVisible) {
+        if (elemRect.bottom > viewPortRect.top && elemRect.top < viewPortRect.bottom) {
+          // element is fully or partially visible, don't scroll to it
+          return
+        }
+      }
+
+      const offset = -(viewPortRect.height / 4)
 
       jump(elem, {
         container: refContents,
