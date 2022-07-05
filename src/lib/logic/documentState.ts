@@ -1,400 +1,286 @@
+import type {
+  JSONArray,
+  JSONData,
+  JSONPatchAdd,
+  JSONPatchCopy,
+  JSONPatchDocument,
+  JSONPatchMove,
+  JSONPatchRemove,
+  JSONPatchReplace,
+  JSONPath,
+  JSONPointer
+} from 'immutable-json-patch'
 import {
   compileJSONPointer,
   existsIn,
   getIn,
   immutableJSONPatch,
-  setIn,
-  updateIn
+  isJSONPatchAdd,
+  isJSONPatchCopy,
+  isJSONPatchMove,
+  isJSONPatchRemove,
+  isJSONPatchReplace,
+  parseJSONPointer,
+  parsePath,
+  startsWithJSONPointer
 } from 'immutable-json-patch'
-import { initial, isEqual, last, uniqueId } from 'lodash-es'
-import {
-  DEFAULT_VISIBLE_SECTIONS,
-  STATE_ENFORCE_STRING,
-  STATE_EXPANDED,
-  STATE_ID,
-  STATE_KEYS,
-  STATE_VISIBLE_SECTIONS
-} from '../constants.js'
+import { initial, isEqual, last } from 'lodash-es'
+import { DEFAULT_VISIBLE_SECTIONS } from '../constants.js'
 import { forEachIndex } from '../utils/arrayUtils.js'
-import { parseJSONPointerWithArrayIndices } from '../utils/jsonPointer.js'
-import { isObject, isStringContainingPrimitiveValue } from '../utils/typeUtils.js'
+import { isObject, isObjectOrArray, isStringContainingPrimitiveValue } from '../utils/typeUtils.js'
 import {
   currentRoundNumber,
   inVisibleSection,
   mergeSections,
   nextRoundNumber
 } from './expandItemsSections.js'
-import type { JSONData, JSONPatchDocument, Path, Section } from '../types'
-import type { JSONPath } from 'immutable-json-patch'
+import type {
+  CaretPosition,
+  DocumentState,
+  JSONPointerMap,
+  JSONSelection,
+  Section,
+  VisibleSection
+} from '../types'
+import { CaretType } from '../types.js'
+import { isJSONArray, isJSONObject } from '../utils/jsonUtils.js'
+import { int } from '../utils/numberUtils.js'
 
-/**
- * Sync a state object with the json it belongs to: update keys, limit, and expanded state
- *
- * When forceRefresh=true, force refreshing the expanded state
- */
-// TODO: refactor syncState so we don't have to pass path=[] all the time, this is only used internally for recursiveness
-export function syncState(
-  json: JSONData,
-  state: JSONData,
-  path: Path,
-  expand: (path: Path) => boolean,
-  forceRefresh = false
-): JSONData {
-  // TODO: this function can be made way more efficient if we pass prevState:
-  //  when immutable, we can simply be done already when the state === prevState
+type CreateSelection = (json: JSONData, documentState: DocumentState) => JSONSelection
 
-  const updatedState = Array.isArray(json) ? [] : {}
-
-  updatedState[STATE_ID] = state && state[STATE_ID] ? state[STATE_ID] : uniqueId()
-
-  if (isObject(json)) {
-    updatedState[STATE_KEYS] = syncKeys(json, state && state[STATE_KEYS])
-
-    updatedState[STATE_EXPANDED] = state && !forceRefresh ? state[STATE_EXPANDED] : expand(path)
-
-    if (updatedState[STATE_EXPANDED]) {
-      Object.keys(json).forEach((key) => {
-        const childJson = json[key]
-        const childState = state && state[key]
-        updatedState[key] = syncState(childJson, childState, path.concat(key), expand, forceRefresh)
-      })
-    }
-
-    // FIXME: must create new id's in case of duplicate id's
-  } else if (Array.isArray(json)) {
-    updatedState[STATE_EXPANDED] = state && !forceRefresh ? state[STATE_EXPANDED] : expand(path)
-
-    // note that we reset the visible items when the state is not expanded
-    updatedState[STATE_VISIBLE_SECTIONS] =
-      state && updatedState[STATE_EXPANDED]
-        ? state[STATE_VISIBLE_SECTIONS] || DEFAULT_VISIBLE_SECTIONS
-        : DEFAULT_VISIBLE_SECTIONS
-
-    if (updatedState[STATE_EXPANDED]) {
-      updatedState[STATE_VISIBLE_SECTIONS].forEach(({ start, end }) => {
-        forEachIndex(start, Math.min(json.length, end), (index) => {
-          const childJson = json[index]
-          const childState = state && state[index]
-          updatedState[index] = syncState(
-            childJson,
-            childState,
-            path.concat(index),
-            expand,
-            forceRefresh
-          )
-        })
-      })
-    }
-  } else {
-    // primitive value (string, number, boolean, null)
-    if (state && state[STATE_ENFORCE_STRING] !== undefined) {
-      // keep as is
-      updatedState[STATE_ENFORCE_STRING] = state[STATE_ENFORCE_STRING]
-    } else if (isStringContainingPrimitiveValue(json)) {
-      // set to true when needed (else, leave undefined)
-      updatedState[STATE_ENFORCE_STRING] = true
-    }
-  }
-
-  return updatedState
+export type CreateDocumentStateProps = {
+  json: JSONData
+  expand?: (path: JSONPath) => boolean
+  select?: CreateSelection
 }
 
-export function createState(json) {
-  if (Array.isArray(json)) {
-    const state = []
-
-    state[STATE_ID] = uniqueId()
-    state[STATE_EXPANDED] = false
-    state[STATE_VISIBLE_SECTIONS] = DEFAULT_VISIBLE_SECTIONS
-
-    return state
+// TODO: write unit tests
+export function createDocumentState(props?: CreateDocumentStateProps): DocumentState {
+  let documentState: DocumentState = {
+    expandedMap: {},
+    enforceStringMap: {},
+    visibleSectionsMap: {},
+    selection: undefined
   }
 
-  if (isObject(json)) {
-    const state = {}
-
-    state[STATE_ID] = uniqueId()
-    state[STATE_EXPANDED] = false
-    state[STATE_KEYS] = Object.keys(json)
-
-    return state
+  if (props?.select) {
+    documentState = {
+      ...documentState,
+      selection: props.select(props.json, documentState)
+    }
   }
 
-  // primitive value
-  const state = {
-    [STATE_ID]: uniqueId()
-  }
-  if (isStringContainingPrimitiveValue(json)) {
-    state[STATE_ENFORCE_STRING] = true
+  if (props?.expand) {
+    documentState = expandWithCallback(props.json, documentState, [], props.expand)
   }
 
-  return state
+  return documentState
 }
 
-/**
- * Expand a node
- * @param {JSON} json
- * @param {JSON} state
- * @param {Path} path
- * @return {JSON} returns the updated state
- */
-export function expandSinglePath(json, state, path) {
-  const value = getIn(json, path)
-
-  if (isObject(value)) {
-    return updateIn(state, path, (objectState) => {
-      const updatedState = {}
-      updatedState[STATE_ID] = objectState[STATE_ID]
-      updatedState[STATE_EXPANDED] = true
-      updatedState[STATE_KEYS] = Object.keys(value)
-
-      forEachKey(objectState, (key) => {
-        updatedState[key] = createState(value[key])
-      })
-
-      return updatedState
-    })
-  }
-
-  if (Array.isArray(value)) {
-    return updateIn(state, path, (arrayState) => {
-      const updatedState = []
-      updatedState[STATE_ID] = arrayState[STATE_ID]
-      updatedState[STATE_EXPANDED] = true
-      updatedState[STATE_VISIBLE_SECTIONS] = DEFAULT_VISIBLE_SECTIONS
-
-      forEachVisibleIndex(value, updatedState, (index) => {
-        updatedState[index] = createState(value[index])
-      })
-
-      return updatedState
-    })
-  }
-
-  return state
+export function getVisibleSections(
+  documentState: DocumentState,
+  pointer: JSONPointer
+): VisibleSection[] {
+  return documentState.visibleSectionsMap[pointer] || DEFAULT_VISIBLE_SECTIONS
 }
 
 /**
  * Invoke a callback function for every visible item in the array
- * @param {JSON} json
- * @param {JSON} state
- * @param {function (index: number)} callback
  */
-export function forEachVisibleIndex(json, state, callback) {
-  state[STATE_VISIBLE_SECTIONS].forEach(({ start, end }) => {
-    forEachIndex(start, Math.min(json.length, end), callback)
+export function forEachVisibleIndex(
+  jsonArray: JSONArray,
+  visibleSections: VisibleSection[],
+  callback: (index: number) => void
+) {
+  visibleSections.forEach(({ start, end }) => {
+    forEachIndex(start, Math.min(jsonArray.length, end), callback)
   })
-}
-
-// TODO: write unit tests
-export function forEachKey(state, callback) {
-  state[STATE_KEYS].forEach((key) => callback(key))
 }
 
 /**
  * Expand all nodes on given path
- * @param {JSON} json
- * @param {JSON} state
- * @param {Path} path
- * @return {JSON} returns the updated state
  */
-// TODO: write unit tests for expandPath
-export function expandPath(json, state, path) {
-  let updatedState = state
+export function expandPath(
+  json: JSONData,
+  documentState: DocumentState,
+  path: JSONPath
+): DocumentState {
+  const expandedMap: JSONPointerMap<boolean> = { ...documentState.expandedMap }
+  const visibleSectionsMap = { ...documentState.visibleSectionsMap }
 
-  for (let i = 0; i < path.length; i++) {
+  for (let i = 0; i <= path.length; i++) {
     const partialPath = path.slice(0, i)
-    const expandedPath = partialPath.concat(STATE_EXPANDED)
-    updatedState = setIn(updatedState, expandedPath, true, true)
+    const partialPointer = compileJSONPointer(partialPath)
 
-    // if needed, enlarge the expanded sections such that the search result becomes visible in the array
-    if (Array.isArray(getIn(updatedState, partialPath))) {
-      const key = path[i]
-      const sectionsPath = partialPath.concat(STATE_VISIBLE_SECTIONS)
-      const sections: Section[] = (getIn(updatedState, sectionsPath) ||
-        DEFAULT_VISIBLE_SECTIONS) as Section[]
-      if (!inVisibleSection(sections, key)) {
-        const start = currentRoundNumber(key)
-        const end = nextRoundNumber(start)
-        const newSection = { start, end }
-        const updatedSections = mergeSections(sections.concat(newSection))
-        updatedState = setIn(updatedState, sectionsPath, updatedSections)
-      }
+    const value = getIn(json, partialPath)
+
+    if (isObjectOrArray(value)) {
+      expandedMap[partialPointer] = true
     }
 
-    // FIXME: the way to sync the state of this nested, just expanded object/array is complicated. Refactor this
-    const partialJson: JSONData = getIn(json, partialPath) as JSONData
-    updatedState = updateIn(updatedState, partialPath, (partialState) => {
-      return syncState(partialJson, partialState as JSONData, [], () => false)
-    })
+    // if needed, enlarge the expanded sections such that the search result becomes visible in the array
+    if (Array.isArray(value) && i < path.length) {
+      const sections = visibleSectionsMap[partialPointer] || DEFAULT_VISIBLE_SECTIONS
+      const index = int(path[i])
+
+      if (!inVisibleSection(sections, index)) {
+        const start = currentRoundNumber(index)
+        const end = nextRoundNumber(start)
+        const newSection = { start, end }
+        visibleSectionsMap[partialPointer] = mergeSections(sections.concat(newSection))
+      }
+    }
   }
 
-  return updatedState
+  return {
+    ...documentState,
+    expandedMap,
+    visibleSectionsMap
+  }
 }
 
 /**
- * Expand a node, end expand it's childs according to the provided callback
- * @param {JSON} json
- * @param {JSON} state
- * @param {Path} path
- * @param {(path: Path) => boolean} expandedCallback
- * @returns {JSON} Returns the updated state
+ * Expand a node, end expand its children according to the provided callback
+ * Nodes that are already expanded will be left untouched
  */
+export function expandWithCallback(
+  json: JSONData,
+  documentState: DocumentState,
+  path: JSONPath,
+  expandedCallback: (path: JSONPath) => boolean
+): DocumentState {
+  const expandedMap = { ...documentState.expandedMap }
+
+  function recurse(value: JSONData) {
+    const pathIndex = currentPath.length
+
+    if (Array.isArray(value)) {
+      if (expandedCallback(currentPath)) {
+        const pointer = compileJSONPointer(currentPath)
+        expandedMap[pointer] = true
+
+        if (value.length > 0) {
+          const visibleSections = getVisibleSections(documentState, pointer)
+
+          forEachVisibleIndex(value, visibleSections, (index) => {
+            currentPath[pathIndex] = String(index)
+            recurse(value[index])
+          })
+
+          currentPath.pop()
+        }
+      }
+    } else if (isObject(value)) {
+      if (expandedCallback(currentPath)) {
+        expandedMap[compileJSONPointer(currentPath)] = true
+
+        const keys = Object.keys(value)
+        if (keys.length > 0) {
+          for (const key of keys) {
+            currentPath[pathIndex] = key
+            recurse(value[key])
+          }
+
+          currentPath.pop()
+        }
+      }
+    }
+  }
+
+  const currentPath = path.slice()
+  recurse(getIn(json, path))
+
+  return {
+    ...documentState,
+    expandedMap
+  }
+}
+
 // TODO: write unit tests
-export function expandWithCallback(json, state, path, expandedCallback) {
-  const updatedState = setIn(state, path.concat(STATE_EXPANDED), true, true)
-
-  return updateIn(updatedState, path, (childState) => {
-    return syncState(
-      getIn(json, path) as JSONData,
-      childState as JSONData,
-      [],
-      expandedCallback,
-      true
-    )
-  })
-}
-
-/**
- * @param {JSON} json
- * @param {JSON} state
- * @param {Path} path
- * @returns {JSON} Returns the updated state
- */
-// TODO: write unit tests
-export function collapse(json, state, path) {
-  return updateIn(state, path, (childState) => {
-    return syncState(getIn(json, path) as JSONData, childState as JSONData, [], () => false, true)
-  })
-}
-
-/**
- * If needed, enlarge the expanded sections such that the search result becomes visible in the array
- * @param {JSON} state
- * @param {Path} path
- * @param {number} index
- * @returns {JSON}
- */
-export function ensureItemIsVisible(state, path, index) {
-  if (!Array.isArray(getIn(state, path))) {
-    return state
+export function expandSingleItem(documentState: DocumentState, path: JSONPath): DocumentState {
+  return {
+    ...documentState,
+    expandedMap: {
+      ...documentState.expandedMap,
+      [compileJSONPointer(path)]: true
+    }
   }
-
-  const sections = getIn(state, path.concat(STATE_VISIBLE_SECTIONS)) as Section[]
-  if (inVisibleSection(sections, index)) {
-    return state
-  }
-
-  const start = currentRoundNumber(index)
-  const end = nextRoundNumber(start)
-  const newSection = { start, end }
-  const updatedSections = mergeSections(sections.concat(newSection))
-  return setIn(state, path.concat(STATE_VISIBLE_SECTIONS), updatedSections)
 }
 
 // TODO: write unit tests
-export function expandRecursively(json, state, path) {
-  const childJson = getIn(json, path)
+export function collapsePath(documentState: DocumentState, path: JSONPath): DocumentState {
+  // delete the expanded state of the path and all it's nested paths
+  const expandedMap = deletePath(documentState.expandedMap, path)
+  const enforceStringMap = deletePath(documentState.enforceStringMap, path)
+  const visibleSectionsMap = deletePath(documentState.visibleSectionsMap, path)
 
-  return updateIn(state, path, (childState) => {
-    return _expandRecursively(childJson, childState)
-  })
+  return {
+    ...documentState,
+    expandedMap,
+    enforceStringMap,
+    visibleSectionsMap
+  }
 }
 
-function _expandRecursively(json, state) {
-  if (isObject(json)) {
-    let updatedState = expandSinglePath(json, state, [])
+// TODO: write unit tests
+export function setEnforceString(
+  documentState: DocumentState,
+  pointer: JSONPointer,
+  enforceString: boolean
+): DocumentState {
+  if (enforceString) {
+    const updatedEnforceString = { ...documentState.enforceStringMap }
+    updatedEnforceString[pointer] = enforceString
 
-    forEachKey(updatedState, (key) => {
-      const updatedChildState = _expandRecursively(json[key], updatedState[key])
-      updatedState = setIn(updatedState, [key], updatedChildState)
-    })
-
-    return updatedState
+    return {
+      ...documentState,
+      enforceStringMap: updatedEnforceString
+    }
+  } else {
+    // remove if defined
+    if (typeof documentState.enforceStringMap[pointer] === 'boolean') {
+      const updatedEnforceString = { ...documentState.enforceStringMap }
+      delete updatedEnforceString[pointer]
+      return {
+        ...documentState,
+        enforceStringMap: updatedEnforceString
+      }
+    } else {
+      return documentState
+    }
   }
-
-  if (Array.isArray(json)) {
-    let updatedState = expandSinglePath(json, state, [])
-
-    forEachVisibleIndex(json, updatedState, (index) => {
-      const updatedChildState = _expandRecursively(json[index], updatedState[index])
-      updatedState = setIn(updatedState, [index], updatedChildState)
-    })
-
-    return updatedState
-  }
-
-  return state
-}
-
-/**
- * Collapse the node at given path
- * @param {JSON} json
- * @param {JSON} state
- * @param {Path} path
- * @returns {JSON} returns the updated state
- */
-export function collapseSinglePath(json, state, path) {
-  const value = getIn(json, path)
-
-  if (Array.isArray(value)) {
-    return updateIn(state, path, (arrayState) => {
-      const updatedState = []
-      updatedState[STATE_ID] = arrayState[STATE_ID]
-      updatedState[STATE_EXPANDED] = false
-      updatedState[STATE_VISIBLE_SECTIONS] = DEFAULT_VISIBLE_SECTIONS // reset visible sections
-      return updatedState
-    })
-  }
-
-  if (isObject(value)) {
-    return updateIn(state, path, (objectState) => {
-      const updatedState = {}
-      updatedState[STATE_ID] = objectState[STATE_ID]
-      updatedState[STATE_EXPANDED] = false
-      updatedState[STATE_KEYS] = objectState[STATE_KEYS] // keep order of keys
-      return updatedState
-    })
-  }
-
-  return state
 }
 
 /**
  * Expand a section of items in an array
- * @param {JSON} json
- * @param {JSON} state
- * @param {Path} path
- * @param {Section} section
- * @return {JSON} returns the updated state
  */
-// TODO: write unit test
-export function expandSection(json, state, path, section) {
-  const updatedState = updateIn(
-    state,
-    path.concat(STATE_VISIBLE_SECTIONS),
-    (sections: Section[]) => {
-      return mergeSections(sections.concat(section))
+export function expandSection(
+  json: JSONData,
+  documentState: DocumentState,
+  pointer: JSONPointer,
+  section: Section
+): DocumentState {
+  return {
+    ...documentState,
+    visibleSectionsMap: {
+      ...documentState.visibleSectionsMap,
+      [pointer]: mergeSections(getVisibleSections(documentState, pointer).concat(section))
     }
-  )
-
-  // instantiate all new expanded items
-  return syncState(json, updatedState as JSONData, path, () => false)
+  }
 }
 
-export function syncKeys(object: Record<string, unknown>, prevKeys?: string[]): string[] {
+export function syncKeys(actualKeys: string[], prevKeys?: string[]): string[] {
   if (!prevKeys) {
-    return Object.keys(object)
+    return actualKeys
   }
 
   // copy the keys that still exist
-  const keys = prevKeys.filter((key) => object[key] !== undefined)
+  const actualKeysSet = new Set(actualKeys)
+  const keys = prevKeys.filter((key) => actualKeysSet.has(key))
 
   // add new keys
   const keysSet = new Set(keys)
-  Object.keys(object)
-    .filter((key) => !keysSet.has(key))
-    .forEach((key) => keys.push(key))
+  actualKeys.filter((key) => !keysSet.has(key)).forEach((key) => keys.push(key))
 
   return keys
 }
@@ -404,279 +290,372 @@ export function syncKeys(object: Record<string, unknown>, prevKeys?: string[]): 
  */
 export function documentStatePatch(
   json: JSONData,
-  state: JSONData,
+  documentState: DocumentState,
   operations: JSONPatchDocument
-): { json: JSONData; state: JSONData } {
-  // TODO: split this function in smaller functions, it's too large
-
-  function before(state, operation) {
-    const { op, path, from } = operation
-    const parentPath: Path = initial(path)
-
-    let updatedState = state
-    let updatedOperation = operation
-
-    // correctly create state value
-    if (operation.value !== undefined) {
-      updatedOperation = {
-        ...updatedOperation,
-        value: createState(operation.value)
-      }
-    }
-
-    // TODO: when path or from is not existing in updatedState, expand that now so we can handle it
-
-    if (op === 'add' || op === 'copy') {
-      const keys = getKeys(state, parentPath as JSONPath)
-      if (keys) {
-        // this is a property inside an object
-        // add the key to STATE_KEYS if needed
-        const key = last(path) as string
-        if (!keys.includes(key)) {
-          updatedState = appendToKeys(updatedState, parentPath, key)
-        }
-      }
-
-      // shift the visible sections one down
-      updatedState = shiftVisibleSections(updatedState, path, 1)
-    }
-
-    if (op === 'move') {
-      const parentPath: Path = initial(path)
-      const keys = getKeys(updatedState, parentPath as JSONPath)
-      const oldKey = last(from) as string
-      const newKey = last(path) as string
-
-      if (isEqual(initial(from), initial(path))) {
-        // move inside the same object
-        if (keys) {
-          if (oldKey !== newKey) {
-            // A key is renamed
-
-            // in case the new key is different but will replace an existing key, remove the existing key
-            updatedState = removeFromKeys(updatedState, parentPath, newKey)
-
-            // Replace the key in the object's STATE_KEYS so it maintains its index
-            updatedState = replaceInKeys(updatedState, parentPath, oldKey, newKey)
-          } else {
-            // key is not renamed but moved -> move it to the end of the keys
-            updatedState = removeFromKeys(updatedState, parentPath, newKey)
-            updatedState = appendToKeys(updatedState, parentPath, newKey)
-          }
-        }
-      } else {
-        // move from one object/array to an other -> remove old key, add new key
-        const fromParentPath: Path = initial(from)
-        const fromKeys = getKeys(updatedState, fromParentPath as JSONPath)
-        if (fromKeys) {
-          updatedState = removeFromKeys(updatedState, fromParentPath, oldKey)
-        }
-        if (keys) {
-          updatedState = appendToKeys(updatedState, parentPath, newKey)
-        }
-      }
-
-      // shift the visible sections one up from where removed, and one down from where inserted
-      updatedState = shiftVisibleSections(updatedState, from, -1)
-      updatedState = shiftVisibleSections(updatedState, path, 1)
-
-      // we must keep the existing state for example when renaming an object property
-      const existingState = getIn(state, from)
-      updatedOperation = { ...updatedOperation, value: existingState }
-    }
-
-    if (op === 'remove') {
-      const parentPath: Path = initial(path)
-      const keys = getKeys(updatedState, parentPath as JSONPath)
-      if (keys) {
-        // remove old key
-        const oldKey = last(path) as string
-        updatedState = removeFromKeys(updatedState, parentPath, oldKey)
-      } else {
-        // shift the visible sections one up
-        updatedState = shiftVisibleSections(updatedState, path, -1)
-      }
-    }
-
-    if (op === 'replace') {
-      const parentPath: Path = initial(path)
-      const keys = getKeys(updatedState, parentPath as JSONPath)
-      if (keys) {
-        const key = last(path) as string
-        if (!keys.includes(key)) {
-          updatedState = appendToKeys(updatedState, parentPath, key)
-        }
-      }
-    }
-
-    return {
-      json: updatedState,
-      operation: updatedOperation
-    }
-  }
-
-  function after(state, operation, previousState) {
-    const { op, path } = operation
-
-    let updatedState = state
-
-    if (op === 'copy') {
-      // copying state will introduce duplicate id's -> replace with a new id
-      if (existsIn(updatedState, path.concat([STATE_ID]))) {
-        updatedState = setIn(updatedState, path.concat([STATE_ID]), uniqueId())
-      }
-    }
-
-    if (op === 'replace') {
-      // copy the old enforceString state after replacing a value
-      const enforceString = getIn(previousState, path.concat([STATE_ENFORCE_STRING]))
-      if (typeof enforceString === 'boolean') {
-        updatedState = setIn(updatedState, path.concat([STATE_ENFORCE_STRING]), enforceString)
-      }
-    }
-
-    return updatedState
-  }
-
-  // debug('documentStatePatch', json, state, operations) // TODO: cleanup logging
-
+): { json: JSONData; documentState: DocumentState } {
   const updatedJson = immutableJSONPatch(json, operations)
-  const initializedState = initializeState(json, state, operations)
-  const updatedState = immutableJSONPatch(initializedState, operations, { before, after })
+
+  const updatedDocumentState = operations.reduce((updatingState, operation) => {
+    if (isJSONPatchAdd(operation)) {
+      return documentStateAdd(updatedJson, updatingState, operation)
+    }
+
+    if (isJSONPatchRemove(operation)) {
+      return documentStateRemove(updatedJson, updatingState, operation)
+    }
+
+    if (isJSONPatchReplace(operation)) {
+      return documentStateReplace(updatedJson, updatingState, operation)
+    }
+
+    if (isJSONPatchCopy(operation) || isJSONPatchMove(operation)) {
+      return documentStateMoveOrCopy(updatedJson, updatingState, operation)
+    }
+
+    return updatingState
+  }, documentState)
 
   return {
-    json: updatedJson as JSONData,
-    state: updatedState as JSONData
+    json: updatedJson,
+    documentState: updatedDocumentState
+  }
+}
+
+export function documentStateAdd(
+  json: JSONData,
+  documentState: DocumentState,
+  operation: JSONPatchAdd
+): DocumentState {
+  const path = parsePath(json, operation.path)
+  const parentPath = initial(path)
+  const parentPointer = compileJSONPointer(parentPath)
+  const parent = getIn(json, parentPath)
+
+  if (isJSONArray(parent)) {
+    const index = int(last(path))
+
+    // shift all paths of the relevant parts of the state
+    const expandedMap = shiftPath(documentState.expandedMap, parentPath, index, 1)
+    const enforceStringMap = shiftPath(documentState.enforceStringMap, parentPath, index, 1)
+    let visibleSectionsMap = shiftPath(documentState.visibleSectionsMap, parentPath, index, 1)
+
+    // shift visible sections of array
+    visibleSectionsMap = updateInPathsMap(visibleSectionsMap, parentPointer, (sections) =>
+      shiftVisibleSections(sections, index, 1)
+    )
+
+    return {
+      ...documentState,
+      expandedMap,
+      enforceStringMap,
+      visibleSectionsMap
+    }
+  }
+
+  // object, nothing to do
+  return documentState
+}
+
+export function documentStateRemove(
+  updatedJson: JSONData,
+  documentState: DocumentState,
+  operation: JSONPatchRemove
+): DocumentState {
+  const path = parsePath(updatedJson, operation.path)
+  const parentPath = initial(path)
+  const parentPointer = compileJSONPointer(parentPath)
+  const parent = getIn(updatedJson, parentPath)
+
+  let { expandedMap, enforceStringMap, visibleSectionsMap } = documentState
+
+  // delete the path itself and its children
+  expandedMap = deletePath(expandedMap, path)
+  enforceStringMap = deletePath(enforceStringMap, path)
+  visibleSectionsMap = deletePath(visibleSectionsMap, path)
+
+  if (isJSONArray(parent)) {
+    const index = int(last(path))
+
+    // shift all paths of the relevant parts of the state
+    expandedMap = shiftPath(expandedMap, parentPath, index, -1)
+    enforceStringMap = shiftPath(enforceStringMap, parentPath, index, -1)
+    visibleSectionsMap = shiftPath(visibleSectionsMap, parentPath, index, -1)
+
+    // shift visible sections of array
+    visibleSectionsMap = updateInPathsMap(visibleSectionsMap, parentPointer, (sections) =>
+      shiftVisibleSections(sections, index, -1)
+    )
+  }
+
+  return {
+    ...documentState,
+    expandedMap,
+    enforceStringMap,
+    visibleSectionsMap
+  }
+}
+
+export function documentStateReplace(
+  updatedJson: JSONData,
+  documentState: DocumentState,
+  operation: JSONPatchReplace
+): DocumentState {
+  const pointer = operation.path
+
+  // cleanup state from paths that are removed now
+  const expandedMap = cleanupNonExistingPaths(updatedJson, documentState.expandedMap)
+  const enforceStringMap = cleanupNonExistingPaths(updatedJson, documentState.enforceStringMap)
+  const visibleSectionsMap = cleanupNonExistingPaths(updatedJson, documentState.visibleSectionsMap)
+
+  // cleanup props of the object/array/value itself that are not applicable anymore
+  if (!isJSONObject(operation.value) && !isJSONArray(operation.value)) {
+    delete expandedMap[pointer]
+  }
+  if (!isJSONArray(operation.value)) {
+    delete visibleSectionsMap[pointer]
+  }
+  if (isJSONObject(operation.value) || isJSONArray(operation.value)) {
+    delete enforceStringMap[pointer]
+  }
+
+  return {
+    ...documentState,
+    expandedMap,
+    enforceStringMap,
+    visibleSectionsMap
+  }
+}
+
+export function documentStateMoveOrCopy(
+  updatedJson: JSONData,
+  documentState: DocumentState,
+  operation: JSONPatchCopy | JSONPatchMove
+): DocumentState {
+  if (isJSONPatchMove(operation) && operation.from === operation.path) {
+    // nothing to do
+    return documentState
+  }
+
+  // get the state that we will move or copy, and move it to the new location
+  const renamePointer = (pointer) => operation.path + pointer.substring(operation.from.length)
+  const expandedMapCopy = movePath(
+    filterPath(documentState.expandedMap, operation.from),
+    renamePointer
+  )
+  const enforceStringMapCopy = movePath(
+    filterPath(documentState.enforceStringMap, operation.from),
+    renamePointer
+  )
+  const visibleSectionsMapCopy = movePath(
+    filterPath(documentState.visibleSectionsMap, operation.from),
+    renamePointer
+  )
+
+  // patch the document state: use the remove and add operations to apply a move or copy
+  // note that `value` is just a fake value, we do not use this for real
+  let updatedState = documentState
+  if (isJSONPatchMove(operation)) {
+    updatedState = documentStateRemove(updatedJson, updatedState, {
+      op: 'remove',
+      path: operation.from
+    })
+  }
+  updatedState = documentStateAdd(updatedJson, updatedState, {
+    op: 'add',
+    path: operation.path,
+    value: null
+  })
+
+  // merge the original and the copied state
+  const expandedMap = mergePaths(updatedState.expandedMap, expandedMapCopy)
+  const enforceStringMap = mergePaths(updatedState.enforceStringMap, enforceStringMapCopy)
+  const visibleSectionsMap = mergePaths(updatedState.visibleSectionsMap, visibleSectionsMapCopy)
+
+  return {
+    ...documentState,
+    expandedMap,
+    enforceStringMap,
+    visibleSectionsMap
   }
 }
 
 /**
- * Initialize the state needed to perform the JSON patch operations.
- * For example to a change in a nested object which is not expanded and
- * hence has no state initialize, we need to create this nested state
- * @param {JSON} json
- * @param {JSON} state
- * @param {JSONPatchDocument} operations
+ * Delete a path from a PathsMap. Will delete the path and its child paths
+ * IMPORTANT: will NOT shift array items when an array item is removed, use shiftPath for that
  */
-export function initializeState(json, state, operations) {
-  let updatedState = state
+export function deletePath<T>(map: JSONPointerMap<T>, path: JSONPath): JSONPointerMap<T> {
+  const updatedMap: JSONPointerMap<T> = {}
+  const pointer = compileJSONPointer(path)
 
-  function initializePath(json, state, path) {
-    let updatedState = state
-
-    if (existsIn(json, path) && !existsIn(updatedState, path)) {
-      // first make sure the parent is initialized
-      if (path.length > 0) {
-        updatedState = initializePath(json, updatedState, initial(path))
-      }
-
-      // then initialize the state itself
-      updatedState = setIn(updatedState, path, createState(getIn(json, path)))
-    }
-
-    return updatedState
-  }
-
-  operations.forEach((operation) => {
-    const from =
-      typeof operation.from === 'string'
-        ? parseJSONPointerWithArrayIndices(json, operation.from)
-        : null
-    const path =
-      typeof operation.path === 'string'
-        ? parseJSONPointerWithArrayIndices(json, operation.path)
-        : null
-
-    if (operation.op === 'add') {
-      updatedState = initializePath(json, updatedState, initial(path)) // initialize parent only
-    }
-
-    if (operation.op === 'copy' || operation.op === 'move') {
-      updatedState = initializePath(json, updatedState, from)
-      updatedState = initializePath(json, updatedState, initial(path)) // initialize parent only
-    }
-
-    if (operation.op === 'remove' || operation.op === 'replace' || operation.op === 'test') {
-      updatedState = initializePath(json, updatedState, path)
+  // partition the contents of the map
+  Object.keys(map).forEach((itemPointer) => {
+    if (!startsWithJSONPointer(itemPointer, pointer)) {
+      updatedMap[itemPointer] = map[itemPointer]
     }
   })
 
-  return updatedState
+  return updatedMap
+}
+
+// TODO: unit test
+export function filterPath<T>(map: JSONPointerMap<T>, pointer: JSONPointer): JSONPointerMap<T> {
+  const filteredMap: JSONPointerMap<T> = {}
+
+  Object.keys(map).forEach((itemPointer) => {
+    if (startsWithJSONPointer(itemPointer, pointer)) {
+      filteredMap[itemPointer] = map[itemPointer]
+    }
+  })
+
+  return filteredMap
+}
+
+// TODO: unit test
+export function mergePaths<T>(a: JSONPointerMap<T>, b: JSONPointerMap<T>): JSONPointerMap<T> {
+  return { ...a, ...b }
+}
+
+// TODO: unit test
+export function movePath<T>(
+  map: JSONPointerMap<T>,
+  changePointer: (pointer: JSONPointer) => JSONPointer
+): JSONPointerMap<T> {
+  const movedMap: JSONPointerMap<T> = {}
+
+  Object.keys(map).forEach((oldPointer) => {
+    const newPointer = changePointer(oldPointer)
+    movedMap[newPointer] = map[oldPointer]
+  })
+
+  return movedMap
+}
+
+export function shiftPath<T>(
+  map: JSONPointerMap<T>,
+  path: JSONPath,
+  index: number,
+  offset: number
+): JSONPointerMap<T> {
+  const indexPathPos = path.length
+  const pointer = compileJSONPointer(path)
+
+  // collect all paths that need to be shifted, with their old path, new path, and value
+  const matches: { oldPointer: JSONPointer; newPointer: JSONPointer; value: T }[] = []
+  for (const itemPointer of Object.keys(map)) {
+    if (startsWithJSONPointer(itemPointer, pointer)) {
+      const itemPath: JSONPath = parseJSONPointer(itemPointer)
+      const pathIndex = int(itemPath[indexPathPos])
+
+      if (pathIndex >= index) {
+        itemPath[indexPathPos] = String(pathIndex + offset)
+
+        matches.push({
+          oldPointer: itemPointer,
+          newPointer: compileJSONPointer(itemPath),
+          value: map[itemPointer]
+        })
+      }
+    }
+  }
+
+  // if there are no changes, just return the original map
+  if (matches.length === 0) {
+    return map
+  }
+
+  const updatedMap = { ...map }
+
+  // delete all old paths from the map
+  // we do this *before* inserting new paths to prevent deleting a math that is already moved
+  matches.forEach((match) => {
+    delete updatedMap[match.oldPointer]
+  })
+
+  // insert shifted paths in the map
+  matches.forEach((match) => {
+    updatedMap[match.newPointer] = match.value
+  })
+
+  return updatedMap
+}
+
+// TODO: unit test
+export function cleanupNonExistingPaths<T>(
+  json: JSONData,
+  map: JSONPointerMap<T>
+): JSONPointerMap<T> {
+  const updatedMap = {}
+
+  // TODO: for optimization, we could pass a filter callback which allows you to filter paths
+  //  starting with a specific, so you don't need to invoke parseJSONPointer and existsIn for largest part
+
+  Object.keys(map)
+    .filter((pointer) => existsIn(json, parsePath(json, pointer)))
+    .forEach((pointer) => {
+      updatedMap[pointer] = map[pointer]
+    })
+
+  return updatedMap
+}
+
+/**
+ * Update a value in a PathsMap.
+ * When the path exists, the callback will be invoked.
+ * When the path does not exist, the callback is not invoked.
+ */
+export function updateInPathsMap<T>(
+  map: JSONPointerMap<T>,
+  pointer: JSONPointer,
+  callback: (value: T) => T
+) {
+  const value = map[pointer]
+
+  if (pointer in map) {
+    const updatedValue = callback(value)
+    if (!isEqual(value, updatedValue)) {
+      const updatedMap = { ...map }
+
+      if (updatedValue === undefined) {
+        delete updatedMap[pointer]
+      } else {
+        updatedMap[pointer] = updatedValue
+      }
+
+      return updatedMap
+    }
+  }
+
+  return map
 }
 
 /**
  * Shift visible sections in an Array with a specified offset
- * @param {JSON} state
- * @param {Path} path
- * @param {number} offset
- * @returns {JSON} Returns the updated state
  */
-export function shiftVisibleSections(state, path, offset) {
-  const parentPath = initial(path)
-  const sectionsPath = parentPath.concat([STATE_VISIBLE_SECTIONS])
-  const visibleSections = getIn(state, sectionsPath as JSONPath) as Section[]
-  if (!visibleSections) {
-    // nothing to do, this is no object but an array apparently :)
-    return state
-  }
-
-  const index = parseInt(last(path), 10)
-  const shiftedVisibleSections = visibleSections.map((section) => {
+export function shiftVisibleSections(
+  visibleSections: VisibleSection[],
+  index: number,
+  offset: number
+): VisibleSection[] {
+  return visibleSections.map((section) => {
     return {
       start: section.start > index ? section.start + offset : section.start,
-
       end: section.end >= index ? section.end + offset : section.end
     }
   })
-
-  return setIn(state, sectionsPath as JSONPath, shiftedVisibleSections)
 }
 
-export function getKeys(state: JSONData, path: Path): string[] {
-  return getIn(state, path.concat([STATE_KEYS]) as JSONPath) as string[]
-}
+export function getEnforceString(
+  value: JSONData,
+  enforceStringMap: JSONPointerMap<boolean> | undefined,
+  pointer: JSONPointer
+): boolean {
+  const enforceString = enforceStringMap ? enforceStringMap[pointer] : undefined
 
-// TODO: write unit tests
-export function isExpanded(state: JSONData, path: Path): boolean {
-  return getIn(state, path.concat([STATE_EXPANDED]) as JSONPath) === true
-}
+  if (typeof enforceString === 'boolean') {
+    return enforceString
+  }
 
-/**
- * Remove a key from the keys of an object at given path.
- * Returns the updated state
- */
-export function removeFromKeys(state: JSONData, path: Path, key: string): JSONData {
-  return updateIn(state, path.concat([STATE_KEYS]) as JSONPath, (keys: string[]) => {
-    const index = keys.indexOf(key)
-    if (index === -1) {
-      return keys
-    }
-
-    const updatedKeys = keys.slice(0)
-    updatedKeys.splice(index, 1)
-
-    return updatedKeys
-  }) as JSONData
-}
-
-export function replaceInKeys(state: JSONData, path: Path, oldKey: string, newKey: string) {
-  return updateIn(state, path.concat([STATE_KEYS]) as JSONPath, (keys: string[]) => {
-    const index = keys.indexOf(oldKey)
-    if (index === -1) {
-      return keys
-    }
-
-    const updatedKeys = keys.slice(0)
-    updatedKeys.splice(index, 1, newKey)
-
-    return updatedKeys
-  })
-}
-
-export function appendToKeys(state: JSONData, path: Path, key: string) {
-  return updateIn(state, path.concat([STATE_KEYS]) as JSONPath, (keys: string[]) =>
-    keys.concat(key)
-  )
+  return isStringContainingPrimitiveValue(value)
 }
 
 export function getNextKeys(keys, key, includeKey = false) {
@@ -691,91 +670,88 @@ export function getNextKeys(keys, key, includeKey = false) {
 
 /**
  * Get all paths which are visible and rendered
- * @param {JSON} json
- * @param {JSON} state
- * @returns {Path[]}
  */
 // TODO: create memoized version of getVisiblePaths which remembers just the previous result if json and state are the same
-export function getVisiblePaths(json, state) {
-  const paths = []
+export function getVisiblePaths(json: JSONData, documentState: DocumentState): JSONPath[] {
+  const paths: JSONPath[] = []
 
-  function _recurse(json, state, path) {
+  function _recurse(value: JSONData, path: JSONPath) {
     paths.push(path)
+    const pointer = compileJSONPointer(path)
 
-    if (json && state && state[STATE_EXPANDED] === true) {
-      if (Array.isArray(json)) {
-        forEachVisibleIndex(json, state, (index) => {
-          _recurse(json[index], state[index], path.concat(index))
+    if (value && documentState.expandedMap[pointer] === true) {
+      if (isJSONArray(value)) {
+        const visibleSections = getVisibleSections(documentState, pointer)
+        forEachVisibleIndex(value, visibleSections, (index) => {
+          _recurse(value[index], path.concat(String(index)))
         })
-      } else {
-        // Object
-        forEachKey(state, (key) => {
-          _recurse(json[key], state[key], path.concat(key))
+      }
+
+      if (isJSONObject(value)) {
+        Object.keys(value).forEach((key) => {
+          _recurse(value[key], path.concat(key))
         })
       }
     }
   }
 
-  _recurse(json, state, [])
+  _recurse(json, [])
 
   return paths
 }
 
-export const CARET_POSITION = {
-  INSIDE: 'inside',
-  AFTER: 'after',
-  KEY: 'key',
-  VALUE: 'value'
-}
-
 /**
  * Get all caret position which are visible and rendered:
- * before a node, at a key, at a value, appending an object/arrayc
- * @param {JSON} json
- * @param {JSON} state
- * @param {boolean} [includeInside=true]
- * @returns {CaretPosition[]}
+ * before a node, at a key, at a value, appending an object/array
  */
 // TODO: create memoized version of getVisibleCaretPositions which remembers just the previous result if json and state are the same
-export function getVisibleCaretPositions(json, state, includeInside = true) {
-  const paths = []
+export function getVisibleCaretPositions(
+  json: JSONData,
+  documentState: DocumentState,
+  includeInside = true
+): CaretPosition[] {
+  const paths: CaretPosition[] = []
 
-  function _recurse(json, state, path) {
-    paths.push({ path, type: CARET_POSITION.VALUE })
+  function _recurse(value: JSONData, path: JSONPath) {
+    paths.push({ path, type: CaretType.value })
 
-    if (json && state && state[STATE_EXPANDED] === true) {
+    const pointer = compileJSONPointer(path)
+    if (value && documentState.expandedMap[pointer] === true) {
       if (includeInside) {
-        paths.push({ path, type: CARET_POSITION.INSIDE })
+        paths.push({ path, type: CaretType.inside })
       }
 
-      if (Array.isArray(json)) {
-        forEachVisibleIndex(json, state, (index) => {
-          const itemPath = path.concat(index)
+      if (isJSONArray(value)) {
+        const visibleSections = getVisibleSections(documentState, pointer)
+        forEachVisibleIndex(value, visibleSections, (index) => {
+          const itemPath = path.concat(String(index))
 
-          _recurse(json[index], state[index], itemPath)
+          _recurse(value[index], itemPath)
 
           if (includeInside) {
-            paths.push({ path: itemPath, type: CARET_POSITION.AFTER })
+            paths.push({ path: itemPath, type: CaretType.after })
           }
         })
-      } else {
-        // Object
-        forEachKey(state, (key) => {
+      }
+
+      if (isJSONObject(value)) {
+        const keys = Object.keys(value)
+        keys.forEach((key) => {
           const propertyPath = path.concat(key)
 
-          paths.push({ path: propertyPath, type: CARET_POSITION.KEY })
+          paths.push({ path: propertyPath, type: CaretType.key })
 
-          _recurse(json[key], state[key], propertyPath)
+          _recurse(value[key], propertyPath)
 
           if (includeInside) {
-            paths.push({ path: propertyPath, type: CARET_POSITION.AFTER })
+            paths.push({ path: propertyPath, type: CaretType.after })
           }
         })
       }
     }
   }
 
-  _recurse(json, state, [])
+  _recurse(json, [])
 
   return paths
 }
@@ -783,14 +759,14 @@ export function getVisibleCaretPositions(json, state, includeInside = true) {
 /**
  * Find the previous visible path.
  * This can be the last child of the previous object or array, or the parent of a first entry.
- * @param {JSON} json
- * @param {JSON} state
- * @param {Path} path
- * @return {Path | null}
  */
 // TODO: write tests for getPreviousVisiblePath
-export function getPreviousVisiblePath(json, state, path) {
-  const visiblePaths = getVisiblePaths(json, state)
+export function getPreviousVisiblePath(
+  json: JSONData,
+  documentState: DocumentState,
+  path: JSONPath
+): JSONPath | null {
+  const visiblePaths = getVisiblePaths(json, documentState)
   const visiblePathPointers = visiblePaths.map(compileJSONPointer)
   const pathPointer = compileJSONPointer(path)
   const index = visiblePathPointers.indexOf(pathPointer)
@@ -805,14 +781,14 @@ export function getPreviousVisiblePath(json, state, path) {
 /**
  * Find the next visible path.
  * This can be the next parent entry.
- * @param {JSON} json
- * @param {JSON} state
- * @param {Path} path
- * @return {Path | null} path
  */
 // TODO: write tests for getNextVisiblePath
-export function getNextVisiblePath(json, state, path) {
-  const visiblePaths = getVisiblePaths(json, state)
+export function getNextVisiblePath(
+  json: JSONData,
+  documentState: DocumentState,
+  path: JSONPath
+): JSONPath | null {
+  const visiblePaths = getVisiblePaths(json, documentState)
   const visiblePathPointers = visiblePaths.map(compileJSONPointer)
   const index = visiblePathPointers.indexOf(compileJSONPointer(path))
 

@@ -1,7 +1,8 @@
 import jmespath from 'jmespath'
+import type { JSONData, JSONPath } from 'immutable-json-patch'
 import { getIn } from 'immutable-json-patch'
 import { parseString } from '../../utils/stringUtils.js'
-import type { JSONData, Path, QueryLanguage, QueryLanguageOptions } from '../../types'
+import type { QueryLanguage, QueryLanguageOptions } from '../../types'
 
 const description = `
 <p>
@@ -102,7 +103,7 @@ function executeQuery(json: JSONData, query: string): JSONData {
 
 // TODO: unit test stringifyPathForJmespath
 // TODO: Isn't there a helper function exposed by the JMESPath library?
-export function stringifyPathForJmespath(path: Path): string {
+export function stringifyPathForJmespath(path: JSONPath): string {
   if (path.length === 0) {
     return '@'
   }

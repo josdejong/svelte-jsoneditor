@@ -3,6 +3,7 @@
 <script>
   import Icon from 'svelte-awesome'
   import { faLock } from '@fortawesome/free-solid-svg-icons'
+  import { createValueSelection } from 'svelte-jsoneditor'
 
   export let value
   export let path
@@ -18,7 +19,7 @@
       event.stopPropagation()
 
       // open in edit mode
-      onSelect({ type: 'value', path, edit: true })
+      onSelect(createValueSelection(path, true))
     }
   }
 </script>

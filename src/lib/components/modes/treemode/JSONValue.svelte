@@ -1,26 +1,19 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { SELECTION_TYPE } from '../../../logic/selection'
-  import { isEqual } from 'lodash-es'
-  import type { SearchResultItem, Selection, Path, TreeModeContext } from '../../../types'
+  import type { SearchResultItem, JSONSelection, TreeModeContext } from '../../../types'
+  import type { JSONData, JSONPath } from 'immutable-json-patch'
+  import { isEditingSelection, isValueSelection } from '../../../logic/selection'
 
-  export let path: Path
-  export let value: JSON
-
+  export let path: JSONPath
+  export let value: JSONData
   export let context: TreeModeContext
-
+  export let isSelected: boolean
   export let enforceString: boolean
-  export let selection: Selection | undefined
+  export let selection: JSONSelection | undefined
+  export let searchResultItems: SearchResultItem[] | undefined
 
-  export let searchResult: SearchResultItem | undefined
-
-  $: isSelected =
-    selection && selection.type === SELECTION_TYPE.VALUE
-      ? isEqual(selection.focusPath, path)
-      : false
-
-  $: isEditing = !context.readOnly && isSelected && selection && selection.edit === true
+  $: isEditing = !context.readOnly && isValueSelection(selection) && isEditingSelection(selection)
 
   $: renderers = context.onRenderValue({
     path,
@@ -31,11 +24,12 @@
     isEditing,
     normalization: context.normalization,
     selection,
-    searchResult,
+    searchResultItems,
     onPatch: context.onPatch,
     onPasteJson: context.onPasteJson,
     onSelect: context.onSelect,
-    onFind: context.onFind
+    onFind: context.onFind,
+    focus: context.focus
   })
 </script>
 

@@ -5,12 +5,13 @@
   import { setContext, tick } from 'svelte'
   import { isChildOf } from '$lib/utils/domUtils'
   import { keyComboFromEvent } from '../../../utils/keyBindings'
+  import type { AbsolutePopupOptions } from '../../../types'
 
   const debug = createDebug('jsoneditor:AbsolutePopup')
 
   let popupComponent = null
   let popupProps = null
-  let popupOptions = {}
+  let popupOptions: AbsolutePopupOptions = {}
 
   let refRootPopup
   let refHiddenInput

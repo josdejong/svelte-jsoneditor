@@ -6,8 +6,9 @@
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { createDebug } from '../../utils/debug.js'
   import { isEmpty, isEqual } from 'lodash-es'
+  import type { JSONData, JSONPath } from 'immutable-json-patch'
   import { setIn } from 'immutable-json-patch'
-  import type { JSONData, Path, QueryLanguageOptions } from '../../types'
+  import type { QueryLanguageOptions } from '../../types'
 
   const debug = createDebug('jsoneditor:TransformWizard')
 
@@ -57,7 +58,7 @@
     }
   }
 
-  function changeFilterPath(path: Path) {
+  function changeFilterPath(path: JSONPath) {
     if (!isEqual(queryOptions?.filter?.path, path)) {
       debug('changeFilterPath', path)
       queryOptions = setIn(queryOptions, ['filter', 'path'], path, true)

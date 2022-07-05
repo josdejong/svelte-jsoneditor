@@ -1,18 +1,45 @@
 import { cloneDeepWith, first, initial, isEmpty, last, times } from 'lodash-es'
-import { compileJSONPointer, getIn, type JSONPath } from 'immutable-json-patch'
-import { parseAndRepair, parseAndRepairOrUndefined, parsePartialJson } from '../utils/jsonUtils.js'
+import type {
+  JSONData,
+  JSONPatchDocument,
+  JSONPatchOperation,
+  JSONPath
+} from 'immutable-json-patch'
+import {
+  compileJSONPointer,
+  getIn,
+  isJSONPatchMove,
+  isJSONPatchRemove,
+  parseJSONPointer,
+  revertJSONPatch
+} from 'immutable-json-patch'
+import {
+  isJSONArray,
+  isJSONObject,
+  parseAndRepair,
+  parseAndRepairOrUndefined,
+  parsePartialJson
+} from '../utils/jsonUtils.js'
 import { findUniqueName } from '../utils/stringUtils.js'
 import { isObject, isObjectOrArray } from '../utils/typeUtils.js'
-import { getKeys, getNextKeys } from './documentState.js'
+import { getNextKeys } from './documentState.js'
 import {
-  createSelection,
+  createAfterSelection,
+  createInsideSelection,
   createSelectionFromOperations,
+  createValueSelection,
+  getEndPath,
   getParentPath,
-  pathStartsWith,
-  SELECTION_TYPE
+  getStartPath,
+  isAfterSelection,
+  isInsideSelection,
+  isKeySelection,
+  isMultiSelection,
+  isValueSelection,
+  pathStartsWith
 } from './selection.js'
-import { STATE_KEYS } from '../constants.js'
-import type { JSONPatchDocument, Path } from '../types'
+import type { ClipboardValues, DragInsideAction, JSONSelection } from '../types'
+import { int } from '../utils/numberUtils.js'
 
 /**
  * Create a JSONPatch for an insert operation.
@@ -20,32 +47,29 @@ import type { JSONPatchDocument, Path } from '../types'
  * This function needs the current data in order to be able to determine
  * a unique property name for the inserted node in case of duplicating
  * and object property
- *
- * @param {JSON} json
- * @param {JSON} state
- * @param {Path} path
- * @param {ClipboardValues} values
- * @return {JSONPatchDocument}
  */
 // TODO: write tests
-export function insertBefore(json, state, path, values) {
-  // TODO: find a better name and define datastructure for values
-  const parentPath: JSONPath = initial(path)
+export function insertBefore(
+  json: JSONData,
+  path: JSONPath,
+  values: ClipboardValues
+): JSONPatchDocument {
+  const parentPath = initial(path)
   const parent = getIn(json, parentPath)
 
-  if (Array.isArray(parent)) {
+  if (isJSONArray(parent)) {
     // the path is parsed from a JSONPatch operation,
     // so array indices are a string which we have to parse into a number
-    const offset = parseInt(last(path), 10)
+    const offset = int(last(path))
     return values.map((entry, index) => ({
       op: 'add',
-      path: compileJSONPointer(parentPath.concat(offset + index)),
+      path: compileJSONPointer(parentPath.concat(String(offset + index))),
       value: entry.value
     }))
-  } else {
+  } else if (isJSONObject(parent)) {
     // 'object'
     const afterKey = last(path)
-    const keys = getKeys(state, parentPath)
+    const keys = Object.keys(parent)
     const nextKeys = getNextKeys(keys, afterKey, true)
 
     return [
@@ -59,9 +83,11 @@ export function insertBefore(json, state, path, values) {
         }
       }),
 
-      // move all lower down keys so the inserted key will maintain it's position
+      // move all lower down keys so the inserted key will maintain its position
       ...nextKeys.map((key) => moveDown(parentPath, key))
     ]
+  } else {
+    throw new Error('Cannot create insert operations: parent must be an Object or Array')
   }
 }
 
@@ -72,21 +98,15 @@ export function insertBefore(json, state, path, values) {
  * This function needs the current data in order to be able to determine
  * a unique property name for the inserted node in case of duplicating
  * and object property
- *
- * @param {JSON} json
- * @param {Path} path
- * @param {ClipboardValues} values
- * @return {JSONPatchDocument}
  */
-export function append(json, path, values) {
-  // TODO: find a better name and define data structure for values
+export function append(json: JSONData, path: JSONPath, values: ClipboardValues): JSONPatchDocument {
   const parent = getIn(json, path)
 
   if (Array.isArray(parent)) {
     const offset = parent.length
     return values.map((entry, index) => ({
       op: 'add',
-      path: compileJSONPointer(path.concat(offset + index)),
+      path: compileJSONPointer(path.concat(String(offset + index))),
       value: entry.value
     }))
   } else {
@@ -105,14 +125,13 @@ export function append(json, path, values) {
 /**
  * Rename an object key
  * Not applicable to arrays
- *
- * @param {Path} parentPath
- * @param {string[]} keys
- * @param {string} oldKey
- * @param {string} newKey
- * @returns {JSONPatchDocument}
  */
-export function rename(parentPath, keys, oldKey, newKey) {
+export function rename(
+  parentPath: JSONPath,
+  keys: string[],
+  oldKey: string,
+  newKey: string
+): JSONPatchDocument {
   const filteredKeys = keys.filter((key) => key !== oldKey)
   const newKeyUnique = findUniqueName(newKey, filteredKeys)
   const nextKeys = getNextKeys(keys, oldKey, false)
@@ -136,42 +155,43 @@ export function rename(parentPath, keys, oldKey, newKey) {
  * This function needs the current data in order to be able to determine
  * a unique property name for the inserted node in case of duplicating
  * and object property
- *
- * @param {JSON} json
- * @param {JSON} state
- * @param {Path[]} paths
- * @param {ClipboardValues} values
- * @return {JSONPatchDocument}
  */
-export function replace(json, state, paths, values) {
-  // TODO: find a better name and define data structure for values
-  const firstPath: JSONPath = first(paths)
+export function replace(
+  json: JSONData,
+  paths: JSONPath[],
+  values: ClipboardValues
+): JSONPatchDocument {
+  const firstPath = first(paths)
   const parentPath = initial(firstPath)
   const parent = getIn(json, parentPath)
 
-  if (Array.isArray(parent)) {
-    const firstPath: JSONPath = first(paths)
-    const offset = firstPath ? parseInt(last(firstPath) as string, 10) : 0
+  if (isJSONArray(parent)) {
+    const firstPath = first(paths)
+    const offset = firstPath ? int(last(firstPath)) : 0
 
     return [
       // remove operations
       ...removeAll(paths),
 
       // insert operations
-      ...values.map((entry, index) => ({
-        op: 'add',
-        path: compileJSONPointer(parentPath.concat(index + offset)),
-        value: entry.value
-      }))
+      ...values.map((entry, index) => {
+        const operation: JSONPatchOperation = {
+          op: 'add',
+          path: compileJSONPointer(parentPath.concat(String(index + offset))),
+          value: entry.value
+        }
+
+        return operation
+      })
     ]
-  } else {
+  } else if (isJSONObject(parent)) {
     // parent is Object
     // if we're going to replace an existing object with key "a" with a new
     // key "a", we must not create a new unique name "a (copy)".
-    const lastPath: JSONPath = last(paths)
+    const lastPath = last(paths)
     const parentPath = initial(lastPath)
     const beforeKey = last(lastPath)
-    const keys: string[] = getKeys(state, parentPath)
+    const keys: string[] = Object.keys(parent)
     const nextKeys = getNextKeys(keys, beforeKey, false)
     const removeKeys = new Set(paths.map((path) => last(path)))
     const filteredKeys = keys.filter((key) => !removeKeys.has(key))
@@ -191,9 +211,11 @@ export function replace(json, state, paths, values) {
       }),
 
       // move down operations
-      // move all lower down keys so the renamed key will maintain it's position
+      // move all lower down keys so the renamed key will maintain its position
       ...nextKeys.map((key) => moveDown(parentPath, key))
     ]
+  } else {
+    throw new Error('Cannot create replace operations: parent must be an Object or Array')
   }
 }
 
@@ -203,15 +225,10 @@ export function replace(json, state, paths, values) {
  * This function needs the current data in order to be able to determine
  * a unique property name for the duplicated node in case of duplicating
  * and object property
- *
- * @param {JSON} json
- * @param {JSON} state
- * @param {Path[]} paths
- * @return {JSONPatchDocument}
  */
-export function duplicate(json, state, paths) {
+export function duplicate(json: JSONData, paths: JSONPath[]): JSONPatchDocument {
   // FIXME: here we assume selection.paths is sorted correctly, that's a dangerous assumption
-  const lastPath: JSONPath = last(paths)
+  const lastPath = last(paths)
 
   if (isEmpty(lastPath)) {
     throw new Error('Cannot duplicate root object')
@@ -221,21 +238,25 @@ export function duplicate(json, state, paths) {
   const beforeKey = last(lastPath)
   const parent = getIn(json, parentPath)
 
-  if (Array.isArray(parent)) {
-    const lastPath: JSONPath = last(paths)
-    const offset = lastPath ? parseInt(last(lastPath) as string, 10) + 1 : 0
+  if (isJSONArray(parent)) {
+    const lastPath = last(paths)
+    const offset = lastPath ? int(last(lastPath)) + 1 : 0
 
     return [
       // copy operations
-      ...paths.map((path, index) => ({
-        op: 'copy',
-        from: compileJSONPointer(path),
-        path: compileJSONPointer(parentPath.concat(index + offset))
-      }))
+      ...paths.map((path, index) => {
+        const operation: JSONPatchOperation = {
+          op: 'copy',
+          from: compileJSONPointer(path),
+          path: compileJSONPointer(parentPath.concat(String(index + offset)))
+        }
+
+        return operation
+      })
     ]
-  } else {
+  } else if (isJSONObject(parent)) {
     // 'object'
-    const keys = getKeys(state, parentPath)
+    const keys = Object.keys(parent)
     const nextKeys = getNextKeys(keys, beforeKey, false)
 
     return [
@@ -255,20 +276,17 @@ export function duplicate(json, state, paths) {
       // move all lower down keys so the renamed key will maintain it's position
       ...nextKeys.map((key) => moveDown(parentPath, key))
     ]
+  } else {
+    throw new Error('Cannot create duplicate operations: parent must be an Object or Array')
   }
 }
 
 /**
  * Create a JSONPatch for an extract action.
- *
- * @param {JSON} json
- * @param {JSON} state
- * @param {Selection} selection
- * @return {JSONPatchDocument}
  */
 // TODO: write unit tests
-export function extract(json, state, selection) {
-  if (selection.type === SELECTION_TYPE.VALUE) {
+export function extract(json: JSONData, selection: JSONSelection): JSONPatchDocument {
+  if (isValueSelection(selection)) {
     return [
       {
         op: 'move',
@@ -278,13 +296,13 @@ export function extract(json, state, selection) {
     ]
   }
 
-  if (selection.type === SELECTION_TYPE.MULTI) {
-    const parentPath: JSONPath = initial(selection.focusPath)
+  if (isMultiSelection(selection)) {
+    const parentPath = initial(selection.focusPath)
     const parent = getIn(json, parentPath)
 
-    if (Array.isArray(parent)) {
+    if (isJSONArray(parent)) {
       const value = selection.paths.map((path) => {
-        const index: number = last(path)
+        const index = int(last(path))
         return parent[index]
       })
 
@@ -295,11 +313,11 @@ export function extract(json, state, selection) {
           value
         }
       ]
-    } else {
+    } else if (isJSONObject(parent)) {
       // object
       const value = {}
       selection.paths.forEach((path) => {
-        const key: string = last(path)
+        const key = String(last(path))
         value[key] = parent[key]
       })
 
@@ -311,26 +329,26 @@ export function extract(json, state, selection) {
         }
       ]
     }
+  } else {
+    throw new Error('Cannot create extract operations: parent must be an Object or Array')
   }
 
   // this should never happen
   throw new Error('Cannot extract: unsupported type of selection ' + JSON.stringify(selection))
 }
 
-/**
- * @param {JSON} json
- * @param {JSON} state
- * @param {Selection} selection
- * @param {string} clipboardText
- * @return {JSONPatchDocument}
- */
 // TODO: write unit tests
-export function insert(json, state, selection, clipboardText) {
-  if (selection.type === SELECTION_TYPE.KEY) {
+export function insert(
+  json: JSONData,
+  selection: JSONSelection | undefined,
+  clipboardText: string
+): JSONPatchDocument {
+  if (isKeySelection(selection)) {
     // rename key
     const clipboard = parseAndRepairOrUndefined(clipboardText)
-    const parentPath: JSONPath = initial(selection.focusPath)
-    const keys = getKeys(state, parentPath)
+    const parentPath = initial(selection.focusPath)
+    const parent = getIn(json, parentPath)
+    const keys = Object.keys(parent)
     const oldKey = last(selection.focusPath)
     const newKey = typeof clipboard === 'string' ? clipboard : clipboardText
 
@@ -338,8 +356,8 @@ export function insert(json, state, selection, clipboardText) {
   }
 
   if (
-    selection.type === SELECTION_TYPE.VALUE ||
-    (selection.type === SELECTION_TYPE.MULTI && isEmpty(selection.focusPath)) // root selected
+    isValueSelection(selection) ||
+    (isMultiSelection(selection) && isEmpty(selection.focusPath)) // root selected
   ) {
     // replace selected value (new value can be primitive or an array/object with contents)
     try {
@@ -362,58 +380,62 @@ export function insert(json, state, selection, clipboardText) {
     }
   }
 
-  if (selection.type === SELECTION_TYPE.MULTI) {
+  if (isMultiSelection(selection)) {
     const newValues = clipboardToValues(clipboardText)
 
-    return replace(json, state, selection.paths, newValues)
+    return replace(json, selection.paths, newValues)
   }
 
-  if (selection.type === SELECTION_TYPE.AFTER) {
+  if (isAfterSelection(selection)) {
     const newValues = clipboardToValues(clipboardText)
     const path = selection.focusPath
-    const parentPath: JSONPath = initial(path)
+    const parentPath = initial(path)
     const parent = getIn(json, parentPath)
 
-    if (Array.isArray(parent)) {
-      const index = last(path)
-      const nextItemPath = parentPath.concat([(index as number) + 1])
+    if (isJSONArray(parent)) {
+      const index = int(last(path))
+      const nextItemPath = parentPath.concat(String(index + 1))
 
-      return insertBefore(json, state, nextItemPath, newValues)
-    } else {
+      return insertBefore(json, nextItemPath, newValues)
+    } else if (isJSONObject(parent)) {
       // value is an Object
-      const key: string = last(path)
-      const keys: string[] = getKeys(state, parentPath)
+      const key = String(last(path))
+      const keys: string[] = Object.keys(parent)
       if (isEmpty(keys) || last(keys) === key) {
         return append(json, parentPath, newValues)
       } else {
         const index = keys.indexOf(key)
         const nextKey = keys[index + 1]
-        const nextKeyPath = parentPath.concat([nextKey])
+        const nextKeyPath = parentPath.concat(nextKey)
 
-        return insertBefore(json, state, nextKeyPath, newValues)
+        return insertBefore(json, nextKeyPath, newValues)
       }
+    } else {
+      throw new Error('Cannot create insert operations: parent must be an Object or Array')
     }
   }
 
-  if (selection.type === SELECTION_TYPE.INSIDE) {
+  if (isInsideSelection(selection)) {
     const newValues = clipboardToValues(clipboardText)
     const path = selection.focusPath
     const value = getIn(json, path)
 
-    if (Array.isArray(value)) {
-      const firstItemPath = path.concat([0])
-      return insertBefore(json, state, firstItemPath, newValues)
-    } else {
+    if (isJSONArray(value)) {
+      const firstItemPath = path.concat('0')
+      return insertBefore(json, firstItemPath, newValues)
+    } else if (isJSONObject(value)) {
       // value is an Object
-      const keys: string[] = getKeys(state, path)
+      const keys = Object.keys(value)
       if (isEmpty(keys)) {
         return append(json, path, newValues)
       } else {
         const firstKey = first(keys)
-        const firstKeyPath = path.concat([firstKey])
+        const firstKeyPath = path.concat(firstKey)
 
-        return insertBefore(json, state, firstKeyPath, newValues)
+        return insertBefore(json, firstKeyPath, newValues)
       }
+    } else {
+      throw new Error('Cannot create insert operations: parent must be an Object or Array')
     }
   }
 
@@ -421,102 +443,98 @@ export function insert(json, state, selection, clipboardText) {
   throw new Error('Cannot insert: unsupported type of selection ' + JSON.stringify(selection))
 }
 
-/**
- * @param {JSON} json
- * @param {JSON} state
- * @param {Selection} selection
- * @param {DragInsideAction} dragInsideAction
- */
-export function moveInsideParent(json, state, selection, dragInsideAction): JSONPatchDocument {
-  const { beforePath, append } = dragInsideAction
+export function moveInsideParent(
+  json: JSONData,
+  selection: JSONSelection,
+  dragInsideAction: DragInsideAction
+): JSONPatchDocument {
+  const beforePath: JSONPath = dragInsideAction['beforePath']
+  const append = dragInsideAction['append']
 
-  const parentPath: Path = initial(selection.focusPath)
-  const parent = getIn(json, parentPath as JSONPath)
+  const parentPath = initial(selection.focusPath)
+  const parent = getIn(json, parentPath)
 
   if (
-    append ||
-    (beforePath && pathStartsWith(beforePath, parentPath) && beforePath.length > parentPath.length)
+    !append &&
+    !(beforePath && pathStartsWith(beforePath, parentPath) && beforePath.length > parentPath.length)
   ) {
-    const startPath = selection.paths ? first(selection.paths) : selection.focusPath
-    const endPath = selection.paths ? last(selection.paths) : selection.focusPath
-    const startKey: string | number = last(startPath)
-    const endKey: string | number = last(endPath)
-    const toKey = beforePath ? beforePath[parentPath.length] : undefined
-
-    if (isObject(parent)) {
-      const keys: string[] = getIn(state, parentPath.concat(STATE_KEYS) as JSONPath) as string[]
-      const startIndex = keys.indexOf(startKey as string)
-      const endIndex = keys.indexOf(endKey as string)
-      const toIndex = append ? keys.length : keys.indexOf(toKey)
-
-      if (startIndex !== -1 && endIndex !== -1 && toIndex !== -1) {
-        if (toIndex > startIndex) {
-          // moving down
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          return [...keys.slice(startIndex, endIndex + 1), ...keys.slice(toIndex, keys.length)].map(
-            (key) => moveDown(parentPath, key)
-          )
-        } else {
-          // moving up
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          return [...keys.slice(toIndex, startIndex), ...keys.slice(endIndex + 1, keys.length)].map(
-            (key) => moveDown(parentPath, key)
-          )
-        }
-      }
-    } else {
-      // array
-      const startIndex: number = startKey as number
-      const endIndex: number = endKey as number
-      const toIndex = toKey
-      const count = endIndex - startIndex + 1
-
-      if (toIndex < startIndex) {
-        // move up
-        const operations: JSONPatchDocument = times(count, (offset) => {
-          return {
-            op: 'move',
-            from: compileJSONPointer(parentPath.concat(startIndex + offset) as JSONPath),
-            path: compileJSONPointer(parentPath.concat(toIndex + offset) as JSONPath)
-          }
-        })
-
-        // debug('moveInsideParent', { startIndex, endIndex, toIndex, count, operations })
-
-        return operations
-      } else {
-        // move down
-        const operations: JSONPatchDocument = times(count, () => {
-          return {
-            op: 'move',
-            from: compileJSONPointer(parentPath.concat(startIndex) as JSONPath),
-            path: compileJSONPointer(parentPath.concat(toIndex) as JSONPath)
-          }
-        })
-
-        // debug('moveInsideParent', { startIndex, endIndex, toIndex, count, operations })
-
-        return operations
-      }
-    }
-  }
-
-  // TODO: throw exception?
-  return undefined
-}
-
-export function createNewValue(json, selection, type) {
-  if (type === 'object') {
-    return {}
-  }
-
-  if (type === 'array') {
     return []
   }
 
-  if (type === 'structure') {
+  const startPath = getStartPath(selection)
+  const endPath = getEndPath(selection)
+  const startKey = last(startPath)
+  const endKey = last(endPath)
+  const toKey: string | undefined = beforePath ? beforePath[parentPath.length] : undefined
+
+  if (isJSONObject(parent)) {
+    const keys = Object.keys(parent)
+    const startIndex = keys.indexOf(startKey)
+    const endIndex = keys.indexOf(endKey)
+    const toIndex = append ? keys.length : keys.indexOf(toKey)
+
+    if (startIndex !== -1 && endIndex !== -1 && toIndex !== -1) {
+      if (toIndex > startIndex) {
+        // moving down
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return [...keys.slice(startIndex, endIndex + 1), ...keys.slice(toIndex, keys.length)].map(
+          (key) => moveDown(parentPath, key)
+        )
+      } else {
+        // moving up
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return [...keys.slice(toIndex, startIndex), ...keys.slice(endIndex + 1, keys.length)].map(
+          (key) => moveDown(parentPath, key)
+        )
+      }
+    }
+  } else if (isJSONArray(parent)) {
+    // array
+    const startIndex = int(startKey)
+    const endIndex = int(endKey)
+    const toIndex = toKey !== undefined ? int(toKey) : parent.length
+    const count = endIndex - startIndex + 1
+
+    if (toIndex < startIndex) {
+      // move up
+      return times(count, (offset) => {
+        return {
+          op: 'move',
+          from: compileJSONPointer(parentPath.concat(String(startIndex + offset))),
+          path: compileJSONPointer(parentPath.concat(String(toIndex + offset)))
+        }
+      })
+    } else {
+      // move down
+      return times(count, () => {
+        return {
+          op: 'move',
+          from: compileJSONPointer(parentPath.concat(String(startIndex))),
+          path: compileJSONPointer(parentPath.concat(String(toIndex)))
+        }
+      })
+    }
+  } else {
+    throw new Error('Cannot create move operations: parent must be an Object or Array')
+  }
+}
+
+export function createNewValue(
+  json: JSONData,
+  selection: JSONSelection,
+  valueType: 'object' | 'array' | 'structure' | 'value'
+) {
+  if (valueType === 'object') {
+    return {}
+  }
+
+  if (valueType === 'array') {
+    return []
+  }
+
+  if (valueType === 'structure') {
     const parentPath = getParentPath(selection)
     const parent = getIn(json, parentPath)
 
@@ -545,10 +563,8 @@ export function createNewValue(json, selection, type) {
 
 /**
  * Create a JSONPatch for a remove operation
- * @param {Path} path
- * @return {JSONPatchDocument}
  */
-export function remove(path) {
+export function remove(path: JSONPath): JSONPatchDocument {
   return [
     {
       op: 'remove',
@@ -559,21 +575,23 @@ export function remove(path) {
 
 /**
  * Create a JSONPatch for a multiple remove operation
- * @param {Path[]} paths
- * @return {JSONPatchDocument}
  */
-export function removeAll(paths) {
+export function removeAll(paths: JSONPath[]): JSONPatchDocument {
   return paths
-    .map((path) => ({
-      op: 'remove',
-      path: compileJSONPointer(path)
-    }))
+    .map((path) => {
+      const operation: JSONPatchOperation = {
+        op: 'remove',
+        path: compileJSONPointer(path)
+      }
+
+      return operation
+    })
     .reverse() // reverse is needed for arrays: delete the last index first
 }
 
 // helper function to move a key down in an object,
 // so another key can get positioned before the moved down keys
-function moveDown(parentPath, key) {
+function moveDown(parentPath: JSONPath, key: string): JSONPatchOperation {
   return {
     op: 'move',
     from: compileJSONPointer(parentPath.concat(key)),
@@ -581,11 +599,7 @@ function moveDown(parentPath, key) {
   }
 }
 
-/**
- * @param {string} clipboardText
- * @returns {Array.<{key: string, value: *}>}
- */
-export function clipboardToValues(clipboardText) {
+export function clipboardToValues(clipboardText: string): ClipboardValues {
   const textIsObject = /^\s*{/.test(clipboardText)
   const textIsArray = /^\s*\[/.test(clipboardText)
 
@@ -618,29 +632,27 @@ export function clipboardToValues(clipboardText) {
   return [{ key: 'New item', value: clipboardRepaired }]
 }
 
-/**
- * @param {JSON} json
- * @param {JSON} state
- * @param {Selection} selection
- * @returns {{newSelection: Selection, operations: JSONPatchDocument}}
- */
 // TODO: write unit tests
-export function createRemoveOperations(json, state, selection) {
-  if (selection.type === SELECTION_TYPE.KEY) {
+export function createRemoveOperations(
+  json: JSONData,
+  selection: JSONSelection
+): { newSelection: JSONSelection; operations: JSONPatchDocument } {
+  if (isKeySelection(selection)) {
     // FIXME: DOESN'T work yet
     const parentPath = initial(selection.focusPath)
-    const keys = getKeys(state, parentPath as JSONPath)
+    const parent = getIn(json, parentPath)
+    const keys = Object.keys(parent)
     const oldKey = last(selection.focusPath)
     const newKey = ''
 
     const operations = rename(parentPath, keys, oldKey, newKey)
-    const newSelection = createSelectionFromOperations(json, state, operations)
+    const newSelection = createSelectionFromOperations(json, operations)
 
     return { operations, newSelection }
   }
 
-  if (selection.type === SELECTION_TYPE.VALUE) {
-    const operations = [
+  if (isValueSelection(selection)) {
+    const operations: JSONPatchDocument = [
       {
         op: 'replace',
         path: compileJSONPointer(selection.focusPath),
@@ -651,18 +663,15 @@ export function createRemoveOperations(json, state, selection) {
     return { operations, newSelection: selection }
   }
 
-  if (selection.type === SELECTION_TYPE.MULTI) {
+  if (isMultiSelection(selection)) {
     const operations = removeAll(selection.paths)
-    const lastPath: JSONPath = last(selection.paths)
+    const lastPath = last(selection.paths)
 
     if (isEmpty(lastPath)) {
       // there is no parent, this is the root document
-      const operations = [{ op: 'replace', path: '', value: '' }]
+      const operations: JSONPatchDocument = [{ op: 'replace', path: '', value: '' }]
 
-      const newSelection = createSelection(json, state, {
-        type: SELECTION_TYPE.VALUE,
-        path: []
-      })
+      const newSelection = createValueSelection([], false)
 
       return { operations, newSelection }
     }
@@ -670,43 +679,73 @@ export function createRemoveOperations(json, state, selection) {
     const parentPath = initial(lastPath)
     const parent = getIn(json, parentPath)
 
-    if (Array.isArray(parent)) {
-      const firstPath: JSONPath = first(selection.paths)
-      const index: number = last(firstPath) as number
+    if (isJSONArray(parent)) {
+      const firstPath = first(selection.paths)
+      const index = int(last(firstPath))
       const newSelection =
         index === 0
-          ? createSelection(json, state, {
-              type: SELECTION_TYPE.INSIDE,
-              path: parentPath
-            })
-          : createSelection(json, state, {
-              type: SELECTION_TYPE.AFTER,
-              path: parentPath.concat([index - 1])
-            })
+          ? createInsideSelection(parentPath)
+          : createAfterSelection(parentPath.concat(String(index - 1)))
 
       return { operations, newSelection }
-    } else {
+    } else if (isJSONObject(parent)) {
       // parent is object
-      const keys = getKeys(state, parentPath)
-      const firstPath: JSONPath = first(selection.paths)
-      const key: string = last(firstPath) as string
+      const keys = Object.keys(parent)
+      const firstPath = first(selection.paths)
+      const key = last(firstPath)
       const index = keys.indexOf(key)
       const previousKey = keys[index - 1]
       const newSelection =
         index === 0
-          ? createSelection(json, state, {
-              type: SELECTION_TYPE.INSIDE,
-              path: parentPath
-            })
-          : createSelection(json, state, {
-              type: SELECTION_TYPE.AFTER,
-              path: parentPath.concat([previousKey])
-            })
+          ? createInsideSelection(parentPath)
+          : createAfterSelection(parentPath.concat(previousKey))
 
       return { operations, newSelection }
+    } else {
+      throw new Error('Cannot create remove operations: parent must be an Object or Array')
     }
   }
 
   // this should never happen
   throw new Error('Cannot remove: unsupported type of selection ' + JSON.stringify(selection))
+}
+
+export function revertJSONPatchWithMoveOperations(
+  json: JSONData,
+  operations: JSONPatchDocument
+): JSONPatchDocument {
+  return revertJSONPatch(json, operations, {
+    before: (json, operation, revertOperations) => {
+      if (isJSONPatchRemove(operation)) {
+        const path = parseJSONPointer(operation.path)
+        return {
+          revertOperations: [...revertOperations, ...createRevertMoveOperations(json, path)]
+        }
+      }
+
+      if (isJSONPatchMove(operation)) {
+        const from = parseJSONPointer(operation.from)
+        return {
+          revertOperations: [...revertOperations, ...createRevertMoveOperations(json, from)]
+        }
+      }
+
+      return { revertOperations }
+    }
+  })
+}
+
+function createRevertMoveOperations(json: JSONData, path: JSONPath): JSONPatchOperation[] {
+  const parentPath = initial(path)
+  const afterKey = last(path)
+  const parent = getIn(json, parentPath)
+  if (isJSONObject(parent)) {
+    const keys = Object.keys(parent)
+    const nextKeys = getNextKeys(keys, afterKey, false)
+
+    // move all lower down keys so the inserted key will maintain its position
+    return nextKeys.map((key) => moveDown(parentPath, key))
+  }
+
+  return []
 }

@@ -1,6 +1,7 @@
 import EnumValue from './components/EnumValue.svelte'
 import { getJSONSchemaOptions } from '../../utils/jsonSchemaUtils.js'
-import type { JSONData, RenderValueComponentDescription, RenderValueProps } from '../../types'
+import type { RenderValueComponentDescription, RenderValueProps } from '../../types'
+import type { JSONData } from 'immutable-json-patch'
 import type { SvelteComponent } from 'svelte'
 
 /**
@@ -16,7 +17,7 @@ export function renderJSONSchemaEnum(
   const enumValues = getJSONSchemaOptions(schema, schemaDefinitions, props.path)
 
   if (enumValues) {
-    const { value, path, readOnly, onPatch, onSelect, isSelected } = props
+    const { value, path, readOnly, onPatch, isSelected } = props
 
     const options = enumValues.map((enumValue) => ({
       value: enumValue,
@@ -37,7 +38,6 @@ export function renderJSONSchemaEnum(
           path,
           readOnly,
           onPatch,
-          onSelect,
           isSelected,
           options: optionsWithValue
         }

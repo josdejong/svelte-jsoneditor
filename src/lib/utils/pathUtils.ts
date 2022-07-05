@@ -1,8 +1,8 @@
 import { memoize } from 'lodash-es'
-import type { Path } from '../types'
+import type { JSONPath } from 'immutable-json-patch'
 
 /**
- * Stringify a path like
+ * Stringify a path like:
  *
  *     ["data", 2, "nested", "property"]
  *
@@ -10,18 +10,21 @@ import type { Path } from '../types'
  *
  *     ".data[2].nested.property"
  */
-export function stringifyPath(path: Path): string {
-  return path
-    .map((prop) => {
-      if (typeof prop === 'number') {
-        return '[' + prop + ']'
-      } else if (typeof prop === 'string' && prop.match(/^[A-Za-z0-9_$]+$/)) {
-        return '.' + prop
-      } else {
-        return '["' + String(prop) + '"]'
-      }
-    })
-    .join('')
+export function stringifyPath(path: JSONPath): string {
+  return path.map(stringifyPathProp).join('')
+}
+
+/**
+ * Stringify a single property of a path. See also stringifyPath
+ */
+export function stringifyPathProp(prop: string): string {
+  if (integerNumberRegex.test(prop)) {
+    return '[' + prop + ']'
+  } else if (javaScriptPropertyRegex.test(prop)) {
+    return '.' + prop
+  } else {
+    return '[' + JSON.stringify(prop) + ']'
+  }
 }
 
 /**
@@ -37,11 +40,19 @@ export function stringifyPath(path: Path): string {
  *   '?.location?.latitude'
  *   '?.address?.["full name"]'
  */
-export function createPropertySelector(path: Path): string {
+export function createPropertySelector(path: JSONPath): string {
   return path
     .map((prop) => {
-      const propStr = String(prop)
-      return javaScriptPropertyRegex.test(propStr) ? `?.${propStr}` : `?.[${JSON.stringify(prop)}]`
+      if (integerNumberRegex.test(prop)) {
+        // an index
+        return `?.[${prop}]`
+      } else if (javaScriptPropertyRegex.test(prop)) {
+        // a key without special characters
+        return `?.${prop}`
+      } else {
+        // a key that may have special characters (like spaces or so)
+        return `?.[${JSON.stringify(prop)}]`
+      }
     })
     .join('')
 }
@@ -50,11 +61,12 @@ export function createPropertySelector(path: Path): string {
 // Note: We can extend this regex to allow unicode characters too.
 // I'm too lazy to figure that out right now
 const javaScriptPropertyRegex = /^[A-z$_][A-z$_\d]*$/i
+const integerNumberRegex = /^\d+$/
 
 /**
  * Create a memoized function that will memoize the input path, and return
  * the memoized instance of the path when the stringified version is the same.
  */
-export function createMemoizePath(): (path: Path) => Path {
+export function createMemoizePath(): (path: JSONPath) => JSONPath {
   return memoize((path) => path, stringifyPath)
 }

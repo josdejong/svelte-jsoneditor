@@ -1,10 +1,10 @@
 /**
  * Find a unique name. Suffix the name with ' (copy)', '(copy 2)', etc
  * until a unique name is found
- * @param {string} name
- * @param {string[]} keys    Array with existing keys
+ * @param name    Proposed name
+ * @param keys    Array with existing keys
  */
-export function findUniqueName(name, keys) {
+export function findUniqueName(name: string, keys: string[]): string {
   const keysSet = new Set(keys)
 
   // remove any " (copy)" or " (copy 2)" suffix from the name
@@ -24,10 +24,8 @@ export function findUniqueName(name, keys) {
 
 /**
  * Transform a text into lower case with the first character upper case
- * @param {string} text
- * @return {string}
  */
-export function toCapital(text) {
+export function toCapital(text: string): string {
   return text && text.length > 0 ? text[0].toUpperCase() + text.substr(1).toLowerCase() : text
 }
 
@@ -37,12 +35,8 @@ export function compareStrings(a, b) {
 
 /**
  * Duplicate a piece of text
- * @param {string} text
- * @param {number} anchorOffset
- * @param {number} focusOffset
- * @return {string}
  */
-export function duplicateInText(text, anchorOffset, focusOffset) {
+export function duplicateInText(text: string, anchorOffset: number, focusOffset: number): string {
   const startOffset = Math.min(anchorOffset, focusOffset)
   const endOffset = Math.max(anchorOffset, focusOffset)
 
@@ -56,10 +50,10 @@ export function duplicateInText(text, anchorOffset, focusOffset) {
 /**
  * Truncate a text to a maximum length.
  * When truncated, the text will pe appended with ellipsis '...'
- * @param {string} text Text to be truncated
- * @param {number} maxLength Maximum allowed length for the text including ellipsis
+ * @param text Text to be truncated
+ * @param maxLength Maximum allowed length for the text including ellipsis
  */
-export function truncate(text, maxLength) {
+export function truncate(text: string, maxLength: number): string {
   const ellipsis = '...'
   const maxTextLength = maxLength - ellipsis.length
 
@@ -69,10 +63,10 @@ export function truncate(text, maxLength) {
 /**
  * Cast contents of a string to the correct type.
  * This can be a string, a number, a boolean, null, undefined, etc
- * @param {string} str
- * @return {string | number | boolean | null | undefined} parsed string
+ * @param str
+ * @return parsed string
  */
-export function parseString(str) {
+export function parseString(str: string): string | number | boolean | null | undefined {
   if (str === '') {
     return ''
   }

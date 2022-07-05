@@ -10,10 +10,7 @@
   } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '../../../utils/debug'
   import Message from '../../controls/Message.svelte'
-  import { onDestroy, onMount } from 'svelte'
-  import { activeElementIsChildOf, getWindow } from '../../../utils/domUtils'
   import { normalizeJsonParseError } from '../../../utils/jsonUtils.js'
-  import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Menu from '../../controls/Menu.svelte'
   import { noop } from 'lodash-es'
 
@@ -24,31 +21,12 @@
   export let onChange = null
   export let onApply
   export let onCancel
-  export let onFocus
-  export let onBlur
   export let onRenderMenu = noop
 
   const debug = createDebug('jsoneditor:JSONRepair')
 
   let domJsonRepair
   let domTextArea
-
-  createFocusTracker({
-    onMount,
-    onDestroy,
-    getWindow: () => getWindow(domJsonRepair),
-    hasFocus: () => activeElementIsChildOf(domJsonRepair),
-    onFocus: () => {
-      if (onFocus) {
-        onFocus()
-      }
-    },
-    onBlur: () => {
-      if (onBlur) {
-        onBlur()
-      }
-    }
-  })
 
   $: error = getErrorMessage(text)
   $: repairable = isRepairable(text)

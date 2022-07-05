@@ -1,26 +1,25 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
+  import type { JSONData, JSONPath } from 'immutable-json-patch'
   import { getIn } from 'immutable-json-patch'
   import { range } from 'lodash-es'
   import { isObject, isObjectOrArray } from '../../../utils/typeUtils'
-  import { STATE_KEYS } from '../../../constants'
-  import { createSelection, SELECTION_TYPE } from '../../../logic/selection'
+  import { createMultiSelection } from '../../../logic/selection'
   import { createDebug } from '../../../utils/debug'
   import NavigationBarItem from '../../../components/controls/navigationBar/NavigationBarItem.svelte'
   import { caseInsensitiveNaturalCompare } from '../../../logic/sort'
-  import type { JSONData, OnSelect, Path } from '../../../types'
+  import type { DocumentState, OnSelect } from '../../../types'
 
   const debug = createDebug('jsoneditor:NavigationBar')
 
   export let json: JSONData
-  export let state: JSONData
-  export let selection: Selection | undefined
+  export let documentState: DocumentState
   export let onSelect: OnSelect
 
   let refNavigationBar: Element | undefined
 
-  $: path = selection ? selection.focusPath : []
+  $: path = documentState.selection ? documentState.selection.focusPath : []
   $: hasNextItem = isObjectOrArray(getIn(json, path))
 
   function scrollToLastItem() {
@@ -38,14 +37,14 @@
   // trigger scrollToLastItem when path changes
   $: scrollToLastItem(path)
 
-  function getItems(path: Path): (string | number)[] {
+  function getItems(path: JSONPath): string[] {
     debug('get items for path', path)
 
     const node = getIn(json, path)
     if (Array.isArray(node)) {
-      return range(0, node.length)
+      return range(0, node.length).map(String)
     } else if (isObject(node)) {
-      const keys = (getIn(state, path.concat(STATE_KEYS)) || Object.keys(node)) as string[]
+      const keys = Object.keys(node)
 
       const sortedKeys = keys.slice(0)
       sortedKeys.sort(caseInsensitiveNaturalCompare)
@@ -57,16 +56,10 @@
     }
   }
 
-  function handleSelect(path: Path) {
+  function handleSelect(path: JSONPath) {
     debug('select path', JSON.stringify(path))
 
-    const newSelection = createSelection(json, state, {
-      type: SELECTION_TYPE.MULTI,
-      anchorPath: path,
-      focusPath: path
-    })
-
-    onSelect(newSelection)
+    onSelect(createMultiSelection(json, path, path))
   }
 </script>
 

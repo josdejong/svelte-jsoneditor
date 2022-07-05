@@ -3,28 +3,39 @@
 <script lang="ts">
   import classnames from 'classnames'
   import { initial } from 'lodash-es'
-  import { SELECTION_TYPE } from '$lib/logic/selection'
+  import {
+    createKeySelection,
+    createValueSelection,
+    isEditingSelection
+  } from '$lib/logic/selection'
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
   import { addNewLineSuffix } from '$lib/utils/domUtils'
   import { UPDATE_SELECTION } from '$lib/constants'
-  import type { Path, Selection, TreeModeContext } from '$lib/types'
+  import type { ExtendedSearchResultItem, TreeModeContext } from '$lib/types'
+  import { type JSONSelection } from '$lib/types'
+  import type { JSONPath, JSONPointer } from 'immutable-json-patch'
+  import { isKeySelection } from '../../../logic/selection.js'
+  import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
 
-  export let path: Path
+  export let path: JSONPath
+  export let pointer: JSONPointer
   export let key: string
+  export let selection: JSONSelection | undefined
+  export let searchResultItems: ExtendedSearchResultItem[] | undefined
   export let onUpdateKey: (oldKey: string, newKey: string) => string
-  export let selection: Selection | undefined
-  export let searchResult
 
   export let context: TreeModeContext
 
-  $: selectedKey = selection && selection.type === SELECTION_TYPE.KEY
-  $: editKey = !context.readOnly && selectedKey && selection && selection['edit'] === true
+  $: isSelected = selection
+    ? selection.pointersMap[pointer] === true && isKeySelection(selection)
+    : undefined
+  $: isEditingKey = isSelected && isEditingSelection(selection)
 
   function handleKeyDoubleClick(event) {
-    if (!editKey && !context.readOnly) {
+    if (!isEditingKey && !context.readOnly) {
       event.preventDefault()
-      context.onSelect({ type: SELECTION_TYPE.KEY, path, edit: true })
+      context.onSelect(createKeySelection(path, true))
     }
   }
 
@@ -38,31 +49,24 @@
     const updatedKey = onUpdateKey(key, context.normalization.unescapeValue(newKey))
     const updatedPath = initial(path).concat(updatedKey)
 
-    if (updateSelection === UPDATE_SELECTION.NEXT_INSIDE) {
-      context.onSelect({
-        type: SELECTION_TYPE.KEY,
-        path: updatedPath,
-        next: true
-      })
-    }
+    context.onSelect(
+      updateSelection === UPDATE_SELECTION.NEXT_INSIDE
+        ? createValueSelection(updatedPath, false)
+        : createKeySelection(updatedPath, false)
+    )
 
-    if (updateSelection === UPDATE_SELECTION.SELF) {
-      context.onSelect(
-        {
-          type: SELECTION_TYPE.KEY,
-          path: updatedPath
-        },
-        { ensureFocus: false }
-      )
+    if (updateSelection !== UPDATE_SELECTION.SELF) {
+      context.focus()
     }
   }
 
   function handleCancelChange() {
-    context.onSelect({ type: SELECTION_TYPE.KEY, path })
+    context.onSelect(createKeySelection(path, false))
+    context.focus()
   }
 </script>
 
-{#if editKey}
+{#if isEditingKey}
   <EditableDiv
     value={context.normalization.escapeValue(key)}
     shortText
@@ -72,12 +76,15 @@
   />
 {:else}
   <div data-type="selectable-key" class={getKeyClass(key)} on:dblclick={handleKeyDoubleClick}>
-    {#if searchResult}
-      <SearchResultHighlighter text={context.normalization.escapeValue(key)} {searchResult} />
+    {#if searchResultItems}
+      <SearchResultHighlighter text={context.normalization.escapeValue(key)} {searchResultItems} />
     {:else}
       {addNewLineSuffix(context.normalization.escapeValue(key))}
     {/if}
   </div>
+{/if}
+{#if !context.readOnly && isSelected && !isEditingKey}
+  <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
 {/if}
 
 <style src="./JSONKey.scss"></style>

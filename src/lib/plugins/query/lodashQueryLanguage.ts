@@ -2,7 +2,8 @@ import * as _ from 'lodash-es'
 import { last } from 'lodash-es'
 import { createPropertySelector, stringifyPath } from '../../utils/pathUtils.js'
 import { parseString } from '../../utils/stringUtils.js'
-import type { JSONData, Path, QueryLanguage, QueryLanguageOptions } from '../../types'
+import type { QueryLanguage, QueryLanguageOptions } from '../../types'
+import type { JSONData, JSONPath } from 'immutable-json-patch'
 
 const description = `
 <p>
@@ -94,6 +95,6 @@ function executeQuery(json: JSONData, query: string): JSONData {
 /**
  * Create a Lodash string containing a path (without leading dot), like "users[2].name"
  */
-function createLodashPropertySelector(path: Path): string {
+function createLodashPropertySelector(path: JSONPath): string {
   return stringifyPath(path).replace(/^\./, '') // remove any leading dot
 }

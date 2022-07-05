@@ -1,9 +1,8 @@
 import assert from 'assert'
+import type { JSONPath } from 'immutable-json-patch'
 import { immutableJSONPatch } from 'immutable-json-patch'
-import { STATE_KEYS, STATE_SEARCH_PROPERTY, STATE_SEARCH_VALUE } from '../constants.js'
-import { syncState } from './documentState.js'
+import { createDocumentState } from './documentState.js'
 import {
-  createRecursiveSearchResults,
   createSearchAndReplaceAllOperations,
   createSearchAndReplaceOperations,
   findCaseInsensitiveMatches,
@@ -11,6 +10,9 @@ import {
   search,
   splitValue
 } from './search.js'
+import type { ExtendedSearchResultItem, SearchResultItem } from '../types.js'
+import { SearchField } from '../types.js'
+import { createKeySelection, createValueSelection } from './selection.js'
 
 describe('search', () => {
   it('search in JSON', () => {
@@ -19,48 +21,44 @@ describe('search', () => {
       a: [{ a: 'b', c: 'a' }, 'e', 'a']
     }
 
-    const results = search('a', json, undefined)
+    const documentState = createDocumentState()
+    const results = search('a', json, documentState)
 
     assert.deepStrictEqual(results, [
       {
         path: ['b', 'c'],
-        field: STATE_SEARCH_VALUE,
+        field: SearchField.value,
         fieldIndex: 0,
         start: 0,
-        end: 1,
-        active: false
+        end: 1
       },
       {
         path: ['a'],
-        field: STATE_SEARCH_PROPERTY,
+        field: SearchField.key,
         fieldIndex: 0,
         start: 0,
-        end: 1,
-        active: false
+        end: 1
       },
       {
-        path: ['a', 0, 'a'],
-        field: STATE_SEARCH_PROPERTY,
+        path: ['a', '0', 'a'],
+        field: SearchField.key,
         fieldIndex: 0,
         start: 0,
-        end: 1,
-        active: false
+        end: 1
       },
       {
-        path: ['a', 0, 'c'],
-        field: STATE_SEARCH_VALUE,
+        path: ['a', '0', 'c'],
+        field: SearchField.value,
         fieldIndex: 0,
         start: 0,
-        end: 1,
-        active: false
+        end: 1
       },
       {
-        path: ['a', 2],
-        field: STATE_SEARCH_VALUE,
+        path: ['a', '2'],
+        field: SearchField.value,
         fieldIndex: 0,
         start: 0,
-        end: 1,
-        active: false
+        end: 1
       }
     ])
   })
@@ -70,40 +68,37 @@ describe('search', () => {
       'hello world': 'hello world, hello WORLD, world'
     }
 
-    const results = search('world', json, undefined)
+    const documentState = createDocumentState()
+    const results = search('world', json, documentState)
 
     assert.deepStrictEqual(results, [
       {
         path: ['hello world'],
-        field: STATE_SEARCH_PROPERTY,
+        field: SearchField.key,
         fieldIndex: 0,
         start: 6,
-        end: 11,
-        active: false
+        end: 11
       },
       {
         path: ['hello world'],
-        field: STATE_SEARCH_VALUE,
+        field: SearchField.value,
         fieldIndex: 0,
         start: 6,
-        end: 11,
-        active: false
+        end: 11
       },
       {
         path: ['hello world'],
-        field: STATE_SEARCH_VALUE,
+        field: SearchField.value,
         fieldIndex: 1,
         start: 19,
-        end: 24,
-        active: false
+        end: 24
       },
       {
         path: ['hello world'],
-        field: STATE_SEARCH_VALUE,
+        field: SearchField.value,
         fieldIndex: 2,
         start: 26,
-        end: 31,
-        active: false
+        end: 31
       }
     ])
   })
@@ -111,31 +106,30 @@ describe('search', () => {
   it('should respect order of keys in document state in search', () => {
     const json = {
       data: {
-        text1: 'foo',
-        text2: 'foo'
+        text2: 'foo',
+        text1: 'foo'
       }
     }
 
-    const state = syncState(json, undefined, [], () => true)
-    state['data'][STATE_KEYS] = ['text2', 'text1'] // reverse the order of the keys
+    const documentState = {
+      ...createDocumentState({ json, expand: () => true })
+    }
 
-    const results = search('foo', json, state)
+    const results = search('foo', json, documentState)
     assert.deepStrictEqual(results, [
       {
         path: ['data', 'text2'],
-        field: STATE_SEARCH_VALUE,
+        field: SearchField.value,
         fieldIndex: 0,
         start: 0,
-        end: 3,
-        active: false
+        end: 3
       },
       {
         path: ['data', 'text1'],
-        field: STATE_SEARCH_VALUE,
+        field: SearchField.value,
         fieldIndex: 0,
         start: 0,
-        end: 3,
-        active: false
+        end: 3
       }
     ])
   })
@@ -156,65 +150,37 @@ describe('search', () => {
     const maxResults = 4
 
     assert.deepStrictEqual(
-      search('ha', { greeting: 'ha ha ha ha ha ha' }, undefined, maxResults).length,
+      search('ha', { greeting: 'ha ha ha ha ha ha' }, createDocumentState(), maxResults).length,
       maxResults
     )
 
     assert.deepStrictEqual(
-      search('ha', { 'ha ha ha ha ha ha': 'ha ha ha ha ha ha' }, undefined, maxResults).length,
+      search('ha', { 'ha ha ha ha ha ha': 'ha ha ha ha ha ha' }, createDocumentState(), maxResults)
+        .length,
       maxResults
     )
-  })
-
-  it('should generate recursive search results from flat results', () => {
-    // Based on document:
-    const json = {
-      b: { c: 'a' },
-      a: [{ a: 'b', c: 'a' }, 'e', 'a a']
-    }
-
-    // search results for 'a':
-    const flatResults = search('a', json, undefined)
-
-    const actual = createRecursiveSearchResults(json, flatResults)
-    const expected = {}
-
-    expected['b'] = {}
-    expected['b'].c = {}
-    expected['b'].c[STATE_SEARCH_VALUE] = [flatResults[0]]
-    expected['a'] = []
-    expected['a'][STATE_SEARCH_PROPERTY] = [flatResults[1]]
-    expected['a'][0] = {}
-    expected['a'][0]['a'] = {}
-    expected['a'][0]['a'][STATE_SEARCH_PROPERTY] = [flatResults[2]]
-    expected['a'][0].c = {}
-    expected['a'][0].c[STATE_SEARCH_VALUE] = [flatResults[3]]
-    expected['a'][2] = {}
-    expected['a'][2][STATE_SEARCH_VALUE] = [flatResults[4], flatResults[5]]
-
-    assert.deepStrictEqual(actual, expected)
   })
 
   it('should find all case insensitive matches', () => {
     const path = []
-    const field = STATE_SEARCH_VALUE
+    const field = SearchField.value
 
     assert.deepStrictEqual(
       findAndCollectCaseInsensitiveMatches('hello world, Hello world', 'hello', path, field),
       [
-        { path, field, fieldIndex: 0, start: 0, end: 5, active: false },
-        { path, field, fieldIndex: 1, start: 13, end: 18, active: false }
+        { path, field, fieldIndex: 0, start: 0, end: 5 },
+        { path, field, fieldIndex: 1, start: 13, end: 18 }
       ]
     )
 
     assert.deepStrictEqual(findAndCollectCaseInsensitiveMatches('hahaha', 'haha', path, field), [
-      { path, field, fieldIndex: 0, start: 0, end: 4, active: false }
+      { path, field, fieldIndex: 0, start: 0, end: 4 }
     ])
     assert.deepStrictEqual(
       findAndCollectCaseInsensitiveMatches('hahahahaha', 'haha', path, field),
       [
-        { path, field, fieldIndex: 0, start: 0, end: 4, active: false },
-        { path, field, fieldIndex: 1, start: 4, end: 8, active: false }
+        { path, field, fieldIndex: 0, start: 0, end: 4 },
+        { path, field, fieldIndex: 1, start: 4, end: 8 }
       ]
     )
 
@@ -228,15 +194,21 @@ describe('search', () => {
     const text = 'hello world, HELLO!'
     const searchTextLowerCase = 'hello'
     const path = []
-    const field = STATE_SEARCH_VALUE
+    const field = SearchField.value
     const searchResults = findAndCollectCaseInsensitiveMatches(
       text,
       searchTextLowerCase,
       path,
       field
     )
+    const extendedSearchResults: ExtendedSearchResultItem[] = searchResults.map((item, index) => {
+      return {
+        ...item,
+        active: index === 1
+      }
+    })
 
-    const parts = splitValue(text, searchResults)
+    const parts = splitValue(text, extendedSearchResults)
 
     assert.deepStrictEqual(parts, [
       {
@@ -252,7 +224,7 @@ describe('search', () => {
       {
         type: 'highlight',
         text: 'HELLO',
-        active: false
+        active: true
       },
       {
         type: 'normal',
@@ -272,13 +244,13 @@ describe('search', () => {
       'hello world': 'hello world, hello WORLD, world',
       after: 'text'
     }
-    const state = syncState(json, undefined, [], () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
-    const results = search('world', json, state)
+    const results = search('world', json, documentState)
 
     const { operations, newSelection } = createSearchAndReplaceOperations(
       json,
-      state,
+      documentState,
       '*',
       results[2]
     )
@@ -291,12 +263,7 @@ describe('search', () => {
       }
     ])
 
-    assert.deepStrictEqual(newSelection, {
-      type: 'value',
-      anchorPath: ['hello world'],
-      focusPath: ['hello world'],
-      edit: false
-    })
+    assert.deepStrictEqual(newSelection, createValueSelection(['hello world'], false))
 
     const updatedJson = immutableJSONPatch(json, operations)
     assert.deepStrictEqual(updatedJson, {
@@ -312,13 +279,13 @@ describe('search', () => {
       'hello world': 'hello world, hello WORLD, world',
       after: 'text'
     }
-    const state = syncState(json, undefined, [], () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
-    const results = search('world', json, state)
+    const results = search('world', json, documentState)
 
     const { operations, newSelection } = createSearchAndReplaceOperations(
       json,
-      state,
+      documentState,
       '*',
       results[0]
     )
@@ -328,12 +295,7 @@ describe('search', () => {
       { op: 'move', from: '/after', path: '/after' }
     ])
 
-    assert.deepStrictEqual(newSelection, {
-      type: 'key',
-      anchorPath: ['hello *'],
-      focusPath: ['hello *'],
-      edit: false
-    })
+    assert.deepStrictEqual(newSelection, createKeySelection(['hello *'], false))
 
     const updatedJson = immutableJSONPatch(json, operations)
     assert.deepStrictEqual(updatedJson, {
@@ -347,11 +309,11 @@ describe('search', () => {
     const json = {
       value: 2
     }
-    const state = syncState(json, undefined, [], () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
-    const results = search('2', json, state)
+    const results = search('2', json, documentState)
 
-    const { operations } = createSearchAndReplaceOperations(json, state, '4', results[0])
+    const { operations } = createSearchAndReplaceOperations(json, documentState, '4', results[0])
 
     assert.deepStrictEqual(operations, [
       {
@@ -371,11 +333,11 @@ describe('search', () => {
     const json = {
       value: 2
     }
-    const state = syncState(json, undefined, [], () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
-    const results = search('2', json, state)
+    const results = search('2', json, documentState)
 
-    const { operations } = createSearchAndReplaceOperations(json, state, 'true', results[0])
+    const { operations } = createSearchAndReplaceOperations(json, documentState, 'true', results[0])
 
     assert.deepStrictEqual(operations, [
       {
@@ -395,11 +357,11 @@ describe('search', () => {
     const json = {
       value: 2
     }
-    const state = syncState(json, undefined, [], () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
-    const results = search('2', json, state)
+    const results = search('2', json, documentState)
 
-    const { operations } = createSearchAndReplaceOperations(json, state, 'null', results[0])
+    const { operations } = createSearchAndReplaceOperations(json, documentState, 'null', results[0])
 
     assert.deepStrictEqual(operations, [
       {
@@ -419,11 +381,11 @@ describe('search', () => {
     const json = {
       value: 2
     }
-    const state = syncState(json, undefined, [], () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
-    const results = search('2', json, state)
+    const results = search('2', json, documentState)
 
-    const { operations } = createSearchAndReplaceOperations(json, state, '*', results[0])
+    const { operations } = createSearchAndReplaceOperations(json, documentState, '*', results[0])
 
     assert.deepStrictEqual(operations, [{ op: 'replace', path: '/value', value: '*' }])
 
@@ -441,13 +403,13 @@ describe('search', () => {
       },
       after: 'text'
     }
-    const state = syncState(json, undefined, [], () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
     const searchText = 'world'
     const replacementText = '*'
     const { operations, newSelection } = createSearchAndReplaceAllOperations(
       json,
-      state,
+      documentState,
       searchText,
       replacementText
     )
@@ -467,12 +429,7 @@ describe('search', () => {
       { op: 'move', from: '/after', path: '/after' }
     ])
 
-    assert.deepStrictEqual(newSelection, {
-      anchorPath: ['hello *'],
-      edit: false,
-      focusPath: ['hello *'],
-      type: 'key'
-    })
+    assert.deepStrictEqual(newSelection, createKeySelection(['hello *'], false))
 
     const updatedJson = immutableJSONPatch(json, operations)
     assert.deepStrictEqual(updatedJson, {
@@ -488,13 +445,13 @@ describe('search', () => {
     const json = {
       value: 2
     }
-    const state = syncState(json, undefined, [], () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
     const searchText = '2'
     const replacementText = '*'
     const { operations } = createSearchAndReplaceAllOperations(
       json,
-      state,
+      documentState,
       searchText,
       replacementText
     )
@@ -517,13 +474,13 @@ describe('search', () => {
     const json = {
       value: 2
     }
-    const state = syncState(json, undefined, [], () => true)
+    const documentState = createDocumentState({ json, expand: () => true })
 
     const searchText = '2'
     const replacementText = '4'
     const { operations } = createSearchAndReplaceAllOperations(
       json,
-      state,
+      documentState,
       searchText,
       replacementText
     )
@@ -541,14 +498,16 @@ describe('search', () => {
       value: 4
     })
   })
-
-  // TODO: test searchNext
-  // TODO: test searchPrevious
 })
 
 // helper function to collect matches
-function findAndCollectCaseInsensitiveMatches(text, searchTextLowerCase, path, field) {
-  const matches = []
+function findAndCollectCaseInsensitiveMatches(
+  text: string,
+  searchTextLowerCase: string,
+  path: JSONPath,
+  field: SearchField
+): SearchResultItem[] {
+  const matches: SearchResultItem[] = []
 
   findCaseInsensitiveMatches(text, searchTextLowerCase, path, field, (match) => matches.push(match))
 

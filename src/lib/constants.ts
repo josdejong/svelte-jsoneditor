@@ -6,16 +6,6 @@ export const MODE = {
   CODE: 'code'
 }
 
-export const STATE_ID = Symbol('id')
-export const STATE_EXPANDED = Symbol('expanded')
-export const STATE_VISIBLE_SECTIONS = Symbol('visible sections')
-export const STATE_KEYS = Symbol('keys')
-export const STATE_SEARCH_PROPERTY = Symbol('search:property')
-export const STATE_SEARCH_VALUE = Symbol('search:value')
-export const STATE_ENFORCE_STRING = Symbol('enforce string')
-export const STATE_SELECTION = Symbol('selection')
-export const VALIDATION_ERROR = Symbol('validation:error')
-
 export const SCROLL_DURATION = 300 // ms
 export const DEBOUNCE_DELAY = 300 // ms
 export const CODE_MODE_ONCHANGE_DELAY = 300 // ms
@@ -27,7 +17,6 @@ export const AUTO_SCROLL_SPEED_FAST = 1200 // pixels per second
 export const MAX_SEARCH_RESULTS = 1000
 export const ARRAY_SECTION_SIZE = 100
 export const DEFAULT_VISIBLE_SECTIONS: Section[] = [{ start: 0, end: ARRAY_SECTION_SIZE }]
-export const MAX_PREVIEW_CHARACTERS = 20e3 // characters
 export const MAX_VALIDATABLE_SIZE = 100 * 1024 * 1024 // 1 MB
 export const MAX_AUTO_REPAIRABLE_SIZE = 1024 * 1024 // 1 MB
 export const MAX_DOCUMENT_SIZE_CODE_MODE = 10 * 1024 * 1024 // 10 MB

@@ -3,19 +3,19 @@
 <script lang="ts">
   import { getColorCSS } from '$lib/utils/typeUtils'
   import { getWindow } from '$lib/utils/domUtils'
+  import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getContext } from 'svelte'
   import ColorPickerPopup from '../../../components/controls/ColorPickerPopup.svelte'
-  import { SELECTION_TYPE } from '../../../logic/selection.js'
-  import type { OnPatch, OnSelect, Path } from '../../../types'
+  import type { OnPatch } from '../../../types'
 
   const { openAbsolutePopup } = getContext('absolute-popup')
 
-  export let path: Path
+  export let path: JSONPath
   export let value: string
   export let readOnly: boolean
   export let onPatch: OnPatch
-  export let onSelect: OnSelect
+  export let focus: () => void
 
   $: color = getColorCSS(value)
 
@@ -32,7 +32,7 @@
   }
 
   function onClose() {
-    onSelect({ type: SELECTION_TYPE.VALUE, path })
+    focus()
   }
 
   function openColorPicker(event) {

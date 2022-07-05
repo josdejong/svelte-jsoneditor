@@ -144,26 +144,39 @@
     path,
     value,
     readOnly,
-    normalization,
-    searchResult,
+    enforceString,
+    searchResultItems,
     isEditing,
+    normalization,
     onPatch,
     onPasteJson,
-    onSelect
+    onSelect,
+    onFind,
+    focus
   }) {
     const renderers = []
 
     if (isEditing) {
       renderers.push({
         component: EditableValue,
-        props: { path, value, normalization, onPatch, onPasteJson, onSelect }
+        props: {
+          path,
+          value,
+          enforceString,
+          normalization,
+          onPatch,
+          onPasteJson,
+          onSelect,
+          onFind,
+          focus
+        }
       })
     }
 
     if (!isEditing) {
       renderers.push({
         component: ReadonlyValue,
-        props: { path, value, readOnly, normalization, searchResult, onSelect }
+        props: { path, value, readOnly, normalization, searchResultItems, onSelect }
       })
     }
 
@@ -279,7 +292,7 @@
       </select>
     </p>
   {/if}
-  <p>
+  <p class="buttons">
     <button
       on:click={() => {
         content = {
@@ -366,6 +379,7 @@
     >
       Set unrepairable text
     </button>
+    <button on:click={openInWindow}>Open editor in new window</button>
     <input
       type="file"
       on:change={(event) => {
@@ -482,10 +496,6 @@
       {/if}
     </div>
   </div>
-
-  <p>
-    <button on:click={openInWindow}>Open editor in new window</button>
-  </p>
 </div>
 
 <!--
@@ -495,7 +505,9 @@ Workaround for the console warning:
 
 See https://github.com/sveltejs/kit/issues/981
 -->
-{#if false}<slot />{/if}
+{#if false}
+  <slot />
+{/if}
 
 <style lang="scss">
   @import '../lib/themes/jse-theme-dark.css';
@@ -548,6 +560,12 @@ See https://github.com/sveltejs/kit/issues/981
 
   p {
     max-width: none;
+
+    &.buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
   }
 
   button,

@@ -1,44 +1,40 @@
 import { initial } from 'lodash-es'
-import { VALIDATION_ERROR } from '../constants.js'
-import type { JSONPath } from 'immutable-json-patch'
-import { existsIn, setIn } from 'immutable-json-patch'
-import type { Path, ValidationError } from '../types'
+import type { JSONPointerMap, ValidationError } from '../types'
+import { compileJSONPointer } from 'immutable-json-patch'
 
 /**
- * Create a nested map with validation errors,
+ * Create a flat map with validation errors, where the key is the stringified path
  * and also create error messages for the parent nodes of the nodes having an error.
  *
  * Returns a nested object containing the validation errors
  */
 export function mapValidationErrors(
   validationErrors: ValidationError[]
-): Record<string, string> | undefined {
-  let object
+): JSONPointerMap<ValidationError> {
+  const map = {}
 
+  // first generate a map with the errors themselves
   validationErrors.forEach((validationError) => {
-    const errorPath: Path = validationError.path.concat([VALIDATION_ERROR])
-    object = setIn(object, errorPath as JSONPath, validationError, true)
+    map[compileJSONPointer(validationError.path)] = validationError
   })
 
-  // create error entries for all parent nodes
+  // create error entries for all parent nodes (displayed when the node is collapsed)
   validationErrors.forEach((validationError) => {
-    const path = validationError.path
-    let parentPath = path
+    let parentPath = validationError.path
 
     while (parentPath.length > 0) {
       parentPath = initial(parentPath)
+      const parentPointer = compileJSONPointer(parentPath)
 
-      const parentErrorPath = parentPath.concat([VALIDATION_ERROR])
-      if (!existsIn(object, parentErrorPath as JSONPath)) {
-        const error = {
+      if (!(parentPointer in map)) {
+        map[parentPointer] = {
           isChildError: true,
           path: parentPath,
           message: 'Contains invalid data'
         }
-        object = setIn(object, parentErrorPath as JSONPath, error, true)
       }
     }
   })
 
-  return object
+  return map
 }

@@ -18,7 +18,6 @@
   import type {
     Content,
     JSONEditorPropsOptional,
-    JSONPatchDocument,
     JSONPatchResult,
     MenuItem,
     MenuSeparatorItem,
@@ -31,14 +30,14 @@
     OnFocus,
     OnRenderMenu,
     OnRenderValue,
-    Path,
     QueryLanguage,
     SortModalCallback,
     TransformModalCallback,
     TransformModalOptions,
     Validator
   } from '../types'
-  import { isMenuSpaceItem } from '../types'
+  import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
+  import { isMenuSpaceItem } from '../typeguards'
   import { noop } from 'lodash-es'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
@@ -63,7 +62,7 @@
   export let onChangeQueryLanguage: OnChangeQueryLanguage = noop
   export let onChange: OnChange = null
   export let onRenderValue: OnRenderValue = renderValue
-  export let onClassName: OnClassName = noop
+  export let onClassName: OnClassName = () => undefined
   export let onRenderMenu: OnRenderMenu = noop
   export let onChangeMode: OnChangeMode = noop
   export let onError: OnError = (err) => {
@@ -146,7 +145,7 @@
     }
   }
 
-  export function expand(callback?: (path: Path) => boolean): void {
+  export function expand(callback?: (path: JSONPath) => boolean): void {
     if (refTreeMode) {
       return refTreeMode.expand(callback)
     } else {
@@ -186,7 +185,7 @@
     }
   }
 
-  export function scrollTo(path: Path): void {
+  export function scrollTo(path: JSONPath): void {
     if (refTreeMode) {
       return refTreeMode.scrollTo(path)
     } else {
@@ -196,7 +195,7 @@
     }
   }
 
-  export function findElement(path: Path): Element {
+  export function findElement(path: JSONPath): Element {
     if (refTreeMode) {
       return refTreeMode.findElement(path)
     } else {
@@ -325,7 +324,7 @@
       mode === MODE.TREE || mode === MODE.CODE
         ? isMenuSpaceItem(items[0])
           ? modeMenuItems.concat(items) // menu is empty, readOnly mode
-          : modeMenuItems.concat([separatorMenuItem], items)
+          : modeMenuItems.concat(separatorMenuItem, items)
         : items
 
     return onRenderMenu(mode, updatedItems) || updatedItems
@@ -346,8 +345,6 @@
     onTransform,
     onClose
   }: TransformModalCallback) {
-    console.log('json', json)
-
     if (readOnly) {
       return
     }

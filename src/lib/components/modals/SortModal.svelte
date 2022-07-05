@@ -10,15 +10,16 @@
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { sortArray, sortObjectKeys } from '../../logic/sort.js'
   import { sortModalState } from './sortModalState.js'
+  import type { JSONData, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { createDebug } from '../../utils/debug'
-  import type { JSONData, OnSort, Path } from '../../types'
+  import type { OnSort } from '../../types'
 
   const debug = createDebug('jsoneditor:SortModal')
 
   export let id: string
   export let json: JSONData // the whole document
-  export let selectedPath: Path
+  export let selectedPath: JSONPath
   export let onSort: OnSort
 
   const { close } = getContext('simple-modal')
@@ -62,10 +63,10 @@
     debug('store state in memory', stateId, sortModalState[stateId])
   }
 
-  function pathToOption(path: Path): { value: Path; label: string } {
+  function pathToOption(path: JSONPath): { value: JSONPath; label: string } {
     return {
       value: path,
-      label: isEmpty(path) ? '(whole item)' : stringifyPath(path)
+      label: isEmpty(path) ? '(whole item)' : compileJSONPointer(path)
     }
   }
 
