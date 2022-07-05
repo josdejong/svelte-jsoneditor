@@ -1227,15 +1227,8 @@
 
     const previousContent = { json, text }
 
-    // Note: from the documentState, we only undo the selection and enforceStringMap,
-    // not the expandedMap or visibleSectionsMap. At the end, we scroll to the selection
-    // and will expand that if needed
     json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
-    documentState = {
-      ...documentState,
-      enforceStringMap: item.undo.state.enforceStringMap,
-      selection: item.undo.state.selection
-    }
+    documentState = item.undo.state
     text = item.undo.text
     textIsRepaired = item.undo.textIsRepaired
 
@@ -1272,15 +1265,8 @@
 
     const previousContent = { json, text }
 
-    // Note: from the documentState, we only redo the selection and enforceStringMap,
-    // not the expandedMap or visibleSectionsMap. At the end, we scroll to the selection
-    // and will expand that if needed
     json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
-    documentState = {
-      ...documentState,
-      enforceStringMap: item.redo.state.enforceStringMap,
-      selection: item.redo.state.selection
-    }
+    documentState = item.redo.state
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired
 
