@@ -197,6 +197,8 @@
 
     // reorder the items when dragging
     if (dragging && dragging.offset !== 0) {
+      const originalIndexes = items.map((item) => item.index)
+
       items = moveItems(
         items,
         dragging.selectionStartIndex,
@@ -204,9 +206,11 @@
         dragging.offset
       )
 
-      items.forEach((item, index) => {
-        item.index = index
-      })
+      // maintain the original indexes. Indexes must keep the same order,
+      // note that the indexes can be a visible section from 200-300 for example
+      for (let i = 0; i < items.length; i++) {
+        items[i].index = originalIndexes[i]
+      }
     }
 
     return items
@@ -375,9 +379,7 @@
     // note that the returned items will be of one section only,
     // and when the selection is spread over multiple sections,
     // no items will be returned: this is not (yet) supported
-    const items = getVisibleItemsWithHeights(selection)
-    const initialPath = getStartPath(selection)
-    const selectionStartIndex = items.findIndex((item) => isEqual(item.path, initialPath))
+    const items = getVisibleItemsWithHeights(selection, visibleSections || DEFAULT_VISIBLE_SECTIONS)
 
     debug('dragSelectionStart', { selection, items })
 
@@ -386,6 +388,8 @@
       return
     }
 
+    const initialPath = getStartPath(selection)
+    const selectionStartIndex = items.findIndex((item) => isEqual(item.path, initialPath))
     const json = context.getJson()
     const documentState = context.getDocumentState()
     const { offset } = onMoveSelection({
@@ -479,7 +483,11 @@
    * Get a list with all visible items and their rendered heights inside
    * this object or array
    */
-  function getVisibleItemsWithHeights(selection: JSONSelection): RenderedItem[] | null {
+  // TODO: extract and unit test getVisibleItemsWithHeights
+  function getVisibleItemsWithHeights(
+    selection: JSONSelection,
+    visibleSections: VisibleSection[]
+  ): RenderedItem[] | null {
     const items = []
 
     function addHeight(prop: string) {
@@ -503,7 +511,7 @@
       // if the selection is spread over multiple visible sections,
       // we will not return any items, so dragging will not work there.
       // We do this to keep things simple for now.
-      const currentSection = DEFAULT_VISIBLE_SECTIONS.find((visibleSection) => {
+      const currentSection = visibleSections.find((visibleSection) => {
         return startIndex >= visibleSection.start && endIndex <= visibleSection.end
       })
 
