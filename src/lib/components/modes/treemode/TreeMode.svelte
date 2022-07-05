@@ -819,7 +819,7 @@
         }
       },
       {
-        onClose: () => setTimeout(onFocus)
+        onClose: () => focus()
       }
     )
   }
