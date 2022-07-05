@@ -111,8 +111,8 @@ export function search(
   documentState: DocumentState,
   maxResults = Infinity
 ): SearchResultItem[] {
-  const results = []
-  const path = [] // we reuse the same Array recursively, this is *much* faster than creating a new path every time
+  const results: SearchResultItem[] = []
+  const path: JSONPath = [] // we reuse the same Array recursively, this is *much* faster than creating a new path every time
 
   function onMatch(match) {
     if (results.length < maxResults) {
@@ -123,10 +123,10 @@ export function search(
   function searchRecursive(searchTextLowerCase: string, value: JSONData) {
     if (isJSONArray(value)) {
       const level = path.length
-      path.push(0)
+      path.push('0')
 
       for (let i = 0; i < value.length; i++) {
-        path[level] = i
+        path[level] = String(i)
 
         searchRecursive(searchTextLowerCase, value[i])
 

@@ -1,6 +1,7 @@
 import { SelectionType } from '../types.js'
 import type { JSONPath } from 'immutable-json-patch'
 import { map, minBy } from 'lodash-es'
+import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 
 /**
  * Create serialization functions to escape and stringify text,
@@ -276,7 +277,7 @@ export function getSelectionTypeFromTarget(target: HTMLElement): SelectionType {
  * @returns {string}
  */
 export function encodeDataPath(path) {
-  return encodeURIComponent(JSON.stringify(path))
+  return encodeURIComponent(compileJSONPointer(path))
 }
 
 /**
@@ -285,7 +286,7 @@ export function encodeDataPath(path) {
  * @returns {JSONPath}
  */
 export function decodeDataPath(pathStr) {
-  return JSON.parse(decodeURIComponent(pathStr))
+  return parseJSONPointer(decodeURIComponent(pathStr))
 }
 
 /**

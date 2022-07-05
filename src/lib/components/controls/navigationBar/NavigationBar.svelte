@@ -37,12 +37,12 @@
   // trigger scrollToLastItem when path changes
   $: scrollToLastItem(path)
 
-  function getItems(path: JSONPath): (string | number)[] {
+  function getItems(path: JSONPath): string[] {
     debug('get items for path', path)
 
     const node = getIn(json, path)
     if (Array.isArray(node)) {
-      return range(0, node.length)
+      return range(0, node.length).map(String)
     } else if (isObject(node)) {
       const keys = Object.keys(node)
 

@@ -12,7 +12,7 @@
   export let path: JSONPath
   export let index: number
   export let onSelect: (path: JSONPath) => void
-  export let getItems: (path: JSONPath) => (string | number)[]
+  export let getItems: (path: JSONPath) => string[]
 
   let refNavigationBarItem: Element | undefined
   let open = false

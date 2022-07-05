@@ -40,21 +40,21 @@ describe('search', () => {
         end: 1
       },
       {
-        path: ['a', 0, 'a'],
+        path: ['a', '0', 'a'],
         field: SearchField.key,
         fieldIndex: 0,
         start: 0,
         end: 1
       },
       {
-        path: ['a', 0, 'c'],
+        path: ['a', '0', 'c'],
         field: SearchField.value,
         fieldIndex: 0,
         start: 0,
         end: 1
       },
       {
-        path: ['a', 2],
+        path: ['a', '2'],
         field: SearchField.value,
         fieldIndex: 0,
         start: 0,
