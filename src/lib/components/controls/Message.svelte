@@ -28,8 +28,16 @@
     {#each actions as action}
       <button
         type="button"
-        on:click={() => action.onClick()}
-        on:mousedown={() => action.onMouseDown()}
+        on:click={() => {
+          if (action.onClick) {
+            action.onClick()
+          }
+        }}
+        on:mousedown={() => {
+          if (action.onMouseDown) {
+            action.onMouseDown()
+          }
+        }}
         class="jse-button jse-action jse-primary"
         title={action.title}
         disabled={action.disabled}

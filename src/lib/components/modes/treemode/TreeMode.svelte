@@ -875,9 +875,7 @@
         onParse: parsePartialJson,
         onRepair: repairPartialJson,
         onApply,
-        onRenderMenu,
-        onFocus,
-        onBlur
+        onRenderMenu
       },
       {
         ...SIMPLE_MODAL_OPTIONS,
