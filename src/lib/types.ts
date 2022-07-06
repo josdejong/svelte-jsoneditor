@@ -303,7 +303,7 @@ export interface HistoryItem {
 
 export type InsertType = 'value' | 'object' | 'array' | 'structure'
 
-export interface PopupConfig {
+export interface PopupEntry {
   id: number
   component: SvelteComponent
   props: Record<string, unknown>

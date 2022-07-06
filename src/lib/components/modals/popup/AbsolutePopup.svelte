@@ -3,13 +3,13 @@
 <script lang="ts">
   import { createDebug } from '../../../utils/debug'
   import { setContext } from 'svelte'
-  import type { PopupConfig } from '../../../types'
+  import type { PopupEntry } from '../../../types'
   import { uniqueId } from '../../../utils/uniqueId'
   import AbsolutePopupEntry from './AbsolutePopupEntry.svelte'
 
   const debug = createDebug('jsoneditor:AbsolutePopup')
 
-  let popups: PopupConfig[] = []
+  let popups: PopupEntry[] = []
 
   function openAbsolutePopup(component, props, options): number {
     debug('open...', props, options)
@@ -45,13 +45,7 @@
 </script>
 
 {#each popups as popup}
-  <AbsolutePopupEntry
-    popupId={popup.id}
-    popupComponent={popup.component}
-    popupProps={popup.props}
-    popupOptions={popup.options}
-    {closeAbsolutePopup}
-  />
+  <AbsolutePopupEntry {popup} {closeAbsolutePopup} />
 {/each}
 
 <slot />
