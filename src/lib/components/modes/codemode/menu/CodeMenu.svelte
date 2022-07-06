@@ -99,5 +99,3 @@
 </script>
 
 <Menu {items} />
-
-<style src="./CodeMenu.scss"></style>
