@@ -303,6 +303,13 @@ export interface HistoryItem {
 
 export type InsertType = 'value' | 'object' | 'array' | 'structure'
 
+export interface PopupConfig {
+  id: number
+  component: SvelteComponent
+  props: Record<string, unknown>
+  options: AbsolutePopupOptions
+}
+
 export interface AbsolutePopupOptions {
   anchor?: Element
   left?: number

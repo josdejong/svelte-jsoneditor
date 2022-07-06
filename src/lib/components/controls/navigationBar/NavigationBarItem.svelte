@@ -16,12 +16,13 @@
 
   let refNavigationBarItem: Element | undefined
   let open = false
+  let popupId: number | undefined
 
   $: itemPath = path.slice(0, index)
   $: selectedItem = path[index]
 
   function handleSelectItem(item) {
-    closeAbsolutePopup()
+    closeAbsolutePopup(popupId)
     onSelect(itemPath.concat(item))
   }
 
@@ -35,7 +36,7 @@
         onSelect: handleSelectItem
       }
 
-      openAbsolutePopup(NavigationBarDropdown, props, {
+      popupId = openAbsolutePopup(NavigationBarDropdown, props, {
         anchor: refNavigationBarItem,
         closeOnOuterClick: true,
         onClose: () => {
