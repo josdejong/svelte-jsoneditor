@@ -1,12 +1,15 @@
 import Tooltip from './Tooltip.svelte'
 
 export function tooltip(node: Element, { text, openAbsolutePopup, closeAbsolutePopup }) {
+  let visible = false
+
   function handleMouseOver() {
     const props = {
-      text //: validationError.isChildError ? 'Contains invalid data' : validationError.message
+      text
     }
 
-    openAbsolutePopup(Tooltip, props, {
+    // opening popup will fail if there is already a popup open
+    visible = openAbsolutePopup(Tooltip, props, {
       position: 'top',
       width: 10 * text.length, // rough estimate of the width of the message
       offsetTop: 3,
@@ -16,7 +19,9 @@ export function tooltip(node: Element, { text, openAbsolutePopup, closeAbsoluteP
   }
 
   function handleMouseOut() {
-    closeAbsolutePopup()
+    if (visible) {
+      closeAbsolutePopup()
+    }
   }
 
   node.addEventListener('mouseover', handleMouseOver)

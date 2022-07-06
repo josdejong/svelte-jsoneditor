@@ -16,13 +16,21 @@
   let refRootPopup
   let refHiddenInput
 
-  function openAbsolutePopup(Component, props, options) {
-    debug('open...', options)
+  function openAbsolutePopup(Component, props, options): boolean {
+    debug('open...', props, options)
+
+    if (popupComponent) {
+      debug('cannot open popup: is already open')
+      return false
+    }
+
     popupComponent = Component
     popupProps = props || {}
     popupOptions = options || {}
 
     tick().then(focus)
+
+    return true
   }
 
   function closeAbsolutePopup() {
