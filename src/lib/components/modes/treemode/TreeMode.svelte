@@ -1942,14 +1942,14 @@
       onTransform: handleTransformSelection,
 
       onCloseContextMenu: function () {
-        closeAbsolutePopup()
+        closeAbsolutePopup(popupId)
         focus()
       }
     }
 
     modalOpen = true
 
-    openAbsolutePopup(ContextMenu, props, {
+    const popupId = openAbsolutePopup(ContextMenu, props, {
       left,
       top,
       offsetTop,

@@ -12,6 +12,7 @@
   export let onChangeQueryLanguage: OnChangeQueryLanguage
 
   let refConfigButton: HTMLButtonElement | undefined
+  let popupId: number | undefined
 
   const { close } = getContext('simple-modal')
   const { openAbsolutePopup, closeAbsolutePopup } = getContext('absolute-popup')
@@ -21,12 +22,12 @@
       queryLanguages,
       queryLanguageId,
       onChangeQueryLanguage: (selectedQueryLanguage) => {
-        closeAbsolutePopup()
+        closeAbsolutePopup(popupId)
         onChangeQueryLanguage(selectedQueryLanguage)
       }
     }
 
-    openAbsolutePopup(SelectQueryLanguage, props, {
+    popupId = openAbsolutePopup(SelectQueryLanguage, props, {
       position: 'bottom',
       offsetTop: -2,
       offsetLeft: 0,
