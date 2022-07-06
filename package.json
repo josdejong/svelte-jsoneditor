@@ -26,7 +26,8 @@
     "lint:eslint": "eslint --cache --ignore-path .gitignore .",
     "format": "prettier --write --plugin-search-dir=. .",
     "prepare": "husky install && cd tools && node generateDiffSequenceEsm.js && cd ..",
-    "release": "npm run lint && npm test && standard-version && npm run package && git push && git push --tag && npm publish package/"
+    "release": "npm run lint && npm test && standard-version && npm run package && git push && git push --tag && npm publish package/",
+    "dry-run": "standard-version --dry-run"
   },
   "dependencies": {
     "@codemirror/commands": "^6.0.1",
