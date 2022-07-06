@@ -8,19 +8,6 @@ export function isObject(value: unknown): value is Record<string, unknown> {
 }
 
 /**
- * Test whether a value is not an object or array, but null, number, string, or
- * boolean.
- */
-export function isValue(value: unknown): boolean {
-  return (
-    value === null ||
-    typeof value === 'number' ||
-    typeof value === 'string' ||
-    typeof value === 'boolean'
-  )
-}
-
-/**
  * Test whether a value is an Object or an Array
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
