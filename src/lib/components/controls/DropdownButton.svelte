@@ -13,6 +13,8 @@
 
   let visible = false
 
+  $: allItemsDisabled = items.every((item) => item.disabled === true)
+
   function toggleShow() {
     const wasVisible = visible
 
@@ -52,6 +54,7 @@
     data-type="jse-open-dropdown"
     class:jse-visible={visible}
     on:click={toggleShow}
+    disabled={allItemsDisabled}
   >
     <Icon data={faCaretDown} />
   </button>

@@ -111,6 +111,7 @@ export interface DropdownButtonItem {
   onClick: () => void
   icon?: FontAwesomeIcon
   title?: string
+  disabled?: boolean
 }
 
 export interface MenuButtonItem {
