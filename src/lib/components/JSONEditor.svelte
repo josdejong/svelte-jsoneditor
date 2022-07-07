@@ -303,7 +303,10 @@
     {
       text: 'text',
       title: `Switch to text mode (current mode: ${mode})`,
-      className: 'jse-group-button jse-first' + (mode === Mode.text ? ' jse-selected' : ''),
+      // check for 'code' mode is here for backward compatibility (deprecated since v0.4.0)
+      className:
+        'jse-group-button jse-first' +
+        (mode === Mode.text || mode === 'code' ? ' jse-selected' : ''),
       onClick: () => toggleMode(Mode.text)
     },
     {
@@ -391,7 +394,7 @@
   $: {
     debug('mode changed to', mode)
     if (mode === 'code') {
-      // deprecation warning since v0.4.0
+      // check for 'code' is here for backward compatibility (deprecated since v0.4.0)
       console.warn(
         'Deprecation warning: "code" mode is renamed to "text". Please use mode="text" instead.'
       )
@@ -404,7 +407,7 @@
   <AbsolutePopup>
     <div class="jse-main" class:jse-focus={hasFocus} bind:this={refJSONEditor}>
       {#key instanceId}
-        <!--  /* mode === 'code' is here for backward compatibility since v0.4.0 -->
+        <!-- check for 'code' is here for backward compatibility (deprecated since v0.4.0) -->
         {#if mode === Mode.text || mode === 'code'}
           <TextMode
             bind:this={refTextMode}
