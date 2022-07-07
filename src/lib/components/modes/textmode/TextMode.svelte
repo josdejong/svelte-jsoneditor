@@ -25,7 +25,7 @@
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
-  import CodeMenu from './menu/CodeMenu.svelte'
+  import TextMenu from './menu/TextMenu.svelte'
   import { basicSetup, EditorView } from 'codemirror'
   import { Compartment, EditorState } from '@codemirror/state'
   import { keymap, ViewUpdate } from '@codemirror/view'
@@ -62,7 +62,7 @@
   export let onSortModal
   export let onTransformModal
 
-  const debug = createDebug('jsoneditor:CodeMode')
+  const debug = createDebug('jsoneditor:TextMode')
 
   const formatCompactKeyBinding = {
     key: 'Mod-i',
@@ -786,7 +786,7 @@
 
 <div class="jse-text-mode" class:no-main-menu={!mainMenuBar} bind:this={domTextMode}>
   {#if mainMenuBar}
-    <CodeMenu
+    <TextMenu
       {readOnly}
       onFormat={handleFormat}
       onCompact={handleCompact}
@@ -863,4 +863,4 @@
   {/if}
 </div>
 
-<style src="./CodeMode.scss"></style>
+<style src="./TextMode.scss"></style>

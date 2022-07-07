@@ -7,7 +7,7 @@
   import { uniqueId } from '../utils/uniqueId.js'
   import { isTextContent, validateContentType } from '../utils/jsonUtils'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
-  import CodeMode from './modes/codemode/CodeMode.svelte'
+  import TextMode from './modes/textmode/TextMode.svelte'
   import TreeMode from './modes/treemode/TreeMode.svelte'
   import { javascriptQueryLanguage } from '../plugins/query/javascriptQueryLanguage.js'
   import { renderValue } from '$lib/plugins/value/renderValue'
@@ -406,7 +406,7 @@
       {#key instanceId}
         <!--  /* mode === 'code' is here for backward compatibility since v0.4.0 -->
         {#if mode === Mode.text || mode === 'code'}
-          <CodeMode
+          <TextMode
             bind:this={refTextMode}
             text={getText(content)}
             {readOnly}
