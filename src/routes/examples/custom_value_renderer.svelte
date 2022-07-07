@@ -3,7 +3,7 @@
   import ReadonlyPassword from './components/ReadonlyPassword.svelte'
 
   let content = {
-    text: undefined, // used when in code mode
+    text: undefined, // used when in text mode
     json: {
       username: 'John',
       password: 'secret...',

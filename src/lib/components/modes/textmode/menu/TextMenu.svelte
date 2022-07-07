@@ -95,7 +95,7 @@
         }
       ]
 
-  $: items = onRenderMenu('code', defaultItems) || defaultItems
+  $: items = onRenderMenu('text', defaultItems) || defaultItems
 </script>
 
 <Menu {items} />

@@ -60,7 +60,7 @@
   }
 
   let content = {
-    text: undefined, // used when in code mode
+    text: undefined, // used when in text mode
     json: {
       team: [
         {

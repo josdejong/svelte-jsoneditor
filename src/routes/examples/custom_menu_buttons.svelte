@@ -3,7 +3,7 @@
   import { faCopy } from '@fortawesome/free-regular-svg-icons'
 
   let content = {
-    text: undefined, // used when in code mode
+    text: undefined, // used when in text mode
     json: {
       array: [1, 2, 3],
       boolean: true,

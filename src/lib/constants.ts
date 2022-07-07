@@ -1,14 +1,8 @@
-// TODO: change MODE into an enum
 import type { Section } from './types'
-
-export const MODE = {
-  TREE: 'tree',
-  CODE: 'code'
-}
 
 export const SCROLL_DURATION = 300 // ms
 export const DEBOUNCE_DELAY = 300 // ms
-export const CODE_MODE_ONCHANGE_DELAY = 300 // ms
+export const TEXT_MODE_ONCHANGE_DELAY = 300 // ms
 export const SEARCH_UPDATE_THROTTLE = 300 // ms
 export const AUTO_SCROLL_INTERVAL = 50 // ms
 export const AUTO_SCROLL_SPEED_SLOW = 200 // pixels per second
@@ -19,7 +13,7 @@ export const ARRAY_SECTION_SIZE = 100
 export const DEFAULT_VISIBLE_SECTIONS: Section[] = [{ start: 0, end: ARRAY_SECTION_SIZE }]
 export const MAX_VALIDATABLE_SIZE = 100 * 1024 * 1024 // 1 MB
 export const MAX_AUTO_REPAIRABLE_SIZE = 1024 * 1024 // 1 MB
-export const MAX_DOCUMENT_SIZE_CODE_MODE = 10 * 1024 * 1024 // 10 MB
+export const MAX_DOCUMENT_SIZE_TEXT_MODE = 10 * 1024 * 1024 // 10 MB
 export const MAX_DOCUMENT_SIZE_EXPAND_ALL = 10 * 1024 // 10 KB
 
 export const SIMPLE_MODAL_OPTIONS = {

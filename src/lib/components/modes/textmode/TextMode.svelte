@@ -8,12 +8,12 @@
   import { debounce, noop, uniqueId } from 'lodash-es'
   import { onDestroy, onMount } from 'svelte'
   import {
-    CODE_MODE_ONCHANGE_DELAY,
+    TEXT_MODE_ONCHANGE_DELAY,
     JSON_STATUS_INVALID,
     JSON_STATUS_REPAIRABLE,
     JSON_STATUS_VALID,
     MAX_AUTO_REPAIRABLE_SIZE,
-    MAX_DOCUMENT_SIZE_CODE_MODE
+    MAX_DOCUMENT_SIZE_TEXT_MODE
   } from '../../../constants'
   import {
     activeElementIsChildOf,
@@ -25,7 +25,7 @@
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
-  import CodeMenu from './menu/CodeMenu.svelte'
+  import TextMenu from './menu/TextMenu.svelte'
   import { basicSetup, EditorView } from 'codemirror'
   import { Compartment, EditorState } from '@codemirror/state'
   import { keymap, ViewUpdate } from '@codemirror/view'
@@ -62,7 +62,7 @@
   export let onSortModal
   export let onTransformModal
 
-  const debug = createDebug('jsoneditor:CodeMode')
+  const debug = createDebug('jsoneditor:TextMode')
 
   const formatCompactKeyBinding = {
     key: 'Mod-i',
@@ -77,7 +77,7 @@
   let codeMirrorRef
   let codeMirrorView
   let codeMirrorText
-  let domCodeMode
+  let domTextMode
   let editorState: EditorState
 
   let onChangeDisabled = false
@@ -90,8 +90,8 @@
   const tabSizeCompartment = new Compartment()
 
   $: isNewDocument = text.length === 0
-  $: tooLarge = text && text.length > MAX_DOCUMENT_SIZE_CODE_MODE
-  $: codeEditorDisabled = tooLarge && !acceptTooLarge
+  $: tooLarge = text && text.length > MAX_DOCUMENT_SIZE_TEXT_MODE
+  $: textEditorDisabled = tooLarge && !acceptTooLarge
 
   $: normalization = createNormalizationFunctions({
     escapeControlCharacters: false,
@@ -120,7 +120,7 @@
     try {
       codeMirrorView = createCodeMirrorView({
         target: codeMirrorRef,
-        initialText: !codeEditorDisabled ? text : '',
+        initialText: !textEditorDisabled ? text : '',
         readOnly,
         indentation
       })
@@ -159,8 +159,8 @@
   createFocusTracker({
     onMount,
     onDestroy,
-    getWindow: () => getWindow(domCodeMode),
-    hasFocus: () => (modalOpen && document.hasFocus()) || activeElementIsChildOf(domCodeMode),
+    getWindow: () => getWindow(domTextMode),
+    hasFocus: () => (modalOpen && document.hasFocus()) || activeElementIsChildOf(domTextMode),
     onFocus,
     onBlur
   })
@@ -371,7 +371,7 @@
   }
 
   function cancelLoadTooLarge() {
-    // copy the latest contents of the code editor again into text
+    // copy the latest contents of the text editor again into text
     onChangeCodeMirrorValue()
   }
 
@@ -461,7 +461,7 @@
 
             return validate()
           },
-          { delay: CODE_MODE_ONCHANGE_DELAY }
+          { delay: TEXT_MODE_ONCHANGE_DELAY }
         ),
         lintGutter(),
         basicSetup,
@@ -549,7 +549,7 @@
   }
 
   function setCodeMirrorValue(text, force = false) {
-    if (codeEditorDisabled && !force) {
+    if (textEditorDisabled && !force) {
       debug('not applying text: editor is disabled')
       return
     }
@@ -676,7 +676,7 @@
   // soon as the user stops typing.
   const onChangeCodeMirrorValueDebounced = debounce(
     onChangeCodeMirrorValue,
-    CODE_MODE_ONCHANGE_DELAY
+    TEXT_MODE_ONCHANGE_DELAY
   )
 
   /**
@@ -784,9 +784,9 @@
       : []
 </script>
 
-<div class="jse-code-mode" class:no-main-menu={!mainMenuBar} bind:this={domCodeMode}>
+<div class="jse-text-mode" class:no-main-menu={!mainMenuBar} bind:this={domTextMode}>
   {#if mainMenuBar}
-    <CodeMenu
+    <TextMenu
       {readOnly}
       onFormat={handleFormat}
       onCompact={handleCompact}
@@ -806,22 +806,22 @@
   {/if}
 
   {#if !isSSR}
-    {#if codeEditorDisabled}
+    {#if textEditorDisabled}
       <Message
         icon={faExclamationTriangle}
         type="error"
         message={`The JSON document is larger than ${formatSize(
-          MAX_DOCUMENT_SIZE_CODE_MODE,
+          MAX_DOCUMENT_SIZE_TEXT_MODE,
           1024
         )}, ` +
-          `and may crash your browser when loading it in code mode. Actual size: ${formatSize(
+          `and may crash your browser when loading it in text mode. Actual size: ${formatSize(
             text.length,
             1024
           )}.`}
         actions={[
           {
             text: 'Open anyway',
-            title: 'Open the document in code mode. This may freeze or crash your browser.',
+            title: 'Open the document in text mode. This may freeze or crash your browser.',
             onClick: handleAcceptTooLarge
           },
           {
@@ -838,7 +838,7 @@
       />
     {/if}
 
-    <div class="jse-contents" class:jse-hidden={codeEditorDisabled} bind:this={codeMirrorRef} />
+    <div class="jse-contents" class:jse-hidden={textEditorDisabled} bind:this={codeMirrorRef} />
 
     {#if statusBar}
       <StatusBar {editorState} />
@@ -863,4 +863,4 @@
   {/if}
 </div>
 
-<style src="./CodeMode.scss"></style>
+<style src="./TextMode.scss"></style>

@@ -3,11 +3,11 @@
 <script lang="ts">
   import { createDebug } from '../utils/debug'
   import Modal from 'svelte-simple-modal'
-  import { MODE, SORT_MODAL_OPTIONS, TRANSFORM_MODAL_OPTIONS } from '../constants.js'
+  import { SORT_MODAL_OPTIONS, TRANSFORM_MODAL_OPTIONS } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
   import { isTextContent, validateContentType } from '../utils/jsonUtils'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
-  import CodeMode from './modes/codemode/CodeMode.svelte'
+  import TextMode from './modes/textmode/TextMode.svelte'
   import TreeMode from './modes/treemode/TreeMode.svelte'
   import { javascriptQueryLanguage } from '../plugins/query/javascriptQueryLanguage.js'
   import { renderValue } from '$lib/plugins/value/renderValue'
@@ -39,6 +39,7 @@
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { isMenuSpaceItem } from '../typeguards'
   import { noop } from 'lodash-es'
+  import { Mode } from '../types'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
@@ -48,7 +49,7 @@
   export let readOnly = false
   export let indentation: number | string = 2
   export let tabSize = 4
-  export let mode: 'tree' | 'code' = MODE.TREE
+  export let mode: Mode = Mode.tree
   export let mainMenuBar = true
   export let navigationBar = true
   export let statusBar = true
@@ -78,7 +79,7 @@
 
   let refJSONEditor
   let refTreeMode
-  let refCodeMode
+  let refTextMode
 
   let open // svelte-simple-modal context open(...)
 
@@ -140,8 +141,8 @@
       return refTreeMode.patch(operations)
     }
 
-    if (refCodeMode) {
-      return refCodeMode.patch(operations)
+    if (refTextMode) {
+      return refTextMode.patch(operations)
     }
   }
 
@@ -157,8 +158,8 @@
    * Open the transform modal
    */
   export function transform(options: TransformModalOptions): void {
-    if (refCodeMode) {
-      refCodeMode.openTransformModal(options)
+    if (refTextMode) {
+      refTextMode.openTransformModal(options)
     } else if (refTreeMode) {
       refTreeMode.openTransformModal(options)
     } else {
@@ -173,7 +174,7 @@
    * the data. Instead of accepting the repair, the user can also click
    * "Repair manually instead". Invoking `.acceptAutoRepair()` will
    * programmatically accept the repair. This will trigger an update,
-   * and the method itself also returns the updated contents. In case of code
+   * and the method itself also returns the updated contents. In case of text
    * mode or when the editor is not in an "accept auto repair" status, nothing
    * will happen, and the contents will be returned as is.
    */
@@ -189,7 +190,7 @@
     if (refTreeMode) {
       return refTreeMode.scrollTo(path)
     } else {
-      // TODO: implement scrollTo for code mode
+      // TODO: implement scrollTo for text mode
 
       throw new Error(`Method scrollTo is not available in mode "${mode}"`)
     }
@@ -204,16 +205,16 @@
   }
 
   export function focus() {
-    if (refCodeMode) {
-      refCodeMode.focus()
+    if (refTextMode) {
+      refTextMode.focus()
     } else if (refTreeMode) {
       refTreeMode.focus()
     }
   }
 
   export function refresh() {
-    if (refCodeMode) {
-      refCodeMode.refresh()
+    if (refTextMode) {
+      refTextMode.refresh()
     } else {
       // nothing to do in tree mode (also: don't throw an exception or so,
       // that annoying having to reckon with that when using .refresh()).
@@ -257,17 +258,17 @@
   }
 
   async function handleRequestRepair() {
-    mode = MODE.CODE
+    mode = Mode.text
 
     await tick()
-    onChangeMode(MODE.CODE)
+    onChangeMode(Mode.text)
   }
 
   async function handleSwitchToTreeMode() {
-    mode = MODE.TREE
+    mode = Mode.tree
 
     await tick()
-    onChangeMode(MODE.TREE)
+    onChangeMode(Mode.tree)
   }
 
   function handleFocus() {
@@ -284,7 +285,7 @@
     }
   }
 
-  async function toggleMode(newMode: 'tree' | 'code') {
+  async function toggleMode(newMode: Mode) {
     if (mode === newMode) {
       return
     }
@@ -297,21 +298,22 @@
     onChangeMode(newMode)
   }
 
-  $: isCodeMode = mode === MODE.CODE
-
   let modeMenuItems: MenuItem[]
   $: modeMenuItems = [
     {
-      text: 'code',
-      title: `Switch to code mode (current mode: ${mode})`,
-      className: 'jse-group-button jse-first' + (isCodeMode ? ' jse-selected' : ''),
-      onClick: () => toggleMode(MODE.CODE)
+      text: 'text',
+      title: `Switch to text mode (current mode: ${mode})`,
+      // check for 'code' mode is here for backward compatibility (deprecated since v0.4.0)
+      className:
+        'jse-group-button jse-first' +
+        (mode === Mode.text || mode === 'code' ? ' jse-selected' : ''),
+      onClick: () => toggleMode(Mode.text)
     },
     {
       text: 'tree',
       title: `Switch to tree mode (current mode: ${mode})`,
-      className: 'jse-group-button jse-last' + (!isCodeMode ? ' jse-selected' : ''),
-      onClick: () => toggleMode(MODE.TREE)
+      className: 'jse-group-button jse-last' + (mode === Mode.tree ? ' jse-selected' : ''),
+      onClick: () => toggleMode(Mode.tree)
     }
   ]
 
@@ -319,13 +321,10 @@
     separator: true
   }
 
-  function handleRenderMenu(mode: 'tree' | 'code' | 'repair', items: MenuItem[]) {
-    const updatedItems =
-      mode === MODE.TREE || mode === MODE.CODE
-        ? isMenuSpaceItem(items[0])
-          ? modeMenuItems.concat(items) // menu is empty, readOnly mode
-          : modeMenuItems.concat(separatorMenuItem, items)
-        : items
+  $: handleRenderMenu = (mode: 'tree' | 'text' | 'repair', items: MenuItem[]) => {
+    const updatedItems = isMenuSpaceItem(items[0])
+      ? modeMenuItems.concat(items) // menu is empty, readOnly mode
+      : modeMenuItems.concat(separatorMenuItem, items)
 
     return onRenderMenu(mode, updatedItems) || updatedItems
   }
@@ -391,6 +390,16 @@
       }
     )
   }
+
+  $: {
+    debug('mode changed to', mode)
+    if (mode === 'code') {
+      // check for 'code' is here for backward compatibility (deprecated since v0.4.0)
+      console.warn(
+        'Deprecation warning: "code" mode is renamed to "text". Please use mode="text" instead.'
+      )
+    }
+  }
 </script>
 
 <Modal>
@@ -398,9 +407,10 @@
   <AbsolutePopup>
     <div class="jse-main" class:jse-focus={hasFocus} bind:this={refJSONEditor}>
       {#key instanceId}
-        {#if mode === MODE.CODE}
-          <CodeMode
-            bind:this={refCodeMode}
+        <!-- check for 'code' is here for backward compatibility (deprecated since v0.4.0) -->
+        {#if mode === Mode.text || mode === 'code'}
+          <TextMode
+            bind:this={refTextMode}
             text={getText(content)}
             {readOnly}
             {indentation}
@@ -419,7 +429,7 @@
             {onTransformModal}
           />
         {:else}
-          <!-- mode === MODE.TREE -->
+          <!-- mode === Mode.tree -->
           <TreeMode
             bind:this={refTreeMode}
             {readOnly}
