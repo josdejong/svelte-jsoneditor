@@ -11,7 +11,7 @@
     faCircleNotch,
     faSearch,
     faTimes
-  } from '@fortawesome/free-solid-svg-icons'
+  } from '@fortawesome/free-solid-svg-icons/index.es'
   import { DEBOUNCE_DELAY, MAX_SEARCH_RESULTS } from '$lib/constants'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
 

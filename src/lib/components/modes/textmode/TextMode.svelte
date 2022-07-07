@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { faExclamationTriangle, faWrench } from '@fortawesome/free-solid-svg-icons'
+  import { faExclamationTriangle, faWrench } from '@fortawesome/free-solid-svg-icons/index.es'
   import { createDebug } from '../../../utils/debug'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'

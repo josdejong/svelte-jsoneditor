@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import Icon from 'svelte-awesome'
-  import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
+  import { faCaretDown } from '@fortawesome/free-solid-svg-icons/index.es'
   import { onDestroy, onMount } from 'svelte'
   import { keyComboFromEvent } from '../../utils/keyBindings'
   import type { DropdownButtonItem } from '../../types'

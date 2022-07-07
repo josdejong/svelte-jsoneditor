@@ -7,7 +7,7 @@
     faExclamationTriangle,
     faTimes,
     faWrench
-  } from '@fortawesome/free-solid-svg-icons'
+  } from '@fortawesome/free-solid-svg-icons/index.es'
   import { createDebug } from '../../../utils/debug'
   import Message from '../../controls/Message.svelte'
   import { normalizeJsonParseError } from '../../../utils/jsonUtils.js'
