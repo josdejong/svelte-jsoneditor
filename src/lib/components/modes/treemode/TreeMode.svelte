@@ -163,7 +163,7 @@
   export let onRenderValue: OnRenderValue
   export let onRequestRepair = noop
   export let onRenderMenu = noop
-  export let onClassName: OnClassName
+  export let onClassName: OnClassName | undefined
   export let onFocus
   export let onBlur
   export let onSortModal
@@ -2144,7 +2144,7 @@
     onPasteJson: handlePasteJson,
     onRenderValue,
     onContextMenu: openContextMenu,
-    onClassName,
+    onClassName: onClassName || (() => undefined),
     onDrag: handleDrag,
     onDragEnd: handleDragEnd
   }
