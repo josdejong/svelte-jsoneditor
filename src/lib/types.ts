@@ -178,7 +178,7 @@ export interface RichValidationError {
   to: number
   message: string
   severity: 'info' | 'warning' | 'error'
-  actions: Array<string>
+  actions: Array<{ name: string; apply: () => void }> | null
 }
 
 export interface TextLocation {

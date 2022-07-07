@@ -41,6 +41,7 @@
   import jsonSourceMap from 'json-source-map'
   import StatusBar from './StatusBar.svelte'
   import { highlighter } from './codemirror/codemirror-theme'
+  import { ParseError, RichValidationError, ValidationError } from '../../../types'
 
   export let readOnly = false
   export let mainMenuBar = true
@@ -391,13 +392,10 @@
     focus()
   }
 
-  /**
-   * @param {ParseError} parseError
-   **/
-  function handleSelectParseError(parseError) {
+  function handleSelectParseError(parseError: ParseError) {
     debug('select parse error', parseError)
 
-    const richParseError = toRichParseError(parseError)
+    const richParseError = toRichParseError(parseError, false)
 
     // we take "to" as head, not as anchor, because the scrollIntoView will
     // move to the head, and when a large whole object is selected as a whole,
@@ -499,11 +497,7 @@
     return codeMirrorView ? normalization.unescapeValue(codeMirrorView.state.doc.toString()) : ''
   }
 
-  /**
-   * @param {ValidationError} validationError
-   * @returns {RichValidationError}
-   */
-  function toRichValidationError(validationError) {
+  function toRichValidationError(validationError: ValidationError): RichValidationError {
     const { path, message, isChildError } = validationError
     const { line, column, from, to } = findTextLocation(text, path)
 
@@ -520,12 +514,7 @@
     }
   }
 
-  /**
-   * @param {ParseError} parseError
-   * @param {boolean} isRepairable
-   * @returns {RichValidationError}
-   */
-  function toRichParseError(parseError, isRepairable) {
+  function toRichParseError(parseError: ParseError, isRepairable: boolean): RichValidationError {
     const { line, column, position, message } = parseError
 
     return {
