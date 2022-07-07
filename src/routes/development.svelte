@@ -105,7 +105,7 @@
   const showTreeEditor = useLocalStorage('svelte-jsoneditor-demo-showTreeEditor', true)
   const showTextEditor = useLocalStorage('svelte-jsoneditor-demo-showTextEditor', true)
   const showRawContents = useLocalStorage('svelte-jsoneditor-demo-showRawContents', true)
-  let height = '400px'
+  let height = '430px'
   const validate = useLocalStorage('svelte-jsoneditor-demo-validate', true)
   const readOnly = useLocalStorage('svelte-jsoneditor-demo-readOnly', false)
   const mainMenuBar = useLocalStorage('svelte-jsoneditor-demo-mainMenuBar', true)
