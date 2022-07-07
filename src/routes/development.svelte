@@ -103,7 +103,7 @@
   const validator = createAjvValidator(schema)
 
   const showTreeEditor = useLocalStorage('svelte-jsoneditor-demo-showTreeEditor', true)
-  const showCodeEditor = useLocalStorage('svelte-jsoneditor-demo-showCodeEditor', true)
+  const showTextEditor = useLocalStorage('svelte-jsoneditor-demo-showTextEditor', true)
   const showRawContents = useLocalStorage('svelte-jsoneditor-demo-showRawContents', true)
   let height = '400px'
   const validate = useLocalStorage('svelte-jsoneditor-demo-validate', true)
@@ -133,6 +133,7 @@
     indentations[0].value
   )
   const tabSize = useLocalStorage('svelte-jsoneditor-demo-tabSize', indentations[0].value)
+  let leftEditorMode = 'tree'
 
   $: queryLanguages = $multipleQueryLanguages
     ? [javascriptQueryLanguage, lodashQueryLanguage, jmespathQueryLanguage]
@@ -195,9 +196,9 @@
     }
   }
 
-  function onChangeCode(content, previousContent, patchResult) {
+  function onChangeText(content, previousContent, patchResult) {
     if ($showRawContents) {
-      console.log('onChangeCode', content, previousContent, patchResult)
+      console.log('onChangeText', content, previousContent, patchResult)
     }
   }
 
@@ -417,11 +418,17 @@
         <label>
           <input type="checkbox" bind:checked={$showTreeEditor} /> Show tree editor
         </label>
+        <select class="mode-toggle" bind:value={leftEditorMode}>
+          <option value="tree">tree</option>
+          <option value="text">text</option>
+          <option value="code">code (deprecated)</option>
+        </select>
       </p>
       <div class="tree-editor" style="height: {height}">
         {#if $showTreeEditor}
           <JSONEditor
             bind:content
+            bind:mode={leftEditorMode}
             mainMenuBar={$mainMenuBar}
             navigationBar={$navigationBar}
             statusBar={$statusBar}
@@ -455,14 +462,14 @@
     <div class="right">
       <p>
         <label>
-          <input type="checkbox" bind:checked={$showCodeEditor} /> Show code editor
+          <input type="checkbox" bind:checked={$showTextEditor} /> Show text editor
         </label>
       </p>
 
-      <div class="code-editor" style="height: {height}">
-        {#if $showCodeEditor}
+      <div class="text-editor" style="height: {height}">
+        {#if $showTextEditor}
           <JSONEditor
-            mode="code"
+            mode="text"
             bind:content
             mainMenuBar={$mainMenuBar}
             navigationBar={$navigationBar}
@@ -477,7 +484,7 @@
             {queryLanguageId}
             {onChangeQueryLanguage}
             {onRenderMenu}
-            onChange={onChangeCode}
+            onChange={onChangeText}
             onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
             {onChangeMode}
           />
@@ -543,11 +550,16 @@ See https://github.com/sveltejs/kit/issues/981
   }
 
   .tree-editor,
-  .code-editor {
+  .text-editor {
     // some styling to try out if it doesn't break the styling of the editor
     line-height: 72px;
     font-size: 72px;
     font-family: 'Comic Sans MS', 'Courier New', serif;
+  }
+
+  .mode-toggle {
+    font-size: 12pt;
+    font-family: arial, serif;
   }
 
   .data {

@@ -34,7 +34,7 @@ Create a JSONEditor with two-way binding `bind:json`:
   import { JSONEditor } from 'svelte-jsoneditor'
 
   let content = {
-    text: undefined, // used when in code mode
+    text: undefined, // used when in text mode
     json: {
       array: [1, 2, 3],
       boolean: true,
@@ -59,7 +59,7 @@ Or one-way binding:
   import { JSONEditor } from 'svelte-jsoneditor'
 
   let content = {
-    text: undefined, // used when in code mode
+    text: undefined, // used when in text mode
     json: {
       greeting: 'Hello World'
     }
@@ -156,15 +156,15 @@ const editor = new JSONEditor({
 
 ### properties
 
-- `content: Content` Pass the JSON contents to be rendered in the JSONEditor. Contents is an object containing a property `json` and `text`. Only one of the two must be defined. In case of `tree` mode, `json` is used. In case of `code` mode, `text` is used.
-- `mode: 'tree' | 'code'`. Open the editor in `'tree'` mode (default) or `'code'` mode.
+- `content: Content` Pass the JSON contents to be rendered in the JSONEditor. Contents is an object containing a property `json` and `text`. Only one of the two must be defined. In case of `tree` mode, `json` is used. In case of `text` mode, `text` is used.
+- `mode: 'tree' | 'text'`. Open the editor in `'tree'` mode (default) or `'text'` mode (formerly: `code` mode).
 - `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
 - `navigationBar: boolean` Show the navigation bar with, where you can see the selected path and navigate through your document from there. Default value is `true`.
-- `statusBar: boolean` Show a status bar at the bottom of the `'code'` editor, showing information about the cursor location and selected contents. Default value is `true`.
+- `statusBar: boolean` Show a status bar at the bottom of the `'text'` editor, showing information about the cursor location and selected contents. Default value is `true`.
 - `readOnly: boolean` Open the editor in read-only mode: no changes can be made, non-relevant buttons are hidden from the menu, and the context menu is not enabled. Default value is `false`.
 - `indentation: number | string` Number of spaces use for indentation when stringifying JSON, or a string to be used as indentation like `'\t'` to use a tab as indentation, or `' '` to use 4 spaces (which is equivalent to configuring `indentation: 4`). See also property `tabSize`.
-- `tabSize: number` When indentation is configured as a tab character (`indentation: '\t'`), `tabSize` configures how large a tab character is rendered. Default value is `4`. Only applicable to `code` mode.
-- `escapeControlCharacters: boolean`. False by default. When `true`, control characters like newline and tab are rendered as escaped characters `\n` and `\t`. Only applicable for `'tree'` mode, in `'code'` mode control characters are always escaped.
+- `tabSize: number` When indentation is configured as a tab character (`indentation: '\t'`), `tabSize` configures how large a tab character is rendered. Default value is `4`. Only applicable to `text` mode.
+- `escapeControlCharacters: boolean`. False by default. When `true`, control characters like newline and tab are rendered as escaped characters `\n` and `\t`. Only applicable for `'tree'` mode, in `'text'` mode control characters are always escaped.
 - `escapeUnicodeCharacters: boolean`. False by default. When `true`, unicode characters like ☎ and 😀 are rendered escaped like `\u260e` and `\ud83d\ude00`.
 - `validator: function (json: JSONData): ValidationError[]`. Validate the JSON document.
   For example use the built-in JSON Schema validator powered by Ajv:
@@ -178,7 +178,7 @@ const editor = new JSONEditor({
 - `onError(err: Error)`.
   Callback fired when an error occurs. Default implementation is to log an error in the console and show a simple alert message to the user.
 - `onChange(content: Content, previousContent: Content, patchResult: JSONPatchResult | null)`. The callback which is invoked on every change made in the JSON document. The parameter `patchResult` is only available in `tree` mode, and not in `text` mode, since a change in arbitrary text cannot be expressed as a JSON Patch document.
-- `onChangeMode(mode: 'tree' | 'code')`. Invoked when the mode is changed.
+- `onChangeMode(mode: 'tree' | 'text')`. Invoked when the mode is changed.
 - `onClassName(path: Path, value: any): string | undefined`.
   Add a custom class name to specific nodes, based on their path and/or value.
 - `onRenderValue(props: RenderValueProps) : RenderValueComponentDescription[]`
@@ -198,7 +198,7 @@ const editor = new JSONEditor({
   }
   ```
 
-- `onRenderMenu(mode: 'tree' | 'code', items: MenuItem[]) : MenuItem[] | undefined`.
+- `onRenderMenu(mode: 'tree' | 'text', items: MenuItem[]) : MenuItem[] | undefined`.
   Callback which can be used to make changes to the menu items. New items can
   be added, or existing items can be removed or reorganized. When the function
   returns `undefined`, the original `items` will be applied.
@@ -279,8 +279,8 @@ const editor = new JSONEditor({
 - `transform({ id?: string, selectedPath?: [], onTransform?: ({ operations: JSONPatchDocument, json: JSONData, transformedJson: JSONData }) => void, onClose?: () => void })` programmatically trigger clicking of the transform button in the main menu, opening the transform model. If a callback `onTransform` is provided, it will replace the build-in logic to apply a transform, allowing you to process the transform operations in an alternative way. If provided, `onClose` callback will trigger when the transform modal closes, both after the user clicked apply or cancel. If an `id` is provided, the transform modal will load the previous status of this `id` instead of the status of the editors transform modal.
 - `scrollTo(path: Path)` Scroll the editor vertically such that the specified path comes into view. The path will be expanded when needed.
 - `findElement(path: Path)` Find the DOM element of a given path. Returns `null` when not found.
-- `acceptAutoRepair(): Content` In tree mode, invalid JSON is automatically repaired when loaded. When the repair was successful, the repaired contents are rendered but not yet applied to the document itself until the user clicks "Ok" or starts editing the data. Instead of accepting the repair, the user can also click "Repair manually instead". Invoking `.acceptAutoRepair()` will programmatically accept the repair. This will trigger an update, and the method itself also returns the updated contents. In case of code mode or when the editor is not in an "accept auto repair" status, nothing will happen, and the contents will be returned as is.
-- `refresh()`. Refresh rendering of the contents, for example after changing the font size. This is only available in `code` mode.
+- `acceptAutoRepair(): Content` In tree mode, invalid JSON is automatically repaired when loaded. When the repair was successful, the repaired contents are rendered but not yet applied to the document itself until the user clicks "Ok" or starts editing the data. Instead of accepting the repair, the user can also click "Repair manually instead". Invoking `.acceptAutoRepair()` will programmatically accept the repair. This will trigger an update, and the method itself also returns the updated contents. In case of `text` mode or when the editor is not in an "accept auto repair" status, nothing will happen, and the contents will be returned as is.
+- `refresh()`. Refresh rendering of the contents, for example after changing the font size. This is only available in `text` mode.
 - `focus()`. Give the editor focus.
 - `destroy()`. Destroy the editor, remove it from the DOM.
 
@@ -408,7 +408,7 @@ For example, to change the default blue theme color to anthracite:
   import { JSONEditor } from 'svelte-jsoneditor'
 
   let content = {
-    text: undefined, // used when in code mode
+    text: undefined, // used when in text mode
     json: {
       string: 'Hello custom theme color :)'
     }
@@ -444,7 +444,7 @@ Full Svelte example:
   import { JSONEditor } from 'svelte-jsoneditor'
 
   let content = {
-    text: undefined, // used when in code mode
+    text: undefined, // used when in text mode
     json: {
       string: 'Hello dark theme :)'
     }
@@ -471,15 +471,15 @@ This library [`josdejong/svelte-jsoneditor`](https://github.com/josdejong/svelte
 | Creation     | Orginal (first published in 2011)                                                                                    | Successor (first published in 2021)                                                                                                                                                                                   |
 | Framework    | Implemented in plain JavaScript, using low level DOM operations                                                      | Uses [Svelte](https://svelte.dev/)                                                                                                                                                                                    |
 | Tree mode    | A tree view having context menu buttons on the left of every line. The keys and values are always in editable state. | A tree view utilizing right-click to open the context menu, and double-click to start editing a key or value (more similar to a Spreadsheet or text editor). It supports copy/paste from and to the system clipboard. |
-| Code mode    | Powered by [Ace editor](https://ace.c9.io/)                                                                          | Powered by [Code Mirror](https://codemirror.net)                                                                                                                                                                      |
-| Preview mode | Used to preview large documents                                                                                      | Not needed, both Tree mode and Code mode can handle large documents                                                                                                                                                   |
+| Text mode    | Powered by [Ace editor](https://ace.c9.io/)                                                                          | Powered by [Code Mirror](https://codemirror.net)                                                                                                                                                                      |
+| Preview mode | Used to preview large documents                                                                                      | Not needed, both `tree` and `text` mode can handle large documents                                                                                                                                                    |
 
 The main reasons to create a new library instead of extending the existing one are:
 
 - The codebase had become hard to maintain, the architecture needed a big overhaul. The codebase uses plain JavaScript to create and update the DOM based on changes in the state of the application. This is complex. Letting a framework like Svelte do this for you makes the code base much simpler.
 - Performance limitations in the old editor.
 - Tree mode: the classic tree mode of `josdejong/jsoneditor` is simple and straightforward, but also limited. The new tree mode of `josdejong/svelte-jsoneditor` allows for much more streamlined editing and interaction. It works quite similar to a Spreadsheet or text editor. Navigate and select using the Arrow and Shift+Arrow keys or by dragging with the mouse. Double-click (or press Enter) to start editing a key or value. Open the context menu by right-clicking on the item or selection you want to operate on. Use cut/copy/paste to move parts of the JSON around and interoperate with other applications.
-- Code mode: the Ace editor library is using an outdated module system (AMD) and the way it is bundled and published is hard to integrate in modern JavaScript projects. Code Mirror 6 is very straightforward to integrate, has much better performance, and is very extensible (paving the way for future features).
+- Code or text mode: the Ace editor library is using an outdated module system (AMD) and the way it is bundled and published is hard to integrate in modern JavaScript projects. Code Mirror 6 is very straightforward to integrate, has much better performance, and is very extensible (paving the way for future features).
 
 ## Develop
 

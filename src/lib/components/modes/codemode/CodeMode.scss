@@ -1,6 +1,6 @@
 @import '../../../styles';
 
-.jse-code-mode {
+.jse-text-mode {
   flex: 1;
   box-sizing: border-box;
   display: flex;
@@ -91,7 +91,7 @@
 
       :global(.cm-search input) {
         font-family: var(--jse-font-family);
-        font-size: var(--jse-font-size-code-mode-search);
+        font-size: var(--jse-font-size-text-mode-search);
         color: var(--jse-input-color);
         border: var(--jse-input-border);
         background: var(--jse-input-background);
@@ -100,7 +100,7 @@
 
       :global(.cm-search button) {
         font-family: var(--jse-font-family);
-        font-size: var(--jse-font-size-code-mode-search);
+        font-size: var(--jse-font-size-text-mode-search);
 
         color: var(--jse-panel-button-color);
         background: var(--jse-panel-button-background);
@@ -119,7 +119,7 @@
 
       :global(.cm-search label) {
         font-family: var(--jse-font-family);
-        font-size: var(--jse-font-size-code-mode-search);
+        font-size: var(--jse-font-size-text-mode-search);
         padding-left: $padding;
       }
 

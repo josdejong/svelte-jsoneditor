@@ -12,6 +12,11 @@ export interface VisibleSection {
   end: number
 }
 
+export enum Mode {
+  text = 'text',
+  tree = 'tree'
+}
+
 export enum SelectionType {
   after = 'after',
   inside = 'inside',
@@ -224,10 +229,10 @@ export type OnPaste = (pastedText: string) => void
 export type OnPasteJson = (pastedJson: { path: JSONPath; contents: JSONData }) => void
 export type OnRenderValue = (props: RenderValueProps) => RenderValueComponentDescription[]
 export type OnClassName = (path: JSONPath, value: JSONData) => string | undefined
-export type OnChangeMode = (mode: 'tree' | 'code') => void
+export type OnChangeMode = (mode: Mode) => void
 export type OnContextMenu = (contextMenuProps: AbsolutePopupOptions) => void
 export type OnRenderMenu = (
-  mode: 'tree' | 'code' | 'repair',
+  mode: 'tree' | 'text' | 'repair',
   items: MenuItem[]
 ) => MenuItem[] | undefined | void
 export type OnError = (error: Error) => void
@@ -329,7 +334,7 @@ export interface JSONEditorPropsOptional {
   readOnly?: boolean
   indentation?: number | string
   tabSize?: number
-  mode?: 'tree' | 'code'
+  mode?: Mode
   mainMenuBar?: boolean
   navigationBar?: boolean
   statusBar?: boolean
