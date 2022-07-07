@@ -57,7 +57,7 @@ export function truncate(text: string, maxLength: number): string {
   const ellipsis = '...'
   const maxTextLength = maxLength - ellipsis.length
 
-  return text.length > maxLength ? text.substr(0, maxTextLength) + ellipsis : text
+  return text.length > maxLength ? text.substring(0, maxTextLength) + ellipsis : text
 }
 
 /**

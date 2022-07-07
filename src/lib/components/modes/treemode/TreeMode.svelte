@@ -117,13 +117,13 @@
     InsertType,
     JSONPatchResult,
     JSONPointerMap,
+    JSONSelection,
     OnChange,
     OnClassName,
     OnRenderValue,
     PastedJson,
     SearchResult,
     Section,
-    JSONSelection,
     TransformModalOptions,
     TreeModeContext,
     ValidationError,
@@ -131,6 +131,8 @@
     ValueNormalization
   } from '$lib/types'
   import { isAfterSelection, isInsideSelection, isKeySelection } from '../../../logic/selection'
+  import { truncate } from '../../../utils/stringUtils.js'
+  import { MAX_CHARACTERS_TEXT_PREVIEW } from '../../../constants.js'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -2212,7 +2214,7 @@
             : []}
         />
         <div class="jse-preview">
-          {text}
+          {truncate(text, MAX_CHARACTERS_TEXT_PREVIEW)}
         </div>
       {/if}
     {:else}
