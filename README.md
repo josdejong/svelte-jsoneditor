@@ -7,7 +7,17 @@ The library is written with Svelte, but can be used in any framework (React, Vue
 ![JSONEditor tree mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_tree_mode_screenshot.png)
 ![JSONEditor text mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_text_mode_screenshot.png)
 
-<!-- TODO: describe features -->
+## Features
+
+- View and edit JSON
+- Has a low level text mode and high level tree mode
+- Format (beautify) and compact JSON
+- Sort, query, filter, and transform JSON
+- Repair JSON
+- JSON schema validation and pluggable custom validation
+- Color highlighting, undo/redo, search and replace
+- Utilities like a color picker and timestamp tag
+- Handles large JSON documents up to 500 MB
 
 ## Install
 
