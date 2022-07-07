@@ -28,7 +28,7 @@ export default {
     {
       file,
       format: 'es',
-      sourcemap: false, // FIXME: enable sourcemap (generated source map has issues right now)
+      sourcemap: true,
       inlineDynamicImports: true
     }
   ],
@@ -51,7 +51,7 @@ export default {
     commonjs(),
     json(),
 
-    typescript(),
+    typescript({ sourceMap: true, inlineSources: true }),
     getBabelOutputPlugin({
       presets: ['@babel/preset-env']
     }),
