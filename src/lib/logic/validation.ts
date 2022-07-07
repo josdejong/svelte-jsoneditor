@@ -1,5 +1,5 @@
 import { initial } from 'lodash-es'
-import type { JSONPointerMap, ValidationError } from '../types'
+import type { JSONPointerMap, NestedValidationError, ValidationError } from '../types'
 import { compileJSONPointer } from 'immutable-json-patch'
 
 /**
@@ -10,7 +10,7 @@ import { compileJSONPointer } from 'immutable-json-patch'
  */
 export function mapValidationErrors(
   validationErrors: ValidationError[]
-): JSONPointerMap<ValidationError> {
+): JSONPointerMap<NestedValidationError> {
   const map = {}
 
   // first generate a map with the errors themselves

@@ -8,12 +8,12 @@
   import { debounce, noop, uniqueId } from 'lodash-es'
   import { onDestroy, onMount } from 'svelte'
   import {
-    TEXT_MODE_ONCHANGE_DELAY,
     JSON_STATUS_INVALID,
     JSON_STATUS_REPAIRABLE,
     JSON_STATUS_VALID,
     MAX_AUTO_REPAIRABLE_SIZE,
-    MAX_DOCUMENT_SIZE_TEXT_MODE
+    MAX_DOCUMENT_SIZE_TEXT_MODE,
+    TEXT_MODE_ONCHANGE_DELAY
   } from '../../../constants'
   import {
     activeElementIsChildOf,
@@ -30,8 +30,8 @@
   import { Compartment, EditorState } from '@codemirror/state'
   import { keymap, ViewUpdate } from '@codemirror/view'
   import { indentWithTab, redo, redoDepth, undo, undoDepth } from '@codemirror/commands'
-  import { linter, lintGutter } from '@codemirror/lint'
   import type { Diagnostic } from '@codemirror/lint'
+  import { linter, lintGutter } from '@codemirror/lint'
   import { json as jsonLang } from '@codemirror/lang-json'
   import { indentUnit } from '@codemirror/language'
   import { closeSearchPanel, openSearchPanel, search } from '@codemirror/search'
@@ -41,7 +41,8 @@
   import jsonSourceMap from 'json-source-map'
   import StatusBar from './StatusBar.svelte'
   import { highlighter } from './codemirror/codemirror-theme'
-  import { ParseError, RichValidationError, ValidationError } from '../../../types'
+  import type { ParseError, RichValidationError, ValidationError } from '../../../types'
+  import { ValidationSeverity } from '../../../types'
 
   export let readOnly = false
   export let mainMenuBar = true
@@ -498,18 +499,17 @@
   }
 
   function toRichValidationError(validationError: ValidationError): RichValidationError {
-    const { path, message, isChildError } = validationError
+    const { path, message } = validationError
     const { line, column, from, to } = findTextLocation(text, path)
 
     return {
       path,
-      isChildError,
       line,
       column,
       from,
       to,
       message,
-      severity: 'warning',
+      severity: ValidationSeverity.warning,
       actions: []
     }
   }
@@ -523,7 +523,7 @@
       column,
       from: position || 0,
       to: position || 0,
-      severity: 'error',
+      severity: ValidationSeverity.error,
       message,
       actions:
         isRepairable && !readOnly

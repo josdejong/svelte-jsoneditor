@@ -147,9 +147,19 @@ export interface MessageAction {
   disabled?: boolean
 }
 
+export enum ValidationSeverity {
+  info = 'info',
+  warning = 'warning',
+  error = 'error'
+}
+
 export interface ValidationError {
   path: JSONPath
   message: string
+  severity: ValidationSeverity
+}
+
+export interface NestedValidationError extends ValidationError {
   isChildError?: boolean
 }
 
@@ -169,15 +179,11 @@ export interface NormalizedParseError {
   message: string
 }
 
-export interface RichValidationError {
-  path?: JSONPath
-  isChildError?: boolean
+export interface RichValidationError extends ValidationError {
   line?: number
   column?: number
   from: number
   to: number
-  message: string
-  severity: 'info' | 'warning' | 'error'
   actions: Array<{ name: string; apply: () => void }> | null
 }
 
@@ -419,7 +425,7 @@ export interface JSONNodeProp {
   expandedMap: JSONPointerMap<boolean> | undefined
   enforceStringMap: JSONPointerMap<boolean> | undefined
   visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
-  validationErrorsMap: JSONPointerMap<ValidationError> | undefined
+  validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   keySearchResultItemsMap: ExtendedSearchResultItem[] | undefined
   valueSearchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
   selection: JSONSelection | undefined
@@ -433,7 +439,7 @@ export interface JSONNodeItem {
   expandedMap: JSONPointerMap<boolean> | undefined
   enforceStringMap: JSONPointerMap<boolean> | undefined
   visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
-  validationErrorsMap: JSONPointerMap<ValidationError> | undefined
+  validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
   selection: JSONSelection | undefined
 }

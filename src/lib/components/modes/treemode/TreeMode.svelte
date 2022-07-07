@@ -118,6 +118,7 @@
     JSONPatchResult,
     JSONPointerMap,
     JSONSelection,
+    NestedValidationError,
     OnChange,
     OnClassName,
     OnRenderValue,
@@ -397,7 +398,7 @@
   let validationErrors: ValidationError[] = []
   $: updateValidationErrors(json, validator)
 
-  let validationErrorsMap: JSONPointerMap<ValidationError>
+  let validationErrorsMap: JSONPointerMap<NestedValidationError>
   $: validationErrorsMap = mapValidationErrors(validationErrors)
 
   function updateValidationErrors(json: JSONData, validator: Validator | null) {
