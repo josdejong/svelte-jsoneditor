@@ -10,7 +10,6 @@ import { terser } from 'rollup-plugin-terser'
 import sveltePreprocess from 'svelte-preprocess'
 import pkg from './package.json'
 import { addBundleExports } from './tools/addBundleExports.js'
-import { createDefinitionsFile } from './tools/createDefinitionsFile.js'
 
 const production = !process.env.ROLLUP_WATCH
 const packageFolder = 'package'
@@ -19,7 +18,6 @@ const sourcemapFile = file + '.map'
 const definitionsFile = file.replace(/\.js$/, '.d.ts')
 
 fs.mkdirSync(path.dirname(file))
-createDefinitionsFile(definitionsFile)
 addBundleExports(packageFolder, file, sourcemapFile, definitionsFile)
 
 export default {

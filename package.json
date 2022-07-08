@@ -15,9 +15,11 @@
   "scripts": {
     "dev": "svelte-kit dev",
     "preview": "svelte-kit preview",
-    "build": "npm run package",
-    "build:watch": "npm run package -- --watch",
-    "package": "svelte-kit sync && svelte-kit package && rollup --config rollup.config.bundle.js",
+    "build": "npm run build:svelte && npm run build:bundle && npm run build:bundle-types",
+    "build:watch": "npm run build -- --watch",
+    "build:svelte": "svelte-kit sync && svelte-kit package",
+    "build:bundle": "rollup --config rollup.config.bundle.js",
+    "build:bundle-types": "rollup --config rollup.config.types.js",
     "test": "mocha",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
@@ -27,7 +29,7 @@
     "lint:fortawesome-es-workaround": "node tools/validateFortawesomeESWorkaround.js",
     "format": "prettier --write --plugin-search-dir=. .",
     "prepare": "husky install && cd tools && node generateDiffSequenceEsm.js && cd ..",
-    "release": "npm run lint && npm test && standard-version && npm run package && git push && git push --tag && npm publish package/",
+    "release": "npm run lint && npm test && standard-version && npm run build && git push && git push --tag && npm publish package/",
     "dry-run": "standard-version --dry-run"
   },
   "dependencies": {
@@ -82,6 +84,7 @@
     "prettier": "2.7.1",
     "prettier-plugin-svelte": "2.7.0",
     "rollup": "2.75.7",
+    "rollup-plugin-dts": "4.2.2",
     "rollup-plugin-svelte": "7.1.0",
     "rollup-plugin-terser": "7.0.2",
     "standard-version": "9.5.0",
