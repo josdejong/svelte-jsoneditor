@@ -27,7 +27,7 @@
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import TextMenu from './menu/TextMenu.svelte'
   import { basicSetup, EditorView } from 'codemirror'
-  import { Compartment, EditorState } from '@codemirror/state'
+  import { Compartment, EditorState, type Extension } from '@codemirror/state'
   import { keymap, ViewUpdate } from '@codemirror/view'
   import { indentWithTab, redo, redoDepth, undo, undoDepth } from '@codemirror/commands'
   import type { Diagnostic } from '@codemirror/lint'
@@ -85,8 +85,7 @@
   let onChangeDisabled = false
   let acceptTooLarge = false
 
-  /** @type{ValidationError[]} */
-  let validationErrors = []
+  let validationErrors: ValidationError[] = []
   const readOnlyCompartment = new Compartment()
   const indentUnitCompartment = new Compartment()
   const tabSizeCompartment = new Compartment()
@@ -454,14 +453,7 @@
       doc: initialText,
       extensions: [
         keymap.of([indentWithTab, formatCompactKeyBinding]),
-        linter(
-          () => {
-            onChangeCodeMirrorValueDebounced.flush()
-
-            return validate()
-          },
-          { delay: TEXT_MODE_ONCHANGE_DELAY }
-        ),
+        linter(validate, { delay: TEXT_MODE_ONCHANGE_DELAY }),
         lintGutter(),
         basicSetup,
         highlighter,
@@ -642,11 +634,7 @@
     }
   }
 
-  /**
-   * @param {number | string} indentation
-   * @returns {Extension}
-   */
-  function createIndentUnit(indentation) {
+  function createIndentUnit(indentation: number | string): Extension {
     return indentUnit.of(typeof indentation === 'number' ? ' '.repeat(indentation) : indentation)
   }
 
@@ -674,20 +662,19 @@
    */
   function emitOnChange(text, previousText) {
     if (onChange) {
-      onChange(text, previousText)
+      setTimeout(() => onChange(text, previousText))
     }
   }
 
   let jsonStatus = JSON_STATUS_VALID
 
-  /** @type {ParseError || null} */
-  let jsonParseError = null
+  let jsonParseError: ParseError | null = null
 
-  /**
-   * @returns {Diagnostic[]}
-   */
   function validate(): Diagnostic[] {
     debug('validate')
+
+    onChangeCodeMirrorValueDebounced.flush()
+
     jsonStatus = JSON_STATUS_VALID
     jsonParseError = null
     validationErrors = []
@@ -735,6 +722,20 @@
 
       return [toRichParseError(jsonParseError, isRepairable)]
     }
+  }
+
+  export function getValidationErrors(): ValidationError[] {
+    if (jsonParseError) {
+      return [
+        {
+          path: [], // FIXME ParseError doesn't have a path
+          message: jsonParseError.message,
+          severity: ValidationSeverity.error
+        }
+      ]
+    }
+
+    return validationErrors
   }
 
   function canAutoRepair(text) {

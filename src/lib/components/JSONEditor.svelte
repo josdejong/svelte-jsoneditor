@@ -34,12 +34,13 @@
     SortModalCallback,
     TransformModalCallback,
     TransformModalOptions,
+    ValidationError,
     Validator
   } from '../types'
+  import { Mode } from '../types'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { isMenuSpaceItem } from '../typeguards'
   import { noop } from 'lodash-es'
-  import { Mode } from '../types'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
@@ -164,6 +165,20 @@
       refTreeMode.openTransformModal(options)
     } else {
       throw new Error(`Method transform is not available in mode "${mode}"`)
+    }
+  }
+
+  /**
+   * Validate the contents of the editor using the configured validator.
+   * Returns a parse error or a list with validation warnings
+   */
+  export function getValidationErrors(): ValidationError[] {
+    if (refTextMode) {
+      return refTextMode.getValidationErrors()
+    } else if (refTreeMode) {
+      return refTreeMode.getValidationErrors()
+    } else {
+      throw new Error(`Method getValidationErrors is not available in mode "${mode}"`)
     }
   }
 

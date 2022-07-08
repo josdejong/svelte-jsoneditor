@@ -411,6 +411,10 @@
     }
   }
 
+  export function getValidationErrors(): ValidationError[] {
+    return validationErrors
+  }
+
   export function getJson() {
     return json
   }
@@ -1504,7 +1508,7 @@
 
     pastedJson = undefined
 
-    emitOnChange(previousContent, patchResult)
+    setTimeout(() => emitOnChange(previousContent, patchResult))
 
     return patchResult
   }

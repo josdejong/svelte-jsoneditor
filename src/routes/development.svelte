@@ -102,6 +102,9 @@
 
   const validator = createAjvValidator(schema)
 
+  let refTreeEditor
+  let refTextEditor
+
   const showTreeEditor = useLocalStorage('svelte-jsoneditor-demo-showTreeEditor', true)
   const showTextEditor = useLocalStorage('svelte-jsoneditor-demo-showTextEditor', true)
   const showRawContents = useLocalStorage('svelte-jsoneditor-demo-showRawContents', true)
@@ -192,13 +195,23 @@
 
   function onChangeTree(content, previousContent, patchResult) {
     if ($showRawContents) {
-      console.log('onChangeTree', content, previousContent, patchResult)
+      console.log('onChangeTree', {
+        content,
+        previousContent,
+        patchResult,
+        validationErrors: refTreeEditor.getValidationErrors()
+      })
     }
   }
 
   function onChangeText(content, previousContent, patchResult) {
     if ($showRawContents) {
-      console.log('onChangeText', content, previousContent, patchResult)
+      console.log('onChangeText', {
+        content,
+        previousContent,
+        patchResult,
+        validationErrors: refTextEditor.getValidationErrors()
+      })
     }
   }
 
@@ -427,6 +440,7 @@
       <div class="tree-editor" style="height: {height}">
         {#if $showTreeEditor}
           <JSONEditor
+            bind:this={refTreeEditor}
             bind:content
             bind:mode={leftEditorMode}
             mainMenuBar={$mainMenuBar}
@@ -469,6 +483,7 @@
       <div class="text-editor" style="height: {height}">
         {#if $showTextEditor}
           <JSONEditor
+            bind:this={refTextEditor}
             mode="text"
             bind:content
             mainMenuBar={$mainMenuBar}
