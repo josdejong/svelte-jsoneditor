@@ -21,10 +21,16 @@ The library is written with Svelte, but can be used in any framework (React, Vue
 
 ## Install
 
-Install via npm:
+Install via npm for usage in a Svelte project:
 
 ```
 npm install svelte-jsoneditor
+```
+
+For use in frameworks like React, Vue, Angular, or vanilla JavaScript:
+
+```
+npm install vanilla-jsoneditor
 ```
 
 Remark: you may notice that `svelte` is a dependency in the project and ask yourself why. This is necessary when using it in a Svelte project or when using it in a TypeScript project. In the latter case, the project depends on types that are defined in the `svelte` package.
@@ -106,7 +112,7 @@ Browser example loading the ES module:
     <div id="jsoneditor"></div>
 
     <script type="module">
-      import { JSONEditor } from 'svelte-jsoneditor/dist/jsoneditor.js'
+      import { JSONEditor } from 'vanilla-jsoneditor'
 
       let content = {
         text: undefined,
@@ -153,7 +159,7 @@ Svelte component:
 JavasScript class:
 
 ```js
-import { JSONEditor } from 'svelte-jsoneditor/dist/jsoneditor.js'
+import { JSONEditor } from 'vanilla-jsoneditor'
 
 const editor = new JSONEditor({
   target: document.getElementById('jsoneditor'),

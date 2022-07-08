@@ -4,8 +4,8 @@
   "version": "0.4.0",
   "type": "module",
   "svelte": "index.js",
-  "module": "dist/jsoneditor.js",
-  "main": "dist/jsoneditor.js",
+  "module": "index.js",
+  "main": "index.js",
   "types": "index.d.ts",
   "repository": {
     "type": "git",
@@ -15,11 +15,10 @@
   "scripts": {
     "dev": "svelte-kit dev",
     "preview": "svelte-kit preview",
-    "build": "npm run build:svelte && npm run build:bundle && npm run build:bundle-types",
+    "build": "npm run build:svelte && npm run build:vanilla",
     "build:watch": "npm run build -- --watch",
     "build:svelte": "svelte-kit sync && svelte-kit package",
-    "build:bundle": "rollup --config rollup.config.bundle.js",
-    "build:bundle-types": "rollup --config rollup.config.types.js",
+    "build:vanilla": "rollup --config rollup.config.bundle.js && rollup --config rollup.config.bundle-types.js && node tools/createVanillaPackageFiles.js",
     "test": "mocha",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
@@ -29,7 +28,7 @@
     "lint:fortawesome-es-workaround": "node tools/validateFortawesomeESWorkaround.js",
     "format": "prettier --write --plugin-search-dir=. .",
     "prepare": "husky install && cd tools && node generateDiffSequenceEsm.js && cd ..",
-    "release": "npm run lint && npm test && standard-version && npm run build && git push && git push --tag && npm publish package/",
+    "release": "npm run lint && npm test && standard-version && npm run build && git push && git push --tag && npm publish package/ && npm publish package-vanilla/",
     "dry-run": "standard-version --dry-run"
   },
   "dependencies": {
