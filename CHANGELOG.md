@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.4.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.60...v0.4.0) (2022-07-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* The 'code' mode has been renamed to 'text' mode.
+* The type `JSONPath` is changed from `Array<string | number>` to `Array<string>`,
+and some TypeScript types now come from `immutable-json-patch`.
+
+### Features
+
+* rename code mode to text mode ([#113](https://github.com/josdejong/svelte-jsoneditor/issues/113)) ([769fb8f](https://github.com/josdejong/svelte-jsoneditor/commit/769fb8ff5e913e61cceae0c074ebea34f15610b7))
+* state refactor ([#111](https://github.com/josdejong/svelte-jsoneditor/issues/111)) ([a58b4c3](https://github.com/josdejong/svelte-jsoneditor/commit/a58b4c33368f2d0ef39c2aba1a45498f4065c7b5))
+
+
+### Bug Fixes
+
+* [#105](https://github.com/josdejong/svelte-jsoneditor/issues/105) disable dropdown button when all items are disabled ([8698606](https://github.com/josdejong/svelte-jsoneditor/commit/86986066e965b1710e0d15e87e79fd0d958d39df))
+* [#107](https://github.com/josdejong/svelte-jsoneditor/issues/107) dependency issue with fortawesome building svelte-kit ([7ad8e95](https://github.com/josdejong/svelte-jsoneditor/commit/7ad8e95d3acfd69377c172f735b5f6d7e1cda47d))
+* [#110](https://github.com/josdejong/svelte-jsoneditor/issues/110) ContextMenu closes when hovering a validation error ([#112](https://github.com/josdejong/svelte-jsoneditor/issues/112)) ([46424bb](https://github.com/josdejong/svelte-jsoneditor/commit/46424bb3fd4353fc541f3d537eda803218ca63f2))
+* generate a valid sourcemap again ([7981a99](https://github.com/josdejong/svelte-jsoneditor/commit/7981a991f9e34183d4f1d94790d341fb5f6d0cde))
+* make `svelte` a dependency, its type definitions are needed in TypeScript projects (see [#19](https://github.com/josdejong/svelte-jsoneditor/issues/19)) ([acb3acf](https://github.com/josdejong/svelte-jsoneditor/commit/acb3acfa14ea7eb01e4140e799bd6a490f6fd0ef))
+* remove the "powered by CodeMirror" text, is listed in readme and webapp footer instead ([89d661a](https://github.com/josdejong/svelte-jsoneditor/commit/89d661ac5c9c6b01f374a654e9016af4e7ad6035))
+* truncate text preview of invalid JSON in tree mode ([67f5790](https://github.com/josdejong/svelte-jsoneditor/commit/67f57908456c9daa89258af095ace61b2fd9f47e))
+
+
+* make sure the next version will be marked as a breaking change ([0737b6c](https://github.com/josdejong/svelte-jsoneditor/commit/0737b6c7db31c1421f903a1dc1ef090b358633f1))
+
 ### [0.3.60](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.59...v0.3.60) (2022-06-09)
 
 
