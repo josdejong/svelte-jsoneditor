@@ -1,6 +1,6 @@
 # svelte-jsoneditor
 
-A web-based tool to view, edit, format, transform, and validate JSON
+A web-based tool to view, edit, format, transform, and validate JSON.
 
 The library is written with Svelte, but can be used in plain JavaScript too and in any framework (SolidJS, React, Vue, Angular, etc).
 
