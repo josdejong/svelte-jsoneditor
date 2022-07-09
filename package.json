@@ -18,7 +18,7 @@
     "build": "npm run build:svelte && npm run build:vanilla",
     "build:watch": "npm run build -- --watch",
     "build:svelte": "svelte-kit sync && svelte-kit package && cpy --flat tools/dist-deprecated package/dist",
-    "build:vanilla": "del-cli package-vanilla && rollup --config rollup.config.bundle.js && rollup --config rollup.config.bundle-types.js && node tools/createVanillaPackageFiles.js && cpy --flat src/lib/themes package-vanilla/themes",
+    "build:vanilla": "del-cli package-vanilla && rollup --config rollup.config.bundle.js && rollup --config rollup.config.bundle-types.js && cpy --flat src/lib/themes package-vanilla/themes && node tools/createVanillaPackageFiles.js",
     "test": "mocha",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",

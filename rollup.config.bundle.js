@@ -10,7 +10,7 @@ import sveltePreprocess from 'svelte-preprocess'
 
 const production = !process.env.ROLLUP_WATCH
 const packageFolder = 'package-vanilla'
-const file = path.join(packageFolder, 'jsoneditor.js')
+const file = path.join(packageFolder, 'index.js')
 
 export default {
   input: 'src/lib/index.ts',

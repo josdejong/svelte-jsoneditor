@@ -11,6 +11,7 @@
 import fs from 'fs'
 import path from 'path'
 import { dirname } from './dirname.cjs'
+import { getFilesRecursively } from './getFilesRecursively.js'
 
 const extensions = ['.js', '.ts', '.svelte']
 
@@ -23,7 +24,7 @@ if (!valid) {
  * @returns {boolean} Returns true if successful, false when there are issues
  */
 function run() {
-  const filenames = getAllFiles(path.join(dirname, '../src')).filter((file) =>
+  const filenames = getFilesRecursively(path.join(dirname, '../src')).filter((file) =>
     hasExtensionOf(file, extensions)
   )
 
@@ -90,26 +91,6 @@ function getNonESImportLineNumbers(filename) {
   })
 
   return issues
-}
-
-/**
- * source: https://coderrocketfuel.com/article/recursively-list-all-the-files-in-a-directory-using-node-js
- * @param {string} dirPath
- * @returns {string[]}
- */
-function getAllFiles(dirPath) {
-  let filenames = []
-
-  fs.readdirSync(dirPath).forEach(function (file) {
-    if (fs.statSync(dirPath + '/' + file).isDirectory()) {
-      const nestedFiles = getAllFiles(dirPath + '/' + file)
-      filenames = filenames.concat(nestedFiles)
-    } else {
-      filenames.push(path.join(dirPath, '/', file))
-    }
-  })
-
-  return filenames
 }
 
 function hasExtensionOf(filename, extensions) {

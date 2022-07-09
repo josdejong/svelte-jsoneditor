@@ -1,8 +1,9 @@
 // create package.json and copy files like LICENSE.md to package-vanilla
 
 import path from 'path'
-import { copyFileSync, readFileSync, writeFileSync, readdirSync } from 'fs'
+import { copyFileSync, readFileSync, writeFileSync } from 'fs'
 import { dirname } from './dirname.cjs'
+import { getFilesRecursively } from './getFilesRecursively.js'
 
 const outputFolder = path.join(dirname, '..', 'package-vanilla')
 
@@ -12,13 +13,15 @@ copyFilenames.forEach((filename) => {
   copyFileSync(path.join(dirname, '..', filename), path.join(outputFolder, filename))
 })
 
-// TODO: create a different README.md explaining what vanilla-jsoneditor is
-
-// collect all file names
-const exports = {}
-const filenames = readdirSync(outputFolder).concat(['package.json'])
+// collect all file names and generate the exports map for package.json
+const exports = {
+  '.': './index.js'
+}
+const filenames = getFilesRecursively(outputFolder).concat([
+  path.join(outputFolder, 'package.json')
+])
 filenames.forEach((filename) => {
-  const relativeFilename = './' + filename
+  const relativeFilename = './' + path.relative(outputFolder, filename).replaceAll('\\', '/')
   exports[relativeFilename] = relativeFilename
 })
 
@@ -27,9 +30,6 @@ const pkg = JSON.parse(String(readFileSync(path.join(dirname, '..', 'package.jso
 const vanillaPackage = {
   ...pkg,
   name: 'vanilla-jsoneditor',
-  module: 'jsoneditor.js',
-  main: 'jsoneditor.js',
-  types: 'jsoneditor.d.ts',
   scripts: undefined,
   exports
 }

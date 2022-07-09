@@ -4,7 +4,7 @@ export default {
   input: 'package/index.d.ts',
   output: [
     {
-      file: 'package-vanilla/jsoneditor.d.ts',
+      file: 'package-vanilla/index.d.ts',
       format: 'es'
     }
   ],
