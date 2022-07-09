@@ -6,9 +6,6 @@ import { dirname } from './dirname.cjs'
 
 const outputFolder = path.join(dirname, '..', 'package-vanilla')
 
-// FIXME: first clear the outputFolder
-// mkdirSync(outputFolder)
-
 // copy markdown files
 const copyFilenames = ['README.md', 'CHANGELOG.md', 'LICENSE.md', 'SECURITY.md']
 copyFilenames.forEach((filename) => {

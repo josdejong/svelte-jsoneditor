@@ -2,7 +2,7 @@
 
 A web-based tool to view, edit, format, transform, and validate JSON
 
-The library is written with Svelte, but can be used in any framework (React, Vue, Angular, plain JavaScript).
+The library is written with Svelte, but can be used in plain JavaScript too and in any framework (SolidJS, React, Vue, Angular, etc).
 
 ![JSONEditor tree mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_tree_mode_screenshot.png)
 ![JSONEditor text mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_text_mode_screenshot.png)
@@ -21,13 +21,13 @@ The library is written with Svelte, but can be used in any framework (React, Vue
 
 ## Install
 
-Install via npm for usage in a Svelte project:
+For usage in a Svelte project:
 
 ```
 npm install svelte-jsoneditor
 ```
 
-For use in frameworks like React, Vue, Angular, or vanilla JavaScript:
+For usage in vanilla JavaScript or frameworks like SolidJS, React, Vue, Angular, etc:
 
 ```
 npm install vanilla-jsoneditor
