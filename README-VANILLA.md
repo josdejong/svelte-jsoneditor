@@ -2,7 +2,7 @@
 
 A web-based tool to view, edit, format, transform, and validate JSON.
 
-This is the vanilla variant of `svelte-jsoneditor` that can be used in vanilla JavaScript or frameworks like SolidJS, React, Vue, Angular
+This is the vanilla variant of `svelte-jsoneditor` that can be used in vanilla JavaScript or frameworks like SolidJS, React, Vue, Angular.
 
 ## Install
 

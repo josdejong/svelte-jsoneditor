@@ -33,8 +33,6 @@ For usage in vanilla JavaScript or frameworks like SolidJS, React, Vue, Angular,
 npm install vanilla-jsoneditor
 ```
 
-Remark: you may notice that `svelte` is a dependency in the project and ask yourself why. This is necessary when using it in a Svelte project or when using it in a TypeScript project. In the latter case, the project depends on types that are defined in the `svelte` package.
-
 ## Use
 
 ### Examples
