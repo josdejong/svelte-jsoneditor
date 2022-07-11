@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.5.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.4.0...v0.5.0) (2022-07-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* The bundled file has been moved into a separate npm package named `vanilla-jsoneditor`. Please replace: `import { JSONEditor} from "svelte-jsoneditor/dist/jsoneditor.js"` with `import { JSONEditor} from "vanilla-jsoneditor"`. Read more about v0.5.0: https://github.com/josdejong/svelte-jsoneditor/blob/main/CHANGELOG.md
+
+### Features
+
+* move bundle into a separate npm package vanilla-jsoneditor ([#114](https://github.com/josdejong/svelte-jsoneditor/issues/114)) ([e865be3](https://github.com/josdejong/svelte-jsoneditor/commit/e865be31e29417d5d5d4fbbd9ebdf9472a94e4f8))
+
 ## [0.4.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.3.60...v0.4.0) (2022-07-08)
 
 
