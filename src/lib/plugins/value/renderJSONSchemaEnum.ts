@@ -2,7 +2,7 @@ import EnumValue from './components/EnumValue.svelte'
 import { getJSONSchemaOptions } from '../../utils/jsonSchemaUtils.js'
 import type { RenderValueComponentDescription, RenderValueProps } from '../../types'
 import type { JSONData } from 'immutable-json-patch'
-import type { SvelteComponent } from 'svelte'
+import type { SvelteComponentTyped } from 'svelte'
 
 /**
  * Search the JSON schema for enums defined at given props.path. If found,
@@ -32,7 +32,7 @@ export function renderJSONSchemaEnum(
 
     return [
       {
-        component: EnumValue as unknown as SvelteComponent, // TODO: casting should not be needed
+        component: EnumValue as unknown as SvelteComponentTyped, // TODO: casting should not be needed
         props: {
           value,
           path,
