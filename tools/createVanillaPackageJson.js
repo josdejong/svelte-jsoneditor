@@ -15,8 +15,7 @@ const filenames = getFilesRecursively(vanillaPackageFolder).concat([
   path.join(vanillaPackageFolder, 'package.json')
 ])
 filenames.forEach((filename) => {
-  const relativeFilename =
-    './' + path.relative(vanillaPackageFolder, filename).replaceAll('\\', '/')
+  const relativeFilename = './' + path.relative(vanillaPackageFolder, filename).replace(/\\/g, '/')
   exports[relativeFilename] = relativeFilename
 })
 
