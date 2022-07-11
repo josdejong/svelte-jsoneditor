@@ -8,5 +8,10 @@ export default {
       format: 'es'
     }
   ],
-  plugins: [dts()]
+  plugins: [
+    dts({
+      // we want to create a standalone bundle that does not have dependencies
+      respectExternal: true
+    })
+  ]
 }

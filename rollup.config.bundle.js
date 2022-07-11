@@ -13,7 +13,7 @@ const packageFolder = 'package-vanilla'
 const file = path.join(packageFolder, 'index.js')
 
 export default {
-  input: 'src/lib/index.ts',
+  input: 'src/lib/index-vanilla.ts',
   output: [
     {
       file,

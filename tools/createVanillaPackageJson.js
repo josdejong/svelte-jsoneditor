@@ -25,7 +25,9 @@ const pkg = JSON.parse(String(readFileSync(path.join(dirname, '..', 'package.jso
 const vanillaPackage = {
   ...pkg,
   name: 'vanilla-jsoneditor',
-  scripts: undefined,
+  scripts: {},
+  dependencies: {},
+  devDependencies: {},
   exports
 }
 writeFileSync(

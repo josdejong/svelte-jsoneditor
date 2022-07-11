@@ -25,6 +25,7 @@
     "build:vanilla:clean": "del-cli package-vanilla",
     "build:vanilla:bundle": "rollup --config rollup.config.bundle.js",
     "build:vanilla:bundle-types": "rollup --config rollup.config.bundle-types.js",
+    "build:vanilla:postprocess-types": "node tools/postprocessVanillaTypes.js",
     "build:vanilla:copy:files": "cpy CHANGELOG.md LICENSE.md SECURITY.md package-vanilla",
     "build:vanilla:copy:readme": "cpy --rename README.md README-VANILLA.md package-vanilla",
     "build:vanilla:copy:themes": "cpy --flat src/lib/themes package-vanilla/themes",
