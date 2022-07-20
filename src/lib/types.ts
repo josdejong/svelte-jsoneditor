@@ -16,7 +16,8 @@ export interface VisibleSection {
 
 export enum Mode {
   text = 'text',
-  tree = 'tree'
+  tree = 'tree',
+  table = 'table'
 }
 
 export enum SelectionType {
@@ -234,7 +235,7 @@ export type OnClassName = (path: JSONPath, value: JSONData) => string | undefine
 export type OnChangeMode = (mode: Mode) => void
 export type OnContextMenu = (contextMenuProps: AbsolutePopupOptions) => void
 export type OnRenderMenu = (
-  mode: 'tree' | 'text' | 'repair',
+  mode: 'tree' | 'text' | 'table' | 'repair',
   items: MenuItem[]
 ) => MenuItem[] | undefined | void
 export type OnError = (error: Error) => void

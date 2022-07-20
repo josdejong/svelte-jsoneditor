@@ -1,0 +1,18 @@
+.jse-table-mode {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: var(--jse-background-color);
+  min-width: 0;
+  min-height: 0;
+  font-family: var(--jse-font-family-mono);
+  font-size: var(--jse-font-size-mono);
+  color: var(--jse-text-color);
+  line-height: var(--jse-line-height);
+
+  .contents {
+    display: flex;
+    overflow: auto;
+  }
+}

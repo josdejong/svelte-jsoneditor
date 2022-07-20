@@ -40,6 +40,7 @@
   import { isMenuSpaceItem } from '../typeguards'
   import { noop } from 'lodash-es'
   import { Mode } from '../types'
+  import TableMode from './modes/tablemode/TableMode.svelte'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
@@ -312,8 +313,14 @@
     {
       text: 'tree',
       title: `Switch to tree mode (current mode: ${mode})`,
-      className: 'jse-group-button jse-last' + (mode === Mode.tree ? ' jse-selected' : ''),
+      className: 'jse-group-button ' + (mode === Mode.tree ? ' jse-selected' : ''),
       onClick: () => toggleMode(Mode.tree)
+    },
+    {
+      text: 'table',
+      title: `Switch to table mode (current mode: ${mode})`,
+      className: 'jse-group-button jse-last' + (mode === Mode.table ? ' jse-selected' : ''),
+      onClick: () => toggleMode(Mode.table)
     }
   ]
 
@@ -428,6 +435,8 @@
             {onSortModal}
             {onTransformModal}
           />
+        {:else if mode === Mode.table}
+          <TableMode externalContent={content} {mainMenuBar} onRenderMenu={handleRenderMenu} />
         {:else}
           <!-- mode === Mode.tree -->
           <TreeMode

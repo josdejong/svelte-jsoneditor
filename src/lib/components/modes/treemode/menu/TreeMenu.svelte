@@ -15,7 +15,7 @@
   import { isObjectOrArray } from '$lib/utils/typeUtils'
   import Menu from '../../../controls/Menu.svelte'
   import { noop } from 'lodash-es'
-  import type { OnRenderMenu, JSONSelection } from '$lib/types'
+  import type { OnRenderMenu, JSONSelection, MenuItem } from '$lib/types'
   import type { JSONData } from 'immutable-json-patch'
   import { isKeySelection, isMultiSelection, isValueSelection } from '../../../../logic/selection'
   import type { HistoryState } from '../../../../logic/history'
@@ -71,7 +71,7 @@
     disabled: json === undefined
   }
 
-  /* @type {MenuItem[]} */
+  let defaultItems: MenuItem[]
   $: defaultItems = !readOnly
     ? [
         expandMenuItem,
