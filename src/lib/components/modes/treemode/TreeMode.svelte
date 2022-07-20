@@ -112,6 +112,7 @@
   import type {
     AbsolutePopupOptions,
     AfterPatchCallback,
+    Content,
     DocumentState,
     HistoryItem,
     InsertType,
@@ -152,7 +153,7 @@
   const jump = createJump()
 
   export let readOnly = false
-  export let externalContent
+  export let externalContent: Content
   export let mainMenuBar = true
   export let navigationBar = true
   export let escapeControlCharacters = false

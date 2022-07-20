@@ -436,14 +436,22 @@
             {onTransformModal}
           />
         {:else if mode === Mode.table}
-          <TableMode externalContent={content} {mainMenuBar} onRenderMenu={handleRenderMenu} />
+          <TableMode
+            externalContent={content}
+            {readOnly}
+            {mainMenuBar}
+            {escapeControlCharacters}
+            {escapeUnicodeCharacters}
+            {onRenderValue}
+            onRenderMenu={handleRenderMenu}
+          />
         {:else}
           <!-- mode === Mode.tree -->
           <TreeMode
             bind:this={refTreeMode}
+            externalContent={content}
             {readOnly}
             {indentation}
-            externalContent={content}
             {mainMenuBar}
             {navigationBar}
             {escapeControlCharacters}

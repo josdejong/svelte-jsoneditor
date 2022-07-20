@@ -37,6 +37,7 @@
 
         .jse-table-cell {
           padding: 2px var(--jse-padding);
+          vertical-align: top;
 
           &.jse-table-cell-header {
             font-weight: normal;

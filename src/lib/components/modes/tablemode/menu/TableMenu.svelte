@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
   import type { MenuItem, OnRenderMenu } from '../../../../types'
   import Menu from '../../../controls/Menu.svelte'

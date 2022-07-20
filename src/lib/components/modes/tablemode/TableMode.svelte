@@ -1,17 +1,39 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { Content } from '../../../types'
+  import type {
+    AfterPatchCallback,
+    Content,
+    ExtendedSearchResultItem,
+    JSONEditorContext,
+    JSONPatchResult,
+    JSONSelection,
+    OnRenderValue,
+    PastedJson,
+    ValueNormalization
+  } from '../../../types'
   import TableMenu from './menu/TableMenu.svelte'
-  import type { JSONArray, JSONPath } from 'immutable-json-patch'
+  import type { JSONArray, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { isJSONArray, isTextContent } from '../../../utils/jsonUtils'
   import { getColumns } from '../../../logic/table.js'
   import { noop } from '../../../utils/noop'
   import { isEmpty } from 'lodash-es'
+  import JSONValue from './JSONValue.svelte'
+  import { createNormalizationFunctions } from '../../../utils/domUtils'
 
+  export let readOnly = false
+  export let externalContent
   export let mainMenuBar = true
-  export let externalContent: Content
+  export let escapeControlCharacters = false
+  export let escapeUnicodeCharacters = false
+  export let onRenderValue: OnRenderValue
   export let onRenderMenu = noop
+
+  let normalization: ValueNormalization
+  $: normalization = createNormalizationFunctions({
+    escapeControlCharacters,
+    escapeUnicodeCharacters
+  })
 
   // FIXME: work out support for object and primitive value
   let items: JSONArray | undefined
@@ -41,10 +63,55 @@
     }
   }
 
+  function handlePatch(
+    operations: JSONPatchDocument,
+    afterPatch?: AfterPatchCallback
+  ): JSONPatchResult {
+    // FIXME: implement handlePatch
+
+    return {
+      json: items,
+      previousJson: items,
+      undo: [],
+      redo: []
+    }
+  }
+
+  function handleSelect(selection: JSONSelection) {
+    // FIXME: implement handleSelect
+  }
+
+  function handleFind(findAndReplace: boolean) {
+    // FIXME: implement handleFind
+  }
+
+  function handlePasteJson(newPastedJson: PastedJson) {
+    // FIXME: implement handlePasteJson
+  }
+
+  export function focus() {
+    // FIXME: implement focus
+  }
+
   $: applyExternalContent(externalContent)
 
   let columns: JSONPath[]
   $: columns = isJSONArray(items) ? getColumns(items) : []
+
+  const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // FIXME: implement support for search and replace
+  const selection = undefined // FIXME: implement selecting contents
+
+  let context: JSONEditorContext
+  $: context = {
+    readOnly,
+    normalization,
+    focus,
+    onPatch: handlePatch,
+    onSelect: handleSelect,
+    onFind: handleFind,
+    onPasteJson: handlePasteJson,
+    onRenderValue
+  }
 </script>
 
 <div class="jse-table-mode" class:no-main-menu={!mainMenuBar}>
@@ -60,10 +127,20 @@
               <th class="jse-table-cell jse-table-cell-header">{column}</th>
             {/each}
           </tr>
-          {#each items as item}
+          {#each items as item, index}
             <tr class="jse-table-row">
               {#each columns as column}
-                <td class="jse-table-cell">{item[column]}</td>
+                <td class="jse-table-cell">
+                  <JSONValue
+                    path={[index].concat(column)}
+                    value={item[column]}
+                    isSelected={false}
+                    enforceString={false}
+                    {selection}
+                    {searchResultItems}
+                    {context}
+                  />
+                </td>
               {/each}
             </tr>
           {/each}

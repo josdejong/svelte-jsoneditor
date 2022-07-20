@@ -359,21 +359,24 @@ export interface JSONEditorPropsOptional {
   onBlur?: OnBlur
 }
 
-export interface TreeModeContext {
+export interface JSONEditorContext {
   readOnly: boolean
   normalization: ValueNormalization
+  focus: () => void
+  onPatch: (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => JSONPatchResult
+  onSelect: OnSelect
+  onFind: OnFind
+  onPasteJson: (newPastedJson: PastedJson) => void
+  onRenderValue: OnRenderValue
+}
+
+export interface TreeModeContext extends JSONEditorContext {
   getJson: () => JSONData
   getDocumentState: () => DocumentState
   findElement: (path: JSONPath) => Element | null
-  focus: () => void
-  onPatch: (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => JSONPatchResult
   onInsert: (type: InsertType) => void
   onExpand: (path: JSONPath, expanded: boolean, recursive?: boolean) => void
-  onSelect: OnSelect
-  onFind: OnFind
   onExpandSection: (path: JSONPath, section: Section) => void
-  onPasteJson: (newPastedJson: PastedJson) => void
-  onRenderValue: OnRenderValue
   onContextMenu: OnContextMenu
   onClassName: OnClassName
   onDrag: (event: Event) => void
