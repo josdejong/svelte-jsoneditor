@@ -11,8 +11,43 @@
   color: var(--jse-text-color);
   line-height: var(--jse-line-height);
 
-  .contents {
+  &.no-main-menu {
+    border-top: var(--jse-main-border);
+  }
+
+  .jse-contents {
+    flex: 1;
     display: flex;
     overflow: auto;
+
+    border-left: var(--jse-main-border);
+    border-right: var(--jse-main-border);
+
+    &:last-child {
+      border-bottom: var(--jse-main-border);
+    }
+
+    table.jse-table-main {
+      border-collapse: collapse;
+
+      .jse-table-row {
+        &:nth-child(odd) {
+          background-color: var(--jse-table-row-odd-background);
+        }
+
+        .jse-table-cell {
+          padding: 2px var(--jse-padding);
+
+          &.jse-table-cell-header {
+            font-weight: normal;
+            text-align: left;
+            color: var(--jse-text-readonly);
+            background: var(--jse-table-row-odd-background);
+            position: sticky;
+            top: 0;
+          }
+        }
+      }
+    }
   }
 }

@@ -38,9 +38,9 @@
   } from '../types'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { isMenuSpaceItem } from '../typeguards'
-  import { noop } from 'lodash-es'
   import { Mode } from '../types'
   import TableMode from './modes/tablemode/TableMode.svelte'
+  import { noop } from '../utils/noop'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')

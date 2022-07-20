@@ -16,6 +16,7 @@
   --jse-theme-color-highlight: #5f9dff;
   --jse-background-color: #fff;
   --jse-text-color: #4d4d4d;
+  --jse-text-readonly: #8d8d8d;
   --jse-text-color-inverse: #fff;
   --jse-error-color: #ee5341;
   --jse-warning-color: #fdc539;
@@ -88,6 +89,9 @@
   /* contents: inline tags inside the JSON document */
   --jse-tag-background: rgba(0, 0, 0, 0.2);
   --jse-tag-color: var(--jse-text-color-inverse);
+
+  /* contents: table */
+  --jse-table-row-odd-background: #f5f5f5;
 
   /* controls in modals: inputs, buttons, and `a` */
   --jse-controls-box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.24);

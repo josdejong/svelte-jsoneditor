@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { MenuItem, OnRenderMenu } from '../../../../types'
   import Menu from '../../../controls/Menu.svelte'
-  import { noop } from 'lodash-es'
+  import { noop } from '../../../../utils/noop'
 
   export let onRenderMenu: OnRenderMenu = noop
 

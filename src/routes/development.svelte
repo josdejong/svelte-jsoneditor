@@ -133,7 +133,7 @@
     indentations[0].value
   )
   const tabSize = useLocalStorage('svelte-jsoneditor-demo-tabSize', indentations[0].value)
-  let leftEditorMode = 'tree'
+  let leftEditorMode = 'table'
 
   $: queryLanguages = $multipleQueryLanguages
     ? [javascriptQueryLanguage, lodashQueryLanguage, jmespathQueryLanguage]

@@ -237,7 +237,7 @@ export type OnContextMenu = (contextMenuProps: AbsolutePopupOptions) => void
 export type OnRenderMenu = (
   mode: 'tree' | 'text' | 'table' | 'repair',
   items: MenuItem[]
-) => MenuItem[] | undefined | void
+) => MenuItem[] | undefined
 export type OnError = (error: Error) => void
 export type OnFocus = () => void
 export type OnBlur = () => void
