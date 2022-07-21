@@ -401,7 +401,7 @@
   let validationErrorsMap: JSONPointerMap<NestedValidationError>
   $: validationErrorsMap = mapValidationErrors(validationErrors)
 
-  function updateValidationErrors(json: JSONData, validator: Validator | null) {
+  function updateValidationErrors(json: JSONData, validator: Validator | null): ValidationError[] {
     const newValidationErrors: ValidationError[] = validator ? validator(json) : []
 
     if (!isEqual(newValidationErrors, validationErrors)) {
@@ -409,10 +409,14 @@
 
       validationErrors = newValidationErrors
     }
+
+    return validationErrors
   }
 
   export function getValidationErrors(): ValidationError[] {
-    return validationErrors
+    // make sure the validation results are up-to-date
+    // normally, they are only updated on the next tick after the json is changed
+    return updateValidationErrors(json, validator)
   }
 
   export function getJson() {
@@ -1508,7 +1512,7 @@
 
     pastedJson = undefined
 
-    setTimeout(() => emitOnChange(previousContent, patchResult))
+    emitOnChange(previousContent, patchResult)
 
     return patchResult
   }

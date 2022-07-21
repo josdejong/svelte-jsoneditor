@@ -194,25 +194,21 @@
   }
 
   function onChangeTree(content, previousContent, patchResult) {
-    if ($showRawContents) {
-      console.log('onChangeTree', {
-        content,
-        previousContent,
-        patchResult,
-        validationErrors: refTreeEditor.getValidationErrors()
-      })
-    }
+    console.log('onChangeTree', {
+      content,
+      previousContent,
+      patchResult,
+      validationErrors: refTreeEditor.getValidationErrors()
+    })
   }
 
   function onChangeText(content, previousContent, patchResult) {
-    if ($showRawContents) {
-      console.log('onChangeText', {
-        content,
-        previousContent,
-        patchResult,
-        validationErrors: refTextEditor.getValidationErrors()
-      })
-    }
+    console.log('onChangeText', {
+      content,
+      previousContent,
+      patchResult,
+      validationErrors: refTextEditor.getValidationErrors()
+    })
   }
 
   function onChangeMode(mode) {

@@ -662,7 +662,7 @@
    */
   function emitOnChange(text, previousText) {
     if (onChange) {
-      setTimeout(() => onChange(text, previousText))
+      onChange(text, previousText)
     }
   }
 
@@ -725,6 +725,10 @@
   }
 
   export function getValidationErrors(): ValidationError[] {
+    // make sure the validation results are up-to-date by validating again
+    // normally, validation is debounced after a change
+    validate()
+
     if (jsonParseError) {
       return [
         {
