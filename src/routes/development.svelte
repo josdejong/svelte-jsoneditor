@@ -105,6 +105,14 @@
   let refTreeEditor
   let refTextEditor
 
+  // for debugging
+  $: if (typeof window !== 'undefined') {
+    window['refTreeEditor'] = refTreeEditor
+  }
+  $: if (typeof window !== 'undefined') {
+    window['refTextEditor'] = refTextEditor
+  }
+
   const showTreeEditor = useLocalStorage('svelte-jsoneditor-demo-showTreeEditor', true)
   const showTextEditor = useLocalStorage('svelte-jsoneditor-demo-showTextEditor', true)
   const showRawContents = useLocalStorage('svelte-jsoneditor-demo-showRawContents', true)
@@ -198,7 +206,7 @@
       content,
       previousContent,
       patchResult,
-      validationErrors: refTreeEditor.getValidationErrors()
+      errors: refTreeEditor.validate()
     })
   }
 
@@ -207,7 +215,7 @@
       content,
       previousContent,
       patchResult,
-      validationErrors: refTextEditor.getValidationErrors()
+      errors: refTextEditor.validate()
     })
   }
 

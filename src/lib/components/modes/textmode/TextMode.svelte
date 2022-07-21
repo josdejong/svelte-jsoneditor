@@ -41,7 +41,13 @@
   import jsonSourceMap from 'json-source-map'
   import StatusBar from './StatusBar.svelte'
   import { highlighter } from './codemirror/codemirror-theme'
-  import type { ParseError, RichValidationError, ValidationError } from '../../../types'
+  import type {
+    ContentErrors,
+    ParseError,
+    RichValidationError,
+    ValidationError
+  } from '../../../types'
+  import { isContentParseError, isContentValidationErrors } from '../../../typeguards'
   import { ValidationSeverity } from '../../../types'
 
   export let readOnly = false
@@ -453,7 +459,7 @@
       doc: initialText,
       extensions: [
         keymap.of([indentWithTab, formatCompactKeyBinding]),
-        linter(validate, { delay: TEXT_MODE_ONCHANGE_DELAY }),
+        linter(validateLinterCallback, { delay: TEXT_MODE_ONCHANGE_DELAY }),
         lintGutter(),
         basicSetup,
         highlighter,
@@ -526,6 +532,17 @@
               }
             ]
           : null
+    }
+  }
+
+  function toDiagnostic(error: RichValidationError): Diagnostic {
+    return {
+      from: error.from,
+      to: error.to,
+      message: error.message,
+      actions: error.actions,
+      severity: error.severity,
+      source: undefined
     }
   }
 
@@ -670,7 +687,23 @@
 
   let jsonParseError: ParseError | null = null
 
-  function validate(): Diagnostic[] {
+  function validateLinterCallback(): Diagnostic[] {
+    const contentErrors = validate()
+
+    if (isContentParseError(contentErrors)) {
+      const { parseError, isRepairable } = contentErrors
+
+      return [toDiagnostic(toRichParseError(parseError, isRepairable))]
+    }
+
+    if (isContentValidationErrors(contentErrors)) {
+      return contentErrors.validationErrors.map(toRichValidationError).map(toDiagnostic)
+    }
+
+    return []
+  }
+
+  export function validate(): ContentErrors {
     debug('validate')
 
     onChangeCodeMirrorValueDebounced.flush()
@@ -680,19 +713,22 @@
     validationErrors = []
 
     if (text.length > MAX_VALIDATABLE_SIZE) {
-      return [
-        {
-          from: 0,
-          to: 0,
-          message: 'Validation turned off: the document is too large',
-          severity: 'info'
-        }
-      ]
+      const validationError: ValidationError = {
+        path: [],
+        message: 'Validation turned off: the document is too large',
+        severity: ValidationSeverity.info
+      }
+
+      return {
+        validationErrors: [validationError]
+      }
     }
 
     if (text.length === 0) {
       // new, empty document, do not try to parse
-      return []
+      return {
+        validationErrors: []
+      }
     }
 
     try {
@@ -702,7 +738,9 @@
       )
 
       if (!validator) {
-        return []
+        return {
+          validationErrors: []
+        }
       }
 
       validationErrors = measure(
@@ -710,7 +748,7 @@
         (duration) => debug(`validate: validated json in ${duration} ms`)
       )
 
-      return validationErrors.map(toRichValidationError)
+      return { validationErrors }
     } catch (err) {
       const isRepairable = measure(
         () => canAutoRepair(text),
@@ -720,26 +758,11 @@
       jsonParseError = normalizeJsonParseError(text, err.message || err.toString())
       jsonStatus = isRepairable ? JSON_STATUS_REPAIRABLE : JSON_STATUS_INVALID
 
-      return [toRichParseError(jsonParseError, isRepairable)]
+      return {
+        parseError: jsonParseError,
+        isRepairable
+      }
     }
-  }
-
-  export function getValidationErrors(): ValidationError[] {
-    // make sure the validation results are up-to-date by validating again
-    // normally, validation is debounced after a change
-    validate()
-
-    if (jsonParseError) {
-      return [
-        {
-          path: [], // FIXME ParseError doesn't have a path
-          message: jsonParseError.message,
-          severity: ValidationSeverity.error
-        }
-      ]
-    }
-
-    return validationErrors
   }
 
   function canAutoRepair(text) {

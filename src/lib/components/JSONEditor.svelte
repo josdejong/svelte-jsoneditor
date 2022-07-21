@@ -17,6 +17,7 @@
   import ModalRef from './modals/ModalRef.svelte'
   import type {
     Content,
+    ContentErrors,
     JSONEditorPropsOptional,
     JSONPatchResult,
     MenuItem,
@@ -34,7 +35,6 @@
     SortModalCallback,
     TransformModalCallback,
     TransformModalOptions,
-    ValidationError,
     Validator
   } from '../types'
   import { Mode } from '../types'
@@ -172,13 +172,13 @@
    * Validate the contents of the editor using the configured validator.
    * Returns a parse error or a list with validation warnings
    */
-  export function getValidationErrors(): ValidationError[] {
+  export function validate(): ContentErrors {
     if (refTextMode) {
-      return refTextMode.getValidationErrors()
+      return refTextMode.validate()
     } else if (refTreeMode) {
-      return refTreeMode.getValidationErrors()
+      return refTreeMode.validate()
     } else {
-      throw new Error(`Method getValidationErrors is not available in mode "${mode}"`)
+      throw new Error(`Method validate is not available in mode "${mode}"`)
     }
   }
 

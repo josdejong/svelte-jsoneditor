@@ -169,17 +169,21 @@ export type Validator = (json: JSONData) => ValidationError[]
 
 export interface ParseError {
   position: number | null
-  row: number | null
-  column: number | null
-  message: string
-}
-
-export interface NormalizedParseError {
-  position: number | null
   line: number | null
   column: number | null
   message: string
 }
+
+export interface ContentParseError {
+  parseError: ParseError
+  isRepairable: boolean
+}
+
+export interface ContentValidationErrors {
+  validationErrors: ValidationError[]
+}
+
+export type ContentErrors = ContentParseError | ContentValidationErrors
 
 export interface RichValidationError extends ValidationError {
   line?: number

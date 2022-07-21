@@ -328,13 +328,13 @@ type JSONPatchResult = {
   redo: JSONPatchDocument
 }
 
-type ValidationError = {
-  path: Path
+interface ValidationError {
+  path: JSONPath
   message: string
-  isChildError?: boolean
+  severity: ValidationSeverity
 }
 
-type QueryLanguage = {
+interface QueryLanguage {
   id: string
   name: string
   description: string
@@ -342,7 +342,7 @@ type QueryLanguage = {
   executeQuery: (json: JSONData, query: string) => JSONData
 }
 
-type QueryLanguageOptions = {
+interface QueryLanguageOptions {
   filter?: {
     path?: string[]
     relation?: '==' | '!=' | '<' | '<=' | '>' | '>='

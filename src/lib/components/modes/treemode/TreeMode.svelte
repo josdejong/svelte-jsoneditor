@@ -93,6 +93,7 @@
   import {
     convertValue,
     isLargeContent,
+    normalizeJsonParseError,
     parsePartialJson,
     repairPartialJson
   } from '$lib/utils/jsonUtils'
@@ -112,6 +113,7 @@
   import type {
     AbsolutePopupOptions,
     AfterPatchCallback,
+    ContentErrors,
     DocumentState,
     HistoryItem,
     InsertType,
@@ -122,6 +124,7 @@
     OnChange,
     OnClassName,
     OnRenderValue,
+    ParseError,
     PastedJson,
     SearchResult,
     Section,
@@ -198,6 +201,8 @@
   let json: JSONData | undefined
   let text: string | undefined
   const rootPath = [] // create the array only once
+
+  let parseError: ParseError | undefined = undefined
 
   function updateSelection(
     selection:
@@ -413,10 +418,20 @@
     return validationErrors
   }
 
-  export function getValidationErrors(): ValidationError[] {
+  export function validate(): ContentErrors {
+    if (parseError) {
+      return {
+        parseError,
+        isRepairable: false // not applicable, if repairable, we will not have a parseError
+      }
+    }
+
     // make sure the validation results are up-to-date
     // normally, they are only updated on the next tick after the json is changed
-    return updateValidationErrors(json, validator)
+    const validationErrors = updateValidationErrors(json, validator)
+    return {
+      validationErrors
+    }
   }
 
   export function getJson() {
@@ -493,6 +508,7 @@
       documentState = expandWithCallback(json, documentState, rootPath, getDefaultExpand(json))
       text = updatedText
       textIsRepaired = false
+      parseError = undefined
       clearSelectionWhenNotExisting(json)
     } catch (err) {
       try {
@@ -500,12 +516,14 @@
         documentState = expandWithCallback(json, documentState, rootPath, getDefaultExpand(json))
         text = updatedText
         textIsRepaired = true
+        parseError = undefined
         clearSelectionWhenNotExisting(json)
-      } catch (err) {
+      } catch (repairError) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
         text = externalContent.text
         textIsRepaired = false
+        parseError = normalizeJsonParseError(text, err.message || err.toString())
         clearSelectionWhenNotExisting(json)
       }
     }
