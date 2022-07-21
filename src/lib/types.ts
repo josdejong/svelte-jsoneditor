@@ -1,5 +1,7 @@
 import type { JSONData, JSONPatchDocument, JSONPath, JSONPointer } from 'immutable-json-patch'
-import type { SvelteComponent } from 'svelte'
+import type { SvelteComponentTyped } from 'svelte'
+
+export type { JSONData, JSONPointer, JSONPath, JSONPatchDocument } from 'immutable-json-patch'
 
 export type TextContent = { text: string } | { json: undefined; text: string }
 
@@ -317,7 +319,7 @@ export type InsertType = 'value' | 'object' | 'array' | 'structure'
 
 export interface PopupEntry {
   id: number
-  component: SvelteComponent
+  component: SvelteComponentTyped
   props: Record<string, unknown>
   options: AbsolutePopupOptions
 }
@@ -457,7 +459,7 @@ export interface DraggingState {
 
 // TODO: can we define proper generic types here?
 export interface RenderValueComponentDescription {
-  component: SvelteComponent
+  component: SvelteComponentTyped
   props: Record<string, unknown>
 }
 

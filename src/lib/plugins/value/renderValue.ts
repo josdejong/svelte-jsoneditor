@@ -5,7 +5,7 @@ import EditableValue from './components/EditableValue.svelte'
 import ReadonlyValue from './components/ReadonlyValue.svelte'
 import TimestampTag from './components/TimestampTag.svelte'
 import type { RenderValueComponentDescription, RenderValueProps } from '../../types'
-import type { SvelteComponent } from 'svelte'
+import type { SvelteComponentTyped } from 'svelte'
 
 export function renderValue({
   path,
@@ -25,21 +25,21 @@ export function renderValue({
 
   if (!isEditing && isBoolean(value)) {
     renderers.push({
-      component: BooleanToggle as unknown as SvelteComponent, // TODO: casting should not be needed
+      component: BooleanToggle as unknown as SvelteComponentTyped, // TODO: casting should not be needed
       props: { path, value, readOnly, onPatch, focus }
     })
   }
 
   if (!isEditing && isColor(value)) {
     renderers.push({
-      component: ColorPicker as unknown as SvelteComponent, // TODO: casting should not be needed
+      component: ColorPicker as unknown as SvelteComponentTyped, // TODO: casting should not be needed
       props: { path, value, readOnly, onPatch, focus }
     })
   }
 
   if (isEditing) {
     renderers.push({
-      component: EditableValue as unknown as SvelteComponent, // TODO: casting should not be needed
+      component: EditableValue as unknown as SvelteComponentTyped, // TODO: casting should not be needed
       props: {
         path,
         value,
@@ -56,14 +56,14 @@ export function renderValue({
 
   if (!isEditing) {
     renderers.push({
-      component: ReadonlyValue as unknown as SvelteComponent, // TODO: casting should not be needed
+      component: ReadonlyValue as unknown as SvelteComponentTyped, // TODO: casting should not be needed
       props: { path, value, readOnly, normalization, searchResultItems, onSelect }
     })
   }
 
   if (!isEditing && isTimestamp(value)) {
     renderers.push({
-      component: TimestampTag as unknown as SvelteComponent, // TODO: casting should not be needed
+      component: TimestampTag as unknown as SvelteComponentTyped, // TODO: casting should not be needed
       props: { value }
     })
   }

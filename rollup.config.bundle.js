@@ -4,26 +4,16 @@ import resolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
 import { getBabelOutputPlugin } from '@rollup/plugin-babel'
 import path from 'path'
-import fs from 'fs'
 import svelte from 'rollup-plugin-svelte'
 import { terser } from 'rollup-plugin-terser'
 import sveltePreprocess from 'svelte-preprocess'
-import pkg from './package.json'
-import { addBundleExports } from './tools/addBundleExports.js'
-import { createDefinitionsFile } from './tools/createDefinitionsFile.js'
 
 const production = !process.env.ROLLUP_WATCH
-const packageFolder = 'package'
-const file = path.join(packageFolder, pkg.module)
-const sourcemapFile = file + '.map'
-const definitionsFile = file.replace(/\.js$/, '.d.ts')
-
-fs.mkdirSync(path.dirname(file))
-createDefinitionsFile(definitionsFile)
-addBundleExports(packageFolder, file, sourcemapFile, definitionsFile)
+const packageFolder = 'package-vanilla'
+const file = path.join(packageFolder, 'index.js')
 
 export default {
-  input: 'src/lib/index.ts',
+  input: 'src/lib/index-vanilla.ts',
   output: [
     {
       file,
