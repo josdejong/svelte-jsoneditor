@@ -428,9 +428,9 @@
 
     // make sure the validation results are up-to-date
     // normally, they are only updated on the next tick after the json is changed
-    const validationErrors = updateValidationErrors(json, validator)
+    const updatedValidationErrors = updateValidationErrors(json, validator)
     return {
-      validationErrors
+      validationErrors: updatedValidationErrors
     }
   }
 
