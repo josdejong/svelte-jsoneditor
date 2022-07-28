@@ -1,5 +1,7 @@
 import { deepStrictEqual } from 'assert'
 import { mapValidationErrors } from './validation.js'
+import type { ValidationError } from '../types'
+import { ValidationSeverity } from '../types.js'
 
 describe('validation', () => {
   it('should create a map from a list with validation errors', () => {
@@ -7,8 +9,16 @@ describe('validation', () => {
     const message2 = 'Year in the past expected'
     const message3 = 'Contains invalid data'
 
-    const error1 = { path: ['pupils', '2', 'age'], message: message1 }
-    const error2 = { path: ['year'], message: message2 }
+    const error1: ValidationError = {
+      path: ['pupils', '2', 'age'],
+      message: message1,
+      severity: ValidationSeverity.warning
+    }
+    const error2: ValidationError = {
+      path: ['year'],
+      message: message2,
+      severity: ValidationSeverity.warning
+    }
 
     const validationErrors = [error1, error2]
 

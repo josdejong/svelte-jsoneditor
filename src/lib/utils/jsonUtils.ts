@@ -1,10 +1,10 @@
-import { compileJSONPointer } from 'immutable-json-patch'
 import type { JSONArray, JSONData, JSONObject, JSONPath } from 'immutable-json-patch'
+import { compileJSONPointer } from 'immutable-json-patch'
 import jsonSourceMap from 'json-source-map'
 import jsonrepair from 'jsonrepair'
 import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
 import { arrayToObject, objectToArray } from './arrayUtils.js'
-import type { Content, NormalizedParseError, TextContent, TextLocation } from '../types'
+import type { Content, ParseError, TextContent, TextLocation } from '../types'
 import { int } from './numberUtils.js'
 
 export function isJSONObject(value: unknown): value is JSONObject {
@@ -113,10 +113,7 @@ const END_WITH_COMMA_AND_OPTIONAL_WHITESPACES_REGEX = /,\s*$/
  * Note that the returned line and column number in the object are zero-based,
  * and in the message are one based (human readable)
  */
-export function normalizeJsonParseError(
-  jsonText: string,
-  parseErrorMessage: string
-): NormalizedParseError {
+export function normalizeJsonParseError(jsonText: string, parseErrorMessage: string): ParseError {
   const positionMatch = POSITION_REGEX.exec(parseErrorMessage)
 
   if (positionMatch) {

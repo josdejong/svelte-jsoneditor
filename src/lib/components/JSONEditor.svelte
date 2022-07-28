@@ -17,6 +17,7 @@
   import ModalRef from './modals/ModalRef.svelte'
   import type {
     Content,
+    ContentErrors,
     JSONEditorPropsOptional,
     JSONPatchResult,
     MenuItem,
@@ -25,6 +26,7 @@
     OnChange,
     OnChangeMode,
     OnChangeQueryLanguage,
+    OnChangeStatus,
     OnClassName,
     OnError,
     OnFocus,
@@ -36,10 +38,10 @@
     TransformModalOptions,
     Validator
   } from '../types'
+  import { Mode } from '../types'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { isMenuSpaceItem } from '../typeguards'
   import { noop } from 'lodash-es'
-  import { Mode } from '../types'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
@@ -168,6 +170,20 @@
   }
 
   /**
+   * Validate the contents of the editor using the configured validator.
+   * Returns a parse error or a list with validation warnings
+   */
+  export function validate(): ContentErrors {
+    if (refTextMode) {
+      return refTextMode.validate()
+    } else if (refTreeMode) {
+      return refTreeMode.validate()
+    } else {
+      throw new Error(`Method validate is not available in mode "${mode}"`)
+    }
+  }
+
+  /**
    * In tree mode, invalid JSON is automatically repaired when loaded. When the
    * repair was successful, the repaired contents are rendered but not yet
    * applied to the document itself until the user clicks "Ok" or starts editing
@@ -229,32 +245,12 @@
     this.$destroy()
   }
 
-  function handleChange(
-    updatedContent: Content,
-    previousContent: Content,
-    patchResult: JSONPatchResult | null
-  ) {
+  function handleChange(updatedContent: Content, previousContent: Content, status: OnChangeStatus) {
     content = updatedContent
 
     if (onChange) {
-      onChange(updatedContent, previousContent, patchResult)
+      onChange(updatedContent, previousContent, status)
     }
-  }
-
-  function handleChangeText(updatedText: string, previousText: string) {
-    const updatedContent = {
-      text: updatedText,
-      json: undefined
-    }
-
-    const previousContent = {
-      text: previousText,
-      json: undefined
-    }
-
-    const patchResult = null
-
-    handleChange(updatedContent, previousContent, patchResult)
   }
 
   async function handleRequestRepair() {
@@ -419,7 +415,7 @@
             {statusBar}
             {escapeUnicodeCharacters}
             {validator}
-            onChange={handleChangeText}
+            onChange={handleChange}
             onSwitchToTreeMode={handleSwitchToTreeMode}
             {onError}
             onFocus={handleFocus}

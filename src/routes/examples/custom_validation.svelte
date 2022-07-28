@@ -16,30 +16,47 @@
         if (member && typeof member === 'object') {
           if ('name' in member) {
             if (typeof member.name !== 'string') {
-              errors.push({ path: ['team', index, 'name'], message: 'Name must be a string' })
+              errors.push({
+                path: ['team', index, 'name'],
+                message: 'Name must be a string',
+                severity: 'warning'
+              })
             }
           } else {
-            errors.push({ path: ['team', index], message: 'Required property "name"" missing' })
+            errors.push({
+              path: ['team', index],
+              message: 'Required property "name"" missing',
+              severity: 'warning'
+            })
           }
 
           if ('age' in member) {
             if (typeof member.age !== 'number') {
-              errors.push({ path: ['team', index, 'age'], message: 'Age must be a number' })
+              errors.push({
+                path: ['team', index, 'age'],
+                message: 'Age must be a number',
+                severity: 'warning'
+              })
             }
           } else {
-            errors.push({ path: ['team', index], message: 'Required property "age" missing' })
+            errors.push({
+              path: ['team', index],
+              message: 'Required property "age" missing',
+              severity: 'warning'
+            })
           }
         } else {
           errors.push({
             path: ['team', index],
-            message: 'Member must be an object with properties "name" and "age"'
+            message: 'Member must be an object with properties "name" and "age"',
+            severity: 'warning'
           })
         }
       })
 
       // check whether the team consists of exactly four members
       if (json.team.length !== 4) {
-        errors.push({ path: ['team'], message: 'A team must have 4 members' })
+        errors.push({ path: ['team'], message: 'A team must have 4 members', severity: 'warning' })
       }
 
       // check whether there is at least one adult member in the team
@@ -49,11 +66,16 @@
       if (adults.length === 0) {
         errors.push({
           path: ['team'],
-          message: 'A team must have at least one adult person (age >= 18)'
+          message: 'A team must have at least one adult person (age >= 18)',
+          severity: 'warning'
         })
       }
     } else {
-      errors.push({ path: [], message: 'Required property "team" missing or not an Array' })
+      errors.push({
+        path: [],
+        message: 'Required property "team" missing or not an Array',
+        severity: 'warning'
+      })
     }
 
     return errors

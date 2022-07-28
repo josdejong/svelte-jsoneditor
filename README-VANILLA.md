@@ -39,9 +39,9 @@ Browser example loading the ES module:
         target: document.getElementById('jsoneditor'),
         props: {
           content,
-          onChange: (updatedContent, previousContent, patchResult) => {
+          onChange: (updatedContent, previousContent, { contentErrors, patchResult }) => {
             // content is an object { json: JSONData } | { text: string }
-            console.log('onChange', updatedContent, previousContent, patchResult)
+            console.log('onChange', { updatedContent, previousContent, contentErrors, patchResult })
             content = updatedContent
           }
         }
