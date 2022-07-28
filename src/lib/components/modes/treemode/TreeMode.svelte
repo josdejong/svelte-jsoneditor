@@ -408,11 +408,11 @@
   $: validationErrorsMap = mapValidationErrors(validationErrors)
 
   function updateValidationErrors(json: JSONData, validator: Validator | null): ValidationError[] {
+    debug('updateValidationErrors')
     const newValidationErrors: ValidationError[] = validator ? validator(json) : []
 
     if (!isEqual(newValidationErrors, validationErrors)) {
-      debug('updateValidationErrors', newValidationErrors)
-
+      debug('updateValidationErrors changed:', newValidationErrors)
       validationErrors = newValidationErrors
     }
 
