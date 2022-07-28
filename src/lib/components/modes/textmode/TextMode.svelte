@@ -92,6 +92,7 @@
   let acceptTooLarge = false
 
   let validationErrors: ValidationError[] = []
+  const linterCompartment = new Compartment()
   const readOnlyCompartment = new Compartment()
   const indentUnitCompartment = new Compartment()
   const tabSizeCompartment = new Compartment()
@@ -106,6 +107,7 @@
   })
 
   $: setCodeMirrorValue(text)
+  $: updateLinter(validator)
   $: updateIndentation(indentation)
   $: updateTabSize(tabSize)
   $: updateReadOnly(readOnly)
@@ -452,6 +454,10 @@
     }
   }
 
+  function createLinter() {
+    return linter(linterCallback, { delay: TEXT_MODE_ONCHANGE_DELAY })
+  }
+
   function createCodeMirrorView({ target, initialText, readOnly, indentation }) {
     debug('Create CodeMirror editor', { readOnly, indentation })
 
@@ -459,7 +465,7 @@
       doc: initialText,
       extensions: [
         keymap.of([indentWithTab, formatCompactKeyBinding]),
-        linter(validateLinterCallback, { delay: TEXT_MODE_ONCHANGE_DELAY }),
+        linterCompartment.of(createLinter()),
         lintGutter(),
         basicSetup,
         highlighter,
@@ -621,6 +627,18 @@
     }
   }
 
+  function updateLinter(validator) {
+    debug('updateLinter', validator)
+
+    if (!codeMirrorView) {
+      return
+    }
+
+    codeMirrorView.dispatch({
+      effects: linterCompartment.reconfigure(createLinter())
+    })
+  }
+
   function updateIndentation(indentation) {
     if (codeMirrorView) {
       debug('updateIndentation', indentation)
@@ -687,7 +705,7 @@
 
   let jsonParseError: ParseError | null = null
 
-  function validateLinterCallback(): Diagnostic[] {
+  function linterCallback(): Diagnostic[] {
     const contentErrors = validate()
 
     if (isContentParseError(contentErrors)) {
@@ -778,15 +796,6 @@
       return false
     }
   }
-
-  function triggerValidation() {
-    // a trick to trigger running diagnostics again
-    forceUpdateText()
-  }
-
-  // we pass unused arguments to trigger the editor to update the diagnostics
-  // passing readOnly is to update the action buttons in case of invalid JSON
-  $: triggerValidation(validator, readOnly)
 
   $: repairActions =
     jsonStatus === JSON_STATUS_REPAIRABLE && !readOnly
