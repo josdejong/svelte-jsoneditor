@@ -82,12 +82,13 @@ Or one-way binding:
     }
   }
 
-  function handleChange(updatedContent, previousContent, patchResult) {
+  function handleChange(updatedContent, previousContent, { contentErrors, patchResult }) {
     // content is an object { json: JSONData } | { text: string }
-    console.log('onChange: ', updatedContent, previousContent, patchResult)
+    console.log('onChange: ', { updatedContent, previousContent, contentErrors, patchResult })
     content = updatedContent
   }
 </script>
+F
 
 <div>
   <JSONEditor {content} onChange="{handleChange}" />
@@ -123,9 +124,9 @@ Browser example loading the ES module:
         target: document.getElementById('jsoneditor'),
         props: {
           content,
-          onChange: (updatedContent, previousContent, patchResult) => {
+          onChange: (updatedContent, previousContent, { contentErrors, patchResult }) => {
             // content is an object { json: JSONData } | { text: string }
-            console.log('onChange', updatedContent, previousContent, patchResult)
+            console.log('onChange', { updatedContent, previousContent, contentErrors, patchResult })
             content = updatedContent
           }
         }
@@ -163,9 +164,9 @@ const editor = new JSONEditor({
   target: document.getElementById('jsoneditor'),
   props: {
     content,
-    onChange: (updatedContent, previousContent, patchResult) => {
+    onChange: (updatedContent, previousContent, { contentErrors, patchResult }) => {
       // content is an object { json: JSONData } | { text: string }
-      console.log('onChange', updatedContent, previousContent, patchResult)
+      console.log('onChange', { updatedContent, previousContent, contentErrors, patchResult })
     }
   }
 })
@@ -194,7 +195,7 @@ const editor = new JSONEditor({
 
 - `onError(err: Error)`.
   Callback fired when an error occurs. Default implementation is to log an error in the console and show a simple alert message to the user.
-- `onChange(content: Content, previousContent: Content, patchResult: JSONPatchResult | null)`. The callback which is invoked on every change made in the JSON document. The parameter `patchResult` is only available in `tree` mode, and not in `text` mode, since a change in arbitrary text cannot be expressed as a JSON Patch document.
+- `onChange(content: Content, previousContent: Content, changeStatus: { contentErrors: ContentErrors, patchResult: JSONPatchResult | null })`. The callback which is invoked on every change made in the JSON document. The parameter `patchResult` is only available in `tree` mode, and not in `text` mode, since a change in arbitrary text cannot be expressed as a JSON Patch document.
 - `onChangeMode(mode: 'tree' | 'text')`. Invoked when the mode is changed.
 - `onClassName(path: Path, value: any): string | undefined`.
   Add a custom class name to specific nodes, based on their path and/or value.
@@ -328,11 +329,29 @@ type JSONPatchResult = {
   redo: JSONPatchDocument
 }
 
+interface ParseError {
+  position: number | null
+  line: number | null
+  column: number | null
+  message: string
+}
+
 interface ValidationError {
   path: JSONPath
   message: string
   severity: ValidationSeverity
 }
+
+interface ContentParseError {
+  parseError: ParseError
+  isRepairable: boolean
+}
+
+interface ContentValidationErrors {
+  validationErrors: ValidationError[]
+}
+
+type ContentErrors = ContentParseError | ContentValidationErrors
 
 interface QueryLanguage {
   id: string

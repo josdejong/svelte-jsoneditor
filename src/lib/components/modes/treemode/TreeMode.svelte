@@ -113,6 +113,7 @@
   import type {
     AbsolutePopupOptions,
     AfterPatchCallback,
+    Content,
     ContentErrors,
     DocumentState,
     HistoryItem,
@@ -419,6 +420,8 @@
   }
 
   export function validate(): ContentErrors {
+    debug('validate')
+
     if (parseError) {
       return {
         parseError,
@@ -943,9 +946,14 @@
       // root selected -> clear complete document
       debug('remove root', { selection: documentState.selection })
 
-      const patchResult = null
-
-      onChange({ text: '', json: undefined }, { text, json }, patchResult)
+      onChange(
+        { text: '', json: undefined },
+        { text, json },
+        {
+          contentErrors: validate(),
+          patchResult: null
+        }
+      )
     } else {
       // remove selection
       const { operations, newSelection } = createRemoveOperations(json, removeSelection)
@@ -1501,17 +1509,19 @@
     }
   }
 
-  /**
-   * @param {Content} previousContent
-   * @param {JSONPatchResult | null} patchResult
-   */
-  function emitOnChange(previousContent, patchResult) {
+  function emitOnChange(previousContent: Content, patchResult: JSONPatchResult | null) {
     // make sure we cannot send an invalid contents like having both
     // json and text defined, or having none defined
     if (text !== undefined) {
-      onChange({ text, json: undefined }, previousContent, patchResult)
+      onChange({ text, json: undefined }, previousContent, {
+        contentErrors: validate(),
+        patchResult
+      })
     } else if (json !== undefined) {
-      onChange({ text: undefined, json }, previousContent, patchResult)
+      onChange({ text: undefined, json }, previousContent, {
+        contentErrors: validate(),
+        patchResult
+      })
     }
   }
 

@@ -43,12 +43,14 @@
   import { highlighter } from './codemirror/codemirror-theme'
   import type {
     ContentErrors,
+    OnChange,
     ParseError,
     RichValidationError,
-    ValidationError
+    ValidationError,
+    Validator
   } from '../../../types'
-  import { isContentParseError, isContentValidationErrors } from '../../../typeguards'
   import { ValidationSeverity } from '../../../types'
+  import { isContentParseError, isContentValidationErrors } from '../../../typeguards'
 
   export let readOnly = false
   export let mainMenuBar = true
@@ -57,11 +59,8 @@
   export let indentation: number | string = 2
   export let tabSize = 4
   export let escapeUnicodeCharacters = false
-  export let validator = null
-
-  /** @type {((text: string, previousText: string) => void) | null} */
-  export let onChange = null
-
+  export let validator: Validator = null
+  export let onChange: OnChange = null
   export let onSwitchToTreeMode = noop
   export let onError
   export let onFocus = noop
@@ -691,13 +690,16 @@
     TEXT_MODE_ONCHANGE_DELAY
   )
 
-  /**
-   * @param {string} text
-   * @param {string} previousText
-   */
-  function emitOnChange(text, previousText) {
+  function emitOnChange(text: string, previousText: string) {
     if (onChange) {
-      onChange(text, previousText)
+      onChange(
+        { text },
+        { text: previousText },
+        {
+          contentErrors: validate(),
+          patchResult: null
+        }
+      )
     }
   }
 

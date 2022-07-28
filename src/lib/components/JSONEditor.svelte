@@ -26,6 +26,7 @@
     OnChange,
     OnChangeMode,
     OnChangeQueryLanguage,
+    OnChangeStatus,
     OnClassName,
     OnError,
     OnFocus,
@@ -244,32 +245,12 @@
     this.$destroy()
   }
 
-  function handleChange(
-    updatedContent: Content,
-    previousContent: Content,
-    patchResult: JSONPatchResult | null
-  ) {
+  function handleChange(updatedContent: Content, previousContent: Content, status: OnChangeStatus) {
     content = updatedContent
 
     if (onChange) {
-      onChange(updatedContent, previousContent, patchResult)
+      onChange(updatedContent, previousContent, status)
     }
-  }
-
-  function handleChangeText(updatedText: string, previousText: string) {
-    const updatedContent = {
-      text: updatedText,
-      json: undefined
-    }
-
-    const previousContent = {
-      text: previousText,
-      json: undefined
-    }
-
-    const patchResult = null
-
-    handleChange(updatedContent, previousContent, patchResult)
   }
 
   async function handleRequestRepair() {
@@ -434,7 +415,7 @@
             {statusBar}
             {escapeUnicodeCharacters}
             {validator}
-            onChange={handleChangeText}
+            onChange={handleChange}
             onSwitchToTreeMode={handleSwitchToTreeMode}
             {onError}
             onFocus={handleFocus}

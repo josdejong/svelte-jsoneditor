@@ -201,21 +201,21 @@
     }
   }
 
-  function onChangeTree(content, previousContent, patchResult) {
+  function onChangeTree(content, previousContent, { contentErrors, patchResult }) {
     console.log('onChangeTree', {
       content,
       previousContent,
-      patchResult,
-      errors: refTreeEditor.validate()
+      contentErrors,
+      patchResult
     })
   }
 
-  function onChangeText(content, previousContent, patchResult) {
+  function onChangeText(content, previousContent, { contentErrors, patchResult }) {
     console.log('onChangeText', {
       content,
       previousContent,
-      patchResult,
-      errors: refTextEditor.validate()
+      contentErrors,
+      patchResult
     })
   }
 
