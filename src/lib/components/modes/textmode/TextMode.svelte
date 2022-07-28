@@ -11,7 +11,6 @@
     JSON_STATUS_INVALID,
     JSON_STATUS_REPAIRABLE,
     JSON_STATUS_VALID,
-    MAX_AUTO_REPAIRABLE_SIZE,
     MAX_DOCUMENT_SIZE_TEXT_MODE,
     TEXT_MODE_ONCHANGE_DELAY
   } from '../../../constants'
@@ -35,9 +34,6 @@
   import { json as jsonLang } from '@codemirror/lang-json'
   import { indentUnit } from '@codemirror/language'
   import { closeSearchPanel, openSearchPanel, search } from '@codemirror/search'
-  import { normalizeJsonParseError } from '../../../utils/jsonUtils.js'
-  import { MAX_VALIDATABLE_SIZE } from '../../../constants.js'
-  import { measure } from '../../../utils/timeUtils.js'
   import jsonSourceMap from 'json-source-map'
   import StatusBar from './StatusBar.svelte'
   import { highlighter } from './codemirror/codemirror-theme'
@@ -51,6 +47,8 @@
   } from '../../../types'
   import { ValidationSeverity } from '../../../types'
   import { isContentParseError, isContentValidationErrors } from '../../../typeguards'
+  import memoizeOne from 'memoize-one'
+  import { validateText } from '../../../logic/validation'
 
   export let readOnly = false
   export let mainMenuBar = true
@@ -728,76 +726,24 @@
 
     onChangeCodeMirrorValueDebounced.flush()
 
-    jsonStatus = JSON_STATUS_VALID
-    jsonParseError = null
-    validationErrors = []
+    const contentErrors = memoizedValidateText(text, validator)
 
-    if (text.length > MAX_VALIDATABLE_SIZE) {
-      const validationError: ValidationError = {
-        path: [],
-        message: 'Validation turned off: the document is too large',
-        severity: ValidationSeverity.info
-      }
-
-      return {
-        validationErrors: [validationError]
-      }
+    if (isContentParseError(contentErrors)) {
+      jsonStatus = contentErrors.isRepairable ? JSON_STATUS_REPAIRABLE : JSON_STATUS_INVALID
+      jsonParseError = contentErrors.parseError
+      validationErrors = []
+    } else {
+      jsonStatus = JSON_STATUS_VALID
+      jsonParseError = null
+      validationErrors = contentErrors.validationErrors
     }
 
-    if (text.length === 0) {
-      // new, empty document, do not try to parse
-      return {
-        validationErrors: []
-      }
-    }
-
-    try {
-      const json = measure(
-        () => JSON.parse(text),
-        (duration) => debug(`validate: parsed json in ${duration} ms`)
-      )
-
-      if (!validator) {
-        return {
-          validationErrors: []
-        }
-      }
-
-      validationErrors = measure(
-        () => validator(json),
-        (duration) => debug(`validate: validated json in ${duration} ms`)
-      )
-
-      return { validationErrors }
-    } catch (err) {
-      const isRepairable = measure(
-        () => canAutoRepair(text),
-        (duration) => debug(`validate: checked whether repairable in ${duration} ms`)
-      )
-
-      jsonParseError = normalizeJsonParseError(text, err.message || err.toString())
-      jsonStatus = isRepairable ? JSON_STATUS_REPAIRABLE : JSON_STATUS_INVALID
-
-      return {
-        parseError: jsonParseError,
-        isRepairable
-      }
-    }
+    return contentErrors
   }
 
-  function canAutoRepair(text) {
-    if (text.length > MAX_AUTO_REPAIRABLE_SIZE) {
-      return false
-    }
-
-    try {
-      JSON.parse(jsonrepair(text))
-
-      return true
-    } catch (err) {
-      return false
-    }
-  }
+  // because onChange returns the validation errors and there is also a separate listener,
+  // we would execute validation twice. Memoizing the last result solves this.
+  const memoizedValidateText = memoizeOne(validateText)
 
   $: repairActions =
     jsonStatus === JSON_STATUS_REPAIRABLE && !readOnly

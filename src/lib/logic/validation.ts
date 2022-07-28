@@ -1,6 +1,20 @@
 import { initial } from 'lodash-es'
-import type { JSONPointerMap, NestedValidationError, ValidationError } from '../types'
-import { compileJSONPointer } from 'immutable-json-patch'
+import type {
+  ContentErrors,
+  JSONPointerMap,
+  NestedValidationError,
+  ValidationError,
+  Validator
+} from '../types.js'
+import { ValidationSeverity } from '../types.js'
+import { compileJSONPointer, type JSONData } from 'immutable-json-patch'
+import { MAX_AUTO_REPAIRABLE_SIZE, MAX_VALIDATABLE_SIZE } from '../constants.js'
+import { measure } from '../utils/timeUtils.js'
+import { normalizeJsonParseError } from '../utils/jsonUtils.js'
+import { createDebug } from '../utils/debug.js'
+import jsonrepair from 'jsonrepair'
+
+const debug = createDebug('validation')
 
 /**
  * Create a flat map with validation errors, where the key is the stringified path
@@ -37,4 +51,78 @@ export function mapValidationErrors(
   })
 
   return map
+}
+
+export function validateJSON(json: JSONData, validator: Validator): ValidationError[] {
+  debug('validateJSON')
+  return validator(json)
+}
+
+export function validateText(text: string, validator: Validator): ContentErrors {
+  debug('validateText')
+
+  if (text.length > MAX_VALIDATABLE_SIZE) {
+    const validationError: ValidationError = {
+      path: [],
+      message: 'Validation turned off: the document is too large',
+      severity: ValidationSeverity.info
+    }
+
+    return {
+      validationErrors: [validationError]
+    }
+  }
+
+  if (text.length === 0) {
+    // new, empty document, do not try to parse
+    return {
+      validationErrors: []
+    }
+  }
+
+  try {
+    const json = measure(
+      () => JSON.parse(text),
+      (duration) => debug(`validate: parsed json in ${duration} ms`)
+    )
+
+    if (!validator) {
+      return {
+        validationErrors: []
+      }
+    }
+
+    const validationErrors = measure(
+      () => validator(json),
+      (duration) => debug(`validate: validated json in ${duration} ms`)
+    )
+
+    return { validationErrors }
+  } catch (err) {
+    const isRepairable = measure(
+      () => canAutoRepair(text),
+      (duration) => debug(`validate: checked whether repairable in ${duration} ms`)
+    )
+
+    const parseError = normalizeJsonParseError(text, err.message || err.toString())
+
+    return {
+      parseError,
+      isRepairable
+    }
+  }
+}
+
+function canAutoRepair(text) {
+  if (text.length > MAX_AUTO_REPAIRABLE_SIZE) {
+    return false
+  }
+
+  try {
+    JSON.parse(jsonrepair(text))
+
+    return true
+  } catch (err) {
+    return false
+  }
 }

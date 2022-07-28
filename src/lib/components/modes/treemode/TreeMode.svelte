@@ -79,7 +79,7 @@
     selectionToPartialJson,
     updateSelectionInDocumentState
   } from '$lib/logic/selection'
-  import { mapValidationErrors } from '$lib/logic/validation'
+  import { mapValidationErrors, validateJSON } from '$lib/logic/validation'
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
@@ -138,6 +138,7 @@
   import { isAfterSelection, isInsideSelection, isKeySelection } from '../../../logic/selection'
   import { truncate } from '../../../utils/stringUtils.js'
   import { MAX_CHARACTERS_TEXT_PREVIEW } from '../../../constants.js'
+  import memoizeOne from 'memoize-one'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -407,16 +408,19 @@
   let validationErrorsMap: JSONPointerMap<NestedValidationError>
   $: validationErrorsMap = mapValidationErrors(validationErrors)
 
-  function updateValidationErrors(json: JSONData, validator: Validator | null): ValidationError[] {
-    debug('updateValidationErrors')
-    const newValidationErrors: ValidationError[] = validator ? validator(json) : []
+  // because onChange returns the validation errors and there is also a separate listener,
+  // we would execute validation twice. Memoizing the last result solves this.
+  const memoizedValidate = memoizeOne(validateJSON)
+
+  function updateValidationErrors(json: JSONData, validator: Validator | null) {
+    const newValidationErrors: ValidationError[] = validator
+      ? memoizedValidate(json, validator)
+      : []
 
     if (!isEqual(newValidationErrors, validationErrors)) {
-      debug('updateValidationErrors changed:', newValidationErrors)
+      debug('validationErrors changed:', newValidationErrors)
       validationErrors = newValidationErrors
     }
-
-    return validationErrors
   }
 
   export function validate(): ContentErrors {
@@ -431,9 +435,9 @@
 
     // make sure the validation results are up-to-date
     // normally, they are only updated on the next tick after the json is changed
-    const updatedValidationErrors = updateValidationErrors(json, validator)
+    updateValidationErrors(json, validator)
     return {
-      validationErrors: updatedValidationErrors
+      validationErrors
     }
   }
 
