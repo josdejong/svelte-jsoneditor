@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.6.1...v0.6.2) (2022-07-28)
+
+
+### Bug Fixes
+
+* revert the ES workaround for `[@fortawesome](https://github.com/fortawesome)` again, it doesn't work anymore ([69533af](https://github.com/josdejong/svelte-jsoneditor/commit/69533af086d512d830804bbc1fd2cbd6d9e1aec8))
+
 ### [0.6.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.6.0...v0.6.1) (2022-07-28)
 
 
