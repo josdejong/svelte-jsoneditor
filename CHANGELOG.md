@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.6.0...v0.6.1) (2022-07-28)
+
+
+### Bug Fixes
+
+* make sure all imports in index.ts have a .js extension ([52431f6](https://github.com/josdejong/svelte-jsoneditor/commit/52431f61f13a7e7f8ad886d9dd10ca42d944accd))
+* re-introduce the ES workaround for `[@fortawesome](https://github.com/fortawesome)` again ([2a7284c](https://github.com/josdejong/svelte-jsoneditor/commit/2a7284c23b20bad7930198f530a84dbdea361b5c))
+
 ## [0.6.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.5.0...v0.6.0) (2022-07-28)
 
 
