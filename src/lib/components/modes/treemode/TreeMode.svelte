@@ -79,7 +79,7 @@
     selectionToPartialJson,
     updateSelectionInDocumentState
   } from '$lib/logic/selection'
-  import { mapValidationErrors } from '$lib/logic/validation'
+  import { mapValidationErrors, validateJSON } from '$lib/logic/validation'
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
@@ -93,6 +93,7 @@
   import {
     convertValue,
     isLargeContent,
+    normalizeJsonParseError,
     parsePartialJson,
     repairPartialJson
   } from '$lib/utils/jsonUtils'
@@ -112,15 +113,19 @@
   import type {
     AbsolutePopupOptions,
     AfterPatchCallback,
+    Content,
+    ContentErrors,
     DocumentState,
     HistoryItem,
     InsertType,
     JSONPatchResult,
     JSONPointerMap,
     JSONSelection,
+    NestedValidationError,
     OnChange,
     OnClassName,
     OnRenderValue,
+    ParseError,
     PastedJson,
     SearchResult,
     Section,
@@ -133,6 +138,7 @@
   import { isAfterSelection, isInsideSelection, isKeySelection } from '../../../logic/selection'
   import { truncate } from '../../../utils/stringUtils.js'
   import { MAX_CHARACTERS_TEXT_PREVIEW } from '../../../constants.js'
+  import memoizeOne from 'memoize-one'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -197,6 +203,8 @@
   let json: JSONData | undefined
   let text: string | undefined
   const rootPath = [] // create the array only once
+
+  let parseError: ParseError | undefined = undefined
 
   function updateSelection(
     selection:
@@ -397,16 +405,39 @@
   let validationErrors: ValidationError[] = []
   $: updateValidationErrors(json, validator)
 
-  let validationErrorsMap: JSONPointerMap<ValidationError>
+  let validationErrorsMap: JSONPointerMap<NestedValidationError>
   $: validationErrorsMap = mapValidationErrors(validationErrors)
 
+  // because onChange returns the validation errors and there is also a separate listener,
+  // we would execute validation twice. Memoizing the last result solves this.
+  const memoizedValidate = memoizeOne(validateJSON)
+
   function updateValidationErrors(json: JSONData, validator: Validator | null) {
-    const newValidationErrors: ValidationError[] = validator ? validator(json) : []
+    const newValidationErrors: ValidationError[] = validator
+      ? memoizedValidate(json, validator)
+      : []
 
     if (!isEqual(newValidationErrors, validationErrors)) {
-      debug('updateValidationErrors', newValidationErrors)
-
+      debug('validationErrors changed:', newValidationErrors)
       validationErrors = newValidationErrors
+    }
+  }
+
+  export function validate(): ContentErrors {
+    debug('validate')
+
+    if (parseError) {
+      return {
+        parseError,
+        isRepairable: false // not applicable, if repairable, we will not have a parseError
+      }
+    }
+
+    // make sure the validation results are up-to-date
+    // normally, they are only updated on the next tick after the json is changed
+    updateValidationErrors(json, validator)
+    return {
+      validationErrors
     }
   }
 
@@ -484,6 +515,7 @@
       documentState = expandWithCallback(json, documentState, rootPath, getDefaultExpand(json))
       text = updatedText
       textIsRepaired = false
+      parseError = undefined
       clearSelectionWhenNotExisting(json)
     } catch (err) {
       try {
@@ -491,12 +523,14 @@
         documentState = expandWithCallback(json, documentState, rootPath, getDefaultExpand(json))
         text = updatedText
         textIsRepaired = true
+        parseError = undefined
         clearSelectionWhenNotExisting(json)
-      } catch (err) {
+      } catch (repairError) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
         text = externalContent.text
         textIsRepaired = false
+        parseError = normalizeJsonParseError(text, err.message || err.toString())
         clearSelectionWhenNotExisting(json)
       }
     }
@@ -916,9 +950,14 @@
       // root selected -> clear complete document
       debug('remove root', { selection: documentState.selection })
 
-      const patchResult = null
-
-      onChange({ text: '', json: undefined }, { text, json }, patchResult)
+      onChange(
+        { text: '', json: undefined },
+        { text, json },
+        {
+          contentErrors: validate(),
+          patchResult: null
+        }
+      )
     } else {
       // remove selection
       const { operations, newSelection } = createRemoveOperations(json, removeSelection)
@@ -1474,17 +1513,19 @@
     }
   }
 
-  /**
-   * @param {Content} previousContent
-   * @param {JSONPatchResult | null} patchResult
-   */
-  function emitOnChange(previousContent, patchResult) {
+  function emitOnChange(previousContent: Content, patchResult: JSONPatchResult | null) {
     // make sure we cannot send an invalid contents like having both
     // json and text defined, or having none defined
     if (text !== undefined) {
-      onChange({ text, json: undefined }, previousContent, patchResult)
+      onChange({ text, json: undefined }, previousContent, {
+        contentErrors: validate(),
+        patchResult
+      })
     } else if (json !== undefined) {
-      onChange({ text: undefined, json }, previousContent, patchResult)
+      onChange({ text: undefined, json }, previousContent, {
+        contentErrors: validate(),
+        patchResult
+      })
     }
   }
 

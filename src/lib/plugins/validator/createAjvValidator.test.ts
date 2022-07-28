@@ -85,10 +85,14 @@ describe('createAjvValidator', () => {
     }
 
     assert.deepStrictEqual(validate(invalidJson), [
-      { path: ['gender'], message: 'should be equal to one of: "male", "female"' },
-      { path: ['age'], message: 'must be integer' },
-      { path: ['job'], message: "must have required property 'address'" },
-      { path: ['job', 'salary'], message: 'must be >= 120' }
+      {
+        path: ['gender'],
+        message: 'should be equal to one of: "male", "female"',
+        severity: 'warning'
+      },
+      { path: ['age'], message: 'must be integer', severity: 'warning' },
+      { path: ['job'], message: "must have required property 'address'", severity: 'warning' },
+      { path: ['job', 'salary'], message: 'must be >= 120', severity: 'warning' }
     ])
   })
 

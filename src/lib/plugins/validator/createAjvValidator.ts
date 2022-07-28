@@ -1,7 +1,8 @@
 import Ajv from 'ajv-dist'
 import type { JSONData } from 'immutable-json-patch'
 import { parsePath } from 'immutable-json-patch'
-import type { ValidationError } from '../../types'
+import type { ValidationError, Validator } from '../../types'
+import { ValidationSeverity } from '../../types.js'
 
 /**
  * Create a JSON Schema validator powered by Ajv.
@@ -11,7 +12,10 @@ import type { ValidationError } from '../../types'
  *                    which can be referenced using $ref
  * @return Returns a validation function
  */
-export function createAjvValidator(schema: JSONData, schemaDefinitions: JSONData = undefined) {
+export function createAjvValidator(
+  schema: JSONData,
+  schemaDefinitions: JSONData = undefined
+): Validator {
   const ajv = new Ajv({
     allErrors: true,
     verbose: true,
@@ -37,7 +41,8 @@ export function createAjvValidator(schema: JSONData, schemaDefinitions: JSONData
 function normalizeAjvError(json: JSONData, ajvError): ValidationError {
   return {
     path: parsePath(json, ajvError.instancePath),
-    message: ajvError.message
+    message: ajvError.message,
+    severity: ValidationSeverity.warning
   }
 }
 
