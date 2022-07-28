@@ -10,7 +10,7 @@ import TimestampTag from './plugins/value/components/TimestampTag.svelte'
 
 // editor
 export { JSONEditor }
-export * from './types'
+export * from './types.js'
 
 // value plugins
 export { renderValue } from './plugins/value/renderValue.js'
