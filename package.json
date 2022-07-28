@@ -13,7 +13,7 @@
   },
   "license": "ISC",
   "scripts": {
-    "dev": "svelte-kit dev",
+    "dev": "vite dev",
     "preview": "svelte-kit preview",
     "build": "npm run build:svelte && npm run build:vanilla",
     "build:watch": "npm run build -- --watch",
@@ -33,10 +33,9 @@
     "test": "mocha",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
-    "lint": "npm run lint:prettier && npm run lint:eslint && npm run lint:fortawesome-es-workaround",
+    "lint": "npm run lint:prettier && npm run lint:eslint",
     "lint:prettier": "prettier --check --plugin-search-dir=. .",
     "lint:eslint": "eslint --cache --ignore-path .gitignore .",
-    "lint:fortawesome-es-workaround": "node tools/validateFortawesomeESWorkaround.js",
     "format": "prettier --write --plugin-search-dir=. .",
     "prepare": "husky install && cd tools && node generateDiffSequenceEsm.js && cd ..",
     "release": "npm-run-all release:**",
@@ -88,7 +87,7 @@
     "@rollup/plugin-json": "4.1.0",
     "@rollup/plugin-node-resolve": "13.3.0",
     "@rollup/plugin-typescript": "8.3.4",
-    "@sveltejs/kit": "1.0.0-next.357",
+    "@sveltejs/kit": "1.0.0-next.396",
     "@types/cookie": "0.5.1",
     "@types/lodash-es": "4.17.6",
     "@types/mocha": "9.1.1",
@@ -114,6 +113,7 @@
     "svelte2tsx": "0.5.13",
     "ts-node": "10.9.1",
     "tslib": "2.4.0",
-    "typescript": "4.7.4"
+    "typescript": "4.7.4",
+    "vite": "3.0.3"
   }
 }

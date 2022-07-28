@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import { uniqueId } from '../../utils/uniqueId.js'
-  import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons/index.es'
+  import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import { debounce, isEmpty, noop } from 'lodash-es'
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'

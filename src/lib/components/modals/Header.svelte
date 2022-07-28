@@ -3,7 +3,7 @@
 <script lang="ts">
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
-  import { faTimes } from '@fortawesome/free-solid-svg-icons/index.es'
+  import { faTimes } from '@fortawesome/free-solid-svg-icons'
 
   export let title = 'Modal'
 
