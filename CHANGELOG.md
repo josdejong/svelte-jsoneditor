@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.6.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.5.0...v0.6.0) (2022-07-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* The signature of `onChange` is changed from `onChange(updatedContent, previousContent, patchResult)`
+to `onChange(updatedContent, previousContent, { contentErrors, patchResult })`.
+
+### Features
+
+* implement validate method and pass contentErrors via onChange, fixes [#56](https://github.com/josdejong/svelte-jsoneditor/issues/56) ([#119](https://github.com/josdejong/svelte-jsoneditor/issues/119)) ([9847382](https://github.com/josdejong/svelte-jsoneditor/commit/9847382396fe5f853f8ecfde4d5227175c498bf4))
+* implement validate method and pass contentErrors via onChange, fixes [#56](https://github.com/josdejong/svelte-jsoneditor/issues/56) ([#119](https://github.com/josdejong/svelte-jsoneditor/issues/119)) ([705f5f2](https://github.com/josdejong/svelte-jsoneditor/commit/705f5f2ed76a24e671f35f9721ff93d165a4f7bc))
+
+
+### Bug Fixes
+
+* [#118](https://github.com/josdejong/svelte-jsoneditor/issues/118) cursor position in TextMode being reset after changing `validator` ([e580e26](https://github.com/josdejong/svelte-jsoneditor/commit/e580e26e3c4d82935a9fed9804666c986d1c3b21))
+
 ## [0.5.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.4.0...v0.5.0) (2022-07-11)
 
 
