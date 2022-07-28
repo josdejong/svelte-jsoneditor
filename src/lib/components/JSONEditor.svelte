@@ -19,7 +19,6 @@
     Content,
     ContentErrors,
     JSONEditorPropsOptional,
-    JSONPatchResult,
     MenuItem,
     MenuSeparatorItem,
     OnBlur,
