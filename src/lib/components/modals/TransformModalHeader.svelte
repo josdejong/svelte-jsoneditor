@@ -3,7 +3,7 @@
 <script lang="ts">
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
-  import { faCog, faTimes } from '@fortawesome/free-solid-svg-icons'
+  import { faCog, faTimes } from '@fortawesome/free-solid-svg-icons/index.es'
   import SelectQueryLanguage from '../controls/selectQueryLanguage/SelectQueryLanguage.svelte'
   import type { OnChangeQueryLanguage, QueryLanguage } from '../../types'
 

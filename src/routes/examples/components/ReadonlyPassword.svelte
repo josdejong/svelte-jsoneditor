@@ -2,7 +2,7 @@
 
 <script>
   import Icon from 'svelte-awesome'
-  import { faLock } from '@fortawesome/free-solid-svg-icons'
+  import { faLock } from '@fortawesome/free-solid-svg-icons/index.es'
   import { createValueSelection } from 'svelte-jsoneditor'
 
   export let value

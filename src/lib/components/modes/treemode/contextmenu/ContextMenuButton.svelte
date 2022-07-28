@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
+  import { faCaretDown } from '@fortawesome/free-solid-svg-icons/index.es'
   import Icon from 'svelte-awesome'
   import {
     CONTEXT_MENU_EXPLANATION,

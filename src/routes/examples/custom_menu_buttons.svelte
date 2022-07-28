@@ -1,6 +1,6 @@
 <script>
   import { JSONEditor } from 'svelte-jsoneditor'
-  import { faCopy } from '@fortawesome/free-regular-svg-icons'
+  import { faCopy } from '@fortawesome/free-regular-svg-icons/index.es'
 
   let content = {
     text: undefined, // used when in text mode
