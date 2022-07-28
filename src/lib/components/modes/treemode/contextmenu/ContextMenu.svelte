@@ -13,7 +13,7 @@
     faPen,
     faSortAmountDownAlt,
     faTimes
-  } from '@fortawesome/free-solid-svg-icons/index.es'
+  } from '@fortawesome/free-solid-svg-icons'
   import type { JSONData } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { initial, isEmpty } from 'lodash-es'
@@ -23,11 +23,7 @@
   import { canConvert, singleItemSelected } from '$lib/logic/selection'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
-  import {
-    faCheckSquare,
-    faLightbulb,
-    faSquare
-  } from '@fortawesome/free-regular-svg-icons/index.es'
+  import { faCheckSquare, faLightbulb, faSquare } from '@fortawesome/free-regular-svg-icons'
   import { findNearestElement } from '$lib/utils/domUtils'
   import type { DocumentState } from '../../../../types'
   import { isKeySelection, isMultiSelection, isValueSelection } from '../../../../logic/selection'

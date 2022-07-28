@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler'
-  import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons/index.es'
+  import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '$lib/utils/debug'
   import type { JSONData, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import {

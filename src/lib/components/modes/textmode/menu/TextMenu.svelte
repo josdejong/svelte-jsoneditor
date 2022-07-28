@@ -7,7 +7,7 @@
     faSearch,
     faSortAmountDownAlt,
     faUndo
-  } from '@fortawesome/free-solid-svg-icons/index.es'
+  } from '@fortawesome/free-solid-svg-icons'
   import { faJSONEditorCompact, faJSONEditorFormat } from '$lib/img/customFontawesomeIcons'
   import Menu from '../../../controls/Menu.svelte'
   import { noop } from 'lodash-es'

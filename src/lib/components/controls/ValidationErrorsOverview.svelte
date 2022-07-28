@@ -5,7 +5,7 @@
     faAngleDown,
     faAngleRight,
     faExclamationTriangle
-  } from '@fortawesome/free-solid-svg-icons/index.es'
+  } from '@fortawesome/free-solid-svg-icons'
   import { isEmpty } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import { stringifyPath } from '../../utils/pathUtils.js'

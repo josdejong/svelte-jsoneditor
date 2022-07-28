@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons/index.es'
+  import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
   import type { JSONArray, JSONData, JSONObject, JSONPath, JSONPointer } from 'immutable-json-patch'
   import { appendToJSONPointer, compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
