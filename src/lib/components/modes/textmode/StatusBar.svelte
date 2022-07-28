@@ -1,6 +1,5 @@
 <script lang="ts">
-  import type { EditorState } from '@codemirror/state'
-  import type { Line } from '@codemirror/text'
+  import type { EditorState, Line } from '@codemirror/state'
 
   export let editorState: EditorState | undefined
 
