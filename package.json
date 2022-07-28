@@ -18,7 +18,7 @@
     "build": "npm run build:svelte && npm run build:vanilla",
     "build:watch": "npm run build -- --watch",
     "build:svelte": "npm-run-all build:svelte:**",
-    "build:svelte:sync": "svelte-kit sync",
+    "build:svelte:prepare": "svelte-kit sync",
     "build:svelte:package": "svelte-kit package",
     "build:svelte:deprecated": "cpy --flat tools/dist-deprecated package/dist",
     "build:vanilla": "npm-run-all build:vanilla:**",
