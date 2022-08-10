@@ -1,4 +1,3 @@
-import path from 'path'
 import preprocess from 'svelte-preprocess'
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -10,14 +9,6 @@ const config = {
   kit: {
     package: {
       dir: 'package'
-    },
-
-    vite: {
-      resolve: {
-        alias: {
-          'svelte-jsoneditor': path.resolve('src/lib')
-        }
-      }
     }
   }
 }

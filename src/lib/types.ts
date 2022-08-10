@@ -150,9 +150,19 @@ export interface MessageAction {
   disabled?: boolean
 }
 
+export enum ValidationSeverity {
+  info = 'info',
+  warning = 'warning',
+  error = 'error'
+}
+
 export interface ValidationError {
   path: JSONPath
   message: string
+  severity: ValidationSeverity
+}
+
+export interface NestedValidationError extends ValidationError {
   isChildError?: boolean
 }
 
@@ -160,27 +170,27 @@ export type Validator = (json: JSONData) => ValidationError[]
 
 export interface ParseError {
   position: number | null
-  row: number | null
-  column: number | null
-  message: string
-}
-
-export interface NormalizedParseError {
-  position: number | null
   line: number | null
   column: number | null
   message: string
 }
 
-export interface RichValidationError {
-  path?: JSONPath
-  isChildError?: boolean
+export interface ContentParseError {
+  parseError: ParseError
+  isRepairable: boolean
+}
+
+export interface ContentValidationErrors {
+  validationErrors: ValidationError[]
+}
+
+export type ContentErrors = ContentParseError | ContentValidationErrors
+
+export interface RichValidationError extends ValidationError {
   line?: number
   column?: number
   from: number
   to: number
-  message: string
-  severity: 'info' | 'warning' | 'error'
   actions: Array<{ name: string; apply: () => void }> | null
 }
 
@@ -221,9 +231,11 @@ export interface QueryLanguageOptions {
 }
 
 export type OnChangeQueryLanguage = (queryLanguageId: string) => void
-export type OnChange =
-  | ((content: Content, previousContent: Content, patchResult: JSONPatchResult | null) => void)
-  | null
+export interface OnChangeStatus {
+  contentErrors: ContentErrors
+  patchResult: JSONPatchResult | null
+}
+export type OnChange = ((content: Content, previousContent: Content, OnChangeStatus) => void) | null
 export type OnSelect = (selection: JSONSelection) => void
 export type OnPatch = (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
 export type OnSort = (operations: JSONPatchDocument) => void
@@ -425,7 +437,7 @@ export interface JSONNodeProp {
   expandedMap: JSONPointerMap<boolean> | undefined
   enforceStringMap: JSONPointerMap<boolean> | undefined
   visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
-  validationErrorsMap: JSONPointerMap<ValidationError> | undefined
+  validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   keySearchResultItemsMap: ExtendedSearchResultItem[] | undefined
   valueSearchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
   selection: JSONSelection | undefined
@@ -439,7 +451,7 @@ export interface JSONNodeItem {
   expandedMap: JSONPointerMap<boolean> | undefined
   enforceStringMap: JSONPointerMap<boolean> | undefined
   visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
-  validationErrorsMap: JSONPointerMap<ValidationError> | undefined
+  validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
   selection: JSONSelection | undefined
 }

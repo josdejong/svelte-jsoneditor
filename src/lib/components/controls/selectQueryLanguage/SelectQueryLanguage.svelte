@@ -1,6 +1,6 @@
 <script lang="ts">
   import Icon from 'svelte-awesome'
-  import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons/index.es'
+  import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
   import type { QueryLanguage, OnChangeQueryLanguage } from '../../../types'
 
   export let queryLanguages: QueryLanguage[]

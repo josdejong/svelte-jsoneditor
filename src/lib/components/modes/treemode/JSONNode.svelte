@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons/index.es'
+  import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
   import type { JSONArray, JSONData, JSONObject, JSONPath, JSONPointer } from 'immutable-json-patch'
   import { appendToJSONPointer, compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
@@ -53,6 +53,7 @@
     JSONNodeProp,
     JSONPointerMap,
     JSONSelection,
+    NestedValidationError,
     RenderedItem,
     TreeModeContext,
     ValidationError,
@@ -76,7 +77,7 @@
   export let expandedMap: JSONPointerMap<boolean> | undefined
   export let enforceStringMap: JSONPointerMap<boolean> | undefined
   export let visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
-  export let validationErrorsMap: JSONPointerMap<ValidationError> | undefined
+  export let validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   export let searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
   export let selection: JSONSelection | undefined
   export let context: TreeModeContext
@@ -126,7 +127,7 @@
     expandedMap: JSONPointerMap<boolean> | undefined,
     enforceStringMap: JSONPointerMap<boolean> | undefined,
     visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined,
-    validationErrorsMap: JSONPointerMap<ValidationError> | undefined,
+    validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined,
     searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
     selection: JSONSelection | undefined,
     dragging: DraggingState
@@ -169,7 +170,7 @@
     expandedMap: JSONPointerMap<boolean> | undefined,
     enforceStringMap: JSONPointerMap<boolean> | undefined,
     visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined,
-    validationErrorsMap: JSONPointerMap<ValidationError> | undefined,
+    validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined,
     searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
     selection: JSONSelection | undefined,
     dragging: DraggingState

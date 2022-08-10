@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import Icon from 'svelte-awesome'
-  import { faClock } from '@fortawesome/free-regular-svg-icons/index.es'
+  import { faClock } from '@fortawesome/free-regular-svg-icons'
   import { getContext } from 'svelte'
   import { tooltip } from '../../../components/controls/tooltip/tooltip.js'
 

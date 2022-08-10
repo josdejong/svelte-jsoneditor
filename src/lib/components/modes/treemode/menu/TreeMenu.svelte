@@ -9,7 +9,7 @@
     faSearch,
     faSortAmountDownAlt,
     faUndo
-  } from '@fortawesome/free-solid-svg-icons/index.es'
+  } from '@fortawesome/free-solid-svg-icons'
   import { CONTEXT_MENU_EXPLANATION } from '$lib/constants'
   import { faJSONEditorCollapse, faJSONEditorExpand } from '$lib/img/customFontawesomeIcons'
   import { isObjectOrArray } from '$lib/utils/typeUtils'

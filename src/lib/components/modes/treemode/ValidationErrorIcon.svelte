@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons/index.es'
+  import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
   import Icon from 'svelte-awesome'
   import { getContext } from 'svelte'
   import { tooltip } from '../../controls/tooltip/tooltip'
