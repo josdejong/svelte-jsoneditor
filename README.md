@@ -536,7 +536,7 @@ npm run dev
 Build the library:
 
 ```
-npm run package
+npm run build
 ```
 
 Run unit tests:
