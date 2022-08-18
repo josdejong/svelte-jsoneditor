@@ -14,7 +14,7 @@
   line-height: var(--jse-line-height);
 
   .jse-hidden-input-label {
-    position: absolute;
+    position: fixed;
     right: 0;
     top: 0;
     width: 0;
