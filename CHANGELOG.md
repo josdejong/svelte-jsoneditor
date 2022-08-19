@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.6.3...v0.6.4) (2022-08-19)
+
+
+### Bug Fixes
+
+* [#124](https://github.com/josdejong/svelte-jsoneditor/issues/124) view jumping up when editor gets focus ([b94f531](https://github.com/josdejong/svelte-jsoneditor/commit/b94f5317cfba8f7dbe6debf915b9852949f6196f))
+
 ### [0.6.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.6.2...v0.6.3) (2022-08-16)
 
 
@@ -35,7 +42,6 @@ to `onChange(updatedContent, previousContent, { contentErrors, patchResult })`.
 ### Features
 
 * implement validate method and pass contentErrors via onChange, fixes [#56](https://github.com/josdejong/svelte-jsoneditor/issues/56) ([#119](https://github.com/josdejong/svelte-jsoneditor/issues/119)) ([9847382](https://github.com/josdejong/svelte-jsoneditor/commit/9847382396fe5f853f8ecfde4d5227175c498bf4))
-* implement validate method and pass contentErrors via onChange, fixes [#56](https://github.com/josdejong/svelte-jsoneditor/issues/56) ([#119](https://github.com/josdejong/svelte-jsoneditor/issues/119)) ([705f5f2](https://github.com/josdejong/svelte-jsoneditor/commit/705f5f2ed76a24e671f35f9721ff93d165a4f7bc))
 
 
 ### Bug Fixes
