@@ -1,4 +1,4 @@
-import type { JSONArray, JSONData, JSONObject, JSONPath } from 'immutable-json-patch'
+import type { JSONData, JSONObject, JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer } from 'immutable-json-patch'
 import jsonSourceMap from 'json-source-map'
 import jsonrepair from 'jsonrepair'
@@ -6,14 +6,6 @@ import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
 import { arrayToObject, objectToArray } from './arrayUtils.js'
 import type { Content, ParseError, TextContent, TextLocation } from '../types'
 import { int } from './numberUtils.js'
-
-export function isJSONObject(value: unknown): value is JSONObject {
-  return isObject(value)
-}
-
-export function isJSONArray(value: unknown): value is JSONArray {
-  return Array.isArray(value)
-}
 
 /**
  * Parse the JSON. if this fails, try to repair and parse.
