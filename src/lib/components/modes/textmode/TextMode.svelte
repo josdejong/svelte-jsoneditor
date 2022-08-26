@@ -93,6 +93,7 @@
   const readOnlyCompartment = new Compartment()
   const indentUnitCompartment = new Compartment()
   const tabSizeCompartment = new Compartment()
+  const editableCompartment = new Compartment()
 
   $: isNewDocument = text.length === 0
   $: tooLarge = text && text.length > MAX_DOCUMENT_SIZE_TEXT_MODE
@@ -481,6 +482,7 @@
           top: true
         }),
         readOnlyCompartment.of(EditorState.readOnly.of(readOnly)),
+        editableCompartment.of(EditorView.editable.of(!readOnly)),
         tabSizeCompartment.of(EditorState.tabSize.of(tabSize)),
         indentUnitCompartment.of(createIndentUnit(indentation)),
         EditorView.lineWrapping
