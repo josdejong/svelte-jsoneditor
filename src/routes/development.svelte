@@ -36,6 +36,9 @@
   "stringContainingNumber": "1234",
   "multi\\nline    text": "Hello\\nWorld    text",
   "tab": "Hello\\tTab",
+  "backslash": "back\\\\slash",
+  "forwardslash": "forward\\/slash",
+  "quote": "quote\\"",
   "timestamp": 1534952749890,
   "url": "https://jsoneditoronline.org",
   "array": [
