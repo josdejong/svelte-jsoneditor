@@ -77,26 +77,33 @@ export function jsonUnescapeUnicode(value) {
 }
 
 const controlCharacters = {
+  '\\': '\\\\',
+  // escaped forward slash '\/' is the same as '/', we can't escape/unescape it
   '\b': '\\b',
   '\f': '\\f',
   '\n': '\\n',
   '\r': '\\r',
   '\t': '\\t'
+  // unicode is handled separately
 }
 
 const escapedControlCharacters = {
+  '\\\\': '\\',
+  // escaped forward slash '\/' is the same as '/', we can't escape/unescape it
+  '\\/': '/',
   '\\b': '\b',
   '\\f': '\f',
   '\\n': '\n',
   '\\r': '\r',
   '\\t': '\t'
+  // unicode is handled separately
 }
 
 /**
  * @param {string} value
  */
 export function jsonEscapeControl(value) {
-  return value.replace(/[\b\f\n\r\t]/g, (x) => {
+  return value.replace(/[\b\f\n\r\t\\]/g, (x) => {
     return controlCharacters[x] || x
   })
 }
@@ -105,7 +112,7 @@ export function jsonEscapeControl(value) {
  * @param {string} value
  */
 export function jsonUnescapeControl(value) {
-  return value.replace(/\\[bfnrt]/g, (x) => {
+  return value.replace(/\\[bfnrt\\]/g, (x) => {
     return escapedControlCharacters[x] || x
   })
 }

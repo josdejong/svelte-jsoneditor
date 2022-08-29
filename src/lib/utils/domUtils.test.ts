@@ -45,12 +45,15 @@ describe('domUtils', () => {
 
       strictEqual(escapeValue('greeting'), 'greeting')
       strictEqual(escapeValue('hello\nworld'), 'hello\nworld')
+      strictEqual(escapeValue('hello\\nworld'), 'hello\\nworld')
+      strictEqual(escapeValue('back\\slash'), 'back\\slash')
       strictEqual(escapeValue('😀'), '😀')
       strictEqual(escapeValue('\ud83d\ude00'), '\ud83d\ude00')
 
       strictEqual(unescapeValue('greeting'), 'greeting')
-      strictEqual(escapeValue('hello\nworld'), 'hello\nworld')
-      strictEqual(escapeValue('hello\\nworld'), 'hello\\nworld')
+      strictEqual(unescapeValue('hello\nworld'), 'hello\nworld')
+      strictEqual(unescapeValue('hello\\nworld'), 'hello\\nworld')
+      strictEqual(unescapeValue('back\\slash'), 'back\\slash')
       strictEqual(unescapeValue('😀'), '😀')
       strictEqual(unescapeValue('\ud83d\ude00'), '\ud83d\ude00')
       strictEqual(unescapeValue('\\ud83d\\ude00'), '\\ud83d\\ude00')
@@ -64,11 +67,13 @@ describe('domUtils', () => {
 
       strictEqual(escapeValue('greeting'), 'greeting')
       strictEqual(escapeValue('hello\nworld'), 'hello\\nworld')
+      strictEqual(escapeValue('back\\slash'), 'back\\\\slash')
       strictEqual(escapeValue('😀'), '😀')
       strictEqual(escapeValue('\ud83d\ude00'), '\ud83d\ude00')
 
       strictEqual(unescapeValue('greeting'), 'greeting')
       strictEqual(unescapeValue('hello\\nworld'), 'hello\nworld')
+      strictEqual(unescapeValue('back\\\\slash'), 'back\\slash')
       strictEqual(unescapeValue('\\ud83d\\ude00'), '\\ud83d\\ude00')
       strictEqual(unescapeValue('\ud83d\ude00'), '\ud83d\ude00')
     })
@@ -81,11 +86,13 @@ describe('domUtils', () => {
 
       strictEqual(escapeValue('greeting'), 'greeting')
       strictEqual(escapeValue('hello\nworld'), 'hello\nworld')
+      strictEqual(escapeValue('back\\slash'), 'back\\slash')
       strictEqual(escapeValue('😀'), '\\ud83d\\ude00')
       strictEqual(escapeValue('\ud83d\ude00'), '\\ud83d\\ude00')
 
       strictEqual(unescapeValue('greeting'), 'greeting')
       strictEqual(unescapeValue('hello\\nworld'), 'hello\\nworld')
+      strictEqual(unescapeValue('back\\\\slash'), 'back\\\\slash')
       strictEqual(unescapeValue('\\ud83d\\ude00'), '😀')
       strictEqual(unescapeValue('\ud83d\ude00'), '\ud83d\ude00')
       strictEqual(unescapeValue('\\ud83d\\ude00'), '\ud83d\ude00')
@@ -99,11 +106,13 @@ describe('domUtils', () => {
 
       strictEqual(escapeValue('greeting'), 'greeting')
       strictEqual(escapeValue('hello\nworld'), 'hello\\nworld')
+      strictEqual(escapeValue('back\\slash'), 'back\\\\slash')
       strictEqual(escapeValue('😀'), '\\ud83d\\ude00')
       strictEqual(escapeValue('\ud83d\ude00'), '\\ud83d\\ude00')
 
       strictEqual(unescapeValue('greeting'), 'greeting')
       strictEqual(unescapeValue('hello\\nworld'), 'hello\nworld')
+      strictEqual(unescapeValue('back\\\\slash'), 'back\\slash')
       strictEqual(unescapeValue('\\ud83d\\ude00'), '😀')
       strictEqual(unescapeValue('\ud83d\ude00'), '\ud83d\ude00')
       strictEqual(unescapeValue('\\ud83d\\ude00'), '\ud83d\ude00')
