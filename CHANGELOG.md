@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.6.4...v0.6.5) (2022-08-29)
+
+
+### Features
+
+* [#129](https://github.com/josdejong/svelte-jsoneditor/issues/129) allow passing additional options to `createAjvValidator` ([a66f230](https://github.com/josdejong/svelte-jsoneditor/commit/a66f230998a4e8c52a65d7cc5ce124968dec600f))
+
+
+### Bug Fixes
+
+* [#131](https://github.com/josdejong/svelte-jsoneditor/issues/131) backslash character not being escaped when `escapeControlCharacters: true` ([#133](https://github.com/josdejong/svelte-jsoneditor/issues/133)) ([1657d9a](https://github.com/josdejong/svelte-jsoneditor/commit/1657d9abe9568f76119275c8808f81a2805a1f73))
+
 ### [0.6.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.6.3...v0.6.4) (2022-08-19)
 
 
