@@ -110,7 +110,13 @@
 >
   {#if refRootPopup}
     <div class="jse-absolute-popup-content" style={calculateStyle(refRootPopup, popup.options)}>
-      <input bind:this={refHiddenInput} class="jse-hidden-input" />
+      <input
+        type="text"
+        readonly="readonly"
+        tabindex="-1"
+        class="jse-hidden-input"
+        bind:this={refHiddenInput}
+      />
       <svelte:component this={popup.component} {...popup.props} />
     </div>
   {/if}

@@ -2231,8 +2231,10 @@
   {#if !isSSR}
     <label class="jse-hidden-input-label">
       <input
-        class="jse-hidden-input"
+        type="text"
+        readonly="readonly"
         tabindex="-1"
+        class="jse-hidden-input"
         bind:this={refHiddenInput}
         on:paste={handlePaste}
       />
