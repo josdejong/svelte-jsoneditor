@@ -3,7 +3,7 @@
 <script lang="ts">
   import { faExclamationTriangle, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '../../../utils/debug'
-  import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
+  import { immutableJSONPatch, JSONPatchDocument, revertJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
   import { debounce, noop, uniqueId } from 'lodash-es'
   import { onDestroy, onMount } from 'svelte'
@@ -39,6 +39,7 @@
   import { highlighter } from './codemirror/codemirror-theme'
   import type {
     ContentErrors,
+    JSONPatchResult,
     OnChange,
     ParseError,
     RichValidationError,
@@ -171,11 +172,7 @@
     onBlur
   })
 
-  /**
-   * @param {JSONPatchDocument} operations
-   * @return {JSONPatchResult}
-   */
-  export function patch(operations) {
+  export function patch(operations: JSONPatchDocument): JSONPatchResult {
     debug('patch', operations)
 
     const previousText = text

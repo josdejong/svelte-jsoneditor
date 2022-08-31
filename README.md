@@ -404,7 +404,7 @@ interface RenderValueProps extends RenderValuePropsOptional {
   isSelected: boolean
   isEditing: boolean
   normalization: ValueNormalization
-  onPatch: (patch: JSONPatchDocument) => void
+  onPatch: (patch: JSONPatchDocument, afterPatch?: AfterPatchCallback) => JSONPatchResult
   onPasteJson: (pastedJson: { path: Path; contents: JSONData }) => void
   onSelect: (selection: Selection) => void
   onFind: (findAndReplace: boolean) => void
