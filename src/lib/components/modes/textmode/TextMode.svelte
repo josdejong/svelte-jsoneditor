@@ -179,13 +179,7 @@
     const previousJson = JSON.parse(text)
     const updatedJson = immutableJSONPatch(previousJson, operations)
     const undo = revertJSONPatch(previousJson, operations)
-    const updatedText = JSON.stringify(updatedJson, null, indentation)
-
-    if (updatedText !== text) {
-      const previousText = text
-      text = updatedText
-      emitOnChange(text, previousText)
-    }
+    text = JSON.stringify(updatedJson, null, indentation)
 
     return {
       json: updatedJson,
@@ -204,13 +198,7 @@
 
     try {
       const json = JSON.parse(text)
-      const updatedText = JSON.stringify(json, null, indentation)
-
-      if (updatedText !== text) {
-        const previousText = text
-        text = updatedText
-        emitOnChange(text, previousText)
-      }
+      text = JSON.stringify(json, null, indentation)
     } catch (err) {
       onError(err)
     }
@@ -225,13 +213,7 @@
 
     try {
       const json = JSON.parse(text)
-      const updatedText = JSON.stringify(json)
-
-      if (updatedText !== text) {
-        const previousText = text
-        text = updatedText
-        emitOnChange(text, previousText)
-      }
+      text = JSON.stringify(json)
     } catch (err) {
       onError(err)
     }
@@ -245,15 +227,9 @@
     }
 
     try {
-      const updatedText = jsonrepair(text)
+      text = jsonrepair(text)
       jsonStatus = JSON_STATUS_VALID
       jsonParseError = undefined
-
-      if (text !== updatedText) {
-        const previousText = text
-        text = updatedText
-        emitOnChange(text, previousText)
-      }
     } catch (err) {
       onError(err)
     }
@@ -557,9 +533,11 @@
       return
     }
 
-    if (codeMirrorView && text !== codeMirrorText) {
-      debug('setCodeMirrorValue length=', text.length)
+    const isChanged = text !== codeMirrorText
+    debug('setCodeMirrorValue', { isChanged, length: text.length })
 
+    if (codeMirrorView && isChanged) {
+      const previousText = codeMirrorText
       codeMirrorText = text
 
       // keep state
@@ -573,6 +551,7 @@
       })
 
       updateCanUndoRedo()
+      emitOnChange(text, previousText)
     }
   }
 
@@ -614,14 +593,15 @@
     }
 
     codeMirrorText = getCodeMirrorValue()
-    if (codeMirrorText !== text) {
-      debug('text changed')
 
-      const previousText = codeMirrorText
+    const isChanged = codeMirrorText !== text
+    debug('onChangeCodeMirrorValue', { isChanged })
+
+    if (isChanged) {
+      const previousText = text
       text = codeMirrorText
 
       updateCanUndoRedo()
-
       emitOnChange(text, previousText)
     }
   }
