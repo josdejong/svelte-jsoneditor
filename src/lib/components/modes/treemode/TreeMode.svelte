@@ -474,6 +474,7 @@
       return
     }
 
+    const previousContent = { json, text }
     const previousState = documentState
     const previousJson = json
     const previousText = text
@@ -491,6 +492,11 @@
       previousText,
       previousTextIsRepaired
     })
+
+    // TODO: work out the patchResult when fully replacing json (is just a replace of the root)
+    const patchResult = null
+
+    emitOnChange(previousContent, patchResult)
   }
 
   function applyExternalText(updatedText) {
@@ -507,6 +513,7 @@
       return
     }
 
+    const previousContent = { json, text }
     const previousJson = json
     const previousState = documentState
     const previousText = text
@@ -543,6 +550,11 @@
       previousText,
       previousTextIsRepaired
     })
+
+    // TODO: work out the patchResult when fully replacing json (is just a replace of the root)
+    const patchResult = null
+
+    emitOnChange(previousContent, patchResult)
   }
 
   function clearSelectionWhenNotExisting(json) {
@@ -661,6 +673,7 @@
       throw new Error('Cannot apply patch: no JSON')
     }
 
+    const previousContent = { json, text }
     const previousJson = json
     const previousState = documentState
     const previousText = text
@@ -712,12 +725,16 @@
       }
     })
 
-    return {
+    const patchResult = {
       json,
       previousJson,
       undo,
       redo: operations
     }
+
+    emitOnChange(previousContent, patchResult)
+
+    return patchResult
   }
 
   // TODO: cleanup logging
@@ -1541,12 +1558,9 @@
 
     debug('handlePatch', operations, afterPatch)
 
-    const previousContent = { json, text }
     const patchResult = patch(operations, afterPatch)
 
     pastedJson = undefined
-
-    emitOnChange(previousContent, patchResult)
 
     return patchResult
   }
