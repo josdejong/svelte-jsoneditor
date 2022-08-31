@@ -126,9 +126,11 @@
     }
 
     try {
+      codeMirrorText = !textEditorDisabled ? text : ''
+
       codeMirrorView = createCodeMirrorView({
         target: codeMirrorRef,
-        initialText: !textEditorDisabled ? text : '',
+        initialText: codeMirrorText,
         readOnly,
         indentation
       })
