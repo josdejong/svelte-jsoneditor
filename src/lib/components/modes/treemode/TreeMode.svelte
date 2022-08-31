@@ -498,12 +498,14 @@
       return
     }
 
-    if (updatedText === text) {
+    const isChanged = updatedText === text
+
+    debug('update external text', { isChanged })
+
+    if (isChanged) {
       // no actual change, don't do anything
       return
     }
-
-    debug('update external text')
 
     const previousJson = json
     const previousState = documentState

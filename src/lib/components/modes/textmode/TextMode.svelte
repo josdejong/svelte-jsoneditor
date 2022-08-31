@@ -176,13 +176,14 @@
   export function patch(operations: JSONPatchDocument): JSONPatchResult {
     debug('patch', operations)
 
-    const previousText = text
     const previousJson = JSON.parse(text)
     const updatedJson = immutableJSONPatch(previousJson, operations)
     const undo = revertJSONPatch(previousJson, operations)
-    text = JSON.stringify(updatedJson, null, indentation)
+    const updatedText = JSON.stringify(updatedJson, null, indentation)
 
-    if (text !== previousText) {
+    if (updatedText !== text) {
+      const previousText = text
+      text = updatedText
       emitOnChange(text, previousText)
     }
 
@@ -202,11 +203,12 @@
     }
 
     try {
-      const previousText = text
       const json = JSON.parse(text)
-      text = JSON.stringify(json, null, indentation)
+      const updatedText = JSON.stringify(json, null, indentation)
 
-      if (text !== previousText) {
+      if (updatedText !== text) {
+        const previousText = text
+        text = updatedText
         emitOnChange(text, previousText)
       }
     } catch (err) {
@@ -222,11 +224,12 @@
     }
 
     try {
-      const previousText = text
       const json = JSON.parse(text)
-      text = JSON.stringify(json)
+      const updatedText = JSON.stringify(json)
 
-      if (text !== previousText) {
+      if (updatedText !== text) {
+        const previousText = text
+        text = updatedText
         emitOnChange(text, previousText)
       }
     } catch (err) {
@@ -242,12 +245,13 @@
     }
 
     try {
-      const previousText = text
-      text = jsonrepair(text)
+      const updatedText = jsonrepair(text)
       jsonStatus = JSON_STATUS_VALID
       jsonParseError = undefined
 
-      if (text !== previousText) {
+      if (text !== updatedText) {
+        const previousText = text
+        text = updatedText
         emitOnChange(text, previousText)
       }
     } catch (err) {
@@ -611,9 +615,9 @@
 
     codeMirrorText = getCodeMirrorValue()
     if (codeMirrorText !== text) {
-      const previousText = codeMirrorText
-
       debug('text changed')
+
+      const previousText = codeMirrorText
       text = codeMirrorText
 
       updateCanUndoRedo()
