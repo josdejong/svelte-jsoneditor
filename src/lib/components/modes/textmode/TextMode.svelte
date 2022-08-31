@@ -3,7 +3,8 @@
 <script lang="ts">
   import { faExclamationTriangle, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '../../../utils/debug'
-  import { immutableJSONPatch, JSONPatchDocument, revertJSONPatch } from 'immutable-json-patch'
+  import type { JSONPatchDocument } from 'immutable-json-patch'
+  import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
   import { debounce, noop, uniqueId } from 'lodash-es'
   import { onDestroy, onMount } from 'svelte'
