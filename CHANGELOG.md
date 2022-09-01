@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.7.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.6.6...v0.7.0) (2022-09-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* Formerly, `onChange` did only fire after a change made by a user. Now, `onChange` also fires 
+after programmatic changes: when changing props or calling `patch`, `set`, `update`.
+
+### Features
+
+* always fire onChange, and let onPatch return a PatchResult (fixes [#128](https://github.com/josdejong/svelte-jsoneditor/issues/128)) ([fb45518](https://github.com/josdejong/svelte-jsoneditor/commit/fb4551805c796137ea85b90f6e00603a6244eeaa))
+* update dependencies ([#135](https://github.com/josdejong/svelte-jsoneditor/issues/135)) ([c2e8e0a](https://github.com/josdejong/svelte-jsoneditor/commit/c2e8e0a29d01ad848518cce7dd1226bc7509f499))
+
+
+### Bug Fixes
+
+* expanded state sometimes being reset when syncing content ([a6cce69](https://github.com/josdejong/svelte-jsoneditor/commit/a6cce69df27921d015a19957152a447ad1ea52b0))
+
 ### [0.6.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.6.5...v0.6.6) (2022-08-29)
 
 
