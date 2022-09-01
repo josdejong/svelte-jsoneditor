@@ -73,8 +73,8 @@
   //
   //    @import 'svelte-jsoneditor/themes/jse-theme-dark.css';
   //
-  @import '../../lib/themes/jse-theme-dark.css';
-  @import 'themes/jse-theme-big.css';
+  @import '../../../lib/themes/jse-theme-dark.css';
+  @import '../../themes/jse-theme-big.css';
 
   .page {
     width: 100%;

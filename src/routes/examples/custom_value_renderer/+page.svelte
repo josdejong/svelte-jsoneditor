@@ -1,6 +1,6 @@
 <script>
   import { EnumValue, JSONEditor, renderValue } from 'svelte-jsoneditor'
-  import ReadonlyPassword from './components/ReadonlyPassword.svelte'
+  import ReadonlyPassword from '../../components/ReadonlyPassword.svelte'
 
   let content = {
     text: undefined, // used when in text mode
