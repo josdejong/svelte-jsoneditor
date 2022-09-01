@@ -474,6 +474,7 @@
       return
     }
 
+    const previousContent = { json, text }
     const previousState = documentState
     const previousJson = json
     const previousText = text
@@ -491,6 +492,14 @@
       previousText,
       previousTextIsRepaired
     })
+
+    // we could work out a patchResult, or use patch(), but only when the previous and new
+    // contents are both json and not text. We go for simplicity and consistency here and
+    // let the functions applyExternalJson and applyExternalText _not_ return
+    // a patchResult ever.
+    const patchResult = null
+
+    emitOnChange(previousContent, patchResult)
   }
 
   function applyExternalText(updatedText) {
@@ -498,13 +507,16 @@
       return
     }
 
-    if (updatedText === text) {
+    const isChanged = updatedText === text
+
+    debug('update external text', { isChanged })
+
+    if (isChanged) {
       // no actual change, don't do anything
       return
     }
 
-    debug('update external text')
-
+    const previousContent = { json, text }
     const previousJson = json
     const previousState = documentState
     const previousText = text
@@ -541,6 +553,14 @@
       previousText,
       previousTextIsRepaired
     })
+
+    // we could work out a patchResult, or use patch(), but only when the previous and new
+    // contents are both json and not text. We go for simplicity and consistency here and
+    // let the functions applyExternalJson and applyExternalText _not_ return
+    // a patchResult ever.
+    const patchResult = null
+
+    emitOnChange(previousContent, patchResult)
   }
 
   function clearSelectionWhenNotExisting(json) {
@@ -659,6 +679,7 @@
       throw new Error('Cannot apply patch: no JSON')
     }
 
+    const previousContent = { json, text }
     const previousJson = json
     const previousState = documentState
     const previousText = text
@@ -710,12 +731,16 @@
       }
     })
 
-    return {
+    const patchResult = {
       json,
       previousJson,
       undo,
       redo: operations
     }
+
+    emitOnChange(previousContent, patchResult)
+
+    return patchResult
   }
 
   // TODO: cleanup logging
@@ -774,7 +799,7 @@
 
   export function acceptAutoRepair() {
     if (textIsRepaired && json !== undefined) {
-      handleChangeJson(json)
+      handleReplaceJson(json)
     }
 
     return { json, text }
@@ -1083,7 +1108,7 @@
       debug('handleInsert', { type, newValue })
 
       const path = []
-      handleChangeJson(newValue, (patchedJson, patchedState) => ({
+      handleReplaceJson(newValue, (patchedJson, patchedState) => ({
         state: {
           ...expandRecursive(patchedJson, patchedState, path),
           selection: createInsideSelection(path)
@@ -1539,17 +1564,14 @@
 
     debug('handlePatch', operations, afterPatch)
 
-    const previousContent = { json, text }
     const patchResult = patch(operations, afterPatch)
 
     pastedJson = undefined
 
-    emitOnChange(previousContent, patchResult)
-
     return patchResult
   }
 
-  function handleChangeJson(updatedJson: JSONData, afterPatch?: AfterPatchCallback) {
+  function handleReplaceJson(updatedJson: JSONData, afterPatch?: AfterPatchCallback) {
     const previousState = documentState
     const previousJson = json
     const previousText = text
@@ -1576,7 +1598,9 @@
       previousTextIsRepaired
     })
 
-    // TODO: work out the patchResult when fully replacing json (is just a replace of the root)
+    // we could work out a patchResult, or use patch(), but only when the previous and new
+    // contents are both json and not text. We go for simplicity and consistency here and
+    // do _not_ return a patchResult ever.
     const patchResult = null
 
     emitOnChange(previousContent, patchResult)

@@ -195,7 +195,7 @@ const editor = new JSONEditor({
 
 - `onError(err: Error)`.
   Callback fired when an error occurs. Default implementation is to log an error in the console and show a simple alert message to the user.
-- `onChange(content: Content, previousContent: Content, changeStatus: { contentErrors: ContentErrors, patchResult: JSONPatchResult | null })`. The callback which is invoked on every change made by a user in the JSON document. The callback is _not_ triggered after programmatic changes made via methods like `.set()`, `.update()`, or `.patch()`. The parameter `patchResult` is only available in `tree` mode, and not in `text` mode, since a change in arbitrary text cannot be expressed as a JSON Patch document.
+- `onChange(content: Content, previousContent: Content, changeStatus: { contentErrors: ContentErrors, patchResult: JSONPatchResult | null })`. The callback which is invoked on every of the contents, both changes made by a user and programmatic changes made via methods like `.set()`, `.update()`, or `.patch()`. The parameter `patchResult` is only available in `tree` mode, and not in `text` mode, since a change in arbitrary text cannot be expressed as a JSON Patch document.
 - `onChangeMode(mode: 'tree' | 'text')`. Invoked when the mode is changed.
 - `onClassName(path: Path, value: any): string | undefined`.
   Add a custom class name to specific nodes, based on their path and/or value.
@@ -404,7 +404,7 @@ interface RenderValueProps extends RenderValuePropsOptional {
   isSelected: boolean
   isEditing: boolean
   normalization: ValueNormalization
-  onPatch: (patch: JSONPatchDocument) => void
+  onPatch: (patch: JSONPatchDocument, afterPatch?: AfterPatchCallback) => JSONPatchResult
   onPasteJson: (pastedJson: { path: Path; contents: JSONData }) => void
   onSelect: (selection: Selection) => void
   onFind: (findAndReplace: boolean) => void

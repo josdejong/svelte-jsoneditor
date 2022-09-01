@@ -3,6 +3,7 @@
 <script lang="ts">
   import { faExclamationTriangle, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '../../../utils/debug'
+  import type { JSONPatchDocument } from 'immutable-json-patch'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
   import { debounce, noop, uniqueId } from 'lodash-es'
@@ -39,6 +40,7 @@
   import { highlighter } from './codemirror/codemirror-theme'
   import type {
     ContentErrors,
+    JSONPatchResult,
     OnChange,
     ParseError,
     RichValidationError,
@@ -124,9 +126,11 @@
     }
 
     try {
+      codeMirrorText = !textEditorDisabled ? text : ''
+
       codeMirrorView = createCodeMirrorView({
         target: codeMirrorRef,
-        initialText: !textEditorDisabled ? text : '',
+        initialText: codeMirrorText,
         readOnly,
         indentation
       })
@@ -171,22 +175,13 @@
     onBlur
   })
 
-  /**
-   * @param {JSONPatchDocument} operations
-   * @return {JSONPatchResult}
-   */
-  export function patch(operations) {
+  export function patch(operations: JSONPatchDocument): JSONPatchResult {
     debug('patch', operations)
 
-    const previousText = text
     const previousJson = JSON.parse(text)
     const updatedJson = immutableJSONPatch(previousJson, operations)
     const undo = revertJSONPatch(previousJson, operations)
     text = JSON.stringify(updatedJson, null, indentation)
-
-    if (text !== previousText) {
-      emitOnChange(text, previousText)
-    }
 
     return {
       json: updatedJson,
@@ -204,13 +199,8 @@
     }
 
     try {
-      const previousText = text
       const json = JSON.parse(text)
       text = JSON.stringify(json, null, indentation)
-
-      if (text !== previousText) {
-        emitOnChange(text, previousText)
-      }
     } catch (err) {
       onError(err)
     }
@@ -224,13 +214,8 @@
     }
 
     try {
-      const previousText = text
       const json = JSON.parse(text)
       text = JSON.stringify(json)
-
-      if (text !== previousText) {
-        emitOnChange(text, previousText)
-      }
     } catch (err) {
       onError(err)
     }
@@ -244,14 +229,9 @@
     }
 
     try {
-      const previousText = text
       text = jsonrepair(text)
       jsonStatus = JSON_STATUS_VALID
       jsonParseError = undefined
-
-      if (text !== previousText) {
-        emitOnChange(text, previousText)
-      }
     } catch (err) {
       onError(err)
     }
@@ -555,9 +535,11 @@
       return
     }
 
-    if (codeMirrorView && text !== codeMirrorText) {
-      debug('setCodeMirrorValue length=', text.length)
+    const isChanged = text !== codeMirrorText
+    debug('setCodeMirrorValue', { isChanged, length: text.length })
 
+    if (codeMirrorView && isChanged) {
+      const previousText = codeMirrorText
       codeMirrorText = text
 
       // keep state
@@ -571,6 +553,7 @@
       })
 
       updateCanUndoRedo()
+      emitOnChange(text, previousText)
     }
   }
 
@@ -612,14 +595,15 @@
     }
 
     codeMirrorText = getCodeMirrorValue()
-    if (codeMirrorText !== text) {
-      const previousText = codeMirrorText
 
-      debug('text changed')
+    const isChanged = codeMirrorText !== text
+    debug('onChangeCodeMirrorValue', { isChanged })
+
+    if (isChanged) {
+      const previousText = text
       text = codeMirrorText
 
       updateCanUndoRedo()
-
       emitOnChange(text, previousText)
     }
   }

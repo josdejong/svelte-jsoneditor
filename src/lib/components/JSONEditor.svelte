@@ -19,6 +19,7 @@
     Content,
     ContentErrors,
     JSONEditorPropsOptional,
+    JSONPatchResult,
     MenuItem,
     MenuSeparatorItem,
     OnBlur,
@@ -124,7 +125,7 @@
     content = updatedContent
   }
 
-  export function patch(operations: JSONPatchDocument): void {
+  export function patch(operations: JSONPatchDocument): JSONPatchResult {
     if (isTextContent(content)) {
       try {
         content = {
