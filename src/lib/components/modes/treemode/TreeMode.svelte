@@ -225,7 +225,8 @@
     }
   }
 
-  let documentState = createDocumentState({ json, expand: getDefaultExpand(json) })
+  let documentStateInitialized = false
+  let documentState = createDocumentState()
   let searchResult: SearchResult | undefined
 
   let normalization: ValueNormalization
@@ -481,7 +482,7 @@
     const previousTextIsRepaired = textIsRepaired
 
     json = updatedJson
-    documentState = expandWithCallback(json, documentState, rootPath, getDefaultExpand(json))
+    expandWhenNotInitialized(json)
     text = undefined
     textIsRepaired = false
     clearSelectionWhenNotExisting(json)
@@ -524,7 +525,7 @@
 
     try {
       json = JSON.parse(updatedText)
-      documentState = expandWithCallback(json, documentState, rootPath, getDefaultExpand(json))
+      expandWhenNotInitialized(json)
       text = updatedText
       textIsRepaired = false
       parseError = undefined
@@ -532,7 +533,7 @@
     } catch (err) {
       try {
         json = JSON.parse(jsonrepair(updatedText))
-        documentState = expandWithCallback(json, documentState, rootPath, getDefaultExpand(json))
+        expandWhenNotInitialized(json)
         text = updatedText
         textIsRepaired = true
         parseError = undefined
@@ -561,6 +562,13 @@
     const patchResult = null
 
     emitOnChange(previousContent, patchResult)
+  }
+
+  function expandWhenNotInitialized(json) {
+    if (!documentStateInitialized) {
+      documentStateInitialized = true
+      documentState = expandWithCallback(json, documentState, rootPath, getDefaultExpand(json))
+    }
   }
 
   function clearSelectionWhenNotExisting(json) {

@@ -53,7 +53,6 @@ export type CreateDocumentStateProps = {
   select?: CreateSelection
 }
 
-// TODO: write unit tests
 export function createDocumentState(props?: CreateDocumentStateProps): DocumentState {
   let documentState: DocumentState = {
     expandedMap: {},

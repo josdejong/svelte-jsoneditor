@@ -400,6 +400,26 @@
     >
       Set unrepairable text
     </button>
+  </p>
+  <p class="buttons">
+    <button
+      on:click={() => {
+        refTreeEditor.patch([{ op: 'add', path: '/updated', value: '2022-09-01T10:13:44Z' }])
+      }}
+    >
+      Patch json in tree editor
+    </button>
+    <button
+      on:click={() => {
+        const content = refTreeEditor.get()
+        const updatedContent = {
+          json: { ...content.json, updated: '2022-09-01T10:13:44Z' }
+        }
+        refTreeEditor.set(updatedContent)
+      }}
+    >
+      Update json in tree editor
+    </button>
     <button on:click={openInWindow}>Open editor in new window</button>
     <input
       type="file"
