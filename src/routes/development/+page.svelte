@@ -1,7 +1,3 @@
-<script context="module" lang="ts">
-  export const prerender = true
-</script>
-
 <script lang="ts">
   import {
     createAjvValidator,
@@ -13,7 +9,7 @@
     EditableValue,
     ReadonlyValue
   } from '$lib'
-  import { useLocalStorage } from '../lib/utils/localStorageUtils.js'
+  import { useLocalStorage } from '../../lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
   import { tick } from 'svelte'
 
@@ -559,8 +555,8 @@ See https://github.com/sveltejs/kit/issues/981
 {/if}
 
 <style lang="scss">
-  @import '../lib/themes/jse-theme-dark.css';
-  @import 'examples/themes/jse-theme-big.css';
+  @import '../../lib/themes/jse-theme-dark.css';
+  @import '../themes/jse-theme-big.css';
 
   .demo-app {
     margin: -10px; // compensate for the padding of the root element
