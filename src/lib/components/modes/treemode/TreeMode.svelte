@@ -139,6 +139,7 @@
   import { truncate } from '../../../utils/stringUtils.js'
   import { MAX_CHARACTERS_TEXT_PREVIEW } from '../../../constants.js'
   import memoizeOne from 'memoize-one'
+  import { isTextContent } from '$lib'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -1547,6 +1548,13 @@
   }
 
   function emitOnChange(previousContent: Content, patchResult: JSONPatchResult | null) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    if (previousContent.json === undefined && previousContent?.text === undefined) {
+      // initialization -> do not fire an onChange event
+      return
+    }
+
     // make sure we cannot send an invalid contents like having both
     // json and text defined, or having none defined
     if (text !== undefined) {
