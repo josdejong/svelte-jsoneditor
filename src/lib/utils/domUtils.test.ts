@@ -43,17 +43,20 @@ describe('domUtils', () => {
         escapeUnicodeCharacters: false
       })
 
-      strictEqual('greeting', escapeValue('greeting'))
-      strictEqual('hello\nworld', escapeValue('hello\nworld'))
-      strictEqual('😀', escapeValue('😀'))
-      strictEqual('\ud83d\ude00', escapeValue('\ud83d\ude00'))
+      strictEqual(escapeValue('greeting'), 'greeting')
+      strictEqual(escapeValue('hello\nworld'), 'hello\nworld')
+      strictEqual(escapeValue('hello\\nworld'), 'hello\\nworld')
+      strictEqual(escapeValue('back\\slash'), 'back\\slash')
+      strictEqual(escapeValue('😀'), '😀')
+      strictEqual(escapeValue('\ud83d\ude00'), '\ud83d\ude00')
 
-      strictEqual('greeting', unescapeValue('greeting'))
-      strictEqual('hello\nworld', escapeValue('hello\nworld'))
-      strictEqual('hello\\nworld', escapeValue('hello\\nworld'))
-      strictEqual('😀', unescapeValue('😀'))
-      strictEqual('\ud83d\ude00', unescapeValue('\ud83d\ude00'))
-      strictEqual('\\ud83d\\ude00', unescapeValue('\\ud83d\\ude00'))
+      strictEqual(unescapeValue('greeting'), 'greeting')
+      strictEqual(unescapeValue('hello\nworld'), 'hello\nworld')
+      strictEqual(unescapeValue('hello\\nworld'), 'hello\\nworld')
+      strictEqual(unescapeValue('back\\slash'), 'back\\slash')
+      strictEqual(unescapeValue('😀'), '😀')
+      strictEqual(unescapeValue('\ud83d\ude00'), '\ud83d\ude00')
+      strictEqual(unescapeValue('\\ud83d\\ude00'), '\\ud83d\\ude00')
     })
 
     it('escapeControlCharacters=true, escapeUnicodeCharacters=false', () => {
@@ -62,15 +65,17 @@ describe('domUtils', () => {
         escapeUnicodeCharacters: false
       })
 
-      strictEqual('greeting', escapeValue('greeting'))
-      strictEqual('hello\\nworld', escapeValue('hello\nworld'))
-      strictEqual('😀', escapeValue('😀'))
-      strictEqual('\ud83d\ude00', escapeValue('\ud83d\ude00'))
+      strictEqual(escapeValue('greeting'), 'greeting')
+      strictEqual(escapeValue('hello\nworld'), 'hello\\nworld')
+      strictEqual(escapeValue('back\\slash'), 'back\\\\slash')
+      strictEqual(escapeValue('😀'), '😀')
+      strictEqual(escapeValue('\ud83d\ude00'), '\ud83d\ude00')
 
-      strictEqual('greeting', unescapeValue('greeting'))
-      strictEqual('hello\nworld', unescapeValue('hello\\nworld'))
-      strictEqual('\\ud83d\\ude00', unescapeValue('\\ud83d\\ude00'))
-      strictEqual('\ud83d\ude00', unescapeValue('\ud83d\ude00'))
+      strictEqual(unescapeValue('greeting'), 'greeting')
+      strictEqual(unescapeValue('hello\\nworld'), 'hello\nworld')
+      strictEqual(unescapeValue('back\\\\slash'), 'back\\slash')
+      strictEqual(unescapeValue('\\ud83d\\ude00'), '\\ud83d\\ude00')
+      strictEqual(unescapeValue('\ud83d\ude00'), '\ud83d\ude00')
     })
 
     it('escapeControlCharacters=false, escapeUnicodeCharacters=true', () => {
@@ -79,16 +84,18 @@ describe('domUtils', () => {
         escapeUnicodeCharacters: true
       })
 
-      strictEqual('greeting', escapeValue('greeting'))
-      strictEqual('hello\nworld', escapeValue('hello\nworld'))
-      strictEqual('\\ud83d\\ude00', escapeValue('😀'))
-      strictEqual('\\ud83d\\ude00', escapeValue('\ud83d\ude00'))
+      strictEqual(escapeValue('greeting'), 'greeting')
+      strictEqual(escapeValue('hello\nworld'), 'hello\nworld')
+      strictEqual(escapeValue('back\\slash'), 'back\\slash')
+      strictEqual(escapeValue('😀'), '\\ud83d\\ude00')
+      strictEqual(escapeValue('\ud83d\ude00'), '\\ud83d\\ude00')
 
-      strictEqual('greeting', unescapeValue('greeting'))
-      strictEqual('hello\\nworld', unescapeValue('hello\\nworld'))
-      strictEqual('😀', unescapeValue('\\ud83d\\ude00'))
-      strictEqual('\ud83d\ude00', unescapeValue('\ud83d\ude00'))
-      strictEqual('\ud83d\ude00', unescapeValue('\\ud83d\\ude00'))
+      strictEqual(unescapeValue('greeting'), 'greeting')
+      strictEqual(unescapeValue('hello\\nworld'), 'hello\\nworld')
+      strictEqual(unescapeValue('back\\\\slash'), 'back\\\\slash')
+      strictEqual(unescapeValue('\\ud83d\\ude00'), '😀')
+      strictEqual(unescapeValue('\ud83d\ude00'), '\ud83d\ude00')
+      strictEqual(unescapeValue('\\ud83d\\ude00'), '\ud83d\ude00')
     })
 
     it('escapeControlCharacters=true, escapeUnicodeCharacters=true', () => {
@@ -97,22 +104,24 @@ describe('domUtils', () => {
         escapeUnicodeCharacters: true
       })
 
-      strictEqual('greeting', escapeValue('greeting'))
-      strictEqual('hello\\nworld', escapeValue('hello\nworld'))
-      strictEqual('\\ud83d\\ude00', escapeValue('😀'))
-      strictEqual('\\ud83d\\ude00', escapeValue('\ud83d\ude00'))
+      strictEqual(escapeValue('greeting'), 'greeting')
+      strictEqual(escapeValue('hello\nworld'), 'hello\\nworld')
+      strictEqual(escapeValue('back\\slash'), 'back\\\\slash')
+      strictEqual(escapeValue('😀'), '\\ud83d\\ude00')
+      strictEqual(escapeValue('\ud83d\ude00'), '\\ud83d\\ude00')
 
-      strictEqual('greeting', unescapeValue('greeting'))
-      strictEqual('hello\nworld', unescapeValue('hello\\nworld'))
-      strictEqual('😀', unescapeValue('\\ud83d\\ude00'))
-      strictEqual('\ud83d\ude00', unescapeValue('\ud83d\ude00'))
-      strictEqual('\ud83d\ude00', unescapeValue('\\ud83d\\ude00'))
+      strictEqual(unescapeValue('greeting'), 'greeting')
+      strictEqual(unescapeValue('hello\\nworld'), 'hello\nworld')
+      strictEqual(unescapeValue('back\\\\slash'), 'back\\slash')
+      strictEqual(unescapeValue('\\ud83d\\ude00'), '😀')
+      strictEqual(unescapeValue('\ud83d\ude00'), '\ud83d\ude00')
+      strictEqual(unescapeValue('\\ud83d\\ude00'), '\ud83d\ude00')
     })
   })
 
   it('jsonEscapeUnicode', () => {
-    strictEqual('\\u260e', jsonEscapeUnicode('\u260e'))
-    strictEqual('\\ud83d\\ude00', jsonEscapeUnicode('\ud83d\ude00'))
-    strictEqual('\b\f\n\r\t', jsonEscapeUnicode('\b\f\n\r\t'))
+    strictEqual(jsonEscapeUnicode('\u260e'), '\\u260e')
+    strictEqual(jsonEscapeUnicode('\ud83d\ude00'), '\\ud83d\\ude00')
+    strictEqual(jsonEscapeUnicode('\b\f\n\r\t'), '\b\f\n\r\t')
   })
 })

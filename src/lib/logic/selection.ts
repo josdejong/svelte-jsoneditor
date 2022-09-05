@@ -1,6 +1,8 @@
 import {
   compileJSONPointer,
   getIn,
+  isJSONArray,
+  isJSONObject,
   isJSONPatchCopy,
   isJSONPatchMove,
   type JSONData,
@@ -30,7 +32,6 @@ import type {
   ValueSelection
 } from '../types.js'
 import { CaretType, SelectionType } from '../types.js'
-import { isJSONArray, isJSONObject } from '../utils/jsonUtils.js'
 import { int } from '../utils/numberUtils.js'
 
 export function isAfterSelection(

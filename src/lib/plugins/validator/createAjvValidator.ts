@@ -1,3 +1,4 @@
+import type { Options } from 'ajv'
 import Ajv from 'ajv-dist'
 import type { JSONData } from 'immutable-json-patch'
 import { parsePath } from 'immutable-json-patch'
@@ -10,16 +11,19 @@ import { ValidationSeverity } from '../../types.js'
  * @param [schemaDefinitions=undefined]
  *                    An object containing JSON Schema definitions
  *                    which can be referenced using $ref
+ * @param [ajvOptions] Optional extra options for Ajv
  * @return Returns a validation function
  */
 export function createAjvValidator(
   schema: JSONData,
-  schemaDefinitions: JSONData = undefined
+  schemaDefinitions: JSONData = undefined,
+  ajvOptions: Options = undefined
 ): Validator {
   const ajv = new Ajv({
     allErrors: true,
     verbose: true,
-    $data: true
+    $data: true,
+    ...ajvOptions
   })
 
   if (schemaDefinitions) {

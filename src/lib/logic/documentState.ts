@@ -1,25 +1,25 @@
-import type {
-  JSONArray,
-  JSONData,
-  JSONPatchAdd,
-  JSONPatchCopy,
-  JSONPatchDocument,
-  JSONPatchMove,
-  JSONPatchRemove,
-  JSONPatchReplace,
-  JSONPath,
-  JSONPointer
-} from 'immutable-json-patch'
 import {
   compileJSONPointer,
   existsIn,
   getIn,
   immutableJSONPatch,
+  isJSONArray,
+  isJSONObject,
   isJSONPatchAdd,
   isJSONPatchCopy,
   isJSONPatchMove,
   isJSONPatchRemove,
   isJSONPatchReplace,
+  type JSONArray,
+  type JSONData,
+  type JSONPatchAdd,
+  type JSONPatchCopy,
+  type JSONPatchDocument,
+  type JSONPatchMove,
+  type JSONPatchRemove,
+  type JSONPatchReplace,
+  type JSONPath,
+  type JSONPointer,
   parseJSONPointer,
   parsePath,
   startsWithJSONPointer
@@ -43,7 +43,6 @@ import type {
   VisibleSection
 } from '../types'
 import { CaretType } from '../types.js'
-import { isJSONArray, isJSONObject } from '../utils/jsonUtils.js'
 import { int } from '../utils/numberUtils.js'
 
 type CreateSelection = (json: JSONData, documentState: DocumentState) => JSONSelection
@@ -54,7 +53,6 @@ export type CreateDocumentStateProps = {
   select?: CreateSelection
 }
 
-// TODO: write unit tests
 export function createDocumentState(props?: CreateDocumentStateProps): DocumentState {
   let documentState: DocumentState = {
     expandedMap: {},

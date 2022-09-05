@@ -1,25 +1,19 @@
 import { cloneDeepWith, first, initial, isEmpty, last, times } from 'lodash-es'
-import type {
-  JSONData,
-  JSONPatchDocument,
-  JSONPatchOperation,
-  JSONPath
-} from 'immutable-json-patch'
 import {
   compileJSONPointer,
   getIn,
+  isJSONArray,
+  isJSONObject,
   isJSONPatchMove,
   isJSONPatchRemove,
+  type JSONData,
+  type JSONPatchDocument,
+  type JSONPatchOperation,
+  type JSONPath,
   parseJSONPointer,
   revertJSONPatch
 } from 'immutable-json-patch'
-import {
-  isJSONArray,
-  isJSONObject,
-  parseAndRepair,
-  parseAndRepairOrUndefined,
-  parsePartialJson
-} from '../utils/jsonUtils.js'
+import { parseAndRepair, parseAndRepairOrUndefined, parsePartialJson } from '../utils/jsonUtils.js'
 import { findUniqueName } from '../utils/stringUtils.js'
 import { isObject, isObjectOrArray } from '../utils/typeUtils.js'
 import { getNextKeys } from './documentState.js'

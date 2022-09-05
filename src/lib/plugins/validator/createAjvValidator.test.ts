@@ -67,22 +67,22 @@ const schemaDefinitions = {
   }
 }
 
+const invalidJson = {
+  firstName: 'John',
+  lastName: 'Doe',
+  gender: null,
+  age: '28',
+  availableToHire: true,
+  job: {
+    company: 'freelance',
+    role: 'developer',
+    salary: 100
+  }
+}
+
 describe('createAjvValidator', () => {
   it('should create a validate function', () => {
     const validate = createAjvValidator(schema, schemaDefinitions)
-
-    const invalidJson = {
-      firstName: 'John',
-      lastName: 'Doe',
-      gender: null,
-      age: '28',
-      availableToHire: true,
-      job: {
-        company: 'freelance',
-        role: 'developer',
-        salary: 100
-      }
-    }
 
     assert.deepStrictEqual(validate(invalidJson), [
       {
@@ -93,6 +93,20 @@ describe('createAjvValidator', () => {
       { path: ['age'], message: 'must be integer', severity: 'warning' },
       { path: ['job'], message: "must have required property 'address'", severity: 'warning' },
       { path: ['job', 'salary'], message: 'must be >= 120', severity: 'warning' }
+    ])
+  })
+
+  it('should pass additional Ajv options', () => {
+    const validate = createAjvValidator(schema, schemaDefinitions, {
+      allErrors: false
+    })
+
+    assert.deepStrictEqual(validate(invalidJson), [
+      {
+        path: ['gender'],
+        message: 'should be equal to one of: "male", "female"',
+        severity: 'warning'
+      }
     ])
   })
 

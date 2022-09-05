@@ -2,6 +2,64 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.0...v0.7.1) (2022-09-05)
+
+
+### Bug Fixes
+
+* `onChange` event being fired when creating the editor in tree mode ([83e22f7](https://github.com/josdejong/svelte-jsoneditor/commit/83e22f74ab73260df0352235c0528b34a3ca5b19))
+
+## [0.7.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.6.6...v0.7.0) (2022-09-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* Formerly, `onChange` did only fire after a change made by a user. Now, `onChange` also fires 
+after programmatic changes: when changing props or calling `patch`, `set`, `update`.
+
+### Features
+
+* always fire onChange, and let onPatch return a PatchResult (fixes [#128](https://github.com/josdejong/svelte-jsoneditor/issues/128)) ([fb45518](https://github.com/josdejong/svelte-jsoneditor/commit/fb4551805c796137ea85b90f6e00603a6244eeaa))
+* update dependencies ([#135](https://github.com/josdejong/svelte-jsoneditor/issues/135)) ([c2e8e0a](https://github.com/josdejong/svelte-jsoneditor/commit/c2e8e0a29d01ad848518cce7dd1226bc7509f499))
+
+
+### Bug Fixes
+
+* expanded state sometimes being reset when syncing content ([a6cce69](https://github.com/josdejong/svelte-jsoneditor/commit/a6cce69df27921d015a19957152a447ad1ea52b0))
+
+### [0.6.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.6.5...v0.6.6) (2022-08-29)
+
+
+### Bug Fixes
+
+* mobile keyboard opening all the time when selecting something in the editor on a touch device ([c2a0937](https://github.com/josdejong/svelte-jsoneditor/commit/c2a0937b6928388c82c76af3e57f1f3a2bc18fdb))
+
+### [0.6.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.6.4...v0.6.5) (2022-08-29)
+
+
+### Features
+
+* [#129](https://github.com/josdejong/svelte-jsoneditor/issues/129) allow passing additional options to `createAjvValidator` ([a66f230](https://github.com/josdejong/svelte-jsoneditor/commit/a66f230998a4e8c52a65d7cc5ce124968dec600f))
+
+
+### Bug Fixes
+
+* [#131](https://github.com/josdejong/svelte-jsoneditor/issues/131) backslash character not being escaped when `escapeControlCharacters: true` ([#133](https://github.com/josdejong/svelte-jsoneditor/issues/133)) ([1657d9a](https://github.com/josdejong/svelte-jsoneditor/commit/1657d9abe9568f76119275c8808f81a2805a1f73))
+
+### [0.6.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.6.3...v0.6.4) (2022-08-19)
+
+
+### Bug Fixes
+
+* [#124](https://github.com/josdejong/svelte-jsoneditor/issues/124) view jumping up when editor gets focus ([b94f531](https://github.com/josdejong/svelte-jsoneditor/commit/b94f5317cfba8f7dbe6debf915b9852949f6196f))
+
+### [0.6.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.6.2...v0.6.3) (2022-08-16)
+
+
+### Bug Fixes
+
+* minor update of all dependencies ([b61778a](https://github.com/josdejong/svelte-jsoneditor/commit/b61778a70a1df6a1073db0a52c86d10773201bc6))
+
 ### [0.6.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.6.1...v0.6.2) (2022-07-28)
 
 
@@ -28,7 +86,6 @@ to `onChange(updatedContent, previousContent, { contentErrors, patchResult })`.
 ### Features
 
 * implement validate method and pass contentErrors via onChange, fixes [#56](https://github.com/josdejong/svelte-jsoneditor/issues/56) ([#119](https://github.com/josdejong/svelte-jsoneditor/issues/119)) ([9847382](https://github.com/josdejong/svelte-jsoneditor/commit/9847382396fe5f853f8ecfde4d5227175c498bf4))
-* implement validate method and pass contentErrors via onChange, fixes [#56](https://github.com/josdejong/svelte-jsoneditor/issues/56) ([#119](https://github.com/josdejong/svelte-jsoneditor/issues/119)) ([705f5f2](https://github.com/josdejong/svelte-jsoneditor/commit/705f5f2ed76a24e671f35f9721ff93d165a4f7bc))
 
 
 ### Bug Fixes

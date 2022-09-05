@@ -5,7 +5,7 @@ import type {
   JSONPath,
   JSONPointer
 } from 'immutable-json-patch'
-import { compileJSONPointer, getIn } from 'immutable-json-patch'
+import { compileJSONPointer, getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
 import { forEachRight, groupBy, initial, isEqual, last } from 'lodash-es'
 import { getEnforceString } from './documentState.js'
 import { createSelectionFromOperations } from './selection.js'
@@ -15,12 +15,11 @@ import type {
   DocumentState,
   ExtendedSearchResultItem,
   JSONPointerMap,
+  JSONSelection,
   SearchResult,
-  SearchResultItem,
-  JSONSelection
+  SearchResultItem
 } from '../types'
 import { SearchField } from '../types.js'
-import { isJSONArray, isJSONObject } from '../utils/jsonUtils.js'
 
 // TODO: comment
 // TODO: unit test

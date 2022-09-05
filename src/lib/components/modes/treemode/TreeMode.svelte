@@ -139,6 +139,7 @@
   import { truncate } from '../../../utils/stringUtils.js'
   import { MAX_CHARACTERS_TEXT_PREVIEW } from '../../../constants.js'
   import memoizeOne from 'memoize-one'
+  import { isTextContent } from '$lib'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -225,7 +226,8 @@
     }
   }
 
-  let documentState = createDocumentState({ json, expand: getDefaultExpand(json) })
+  let documentStateInitialized = false
+  let documentState = createDocumentState()
   let searchResult: SearchResult | undefined
 
   let normalization: ValueNormalization
@@ -474,13 +476,14 @@
       return
     }
 
+    const previousContent = { json, text }
     const previousState = documentState
     const previousJson = json
     const previousText = text
     const previousTextIsRepaired = textIsRepaired
 
     json = updatedJson
-    documentState = expandWithCallback(json, documentState, rootPath, getDefaultExpand(json))
+    expandWhenNotInitialized(json)
     text = undefined
     textIsRepaired = false
     clearSelectionWhenNotExisting(json)
@@ -491,6 +494,14 @@
       previousText,
       previousTextIsRepaired
     })
+
+    // we could work out a patchResult, or use patch(), but only when the previous and new
+    // contents are both json and not text. We go for simplicity and consistency here and
+    // let the functions applyExternalJson and applyExternalText _not_ return
+    // a patchResult ever.
+    const patchResult = null
+
+    emitOnChange(previousContent, patchResult)
   }
 
   function applyExternalText(updatedText) {
@@ -498,13 +509,16 @@
       return
     }
 
-    if (updatedText === text) {
+    const isChanged = updatedText === text
+
+    debug('update external text', { isChanged })
+
+    if (isChanged) {
       // no actual change, don't do anything
       return
     }
 
-    debug('update external text')
-
+    const previousContent = { json, text }
     const previousJson = json
     const previousState = documentState
     const previousText = text
@@ -512,7 +526,7 @@
 
     try {
       json = JSON.parse(updatedText)
-      documentState = expandWithCallback(json, documentState, rootPath, getDefaultExpand(json))
+      expandWhenNotInitialized(json)
       text = updatedText
       textIsRepaired = false
       parseError = undefined
@@ -520,7 +534,7 @@
     } catch (err) {
       try {
         json = JSON.parse(jsonrepair(updatedText))
-        documentState = expandWithCallback(json, documentState, rootPath, getDefaultExpand(json))
+        expandWhenNotInitialized(json)
         text = updatedText
         textIsRepaired = true
         parseError = undefined
@@ -541,6 +555,21 @@
       previousText,
       previousTextIsRepaired
     })
+
+    // we could work out a patchResult, or use patch(), but only when the previous and new
+    // contents are both json and not text. We go for simplicity and consistency here and
+    // let the functions applyExternalJson and applyExternalText _not_ return
+    // a patchResult ever.
+    const patchResult = null
+
+    emitOnChange(previousContent, patchResult)
+  }
+
+  function expandWhenNotInitialized(json) {
+    if (!documentStateInitialized) {
+      documentStateInitialized = true
+      documentState = expandWithCallback(json, documentState, rootPath, getDefaultExpand(json))
+    }
   }
 
   function clearSelectionWhenNotExisting(json) {
@@ -659,6 +688,7 @@
       throw new Error('Cannot apply patch: no JSON')
     }
 
+    const previousContent = { json, text }
     const previousJson = json
     const previousState = documentState
     const previousText = text
@@ -710,12 +740,16 @@
       }
     })
 
-    return {
+    const patchResult = {
       json,
       previousJson,
       undo,
       redo: operations
     }
+
+    emitOnChange(previousContent, patchResult)
+
+    return patchResult
   }
 
   // TODO: cleanup logging
@@ -774,7 +808,7 @@
 
   export function acceptAutoRepair() {
     if (textIsRepaired && json !== undefined) {
-      handleChangeJson(json)
+      handleReplaceJson(json)
     }
 
     return { json, text }
@@ -1083,7 +1117,7 @@
       debug('handleInsert', { type, newValue })
 
       const path = []
-      handleChangeJson(newValue, (patchedJson, patchedState) => ({
+      handleReplaceJson(newValue, (patchedJson, patchedState) => ({
         state: {
           ...expandRecursive(patchedJson, patchedState, path),
           selection: createInsideSelection(path)
@@ -1514,6 +1548,13 @@
   }
 
   function emitOnChange(previousContent: Content, patchResult: JSONPatchResult | null) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    if (previousContent.json === undefined && previousContent?.text === undefined) {
+      // initialization -> do not fire an onChange event
+      return
+    }
+
     // make sure we cannot send an invalid contents like having both
     // json and text defined, or having none defined
     if (text !== undefined) {
@@ -1539,17 +1580,14 @@
 
     debug('handlePatch', operations, afterPatch)
 
-    const previousContent = { json, text }
     const patchResult = patch(operations, afterPatch)
 
     pastedJson = undefined
 
-    emitOnChange(previousContent, patchResult)
-
     return patchResult
   }
 
-  function handleChangeJson(updatedJson: JSONData, afterPatch?: AfterPatchCallback) {
+  function handleReplaceJson(updatedJson: JSONData, afterPatch?: AfterPatchCallback) {
     const previousState = documentState
     const previousJson = json
     const previousText = text
@@ -1576,7 +1614,9 @@
       previousTextIsRepaired
     })
 
-    // TODO: work out the patchResult when fully replacing json (is just a replace of the root)
+    // we could work out a patchResult, or use patch(), but only when the previous and new
+    // contents are both json and not text. We go for simplicity and consistency here and
+    // do _not_ return a patchResult ever.
     const patchResult = null
 
     emitOnChange(previousContent, patchResult)
@@ -2231,8 +2271,10 @@
   {#if !isSSR}
     <label class="jse-hidden-input-label">
       <input
-        class="jse-hidden-input"
+        type="text"
+        readonly="readonly"
         tabindex="-1"
+        class="jse-hidden-input"
         bind:this={refHiddenInput}
         on:paste={handlePaste}
       />

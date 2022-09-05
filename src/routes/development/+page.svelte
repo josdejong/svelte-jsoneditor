@@ -1,7 +1,3 @@
-<script context="module" lang="ts">
-  export const prerender = true
-</script>
-
 <script lang="ts">
   import {
     createAjvValidator,
@@ -13,7 +9,7 @@
     EditableValue,
     ReadonlyValue
   } from '$lib'
-  import { useLocalStorage } from '../lib/utils/localStorageUtils.js'
+  import { useLocalStorage } from '../../lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
   import { tick } from 'svelte'
 
@@ -36,6 +32,9 @@
   "stringContainingNumber": "1234",
   "multi\\nline    text": "Hello\\nWorld    text",
   "tab": "Hello\\tTab",
+  "backslash": "back\\\\slash",
+  "forwardslash": "forward\\/slash",
+  "quote": "quote\\"",
   "timestamp": 1534952749890,
   "url": "https://jsoneditoronline.org",
   "array": [
@@ -397,6 +396,26 @@
     >
       Set unrepairable text
     </button>
+  </p>
+  <p class="buttons">
+    <button
+      on:click={() => {
+        refTreeEditor.patch([{ op: 'add', path: '/updated', value: '2022-09-01T10:13:44Z' }])
+      }}
+    >
+      Patch json in tree editor
+    </button>
+    <button
+      on:click={() => {
+        const content = refTreeEditor.get()
+        const updatedContent = {
+          json: { ...content.json, updated: '2022-09-01T10:13:44Z' }
+        }
+        refTreeEditor.set(updatedContent)
+      }}
+    >
+      Update json in tree editor
+    </button>
     <button on:click={openInWindow}>Open editor in new window</button>
     <input
       type="file"
@@ -537,8 +556,8 @@ See https://github.com/sveltejs/kit/issues/981
 {/if}
 
 <style lang="scss">
-  @import '../lib/themes/jse-theme-dark.css';
-  @import 'examples/themes/jse-theme-big.css';
+  @import '../../lib/themes/jse-theme-dark.css';
+  @import '../themes/jse-theme-big.css';
 
   .demo-app {
     margin: -10px; // compensate for the padding of the root element
