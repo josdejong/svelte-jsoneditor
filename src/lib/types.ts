@@ -372,6 +372,7 @@ export interface JSONEditorPropsOptional {
 
 export interface TreeModeContext {
   readOnly: boolean
+  parser: JSON
   normalization: ValueNormalization
   getJson: () => JSONData
   getDocumentState: () => DocumentState
@@ -400,6 +401,7 @@ export interface RenderValuePropsOptional {
   searchResultItems?: SearchResultItem[]
   isSelected?: boolean
   isEditing?: boolean
+  parser?: JSON
   normalization?: ValueNormalization
   onPatch?: TreeModeContext['onPatch']
   onPasteJson?: OnPasteJson
@@ -417,6 +419,7 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   searchResultItems: SearchResultItem[] | undefined
   isSelected: boolean
   isEditing: boolean
+  parser: JSON
   normalization: ValueNormalization
   onPatch: TreeModeContext['onPatch']
   onPasteJson: OnPasteJson

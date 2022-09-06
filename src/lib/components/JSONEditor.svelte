@@ -58,6 +58,7 @@
   export let escapeControlCharacters = false
   export let escapeUnicodeCharacters = false
   export let validator: Validator | null = null
+  export let parser: JSON = JSON
 
   export let queryLanguages: QueryLanguage[] = [javascriptQueryLanguage]
   export let queryLanguageId: string = queryLanguages[0].id
@@ -97,7 +98,7 @@
   }
 
   function getText(content: Content) {
-    return isTextContent(content) ? content.text : JSON.stringify(content.json, null, indentation)
+    return isTextContent(content) ? content.text : parser.stringify(content.json, null, indentation)
   }
 
   export function set(newContent: Content) {
@@ -129,7 +130,7 @@
     if (isTextContent(content)) {
       try {
         content = {
-          json: JSON.parse(content.text),
+          json: parser.parse(content.text),
           text: undefined
         }
       } catch (err) {
@@ -352,6 +353,7 @@
         selectedPath,
         escapeControlCharacters,
         escapeUnicodeCharacters,
+        parser,
         queryLanguages,
         queryLanguageId,
         onChangeQueryLanguage: handleChangeQueryLanguage,
@@ -414,6 +416,7 @@
             {mainMenuBar}
             {statusBar}
             {escapeUnicodeCharacters}
+            {parser}
             {validator}
             onChange={handleChange}
             onSwitchToTreeMode={handleSwitchToTreeMode}
@@ -435,6 +438,7 @@
             {navigationBar}
             {escapeControlCharacters}
             {escapeUnicodeCharacters}
+            {parser}
             {validator}
             {onError}
             onChange={handleChange}

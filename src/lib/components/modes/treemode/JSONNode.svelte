@@ -37,7 +37,6 @@
     isChildOfNodeName,
     isContentEditableDiv
   } from '$lib/utils/domUtils'
-  import { valueType } from '$lib/utils/typeUtils'
   import CollapsedItems from './CollapsedItems.svelte'
   import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
   import JSONKey from './JSONKey.svelte'
@@ -71,6 +70,7 @@
   import { createMemoizePath } from '../../../utils/pathUtils'
   import { getEnforceString } from '../../../logic/documentState'
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
+  import { isObject } from '$lib/utils/typeUtils.js'
 
   export let value: JSONData
   export let path: JSONPath
@@ -100,7 +100,7 @@
   $: expanded = expandedMap ? expandedMap[pointer] === true : false
 
   let enforceString: boolean | undefined
-  $: enforceString = getEnforceString(value, enforceStringMap, pointer)
+  $: enforceString = getEnforceString(value, enforceStringMap, pointer, context.parser)
 
   let visibleSections: VisibleSection[] | undefined
   $: visibleSections = visibleSectionsMap ? visibleSectionsMap[pointer] : undefined
@@ -112,7 +112,6 @@
   $: isSelected = selection ? selection.pointersMap[pointer] === true : false
 
   $: root = path.length === 0
-  $: type = valueType(value)
 
   function getIndentationStyle(level) {
     return `margin-left: calc(${level} * var(--jse-indent-size))`
@@ -605,7 +604,7 @@
   on:focus={undefined}
   on:blur={undefined}
 >
-  {#if type === 'array'}
+  {#if Array.isArray(value)}
     <div class="jse-header-outer" style={indentationStyle}>
       <div class="jse-header">
         <button
@@ -727,7 +726,7 @@
         {/if}
       </div>
     {/if}
-  {:else if type === 'object'}
+  {:else if isObject(value)}
     <div class="jse-header-outer" style={indentationStyle}>
       <div class="jse-header">
         <button

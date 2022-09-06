@@ -12,6 +12,7 @@
 
   export let path: JSONPath
   export let value: JSONData
+  export let parser: JSON
   export let normalization: ValueNormalization
   export let enforceString: boolean
   export let onPatch: OnPatch
@@ -21,7 +22,7 @@
   export let focus: () => void
 
   function convert(value: string) {
-    return enforceString ? value : stringConvert(value)
+    return enforceString ? value : stringConvert(value, parser)
   }
 
   function handleChangeValue(newValue: string, updateSelection: string) {
@@ -60,7 +61,7 @@
 
   function handlePaste(pastedText: string): void {
     try {
-      const pastedJson = JSON.parse(pastedText)
+      const pastedJson = parser.parse(pastedText)
       if (isObjectOrArray(pastedJson)) {
         onPasteJson({
           path,
@@ -74,7 +75,7 @@
   }
 
   function handleOnValueClass(value: string): string {
-    return getValueClass(convert(normalization.unescapeValue(value)))
+    return getValueClass(convert(normalization.unescapeValue(value)), parser)
   }
 </script>
 

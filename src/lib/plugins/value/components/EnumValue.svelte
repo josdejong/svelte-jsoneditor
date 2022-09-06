@@ -8,6 +8,7 @@
 
   export let path: JSONPath
   export let value: JSONData
+  export let parser: JSON
   export let readOnly: boolean
   export let isSelected: boolean
   export let onPatch: OnPatch
@@ -52,7 +53,7 @@
 </script>
 
 <select
-  class={`jse-enum-value ${getValueClass(bindValue)}`}
+  class={`jse-enum-value ${getValueClass(bindValue, parser)}`}
   class:jse-selected={isSelected}
   bind:value={bindValue}
   bind:this={refSelect}

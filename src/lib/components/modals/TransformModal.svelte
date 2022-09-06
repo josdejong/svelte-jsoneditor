@@ -33,6 +33,7 @@
 
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
+  export let parser: JSON
 
   export let queryLanguages: QueryLanguage[]
   export let queryLanguageId: string
@@ -245,6 +246,7 @@
                 navigationBar={false}
                 {escapeControlCharacters}
                 {escapeUnicodeCharacters}
+                {parser}
                 {onRenderValue}
                 onError={console.error}
                 onChange={noop}
@@ -268,6 +270,7 @@
                 navigationBar={false}
                 {escapeControlCharacters}
                 {escapeUnicodeCharacters}
+                {parser}
                 {onRenderValue}
                 onError={console.error}
                 onChange={noop}

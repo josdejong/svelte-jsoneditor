@@ -18,6 +18,7 @@
   export let value: JSONData
   export let readOnly: boolean
   export let normalization: ValueNormalization
+  export let parser: JSON
   export let onSelect: OnSelect
 
   export let searchResultItems: ExtendedSearchResultItem[] | undefined
@@ -43,7 +44,7 @@
 
 <div
   data-type="selectable-value"
-  class={getValueClass(value)}
+  class={getValueClass(value, parser)}
   on:click={handleValueClick}
   on:dblclick={handleValueDoubleClick}
   title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : null}

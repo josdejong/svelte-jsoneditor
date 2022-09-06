@@ -252,7 +252,8 @@ describe('search', () => {
       json,
       documentState,
       '*',
-      results[2]
+      results[2],
+      JSON
     )
 
     assert.deepStrictEqual(operations, [
@@ -287,7 +288,8 @@ describe('search', () => {
       json,
       documentState,
       '*',
-      results[0]
+      results[0],
+      JSON
     )
 
     assert.deepStrictEqual(operations, [
@@ -313,7 +315,13 @@ describe('search', () => {
 
     const results = search('2', json, documentState)
 
-    const { operations } = createSearchAndReplaceOperations(json, documentState, '4', results[0])
+    const { operations } = createSearchAndReplaceOperations(
+      json,
+      documentState,
+      '4',
+      results[0],
+      JSON
+    )
 
     assert.deepStrictEqual(operations, [
       {
@@ -337,7 +345,13 @@ describe('search', () => {
 
     const results = search('2', json, documentState)
 
-    const { operations } = createSearchAndReplaceOperations(json, documentState, 'true', results[0])
+    const { operations } = createSearchAndReplaceOperations(
+      json,
+      documentState,
+      'true',
+      results[0],
+      JSON
+    )
 
     assert.deepStrictEqual(operations, [
       {
@@ -361,7 +375,13 @@ describe('search', () => {
 
     const results = search('2', json, documentState)
 
-    const { operations } = createSearchAndReplaceOperations(json, documentState, 'null', results[0])
+    const { operations } = createSearchAndReplaceOperations(
+      json,
+      documentState,
+      'null',
+      results[0],
+      JSON
+    )
 
     assert.deepStrictEqual(operations, [
       {
@@ -385,7 +405,13 @@ describe('search', () => {
 
     const results = search('2', json, documentState)
 
-    const { operations } = createSearchAndReplaceOperations(json, documentState, '*', results[0])
+    const { operations } = createSearchAndReplaceOperations(
+      json,
+      documentState,
+      '*',
+      results[0],
+      JSON
+    )
 
     assert.deepStrictEqual(operations, [{ op: 'replace', path: '/value', value: '*' }])
 
@@ -411,7 +437,8 @@ describe('search', () => {
       json,
       documentState,
       searchText,
-      replacementText
+      replacementText,
+      JSON
     )
 
     assert.deepStrictEqual(operations, [
@@ -453,7 +480,8 @@ describe('search', () => {
       json,
       documentState,
       searchText,
-      replacementText
+      replacementText,
+      JSON
     )
 
     assert.deepStrictEqual(operations, [
@@ -482,7 +510,8 @@ describe('search', () => {
       json,
       documentState,
       searchText,
-      replacementText
+      replacementText,
+      JSON
     )
 
     assert.deepStrictEqual(operations, [

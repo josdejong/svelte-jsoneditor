@@ -12,6 +12,9 @@
   import { useLocalStorage } from '../../lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
   import { tick } from 'svelte'
+  import { parse, stringify } from 'lossless-json'
+
+  const LosslessJSON = { parse, stringify }
 
   let content = {
     text: `{
@@ -20,6 +23,9 @@
   "html_code": "&quot;",
   "html_characters<a>": "<a>",
   "escaped_unicode": "\\u260e",
+  "long": 9223372036854775807,
+  "float": 4.0,
+  "big": 1e500,
   "unicode": "😀,💩",
   "return": "\\n",
   "null": null,
@@ -99,6 +105,19 @@
     { value: '\t', label: '1 tab' }
   ]
 
+  const parsers = [
+    {
+      id: 'JSON',
+      value: JSON,
+      label: 'JSON'
+    },
+    {
+      id: 'LosslessJSON',
+      value: LosslessJSON,
+      label: 'LosslessJSON'
+    }
+  ]
+
   const validator = createAjvValidator(schema)
 
   let refTreeEditor
@@ -142,6 +161,7 @@
     'svelte-jsoneditor-demo-indentation',
     indentations[0].value
   )
+  const selectedParserId = useLocalStorage('svelte-jsoneditor-demo-parser', parsers[0].id)
   const tabSize = useLocalStorage('svelte-jsoneditor-demo-tabSize', indentations[0].value)
   let leftEditorMode = 'tree'
 
@@ -149,6 +169,8 @@
     ? [javascriptQueryLanguage, lodashQueryLanguage, jmespathQueryLanguage]
     : [javascriptQueryLanguage]
   let queryLanguageId = javascriptQueryLanguage.id // TODO: store in local storage
+
+  $: selectedParser = parsers.find((parser) => parser.id === $selectedParserId).value
 
   // only editable/readonly div, no color picker, boolean toggle, timestamp
   function customRenderValue({
@@ -298,17 +320,24 @@
     <label>
       <input type="checkbox" bind:checked={$multipleQueryLanguages} /> Multiple query languages
     </label>
-  </p>
-  {#if $multipleQueryLanguages}
-    <p>
-      Selected query language:
+    {#if $multipleQueryLanguages}
+      . Selected query language:
       <select bind:value={queryLanguageId}>
         {#each queryLanguages as queryLanguage}
           <option value={queryLanguage.id}>{queryLanguage.name}</option>
         {/each}
       </select>
-    </p>
-  {/if}
+    {/if}
+  </p>
+
+  <p>
+    JSON Parser <select bind:value={$selectedParserId}>
+      {#each parsers as parser}
+        <option value={parser.id}>{parser.label}</option>
+      {/each}
+    </select>
+  </p>
+
   <p class="buttons">
     <button
       on:click={() => {
@@ -474,6 +503,7 @@
             readOnly={$readOnly}
             indentation={$selectedIndentation}
             tabSize={$tabSize}
+            parser={selectedParser}
             validator={$validate ? validator : undefined}
             {queryLanguages}
             bind:queryLanguageId
@@ -490,7 +520,7 @@
           json contents:
           <pre>
 					<code>
-					{content.json !== undefined ? JSON.stringify(content.json, null, 2) : 'undefined'}
+					{content.json !== undefined ? selectedParser.stringify(content.json, null, 2) : 'undefined'}
 					</code>
 				</pre>
         </div>
@@ -517,6 +547,7 @@
             readOnly={$readOnly}
             indentation={$selectedIndentation}
             tabSize={$tabSize}
+            parser={selectedParser}
             validator={$validate ? validator : undefined}
             {queryLanguages}
             {queryLanguageId}

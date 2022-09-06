@@ -355,14 +355,14 @@ describe('documentState', () => {
     const json1 = 42
     const documentState1 = createDocumentState()
     assert.strictEqual(
-      getEnforceString(json1, documentState1.enforceStringMap, compileJSONPointer([])),
+      getEnforceString(json1, documentState1.enforceStringMap, compileJSONPointer([]), JSON),
       false
     )
 
     const json2 = '42'
     const documentState2 = createDocumentState()
     assert.strictEqual(
-      getEnforceString(json2, documentState2.enforceStringMap, compileJSONPointer([])),
+      getEnforceString(json2, documentState2.enforceStringMap, compileJSONPointer([]), JSON),
       true
     )
   })
@@ -514,12 +514,15 @@ describe('documentState', () => {
         }
       }
       const pointer = compileJSONPointer([])
-      assert.strictEqual(getEnforceString(json, documentState.enforceStringMap, pointer), true)
+      assert.strictEqual(
+        getEnforceString(json, documentState.enforceStringMap, pointer, JSON),
+        true
+      )
 
       const operations: JSONPatchDocument = [{ op: 'replace', path: '', value: 'forty two' }]
       const res = documentStatePatch(json, documentState, operations)
       assert.deepStrictEqual(
-        getEnforceString(res.json, res.documentState.enforceStringMap, pointer),
+        getEnforceString(res.json, res.documentState.enforceStringMap, pointer, JSON),
         true
       )
     })

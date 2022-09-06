@@ -335,11 +335,12 @@ export function extract(json: JSONData, selection: JSONSelection): JSONPatchDocu
 export function insert(
   json: JSONData,
   selection: JSONSelection | undefined,
-  clipboardText: string
+  clipboardText: string,
+  parser: JSON
 ): JSONPatchDocument {
   if (isKeySelection(selection)) {
     // rename key
-    const clipboard = parseAndRepairOrUndefined(clipboardText)
+    const clipboard = parseAndRepairOrUndefined(clipboardText, parser)
     const parentPath = initial(selection.focusPath)
     const parent = getIn(json, parentPath)
     const keys = Object.keys(parent)
@@ -359,7 +360,7 @@ export function insert(
         {
           op: 'replace',
           path: compileJSONPointer(selection.focusPath),
-          value: parsePartialJson(clipboardText, parseAndRepair)
+          value: parsePartialJson(clipboardText, (text) => parseAndRepair(text, parser))
         }
       ]
     } catch (err) {
@@ -375,13 +376,13 @@ export function insert(
   }
 
   if (isMultiSelection(selection)) {
-    const newValues = clipboardToValues(clipboardText)
+    const newValues = clipboardToValues(clipboardText, parser)
 
     return replace(json, selection.paths, newValues)
   }
 
   if (isAfterSelection(selection)) {
-    const newValues = clipboardToValues(clipboardText)
+    const newValues = clipboardToValues(clipboardText, parser)
     const path = selection.focusPath
     const parentPath = initial(path)
     const parent = getIn(json, parentPath)
@@ -410,7 +411,7 @@ export function insert(
   }
 
   if (isInsideSelection(selection)) {
-    const newValues = clipboardToValues(clipboardText)
+    const newValues = clipboardToValues(clipboardText, parser)
     const path = selection.focusPath
     const value = getIn(json, path)
 
@@ -593,15 +594,15 @@ function moveDown(parentPath: JSONPath, key: string): JSONPatchOperation {
   }
 }
 
-export function clipboardToValues(clipboardText: string): ClipboardValues {
+export function clipboardToValues(clipboardText: string, parser: JSON): ClipboardValues {
   const textIsObject = /^\s*{/.test(clipboardText)
   const textIsArray = /^\s*\[/.test(clipboardText)
 
-  const clipboardOriginal = parseAndRepairOrUndefined(clipboardText)
+  const clipboardOriginal = parseAndRepairOrUndefined(clipboardText, parser)
   const clipboardRepaired =
     clipboardOriginal !== undefined
       ? clipboardOriginal
-      : parsePartialJson(clipboardText, parseAndRepair)
+      : parsePartialJson(clipboardText, (text) => parseAndRepair(text, parser))
 
   if (
     (textIsObject && isObject(clipboardRepaired)) ||

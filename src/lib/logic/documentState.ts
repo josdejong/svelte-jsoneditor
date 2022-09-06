@@ -645,7 +645,8 @@ export function shiftVisibleSections(
 export function getEnforceString(
   value: JSONData,
   enforceStringMap: JSONPointerMap<boolean> | undefined,
-  pointer: JSONPointer
+  pointer: JSONPointer,
+  parser: JSON
 ): boolean {
   const enforceString = enforceStringMap ? enforceStringMap[pointer] : undefined
 
@@ -653,7 +654,7 @@ export function getEnforceString(
     return enforceString
   }
 
-  return isStringContainingPrimitiveValue(value)
+  return isStringContainingPrimitiveValue(value, parser)
 }
 
 export function getNextKeys(keys, key, includeKey = false) {

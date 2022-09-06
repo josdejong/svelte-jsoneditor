@@ -74,13 +74,13 @@ describe('jsonUtils', () => {
   })
 
   it('should parse partial JSON', () => {
-    deepStrictEqual(parsePartialJson('"hello world"'), 'hello world')
-    deepStrictEqual(parsePartialJson('null'), null)
-    deepStrictEqual(parsePartialJson('42'), 42)
+    deepStrictEqual(parsePartialJson('"hello world"', JSON.parse), 'hello world')
+    deepStrictEqual(parsePartialJson('null', JSON.parse), null)
+    deepStrictEqual(parsePartialJson('42', JSON.parse), 42)
 
     // parse partial array
-    deepStrictEqual(parsePartialJson('1,2'), [1, 2])
-    deepStrictEqual(parsePartialJson('1,2,'), [1, 2])
+    deepStrictEqual(parsePartialJson('1,2', JSON.parse), [1, 2])
+    deepStrictEqual(parsePartialJson('1,2,', JSON.parse), [1, 2])
 
     // parse partial object
     const partialJson = '"str": "hello world",\n' + '"nill": null,\n' + '"bool": false'
@@ -89,8 +89,8 @@ describe('jsonUtils', () => {
       nill: null,
       bool: false
     }
-    deepStrictEqual(parsePartialJson(partialJson), expected)
-    deepStrictEqual(parsePartialJson(partialJson + ','), expected)
+    deepStrictEqual(parsePartialJson(partialJson, JSON.parse), expected)
+    deepStrictEqual(parsePartialJson(partialJson + ',', JSON.parse), expected)
   })
 
   it('should validate content type', () => {
@@ -186,30 +186,34 @@ describe('jsonUtils', () => {
 
   describe('convertValue', () => {
     it('should convert an object to an array', () => {
-      deepStrictEqual(convertValue({ 2: 'c', 1: 'b', 0: 'a' }, 'array'), ['a', 'b', 'c'])
+      deepStrictEqual(convertValue({ 2: 'c', 1: 'b', 0: 'a' }, 'array', JSON), ['a', 'b', 'c'])
     })
 
     it('should convert an array to an array', () => {
       const array = [1, 2, 3]
-      strictEqual(convertValue(array, 'array'), array)
+      strictEqual(convertValue(array, 'array', JSON), array)
     })
 
     it('should convert a stringified object to an array', () => {
-      deepStrictEqual(convertValue('{ "2": "c", "1": "b", "0": "a" }', 'array'), ['a', 'b', 'c'])
+      deepStrictEqual(convertValue('{ "2": "c", "1": "b", "0": "a" }', 'array', JSON), [
+        'a',
+        'b',
+        'c'
+      ])
     })
 
     it('should convert a stringified array to an array', () => {
-      deepStrictEqual(convertValue('[1,2,3]', 'array'), [1, 2, 3])
+      deepStrictEqual(convertValue('[1,2,3]', 'array', JSON), [1, 2, 3])
     })
 
     it('should throw when impossible to convert to an array', () => {
       throws(() => {
-        convertValue('no valid json text', 'array')
+        convertValue('no valid json text', 'array', JSON)
       }, /SyntaxError/)
     })
 
     it('should convert an array to an object', () => {
-      deepStrictEqual(convertValue(['a', 'b', 'c'], 'object'), { 2: 'c', 1: 'b', 0: 'a' })
+      deepStrictEqual(convertValue(['a', 'b', 'c'], 'object', JSON), { 2: 'c', 1: 'b', 0: 'a' })
     })
 
     it('should convert an object to an object', () => {
@@ -217,34 +221,34 @@ describe('jsonUtils', () => {
         a: 1,
         b: 2
       }
-      strictEqual(convertValue(object, 'object'), object)
+      strictEqual(convertValue(object, 'object', JSON), object)
     })
 
     it('should convert a stringified object to an object', () => {
-      deepStrictEqual(convertValue('{"a":1,"b":2}', 'object'), { a: 1, b: 2 })
+      deepStrictEqual(convertValue('{"a":1,"b":2}', 'object', JSON), { a: 1, b: 2 })
     })
 
     it('should convert a stringified array to an object', () => {
-      deepStrictEqual(convertValue('["a", "b", "c"]', 'object'), { 2: 'c', 1: 'b', 0: 'a' })
+      deepStrictEqual(convertValue('["a", "b", "c"]', 'object', JSON), { 2: 'c', 1: 'b', 0: 'a' })
     })
 
     it('should throw when impossible to convert to an object', () => {
       throws(() => {
-        convertValue('no valid json text', 'object')
+        convertValue('no valid json text', 'object', JSON)
       }, /SyntaxError/)
     })
 
     it('should convert an array to a value', () => {
-      deepStrictEqual(convertValue([1, 2, 3], 'value'), '[1,2,3]')
+      deepStrictEqual(convertValue([1, 2, 3], 'value', JSON), '[1,2,3]')
     })
 
     it('should convert an object to a value', () => {
-      deepStrictEqual(convertValue({ a: 1, b: 2 }, 'value'), '{"a":1,"b":2}')
+      deepStrictEqual(convertValue({ a: 1, b: 2 }, 'value', JSON), '{"a":1,"b":2}')
     })
 
     it('should convert a value to a value', () => {
-      strictEqual(convertValue('foo', 'value'), 'foo')
-      strictEqual(convertValue(true, 'value'), true)
+      strictEqual(convertValue('foo', 'value', JSON), 'foo')
+      strictEqual(convertValue(true, 'value', JSON), true)
     })
   })
 })

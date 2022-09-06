@@ -32,10 +32,6 @@ describe('domUtils', () => {
     ])
   })
 
-  it('encode data path with a number as index', () => {
-    strictEqual(encodeDataPath(['array', 2]), '%2Farray%2F2')
-  })
-
   describe('should escape/unescape text', () => {
     it('escapeControlCharacters=false, escapeUnicodeCharacters=false', () => {
       const { escapeValue, unescapeValue } = createNormalizationFunctions({

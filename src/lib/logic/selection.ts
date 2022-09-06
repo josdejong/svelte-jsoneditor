@@ -651,7 +651,8 @@ export function createMultiSelection(
 export function selectionToPartialJson(
   json: JSONData,
   selection: JSONSelection,
-  indentation: number | string | null = 2
+  indentation: number | string | null,
+  parser: JSON
 ): string | null {
   if (isKeySelection(selection)) {
     return String(last(selection.focusPath))
@@ -659,13 +660,13 @@ export function selectionToPartialJson(
 
   if (isValueSelection(selection)) {
     const value = getIn(json, selection.focusPath)
-    return typeof value === 'string' ? value : JSON.stringify(value, null, indentation) // TODO: customizable indentation?
+    return typeof value === 'string' ? value : parser.stringify(value, null, indentation) // TODO: customizable indentation?
   }
 
   if (isMultiSelection(selection)) {
     if (isEmpty(selection.focusPath)) {
       // root object -> does not have a parent key/index
-      return JSON.stringify(json, null, indentation)
+      return parser.stringify(json, null, indentation)
     }
 
     const parentPath = getParentPath(selection)
@@ -674,12 +675,12 @@ export function selectionToPartialJson(
       if (selection.paths.length === 1) {
         // do not suffix a single selected array item with a comma
         const item = getIn(json, first(selection.paths))
-        return JSON.stringify(item, null, indentation)
+        return parser.stringify(item, null, indentation)
       } else {
         return selection.paths
           .map((path) => {
             const item = getIn(json, path)
-            return `${JSON.stringify(item, null, indentation)},`
+            return `${parser.stringify(item, null, indentation)},`
           })
           .join('\n')
       }
@@ -689,7 +690,7 @@ export function selectionToPartialJson(
         .map((path) => {
           const key = last(path)
           const value = getIn(json, path)
-          return `${JSON.stringify(key)}: ${JSON.stringify(value, null, indentation)},`
+          return `${parser.stringify(key)}: ${parser.stringify(value, null, indentation)},`
         })
         .join('\n')
     }

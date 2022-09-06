@@ -68,6 +68,7 @@
     "json-source-map": "^0.6.1",
     "jsonrepair": "^2.2.1",
     "lodash-es": "^4.17.21",
+    "lossless-json": "file:../lossless-json/lossless-json-1.0.5.tgz",
     "memoize-one": "^6.0.0",
     "natural-compare-lite": "^1.4.0",
     "sass": "^1.54.8",

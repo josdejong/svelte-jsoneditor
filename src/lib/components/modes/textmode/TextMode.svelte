@@ -59,6 +59,7 @@
   export let indentation: number | string = 2
   export let tabSize = 4
   export let escapeUnicodeCharacters = false
+  export let parser: JSON
   export let validator: Validator = null
   export let onChange: OnChange = null
   export let onSwitchToTreeMode = noop
@@ -178,10 +179,10 @@
   export function patch(operations: JSONPatchDocument): JSONPatchResult {
     debug('patch', operations)
 
-    const previousJson = JSON.parse(text)
+    const previousJson = parser.parse(text)
     const updatedJson = immutableJSONPatch(previousJson, operations)
     const undo = revertJSONPatch(previousJson, operations)
-    text = JSON.stringify(updatedJson, null, indentation)
+    text = parser.stringify(updatedJson, null, indentation)
 
     return {
       json: updatedJson,
@@ -199,8 +200,8 @@
     }
 
     try {
-      const json = JSON.parse(text)
-      text = JSON.stringify(json, null, indentation)
+      const json = parser.parse(text)
+      text = parser.stringify(json, null, indentation)
     } catch (err) {
       onError(err)
     }
@@ -214,8 +215,8 @@
     }
 
     try {
-      const json = JSON.parse(text)
-      text = JSON.stringify(json)
+      const json = parser.parse(text)
+      text = parser.stringify(json)
     } catch (err) {
       onError(err)
     }
@@ -243,7 +244,7 @@
     }
 
     try {
-      const json = JSON.parse(text)
+      const json = parser.parse(text)
 
       modalOpen = true
 
@@ -275,7 +276,7 @@
    */
   export function openTransformModal({ id, selectedPath, onTransform, onClose }) {
     try {
-      const json = JSON.parse(text)
+      const json = parser.parse(text)
 
       modalOpen = true
 

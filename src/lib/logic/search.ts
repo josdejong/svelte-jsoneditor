@@ -237,7 +237,8 @@ export function createSearchAndReplaceOperations(
   json: JSONData,
   documentState: DocumentState,
   replacementText: string,
-  searchResultItem: SearchResultItem
+  searchResultItem: SearchResultItem,
+  parser: JSON
 ): { newSelection: JSONSelection; operations: JSONPatchDocument } {
   const { field, path, start, end } = searchResultItem
 
@@ -265,7 +266,12 @@ export function createSearchAndReplaceOperations(
     const currentValueText = typeof currentValue === 'string' ? currentValue : String(currentValue)
 
     const pointer = compileJSONPointer(path)
-    const enforceString = getEnforceString(currentValue, documentState.enforceStringMap, pointer)
+    const enforceString = getEnforceString(
+      currentValue,
+      documentState.enforceStringMap,
+      pointer,
+      parser
+    )
 
     const value = replaceText(currentValueText, replacementText, start, end)
 
@@ -273,7 +279,7 @@ export function createSearchAndReplaceOperations(
       {
         op: 'replace',
         path: compileJSONPointer(path),
-        value: enforceString ? value : stringConvert(value)
+        value: enforceString ? value : stringConvert(value, parser)
       }
     ]
 
@@ -292,7 +298,8 @@ export function createSearchAndReplaceAllOperations(
   json: JSONData,
   documentState: DocumentState,
   searchText: string,
-  replacementText
+  replacementText: string,
+  parser: JSON
 ): { newSelection: JSONSelection; operations: JSONPatchDocument } {
   // TODO: to improve performance, we could reuse existing search results (except when hitting a maxResult limit)
   const searchResultItems = search(searchText, json, documentState, Infinity /* maxResults */)
@@ -366,7 +373,12 @@ export function createSearchAndReplaceAllOperations(
         typeof currentValue === 'string' ? currentValue : String(currentValue)
 
       const pointer = compileJSONPointer(path)
-      const enforceString = getEnforceString(currentValue, documentState.enforceStringMap, pointer)
+      const enforceString = getEnforceString(
+        currentValue,
+        documentState.enforceStringMap,
+        pointer,
+        parser
+      )
 
       const value = replaceAllText(currentValueText, replacementText, items)
 
@@ -374,7 +386,7 @@ export function createSearchAndReplaceAllOperations(
         {
           op: 'replace',
           path: compileJSONPointer(path),
-          value: enforceString ? value : stringConvert(value)
+          value: enforceString ? value : stringConvert(value, parser)
         }
       ]
       allOperations = allOperations.concat(operations)
