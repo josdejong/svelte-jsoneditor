@@ -711,7 +711,7 @@
 
     onChangeCodeMirrorValueDebounced.flush()
 
-    const contentErrors = memoizedValidateText(text, validator)
+    const contentErrors = memoizedValidateText(text, validator, parser)
 
     if (isContentParseError(contentErrors)) {
       jsonStatus = contentErrors.isRepairable ? JSON_STATUS_REPAIRABLE : JSON_STATUS_INVALID

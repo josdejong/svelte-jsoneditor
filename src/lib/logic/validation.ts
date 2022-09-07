@@ -58,7 +58,7 @@ export function validateJSON(json: JSONData, validator: Validator): ValidationEr
   return validator(json)
 }
 
-export function validateText(text: string, validator: Validator): ContentErrors {
+export function validateText(text: string, validator: Validator, parser: JSON): ContentErrors {
   debug('validateText')
 
   if (text.length > MAX_VALIDATABLE_SIZE) {
@@ -82,7 +82,7 @@ export function validateText(text: string, validator: Validator): ContentErrors 
 
   try {
     const json = measure(
-      () => JSON.parse(text),
+      () => parser.parse(text),
       (duration) => debug(`validate: parsed json in ${duration} ms`)
     )
 
@@ -100,7 +100,7 @@ export function validateText(text: string, validator: Validator): ContentErrors 
     return { validationErrors }
   } catch (err) {
     const isRepairable = measure(
-      () => canAutoRepair(text),
+      () => canAutoRepair(text, parser),
       (duration) => debug(`validate: checked whether repairable in ${duration} ms`)
     )
 
@@ -113,13 +113,13 @@ export function validateText(text: string, validator: Validator): ContentErrors 
   }
 }
 
-function canAutoRepair(text) {
+function canAutoRepair(text: string, parser: JSON): boolean {
   if (text.length > MAX_AUTO_REPAIRABLE_SIZE) {
     return false
   }
 
   try {
-    JSON.parse(jsonrepair(text))
+    parser.parse(jsonrepair(text))
 
     return true
   } catch (err) {
