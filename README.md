@@ -193,6 +193,8 @@ const editor = new JSONEditor({
   const validator = createAjvValidator(schema, schemaDefinitions)
   ```
 
+- `parser: JSON`. Configure a custom JSON parser, like [`lossless-json`](https://github.com/josdejong/lossless-json). By default, the native `JSON` parser of JavaScript is used. The `JSON` interface is an object with a `parse` and `stringify` function.
+
 - `onError(err: Error)`.
   Callback fired when an error occurs. Default implementation is to log an error in the console and show a simple alert message to the user.
 - `onChange(content: Content, previousContent: Content, changeStatus: { contentErrors: ContentErrors, patchResult: JSONPatchResult | null })`. The callback which is invoked on every of the contents, both changes made by a user and programmatic changes made via methods like `.set()`, `.update()`, or `.patch()`. The parameter `patchResult` is only available in `tree` mode, and not in `text` mode, since a change in arbitrary text cannot be expressed as a JSON Patch document.
