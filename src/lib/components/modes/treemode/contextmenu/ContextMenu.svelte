@@ -31,6 +31,7 @@
 
   export let json: JSONData
   export let documentState: DocumentState
+  export let parser: JSON
 
   export let showTip
 
@@ -112,7 +113,8 @@
       ? getEnforceString(
           focusValue,
           documentState.enforceStringMap,
-          compileJSONPointer(selection.focusPath)
+          compileJSONPointer(selection.focusPath),
+          parser
         )
       : false
 

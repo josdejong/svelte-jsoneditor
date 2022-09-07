@@ -2004,6 +2004,7 @@
     const props = {
       json,
       documentState: documentState,
+      parser,
       showTip,
 
       onEditKey: handleEditKey,
