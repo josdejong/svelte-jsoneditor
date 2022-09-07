@@ -13,6 +13,7 @@
   import { range } from 'lodash-es'
   import { tick } from 'svelte'
   import { parse, stringify } from 'lossless-json'
+  import { truncate } from '$lib/utils/stringUtils.js'
 
   const LosslessJSON = { parse, stringify }
 
@@ -520,7 +521,9 @@
           json contents:
           <pre>
 					<code>
-					{content.json !== undefined ? selectedParser.stringify(content.json, null, 2) : 'undefined'}
+					{content.json !== undefined
+                ? truncate(selectedParser.stringify(content.json, null, 2), 1e5)
+                : 'undefined'}
 					</code>
 				</pre>
         </div>
@@ -565,7 +568,7 @@
           text contents:
           <pre>
 						<code>
-						{content.text}
+						{truncate(content.text, 1e5)}
 						</code>
 					</pre>
         </div>
