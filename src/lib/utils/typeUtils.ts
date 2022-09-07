@@ -39,16 +39,31 @@ export function isBoolean(value: unknown): value is boolean {
 /**
  * Test whether a value is a timestamp in milliseconds after the year 2000.
  */
-export function isTimestamp(value: unknown): value is number {
+export function isTimestamp(value: unknown): boolean {
   const YEAR_2000 = 946684800000
 
-  return (
-    typeof value === 'number' &&
-    value > YEAR_2000 &&
-    isFinite(value) &&
-    Math.floor(value) === value &&
-    !isNaN(new Date(value).valueOf())
-  )
+  if (typeof value === 'number') {
+    return (
+      value > YEAR_2000 &&
+      isFinite(value) &&
+      Math.floor(value) === value &&
+      !isNaN(new Date(value).valueOf())
+    )
+  }
+
+  if (typeof value === 'bigint') {
+    return isTimestamp(Number(value))
+  }
+
+  // try getting the primitive value if that is different. For example when having a LosslessNumber
+  try {
+    const valueOf = value.valueOf()
+    if (valueOf !== value) {
+      return isTimestamp(valueOf)
+    }
+  } catch (err) {
+    return false
+  }
 }
 
 /**

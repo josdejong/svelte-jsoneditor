@@ -45,6 +45,21 @@ describe('typeUtils', () => {
     strictEqual(isTimestamp(1574809200000), true)
     strictEqual(isTimestamp(1574809200000.2), false)
     strictEqual(isTimestamp(123), false)
+    strictEqual(isTimestamp(1574809200000n), true)
+
+    class MyNumberType {
+      value: string
+
+      constructor(value: string) {
+        this.value = value
+      }
+
+      valueOf() {
+        return parseFloat(this.value)
+      }
+    }
+
+    strictEqual(isTimestamp(new MyNumberType('1574809200000')), true)
   })
 
   it('stringConvert', () => {

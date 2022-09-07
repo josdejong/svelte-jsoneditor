@@ -641,6 +641,7 @@ See https://github.com/sveltejs/kit/issues/981
 
   p {
     max-width: none;
+    margin: 10px 0;
 
     &.buttons {
       display: flex;
