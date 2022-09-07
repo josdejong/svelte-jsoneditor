@@ -64,7 +64,7 @@ export function sortArray(
   rootPath: JSONPath = [],
   propertyPath: JSONPath = [],
   direction: 1 | -1 = 1
-) {
+): JSONPatchDocument {
   const comparator = createObjectComparator(propertyPath, direction)
 
   // TODO: make the mechanism to sort configurable? Like use sortOperationsMove and sortOperationsMoveAdvanced

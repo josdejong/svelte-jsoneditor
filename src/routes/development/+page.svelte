@@ -659,6 +659,10 @@ See https://github.com/sveltejs/kit/issues/981
 
   label {
     white-space: nowrap;
+
+    &:hover {
+      background: white;
+    }
   }
 
   :global(.jse-main.jse-focus) {
