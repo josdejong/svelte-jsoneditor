@@ -73,9 +73,17 @@
         padding: 0 $padding;
       }
 
-      :global(.cm-diagnostic) {
+      :global(.cm-tooltip) {
         font-size: var(--jse-font-size);
         font-family: var(--jse-font-family);
+        color: var(--jse-tooltip-color);
+        background: var(--jse-tooltip-background);
+        border: var(--jse-tooltip-border);
+      }
+
+      :global(.cm-diagnosticAction) {
+        background: var(--jse-tooltip-action-button-color);
+        background: var(--jse-tooltip-action-button-background);
       }
 
       :global(.cm-panels) {
