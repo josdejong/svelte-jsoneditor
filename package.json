@@ -7,6 +7,7 @@
   "module": "index.js",
   "main": "index.js",
   "types": "index.d.ts",
+  "sideEffects": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/josdejong/svelte-jsoneditor.git"
@@ -29,7 +30,7 @@
     "build:vanilla:copy:files": "cpy CHANGELOG.md LICENSE.md SECURITY.md package-vanilla",
     "build:vanilla:copy:readme": "cpy --rename README.md README-VANILLA.md package-vanilla",
     "build:vanilla:copy:themes": "cpy --flat src/lib/themes package-vanilla/themes",
-    "build:vanilla:package.json": "node tools/createVanillaPackageJson.js",
+    "build:vanilla:package-json": "node tools/createVanillaPackageJson.js",
     "test": "mocha",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
