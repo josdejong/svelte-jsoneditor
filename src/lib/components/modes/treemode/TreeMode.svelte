@@ -139,7 +139,6 @@
   import { truncate } from '../../../utils/stringUtils.js'
   import { MAX_CHARACTERS_TEXT_PREVIEW } from '../../../constants.js'
   import memoizeOne from 'memoize-one'
-  import { isTextContent } from '$lib'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
