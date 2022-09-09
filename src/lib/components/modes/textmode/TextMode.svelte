@@ -547,25 +547,26 @@
 
     const isChanged = !isEqual(newContent, content)
     debug('setCodeMirrorContent', { isChanged })
-
-    if (codeMirrorView && isChanged) {
-      const previousContent = content
-      content = newContent
-      text = newText
-
-      // keep state
-      // to reset state: codeMirrorView.setState(EditorState.create({doc: text, extensions: ...}))
-      codeMirrorView.dispatch({
-        changes: {
-          from: 0,
-          to: codeMirrorView.state.doc.length,
-          insert: normalization.escapeValue(text)
-        }
-      })
-
-      updateCanUndoRedo()
-      emitOnChange(content, previousContent)
+    if (!codeMirrorView || !isChanged) {
+      return
     }
+
+    const previousContent = content
+    content = newContent
+    text = newText
+
+    // keep state
+    // to reset state: codeMirrorView.setState(EditorState.create({doc: text, extensions: ...}))
+    codeMirrorView.dispatch({
+      changes: {
+        from: 0,
+        to: codeMirrorView.state.doc.length,
+        insert: normalization.escapeValue(text)
+      }
+    })
+
+    updateCanUndoRedo()
+    emitOnChange(content, previousContent)
   }
 
   /**
@@ -609,15 +610,16 @@
 
     const isChanged = codeMirrorText !== text
     debug('onChangeCodeMirrorValue', { isChanged })
-
-    if (isChanged) {
-      const previousContent = content
-      text = codeMirrorText
-      content = { text }
-
-      updateCanUndoRedo()
-      emitOnChange(content, previousContent)
+    if (!isChanged) {
+      return
     }
+
+    const previousContent = content
+    text = codeMirrorText
+    content = { text }
+
+    updateCanUndoRedo()
+    emitOnChange(content, previousContent)
   }
 
   function updateLinter(validator) {
