@@ -98,9 +98,8 @@
 
   let content: Content = externalContent
   let text = getText(content, indentation) // text is just a cached version of content.text or parsed content.json
+  let editorDisabled = false
   $: isNewDocument = text.length === 0
-  $: tooLarge = text && text.length > MAX_DOCUMENT_SIZE_TEXT_MODE
-  $: textEditorDisabled = tooLarge && !acceptTooLarge
 
   $: normalization = createNormalizationFunctions({
     escapeControlCharacters: false,
@@ -130,7 +129,7 @@
     try {
       codeMirrorView = createCodeMirrorView({
         target: codeMirrorRef,
-        initialText: !textEditorDisabled ? text : '',
+        initialText: !disableTextEditor(text, acceptTooLarge) ? text : '',
         readOnly,
         indentation
       })
@@ -361,7 +360,7 @@
 
   function handleAcceptTooLarge() {
     acceptTooLarge = true
-    setCodeMirrorContent(externalContent, true)
+    setCodeMirrorContent(externalContent)
   }
 
   function cancelLoadTooLarge() {
@@ -537,19 +536,22 @@
     }
   }
 
-  function setCodeMirrorContent(newContent: Content, force = false) {
-    if (textEditorDisabled && !force) {
+  function setCodeMirrorContent(newContent: Content) {
+    const newText = getText(newContent, indentation)
+
+    editorDisabled = disableTextEditor(newText, acceptTooLarge)
+    if (editorDisabled) {
       debug('not applying text: editor is disabled')
       return
     }
 
     const isChanged = !isEqual(newContent, content)
-    debug('setCodeMirrorValue', { isChanged })
+    debug('setCodeMirrorContent', { isChanged })
 
     if (codeMirrorView && isChanged) {
       const previousContent = content
       content = newContent
-      text = getText(content, indentation)
+      text = newText
 
       // keep state
       // to reset state: codeMirrorView.setState(EditorState.create({doc: text, extensions: ...}))
@@ -691,6 +693,11 @@
     }
   }
 
+  function disableTextEditor(text: string, acceptTooLarge: boolean): boolean {
+    const tooLarge = text && text.length > MAX_DOCUMENT_SIZE_TEXT_MODE
+    return tooLarge && !acceptTooLarge
+  }
+
   let jsonStatus = JSON_STATUS_VALID
 
   let jsonParseError: ParseError | null = null
@@ -770,7 +777,7 @@
   {/if}
 
   {#if !isSSR}
-    {#if textEditorDisabled}
+    {#if editorDisabled}
       <Message
         icon={faExclamationTriangle}
         type="error"
@@ -802,7 +809,7 @@
       />
     {/if}
 
-    <div class="jse-contents" class:jse-hidden={textEditorDisabled} bind:this={codeMirrorRef} />
+    <div class="jse-contents" class:jse-hidden={editorDisabled} bind:this={codeMirrorRef} />
 
     {#if statusBar}
       <StatusBar {editorState} />
