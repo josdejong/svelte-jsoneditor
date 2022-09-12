@@ -98,7 +98,7 @@
 
   let content: Content = externalContent
   let text = getText(content, indentation) // text is just a cached version of content.text or parsed content.json
-  let editorDisabled = false
+  let editorDisabled = disableTextEditor(text, acceptTooLarge)
   $: isNewDocument = text.length === 0
 
   $: normalization = createNormalizationFunctions({
@@ -129,7 +129,7 @@
     try {
       codeMirrorView = createCodeMirrorView({
         target: codeMirrorRef,
-        initialText: !disableTextEditor(text, acceptTooLarge) ? text : '',
+        initialText: !editorDisabled ? text : '',
         readOnly,
         indentation
       })
@@ -541,7 +541,7 @@
 
     editorDisabled = disableTextEditor(newText, acceptTooLarge)
     if (editorDisabled) {
-      debug('not applying text: editor is disabled')
+      debug('externalContent not applying text: editor is disabled')
       return
     }
 
@@ -721,7 +721,7 @@
   }
 
   export function validate(): ContentErrors {
-    debug('validate')
+    debug('validate:start')
 
     onChangeCodeMirrorValueDebounced.flush()
 
@@ -736,6 +736,8 @@
       jsonParseError = null
       validationErrors = contentErrors.validationErrors
     }
+
+    debug('validate:end')
 
     return contentErrors
   }
