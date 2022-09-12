@@ -317,8 +317,8 @@ export function isTextContent(content: Content): content is TextContent {
 /**
  * Get the contents as Text. If the contents is JSON, the JSON will be parsed.
  */
-export function getText(content: Content, indentation: number | string) {
-  return isTextContent(content) ? content.text : JSON.stringify(content.json, null, indentation)
+export function getText(content: Content, indentation: number | string, parser: JSON) {
+  return isTextContent(content) ? content.text : parser.stringify(content.json, null, indentation)
 }
 
 /**

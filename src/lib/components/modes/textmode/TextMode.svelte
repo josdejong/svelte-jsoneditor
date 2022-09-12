@@ -99,7 +99,7 @@
   const tabSizeCompartment = new Compartment()
 
   let content: Content = externalContent
-  let text = getText(content, indentation) // text is just a cached version of content.text or parsed content.json
+  let text = getText(content, indentation, parser) // text is just a cached version of content.text or parsed content.json
   let editorDisabled = disableTextEditor(text, acceptTooLarge)
   $: isNewDocument = text.length === 0
 
@@ -540,7 +540,7 @@
   }
 
   function setCodeMirrorContent(newContent: Content, forceUpdate = false) {
-    const newText = getText(newContent, indentation)
+    const newText = getText(newContent, indentation, parser)
 
     editorDisabled = disableTextEditor(newText, acceptTooLarge)
     if (editorDisabled) {
