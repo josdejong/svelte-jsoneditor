@@ -360,7 +360,7 @@
 
   function handleAcceptTooLarge() {
     acceptTooLarge = true
-    setCodeMirrorContent(externalContent)
+    setCodeMirrorContent(externalContent, true)
   }
 
   function cancelLoadTooLarge() {
@@ -536,7 +536,7 @@
     }
   }
 
-  function setCodeMirrorContent(newContent: Content) {
+  function setCodeMirrorContent(newContent: Content, forceUpdate = false) {
     const newText = getText(newContent, indentation)
 
     editorDisabled = disableTextEditor(newText, acceptTooLarge)
@@ -546,8 +546,8 @@
     }
 
     const isChanged = !isEqual(newContent, content)
-    debug('setCodeMirrorContent', { isChanged })
-    if (!codeMirrorView || !isChanged) {
+    debug('setCodeMirrorContent', { isChanged, forceUpdate })
+    if (!codeMirrorView || (!isChanged && !forceUpdate)) {
       return
     }
 
@@ -566,7 +566,9 @@
     })
 
     updateCanUndoRedo()
-    emitOnChange(content, previousContent)
+    if (isChanged) {
+      emitOnChange(content, previousContent)
+    }
   }
 
   /**
@@ -705,6 +707,10 @@
   let jsonParseError: ParseError | null = null
 
   function linterCallback(): Diagnostic[] {
+    if (editorDisabled) {
+      return []
+    }
+
     const contentErrors = validate()
 
     if (isContentParseError(contentErrors)) {
