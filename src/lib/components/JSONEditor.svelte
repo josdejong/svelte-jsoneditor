@@ -97,10 +97,6 @@
     return content
   }
 
-  function getText(content: Content) {
-    return isTextContent(content) ? content.text : parser.stringify(content.json, null, indentation)
-  }
-
   export function set(newContent: Content) {
     debug('set')
 
@@ -409,7 +405,7 @@
         {#if mode === Mode.text || mode === 'code'}
           <TextMode
             bind:this={refTextMode}
-            text={getText(content)}
+            externalContent={content}
             {readOnly}
             {indentation}
             {tabSize}
