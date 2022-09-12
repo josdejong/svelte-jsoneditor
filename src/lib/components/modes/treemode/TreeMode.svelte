@@ -1765,6 +1765,7 @@
     // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
     const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
     const keepAnchorPath = event.shiftKey
+    debug('keydown', { combo, key: event.key })
 
     if (combo === 'Ctrl+X') {
       // cut formatted
@@ -1889,11 +1890,14 @@
       }
     }
 
-    if (combo.length === (combo.startsWith('Shift+') ? 7 : 1) && documentState.selection) {
+    const normalizedCombo = combo
+      .replace(/^Shift\+/, '') // replace 'Shift+A' with 'A'
+      .replace(/^Numpad_/, '') // replace 'Numpad_4' with '4'
+    if (normalizedCombo.length === 1 && documentState.selection) {
       // a regular key like a, A, _, etc is entered.
       // Replace selected contents with a new value having this first character as text
       event.preventDefault()
-      handleInsertCharacter(event.key)
+      handleInsertCharacter(normalizedCombo)
       return
     }
 
