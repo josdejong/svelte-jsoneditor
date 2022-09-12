@@ -92,6 +92,7 @@
 
   let validationErrors: ValidationError[] = []
   const linterCompartment = new Compartment()
+  const editableCompartment = new Compartment() // needed to prevent a mobile keyboard from opening when readonly
   const readOnlyCompartment = new Compartment()
   const indentUnitCompartment = new Compartment()
   const tabSizeCompartment = new Compartment()
@@ -468,6 +469,7 @@
           top: true
         }),
         readOnlyCompartment.of(EditorState.readOnly.of(readOnly)),
+        editableCompartment.of(EditorView.editable.of(!readOnly)),
         tabSizeCompartment.of(EditorState.tabSize.of(tabSize)),
         indentUnitCompartment.of(createIndentUnit(indentation)),
         EditorView.lineWrapping
@@ -661,7 +663,10 @@
       debug('updateReadOnly', readOnly)
 
       codeMirrorView.dispatch({
-        effects: readOnlyCompartment.reconfigure(EditorState.readOnly.of(readOnly))
+        effects: [
+          readOnlyCompartment.reconfigure(EditorState.readOnly.of(readOnly)),
+          editableCompartment.reconfigure(EditorView.editable.of(!readOnly))
+        ]
       })
     }
   }
