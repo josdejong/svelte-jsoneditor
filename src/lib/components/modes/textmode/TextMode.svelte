@@ -6,7 +6,7 @@
   import type { JSONPatchDocument } from 'immutable-json-patch'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
-  import { debounce, noop, uniqueId } from 'lodash-es'
+  import { debounce, isEqual, noop, uniqueId } from 'lodash-es'
   import { onDestroy, onMount } from 'svelte'
   import {
     JSON_STATUS_INVALID,
@@ -21,7 +21,7 @@
     getWindow
   } from '$lib/utils/domUtils'
   import { formatSize } from '$lib/utils/fileUtils'
-  import { findTextLocation } from '$lib/utils/jsonUtils'
+  import { findTextLocation, getText } from '$lib/utils/jsonUtils'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
@@ -39,6 +39,7 @@
   import StatusBar from './StatusBar.svelte'
   import { highlighter } from './codemirror/codemirror-theme'
   import type {
+    Content,
     ContentErrors,
     JSONPatchResult,
     OnChange,
@@ -55,7 +56,7 @@
   export let readOnly = false
   export let mainMenuBar = true
   export let statusBar = true
-  export let text = ''
+  export let externalContent: Content
   export let indentation: number | string = 2
   export let tabSize = 4
   export let escapeUnicodeCharacters = false
@@ -83,7 +84,6 @@
 
   let codeMirrorRef
   let codeMirrorView
-  let codeMirrorText
   let domTextMode
   let editorState: EditorState
 
@@ -96,16 +96,17 @@
   const indentUnitCompartment = new Compartment()
   const tabSizeCompartment = new Compartment()
 
+  let content: Content = externalContent
+  let text = getText(content, indentation) // text is just a cached version of content.text or parsed content.json
+  let editorDisabled = disableTextEditor(text, acceptTooLarge)
   $: isNewDocument = text.length === 0
-  $: tooLarge = text && text.length > MAX_DOCUMENT_SIZE_TEXT_MODE
-  $: textEditorDisabled = tooLarge && !acceptTooLarge
 
   $: normalization = createNormalizationFunctions({
     escapeControlCharacters: false,
     escapeUnicodeCharacters
   })
 
-  $: setCodeMirrorValue(text)
+  $: setCodeMirrorContent(externalContent)
   $: updateLinter(validator)
   $: updateIndentation(indentation)
   $: updateTabSize(tabSize)
@@ -126,11 +127,9 @@
     }
 
     try {
-      codeMirrorText = !textEditorDisabled ? text : ''
-
       codeMirrorView = createCodeMirrorView({
         target: codeMirrorRef,
-        initialText: codeMirrorText,
+        initialText: !editorDisabled ? text : '',
         readOnly,
         indentation
       })
@@ -181,7 +180,9 @@
     const previousJson = JSON.parse(text)
     const updatedJson = immutableJSONPatch(previousJson, operations)
     const undo = revertJSONPatch(previousJson, operations)
-    text = JSON.stringify(updatedJson, null, indentation)
+    setCodeMirrorContent({
+      text: JSON.stringify(updatedJson, null, indentation)
+    })
 
     return {
       json: updatedJson,
@@ -200,7 +201,9 @@
 
     try {
       const json = JSON.parse(text)
-      text = JSON.stringify(json, null, indentation)
+      setCodeMirrorContent({
+        text: JSON.stringify(json, null, indentation)
+      })
     } catch (err) {
       onError(err)
     }
@@ -215,7 +218,9 @@
 
     try {
       const json = JSON.parse(text)
-      text = JSON.stringify(json)
+      setCodeMirrorContent({
+        text: JSON.stringify(json)
+      })
     } catch (err) {
       onError(err)
     }
@@ -229,7 +234,9 @@
     }
 
     try {
-      text = jsonrepair(text)
+      setCodeMirrorContent({
+        text: jsonrepair(text)
+      })
       jsonStatus = JSON_STATUS_VALID
       jsonParseError = undefined
     } catch (err) {
@@ -353,7 +360,7 @@
 
   function handleAcceptTooLarge() {
     acceptTooLarge = true
-    setCodeMirrorValue(text, true)
+    setCodeMirrorContent(externalContent, true)
   }
 
   function cancelLoadTooLarge() {
@@ -529,31 +536,38 @@
     }
   }
 
-  function setCodeMirrorValue(text, force = false) {
-    if (textEditorDisabled && !force) {
-      debug('not applying text: editor is disabled')
+  function setCodeMirrorContent(newContent: Content, forceUpdate = false) {
+    const newText = getText(newContent, indentation)
+
+    editorDisabled = disableTextEditor(newText, acceptTooLarge)
+    if (editorDisabled) {
+      debug('externalContent not applying text: editor is disabled')
       return
     }
 
-    const isChanged = text !== codeMirrorText
-    debug('setCodeMirrorValue', { isChanged, length: text.length })
+    const isChanged = !isEqual(newContent, content)
+    debug('setCodeMirrorContent', { isChanged, forceUpdate })
+    if (!codeMirrorView || (!isChanged && !forceUpdate)) {
+      return
+    }
 
-    if (codeMirrorView && isChanged) {
-      const previousText = codeMirrorText
-      codeMirrorText = text
+    const previousContent = content
+    content = newContent
+    text = newText
 
-      // keep state
-      // to reset state: codeMirrorView.setState(EditorState.create({doc: text, extensions: ...}))
-      codeMirrorView.dispatch({
-        changes: {
-          from: 0,
-          to: codeMirrorView.state.doc.length,
-          insert: normalization.escapeValue(text)
-        }
-      })
+    // keep state
+    // to reset state: codeMirrorView.setState(EditorState.create({doc: text, extensions: ...}))
+    codeMirrorView.dispatch({
+      changes: {
+        from: 0,
+        to: codeMirrorView.state.doc.length,
+        insert: normalization.escapeValue(text)
+      }
+    })
 
-      updateCanUndoRedo()
-      emitOnChange(text, previousText)
+    updateCanUndoRedo()
+    if (isChanged) {
+      emitOnChange(content, previousContent)
     }
   }
 
@@ -594,18 +608,20 @@
       return
     }
 
-    codeMirrorText = getCodeMirrorValue()
+    const codeMirrorText = getCodeMirrorValue()
 
     const isChanged = codeMirrorText !== text
     debug('onChangeCodeMirrorValue', { isChanged })
-
-    if (isChanged) {
-      const previousText = text
-      text = codeMirrorText
-
-      updateCanUndoRedo()
-      emitOnChange(text, previousText)
+    if (!isChanged) {
+      return
     }
+
+    const previousContent = content
+    text = codeMirrorText
+    content = { text }
+
+    updateCanUndoRedo()
+    emitOnChange(content, previousContent)
   }
 
   function updateLinter(validator) {
@@ -672,17 +688,18 @@
     TEXT_MODE_ONCHANGE_DELAY
   )
 
-  function emitOnChange(text: string, previousText: string) {
+  function emitOnChange(content: Content, previousContent: Content) {
     if (onChange) {
-      onChange(
-        { text },
-        { text: previousText },
-        {
-          contentErrors: validate(),
-          patchResult: null
-        }
-      )
+      onChange(content, previousContent, {
+        contentErrors: validate(),
+        patchResult: null
+      })
     }
+  }
+
+  function disableTextEditor(text: string, acceptTooLarge: boolean): boolean {
+    const tooLarge = text && text.length > MAX_DOCUMENT_SIZE_TEXT_MODE
+    return tooLarge && !acceptTooLarge
   }
 
   let jsonStatus = JSON_STATUS_VALID
@@ -690,6 +707,10 @@
   let jsonParseError: ParseError | null = null
 
   function linterCallback(): Diagnostic[] {
+    if (editorDisabled) {
+      return []
+    }
+
     const contentErrors = validate()
 
     if (isContentParseError(contentErrors)) {
@@ -706,7 +727,7 @@
   }
 
   export function validate(): ContentErrors {
-    debug('validate')
+    debug('validate:start')
 
     onChangeCodeMirrorValueDebounced.flush()
 
@@ -721,6 +742,8 @@
       jsonParseError = null
       validationErrors = contentErrors.validationErrors
     }
+
+    debug('validate:end')
 
     return contentErrors
   }
@@ -764,7 +787,7 @@
   {/if}
 
   {#if !isSSR}
-    {#if textEditorDisabled}
+    {#if editorDisabled}
       <Message
         icon={faExclamationTriangle}
         type="error"
@@ -796,7 +819,7 @@
       />
     {/if}
 
-    <div class="jse-contents" class:jse-hidden={textEditorDisabled} bind:this={codeMirrorRef} />
+    <div class="jse-contents" class:jse-hidden={editorDisabled} bind:this={codeMirrorRef} />
 
     {#if statusBar}
       <StatusBar {editorState} />
