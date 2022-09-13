@@ -7,7 +7,7 @@
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
   import { DEBOUNCE_DELAY } from '../../constants.js'
-  import type { JSONData, JSONPath } from 'immutable-json-patch'
+  import type { JSONValue, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { transformModalState } from './transformModalState.js'
@@ -28,7 +28,7 @@
   const debug = createDebug('jsoneditor:TransformModal')
 
   export let id = 'transform-modal-' + uniqueId()
-  export let json: JSONData
+  export let json: JSONValue
   export let selectedPath: JSONPath = []
 
   export let escapeControlCharacters: boolean
@@ -85,7 +85,7 @@
     debug('handleChangeQuery', { query, isManual })
   }
 
-  function previewTransform(json: JSONData, query: string) {
+  function previewTransform(json: JSONValue, query: string) {
     try {
       debug('previewTransform', {
         query

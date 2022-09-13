@@ -11,7 +11,7 @@ import {
   isJSONPatchRemove,
   isJSONPatchReplace,
   type JSONArray,
-  type JSONData,
+  type JSONValue,
   type JSONPatchAdd,
   type JSONPatchCopy,
   type JSONPatchDocument,
@@ -45,10 +45,10 @@ import type {
 import { CaretType } from '../types.js'
 import { int } from '../utils/numberUtils.js'
 
-type CreateSelection = (json: JSONData, documentState: DocumentState) => JSONSelection
+type CreateSelection = (json: JSONValue, documentState: DocumentState) => JSONSelection
 
 export type CreateDocumentStateProps = {
-  json: JSONData
+  json: JSONValue
   expand?: (path: JSONPath) => boolean
   select?: CreateSelection
 }
@@ -99,7 +99,7 @@ export function forEachVisibleIndex(
  * Expand all nodes on given path
  */
 export function expandPath(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   path: JSONPath
 ): DocumentState {
@@ -142,14 +142,14 @@ export function expandPath(
  * Nodes that are already expanded will be left untouched
  */
 export function expandWithCallback(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   path: JSONPath,
   expandedCallback: (path: JSONPath) => boolean
 ): DocumentState {
   const expandedMap = { ...documentState.expandedMap }
 
-  function recurse(value: JSONData) {
+  function recurse(value: JSONValue) {
     const pathIndex = currentPath.length
 
     if (Array.isArray(value)) {
@@ -253,7 +253,7 @@ export function setEnforceString(
  * Expand a section of items in an array
  */
 export function expandSection(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   pointer: JSONPointer,
   section: Section
@@ -287,10 +287,10 @@ export function syncKeys(actualKeys: string[], prevKeys?: string[]): string[] {
  * Apply patch operations to both json and state
  */
 export function documentStatePatch(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   operations: JSONPatchDocument
-): { json: JSONData; documentState: DocumentState } {
+): { json: JSONValue; documentState: DocumentState } {
   const updatedJson = immutableJSONPatch(json, operations)
 
   const updatedDocumentState = operations.reduce((updatingState, operation) => {
@@ -320,7 +320,7 @@ export function documentStatePatch(
 }
 
 export function documentStateAdd(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   operation: JSONPatchAdd
 ): DocumentState {
@@ -355,7 +355,7 @@ export function documentStateAdd(
 }
 
 export function documentStateRemove(
-  updatedJson: JSONData,
+  updatedJson: JSONValue,
   documentState: DocumentState,
   operation: JSONPatchRemove
 ): DocumentState {
@@ -394,7 +394,7 @@ export function documentStateRemove(
 }
 
 export function documentStateReplace(
-  updatedJson: JSONData,
+  updatedJson: JSONValue,
   documentState: DocumentState,
   operation: JSONPatchReplace
 ): DocumentState {
@@ -425,7 +425,7 @@ export function documentStateReplace(
 }
 
 export function documentStateMoveOrCopy(
-  updatedJson: JSONData,
+  updatedJson: JSONValue,
   documentState: DocumentState,
   operation: JSONPatchCopy | JSONPatchMove
 ): DocumentState {
@@ -579,7 +579,7 @@ export function shiftPath<T>(
 
 // TODO: unit test
 export function cleanupNonExistingPaths<T>(
-  json: JSONData,
+  json: JSONValue,
   map: JSONPointerMap<T>
 ): JSONPointerMap<T> {
   const updatedMap = {}
@@ -643,7 +643,7 @@ export function shiftVisibleSections(
 }
 
 export function getEnforceString(
-  value: JSONData,
+  value: JSONValue,
   enforceStringMap: JSONPointerMap<boolean> | undefined,
   pointer: JSONPointer,
   parser: JSON
@@ -671,10 +671,10 @@ export function getNextKeys(keys, key, includeKey = false) {
  * Get all paths which are visible and rendered
  */
 // TODO: create memoized version of getVisiblePaths which remembers just the previous result if json and state are the same
-export function getVisiblePaths(json: JSONData, documentState: DocumentState): JSONPath[] {
+export function getVisiblePaths(json: JSONValue, documentState: DocumentState): JSONPath[] {
   const paths: JSONPath[] = []
 
-  function _recurse(value: JSONData, path: JSONPath) {
+  function _recurse(value: JSONValue, path: JSONPath) {
     paths.push(path)
     const pointer = compileJSONPointer(path)
 
@@ -705,13 +705,13 @@ export function getVisiblePaths(json: JSONData, documentState: DocumentState): J
  */
 // TODO: create memoized version of getVisibleCaretPositions which remembers just the previous result if json and state are the same
 export function getVisibleCaretPositions(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   includeInside = true
 ): CaretPosition[] {
   const paths: CaretPosition[] = []
 
-  function _recurse(value: JSONData, path: JSONPath) {
+  function _recurse(value: JSONValue, path: JSONPath) {
     paths.push({ path, type: CaretType.value })
 
     const pointer = compileJSONPointer(path)
@@ -761,7 +761,7 @@ export function getVisibleCaretPositions(
  */
 // TODO: write tests for getPreviousVisiblePath
 export function getPreviousVisiblePath(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   path: JSONPath
 ): JSONPath | null {
@@ -783,7 +783,7 @@ export function getPreviousVisiblePath(
  */
 // TODO: write tests for getNextVisiblePath
 export function getNextVisiblePath(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   path: JSONPath
 ): JSONPath | null {

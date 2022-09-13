@@ -6,7 +6,7 @@ import {
   isJSONObject,
   isJSONPatchMove,
   isJSONPatchRemove,
-  type JSONData,
+  type JSONValue,
   type JSONPatchDocument,
   type JSONPatchOperation,
   type JSONPath,
@@ -44,7 +44,7 @@ import { int } from '../utils/numberUtils.js'
  */
 // TODO: write tests
 export function insertBefore(
-  json: JSONData,
+  json: JSONValue,
   path: JSONPath,
   values: ClipboardValues
 ): JSONPatchDocument {
@@ -93,7 +93,11 @@ export function insertBefore(
  * a unique property name for the inserted node in case of duplicating
  * and object property
  */
-export function append(json: JSONData, path: JSONPath, values: ClipboardValues): JSONPatchDocument {
+export function append(
+  json: JSONValue,
+  path: JSONPath,
+  values: ClipboardValues
+): JSONPatchDocument {
   const parent = getIn(json, path)
 
   if (Array.isArray(parent)) {
@@ -151,7 +155,7 @@ export function rename(
  * and object property
  */
 export function replace(
-  json: JSONData,
+  json: JSONValue,
   paths: JSONPath[],
   values: ClipboardValues
 ): JSONPatchDocument {
@@ -220,7 +224,7 @@ export function replace(
  * a unique property name for the duplicated node in case of duplicating
  * and object property
  */
-export function duplicate(json: JSONData, paths: JSONPath[]): JSONPatchDocument {
+export function duplicate(json: JSONValue, paths: JSONPath[]): JSONPatchDocument {
   // FIXME: here we assume selection.paths is sorted correctly, that's a dangerous assumption
   const lastPath = last(paths)
 
@@ -279,7 +283,7 @@ export function duplicate(json: JSONData, paths: JSONPath[]): JSONPatchDocument 
  * Create a JSONPatch for an extract action.
  */
 // TODO: write unit tests
-export function extract(json: JSONData, selection: JSONSelection): JSONPatchDocument {
+export function extract(json: JSONValue, selection: JSONSelection): JSONPatchDocument {
   if (isValueSelection(selection)) {
     return [
       {
@@ -333,7 +337,7 @@ export function extract(json: JSONData, selection: JSONSelection): JSONPatchDocu
 
 // TODO: write unit tests
 export function insert(
-  json: JSONData,
+  json: JSONValue,
   selection: JSONSelection | undefined,
   clipboardText: string,
   parser: JSON
@@ -439,7 +443,7 @@ export function insert(
 }
 
 export function moveInsideParent(
-  json: JSONData,
+  json: JSONValue,
   selection: JSONSelection,
   dragInsideAction: DragInsideAction
 ): JSONPatchDocument {
@@ -517,7 +521,7 @@ export function moveInsideParent(
 }
 
 export function createNewValue(
-  json: JSONData,
+  json: JSONValue,
   selection: JSONSelection,
   valueType: 'object' | 'array' | 'structure' | 'value'
 ) {
@@ -629,7 +633,7 @@ export function clipboardToValues(clipboardText: string, parser: JSON): Clipboar
 
 // TODO: write unit tests
 export function createRemoveOperations(
-  json: JSONData,
+  json: JSONValue,
   selection: JSONSelection
 ): { newSelection: JSONSelection; operations: JSONPatchDocument } {
   if (isKeySelection(selection)) {
@@ -706,7 +710,7 @@ export function createRemoveOperations(
 }
 
 export function revertJSONPatchWithMoveOperations(
-  json: JSONData,
+  json: JSONValue,
   operations: JSONPatchDocument
 ): JSONPatchDocument {
   return revertJSONPatch(json, operations, {
@@ -730,7 +734,7 @@ export function revertJSONPatchWithMoveOperations(
   })
 }
 
-function createRevertMoveOperations(json: JSONData, path: JSONPath): JSONPatchOperation[] {
+function createRevertMoveOperations(json: JSONValue, path: JSONPath): JSONPatchOperation[] {
   const parentPath = initial(path)
   const afterKey = last(path)
   const parent = getIn(json, parentPath)

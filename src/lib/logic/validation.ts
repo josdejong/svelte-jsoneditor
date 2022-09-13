@@ -7,7 +7,7 @@ import type {
   Validator
 } from '../types.js'
 import { ValidationSeverity } from '../types.js'
-import { compileJSONPointer, type JSONData } from 'immutable-json-patch'
+import { compileJSONPointer, type JSONValue } from 'immutable-json-patch'
 import { MAX_AUTO_REPAIRABLE_SIZE, MAX_VALIDATABLE_SIZE } from '../constants.js'
 import { measure } from '../utils/timeUtils.js'
 import { normalizeJsonParseError } from '../utils/jsonUtils.js'
@@ -53,7 +53,7 @@ export function mapValidationErrors(
   return map
 }
 
-export function validateJSON(json: JSONData, validator: Validator): ValidationError[] {
+export function validateJSON(json: JSONValue, validator: Validator): ValidationError[] {
   debug('validateJSON')
   return validator(json)
 }

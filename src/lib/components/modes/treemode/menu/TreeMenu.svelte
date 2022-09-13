@@ -16,11 +16,11 @@
   import Menu from '../../../controls/Menu.svelte'
   import { noop } from 'lodash-es'
   import type { OnRenderMenu, JSONSelection } from '$lib/types'
-  import type { JSONData } from 'immutable-json-patch'
+  import type { JSONValue } from 'immutable-json-patch'
   import { isKeySelection, isMultiSelection, isValueSelection } from '../../../../logic/selection'
   import type { HistoryState } from '../../../../logic/history'
 
-  export let json: JSONData
+  export let json: JSONValue
   export let selection: JSONSelection | undefined
 
   export let readOnly: boolean

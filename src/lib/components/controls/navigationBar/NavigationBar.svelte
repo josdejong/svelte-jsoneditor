@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONData, JSONPath } from 'immutable-json-patch'
+  import type { JSONValue, JSONPath } from 'immutable-json-patch'
   import { getIn } from 'immutable-json-patch'
   import { range } from 'lodash-es'
   import { isObject, isObjectOrArray } from '../../../utils/typeUtils'
@@ -13,7 +13,7 @@
 
   const debug = createDebug('jsoneditor:NavigationBar')
 
-  export let json: JSONData
+  export let json: JSONValue
   export let documentState: DocumentState
   export let onSelect: OnSelect
 

@@ -24,7 +24,7 @@ import {
   type JSONPointerMap,
   type VisibleSection
 } from '../types.js'
-import type { JSONData, JSONPatchDocument } from 'immutable-json-patch'
+import type { JSONValue, JSONPatchDocument } from 'immutable-json-patch'
 import { compileJSONPointer, deleteIn, setIn } from 'immutable-json-patch'
 
 describe('documentState', () => {
@@ -368,7 +368,7 @@ describe('documentState', () => {
   })
 
   describe('documentStatePatch', () => {
-    function createJsonAndState(): { json: JSONData; documentState: DocumentState } {
+    function createJsonAndState(): { json: JSONValue; documentState: DocumentState } {
       const json = {
         members: [
           { id: 1, name: 'Joe' },
@@ -1129,7 +1129,7 @@ describe('documentState', () => {
 /**
  * Helper function to get the visible indices of an Array state
  */
-function getVisibleIndices(json: JSONData, visibleSections: VisibleSection[]): number[] {
+function getVisibleIndices(json: JSONValue, visibleSections: VisibleSection[]): number[] {
   const visibleIndices = []
 
   if (Array.isArray(json)) {

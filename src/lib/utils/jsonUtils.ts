@@ -1,4 +1,4 @@
-import type { JSONData, JSONObject, JSONPath } from 'immutable-json-patch'
+import type { JSONValue, JSONObject, JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer } from 'immutable-json-patch'
 import jsonSourceMap from 'json-source-map'
 import jsonrepair from 'jsonrepair'
@@ -11,7 +11,7 @@ import { int } from './numberUtils.js'
  * Parse the JSON. if this fails, try to repair and parse.
  * Throws an exception when the JSON is invalid and could not be parsed.
  */
-export function parseAndRepair(jsonText: string, parser: JSON): JSONData {
+export function parseAndRepair(jsonText: string, parser: JSON): JSONValue {
   try {
     return parser.parse(jsonText)
   } catch (err) {
@@ -24,7 +24,10 @@ export function parseAndRepair(jsonText: string, parser: JSON): JSONData {
  * Parse the JSON and if needed repair it.
  * When not valid, undefined is returned.
  */
-export function parseAndRepairOrUndefined(partialJson: string, parser: JSON): JSONData | undefined {
+export function parseAndRepairOrUndefined(
+  partialJson: string,
+  parser: JSON
+): JSONValue | undefined {
   try {
     return parseAndRepair(partialJson, parser)
   } catch (err) {
@@ -33,7 +36,10 @@ export function parseAndRepairOrUndefined(partialJson: string, parser: JSON): JS
 }
 
 // TODO: deduplicate the logic in repairPartialJson and parseAndRepairPartialJson ?
-export function parsePartialJson(partialJson: string, parse: (text: string) => JSONData): JSONData {
+export function parsePartialJson(
+  partialJson: string,
+  parse: (text: string) => JSONValue
+): JSONValue {
   // for now: dumb brute force approach: simply try out a few things...
 
   // remove trailing comma
@@ -215,10 +221,10 @@ export function findTextLocation(text: string, path: JSONPath): TextLocation | n
  * If it cannot be converted, an error is thrown
  */
 export function convertValue(
-  value: JSONData,
+  value: JSONValue,
   type: 'value' | 'object' | 'array',
   parser: JSON
-): JSONData {
+): JSONValue {
   // FIXME: improve the TypeScript here, there are a couple of conversions
   if (type === 'array') {
     if (Array.isArray(value)) {

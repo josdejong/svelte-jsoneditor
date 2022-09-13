@@ -1,5 +1,5 @@
 import diffSequence from '../generated/diffSequence.js'
-import type { JSONArray, JSONData, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
+import type { JSONArray, JSONValue, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, getIn, parseFrom, parsePath, setIn } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import naturalCompare from 'natural-compare-lite'
@@ -22,7 +22,7 @@ export function caseInsensitiveNaturalCompare(a, b) {
  *                       to get the array sorted.
  */
 export function sortObjectKeys(
-  json: JSONData,
+  json: JSONValue,
   rootPath: JSONPath = [],
   direction: 1 | -1 = 1
 ): JSONPatchDocument {
@@ -60,7 +60,7 @@ export function sortObjectKeys(
  *                           to get the array sorted.
  */
 export function sortArray(
-  json: JSONData,
+  json: JSONValue,
   rootPath: JSONPath = [],
   propertyPath: JSONPath = [],
   direction: 1 | -1 = 1

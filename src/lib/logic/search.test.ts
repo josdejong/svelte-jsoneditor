@@ -421,6 +421,10 @@ describe('search', () => {
     })
   })
 
+  // it('should search inside a JSON object with LosslessNumbers', () => {
+  //
+  // })
+
   it('should create operations to replace all search results', () => {
     const json = {
       before: 'text',

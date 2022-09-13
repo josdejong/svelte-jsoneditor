@@ -8,14 +8,14 @@
   import { addNewLineSuffix } from '$lib/utils/domUtils'
   import type {
     ExtendedSearchResultItem,
-    JSONData,
+    JSONValue,
     OnSelect,
     JSONPath,
     ValueNormalization
   } from '../../../types'
 
   export let path: JSONPath
-  export let value: JSONData
+  export let value: JSONValue
   export let readOnly: boolean
   export let normalization: ValueNormalization
   export let parser: JSON

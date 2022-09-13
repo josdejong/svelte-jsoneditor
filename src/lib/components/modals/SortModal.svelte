@@ -10,7 +10,7 @@
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { sortArray, sortObjectKeys } from '../../logic/sort.js'
   import { sortModalState } from './sortModalState.js'
-  import type { JSONData, JSONPath } from 'immutable-json-patch'
+  import type { JSONValue, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { createDebug } from '../../utils/debug'
   import type { OnSort } from '../../types'
@@ -18,7 +18,7 @@
   const debug = createDebug('jsoneditor:SortModal')
 
   export let id: string
-  export let json: JSONData // the whole document
+  export let json: JSONValue // the whole document
   export let selectedPath: JSONPath
   export let onSort: OnSort
 

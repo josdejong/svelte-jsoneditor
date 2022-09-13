@@ -1,6 +1,6 @@
 import type { Options } from 'ajv'
 import Ajv from 'ajv-dist'
-import type { JSONData } from 'immutable-json-patch'
+import type { JSONValue } from 'immutable-json-patch'
 import { parsePath } from 'immutable-json-patch'
 import type { ValidationError, Validator } from '../../types'
 import { ValidationSeverity } from '../../types.js'
@@ -15,8 +15,8 @@ import { ValidationSeverity } from '../../types.js'
  * @return Returns a validation function
  */
 export function createAjvValidator(
-  schema: JSONData,
-  schemaDefinitions: JSONData = undefined,
+  schema: JSONValue,
+  schemaDefinitions: JSONValue = undefined,
   ajvOptions: Options = undefined
 ): Validator {
   const ajv = new Ajv({
@@ -34,7 +34,7 @@ export function createAjvValidator(
 
   const validateAjv = ajv.compile(schema)
 
-  return function validate(json: JSONData): ValidationError[] {
+  return function validate(json: JSONValue): ValidationError[] {
     validateAjv(json)
     const ajvErrors = validateAjv.errors || []
 
@@ -42,7 +42,7 @@ export function createAjvValidator(
   }
 }
 
-function normalizeAjvError(json: JSONData, ajvError): ValidationError {
+function normalizeAjvError(json: JSONValue, ajvError): ValidationError {
   return {
     path: parsePath(json, ajvError.instancePath),
     message: ajvError.message,

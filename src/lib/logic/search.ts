@@ -1,5 +1,5 @@
 import type {
-  JSONData,
+  JSONValue,
   JSONPatchDocument,
   JSONPatchOperation,
   JSONPath,
@@ -24,7 +24,7 @@ import { SearchField } from '../types.js'
 // TODO: comment
 // TODO: unit test
 export function updateSearchResult(
-  json: JSONData,
+  json: JSONValue,
   newResultItems: SearchResultItem[],
   previousResult: SearchResult | undefined
 ): SearchResult {
@@ -106,7 +106,7 @@ export function searchPrevious(searchResult: SearchResult): SearchResult {
 // TODO: comment
 export function search(
   searchText: string,
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   maxResults = Infinity
 ): SearchResultItem[] {
@@ -119,7 +119,7 @@ export function search(
     }
   }
 
-  function searchRecursive(searchTextLowerCase: string, value: JSONData) {
+  function searchRecursive(searchTextLowerCase: string, value: JSONValue) {
     if (isJSONArray(value)) {
       const level = path.length
       path.push('0')
@@ -234,7 +234,7 @@ export function replaceAllText(
 }
 
 export function createSearchAndReplaceOperations(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   replacementText: string,
   searchResultItem: SearchResultItem,
@@ -295,7 +295,7 @@ export function createSearchAndReplaceOperations(
 }
 
 export function createSearchAndReplaceAllOperations(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   searchText: string,
   replacementText: string,

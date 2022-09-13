@@ -4,7 +4,7 @@
   import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '$lib/utils/debug'
-  import type { JSONData, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
+  import type { JSONValue, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import {
     compileJSONPointer,
     existsIn,
@@ -201,7 +201,7 @@
     }
   })
 
-  let json: JSONData | undefined
+  let json: JSONValue | undefined
   let text: string | undefined
   const rootPath = [] // create the array only once
 
@@ -416,7 +416,7 @@
   // we would execute validation twice. Memoizing the last result solves this.
   const memoizedValidate = memoizeOne(validateJSON)
 
-  function updateValidationErrors(json: JSONData, validator: Validator | null) {
+  function updateValidationErrors(json: JSONValue, validator: Validator | null) {
     const newValidationErrors: ValidationError[] = validator
       ? memoizedValidate(json, validator)
       : []
@@ -600,7 +600,7 @@
     previousText,
     previousTextIsRepaired
   }: {
-    previousJson: JSONData | undefined
+    previousJson: JSONValue | undefined
     previousText: string | undefined
     previousState: DocumentState
     previousTextIsRepaired: boolean
@@ -1155,7 +1155,7 @@
 
     try {
       const path = documentState.selection.anchorPath
-      const currentValue: JSONData = getIn(json, path)
+      const currentValue: JSONValue = getIn(json, path)
       const convertedValue = convertValue(currentValue, type, parser)
       if (convertedValue === currentValue) {
         // no change, do nothing
@@ -1589,7 +1589,7 @@
     return patchResult
   }
 
-  function handleReplaceJson(updatedJson: JSONData, afterPatch?: AfterPatchCallback) {
+  function handleReplaceJson(updatedJson: JSONValue, afterPatch?: AfterPatchCallback) {
     const previousState = documentState
     const previousJson = json
     const previousText = text
@@ -1681,7 +1681,7 @@
    * else expand in a minimalistic way
    */
   function expandRecursive(
-    json: JSONData,
+    json: JSONValue,
     documentState: DocumentState,
     path: JSONPath
   ): DocumentState {

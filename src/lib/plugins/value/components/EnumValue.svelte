@@ -1,13 +1,13 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONData, JSONPath } from 'immutable-json-patch'
+  import type { JSONValue, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
   import type { OnPatch } from '../../../types'
 
   export let path: JSONPath
-  export let value: JSONData
+  export let value: JSONValue
   export let parser: JSON
   export let readOnly: boolean
   export let isSelected: boolean
@@ -17,7 +17,7 @@
 
   let refSelect: HTMLSelectElement | undefined
 
-  let bindValue: JSONData = value
+  let bindValue: JSONValue = value
   $: bindValue = value
 
   function applyFocus(isSelected: boolean) {

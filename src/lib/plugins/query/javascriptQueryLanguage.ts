@@ -1,7 +1,7 @@
 import { createPropertySelector } from '../../utils/pathUtils.js'
 import { parseString } from '../../utils/stringUtils.js'
 import type { QueryLanguage, QueryLanguageOptions } from '../../types'
-import type { JSONData } from 'immutable-json-patch'
+import type { JSONValue } from 'immutable-json-patch'
 
 const description = `
 <p>
@@ -17,7 +17,7 @@ export const javascriptQueryLanguage: QueryLanguage = {
   executeQuery
 }
 
-function createQuery(json: JSONData, queryOptions: QueryLanguageOptions): string {
+function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): string {
   const { filter, sort, projection } = queryOptions
   const queryParts = []
 
@@ -80,7 +80,7 @@ function createQuery(json: JSONData, queryOptions: QueryLanguageOptions): string
   return `function query (data) {\n${queryParts.join('')}}`
 }
 
-function executeQuery(json: JSONData, query: string): JSONData {
+function executeQuery(json: JSONValue, query: string): JSONValue {
   // FIXME: replace unsafe new Function with a JS based query language
   //  As long as we don't persist or fetch queries, there is no security risk.
   // TODO: only import the most relevant subset of lodash instead of the full library?

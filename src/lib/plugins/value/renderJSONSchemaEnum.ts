@@ -1,7 +1,7 @@
 import EnumValue from './components/EnumValue.svelte'
 import { getJSONSchemaOptions } from '../../utils/jsonSchemaUtils.js'
 import type { RenderValueComponentDescription, RenderValueProps } from '../../types'
-import type { JSONData } from 'immutable-json-patch'
+import type { JSONValue } from 'immutable-json-patch'
 import type { SvelteComponentTyped } from 'svelte'
 
 /**
@@ -11,8 +11,8 @@ import type { SvelteComponentTyped } from 'svelte'
  */
 export function renderJSONSchemaEnum(
   props: RenderValueProps,
-  schema: JSONData,
-  schemaDefinitions: JSONData
+  schema: JSONValue,
+  schemaDefinitions: JSONValue
 ): RenderValueComponentDescription[] {
   const enumValues = getJSONSchemaOptions(schema, schemaDefinitions, props.path)
 

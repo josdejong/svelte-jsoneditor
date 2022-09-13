@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONData, JSONPath } from 'immutable-json-patch'
+  import type { JSONValue, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils'
   import { createValueSelection, getSelectionNextInside } from '../../../logic/selection'
@@ -11,7 +11,7 @@
   import type { OnFind, OnPasteJson, OnPatch, OnSelect, ValueNormalization } from '../../../types'
 
   export let path: JSONPath
-  export let value: JSONData
+  export let value: JSONValue
   export let parser: JSON
   export let normalization: ValueNormalization
   export let enforceString: boolean

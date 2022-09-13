@@ -3,7 +3,13 @@
 <script lang="ts">
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
-  import type { JSONArray, JSONData, JSONObject, JSONPath, JSONPointer } from 'immutable-json-patch'
+  import type {
+    JSONArray,
+    JSONValue as JSONValueType,
+    JSONObject,
+    JSONPath,
+    JSONPointer
+  } from 'immutable-json-patch'
   import { appendToJSONPointer, compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
   import { initial, isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
@@ -72,7 +78,7 @@
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
   import { isObject } from '$lib/utils/typeUtils.js'
 
-  export let value: JSONData
+  export let value: JSONValueType
   export let path: JSONPath
   export let expandedMap: JSONPointerMap<boolean> | undefined
   export let enforceStringMap: JSONPointerMap<boolean> | undefined

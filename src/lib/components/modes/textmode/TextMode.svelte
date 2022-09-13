@@ -279,7 +279,7 @@
    * @param {Object} options
    * @property {string} [id]
    * @property {JSONPath} [selectedPath]
-   * @property {({ operations: JSONPatchDocument, json: JSONData, transformedJson: JSONData }) => void} [onTransform]
+   * @property {({ operations: JSONPatchDocument, json: JSONValue, transformedJson: JSONValue }) => void} [onTransform]
    * @property {() => void} [onClose]
    */
   export function openTransformModal({ id, selectedPath, onTransform, onClose }) {

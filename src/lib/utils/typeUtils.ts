@@ -7,10 +7,7 @@ import { isDigit, isNumber } from './numberUtils.js'
  */
 export function isObject(value: unknown): value is Record<string, unknown> {
   return (
-    typeof value === 'object' &&
-    value !== null &&
-    value.constructor === Object && // do not match on classes or Array
-    !Array.isArray(value)
+    typeof value === 'object' && value !== null && value.constructor === Object // do not match on classes or Array
   )
 }
 
