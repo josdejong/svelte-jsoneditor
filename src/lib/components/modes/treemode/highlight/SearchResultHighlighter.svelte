@@ -7,8 +7,6 @@
   export let searchResultItems: ExtendedSearchResultItem[]
 
   $: parts = splitValue(String(text), searchResultItems)
-
-  $: console.log('SearchResultHighlighter', { text, parts })
 </script>
 
 {#each parts as part}
