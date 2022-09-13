@@ -93,6 +93,21 @@
     }
   }
 
+  // rerender the full editor when the parser changes. This is needed because
+  // numeric state is hold at many places in the editor.
+  let previousParser = parser
+  $: {
+    // Check whether the actual instance of parse or stringify changed
+    // Be forgiving against having a new `parser` object holding the exact same methods.
+    if (parser.parse !== previousParser.parse || parser.stringify !== previousParser.stringify) {
+      debug('parser changed, recreate editor')
+      previousParser = parser
+
+      // new editor id -> will re-create the editor
+      instanceId = uniqueId()
+    }
+  }
+
   export function get(): Content {
     return content
   }
