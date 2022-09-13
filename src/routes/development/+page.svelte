@@ -395,10 +395,12 @@
         content = {
           text: undefined,
           json: [...new Array(1000)].map((value, index) => {
+            const random = Math.round(Math.random() * 1000)
             return {
               id: index,
               name: 'Item ' + index,
-              random: Math.round(Math.random() * 1000)
+              random,
+              long: 9223372000000000000n + BigInt(random)
             }
           })
         }

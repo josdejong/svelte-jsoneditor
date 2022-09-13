@@ -3,7 +3,8 @@ import { last } from 'lodash-es'
 import { createPropertySelector, stringifyPath } from '../../utils/pathUtils.js'
 import { parseString } from '../../utils/stringUtils.js'
 import type { QueryLanguage, QueryLanguageOptions } from '../../types'
-import type { JSONValue, JSONPath } from 'immutable-json-patch'
+import type { JSONPath, JSONValue } from 'immutable-json-patch'
+import { isInteger, isSafeNumber } from 'lossless-json'
 
 const description = `
 <p>
@@ -33,7 +34,11 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
     const actualValueGetter = `item => item${createPropertySelector(filter.path)}`
 
     const filterValueStr =
-      typeof parseString(filter.value) === 'string' ? `'${filter.value}'` : filter.value
+      typeof parseString(filter.value) === 'string'
+        ? `'${filter.value}'`
+        : isInteger(filter.value) && !isSafeNumber(filter.value)
+        ? `${filter.value}n` // bigint
+        : filter.value
 
     queryParts.push(
       `  data = _.filter(data, ${actualValueGetter} ${filter.relation} ${filterValueStr})\n`

@@ -2,6 +2,7 @@ import { createPropertySelector } from '../../utils/pathUtils.js'
 import { parseString } from '../../utils/stringUtils.js'
 import type { QueryLanguage, QueryLanguageOptions } from '../../types'
 import type { JSONValue } from 'immutable-json-patch'
+import { isInteger, isSafeNumber } from 'lossless-json'
 
 const description = `
 <p>
@@ -27,7 +28,11 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
     const actualValueGetter = `item => item${createPropertySelector(filter.path)}`
 
     const filterValueStr =
-      typeof parseString(filter.value) === 'string' ? `'${filter.value}'` : filter.value
+      typeof parseString(filter.value) === 'string'
+        ? `'${filter.value}'`
+        : isInteger(filter.value) && !isSafeNumber(filter.value)
+        ? `${filter.value}n` // bigint
+        : filter.value
 
     queryParts.push(
       `  data = data.filter(${actualValueGetter} ${filter.relation} ${filterValueStr})\n`

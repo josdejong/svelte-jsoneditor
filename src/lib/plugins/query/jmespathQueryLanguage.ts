@@ -1,5 +1,5 @@
 import jmespath from 'jmespath'
-import type { JSONValue, JSONPath } from 'immutable-json-patch'
+import type { JSONPath, JSONValue } from 'immutable-json-patch'
 import { getIn } from 'immutable-json-patch'
 import { parseString } from '../../utils/stringUtils.js'
 import type { QueryLanguage, QueryLanguageOptions } from '../../types'
@@ -38,8 +38,8 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
     const filterValue = parseString(filter.value)
     const filterValueStr =
       typeof exampleValue === 'string' && filterValue !== null && filterValue !== undefined
-        ? JSON.stringify(filter.value)
-        : JSON.stringify(filterValue)
+        ? `"${filter.value}"`
+        : filterValue
 
     query +=
       '[? ' +
