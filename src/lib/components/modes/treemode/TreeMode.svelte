@@ -123,13 +123,19 @@
     JSONPointerMap,
     JSONSelection,
     NestedValidationError,
+    OnBlur,
     OnChange,
     OnClassName,
+    OnError,
+    OnFocus,
+    OnRenderMenu,
     OnRenderValue,
     ParseError,
     PastedJson,
     SearchResult,
     Section,
+    SortModalCallback,
+    TransformModalCallback,
     TransformModalOptions,
     TreeModeContext,
     ValidationError,
@@ -160,27 +166,26 @@
   let hasFocus = false
   const jump = createJump()
 
-  export let readOnly = false
-  export let externalContent
-  export let mainMenuBar = true
-  export let navigationBar = true
-  export let escapeControlCharacters = false
-  export let escapeUnicodeCharacters = false
+  export let readOnly: boolean
+  export let externalContent: Content
+  export let mainMenuBar: boolean
+  export let navigationBar: boolean
+  export let escapeControlCharacters: boolean
+  export let escapeUnicodeCharacters: boolean
   export let parser: JSONParser
-  export let validator: Validator | null = null
+  export let validator: Validator | null
   export let validationParser: JSONParser
-
-  export let indentation: number | string = 2
-  export let onError
+  export let indentation: number | string
+  export let onError: OnError
   export let onChange: OnChange
   export let onRenderValue: OnRenderValue
-  export let onRequestRepair = noop
-  export let onRenderMenu = noop
+  export let onRequestRepair: () => void
+  export let onRenderMenu: OnRenderMenu
   export let onClassName: OnClassName | undefined
-  export let onFocus
-  export let onBlur
-  export let onSortModal
-  export let onTransformModal
+  export let onFocus: OnFocus
+  export let onBlur: OnBlur
+  export let onSortModal: (props: SortModalCallback) => void
+  export let onTransformModal: (props: TransformModalCallback) => void
 
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus

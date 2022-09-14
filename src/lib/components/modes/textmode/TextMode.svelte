@@ -6,7 +6,7 @@
   import type { JSONPatchDocument } from 'immutable-json-patch'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
-  import { debounce, isEqual, noop, uniqueId } from 'lodash-es'
+  import { debounce, isEqual, uniqueId } from 'lodash-es'
   import { onDestroy, onMount } from 'svelte'
   import {
     JSON_STATUS_INVALID,
@@ -43,9 +43,15 @@
     ContentErrors,
     JSONParser,
     JSONPatchResult,
+    OnBlur,
     OnChange,
+    OnError,
+    OnFocus,
+    OnRenderMenu,
     ParseError,
     RichValidationError,
+    SortModalCallback,
+    TransformModalCallback,
     ValidationError,
     Validator
   } from '../../../types'
@@ -54,24 +60,24 @@
   import memoizeOne from 'memoize-one'
   import { validateText } from '../../../logic/validation'
 
-  export let readOnly = false
-  export let mainMenuBar = true
-  export let statusBar = true
+  export let readOnly: boolean
+  export let mainMenuBar: boolean
+  export let statusBar: boolean
   export let externalContent: Content
-  export let indentation: number | string = 2
-  export let tabSize = 4
-  export let escapeUnicodeCharacters = false
+  export let indentation: number | string
+  export let tabSize: number
+  export let escapeUnicodeCharacters: boolean
   export let parser: JSONParser
-  export let validator: Validator | null = null
+  export let validator: Validator | null
   export let validationParser: JSONParser
-  export let onChange: OnChange = null
-  export let onSwitchToTreeMode = noop
-  export let onError
-  export let onFocus = noop
-  export let onBlur = noop
-  export let onRenderMenu = noop
-  export let onSortModal
-  export let onTransformModal
+  export let onChange: OnChange
+  export let onSwitchToTreeMode: () => void
+  export let onError: OnError
+  export let onFocus: OnFocus
+  export let onBlur: OnBlur
+  export let onRenderMenu: OnRenderMenu
+  export let onSortModal: (props: SortModalCallback) => void
+  export let onTransformModal: (props: TransformModalCallback) => void
 
   const debug = createDebug('jsoneditor:TextMode')
 
