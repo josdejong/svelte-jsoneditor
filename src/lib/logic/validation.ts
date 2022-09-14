@@ -56,16 +56,17 @@ export function mapValidationErrors(
 
 export function validateJSON(
   json: JSONValue,
-  validator: Validator,
+  validator: Validator | undefined,
   convertJSON: (value: JSONValue) => JSONValue
 ): ValidationError[] {
   debug('validateJSON')
-  return validator(convertJSON(json))
+
+  return validator ? validator(convertJSON(json)) : []
 }
 
 export function validateText(
   text: string,
-  validator: Validator,
+  validator: Validator | undefined,
   parser: JSONParser
 ): ContentErrors {
   debug('validateText')
