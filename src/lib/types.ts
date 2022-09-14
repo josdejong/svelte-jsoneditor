@@ -1,4 +1,4 @@
-import type { JSONValue, JSONPatchDocument, JSONPath, JSONPointer } from 'immutable-json-patch'
+import type { JSONPatchDocument, JSONPath, JSONPointer, JSONValue } from 'immutable-json-patch'
 import type { SvelteComponentTyped } from 'svelte'
 
 export type { JSONValue, JSONPointer, JSONPath, JSONPatchDocument } from 'immutable-json-patch'
@@ -8,6 +8,8 @@ export type TextContent = { text: string } | { json: undefined; text: string }
 export type JSONContent = { json: JSONValue } | { json: JSONValue; text: undefined }
 
 export type Content = JSONContent | TextContent
+
+export type JSONParser = JSON
 
 export interface VisibleSection {
   start: number
@@ -372,7 +374,7 @@ export interface JSONEditorPropsOptional {
 
 export interface TreeModeContext {
   readOnly: boolean
-  parser: JSON
+  parser: JSONParser
   normalization: ValueNormalization
   getJson: () => JSONValue
   getDocumentState: () => DocumentState
@@ -401,7 +403,7 @@ export interface RenderValuePropsOptional {
   searchResultItems?: SearchResultItem[]
   isSelected?: boolean
   isEditing?: boolean
-  parser?: JSON
+  parser?: JSONParser
   normalization?: ValueNormalization
   onPatch?: TreeModeContext['onPatch']
   onPasteJson?: OnPasteJson
@@ -419,7 +421,7 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   searchResultItems: SearchResultItem[] | undefined
   isSelected: boolean
   isEditing: boolean
-  parser: JSON
+  parser: JSONParser
   normalization: ValueNormalization
   onPatch: TreeModeContext['onPatch']
   onPasteJson: OnPasteJson

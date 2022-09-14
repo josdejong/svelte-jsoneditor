@@ -1,14 +1,14 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONValue, JSONPath } from 'immutable-json-patch'
+  import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
-  import type { OnPatch } from '../../../types'
+  import type { JSONParser, OnPatch } from '../../../types'
 
   export let path: JSONPath
   export let value: JSONValue
-  export let parser: JSON
+  export let parser: JSONParser
   export let readOnly: boolean
   export let isSelected: boolean
   export let onPatch: OnPatch

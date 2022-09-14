@@ -4,7 +4,7 @@
   import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '$lib/utils/debug'
-  import type { JSONValue, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
+  import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
   import {
     compileJSONPointer,
     existsIn,
@@ -118,6 +118,7 @@
     DocumentState,
     HistoryItem,
     InsertType,
+    JSONParser,
     JSONPatchResult,
     JSONPointerMap,
     JSONSelection,
@@ -135,10 +136,12 @@
     Validator,
     ValueNormalization
   } from '$lib/types'
+  import { ValidationSeverity } from '$lib/types'
   import { isAfterSelection, isInsideSelection, isKeySelection } from '../../../logic/selection'
   import { truncate } from '../../../utils/stringUtils.js'
   import { MAX_CHARACTERS_TEXT_PREVIEW } from '../../../constants.js'
   import memoizeOne from 'memoize-one'
+  import { measure } from '$lib/utils/timeUtils'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -163,8 +166,9 @@
   export let navigationBar = true
   export let escapeControlCharacters = false
   export let escapeUnicodeCharacters = false
-  export let parser: JSON
-  export let validator: Validator = null
+  export let parser: JSONParser
+  export let validator: Validator | null = null
+  export let validationParser: JSONParser
 
   export let indentation: number | string = 2
   export let onError
@@ -406,8 +410,15 @@
   let textIsRepaired = false
   $: textIsUnrepairable = text !== undefined && json === undefined
 
+  // if needed, provide a converter to convert non-native JSON to native JSON
+  // (like replace bigint or LosslessNumber into regular numbers)
+  $: validatorJSONConverter =
+    parser !== validationParser
+      ? (value) => validationParser.parse(parser.stringify(value))
+      : (value) => value
+
   let validationErrors: ValidationError[] = []
-  $: updateValidationErrors(json, validator)
+  $: updateValidationErrors(json, validator, validatorJSONConverter)
 
   let validationErrorsMap: JSONPointerMap<NestedValidationError>
   $: validationErrorsMap = mapValidationErrors(validationErrors)
@@ -416,15 +427,33 @@
   // we would execute validation twice. Memoizing the last result solves this.
   const memoizedValidate = memoizeOne(validateJSON)
 
-  function updateValidationErrors(json: JSONValue, validator: Validator | null) {
-    const newValidationErrors: ValidationError[] = validator
-      ? memoizedValidate(json, validator)
-      : []
+  function updateValidationErrors(
+    json: JSONValue,
+    validator: Validator | null,
+    convertJSON: (value: JSONValue) => JSONValue
+  ) {
+    measure(
+      () => {
+        let newValidationErrors: ValidationError[]
+        try {
+          newValidationErrors = memoizedValidate(json, validator, convertJSON)
+        } catch (err) {
+          newValidationErrors = [
+            {
+              path: [],
+              message: 'Failed to validate: ' + err.message,
+              severity: ValidationSeverity.warning
+            }
+          ]
+        }
 
-    if (!isEqual(newValidationErrors, validationErrors)) {
-      debug('validationErrors changed:', newValidationErrors)
-      validationErrors = newValidationErrors
-    }
+        if (!isEqual(newValidationErrors, validationErrors)) {
+          debug('validationErrors changed:', newValidationErrors)
+          validationErrors = newValidationErrors
+        }
+      },
+      (duration) => debug(`validationErrors updated in ${duration} ms`)
+    )
   }
 
   export function validate(): ContentErrors {
@@ -439,7 +468,7 @@
 
     // make sure the validation results are up-to-date
     // normally, they are only updated on the next tick after the json is changed
-    updateValidationErrors(json, validator)
+    updateValidationErrors(json, validator, validatorJSONConverter)
     return {
       validationErrors
     }
@@ -797,7 +826,7 @@
         {
           op: 'replace',
           path: compileJSONPointer(path),
-          value: updatedValue
+          value: updatedValue as JSONValue
         }
       ],
       (patchedJson, patchedState) => {

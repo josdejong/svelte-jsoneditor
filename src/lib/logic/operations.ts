@@ -6,10 +6,10 @@ import {
   isJSONObject,
   isJSONPatchMove,
   isJSONPatchRemove,
-  type JSONValue,
   type JSONPatchDocument,
   type JSONPatchOperation,
   type JSONPath,
+  type JSONValue,
   parseJSONPointer,
   revertJSONPatch
 } from 'immutable-json-patch'
@@ -32,7 +32,7 @@ import {
   isValueSelection,
   pathStartsWith
 } from './selection.js'
-import type { ClipboardValues, DragInsideAction, JSONSelection } from '../types'
+import type { ClipboardValues, DragInsideAction, JSONParser, JSONSelection } from '../types'
 import { int } from '../utils/numberUtils.js'
 
 /**
@@ -340,7 +340,7 @@ export function insert(
   json: JSONValue,
   selection: JSONSelection | undefined,
   clipboardText: string,
-  parser: JSON
+  parser: JSONParser
 ): JSONPatchDocument {
   if (isKeySelection(selection)) {
     // rename key
@@ -364,7 +364,9 @@ export function insert(
         {
           op: 'replace',
           path: compileJSONPointer(selection.focusPath),
-          value: parsePartialJson(clipboardText, (text) => parseAndRepair(text, parser))
+          value: parsePartialJson(clipboardText, (text) =>
+            parseAndRepair(text, parser)
+          ) as JSONValue
         }
       ]
     } catch (err) {
@@ -598,7 +600,7 @@ function moveDown(parentPath: JSONPath, key: string): JSONPatchOperation {
   }
 }
 
-export function clipboardToValues(clipboardText: string, parser: JSON): ClipboardValues {
+export function clipboardToValues(clipboardText: string, parser: JSONParser): ClipboardValues {
   const textIsObject = /^\s*{/.test(clipboardText)
   const textIsArray = /^\s*\[/.test(clipboardText)
 
@@ -612,7 +614,7 @@ export function clipboardToValues(clipboardText: string, parser: JSON): Clipboar
     (textIsObject && isObject(clipboardRepaired)) ||
     (textIsArray && Array.isArray(clipboardRepaired))
   ) {
-    return [{ key: 'New item', value: clipboardRepaired }]
+    return [{ key: 'New item', value: clipboardRepaired as JSONValue }]
   }
 
   if (Array.isArray(clipboardRepaired)) {
@@ -623,12 +625,12 @@ export function clipboardToValues(clipboardText: string, parser: JSON): Clipboar
 
   if (isObject(clipboardRepaired)) {
     return Object.keys(clipboardRepaired).map((key) => {
-      return { key, value: clipboardRepaired[key] }
+      return { key, value: clipboardRepaired[key] as JSONValue }
     })
   }
 
   // regular value
-  return [{ key: 'New item', value: clipboardRepaired }]
+  return [{ key: 'New item', value: clipboardRepaired as JSONValue }]
 }
 
 // TODO: write unit tests

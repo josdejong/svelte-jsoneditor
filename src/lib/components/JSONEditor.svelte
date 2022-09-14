@@ -5,7 +5,7 @@
   import Modal from 'svelte-simple-modal'
   import { SORT_MODAL_OPTIONS, TRANSFORM_MODAL_OPTIONS } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
-  import { isTextContent, validateContentType } from '../utils/jsonUtils'
+  import { isEqualParser, isTextContent, validateContentType } from '../utils/jsonUtils'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import TextMode from './modes/textmode/TextMode.svelte'
   import TreeMode from './modes/treemode/TreeMode.svelte'
@@ -19,6 +19,7 @@
     Content,
     ContentErrors,
     JSONEditorPropsOptional,
+    JSONParser,
     JSONPatchResult,
     MenuItem,
     MenuSeparatorItem,
@@ -57,8 +58,9 @@
   export let statusBar = true
   export let escapeControlCharacters = false
   export let escapeUnicodeCharacters = false
+  export let parser: JSONParser = JSON
   export let validator: Validator | null = null
-  export let parser: JSON = JSON
+  export let validationParser: JSONParser = JSON
 
   export let queryLanguages: QueryLanguage[] = [javascriptQueryLanguage]
   export let queryLanguageId: string = queryLanguages[0].id
@@ -97,9 +99,7 @@
   // numeric state is hold at many places in the editor.
   let previousParser = parser
   $: {
-    // Check whether the actual instance of parse or stringify changed
-    // Be forgiving against having a new `parser` object holding the exact same methods.
-    if (parser.parse !== previousParser.parse || parser.stringify !== previousParser.stringify) {
+    if (!isEqualParser(parser, previousParser)) {
       debug('parser changed, recreate editor')
       previousParser = parser
 
@@ -429,6 +429,7 @@
             {escapeUnicodeCharacters}
             {parser}
             {validator}
+            {validationParser}
             onChange={handleChange}
             onSwitchToTreeMode={handleSwitchToTreeMode}
             {onError}
@@ -451,6 +452,7 @@
             {escapeUnicodeCharacters}
             {parser}
             {validator}
+            {validationParser}
             {onError}
             onChange={handleChange}
             onRequestRepair={handleRequestRepair}

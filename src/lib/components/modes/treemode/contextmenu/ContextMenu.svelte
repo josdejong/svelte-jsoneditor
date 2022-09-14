@@ -25,13 +25,13 @@
   import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
   import { faCheckSquare, faLightbulb, faSquare } from '@fortawesome/free-regular-svg-icons'
   import { findNearestElement } from '$lib/utils/domUtils'
-  import type { DocumentState } from '../../../../types'
+  import type { DocumentState, JSONParser } from '../../../../types'
   import { isKeySelection, isMultiSelection, isValueSelection } from '../../../../logic/selection'
   import { getEnforceString } from '../../../../logic/documentState'
 
   export let json: JSONValue
   export let documentState: DocumentState
-  export let parser: JSON
+  export let parser: JSONParser
 
   export let showTip
 

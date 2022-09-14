@@ -1,6 +1,7 @@
 import { initial } from 'lodash-es'
 import type {
   ContentErrors,
+  JSONParser,
   JSONPointerMap,
   NestedValidationError,
   ValidationError,
@@ -53,12 +54,20 @@ export function mapValidationErrors(
   return map
 }
 
-export function validateJSON(json: JSONValue, validator: Validator): ValidationError[] {
+export function validateJSON(
+  json: JSONValue,
+  validator: Validator,
+  convertJSON: (value: JSONValue) => JSONValue
+): ValidationError[] {
   debug('validateJSON')
-  return validator(json)
+  return validator(convertJSON(json))
 }
 
-export function validateText(text: string, validator: Validator, parser: JSON): ContentErrors {
+export function validateText(
+  text: string,
+  validator: Validator,
+  parser: JSONParser
+): ContentErrors {
   debug('validateText')
 
   if (text.length > MAX_VALIDATABLE_SIZE) {
@@ -113,7 +122,7 @@ export function validateText(text: string, validator: Validator, parser: JSON): 
   }
 }
 
-function canAutoRepair(text: string, parser: JSON): boolean {
+function canAutoRepair(text: string, parser: JSONParser): boolean {
   if (text.length > MAX_AUTO_REPAIRABLE_SIZE) {
     return false
   }

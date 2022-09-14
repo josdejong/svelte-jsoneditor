@@ -1,13 +1,13 @@
 <script lang="ts">
   import {
     createAjvValidator,
-    JSONEditor,
-    jmespathQueryLanguage,
-    lodashQueryLanguage,
-    javascriptQueryLanguage,
-    renderValue,
     EditableValue,
-    ReadonlyValue
+    javascriptQueryLanguage,
+    jmespathQueryLanguage,
+    JSONEditor,
+    lodashQueryLanguage,
+    ReadonlyValue,
+    renderValue
   } from '$lib'
   import { useLocalStorage } from '../../lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
@@ -15,7 +15,11 @@
   import { parse, stringify } from 'lossless-json'
   import { truncate } from '$lib/utils/stringUtils.js'
 
-  const LosslessJSON = { parse, stringify }
+  // const LosslessJSON: JSONParser = { ... } // FIXME: make the types work
+  const LosslessJSON = {
+    parse,
+    stringify
+  }
 
   let content = {
     text: `{

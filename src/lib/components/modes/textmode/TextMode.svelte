@@ -41,6 +41,7 @@
   import type {
     Content,
     ContentErrors,
+    JSONParser,
     JSONPatchResult,
     OnChange,
     ParseError,
@@ -60,8 +61,9 @@
   export let indentation: number | string = 2
   export let tabSize = 4
   export let escapeUnicodeCharacters = false
-  export let parser: JSON
-  export let validator: Validator = null
+  export let parser: JSONParser
+  export let validator: Validator | null = null
+  export let validationParser: JSONParser
   export let onChange: OnChange = null
   export let onSwitchToTreeMode = noop
   export let onError
@@ -737,7 +739,7 @@
 
     onChangeCodeMirrorValueDebounced.flush()
 
-    const contentErrors = memoizedValidateText(text, validator, parser)
+    const contentErrors = memoizedValidateText(text, validator, validationParser)
 
     if (isContentParseError(contentErrors)) {
       jsonStatus = contentErrors.isRepairable ? JSON_STATUS_REPAIRABLE : JSON_STATUS_INVALID

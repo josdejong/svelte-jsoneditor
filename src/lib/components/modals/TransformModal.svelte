@@ -7,7 +7,7 @@
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
   import { DEBOUNCE_DELAY } from '../../constants.js'
-  import type { JSONValue, JSONPath } from 'immutable-json-patch'
+  import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { transformModalState } from './transformModalState.js'
@@ -18,6 +18,7 @@
   import TreeMode from '../modes/treemode/TreeMode.svelte'
   import type {
     Content,
+    JSONParser,
     OnChangeQueryLanguage,
     OnClassName,
     OnPatch,
@@ -33,7 +34,7 @@
 
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
-  export let parser: JSON
+  export let parser: JSONParser
 
   export let queryLanguages: QueryLanguage[]
   export let queryLanguageId: string

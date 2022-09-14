@@ -1,17 +1,18 @@
-import type { JSONValue, JSONObject, JSONPath } from 'immutable-json-patch'
+import type { JSONObject, JSONPath, JSONValue } from 'immutable-json-patch'
 import { compileJSONPointer } from 'immutable-json-patch'
 import jsonSourceMap from 'json-source-map'
 import jsonrepair from 'jsonrepair'
 import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
 import { arrayToObject, objectToArray } from './arrayUtils.js'
-import type { Content, ParseError, TextContent, TextLocation } from '../types'
+import type { Content, JSONParser, ParseError, TextContent, TextLocation } from '../types'
 import { int } from './numberUtils.js'
+import type { JavaScriptValue } from 'lossless-json'
 
 /**
  * Parse the JSON. if this fails, try to repair and parse.
  * Throws an exception when the JSON is invalid and could not be parsed.
  */
-export function parseAndRepair(jsonText: string, parser: JSON): JSONValue {
+export function parseAndRepair(jsonText: string, parser: JSONParser): JavaScriptValue {
   try {
     return parser.parse(jsonText)
   } catch (err) {
@@ -26,8 +27,8 @@ export function parseAndRepair(jsonText: string, parser: JSON): JSONValue {
  */
 export function parseAndRepairOrUndefined(
   partialJson: string,
-  parser: JSON
-): JSONValue | undefined {
+  parser: JSONParser
+): JavaScriptValue | undefined {
   try {
     return parseAndRepair(partialJson, parser)
   } catch (err) {
@@ -38,8 +39,8 @@ export function parseAndRepairOrUndefined(
 // TODO: deduplicate the logic in repairPartialJson and parseAndRepairPartialJson ?
 export function parsePartialJson(
   partialJson: string,
-  parse: (text: string) => JSONValue
-): JSONValue {
+  parse: (text: string) => JavaScriptValue
+): JavaScriptValue {
   // for now: dumb brute force approach: simply try out a few things...
 
   // remove trailing comma
@@ -223,7 +224,7 @@ export function findTextLocation(text: string, path: JSONPath): TextLocation | n
 export function convertValue(
   value: JSONValue,
   type: 'value' | 'object' | 'array',
-  parser: JSON
+  parser: JSONParser
 ): JSONValue {
   // FIXME: improve the TypeScript here, there are a couple of conversions
   if (type === 'array') {
@@ -323,7 +324,7 @@ export function isTextContent(content: Content): content is TextContent {
 /**
  * Get the contents as Text. If the contents is JSON, the JSON will be parsed.
  */
-export function getText(content: Content, indentation: number | string, parser: JSON) {
+export function getText(content: Content, indentation: number | string, parser: JSONParser) {
   return isTextContent(content) ? content.text : parser.stringify(content.json, null, indentation)
 }
 
@@ -403,3 +404,11 @@ export function estimateSerializedSize(content: Content, maxSize = Infinity): nu
 const POSITION_REGEX = /(position|char) (\d+)/
 const LINE_REGEX = /line (\d+)/
 const COLUMN_REGEX = /column (\d+)/
+
+/**
+ * Check whether the actual functions of parse and stringify are strictly equal.
+ * The object holding the functions may be a differing instance.
+ */
+export function isEqualParser(a: JSONParser, b: JSONParser): boolean {
+  return a.parse === b.parse && a.stringify === b.stringify
+}

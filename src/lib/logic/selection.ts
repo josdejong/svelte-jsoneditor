@@ -5,10 +5,10 @@ import {
   isJSONObject,
   isJSONPatchCopy,
   isJSONPatchMove,
-  type JSONValue,
   type JSONPatchDocument,
   type JSONPath,
   type JSONPointer,
+  type JSONValue,
   parsePath,
   startsWithJSONPointer
 } from 'immutable-json-patch'
@@ -26,6 +26,7 @@ import type {
   CaretPosition,
   DocumentState,
   InsideSelection,
+  JSONParser,
   JSONSelection,
   KeySelection,
   MultiSelection,
@@ -652,7 +653,7 @@ export function selectionToPartialJson(
   json: JSONValue,
   selection: JSONSelection,
   indentation: number | string | null,
-  parser: JSON
+  parser: JSONParser
 ): string | null {
   if (isKeySelection(selection)) {
     return String(last(selection.focusPath))

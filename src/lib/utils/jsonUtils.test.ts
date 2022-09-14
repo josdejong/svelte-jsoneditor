@@ -1,9 +1,12 @@
+import type { JSONParser } from '$lib/types.js'
 import { deepStrictEqual, strictEqual, throws } from 'assert'
+import { parse, stringify } from 'lossless-json'
 import {
   calculatePosition,
   convertValue,
   countCharacterOccurrences,
   estimateSerializedSize,
+  isEqualParser,
   isLargeContent,
   isTextContent,
   normalizeJsonParseError,
@@ -249,6 +252,17 @@ describe('jsonUtils', () => {
     it('should convert a value to a value', () => {
       strictEqual(convertValue('foo', 'value', JSON), 'foo')
       strictEqual(convertValue(true, 'value', JSON), true)
+    })
+
+    it('should test whether two parsers are equal', () => {
+      // FIXME: should not be needed to cast to JSONParser
+      const LosslessJSON = { parse, stringify } as JSONParser
+      const LosslessJSON2 = { parse, stringify } as JSONParser
+
+      strictEqual(isEqualParser(JSON, JSON), true)
+      strictEqual(isEqualParser(LosslessJSON, LosslessJSON), true)
+      strictEqual(isEqualParser(LosslessJSON, LosslessJSON2), true)
+      strictEqual(isEqualParser(LosslessJSON, JSON), false)
     })
   })
 })

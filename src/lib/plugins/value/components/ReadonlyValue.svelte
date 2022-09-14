@@ -8,9 +8,10 @@
   import { addNewLineSuffix } from '$lib/utils/domUtils'
   import type {
     ExtendedSearchResultItem,
+    JSONParser,
+    JSONPath,
     JSONValue,
     OnSelect,
-    JSONPath,
     ValueNormalization
   } from '../../../types'
 
@@ -18,7 +19,7 @@
   export let value: JSONValue
   export let readOnly: boolean
   export let normalization: ValueNormalization
-  export let parser: JSON
+  export let parser: JSONParser
   export let onSelect: OnSelect
 
   export let searchResultItems: ExtendedSearchResultItem[] | undefined

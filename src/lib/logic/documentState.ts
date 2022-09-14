@@ -11,7 +11,6 @@ import {
   isJSONPatchRemove,
   isJSONPatchReplace,
   type JSONArray,
-  type JSONValue,
   type JSONPatchAdd,
   type JSONPatchCopy,
   type JSONPatchDocument,
@@ -20,6 +19,7 @@ import {
   type JSONPatchReplace,
   type JSONPath,
   type JSONPointer,
+  type JSONValue,
   parseJSONPointer,
   parsePath,
   startsWithJSONPointer
@@ -37,6 +37,7 @@ import {
 import type {
   CaretPosition,
   DocumentState,
+  JSONParser,
   JSONPointerMap,
   JSONSelection,
   Section,
@@ -646,7 +647,7 @@ export function getEnforceString(
   value: JSONValue,
   enforceStringMap: JSONPointerMap<boolean> | undefined,
   pointer: JSONPointer,
-  parser: JSON
+  parser: JSONParser
 ): boolean {
   const enforceString = enforceStringMap ? enforceStringMap[pointer] : undefined
 

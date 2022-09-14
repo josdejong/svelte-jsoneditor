@@ -1,9 +1,9 @@
 import type {
-  JSONValue,
   JSONPatchDocument,
   JSONPatchOperation,
   JSONPath,
-  JSONPointer
+  JSONPointer,
+  JSONValue
 } from 'immutable-json-patch'
 import { compileJSONPointer, getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
 import { forEachRight, groupBy, initial, isEqual, last } from 'lodash-es'
@@ -14,6 +14,7 @@ import { stringConvert } from '../utils/typeUtils.js'
 import type {
   DocumentState,
   ExtendedSearchResultItem,
+  JSONParser,
   JSONPointerMap,
   JSONSelection,
   SearchResult,
@@ -238,7 +239,7 @@ export function createSearchAndReplaceOperations(
   documentState: DocumentState,
   replacementText: string,
   searchResultItem: SearchResultItem,
-  parser: JSON
+  parser: JSONParser
 ): { newSelection: JSONSelection; operations: JSONPatchDocument } {
   const { field, path, start, end } = searchResultItem
 
@@ -279,7 +280,7 @@ export function createSearchAndReplaceOperations(
       {
         op: 'replace',
         path: compileJSONPointer(path),
-        value: enforceString ? value : stringConvert(value, parser)
+        value: enforceString ? value : (stringConvert(value, parser) as JSONValue)
       }
     ]
 
@@ -299,7 +300,7 @@ export function createSearchAndReplaceAllOperations(
   documentState: DocumentState,
   searchText: string,
   replacementText: string,
-  parser: JSON
+  parser: JSONParser
 ): { newSelection: JSONSelection; operations: JSONPatchDocument } {
   // TODO: to improve performance, we could reuse existing search results (except when hitting a maxResult limit)
   const searchResultItems = search(searchText, json, documentState, Infinity /* maxResults */)
@@ -386,7 +387,7 @@ export function createSearchAndReplaceAllOperations(
         {
           op: 'replace',
           path: compileJSONPointer(path),
-          value: enforceString ? value : stringConvert(value, parser)
+          value: enforceString ? value : (stringConvert(value, parser) as JSONValue)
         }
       ]
       allOperations = allOperations.concat(operations)

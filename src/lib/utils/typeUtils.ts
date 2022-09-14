@@ -1,6 +1,7 @@
 // TODO: unit test typeUtils.js
 
 import { isDigit, isNumber } from './numberUtils.js'
+import type { JSONParser } from '../types.js'
 
 /**
  * Test whether a value is an Object (and not an Array or Class)
@@ -93,7 +94,7 @@ export function isColor(value: unknown): boolean {
  * Get the type of the value
  */
 // TODO: unit test valueType()
-export function valueType(value: unknown, parser: JSON): string {
+export function valueType(value: unknown, parser: JSONParser): string {
   // primitive types
   if (
     typeof value === 'number' ||
@@ -143,7 +144,7 @@ export function isUrl(text: unknown): boolean {
  * Convert contents of a string to the correct JSON type. This can be a string,
  * a number, a boolean, etc
  */
-export function stringConvert(str: string, parser: JSON): string | null | boolean | number {
+export function stringConvert(str: string, parser: JSONParser): unknown {
   if (str === '') {
     return ''
   }
@@ -173,6 +174,6 @@ export function stringConvert(str: string, parser: JSON): string | null | boolea
  * Test whether a string contains a numeric, boolean, or null value.
  * Returns true when the string contains a number, boolean, or null.
  */
-export function isStringContainingPrimitiveValue(str: unknown, parser: JSON): boolean {
+export function isStringContainingPrimitiveValue(str: unknown, parser: JSONParser): boolean {
   return typeof str === 'string' && typeof stringConvert(str, parser) !== 'string'
 }
