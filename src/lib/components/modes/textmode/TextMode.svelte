@@ -833,17 +833,19 @@
       <StatusBar {editorState} />
     {/if}
 
-    {#if jsonParseError}
-      <Message
-        type="error"
-        icon={faExclamationTriangle}
-        message={jsonParseError.message}
-        actions={repairActions}
-        onClick={() => handleSelectParseError(jsonParseError)}
-      />
-    {/if}
+    {#if !editorDisabled}
+      {#if jsonParseError}
+        <Message
+          type="error"
+          icon={faExclamationTriangle}
+          message={jsonParseError.message}
+          actions={repairActions}
+          onClick={() => handleSelectParseError(jsonParseError)}
+        />
+      {/if}
 
-    <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
+      <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
+    {/if}
   {:else}
     <div class="jse-contents">
       <div class="jse-loading-space" />
