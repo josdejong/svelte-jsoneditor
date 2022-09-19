@@ -2,6 +2,8 @@
 
 A web-based tool to view, edit, format, transform, and validate JSON.
 
+Try it out: https://jsoneditoronline.org
+
 The library is written with Svelte, but can be used in plain JavaScript too and in any framework (SolidJS, React, Vue, Angular, etc).
 
 ![JSONEditor tree mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_tree_mode_screenshot.png)
@@ -88,7 +90,6 @@ Or one-way binding:
     content = updatedContent
   }
 </script>
-F
 
 <div>
   <JSONEditor {content} onChange="{handleChange}" />
