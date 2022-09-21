@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.4...v0.7.5) (2022-09-21)
+
+
+### Bug Fixes
+
+* [#98](https://github.com/josdejong/svelte-jsoneditor/issues/98) make copy compatible on non-secure origins and older browser ([#144](https://github.com/josdejong/svelte-jsoneditor/issues/144)) ([d43a646](https://github.com/josdejong/svelte-jsoneditor/commit/d43a6465cd01f91fe8d1634038dfcf67fa578c81))
+
 ### [0.7.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.3...v0.7.4) (2022-09-12)
 
 
