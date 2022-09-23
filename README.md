@@ -140,6 +140,12 @@ Browser example loading the ES module:
 </html>
 ```
 
+### Wrapper libraries for specific frameworks
+
+To make it easier to use the library in your framework of choice, you can use a wrapper library:
+
+- Vue: https://github.com/cloydlau/json-editor-vue
+
 ## API
 
 ### constructor
