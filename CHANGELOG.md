@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.5...v0.7.6) (2022-09-28)
+
+
+### Bug Fixes
+
+* [#149](https://github.com/josdejong/svelte-jsoneditor/issues/149) double quote and unicode characters of control characters not being escaped correctly ([ab213e6](https://github.com/josdejong/svelte-jsoneditor/commit/ab213e6cf276d5556f675ccfd73d8b8265b40283))
+* escaping unicode characters not triggered when loading a document in text mode ([9dedca0](https://github.com/josdejong/svelte-jsoneditor/commit/9dedca039faa887805bd4b0755276c09d3671a45))
+
 ### [0.7.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.4...v0.7.5) (2022-09-21)
 
 
