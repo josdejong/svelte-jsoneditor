@@ -1,6 +1,7 @@
 <script>
   import { JSONEditor } from 'svelte-jsoneditor'
   import { faCopy } from '@fortawesome/free-regular-svg-icons'
+  import copyToClipboard from '$lib/utils/copyToClipboard'
 
   let content = {
     text: undefined, // used when in text mode
@@ -15,13 +16,13 @@
     }
   }
 
-  function handleCopy() {
+  async function handleCopy() {
     console.log('Custom copy button clicked')
 
     const contents =
       content.text !== undefined ? content.text : JSON.stringify(content.json, null, 2)
 
-    navigator.clipboard.writeText(contents).catch((err) => console.error(err))
+    await copyToClipboard(contents)
   }
 
   function handleRenderMenu(mode, items) {

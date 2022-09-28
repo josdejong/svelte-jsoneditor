@@ -40,6 +40,11 @@ describe('domUtils', () => {
       })
 
       strictEqual(escapeValue('greeting'), 'greeting')
+      strictEqual(escapeValue('"'), '"')
+      strictEqual(escapeValue('\u0022'), '\u0022') // double quote
+      strictEqual(escapeValue('\u000A'), '\u000A') // line feed
+      strictEqual(escapeValue('\u0009'), '\u0009') // tab
+      strictEqual(escapeValue('\u000D'), '\u000D') // carriage return
       strictEqual(escapeValue('hello\nworld'), 'hello\nworld')
       strictEqual(escapeValue('hello\\nworld'), 'hello\\nworld')
       strictEqual(escapeValue('back\\slash'), 'back\\slash')
@@ -47,6 +52,11 @@ describe('domUtils', () => {
       strictEqual(escapeValue('\ud83d\ude00'), '\ud83d\ude00')
 
       strictEqual(unescapeValue('greeting'), 'greeting')
+      strictEqual(unescapeValue('"'), '"')
+      strictEqual(unescapeValue('\u0022'), '\u0022') // double quote
+      strictEqual(unescapeValue('\u000A'), '\u000A') // line feed
+      strictEqual(unescapeValue('\u0009'), '\u0009') // tab
+      strictEqual(unescapeValue('\u000D'), '\u000D') // carriage return
       strictEqual(unescapeValue('hello\nworld'), 'hello\nworld')
       strictEqual(unescapeValue('hello\\nworld'), 'hello\\nworld')
       strictEqual(unescapeValue('back\\slash'), 'back\\slash')
@@ -62,12 +72,22 @@ describe('domUtils', () => {
       })
 
       strictEqual(escapeValue('greeting'), 'greeting')
+      strictEqual(escapeValue('"'), '\\"')
+      strictEqual(escapeValue('\u0022'), '\\"') // double quote
+      strictEqual(escapeValue('\u000A'), '\\n') // line feed
+      strictEqual(escapeValue('\u0009'), '\\t') // tab
+      strictEqual(escapeValue('\u000D'), '\\r') // carriage return
       strictEqual(escapeValue('hello\nworld'), 'hello\\nworld')
       strictEqual(escapeValue('back\\slash'), 'back\\\\slash')
       strictEqual(escapeValue('😀'), '😀')
       strictEqual(escapeValue('\ud83d\ude00'), '\ud83d\ude00')
 
       strictEqual(unescapeValue('greeting'), 'greeting')
+      strictEqual(unescapeValue('\\"'), '"')
+      strictEqual(unescapeValue('\\u0022'), '\\u0022') // double quote
+      strictEqual(unescapeValue('\\u000A'), '\\u000A') // line feed
+      strictEqual(unescapeValue('\\u0009'), '\\u0009') // tab
+      strictEqual(unescapeValue('\\u000D'), '\\u000D') // carriage return
       strictEqual(unescapeValue('hello\\nworld'), 'hello\nworld')
       strictEqual(unescapeValue('back\\\\slash'), 'back\\slash')
       strictEqual(unescapeValue('\\ud83d\\ude00'), '\\ud83d\\ude00')
@@ -81,12 +101,23 @@ describe('domUtils', () => {
       })
 
       strictEqual(escapeValue('greeting'), 'greeting')
+      strictEqual(escapeValue('"'), '"')
+      strictEqual(escapeValue('\u0022'), '\u0022') // double quote (parsed in JS as ")
+      strictEqual(escapeValue('\u000A'), '\u000A') // line feed (parsed in JS as \n)
+      strictEqual(escapeValue('\u0009'), '\u0009') // tab (parsed in JS as \t)
+      strictEqual(escapeValue('\u000D'), '\u000D') // carriage return (parsed in JS as \r)
       strictEqual(escapeValue('hello\nworld'), 'hello\nworld')
       strictEqual(escapeValue('back\\slash'), 'back\\slash')
       strictEqual(escapeValue('😀'), '\\ud83d\\ude00')
       strictEqual(escapeValue('\ud83d\ude00'), '\\ud83d\\ude00')
 
       strictEqual(unescapeValue('greeting'), 'greeting')
+      strictEqual(unescapeValue('\\"'), '\\"')
+      strictEqual(unescapeValue('\u0022'), '\u0022') // double quote
+      strictEqual(unescapeValue('\\u0022'), '\\"') // double quote
+      strictEqual(unescapeValue('\\u000A'), '\\n') // line feed
+      strictEqual(unescapeValue('\\u0009'), '\\t') // tab
+      strictEqual(unescapeValue('\\u000D'), '\\r') // carriage return
       strictEqual(unescapeValue('hello\\nworld'), 'hello\\nworld')
       strictEqual(unescapeValue('back\\\\slash'), 'back\\\\slash')
       strictEqual(unescapeValue('\\ud83d\\ude00'), '😀')
@@ -101,12 +132,22 @@ describe('domUtils', () => {
       })
 
       strictEqual(escapeValue('greeting'), 'greeting')
+      strictEqual(escapeValue('"'), '\\"')
+      strictEqual(escapeValue('\u0022'), '\\"') // double quote
+      strictEqual(escapeValue('\u000A'), '\\n') // line feed
+      strictEqual(escapeValue('\u0009'), '\\t') // tab
+      strictEqual(escapeValue('\u000D'), '\\r') // carriage return
       strictEqual(escapeValue('hello\nworld'), 'hello\\nworld')
       strictEqual(escapeValue('back\\slash'), 'back\\\\slash')
       strictEqual(escapeValue('😀'), '\\ud83d\\ude00')
       strictEqual(escapeValue('\ud83d\ude00'), '\\ud83d\\ude00')
 
       strictEqual(unescapeValue('greeting'), 'greeting')
+      strictEqual(unescapeValue('\\"'), '"')
+      strictEqual(unescapeValue('\\u0022'), '\u0022') // double quote
+      strictEqual(unescapeValue('\\u000A'), '\u000A') // line feed
+      strictEqual(unescapeValue('\\u0009'), '\u0009') // tab
+      strictEqual(unescapeValue('\\u000D'), '\u000D') // carriage return
       strictEqual(unescapeValue('hello\\nworld'), 'hello\nworld')
       strictEqual(unescapeValue('back\\\\slash'), 'back\\slash')
       strictEqual(unescapeValue('\\ud83d\\ude00'), '😀')

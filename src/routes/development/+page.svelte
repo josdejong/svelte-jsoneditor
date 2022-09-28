@@ -32,6 +32,8 @@
   "float": 4.0,
   "big": 1e500,
   "unicode": "😀,💩",
+  "escaped double quote": "\\"abc\\"",
+  "unicode double quote": "\\u0022abc\\u0022",
   "return": "\\n",
   "null": null,
   "number": 123,

@@ -99,6 +99,7 @@
   } from '$lib/utils/jsonUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { isObject, isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils'
+  import copyToClipboard from '$lib/utils/copyToClipboard'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
@@ -863,11 +864,7 @@
 
     debug('cut', { selection: documentState.selection, clipboard, indent })
 
-    try {
-      await navigator.clipboard.writeText(clipboard)
-    } catch (err) {
-      onError(err)
-    }
+    await copyToClipboard(clipboard)
 
     const { operations, newSelection } = createRemoveOperations(json, documentState.selection)
 
@@ -888,11 +885,7 @@
 
     debug('copy', { clipboard, indent })
 
-    try {
-      await navigator.clipboard.writeText(clipboard)
-    } catch (err) {
-      onError(err)
-    }
+    await copyToClipboard(clipboard)
   }
 
   function handlePaste(event) {

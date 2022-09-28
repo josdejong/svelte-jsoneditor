@@ -139,7 +139,7 @@
     try {
       codeMirrorView = createCodeMirrorView({
         target: codeMirrorRef,
-        initialText: !editorDisabled ? text : '',
+        initialText: !editorDisabled ? normalization.escapeValue(text) : '',
         readOnly,
         indentation
       })
