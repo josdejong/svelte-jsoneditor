@@ -21,6 +21,8 @@
   "html_characters<a>": "<a>",
   "escaped_unicode": "\\u260e",
   "unicode": "😀,💩",
+  "escaped double quote": "\\"abc\\"",
+  "unicode double quote": "\\u0022abc\\u0022",
   "return": "\\n",
   "null": null,
   "number": 123,
