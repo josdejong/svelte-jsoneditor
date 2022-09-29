@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.7](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.6...v0.7.7) (2022-09-29)
+
+
+### Features
+
+* implemented options `parser` and `validationParser` to support alternative JSON parsers like lossless-json ([#151](https://github.com/josdejong/svelte-jsoneditor/issues/151)) ([b47368b](https://github.com/josdejong/svelte-jsoneditor/commit/b47368b7de4c90bab89572210c869eaba64348a7))
+
 ### [0.7.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.5...v0.7.6) (2022-09-28)
 
 
