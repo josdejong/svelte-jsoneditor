@@ -6,13 +6,13 @@
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { createDebug } from '../../utils/debug.js'
   import { isEmpty, isEqual } from 'lodash-es'
-  import type { JSONData, JSONPath } from 'immutable-json-patch'
+  import type { JSONValue, JSONPath } from 'immutable-json-patch'
   import { setIn } from 'immutable-json-patch'
   import type { QueryLanguageOptions } from '../../types'
 
   const debug = createDebug('jsoneditor:TransformWizard')
 
-  export let json: JSONData
+  export let json: JSONValue
   export let queryOptions: QueryLanguageOptions = {}
   export let onChange: (queryOptions: QueryLanguageOptions) => void
 

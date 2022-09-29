@@ -5,7 +5,7 @@
   import Modal from 'svelte-simple-modal'
   import { SORT_MODAL_OPTIONS, TRANSFORM_MODAL_OPTIONS } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
-  import { isTextContent, validateContentType } from '../utils/jsonUtils'
+  import { isEqualParser, isTextContent, validateContentType } from '../utils/jsonUtils'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import TextMode from './modes/textmode/TextMode.svelte'
   import TreeMode from './modes/treemode/TreeMode.svelte'
@@ -19,6 +19,7 @@
     Content,
     ContentErrors,
     JSONEditorPropsOptional,
+    JSONParser,
     JSONPatchResult,
     MenuItem,
     MenuSeparatorItem,
@@ -57,7 +58,9 @@
   export let statusBar = true
   export let escapeControlCharacters = false
   export let escapeUnicodeCharacters = false
+  export let parser: JSONParser = JSON
   export let validator: Validator | null = null
+  export let validationParser: JSONParser = JSON
 
   export let queryLanguages: QueryLanguage[] = [javascriptQueryLanguage]
   export let queryLanguageId: string = queryLanguages[0].id
@@ -89,6 +92,19 @@
     const contentError = validateContentType(content)
     if (contentError) {
       console.error('Error: ' + contentError)
+    }
+  }
+
+  // rerender the full editor when the parser changes. This is needed because
+  // numeric state is hold at many places in the editor.
+  let previousParser = parser
+  $: {
+    if (!isEqualParser(parser, previousParser)) {
+      debug('parser changed, recreate editor')
+      previousParser = parser
+
+      // new editor id -> will re-create the editor
+      instanceId = uniqueId()
     }
   }
 
@@ -125,7 +141,7 @@
     if (isTextContent(content)) {
       try {
         content = {
-          json: JSON.parse(content.text),
+          json: parser.parse(content.text),
           text: undefined
         }
       } catch (err) {
@@ -348,6 +364,7 @@
         selectedPath,
         escapeControlCharacters,
         escapeUnicodeCharacters,
+        parser,
         queryLanguages,
         queryLanguageId,
         onChangeQueryLanguage: handleChangeQueryLanguage,
@@ -410,7 +427,9 @@
             {mainMenuBar}
             {statusBar}
             {escapeUnicodeCharacters}
+            {parser}
             {validator}
+            {validationParser}
             onChange={handleChange}
             onSwitchToTreeMode={handleSwitchToTreeMode}
             {onError}
@@ -431,7 +450,9 @@
             {navigationBar}
             {escapeControlCharacters}
             {escapeUnicodeCharacters}
+            {parser}
             {validator}
+            {validationParser}
             {onError}
             onChange={handleChange}
             onRequestRepair={handleRequestRepair}

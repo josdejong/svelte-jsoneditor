@@ -1,5 +1,5 @@
 import jmespath from 'jmespath'
-import type { JSONData, JSONPath } from 'immutable-json-patch'
+import type { JSONPath, JSONValue } from 'immutable-json-patch'
 import { getIn } from 'immutable-json-patch'
 import { parseString } from '../../utils/stringUtils.js'
 import type { QueryLanguage, QueryLanguageOptions } from '../../types'
@@ -28,7 +28,7 @@ export const jmespathQueryLanguage: QueryLanguage = {
  * @param queryOptions
  * @return Returns a query (as string)
  */
-function createQuery(json: JSONData, queryOptions: QueryLanguageOptions): string {
+function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): string {
   const { sort, filter, projection } = queryOptions
   let query = ''
 
@@ -38,8 +38,8 @@ function createQuery(json: JSONData, queryOptions: QueryLanguageOptions): string
     const filterValue = parseString(filter.value)
     const filterValueStr =
       typeof exampleValue === 'string' && filterValue !== null && filterValue !== undefined
-        ? JSON.stringify(filter.value)
-        : JSON.stringify(filterValue)
+        ? `"${filter.value}"`
+        : filterValue
 
     query +=
       '[? ' +
@@ -97,7 +97,7 @@ function createQuery(json: JSONData, queryOptions: QueryLanguageOptions): string
 /**
  * Execute a JMESPath query, returns the transformed JSON
  */
-function executeQuery(json: JSONData, query: string): JSONData {
+function executeQuery(json: JSONValue, query: string): JSONValue {
   return jmespath.search(json, query)
 }
 

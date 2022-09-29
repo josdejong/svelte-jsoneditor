@@ -61,7 +61,7 @@ export function compareArrays<T>(a: Array<T>, b: Array<T>): number {
 
 /**
  * Get the paths of all nested properties in the items of an array
- * @param {JSONData} array
+ * @param {JSONValue} array
  * @param {boolean} [includeObjects=false] If true, object and array paths are returned as well
  * @return {Path[]}
  */

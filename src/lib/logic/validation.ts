@@ -1,13 +1,14 @@
 import { initial } from 'lodash-es'
 import type {
   ContentErrors,
+  JSONParser,
   JSONPointerMap,
   NestedValidationError,
   ValidationError,
   Validator
 } from '../types.js'
 import { ValidationSeverity } from '../types.js'
-import { compileJSONPointer, type JSONData } from 'immutable-json-patch'
+import { compileJSONPointer, type JSONValue } from 'immutable-json-patch'
 import { MAX_AUTO_REPAIRABLE_SIZE, MAX_VALIDATABLE_SIZE } from '../constants.js'
 import { measure } from '../utils/timeUtils.js'
 import { normalizeJsonParseError } from '../utils/jsonUtils.js'
@@ -53,12 +54,21 @@ export function mapValidationErrors(
   return map
 }
 
-export function validateJSON(json: JSONData, validator: Validator): ValidationError[] {
+export function validateJSON(
+  json: JSONValue,
+  validator: Validator | null,
+  convertJSON: (value: JSONValue) => JSONValue
+): ValidationError[] {
   debug('validateJSON')
-  return validator(json)
+
+  return validator ? validator(convertJSON(json)) : []
 }
 
-export function validateText(text: string, validator: Validator): ContentErrors {
+export function validateText(
+  text: string,
+  validator: Validator | null,
+  parser: JSONParser
+): ContentErrors {
   debug('validateText')
 
   if (text.length > MAX_VALIDATABLE_SIZE) {
@@ -82,7 +92,7 @@ export function validateText(text: string, validator: Validator): ContentErrors 
 
   try {
     const json = measure(
-      () => JSON.parse(text),
+      () => parser.parse(text),
       (duration) => debug(`validate: parsed json in ${duration} ms`)
     )
 
@@ -100,7 +110,7 @@ export function validateText(text: string, validator: Validator): ContentErrors 
     return { validationErrors }
   } catch (err) {
     const isRepairable = measure(
-      () => canAutoRepair(text),
+      () => canAutoRepair(text, parser),
       (duration) => debug(`validate: checked whether repairable in ${duration} ms`)
     )
 
@@ -113,13 +123,13 @@ export function validateText(text: string, validator: Validator): ContentErrors 
   }
 }
 
-function canAutoRepair(text) {
+function canAutoRepair(text: string, parser: JSONParser): boolean {
   if (text.length > MAX_AUTO_REPAIRABLE_SIZE) {
     return false
   }
 
   try {
-    JSON.parse(jsonrepair(text))
+    parser.parse(jsonrepair(text))
 
     return true
   } catch (err) {

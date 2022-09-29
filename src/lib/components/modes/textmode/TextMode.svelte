@@ -6,7 +6,7 @@
   import type { JSONPatchDocument } from 'immutable-json-patch'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
-  import { debounce, isEqual, noop, uniqueId } from 'lodash-es'
+  import { debounce, isEqual, uniqueId } from 'lodash-es'
   import { onDestroy, onMount } from 'svelte'
   import {
     JSON_STATUS_INVALID,
@@ -41,10 +41,17 @@
   import type {
     Content,
     ContentErrors,
+    JSONParser,
     JSONPatchResult,
+    OnBlur,
     OnChange,
+    OnError,
+    OnFocus,
+    OnRenderMenu,
     ParseError,
     RichValidationError,
+    SortModalCallback,
+    TransformModalCallback,
     ValidationError,
     Validator
   } from '../../../types'
@@ -53,22 +60,24 @@
   import memoizeOne from 'memoize-one'
   import { validateText } from '../../../logic/validation'
 
-  export let readOnly = false
-  export let mainMenuBar = true
-  export let statusBar = true
+  export let readOnly: boolean
+  export let mainMenuBar: boolean
+  export let statusBar: boolean
   export let externalContent: Content
-  export let indentation: number | string = 2
-  export let tabSize = 4
-  export let escapeUnicodeCharacters = false
-  export let validator: Validator = null
-  export let onChange: OnChange = null
-  export let onSwitchToTreeMode = noop
-  export let onError
-  export let onFocus = noop
-  export let onBlur = noop
-  export let onRenderMenu = noop
-  export let onSortModal
-  export let onTransformModal
+  export let indentation: number | string
+  export let tabSize: number
+  export let escapeUnicodeCharacters: boolean
+  export let parser: JSONParser
+  export let validator: Validator | null
+  export let validationParser: JSONParser
+  export let onChange: OnChange
+  export let onSwitchToTreeMode: () => void
+  export let onError: OnError
+  export let onFocus: OnFocus
+  export let onBlur: OnBlur
+  export let onRenderMenu: OnRenderMenu
+  export let onSortModal: (props: SortModalCallback) => void
+  export let onTransformModal: (props: TransformModalCallback) => void
 
   const debug = createDebug('jsoneditor:TextMode')
 
@@ -98,7 +107,7 @@
   const tabSizeCompartment = new Compartment()
 
   let content: Content = externalContent
-  let text = getText(content, indentation) // text is just a cached version of content.text or parsed content.json
+  let text = getText(content, indentation, parser) // text is just a cached version of content.text or parsed content.json
   let editorDisabled = disableTextEditor(text, acceptTooLarge)
   $: isNewDocument = text.length === 0
 
@@ -178,11 +187,11 @@
   export function patch(operations: JSONPatchDocument): JSONPatchResult {
     debug('patch', operations)
 
-    const previousJson = JSON.parse(text)
+    const previousJson = parser.parse(text)
     const updatedJson = immutableJSONPatch(previousJson, operations)
     const undo = revertJSONPatch(previousJson, operations)
     setCodeMirrorContent({
-      text: JSON.stringify(updatedJson, null, indentation)
+      text: parser.stringify(updatedJson, null, indentation)
     })
 
     return {
@@ -201,9 +210,9 @@
     }
 
     try {
-      const json = JSON.parse(text)
+      const json = parser.parse(text)
       setCodeMirrorContent({
-        text: JSON.stringify(json, null, indentation)
+        text: parser.stringify(json, null, indentation)
       })
     } catch (err) {
       onError(err)
@@ -218,9 +227,9 @@
     }
 
     try {
-      const json = JSON.parse(text)
+      const json = parser.parse(text)
       setCodeMirrorContent({
-        text: JSON.stringify(json)
+        text: parser.stringify(json)
       })
     } catch (err) {
       onError(err)
@@ -251,7 +260,7 @@
     }
 
     try {
-      const json = JSON.parse(text)
+      const json = parser.parse(text)
 
       modalOpen = true
 
@@ -278,12 +287,12 @@
    * @param {Object} options
    * @property {string} [id]
    * @property {JSONPath} [selectedPath]
-   * @property {({ operations: JSONPatchDocument, json: JSONData, transformedJson: JSONData }) => void} [onTransform]
+   * @property {({ operations: JSONPatchDocument, json: JSONValue, transformedJson: JSONValue }) => void} [onTransform]
    * @property {() => void} [onClose]
    */
   export function openTransformModal({ id, selectedPath, onTransform, onClose }) {
     try {
-      const json = JSON.parse(text)
+      const json = parser.parse(text)
 
       modalOpen = true
 
@@ -539,7 +548,7 @@
   }
 
   function setCodeMirrorContent(newContent: Content, forceUpdate = false) {
-    const newText = getText(newContent, indentation)
+    const newText = getText(newContent, indentation, parser)
 
     editorDisabled = disableTextEditor(newText, acceptTooLarge)
     if (editorDisabled) {
@@ -736,7 +745,7 @@
 
     onChangeCodeMirrorValueDebounced.flush()
 
-    const contentErrors = memoizedValidateText(text, validator)
+    const contentErrors = memoizedValidateText(text, validator, validationParser)
 
     if (isContentParseError(contentErrors)) {
       jsonStatus = contentErrors.isRepairable ? JSON_STATUS_REPAIRABLE : JSON_STATUS_INVALID
@@ -830,17 +839,19 @@
       <StatusBar {editorState} />
     {/if}
 
-    {#if jsonParseError}
-      <Message
-        type="error"
-        icon={faExclamationTriangle}
-        message={jsonParseError.message}
-        actions={repairActions}
-        onClick={() => handleSelectParseError(jsonParseError)}
-      />
-    {/if}
+    {#if !editorDisabled}
+      {#if jsonParseError}
+        <Message
+          type="error"
+          icon={faExclamationTriangle}
+          message={jsonParseError.message}
+          actions={repairActions}
+          onClick={() => handleSelectParseError(jsonParseError)}
+        />
+      {/if}
 
-    <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
+      <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
+    {/if}
   {:else}
     <div class="jse-contents">
       <div class="jse-loading-space" />

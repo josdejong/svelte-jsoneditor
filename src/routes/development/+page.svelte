@@ -1,17 +1,25 @@
 <script lang="ts">
   import {
     createAjvValidator,
-    JSONEditor,
-    jmespathQueryLanguage,
-    lodashQueryLanguage,
-    javascriptQueryLanguage,
-    renderValue,
     EditableValue,
-    ReadonlyValue
+    javascriptQueryLanguage,
+    jmespathQueryLanguage,
+    JSONEditor,
+    lodashQueryLanguage,
+    ReadonlyValue,
+    renderValue
   } from '$lib'
   import { useLocalStorage } from '../../lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
   import { tick } from 'svelte'
+  import { parse, stringify } from 'lossless-json'
+  import { truncate } from '$lib/utils/stringUtils.js'
+
+  // const LosslessJSON: JSONParser = { ... } // FIXME: make the types work
+  const LosslessJSON = {
+    parse,
+    stringify
+  }
 
   let content = {
     text: `{
@@ -20,6 +28,9 @@
   "html_code": "&quot;",
   "html_characters<a>": "<a>",
   "escaped_unicode": "\\u260e",
+  "long": 9223372036854775807,
+  "float": 4.0,
+  "big": 1e500,
   "unicode": "😀,💩",
   "escaped double quote": "\\"abc\\"",
   "unicode double quote": "\\u0022abc\\u0022",
@@ -101,6 +112,19 @@
     { value: '\t', label: '1 tab' }
   ]
 
+  const parsers = [
+    {
+      id: 'JSON',
+      value: JSON,
+      label: 'JSON'
+    },
+    {
+      id: 'LosslessJSON',
+      value: LosslessJSON,
+      label: 'LosslessJSON'
+    }
+  ]
+
   const validator = createAjvValidator(schema)
 
   let refTreeEditor
@@ -144,6 +168,7 @@
     'svelte-jsoneditor-demo-indentation',
     indentations[0].value
   )
+  const selectedParserId = useLocalStorage('svelte-jsoneditor-demo-parser', parsers[0].id)
   const tabSize = useLocalStorage('svelte-jsoneditor-demo-tabSize', indentations[0].value)
   let leftEditorMode = 'tree'
 
@@ -151,6 +176,8 @@
     ? [javascriptQueryLanguage, lodashQueryLanguage, jmespathQueryLanguage]
     : [javascriptQueryLanguage]
   let queryLanguageId = javascriptQueryLanguage.id // TODO: store in local storage
+
+  $: selectedParser = parsers.find((parser) => parser.id === $selectedParserId).value
 
   // only editable/readonly div, no color picker, boolean toggle, timestamp
   function customRenderValue({
@@ -300,17 +327,24 @@
     <label>
       <input type="checkbox" bind:checked={$multipleQueryLanguages} /> Multiple query languages
     </label>
-  </p>
-  {#if $multipleQueryLanguages}
-    <p>
-      Selected query language:
+    {#if $multipleQueryLanguages}
+      . Selected query language:
       <select bind:value={queryLanguageId}>
         {#each queryLanguages as queryLanguage}
           <option value={queryLanguage.id}>{queryLanguage.name}</option>
         {/each}
       </select>
-    </p>
-  {/if}
+    {/if}
+  </p>
+
+  <p>
+    JSON Parser <select bind:value={$selectedParserId}>
+      {#each parsers as parser}
+        <option value={parser.id}>{parser.label}</option>
+      {/each}
+    </select>
+  </p>
+
   <p class="buttons">
     <button
       on:click={() => {
@@ -367,10 +401,12 @@
         content = {
           text: undefined,
           json: [...new Array(1000)].map((value, index) => {
+            const random = Math.round(Math.random() * 1000)
             return {
               id: index,
               name: 'Item ' + index,
-              random: Math.round(Math.random() * 1000)
+              random,
+              long: 9223372000000000000n + BigInt(random)
             }
           })
         }
@@ -476,6 +512,7 @@
             readOnly={$readOnly}
             indentation={$selectedIndentation}
             tabSize={$tabSize}
+            parser={selectedParser}
             validator={$validate ? validator : undefined}
             {queryLanguages}
             bind:queryLanguageId
@@ -492,7 +529,9 @@
           json contents:
           <pre>
 					<code>
-					{content.json !== undefined ? JSON.stringify(content.json, null, 2) : 'undefined'}
+					{content.json !== undefined
+                ? truncate(selectedParser.stringify(content.json, null, 2), 1e5)
+                : 'undefined'}
 					</code>
 				</pre>
         </div>
@@ -519,6 +558,7 @@
             readOnly={$readOnly}
             indentation={$selectedIndentation}
             tabSize={$tabSize}
+            parser={selectedParser}
             validator={$validate ? validator : undefined}
             {queryLanguages}
             {queryLanguageId}
@@ -536,7 +576,7 @@
           text contents:
           <pre>
 						<code>
-						{content.text}
+						{truncate(content.text, 1e5)}
 						</code>
 					</pre>
         </div>
@@ -612,6 +652,7 @@ See https://github.com/sveltejs/kit/issues/981
 
   p {
     max-width: none;
+    margin: 10px 0;
 
     &.buttons {
       display: flex;
@@ -629,6 +670,10 @@ See https://github.com/sveltejs/kit/issues/981
 
   label {
     white-space: nowrap;
+
+    &:hover {
+      background: white;
+    }
   }
 
   :global(.jse-main.jse-focus) {

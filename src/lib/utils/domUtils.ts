@@ -1,4 +1,5 @@
 import { SelectionType } from '../types.js'
+import type { ValueNormalization } from '../types.js'
 import type { JSONPath } from 'immutable-json-patch'
 import { map, minBy } from 'lodash-es'
 import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
@@ -6,13 +7,14 @@ import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 /**
  * Create serialization functions to escape and stringify text,
  * and the other way around: to parse and unescape text.
- * @param {{
- *   escapeControlCharacters: boolean,
- *   escapeUnicodeCharacters: boolean
- * }} options
- * @return {ValueNormalization}
  */
-export function createNormalizationFunctions({ escapeControlCharacters, escapeUnicodeCharacters }) {
+export function createNormalizationFunctions({
+  escapeControlCharacters,
+  escapeUnicodeCharacters
+}: {
+  escapeControlCharacters: boolean
+  escapeUnicodeCharacters: boolean
+}): ValueNormalization {
   if (escapeControlCharacters) {
     if (escapeUnicodeCharacters) {
       return normalizeControlAndUnicode
@@ -50,10 +52,8 @@ const normalizeNothing = {
 
 /**
  * Source:  https://stackoverflow.com/questions/12271547/shouldnt-json-stringify-escape-unicode-characters
- * @param {string} value
- * @returns {string}
  */
-export function jsonEscapeUnicode(value) {
+export function jsonEscapeUnicode(value: string): string {
   return value.replace(/[^\x20-\x7F]/g, (x) => {
     if (x === '\b' || x === '\f' || x === '\n' || x === '\r' || x === '\t') {
       return x
@@ -63,10 +63,7 @@ export function jsonEscapeUnicode(value) {
   })
 }
 
-/**
- * @param {string} value
- */
-export function jsonUnescapeUnicode(value) {
+export function jsonUnescapeUnicode(value: string): string {
   return value.replace(/\\u[a-fA-F0-9]{4}/g, (x) => {
     try {
       const unescaped = JSON.parse('"' + x + '"')
@@ -104,29 +101,19 @@ const escapedControlCharacters = {
   // unicode is handled separately
 }
 
-/**
- * @param {string} value
- */
-export function jsonEscapeControl(value) {
+export function jsonEscapeControl(value: string): string {
   return value.replace(/["\b\f\n\r\t\\]/g, (x) => {
     return controlCharacters[x] || x
   })
 }
 
-/**
- * @param {string} value
- */
-export function jsonUnescapeControl(value) {
+export function jsonUnescapeControl(value: string): string {
   return value.replace(/\\["bfnrt\\]/g, (x) => {
     return escapedControlCharacters[x] || x
   })
 }
 
-/**
- * @param {any} value
- * @return {string} value
- */
-export function addNewLineSuffix(value) {
+export function addNewLineSuffix(value: unknown): string {
   if (typeof value !== 'string') {
     return String(value)
   }
@@ -142,16 +129,14 @@ export function addNewLineSuffix(value) {
 /**
  * Remove a newline suffix from text returned by element.innerText, it adds
  * one return too much.
- * @param {string} text
- * @returns {string}
  */
-export function removeNewLineSuffix(text) {
+export function removeNewLineSuffix(text: string): string {
   return text.replace(/\n$/, '')
 }
 
 // regular expression matching one or multiple return characters with all their
 // enclosing white spaces
-export function removeReturnsAndSurroundingWhitespace(text) {
+export function removeReturnsAndSurroundingWhitespace(text: string): string {
   return text.replace(/(\b|^)\s*(\b|$)/g, (match) => {
     return /\n/.exec(match) ? '' : match
   })
@@ -285,19 +270,15 @@ export function getSelectionTypeFromTarget(target: HTMLElement): SelectionType {
 
 /**
  * Encode a path into a string that can be used as attribute in HTML
- * @param {JSONPath} path
- * @returns {string}
  */
-export function encodeDataPath(path) {
+export function encodeDataPath(path: JSONPath): string {
   return encodeURIComponent(compileJSONPointer(path))
 }
 
 /**
  * Decode a path that was stringified for use as an HTML attribute
- * @param {string} pathStr
- * @returns {JSONPath}
  */
-export function decodeDataPath(pathStr) {
+export function decodeDataPath(pathStr: string): JSONPath {
   return parseJSONPointer(decodeURIComponent(pathStr))
 }
 

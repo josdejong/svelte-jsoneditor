@@ -1,9 +1,9 @@
 import type {
-  JSONData,
   JSONPatchDocument,
   JSONPatchOperation,
   JSONPath,
-  JSONPointer
+  JSONPointer,
+  JSONValue
 } from 'immutable-json-patch'
 import { compileJSONPointer, getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
 import { forEachRight, groupBy, initial, isEqual, last } from 'lodash-es'
@@ -14,6 +14,7 @@ import { stringConvert } from '../utils/typeUtils.js'
 import type {
   DocumentState,
   ExtendedSearchResultItem,
+  JSONParser,
   JSONPointerMap,
   JSONSelection,
   SearchResult,
@@ -24,7 +25,7 @@ import { SearchField } from '../types.js'
 // TODO: comment
 // TODO: unit test
 export function updateSearchResult(
-  json: JSONData,
+  json: JSONValue,
   newResultItems: SearchResultItem[],
   previousResult: SearchResult | undefined
 ): SearchResult {
@@ -106,7 +107,7 @@ export function searchPrevious(searchResult: SearchResult): SearchResult {
 // TODO: comment
 export function search(
   searchText: string,
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   maxResults = Infinity
 ): SearchResultItem[] {
@@ -119,7 +120,7 @@ export function search(
     }
   }
 
-  function searchRecursive(searchTextLowerCase: string, value: JSONData) {
+  function searchRecursive(searchTextLowerCase: string, value: JSONValue) {
     if (isJSONArray(value)) {
       const level = path.length
       path.push('0')
@@ -234,10 +235,11 @@ export function replaceAllText(
 }
 
 export function createSearchAndReplaceOperations(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   replacementText: string,
-  searchResultItem: SearchResultItem
+  searchResultItem: SearchResultItem,
+  parser: JSONParser
 ): { newSelection: JSONSelection; operations: JSONPatchDocument } {
   const { field, path, start, end } = searchResultItem
 
@@ -265,7 +267,12 @@ export function createSearchAndReplaceOperations(
     const currentValueText = typeof currentValue === 'string' ? currentValue : String(currentValue)
 
     const pointer = compileJSONPointer(path)
-    const enforceString = getEnforceString(currentValue, documentState.enforceStringMap, pointer)
+    const enforceString = getEnforceString(
+      currentValue,
+      documentState.enforceStringMap,
+      pointer,
+      parser
+    )
 
     const value = replaceText(currentValueText, replacementText, start, end)
 
@@ -273,7 +280,7 @@ export function createSearchAndReplaceOperations(
       {
         op: 'replace',
         path: compileJSONPointer(path),
-        value: enforceString ? value : stringConvert(value)
+        value: enforceString ? value : (stringConvert(value, parser) as JSONValue)
       }
     ]
 
@@ -289,10 +296,11 @@ export function createSearchAndReplaceOperations(
 }
 
 export function createSearchAndReplaceAllOperations(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   searchText: string,
-  replacementText
+  replacementText: string,
+  parser: JSONParser
 ): { newSelection: JSONSelection; operations: JSONPatchDocument } {
   // TODO: to improve performance, we could reuse existing search results (except when hitting a maxResult limit)
   const searchResultItems = search(searchText, json, documentState, Infinity /* maxResults */)
@@ -366,7 +374,12 @@ export function createSearchAndReplaceAllOperations(
         typeof currentValue === 'string' ? currentValue : String(currentValue)
 
       const pointer = compileJSONPointer(path)
-      const enforceString = getEnforceString(currentValue, documentState.enforceStringMap, pointer)
+      const enforceString = getEnforceString(
+        currentValue,
+        documentState.enforceStringMap,
+        pointer,
+        parser
+      )
 
       const value = replaceAllText(currentValueText, replacementText, items)
 
@@ -374,7 +387,7 @@ export function createSearchAndReplaceAllOperations(
         {
           op: 'replace',
           path: compileJSONPointer(path),
-          value: enforceString ? value : stringConvert(value)
+          value: enforceString ? value : (stringConvert(value, parser) as JSONValue)
         }
       ]
       allOperations = allOperations.concat(operations)

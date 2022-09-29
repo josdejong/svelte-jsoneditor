@@ -42,5 +42,9 @@
 
   .jse-space {
     height: 200px; // Trick for the property select box dropdown to be fully visible
+
+    .jse-error {
+      color: var(--jse-error-color);
+    }
   }
 }

@@ -14,7 +14,7 @@
     faSortAmountDownAlt,
     faTimes
   } from '@fortawesome/free-solid-svg-icons'
-  import type { JSONData } from 'immutable-json-patch'
+  import type { JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { initial, isEmpty } from 'lodash-es'
   import { onMount } from 'svelte'
@@ -25,12 +25,13 @@
   import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
   import { faCheckSquare, faLightbulb, faSquare } from '@fortawesome/free-regular-svg-icons'
   import { findNearestElement } from '$lib/utils/domUtils'
-  import type { DocumentState } from '../../../../types'
+  import type { DocumentState, JSONParser } from '../../../../types'
   import { isKeySelection, isMultiSelection, isValueSelection } from '../../../../logic/selection'
   import { getEnforceString } from '../../../../logic/documentState'
 
-  export let json: JSONData
+  export let json: JSONValue
   export let documentState: DocumentState
+  export let parser: JSONParser
 
   export let showTip
 
@@ -112,7 +113,8 @@
       ? getEnforceString(
           focusValue,
           documentState.enforceStringMap,
-          compileJSONPointer(selection.focusPath)
+          compileJSONPointer(selection.focusPath),
+          parser
         )
       : false
 

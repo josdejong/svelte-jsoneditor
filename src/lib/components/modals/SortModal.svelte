@@ -10,7 +10,7 @@
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { sortArray, sortObjectKeys } from '../../logic/sort.js'
   import { sortModalState } from './sortModalState.js'
-  import type { JSONData, JSONPath } from 'immutable-json-patch'
+  import type { JSONValue, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { createDebug } from '../../utils/debug'
   import type { OnSort } from '../../types'
@@ -18,7 +18,7 @@
   const debug = createDebug('jsoneditor:SortModal')
 
   export let id: string
-  export let json: JSONData // the whole document
+  export let json: JSONValue // the whole document
   export let selectedPath: JSONPath
   export let onSort: OnSort
 
@@ -44,6 +44,7 @@
     (sortModalState[stateId] && sortModalState[stateId].selectedProperty) || undefined
   let selectedDirection =
     (sortModalState[stateId] && sortModalState[stateId].selectedDirection) || asc
+  let sortError: string | undefined = undefined
 
   $: {
     // if there is only one option, select it and do not render the select box
@@ -71,26 +72,32 @@
   }
 
   function handleSort() {
-    if (jsonIsArray) {
-      if (!selectedProperty) {
-        return
+    try {
+      sortError = undefined
+
+      if (jsonIsArray) {
+        if (!selectedProperty) {
+          return
+        }
+
+        const property = selectedProperty.value
+        const direction = selectedDirection.value
+        const operations = sortArray(json, selectedPath, property, direction)
+
+        onSort(operations)
+      } else if (isObject(selectedJson)) {
+        const direction = selectedDirection.value
+        const operations = sortObjectKeys(json, selectedPath, direction)
+
+        onSort(operations)
+      } else {
+        console.error('Cannot sort: no array or object')
       }
 
-      const property = selectedProperty.value
-      const direction = selectedDirection.value
-      const operations = sortArray(json, selectedPath, property, direction)
-
-      onSort(operations)
-    } else if (isObject(selectedJson)) {
-      const direction = selectedDirection.value
-      const operations = sortObjectKeys(json, selectedPath, direction)
-
-      onSort(operations)
-    } else {
-      console.error('Cannot sort: no array or object')
+      close()
+    } catch (err) {
+      sortError = err.toString()
     }
-
-    close()
   }
 
   function focus(element: HTMLElement) {
@@ -142,7 +149,13 @@
       </tbody>
     </table>
 
-    <div class="jse-space" />
+    <div class="jse-space">
+      {#if sortError}
+        <div class="jse-error">
+          {sortError}
+        </div>
+      {/if}
+    </div>
 
     <div class="jse-actions">
       <button

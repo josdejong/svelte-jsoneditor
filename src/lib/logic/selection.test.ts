@@ -605,45 +605,58 @@ describe('selection', () => {
   })
 
   it('should turn selection into text', () => {
-    assert.deepStrictEqual(selectionToPartialJson(json, createKeySelection(['str'], false)), 'str')
     assert.deepStrictEqual(
-      selectionToPartialJson(json, createValueSelection(['str'], false)),
+      selectionToPartialJson(json, createKeySelection(['str'], false), 2, JSON),
+      'str'
+    )
+    assert.deepStrictEqual(
+      selectionToPartialJson(json, createValueSelection(['str'], false), 2, JSON),
       'hello world'
     )
     assert.deepStrictEqual(
-      selectionToPartialJson(json, createValueSelection(['obj', 'arr', '1'], false)),
+      selectionToPartialJson(json, createValueSelection(['obj', 'arr', '1'], false), 2, JSON),
       '2'
     )
-    assert.deepStrictEqual(selectionToPartialJson(json, createAfterSelection(['str'])), null)
-    assert.deepStrictEqual(selectionToPartialJson(json, createInsideSelection(['str'])), null)
+    assert.deepStrictEqual(
+      selectionToPartialJson(json, createAfterSelection(['str']), 2, JSON),
+      null
+    )
+    assert.deepStrictEqual(
+      selectionToPartialJson(json, createInsideSelection(['str']), 2, JSON),
+      null
+    )
 
     assert.deepStrictEqual(
-      selectionToPartialJson(json, createMultiSelection(json, ['str'], ['bool'])),
+      selectionToPartialJson(json, createMultiSelection(json, ['str'], ['bool']), 2, JSON),
       '"str": "hello world",\n' + '"nill": null,\n' + '"bool": false,'
     )
 
     assert.deepStrictEqual(
       selectionToPartialJson(
         json,
-        createMultiSelection(json, ['obj', 'arr', '0'], ['obj', 'arr', '1'])
+        createMultiSelection(json, ['obj', 'arr', '0'], ['obj', 'arr', '1']),
+        2,
+        JSON
       ),
       '1,\n' + '2,'
     )
     assert.deepStrictEqual(
       selectionToPartialJson(
         json,
-        createMultiSelection(json, ['obj', 'arr', '0'], ['obj', 'arr', '0'])
+        createMultiSelection(json, ['obj', 'arr', '0'], ['obj', 'arr', '0']),
+        2,
+        JSON
       ),
       '1'
     )
 
     assert.deepStrictEqual(
-      selectionToPartialJson(json, createValueSelection(['obj'], false)),
+      selectionToPartialJson(json, createValueSelection(['obj'], false), 2, JSON),
       JSON.stringify(json.obj, null, 2)
     )
 
     assert.deepStrictEqual(
-      selectionToPartialJson(json, createMultiSelection(json, ['obj'], ['obj'])),
+      selectionToPartialJson(json, createMultiSelection(json, ['obj'], ['obj']), 2, JSON),
       '"obj": ' + JSON.stringify(json.obj, null, 2) + ','
     )
   })
@@ -651,7 +664,10 @@ describe('selection', () => {
   it('should turn selected root object into text', () => {
     const json2 = {}
 
-    assert.deepStrictEqual(selectionToPartialJson(json2, createMultiSelection(json2, [], [])), '{}')
+    assert.deepStrictEqual(
+      selectionToPartialJson(json2, createMultiSelection(json2, [], []), 2, JSON),
+      '{}'
+    )
   })
 
   it('should turn selection into text with specified indentation', () => {
@@ -659,25 +675,31 @@ describe('selection', () => {
     const objArr2 = '{\n' + '    "first": 3,\n' + '    "last": 4\n' + '}'
 
     assert.deepStrictEqual(
-      selectionToPartialJson(json, createValueSelection(['obj', 'arr', '2'], false), indentation),
+      selectionToPartialJson(
+        json,
+        createValueSelection(['obj', 'arr', '2'], false),
+        indentation,
+        JSON
+      ),
       objArr2
     )
     assert.deepStrictEqual(
       selectionToPartialJson(
         json,
         createMultiSelection(json, ['obj', 'arr', '1'], ['obj', 'arr', '2']),
-        indentation
+        indentation,
+        JSON
       ),
       `2,\n${objArr2},`
     )
 
     assert.deepStrictEqual(
-      selectionToPartialJson(json, createMultiSelection(json, ['obj'], ['obj'])),
+      selectionToPartialJson(json, createMultiSelection(json, ['obj'], ['obj']), 2, JSON),
       '"obj": ' + JSON.stringify(json.obj, null, 2) + ','
     )
 
     assert.deepStrictEqual(
-      selectionToPartialJson(json, createMultiSelection(json, ['obj'], ['obj']), indentation),
+      selectionToPartialJson(json, createMultiSelection(json, ['obj'], ['obj']), indentation, JSON),
       '"obj": ' + JSON.stringify(json.obj, null, indentation) + ','
     )
   })

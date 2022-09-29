@@ -7,7 +7,7 @@
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
   import { DEBOUNCE_DELAY } from '../../constants.js'
-  import type { JSONData, JSONPath } from 'immutable-json-patch'
+  import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { stringifyPath } from '../../utils/pathUtils.js'
   import { transformModalState } from './transformModalState.js'
@@ -18,6 +18,7 @@
   import TreeMode from '../modes/treemode/TreeMode.svelte'
   import type {
     Content,
+    JSONParser,
     OnChangeQueryLanguage,
     OnClassName,
     OnPatch,
@@ -28,11 +29,12 @@
   const debug = createDebug('jsoneditor:TransformModal')
 
   export let id = 'transform-modal-' + uniqueId()
-  export let json: JSONData
+  export let json: JSONValue
   export let selectedPath: JSONPath = []
 
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
+  export let parser: JSONParser
 
   export let queryLanguages: QueryLanguage[]
   export let queryLanguageId: string
@@ -84,7 +86,7 @@
     debug('handleChangeQuery', { query, isManual })
   }
 
-  function previewTransform(json: JSONData, query: string) {
+  function previewTransform(json: JSONValue, query: string) {
     try {
       debug('previewTransform', {
         query
@@ -245,6 +247,7 @@
                 navigationBar={false}
                 {escapeControlCharacters}
                 {escapeUnicodeCharacters}
+                {parser}
                 {onRenderValue}
                 onError={console.error}
                 onChange={noop}
@@ -268,6 +271,7 @@
                 navigationBar={false}
                 {escapeControlCharacters}
                 {escapeUnicodeCharacters}
+                {parser}
                 {onRenderValue}
                 onError={console.error}
                 onChange={noop}

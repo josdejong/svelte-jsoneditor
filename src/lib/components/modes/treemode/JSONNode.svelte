@@ -3,7 +3,13 @@
 <script lang="ts">
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import classnames from 'classnames'
-  import type { JSONArray, JSONData, JSONObject, JSONPath, JSONPointer } from 'immutable-json-patch'
+  import type {
+    JSONArray,
+    JSONValue as JSONValueType,
+    JSONObject,
+    JSONPath,
+    JSONPointer
+  } from 'immutable-json-patch'
   import { appendToJSONPointer, compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
   import { initial, isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
@@ -37,7 +43,6 @@
     isChildOfNodeName,
     isContentEditableDiv
   } from '$lib/utils/domUtils'
-  import { valueType } from '$lib/utils/typeUtils'
   import CollapsedItems from './CollapsedItems.svelte'
   import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
   import JSONKey from './JSONKey.svelte'
@@ -71,8 +76,9 @@
   import { createMemoizePath } from '../../../utils/pathUtils'
   import { getEnforceString } from '../../../logic/documentState'
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
+  import { isObject } from '$lib/utils/typeUtils.js'
 
-  export let value: JSONData
+  export let value: JSONValueType
   export let path: JSONPath
   export let expandedMap: JSONPointerMap<boolean> | undefined
   export let enforceStringMap: JSONPointerMap<boolean> | undefined
@@ -100,7 +106,7 @@
   $: expanded = expandedMap ? expandedMap[pointer] === true : false
 
   let enforceString: boolean | undefined
-  $: enforceString = getEnforceString(value, enforceStringMap, pointer)
+  $: enforceString = getEnforceString(value, enforceStringMap, pointer, context.parser)
 
   let visibleSections: VisibleSection[] | undefined
   $: visibleSections = visibleSectionsMap ? visibleSectionsMap[pointer] : undefined
@@ -112,7 +118,6 @@
   $: isSelected = selection ? selection.pointersMap[pointer] === true : false
 
   $: root = path.length === 0
-  $: type = valueType(value)
 
   function getIndentationStyle(level) {
     return `margin-left: calc(${level} * var(--jse-indent-size))`
@@ -605,7 +610,7 @@
   on:focus={undefined}
   on:blur={undefined}
 >
-  {#if type === 'array'}
+  {#if Array.isArray(value)}
     <div class="jse-header-outer" style={indentationStyle}>
       <div class="jse-header">
         <button
@@ -727,7 +732,7 @@
         {/if}
       </div>
     {/if}
-  {:else if type === 'object'}
+  {:else if isObject(value)}
     <div class="jse-header-outer" style={indentationStyle}>
       <div class="jse-header">
         <button

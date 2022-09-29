@@ -5,10 +5,10 @@ import {
   isJSONObject,
   isJSONPatchCopy,
   isJSONPatchMove,
-  type JSONData,
   type JSONPatchDocument,
   type JSONPath,
   type JSONPointer,
+  type JSONValue,
   parsePath,
   startsWithJSONPointer
 } from 'immutable-json-patch'
@@ -26,6 +26,7 @@ import type {
   CaretPosition,
   DocumentState,
   InsideSelection,
+  JSONParser,
   JSONSelection,
   KeySelection,
   MultiSelection,
@@ -67,7 +68,7 @@ export function isMultiSelection(
  * between (and including) start and end
  */
 export function expandSelection(
-  json: JSONData,
+  json: JSONValue,
   anchorPath: JSONPath,
   focusPath: JSONPath
 ): JSONPath[] {
@@ -191,7 +192,7 @@ export function isPathInsideSelection(
 }
 
 export function getSelectionUp(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   keepAnchorPath = false,
   useFocusPath = false
@@ -248,7 +249,7 @@ export function getSelectionUp(
 }
 
 export function getSelectionDown(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   keepAnchorPath = false,
   useFocusPath = false
@@ -320,7 +321,7 @@ export function getSelectionDown(
  * Only applicable for ValueSelection
  */
 export function getSelectionNextInside(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   path: JSONPath
 ): JSONSelection | null {
@@ -342,7 +343,7 @@ export function getSelectionNextInside(
  */
 // TODO: unit test
 export function findCaretAndSiblings(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   includeInside: boolean
 ): { next: CaretPosition | null; caret: CaretPosition | null; previous: CaretPosition | null } {
@@ -366,7 +367,7 @@ export function findCaretAndSiblings(
 }
 
 export function getSelectionLeft(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   keepAnchorPath = false,
   includeInside = true
@@ -401,7 +402,7 @@ export function getSelectionLeft(
 }
 
 export function getSelectionRight(
-  json: JSONData,
+  json: JSONValue,
   documentState: DocumentState,
   keepAnchorPath = false,
   includeInside = true
@@ -431,7 +432,7 @@ export function getSelectionRight(
 /**
  * Get a proper initial selection based on what is visible
  */
-export function getInitialSelection(json: JSONData, documentState: DocumentState): JSONSelection {
+export function getInitialSelection(json: JSONValue, documentState: DocumentState): JSONSelection {
   const visiblePaths = getVisiblePaths(json, documentState)
 
   // find the first, deepest nested entry (normally a value, not an Object/Array)
@@ -450,7 +451,7 @@ export function getInitialSelection(json: JSONData, documentState: DocumentState
 }
 
 export function createSelectionFromOperations(
-  json: JSONData,
+  json: JSONValue,
   operations: JSONPatchDocument
 ): JSONSelection | null {
   if (operations.length === 1) {
@@ -546,7 +547,7 @@ export function singleItemSelected(selection: JSONSelection | undefined): boolea
   )
 }
 
-export function findRootPath(json: JSONData, selection: JSONSelection): JSONPath {
+export function findRootPath(json: JSONValue, selection: JSONSelection): JSONPath {
   return singleItemSelected(selection) && isObjectOrArray(getIn(json, selection.focusPath))
     ? selection.focusPath
     : initial(selection.focusPath) // the parent path of the paths
@@ -623,7 +624,7 @@ export function createAfterSelection(path: JSONPath): AfterSelection {
 }
 
 export function createMultiSelection(
-  json: JSONData,
+  json: JSONValue,
   anchorPath: JSONPath,
   focusPath: JSONPath
 ): MultiSelection {
@@ -649,9 +650,10 @@ export function createMultiSelection(
  * clipboard for example.
  */
 export function selectionToPartialJson(
-  json: JSONData,
+  json: JSONValue,
   selection: JSONSelection,
-  indentation: number | string | null = 2
+  indentation: number | string | null,
+  parser: JSONParser
 ): string | null {
   if (isKeySelection(selection)) {
     return String(last(selection.focusPath))
@@ -659,13 +661,13 @@ export function selectionToPartialJson(
 
   if (isValueSelection(selection)) {
     const value = getIn(json, selection.focusPath)
-    return typeof value === 'string' ? value : JSON.stringify(value, null, indentation) // TODO: customizable indentation?
+    return typeof value === 'string' ? value : parser.stringify(value, null, indentation) // TODO: customizable indentation?
   }
 
   if (isMultiSelection(selection)) {
     if (isEmpty(selection.focusPath)) {
       // root object -> does not have a parent key/index
-      return JSON.stringify(json, null, indentation)
+      return parser.stringify(json, null, indentation)
     }
 
     const parentPath = getParentPath(selection)
@@ -674,12 +676,12 @@ export function selectionToPartialJson(
       if (selection.paths.length === 1) {
         // do not suffix a single selected array item with a comma
         const item = getIn(json, first(selection.paths))
-        return JSON.stringify(item, null, indentation)
+        return parser.stringify(item, null, indentation)
       } else {
         return selection.paths
           .map((path) => {
             const item = getIn(json, path)
-            return `${JSON.stringify(item, null, indentation)},`
+            return `${parser.stringify(item, null, indentation)},`
           })
           .join('\n')
       }
@@ -689,7 +691,7 @@ export function selectionToPartialJson(
         .map((path) => {
           const key = last(path)
           const value = getIn(json, path)
-          return `${JSON.stringify(key)}: ${JSON.stringify(value, null, indentation)},`
+          return `${parser.stringify(key)}: ${parser.stringify(value, null, indentation)},`
         })
         .join('\n')
     }
@@ -763,7 +765,7 @@ export function fromCaretPosition(caretPosition: CaretPosition): JSONSelection {
 
 // TODO: unit test
 export function fromSelectionType(
-  json: JSONData,
+  json: JSONValue,
   selectionType: SelectionType,
   path: JSONPath
 ): JSONSelection {

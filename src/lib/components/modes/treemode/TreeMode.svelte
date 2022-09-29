@@ -4,7 +4,7 @@
   import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '$lib/utils/debug'
-  import type { JSONData, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
+  import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
   import {
     compileJSONPointer,
     existsIn,
@@ -119,27 +119,36 @@
     DocumentState,
     HistoryItem,
     InsertType,
+    JSONParser,
     JSONPatchResult,
     JSONPointerMap,
     JSONSelection,
     NestedValidationError,
+    OnBlur,
     OnChange,
     OnClassName,
+    OnError,
+    OnFocus,
+    OnRenderMenu,
     OnRenderValue,
     ParseError,
     PastedJson,
     SearchResult,
     Section,
+    SortModalCallback,
+    TransformModalCallback,
     TransformModalOptions,
     TreeModeContext,
     ValidationError,
     Validator,
     ValueNormalization
   } from '$lib/types'
+  import { ValidationSeverity } from '$lib/types'
   import { isAfterSelection, isInsideSelection, isKeySelection } from '../../../logic/selection'
   import { truncate } from '../../../utils/stringUtils.js'
   import { MAX_CHARACTERS_TEXT_PREVIEW } from '../../../constants.js'
   import memoizeOne from 'memoize-one'
+  import { measure } from '$lib/utils/timeUtils'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -158,25 +167,26 @@
   let hasFocus = false
   const jump = createJump()
 
-  export let readOnly = false
-  export let externalContent
-  export let mainMenuBar = true
-  export let navigationBar = true
-  export let escapeControlCharacters = false
-  export let escapeUnicodeCharacters = false
-  export let validator: Validator = null
-
-  export let indentation: number | string = 2
-  export let onError
+  export let readOnly: boolean
+  export let externalContent: Content
+  export let mainMenuBar: boolean
+  export let navigationBar: boolean
+  export let escapeControlCharacters: boolean
+  export let escapeUnicodeCharacters: boolean
+  export let parser: JSONParser
+  export let validator: Validator | null
+  export let validationParser: JSONParser
+  export let indentation: number | string
+  export let onError: OnError
   export let onChange: OnChange
   export let onRenderValue: OnRenderValue
-  export let onRequestRepair = noop
-  export let onRenderMenu = noop
+  export let onRequestRepair: () => void
+  export let onRenderMenu: OnRenderMenu
   export let onClassName: OnClassName | undefined
-  export let onFocus
-  export let onBlur
-  export let onSortModal
-  export let onTransformModal
+  export let onFocus: OnFocus
+  export let onBlur: OnBlur
+  export let onSortModal: (props: SortModalCallback) => void
+  export let onTransformModal: (props: TransformModalCallback) => void
 
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
@@ -201,7 +211,7 @@
     }
   })
 
-  let json: JSONData | undefined
+  let json: JSONValue | undefined
   let text: string | undefined
   const rootPath = [] // create the array only once
 
@@ -286,7 +296,8 @@
       json,
       documentState,
       replacementText,
-      activeItem
+      activeItem,
+      parser
     )
 
     handlePatch(operations, (patchedJson, patchedState) => ({
@@ -305,7 +316,8 @@
       json,
       documentState,
       text,
-      replacementText
+      replacementText,
+      parser
     )
 
     handlePatch(operations, (patchedJson, patchedState) => ({
@@ -404,8 +416,15 @@
   let textIsRepaired = false
   $: textIsUnrepairable = text !== undefined && json === undefined
 
+  // if needed, provide a converter to convert non-native JSON to native JSON
+  // (like replace bigint or LosslessNumber into regular numbers)
+  $: validatorJSONConverter =
+    parser !== validationParser
+      ? (value) => validationParser.parse(parser.stringify(value))
+      : (value) => value
+
   let validationErrors: ValidationError[] = []
-  $: updateValidationErrors(json, validator)
+  $: updateValidationErrors(json, validator, validatorJSONConverter)
 
   let validationErrorsMap: JSONPointerMap<NestedValidationError>
   $: validationErrorsMap = mapValidationErrors(validationErrors)
@@ -414,15 +433,33 @@
   // we would execute validation twice. Memoizing the last result solves this.
   const memoizedValidate = memoizeOne(validateJSON)
 
-  function updateValidationErrors(json: JSONData, validator: Validator | null) {
-    const newValidationErrors: ValidationError[] = validator
-      ? memoizedValidate(json, validator)
-      : []
+  function updateValidationErrors(
+    json: JSONValue,
+    validator: Validator | null,
+    convertJSON: (value: JSONValue) => JSONValue
+  ) {
+    measure(
+      () => {
+        let newValidationErrors: ValidationError[]
+        try {
+          newValidationErrors = memoizedValidate(json, validator, convertJSON)
+        } catch (err) {
+          newValidationErrors = [
+            {
+              path: [],
+              message: 'Failed to validate: ' + err.message,
+              severity: ValidationSeverity.warning
+            }
+          ]
+        }
 
-    if (!isEqual(newValidationErrors, validationErrors)) {
-      debug('validationErrors changed:', newValidationErrors)
-      validationErrors = newValidationErrors
-    }
+        if (!isEqual(newValidationErrors, validationErrors)) {
+          debug('validationErrors changed:', newValidationErrors)
+          validationErrors = newValidationErrors
+        }
+      },
+      (duration) => debug(`validationErrors updated in ${duration} ms`)
+    )
   }
 
   export function validate(): ContentErrors {
@@ -437,7 +474,7 @@
 
     // make sure the validation results are up-to-date
     // normally, they are only updated on the next tick after the json is changed
-    updateValidationErrors(json, validator)
+    updateValidationErrors(json, validator, validatorJSONConverter)
     return {
       validationErrors
     }
@@ -525,7 +562,7 @@
     const previousTextIsRepaired = textIsRepaired
 
     try {
-      json = JSON.parse(updatedText)
+      json = parser.parse(updatedText)
       expandWhenNotInitialized(json)
       text = updatedText
       textIsRepaired = false
@@ -533,7 +570,7 @@
       clearSelectionWhenNotExisting(json)
     } catch (err) {
       try {
-        json = JSON.parse(jsonrepair(updatedText))
+        json = parser.parse(jsonrepair(updatedText))
         expandWhenNotInitialized(json)
         text = updatedText
         textIsRepaired = true
@@ -598,7 +635,7 @@
     previousText,
     previousTextIsRepaired
   }: {
-    previousJson: JSONData | undefined
+    previousJson: JSONValue | undefined
     previousText: string | undefined
     previousState: DocumentState
     previousTextIsRepaired: boolean
@@ -785,8 +822,8 @@
     const path = documentState.selection.focusPath
     const pointer = compileJSONPointer(path)
     const value = getIn(json, path)
-    const enforceString = !getEnforceString(value, documentState.enforceStringMap, pointer)
-    const updatedValue = enforceString ? String(value) : stringConvert(String(value))
+    const enforceString = !getEnforceString(value, documentState.enforceStringMap, pointer, parser)
+    const updatedValue = enforceString ? String(value) : stringConvert(String(value), parser)
 
     debug('handleToggleEnforceString', { enforceString, value, updatedValue })
 
@@ -795,7 +832,7 @@
         {
           op: 'replace',
           path: compileJSONPointer(path),
-          value: updatedValue
+          value: updatedValue as JSONValue
         }
       ],
       (patchedJson, patchedState) => {
@@ -820,7 +857,7 @@
     }
 
     const cutIndentation = indent ? indentation : null
-    const clipboard = selectionToPartialJson(json, documentState.selection, cutIndentation)
+    const clipboard = selectionToPartialJson(json, documentState.selection, cutIndentation, parser)
     if (clipboard == null) {
       return
     }
@@ -841,7 +878,7 @@
 
   async function handleCopy(indent = true) {
     const copyIndentation = indent ? indentation : null
-    const clipboard = selectionToPartialJson(json, documentState.selection, copyIndentation)
+    const clipboard = selectionToPartialJson(json, documentState.selection, copyIndentation, parser)
     if (clipboard == null) {
       return
     }
@@ -892,7 +929,7 @@
         createDefaultSelection()
       }
 
-      const operations = insert(json, documentState.selection, clipboardText)
+      const operations = insert(json, documentState.selection, clipboardText, parser)
 
       debug('paste', { clipboardText, operations, selection: documentState.selection })
 
@@ -1048,8 +1085,8 @@
     const newValue = createNewValue(json, documentState.selection, type)
 
     if (json !== undefined) {
-      const data = JSON.stringify(newValue)
-      const operations = insert(json, documentState.selection, data)
+      const data = parser.stringify(newValue)
+      const operations = insert(json, documentState.selection, data, parser)
       debug('handleInsert', { type, operations, newValue, data })
 
       const operation = last(
@@ -1145,8 +1182,8 @@
 
     try {
       const path = documentState.selection.anchorPath
-      const currentValue: JSONData = getIn(json, path)
-      const convertedValue = convertValue(currentValue, type)
+      const currentValue: JSONValue = getIn(json, path)
+      const convertedValue = convertValue(currentValue, type, parser)
       if (convertedValue === currentValue) {
         // no change, do nothing
         return
@@ -1579,7 +1616,7 @@
     return patchResult
   }
 
-  function handleReplaceJson(updatedJson: JSONData, afterPatch?: AfterPatchCallback) {
+  function handleReplaceJson(updatedJson: JSONValue, afterPatch?: AfterPatchCallback) {
     const previousState = documentState
     const previousJson = json
     const previousText = text
@@ -1624,13 +1661,13 @@
     const previousTextIsRepaired = textIsRepaired
 
     try {
-      json = JSON.parse(updatedText)
+      json = parser.parse(updatedText)
       documentState = expandWithCallback(json, documentState, rootPath, expandMinimal)
       text = undefined
       textIsRepaired = false
     } catch (err) {
       try {
-        json = JSON.parse(jsonrepair(updatedText))
+        json = parser.parse(jsonrepair(updatedText))
         documentState = expandWithCallback(json, documentState, rootPath, expandMinimal)
         text = updatedText
         textIsRepaired = true
@@ -1671,7 +1708,7 @@
    * else expand in a minimalistic way
    */
   function expandRecursive(
-    json: JSONData,
+    json: JSONValue,
     documentState: DocumentState,
     path: JSONPath
   ): DocumentState {
@@ -1998,6 +2035,7 @@
     const props = {
       json,
       documentState: documentState,
+      parser,
       showTip,
 
       onEditKey: handleEditKey,
@@ -2209,6 +2247,7 @@
   let context: TreeModeContext
   $: context = {
     readOnly,
+    parser,
     normalization,
     getJson,
     getDocumentState,

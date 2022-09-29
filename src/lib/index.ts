@@ -28,7 +28,12 @@ export { jmespathQueryLanguage } from './plugins/query/jmespathQueryLanguage.js'
 // utils
 export { SortModal, TransformModal }
 export { getJSONSchemaOptions, findSchema, findEnum } from './utils/jsonSchemaUtils.js'
-export { isTextContent, isLargeContent, estimateSerializedSize } from './utils/jsonUtils.js'
+export {
+  isEqualParser,
+  isTextContent,
+  isLargeContent,
+  estimateSerializedSize
+} from './utils/jsonUtils.js'
 export {
   isValueSelection,
   isKeySelection,
