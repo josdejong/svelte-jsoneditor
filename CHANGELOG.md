@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.8](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.7...v0.7.8) (2022-09-29)
+
+
+### Bug Fixes
+
+* [#153](https://github.com/josdejong/svelte-jsoneditor/issues/153) code using a missing dependency `lossless-json` ([4a34214](https://github.com/josdejong/svelte-jsoneditor/commit/4a34214703843f0af6a0253652649cc33083b746))
+
 ### [0.7.7](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.6...v0.7.7) (2022-09-29)
 
 
