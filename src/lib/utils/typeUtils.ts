@@ -177,3 +177,12 @@ export function stringConvert(str: string, parser: JSONParser): unknown {
 export function isStringContainingPrimitiveValue(str: unknown, parser: JSONParser): boolean {
   return typeof str === 'string' && typeof stringConvert(str, parser) !== 'string'
 }
+
+/**
+ * Test whether a string contains an integer number
+ */
+export function isInteger(value: string): boolean {
+  return INTEGER_REGEX.test(value)
+}
+
+const INTEGER_REGEX = /^-?[0-9]+$/

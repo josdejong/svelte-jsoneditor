@@ -2,7 +2,7 @@ import { createPropertySelector } from '../../utils/pathUtils.js'
 import { parseString } from '../../utils/stringUtils.js'
 import type { QueryLanguage, QueryLanguageOptions } from '../../types'
 import type { JSONValue } from 'immutable-json-patch'
-import { isInteger, isSafeNumber } from 'lossless-json'
+import { isInteger } from '../../utils/typeUtils.js'
 
 const description = `
 <p>
@@ -27,10 +27,11 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
     // so a filter value like '5' (text) will match numbers like 5 too.
     const actualValueGetter = `item => item${createPropertySelector(filter.path)}`
 
+    const filterValue = parseString(filter.value)
     const filterValueStr =
-      typeof parseString(filter.value) === 'string'
+      typeof filterValue === 'string'
         ? `'${filter.value}'`
-        : isInteger(filter.value) && !isSafeNumber(filter.value)
+        : isInteger(filter.value) && !Number.isSafeInteger(filterValue)
         ? `${filter.value}n` // bigint
         : filter.value
 

@@ -1,5 +1,6 @@
 import { strictEqual } from 'assert'
 import {
+  isInteger,
   isObject,
   isObjectOrArray,
   isStringContainingPrimitiveValue,
@@ -88,5 +89,13 @@ describe('typeUtils', () => {
     strictEqual(isStringContainingPrimitiveValue('true', JSON), true)
     strictEqual(isStringContainingPrimitiveValue('false', JSON), true)
     strictEqual(isStringContainingPrimitiveValue('null', JSON), true)
+  })
+
+  it('isInteger', () => {
+    strictEqual(isInteger('4250'), true)
+    strictEqual(isInteger('-4250'), true)
+    strictEqual(isInteger('2.345'), false)
+    strictEqual(isInteger('2a'), false)
+    strictEqual(isInteger('abc'), false)
   })
 })
