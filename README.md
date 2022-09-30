@@ -155,6 +155,8 @@ Svelte component:
 ```html
 <script>
   import { JSONEditor } from 'svelte-jsoneditor'
+
+  let content = { text: '[1,2,3]' }
 </script>
 
 <div>
@@ -166,6 +168,8 @@ JavasScript class:
 
 ```js
 import { JSONEditor } from 'vanilla-jsoneditor'
+
+const content = { text: '[1,2,3]' }
 
 const editor = new JSONEditor({
   target: document.getElementById('jsoneditor'),
@@ -200,7 +204,22 @@ const editor = new JSONEditor({
   const validator = createAjvValidator(schema, schemaDefinitions)
   ```
 
-- `parser: JSON = JSON`. Configure a custom JSON parser, like [`lossless-json`](https://github.com/josdejong/lossless-json). By default, the native `JSON` parser of JavaScript is used. The `JSON` interface is an object with a `parse` and `stringify` function.
+- `parser: JSON = JSON`. Configure a custom JSON parser, like [`lossless-json`](https://github.com/josdejong/lossless-json). By default, the native `JSON` parser of JavaScript is used. The `JSON` interface is an object with a `parse` and `stringify` function. For example:
+
+  ```html
+  <script>
+    import { JSONEditor } from 'svelte-jsoneditor'
+    import { parse, stringify } from 'lossless-json'
+
+    const LosslessJSONParser = { parse, stringify }
+
+    let content = { text: '[1,2,3]' }
+  </script>
+
+  <div>
+    <JSONEditor {content} parser="{LosslessJSONParser}" />
+  </div>
+  ```
 
 - `validationParser: JSON = JSON`. Only applicable when a `validator` is provided. This is the same as `parser`, except that this parser is used to parse the data before sending it to the validator. Configure a custom JSON parser that is used to parse JSON before passing it to the `validator`. By default, the built-in `JSON` parser is used. When passing a custom `validationParser`, make sure the output of the parser is supported by the configured `validator`. So, when the `validationParser` can output `bigint` numbers or other numeric types, the `validator` must also support that. In tree mode, when `parser` is not equal to `validationParser`, the JSON document will be converted before it is passed to the `validator` via `validationParser.parse(parser.stringify(json))`.
 
