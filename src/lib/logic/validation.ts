@@ -57,17 +57,30 @@ export function mapValidationErrors(
 export function validateJSON(
   json: JSONValue,
   validator: Validator | null,
-  convertJSON: (value: JSONValue) => JSONValue
+  parser: JSONParser,
+  validationParser: JSONParser
 ): ValidationError[] {
   debug('validateJSON')
 
-  return validator ? validator(convertJSON(json)) : []
+  if (!validator) {
+    return []
+  }
+
+  if (parser !== validationParser) {
+    // if needed, convert for example Lossless JSON to native JSON
+    // (like replace bigint or LosslessNumber into regular numbers)
+    const convertedJSON = validationParser.parse(parser.stringify(json))
+    return validator(convertedJSON)
+  } else {
+    return validator(json)
+  }
 }
 
 export function validateText(
   text: string,
   validator: Validator | null,
-  parser: JSONParser
+  parser: JSONParser,
+  validationParser: JSONParser
 ): ContentErrors {
   debug('validateText')
 
@@ -91,6 +104,8 @@ export function validateText(
   }
 
   try {
+    // parse with the "main" parser (not the validation parser) to get parse errors
+    // (like syntax errors and duplicate keys errors)
     const json = measure(
       () => parser.parse(text),
       (duration) => debug(`validate: parsed json in ${duration} ms`)
@@ -102,8 +117,18 @@ export function validateText(
       }
     }
 
+    // if needed, parse with the validationParser to be able to feed the json to the validator
+    const convertedJSON =
+      parser === validationParser
+        ? json
+        : measure(
+            () => validationParser.parse(text),
+            (duration) => debug(`validate: parsed json with the validationParser in ${duration} ms`)
+          )
+
+    // actually validate the json
     const validationErrors = measure(
-      () => validator(json),
+      () => validator(convertedJSON),
       (duration) => debug(`validate: validated json in ${duration} ms`)
     )
 

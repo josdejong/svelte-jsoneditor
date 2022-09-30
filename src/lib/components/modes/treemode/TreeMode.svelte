@@ -416,15 +416,8 @@
   let textIsRepaired = false
   $: textIsUnrepairable = text !== undefined && json === undefined
 
-  // if needed, provide a converter to convert non-native JSON to native JSON
-  // (like replace bigint or LosslessNumber into regular numbers)
-  $: validatorJSONConverter =
-    parser !== validationParser
-      ? (value) => validationParser.parse(parser.stringify(value))
-      : (value) => value
-
   let validationErrors: ValidationError[] = []
-  $: updateValidationErrors(json, validator, validatorJSONConverter)
+  $: updateValidationErrors(json, validator, parser, validationParser)
 
   let validationErrorsMap: JSONPointerMap<NestedValidationError>
   $: validationErrorsMap = mapValidationErrors(validationErrors)
@@ -436,13 +429,14 @@
   function updateValidationErrors(
     json: JSONValue,
     validator: Validator | null,
-    convertJSON: (value: JSONValue) => JSONValue
+    parser: JSONParser,
+    validationParser: JSONParser
   ) {
     measure(
       () => {
         let newValidationErrors: ValidationError[]
         try {
-          newValidationErrors = memoizedValidate(json, validator, convertJSON)
+          newValidationErrors = memoizedValidate(json, validator, parser, validationParser)
         } catch (err) {
           newValidationErrors = [
             {
@@ -474,7 +468,7 @@
 
     // make sure the validation results are up-to-date
     // normally, they are only updated on the next tick after the json is changed
-    updateValidationErrors(json, validator, validatorJSONConverter)
+    updateValidationErrors(json, validator, parser, validationParser)
     return {
       validationErrors
     }
