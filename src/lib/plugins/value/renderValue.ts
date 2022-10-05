@@ -14,6 +14,7 @@ export function renderValue({
   enforceString,
   searchResultItems,
   isEditing,
+  parser,
   normalization,
   onPatch,
   onPasteJson,
@@ -44,6 +45,7 @@ export function renderValue({
         path,
         value,
         enforceString,
+        parser,
         normalization,
         onPatch,
         onPasteJson,
@@ -57,7 +59,7 @@ export function renderValue({
   if (!isEditing) {
     renderers.push({
       component: ReadonlyValue as unknown as SvelteComponentTyped, // TODO: casting should not be needed
-      props: { path, value, readOnly, normalization, searchResultItems, onSelect }
+      props: { path, value, readOnly, parser, normalization, searchResultItems, onSelect }
     })
   }
 

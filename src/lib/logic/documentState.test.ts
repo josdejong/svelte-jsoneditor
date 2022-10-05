@@ -24,7 +24,7 @@ import {
   type JSONPointerMap,
   type VisibleSection
 } from '../types.js'
-import type { JSONData, JSONPatchDocument } from 'immutable-json-patch'
+import type { JSONValue, JSONPatchDocument } from 'immutable-json-patch'
 import { compileJSONPointer, deleteIn, setIn } from 'immutable-json-patch'
 
 describe('documentState', () => {
@@ -355,20 +355,20 @@ describe('documentState', () => {
     const json1 = 42
     const documentState1 = createDocumentState()
     assert.strictEqual(
-      getEnforceString(json1, documentState1.enforceStringMap, compileJSONPointer([])),
+      getEnforceString(json1, documentState1.enforceStringMap, compileJSONPointer([]), JSON),
       false
     )
 
     const json2 = '42'
     const documentState2 = createDocumentState()
     assert.strictEqual(
-      getEnforceString(json2, documentState2.enforceStringMap, compileJSONPointer([])),
+      getEnforceString(json2, documentState2.enforceStringMap, compileJSONPointer([]), JSON),
       true
     )
   })
 
   describe('documentStatePatch', () => {
-    function createJsonAndState(): { json: JSONData; documentState: DocumentState } {
+    function createJsonAndState(): { json: JSONValue; documentState: DocumentState } {
       const json = {
         members: [
           { id: 1, name: 'Joe' },
@@ -514,12 +514,15 @@ describe('documentState', () => {
         }
       }
       const pointer = compileJSONPointer([])
-      assert.strictEqual(getEnforceString(json, documentState.enforceStringMap, pointer), true)
+      assert.strictEqual(
+        getEnforceString(json, documentState.enforceStringMap, pointer, JSON),
+        true
+      )
 
       const operations: JSONPatchDocument = [{ op: 'replace', path: '', value: 'forty two' }]
       const res = documentStatePatch(json, documentState, operations)
       assert.deepStrictEqual(
-        getEnforceString(res.json, res.documentState.enforceStringMap, pointer),
+        getEnforceString(res.json, res.documentState.enforceStringMap, pointer, JSON),
         true
       )
     })
@@ -1126,7 +1129,7 @@ describe('documentState', () => {
 /**
  * Helper function to get the visible indices of an Array state
  */
-function getVisibleIndices(json: JSONData, visibleSections: VisibleSection[]): number[] {
+function getVisibleIndices(json: JSONValue, visibleSections: VisibleSection[]): number[] {
   const visibleIndices = []
 
   if (Array.isArray(json)) {

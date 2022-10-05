@@ -2,6 +2,8 @@
 
 A web-based tool to view, edit, format, transform, and validate JSON.
 
+Try it out: https://jsoneditoronline.org
+
 The library is written with Svelte, but can be used in plain JavaScript too and in any framework (SolidJS, React, Vue, Angular, etc).
 
 ![JSONEditor tree mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_tree_mode_screenshot.png)
@@ -88,7 +90,6 @@ Or one-way binding:
     content = updatedContent
   }
 </script>
-F
 
 <div>
   <JSONEditor {content} onChange="{handleChange}" />
@@ -97,7 +98,7 @@ F
 
 ### Standalone bundle (use in React, Vue, Angular, plain JavaScript, ...)
 
-The library provides a standalone bundle of the editor which can be used in any browser environment and framework. In a framework like React, Vue, or Angular, you'll need to write some wrapper code around the class interface.
+The library provides a standalone bundle of the editor via the npm library `vanilla-jsoneditor` (instead of `svelte-jsoneditor`) which can be used in any browser environment and framework. In a framework like React, Vue, or Angular, you'll need to write some wrapper code around the class interface.
 
 Browser example loading the ES module:
 
@@ -139,6 +140,12 @@ Browser example loading the ES module:
 </html>
 ```
 
+### Wrapper libraries for specific frameworks
+
+To make it easier to use the library in your framework of choice, you can use a wrapper library:
+
+- Vue: https://github.com/cloydlau/json-editor-vue
+
 ## API
 
 ### constructor
@@ -148,6 +155,8 @@ Svelte component:
 ```html
 <script>
   import { JSONEditor } from 'svelte-jsoneditor'
+
+  let content = { text: '[1,2,3]' }
 </script>
 
 <div>
@@ -159,6 +168,8 @@ JavasScript class:
 
 ```js
 import { JSONEditor } from 'vanilla-jsoneditor'
+
+const content = { text: '[1,2,3]' }
 
 const editor = new JSONEditor({
   target: document.getElementById('jsoneditor'),
@@ -192,6 +203,25 @@ const editor = new JSONEditor({
 
   const validator = createAjvValidator(schema, schemaDefinitions)
   ```
+
+- `parser: JSON = JSON`. Configure a custom JSON parser, like [`lossless-json`](https://github.com/josdejong/lossless-json). By default, the native `JSON` parser of JavaScript is used. The `JSON` interface is an object with a `parse` and `stringify` function. For example:
+
+  ```html
+  <script>
+    import { JSONEditor } from 'svelte-jsoneditor'
+    import { parse, stringify } from 'lossless-json'
+
+    const LosslessJSONParser = { parse, stringify }
+
+    let content = { text: '[1,2,3]' }
+  </script>
+
+  <div>
+    <JSONEditor {content} parser="{LosslessJSONParser}" />
+  </div>
+  ```
+
+- `validationParser: JSON = JSON`. Only applicable when a `validator` is provided. This is the same as `parser`, except that this parser is used to parse the data before sending it to the validator. Configure a custom JSON parser that is used to parse JSON before passing it to the `validator`. By default, the built-in `JSON` parser is used. When passing a custom `validationParser`, make sure the output of the parser is supported by the configured `validator`. So, when the `validationParser` can output `bigint` numbers or other numeric types, the `validator` must also support that. In tree mode, when `parser` is not equal to `validationParser`, the JSON document will be converted before it is passed to the `validator` via `validationParser.parse(parser.stringify(json))`.
 
 - `onError(err: Error)`.
   Callback fired when an error occurs. Default implementation is to log an error in the console and show a simple alert message to the user.

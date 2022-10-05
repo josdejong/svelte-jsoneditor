@@ -27,6 +27,9 @@
       <a href="examples/custom_validation">Custom validation</a>
     </li>
     <li>
+      <a href="examples/custom_json_parser">Custom JSON Parser (Lossless JSON)</a>
+    </li>
+    <li>
       <a href="examples/custom_value_renderer">Custom value renderer (password, enum)</a>
     </li>
     <li>

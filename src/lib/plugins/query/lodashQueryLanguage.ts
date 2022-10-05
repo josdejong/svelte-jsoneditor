@@ -3,7 +3,8 @@ import { last } from 'lodash-es'
 import { createPropertySelector, stringifyPath } from '../../utils/pathUtils.js'
 import { parseString } from '../../utils/stringUtils.js'
 import type { QueryLanguage, QueryLanguageOptions } from '../../types'
-import type { JSONData, JSONPath } from 'immutable-json-patch'
+import type { JSONPath, JSONValue } from 'immutable-json-patch'
+import { isInteger } from '../../utils/typeUtils.js'
 
 const description = `
 <p>
@@ -23,7 +24,7 @@ export const lodashQueryLanguage: QueryLanguage = {
   executeQuery
 }
 
-function createQuery(json: JSONData, queryOptions: QueryLanguageOptions): string {
+function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): string {
   const { filter, sort, projection } = queryOptions
   const queryParts = []
 
@@ -32,8 +33,13 @@ function createQuery(json: JSONData, queryOptions: QueryLanguageOptions): string
     // so a filter value like '5' (text) will match numbers like 5 too.
     const actualValueGetter = `item => item${createPropertySelector(filter.path)}`
 
+    const filterValue = parseString(filter.value)
     const filterValueStr =
-      typeof parseString(filter.value) === 'string' ? `'${filter.value}'` : filter.value
+      typeof filterValue === 'string'
+        ? `'${filter.value}'`
+        : isInteger(filter.value) && !Number.isSafeInteger(filterValue)
+        ? `${filter.value}n` // bigint
+        : filter.value
 
     queryParts.push(
       `  data = _.filter(data, ${actualValueGetter} ${filter.relation} ${filterValueStr})\n`
@@ -69,7 +75,7 @@ function createQuery(json: JSONData, queryOptions: QueryLanguageOptions): string
   return `function query (data) {\n${queryParts.join('')}}`
 }
 
-function executeQuery(json: JSONData, query: string): JSONData {
+function executeQuery(json: JSONValue, query: string): JSONValue {
   // FIXME: replace unsafe new Function with a JS based query language
   //  As long as we don't persist or fetch queries, there is no security risk.
   // TODO: only import the most relevant subset of lodash instead of the full library?

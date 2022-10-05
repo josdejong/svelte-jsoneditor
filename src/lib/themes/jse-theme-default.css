@@ -29,6 +29,13 @@
   --jse-modal-overlay-background: rgba(0, 0, 0, 0.3);
   --jse-modal-code-background: rgba(0, 0, 0, 0.05);
 
+  /* tooltip in text mode */
+  --jse-tooltip-color: var(--jse-text-color);
+  --jse-tooltip-background: var(--jse-modal-background);
+  --jse-tooltip-border: var(--jse-main-border);
+  --jse-tooltip-action-button-color: var(--jse-text-color-inverse);
+  --jse-tooltip-action-button-background: #4d4d4d;
+
   /* panels: navigation bar, gutter, search box */
   --jse-panel-background: #ebebeb;
   --jse-panel-color: var(--jse-text-color);

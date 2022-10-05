@@ -56,50 +56,52 @@ describe('operations', () => {
   })
 
   it('should turn clipboard text into an array with key/value pairs', () => {
-    assert.deepStrictEqual(clipboardToValues('42'), [{ key: 'New item', value: 42 }])
+    assert.deepStrictEqual(clipboardToValues('42', JSON), [{ key: 'New item', value: 42 }])
 
-    assert.deepStrictEqual(clipboardToValues('Hello world'), [
+    assert.deepStrictEqual(clipboardToValues('Hello world', JSON), [
       { key: 'New item', value: 'Hello world' }
     ])
 
-    assert.deepStrictEqual(clipboardToValues('"Hello world"'), [
+    assert.deepStrictEqual(clipboardToValues('"Hello world"', JSON), [
       { key: 'New item', value: 'Hello world' }
     ])
 
-    assert.deepStrictEqual(clipboardToValues('[1,2,3]'), [{ key: 'New item', value: [1, 2, 3] }])
+    assert.deepStrictEqual(clipboardToValues('[1,2,3]', JSON), [
+      { key: 'New item', value: [1, 2, 3] }
+    ])
 
-    assert.deepStrictEqual(clipboardToValues('{"a": 2, "b": 3}'), [
+    assert.deepStrictEqual(clipboardToValues('{"a": 2, "b": 3}', JSON), [
       { key: 'New item', value: { a: 2, b: 3 } }
     ])
 
     // partial array
-    assert.deepStrictEqual(clipboardToValues('1, 2, 3,'), [
+    assert.deepStrictEqual(clipboardToValues('1, 2, 3,', JSON), [
       { key: 'New item 0', value: 1 },
       { key: 'New item 1', value: 2 },
       { key: 'New item 2', value: 3 }
     ])
-    assert.deepStrictEqual(clipboardToValues('1,\n2,\n3,\n'), [
+    assert.deepStrictEqual(clipboardToValues('1,\n2,\n3,\n', JSON), [
       { key: 'New item 0', value: 1 },
       { key: 'New item 1', value: 2 },
       { key: 'New item 2', value: 3 }
     ])
-    assert.deepStrictEqual(clipboardToValues('1,\n2,\n3\n'), [
+    assert.deepStrictEqual(clipboardToValues('1,\n2,\n3\n', JSON), [
       { key: 'New item 0', value: 1 },
       { key: 'New item 1', value: 2 },
       { key: 'New item 2', value: 3 }
     ])
-    assert.deepStrictEqual(clipboardToValues('{"id":1},{"id":2},{"id":3}'), [
+    assert.deepStrictEqual(clipboardToValues('{"id":1},{"id":2},{"id":3}', JSON), [
       { key: 'New item 0', value: { id: 1 } },
       { key: 'New item 1', value: { id: 2 } },
       { key: 'New item 2', value: { id: 3 } }
     ])
 
     // partial object
-    assert.deepStrictEqual(clipboardToValues('"a": 2,\n"b": 3,\n'), [
+    assert.deepStrictEqual(clipboardToValues('"a": 2,\n"b": 3,\n', JSON), [
       { key: 'a', value: 2 },
       { key: 'b', value: 3 }
     ])
-    assert.deepStrictEqual(clipboardToValues('"a": 2,\n"b": 3\n'), [
+    assert.deepStrictEqual(clipboardToValues('"a": 2,\n"b": 3\n', JSON), [
       { key: 'a', value: 2 },
       { key: 'b', value: 3 }
     ])

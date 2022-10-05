@@ -8,16 +8,18 @@
   import { addNewLineSuffix } from '$lib/utils/domUtils'
   import type {
     ExtendedSearchResultItem,
-    JSONData,
-    OnSelect,
+    JSONParser,
     JSONPath,
+    JSONValue,
+    OnSelect,
     ValueNormalization
   } from '../../../types'
 
   export let path: JSONPath
-  export let value: JSONData
+  export let value: JSONValue
   export let readOnly: boolean
   export let normalization: ValueNormalization
+  export let parser: JSONParser
   export let onSelect: OnSelect
 
   export let searchResultItems: ExtendedSearchResultItem[] | undefined
@@ -43,7 +45,7 @@
 
 <div
   data-type="selectable-value"
-  class={getValueClass(value)}
+  class={getValueClass(value, parser)}
   on:click={handleValueClick}
   on:dblclick={handleValueDoubleClick}
   title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : null}

@@ -2,10 +2,10 @@
 
 import path from 'path'
 import { readFileSync, writeFileSync } from 'fs'
-import { dirname } from './dirname.cjs'
+import { getAbsolutePath } from './getAbsolutePath.mjs'
 import { getFilesRecursively } from './getFilesRecursively.js'
 
-const vanillaPackageFolder = path.join(dirname, '..', 'package-vanilla')
+const vanillaPackageFolder = getAbsolutePath(import.meta.url, '..', 'package-vanilla')
 
 // collect all file names and generate the exports map for package.json
 const exports = {
@@ -20,7 +20,7 @@ filenames.forEach((filename) => {
 })
 
 // generate a package.json
-const pkg = JSON.parse(String(readFileSync(path.join(dirname, '..', 'package.json'))))
+const pkg = JSON.parse(String(readFileSync(getAbsolutePath(import.meta.url, '..', 'package.json'))))
 const vanillaPackage = {
   ...pkg,
   name: 'vanilla-jsoneditor',

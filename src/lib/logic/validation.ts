@@ -1,13 +1,14 @@
 import { initial } from 'lodash-es'
 import type {
   ContentErrors,
+  JSONParser,
   JSONPointerMap,
   NestedValidationError,
   ValidationError,
   Validator
 } from '../types.js'
 import { ValidationSeverity } from '../types.js'
-import { compileJSONPointer, type JSONData } from 'immutable-json-patch'
+import { compileJSONPointer, type JSONValue } from 'immutable-json-patch'
 import { MAX_AUTO_REPAIRABLE_SIZE, MAX_VALIDATABLE_SIZE } from '../constants.js'
 import { measure } from '../utils/timeUtils.js'
 import { normalizeJsonParseError } from '../utils/jsonUtils.js'
@@ -53,12 +54,34 @@ export function mapValidationErrors(
   return map
 }
 
-export function validateJSON(json: JSONData, validator: Validator): ValidationError[] {
+export function validateJSON(
+  json: JSONValue,
+  validator: Validator | null,
+  parser: JSONParser,
+  validationParser: JSONParser
+): ValidationError[] {
   debug('validateJSON')
-  return validator(json)
+
+  if (!validator) {
+    return []
+  }
+
+  if (parser !== validationParser) {
+    // if needed, convert for example Lossless JSON to native JSON
+    // (like replace bigint or LosslessNumber into regular numbers)
+    const convertedJSON = validationParser.parse(parser.stringify(json))
+    return validator(convertedJSON)
+  } else {
+    return validator(json)
+  }
 }
 
-export function validateText(text: string, validator: Validator): ContentErrors {
+export function validateText(
+  text: string,
+  validator: Validator | null,
+  parser: JSONParser,
+  validationParser: JSONParser
+): ContentErrors {
   debug('validateText')
 
   if (text.length > MAX_VALIDATABLE_SIZE) {
@@ -81,8 +104,10 @@ export function validateText(text: string, validator: Validator): ContentErrors 
   }
 
   try {
+    // parse with the "main" parser (not the validation parser) to get parse errors
+    // (like syntax errors and duplicate keys errors)
     const json = measure(
-      () => JSON.parse(text),
+      () => parser.parse(text),
       (duration) => debug(`validate: parsed json in ${duration} ms`)
     )
 
@@ -92,15 +117,25 @@ export function validateText(text: string, validator: Validator): ContentErrors 
       }
     }
 
+    // if needed, parse with the validationParser to be able to feed the json to the validator
+    const convertedJSON =
+      parser === validationParser
+        ? json
+        : measure(
+            () => validationParser.parse(text),
+            (duration) => debug(`validate: parsed json with the validationParser in ${duration} ms`)
+          )
+
+    // actually validate the json
     const validationErrors = measure(
-      () => validator(json),
+      () => validator(convertedJSON),
       (duration) => debug(`validate: validated json in ${duration} ms`)
     )
 
     return { validationErrors }
   } catch (err) {
     const isRepairable = measure(
-      () => canAutoRepair(text),
+      () => canAutoRepair(text, parser),
       (duration) => debug(`validate: checked whether repairable in ${duration} ms`)
     )
 
@@ -113,13 +148,13 @@ export function validateText(text: string, validator: Validator): ContentErrors 
   }
 }
 
-function canAutoRepair(text) {
+function canAutoRepair(text: string, parser: JSONParser): boolean {
   if (text.length > MAX_AUTO_REPAIRABLE_SIZE) {
     return false
   }
 
   try {
-    JSON.parse(jsonrepair(text))
+    parser.parse(jsonrepair(text))
 
     return true
   } catch (err) {

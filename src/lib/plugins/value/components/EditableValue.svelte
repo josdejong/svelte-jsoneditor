@@ -1,17 +1,25 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONData, JSONPath } from 'immutable-json-patch'
+  import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils'
   import { createValueSelection, getSelectionNextInside } from '../../../logic/selection'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
   import EditableDiv from '../../../components/controls/EditableDiv.svelte'
   import { UPDATE_SELECTION } from '../../../constants.js'
-  import type { OnFind, OnPasteJson, OnPatch, OnSelect, ValueNormalization } from '../../../types'
+  import type {
+    JSONParser,
+    OnFind,
+    OnPasteJson,
+    OnPatch,
+    OnSelect,
+    ValueNormalization
+  } from '../../../types'
 
   export let path: JSONPath
-  export let value: JSONData
+  export let value: JSONValue
+  export let parser: JSONParser
   export let normalization: ValueNormalization
   export let enforceString: boolean
   export let onPatch: OnPatch
@@ -21,7 +29,7 @@
   export let focus: () => void
 
   function convert(value: string) {
-    return enforceString ? value : stringConvert(value)
+    return enforceString ? value : stringConvert(value, parser)
   }
 
   function handleChangeValue(newValue: string, updateSelection: string) {
@@ -60,7 +68,7 @@
 
   function handlePaste(pastedText: string): void {
     try {
-      const pastedJson = JSON.parse(pastedText)
+      const pastedJson = parser.parse(pastedText)
       if (isObjectOrArray(pastedJson)) {
         onPasteJson({
           path,
@@ -74,7 +82,7 @@
   }
 
   function handleOnValueClass(value: string): string {
-    return getValueClass(convert(normalization.unescapeValue(value)))
+    return getValueClass(convert(normalization.unescapeValue(value)), parser)
   }
 </script>
 

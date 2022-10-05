@@ -1,13 +1,12 @@
 import { readFileSync, writeFileSync } from 'fs'
-import { dirname } from './dirname.cjs'
-import path from 'path'
+import { getAbsolutePath } from './getAbsolutePath.mjs'
 
 const declareModuleSection = `declare module '*.svelte' {
     export { SvelteComponentDev as default } from 'svelte/internal';
 }
 `
 
-const filename = path.join(dirname, '..', 'package-vanilla', 'index.d.ts')
+const filename = getAbsolutePath(import.meta.url, '..', 'package-vanilla', 'index.d.ts')
 const contents = String(readFileSync(filename))
 
 const index = contents.indexOf(declareModuleSection)

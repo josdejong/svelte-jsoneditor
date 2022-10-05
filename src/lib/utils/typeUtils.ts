@@ -1,18 +1,27 @@
 // TODO: unit test typeUtils.js
 
+import { isDigit, isNumber } from './numberUtils.js'
+import type { JSONParser } from '../types.js'
+
 /**
- * Test whether a value is an Object (and not an Array!)
+ * Test whether a value is an Object (and not an Array or Class)
  */
 export function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
+  return (
+    typeof value === 'object' && value !== null && value.constructor === Object // do not match on classes or Array
+  )
 }
 
 /**
- * Test whether a value is an Object or an Array
+ * Test whether a value is an Object or an Array (and not a Class)
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function isObjectOrArray(value: unknown): value is Object | Array<unknown> {
-  return typeof value === 'object' && value !== null
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    (value.constructor === Object || value.constructor === Array)
+  )
 }
 
 /**
@@ -28,16 +37,31 @@ export function isBoolean(value: unknown): value is boolean {
 /**
  * Test whether a value is a timestamp in milliseconds after the year 2000.
  */
-export function isTimestamp(value: unknown): value is number {
+export function isTimestamp(value: unknown): boolean {
   const YEAR_2000 = 946684800000
 
-  return (
-    typeof value === 'number' &&
-    value > YEAR_2000 &&
-    isFinite(value) &&
-    Math.floor(value) === value &&
-    !isNaN(new Date(value).valueOf())
-  )
+  if (typeof value === 'number') {
+    return (
+      value > YEAR_2000 &&
+      isFinite(value) &&
+      Math.floor(value) === value &&
+      !isNaN(new Date(value).valueOf())
+    )
+  }
+
+  if (typeof value === 'bigint') {
+    return isTimestamp(Number(value))
+  }
+
+  // try getting the primitive value if that is different. For example when having a LosslessNumber
+  try {
+    const valueOf = value.valueOf()
+    if (valueOf !== value) {
+      return isTimestamp(valueOf)
+    }
+  } catch (err) {
+    return false
+  }
 }
 
 /**
@@ -69,30 +93,42 @@ export function isColor(value: unknown): boolean {
 /**
  * Get the type of the value
  */
-export function valueType(value: unknown): string {
-  if (value === null) {
-    return 'null'
+// TODO: unit test valueType()
+export function valueType(value: unknown, parser: JSONParser): string {
+  // primitive types
+  if (
+    typeof value === 'number' ||
+    typeof value === 'string' ||
+    typeof value === 'boolean' ||
+    value === null
+  ) {
+    return typeof value
   }
-  if (value === undefined) {
-    return 'undefined'
-  }
-  if (typeof value === 'number') {
-    return 'number'
-  }
-  if (typeof value === 'string') {
-    return 'string'
-  }
-  if (typeof value === 'boolean') {
-    return 'boolean'
-  }
-  if (value instanceof RegExp) {
-    return 'regexp'
-  }
+
   if (Array.isArray(value)) {
     return 'array'
   }
+  if (isObject(value)) {
+    // plain object only
+    return 'object'
+  }
 
-  return 'object'
+  // unknown type. Try out what stringfying results in
+  const valueStr = parser.stringify(value)
+  if (valueStr[0] === '"') {
+    return 'string'
+  }
+  if (isDigit(valueStr[0])) {
+    return 'number'
+  }
+  if (valueStr === 'true' || valueStr === 'false') {
+    return 'boolean'
+  }
+  if (valueStr === 'null') {
+    return 'null'
+  }
+
+  return 'unknown'
 }
 
 /**
@@ -108,38 +144,45 @@ export function isUrl(text: unknown): boolean {
  * Convert contents of a string to the correct JSON type. This can be a string,
  * a number, a boolean, etc
  */
-export function stringConvert(str: string): string | null | boolean | number {
+export function stringConvert(str: string, parser: JSONParser): unknown {
   if (str === '') {
     return ''
   }
 
-  if (str === 'null') {
+  const strTrim = str.trim()
+
+  if (strTrim === 'null') {
     return null
   }
 
-  if (str === 'true') {
+  if (strTrim === 'true') {
     return true
   }
 
-  if (str === 'false') {
+  if (strTrim === 'false') {
     return false
   }
 
-  const num = Number(str)
-  if (
-    !isNaN(num) && // will nicely fail with '123ab'
-    !isNaN(parseFloat(str)) // will nicely fail with '  '
-  ) {
-    return num
-  } else {
-    return str
+  if (isNumber(strTrim)) {
+    return parser.parse(strTrim)
   }
+
+  return str
 }
 
 /**
  * Test whether a string contains a numeric, boolean, or null value.
  * Returns true when the string contains a number, boolean, or null.
  */
-export function isStringContainingPrimitiveValue(str: unknown): boolean {
-  return typeof str === 'string' && typeof stringConvert(str) !== 'string'
+export function isStringContainingPrimitiveValue(str: unknown, parser: JSONParser): boolean {
+  return typeof str === 'string' && typeof stringConvert(str, parser) !== 'string'
 }
+
+/**
+ * Test whether a string contains an integer number
+ */
+export function isInteger(value: string): boolean {
+  return INTEGER_REGEX.test(value)
+}
+
+const INTEGER_REGEX = /^-?[0-9]+$/

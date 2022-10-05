@@ -2,6 +2,72 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.9](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.8...v0.7.9) (2022-09-30)
+
+
+### Bug Fixes
+
+* [#123](https://github.com/josdejong/svelte-jsoneditor/issues/123) use the main `parser` instead of `validationParser` to determine any parse errors ([c18ede3](https://github.com/josdejong/svelte-jsoneditor/commit/c18ede30070f27a612b8019a77feaca97500e1bf))
+
+### [0.7.8](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.7...v0.7.8) (2022-09-29)
+
+
+### Bug Fixes
+
+* [#153](https://github.com/josdejong/svelte-jsoneditor/issues/153) code using a missing dependency `lossless-json` ([4a34214](https://github.com/josdejong/svelte-jsoneditor/commit/4a34214703843f0af6a0253652649cc33083b746))
+
+### [0.7.7](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.6...v0.7.7) (2022-09-29)
+
+
+### Features
+
+* implemented options `parser` and `validationParser` to support alternative JSON parsers like lossless-json ([#151](https://github.com/josdejong/svelte-jsoneditor/issues/151)) ([b47368b](https://github.com/josdejong/svelte-jsoneditor/commit/b47368b7de4c90bab89572210c869eaba64348a7))
+
+### [0.7.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.5...v0.7.6) (2022-09-28)
+
+
+### Bug Fixes
+
+* [#149](https://github.com/josdejong/svelte-jsoneditor/issues/149) double quote and unicode characters of control characters not being escaped correctly ([ab213e6](https://github.com/josdejong/svelte-jsoneditor/commit/ab213e6cf276d5556f675ccfd73d8b8265b40283))
+* escaping unicode characters not triggered when loading a document in text mode ([9dedca0](https://github.com/josdejong/svelte-jsoneditor/commit/9dedca039faa887805bd4b0755276c09d3671a45))
+
+### [0.7.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.4...v0.7.5) (2022-09-21)
+
+
+### Bug Fixes
+
+* [#98](https://github.com/josdejong/svelte-jsoneditor/issues/98) make copy compatible on non-secure origins and older browser ([#144](https://github.com/josdejong/svelte-jsoneditor/issues/144)) ([d43a646](https://github.com/josdejong/svelte-jsoneditor/commit/d43a6465cd01f91fe8d1634038dfcf67fa578c81))
+
+### [0.7.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.3...v0.7.4) (2022-09-12)
+
+
+### Bug Fixes
+
+* [#130](https://github.com/josdejong/svelte-jsoneditor/issues/130) do not open mobile keyboard when the editor is readonly ([1c669fa](https://github.com/josdejong/svelte-jsoneditor/commit/1c669fa731468bcabdcd72935fff468511a6fe5b))
+* [#138](https://github.com/josdejong/svelte-jsoneditor/issues/138) text of tooltip in text mode not readable when using a dark theme ([5e7790e](https://github.com/josdejong/svelte-jsoneditor/commit/5e7790e6fec93b9a8f6646ab4a064d12f9f74762))
+* [#139](https://github.com/josdejong/svelte-jsoneditor/issues/139) cannot use numpad keyboard to enter numbers in tree mode ([e2383d9](https://github.com/josdejong/svelte-jsoneditor/commit/e2383d94d2e51dc8d774122deb05ef0092095851))
+* inserting non capital case characters ([861f36d](https://github.com/josdejong/svelte-jsoneditor/commit/861f36db8a5f725e7716a34d72c7743659b8c823))
+* let `text` mode not change json contents directly into text contents, and prevent freezing when loading a large document ([#141](https://github.com/josdejong/svelte-jsoneditor/issues/141)) ([28b2b56](https://github.com/josdejong/svelte-jsoneditor/commit/28b2b5687d899533e45248eb76afef6aa8d10594))
+
+### [0.7.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.2...v0.7.3) (2022-09-09)
+
+
+### Bug Fixes
+
+* circular dependency caused by an unused import ([65a4f5d](https://github.com/josdejong/svelte-jsoneditor/commit/65a4f5d6041b3fd5de0eebc57b9603a0112c01f2))
+
+### [0.7.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.1...v0.7.2) (2022-09-09)
+
+
+### Features
+
+* update all dependencies ([dff38e3](https://github.com/josdejong/svelte-jsoneditor/commit/dff38e3ad7ec490e6fe34ef584f1622e8cae7b2f))
+
+
+### Bug Fixes
+
+* mark the package as side-effects free, allowing better optimization in bundlers ([23c1816](https://github.com/josdejong/svelte-jsoneditor/commit/23c1816ea3518360f3f0fd13ebf7acd9abb6d5a5))
+
 ### [0.7.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.0...v0.7.1) (2022-09-05)
 
 

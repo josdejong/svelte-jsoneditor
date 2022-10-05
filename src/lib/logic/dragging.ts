@@ -1,6 +1,6 @@
 import { createMultiSelection, getEndPath, getStartPath } from './selection.js'
 import { initial, isEqual } from 'lodash-es'
-import type { JSONData, JSONPatchDocument } from 'immutable-json-patch'
+import type { JSONValue, JSONPatchDocument } from 'immutable-json-patch'
 import { getIn } from 'immutable-json-patch'
 import { moveInsideParent } from './operations.js'
 import type {
@@ -13,7 +13,7 @@ import type {
 } from '../types'
 
 export interface MoveSelectionProps {
-  json: JSONData
+  json: JSONValue
   documentState: DocumentState
   deltaY: number
   items: RenderedItem[]
@@ -127,7 +127,7 @@ function findSwapPathDown({
 
 interface UpdatedArraySelectionProps {
   items: RenderedItem[]
-  json: JSONData
+  json: JSONValue
   selection: JSONSelection
   offset: number
 }

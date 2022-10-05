@@ -1,22 +1,23 @@
-import type { JSONData, JSONObject, JSONPath } from 'immutable-json-patch'
+import type { JSONObject, JSONPath, JSONValue } from 'immutable-json-patch'
 import { compileJSONPointer } from 'immutable-json-patch'
 import jsonSourceMap from 'json-source-map'
 import jsonrepair from 'jsonrepair'
 import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
 import { arrayToObject, objectToArray } from './arrayUtils.js'
-import type { Content, ParseError, TextContent, TextLocation } from '../types'
+import type { Content, JSONParser, ParseError, TextContent, TextLocation } from '../types'
 import { int } from './numberUtils.js'
+import type { JavaScriptValue } from 'lossless-json'
 
 /**
  * Parse the JSON. if this fails, try to repair and parse.
  * Throws an exception when the JSON is invalid and could not be parsed.
  */
-export function parseAndRepair(jsonText: string): JSONData {
+export function parseAndRepair(jsonText: string, parser: JSONParser): JavaScriptValue {
   try {
-    return JSON.parse(jsonText)
+    return parser.parse(jsonText)
   } catch (err) {
     // this can also throw
-    return JSON.parse(jsonrepair(jsonText))
+    return parser.parse(jsonrepair(jsonText))
   }
 }
 
@@ -24,16 +25,22 @@ export function parseAndRepair(jsonText: string): JSONData {
  * Parse the JSON and if needed repair it.
  * When not valid, undefined is returned.
  */
-export function parseAndRepairOrUndefined(partialJson: string): JSONData | undefined {
+export function parseAndRepairOrUndefined(
+  partialJson: string,
+  parser: JSONParser
+): JavaScriptValue | undefined {
   try {
-    return parseAndRepair(partialJson)
+    return parseAndRepair(partialJson, parser)
   } catch (err) {
     return undefined
   }
 }
 
 // TODO: deduplicate the logic in repairPartialJson and parseAndRepairPartialJson ?
-export function parsePartialJson(partialJson: string, parse = JSON.parse): JSONData {
+export function parsePartialJson(
+  partialJson: string,
+  parse: (text: string) => JavaScriptValue
+): JavaScriptValue {
   // for now: dumb brute force approach: simply try out a few things...
 
   // remove trailing comma
@@ -103,7 +110,7 @@ const END_WITH_COMMA_AND_OPTIONAL_WHITESPACES_REGEX = /,\s*$/
  * and return the line and column numbers in an object
  *
  * Note that the returned line and column number in the object are zero-based,
- * and in the message are one based (human readable)
+ * and in the message are one based (human-readable)
  */
 export function normalizeJsonParseError(jsonText: string, parseErrorMessage: string): ParseError {
   const positionMatch = POSITION_REGEX.exec(parseErrorMessage)
@@ -214,7 +221,11 @@ export function findTextLocation(text: string, path: JSONPath): TextLocation | n
  * Convert a JSON object, array, or value to another type
  * If it cannot be converted, an error is thrown
  */
-export function convertValue(value: JSONData, type: 'value' | 'object' | 'array'): JSONData {
+export function convertValue(
+  value: JSONValue,
+  type: 'value' | 'object' | 'array',
+  parser: JSONParser
+): JSONValue {
   // FIXME: improve the TypeScript here, there are a couple of conversions
   if (type === 'array') {
     if (Array.isArray(value)) {
@@ -227,7 +238,7 @@ export function convertValue(value: JSONData, type: 'value' | 'object' | 'array'
     }
 
     if (typeof value === 'string') {
-      const parsedValue = JSON.parse(value)
+      const parsedValue = parser.parse(value)
 
       if (Array.isArray(parsedValue)) {
         return parsedValue
@@ -252,7 +263,7 @@ export function convertValue(value: JSONData, type: 'value' | 'object' | 'array'
     }
 
     if (typeof value === 'string') {
-      const parsedValue = JSON.parse(value)
+      const parsedValue = parser.parse(value)
 
       if (isObject(parsedValue)) {
         return parsedValue as JSONObject
@@ -266,14 +277,14 @@ export function convertValue(value: JSONData, type: 'value' | 'object' | 'array'
 
   if (type === 'value') {
     if (isObjectOrArray(value)) {
-      return JSON.stringify(value)
+      return parser.stringify(value)
     }
 
     // nothing to do
     return value
   }
 
-  throw new Error(`Cannot convert ${valueType(value)} to ${type}`)
+  throw new Error(`Cannot convert ${valueType(value, parser)} to ${type}`)
 }
 
 /**
@@ -308,6 +319,13 @@ export function validateContentType(content: unknown): string | null {
  */
 export function isTextContent(content: Content): content is TextContent {
   return typeof (content as Record<string, unknown>).text === 'string'
+}
+
+/**
+ * Get the contents as Text. If the contents is JSON, the JSON will be parsed.
+ */
+export function getText(content: Content, indentation: number | string, parser: JSONParser) {
+  return isTextContent(content) ? content.text : parser.stringify(content.json, null, indentation)
 }
 
 /**
@@ -386,3 +404,11 @@ export function estimateSerializedSize(content: Content, maxSize = Infinity): nu
 const POSITION_REGEX = /(position|char) (\d+)/
 const LINE_REGEX = /line (\d+)/
 const COLUMN_REGEX = /column (\d+)/
+
+/**
+ * Check whether the actual functions of parse and stringify are strictly equal.
+ * The object holding the functions may be a differing instance.
+ */
+export function isEqualParser(a: JSONParser, b: JSONParser): boolean {
+  return a.parse === b.parse && a.stringify === b.stringify
+}
