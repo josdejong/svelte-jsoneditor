@@ -8,13 +8,15 @@
     JSONEditorContext,
     JSONPatchResult,
     JSONSelection,
+    JSONParser,
     OnRenderValue,
     PastedJson,
     ValueNormalization
   } from '../../../types'
   import TableMenu from './menu/TableMenu.svelte'
   import type { JSONArray, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-  import { isJSONArray, isTextContent } from '../../../utils/jsonUtils'
+  import { isJSONArray } from 'immutable-json-patch'
+  import { isTextContent } from '../../../utils/jsonUtils'
   import { getColumns } from '../../../logic/table.js'
   import { noop } from '../../../utils/noop'
   import { isEmpty } from 'lodash-es'
@@ -26,6 +28,7 @@
   export let mainMenuBar = true
   export let escapeControlCharacters = false
   export let escapeUnicodeCharacters = false
+  export let parser: JSONParser
   export let onRenderValue: OnRenderValue
   export let onRenderMenu = noop
 
@@ -104,6 +107,7 @@
   let context: JSONEditorContext
   $: context = {
     readOnly,
+    parser,
     normalization,
     focus,
     onPatch: handlePatch,

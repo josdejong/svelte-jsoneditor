@@ -453,6 +453,7 @@
             {mainMenuBar}
             {escapeControlCharacters}
             {escapeUnicodeCharacters}
+            {parser}
             {onRenderValue}
             onRenderMenu={handleRenderMenu}
           />

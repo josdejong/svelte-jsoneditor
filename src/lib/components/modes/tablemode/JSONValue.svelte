@@ -22,6 +22,7 @@
     enforceString,
     isSelected,
     isEditing,
+    parser: context.parser,
     normalization: context.normalization,
     selection,
     searchResultItems,
