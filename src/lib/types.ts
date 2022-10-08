@@ -121,6 +121,14 @@ export interface DropdownButtonItem {
   disabled?: boolean
 }
 
+export interface CustomDropdownButtonItem {
+  text: string
+  onClick: (structure: string) => void
+  structure: string
+  title?: string
+  disabled?: boolean
+}
+
 export interface MenuButtonItem {
   onClick: () => void
   icon?: FontAwesomeIcon

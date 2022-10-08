@@ -133,13 +133,15 @@
     TreeModeContext,
     ValidationError,
     Validator,
-    ValueNormalization
+    ValueNormalization,
+    CustomDropdownButtonItem
   } from '$lib/types'
   import { isAfterSelection, isInsideSelection, isKeySelection } from '../../../logic/selection'
   import { truncate } from '../../../utils/stringUtils.js'
   import { MAX_CHARACTERS_TEXT_PREVIEW } from '../../../constants.js'
   import memoizeOne from 'memoize-one'
   import { isTextContent } from '$lib'
+  import CustomDropdownButton from '$lib/components/controls/CustomDropdownButton.svelte'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -181,6 +183,10 @@
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
   let modalOpen = false
+
+  //Used to control the visibility of a custuom drop down buttton for the context menu.
+  export let customDropdownButton: Boolean
+  export let customDropdownItems: CustomDropdownButtonItem[]
 
   createFocusTracker({
     onMount,
@@ -2000,6 +2006,8 @@
     showTip
   }: AbsolutePopupOptions) {
     const props = {
+      customDropdownButton,
+      customDropdownItems,
       json,
       documentState: documentState,
       showTip,
@@ -2101,7 +2109,6 @@
     if (readOnly) {
       return
     }
-
     openContextMenu({
       anchor: findParentWithNodeName(event.target, 'BUTTON'),
       offsetTop: 0,
@@ -2261,6 +2268,7 @@
       onContextMenu={handleContextMenuFromTreeMenu}
       onCopy={handleCopy}
       {onRenderMenu}
+      {customDropdownButton}
     />
   {/if}
 

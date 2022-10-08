@@ -34,6 +34,7 @@ import {
 } from './selection.js'
 import type { ClipboardValues, DragInsideAction, JSONSelection } from '../types'
 import { int } from '../utils/numberUtils.js'
+import { text } from 'svelte/internal'
 
 /**
  * Create a JSONPatch for an insert operation.
@@ -518,7 +519,7 @@ export function moveInsideParent(
 export function createNewValue(
   json: JSONData,
   selection: JSONSelection,
-  valueType: 'object' | 'array' | 'structure' | 'value'
+  valueType: 'object' | 'array' | 'structure' | 'value' | 'custom structure'
 ) {
   if (valueType === 'object') {
     return {}
@@ -539,8 +540,8 @@ export function createNewValue(
           return Array.isArray(value)
             ? []
             : isObject(value)
-            ? undefined // leave object as is, will recurse into it
-            : ''
+              ? undefined // leave object as is, will recurse into it
+              : ''
         })
       } else {
         // just a primitive value
@@ -548,7 +549,15 @@ export function createNewValue(
       }
     }
   }
-
+  try {
+    const val = valueType.slice(0, 16)
+    const struc = valueType.slice(17)
+    if (val === 'custom structure') {
+      return JSON.parse(struc)
+    }
+  } catch (error) {
+    console.error(error)
+  }
   // type === value,
   // or type === structure but the parent is no array or an array containing
   // primitive values (and no objects having any structure).

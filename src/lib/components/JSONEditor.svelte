@@ -36,7 +36,8 @@
     SortModalCallback,
     TransformModalCallback,
     TransformModalOptions,
-    Validator
+    Validator,
+    CustomDropdownButtonItem
   } from '../types'
   import { Mode } from '../types'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
@@ -75,6 +76,9 @@
   export let onFocus: OnFocus = noop
   export let onBlur: OnBlur = noop
 
+  //Used to control the visibility of a custuom drop down buttton for the context menu.
+  export let customDropdownButton: Boolean = false
+  export let customDropdownItems: CustomDropdownButtonItem[]
   let instanceId = uniqueId()
 
   let hasFocus = false
@@ -446,6 +450,8 @@
             onRenderMenu={handleRenderMenu}
             {onSortModal}
             {onTransformModal}
+            {customDropdownButton}
+            {customDropdownItems}
           />
         {/if}
       {/key}

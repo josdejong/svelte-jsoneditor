@@ -20,6 +20,8 @@
   import { onMount } from 'svelte'
   import Icon from 'svelte-awesome'
   import DropdownButton from '../../../controls/DropdownButton.svelte'
+  import CustomDropdownButton from '$lib/components/controls/CustomDropdownButton.svelte'
+  import type { CustomDropdownButtonItem } from 'src/lib/types'
   import { canConvert, singleItemSelected } from '$lib/logic/selection'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
@@ -31,6 +33,9 @@
 
   export let json: JSONData
   export let documentState: DocumentState
+  //Used to control the visibility of a custom drop down button.
+  export let customDropdownButton: Boolean
+  export let customDropdownItems: CustomDropdownButtonItem[]
 
   export let showTip
 
@@ -63,6 +68,7 @@
         firstEnabledButton.focus()
       }
     })
+    addFunction(customDropdownItems)
   })
 
   $: selection = documentState.selection
@@ -221,6 +227,12 @@
       if (nearest) {
         nearest.focus()
       }
+    }
+  }
+
+  function addFunction(value: CustomDropdownButtonItem[]) {
+    for (let i: number = 0; i < value.length; i++) {
+      value[i].onClick = handleInsertOrConvert
     }
   }
 
@@ -414,6 +426,19 @@
     </div>
   </div>
   <div class="jse-separator" />
+  {#if customDropdownButton}
+    <CustomDropdownButton width="12em" items={customDropdownItems}>
+      <button
+        type="button"
+        slot="defaultItem"
+        title="Custom structure"
+        disabled={!canInsertOrConvertValue}
+      >
+        Custom Structure
+      </button>
+    </CustomDropdownButton>
+    <div class="jse-separator" />
+  {/if}
   <div class="jse-row">
     <button
       type="button"

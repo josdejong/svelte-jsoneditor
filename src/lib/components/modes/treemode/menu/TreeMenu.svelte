@@ -37,6 +37,8 @@
   export let onCopy
 
   export let onRenderMenu: OnRenderMenu = noop
+  //Not used but since a warning is thrown the variable below has been added.
+  export let customDropdownButton: Boolean
 
   function handleToggleSearch() {
     showSearch = !showSearch
