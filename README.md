@@ -144,7 +144,9 @@ Browser example loading the ES module:
 
 To make it easier to use the library in your framework of choice, you can use a wrapper library:
 
-- Vue: https://github.com/cloydlau/json-editor-vue
+- Vue:
+  - [json-editor-vue](https://github.com/cloydlau/json-editor-vue)
+  - [vue3-ts-jsoneditor](https://github.com/bestkolobok/vue3-jsoneditor)
 
 ## API
 
