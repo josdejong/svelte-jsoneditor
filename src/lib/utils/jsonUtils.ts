@@ -238,16 +238,23 @@ export function convertValue(
     }
 
     if (typeof value === 'string') {
-      const parsedValue = parser.parse(value)
+      try{
+        const parsedValue = parser.parse(value)
 
-      if (Array.isArray(parsedValue)) {
-        return parsedValue
+        if (Array.isArray(parsedValue)) {
+          return parsedValue
+        }
+
+        if (isObject(parsedValue)) {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          return objectToArray(parsedValue)
+        }
       }
-
-      if (isObject(parsedValue)) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        return objectToArray(parsedValue)
+      
+      catch(e){
+        //we could not parse the string, so we return the string as the first key of the array
+        return [value];
       }
     }
   }
@@ -263,14 +270,21 @@ export function convertValue(
     }
 
     if (typeof value === 'string') {
-      const parsedValue = parser.parse(value)
+      try{
+        const parsedValue = parser.parse(value)
 
-      if (isObject(parsedValue)) {
-        return parsedValue as JSONObject
+        if (isObject(parsedValue)) {
+          return parsedValue as JSONObject
+        }
+
+        if (Array.isArray(parsedValue)) {
+          return arrayToObject(parsedValue)
+        }
       }
-
-      if (Array.isArray(parsedValue)) {
-        return arrayToObject(parsedValue)
+      
+      catch(e){
+        //we could not parse the string, so we return the string as the first value of the object with key '0'
+        return {0: value};
       }
     }
   }
