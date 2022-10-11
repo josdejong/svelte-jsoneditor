@@ -257,6 +257,9 @@ export function convertValue(
         return [value];
       }
     }
+
+    //all other cases, we return the value as the first key of the array, same as the parsing error under the string case
+    return [value]
   }
 
   if (type === 'object') {
@@ -283,10 +286,13 @@ export function convertValue(
       }
       
       catch(e){
-        //we could not parse the string, so we return the string as the first value of the object with key '0'
-        return {0: value};
+        //we could not parse the string, so we return the string as the first value of the object with key 'value'
+        return {value: value};
       }
     }
+
+    //all other cases, we return the value keyed under "value", same as the parsing error under the string case
+    return {value: value};
   }
 
   if (type === 'value') {
