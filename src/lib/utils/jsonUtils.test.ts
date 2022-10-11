@@ -1,5 +1,5 @@
 import type { JSONParser } from '$lib/types.js'
-import { deepStrictEqual, strictEqual, throws, equal, deepEqual } from 'assert'
+import { deepStrictEqual, strictEqual, deepEqual } from 'assert'
 import { parse, stringify } from 'lossless-json'
 import {
   calculatePosition,
