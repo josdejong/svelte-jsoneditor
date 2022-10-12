@@ -26,12 +26,16 @@
   const copiedDelay = 1000 // ms
 
   onMount(() => {
-    inputRef.focus()
+    focus()
   })
 
   onDestroy(() => {
     clearTimeout(copiedTimer)
   })
+
+  function focus() {
+    inputRef.focus()
+  }
 
   function validate(path: string): string | undefined {
     try {
@@ -76,6 +80,7 @@
     copyToClipBoard(inputPath)
     copied = true
     copiedTimer = setTimeout(() => (copied = false), copiedDelay)
+    focus()
   }
 </script>
 
