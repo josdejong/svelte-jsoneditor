@@ -4,6 +4,7 @@
   flex: 1;
   display: flex;
   border: var(--jse-edit-outline);
+  background: var(--jse-background-color);
 
   input.jse-navigation-bar-text {
     flex: 1;
@@ -26,6 +27,9 @@
   }
 
   button.jse-navigation-bar-copy {
+    &.copied {
+      color: var(--jse-message-success-background);
+    }
   }
 
   button.jse-navigation-bar-validation-error {
@@ -38,5 +42,14 @@
     input.jse-navigation-bar-text {
       color: var(--jse-error-color);
     }
+  }
+
+  .jse-copied-text {
+    background: var(--jse-message-success-background);
+    color: var(--jse-message-success-color);
+    position: relative;
+    margin: 2px;
+    padding: 0 5px;
+    border-radius: $border-radius;
   }
 }
