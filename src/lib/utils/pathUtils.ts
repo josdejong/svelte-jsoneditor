@@ -38,12 +38,66 @@ export function stringifyJSONPathProp(prop: string): string {
  * will be changed into:
  *
  *   "data[2].nested.property"
+ *
+ * See also prependRootObject
  */
 export function stripRootObject(path: string): string {
   return path
     .replace(/^\$/, '') // remove any leading $ character
     .replace(/^\./, '') // remove any leading dot
 }
+
+/**
+ * Add $ and . at the start of a JSON path when missing
+ * This is the opposite of stripRootObject
+ */
+export function prependRootObject(path: string): string {
+  if (path.startsWith('$')) {
+    return path
+  }
+
+  return !path.startsWith('[') && !path.startsWith('.') ? '$.' + path : '$' + path
+}
+
+/**
+ * Parse a string into a JSONPath. For example the input:
+ *
+ *   "$.data[2]['nested property'].name"
+ *
+ * will return:
+ *
+ *   ["data", "2", "nested property", "name"]
+ *
+ */
+export function parseJSONPath(path: string): JSONPath {
+  let remainder = prependRootObject(path.trim()).substring(1) // strip the leading $
+
+  const jsonPath: JSONPath = []
+
+  while (remainder.length > 0) {
+    const match = remainder.match(regexJsonPathProp)
+
+    if (!match) {
+      throw new SyntaxError(
+        `Cannot parse path: unexpected part "${remainder}" at position ${
+          path.length - remainder.length
+        }`
+      )
+    }
+
+    jsonPath.push(match[1] || match[2] || match[3])
+    remainder = remainder.substring(match[0].length)
+  }
+
+  return jsonPath
+}
+
+const regexJsonPathDotProp = '^\\.([A-zA-Z$_][a-zA-Z$_0-9]*)' // matches ".foo" at the start
+const regexJsonPathArrayIndex = '^\\[([0-9]+)]' // matches "[123]" at the start
+const regexJsonPathArrayProp = "^\\['(.*)']" // matches "['foo-bar baz']" at the start
+const regexJsonPathProp = new RegExp(
+  [regexJsonPathDotProp, regexJsonPathArrayIndex, regexJsonPathArrayProp].join('|')
+)
 
 /**
  * Convert a JSONPath into an option for use in a select box
@@ -103,7 +157,7 @@ export function createPropertySelector(path: JSONPath): string {
 // https://developer.mozilla.org/en-US/docs/Glossary/Identifier
 // Note: We can extend this regex to allow unicode characters too.
 // I'm too lazy to figure that out right now
-const javaScriptPropertyRegex = /^[A-z$_][A-z$_\d]*$/i
+const javaScriptPropertyRegex = /^[a-zA-Z$_][a-zA-Z$_\d]*$/
 const integerNumberRegex = /^\d+$/
 
 /**

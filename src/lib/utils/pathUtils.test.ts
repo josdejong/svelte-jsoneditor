@@ -1,8 +1,9 @@
-import { deepStrictEqual, notStrictEqual, strictEqual } from 'assert'
+import { deepStrictEqual, notStrictEqual, strictEqual, throws } from 'assert'
 import {
   createLodashPropertySelector,
   createMemoizePath,
   createPropertySelector,
+  parseJSONPath,
   pathToOption,
   stringifyJSONPath,
   stripRootObject
@@ -21,6 +22,33 @@ describe('pathUtils', () => {
     strictEqual(stringifyJSONPath(['foo', 'prop-with-hyphens']), "$.foo['prop-with-hyphens']")
     strictEqual(stringifyJSONPath(['foo', 'prop with spaces']), "$.foo['prop with spaces']")
     strictEqual(stringifyJSONPath(['foo', 'prop with \'".[']), "$.foo['prop with '\".[']")
+  })
+
+  it('parseJSONPath', () => {
+    deepStrictEqual(parseJSONPath('$'), [])
+    deepStrictEqual(parseJSONPath("$['']"), [''])
+    deepStrictEqual(parseJSONPath('$.foo'), ['foo'])
+    deepStrictEqual(parseJSONPath('$.foo.bar'), ['foo', 'bar'])
+    deepStrictEqual(parseJSONPath('$.foo[2]'), ['foo', '2'])
+    deepStrictEqual(parseJSONPath('$.foo[2].bar'), ['foo', '2', 'bar'])
+    deepStrictEqual(parseJSONPath('$.foo[2].bar_baz'), ['foo', '2', 'bar_baz'])
+    deepStrictEqual(parseJSONPath('$[2]'), ['2'])
+    deepStrictEqual(parseJSONPath("$.foo['prop-with-hyphens']"), ['foo', 'prop-with-hyphens'])
+    deepStrictEqual(parseJSONPath("$.foo['prop with spaces']"), ['foo', 'prop with spaces'])
+    deepStrictEqual(parseJSONPath("$.foo['prop with '\".[']"), ['foo', 'prop with \'".['])
+
+    // with missing root document or initial dot or enclosing whitespace
+    deepStrictEqual(parseJSONPath('.foo.bar'), ['foo', 'bar'])
+    deepStrictEqual(parseJSONPath('foo.bar'), ['foo', 'bar'])
+    deepStrictEqual(parseJSONPath('[2]'), ['2'])
+    deepStrictEqual(parseJSONPath(' $[2]  '), ['2'])
+
+    throws(() => {
+      parseJSONPath('["hello"]')
+    }, new SyntaxError('Cannot parse path: unexpected part "["hello"]" at position 0'))
+    throws(() => {
+      parseJSONPath('.foo.bar baz')
+    }, new SyntaxError('Cannot parse path: unexpected part " baz" at position 8'))
   })
 
   it('createLodashPropertySelector', () => {
