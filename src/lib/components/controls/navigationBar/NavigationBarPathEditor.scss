@@ -11,16 +11,32 @@
     font-size: inherit;
     padding: 0 5px 1px;
     background: var(--jse-background-color);
+    color: var(--jse-text-color);
     border: none;
     outline: none;
   }
 
-  button.jse-navigation-bar-copy {
+  button {
     border: none;
     background: var(--jse-background-color);
     cursor: pointer;
     font-family: inherit;
     font-size: 80%;
     color: inherit;
+  }
+
+  button.jse-navigation-bar-copy {
+  }
+
+  button.jse-navigation-bar-validation-error {
+    color: var(--jse-error-color);
+  }
+
+  &.error {
+    border-color: var(--jse-error-color);
+
+    input.jse-navigation-bar-text {
+      color: var(--jse-error-color);
+    }
   }
 }

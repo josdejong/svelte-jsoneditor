@@ -21,6 +21,7 @@
   export let onSelect: OnSelect
 
   let refNavigationBar: Element | undefined
+  let refEditButton: HTMLButtonElement | undefined
   let editing = false
 
   $: path = documentState.selection ? documentState.selection.focusPath : []
@@ -69,6 +70,15 @@
   function toggleEditing() {
     editing = !editing
   }
+
+  function handleCloseEditor() {
+    editing = false
+  }
+
+  function handleChangePath(path: JSONPath) {
+    handleCloseEditor()
+    handleSelect(path)
+  }
 </script>
 
 <div class="jse-navigation-bar" bind:this={refNavigationBar}>
@@ -80,7 +90,7 @@
       <NavigationBarItem {getItems} {path} index={undefined} onSelect={handleSelect} />
     {/if}
   {:else}
-    <NavigationBarPathEditor {path} />
+    <NavigationBarPathEditor {path} onClose={handleCloseEditor} onChange={handleChangePath} />
   {/if}
 
   <button
@@ -88,8 +98,9 @@
     class="jse-navigation-bar-edit"
     class:flex={!editing}
     class:editing
-    title="Click to edit the selected path"
+    title="Edit the selected path"
     on:click={toggleEditing}
+    bind:this={refEditButton}
   >
     <span class="jse-navigation-bar-space">
       <!-- ensure the right height (arrows have less height than the text) -->

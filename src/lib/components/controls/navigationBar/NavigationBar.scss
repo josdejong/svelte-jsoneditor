@@ -18,9 +18,12 @@
     font-size: var(--jse-font-size-mono);
     padding: $padding-half $padding;
     color: var(--jse-panel-color-readonly);
+    background: transparent;
     border: none;
     display: flex;
     cursor: pointer;
+    outline: none;
+    align-items: center;
 
     &.flex {
       flex: 1;
