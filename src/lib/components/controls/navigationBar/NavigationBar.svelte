@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONValue, JSONPath } from 'immutable-json-patch'
+  import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { getIn } from 'immutable-json-patch'
   import { range } from 'lodash-es'
   import { isObject, isObjectOrArray } from '../../../utils/typeUtils'
@@ -10,6 +10,9 @@
   import NavigationBarItem from '../../../components/controls/navigationBar/NavigationBarItem.svelte'
   import { caseInsensitiveNaturalCompare } from '../../../logic/sort'
   import type { DocumentState, OnSelect } from '../../../types'
+  import Icon from 'svelte-awesome'
+  import { faEdit } from '@fortawesome/free-solid-svg-icons'
+  import NavigationBarPathEditor from '$lib/components/controls/navigationBar/NavigationBarPathEditor.svelte'
 
   const debug = createDebug('jsoneditor:NavigationBar')
 
@@ -18,6 +21,7 @@
   export let onSelect: OnSelect
 
   let refNavigationBar: Element | undefined
+  let editing = false
 
   $: path = documentState.selection ? documentState.selection.focusPath : []
   $: hasNextItem = isObjectOrArray(getIn(json, path))
@@ -61,19 +65,39 @@
 
     onSelect(createMultiSelection(json, path, path))
   }
+
+  function toggleEditing() {
+    editing = !editing
+  }
 </script>
 
 <div class="jse-navigation-bar" bind:this={refNavigationBar}>
-  {#each path as item, index (index)}
-    <NavigationBarItem {getItems} {path} {index} onSelect={handleSelect} />
-  {/each}
-  {#if hasNextItem}
-    <NavigationBarItem {getItems} {path} index={undefined} onSelect={handleSelect} />
+  {#if !editing}
+    {#each path as item, index (index)}
+      <NavigationBarItem {getItems} {path} {index} onSelect={handleSelect} />
+    {/each}
+    {#if hasNextItem}
+      <NavigationBarItem {getItems} {path} index={undefined} onSelect={handleSelect} />
+    {/if}
+  {:else}
+    <NavigationBarPathEditor {path} />
   {/if}
-  <div class="jse-navigation-bar-space">
-    <!-- ensure the right height (arrows have less height than the text) -->
-    {!isObjectOrArray(json) ? 'Navigation bar' : '\u00A0'}
-  </div>
+
+  <button
+    type="button"
+    class="jse-navigation-bar-edit"
+    class:flex={!editing}
+    class:editing
+    title="Click to edit the selected path"
+    on:click={toggleEditing}
+  >
+    <span class="jse-navigation-bar-space">
+      <!-- ensure the right height (arrows have less height than the text) -->
+      {!isObjectOrArray(json) && !editing ? 'Navigation bar' : '\u00A0'}
+    </span>
+
+    <Icon data={faEdit} />
+  </button>
 </div>
 
 <style src="./NavigationBar.scss"></style>

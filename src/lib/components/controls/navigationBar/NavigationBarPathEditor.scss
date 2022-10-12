@@ -1,0 +1,26 @@
+@import '../../../styles';
+
+.jse-navigation-bar-path-editor {
+  flex: 1;
+  display: flex;
+  border: var(--jse-edit-outline);
+
+  input.jse-navigation-bar-text {
+    flex: 1;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0 5px 1px;
+    background: var(--jse-background-color);
+    border: none;
+    outline: none;
+  }
+
+  button.jse-navigation-bar-copy {
+    border: none;
+    background: var(--jse-background-color);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 80%;
+    color: inherit;
+  }
+}

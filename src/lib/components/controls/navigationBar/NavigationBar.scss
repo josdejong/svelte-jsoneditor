@@ -13,8 +13,30 @@
   border-left: var(--jse-main-border);
   border-right: var(--jse-main-border);
 
-  .jse-navigation-bar-space {
+  .jse-navigation-bar-edit {
+    font-family: var(--jse-font-family-mono);
+    font-size: var(--jse-font-size-mono);
     padding: $padding-half $padding;
-    color: var(--jse-navigation-bar-color);
+    color: var(--jse-panel-color-readonly);
+    border: none;
+    display: flex;
+    cursor: pointer;
+
+    &.flex {
+      flex: 1;
+    }
+
+    &:focus,
+    &:hover,
+    &.editing {
+      background: var(--jse-panel-button-background-highlight);
+      color: var(--jse-panel-button-color-highlight);
+      transition: color 0.2s ease-in, background 0.2s ease-in;
+    }
+
+    .jse-navigation-bar-space {
+      flex: 1;
+      text-align: left;
+    }
   }
 }
