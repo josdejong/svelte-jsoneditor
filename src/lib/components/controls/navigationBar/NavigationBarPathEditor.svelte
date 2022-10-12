@@ -13,6 +13,7 @@
   export let path: JSONPath
   export let onChange: (updatedPath: JSONPath) => void
   export let onClose: () => void
+  export let pathExists: (path: JSONPath) => boolean
 
   let inputRef
   let inputPath: string
@@ -26,10 +27,17 @@
 
   function validate(path: string): string | undefined {
     try {
-      parseJSONPath(path)
+      const parsedPath = parseJSONPath(path)
+      validatePathExists(parsedPath)
       return undefined
     } catch (err) {
       return err.toString()
+    }
+  }
+
+  function validatePathExists(path: JSONPath) {
+    if (!pathExists(path)) {
+      throw new Error('Path does not exist')
     }
   }
 
@@ -48,6 +56,7 @@
       validationActive = true
       try {
         const updatedPath = parseJSONPath(inputPath)
+        validatePathExists(updatedPath)
         onChange(updatedPath)
       } catch (err) {
         console.error(err)

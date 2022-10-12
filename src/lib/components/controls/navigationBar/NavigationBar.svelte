@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import type { JSONPath, JSONValue } from 'immutable-json-patch'
-  import { getIn } from 'immutable-json-patch'
+  import { existsIn, getIn } from 'immutable-json-patch'
   import { range } from 'lodash-es'
   import { isObject, isObjectOrArray } from '../../../utils/typeUtils'
   import { createMultiSelection } from '../../../logic/selection'
@@ -61,6 +61,10 @@
     }
   }
 
+  function pathExists(path: JSONPath): boolean {
+    return existsIn(json, path)
+  }
+
   function handleSelect(path: JSONPath) {
     debug('select path', JSON.stringify(path))
 
@@ -90,7 +94,12 @@
       <NavigationBarItem {getItems} {path} index={undefined} onSelect={handleSelect} />
     {/if}
   {:else}
-    <NavigationBarPathEditor {path} onClose={handleCloseEditor} onChange={handleChangePath} />
+    <NavigationBarPathEditor
+      {path}
+      onClose={handleCloseEditor}
+      onChange={handleChangePath}
+      {pathExists}
+    />
   {/if}
 
   <button
