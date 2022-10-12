@@ -11,7 +11,7 @@
   import { caseInsensitiveNaturalCompare } from '../../../logic/sort'
   import type { DocumentState, OnSelect } from '../../../types'
   import Icon from 'svelte-awesome'
-  import { faEdit } from '@fortawesome/free-solid-svg-icons'
+  import { faClose, faEdit } from '@fortawesome/free-solid-svg-icons'
   import NavigationBarPathEditor from '$lib/components/controls/navigationBar/NavigationBarPathEditor.svelte'
 
   const debug = createDebug('jsoneditor:NavigationBar')
@@ -98,7 +98,7 @@
     class="jse-navigation-bar-edit"
     class:flex={!editing}
     class:editing
-    title="Edit the selected path"
+    title={editing ? 'Cancel editing the selected path' : 'Edit the selected path'}
     on:click={toggleEditing}
     bind:this={refEditButton}
   >
@@ -107,7 +107,7 @@
       {!isObjectOrArray(json) && !editing ? 'Navigation bar' : '\u00A0'}
     </span>
 
-    <Icon data={faEdit} />
+    <Icon data={editing ? faClose : faEdit} />
   </button>
 </div>
 
