@@ -1,9 +1,9 @@
 import * as _ from 'lodash-es'
 import { last } from 'lodash-es'
-import { createPropertySelector, stringifyPath } from '../../utils/pathUtils.js'
+import { createLodashPropertySelector, createPropertySelector } from '../../utils/pathUtils.js'
 import { parseString } from '../../utils/stringUtils.js'
 import type { QueryLanguage, QueryLanguageOptions } from '../../types'
-import type { JSONPath, JSONValue } from 'immutable-json-patch'
+import type { JSONValue } from 'immutable-json-patch'
 import { isInteger } from '../../utils/typeUtils.js'
 
 const description = `
@@ -48,7 +48,7 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
 
   if (sort && sort.path && sort.direction) {
     queryParts.push(
-      `  data = _.orderBy(data, ['${createLodashPropertySelector(sort.path)}'], ['${
+      `  data = _.orderBy(data, [${createLodashPropertySelector(sort.path)}], ['${
         sort.direction
       }'])\n`
     )
@@ -96,11 +96,4 @@ function executeQuery(json: JSONValue, query: string): JSONValue {
 
   const output = queryFn(json)
   return output !== undefined ? output : null
-}
-
-/**
- * Create a Lodash string containing a path (without leading dot), like "users[2].name"
- */
-function createLodashPropertySelector(path: JSONPath): string {
-  return stringifyPath(path).replace(/^\./, '') // remove any leading dot
 }

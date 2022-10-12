@@ -406,7 +406,10 @@
               id: index,
               name: 'Item ' + index,
               random,
-              long: 9223372000000000000n + BigInt(random)
+              long: 9223372000000000000n + BigInt(random),
+              'nested random': {
+                value: random
+              }
             }
           })
         }
