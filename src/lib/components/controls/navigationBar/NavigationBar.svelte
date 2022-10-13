@@ -7,12 +7,12 @@
   import { isObject, isObjectOrArray } from '../../../utils/typeUtils'
   import { createMultiSelection } from '../../../logic/selection'
   import { createDebug } from '../../../utils/debug'
-  import NavigationBarItem from '../../../components/controls/navigationBar/NavigationBarItem.svelte'
   import { caseInsensitiveNaturalCompare } from '../../../logic/sort'
   import type { DocumentState, JSONPathParser, OnError, OnSelect } from '../../../types'
   import Icon from 'svelte-awesome'
   import { faClose, faEdit } from '@fortawesome/free-solid-svg-icons'
-  import NavigationBarPathEditor from '$lib/components/controls/navigationBar/NavigationBarPathEditor.svelte'
+  import NavigationBarItem from './NavigationBarItem.svelte'
+  import NavigationBarPathEditor from './NavigationBarPathEditor.svelte'
 
   const debug = createDebug('jsoneditor:NavigationBar')
 

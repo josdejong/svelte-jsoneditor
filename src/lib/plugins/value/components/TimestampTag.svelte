@@ -4,7 +4,7 @@
   import Icon from 'svelte-awesome'
   import { faClock } from '@fortawesome/free-regular-svg-icons'
   import { getContext } from 'svelte'
-  import { tooltip } from '$lib/components/controls/tooltip/tooltip.ts'
+  import { tooltip } from '$lib/components/controls/tooltip/tooltip'
 
   const absolutePopupContext = getContext('absolute-popup')
 

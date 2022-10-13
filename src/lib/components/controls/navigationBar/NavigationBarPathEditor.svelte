@@ -5,7 +5,7 @@
   import { faCopy, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
   import Icon from 'svelte-awesome'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
-  import { tooltip } from '../../controls/tooltip/tooltip.ts'
+  import { tooltip } from '../../controls/tooltip/tooltip'
   import type { JSONPathParser, OnError } from '../../../types.ts'
 
   const absolutePopupContext = getContext('absolute-popup')

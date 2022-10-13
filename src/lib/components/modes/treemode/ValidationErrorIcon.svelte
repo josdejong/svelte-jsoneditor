@@ -2,7 +2,7 @@
   import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
   import Icon from 'svelte-awesome'
   import { getContext } from 'svelte'
-  import { tooltip } from '../../controls/tooltip/tooltip.ts'
+  import { tooltip } from '../../controls/tooltip/tooltip'
   import type { ValidationError } from '../../../types'
 
   const absolutePopupContext = getContext('absolute-popup')
