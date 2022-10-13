@@ -591,6 +591,12 @@ Run linter:
 npm run lint
 ```
 
+Automatically fix linting issues:
+
+```
+npm run format
+```
+
 Publish to npm (will increase version number and publish to npm):
 
 ```
