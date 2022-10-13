@@ -11,6 +11,11 @@ export type Content = JSONContent | TextContent
 
 export type JSONParser = JSON
 
+export interface JSONPathParser {
+  parse: (pathStr) => JSONPath
+  stringify: (path: JSONPath) => string
+}
+
 export interface VisibleSection {
   start: number
   end: number

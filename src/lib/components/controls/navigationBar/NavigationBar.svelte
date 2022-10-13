@@ -9,7 +9,7 @@
   import { createDebug } from '../../../utils/debug'
   import NavigationBarItem from '../../../components/controls/navigationBar/NavigationBarItem.svelte'
   import { caseInsensitiveNaturalCompare } from '../../../logic/sort'
-  import type { DocumentState, OnError, OnSelect } from '../../../types'
+  import type { DocumentState, JSONPathParser, OnError, OnSelect } from '../../../types'
   import Icon from 'svelte-awesome'
   import { faClose, faEdit } from '@fortawesome/free-solid-svg-icons'
   import NavigationBarPathEditor from '$lib/components/controls/navigationBar/NavigationBarPathEditor.svelte'
@@ -20,6 +20,7 @@
   export let documentState: DocumentState
   export let onSelect: OnSelect
   export let onError: OnError
+  export let pathParser: JSONPathParser
 
   let refNavigationBar: Element | undefined
   let refEditButton: HTMLButtonElement | undefined
@@ -101,6 +102,7 @@
       onChange={handleChangePath}
       {onError}
       {pathExists}
+      {pathParser}
     />
   {/if}
 

@@ -1,17 +1,17 @@
 <script lang="ts">
   import type { JSONPath } from 'immutable-json-patch'
-  import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils'
   import { getContext, onDestroy, onMount } from 'svelte'
   import copyToClipBoard from '$lib/utils/copyToClipboard'
   import { faCopy, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
   import Icon from 'svelte-awesome'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { tooltip } from '../../controls/tooltip/tooltip.ts'
-  import type { OnError } from '$lib/types'
+  import type { JSONPathParser, OnError } from '../../../types.ts'
 
   const absolutePopupContext = getContext('absolute-popup')
 
   export let path: JSONPath
+  export let pathParser: JSONPathParser
   export let onChange: (updatedPath: JSONPath) => void
   export let onClose: () => void
   export let onError: OnError
@@ -20,7 +20,7 @@
   let inputRef
   let inputPath: string
   let validationActive = false
-  $: inputPath = stringifyJSONPath(path)
+  $: inputPath = pathParser.stringify(path)
   $: inputValidationError = validationActive ? parseAndValidate(inputPath).error : undefined
 
   let copiedTimer = undefined
@@ -44,7 +44,7 @@
     error: Error | undefined
   } {
     try {
-      const path = parseJSONPath(pathStr)
+      const path = pathParser.parse(pathStr)
       validatePathExists(path)
       return {
         path,

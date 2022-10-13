@@ -121,6 +121,7 @@
     InsertType,
     JSONParser,
     JSONPatchResult,
+    JSONPathParser,
     JSONPointerMap,
     JSONSelection,
     NestedValidationError,
@@ -176,6 +177,7 @@
   export let parser: JSONParser
   export let validator: Validator | null
   export let validationParser: JSONParser
+  export let pathParser: JSONPathParser
   export let indentation: number | string
   export let onError: OnError
   export let onChange: OnChange
@@ -2294,7 +2296,13 @@
   {/if}
 
   {#if navigationBar}
-    <NavigationBar {json} {documentState} onSelect={handleNavigationBarSelect} {onError} />
+    <NavigationBar
+      {json}
+      {documentState}
+      onSelect={handleNavigationBarSelect}
+      {onError}
+      {pathParser}
+    />
   {/if}
 
   {#if !isSSR}
