@@ -93,16 +93,21 @@ export function isColor(value: unknown): boolean {
 /**
  * Get the type of the value
  */
-// TODO: unit test valueType()
 export function valueType(value: unknown, parser: JSONParser): string {
   // primitive types
   if (
     typeof value === 'number' ||
     typeof value === 'string' ||
     typeof value === 'boolean' ||
-    value === null
+    typeof value === 'undefined'
   ) {
     return typeof value
+  }
+  if (typeof value === 'bigint') {
+    return 'number' // we return number here, not bigint: all numeric types should return the same name
+  }
+  if (value === null) {
+    return 'null'
   }
 
   if (Array.isArray(value)) {
@@ -115,10 +120,7 @@ export function valueType(value: unknown, parser: JSONParser): string {
 
   // unknown type. Try out what stringfying results in
   const valueStr = parser.stringify(value)
-  if (valueStr[0] === '"') {
-    return 'string'
-  }
-  if (isDigit(valueStr[0])) {
+  if (valueStr && isDigit(valueStr[0])) {
     return 'number'
   }
   if (valueStr === 'true' || valueStr === 'false') {

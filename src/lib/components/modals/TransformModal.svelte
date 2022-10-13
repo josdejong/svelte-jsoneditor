@@ -9,7 +9,7 @@
   import { DEBOUNCE_DELAY } from '../../constants.js'
   import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
-  import { stringifyPath } from '../../utils/pathUtils.js'
+  import { stringifyJSONPath } from '../../utils/pathUtils.js'
   import { transformModalState } from './transformModalState.js'
   import TransformWizard from './TransformWizard.svelte'
   import TransformModalHeader from './TransformModalHeader.svelte'
@@ -200,7 +200,7 @@
             type="text"
             readonly
             title="Selected path"
-            value={!isEmpty(selectedPath) ? stringifyPath(selectedPath) : '(whole document)'}
+            value={!isEmpty(selectedPath) ? stringifyJSONPath(selectedPath) : '(whole document)'}
           />
 
           <div class="jse-label">

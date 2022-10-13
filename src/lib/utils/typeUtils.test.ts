@@ -5,8 +5,12 @@ import {
   isObjectOrArray,
   isStringContainingPrimitiveValue,
   isTimestamp,
-  stringConvert
+  stringConvert,
+  valueType
 } from './typeUtils.js'
+import { LosslessNumber, parse, stringify } from 'lossless-json'
+
+const LosslessJSONParser = { parse, stringify }
 
 describe('typeUtils', () => {
   class TestClass {
@@ -79,6 +83,19 @@ describe('typeUtils', () => {
     strictEqual(stringConvert('2.4 ', JSON), 2.4)
     strictEqual(stringConvert('123ab', JSON), '123ab')
     strictEqual(stringConvert('  ', JSON), '  ')
+  })
+
+  it('valueType', () => {
+    strictEqual(valueType(2, JSON), 'number')
+    strictEqual(valueType('some text', JSON), 'string')
+    strictEqual(valueType(true, JSON), 'boolean')
+    strictEqual(valueType(false, JSON), 'boolean')
+    strictEqual(valueType(null, JSON), 'null')
+    strictEqual(valueType([], JSON), 'array')
+    strictEqual(valueType({}, JSON), 'object')
+    strictEqual(valueType(123n, JSON), 'number')
+    strictEqual(valueType(new Date(), JSON), 'unknown')
+    strictEqual(valueType(new LosslessNumber('123'), LosslessJSONParser as JSON), 'number')
   })
 
   it('isStringContainingPrimitiveValue', () => {

@@ -8,8 +8,9 @@
   } from '@fortawesome/free-solid-svg-icons'
   import { isEmpty } from 'lodash-es'
   import Icon from 'svelte-awesome'
-  import { stringifyPath } from '../../utils/pathUtils.js'
+  import { stringifyJSONPath } from '../../utils/pathUtils.js'
   import type { ValidationError } from '../../types'
+  import { stripRootObject } from '$lib/utils/pathUtils.js'
 
   export let validationErrors: ValidationError[]
   export let selectError: (error: ValidationError) => void
@@ -42,7 +43,7 @@
                 <Icon data={faExclamationTriangle} />
               </td>
               <td>
-                {stringifyPath(validationError.path)}
+                {stripRootObject(stringifyJSONPath(validationError.path))}
               </td>
               <td>
                 {validationError.message}

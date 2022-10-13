@@ -34,6 +34,7 @@ export {
   isLargeContent,
   estimateSerializedSize
 } from './utils/jsonUtils.js'
+export { parseJSONPath, stringifyJSONPath } from './utils/pathUtils.js'
 export {
   isValueSelection,
   isKeySelection,

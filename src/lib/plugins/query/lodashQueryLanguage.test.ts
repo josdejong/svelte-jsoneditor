@@ -271,6 +271,38 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
+    it('should correctly escape and quote orderBy', () => {
+      const item42 = {
+        nested: {
+          'complex "field" \'name\'': 42
+        }
+      }
+      const item0 = {
+        nested: {
+          'complex "field" \'name\'': 0
+        }
+      }
+      const json = [item42, item0]
+      const query = createQuery(json, {
+        sort: {
+          path: ['nested', 'complex "field" \'name\''],
+          direction: 'asc'
+        }
+      })
+
+      const result = executeQuery(json, query)
+
+      assert.deepStrictEqual(
+        query,
+        'function query (data) {\n' +
+          '  data = _.orderBy(data, [["nested","complex \\"field\\" \'name\'"]], [\'asc\'])\n' +
+          '  return data\n' +
+          '}'
+      )
+
+      assert.deepStrictEqual(result, [item0, item42])
+    })
+
     it('should allow defining multiple functions', () => {
       const query =
         'function square(x) {\n' +

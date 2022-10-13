@@ -14,6 +14,8 @@
   import { tick } from 'svelte'
   import { parse, stringify } from 'lossless-json'
   import { truncate } from '$lib/utils/stringUtils.js'
+  import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils'
+  import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 
   // const LosslessJSON: JSONParser = { ... } // FIXME: make the types work
   const LosslessJSON = {
@@ -125,6 +127,25 @@
     }
   ]
 
+  const pathParsers = [
+    {
+      id: 'JSONPath',
+      value: {
+        parse: parseJSONPath,
+        stringify: stringifyJSONPath
+      },
+      label: 'JSONPath'
+    },
+    {
+      id: 'JSONPointer',
+      value: {
+        parse: parseJSONPointer,
+        stringify: compileJSONPointer
+      },
+      label: 'JSONPointer'
+    }
+  ]
+
   const validator = createAjvValidator(schema)
 
   let refTreeEditor
@@ -169,6 +190,10 @@
     indentations[0].value
   )
   const selectedParserId = useLocalStorage('svelte-jsoneditor-demo-parser', parsers[0].id)
+  const selectedPathParserId = useLocalStorage(
+    'svelte-jsoneditor-demo-path-parser',
+    pathParsers[0].id
+  )
   const tabSize = useLocalStorage('svelte-jsoneditor-demo-tabSize', indentations[0].value)
   let leftEditorMode = 'tree'
 
@@ -178,6 +203,7 @@
   let queryLanguageId = javascriptQueryLanguage.id // TODO: store in local storage
 
   $: selectedParser = parsers.find((parser) => parser.id === $selectedParserId).value
+  $: selectedPathParser = pathParsers.find((parser) => parser.id === $selectedPathParserId).value
 
   // only editable/readonly div, no color picker, boolean toggle, timestamp
   function customRenderValue({
@@ -338,9 +364,16 @@
   </p>
 
   <p>
-    JSON Parser <select bind:value={$selectedParserId}>
+    JSON Parser: <select bind:value={$selectedParserId}>
       {#each parsers as parser}
         <option value={parser.id}>{parser.label}</option>
+      {/each}
+    </select>
+
+    Path Parser:
+    <select bind:value={$selectedPathParserId}>
+      {#each pathParsers as pathParser}
+        <option value={pathParser.id}>{pathParser.label}</option>
       {/each}
     </select>
   </p>
@@ -406,7 +439,10 @@
               id: index,
               name: 'Item ' + index,
               random,
-              long: 9223372000000000000n + BigInt(random)
+              long: 9223372000000000000n + BigInt(random),
+              'nested random': {
+                value: random
+              }
             }
           })
         }
@@ -513,6 +549,7 @@
             indentation={$selectedIndentation}
             tabSize={$tabSize}
             parser={selectedParser}
+            pathParser={selectedPathParser}
             validator={$validate ? validator : undefined}
             {queryLanguages}
             bind:queryLanguageId
@@ -559,6 +596,7 @@
             indentation={$selectedIndentation}
             tabSize={$tabSize}
             parser={selectedParser}
+            pathParser={selectedPathParser}
             validator={$validate ? validator : undefined}
             {queryLanguages}
             {queryLanguageId}
