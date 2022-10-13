@@ -7,19 +7,21 @@
   import Icon from 'svelte-awesome'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { tooltip } from '../../controls/tooltip/tooltip.ts'
+  import type { OnError } from '$lib/types'
 
   const absolutePopupContext = getContext('absolute-popup')
 
   export let path: JSONPath
   export let onChange: (updatedPath: JSONPath) => void
   export let onClose: () => void
+  export let onError: OnError
   export let pathExists: (path: JSONPath) => boolean
 
   let inputRef
   let inputPath: string
   let validationActive = false
   $: inputPath = stringifyJSONPath(path)
-  $: inputValidationError = validationActive ? validate(inputPath) : undefined
+  $: inputValidationError = validationActive ? parseAndValidate(inputPath).error : undefined
 
   let copiedTimer = undefined
   let copied = false
@@ -37,19 +39,28 @@
     inputRef.focus()
   }
 
-  function validate(path: string): string | undefined {
+  function parseAndValidate(pathStr: string): {
+    path: JSONPath | undefined
+    error: Error | undefined
+  } {
     try {
-      const parsedPath = parseJSONPath(path)
-      validatePathExists(parsedPath)
-      return undefined
-    } catch (err) {
-      return err.toString()
+      const path = parseJSONPath(pathStr)
+      validatePathExists(path)
+      return {
+        path,
+        error: undefined
+      }
+    } catch (error) {
+      return {
+        path: undefined,
+        error
+      }
     }
   }
 
   function validatePathExists(path: JSONPath) {
     if (!pathExists(path)) {
-      throw new Error('Path does not exist')
+      throw new Error('Path does not exist in current document')
     }
   }
 
@@ -66,12 +77,11 @@
 
     if (combo === 'Enter') {
       validationActive = true
-      try {
-        const updatedPath = parseJSONPath(inputPath)
-        validatePathExists(updatedPath)
-        onChange(updatedPath)
-      } catch (err) {
-        console.error(err)
+      const result = parseAndValidate(inputPath)
+      if (result.path !== undefined) {
+        onChange(result.path)
+      } else {
+        onError(result.error)
       }
     }
   }

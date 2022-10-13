@@ -2294,7 +2294,7 @@
   {/if}
 
   {#if navigationBar}
-    <NavigationBar {json} {documentState} onSelect={handleNavigationBarSelect} />
+    <NavigationBar {json} {documentState} onSelect={handleNavigationBarSelect} {onError} />
   {/if}
 
   {#if !isSSR}
