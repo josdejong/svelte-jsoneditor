@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.10](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.9...v0.7.10) (2022-10-13)
+
+
+### Features
+
+* implement a path editor in the Navigation Bar ([#164](https://github.com/josdejong/svelte-jsoneditor/issues/164)) ([9692634](https://github.com/josdejong/svelte-jsoneditor/commit/969263447d080eef830755744363d547365ef1d4))
+
+
+### Bug Fixes
+
+* [#162](https://github.com/josdejong/svelte-jsoneditor/issues/162) clicking the color picker causes a form submit ([42f2586](https://github.com/josdejong/svelte-jsoneditor/commit/42f25865e8dd61b574d663a72ac6ba643f21bd1a))
+* show paths in Sort modal as a JSONPath (dot separated) instead of JSONPointer ([3cde53d](https://github.com/josdejong/svelte-jsoneditor/commit/3cde53d6e34d195eb050dc1bdc35d383f06a0f7d))
+
 ### [0.7.9](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.8...v0.7.9) (2022-09-30)
 
 
