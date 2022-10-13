@@ -2,7 +2,24 @@
 
 A web-based tool to view, edit, format, transform, and validate JSON.
 
-This is the vanilla variant of `svelte-jsoneditor` that can be used in vanilla JavaScript or frameworks like SolidJS, React, Vue, Angular.
+Try it out: https://jsoneditoronline.org
+
+This is the vanilla variant of `svelte-jsoneditor`, which can be used in vanilla JavaScript or frameworks like SolidJS, React, Vue, Angular.
+
+![JSONEditor tree mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_tree_mode_screenshot.png)
+![JSONEditor text mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_text_mode_screenshot.png)
+
+## Features
+
+- View and edit JSON
+- Has a low level text mode and high level tree mode
+- Format (beautify) and compact JSON
+- Sort, query, filter, and transform JSON
+- Repair JSON
+- JSON schema validation and pluggable custom validation
+- Color highlighting, undo/redo, search and replace
+- Utilities like a color picker and timestamp tag
+- Handles large JSON documents up to 500 MB
 
 ## Install
 
@@ -11,6 +28,8 @@ Install using npm:
 ```
 npm install vanilla-jsoneditor
 ```
+
+Remark: for usage in a Svelte project, install `svelte-jsoneditor` instead.
 
 ## Use
 
