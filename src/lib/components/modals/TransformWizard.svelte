@@ -3,10 +3,10 @@
 <script lang="ts">
   import Select from 'svelte-select'
   import { getNestedPaths } from '../../utils/arrayUtils.js'
-  import { stringifyPath } from '../../utils/pathUtils.js'
+  import { pathToOption } from '../../utils/pathUtils.js'
   import { createDebug } from '../../utils/debug.js'
-  import { isEmpty, isEqual } from 'lodash-es'
-  import type { JSONValue, JSONPath } from 'immutable-json-patch'
+  import { isEqual } from 'lodash-es'
+  import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { setIn } from 'immutable-json-patch'
   import type { QueryLanguageOptions } from '../../types'
 
@@ -50,13 +50,6 @@
   $: fieldPath = queryOptions?.filter?.path
     ? fieldOptions.find((option) => isEqual(option.value, queryOptions?.filter?.path))
     : null
-
-  function pathToOption(path) {
-    return {
-      value: path,
-      label: isEmpty(path) ? '(whole item)' : stringifyPath(path)
-    }
-  }
 
   function changeFilterPath(path: JSONPath) {
     if (!isEqual(queryOptions?.filter?.path, path)) {

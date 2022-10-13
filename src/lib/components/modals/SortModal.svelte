@@ -7,10 +7,10 @@
   import Header from './Header.svelte'
   import { getNestedPaths } from '../../utils/arrayUtils.js'
   import { isObject } from '../../utils/typeUtils.js'
-  import { stringifyPath } from '../../utils/pathUtils.js'
+  import { pathToOption, stringifyJSONPath } from '../../utils/pathUtils.js'
   import { sortArray, sortObjectKeys } from '../../logic/sort.js'
   import { sortModalState } from './sortModalState.js'
-  import type { JSONValue, JSONPath } from 'immutable-json-patch'
+  import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { createDebug } from '../../utils/debug'
   import type { OnSort } from '../../types'
@@ -62,13 +62,6 @@
     }
 
     debug('store state in memory', stateId, sortModalState[stateId])
-  }
-
-  function pathToOption(path: JSONPath): { value: JSONPath; label: string } {
-    return {
-      value: path,
-      label: isEmpty(path) ? '(whole item)' : stringifyPath(path)
-    }
   }
 
   function handleSort() {
@@ -123,7 +116,7 @@
               type="text"
               readonly
               title="Selected path"
-              value={!isEmpty(selectedPath) ? stringifyPath(selectedPath) : '(whole document)'}
+              value={!isEmpty(selectedPath) ? stringifyJSONPath(selectedPath) : '(whole document)'}
             />
           </td>
         </tr>
