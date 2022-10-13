@@ -211,27 +211,27 @@ describe('jsonUtils', () => {
 
     it('should return a reasonable array when a value cannot be parsed as JSON', () => {
       const array = ['no valid json text']
-      deepEqual(convertValue('no valid json text', 'array', JSON),array)
+      deepEqual(convertValue('no valid json text', 'array', JSON), array)
     })
 
     it('should return an array with a null value when given invalid JSON value "null"', () => {
       const array = [null]
-      deepEqual(convertValue(null, 'array', JSON),array)
+      deepEqual(convertValue(null, 'array', JSON), array)
     })
 
     it('should return an array with undefined value when given invalid JSON value "undefined"', () => {
       const array = [undefined]
-      deepEqual(convertValue(undefined, 'array', JSON),array)
+      deepEqual(convertValue(undefined, 'array', JSON), array)
     })
 
     it('should return an array with number value when given invalid JSON as number', () => {
       const array = [1]
-      deepEqual(convertValue(1, 'array', JSON),array)
+      deepEqual(convertValue(1, 'array', JSON), array)
     })
 
     it('should return an array with boolean value when given invalid JSON as boolean', () => {
       const array = [false]
-      deepEqual(convertValue(false, 'array', JSON),array)
+      deepEqual(convertValue(false, 'array', JSON), array)
     })
 
     it('should convert an array to an object', () => {
@@ -258,35 +258,35 @@ describe('jsonUtils', () => {
       const object = {
         value: 'no valid json text'
       }
-      deepEqual(convertValue('no valid json text', 'object', JSON),object)
+      deepEqual(convertValue('no valid json text', 'object', JSON), object)
     })
 
     it('should return a reasonable object with a null value under "value" when given invalid JSON value "null"', () => {
       const object = {
         value: null
       }
-      deepEqual(convertValue(null, 'object', JSON),object)
+      deepEqual(convertValue(null, 'object', JSON), object)
     })
 
     it('should return a reasonable object with a undefined value under "value" when given invalid JSON value "undefined"', () => {
       const object = {
         value: undefined
       }
-      deepEqual(convertValue(undefined, 'object', JSON),object)
+      deepEqual(convertValue(undefined, 'object', JSON), object)
     })
 
     it('should return a reasonable object with a number value under "value" when given invalid JSON of number', () => {
       const object = {
         value: 1
       }
-      deepEqual(convertValue(1, 'object', JSON),object)
+      deepEqual(convertValue(1, 'object', JSON), object)
     })
 
     it('should return a reasonable object with a boolean value under "value" when given invalid JSON value of boolean', () => {
       const object = {
         value: false
       }
-      deepEqual(convertValue(false, 'object', JSON),object)
+      deepEqual(convertValue(false, 'object', JSON), object)
     })
 
     it('should convert an array to a value', () => {

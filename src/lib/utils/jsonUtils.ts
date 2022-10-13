@@ -238,7 +238,7 @@ export function convertValue(
     }
 
     if (typeof value === 'string') {
-      try{
+      try {
         const parsedValue = parser.parse(value)
 
         if (Array.isArray(parsedValue)) {
@@ -250,11 +250,9 @@ export function convertValue(
           // @ts-ignore
           return objectToArray(parsedValue)
         }
-      }
-      
-      catch(e){
+      } catch (e) {
         //we could not parse the string, so we return the string as the first key of the array
-        return [value];
+        return [value]
       }
     }
 
@@ -273,7 +271,7 @@ export function convertValue(
     }
 
     if (typeof value === 'string') {
-      try{
+      try {
         const parsedValue = parser.parse(value)
 
         if (isObject(parsedValue)) {
@@ -283,16 +281,14 @@ export function convertValue(
         if (Array.isArray(parsedValue)) {
           return arrayToObject(parsedValue)
         }
-      }
-      
-      catch(e){
+      } catch (e) {
         //we could not parse the string, so we return the string as the first value of the object with key 'value'
-        return {value: value};
+        return { value: value }
       }
     }
 
     //all other cases, we return the value keyed under "value", same as the parsing error under the string case
-    return {value: value};
+    return { value: value }
   }
 
   if (type === 'value') {
