@@ -95,7 +95,7 @@
   let open // svelte-simple-modal context open(...)
 
   $: {
-    const contentError = validateContentType(content)
+    const contentError = validateContentType(content, parser, indentation)
     if (contentError) {
       console.error('Error: ' + contentError)
     }
@@ -121,7 +121,7 @@
   export function set(newContent: Content) {
     debug('set')
 
-    const contentError = validateContentType(newContent)
+    const contentError = validateContentType(newContent, parser, indentation)
     if (contentError) {
       throw new Error(contentError)
     }
@@ -135,7 +135,7 @@
   export function update(updatedContent: Content) {
     debug('update')
 
-    const contentError = validateContentType(updatedContent)
+    const contentError = validateContentType(updatedContent, parser, indentation)
     if (contentError) {
       throw new Error(contentError)
     }

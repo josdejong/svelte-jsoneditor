@@ -97,26 +97,28 @@ describe('jsonUtils', () => {
   })
 
   it('should validate content type', () => {
-    deepStrictEqual(validateContentType({ json: [1, 2, 3] }), null)
-    deepStrictEqual(validateContentType({ text: '[1,2,3]' }), null)
+    deepStrictEqual(validateContentType({ json: [1, 2, 3] }, JSON, 2), null)
+    deepStrictEqual(validateContentType({ text: '[1,2,3]' }, JSON, 2), null)
 
+    const jsonTextContent = { text: [1, 2, 3] }, jsonTextContentCopy = { ...jsonTextContent }
+    validateContentType(jsonTextContent, JSON, 2)
     deepStrictEqual(
-      validateContentType({ text: [1, 2, 3] }),
-      'Content "text" property must be string'
+      jsonTextContent.text,
+      JSON.stringify(jsonTextContentCopy.text, null, 2)
     )
 
     deepStrictEqual(
-      validateContentType({ json: [1, 2, 3], text: '[1,2,3]' }),
+      validateContentType({ json: [1, 2, 3], text: '[1,2,3]' }, JSON, 2),
       'Content must contain either a property "json" or a property "text" but not both'
     )
 
     deepStrictEqual(
-      validateContentType({}),
+      validateContentType({}, JSON, 2),
       'Content must contain either a property "json" or a property "text"'
     )
 
-    deepStrictEqual(validateContentType([]), 'Content must be an object')
-    deepStrictEqual(validateContentType(2), 'Content must be an object')
+    deepStrictEqual(validateContentType([], JSON, 2), 'Content must be an object')
+    deepStrictEqual(validateContentType(2, JSON, 2), 'Content must be an object')
   })
 
   describe('estimateSerializedSize', () => {

@@ -292,7 +292,11 @@ export function convertValue(
  * Returns a string with validation error message when there is an issue,
  * or null otherwise
  */
-export function validateContentType(content: unknown): string | null {
+export function validateContentType(
+  content: unknown,
+  parser: JSONParser,
+  indentation: number | string | null,
+): string | null {
   if (!isObject(content)) {
     return 'Content must be an object'
   }
@@ -307,7 +311,9 @@ export function validateContentType(content: unknown): string | null {
     if (content.text === undefined) {
       return 'Content must contain either a property "json" or a property "text"'
     } else if (typeof content.text !== 'string') {
-      return 'Content "text" property must be string'
+      // return 'Content "text" property must be string'
+      content.text = parser.stringify(content.text, null, indentation)
+      return null
     } else {
       return null
     }
