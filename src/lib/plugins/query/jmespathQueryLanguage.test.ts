@@ -188,6 +188,46 @@ describe('jmespathQueryLanguage', () => {
     })
   })
 
+  it('should correctly escape and quote sort and projection fields', () => {
+    const item42 = {
+      id: 42,
+      nested: {
+        'complex "field" \'name\'': 42
+      }
+    }
+    const item0 = {
+      id: 0,
+      nested: {
+        'complex "field" \'name\'': 0
+      }
+    }
+    const json = [item42, item0]
+    console.log(json)
+    const query = createQuery(json, {
+      sort: {
+        path: ['nested', 'complex "field" \'name\''],
+        direction: 'asc'
+      },
+      projection: {
+        paths: [['id'], ['nested', 'complex "field" \'name\'']]
+      }
+    })
+
+    assert.deepStrictEqual(
+      query,
+      '[*] ' +
+        '| sort_by(@, &nested."complex \\"field\\" \'name\'") ' +
+        '| [*].{id: id, "complex \\"field\\" \'name\'": nested."complex \\"field\\" \'name\'"}'
+    )
+
+    const result = executeQuery(json, query)
+
+    assert.deepStrictEqual(result, [
+      { id: 0, 'complex "field" \'name\'': 0 },
+      { id: 42, 'complex "field" \'name\'': 42 }
+    ])
+  })
+
   it('should return null when property is not found', () => {
     const query = '@.foo'
     const data = {}
