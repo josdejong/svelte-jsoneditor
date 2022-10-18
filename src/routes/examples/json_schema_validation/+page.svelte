@@ -109,7 +109,9 @@
   property <code>age</code> which must be a positive integer.
 </p>
 <p>
-  See <a href="https://json-schema.org/" target="_blank">https://json-schema.org/</a> for more information.
+  See <a href="https://json-schema.org/" target="_blank" rel="noreferrer"
+    >https://json-schema.org/</a
+  > for more information.
 </p>
 
 <div class="editor">

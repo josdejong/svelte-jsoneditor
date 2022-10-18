@@ -45,6 +45,7 @@
   })
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="jse-dropdown-button" {title} on:click={handleClick}>
   <slot name="defaultItem" />
 
