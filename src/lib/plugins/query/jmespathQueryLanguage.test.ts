@@ -202,7 +202,6 @@ describe('jmespathQueryLanguage', () => {
       }
     }
     const json = [item42, item0]
-    console.log(json)
     const query = createQuery(json, {
       sort: {
         path: ['nested', 'complex "field" \'name\''],
