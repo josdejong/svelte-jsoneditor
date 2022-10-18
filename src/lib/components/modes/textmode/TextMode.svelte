@@ -499,7 +499,7 @@
 
   function toRichValidationError(validationError: ValidationError): RichValidationError {
     const { path, message } = validationError
-    const { line, column, from, to } = findTextLocation(text, path)
+    const { line, column, from, to } = findTextLocation(normalization.escapeValue(text), path)
 
     return {
       path,
@@ -745,7 +745,12 @@
 
     onChangeCodeMirrorValueDebounced.flush()
 
-    const contentErrors = memoizedValidateText(text, validator, parser, validationParser)
+    const contentErrors = memoizedValidateText(
+      normalization.escapeValue(text),
+      validator,
+      parser,
+      validationParser
+    )
 
     if (isContentParseError(contentErrors)) {
       jsonStatus = contentErrors.isRepairable ? JSON_STATUS_REPAIRABLE : JSON_STATUS_INVALID
