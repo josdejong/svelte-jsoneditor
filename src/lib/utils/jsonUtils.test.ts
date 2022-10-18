@@ -102,7 +102,7 @@ describe('jsonUtils', () => {
 
     deepStrictEqual(
       validateContentType({ text: [1, 2, 3] }),
-      'Content "text" property must be string'
+      'Content "text" property must be a string containing a JSON document. Did you mean to use the "json" property instead?'
     )
 
     deepStrictEqual(

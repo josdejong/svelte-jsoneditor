@@ -323,7 +323,10 @@ export function validateContentType(content: unknown): string | null {
     if (content.text === undefined) {
       return 'Content must contain either a property "json" or a property "text"'
     } else if (typeof content.text !== 'string') {
-      return 'Content "text" property must be string'
+      return (
+        'Content "text" property must be a string containing a JSON document. ' +
+        'Did you mean to use the "json" property instead?'
+      )
     } else {
       return null
     }
