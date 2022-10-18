@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.11](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.10...v0.7.11) (2022-10-18)
+
+
+### Features
+
+* convert primitive values like a string into an object or array holding the value ([67d78f0](https://github.com/josdejong/svelte-jsoneditor/commit/67d78f09744f0ff4d879728f2d1b3aaa92fa5e8c)), closes [#160](https://github.com/josdejong/svelte-jsoneditor/issues/160)
+
+
+### Bug Fixes
+
+* correctly handle property names containing spaces and special characters in JMESPath ([8e7d3e8](https://github.com/josdejong/svelte-jsoneditor/commit/8e7d3e89dbd00edc045147b203f606171e0486b8))
+* errors not displayed at the right position in text mode when `escapeUnicodeCharacters=true` ([8e7be40](https://github.com/josdejong/svelte-jsoneditor/commit/8e7be40778eb31f4fea51bf52e79803c411c1ebf))
+* improve error message when using `content.text` wrongly (see [#166](https://github.com/josdejong/svelte-jsoneditor/issues/166)) ([cdad5fb](https://github.com/josdejong/svelte-jsoneditor/commit/cdad5fb8712cd45ca14333ded75adc5877410476))
+* revert dev dependency `rollup-plugin-dts` to v4 too to have it work with rollup v2 ([2b183c7](https://github.com/josdejong/svelte-jsoneditor/commit/2b183c7bbb3003a7dfaa19404e1f76d005558236))
+
 ### [0.7.10](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.9...v0.7.10) (2022-10-13)
 
 
