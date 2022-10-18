@@ -53,7 +53,7 @@ Create a JSONEditor with two-way binding `bind:json`:
   import { JSONEditor } from 'svelte-jsoneditor'
 
   let content = {
-    text: undefined, // used when in text mode
+    text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       array: [1, 2, 3],
       boolean: true,
@@ -78,7 +78,7 @@ Or one-way binding:
   import { JSONEditor } from 'svelte-jsoneditor'
 
   let content = {
-    text: undefined, // used when in text mode
+    text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       greeting: 'Hello World'
     }
@@ -187,7 +187,7 @@ const editor = new JSONEditor({
 
 ### properties
 
-- `content: Content` Pass the JSON contents to be rendered in the JSONEditor. Contents is an object containing a property `json` and `text`. Only one of the two must be defined. In case of `tree` mode, `json` is used. In case of `text` mode, `text` is used.
+- `content: Content` Pass the JSON contents to be rendered in the JSONEditor. `Content` is an object containing a property `json` (a parsed JSON document) or `text` (a stringified JSON document). Only one of the two properties must be defined. You can pass both content types to the editor independent of in what mode it is. When making a change in `tree` mode, the updated content will be `{ json }`. When making a change in `text` mode, the updated content will be of type `{ text }`. Please be aware that `text` can contain invalid JSON: whilst typing, a JSON document will be temporarily invalid, like when the user is typing a new string.
 - `mode: 'tree' | 'text'`. Open the editor in `'tree'` mode (default) or `'text'` mode (formerly: `code` mode).
 - `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
 - `navigationBar: boolean` Show the navigation bar with, where you can see the selected path and navigate through your document from there. Default value is `true`.
@@ -484,7 +484,7 @@ For example, to change the default blue theme color to anthracite:
   import { JSONEditor } from 'svelte-jsoneditor'
 
   let content = {
-    text: undefined, // used when in text mode
+    text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       string: 'Hello custom theme color :)'
     }
@@ -520,7 +520,7 @@ Full Svelte example:
   import { JSONEditor } from 'svelte-jsoneditor'
 
   let content = {
-    text: undefined, // used when in text mode
+    text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       string: 'Hello dark theme :)'
     }

@@ -17,7 +17,7 @@
   let selectedFontSize = fontSizes[1].value
 
   let content = {
-    text: undefined, // used when in text mode
+    text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       array: [1, 2, 3],
       boolean: true,
