@@ -117,7 +117,7 @@ export type ClipboardValues = Array<{ key: string; value: JSONValue }>
 export interface FontAwesomeIcon {
   prefix: string
   iconName: string
-  icon: [number, number, Array<number | string>, string, string]
+  icon: [number, number, Array<number | string>, string | null, string]
 }
 
 export interface DropdownButtonItem {

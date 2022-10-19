@@ -38,29 +38,29 @@ import { int } from '../utils/numberUtils.js'
 export function isAfterSelection(
   selection: JSONSelection | undefined
 ): selection is AfterSelection {
-  return selection && selection.type === SelectionType.after
+  return (selection && selection.type === SelectionType.after) || false
 }
 
 export function isInsideSelection(
   selection: JSONSelection | undefined
 ): selection is InsideSelection {
-  return selection && selection.type === SelectionType.inside
+  return (selection && selection.type === SelectionType.inside) || false
 }
 
 export function isKeySelection(selection: JSONSelection | undefined): selection is KeySelection {
-  return selection && selection.type === SelectionType.key
+  return (selection && selection.type === SelectionType.key) || false
 }
 
 export function isValueSelection(
   selection: JSONSelection | undefined
 ): selection is ValueSelection {
-  return selection && selection.type === SelectionType.value
+  return (selection && selection.type === SelectionType.value) || false
 }
 
 export function isMultiSelection(
   selection: JSONSelection | undefined
 ): selection is MultiSelection {
-  return selection && selection.type === SelectionType.multi
+  return (selection && selection.type === SelectionType.multi) || false
 }
 
 /**

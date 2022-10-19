@@ -33,7 +33,6 @@ describe('stringUtils', () => {
     assert.deepStrictEqual(toCapital('HEllo'), 'Hello')
     assert.deepStrictEqual(toCapital('HEllo'), 'Hello')
     assert.deepStrictEqual(toCapital(''), '')
-    assert.deepStrictEqual(toCapital(undefined), undefined)
   })
 
   it('compareStrings', () => {

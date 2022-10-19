@@ -26,7 +26,7 @@ export function findUniqueName(name: string, keys: string[]): string {
  * Transform a text into lower case with the first character upper case
  */
 export function toCapital(text: string): string {
-  return text && text.length > 0 ? text[0].toUpperCase() + text.substr(1).toLowerCase() : text
+  return text && text.length > 0 ? text[0].toUpperCase() + text.substring(1).toLowerCase() : text
 }
 
 export function compareStrings(a, b) {
