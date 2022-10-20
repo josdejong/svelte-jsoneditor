@@ -46,6 +46,9 @@
         .jse-table-cell {
           padding: 2px var(--jse-padding);
           vertical-align: top;
+          white-space: nowrap;
+          max-width: 400px;
+          overflow: hidden; // TODO: wrap instead?
 
           &.jse-table-cell-header,
           &.jse-table-cell-gutter {
@@ -65,8 +68,18 @@
           &.jse-table-cell-gutter {
             // FIXME: border and/or border shadow?
           }
+
+          :global(div) {
+            display: inline-block;
+          }
         }
       }
     }
   }
+}
+
+// FIXME: this is ugly. give JSONValue an extra class instead
+.jse-table-cell :global(.jse-value) {
+  overflow-wrap: normal;
+  white-space: nowrap;
 }

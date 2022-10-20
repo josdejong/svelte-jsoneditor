@@ -168,16 +168,19 @@
             <tr class="jse-table-row">
               <th class="jse-table-cell jse-table-cell-gutter">{index + 1}</th>
               {#each columns as column}
+                {@const value = item[column]}
                 <td class="jse-table-cell">
-                  <JSONValue
-                    path={[index].concat(column)}
-                    value={item[column]}
-                    isSelected={false}
-                    enforceString={false}
-                    {selection}
-                    {searchResultItems}
-                    {context}
-                  />
+                  {#if value !== undefined}
+                    <JSONValue
+                      path={[index].concat(column)}
+                      {value}
+                      isSelected={false}
+                      enforceString={false}
+                      {selection}
+                      {searchResultItems}
+                      {context}
+                    />
+                  {/if}
                 </td>
               {/each}
             </tr>
