@@ -30,8 +30,16 @@
     table.jse-table-main {
       border-collapse: collapse;
 
+      .jse-table-invisible-start-section,
+      .jse-table-invisible-end-section {
+        td {
+          margin: 0;
+          padding: 0;
+        }
+      }
+
       .jse-table-row {
-        &:nth-child(odd) {
+        &:hover {
           background-color: var(--jse-table-row-odd-background);
         }
 
@@ -39,13 +47,23 @@
           padding: 2px var(--jse-padding);
           vertical-align: top;
 
-          &.jse-table-cell-header {
+          &.jse-table-cell-header,
+          &.jse-table-cell-gutter {
             font-weight: normal;
             text-align: left;
             color: var(--jse-text-readonly);
-            background: var(--jse-table-row-odd-background);
+            background: var(--jse-table-header-background);
+          }
+
+          &.jse-table-cell-header {
             position: sticky;
             top: 0;
+
+            // FIXME: border and/or border shadow?
+          }
+
+          &.jse-table-cell-gutter {
+            // FIXME: border and/or border shadow?
           }
         }
       }

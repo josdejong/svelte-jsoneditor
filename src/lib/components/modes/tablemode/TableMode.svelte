@@ -22,6 +22,10 @@
   import { isEmpty } from 'lodash-es'
   import JSONValue from './JSONValue.svelte'
   import { createNormalizationFunctions } from '../../../utils/domUtils'
+  import { createDebug } from '$lib/utils/debug'
+  import { createDocumentState } from '$lib/logic/documentState'
+
+  const debug = createDebug('jsoneditor:TableMode')
 
   export let readOnly = false
   export let externalContent
@@ -40,6 +44,47 @@
 
   // FIXME: work out support for object and primitive value
   let items: JSONArray | undefined
+
+  $: applyExternalContent(externalContent)
+
+  let columns: JSONPath[]
+  $: columns = isJSONArray(items) ? getColumns(items) : []
+
+  let viewPortHeight = 600
+  let scrollTop = 0
+  let itemHeight = 22 // px // FIXME: measure the actual item height (else scroll goes too fast and will be jumpy on a touch screen)
+
+  $: itemCount = Array.isArray(items) ? items.length : 0
+  $: visibleItemCount = Math.ceil(viewPortHeight / itemHeight)
+  $: startIndex = Math.max(
+    Math.min(Math.floor(scrollTop / itemHeight), itemCount - visibleItemCount),
+    0
+  )
+  $: endIndex = Math.min(startIndex + visibleItemCount, itemCount)
+  $: invisibleStartSectionHeight = startIndex * itemHeight
+  $: invisibleEndSectionHeight = (itemCount - endIndex) * itemHeight
+  $: visibleItems = Array.isArray(items) ? items.slice(startIndex, endIndex) : []
+
+  $: debug({ viewPortHeight, itemHeight, itemCount, startIndex, endIndex })
+
+  const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // FIXME: implement support for search and replace
+  const selection = undefined // FIXME: implement selecting contents
+
+  let context: JSONEditorContext
+  $: context = {
+    readOnly,
+    parser,
+    normalization,
+    getJson: () => items,
+    getDocumentState: () => createDocumentState(), // FIXME: what to do with getDocumentState()? It's not relevant in TableMode
+    findElement: () => null, // FIXME: what to do with getDocumentState()? It's not relevant in TableMode
+    focus,
+    onPatch: handlePatch,
+    onSelect: handleSelect,
+    onFind: handleFind,
+    onPasteJson: handlePasteJson,
+    onRenderValue
+  }
 
   function applyExternalContent(content: Content) {
     if (isTextContent(content)) {
@@ -96,25 +141,8 @@
     // FIXME: implement focus
   }
 
-  $: applyExternalContent(externalContent)
-
-  let columns: JSONPath[]
-  $: columns = isJSONArray(items) ? getColumns(items) : []
-
-  const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // FIXME: implement support for search and replace
-  const selection = undefined // FIXME: implement selecting contents
-
-  let context: JSONEditorContext
-  $: context = {
-    readOnly,
-    parser,
-    normalization,
-    focus,
-    onPatch: handlePatch,
-    onSelect: handleSelect,
-    onFind: handleFind,
-    onPasteJson: handlePasteJson,
-    onRenderValue
+  function handleScroll(event: Event) {
+    scrollTop = event.target.scrollTop
   }
 </script>
 
@@ -122,17 +150,23 @@
   {#if mainMenuBar}
     <TableMenu {onRenderMenu} />
   {/if}
-  <div class="jse-contents">
+  <div class="jse-contents" bind:clientHeight={viewPortHeight} on:scroll={handleScroll}>
     {#if items && !isEmpty(columns)}
       <table class="jse-table-main">
         <tbody>
           <tr class="jse-table-row jse-table-row-header">
+            <th class="jse-table-cell jse-table-cell-header" />
             {#each columns as column}
               <th class="jse-table-cell jse-table-cell-header">{column}</th>
             {/each}
           </tr>
-          {#each items as item, index}
+          <tr class="jse-table-invisible-start-section">
+            <td style:height={invisibleStartSectionHeight + 'px'} colspan={columns.length} />
+          </tr>
+          {#each visibleItems as item, visibleIndex}
+            {@const index = startIndex + visibleIndex}
             <tr class="jse-table-row">
+              <th class="jse-table-cell jse-table-cell-gutter">{index + 1}</th>
               {#each columns as column}
                 <td class="jse-table-cell">
                   <JSONValue
@@ -148,6 +182,10 @@
               {/each}
             </tr>
           {/each}
+
+          <tr class="jse-table-invisible-end-section">
+            <td style:height={invisibleEndSectionHeight + 'px'} colspan={columns.length} />
+          </tr>
         </tbody>
       </table>
     {:else}

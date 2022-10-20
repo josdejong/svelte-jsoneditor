@@ -74,6 +74,10 @@
   --jse-tag-background: #444444;
   --jse-tag-color: #bdbdbd;
 
+  /* contents: table */
+  --jse-table-header-background: #333333;
+  --jse-table-row-odd-background: rgba(255, 255, 255, 0.1);
+
   /* controls in modals: inputs, buttons, and `a` */
   --jse-input-background: #3d3d3d;
   --jse-input-border: var(--jse-main-border);

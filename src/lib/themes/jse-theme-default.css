@@ -97,7 +97,8 @@
   --jse-tag-color: var(--jse-text-color-inverse);
 
   /* contents: table */
-  --jse-table-row-odd-background: #f5f5f5;
+  --jse-table-header-background: #f5f5f5;
+  --jse-table-row-odd-background: rgba(0, 0, 0, 0.05);
 
   /* controls in modals: inputs, buttons, and `a` */
   --jse-controls-box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.24);
