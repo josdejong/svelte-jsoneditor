@@ -1,5 +1,5 @@
 import type { JSONParser } from '$lib/types.js'
-import { deepStrictEqual, strictEqual, throws } from 'assert'
+import { deepStrictEqual, strictEqual, deepEqual } from 'assert'
 import { parse, stringify } from 'lossless-json'
 import {
   calculatePosition,
@@ -102,7 +102,7 @@ describe('jsonUtils', () => {
 
     deepStrictEqual(
       validateContentType({ text: [1, 2, 3] }),
-      'Content "text" property must be string'
+      'Content "text" property must be a string containing a JSON document. Did you mean to use the "json" property instead?'
     )
 
     deepStrictEqual(
@@ -209,10 +209,29 @@ describe('jsonUtils', () => {
       deepStrictEqual(convertValue('[1,2,3]', 'array', JSON), [1, 2, 3])
     })
 
-    it('should throw when impossible to convert to an array', () => {
-      throws(() => {
-        convertValue('no valid json text', 'array', JSON)
-      }, /SyntaxError/)
+    it('should return a reasonable array when a value cannot be parsed as JSON', () => {
+      const array = ['no valid json text']
+      deepEqual(convertValue('no valid json text', 'array', JSON), array)
+    })
+
+    it('should return an array with a null value when given invalid JSON value "null"', () => {
+      const array = [null]
+      deepEqual(convertValue(null, 'array', JSON), array)
+    })
+
+    it('should return an array with undefined value when given invalid JSON value "undefined"', () => {
+      const array = [undefined]
+      deepEqual(convertValue(undefined, 'array', JSON), array)
+    })
+
+    it('should return an array with number value when given invalid JSON as number', () => {
+      const array = [1]
+      deepEqual(convertValue(1, 'array', JSON), array)
+    })
+
+    it('should return an array with boolean value when given invalid JSON as boolean', () => {
+      const array = [false]
+      deepEqual(convertValue(false, 'array', JSON), array)
     })
 
     it('should convert an array to an object', () => {
@@ -235,10 +254,39 @@ describe('jsonUtils', () => {
       deepStrictEqual(convertValue('["a", "b", "c"]', 'object', JSON), { 2: 'c', 1: 'b', 0: 'a' })
     })
 
-    it('should throw when impossible to convert to an object', () => {
-      throws(() => {
-        convertValue('no valid json text', 'object', JSON)
-      }, /SyntaxError/)
+    it('should return a reasonable object when a value cannot be parsed as JSON, putting the value in a "value" key', () => {
+      const object = {
+        value: 'no valid json text'
+      }
+      deepEqual(convertValue('no valid json text', 'object', JSON), object)
+    })
+
+    it('should return a reasonable object with a null value under "value" when given invalid JSON value "null"', () => {
+      const object = {
+        value: null
+      }
+      deepEqual(convertValue(null, 'object', JSON), object)
+    })
+
+    it('should return a reasonable object with a undefined value under "value" when given invalid JSON value "undefined"', () => {
+      const object = {
+        value: undefined
+      }
+      deepEqual(convertValue(undefined, 'object', JSON), object)
+    })
+
+    it('should return a reasonable object with a number value under "value" when given invalid JSON of number', () => {
+      const object = {
+        value: 1
+      }
+      deepEqual(convertValue(1, 'object', JSON), object)
+    })
+
+    it('should return a reasonable object with a boolean value under "value" when given invalid JSON value of boolean', () => {
+      const object = {
+        value: false
+      }
+      deepEqual(convertValue(false, 'object', JSON), object)
     })
 
     it('should convert an array to a value', () => {

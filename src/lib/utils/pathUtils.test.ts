@@ -1,19 +1,87 @@
-import { notStrictEqual, strictEqual } from 'assert'
-import { createMemoizePath, createPropertySelector, stringifyPath } from './pathUtils.js'
+import { deepStrictEqual, notStrictEqual, strictEqual, throws } from 'assert'
+import {
+  createLodashPropertySelector,
+  createMemoizePath,
+  createPropertySelector,
+  parseJSONPath,
+  pathToOption,
+  stringifyJSONPath,
+  stripRootObject
+} from './pathUtils.js'
 
 describe('pathUtils', () => {
-  it('stringifyPath', () => {
-    strictEqual(stringifyPath([]), '')
-    strictEqual(stringifyPath(['']), '[""]')
-    strictEqual(stringifyPath(['foo']), '.foo')
-    strictEqual(stringifyPath(['foo', 'bar']), '.foo.bar')
-    strictEqual(stringifyPath(['foo', '2']), '.foo[2]')
-    strictEqual(stringifyPath(['foo', '2', 'bar']), '.foo[2].bar')
-    strictEqual(stringifyPath(['foo', '2', 'bar_baz']), '.foo[2].bar_baz')
-    strictEqual(stringifyPath(['2']), '[2]')
-    strictEqual(stringifyPath(['foo', 'prop-with-hyphens']), '.foo["prop-with-hyphens"]')
-    strictEqual(stringifyPath(['foo', 'prop with spaces']), '.foo["prop with spaces"]')
-    strictEqual(stringifyPath(['foo', 'prop with ".[']), '.foo["prop with \\".["]')
+  it('stringifyJSONPath', () => {
+    strictEqual(stringifyJSONPath([]), '$')
+    strictEqual(stringifyJSONPath(['']), "$['']")
+    strictEqual(stringifyJSONPath(['foo']), '$.foo')
+    strictEqual(stringifyJSONPath(['foo', 'bar']), '$.foo.bar')
+    strictEqual(stringifyJSONPath(['foo', '2']), '$.foo[2]')
+    strictEqual(stringifyJSONPath(['foo', '2', 'bar']), '$.foo[2].bar')
+    strictEqual(stringifyJSONPath(['foo', '2', 'bar_baz']), '$.foo[2].bar_baz')
+    strictEqual(stringifyJSONPath(['2']), '$[2]')
+    strictEqual(stringifyJSONPath(['foo', 'prop-with-hyphens']), "$.foo['prop-with-hyphens']")
+    strictEqual(stringifyJSONPath(['foo', 'prop with spaces']), "$.foo['prop with spaces']")
+    strictEqual(stringifyJSONPath(['foo', 'prop with \'".[']), "$.foo['prop with '\".[']")
+  })
+
+  it('parseJSONPath', () => {
+    deepStrictEqual(parseJSONPath('$'), [])
+    deepStrictEqual(parseJSONPath("$['']"), [''])
+    deepStrictEqual(parseJSONPath('$.foo'), ['foo'])
+    deepStrictEqual(parseJSONPath('$.foo.bar'), ['foo', 'bar'])
+    deepStrictEqual(parseJSONPath('$.foo[2]'), ['foo', '2'])
+    deepStrictEqual(parseJSONPath('$.foo[2].bar'), ['foo', '2', 'bar'])
+    deepStrictEqual(parseJSONPath('$.foo[2].bar_baz'), ['foo', '2', 'bar_baz'])
+    deepStrictEqual(parseJSONPath('$[2]'), ['2'])
+    deepStrictEqual(parseJSONPath("$.foo['prop-with-hyphens']"), ['foo', 'prop-with-hyphens'])
+    deepStrictEqual(parseJSONPath("$.foo['prop with spaces']"), ['foo', 'prop with spaces'])
+    deepStrictEqual(parseJSONPath("$.foo['prop with '\".[']"), ['foo', 'prop with \'".['])
+
+    // with missing root document or initial dot or enclosing whitespace
+    deepStrictEqual(parseJSONPath('.foo.bar'), ['foo', 'bar'])
+    deepStrictEqual(parseJSONPath('foo.bar'), ['foo', 'bar'])
+    deepStrictEqual(parseJSONPath('[2]'), ['2'])
+    deepStrictEqual(parseJSONPath(' $[2]  '), ['2'])
+
+    throws(() => {
+      parseJSONPath('["hello"]')
+    }, new SyntaxError('Cannot parse path: unexpected part "["hello"]" at position 0'))
+    throws(() => {
+      parseJSONPath('.foo.bar baz')
+    }, new SyntaxError('Cannot parse path: unexpected part " baz" at position 8'))
+  })
+
+  it('createLodashPropertySelector', () => {
+    strictEqual(createLodashPropertySelector([]), "''")
+    strictEqual(createLodashPropertySelector(['']), '[""]')
+    strictEqual(createLodashPropertySelector(['foo']), "'foo'")
+    strictEqual(createLodashPropertySelector(['foo', 'bar']), "'foo.bar'")
+    strictEqual(createLodashPropertySelector(['foo', '2']), "'foo[2]'")
+    strictEqual(createLodashPropertySelector(['foo', '2', 'bar']), "'foo[2].bar'")
+    strictEqual(createLodashPropertySelector(['foo', '2', 'bar baz']), '["foo","2","bar baz"]')
+    strictEqual(createLodashPropertySelector(['2']), "'[2]'")
+    strictEqual(
+      createLodashPropertySelector(['foo', 'prop-with-hyphens']),
+      '["foo","prop-with-hyphens"]'
+    )
+    strictEqual(
+      createLodashPropertySelector(['foo', 'prop with spaces']),
+      '["foo","prop with spaces"]'
+    )
+    strictEqual(createLodashPropertySelector(['foo', 'prop with ".[']), '["foo","prop with \\".["]')
+  })
+
+  it('stripRootObject', () => {
+    strictEqual(stripRootObject('$.foo.bar'), 'foo.bar')
+    strictEqual(stripRootObject("$['foo'].bar"), "['foo'].bar")
+  })
+
+  it('pathToOption', () => {
+    deepStrictEqual(pathToOption([]), { value: [], label: '(whole item)' })
+    deepStrictEqual(pathToOption(['users', '2', 'first name']), {
+      value: ['users', '2', 'first name'],
+      label: "users[2]['first name']"
+    })
   })
 
   it('createPropertySelector', () => {

@@ -2,7 +2,7 @@
   import { JSONEditor } from 'svelte-jsoneditor'
 
   let content = {
-    text: undefined, // used when in text mode
+    text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       string: 'Hello custom theme color :)'
     }

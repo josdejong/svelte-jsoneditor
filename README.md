@@ -53,7 +53,7 @@ Create a JSONEditor with two-way binding `bind:json`:
   import { JSONEditor } from 'svelte-jsoneditor'
 
   let content = {
-    text: undefined, // used when in text mode
+    text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       array: [1, 2, 3],
       boolean: true,
@@ -78,7 +78,7 @@ Or one-way binding:
   import { JSONEditor } from 'svelte-jsoneditor'
 
   let content = {
-    text: undefined, // used when in text mode
+    text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       greeting: 'Hello World'
     }
@@ -144,7 +144,9 @@ Browser example loading the ES module:
 
 To make it easier to use the library in your framework of choice, you can use a wrapper library:
 
-- Vue: https://github.com/cloydlau/json-editor-vue
+- Vue:
+  - [json-editor-vue](https://github.com/cloydlau/json-editor-vue)
+  - [vue3-ts-jsoneditor](https://github.com/bestkolobok/vue3-jsoneditor)
 
 ## API
 
@@ -185,7 +187,7 @@ const editor = new JSONEditor({
 
 ### properties
 
-- `content: Content` Pass the JSON contents to be rendered in the JSONEditor. Contents is an object containing a property `json` and `text`. Only one of the two must be defined. In case of `tree` mode, `json` is used. In case of `text` mode, `text` is used.
+- `content: Content` Pass the JSON contents to be rendered in the JSONEditor. `Content` is an object containing a property `json` (a parsed JSON document) or `text` (a stringified JSON document). Only one of the two properties must be defined. You can pass both content types to the editor independent of in what mode it is. When making a change in `tree` mode, the updated content will be `{ json }`. When making a change in `text` mode, the updated content will be of type `{ text }`. Please be aware that `text` can contain invalid JSON: whilst typing, a JSON document will be temporarily invalid, like when the user is typing a new string.
 - `mode: 'tree' | 'text'`. Open the editor in `'tree'` mode (default) or `'text'` mode (formerly: `code` mode).
 - `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
 - `navigationBar: boolean` Show the navigation bar with, where you can see the selected path and navigate through your document from there. Default value is `true`.
@@ -221,7 +223,9 @@ const editor = new JSONEditor({
   </div>
   ```
 
-- `validationParser: JSON = JSON`. Only applicable when a `validator` is provided. This is the same as `parser`, except that this parser is used to parse the data before sending it to the validator. Configure a custom JSON parser that is used to parse JSON before passing it to the `validator`. By default, the built-in `JSON` parser is used. When passing a custom `validationParser`, make sure the output of the parser is supported by the configured `validator`. So, when the `validationParser` can output `bigint` numbers or other numeric types, the `validator` must also support that. In tree mode, when `parser` is not equal to `validationParser`, the JSON document will be converted before it is passed to the `validator` via `validationParser.parse(parser.stringify(json))`.
+- `validationParser: JSONParser = JSON`. Only applicable when a `validator` is provided. This is the same as `parser`, except that this parser is used to parse the data before sending it to the validator. Configure a custom JSON parser that is used to parse JSON before passing it to the `validator`. By default, the built-in `JSON` parser is used. When passing a custom `validationParser`, make sure the output of the parser is supported by the configured `validator`. So, when the `validationParser` can output `bigint` numbers or other numeric types, the `validator` must also support that. In tree mode, when `parser` is not equal to `validationParser`, the JSON document will be converted before it is passed to the `validator` via `validationParser.parse(parser.stringify(json))`.
+
+- `pathParser: JSONPathParser`. An optional object with a parse and stringify method to parse and stringify a `JSONPath`, which is an array with property names. The `pathParser` is used in the path editor in the navigation bar, which is opened by clicking the edit button on the right side of the navigation bar. The `pathParser.parse` function is allowed to throw an Error when the input is invalid. By default, a JSON Path notation is used, which looks like `$.data[2].nested.property`. Alternatively, it is possible to use for example a JSON Pointer notation like `/data/2/nested/property` or something custom-made. Related helper functions: `parseJSONPath` and `stringifyJSONPath`, `parseJSONPointer` and `compileJSONPointer`.
 
 - `onError(err: Error)`.
   Callback fired when an error occurs. Default implementation is to log an error in the console and show a simple alert message to the user.
@@ -342,7 +346,12 @@ type TextContent = { text: string } | { json: undefined; text: string }
 type JSONContent = { json: JSONData } | { json: JSONData; text: undefined }
 type Content = JSONContent | TextContent
 
-type Path = Array<string | number | symbol>
+type JSONParser = JSON
+
+interface JSONPathParser {
+  parse: (pathStr) => JSONPath
+  stringify: (path: JSONPath) => string
+}
 
 type JSONPatchDocument = JSONPatchOperation[]
 
@@ -475,7 +484,7 @@ For example, to change the default blue theme color to anthracite:
   import { JSONEditor } from 'svelte-jsoneditor'
 
   let content = {
-    text: undefined, // used when in text mode
+    text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       string: 'Hello custom theme color :)'
     }
@@ -511,7 +520,7 @@ Full Svelte example:
   import { JSONEditor } from 'svelte-jsoneditor'
 
   let content = {
-    text: undefined, // used when in text mode
+    text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       string: 'Hello dark theme :)'
     }
@@ -580,6 +589,12 @@ Run linter:
 
 ```
 npm run lint
+```
+
+Automatically fix linting issues:
+
+```
+npm run format
 ```
 
 Publish to npm (will increase version number and publish to npm):

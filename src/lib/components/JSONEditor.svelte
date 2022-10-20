@@ -21,6 +21,7 @@
     JSONEditorPropsOptional,
     JSONParser,
     JSONPatchResult,
+    JSONPathParser,
     MenuItem,
     MenuSeparatorItem,
     OnBlur,
@@ -44,6 +45,7 @@
   import { isMenuSpaceItem } from '../typeguards'
   import TableMode from './modes/tablemode/TableMode.svelte'
   import { noop } from '../utils/noop'
+  import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
@@ -62,6 +64,10 @@
   export let parser: JSONParser = JSON
   export let validator: Validator | null = null
   export let validationParser: JSONParser = JSON
+  export let pathParser: JSONPathParser = {
+    parse: parseJSONPath,
+    stringify: stringifyJSONPath
+  }
 
   export let queryLanguages: QueryLanguage[] = [javascriptQueryLanguage]
   export let queryLanguageId: string = queryLanguages[0].id
@@ -471,6 +477,7 @@
             {parser}
             {validator}
             {validationParser}
+            {pathParser}
             {onError}
             onChange={handleChange}
             onRequestRepair={handleRequestRepair}

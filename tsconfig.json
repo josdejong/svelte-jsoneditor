@@ -21,6 +21,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
+    "strict": false, // TODO: change config strict to true
+    "noImplicitAny": null, // TODO: change config noImplicitAny to false
     "allowJs": false, // turned off (temporarily?) because else Mocha tests fail to run in WebStorm, see https://youtrack.jetbrains.com/issue/WEB-50130
     "checkJs": false,
     "paths": {

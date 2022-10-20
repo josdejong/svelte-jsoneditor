@@ -59,7 +59,7 @@ export function jsonEscapeUnicode(value: string): string {
       return x
     }
 
-    return '\\u' + ('000' + x.codePointAt(0).toString(16)).slice(-4)
+    return '\\u' + ('000' + x.codePointAt(0)?.toString(16)).slice(-4)
   })
 }
 
@@ -209,8 +209,8 @@ export function setCursorToEnd(element) {
   const selection = window.getSelection()
   range.setStart(element, 1)
   range.collapse(true)
-  selection.removeAllRanges()
-  selection.addRange(range)
+  selection?.removeAllRanges()
+  selection?.addRange(range)
 }
 
 /**

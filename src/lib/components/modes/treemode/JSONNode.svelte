@@ -5,10 +5,10 @@
   import classnames from 'classnames'
   import type {
     JSONArray,
-    JSONValue as JSONValueType,
     JSONObject,
     JSONPath,
-    JSONPointer
+    JSONPointer,
+    JSONValue as JSONValueType
   } from 'immutable-json-patch'
   import { appendToJSONPointer, compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
   import { initial, isEqual, last } from 'lodash-es'
@@ -657,12 +657,14 @@
         <ValidationErrorIcon {validationError} onExpand={handleExpand} />
       {/if}
       {#if expanded}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
           class="jse-insert-selection-area jse-inside"
           data-type="insert-selection-area-inside"
           on:click={handleInsertInside}
         />
       {:else}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
           class="jse-insert-selection-area jse-after"
           data-type="insert-selection-area-after"
@@ -724,6 +726,7 @@
           <span class="jse-bracket">]</span>
         </div>
         {#if !root}
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
             class="jse-insert-selection-area jse-after"
             data-type="insert-selection-area-after"
@@ -775,12 +778,14 @@
         <ValidationErrorIcon {validationError} onExpand={handleExpand} />
       {/if}
       {#if expanded}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
           class="jse-insert-selection-area jse-inside"
           data-type="insert-selection-area-inside"
           on:click={handleInsertInside}
         />
       {:else if !root}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
           class="jse-insert-selection-area jse-after"
           data-type="insert-selection-area-after"
@@ -837,6 +842,7 @@
           <div class="jse-bracket">&rbrace;</div>
         </div>
         {#if !root}
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
             class="jse-insert-selection-area jse-after"
             data-type="insert-selection-area-after"
@@ -871,6 +877,7 @@
         <ValidationErrorIcon {validationError} onExpand={handleExpand} />
       {/if}
       {#if !root}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
           class="jse-insert-selection-area jse-after"
           data-type="insert-selection-area-after"

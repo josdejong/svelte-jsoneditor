@@ -64,7 +64,7 @@ function defaultConvertValue(value: JavaScriptPrimitive): JSONPrimitive {
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  if (value.isLosslessNumber === true) {
+  if (value && value.isLosslessNumber) {
     return toSafeNumberOrThrow(value.toString(), { approx: true }) as JSONPrimitive
   }
 

@@ -81,7 +81,7 @@
   }
 
   let content = {
-    text: undefined, // used when in text mode
+    text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       firstName: 'John',
       lastName: 'Doe',
@@ -109,7 +109,9 @@
   property <code>age</code> which must be a positive integer.
 </p>
 <p>
-  See <a href="https://json-schema.org/" target="_blank">https://json-schema.org/</a> for more information.
+  See <a href="https://json-schema.org/" target="_blank" rel="noreferrer"
+    >https://json-schema.org/</a
+  > for more information.
 </p>
 
 <div class="editor">

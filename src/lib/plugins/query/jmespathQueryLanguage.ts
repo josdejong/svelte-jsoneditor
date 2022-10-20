@@ -81,7 +81,7 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
         projection.paths
           .map((path) => {
             const name = path[path.length - 1]
-            return name + ': ' + stringifyPathForJmespath(path)
+            return stringifyProp(name) + ': ' + stringifyPathForJmespath(path)
           })
           .join(', ') +
         '}'
@@ -112,10 +112,8 @@ export function stringifyPathForJmespath(path: JSONPath): string {
     .map((prop) => {
       if (typeof prop === 'number') {
         return '[' + prop + ']'
-      } else if (typeof prop === 'string' && prop.match(/^[A-Za-z\d_$]+$/)) {
-        return '.' + prop
       } else {
-        return '."' + String(prop) + '"'
+        return '.' + stringifyProp(String(prop))
       }
     })
     .join('')
@@ -123,4 +121,8 @@ export function stringifyPathForJmespath(path: JSONPath): string {
   return str[0] === '.'
     ? str.slice(1) // remove first dot
     : str
+}
+
+function stringifyProp(prop: string): string {
+  return prop.match(/^[A-Za-z\d_$]+$/) ? prop : JSON.stringify(prop)
 }

@@ -11,13 +11,13 @@ import { ValidationSeverity } from '../../types.js'
  * @param [schemaDefinitions=undefined]
  *                    An object containing JSON Schema definitions
  *                    which can be referenced using $ref
- * @param [ajvOptions] Optional extra options for Ajv
+ * @param [ajvOptions=undefined] Optional extra options for Ajv
  * @return Returns a validation function
  */
 export function createAjvValidator(
   schema: JSONValue,
-  schemaDefinitions: JSONValue = undefined,
-  ajvOptions: Options = undefined
+  schemaDefinitions?: JSONValue,
+  ajvOptions?: Options
 ): Validator {
   const ajv = new Ajv({
     allErrors: true,

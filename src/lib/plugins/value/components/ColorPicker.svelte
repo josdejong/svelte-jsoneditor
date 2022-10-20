@@ -67,6 +67,7 @@
 </script>
 
 <button
+  type="button"
   class="jse-color-picker-button"
   style="background: {color}"
   title={!readOnly ? 'Click to open a color picker' : `Color ${value}`}
