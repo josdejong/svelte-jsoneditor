@@ -1,4 +1,4 @@
-import { getColumns, getRecursiveKeys } from './table.js'
+import { getColumns, getRecursiveKeys, getShallowKeys } from './table.js'
 import { deepStrictEqual } from 'assert'
 import type { JSONArray } from 'immutable-json-patch'
 
@@ -16,12 +16,7 @@ describe('table', () => {
   it('should extract table columns from data without flattening', () => {
     deepStrictEqual(getColumns(json, false), [['name'], ['address'], ['scores'], ['updated']])
     deepStrictEqual(getColumns(json, false, 1), [['name'], ['address'], ['scores']])
-  })
-
-  it('should return an empty array on non-array input', () => {
-    deepStrictEqual(getColumns({} as JSONArray, false), [])
-    deepStrictEqual(getColumns(null, false), [])
-    deepStrictEqual(getColumns('foo' as unknown as JSONArray, false), [])
+    deepStrictEqual(getColumns([1, 2, 3], false), [[]])
   })
 
   it('should extract table columns from data with flattening', () => {
@@ -38,6 +33,13 @@ describe('table', () => {
       ['address', 'street'],
       ['scores']
     ])
+    deepStrictEqual(getColumns([1, 2, 3], true), [[]])
+  })
+
+  it('should return an empty array on non-array input', () => {
+    deepStrictEqual(getColumns({} as JSONArray, false), [])
+    deepStrictEqual(getColumns(null, false), [])
+    deepStrictEqual(getColumns('foo' as unknown as JSONArray, false), [])
   })
 
   it('should collect recursive keys from an object', () => {
@@ -46,5 +48,10 @@ describe('table', () => {
       getRecursiveKeys({ a: [1, 2, 3], b: { nested1: 4, nested2: { foo: 5, bar: [] } }, c: 42 }),
       [['a'], ['b', 'nested1'], ['b', 'nested2', 'foo'], ['b', 'nested2', 'bar'], ['c']]
     )
+  })
+
+  it('should collect shallow keys from an object or value', () => {
+    deepStrictEqual(getShallowKeys({ a: 1, b: 2, c: { d: 3 } }), [['a'], ['b'], ['c']])
+    deepStrictEqual(getShallowKeys(42), [[]])
   })
 })

@@ -15,14 +15,16 @@ export function getColumns(
   const compiledPaths = new Set()
 
   for (let i = 0; i < maxLookupCount; i++) {
-    const paths: JSONPath[] = flatten
-      ? getRecursiveKeys(array[i])
-      : Object.keys(array[i]).map((key) => [key])
+    const paths: JSONPath[] = flatten ? getRecursiveKeys(array[i]) : getShallowKeys(array[i])
 
     paths.forEach((path) => compiledPaths.add(compileJSONPointer(path)))
   }
 
   return Array.from(compiledPaths).map(parseJSONPointer)
+}
+
+export function getShallowKeys(value: JSONValue): JSONPath[] {
+  return isJSONObject(value) ? Object.keys(value).map((key) => [key]) : [[]]
 }
 
 export function getRecursiveKeys(value: JSONValue): JSONPath[] {
