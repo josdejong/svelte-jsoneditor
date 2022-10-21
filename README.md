@@ -263,7 +263,7 @@ const editor = new JSONEditor({
     ```ts
     interface MenuButtonItem {
       onClick: () => void
-      icon?: FontAwesomeIcon
+      icon?: IconDefinition
       text?: string
       title?: string
       className?: string

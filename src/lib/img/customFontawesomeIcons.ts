@@ -1,8 +1,9 @@
-import type { FontAwesomeIcon } from '../types'
+import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
+import type { IconName } from '@fortawesome/fontawesome-common-types'
 
-export const faJSONEditorExpand: FontAwesomeIcon = {
+export const faJSONEditorExpand: IconDefinition = {
   prefix: 'fas',
-  iconName: 'jsoneditor-expand',
+  iconName: 'jsoneditor-expand' as IconName,
   icon: [
     512,
     512,
@@ -15,9 +16,9 @@ export const faJSONEditorExpand: FontAwesomeIcon = {
   ]
 }
 
-export const faJSONEditorCollapse: FontAwesomeIcon = {
+export const faJSONEditorCollapse: IconDefinition = {
   prefix: 'fas',
-  iconName: 'jsoneditor-collapse',
+  iconName: 'jsoneditor-collapse' as IconName,
   icon: [
     512,
     512,
@@ -27,9 +28,9 @@ export const faJSONEditorCollapse: FontAwesomeIcon = {
   ]
 }
 
-export const faJSONEditorFormat: FontAwesomeIcon = {
+export const faJSONEditorFormat: IconDefinition = {
   prefix: 'fas',
-  iconName: 'jsoneditor-format',
+  iconName: 'jsoneditor-format' as IconName,
   icon: [
     512,
     512,
@@ -42,9 +43,9 @@ export const faJSONEditorFormat: FontAwesomeIcon = {
   ]
 }
 
-export const faJSONEditorCompact: FontAwesomeIcon = {
+export const faJSONEditorCompact: IconDefinition = {
   prefix: 'fas',
-  iconName: 'jsoneditor-compact',
+  iconName: 'jsoneditor-compact' as IconName,
   icon: [
     512,
     512,
