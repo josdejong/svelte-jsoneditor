@@ -1,5 +1,6 @@
 import type { JSONPatchDocument, JSONPath, JSONPointer, JSONValue } from 'immutable-json-patch'
 import type { SvelteComponentTyped } from 'svelte'
+import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 
 export type { JSONValue, JSONPointer, JSONPath, JSONPatchDocument } from 'immutable-json-patch'
 
@@ -115,23 +116,22 @@ export type JSONPointerMap<T> = { [pointer: JSONPointer]: T }
 
 export type ClipboardValues = Array<{ key: string; value: JSONValue }>
 
-export interface FontAwesomeIcon {
-  prefix: string
-  iconName: string
-  icon: [number, number, Array<number | string>, string | null, string]
-}
+/**
+ * @deprecated Use IconDefinition instead of FontAwesomeIcon
+ */
+export type FontAwesomeIcon = IconDefinition
 
 export interface DropdownButtonItem {
   text: string
   onClick: () => void
-  icon?: FontAwesomeIcon
+  icon?: IconDefinition
   title?: string
   disabled?: boolean
 }
 
 export interface MenuButtonItem {
   onClick: () => void
-  icon?: FontAwesomeIcon
+  icon?: IconDefinition
   text?: string
   title?: string
   className?: string
@@ -151,7 +151,7 @@ export type MenuItem = MenuButtonItem | MenuSeparatorItem | MenuSpaceItem
 export interface MessageAction {
   text: string
   title: string
-  icon?: FontAwesomeIcon
+  icon?: IconDefinition
   onClick?: () => void
   onMouseDown?: () => void
   disabled?: boolean
