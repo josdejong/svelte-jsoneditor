@@ -1,12 +1,47 @@
-import type { JSONPath } from 'immutable-json-patch'
-import type { JSONArray } from 'immutable-json-patch'
-import { first, isEmpty } from 'lodash-es'
+import type { JSONArray, JSONPath, JSONValue } from 'immutable-json-patch'
+import {
+  compileJSONPointer,
+  isJSONArray,
+  isJSONObject,
+  parseJSONPointer
+} from 'immutable-json-patch'
+import { isEmpty } from 'lodash-es'
 
-// TODO: unit test
-export function getColumns(json: JSONArray): JSONPath[] {
-  // TODO: create columns for nested objects
-  // FIXME: should iterate over the whole object?
-  return Object.keys(first(json)).map((key) => [key])
+export function getColumns(
+  array: JSONArray,
+  flatten: boolean,
+  maxLookupCount = Math.min(isJSONArray(array) ? array.length : 0, 100)
+): JSONPath[] {
+  const compiledPaths = new Set()
+
+  for (let i = 0; i < maxLookupCount; i++) {
+    const paths: JSONPath[] = flatten
+      ? getRecursiveKeys(array[i])
+      : Object.keys(array[i]).map((key) => [key])
+
+    paths.forEach((path) => compiledPaths.add(compileJSONPointer(path)))
+  }
+
+  return Array.from(compiledPaths).map(parseJSONPointer)
+}
+
+export function getRecursiveKeys(value: JSONValue): JSONPath[] {
+  const paths = []
+
+  function recurse(value: JSONValue, path: JSONPath) {
+    if (isJSONObject(value)) {
+      Object.keys(value).forEach((key) => {
+        recurse(value[key], path.concat(key))
+      })
+    } else {
+      // array or primitive value like string or number
+      paths.push(path)
+    }
+  }
+
+  recurse(value, [])
+
+  return paths
 }
 
 export interface VisibleSection {

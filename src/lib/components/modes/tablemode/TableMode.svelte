@@ -15,7 +15,7 @@
   } from '../../../types'
   import TableMenu from './menu/TableMenu.svelte'
   import type { JSONArray, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-  import { compileJSONPointer, isJSONArray } from 'immutable-json-patch'
+  import { compileJSONPointer, getIn, isJSONArray } from 'immutable-json-patch'
   import { isTextContent } from '../../../utils/jsonUtils'
   import { calculateVisibleSection, getColumns } from '../../../logic/table.js'
   import { noop } from '../../../utils/noop'
@@ -26,6 +26,8 @@
   import { createDocumentState } from '$lib/logic/documentState'
   import { isObjectOrArray } from '$lib/utils/typeUtils.js'
   import TableTag from '$lib/components/modes/tablemode/tag/TableTag.svelte'
+  import { stringifyJSONPath } from '$lib'
+  import { stripRootObject } from '$lib/utils/pathUtils'
 
   const debug = createDebug('jsoneditor:TableMode')
 
@@ -34,6 +36,7 @@
   export let mainMenuBar = true
   export let escapeControlCharacters = false
   export let escapeUnicodeCharacters = false
+  export let flattenColumns = false
   export let parser: JSONParser
   export let onRenderValue: OnRenderValue
   export let onRenderMenu = noop
@@ -50,7 +53,7 @@
   $: applyExternalContent(externalContent)
 
   let columns: JSONPath[]
-  $: columns = isJSONArray(items) ? getColumns(items) : []
+  $: columns = isJSONArray(items) ? getColumns(items, flattenColumns) : []
 
   let itemHeightsCache: Record<number, number> = {}
 
@@ -165,7 +168,9 @@
           <tr class="jse-table-row jse-table-row-header">
             <th class="jse-table-cell jse-table-cell-header" />
             {#each columns as column}
-              <th class="jse-table-cell jse-table-cell-header">{column}</th>
+              <th class="jse-table-cell jse-table-cell-header">
+                {stripRootObject(stringifyJSONPath(column))}
+              </th>
             {/each}
           </tr>
           <tr class="jse-table-invisible-start-section">
@@ -180,7 +185,7 @@
               >
               {#each columns as column}
                 {@const path = [index].concat(column)}
-                {@const value = item[column]}
+                {@const value = getIn(item, column)}
                 <td class="jse-table-cell">
                   {#if isObjectOrArray(value)}
                     <TableTag {path} {value} onEdit={handleEdit} />

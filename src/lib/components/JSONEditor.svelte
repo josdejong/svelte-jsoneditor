@@ -61,6 +61,7 @@
   export let statusBar = true
   export let escapeControlCharacters = false
   export let escapeUnicodeCharacters = false
+  export let flattenColumns = true
   export let parser: JSONParser = JSON
   export let validator: Validator | null = null
   export let validationParser: JSONParser = JSON
@@ -459,6 +460,7 @@
             {mainMenuBar}
             {escapeControlCharacters}
             {escapeUnicodeCharacters}
+            {flattenColumns}
             {parser}
             {onRenderValue}
             onRenderMenu={handleRenderMenu}

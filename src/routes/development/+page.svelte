@@ -176,6 +176,7 @@
     'svelte-jsoneditor-demo-escapeUnicodeCharacters',
     false
   )
+  const flattenColumns = useLocalStorage('svelte-jsoneditor-demo-flattenColumns', false)
   const useCustomValueRenderer = useLocalStorage(
     'svelte-jsoneditor-demo-useCustomValueRenderer',
     false
@@ -341,6 +342,9 @@
     </label>
     <label>
       <input type="checkbox" bind:checked={$escapeUnicodeCharacters} /> escapeUnicodeCharacters
+    </label>
+    <label>
+      <input type="checkbox" bind:checked={$flattenColumns} /> flattenColumns
     </label>
     <label>
       <input type="checkbox" bind:checked={$readOnly} /> readOnly
@@ -546,6 +550,7 @@
             statusBar={$statusBar}
             escapeControlCharacters={$escapeControlCharacters}
             escapeUnicodeCharacters={$escapeUnicodeCharacters}
+            flattenColumns={$flattenColumns}
             readOnly={$readOnly}
             indentation={$selectedIndentation}
             tabSize={$tabSize}
@@ -593,6 +598,7 @@
             statusBar={$statusBar}
             escapeControlCharacters={$escapeControlCharacters}
             escapeUnicodeCharacters={$escapeUnicodeCharacters}
+            flattenColumns={$flattenColumns}
             readOnly={$readOnly}
             indentation={$selectedIndentation}
             tabSize={$tabSize}
