@@ -50,7 +50,7 @@
           vertical-align: top;
           white-space: nowrap;
           max-width: 400px;
-          overflow: hidden; // TODO: wrap instead?
+          overflow: hidden;
 
           &.jse-table-cell-header,
           &.jse-table-cell-gutter {

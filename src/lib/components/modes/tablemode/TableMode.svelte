@@ -17,7 +17,7 @@
   import type { JSONArray, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, isJSONArray } from 'immutable-json-patch'
   import { isTextContent } from '../../../utils/jsonUtils'
-  import { getColumns } from '../../../logic/table.js'
+  import { calculateVisibleSection, getColumns } from '../../../logic/table.js'
   import { noop } from '../../../utils/noop'
   import { isEmpty } from 'lodash-es'
   import JSONValue from './JSONValue.svelte'
@@ -26,7 +26,6 @@
   import { createDocumentState } from '$lib/logic/documentState'
   import { isObjectOrArray } from '$lib/utils/typeUtils.js'
   import TableTag from '$lib/components/modes/tablemode/tag/TableTag.svelte'
-  import { calculateVisibleSection } from '$lib/utils/calculateVisibleSection'
 
   const debug = createDebug('jsoneditor:TableMode')
 
