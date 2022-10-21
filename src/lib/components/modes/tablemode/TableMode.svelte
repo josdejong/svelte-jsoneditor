@@ -15,7 +15,7 @@
   } from '../../../types'
   import TableMenu from './menu/TableMenu.svelte'
   import type { JSONArray, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-  import { isJSONArray } from 'immutable-json-patch'
+  import { compileJSONPointer, isJSONArray } from 'immutable-json-patch'
   import { isTextContent } from '../../../utils/jsonUtils'
   import { getColumns } from '../../../logic/table.js'
   import { noop } from '../../../utils/noop'
@@ -24,6 +24,8 @@
   import { createNormalizationFunctions } from '../../../utils/domUtils'
   import { createDebug } from '$lib/utils/debug'
   import { createDocumentState } from '$lib/logic/documentState'
+  import { isObjectOrArray } from '$lib/utils/typeUtils.js'
+  import TableTag from '$lib/components/modes/tablemode/tag/TableTag.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
 
@@ -68,7 +70,7 @@
   $: debug({ viewPortHeight, itemHeight, itemCount, startIndex, endIndex })
 
   const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // FIXME: implement support for search and replace
-  const selection = undefined // FIXME: implement selecting contents
+  const selection: JSONSelection | undefined = undefined // FIXME: implement selecting contents
 
   let context: JSONEditorContext
   $: context = {
@@ -126,6 +128,7 @@
   }
 
   function handleSelect(selection: JSONSelection) {
+    debug('select', selection)
     // FIXME: implement handleSelect
   }
 
@@ -143,6 +146,12 @@
 
   function handleScroll(event: Event) {
     scrollTop = event.target.scrollTop
+  }
+
+  function handleEdit(path: JSONPath, value: JSONValue) {
+    debug('edit', { path, value })
+
+    // FIXME: open a popup where you can edit the nested object/array
   }
 </script>
 
@@ -168,13 +177,18 @@
             <tr class="jse-table-row">
               <th class="jse-table-cell jse-table-cell-gutter">{index + 1}</th>
               {#each columns as column}
+                {@const path = [index].concat(column)}
                 {@const value = item[column]}
                 <td class="jse-table-cell">
-                  {#if value !== undefined}
+                  {#if isObjectOrArray(value)}
+                    <TableTag {path} {value} onEdit={handleEdit} />
+                  {:else if value !== undefined}
                     <JSONValue
-                      path={[index].concat(column)}
+                      {path}
                       {value}
-                      isSelected={false}
+                      isSelected={selection
+                        ? selection.pointersMap[compileJSONPointer(path)] === true
+                        : false}
                       enforceString={false}
                       {selection}
                       {searchResultItems}

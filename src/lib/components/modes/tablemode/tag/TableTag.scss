@@ -1,0 +1,16 @@
+@import '../../../../styles';
+
+.jse-table-tag {
+  display: flex;
+  gap: 2px;
+
+  .jse-bracket {
+    color: var(--jse-delimiter-color);
+  }
+
+  .jse-tag {
+    @include tag-mixin;
+
+    margin: 0 2px;
+  }
+}
