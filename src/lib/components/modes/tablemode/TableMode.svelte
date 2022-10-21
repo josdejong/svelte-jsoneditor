@@ -6,9 +6,9 @@
     Content,
     ExtendedSearchResultItem,
     JSONEditorContext,
+    JSONParser,
     JSONPatchResult,
     JSONSelection,
-    JSONParser,
     OnRenderValue,
     PastedJson,
     ValueNormalization
@@ -26,6 +26,7 @@
   import { createDocumentState } from '$lib/logic/documentState'
   import { isObjectOrArray } from '$lib/utils/typeUtils.js'
   import TableTag from '$lib/components/modes/tablemode/tag/TableTag.svelte'
+  import { calculateVisibleSection } from '$lib/utils/calculateVisibleSection'
 
   const debug = createDebug('jsoneditor:TableMode')
 
@@ -52,22 +53,21 @@
   let columns: JSONPath[]
   $: columns = isJSONArray(items) ? getColumns(items) : []
 
+  let itemHeightsCache: Record<number, number> = {}
+
   let viewPortHeight = 600
   let scrollTop = 0
-  let itemHeight = 22 // px // FIXME: measure the actual item height (else scroll goes too fast and will be jumpy on a touch screen)
+  let defaultItemHeight = 22 // px
 
-  $: itemCount = Array.isArray(items) ? items.length : 0
-  $: visibleItemCount = Math.ceil(viewPortHeight / itemHeight)
-  $: startIndex = Math.max(
-    Math.min(Math.floor(scrollTop / itemHeight), itemCount - visibleItemCount),
-    0
+  $: visibleSection = calculateVisibleSection(
+    scrollTop,
+    viewPortHeight,
+    items,
+    itemHeightsCache, // warning: itemHeightsCache is mutated and is not responsive itself
+    defaultItemHeight
   )
-  $: endIndex = Math.min(startIndex + visibleItemCount, itemCount)
-  $: invisibleStartSectionHeight = startIndex * itemHeight
-  $: invisibleEndSectionHeight = (itemCount - endIndex) * itemHeight
-  $: visibleItems = Array.isArray(items) ? items.slice(startIndex, endIndex) : []
 
-  $: debug({ viewPortHeight, itemHeight, itemCount, startIndex, endIndex })
+  // $: debug('visibleSection', visibleSection) // TODO: cleanup
 
   const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // FIXME: implement support for search and replace
   const selection: JSONSelection | undefined = undefined // FIXME: implement selecting contents
@@ -170,12 +170,15 @@
             {/each}
           </tr>
           <tr class="jse-table-invisible-start-section">
-            <td style:height={invisibleStartSectionHeight + 'px'} colspan={columns.length} />
+            <td style:height={visibleSection.startHeight + 'px'} colspan={columns.length} />
           </tr>
-          {#each visibleItems as item, visibleIndex}
-            {@const index = startIndex + visibleIndex}
+          {#each visibleSection.visibleItems as item, visibleIndex}
+            {@const index = visibleSection.startIndex + visibleIndex}
             <tr class="jse-table-row">
-              <th class="jse-table-cell jse-table-cell-gutter">{index + 1}</th>
+              <th
+                class="jse-table-cell jse-table-cell-gutter"
+                bind:clientHeight={itemHeightsCache[index]}>{index + 1}</th
+              >
               {#each columns as column}
                 {@const path = [index].concat(column)}
                 {@const value = item[column]}
@@ -201,7 +204,7 @@
           {/each}
 
           <tr class="jse-table-invisible-end-section">
-            <td style:height={invisibleEndSectionHeight + 'px'} colspan={columns.length} />
+            <td style:height={visibleSection.endHeight + 'px'} colspan={columns.length} />
           </tr>
         </tbody>
       </table>
