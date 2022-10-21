@@ -58,17 +58,17 @@ export interface VisibleSection {
 export function calculateVisibleSection(
   scrollTop: number,
   viewPortHeight: number,
-  items: JSONArray,
+  json: JSONValue | undefined,
   itemHeights: Record<number, number>,
   defaultItemHeight: number
 ): VisibleSection {
-  const itemCount = Array.isArray(items) ? items.length : 0
+  const itemCount = isJSONArray(json) ? json.length : 0
   const averageItemHeight = calculateAverageItemHeight(itemHeights, defaultItemHeight)
 
   const viewPortTop = scrollTop
   let startIndex = 0
   let startHeight = 0
-  while (startHeight < viewPortTop && startIndex < items.length) {
+  while (startHeight < viewPortTop && startIndex < itemCount) {
     startHeight += itemHeights[startIndex] || defaultItemHeight
     startIndex++
   }
@@ -90,7 +90,7 @@ export function calculateVisibleSection(
     endHeight += itemHeights[i] || defaultItemHeight
   }
 
-  const visibleItems = Array.isArray(items) ? items.slice(startIndex, endIndex) : []
+  const visibleItems = isJSONArray(json) ? json.slice(startIndex, endIndex) : []
 
   return {
     startIndex,

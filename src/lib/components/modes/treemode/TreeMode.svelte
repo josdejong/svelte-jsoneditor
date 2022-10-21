@@ -1583,12 +1583,14 @@
     // make sure we cannot send an invalid contents like having both
     // json and text defined, or having none defined
     if (text !== undefined) {
-      onChange({ text, json: undefined }, previousContent, {
+      const content = { text, json: undefined }
+      onChange(content, previousContent, {
         contentErrors: validate(),
         patchResult
       })
     } else if (json !== undefined) {
-      onChange({ text: undefined, json }, previousContent, {
+      const content = { text: undefined, json }
+      onChange(content, previousContent, {
         contentErrors: validate(),
         patchResult
       })

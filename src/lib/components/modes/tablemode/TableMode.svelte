@@ -4,42 +4,56 @@
   import type {
     AfterPatchCallback,
     Content,
+    ContentErrors,
     ExtendedSearchResultItem,
+    HistoryItem,
     JSONEditorContext,
     JSONParser,
     JSONPatchResult,
     JSONSelection,
+    OnChange,
+    OnRenderMenu,
     OnRenderValue,
     PastedJson,
+    SortModalCallback,
+    TransformModalCallback,
+    TransformModalOptions,
     ValueNormalization
   } from '../../../types'
   import TableMenu from './menu/TableMenu.svelte'
-  import type { JSONArray, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-  import { compileJSONPointer, getIn, isJSONArray } from 'immutable-json-patch'
+  import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
+  import { compileJSONPointer, getIn, immutableJSONPatch, isJSONArray } from 'immutable-json-patch'
   import { isTextContent } from '../../../utils/jsonUtils'
   import { calculateVisibleSection, getColumns } from '../../../logic/table.js'
-  import { noop } from '../../../utils/noop'
-  import { isEmpty } from 'lodash-es'
-  import JSONValue from './JSONValue.svelte'
+  import { isEmpty, uniqueId } from 'lodash-es'
+  import JSONValueComponent from './JSONValue.svelte'
   import { createNormalizationFunctions } from '../../../utils/domUtils'
   import { createDebug } from '$lib/utils/debug'
-  import { createDocumentState } from '$lib/logic/documentState'
+  import { createDocumentState, documentStatePatch } from '$lib/logic/documentState'
   import { isObjectOrArray } from '$lib/utils/typeUtils.js'
   import TableTag from '$lib/components/modes/tablemode/tag/TableTag.svelte'
   import { stringifyJSONPath } from '$lib'
   import { stripRootObject } from '$lib/utils/pathUtils'
+  import { revertJSONPatchWithMoveOperations } from '$lib/logic/operations'
+  import { removeEditModeFromSelection } from '$lib/logic/selection'
+  import { createHistory } from '$lib/logic/history'
 
   const debug = createDebug('jsoneditor:TableMode')
+  const sortModalId = uniqueId()
+  const transformModalId = uniqueId()
 
-  export let readOnly = false
-  export let externalContent
-  export let mainMenuBar = true
-  export let escapeControlCharacters = false
-  export let escapeUnicodeCharacters = false
-  export let flattenColumns = false
+  export let readOnly: boolean
+  export let externalContent: Content
+  export let mainMenuBar: boolean
+  export let escapeControlCharacters: boolean
+  export let escapeUnicodeCharacters: boolean
+  export let flattenColumns: boolean
   export let parser: JSONParser
+  export let onChange: OnChange
   export let onRenderValue: OnRenderValue
-  export let onRenderMenu = noop
+  export let onRenderMenu: OnRenderMenu
+  export let onSortModal: (props: SortModalCallback) => void
+  export let onTransformModal: (props: TransformModalCallback) => void
 
   let normalization: ValueNormalization
   $: normalization = createNormalizationFunctions({
@@ -48,12 +62,13 @@
   })
 
   // FIXME: work out support for object and primitive value
-  let items: JSONArray | undefined
+  let json: JSONValue | undefined
+  let text: string | undefined // FIXME: use text when loading invalid contents
 
   $: applyExternalContent(externalContent)
 
   let columns: JSONPath[]
-  $: columns = isJSONArray(items) ? getColumns(items, flattenColumns) : []
+  $: columns = isJSONArray(json) ? getColumns(json, flattenColumns) : []
 
   let itemHeightsCache: Record<number, number> = {}
 
@@ -64,7 +79,7 @@
   $: visibleSection = calculateVisibleSection(
     scrollTop,
     viewPortHeight,
-    items,
+    json,
     itemHeightsCache, // warning: itemHeightsCache is mutated and is not responsive itself
     defaultItemHeight
   )
@@ -74,12 +89,19 @@
   const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // FIXME: implement support for search and replace
   const selection: JSONSelection | undefined = undefined // FIXME: implement selecting contents
 
+  const history = createHistory<HistoryItem>({
+    onChange: (state) => {
+      historyState = state
+    }
+  })
+  let historyState = history.getState()
+
   let context: JSONEditorContext
   $: context = {
     readOnly,
     parser,
     normalization,
-    getJson: () => items,
+    getJson: () => json,
     getDocumentState: () => createDocumentState(), // FIXME: what to do with getDocumentState()? It's not relevant in TableMode
     findElement: () => null, // FIXME: what to do with getDocumentState()? It's not relevant in TableMode
     focus,
@@ -93,39 +115,125 @@
   function applyExternalContent(content: Content) {
     if (isTextContent(content)) {
       try {
-        const json = JSON.parse(content.text)
-        if (isJSONArray(json)) {
-          items = json
+        const updatedJson = JSON.parse(content.text)
+        if (isJSONArray(updatedJson)) {
+          json = updatedJson
         } else {
-          items = undefined
+          json = undefined
           // FIXME: handle non-Array json data
         }
       } catch (err) {
         // FIXME: handle invalid JSON
         console.error(err)
-        items = undefined
+        json = undefined
       }
     } else {
       if (isJSONArray(content.json)) {
-        items = content.json
+        json = content.json
       } else {
-        items = undefined
+        json = undefined
         // FIXME: handle non-Array json data
       }
     }
+  }
+
+  export function validate(): ContentErrors {
+    // FIXME: implement validate
+    return {
+      validationErrors: []
+    }
+  }
+
+  export function patch(
+    operations: JSONPatchDocument,
+    afterPatch?: AfterPatchCallback
+  ): JSONPatchResult {
+    debug('patch', operations, afterPatch)
+
+    if (json === undefined) {
+      throw new Error('Cannot apply patch: no JSON')
+    }
+
+    const previousContent: Content = { json }
+    const previousJson = json
+    const previousState = createDocumentState() // FIXME: DocumentState is not relevant for TableMode
+
+    // execute the patch operations
+    const undo: JSONPatchDocument = revertJSONPatchWithMoveOperations(
+      json,
+      operations
+    ) as JSONPatchDocument
+    const documentState = createDocumentState() // FIXME: DocumentState is not relevant for TableMode
+    const patched = documentStatePatch(json, documentState, operations)
+
+    const callback =
+      typeof afterPatch === 'function' ? afterPatch(patched.json, documentState) : undefined
+
+    json = callback && callback.json !== undefined ? callback.json : patched.json
+    // FIXME: DocumentState is not relevant for TableMode
+    const newState = callback && callback.state !== undefined ? callback.state : documentState
+    //documentState = newState // FIXME: DocumentState is not relevant for TableMode
+
+    history.add({
+      undo: {
+        patch: undo,
+        json: undefined,
+        text: undefined,
+        state: removeEditModeFromSelection(previousState),
+        textIsRepaired: false
+      },
+      redo: {
+        patch: operations,
+        json: undefined,
+        state: removeEditModeFromSelection(newState),
+        text: undefined,
+        textIsRepaired: false
+      }
+    })
+
+    const patchResult = {
+      json,
+      previousJson,
+      undo,
+      redo: operations
+    }
+
+    emitOnChange(previousContent, patchResult)
+
+    return patchResult
   }
 
   function handlePatch(
     operations: JSONPatchDocument,
     afterPatch?: AfterPatchCallback
   ): JSONPatchResult {
-    // FIXME: implement handlePatch
+    debug('patch', operations, afterPatch)
 
-    return {
-      json: items,
-      previousJson: items,
-      undo: [],
-      redo: []
+    return patch(operations, afterPatch)
+  }
+
+  function emitOnChange(previousContent: Content, patchResult: JSONPatchResult | null) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    if (previousContent.json === undefined && previousContent?.text === undefined) {
+      // initialization -> do not fire an onChange event
+      return
+    }
+
+    // make sure we cannot send an invalid contents like having both
+    // json and text defined, or having none defined
+    if (text !== undefined) {
+      const content = { text, json: undefined }
+      onChange(content, previousContent, {
+        contentErrors: validate(),
+        patchResult
+      })
+    } else if (json !== undefined) {
+      const content = { text: undefined, json }
+      onChange(content, previousContent, {
+        contentErrors: validate(),
+        patchResult
+      })
     }
   }
 
@@ -147,7 +255,7 @@
   }
 
   function handleScroll(event: Event) {
-    scrollTop = event.target.scrollTop
+    scrollTop = event.target['scrollTop']
   }
 
   function handleEdit(path: JSONPath, value: JSONValue) {
@@ -155,14 +263,173 @@
 
     // FIXME: open a popup where you can edit the nested object/array
   }
+
+  function openSortModal(selectedPath: JSONPath) {
+    if (readOnly) {
+      return
+    }
+
+    // FIXME: track focus whilst editor is open (use createFocusTracker)
+
+    onSortModal({
+      id: sortModalId,
+      json,
+      selectedPath,
+      onSort: async (operations) => {
+        debug('onSort', selectedPath, operations)
+
+        handlePatch(operations)
+      },
+      onClose: () => {
+        // FIXME: focus()
+      }
+    })
+  }
+
+  /**
+   * This method is exposed via JSONEditor.transform
+   */
+  export function openTransformModal({
+    id,
+    selectedPath,
+    onTransform,
+    onClose
+  }: TransformModalOptions) {
+    // FIXME: track modalOpen = true
+
+    onTransformModal({
+      id: id || transformModalId,
+      json,
+      selectedPath,
+      onTransform: onTransform
+        ? (operations) => {
+            onTransform({
+              operations,
+              json,
+              transformedJson: immutableJSONPatch(json, operations)
+            })
+          }
+        : (operations) => {
+            debug('onTransform', selectedPath, operations)
+
+            handlePatch(operations)
+          },
+      onClose: () => {
+        // FIXME: handle focus
+        // modalOpen = false
+        // focus()
+        if (onClose) {
+          onClose()
+        }
+      }
+    })
+  }
+
+  function handleSortAll() {
+    const selectedPath = []
+    openSortModal(selectedPath)
+  }
+
+  function handleTransformAll() {
+    openTransformModal({
+      selectedPath: []
+    })
+  }
+
+  function handleUndo() {
+    if (readOnly) {
+      return
+    }
+
+    if (!history.getState().canUndo) {
+      return
+    }
+
+    const item = history.undo()
+    if (!item) {
+      return
+    }
+
+    const previousContent = { json, text }
+
+    json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
+    // documentState = item.undo.state // FIXME
+    text = item.undo.text
+    // textIsRepaired = item.undo.textIsRepaired // FIXME
+
+    debug('undo', { item, json })
+
+    const patchResult = {
+      json,
+      previousJson: previousContent.json,
+      redo: item.undo.patch,
+      undo: item.redo.patch
+    }
+
+    emitOnChange(previousContent, patchResult)
+
+    // FIXME: handle focus and selection
+    // focus()
+    // if (documentState.selection) {
+    //   scrollTo(documentState.selection.focusPath, false)
+    // }
+  }
+
+  function handleRedo() {
+    if (readOnly) {
+      return
+    }
+
+    if (!history.getState().canRedo) {
+      return
+    }
+
+    const item = history.redo()
+    if (!item) {
+      return
+    }
+
+    const previousContent = { json, text }
+
+    json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
+    // documentState = item.redo.state // FIXME
+    text = item.redo.text
+    // textIsRepaired = item.redo.textIsRepaired // FIXME
+
+    debug('redo', { item, json })
+
+    const patchResult = {
+      json,
+      previousJson: previousContent.json,
+      redo: item.redo.patch,
+      undo: item.undo.patch
+    }
+
+    emitOnChange(previousContent, patchResult)
+
+    // FIXME: handle focus and selection
+    // focus()
+    // if (documentState.selection) {
+    //   scrollTo(documentState.selection.focusPath, false)
+    // }
+  }
 </script>
 
 <div class="jse-table-mode" class:no-main-menu={!mainMenuBar}>
   {#if mainMenuBar}
-    <TableMenu {onRenderMenu} />
+    <TableMenu
+      {json}
+      {readOnly}
+      {historyState}
+      onSort={handleSortAll}
+      onTransform={handleTransformAll}
+      onUndo={handleUndo}
+      onRedo={handleRedo}
+      {onRenderMenu}
+    />
   {/if}
   <div class="jse-contents" bind:clientHeight={viewPortHeight} on:scroll={handleScroll}>
-    {#if items && !isEmpty(columns)}
+    {#if json && !isEmpty(columns)}
       <table class="jse-table-main">
         <tbody>
           <tr class="jse-table-row jse-table-row-header">
@@ -190,7 +457,7 @@
                   {#if isObjectOrArray(value)}
                     <TableTag {path} {value} onEdit={handleEdit} />
                   {:else if value !== undefined}
-                    <JSONValue
+                    <JSONValueComponent
                       {path}
                       {value}
                       isSelected={selection

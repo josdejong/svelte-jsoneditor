@@ -14,8 +14,7 @@
   import { faJSONEditorCollapse, faJSONEditorExpand } from '$lib/img/customFontawesomeIcons'
   import { isObjectOrArray } from '$lib/utils/typeUtils'
   import Menu from '../../../controls/Menu.svelte'
-  import { noop } from 'lodash-es'
-  import type { OnRenderMenu, JSONSelection, MenuItem } from '$lib/types'
+  import type { JSONSelection, MenuItem, OnRenderMenu } from '$lib/types'
   import type { JSONValue } from 'immutable-json-patch'
   import { isKeySelection, isMultiSelection, isValueSelection } from '../../../../logic/selection'
   import type { HistoryState } from '../../../../logic/history'
@@ -27,16 +26,15 @@
   export let showSearch = false
   export let historyState: HistoryState
 
-  export let onExpandAll
-  export let onCollapseAll
-  export let onUndo
-  export let onRedo
-  export let onSort
-  export let onTransform
-  export let onContextMenu
-  export let onCopy
-
-  export let onRenderMenu: OnRenderMenu = noop
+  export let onExpandAll: () => void
+  export let onCollapseAll: () => void
+  export let onUndo: () => void
+  export let onRedo: () => void
+  export let onSort: () => void
+  export let onTransform: () => void
+  export let onContextMenu: () => void
+  export let onCopy: () => void
+  export let onRenderMenu: OnRenderMenu
 
   function handleToggleSearch() {
     showSearch = !showSearch

@@ -92,6 +92,7 @@
 
   let refJSONEditor
   let refTreeMode
+  let refTableMode
   let refTextMode
 
   let open // svelte-simple-modal context open(...)
@@ -163,6 +164,12 @@
       return refTreeMode.patch(operations)
     }
 
+    if (refTableMode) {
+      // Note that tree mode has an optional afterPatch callback.
+      // right now we don's support this in the public API.
+      return refTableMode.patch(operations)
+    }
+
     if (refTextMode) {
       return refTextMode.patch(operations)
     }
@@ -184,6 +191,8 @@
       refTextMode.openTransformModal(options)
     } else if (refTreeMode) {
       refTreeMode.openTransformModal(options)
+    } else if (refTableMode) {
+      refTableMode.openTransformModal(options)
     } else {
       throw new Error(`Method transform is not available in mode "${mode}"`)
     }
@@ -198,6 +207,8 @@
       return refTextMode.validate()
     } else if (refTreeMode) {
       return refTreeMode.validate()
+    } else if (refTableMode) {
+      return refTableMode.validate()
     } else {
       throw new Error(`Method validate is not available in mode "${mode}"`)
     }
@@ -455,6 +466,7 @@
           />
         {:else if mode === Mode.table}
           <TableMode
+            bind:this={refTableMode}
             externalContent={content}
             {readOnly}
             {mainMenuBar}
@@ -462,8 +474,11 @@
             {escapeUnicodeCharacters}
             {flattenColumns}
             {parser}
+            onChange={handleChange}
             {onRenderValue}
             onRenderMenu={handleRenderMenu}
+            {onSortModal}
+            {onTransformModal}
           />
         {:else}
           <!-- mode === Mode.tree -->

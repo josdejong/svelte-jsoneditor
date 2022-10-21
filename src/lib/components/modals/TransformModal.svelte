@@ -249,6 +249,7 @@
                 {escapeUnicodeCharacters}
                 {parser}
                 {onRenderValue}
+                onRenderMenu={noop}
                 onError={console.error}
                 onChange={noop}
                 onFocus={noop}
@@ -273,6 +274,7 @@
                 {escapeUnicodeCharacters}
                 {parser}
                 {onRenderValue}
+                onRenderMenu={noop}
                 onError={console.error}
                 onChange={noop}
                 onFocus={noop}
