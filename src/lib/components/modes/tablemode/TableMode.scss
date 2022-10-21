@@ -1,3 +1,5 @@
+@import '../../../styles';
+
 .jse-table-mode {
   flex: 1;
   display: flex;
@@ -61,6 +63,7 @@
           &.jse-table-cell-header {
             position: sticky;
             top: 0;
+            z-index: 1;
 
             // FIXME: border and/or border shadow?
           }
@@ -82,4 +85,5 @@
 .jse-table-cell :global(.jse-value) {
   overflow-wrap: normal;
   white-space: nowrap;
+  padding-left: 0;
 }
