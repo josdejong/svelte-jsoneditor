@@ -187,7 +187,7 @@ const editor = new JSONEditor({
 
 ### properties
 
-- `content: Content` Pass the JSON contents to be rendered in the JSONEditor. `Content` is an object containing a property `json` (a parsed JSON document) or `text` (a stringified JSON document). Only one of the two properties must be defined. You can pass both content types to the editor independent of in what mode it is. When making a change in `tree` mode, the updated content will be `{ json }`. When making a change in `text` mode, the updated content will be of type `{ text }`. Please be aware that `text` can contain invalid JSON: whilst typing, a JSON document will be temporarily invalid, like when the user is typing a new string.
+- `content: Content` Pass the JSON contents to be rendered in the JSONEditor. `Content` is an object containing a property `json` (a parsed JSON document) or `text` (a stringified JSON document). Only one of the two properties must be defined. You can pass both content types to the editor independent of in what mode it is.
 - `mode: 'tree' | 'text'`. Open the editor in `'tree'` mode (default) or `'text'` mode (formerly: `code` mode).
 - `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
 - `navigationBar: boolean` Show the navigation bar with, where you can see the selected path and navigate through your document from there. Default value is `true`.
@@ -229,7 +229,8 @@ const editor = new JSONEditor({
 
 - `onError(err: Error)`.
   Callback fired when an error occurs. Default implementation is to log an error in the console and show a simple alert message to the user.
-- `onChange(content: Content, previousContent: Content, changeStatus: { contentErrors: ContentErrors, patchResult: JSONPatchResult | null })`. The callback which is invoked on every of the contents, both changes made by a user and programmatic changes made via methods like `.set()`, `.update()`, or `.patch()`. The parameter `patchResult` is only available in `tree` mode, and not in `text` mode, since a change in arbitrary text cannot be expressed as a JSON Patch document.
+- `onChange(content: Content, previousContent: Content, changeStatus: { contentErrors: ContentErrors, patchResult: JSONPatchResult | null })`. The callback which is invoked on every of the contents, both changes made by a user and programmatic changes made via methods like `.set()`, `.update()`, or `.patch()`.
+  The returned `content` is sometimes of type `{ json }`, and sometimes of type `{ text }`. Which of the two is returned depends on the mode of the editor, the change that is applied, and the state of the document (valid, invalid, empty). Please be aware that `{ text }` can contain invalid JSON: whilst typing in `tree mode`, a JSON document will be temporarily invalid, like when the user is typing a new string. The parameter `patchResult` is only returned on changes that can be represented as a JSON Patch document, and for example not when freely typing in `text` mode.
 - `onChangeMode(mode: 'tree' | 'text')`. Invoked when the mode is changed.
 - `onClassName(path: Path, value: any): string | undefined`.
   Add a custom class name to specific nodes, based on their path and/or value.
