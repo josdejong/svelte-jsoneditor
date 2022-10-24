@@ -5,7 +5,7 @@
   import { stringifyJSONPath, stripRootObject } from '../../../utils/pathUtils.js'
   import { Icon } from 'svelte-awesome'
   import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons'
-  import { isEqual } from 'lodash-es'
+  import { isEmpty, isEqual } from 'lodash-es'
   import { SORT_DIRECTION_NAMES } from '../../../constants.ts'
 
   export let path: JSONPath
@@ -30,7 +30,7 @@
   title="Sort the data on this column"
 >
   <span class="jse-column-name">
-    {stripRootObject(stringifyJSONPath(path))}
+    {!isEmpty(path) ? stripRootObject(stringifyJSONPath(path)) : 'values'}
   </span>
   {#if sortDirection !== undefined}
     <span class="jse-column-sort-icon" title={`Currently sorted in ${sortDirectionName} order`}>
