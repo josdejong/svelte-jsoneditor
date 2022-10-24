@@ -1,15 +1,54 @@
 import diffSequence from '../generated/diffSequence.js'
-import type { JSONArray, JSONValue, JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-import { compileJSONPointer, getIn, parseFrom, parsePath, setIn } from 'immutable-json-patch'
+import type { JSONArray, JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
+import {
+  compileJSONPointer,
+  getIn,
+  isJSONArray,
+  parseFrom,
+  parsePath,
+  setIn
+} from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import naturalCompare from 'natural-compare-lite'
 import { int } from '../utils/numberUtils.js'
+import { isObject } from '../utils/typeUtils.js'
 
 export function caseInsensitiveNaturalCompare(a, b) {
   const aLower = typeof a === 'string' ? a.toLowerCase() : a
   const bLower = typeof b === 'string' ? b.toLowerCase() : b
 
   return naturalCompare(aLower, bLower)
+}
+
+/**
+ * Sort a JSON object or array
+ * @param json           The the JSON containg the (optionally nested)
+ *                       object to be sorted
+ * @param [rootPath=[]]  Relative path when the array was located
+ * @param [itemPath=[]]  Item path by which to sort items in case of an array
+ * @param [direction=1]  Pass 1 to sort ascending, -1 to sort descending
+ * @return               Returns a JSONPatch document with move operation
+ *                       to get the array sorted.
+ */
+export function sortJson(
+  json: JSONValue,
+  rootPath: JSONPath = [],
+  itemPath: JSONPath = [],
+  direction: 1 | -1 = 1
+): JSONPatchDocument {
+  if (isJSONArray(getIn(json, rootPath))) {
+    if (itemPath === undefined) {
+      throw new Error('Cannot sort: no property selected by which to sort the array')
+    }
+
+    return sortArray(json, rootPath, itemPath, direction)
+  }
+
+  if (isObject(json)) {
+    return sortObjectKeys(json, rootPath, direction)
+  }
+
+  throw new Error('Cannot sort: no array or object')
 }
 
 /**

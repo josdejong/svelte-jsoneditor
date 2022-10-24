@@ -15,28 +15,30 @@
     OnRenderMenu,
     OnRenderValue,
     PastedJson,
+    SortedColumn,
     SortModalCallback,
     TransformModalCallback,
     TransformModalOptions,
     ValueNormalization
   } from '../../../types'
+  import { SortDirection } from '../../../types'
   import TableMenu from './menu/TableMenu.svelte'
   import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn, immutableJSONPatch, isJSONArray } from 'immutable-json-patch'
   import { isTextContent } from '../../../utils/jsonUtils'
   import { calculateVisibleSection, getColumns } from '../../../logic/table.js'
-  import { isEmpty, uniqueId } from 'lodash-es'
+  import { isEmpty, isEqual, uniqueId } from 'lodash-es'
   import JSONValueComponent from './JSONValue.svelte'
   import { createNormalizationFunctions } from '../../../utils/domUtils'
   import { createDebug } from '$lib/utils/debug'
   import { createDocumentState, documentStatePatch } from '$lib/logic/documentState'
   import { isObjectOrArray } from '$lib/utils/typeUtils.js'
   import TableTag from '$lib/components/modes/tablemode/tag/TableTag.svelte'
-  import { stringifyJSONPath } from '$lib'
-  import { stripRootObject } from '$lib/utils/pathUtils'
   import { revertJSONPatchWithMoveOperations } from '$lib/logic/operations'
   import { removeEditModeFromSelection } from '$lib/logic/selection'
   import { createHistory } from '$lib/logic/history'
+  import ColumnHeader from '$lib/components/modes/tablemode/ColumnHeader.svelte'
+  import { sortJson } from '$lib/logic/sort'
 
   const debug = createDebug('jsoneditor:TableMode')
   const sortModalId = uniqueId()
@@ -89,6 +91,19 @@
   const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // FIXME: implement support for search and replace
   const selection: JSONSelection | undefined = undefined // FIXME: implement selecting contents
 
+  let sortedColumn: SortedColumn | undefined = undefined
+
+  function onSortByHeader(newSortedColumn: SortedColumn) {
+    debug('onSortByHeader', newSortedColumn)
+
+    const rootPath = []
+    const direction = newSortedColumn.sortDirection === SortDirection.desc ? -1 : 1
+    const operations = sortJson(json, rootPath, newSortedColumn.path, direction)
+    handlePatch(operations)
+
+    sortedColumn = newSortedColumn
+  }
+
   const history = createHistory<HistoryItem>({
     onChange: (state) => {
       historyState = state
@@ -113,6 +128,18 @@
   }
 
   function applyExternalContent(content: Content) {
+    const currentContent = { json }
+    const isChanged = isTextContent(content)
+      ? true // FIXME: handle text content
+      : !isEqual(currentContent.json, content.json)
+
+    debug('update external content', { isChanged })
+
+    if (!isChanged) {
+      // no actual change, don't do anything
+      return
+    }
+
     if (isTextContent(content)) {
       try {
         const updatedJson = JSON.parse(content.text)
@@ -135,6 +162,9 @@
         // FIXME: handle non-Array json data
       }
     }
+
+    // reset the sorting order (we don't know...)
+    sortedColumn = undefined
   }
 
   export function validate(): ContentErrors {
@@ -197,6 +227,8 @@
       undo,
       redo: operations
     }
+
+    sortedColumn = undefined
 
     emitOnChange(previousContent, patchResult)
 
@@ -366,6 +398,8 @@
       undo: item.redo.patch
     }
 
+    sortedColumn = undefined
+
     emitOnChange(previousContent, patchResult)
 
     // FIXME: handle focus and selection
@@ -405,6 +439,8 @@
       undo: item.undo.patch
     }
 
+    sortedColumn = undefined
+
     emitOnChange(previousContent, patchResult)
 
     // FIXME: handle focus and selection
@@ -436,7 +472,7 @@
             <th class="jse-table-cell jse-table-cell-header" />
             {#each columns as column}
               <th class="jse-table-cell jse-table-cell-header">
-                {stripRootObject(stringifyJSONPath(column))}
+                <ColumnHeader path={column} {sortedColumn} onSort={onSortByHeader} />
               </th>
             {/each}
           </tr>

@@ -1,4 +1,5 @@
 import type { Section } from './types'
+import { SortDirection } from './types.js'
 
 export const SCROLL_DURATION = 300 // ms
 export const DEBOUNCE_DELAY = 300 // ms
@@ -64,4 +65,9 @@ export const UPDATE_SELECTION = {
   NO: 'NO',
   SELF: 'SELF',
   NEXT_INSIDE: 'NEXT_INSIDE'
+}
+
+export const SORT_DIRECTION_NAMES = {
+  [SortDirection.asc]: 'ascending',
+  [SortDirection.desc]: 'descending'
 }

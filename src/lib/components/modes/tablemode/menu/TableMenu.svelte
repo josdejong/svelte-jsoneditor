@@ -16,8 +16,6 @@
   export let onRedo: () => void
   export let onRenderMenu: OnRenderMenu
 
-  $: console.log('TableMenu', { readOnly, json })
-
   let defaultItems: MenuItem[]
   $: defaultItems = !readOnly
     ? [

@@ -516,3 +516,13 @@ export interface SortModalCallback {
   onSort: OnSort
   onClose: () => void
 }
+
+export enum SortDirection {
+  asc = 'asc',
+  desc = 'desc'
+}
+
+export interface SortedColumn {
+  path: JSONPath
+  sortDirection: SortDirection
+}

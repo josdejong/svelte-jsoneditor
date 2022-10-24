@@ -6,9 +6,8 @@
   import Select from 'svelte-select'
   import Header from './Header.svelte'
   import { getNestedPaths } from '../../utils/arrayUtils.js'
-  import { isObject } from '../../utils/typeUtils.js'
   import { pathToOption, stringifyJSONPath } from '../../utils/pathUtils.js'
-  import { sortArray, sortObjectKeys } from '../../logic/sort.js'
+  import { sortJson } from '../../logic/sort.js'
   import { sortModalState } from './sortModalState.js'
   import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
@@ -68,24 +67,10 @@
     try {
       sortError = undefined
 
-      if (jsonIsArray) {
-        if (!selectedProperty) {
-          return
-        }
-
-        const property = selectedProperty.value
-        const direction = selectedDirection.value
-        const operations = sortArray(json, selectedPath, property, direction)
-
-        onSort(operations)
-      } else if (isObject(selectedJson)) {
-        const direction = selectedDirection.value
-        const operations = sortObjectKeys(json, selectedPath, direction)
-
-        onSort(operations)
-      } else {
-        console.error('Cannot sort: no array or object')
-      }
+      const path: JSONPath | undefined = selectedProperty?.value
+      const direction = selectedDirection?.value
+      const operations = sortJson(json, selectedPath, path, direction)
+      onSort(operations)
 
       close()
     } catch (err) {

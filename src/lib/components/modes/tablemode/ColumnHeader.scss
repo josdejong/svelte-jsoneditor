@@ -1,0 +1,16 @@
+@import '../../../styles';
+
+.jse-column-header {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  gap: $padding;
+
+  span.jse-column-sort-icon {
+    height: 1em;
+  }
+}
