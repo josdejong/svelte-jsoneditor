@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.8.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.11...v0.8.0) (2022-10-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* The custom `FontAwesomeIcon` is now replaced with `IconDefinition` from FontAwesome
+
+### Bug Fixes
+
+* [#169](https://github.com/josdejong/svelte-jsoneditor/issues/169) use `IconDefinition` from FontAwesome instead of a custom interface `FontAwesomeIcon` ([9d693f9](https://github.com/josdejong/svelte-jsoneditor/commit/9d693f94ebeffa187a2f3ab8f85998b987be8b94))
+
 ### [0.7.11](https://github.com/josdejong/svelte-jsoneditor/compare/v0.7.10...v0.7.11) (2022-10-18)
 
 
