@@ -13,7 +13,7 @@ export type Content = JSONContent | TextContent
 export type JSONParser = JSON
 
 export interface JSONPathParser {
-  parse: (pathStr) => JSONPath
+  parse: (pathStr: string) => JSONPath
   stringify: (path: JSONPath) => string
 }
 
