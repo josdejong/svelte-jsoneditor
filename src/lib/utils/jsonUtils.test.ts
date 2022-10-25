@@ -1,18 +1,24 @@
 import type { JSONParser } from '$lib/types.js'
-import { deepStrictEqual, strictEqual, deepEqual } from 'assert'
-import { parse, stringify } from 'lossless-json'
+import { deepStrictEqual, strictEqual, deepEqual, throws } from 'assert'
+import { LosslessNumber, parse, stringify } from 'lossless-json'
 import {
   calculatePosition,
   convertValue,
   countCharacterOccurrences,
   estimateSerializedSize,
+  isContent,
   isEqualParser,
+  isJSONContent,
   isLargeContent,
   isTextContent,
   normalizeJsonParseError,
   parsePartialJson,
+  toJSONContent,
+  toTextContent,
   validateContentType
 } from './jsonUtils.js'
+
+const LosslessJSONParser = { parse, stringify }
 
 describe('jsonUtils', () => {
   const jsonString = '{\n' + '  id: 2,\n' + '  name: "Jo"\n' + '}'
@@ -163,7 +169,7 @@ describe('jsonUtils', () => {
     }
   })
 
-  describe('isLargeContent', () => {
+  it('isLargeContent', () => {
     const text = '[1,2,3,4,5,6,7,8,9,0]'
     const textContent = { text }
     const jsonContent = { json: JSON.parse(text) }
@@ -175,16 +181,95 @@ describe('jsonUtils', () => {
     strictEqual(isLargeContent(jsonContent, 10), true)
   })
 
-  describe('isTextContent', () => {
+  it('isContent', () => {
+    strictEqual(isContent({ text: '' }), true)
+    strictEqual(isContent({ json: [] }), true)
+    strictEqual(isContent({ text: '', json: [] }), true)
+    strictEqual(isContent(1), false)
+    strictEqual(isContent({}), false)
+
+    const f = () => null
+    f.text = '[]'
+    strictEqual(isContent(f), false)
+
+    class C {
+      text: '[]'
+    }
+    const c = new C()
+    strictEqual(isContent(c), false)
+  })
+
+  it('isTextContent', () => {
     strictEqual(isTextContent({ text: '' }), true)
     strictEqual(isTextContent({ json: [] }), false)
     strictEqual(isTextContent({ text: '', json: [] }), true)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     strictEqual(isTextContent(1), false)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     strictEqual(isTextContent({}), false)
+
+    const f = () => null
+    f.text = '[]'
+    strictEqual(isTextContent(f), false)
+
+    class C {
+      text: '[]'
+    }
+    const c = new C()
+    strictEqual(isTextContent(c), false)
+  })
+
+  it('isJSONContent', () => {
+    strictEqual(isJSONContent({ text: '' }), false)
+    strictEqual(isJSONContent({ json: [] }), true)
+    strictEqual(isJSONContent({ text: '', json: [] }), false) // text has precedence over json
+    strictEqual(isJSONContent(1), false)
+    strictEqual(isJSONContent({}), false)
+
+    const f = () => null
+    f.json = []
+    strictEqual(isJSONContent(f), false)
+
+    class C {
+      json: []
+    }
+    const c = new C()
+    strictEqual(isJSONContent(c), false)
+  })
+
+  it('toTextContent', () => {
+    const textContent = { text: '[1,2,3]' }
+    strictEqual(toTextContent(textContent), textContent)
+    deepStrictEqual(toTextContent({ json: [1, 2, 3] }), textContent)
+    deepStrictEqual(toTextContent({ json: [1, 2, 3] }, 2), { text: '[\n  1,\n  2,\n  3\n]' })
+
+    deepStrictEqual(
+      toTextContent(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        { json: [new LosslessNumber('1'), new LosslessNumber('2'), new LosslessNumber('3')] },
+        2,
+        LosslessJSONParser
+      ),
+      { text: '[\n  1,\n  2,\n  3\n]' }
+    )
+  })
+
+  it('toJSONContent', () => {
+    const jsonContent = { json: [1, 2, 3] }
+
+    deepStrictEqual(toJSONContent({ text: '[1,2,3]' }), jsonContent)
+    strictEqual(toJSONContent(jsonContent), jsonContent)
+
+    deepStrictEqual(toJSONContent({ text: '[1,2,3]' }, LosslessJSONParser as JSONParser), {
+      json: [new LosslessNumber('1'), new LosslessNumber('2'), new LosslessNumber('3')]
+    })
+
+    throws(() => {
+      toJSONContent({ text: '[1,2,3' })
+    }, new SyntaxError('Unexpected end of JSON input'))
+
+    throws(() => {
+      toJSONContent({ text: '[1,2,3' }, LosslessJSONParser as JSONParser)
+    }, new SyntaxError("Array item or end of array ']' expected but reached end of input at position 6"))
   })
 
   describe('convertValue', () => {

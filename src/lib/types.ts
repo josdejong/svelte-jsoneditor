@@ -13,7 +13,7 @@ export type Content = JSONContent | TextContent
 export type JSONParser = JSON
 
 export interface JSONPathParser {
-  parse: (pathStr) => JSONPath
+  parse: (pathStr: string) => JSONPath
   stringify: (path: JSONPath) => string
 }
 
@@ -242,7 +242,9 @@ export interface OnChangeStatus {
   contentErrors: ContentErrors
   patchResult: JSONPatchResult | null
 }
-export type OnChange = ((content: Content, previousContent: Content, OnChangeStatus) => void) | null
+export type OnChange =
+  | ((content: Content, previousContent: Content, status: OnChangeStatus) => void)
+  | null
 export type OnSelect = (selection: JSONSelection) => void
 export type OnPatch = (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
 export type OnSort = (operations: JSONPatchDocument) => void

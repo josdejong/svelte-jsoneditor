@@ -4,7 +4,14 @@ import jsonSourceMap from 'json-source-map'
 import jsonrepair from 'jsonrepair'
 import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
 import { arrayToObject, objectToArray } from './arrayUtils.js'
-import type { Content, JSONParser, ParseError, TextContent, TextLocation } from '../types'
+import type {
+  Content,
+  JSONContent,
+  JSONParser,
+  ParseError,
+  TextContent,
+  TextLocation
+} from '../types'
 import { int } from './numberUtils.js'
 import type { JavaScriptValue } from 'lossless-json'
 
@@ -334,17 +341,54 @@ export function validateContentType(content: unknown): string | null {
 }
 
 /**
+ * Check whether a value is Content (TextContent or JSONContent)
+ */
+export function isContent(content: unknown): content is Content {
+  return (
+    isObject(content) && (typeof content.json !== 'undefined' || typeof content.text === 'string')
+  )
+}
+
+/**
  * Check whether content contains text (and not JSON)
  */
-export function isTextContent(content: Content): content is TextContent {
-  return typeof (content as Record<string, unknown>).text === 'string'
+export function isTextContent(content: unknown): content is TextContent {
+  return isObject(content) && typeof content.text === 'string'
+}
+
+/**
+ * Check whether content contains text (and not JSON)
+ */
+export function isJSONContent(content: unknown): content is JSONContent {
+  return isObject(content) && typeof content.json !== 'undefined' && !isTextContent(content)
+}
+
+/**
+ * Convert Content into TextContent if it is JSONContent, else leave it as is
+ */
+export function toTextContent(
+  content: Content,
+  indentation: number | string | undefined = undefined,
+  parser: JSONParser = JSON
+): TextContent {
+  return isTextContent(content)
+    ? content
+    : { text: parser.stringify(content.json, null, indentation) }
+}
+
+/**
+ * Convert Content into TextContent if it is JSONContent, else leave it as is
+ * @throws {SyntaxError} Will throw a parse error when the text contents does not contain valid JSON
+ */
+export function toJSONContent(content: Content, parser: JSONParser = JSON): JSONContent {
+  return isJSONContent(content) ? content : { json: parser.parse(content.text) }
 }
 
 /**
  * Get the contents as Text. If the contents is JSON, the JSON will be parsed.
  */
 export function getText(content: Content, indentation: number | string, parser: JSONParser) {
-  return isTextContent(content) ? content.text : parser.stringify(content.json, null, indentation)
+  return toTextContent(content, indentation, parser).text
 }
 
 /**
