@@ -1,6 +1,4 @@
 import JSONEditor from './components/JSONEditor.svelte'
-import SortModal from './components/modals/SortModal.svelte'
-import TransformModal from './components/modals/TransformModal.svelte'
 import BooleanToggle from './plugins/value/components/BooleanToggle.svelte'
 import ColorPicker from './plugins/value/components/ColorPicker.svelte'
 import EditableValue from './plugins/value/components/EditableValue.svelte'
@@ -25,30 +23,27 @@ export { lodashQueryLanguage } from './plugins/query/lodashQueryLanguage.js'
 export { javascriptQueryLanguage } from './plugins/query/javascriptQueryLanguage.js'
 export { jmespathQueryLanguage } from './plugins/query/jmespathQueryLanguage.js'
 
-// utils
-export { SortModal, TransformModal }
-export { getJSONSchemaOptions, findSchema, findEnum } from './utils/jsonSchemaUtils.js'
+// content
 export {
-  isEqualParser,
+  isContent,
   isTextContent,
+  isJSONContent,
   isLargeContent,
+  toTextContent,
+  toJSONContent,
   estimateSerializedSize
 } from './utils/jsonUtils.js'
+
+// parser
+export { isEqualParser } from './utils/jsonUtils.js'
+
+// path
 export { parseJSONPath, stringifyJSONPath } from './utils/pathUtils.js'
+
+// immutable-json-patch
 export {
-  isValueSelection,
-  isKeySelection,
-  isInsideSelection,
-  isAfterSelection,
-  isMultiSelection,
-  isEditingSelection,
-  createValueSelection,
-  createKeySelection,
-  createInsideSelection,
-  createAfterSelection,
-  createMultiSelection
-} from './logic/selection.js'
-export {
+  immutableJSONPatch,
+  revertJSONPatch,
   parseJSONPointer,
   parsePath,
   parseFrom,
@@ -61,4 +56,3 @@ export {
   existsIn,
   deleteIn
 } from 'immutable-json-patch'
-export { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'

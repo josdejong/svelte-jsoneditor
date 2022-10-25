@@ -85,7 +85,7 @@ Or one-way binding:
   }
 
   function handleChange(updatedContent, previousContent, { contentErrors, patchResult }) {
-    // content is an object { json: JSONData } | { text: string }
+    // content is an object { json: JSONValue } | { text: string }
     console.log('onChange: ', { updatedContent, previousContent, contentErrors, patchResult })
     content = updatedContent
   }
@@ -126,7 +126,7 @@ Browser example loading the ES module:
         props: {
           content,
           onChange: (updatedContent, previousContent, { contentErrors, patchResult }) => {
-            // content is an object { json: JSONData } | { text: string }
+            // content is an object { json: JSONValue } | { text: string }
             console.log('onChange', { updatedContent, previousContent, contentErrors, patchResult })
             content = updatedContent
           }
@@ -178,7 +178,7 @@ const editor = new JSONEditor({
   props: {
     content,
     onChange: (updatedContent, previousContent, { contentErrors, patchResult }) => {
-      // content is an object { json: JSONData } | { text: string }
+      // content is an object { json: JSONValue } | { text: string }
       console.log('onChange', { updatedContent, previousContent, contentErrors, patchResult })
     }
   }
@@ -197,7 +197,7 @@ const editor = new JSONEditor({
 - `tabSize: number` When indentation is configured as a tab character (`indentation: '\t'`), `tabSize` configures how large a tab character is rendered. Default value is `4`. Only applicable to `text` mode.
 - `escapeControlCharacters: boolean`. False by default. When `true`, control characters like newline and tab are rendered as escaped characters `\n` and `\t`. Only applicable for `'tree'` mode, in `'text'` mode control characters are always escaped.
 - `escapeUnicodeCharacters: boolean`. False by default. When `true`, unicode characters like ☎ and 😀 are rendered escaped like `\u260e` and `\ud83d\ude00`.
-- `validator: function (json: JSONData): ValidationError[]`. Validate the JSON document.
+- `validator: function (json: JSONValue): ValidationError[]`. Validate the JSON document.
   For example use the built-in JSON Schema validator powered by Ajv:
 
   ```js
@@ -329,7 +329,7 @@ const editor = new JSONEditor({
   - `editor.expand(path => true)` expand all
   - `editor.expand(path => false)` collapse all
   - `editor.expand(path => path.length < 2)` expand all paths up to 2 levels deep
-- `transform({ id?: string, selectedPath?: [], onTransform: ({ operations: JSONPatchDocument, json: JSONData, transformedJson: JSONData }) => void, onClose: () => void })` programmatically trigger clicking of the transform button in the main menu, opening the transform model. If a callback `onTransform` is provided, it will replace the build-in logic to apply a transform, allowing you to process the transform operations in an alternative way. If provided, `onClose` callback will trigger when the transform modal closes, both after the user clicked apply or cancel. If an `id` is provided, the transform modal will load the previous status of this `id` instead of the status of the editors transform modal.
+- `transform({ id?: string, selectedPath?: [], onTransform: ({ operations: JSONPatchDocument, json: JSONValue, transformedJson: JSONValue }) => void, onClose: () => void })` programmatically trigger clicking of the transform button in the main menu, opening the transform model. If a callback `onTransform` is provided, it will replace the build-in logic to apply a transform, allowing you to process the transform operations in an alternative way. If provided, `onClose` callback will trigger when the transform modal closes, both after the user clicked apply or cancel. If an `id` is provided, the transform modal will load the previous status of this `id` instead of the status of the editors transform modal.
 - `scrollTo(path: Path)` Scroll the editor vertically such that the specified path comes into view. The path will be expanded when needed.
 - `findElement(path: Path)` Find the DOM element of a given path. Returns `null` when not found.
 - `acceptAutoRepair(): Content` In tree mode, invalid JSON is automatically repaired when loaded. When the repair was successful, the repaired contents are rendered but not yet applied to the document itself until the user clicks "Ok" or starts editing the data. Instead of accepting the repair, the user can also click "Repair manually instead". Invoking `.acceptAutoRepair()` will programmatically accept the repair. This will trigger an update, and the method itself also returns the updated contents. In case of `text` mode or when the editor is not in an "accept auto repair" status, nothing will happen, and the contents will be returned as is.
@@ -338,13 +338,59 @@ const editor = new JSONEditor({
 - `focus()`. Give the editor focus.
 - `destroy()`. Destroy the editor, remove it from the DOM.
 
+### Utility functions
+
+- Rendering of values:
+  - `renderValue`
+  - `renderJSONSchemaEnum`
+  - Components:
+    - `BooleanToggle`
+    - `ColorPicker`
+    - `EditableValue`
+    - `EnumValue`
+    - `ReadonlyValue`
+    - `TimestampTag`
+- Validation:
+  - `createAjvValidator`
+- Query languages:
+  - `lodashQueryLanguage`
+  - `javascriptQueryLanguage`
+  - `jmespathQueryLanguage`
+- Content:
+  - `isContent`
+  - `isTextContent`
+  - `isJSONContent`
+  - `isLargeContent`
+  - `toTextContent`
+  - `toJSONContent`
+  - `estimateSerializedSize`
+- Parser:
+  - `isEqualParser`
+- Path:
+  - `parseJSONPath`
+  - `stringifyJSONPath`
+- Functions from [`immutable-json-patch`](https://github.com/josdejong/immutable-json-patch/):
+  - `immutableJSONPatch`
+  - `revertJSONPatch`
+  - `parseJSONPointer`
+  - `parsePath`
+  - `parseFrom`
+  - `compileJSONPointer`
+  - `compileJSONPointerProp`
+  - `getIn`
+  - `setIn`
+  - `updateIn`
+  - `insertAt`
+  - `existsIn`
+  - `deleteIn`
+
 ### Types
 
 ```ts
-type JSONData = { [key: string]: JSONData } | JSONData[] | string | number | boolean | null
+type JSONValue = { [key: string]: JSONValue } | JSONValue[] | string | number | boolean | null
 
-type TextContent = { text: string } | { json: undefined; text: string }
-type JSONContent = { json: JSONData } | { json: JSONData; text: undefined }
+type TextContent = { text: string }
+type JSONContent = { json: JSONValue }
 type Content = JSONContent | TextContent
 
 type JSONParser = JSON
@@ -360,12 +406,12 @@ type JSONPatchOperation = {
   op: 'add' | 'remove' | 'replace' | 'copy' | 'move' | 'test'
   path: string
   from?: string
-  value?: JSONData
+  value?: JSONValue
 }
 
 type JSONPatchResult = {
-  json: JSONData
-  previousJson: JSONData
+  json: JSONValue
+  previousJson: JSONValue
   undo: JSONPatchDocument
   redo: JSONPatchDocument
 }
@@ -398,8 +444,8 @@ interface QueryLanguage {
   id: string
   name: string
   description: string
-  createQuery: (json: JSONData, queryOptions: QueryLanguageOptions) => string
-  executeQuery: (json: JSONData, query: string) => JSONData
+  createQuery: (json: JSONValue, queryOptions: QueryLanguageOptions) => string
+  executeQuery: (json: JSONValue, query: string) => JSONValue
 }
 
 interface QueryLanguageOptions {
@@ -419,7 +465,7 @@ interface QueryLanguageOptions {
 
 interface RenderValuePropsOptional {
   path?: Path
-  value?: JSONData
+  value?: JSONValue
   readOnly?: boolean
   enforceString?: boolean
   selection?: Selection
@@ -428,7 +474,7 @@ interface RenderValuePropsOptional {
   isEditing?: boolean
   normalization?: ValueNormalization
   onPatch?: TreeModeContext['onPatch']
-  onPasteJson?: (pastedJson: { path: Path; contents: JSONData }) => void
+  onPasteJson?: (pastedJson: { path: Path; contents: JSONValue }) => void
   onSelect?: (selection: Selection) => void
   onFind?: (findAndReplace: boolean) => void
   focus?: () => void
@@ -436,7 +482,7 @@ interface RenderValuePropsOptional {
 
 interface RenderValueProps extends RenderValuePropsOptional {
   path: Path
-  value: JSONData
+  value: JSONValue
   readOnly: boolean
   enforceString: boolean | undefined
   selection: Selection | undefined
@@ -445,7 +491,7 @@ interface RenderValueProps extends RenderValuePropsOptional {
   isEditing: boolean
   normalization: ValueNormalization
   onPatch: (patch: JSONPatchDocument, afterPatch?: AfterPatchCallback) => JSONPatchResult
-  onPasteJson: (pastedJson: { path: Path; contents: JSONData }) => void
+  onPasteJson: (pastedJson: { path: Path; contents: JSONValue }) => void
   onSelect: (selection: Selection) => void
   onFind: (findAndReplace: boolean) => void
   focus: () => void
