@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>JSONEditor | Custom theme colors and font size</title>
+
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+
+      #my-jsoneditor {
+        /* define a custom theme color and font size */
+        --jse-theme-color: #ec1897;
+        --jse-theme-color-highlight: #f553b5;
+        --jse-font-size: 24px;
+        --jse-font-size-mono: 24px;
+
+        width: 600px;
+        height: 500px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>JSONEditor with a custom theme color and large font</h1>
+    <div id="my-jsoneditor"></div>
+
+    <script type="module">
+      import { JSONEditor } from '../../package-vanilla/index.js'
+
+      const editor = new JSONEditor({
+        target: document.getElementById('my-jsoneditor'),
+        props: {
+          content: {
+            json: [1, 2, 3]
+          }
+        }
+      })
+    </script>
+  </body>
+</html>
