@@ -72,6 +72,7 @@
   let columns: JSONPath[]
   $: columns = isJSONArray(json) ? getColumns(json, flattenColumns) : []
 
+  let refContents
   let itemHeightsCache: Record<number, number> = {}
 
   let viewPortHeight = 600
@@ -87,6 +88,22 @@
   )
 
   // $: debug('visibleSection', visibleSection) // TODO: cleanup
+
+  $: refreshScrollTop(json)
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  function refreshScrollTop(_json: JSONValue | undefined) {
+    // When the contents go from lots of items and scrollable contents to only a few items and
+    // no vertical scroll, the actual scrollTop changes to 0 but there is no on:scroll event
+    // triggered, so the internal scrollTop variable is not up-to-date.
+    // This is a workaround to update the scrollTop by triggering an on:scroll event
+    if (refContents) {
+      refContents.scrollTo({
+        top: refContents.scrollTop,
+        left: refContents.scrollLeft
+      })
+    }
+  }
 
   const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // FIXME: implement support for search and replace
   const selection: JSONSelection | undefined = undefined // FIXME: implement selecting contents
@@ -464,7 +481,12 @@
       {onRenderMenu}
     />
   {/if}
-  <div class="jse-contents" bind:clientHeight={viewPortHeight} on:scroll={handleScroll}>
+  <div
+    class="jse-contents"
+    bind:this={refContents}
+    bind:clientHeight={viewPortHeight}
+    on:scroll={handleScroll}
+  >
     {#if json && !isEmpty(columns)}
       <table class="jse-table-main">
         <tbody>
