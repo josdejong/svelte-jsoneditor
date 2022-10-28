@@ -27,7 +27,9 @@
 <p>
   Instead of using the native <code>JSON</code>
   parser, you can configure a different parser like
-  <a target="_blank" href="https://github.com/josdejong/lossless-json">lossless-json</a>
+  <a target="_blank" href="https://github.com/josdejong/lossless-json" rel="noreferrer"
+    >lossless-json</a
+  >
   using the option <code>parser</code> in order to be able to handle large numbers like
   <code>long</code> values.
 </p>

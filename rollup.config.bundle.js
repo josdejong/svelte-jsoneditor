@@ -5,7 +5,7 @@ import typescript from '@rollup/plugin-typescript'
 import { getBabelOutputPlugin } from '@rollup/plugin-babel'
 import path from 'path'
 import svelte from 'rollup-plugin-svelte'
-import { terser } from 'rollup-plugin-terser'
+import terser from '@rollup/plugin-terser'
 import sveltePreprocess from 'svelte-preprocess'
 
 const production = !process.env.ROLLUP_WATCH
