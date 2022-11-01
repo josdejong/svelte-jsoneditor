@@ -19,6 +19,7 @@
   import type {
     Content,
     JSONParser,
+    JSONPathParser,
     OnChangeQueryLanguage,
     OnClassName,
     OnPatch,
@@ -32,9 +33,12 @@
   export let json: JSONValue
   export let selectedPath: JSONPath = []
 
+  export let indentation: number | string
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
   export let parser: JSONParser
+  export let validationParser: JSONParser
+  export let pathParser: JSONPathParser
 
   export let queryLanguages: QueryLanguage[]
   export let queryLanguageId: string
@@ -245,6 +249,7 @@
                 readOnly={true}
                 mainMenuBar={false}
                 navigationBar={false}
+                {indentation}
                 {escapeControlCharacters}
                 {escapeUnicodeCharacters}
                 {parser}
@@ -256,7 +261,11 @@
                 onBlur={noop}
                 onSortModal={noop}
                 onTransformModal={noop}
+                onRequestRepair={noop}
                 {onClassName}
+                validator={null}
+                {validationParser}
+                {pathParser}
               />
             {/if}
           </div>
@@ -270,6 +279,7 @@
                 readOnly={true}
                 mainMenuBar={false}
                 navigationBar={false}
+                {indentation}
                 {escapeControlCharacters}
                 {escapeUnicodeCharacters}
                 {parser}
@@ -281,7 +291,11 @@
                 onBlur={noop}
                 onSortModal={noop}
                 onTransformModal={noop}
+                onRequestRepair={noop}
                 {onClassName}
+                validator={null}
+                {validationParser}
+                {pathParser}
               />
             {:else}
               <div class="jse-preview jse-error">
