@@ -479,6 +479,8 @@
             {parser}
             onChange={handleChange}
             {onRenderValue}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             onRenderMenu={handleRenderMenu}
             {onSortModal}
             {onTransformModal}

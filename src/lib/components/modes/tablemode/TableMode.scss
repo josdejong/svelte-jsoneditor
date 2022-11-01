@@ -17,6 +17,22 @@
     border-top: var(--jse-main-border);
   }
 
+  .jse-hidden-input-label {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+
+    .jse-hidden-input {
+      width: 0;
+      height: 0;
+      padding: 0;
+      border: 0;
+      outline: none;
+    }
+  }
+
   .jse-contents {
     flex: 1;
     align-items: start;
@@ -38,6 +54,12 @@
         td {
           margin: 0;
           padding: 0;
+        }
+      }
+
+      .jse-table-invisible-end-section {
+        td {
+          padding-bottom: $padding;
         }
       }
 

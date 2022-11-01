@@ -11,7 +11,9 @@
     JSONParser,
     JSONPatchResult,
     JSONSelection,
+    OnBlur,
     OnChange,
+    OnFocus,
     OnRenderMenu,
     OnRenderValue,
     PastedJson,
@@ -35,7 +37,13 @@
   import { calculateVisibleSection, getColumns } from '../../../logic/table.js'
   import { isEmpty, isEqual, uniqueId } from 'lodash-es'
   import JSONValueComponent from './JSONValue.svelte'
-  import { createNormalizationFunctions, getDataPathFromTarget } from '../../../utils/domUtils'
+  import {
+    activeElementIsChildOf,
+    createNormalizationFunctions,
+    getDataPathFromTarget,
+    getWindow,
+    isChildOfNodeName
+  } from '../../../utils/domUtils'
   import { createDebug } from '$lib/utils/debug'
   import { createDocumentState, documentStatePatch } from '$lib/logic/documentState'
   import { isObjectOrArray } from '$lib/utils/typeUtils.js'
@@ -47,6 +55,9 @@
   import { sortJson } from '$lib/logic/sort'
   import { encodeDataPath } from '$lib/utils/domUtils.js'
   import { isValueSelection } from '$lib/logic/selection.js'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings'
+  import { createFocusTracker } from '$lib/components/controls/createFocusTracker'
+  import { onDestroy, onMount } from 'svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
   const sortModalId = uniqueId()
@@ -62,6 +73,8 @@
   export let onChange: OnChange
   export let onRenderValue: OnRenderValue
   export let onRenderMenu: OnRenderMenu
+  export let onFocus: OnFocus
+  export let onBlur: OnBlur
   export let onSortModal: (props: SortModalCallback) => void
   export let onTransformModal: (props: TransformModalCallback) => void
 
@@ -69,6 +82,29 @@
   $: normalization = createNormalizationFunctions({
     escapeControlCharacters,
     escapeUnicodeCharacters
+  })
+
+  let refJsonEditor
+  let refContents
+  let refHiddenInput
+
+  createFocusTracker({
+    onMount,
+    onDestroy,
+    getWindow: () => getWindow(refJsonEditor),
+    hasFocus: () => (modalOpen && document.hasFocus()) || activeElementIsChildOf(refJsonEditor),
+    onFocus: () => {
+      hasFocus = true
+      if (onFocus) {
+        onFocus()
+      }
+    },
+    onBlur: () => {
+      hasFocus = false
+      if (onBlur) {
+        onBlur()
+      }
+    }
   })
 
   // FIXME: work out support for object and primitive value
@@ -80,7 +116,11 @@
   let columns: JSONPath[]
   $: columns = isJSONArray(json) ? getColumns(json, flattenColumns) : []
 
-  let refContents
+  // modalOpen is true when one of the modals is open.
+  // This is used to track whether the editor still has focus
+  let modalOpen = false
+  let hasFocus = false
+
   let itemHeightsCache: Record<number, number> = {}
 
   let viewPortHeight = 600
@@ -330,7 +370,13 @@
   }
 
   export function focus() {
-    // FIXME: implement focus
+    // with just .focus(), sometimes the input doesn't react on onpaste events
+    // in Chrome when having a large document open and then doing cut/paste.
+    // Calling both .focus() and .select() did solve this issue.
+    if (refHiddenInput) {
+      refHiddenInput.focus()
+      refHiddenInput.select()
+    }
   }
 
   function handleScroll(event: Event) {
@@ -342,6 +388,39 @@
     if (path) {
       updateSelection(createValueSelection(path, false))
     }
+
+    // TODO: ugly to have two setTimeout here. Without it, hiddenInput will blur
+    setTimeout(() => {
+      setTimeout(() => {
+        if (!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) {
+          // for example when clicking on the empty area in the main menu
+          focus()
+        }
+      })
+    })
+  }
+
+  function handleKeyDown(event) {
+    // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
+    const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
+    debug('keydown', { combo, key: event.key })
+
+    if (combo === 'Enter' && documentState.selection) {
+      if (isValueSelection(documentState.selection)) {
+        event.preventDefault()
+
+        const value = getIn(json, documentState.selection.focusPath)
+        if (isObjectOrArray(value)) {
+          // expand object/array
+          // FIXME: open popup to edit a nested object/array
+        } else {
+          if (!readOnly) {
+            // go to value edit mode
+            updateSelection({ ...documentState.selection, edit: true })
+          }
+        }
+      }
+    }
   }
 
   function handleEdit(path: JSONPath, value: JSONValue) {
@@ -350,12 +429,32 @@
     // FIXME: open a popup where you can edit the nested object/array
   }
 
+  function handlePaste(event) {
+    event.preventDefault()
+
+    if (readOnly) {
+      return
+    }
+
+    const clipboardText = event.clipboardData.getData('text/plain')
+
+    // FIXME: implement handlePaste
+    // try {
+    //   doPaste(clipboardText)
+    // } catch (err) {
+    //   openRepairModal(clipboardText, (repairedText) => {
+    //     debug('repaired pasted text: ', repairedText)
+    //     doPaste(repairedText)
+    //   })
+    // }
+  }
+
   function openSortModal(selectedPath: JSONPath) {
     if (readOnly) {
       return
     }
 
-    // FIXME: track focus whilst editor is open (use createFocusTracker)
+    modalOpen = true
 
     onSortModal({
       id: sortModalId,
@@ -367,7 +466,8 @@
         handlePatch(operations)
       },
       onClose: () => {
-        // FIXME: focus()
+        modalOpen = false
+        focus()
       }
     })
   }
@@ -381,7 +481,7 @@
     onTransform,
     onClose
   }: TransformModalOptions) {
-    // FIXME: track modalOpen = true
+    modalOpen = true
 
     onTransformModal({
       id: id || transformModalId,
@@ -401,9 +501,8 @@
             handlePatch(operations)
           },
       onClose: () => {
-        // FIXME: handle focus
-        // modalOpen = false
-        // focus()
+        modalOpen = false
+        focus()
         if (onClose) {
           onClose()
         }
@@ -511,7 +610,13 @@
   }
 </script>
 
-<div class="jse-table-mode" class:no-main-menu={!mainMenuBar}>
+<div
+  class="jse-table-mode"
+  class:no-main-menu={!mainMenuBar}
+  on:mousedown={handleMouseDown}
+  on:keydown={handleKeyDown}
+  bind:this={refJsonEditor}
+>
   {#if mainMenuBar}
     <TableMenu
       {json}
@@ -524,12 +629,21 @@
       {onRenderMenu}
     />
   {/if}
+  <label class="jse-hidden-input-label">
+    <input
+      type="text"
+      readonly="readonly"
+      tabindex="-1"
+      class="jse-hidden-input"
+      bind:this={refHiddenInput}
+      on:paste={handlePaste}
+    />
+  </label>
   <div
     class="jse-contents"
     bind:this={refContents}
     bind:clientHeight={viewPortHeight}
     on:scroll={handleScroll}
-    on:mousedown={handleMouseDown}
   >
     {#if json && !isEmpty(columns)}
       <table class="jse-table-main">

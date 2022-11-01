@@ -2002,7 +2002,7 @@
   function handleMouseDown(event) {
     debug('handleMouseDown', event)
 
-    // TODO: ugly to have to have two setTimeout here. Without it, hiddenInput will blur
+    // TODO: ugly to have two setTimeout here. Without it, hiddenInput will blur
     setTimeout(() => {
       setTimeout(() => {
         if (!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) {
