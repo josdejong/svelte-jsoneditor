@@ -262,6 +262,7 @@ export type OnRenderMenu = (
 export type OnError = (error: Error) => void
 export type OnFocus = () => void
 export type OnBlur = () => void
+export type FindNextInside = (path: JSONPath) => JSONSelection | undefined
 
 export interface SearchResult {
   items: ExtendedSearchResultItem[]
@@ -387,6 +388,7 @@ export interface JSONEditorContext {
   getJson: () => JSONValue
   getDocumentState: () => DocumentState
   findElement: (path: JSONPath) => Element | null
+  findNextInside: FindNextInside
   focus: () => void
   onPatch: (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => JSONPatchResult
   onSelect: OnSelect
@@ -415,7 +417,6 @@ export interface RenderValuePropsOptional {
   enforceString?: boolean
   selection?: JSONSelection
   searchResultItems?: SearchResultItem[]
-  isSelected?: boolean
   isEditing?: boolean
   parser?: JSONParser
   normalization?: ValueNormalization
@@ -423,6 +424,7 @@ export interface RenderValuePropsOptional {
   onPasteJson?: OnPasteJson
   onSelect?: OnSelect
   onFind?: OnFind
+  findNextInside?: FindNextInside
   focus?: () => void
 }
 
@@ -433,7 +435,6 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   enforceString: boolean
   selection: JSONSelection | undefined
   searchResultItems: SearchResultItem[] | undefined
-  isSelected: boolean
   isEditing: boolean
   parser: JSONParser
   normalization: ValueNormalization
@@ -441,6 +442,7 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   onPasteJson: OnPasteJson
   onSelect: OnSelect
   onFind: OnFind
+  findNextInside: FindNextInside
   focus: () => void
 }
 

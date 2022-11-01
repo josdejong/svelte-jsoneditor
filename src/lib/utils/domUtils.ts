@@ -287,7 +287,7 @@ export function decodeDataPath(pathStr: string): JSONPath {
  */
 export function getDataPathFromTarget(target: HTMLElement): JSONPath | null {
   const parent = findParent(target, (element) => {
-    return element.hasAttribute('data-path')
+    return element?.hasAttribute ? element.hasAttribute('data-path') : false
   })
 
   return parent ? decodeDataPath(parent.getAttribute('data-path')) : null

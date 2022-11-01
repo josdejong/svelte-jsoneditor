@@ -73,6 +73,10 @@
             // FIXME: border and/or border shadow?
           }
 
+          &.jse-selected-value > :global(.jse-value) {
+            background: var(--jse-selection-background-color);
+          }
+
           :global(div) {
             display: inline-block;
           }

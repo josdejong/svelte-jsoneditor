@@ -24,21 +24,29 @@
   import { SortDirection } from '../../../types'
   import TableMenu from './menu/TableMenu.svelte'
   import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
-  import { compileJSONPointer, getIn, immutableJSONPatch, isJSONArray } from 'immutable-json-patch'
+  import {
+    compileJSONPointer,
+    existsIn,
+    getIn,
+    immutableJSONPatch,
+    isJSONArray
+  } from 'immutable-json-patch'
   import { isTextContent } from '../../../utils/jsonUtils'
   import { calculateVisibleSection, getColumns } from '../../../logic/table.js'
   import { isEmpty, isEqual, uniqueId } from 'lodash-es'
   import JSONValueComponent from './JSONValue.svelte'
-  import { createNormalizationFunctions } from '../../../utils/domUtils'
+  import { createNormalizationFunctions, getDataPathFromTarget } from '../../../utils/domUtils'
   import { createDebug } from '$lib/utils/debug'
   import { createDocumentState, documentStatePatch } from '$lib/logic/documentState'
   import { isObjectOrArray } from '$lib/utils/typeUtils.js'
   import TableTag from '$lib/components/modes/tablemode/tag/TableTag.svelte'
   import { revertJSONPatchWithMoveOperations } from '$lib/logic/operations'
-  import { removeEditModeFromSelection } from '$lib/logic/selection'
+  import { createValueSelection, removeEditModeFromSelection } from '$lib/logic/selection'
   import { createHistory } from '$lib/logic/history'
   import ColumnHeader from '$lib/components/modes/tablemode/ColumnHeader.svelte'
   import { sortJson } from '$lib/logic/sort'
+  import { encodeDataPath } from '$lib/utils/domUtils.js'
+  import { isValueSelection } from '$lib/logic/selection.js'
 
   const debug = createDebug('jsoneditor:TableMode')
   const sortModalId = uniqueId()
@@ -105,10 +113,28 @@
     }
   }
 
-  const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // FIXME: implement support for search and replace
-  const selection: JSONSelection | undefined = undefined // FIXME: implement selecting contents
+  function updateSelection(
+    selection:
+      | JSONSelection
+      | undefined
+      | ((selection: JSONSelection | undefined) => JSONSelection | undefined)
+  ) {
+    debug('updateSelection', selection)
 
-  let sortedColumn: SortedColumn | undefined = undefined
+    const updatedSelection =
+      typeof selection === 'function' ? selection(documentState.selection) : selection
+
+    if (!isEqual(updatedSelection, documentState.selection)) {
+      documentState = {
+        ...documentState,
+        selection: updatedSelection
+      }
+    }
+  }
+
+  let documentState = createDocumentState()
+  const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // FIXME: implement support for search and replace
+  let sortedColumn: SortedColumn | undefined = undefined // TODO: sortedColumn should become part of the DocumentState
 
   function onSortByHeader(newSortedColumn: SortedColumn) {
     debug('onSortByHeader', newSortedColumn)
@@ -134,11 +160,12 @@
     parser,
     normalization,
     getJson: () => json,
-    getDocumentState: () => createDocumentState(), // FIXME: what to do with getDocumentState()? It's not relevant in TableMode
-    findElement: () => null, // FIXME: what to do with getDocumentState()? It's not relevant in TableMode
+    getDocumentState: () => documentState,
+    findElement: () => null, // FIXME: implement findElement?
+    findNextInside,
     focus,
     onPatch: handlePatch,
-    onSelect: handleSelect,
+    onSelect: updateSelection,
     onFind: handleFind,
     onPasteJson: handlePasteJson,
     onRenderValue
@@ -203,23 +230,22 @@
 
     const previousContent: Content = { json }
     const previousJson = json
-    const previousState = createDocumentState() // FIXME: DocumentState is not relevant for TableMode
+    const previousState = documentState
 
     // execute the patch operations
     const undo: JSONPatchDocument = revertJSONPatchWithMoveOperations(
       json,
       operations
     ) as JSONPatchDocument
-    const documentState = createDocumentState() // FIXME: DocumentState is not relevant for TableMode
     const patched = documentStatePatch(json, documentState, operations)
 
     const callback =
-      typeof afterPatch === 'function' ? afterPatch(patched.json, documentState) : undefined
+      typeof afterPatch === 'function' ? afterPatch(patched.json, patched.documentState) : undefined
 
     json = callback && callback.json !== undefined ? callback.json : patched.json
-    // FIXME: DocumentState is not relevant for TableMode
-    const newState = callback && callback.state !== undefined ? callback.state : documentState
-    //documentState = newState // FIXME: DocumentState is not relevant for TableMode
+    const newState =
+      callback && callback.state !== undefined ? callback.state : patched.documentState
+    documentState = newState
 
     history.add({
       undo: {
@@ -286,11 +312,6 @@
     }
   }
 
-  function handleSelect(selection: JSONSelection) {
-    debug('select', selection)
-    // FIXME: implement handleSelect
-  }
-
   function handleFind(findAndReplace: boolean) {
     // FIXME: implement handleFind
   }
@@ -299,12 +320,28 @@
     // FIXME: implement handlePasteJson
   }
 
+  function findNextInside(path: JSONPath): JSONSelection {
+    const index = parseInt(path[0])
+    const nextPath = [String(index + 1), ...path.slice(1)]
+
+    return existsIn(json, nextPath)
+      ? createValueSelection(nextPath, false)
+      : createValueSelection(path, false)
+  }
+
   export function focus() {
     // FIXME: implement focus
   }
 
   function handleScroll(event: Event) {
     scrollTop = event.target['scrollTop']
+  }
+
+  function handleMouseDown(event: Event) {
+    const path = event?.target ? getDataPathFromTarget(event.target as HTMLElement) : undefined
+    if (path) {
+      updateSelection(createValueSelection(path, false))
+    }
   }
 
   function handleEdit(path: JSONPath, value: JSONValue) {
@@ -402,7 +439,7 @@
     const previousContent = { json, text }
 
     json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
-    // documentState = item.undo.state // FIXME
+    documentState = item.undo.state
     text = item.undo.text
     // textIsRepaired = item.undo.textIsRepaired // FIXME
 
@@ -443,7 +480,7 @@
     const previousContent = { json, text }
 
     json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
-    // documentState = item.redo.state // FIXME
+    documentState = item.redo.state
     text = item.redo.text
     // textIsRepaired = item.redo.textIsRepaired // FIXME
 
@@ -466,6 +503,12 @@
     //   scrollTo(documentState.selection.focusPath, false)
     // }
   }
+
+  function isPathSelected(path: JSONPath): boolean {
+    return documentState.selection
+      ? documentState.selection.pointersMap[compileJSONPointer(path)] === true
+      : false
+  }
 </script>
 
 <div class="jse-table-mode" class:no-main-menu={!mainMenuBar}>
@@ -486,6 +529,7 @@
     bind:this={refContents}
     bind:clientHeight={viewPortHeight}
     on:scroll={handleScroll}
+    on:mousedown={handleMouseDown}
   >
     {#if json && !isEmpty(columns)}
       <table class="jse-table-main">
@@ -511,18 +555,20 @@
               {#each columns as column}
                 {@const path = [index].concat(column)}
                 {@const value = getIn(item, column)}
-                <td class="jse-table-cell">
+                {@const isSelected = isPathSelected(path)}
+                <td
+                  class="jse-table-cell"
+                  data-path={encodeDataPath(path)}
+                  class:jse-selected-value={isSelected && isValueSelection(documentState.selection)}
+                >
                   {#if isObjectOrArray(value)}
                     <TableTag {path} {value} onEdit={handleEdit} />
                   {:else if value !== undefined}
                     <JSONValueComponent
                       {path}
                       {value}
-                      isSelected={selection
-                        ? selection.pointersMap[compileJSONPointer(path)] === true
-                        : false}
                       enforceString={false}
-                      {selection}
+                      selection={isSelected ? documentState.selection : undefined}
                       {searchResultItems}
                       {context}
                     />

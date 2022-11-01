@@ -8,7 +8,6 @@
   export let path: JSONPath
   export let value: JSONValue
   export let context: JSONEditorContext
-  export let isSelected: boolean
   export let enforceString: boolean
   export let selection: JSONSelection | undefined
   export let searchResultItems: SearchResultItem[] | undefined
@@ -20,7 +19,6 @@
     value,
     readOnly: context.readOnly,
     enforceString,
-    isSelected,
     isEditing,
     parser: context.parser,
     normalization: context.normalization,
@@ -30,6 +28,7 @@
     onPasteJson: context.onPasteJson,
     onSelect: context.onSelect,
     onFind: context.onFind,
+    findNextInside: context.findNextInside,
     focus: context.focus
   })
 </script>

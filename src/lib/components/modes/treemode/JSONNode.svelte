@@ -862,7 +862,6 @@
           {path}
           {value}
           {enforceString}
-          {isSelected}
           selection={isSelected ? selection : undefined}
           searchResultItems={filterValueSearchResults(searchResultItemsMap, pointer)}
           {context}

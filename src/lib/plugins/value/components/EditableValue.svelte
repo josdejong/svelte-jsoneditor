@@ -9,7 +9,9 @@
   import EditableDiv from '../../../components/controls/EditableDiv.svelte'
   import { UPDATE_SELECTION } from '../../../constants.js'
   import type {
+    FindNextInside,
     JSONParser,
+    JSONSelection,
     OnFind,
     OnPasteJson,
     OnPatch,
@@ -27,8 +29,9 @@
   export let onSelect: OnSelect
   export let onFind: OnFind
   export let focus: () => void
+  export let findNextInside: FindNextInside
 
-  function convert(value: string) {
+  function convert(value: string): JSONValue {
     return enforceString ? value : stringConvert(value, parser)
   }
 
@@ -44,7 +47,7 @@
       (patchedJson, patchedState) => {
         const selection =
           updateSelection === UPDATE_SELECTION.NEXT_INSIDE
-            ? getSelectionNextInside(patchedJson, patchedState, path) || patchedState.selection
+            ? findNextInside(path)
             : createValueSelection(path, false)
 
         return {

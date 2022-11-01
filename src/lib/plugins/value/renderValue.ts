@@ -20,6 +20,7 @@ export function renderValue({
   onPasteJson,
   onSelect,
   onFind,
+  findNextInside,
   focus
 }: RenderValueProps): RenderValueComponentDescription[] {
   const renderers: RenderValueComponentDescription[] = []
@@ -51,6 +52,7 @@ export function renderValue({
         onPasteJson,
         onSelect,
         onFind,
+        findNextInside,
         focus
       }
     })

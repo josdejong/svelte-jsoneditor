@@ -67,6 +67,7 @@
     getInitialSelection,
     getSelectionDown,
     getSelectionLeft,
+    getSelectionNextInside,
     getSelectionPaths,
     getSelectionRight,
     getSelectionUp,
@@ -2226,6 +2227,10 @@
     }
   }
 
+  function findNextInside(path: JSONPath): JSONSelection {
+    return getSelectionNextInside(json, documentState, path)
+  }
+
   $: autoScrollHandler = refContents ? createAutoScrollHandler(refContents) : undefined
 
   function handleDrag(event) {
@@ -2250,6 +2255,7 @@
     getJson,
     getDocumentState,
     findElement,
+    findNextInside,
     focus,
     onPatch: handlePatch,
     onInsert: handleInsert,
