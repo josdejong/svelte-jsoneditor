@@ -322,8 +322,6 @@
     operations: JSONPatchDocument,
     afterPatch?: AfterPatchCallback
   ): JSONPatchResult {
-    debug('patch', operations, afterPatch)
-
     return patch(operations, afterPatch)
   }
 
