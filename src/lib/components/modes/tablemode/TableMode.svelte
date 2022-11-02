@@ -23,7 +23,7 @@
     TransformModalOptions,
     ValueNormalization
   } from '../../../types'
-  import { SortDirection } from '../../../types'
+  import { SelectionType, SortDirection } from '../../../types'
   import TableMenu from './menu/TableMenu.svelte'
   import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
   import {
@@ -49,7 +49,12 @@
   import { isObjectOrArray } from '$lib/utils/typeUtils.js'
   import TableTag from '$lib/components/modes/tablemode/tag/TableTag.svelte'
   import { revertJSONPatchWithMoveOperations } from '$lib/logic/operations'
-  import { createValueSelection, removeEditModeFromSelection } from '$lib/logic/selection'
+  import {
+    createValueSelection,
+    isEditingSelection,
+    isPathInsideSelection,
+    removeEditModeFromSelection
+  } from '$lib/logic/selection'
   import { createHistory } from '$lib/logic/history'
   import ColumnHeader from '$lib/components/modes/tablemode/ColumnHeader.svelte'
   import { sortJson } from '$lib/logic/sort'
@@ -384,6 +389,14 @@
   function handleMouseDown(event: Event) {
     const path = event?.target ? getDataPathFromTarget(event.target as HTMLElement) : undefined
     if (path) {
+      // when clicking inside the current selection, editing a value, do nothing
+      if (
+        isEditingSelection(documentState.selection) &&
+        isPathInsideSelection(documentState.selection, path, SelectionType.value)
+      ) {
+        return
+      }
+
       updateSelection(createValueSelection(path, false))
     }
 
@@ -665,7 +678,7 @@
                 bind:clientHeight={itemHeightsCache[index]}>{index + 1}</th
               >
               {#each columns as column}
-                {@const path = [index].concat(column)}
+                {@const path = [String(index)].concat(column)}
                 {@const value = getIn(item, column)}
                 {@const isSelected = isPathSelected(path)}
                 <td
