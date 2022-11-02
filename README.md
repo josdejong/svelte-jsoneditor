@@ -364,6 +364,18 @@ const editor = new JSONEditor({
   - `toTextContent`
   - `toJSONContent`
   - `estimateSerializedSize`
+- Selection:
+  - `isValueSelection`
+  - `isKeySelection`
+  - `isInsideSelection`
+  - `isAfterSelection`
+  - `isMultiSelection`,
+  - `isEditingSelection`
+  - `createValueSelection`
+  - `createKeySelection`
+  - `createInsideSelection`,
+  - `createAfterSelection`
+  - `createMultiSelection`
 - Parser:
   - `isEqualParser`
 - Path:

@@ -34,6 +34,21 @@ export {
   estimateSerializedSize
 } from './utils/jsonUtils.js'
 
+// selection
+export {
+  isValueSelection,
+  isKeySelection,
+  isInsideSelection,
+  isAfterSelection,
+  isMultiSelection,
+  isEditingSelection,
+  createValueSelection,
+  createKeySelection,
+  createInsideSelection,
+  createAfterSelection,
+  createMultiSelection
+} from './logic/selection.js'
+
 // parser
 export { isEqualParser } from './utils/jsonUtils.js'
 
