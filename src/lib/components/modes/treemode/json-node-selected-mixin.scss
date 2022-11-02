@@ -78,6 +78,19 @@
     }
   }
 
+  &.jse-readonly {
+    .jse-header,
+    .jse-contents,
+    .jse-meta,
+    .jse-expand,
+    .jse-footer,
+    :global(.jse-key),
+    :global(.jse-value),
+    :global(.jse-collapsed-items) {
+      cursor: default !important; // TODO: get rid of the !important here
+    }
+  }
+
   .jse-insert-area {
     &.jse-selected {
       z-index: 2;
