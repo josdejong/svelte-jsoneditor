@@ -4,20 +4,20 @@
   import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils'
-  import { createValueSelection, getSelectionNextInside } from '../../../logic/selection'
+  import { createValueSelection } from '../../../logic/selection'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
   import EditableDiv from '../../../components/controls/EditableDiv.svelte'
   import { UPDATE_SELECTION } from '../../../constants.js'
   import type {
     FindNextInside,
     JSONParser,
-    JSONSelection,
     OnFind,
     OnPasteJson,
     OnPatch,
     OnSelect,
     ValueNormalization
   } from '../../../types'
+  import { isEqual } from 'lodash-es'
 
   export let path: JSONPath
   export let value: JSONValue
@@ -45,6 +45,13 @@
         }
       ],
       (patchedJson, patchedState) => {
+        // Leave the selection as is when it is no longer the path that we were editing here
+        // This happens for example when the user clicks or double-clicks on another value
+        // whilst editing a value
+        if (!isEqual(path, patchedState.selection.focusPath)) {
+          return undefined
+        }
+
         const selection =
           updateSelection === UPDATE_SELECTION.NEXT_INSIDE
             ? findNextInside(path)
