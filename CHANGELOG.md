@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.9.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.9.0...v0.9.1) (2022-11-02)
+
+
+### Bug Fixes
+
+* export and document all selection utility functions again (reverting their removal in `v0.9.0`) ([0dd1dee](https://github.com/josdejong/svelte-jsoneditor/commit/0dd1dee55983cb261911814870410a57be87590c))
+* update codemirror dependencies and all devDependencies ([77cbb6d](https://github.com/josdejong/svelte-jsoneditor/commit/77cbb6d4fc95f3d0867a1117af682d6d534903f8))
+
 ## [0.9.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.8.0...v0.9.0) (2022-10-25)
 
 
