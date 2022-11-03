@@ -437,8 +437,8 @@
     }
   }
 
-  function handleEdit(path: JSONPath, value: JSONValue) {
-    debug('edit nested object or array', { path, value })
+  function handleOpenJSONEditorModal(path: JSONPath, value: JSONValue) {
+    debug('handleOpenJSONEditorModal', { path, value })
 
     // open a popup where you can edit the nested object/array
     onJSONEditorModal({
@@ -449,7 +449,9 @@
       },
       path,
       onPatch: context.onPatch,
-      onClose: noop
+      onClose: () => {
+        focus()
+      }
     })
   }
 
@@ -627,10 +629,8 @@
     // }
   }
 
-  function isPathSelected(path: JSONPath): boolean {
-    return documentState.selection
-      ? documentState.selection.pointersMap[compileJSONPointer(path)] === true
-      : false
+  function isPathSelected(path: JSONPath, selection: JSONSelection): boolean {
+    return selection ? selection.pointersMap[compileJSONPointer(path)] === true : false
   }
 </script>
 
@@ -693,14 +693,14 @@
               {#each columns as column}
                 {@const path = [String(index)].concat(column)}
                 {@const value = getIn(item, column)}
-                {@const isSelected = isPathSelected(path)}
+                {@const isSelected = isPathSelected(path, documentState.selection)}
                 <td
                   class="jse-table-cell"
                   data-path={encodeDataPath(path)}
                   class:jse-selected-value={isSelected && isValueSelection(documentState.selection)}
                 >
                   {#if isObjectOrArray(value)}
-                    <TableTag {path} {value} onEdit={handleEdit} />
+                    <TableTag {path} {value} {isSelected} onEdit={handleOpenJSONEditorModal} />
                   {:else if value !== undefined}
                     <JSONValueComponent
                       {path}

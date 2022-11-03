@@ -4,6 +4,10 @@
   display: flex;
   gap: 2px;
 
+  &.jse-selected {
+    background: var(--jse-selection-background-color);
+  }
+
   .jse-bracket {
     color: var(--jse-delimiter-color);
   }
