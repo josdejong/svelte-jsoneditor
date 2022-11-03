@@ -423,10 +423,11 @@
       if (isValueSelection(documentState.selection)) {
         event.preventDefault()
 
-        const value = getIn(json, documentState.selection.focusPath)
+        const path = documentState.selection.focusPath
+        const value = getIn(json, path)
         if (isObjectOrArray(value)) {
-          // expand object/array
-          // FIXME: open popup to edit a nested object/array
+          // edit nested object/array
+          openJSONEditorModal(path, value)
         } else {
           if (!readOnly) {
             // go to value edit mode
@@ -437,8 +438,8 @@
     }
   }
 
-  function handleOpenJSONEditorModal(path: JSONPath, value: JSONValue) {
-    debug('handleOpenJSONEditorModal', { path, value })
+  function openJSONEditorModal(path: JSONPath, value: JSONValue) {
+    debug('openJSONEditorModal', { path, value })
 
     // open a popup where you can edit the nested object/array
     onJSONEditorModal({
@@ -700,7 +701,7 @@
                   class:jse-selected-value={isSelected && isValueSelection(documentState.selection)}
                 >
                   {#if isObjectOrArray(value)}
-                    <TableTag {path} {value} {isSelected} onEdit={handleOpenJSONEditorModal} />
+                    <TableTag {path} {value} {isSelected} onEdit={openJSONEditorModal} />
                   {:else if value !== undefined}
                     <JSONValueComponent
                       {path}
