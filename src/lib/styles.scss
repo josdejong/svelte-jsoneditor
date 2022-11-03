@@ -65,3 +65,22 @@ $errors-overview-max-height: 25%;
     cursor: inherit;
   }
 }
+
+@mixin modal-input-mixin {
+  border: var(--jse-input-border);
+  outline: none;
+  box-sizing: border-box;
+  padding: $padding-half;
+  font-family: var(--jse-font-family-mono);
+  font-size: var(--jse-font-size-mono);
+  color: inherit;
+  background: var(--jse-input-background);
+
+  &:focus {
+    border: var(--jse-input-border-focus);
+  }
+
+  &:read-only {
+    background: var(--jse-input-background-readonly);
+  }
+}

@@ -45,17 +45,18 @@
     JSONPatchResult,
     OnBlur,
     OnChange,
+    OnChangeMode,
     OnError,
     OnFocus,
     OnRenderMenu,
+    OnSortModal,
+    OnTransformModal,
     ParseError,
     RichValidationError,
-    SortModalCallback,
-    TransformModalCallback,
     ValidationError,
     Validator
   } from '../../../types'
-  import { ValidationSeverity } from '../../../types'
+  import { Mode, ValidationSeverity } from '../../../types'
   import { isContentParseError, isContentValidationErrors } from '../../../typeguards'
   import memoizeOne from 'memoize-one'
   import { validateText } from '../../../logic/validation'
@@ -71,13 +72,13 @@
   export let validator: Validator | null
   export let validationParser: JSONParser
   export let onChange: OnChange
-  export let onSwitchToTreeMode: () => void
+  export let onChangeMode: OnChangeMode
   export let onError: OnError
   export let onFocus: OnFocus
   export let onBlur: OnBlur
   export let onRenderMenu: OnRenderMenu
-  export let onSortModal: (props: SortModalCallback) => void
-  export let onTransformModal: (props: TransformModalCallback) => void
+  export let onSortModal: OnSortModal
+  export let onTransformModal: OnTransformModal
 
   const debug = createDebug('jsoneditor:TextMode')
 
@@ -371,6 +372,10 @@
   function handleAcceptTooLarge() {
     acceptTooLarge = true
     setCodeMirrorContent(externalContent, true)
+  }
+
+  function handleSwitchToTreeMode() {
+    onChangeMode(Mode.tree)
   }
 
   function cancelLoadTooLarge() {
@@ -827,7 +832,7 @@
           {
             text: 'Open in tree mode',
             title: 'Open the document in tree mode. Tree mode can handle large documents.',
-            onClick: onSwitchToTreeMode
+            onClick: handleSwitchToTreeMode
           },
           {
             text: 'Cancel',

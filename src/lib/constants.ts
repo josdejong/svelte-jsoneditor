@@ -36,6 +36,11 @@ export const TRANSFORM_MODAL_OPTIONS = {
   classWindow: 'jse-modal-window jse-modal-window-transform'
 }
 
+export const JSONEDITOR_MODAL_OPTIONS = {
+  ...SIMPLE_MODAL_OPTIONS,
+  classWindow: 'jse-modal-window jse-modal-window-jsoneditor'
+}
+
 export const INSERT_EXPLANATION =
   'Insert or paste contents, ' +
   'enter [ insert a new array, ' +

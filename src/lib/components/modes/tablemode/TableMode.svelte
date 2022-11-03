@@ -14,16 +14,17 @@
     OnBlur,
     OnChange,
     OnFocus,
+    OnJSONEditorModal,
     OnRenderMenu,
     OnRenderValue,
+    OnSortModal,
+    OnTransformModal,
     PastedJson,
     SortedColumn,
-    SortModalCallback,
-    TransformModalCallback,
     TransformModalOptions,
     ValueNormalization
   } from '../../../types'
-  import { SelectionType, SortDirection } from '../../../types'
+  import { Mode, SelectionType, SortDirection } from '../../../types'
   import TableMenu from './menu/TableMenu.svelte'
   import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
   import {
@@ -63,6 +64,7 @@
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { createFocusTracker } from '$lib/components/controls/createFocusTracker'
   import { onDestroy, onMount } from 'svelte'
+  import { noop } from '$lib/utils/noop'
 
   const debug = createDebug('jsoneditor:TableMode')
   const sortModalId = uniqueId()
@@ -80,8 +82,9 @@
   export let onRenderMenu: OnRenderMenu
   export let onFocus: OnFocus
   export let onBlur: OnBlur
-  export let onSortModal: (props: SortModalCallback) => void
-  export let onTransformModal: (props: TransformModalCallback) => void
+  export let onSortModal: OnSortModal
+  export let onTransformModal: OnTransformModal
+  export let onJSONEditorModal: OnJSONEditorModal
 
   let normalization: ValueNormalization
   $: normalization = createNormalizationFunctions({
@@ -435,9 +438,19 @@
   }
 
   function handleEdit(path: JSONPath, value: JSONValue) {
-    debug('edit', { path, value })
+    debug('edit nested object or array', { path, value })
 
-    // FIXME: open a popup where you can edit the nested object/array
+    // open a popup where you can edit the nested object/array
+    onJSONEditorModal({
+      // TODO: make the default mode of the JSONEditorModal configurable?
+      mode: isJSONArray(value) ? Mode.table : Mode.tree,
+      content: {
+        json: value
+      },
+      path,
+      onPatch: context.onPatch,
+      onClose: noop
+    })
   }
 
   function handlePaste(event) {

@@ -128,24 +128,25 @@
     NestedValidationError,
     OnBlur,
     OnChange,
+    OnChangeMode,
     OnClassName,
     OnError,
     OnFocus,
     OnRenderMenu,
     OnRenderValue,
+    OnSortModal,
+    OnTransformModal,
     ParseError,
     PastedJson,
     SearchResult,
     Section,
-    SortModalCallback,
-    TransformModalCallback,
     TransformModalOptions,
     TreeModeContext,
     ValidationError,
     Validator,
     ValueNormalization
   } from '$lib/types'
-  import { ValidationSeverity } from '$lib/types'
+  import { Mode, ValidationSeverity } from '$lib/types'
   import { isAfterSelection, isInsideSelection, isKeySelection } from '../../../logic/selection'
   import { truncate } from '../../../utils/stringUtils.js'
   import { MAX_CHARACTERS_TEXT_PREVIEW } from '../../../constants.js'
@@ -182,14 +183,14 @@
   export let indentation: number | string
   export let onError: OnError
   export let onChange: OnChange
+  export let onChangeMode: OnChangeMode
   export let onRenderValue: OnRenderValue
-  export let onRequestRepair: () => void
   export let onRenderMenu: OnRenderMenu
   export let onClassName: OnClassName | undefined
   export let onFocus: OnFocus
   export let onBlur: OnBlur
-  export let onSortModal: (props: SortModalCallback) => void
-  export let onTransformModal: (props: TransformModalCallback) => void
+  export let onSortModal: OnSortModal
+  export let onTransformModal: OnTransformModal
 
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
@@ -2174,6 +2175,10 @@
     pastedJson = undefined
   }
 
+  function handleRequestRepair() {
+    onChangeMode(Mode.text)
+  }
+
   function handleNavigationBarSelect(newSelection: JSONSelection) {
     updateSelection(newSelection)
 
@@ -2336,7 +2341,7 @@
                 {
                   icon: faCode,
                   text: 'Repair manually',
-                  onClick: onRequestRepair
+                  onClick: handleRequestRepair
                 }
               ]
             : []}
@@ -2415,7 +2420,7 @@
                 {
                   icon: faCode,
                   text: 'Repair manually instead',
-                  onClick: onRequestRepair
+                  onClick: handleRequestRepair
                 }
               ]
             : []}

@@ -71,6 +71,13 @@
   display: flex;
 }
 
+:global(.bg.jse-modal-bg .jse-modal-window.jse-modal-window-jsoneditor) {
+  width: 800px;
+  height: 700px;
+  max-height: 80%;
+  display: flex;
+}
+
 :global(.bg.jse-modal-bg .jse-modal-content) {
   flex: 1;
   display: flex;

@@ -262,6 +262,9 @@ export type OnRenderMenu = (
 export type OnError = (error: Error) => void
 export type OnFocus = () => void
 export type OnBlur = () => void
+export type OnSortModal = (props: SortModalCallback) => void
+export type OnTransformModal = (props: TransformModalCallback) => void
+export type OnJSONEditorModal = (props: JSONEditorModalCallback) => void
 export type FindNextInside = (path: JSONPath) => JSONSelection | undefined
 
 export interface SearchResult {
@@ -518,6 +521,14 @@ export interface SortModalCallback {
   json: JSONValue
   selectedPath: JSONPath
   onSort: OnSort
+  onClose: () => void
+}
+
+export interface JSONEditorModalCallback {
+  mode: Mode
+  content: Content
+  path: JSONPath
+  onPatch: OnPatch
   onClose: () => void
 }
 
