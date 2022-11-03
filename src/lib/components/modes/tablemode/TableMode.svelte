@@ -436,6 +436,18 @@
         }
       }
     }
+
+    if (combo === 'Ctrl+Z') {
+      event.preventDefault()
+
+      handleUndo()
+    }
+
+    if (combo === 'Ctrl+Shift+Z') {
+      event.preventDefault()
+
+      handleRedo()
+    }
   }
 
   function openJSONEditorModal(path: JSONPath, value: JSONValue) {
