@@ -7,3 +7,7 @@
   padding-top: 1px;
   height: var(--jse-line-height);
 }
+
+:global(.jse-json-node:not(.jse-readonly)) .jse-boolean-toggle > :global(svg) {
+  cursor: pointer;
+}
