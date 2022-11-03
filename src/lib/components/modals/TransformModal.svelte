@@ -25,6 +25,7 @@
     OnRenderValue,
     QueryLanguage
   } from '../../types'
+  import { stripRootObject } from '$lib/utils/pathUtils'
 
   const debug = createDebug('jsoneditor:TransformModal')
 
@@ -200,7 +201,9 @@
             type="text"
             readonly
             title="Selected path"
-            value={!isEmpty(selectedPath) ? stringifyJSONPath(selectedPath) : '(whole document)'}
+            value={!isEmpty(selectedPath)
+              ? stripRootObject(stringifyJSONPath(selectedPath))
+              : '(whole document)'}
           />
 
           <div class="jse-label">
