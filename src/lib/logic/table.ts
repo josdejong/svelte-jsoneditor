@@ -5,7 +5,9 @@ import {
   isJSONObject,
   parseJSONPointer
 } from 'immutable-json-patch'
-import { isEmpty } from 'lodash-es'
+import { isEmpty, isEqual } from 'lodash-es'
+import type { JSONSelection } from '../types'
+import { createValueSelection } from './selection'
 
 export function getColumns(
   array: JSONArray,
@@ -117,4 +119,72 @@ function calculateAverageItemHeight(
   const add = (a, b) => a + b
   const total = values.reduce(add)
   return total / values.length
+}
+
+// TODO: write unit test
+export function selectPreviousRow(
+  json: JSONValue,
+  columns: JSONPath[],
+  selection: JSONSelection
+): JSONSelection {
+  const [index, ...column] = selection.focusPath
+  const indexNum = parseFloat(index)
+
+  if (indexNum > 0) {
+    const previousPath = [String(indexNum - 1), ...column]
+    return createValueSelection(previousPath, false)
+  }
+
+  return selection
+}
+
+// TODO: write unit test
+export function selectNextRow(
+  json: JSONValue,
+  columns: JSONPath[],
+  selection: JSONSelection
+): JSONSelection {
+  const [index, ...column] = selection.focusPath
+  const indexNum = parseFloat(index)
+
+  if (indexNum < (json as JSONArray).length - 1) {
+    const previousPath = [String(indexNum + 1), ...column]
+    return createValueSelection(previousPath, false)
+  }
+
+  return selection
+}
+
+// TODO: write unit test
+export function selectPreviousColumn(
+  json: JSONValue,
+  columns: JSONPath[],
+  selection: JSONSelection
+): JSONSelection {
+  const [index, ...column] = selection.focusPath
+  const columnIndex: number = columns.findIndex((c) => isEqual(c, column))
+
+  if (columnIndex === -1 || columnIndex === 0) {
+    return selection
+  }
+
+  const previousPath = [index, ...columns[columnIndex - 1]]
+  return createValueSelection(previousPath, false)
+}
+
+// TODO: write unit test
+export function selectNextColumn(
+  json: JSONValue,
+  columns: JSONPath[],
+  selection: JSONSelection
+): JSONSelection {
+  const [index, ...column] = selection.focusPath
+  const columnIndex: number = columns.findIndex((c) => isEqual(c, column))
+
+  if (columnIndex === -1 || columnIndex >= columns.length - 1) {
+    return selection
+  }
+
+  const nextPath = [index, ...columns[columnIndex + 1]]
+  return createValueSelection(nextPath, false)
 }

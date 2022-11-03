@@ -35,7 +35,14 @@
     isJSONArray
   } from 'immutable-json-patch'
   import { isTextContent } from '../../../utils/jsonUtils'
-  import { calculateVisibleSection, getColumns } from '../../../logic/table.js'
+  import {
+    calculateVisibleSection,
+    getColumns,
+    selectNextColumn,
+    selectNextRow,
+    selectPreviousColumn,
+    selectPreviousRow
+  } from '../../../logic/table.js'
   import { isEmpty, isEqual, uniqueId } from 'lodash-es'
   import JSONValueComponent from './JSONValue.svelte'
   import {
@@ -64,7 +71,6 @@
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { createFocusTracker } from '$lib/components/controls/createFocusTracker'
   import { onDestroy, onMount } from 'svelte'
-  import { noop } from '$lib/utils/noop'
 
   const debug = createDebug('jsoneditor:TableMode')
   const sortModalId = uniqueId()
@@ -414,10 +420,67 @@
     })
   }
 
+  function createDefaultSelection(): JSONSelection | undefined {
+    if (isJSONArray(json) && !isEmpty(json) && !isEmpty(columns)) {
+      // Select the first row, first column
+      const path = ['0', ...columns[0]]
+
+      return createValueSelection(path, false)
+    } else {
+      return undefined
+    }
+  }
+
+  function createDefaultSelectionWhenUndefined() {
+    if (!documentState.selection) {
+      updateSelection(createDefaultSelection())
+    }
+  }
+
   function handleKeyDown(event) {
     // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
     const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
     debug('keydown', { combo, key: event.key })
+
+    if (combo === 'Left') {
+      event.preventDefault()
+
+      createDefaultSelectionWhenUndefined()
+
+      if (documentState.selection) {
+        updateSelection(selectPreviousColumn(json, columns, documentState.selection))
+      }
+    }
+
+    if (combo === 'Right') {
+      event.preventDefault()
+
+      createDefaultSelectionWhenUndefined()
+
+      if (documentState.selection) {
+        updateSelection(selectNextColumn(json, columns, documentState.selection))
+      }
+    }
+
+    if (combo === 'Up') {
+      event.preventDefault()
+
+      createDefaultSelectionWhenUndefined()
+
+      if (documentState.selection) {
+        updateSelection(selectPreviousRow(json, columns, documentState.selection))
+      }
+    }
+
+    if (combo === 'Down') {
+      event.preventDefault()
+
+      createDefaultSelectionWhenUndefined()
+
+      if (documentState.selection) {
+        updateSelection(selectNextRow(json, columns, documentState.selection))
+      }
+    }
 
     if (combo === 'Enter' && documentState.selection) {
       if (isValueSelection(documentState.selection)) {
