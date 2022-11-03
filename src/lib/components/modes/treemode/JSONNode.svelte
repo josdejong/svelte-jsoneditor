@@ -602,6 +602,7 @@
   class:jse-selected={isSelected && isMultiSelection(selection)}
   class:jse-selected-key={isSelected && isKeySelection(selection)}
   class:jse-selected-value={isSelected && isValueSelection(selection)}
+  class:jse-readonly={context.readOnly}
   class:jse-hovered={hover === HOVER_COLLECTION}
   on:mousedown={handleMouseDown}
   on:mousemove={handleMouseMove}

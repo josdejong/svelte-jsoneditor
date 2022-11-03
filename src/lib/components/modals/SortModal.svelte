@@ -13,6 +13,7 @@
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { createDebug } from '../../utils/debug'
   import type { OnSort } from '../../types'
+  import { stripRootObject } from '$lib/utils/pathUtils.js'
 
   const debug = createDebug('jsoneditor:SortModal')
 
@@ -101,7 +102,9 @@
               type="text"
               readonly
               title="Selected path"
-              value={!isEmpty(selectedPath) ? stringifyJSONPath(selectedPath) : '(whole document)'}
+              value={!isEmpty(selectedPath)
+                ? stripRootObject(stringifyJSONPath(selectedPath))
+                : '(whole document)'}
             />
           </td>
         </tr>
