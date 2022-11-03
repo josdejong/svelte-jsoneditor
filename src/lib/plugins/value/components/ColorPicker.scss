@@ -16,6 +16,6 @@
   outline: none;
 }
 
-:global(.jse-json-node:not(.jse-readonly)) .jse-color-picker-button {
+.jse-color-picker-button:not(.jse-readonly) {
   cursor: pointer;
 }
