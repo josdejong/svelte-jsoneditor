@@ -34,6 +34,7 @@
 
 <div
   class="jse-boolean-toggle"
+  class:jse-readonly={readOnly}
   on:mousedown={toggleBooleanValue}
   title={!readOnly ? 'Click to toggle this boolean value' : `Boolean value ${value}`}
 >

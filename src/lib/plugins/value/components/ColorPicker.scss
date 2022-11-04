@@ -14,5 +14,8 @@
   border-radius: 2px;
   background: inherit;
   outline: none;
+}
+
+.jse-color-picker-button:not(.jse-readonly) {
   cursor: pointer;
 }
