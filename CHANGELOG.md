@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.9.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.9.1...v0.9.2) (2022-11-04)
+
+
+### Bug Fixes
+
+* incorrect cursor style for ColorPicker & BooleanToggle ([#184](https://github.com/josdejong/svelte-jsoneditor/issues/184)) ([12e60e5](https://github.com/josdejong/svelte-jsoneditor/commit/12e60e5b836f9294ea4a0b3bfe2384745c0509cf))
+* remove root `$` prefix from the path in the Sort and Transform modal ([50ce3f0](https://github.com/josdejong/svelte-jsoneditor/commit/50ce3f04980a02164a4fa897afec942933e21db9))
+* when switching to a different JSON parser, stringify and parse the contents again ([2cece4e](https://github.com/josdejong/svelte-jsoneditor/commit/2cece4ebc7dbd75dc28f743c5b3ea12470848e7d))
+
 ### [0.9.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.9.0...v0.9.1) (2022-11-02)
 
 
