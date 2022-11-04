@@ -5,7 +5,12 @@
   import Modal from 'svelte-simple-modal'
   import { SORT_MODAL_OPTIONS, TRANSFORM_MODAL_OPTIONS } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
-  import { isEqualParser, isTextContent, validateContentType } from '../utils/jsonUtils'
+  import {
+    isEqualParser,
+    isJSONContent,
+    isTextContent,
+    validateContentType
+  } from '../utils/jsonUtils'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import TextMode from './modes/textmode/TextMode.svelte'
   import TreeMode from './modes/treemode/TreeMode.svelte'
@@ -107,6 +112,13 @@
   $: {
     if (!isEqualParser(parser, previousParser)) {
       debug('parser changed, recreate editor')
+
+      if (isJSONContent(content)) {
+        content = {
+          json: parser.parse(previousParser.stringify(content.json))
+        }
+      }
+
       previousParser = parser
 
       // new editor id -> will re-create the editor
