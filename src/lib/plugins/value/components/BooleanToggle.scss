@@ -8,6 +8,6 @@
   height: var(--jse-line-height);
 }
 
-.jse-boolean-toggle:not(.jse-readonly) > :global(svg) {
+.jse-boolean-toggle:not(.jse-readonly) {
   cursor: pointer;
 }
