@@ -32,13 +32,13 @@
 
     :global(.cm-editor) {
       flex: 1;
-      overflow: hidden;
 
       :global(.cm-scroller) {
         font-family: var(--jse-font-family-mono);
         font-size: var(--jse-font-size-mono);
         line-height: var(--jse-line-height);
         color: var(--jse-delimiter-color);
+        overflow: hidden;
       }
 
       :global(.cm-gutters) {
