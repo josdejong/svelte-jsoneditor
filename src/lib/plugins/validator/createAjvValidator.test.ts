@@ -1,4 +1,5 @@
 import assert from 'assert'
+import Ajv from 'ajv-dist'
 import { createAjvValidator } from './createAjvValidator.js'
 
 const schema = {
@@ -82,7 +83,7 @@ const invalidJson = {
 
 describe('createAjvValidator', () => {
   it('should create a validate function', () => {
-    const validate = createAjvValidator(schema, schemaDefinitions)
+    const validate = createAjvValidator({ schema, schemaDefinitions })
 
     assert.deepStrictEqual(validate(invalidJson), [
       {
@@ -97,8 +98,12 @@ describe('createAjvValidator', () => {
   })
 
   it('should pass additional Ajv options', () => {
-    const validate = createAjvValidator(schema, schemaDefinitions, {
-      allErrors: false
+    const validate = createAjvValidator({
+      schema,
+      schemaDefinitions,
+      ajvOptions: {
+        allErrors: false
+      }
     })
 
     assert.deepStrictEqual(validate(invalidJson), [
@@ -108,6 +113,66 @@ describe('createAjvValidator', () => {
         severity: 'warning'
       }
     ])
+  })
+
+  it('should apply additional Ajv configuration to the existing Ajv instance', () => {
+    const validate = createAjvValidator({
+      schema,
+      ajvOptions: {
+        allErrors: false
+      },
+      onCreateAjv: (ajv) => {
+        Object.keys(schemaDefinitions).forEach((ref) => {
+          ajv.addSchema(schemaDefinitions[ref], ref)
+        })
+      }
+    })
+
+    assert.deepStrictEqual(validate(invalidJson), [
+      {
+        path: ['gender'],
+        message: 'should be equal to one of: "male", "female"',
+        severity: 'warning'
+      }
+    ])
+  })
+
+  it('should provide a custom Ajv instance', () => {
+    const validate = createAjvValidator({
+      schema,
+      onCreateAjv: () => {
+        const myAjv = new Ajv({
+          allErrors: false,
+          verbose: true,
+          $data: true
+        })
+
+        Object.keys(schemaDefinitions).forEach((ref) => {
+          myAjv.addSchema(schemaDefinitions[ref], ref)
+        })
+
+        return myAjv
+      }
+    })
+
+    assert.deepStrictEqual(validate(invalidJson), [
+      {
+        path: ['gender'],
+        message: 'should be equal to one of: "male", "female"',
+        severity: 'warning'
+      }
+    ])
+  })
+
+  it('should throw an error when using the deprecated API', () => {
+    // Deprecation error for the API of v0.9.2 and older
+    assert.throws(() => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      createAjvValidator(schema, schemaDefinitions, {
+        allErrors: false
+      })
+    }, /the signature of createAjvValidator is changed/)
   })
 
   // TODO: test support for draft04, draft-06, draft-07

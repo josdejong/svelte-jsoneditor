@@ -16,7 +16,7 @@ export { renderJSONSchemaEnum } from './plugins/value/renderJSONSchemaEnum.js'
 export { BooleanToggle, ColorPicker, EditableValue, EnumValue, ReadonlyValue, TimestampTag }
 
 // validator plugins
-export { createAjvValidator } from './plugins/validator/createAjvValidator.js'
+export * from './plugins/validator/createAjvValidator.js'
 
 // query plugins
 export { lodashQueryLanguage } from './plugins/query/lodashQueryLanguage.js'

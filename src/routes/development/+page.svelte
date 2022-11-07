@@ -146,7 +146,7 @@
     }
   ]
 
-  const validator = createAjvValidator(schema)
+  const validator = createAjvValidator({ schema })
 
   let refTreeEditor
   let refTextEditor
