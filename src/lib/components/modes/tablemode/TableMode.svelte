@@ -407,17 +407,10 @@
       }
 
       updateSelection(createValueSelection(path, false))
-    }
 
-    // TODO: ugly to have two setTimeout here. Without it, hiddenInput will blur
-    setTimeout(() => {
-      setTimeout(() => {
-        if (!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) {
-          // for example when clicking on the empty area in the main menu
-          focus()
-        }
-      })
-    })
+      focus()
+      event.preventDefault()
+    }
   }
 
   function createDefaultSelection(): JSONSelection | undefined {
@@ -513,24 +506,6 @@
     }
   }
 
-  function openJSONEditorModal(path: JSONPath, value: JSONValue) {
-    debug('openJSONEditorModal', { path, value })
-
-    // open a popup where you can edit the nested object/array
-    onJSONEditorModal({
-      // TODO: make the default mode of the JSONEditorModal configurable?
-      mode: isJSONArray(value) ? Mode.table : Mode.tree,
-      content: {
-        json: value
-      },
-      path,
-      onPatch: context.onPatch,
-      onClose: () => {
-        focus()
-      }
-    })
-  }
-
   function handlePaste(event) {
     event.preventDefault()
 
@@ -608,6 +583,27 @@
         if (onClose) {
           onClose()
         }
+      }
+    })
+  }
+
+  function openJSONEditorModal(path: JSONPath, value: JSONValue) {
+    debug('openJSONEditorModal', { path, value })
+
+    modalOpen = true
+
+    // open a popup where you can edit the nested object/array
+    onJSONEditorModal({
+      // TODO: make the default mode of the JSONEditorModal configurable?
+      mode: isJSONArray(value) ? Mode.table : Mode.tree,
+      content: {
+        json: value
+      },
+      path,
+      onPatch: context.onPatch,
+      onClose: () => {
+        modalOpen = false
+        focus()
       }
     })
   }
