@@ -53,6 +53,7 @@ export interface DocumentState {
   enforceStringMap: JSONPointerMap<boolean>
   visibleSectionsMap: JSONPointerMap<VisibleSection[]>
   selection: JSONSelection | undefined
+  sortedColumn: SortedColumn | undefined
 }
 
 export interface JSONPatchResult {
@@ -504,15 +505,11 @@ export interface TransformModalOptions {
   onClose?: () => void
 }
 
-export interface TransformModalCallback extends TransformModalOptions {
+export interface TransformModalCallback {
   id: string
   selectedPath: JSONPath
   json: JSONValue
-  onTransform: (state: {
-    operations: JSONPatchDocument
-    json: JSONValue
-    transformedJson: JSONValue
-  }) => void
+  onTransform: (operations: JSONPatchDocument) => void
   onClose: () => void
 }
 

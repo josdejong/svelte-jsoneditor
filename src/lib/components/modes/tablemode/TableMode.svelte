@@ -167,6 +167,15 @@
     }
   }
 
+  function clearSortedColumn() {
+    if (documentState.sortedColumn) {
+      documentState = {
+        ...documentState,
+        sortedColumn: undefined
+      }
+    }
+  }
+
   function updateSelection(
     selection:
       | JSONSelection
@@ -188,7 +197,6 @@
 
   let documentState = createDocumentState()
   const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // FIXME: implement support for search and replace
-  let sortedColumn: SortedColumn | undefined = undefined // TODO: sortedColumn should become part of the DocumentState
 
   function onSortByHeader(newSortedColumn: SortedColumn) {
     debug('onSortByHeader', newSortedColumn)
@@ -196,9 +204,14 @@
     const rootPath = []
     const direction = newSortedColumn.sortDirection === SortDirection.desc ? -1 : 1
     const operations = sortJson(json, rootPath, newSortedColumn.path, direction)
-    handlePatch(operations)
-
-    sortedColumn = newSortedColumn
+    handlePatch(operations, (patchedJson, patchedState) => {
+      return {
+        state: {
+          ...patchedState,
+          sortedColumn: newSortedColumn
+        }
+      }
+    })
   }
 
   const history = createHistory<HistoryItem>({
@@ -238,6 +251,13 @@
       return
     }
 
+    const previousContent = { json, text }
+    // FIXME: add an item to history
+    // const previousJson = json
+    // const previousState = documentState
+    // const previousText = text
+    // const previousTextIsRepaired = textIsRepaired
+
     if (isTextContent(content)) {
       try {
         const updatedJson = JSON.parse(content.text)
@@ -262,7 +282,22 @@
     }
 
     // reset the sorting order (we don't know...)
-    sortedColumn = undefined
+    clearSortedColumn()
+
+    // FIXME: add an item to history
+    // addHistoryItem({
+    //   previousJson,
+    //   previousState,
+    //   previousText,
+    //   previousTextIsRepaired
+    // })
+
+    // we could work out a patchResult, or use patch(), but only when the previous and new
+    // contents are both json and not text. We go for simplicity and consistency here and
+    // let the function applyExternalContent _not_ return a patchResult ever.
+    const patchResult = null
+
+    emitOnChange(previousContent, patchResult)
   }
 
   export function validate(): ContentErrors {
@@ -324,8 +359,6 @@
       undo,
       redo: operations
     }
-
-    sortedColumn = undefined
 
     emitOnChange(previousContent, patchResult)
 
@@ -649,8 +682,6 @@
       undo: item.redo.patch
     }
 
-    sortedColumn = undefined
-
     emitOnChange(previousContent, patchResult)
 
     // FIXME: handle focus and selection
@@ -689,8 +720,6 @@
       redo: item.redo.patch,
       undo: item.undo.patch
     }
-
-    sortedColumn = undefined
 
     emitOnChange(previousContent, patchResult)
 
@@ -748,7 +777,11 @@
             <th class="jse-table-cell jse-table-cell-header" />
             {#each columns as column}
               <th class="jse-table-cell jse-table-cell-header">
-                <ColumnHeader path={column} {sortedColumn} onSort={onSortByHeader} />
+                <ColumnHeader
+                  path={column}
+                  sortedColumn={documentState.sortedColumn}
+                  onSort={onSortByHeader}
+                />
               </th>
             {/each}
           </tr>
