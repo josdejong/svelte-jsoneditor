@@ -89,6 +89,9 @@
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
 
+  const isSSR = typeof window === 'undefined'
+  debug('isSSR:', isSSR)
+
   export let readOnly: boolean
   export let externalContent: Content
   export let mainMenuBar: boolean
@@ -971,132 +974,141 @@
       {onRenderMenu}
     />
   {/if}
-  <label class="jse-hidden-input-label">
-    <input
-      type="text"
-      readonly="readonly"
-      tabindex="-1"
-      class="jse-hidden-input"
-      bind:this={refHiddenInput}
-      on:paste={handlePaste}
-    />
-  </label>
-  {#if containsValidArray}
-    <div
-      class="jse-contents"
-      bind:this={refContents}
-      bind:clientHeight={viewPortHeight}
-      on:scroll={handleScroll}
-    >
-      <table class="jse-table-main">
-        <tbody>
-          <tr class="jse-table-row jse-table-row-header">
-            <th class="jse-table-cell jse-table-cell-header" />
-            {#each columns as column}
-              <th class="jse-table-cell jse-table-cell-header">
-                <ColumnHeader
-                  path={column}
-                  sortedColumn={documentState.sortedColumn}
-                  onSort={onSortByHeader}
-                />
-              </th>
-            {/each}
-          </tr>
-          <tr class="jse-table-invisible-start-section">
-            <td style:height={visibleSection.startHeight + 'px'} colspan={columns.length} />
-          </tr>
-          {#each visibleSection.visibleItems as item, visibleIndex}
-            {@const index = visibleSection.startIndex + visibleIndex}
-            <tr class="jse-table-row">
-              <th
-                class="jse-table-cell jse-table-cell-gutter"
-                bind:clientHeight={itemHeightsCache[index]}>{index + 1}</th
-              >
+
+  {#if !isSSR}
+    <label class="jse-hidden-input-label">
+      <input
+        type="text"
+        readonly="readonly"
+        tabindex="-1"
+        class="jse-hidden-input"
+        bind:this={refHiddenInput}
+        on:paste={handlePaste}
+      />
+    </label>
+    {#if containsValidArray}
+      <div
+        class="jse-contents"
+        bind:this={refContents}
+        bind:clientHeight={viewPortHeight}
+        on:scroll={handleScroll}
+      >
+        <table class="jse-table-main">
+          <tbody>
+            <tr class="jse-table-row jse-table-row-header">
+              <th class="jse-table-cell jse-table-cell-header" />
               {#each columns as column}
-                {@const path = [String(index)].concat(column)}
-                {@const value = getIn(item, column)}
-                {@const isSelected = isPathSelected(path, documentState.selection)}
-                <td
-                  class="jse-table-cell"
-                  data-path={encodeDataPath(path)}
-                  class:jse-selected-value={isSelected && isValueSelection(documentState.selection)}
-                >
-                  {#if isObjectOrArray(value)}
-                    <TableTag {path} {value} {isSelected} onEdit={openJSONEditorModal} />
-                  {:else if value !== undefined}
-                    <JSONValueComponent
-                      {path}
-                      {value}
-                      enforceString={false}
-                      selection={isSelected ? documentState.selection : undefined}
-                      {searchResultItems}
-                      {context}
-                    />
-                  {/if}
-                </td>
+                <th class="jse-table-cell jse-table-cell-header">
+                  <ColumnHeader
+                    path={column}
+                    sortedColumn={documentState.sortedColumn}
+                    onSort={onSortByHeader}
+                  />
+                </th>
               {/each}
             </tr>
-          {/each}
+            <tr class="jse-table-invisible-start-section">
+              <td style:height={visibleSection.startHeight + 'px'} colspan={columns.length} />
+            </tr>
+            {#each visibleSection.visibleItems as item, visibleIndex}
+              {@const index = visibleSection.startIndex + visibleIndex}
+              <tr class="jse-table-row">
+                <th
+                  class="jse-table-cell jse-table-cell-gutter"
+                  bind:clientHeight={itemHeightsCache[index]}>{index + 1}</th
+                >
+                {#each columns as column}
+                  {@const path = [String(index)].concat(column)}
+                  {@const value = getIn(item, column)}
+                  {@const isSelected = isPathSelected(path, documentState.selection)}
+                  <td
+                    class="jse-table-cell"
+                    data-path={encodeDataPath(path)}
+                    class:jse-selected-value={isSelected &&
+                      isValueSelection(documentState.selection)}
+                  >
+                    {#if isObjectOrArray(value)}
+                      <TableTag {path} {value} {isSelected} onEdit={openJSONEditorModal} />
+                    {:else if value !== undefined}
+                      <JSONValueComponent
+                        {path}
+                        {value}
+                        enforceString={false}
+                        selection={isSelected ? documentState.selection : undefined}
+                        {searchResultItems}
+                        {context}
+                      />
+                    {/if}
+                  </td>
+                {/each}
+              </tr>
+            {/each}
 
-          <tr class="jse-table-invisible-end-section">
-            <td style:height={visibleSection.endHeight + 'px'} colspan={columns.length} />
-          </tr>
-        </tbody>
-      </table>
-    </div>
+            <tr class="jse-table-invisible-end-section">
+              <td style:height={visibleSection.endHeight + 'px'} colspan={columns.length} />
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-    {#if textIsRepaired}
+      {#if textIsRepaired}
+        <Message
+          type="success"
+          message="The loaded JSON document was invalid but is successfully repaired."
+          actions={!readOnly
+            ? [
+                {
+                  icon: faCheck,
+                  text: 'Ok',
+                  onClick: acceptAutoRepair
+                },
+                {
+                  icon: faCode,
+                  text: 'Repair manually instead',
+                  onClick: handleRequestRepair
+                }
+              ]
+            : []}
+        />
+      {/if}
+
+      <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
+    {:else if parseError}
       <Message
-        type="success"
-        message="The loaded JSON document was invalid but is successfully repaired."
+        type="error"
+        message="The loaded JSON document is invalid and could not be repaired automatically."
         actions={!readOnly
           ? [
               {
-                icon: faCheck,
-                text: 'Ok',
-                onClick: acceptAutoRepair
-              },
-              {
                 icon: faCode,
-                text: 'Repair manually instead',
+                text: 'Repair manually',
                 onClick: handleRequestRepair
               }
             ]
           : []}
       />
+      <div class="jse-preview">
+        {truncate(text, MAX_CHARACTERS_TEXT_PREVIEW)}
+      </div>
+    {:else}
+      <Message
+        type="info"
+        message="The loaded JSON document is not an array and cannot be rendered in table mode."
+        actions={[
+          {
+            text: 'Edit in tree mode',
+            onClick: () => onChangeMode(Mode.tree)
+          }
+        ]}
+      />
+      <div class="jse-preview">
+        {truncate(text, MAX_CHARACTERS_TEXT_PREVIEW)}
+      </div>
     {/if}
-
-    <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
-  {:else if parseError}
-    <Message
-      type="error"
-      message="The loaded JSON document is invalid and could not be repaired automatically."
-      actions={!readOnly
-        ? [
-            {
-              icon: faCode,
-              text: 'Repair manually',
-              onClick: handleRequestRepair
-            }
-          ]
-        : []}
-    />
-    <div class="jse-preview">
-      {truncate(text, MAX_CHARACTERS_TEXT_PREVIEW)}
-    </div>
   {:else}
-    <Message
-      type="info"
-      message="The loaded JSON document is not an array and cannot be rendered in table mode."
-      actions={[
-        {
-          text: 'Edit in tree mode',
-          onClick: () => onChangeMode(Mode.tree)
-        }
-      ]}
-    />
-    <div class="jse-preview">
-      {truncate(text, MAX_CHARACTERS_TEXT_PREVIEW)}
+    <div class="jse-contents jse-contents-loading">
+      <div class="jse-loading-space" />
+      <div class="jse-loading">loading...</div>
     </div>
   {/if}
 </div>

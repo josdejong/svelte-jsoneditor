@@ -36,6 +36,7 @@
   .jse-contents {
     flex: 1;
     align-items: start;
+    flex-direction: column;
     display: flex;
     overflow: auto;
 
@@ -103,6 +104,23 @@
             display: inline-block;
           }
         }
+      }
+    }
+
+    &.jse-contents-loading {
+      align-items: unset;
+
+      .jse-loading-space {
+        flex: 1;
+      }
+
+      .jse-loading {
+        flex: 2;
+        text-align: center;
+        color: var(--jse-panel-color-readonly);
+        box-sizing: border-box;
+        font-family: var(--jse-font-family);
+        font-size: var(--jse-font-size);
       }
     }
   }
