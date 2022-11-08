@@ -77,13 +77,14 @@
   import { onDestroy, onMount } from 'svelte'
   import jsonrepair from 'jsonrepair'
   import Message from '$lib/components/controls/Message.svelte'
-  import { faCheck, faCode, faEdit } from '@fortawesome/free-solid-svg-icons'
+  import { faCheck, faCode } from '@fortawesome/free-solid-svg-icons'
   import { measure } from '$lib/utils/timeUtils'
   import memoizeOne from 'memoize-one'
   import { validateJSON } from '$lib/logic/validation'
   import ValidationErrorsOverview from '$lib/components/controls/ValidationErrorsOverview.svelte'
   import { MAX_CHARACTERS_TEXT_PREVIEW } from '$lib/constants.js'
   import { truncate } from '$lib/utils/stringUtils.js'
+  import { getText } from '$lib/utils/jsonUtils.js'
 
   const debug = createDebug('jsoneditor:TableMode')
   const sortModalId = uniqueId()
@@ -101,6 +102,7 @@
   export let parser: JSONParser
   export let validator: Validator | null
   export let validationParser: JSONParser
+  export let indentation: number | string
   export let onChange: OnChange
   export let onChangeMode: OnChangeMode
   export let onRenderValue: OnRenderValue
@@ -1088,7 +1090,7 @@
           : []}
       />
       <div class="jse-preview">
-        {truncate(text, MAX_CHARACTERS_TEXT_PREVIEW)}
+        {truncate(text || '', MAX_CHARACTERS_TEXT_PREVIEW)}
       </div>
     {:else}
       <Message
@@ -1102,7 +1104,7 @@
         ]}
       />
       <div class="jse-preview">
-        {truncate(text, MAX_CHARACTERS_TEXT_PREVIEW)}
+        {truncate(getText({ text, json }, indentation, parser), MAX_CHARACTERS_TEXT_PREVIEW)}
       </div>
     {/if}
   {:else}

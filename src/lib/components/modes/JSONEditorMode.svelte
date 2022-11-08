@@ -246,6 +246,7 @@
     {parser}
     {validator}
     {validationParser}
+    {indentation}
     {onChange}
     {onChangeMode}
     {onRenderValue}
