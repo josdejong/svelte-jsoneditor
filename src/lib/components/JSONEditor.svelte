@@ -344,7 +344,7 @@
         escapeUnicodeCharacters,
         flattenColumns,
         parser,
-        validator,
+        validator: undefined, // TODO: support partial JSON validation?
         validationParser,
         pathParser,
 

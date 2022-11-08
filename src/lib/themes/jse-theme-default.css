@@ -128,7 +128,7 @@
   --jse-message-warning-color: var(--jse-text-color);
   --jse-message-success-background: #9ac45d;
   --jse-message-success-color: var(--jse-text-color-inverse);
-  --jse-message-info-background: #9d9d9d;
+  --jse-message-info-background: #4f91ff;
   --jse-message-info-color: var(--jse-text-color-inverse);
   --jse-message-action-background: rgba(255, 255, 255, 0.2);
   --jse-message-action-background-highlight: rgba(255, 255, 255, 0.3);

@@ -20,7 +20,7 @@
 
 <div class="jse-message jse-{type}">
   <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <div class="jse-text" class:jse-clickable={onClick !== null} on:click={handleClick}>
+  <div class="jse-text" class:jse-clickable={!!onClick} on:click={handleClick}>
     {#if icon}
       <Icon data={icon} />
     {/if}

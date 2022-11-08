@@ -14,18 +14,22 @@
     JSONSelection,
     OnBlur,
     OnChange,
+    OnChangeMode,
     OnFocus,
     OnJSONEditorModal,
     OnRenderMenu,
     OnRenderValue,
     OnSortModal,
     OnTransformModal,
+    ParseError,
     PastedJson,
     SortedColumn,
     TransformModalOptions,
+    ValidationError,
+    Validator,
     ValueNormalization
   } from '../../../types'
-  import { Mode, SelectionType, SortDirection } from '../../../types'
+  import { Mode, SelectionType, SortDirection, ValidationSeverity } from '../../../types'
   import TableMenu from './menu/TableMenu.svelte'
   import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
   import {
@@ -35,7 +39,7 @@
     immutableJSONPatch,
     isJSONArray
   } from 'immutable-json-patch'
-  import { isTextContent } from '../../../utils/jsonUtils'
+  import { isTextContent, normalizeJsonParseError } from '../../../utils/jsonUtils'
   import {
     calculateVisibleSection,
     getColumns,
@@ -71,6 +75,15 @@
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { createFocusTracker } from '$lib/components/controls/createFocusTracker'
   import { onDestroy, onMount } from 'svelte'
+  import jsonrepair from 'jsonrepair'
+  import Message from '$lib/components/controls/Message.svelte'
+  import { faCheck, faCode, faEdit } from '@fortawesome/free-solid-svg-icons'
+  import { measure } from '$lib/utils/timeUtils'
+  import memoizeOne from 'memoize-one'
+  import { validateJSON } from '$lib/logic/validation'
+  import ValidationErrorsOverview from '$lib/components/controls/ValidationErrorsOverview.svelte'
+  import { MAX_CHARACTERS_TEXT_PREVIEW } from '$lib/constants.js'
+  import { truncate } from '$lib/utils/stringUtils.js'
 
   const debug = createDebug('jsoneditor:TableMode')
   const sortModalId = uniqueId()
@@ -83,7 +96,10 @@
   export let escapeUnicodeCharacters: boolean
   export let flattenColumns: boolean
   export let parser: JSONParser
+  export let validator: Validator | null
+  export let validationParser: JSONParser
   export let onChange: OnChange
+  export let onChangeMode: OnChangeMode
   export let onRenderValue: OnRenderValue
   export let onRenderMenu: OnRenderMenu
   export let onFocus: OnFocus
@@ -121,14 +137,16 @@
     }
   })
 
-  // FIXME: work out support for object and primitive value
   let json: JSONValue | undefined
-  let text: string | undefined // FIXME: use text when loading invalid contents
+  let text: string | undefined
+  let parseError: ParseError | undefined = undefined
 
   $: applyExternalContent(externalContent)
 
   let columns: JSONPath[]
   $: columns = isJSONArray(json) ? getColumns(json, flattenColumns) : []
+
+  $: containsValidArray = json && !isEmpty(columns)
 
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
@@ -195,6 +213,26 @@
     }
   }
 
+  function clearSelectionWhenNotExisting(json: JSONValue) {
+    if (documentState.selection === undefined) {
+      return
+    }
+
+    if (
+      documentState.selection &&
+      existsIn(json, documentState.selection.anchorPath) &&
+      existsIn(json, documentState.selection.focusPath)
+    ) {
+      return
+    }
+
+    debug('clearing selection: path does not exist anymore', documentState.selection)
+    documentState = {
+      ...documentState,
+      selection: undefined
+    }
+  }
+
   let documentState = createDocumentState()
   let textIsRepaired = false // FIXME: implement repairing text
   const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // FIXME: implement support for search and replace
@@ -242,7 +280,7 @@
   function applyExternalContent(content: Content) {
     const currentContent = { json }
     const isChanged = isTextContent(content)
-      ? true // FIXME: handle text content
+      ? content.text !== text
       : !isEqual(currentContent.json, content.json)
 
     debug('update external content', { isChanged })
@@ -260,26 +298,33 @@
 
     if (isTextContent(content)) {
       try {
-        const updatedJson = JSON.parse(content.text)
-        if (isJSONArray(updatedJson)) {
-          json = updatedJson
-        } else {
-          json = undefined
-          // FIXME: handle non-Array json data
-        }
+        json = JSON.parse(content.text)
+        text = content.text
+        textIsRepaired = false
+        parseError = undefined
       } catch (err) {
-        // FIXME: handle invalid JSON
-        console.error(err)
-        json = undefined
+        try {
+          json = parser.parse(jsonrepair(content.text))
+          text = content.text
+          textIsRepaired = true
+          parseError = undefined
+        } catch (repairError) {
+          // no valid JSON, will show empty document or invalid json
+          json = undefined
+          text = externalContent.text
+          textIsRepaired = false
+          parseError = normalizeJsonParseError(text, err.message || err.toString())
+        }
       }
     } else {
-      if (isJSONArray(content.json)) {
-        json = content.json
-      } else {
-        json = undefined
-        // FIXME: handle non-Array json data
-      }
+      json = content.json
+      text = undefined
+      textIsRepaired = false
+      parseError = undefined
     }
+
+    // make sure the selection is valid
+    clearSelectionWhenNotExisting(json)
 
     // reset the sorting order (we don't know...)
     clearSortedColumn()
@@ -332,7 +377,7 @@
             state: removeEditModeFromSelection(documentState),
             json: undefined,
             text,
-            textIsRepaired: false
+            textIsRepaired
           }
         })
       } else {
@@ -377,10 +422,58 @@
     }
   }
 
+  let validationErrors: ValidationError[] = []
+  $: updateValidationErrors(json, validator, parser, validationParser)
+
+  // because onChange returns the validation errors and there is also a separate listener,
+  // we would execute validation twice. Memoizing the last result solves this.
+  const memoizedValidate = memoizeOne(validateJSON)
+
+  function updateValidationErrors(
+    json: JSONValue,
+    validator: Validator | null,
+    parser: JSONParser,
+    validationParser: JSONParser
+  ) {
+    measure(
+      () => {
+        let newValidationErrors: ValidationError[]
+        try {
+          newValidationErrors = memoizedValidate(json, validator, parser, validationParser)
+        } catch (err) {
+          newValidationErrors = [
+            {
+              path: [],
+              message: 'Failed to validate: ' + err.message,
+              severity: ValidationSeverity.warning
+            }
+          ]
+        }
+
+        if (!isEqual(newValidationErrors, validationErrors)) {
+          debug('validationErrors changed:', newValidationErrors)
+          validationErrors = newValidationErrors
+        }
+      },
+      (duration) => debug(`validationErrors updated in ${duration} ms`)
+    )
+  }
+
   export function validate(): ContentErrors {
-    // FIXME: implement validate
+    debug('validate')
+
+    if (parseError) {
+      return {
+        parseError,
+        isRepairable: false // not applicable, if repairable, we will not have a parseError
+      }
+    }
+
+    // make sure the validation results are up-to-date
+    // normally, they are only updated on the next tick after the json is changed
+    updateValidationErrors(json, validator, parser, validationParser)
     return {
-      validationErrors: []
+      validationErrors
     }
   }
 
@@ -397,6 +490,7 @@
     const previousContent: Content = { json }
     const previousJson = json
     const previousState = documentState
+    const previousTextIsRepaired = textIsRepaired
 
     // execute the patch operations
     const undo: JSONPatchDocument = revertJSONPatchWithMoveOperations(
@@ -412,6 +506,8 @@
     const newState =
       callback && callback.state !== undefined ? callback.state : patched.documentState
     documentState = newState
+    text = undefined
+    textIsRepaired = false
 
     history.add({
       undo: {
@@ -419,14 +515,14 @@
         json: undefined,
         text: undefined,
         state: removeEditModeFromSelection(previousState),
-        textIsRepaired: false
+        textIsRepaired: previousTextIsRepaired
       },
       redo: {
         patch: operations,
         json: undefined,
         state: removeEditModeFromSelection(newState),
         text: undefined,
-        textIsRepaired: false
+        textIsRepaired
       }
     })
 
@@ -540,6 +636,42 @@
     }
   }
 
+  export function acceptAutoRepair() {
+    if (textIsRepaired && json !== undefined) {
+      const previousState = documentState
+      const previousJson = json
+      const previousText = text
+      const previousContent = { json, text }
+      const previousTextIsRepaired = textIsRepaired
+
+      // json stays as is
+      text = undefined
+      textIsRepaired = false
+
+      clearSelectionWhenNotExisting(json)
+
+      addHistoryItem({
+        previousJson,
+        previousState,
+        previousText,
+        previousTextIsRepaired
+      })
+
+      // we could work out a patchResult, or use patch(), but only when the previous and new
+      // contents are both json and not text. We go for simplicity and consistency here and
+      // do _not_ return a patchResult ever.
+      const patchResult = null
+
+      emitOnChange(previousContent, patchResult)
+    }
+
+    return { json, text }
+  }
+
+  function handleRequestRepair() {
+    onChangeMode(Mode.text)
+  }
+
   function handleKeyDown(event) {
     // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
     const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
@@ -634,6 +766,14 @@
     //     doPaste(repairedText)
     //   })
     // }
+  }
+
+  function handleSelectValidationError(error: ValidationError) {
+    debug('select validation error', error)
+
+    updateSelection(createValueSelection(error.path, false))
+
+    // scrollTo(error.path) // FIXME: scroll to selected error
   }
 
   function openSortModal(selectedPath: JSONPath) {
@@ -841,13 +981,13 @@
       on:paste={handlePaste}
     />
   </label>
-  <div
-    class="jse-contents"
-    bind:this={refContents}
-    bind:clientHeight={viewPortHeight}
-    on:scroll={handleScroll}
-  >
-    {#if json && !isEmpty(columns)}
+  {#if containsValidArray}
+    <div
+      class="jse-contents"
+      bind:this={refContents}
+      bind:clientHeight={viewPortHeight}
+      on:scroll={handleScroll}
+    >
       <table class="jse-table-main">
         <tbody>
           <tr class="jse-table-row jse-table-row-header">
@@ -903,10 +1043,62 @@
           </tr>
         </tbody>
       </table>
-    {:else}
-      Error: data is not a JSON Array containing objects
+    </div>
+
+    {#if textIsRepaired}
+      <Message
+        type="success"
+        message="The loaded JSON document was invalid but is successfully repaired."
+        actions={!readOnly
+          ? [
+              {
+                icon: faCheck,
+                text: 'Ok',
+                onClick: acceptAutoRepair
+              },
+              {
+                icon: faCode,
+                text: 'Repair manually instead',
+                onClick: handleRequestRepair
+              }
+            ]
+          : []}
+      />
     {/if}
-  </div>
+
+    <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
+  {:else if parseError}
+    <Message
+      type="error"
+      message="The loaded JSON document is invalid and could not be repaired automatically."
+      actions={!readOnly
+        ? [
+            {
+              icon: faCode,
+              text: 'Repair manually',
+              onClick: handleRequestRepair
+            }
+          ]
+        : []}
+    />
+    <div class="jse-preview">
+      {truncate(text, MAX_CHARACTERS_TEXT_PREVIEW)}
+    </div>
+  {:else}
+    <Message
+      type="info"
+      message="The loaded JSON document is not an array and cannot be rendered in table mode."
+      actions={[
+        {
+          text: 'Edit in tree mode',
+          onClick: () => onChangeMode(Mode.tree)
+        }
+      ]}
+    />
+    <div class="jse-preview">
+      {truncate(text, MAX_CHARACTERS_TEXT_PREVIEW)}
+    </div>
+  {/if}
 </div>
 
 <style src="./TableMode.scss"></style>

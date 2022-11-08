@@ -217,9 +217,8 @@
 
   let json: JSONValue | undefined
   let text: string | undefined
-  const rootPath = [] // create the array only once
-
   let parseError: ParseError | undefined = undefined
+  const rootPath = [] // create the array only once
 
   function updateSelection(
     selection:
@@ -544,11 +543,11 @@
       return
     }
 
-    const isChanged = updatedText === text
+    const isChanged = updatedText !== text
 
     debug('update external text', { isChanged })
 
-    if (isChanged) {
+    if (!isChanged) {
       // no actual change, don't do anything
       return
     }
@@ -565,7 +564,6 @@
       text = updatedText
       textIsRepaired = false
       parseError = undefined
-      clearSelectionWhenNotExisting(json)
     } catch (err) {
       try {
         json = parser.parse(jsonrepair(updatedText))
@@ -573,16 +571,16 @@
         text = updatedText
         textIsRepaired = true
         parseError = undefined
-        clearSelectionWhenNotExisting(json)
       } catch (repairError) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
         text = externalContent.text
         textIsRepaired = false
         parseError = normalizeJsonParseError(text, err.message || err.toString())
-        clearSelectionWhenNotExisting(json)
       }
     }
+
+    clearSelectionWhenNotExisting(json)
 
     addHistoryItem({
       previousJson,

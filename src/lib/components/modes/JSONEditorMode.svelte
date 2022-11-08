@@ -244,7 +244,10 @@
     {escapeUnicodeCharacters}
     {flattenColumns}
     {parser}
+    {validator}
+    {validationParser}
     {onChange}
+    {onChangeMode}
     {onRenderValue}
     {onFocus}
     {onBlur}
