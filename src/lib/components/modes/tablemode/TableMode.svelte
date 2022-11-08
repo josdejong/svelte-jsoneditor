@@ -5,6 +5,7 @@
     AfterPatchCallback,
     Content,
     ContentErrors,
+    DocumentState,
     ExtendedSearchResultItem,
     HistoryItem,
     JSONEditorContext,
@@ -49,8 +50,7 @@
     activeElementIsChildOf,
     createNormalizationFunctions,
     getDataPathFromTarget,
-    getWindow,
-    isChildOfNodeName
+    getWindow
   } from '../../../utils/domUtils'
   import { createDebug } from '$lib/utils/debug'
   import { createDocumentState, documentStatePatch } from '$lib/logic/documentState'
@@ -196,6 +196,7 @@
   }
 
   let documentState = createDocumentState()
+  let textIsRepaired = false // FIXME: implement repairing text
   const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // FIXME: implement support for search and replace
 
   function onSortByHeader(newSortedColumn: SortedColumn) {
@@ -252,11 +253,10 @@
     }
 
     const previousContent = { json, text }
-    // FIXME: add an item to history
-    // const previousJson = json
-    // const previousState = documentState
-    // const previousText = text
-    // const previousTextIsRepaired = textIsRepaired
+    const previousJson = json
+    const previousState = documentState
+    const previousText = text
+    const previousTextIsRepaired = textIsRepaired
 
     if (isTextContent(content)) {
       try {
@@ -284,13 +284,12 @@
     // reset the sorting order (we don't know...)
     clearSortedColumn()
 
-    // FIXME: add an item to history
-    // addHistoryItem({
-    //   previousJson,
-    //   previousState,
-    //   previousText,
-    //   previousTextIsRepaired
-    // })
+    addHistoryItem({
+      previousJson,
+      previousState,
+      previousText,
+      previousTextIsRepaired
+    })
 
     // we could work out a patchResult, or use patch(), but only when the previous and new
     // contents are both json and not text. We go for simplicity and consistency here and
@@ -298,6 +297,84 @@
     const patchResult = null
 
     emitOnChange(previousContent, patchResult)
+  }
+
+  // TODO: addHistoryItem is a duplicate of addHistoryItem in TreeMode.svelte. Can we extract and reuse this logic?
+  function addHistoryItem({
+    previousJson,
+    previousState,
+    previousText,
+    previousTextIsRepaired
+  }: {
+    previousJson: JSONValue | undefined
+    previousText: string | undefined
+    previousState: DocumentState
+    previousTextIsRepaired: boolean
+  }) {
+    if (previousJson === undefined && previousText === undefined) {
+      // initialization -> do not create a history item
+      return
+    }
+
+    if (json !== undefined) {
+      if (previousJson !== undefined) {
+        // regular undo/redo with JSON patch
+        history.add({
+          undo: {
+            patch: [{ op: 'replace', path: '', value: previousJson }],
+            state: removeEditModeFromSelection(previousState),
+            json: undefined,
+            text: previousText,
+            textIsRepaired: previousTextIsRepaired
+          },
+          redo: {
+            patch: [{ op: 'replace', path: '', value: json }],
+            state: removeEditModeFromSelection(documentState),
+            json: undefined,
+            text,
+            textIsRepaired: false
+          }
+        })
+      } else {
+        history.add({
+          undo: {
+            patch: undefined,
+            json: undefined,
+            text: previousText,
+            state: removeEditModeFromSelection(previousState),
+            textIsRepaired: previousTextIsRepaired
+          },
+          redo: {
+            patch: undefined,
+            json,
+            state: removeEditModeFromSelection(documentState),
+            text,
+            textIsRepaired
+          }
+        })
+      }
+    } else {
+      if (previousJson !== undefined) {
+        history.add({
+          undo: {
+            patch: undefined,
+            json: previousJson,
+            state: removeEditModeFromSelection(previousState),
+            text: previousText,
+            textIsRepaired: previousTextIsRepaired
+          },
+          redo: {
+            patch: undefined,
+            json: undefined,
+            text,
+            textIsRepaired,
+            state: removeEditModeFromSelection(documentState)
+          }
+        })
+      } else {
+        // this cannot happen. Nothing to do, no change
+      }
+    }
   }
 
   export function validate(): ContentErrors {
@@ -671,7 +748,7 @@
     json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
     documentState = item.undo.state
     text = item.undo.text
-    // textIsRepaired = item.undo.textIsRepaired // FIXME
+    textIsRepaired = item.undo.textIsRepaired
 
     debug('undo', { item, json })
 
@@ -710,7 +787,7 @@
     json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
     documentState = item.redo.state
     text = item.redo.text
-    // textIsRepaired = item.redo.textIsRepaired // FIXME
+    textIsRepaired = item.redo.textIsRepaired
 
     debug('redo', { item, json })
 
