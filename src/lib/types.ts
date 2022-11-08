@@ -537,6 +537,11 @@ export enum SortDirection {
   desc = 'desc'
 }
 
+export interface TableCellIndex {
+  rowIndex: number
+  columnIndex: number
+}
+
 export interface SortedColumn {
   path: JSONPath
   sortDirection: SortDirection

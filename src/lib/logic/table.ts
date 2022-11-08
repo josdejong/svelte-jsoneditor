@@ -6,8 +6,8 @@ import {
   parseJSONPointer
 } from 'immutable-json-patch'
 import { isEmpty, isEqual } from 'lodash-es'
-import type { JSONSelection } from '../types'
-import { createValueSelection } from './selection'
+import type { JSONSelection, TableCellIndex } from '../types'
+import { createValueSelection } from './selection.js'
 
 export function getColumns(
   array: JSONArray,
@@ -121,70 +121,69 @@ function calculateAverageItemHeight(
   return total / values.length
 }
 
-// TODO: write unit test
-export function selectPreviousRow(
-  json: JSONValue,
-  columns: JSONPath[],
-  selection: JSONSelection
-): JSONSelection {
-  const [index, ...column] = selection.focusPath
-  const indexNum = parseFloat(index)
+export function selectPreviousRow(columns: JSONPath[], selection: JSONSelection): JSONSelection {
+  const { rowIndex, columnIndex } = toTableCellPosition(selection.focusPath, columns)
 
-  if (indexNum > 0) {
-    const previousPath = [String(indexNum - 1), ...column]
+  if (rowIndex > 0) {
+    const previousPosition = { rowIndex: rowIndex - 1, columnIndex }
+    const previousPath = fromTableCellPosition(previousPosition, columns)
     return createValueSelection(previousPath, false)
   }
 
   return selection
 }
 
-// TODO: write unit test
 export function selectNextRow(
   json: JSONValue,
   columns: JSONPath[],
   selection: JSONSelection
 ): JSONSelection {
-  const [index, ...column] = selection.focusPath
-  const indexNum = parseFloat(index)
+  const { rowIndex, columnIndex } = toTableCellPosition(selection.focusPath, columns)
 
-  if (indexNum < (json as JSONArray).length - 1) {
-    const previousPath = [String(indexNum + 1), ...column]
+  if (rowIndex < (json as JSONArray).length - 1) {
+    const nextPosition = { rowIndex: rowIndex + 1, columnIndex }
+    const nextPath = fromTableCellPosition(nextPosition, columns)
+    return createValueSelection(nextPath, false)
+  }
+
+  return selection
+}
+
+export function selectPreviousColumn(columns: JSONPath[], selection: JSONSelection): JSONSelection {
+  const { rowIndex, columnIndex } = toTableCellPosition(selection.focusPath, columns)
+
+  if (columnIndex > 0) {
+    const previousPosition = { rowIndex, columnIndex: columnIndex - 1 }
+    const previousPath = fromTableCellPosition(previousPosition, columns)
     return createValueSelection(previousPath, false)
   }
 
   return selection
 }
 
-// TODO: write unit test
-export function selectPreviousColumn(
-  json: JSONValue,
-  columns: JSONPath[],
-  selection: JSONSelection
-): JSONSelection {
-  const [index, ...column] = selection.focusPath
-  const columnIndex: number = columns.findIndex((c) => isEqual(c, column))
+export function selectNextColumn(columns: JSONPath[], selection: JSONSelection): JSONSelection {
+  const { rowIndex, columnIndex } = toTableCellPosition(selection.focusPath, columns)
 
-  if (columnIndex === -1 || columnIndex === 0) {
-    return selection
+  if (columnIndex < columns.length - 1) {
+    const nextPosition = { rowIndex, columnIndex: columnIndex + 1 }
+    const nextPath = fromTableCellPosition(nextPosition, columns)
+    return createValueSelection(nextPath, false)
   }
 
-  const previousPath = [index, ...columns[columnIndex - 1]]
-  return createValueSelection(previousPath, false)
+  return selection
 }
 
-// TODO: write unit test
-export function selectNextColumn(
-  json: JSONValue,
-  columns: JSONPath[],
-  selection: JSONSelection
-): JSONSelection {
-  const [index, ...column] = selection.focusPath
-  const columnIndex: number = columns.findIndex((c) => isEqual(c, column))
+export function toTableCellPosition(path: JSONPath, columns: JSONPath[]): TableCellIndex {
+  const [index, ...column] = path
 
-  if (columnIndex === -1 || columnIndex >= columns.length - 1) {
-    return selection
+  return {
+    rowIndex: parseFloat(index),
+    columnIndex: columns.findIndex((c) => isEqual(c, column))
   }
+}
 
-  const nextPath = [index, ...columns[columnIndex + 1]]
-  return createValueSelection(nextPath, false)
+export function fromTableCellPosition(position: TableCellIndex, columns: JSONPath[]): JSONPath {
+  const { rowIndex, columnIndex } = position
+
+  return [String(rowIndex), ...columns[columnIndex]]
 }

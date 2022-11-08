@@ -441,7 +441,7 @@
       createDefaultSelectionWhenUndefined()
 
       if (documentState.selection) {
-        updateSelection(selectPreviousColumn(json, columns, documentState.selection))
+        updateSelection(selectPreviousColumn(columns, documentState.selection))
       }
     }
 
@@ -451,7 +451,7 @@
       createDefaultSelectionWhenUndefined()
 
       if (documentState.selection) {
-        updateSelection(selectNextColumn(json, columns, documentState.selection))
+        updateSelection(selectNextColumn(columns, documentState.selection))
       }
     }
 
@@ -461,7 +461,7 @@
       createDefaultSelectionWhenUndefined()
 
       if (documentState.selection) {
-        updateSelection(selectPreviousRow(json, columns, documentState.selection))
+        updateSelection(selectPreviousRow(columns, documentState.selection))
       }
     }
 
