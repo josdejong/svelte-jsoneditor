@@ -2,9 +2,13 @@
   import type { JSONArray, JSONObject } from 'lossless-json'
   import { isJSONArray } from 'immutable-json-patch'
   import type { JSONPath } from 'immutable-json-patch'
+  import type { JSONParser } from '$lib/types'
+  import { truncate } from '$lib/utils/stringUtils.js'
+  import { MAX_INLINE_OBJECT_CHARS } from '$lib/constants.js'
 
   export let path: JSONPath
   export let value: JSONArray | JSONObject
+  export let parser: JSONParser
   export let isSelected: boolean
   export let onEdit: (path: JSONPath, value: JSONArray | JSONObject) => void
 
@@ -12,15 +16,13 @@
   $: description = (isJSONArray(value) ? 'item' : 'prop') + (count === 1 ? '' : 's')
 </script>
 
-<div class="jse-table-tag" class:jse-selected={isSelected}>
-  <span class="jse-bracket">{isJSONArray(value) ? '[' : '{'}</span><button
-    type="button"
-    class="jse-tag"
-    on:click={() => onEdit(path, value)}
-  >
-    {count}
-    {description}
-  </button><span class="jse-bracket">{isJSONArray(value) ? ']' : '}'}</span>
-</div>
+<button
+  type="button"
+  class="jse-inline-value"
+  class:jse-selected={isSelected}
+  on:dblclick={() => onEdit(path, value)}
+>
+  {truncate(parser.stringify(value), MAX_INLINE_OBJECT_CHARS)}
+</button>
 
-<style src="./TableTag.scss"></style>
+<style src="./InlineValue.scss"></style>

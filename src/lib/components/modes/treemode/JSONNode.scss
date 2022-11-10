@@ -179,7 +179,27 @@
 }
 
 .jse-tag {
-  @include tag-mixin;
+  border: none;
+  font-size: 80%;
+  font-family: var(--jse-font-family);
+  color: var(--jse-tag-color);
+  background: var(--jse-tag-background);
+  border-radius: 2px;
+  cursor: pointer;
+  //position: relative;
+  display: inline-block;
+  padding: 0 4px;
+  line-height: normal;
+  margin: 1px 0;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &.jse-expanded {
+    opacity: 0.7;
+    cursor: inherit;
+  }
 }
 
 .jse-identifier {

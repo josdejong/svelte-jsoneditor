@@ -61,7 +61,7 @@
   import { createDebug } from '$lib/utils/debug'
   import { createDocumentState, documentStatePatch } from '$lib/logic/documentState'
   import { isObjectOrArray } from '$lib/utils/typeUtils.js'
-  import TableTag from '$lib/components/modes/tablemode/tag/TableTag.svelte'
+  import InlineValue from '$lib/components/modes/tablemode/tag/InlineValue.svelte'
   import { revertJSONPatchWithMoveOperations } from '$lib/logic/operations'
   import {
     createValueSelection,
@@ -1056,7 +1056,13 @@
                       isValueSelection(documentState.selection)}
                   >
                     {#if isObjectOrArray(value)}
-                      <TableTag {path} {value} {isSelected} onEdit={openJSONEditorModal} />
+                      <InlineValue
+                        {path}
+                        {value}
+                        {parser}
+                        {isSelected}
+                        onEdit={openJSONEditorModal}
+                      />
                       {#if !isEmpty(validationErrorsByColumn)}
                         <ValidationErrorIcon
                           validationError={mergeValidationErrors(path, validationErrorsByColumn)}
