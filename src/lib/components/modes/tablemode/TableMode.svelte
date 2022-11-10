@@ -166,7 +166,7 @@
 
   let viewPortHeight = 600
   let scrollTop = 0
-  let defaultItemHeight = 22 // px
+  let defaultItemHeight = 18 // px
 
   $: visibleSection = calculateVisibleSection(
     scrollTop,
@@ -1056,12 +1056,8 @@
                       isValueSelection(documentState.selection)}
                   >
                     {#if isObjectOrArray(value)}
-                      <TableTag
-                        {path}
-                        {value}
-                        {isSelected}
-                        onEdit={openJSONEditorModal}
-                      />{#if !isEmpty(validationErrorsByColumn)}
+                      <TableTag {path} {value} {isSelected} onEdit={openJSONEditorModal} />
+                      {#if !isEmpty(validationErrorsByColumn)}
                         <ValidationErrorIcon
                           validationError={mergeValidationErrors(path, validationErrorsByColumn)}
                           onExpand={noop}

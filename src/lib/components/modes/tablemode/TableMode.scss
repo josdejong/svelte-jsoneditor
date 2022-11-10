@@ -71,11 +71,10 @@
         }
 
         .jse-table-cell {
-          padding: 2px var(--jse-padding);
+          padding: 0 var(--jse-padding);
           vertical-align: top;
           white-space: nowrap;
           max-width: 400px;
-          overflow: hidden;
           height: var(--jse-line-height);
 
           &.jse-table-cell-header,
