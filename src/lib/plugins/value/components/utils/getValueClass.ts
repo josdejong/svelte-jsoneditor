@@ -1,4 +1,4 @@
-import { isUrl, valueType } from '../../../../utils/typeUtils'
+import { isUrl, valueType } from '../../../../utils/typeUtils.js'
 import classnames from 'classnames'
 import type { JSONParser } from '$lib'
 

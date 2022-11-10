@@ -1,4 +1,4 @@
-import { createDebug } from '../utils/debug'
+import { createDebug } from '../utils/debug.js'
 
 const MAX_HISTORY_ITEMS = 1000
 

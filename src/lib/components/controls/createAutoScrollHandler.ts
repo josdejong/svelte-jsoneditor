@@ -1,4 +1,4 @@
-import { createDebug } from '../../utils/debug'
+import { createDebug } from '../../utils/debug.js'
 import {
   AUTO_SCROLL_INTERVAL,
   AUTO_SCROLL_SPEED_FAST,
