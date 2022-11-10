@@ -6,12 +6,12 @@ import {
   parseJSONPointer
 } from 'immutable-json-patch'
 import { groupBy, isEmpty, mapValues, partition } from 'lodash-es'
-import type { JSONSelection, TableCellIndex, ValidationError } from '../types'
+import type { JSONSelection, TableCellIndex, ValidationError } from '../types.js'
 import { createValueSelection, pathStartsWith } from './selection.js'
 import { isNumber } from '../utils/numberUtils.js'
 import type { Dictionary } from 'lodash'
-import { stringifyJSONPath, stripRootObject } from '$lib/utils/pathUtils'
-import { ValidationSeverity } from '../types'
+import { stringifyJSONPath, stripRootObject } from '../utils/pathUtils.js'
+import { ValidationSeverity } from '../types.js'
 
 export function getColumns(
   array: JSONArray,
@@ -251,7 +251,6 @@ export function groupValidationErrors(
   }
 }
 
-// TODO: write unit tests
 export function mergeValidationErrors(
   path: JSONPath,
   validationErrors: ValidationError[] | undefined
