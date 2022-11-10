@@ -75,9 +75,11 @@
   --jse-edit-outline: 2px solid #656565;
 
   /* contents: selected or hovered */
-  --jse-hover-background-color: rgba(0, 0, 0, 0.06);
   --jse-selection-background-color: #d3d3d3;
   --jse-selection-background-light-color: #e8e8e8;
+  --jse-hover-background-color: rgba(0, 0, 0, 0.06);
+  --jse-active-line-background-color: rgba(0, 0, 0, 0.06);
+  --jse-search-match-background-color: #99ff7780;
 
   /* contents: section of collapsed items in an array */
   --jse-collapsed-items-background-color: #f5f5f5;

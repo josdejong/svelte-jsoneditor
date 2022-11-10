@@ -66,6 +66,10 @@
         outline: var(--jse-search-match-active-outline);
       }
 
+      :global(.cm-selectionMatch) {
+        background-color: var(--jse-search-match-background-color);
+      }
+
       :global(.cm-foldPlaceholder) {
         background: var(--jse-tag-background);
         color: var(--jse-tag-color);
