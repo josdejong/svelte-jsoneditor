@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.10.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.10.0...v0.10.1) (2022-11-10)
+
+
+### Bug Fixes
+
+* improve highlighting color of search matches in dark mode ([fb7bdd9](https://github.com/josdejong/svelte-jsoneditor/commit/fb7bdd93ee35c752711a9420a441d99981062983))
+
 ## [0.10.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.9.2...v0.10.0) (2022-11-10)
 
 
