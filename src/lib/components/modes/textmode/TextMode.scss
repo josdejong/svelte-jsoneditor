@@ -49,7 +49,7 @@
 
       :global(.cm-activeLine),
       :global(.cm-activeLineGutter) {
-        background: var(--jse-hover-background-color);
+        background: var(--jse-active-line-background-color);
       }
 
       :global(.cm-selectionBackground) {
