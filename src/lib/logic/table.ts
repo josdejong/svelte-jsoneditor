@@ -5,9 +5,13 @@ import {
   isJSONObject,
   parseJSONPointer
 } from 'immutable-json-patch'
-import { isEmpty, isEqual } from 'lodash-es'
-import type { JSONSelection, TableCellIndex } from '../types'
-import { createValueSelection } from './selection.js'
+import { groupBy, isEmpty, mapValues, partition } from 'lodash-es'
+import type { JSONSelection, TableCellIndex, ValidationError } from '../types'
+import { createValueSelection, pathStartsWith } from './selection.js'
+import { isNumber } from '../utils/numberUtils.js'
+import type { Dictionary } from 'lodash'
+import { stringifyJSONPath, stripRootObject } from '$lib/utils/pathUtils'
+import { ValidationSeverity } from '../types'
 
 export function getColumns(
   array: JSONArray,
@@ -177,8 +181,8 @@ export function toTableCellPosition(path: JSONPath, columns: JSONPath[]): TableC
   const [index, ...column] = path
 
   return {
-    rowIndex: parseFloat(index),
-    columnIndex: columns.findIndex((c) => isEqual(c, column))
+    rowIndex: parseInt(index, 10),
+    columnIndex: columns.findIndex((c) => pathStartsWith(column, c))
   }
 }
 
@@ -186,4 +190,97 @@ export function fromTableCellPosition(position: TableCellIndex, columns: JSONPat
   const { rowIndex, columnIndex } = position
 
   return [String(rowIndex), ...columns[columnIndex]]
+}
+
+export function stringifyTableCellPosition(position: TableCellIndex): string {
+  const { rowIndex, columnIndex } = position
+
+  return `${rowIndex}:${columnIndex}`
+}
+
+interface GroupedValidationErrorsByRow {
+  row: ValidationError[]
+  columns: Dictionary<ValidationError[]>
+}
+
+export interface GroupedValidationErrors {
+  root: ValidationError[]
+  rows: Dictionary<GroupedValidationErrorsByRow>
+}
+
+/**
+ * Group validation errors for use in the Table view: per column, and a group for the row as a whole
+ */
+export function groupValidationErrors(
+  validationErrors: ValidationError[],
+  columns: JSONPath[]
+): GroupedValidationErrors {
+  const [arrayErrors, rootErrors] = partition(validationErrors, (validationError) =>
+    isNumber(validationError.path[0])
+  )
+
+  const errorsByRow: Dictionary<ValidationError[]> = groupBy(arrayErrors, findRowIndex)
+
+  const groupedErrorsByRow = mapValues(errorsByRow, (errors) => {
+    const groupByRow: GroupedValidationErrorsByRow = {
+      row: [],
+      columns: {}
+    }
+
+    errors.forEach((error) => {
+      const columnIndex = findColumnIndex(error, columns)
+
+      if (columnIndex !== -1) {
+        if (groupByRow.columns[columnIndex] === undefined) {
+          groupByRow.columns[columnIndex] = []
+        }
+        groupByRow.columns[columnIndex].push(error)
+      } else {
+        // TODO: handle the error "must have required property 'id'" -> find the columnIndex from that message
+
+        groupByRow.row.push(error)
+      }
+    })
+
+    return groupByRow
+  })
+
+  return {
+    root: rootErrors,
+    rows: groupedErrorsByRow
+  }
+}
+
+// TODO: write unit tests
+export function mergeValidationErrors(
+  path: JSONPath,
+  validationErrors: ValidationError[] | undefined
+): ValidationError | undefined {
+  if (!validationErrors || validationErrors.length === 0) {
+    return undefined
+  }
+
+  if (validationErrors.length === 1) {
+    return validationErrors[0]
+  }
+
+  return {
+    path,
+    message:
+      'Multiple validation issues: ' +
+      validationErrors
+        .map((error) => {
+          return stripRootObject(stringifyJSONPath(error.path)) + ' ' + error.message
+        })
+        .join(', '),
+    severity: ValidationSeverity.warning
+  }
+}
+
+function findRowIndex(error: ValidationError): number {
+  return parseInt(error.path[0], 10)
+}
+
+function findColumnIndex(error: ValidationError, columns: JSONPath[]): number {
+  return toTableCellPosition(error.path, columns).columnIndex
 }

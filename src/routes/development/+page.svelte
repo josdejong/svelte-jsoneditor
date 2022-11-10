@@ -99,6 +99,40 @@
     required: ['foo']
   }
 
+  const arraySchema = {
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'number'
+        },
+        random: {
+          type: 'number',
+          minimum: 0
+        },
+        array: {
+          type: 'array',
+          items: {
+            type: 'number'
+          }
+        },
+        name: {
+          type: 'string'
+        },
+        long: {
+          type: 'number'
+        },
+        'nested object': {
+          type: 'object'
+        }
+      },
+      required: ['id', 'name', 'random', 'array'],
+      additionalProperties: false
+    },
+    minItems: 1001
+  }
+
   const themes = [
     { value: 'jse-theme-default', label: 'default' },
     { value: 'jse-theme-dark', label: 'dark' },
@@ -147,6 +181,7 @@
   ]
 
   const validator = createAjvValidator(schema)
+  const arrayValidator = createAjvValidator(arraySchema)
 
   let refTreeEditor
   let refTextEditor
@@ -163,7 +198,8 @@
   const showTextEditor = useLocalStorage('svelte-jsoneditor-demo-showTextEditor', true)
   const showRawContents = useLocalStorage('svelte-jsoneditor-demo-showRawContents', true)
   let height = '430px'
-  const validate = useLocalStorage('svelte-jsoneditor-demo-validate', true)
+  const validate = useLocalStorage('svelte-jsoneditor-demo-validate', false)
+  const validateArray = useLocalStorage('svelte-jsoneditor-demo-validate-array', false)
   const readOnly = useLocalStorage('svelte-jsoneditor-demo-readOnly', false)
   const mainMenuBar = useLocalStorage('svelte-jsoneditor-demo-mainMenuBar', true)
   const navigationBar = useLocalStorage('svelte-jsoneditor-demo-navigationBar', true)
@@ -205,6 +241,8 @@
 
   $: selectedParser = parsers.find((parser) => parser.id === $selectedParserId).value
   $: selectedPathParser = pathParsers.find((parser) => parser.id === $selectedPathParserId).value
+
+  $: selectedValidator = $validate ? validator : $validateArray ? arrayValidator : undefined
 
   // only editable/readonly div, no color picker, boolean toggle, timestamp
   function customRenderValue({
@@ -329,6 +367,9 @@
       <input type="checkbox" bind:checked={$validate} /> validate
     </label>
     <label>
+      <input type="checkbox" bind:checked={$validateArray} /> validate array
+    </label>
+    <label>
       <input type="checkbox" bind:checked={$mainMenuBar} /> mainMenuBar
     </label>
     <label>
@@ -439,7 +480,7 @@
           text: undefined,
           json: [...new Array(1000)].map((value, index) => {
             const random = Math.round(Math.random() * 1000)
-            return {
+            const item = {
               id: index,
               name: 'Item ' + index,
               random,
@@ -449,6 +490,24 @@
               array: [index, 1, 7, 3],
               long: 9223372000000000000n + BigInt(random)
             }
+
+            // introduce some validation issues
+            if (index === 3) {
+              item.array[2] = 'oopsie'
+              item.array[3] = null
+              delete item['id']
+            }
+            if (index === 4) {
+              item.random = -1
+            }
+            if (index === 7) {
+              item.random = String(item.random)
+            }
+            if (index === 9) {
+              item.unknownProp = 'other'
+            }
+
+            return item
           })
         }
       }}
@@ -557,7 +616,7 @@
             tabSize={$tabSize}
             parser={selectedParser}
             pathParser={selectedPathParser}
-            validator={$validate ? validator : undefined}
+            validator={selectedValidator}
             {queryLanguages}
             bind:queryLanguageId
             {onRenderMenu}
@@ -605,7 +664,7 @@
             tabSize={$tabSize}
             parser={selectedParser}
             pathParser={selectedPathParser}
-            validator={$validate ? validator : undefined}
+            validator={selectedValidator}
             {queryLanguages}
             {queryLanguageId}
             {onChangeQueryLanguage}
@@ -718,7 +777,7 @@ See https://github.com/sveltejs/kit/issues/981
     white-space: nowrap;
 
     &:hover {
-      background: white;
+      background: rgba(255, 255, 255, 0.5);
     }
   }
 

@@ -43,6 +43,8 @@
   import {
     calculateVisibleSection,
     getColumns,
+    groupValidationErrors,
+    mergeValidationErrors,
     selectNextColumn,
     selectNextRow,
     selectPreviousColumn,
@@ -85,6 +87,8 @@
   import { MAX_CHARACTERS_TEXT_PREVIEW } from '$lib/constants.js'
   import { truncate } from '$lib/utils/stringUtils.js'
   import { getText } from '$lib/utils/jsonUtils.js'
+  import { noop } from '$lib/utils/noop.js'
+  import ValidationErrorIcon from '$lib/components/modes/treemode/ValidationErrorIcon.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
   const sortModalId = uniqueId()
@@ -239,7 +243,7 @@
   }
 
   let documentState = createDocumentState()
-  let textIsRepaired = false // FIXME: implement repairing text
+  let textIsRepaired = false
   const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // FIXME: implement support for search and replace
 
   function onSortByHeader(newSortedColumn: SortedColumn) {
@@ -429,6 +433,9 @@
 
   let validationErrors: ValidationError[] = []
   $: updateValidationErrors(json, validator, parser, validationParser)
+  $: groupedValidationErrors = groupValidationErrors(validationErrors, columns)
+
+  $: debug('groupedValidationErrors', groupedValidationErrors)
 
   // because onChange returns the validation errors and there is also a separate listener,
   // we would execute validation twice. Memoizing the last result solves this.
@@ -998,7 +1005,13 @@
         <table class="jse-table-main">
           <tbody>
             <tr class="jse-table-row jse-table-row-header">
-              <th class="jse-table-cell jse-table-cell-header" />
+              <th class="jse-table-cell jse-table-cell-header">
+                {#if !isEmpty(groupedValidationErrors?.root)}<ValidationErrorIcon
+                    validationError={mergeValidationErrors([], groupedValidationErrors?.root)}
+                    onExpand={noop}
+                  />
+                {/if}
+              </th>
               {#each columns as column}
                 <th class="jse-table-cell jse-table-cell-header">
                   <ColumnHeader
@@ -1013,16 +1026,27 @@
               <td style:height={visibleSection.startHeight + 'px'} colspan={columns.length} />
             </tr>
             {#each visibleSection.visibleItems as item, visibleIndex}
-              {@const index = visibleSection.startIndex + visibleIndex}
+              {@const rowIndex = visibleSection.startIndex + visibleIndex}
+              {@const validationErrorsByRow = groupedValidationErrors.rows[rowIndex]}
               <tr class="jse-table-row">
                 <th
                   class="jse-table-cell jse-table-cell-gutter"
-                  bind:clientHeight={itemHeightsCache[index]}>{index + 1}</th
+                  bind:clientHeight={itemHeightsCache[rowIndex]}
                 >
-                {#each columns as column}
-                  {@const path = [String(index)].concat(column)}
+                  {rowIndex + 1}{#if !isEmpty(validationErrorsByRow?.row)}<ValidationErrorIcon
+                      validationError={mergeValidationErrors(
+                        [String(rowIndex)],
+                        validationErrorsByRow.row
+                      )}
+                      onExpand={noop}
+                    />
+                  {/if}
+                </th>
+                {#each columns as column, columnIndex}
+                  {@const path = [String(rowIndex)].concat(column)}
                   {@const value = getIn(item, column)}
                   {@const isSelected = isPathSelected(path, documentState.selection)}
+                  {@const validationErrorsByColumn = validationErrorsByRow?.columns[columnIndex]}
                   <td
                     class="jse-table-cell"
                     data-path={encodeDataPath(path)}
@@ -1030,7 +1054,16 @@
                       isValueSelection(documentState.selection)}
                   >
                     {#if isObjectOrArray(value)}
-                      <TableTag {path} {value} {isSelected} onEdit={openJSONEditorModal} />
+                      <TableTag
+                        {path}
+                        {value}
+                        {isSelected}
+                        onEdit={openJSONEditorModal}
+                      />{#if !isEmpty(validationErrorsByColumn)}<ValidationErrorIcon
+                          validationError={mergeValidationErrors(path, validationErrorsByColumn)}
+                          onExpand={noop}
+                        />
+                      {/if}
                     {:else if value !== undefined}
                       <JSONValueComponent
                         {path}
@@ -1039,7 +1072,11 @@
                         selection={isSelected ? documentState.selection : undefined}
                         {searchResultItems}
                         {context}
-                      />
+                      />{#if !isEmpty(validationErrorsByColumn)}<ValidationErrorIcon
+                          validationError={mergeValidationErrors(path, validationErrorsByColumn)}
+                          onExpand={noop}
+                        />
+                      {/if}
                     {/if}
                   </td>
                 {/each}

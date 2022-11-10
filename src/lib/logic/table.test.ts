@@ -7,6 +7,7 @@ import {
   selectNextRow,
   selectPreviousColumn,
   selectPreviousRow,
+  stringifyTableCellPosition,
   toTableCellPosition
 } from './table.js'
 import { deepStrictEqual } from 'assert'
@@ -67,7 +68,7 @@ describe('table', () => {
   })
 
   describe('selection', () => {
-    const columns: JSONPath[] = [['id'], ['name'], ['address', 'city']]
+    const columns: JSONPath[] = [['id'], ['name'], ['address', 'city'], ['other']]
     const json = [
       { id: 1, name: 'Joe', address: { city: 'Amsterdam' } },
       { id: 2, name: 'Sarah', address: { city: 'Groningen' } }
@@ -87,6 +88,13 @@ describe('table', () => {
       deepStrictEqual(toTableCellPosition(['2', 'foo'], columns), {
         rowIndex: 2,
         columnIndex: -1
+      })
+    })
+
+    it('toTableCellPosition of a non-flattened, nested item', () => {
+      deepStrictEqual(toTableCellPosition(['2', 'other', 'nickname'], columns), {
+        rowIndex: 2,
+        columnIndex: 3
       })
     })
 
@@ -157,9 +165,17 @@ describe('table', () => {
       )
 
       deepStrictEqual(
-        selectNextColumn(columns, createValueSelection(['2', 'address', 'city'], false)),
-        createValueSelection(['2', 'address', 'city'], false)
+        selectNextColumn(columns, createValueSelection(['2', 'other'], false)),
+        createValueSelection(['2', 'other'], false)
       )
     })
+
+    it('stringifyTableCellPosition', () => {
+      deepStrictEqual(stringifyTableCellPosition({ rowIndex: 2, columnIndex: 5 }), '2:5')
+    })
+  })
+
+  it('groupValidationErrors', () => {
+    // FIXME: write tests for groupValidationErrors
   })
 })
