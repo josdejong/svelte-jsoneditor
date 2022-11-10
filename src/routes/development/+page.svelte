@@ -180,7 +180,7 @@
     }
   ]
 
-  const validator = createAjvValidator(schema)
+  const validator = createAjvValidator({ schema })
   const arrayValidator = createAjvValidator(arraySchema)
 
   let refTreeEditor

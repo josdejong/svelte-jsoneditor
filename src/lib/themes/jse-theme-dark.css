@@ -57,6 +57,8 @@
   --jse-selection-background-color: #464646;
   --jse-selection-background-light-color: #333333;
   --jse-hover-background-color: #343434;
+  --jse-active-line-background-color: rgba(255, 255, 255, 0.06);
+  --jse-search-match-background-color: #343434;
 
   /* contents: section of collapsed items in an array */
   --jse-collapsed-items-background-color: #333333;

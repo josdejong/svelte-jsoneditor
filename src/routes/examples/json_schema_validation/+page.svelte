@@ -73,7 +73,7 @@
   }
 
   // create a JSON schema validator powered by Ajv
-  const validator = createAjvValidator(schema, schemaDefinitions)
+  const validator = createAjvValidator({ schema, schemaDefinitions })
 
   // enable rendering a select box for enums
   function onRenderValue(props) {

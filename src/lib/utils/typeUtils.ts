@@ -1,6 +1,6 @@
 // TODO: unit test typeUtils.js
 
-import { isDigit, isNumber } from './numberUtils.js'
+import { isNumber } from './numberUtils.js'
 import type { JSONParser } from '../types.js'
 import type { JSONValue } from 'lossless-json'
 
@@ -119,9 +119,9 @@ export function valueType(value: unknown, parser: JSONParser): string {
     return 'object'
   }
 
-  // unknown type. Try out what stringfying results in
+  // unknown type (like a LosslessNumber). Try out what stringfying results in
   const valueStr = parser.stringify(value)
-  if (valueStr && isDigit(valueStr[0])) {
+  if (valueStr && isNumber(valueStr)) {
     return 'number'
   }
   if (valueStr === 'true' || valueStr === 'false') {

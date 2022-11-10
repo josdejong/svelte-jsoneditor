@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.10.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.10.0...v0.10.1) (2022-11-10)
+
+
+### Bug Fixes
+
+* improve highlighting color of search matches in dark mode ([fb7bdd9](https://github.com/josdejong/svelte-jsoneditor/commit/fb7bdd93ee35c752711a9420a441d99981062983))
+
+## [0.10.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.9.2...v0.10.0) (2022-11-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* The signature of `createAjvValidator` is changed from up to three unnamed arguments
+`createAjvValidator(schema, schemaDefinitions, ajvOptions)` to a single object with options
+`createAjvValidator({ schema, schemaDefinitions, ajvOptions })`.
+
+### Features
+
+* implement `onCreateAjv` callback for the `createAjvValidator` plugin ([da3d76c](https://github.com/josdejong/svelte-jsoneditor/commit/da3d76ce4087464a0d66566f9239498bbff710fd))
+
+
+### Bug Fixes
+
+* [#188](https://github.com/josdejong/svelte-jsoneditor/issues/188) selected text not visible in text mode when in dark mode ([41856da](https://github.com/josdejong/svelte-jsoneditor/commit/41856da229912db510090049b47bae3543f996a3))
+* improve highlighting color of search matches in dark mode ([b85c260](https://github.com/josdejong/svelte-jsoneditor/commit/b85c26002c376fd15b340e71b1e2225747785365))
+* negative numbers like `-4.1` not highlighted with the right color in tree mode ([071c3f9](https://github.com/josdejong/svelte-jsoneditor/commit/071c3f9d248e18c5638c5352ca4a60fb227f639e))
+
+### [0.9.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.9.1...v0.9.2) (2022-11-04)
+
+
+### Bug Fixes
+
+* incorrect cursor style for ColorPicker & BooleanToggle ([#184](https://github.com/josdejong/svelte-jsoneditor/issues/184)) ([12e60e5](https://github.com/josdejong/svelte-jsoneditor/commit/12e60e5b836f9294ea4a0b3bfe2384745c0509cf))
+* remove root `$` prefix from the path in the Sort and Transform modal ([50ce3f0](https://github.com/josdejong/svelte-jsoneditor/commit/50ce3f04980a02164a4fa897afec942933e21db9))
+* when switching to a different JSON parser, stringify and parse the contents again ([2cece4e](https://github.com/josdejong/svelte-jsoneditor/commit/2cece4ebc7dbd75dc28f743c5b3ea12470848e7d))
+
 ### [0.9.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.9.0...v0.9.1) (2022-11-02)
 
 

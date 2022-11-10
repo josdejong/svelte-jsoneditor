@@ -9,7 +9,12 @@
     TRANSFORM_MODAL_OPTIONS
   } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
-  import { isEqualParser, isTextContent, validateContentType } from '../utils/jsonUtils'
+  import {
+    isEqualParser,
+    isJSONContent,
+    isTextContent,
+    validateContentType
+  } from '../utils/jsonUtils'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import { javascriptQueryLanguage } from '../plugins/query/javascriptQueryLanguage.js'
   import { renderValue } from '$lib/plugins/value/renderValue'
@@ -105,6 +110,13 @@
   $: {
     if (!isEqualParser(parser, previousParser)) {
       debug('parser changed, recreate editor')
+
+      if (isJSONContent(content)) {
+        content = {
+          json: parser.parse(previousParser.stringify(content.json))
+        }
+      }
+
       previousParser = parser
 
       // new editor id -> will re-create the editor

@@ -127,7 +127,7 @@
         props: {
           content,
           onChange: (update) => console.log('onChange', update),
-          validator: createAjvValidator(schema, schemaDefinitions)
+          validator: createAjvValidator({ schema, schemaDefinitions })
         }
       })
     </script>

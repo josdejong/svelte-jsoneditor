@@ -87,6 +87,8 @@ describe('typeUtils', () => {
 
   it('valueType', () => {
     strictEqual(valueType(2, JSON), 'number')
+    strictEqual(valueType(-2, JSON), 'number')
+    strictEqual(valueType(2.4e3, JSON), 'number')
     strictEqual(valueType('some text', JSON), 'string')
     strictEqual(valueType(true, JSON), 'boolean')
     strictEqual(valueType(false, JSON), 'boolean')
@@ -96,12 +98,15 @@ describe('typeUtils', () => {
     strictEqual(valueType(123n, JSON), 'number')
     strictEqual(valueType(new Date(), JSON), 'unknown')
     strictEqual(valueType(new LosslessNumber('123'), LosslessJSONParser as JSON), 'number')
+    strictEqual(valueType(new LosslessNumber('2.4e3'), LosslessJSONParser as JSON), 'number')
+    strictEqual(valueType(new LosslessNumber('-4.0'), LosslessJSONParser as JSON), 'number')
   })
 
   it('isStringContainingPrimitiveValue', () => {
     strictEqual(isStringContainingPrimitiveValue(22, JSON), false)
     strictEqual(isStringContainingPrimitiveValue('text', JSON), false)
     strictEqual(isStringContainingPrimitiveValue('2.4', JSON), true)
+    strictEqual(isStringContainingPrimitiveValue('-2.4', JSON), true)
     strictEqual(isStringContainingPrimitiveValue('2e3', JSON), true)
     strictEqual(isStringContainingPrimitiveValue('true', JSON), true)
     strictEqual(isStringContainingPrimitiveValue('false', JSON), true)

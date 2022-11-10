@@ -203,7 +203,7 @@ const editor = new JSONEditor({
   ```js
   import { createAjvValidator } from 'svelte-jsoneditor'
 
-  const validator = createAjvValidator(schema, schemaDefinitions)
+  const validator = createAjvValidator({ schema, schemaDefinitions })
   ```
 
 - `parser: JSON = JSON`. Configure a custom JSON parser, like [`lossless-json`](https://github.com/josdejong/lossless-json). By default, the native `JSON` parser of JavaScript is used. The `JSON` interface is an object with a `parse` and `stringify` function. For example:
