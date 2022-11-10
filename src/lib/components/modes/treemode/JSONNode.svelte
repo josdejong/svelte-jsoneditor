@@ -638,6 +638,7 @@
                 {value.length}
                 {value.length === 1 ? 'item' : 'items'}
               </span>
+              &nbsp;
             {:else}
               <div class="jse-bracket">[</div>
               <button type="button" class="jse-tag" on:click={handleExpand}>

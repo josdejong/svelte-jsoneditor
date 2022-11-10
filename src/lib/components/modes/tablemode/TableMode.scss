@@ -49,6 +49,7 @@
 
     table.jse-table-main {
       border-collapse: collapse;
+      border-spacing: 0;
 
       .jse-table-invisible-start-section,
       .jse-table-invisible-end-section {
@@ -75,6 +76,7 @@
           white-space: nowrap;
           max-width: 400px;
           overflow: hidden;
+          height: var(--jse-line-height);
 
           &.jse-table-cell-header,
           &.jse-table-cell-gutter {

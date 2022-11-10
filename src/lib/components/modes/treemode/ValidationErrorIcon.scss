@@ -7,7 +7,15 @@ button.jse-validation-error {
   color: var(--jse-warning-color);
   padding: 0 $input-padding;
   margin: 0;
-  font-size: var(--jse-font-size-mono);
-  height: var(--jse-line-height);
+  height: 18px;
+  width: 18px;
   overflow: hidden;
+  position: relative;
+  vertical-align: top;
+
+  :global(svg) {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 }

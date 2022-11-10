@@ -1002,7 +1002,7 @@
         bind:clientHeight={viewPortHeight}
         on:scroll={handleScroll}
       >
-        <table class="jse-table-main">
+        <table class="jse-table-main" cellpadding="0" cellspacing="0">
           <tbody>
             <tr class="jse-table-row jse-table-row-header">
               <th class="jse-table-cell jse-table-cell-header">
@@ -1033,7 +1033,9 @@
                   class="jse-table-cell jse-table-cell-gutter"
                   bind:clientHeight={itemHeightsCache[rowIndex]}
                 >
-                  {rowIndex + 1}{#if !isEmpty(validationErrorsByRow?.row)}<ValidationErrorIcon
+                  {rowIndex + 1}
+                  {#if !isEmpty(validationErrorsByRow?.row)}
+                    <ValidationErrorIcon
                       validationError={mergeValidationErrors(
                         [String(rowIndex)],
                         validationErrorsByRow.row
@@ -1059,7 +1061,8 @@
                         {value}
                         {isSelected}
                         onEdit={openJSONEditorModal}
-                      />{#if !isEmpty(validationErrorsByColumn)}<ValidationErrorIcon
+                      />{#if !isEmpty(validationErrorsByColumn)}
+                        <ValidationErrorIcon
                           validationError={mergeValidationErrors(path, validationErrorsByColumn)}
                           onExpand={noop}
                         />
@@ -1072,7 +1075,8 @@
                         selection={isSelected ? documentState.selection : undefined}
                         {searchResultItems}
                         {context}
-                      />{#if !isEmpty(validationErrorsByColumn)}<ValidationErrorIcon
+                      />{#if !isEmpty(validationErrorsByColumn)}
+                        <ValidationErrorIcon
                           validationError={mergeValidationErrors(path, validationErrorsByColumn)}
                           onExpand={noop}
                         />
