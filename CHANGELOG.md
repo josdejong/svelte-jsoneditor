@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.10.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.9.2...v0.10.0) (2022-11-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* The signature of `createAjvValidator` is changed from up to three unnamed arguments
+`createAjvValidator(schema, schemaDefinitions, ajvOptions)` to a single object with options
+`createAjvValidator({ schema, schemaDefinitions, ajvOptions })`.
+
+### Features
+
+* implement `onCreateAjv` callback for the `createAjvValidator` plugin ([da3d76c](https://github.com/josdejong/svelte-jsoneditor/commit/da3d76ce4087464a0d66566f9239498bbff710fd))
+
+
+### Bug Fixes
+
+* [#188](https://github.com/josdejong/svelte-jsoneditor/issues/188) selected text not visible in text mode when in dark mode ([41856da](https://github.com/josdejong/svelte-jsoneditor/commit/41856da229912db510090049b47bae3543f996a3))
+* improve highlighting color of search matches in dark mode ([b85c260](https://github.com/josdejong/svelte-jsoneditor/commit/b85c26002c376fd15b340e71b1e2225747785365))
+* negative numbers like `-4.1` not highlighted with the right color in tree mode ([071c3f9](https://github.com/josdejong/svelte-jsoneditor/commit/071c3f9d248e18c5638c5352ca4a60fb227f639e))
+
 ### [0.9.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.9.1...v0.9.2) (2022-11-04)
 
 
