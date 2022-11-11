@@ -1062,27 +1062,19 @@
                         {parser}
                         {isSelected}
                         onEdit={openJSONEditorModal}
-                      />
-                      {#if !isEmpty(validationErrorsByColumn)}
-                        <ValidationErrorIcon
-                          validationError={mergeValidationErrors(path, validationErrorsByColumn)}
-                          onExpand={noop}
-                        />
-                      {/if}
-                    {:else if value !== undefined}
+                      />{:else}
                       <JSONValueComponent
                         {path}
-                        {value}
+                        value={value !== undefined ? value : ''}
                         enforceString={false}
                         selection={isSelected ? documentState.selection : undefined}
                         {searchResultItems}
                         {context}
-                      />{#if !isEmpty(validationErrorsByColumn)}
-                        <ValidationErrorIcon
-                          validationError={mergeValidationErrors(path, validationErrorsByColumn)}
-                          onExpand={noop}
-                        />
-                      {/if}
+                      />{/if}{#if !isEmpty(validationErrorsByColumn)}
+                      <ValidationErrorIcon
+                        validationError={mergeValidationErrors(path, validationErrorsByColumn)}
+                        onExpand={noop}
+                      />
                     {/if}
                   </td>
                 {/each}

@@ -15,7 +15,6 @@ import {
 import { deepStrictEqual } from 'assert'
 import type { JSONArray, JSONPath } from 'immutable-json-patch'
 import { createValueSelection } from './selection.js'
-import { cloneDeep } from 'lodash-es'
 import type { ValidationError } from '../types.js'
 import { ValidationSeverity } from '../types.js'
 
@@ -92,6 +91,11 @@ describe('table', () => {
 
       deepStrictEqual(toTableCellPosition(['2', 'foo'], columns), {
         rowIndex: 2,
+        columnIndex: -1
+      })
+
+      deepStrictEqual(toTableCellPosition([], columns), {
+        rowIndex: -1,
         columnIndex: -1
       })
     })
@@ -181,11 +185,7 @@ describe('table', () => {
   })
 
   describe('groupValidationErrors', () => {
-    const array = [
-      { id: 1, name: 'Item 1', random: 33, array: [1, 2, 3] },
-      { id: 2, name: 'Item 2', random: 51, array: [4, 5, 6] }
-    ]
-    const columns = [['id'], ['name'], ['random'], ['array']]
+    const columns = [['id'], ['name'], ['address'], ['array']]
 
     it('should put root errors in root', () => {
       const error: ValidationError = {
@@ -201,11 +201,6 @@ describe('table', () => {
     })
 
     it('should put cell errors in the right cell', () => {
-      const invalidArray = cloneDeep(array)
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      invalidArray[1].array[2] = 'oopsie'
-
       const error: ValidationError = {
         message: 'must be number',
         path: ['5', 'array', '2'],
@@ -226,11 +221,6 @@ describe('table', () => {
     })
 
     it('should put row errors in the row header', () => {
-      const invalidArray = cloneDeep(array)
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      invalidArray[1].unknownProp = 'oopsie'
-
       const error: ValidationError = {
         message: 'should NOT have additional property: unknownProp',
         path: ['9'],
@@ -243,6 +233,46 @@ describe('table', () => {
           '9': {
             row: [error],
             columns: {}
+          }
+        }
+      })
+    })
+
+    it('should put missing required properties in the right column', () => {
+      const error: ValidationError = {
+        path: ['3'],
+        message: "must have required property 'name'",
+        severity: ValidationSeverity.warning
+      }
+
+      deepStrictEqual(groupValidationErrors([error], columns), {
+        root: [],
+        rows: {
+          '3': {
+            row: [],
+            columns: {
+              '1': [error]
+            }
+          }
+        }
+      })
+    })
+
+    it('should put missing nested required properties in the right column', () => {
+      const error: ValidationError = {
+        path: ['3', 'address'],
+        message: "must have required property 'city'",
+        severity: ValidationSeverity.warning
+      }
+
+      deepStrictEqual(groupValidationErrors([error], columns), {
+        root: [],
+        rows: {
+          '3': {
+            row: [],
+            columns: {
+              '2': [error]
+            }
           }
         }
       })

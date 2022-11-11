@@ -180,8 +180,10 @@ export function selectNextColumn(columns: JSONPath[], selection: JSONSelection):
 export function toTableCellPosition(path: JSONPath, columns: JSONPath[]): TableCellIndex {
   const [index, ...column] = path
 
+  const rowIndex = parseInt(index, 10)
+
   return {
-    rowIndex: parseInt(index, 10),
+    rowIndex: !isNaN(rowIndex) ? rowIndex : -1,
     columnIndex: columns.findIndex((c) => pathStartsWith(column, c))
   }
 }
@@ -281,5 +283,29 @@ function findRowIndex(error: ValidationError): number {
 }
 
 function findColumnIndex(error: ValidationError, columns: JSONPath[]): number {
-  return toTableCellPosition(error.path, columns).columnIndex
+  const position = toTableCellPosition(error.path, columns)
+
+  if (position.columnIndex !== -1) {
+    return position.columnIndex
+  }
+
+  // utilize an error message like "must have required property 'id'",
+  // extract the property name, built the path from it, and use that.
+  if (position.rowIndex !== -1) {
+    const match = requiredPropertyRegex.exec(error.message)
+    if (match) {
+      const prop = match[1]
+      const path = error.path.concat(prop)
+      const matchedPosition = toTableCellPosition(path, columns)
+
+      if (matchedPosition.columnIndex !== -1) {
+        return matchedPosition.columnIndex
+      }
+    }
+  }
+
+  return -1
 }
+
+// matches a validation error like "must have required property 'id'" to find the property name
+const requiredPropertyRegex = /^must have required property '(.*)'$/
