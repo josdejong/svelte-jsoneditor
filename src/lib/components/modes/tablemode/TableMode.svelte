@@ -42,6 +42,7 @@
   import { isTextContent, normalizeJsonParseError } from '../../../utils/jsonUtils'
   import {
     calculateVisibleSection,
+    clearSortedColumnWhenAffectedByOperations,
     getColumns,
     groupValidationErrors,
     mergeValidationErrors,
@@ -511,12 +512,22 @@
     ) as JSONPatchDocument
     const patched = documentStatePatch(json, documentState, operations)
 
-    const callback =
-      typeof afterPatch === 'function' ? afterPatch(patched.json, patched.documentState) : undefined
+    // Clear the sorted column when needed. We need to do this before `afterPatch`,
+    // else we clear any changed made in the callback. It is a bit odd that
+    // afterPatch does not receive the actual previousDocumentState. Better ideas?
+    const patchedJson = patched.json
+    const patchedDocumentState = clearSortedColumnWhenAffectedByOperations(
+      documentState,
+      operations,
+      columns
+    )
 
-    json = callback && callback.json !== undefined ? callback.json : patched.json
+    const callback =
+      typeof afterPatch === 'function' ? afterPatch(patchedJson, patchedDocumentState) : undefined
+
+    json = callback && callback.json !== undefined ? callback.json : patchedJson
     const newState =
-      callback && callback.state !== undefined ? callback.state : patched.documentState
+      callback && callback.state !== undefined ? callback.state : patchedDocumentState
     documentState = newState
     text = undefined
     textIsRepaired = false
@@ -801,6 +812,8 @@
       selectedPath,
       onSort: async (operations) => {
         debug('onSort', selectedPath, operations)
+
+        // TODO: mark the selected column as sorted (if there is a match)
 
         handlePatch(operations)
       },

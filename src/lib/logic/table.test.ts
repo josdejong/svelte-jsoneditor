@@ -5,6 +5,7 @@ import {
   getShallowKeys,
   groupValidationErrors,
   mergeValidationErrors,
+  operationAffectsSortedColumn,
   selectNextColumn,
   selectNextRow,
   selectPreviousColumn,
@@ -15,8 +16,8 @@ import {
 import { deepStrictEqual } from 'assert'
 import type { JSONArray, JSONPath } from 'immutable-json-patch'
 import { createValueSelection } from './selection.js'
-import type { ValidationError } from '../types.js'
-import { ValidationSeverity } from '../types.js'
+import type { SortedColumn, ValidationError } from '../types.js'
+import { SortDirection, ValidationSeverity } from '../types.js'
 
 describe('table', () => {
   const json = [
@@ -302,5 +303,49 @@ describe('table', () => {
     })
 
     deepStrictEqual(mergeValidationErrors(path, []), undefined)
+  })
+
+  it('operationAffectsSortedColumn', () => {
+    const columns = [['id'], ['name'], ['address'], ['array']]
+    const sortedColumn: SortedColumn = {
+      path: ['name'],
+      sortDirection: SortDirection.asc
+    }
+
+    deepStrictEqual(
+      operationAffectsSortedColumn(sortedColumn, { op: 'add', path: '/2', value: 42 }, columns),
+      true
+    )
+
+    deepStrictEqual(
+      operationAffectsSortedColumn(
+        sortedColumn,
+        { op: 'replace', path: '/1/name', value: 'Joe' },
+        columns
+      ),
+      true
+    )
+
+    deepStrictEqual(
+      operationAffectsSortedColumn(
+        sortedColumn,
+        { op: 'replace', path: '/1/id', value: 42 },
+        columns
+      ),
+      false
+    )
+
+    deepStrictEqual(
+      operationAffectsSortedColumn(
+        sortedColumn,
+        {
+          op: 'replace',
+          path: '/1/address/city',
+          value: 'Rotterdam'
+        },
+        columns
+      ),
+      false
+    )
   })
 })

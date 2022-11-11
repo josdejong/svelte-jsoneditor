@@ -1,12 +1,18 @@
-import type { JSONArray, JSONPath, JSONValue } from 'immutable-json-patch'
+import type { JSONArray, JSONPatchOperation, JSONPath, JSONValue } from 'immutable-json-patch'
 import {
   compileJSONPointer,
   isJSONArray,
   isJSONObject,
   parseJSONPointer
 } from 'immutable-json-patch'
-import { groupBy, isEmpty, mapValues, partition } from 'lodash-es'
-import type { JSONSelection, TableCellIndex, ValidationError } from '../types.js'
+import { groupBy, isEmpty, isEqual, mapValues, partition } from 'lodash-es'
+import type {
+  DocumentState,
+  JSONSelection,
+  SortedColumn,
+  TableCellIndex,
+  ValidationError
+} from '../types.js'
 import { createValueSelection, pathStartsWith } from './selection.js'
 import { isNumber } from '../utils/numberUtils.js'
 import type { Dictionary } from 'lodash'
@@ -309,3 +315,51 @@ function findColumnIndex(error: ValidationError, columns: JSONPath[]): number {
 
 // matches a validation error like "must have required property 'id'" to find the property name
 const requiredPropertyRegex = /^must have required property '(.*)'$/
+
+/**
+ * Clear the sorted column from the documentState when it is affected by the operations
+ */
+export function clearSortedColumnWhenAffectedByOperations(
+  documentState: DocumentState,
+  operations: JSONPatchOperation[],
+  columms: JSONPath[]
+): DocumentState {
+  const mustBeCleared = operations.some((operation) =>
+    operationAffectsSortedColumn(documentState.sortedColumn, operation, columms)
+  )
+
+  if (mustBeCleared) {
+    return {
+      ...documentState,
+      sortedColumn: undefined
+    }
+  }
+
+  return documentState
+}
+
+export function operationAffectsSortedColumn(
+  sortedColumn: SortedColumn | undefined,
+  operation: JSONPatchOperation,
+  columns: JSONPath[]
+): boolean {
+  if (!sortedColumn) {
+    return false
+  }
+
+  // an operation of replacing a value in a different column does not affect the currently sorted order
+  if (operation.op === 'replace') {
+    const path = parseJSONPointer(operation.path)
+    const { rowIndex, columnIndex } = toTableCellPosition(path, columns)
+    const selectedColumnIndex = columns.findIndex((column) => isEqual(column, sortedColumn.path))
+
+    if (rowIndex !== -1 && columnIndex !== -1 && columnIndex !== selectedColumnIndex) {
+      return false
+    }
+  }
+
+  // TODO: there are more cases where we can known an operation does not affect the sorted order, improve this
+  //  For example adding a nested value in a different column, or removing a full row.
+
+  return true
+}
