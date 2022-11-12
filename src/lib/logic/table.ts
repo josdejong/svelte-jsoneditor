@@ -295,26 +295,8 @@ function findColumnIndex(error: ValidationError, columns: JSONPath[]): number {
     return position.columnIndex
   }
 
-  // utilize an error message like "must have required property 'id'",
-  // extract the property name, built the path from it, and use that.
-  if (position.rowIndex !== -1) {
-    const match = requiredPropertyRegex.exec(error.message)
-    if (match) {
-      const prop = match[1]
-      const path = error.path.concat(prop)
-      const matchedPosition = toTableCellPosition(path, columns)
-
-      if (matchedPosition.columnIndex !== -1) {
-        return matchedPosition.columnIndex
-      }
-    }
-  }
-
   return -1
 }
-
-// matches a validation error like "must have required property 'id'" to find the property name
-const requiredPropertyRegex = /^must have required property '(.*)'$/
 
 /**
  * Clear the sorted column from the documentState when it is affected by the operations

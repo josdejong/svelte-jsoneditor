@@ -239,26 +239,6 @@ describe('table', () => {
       })
     })
 
-    it('should put missing required properties in the right column', () => {
-      const error: ValidationError = {
-        path: ['3'],
-        message: "must have required property 'name'",
-        severity: ValidationSeverity.warning
-      }
-
-      deepStrictEqual(groupValidationErrors([error], columns), {
-        root: [],
-        rows: {
-          '3': {
-            row: [],
-            columns: {
-              '1': [error]
-            }
-          }
-        }
-      })
-    })
-
     it('should put missing nested required properties in the right column', () => {
       const error: ValidationError = {
         path: ['3', 'address'],
