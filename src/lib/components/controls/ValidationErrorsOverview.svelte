@@ -11,9 +11,13 @@
   import { stringifyJSONPath } from '../../utils/pathUtils.js'
   import type { ValidationError } from '../../types'
   import { stripRootObject } from '$lib/utils/pathUtils.js'
+  import { MAX_VALIDATION_ERRORS } from '$lib/constants'
+  import { limit } from '$lib/utils/arrayUtils'
 
   export let validationErrors: ValidationError[]
   export let selectError: (error: ValidationError) => void
+
+  $: count = validationErrors.length
 
   let expanded = true
 
@@ -28,10 +32,10 @@
 
 {#if !isEmpty(validationErrors)}
   <div class="jse-validation-errors-overview">
-    {#if expanded || validationErrors.length === 1}
+    {#if expanded || count === 1}
       <table>
         <tbody>
-          {#each validationErrors as validationError, index}
+          {#each limit(validationErrors, MAX_VALIDATION_ERRORS) as validationError, index}
             <tr
               class="jse-validation-error"
               on:click={() => {
@@ -62,6 +66,15 @@
               </td>
             </tr>
           {/each}
+
+          {#if count > MAX_VALIDATION_ERRORS}
+            <tr class="jse-validation-error">
+              <td />
+              <td />
+              <td>(and {count - MAX_VALIDATION_ERRORS} more errors)</td>
+              <td />
+            </tr>
+          {/if}
         </tbody>
       </table>
     {:else}
@@ -72,7 +85,7 @@
               <Icon data={faExclamationTriangle} />
             </td>
             <td>
-              {validationErrors.length} validation errors
+              {count} validation errors
               <div class="jse-validation-errors-expand">
                 <Icon data={faAngleRight} />
               </div>
