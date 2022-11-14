@@ -282,5 +282,6 @@
     onRenderMenu={handleRenderMenu}
     {onSortModal}
     {onTransformModal}
+    {onJSONEditorModal}
   />
 {/if}

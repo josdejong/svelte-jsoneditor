@@ -92,8 +92,8 @@
     !rootSelected &&
     !Array.isArray(getIn(json, initial(selection.focusPath)))
 
-  $: canEditValue =
-    hasJson && selection != null && singleItemSelected(selection) && !isObjectOrArray(focusValue)
+  $: canEditValue = hasJson && selection != null && singleItemSelected(selection)
+  $: canEnforceString = canEditValue && !isObjectOrArray(focusValue)
 
   $: convertMode = hasSelectionContents
   $: insertOrConvertText = convertMode ? 'Convert to' : 'Insert'
@@ -239,7 +239,7 @@
       text: 'Enforce string',
       title: 'Enforce keeping the value as string when it contains a numeric value',
       onClick: handleToggleEnforceString,
-      disabled: !canEditValue
+      disabled: !canEnforceString
     }
   ]
 

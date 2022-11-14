@@ -10,6 +10,7 @@
     existsIn,
     getIn,
     immutableJSONPatch,
+    isJSONArray,
     isJSONPatchAdd,
     isJSONPatchReplace,
     parsePath
@@ -132,6 +133,7 @@
     OnClassName,
     OnError,
     OnFocus,
+    OnJSONEditorModal,
     OnRenderMenu,
     OnRenderValue,
     OnSortModal,
@@ -191,6 +193,7 @@
   export let onBlur: OnBlur
   export let onSortModal: OnSortModal
   export let onTransformModal: OnTransformModal
+  export let onJSONEditorModal: OnJSONEditorModal
 
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
@@ -807,7 +810,13 @@
       return
     }
 
-    updateSelection(createValueSelection(documentState.selection.focusPath, true))
+    const path = documentState.selection.focusPath
+    const value = getIn(json, path)
+    if (isObjectOrArray(value)) {
+      openJSONEditorModal(path, value)
+    } else {
+      updateSelection(createValueSelection(path, true))
+    }
   }
 
   function handleToggleEnforceString() {
@@ -1493,6 +1502,27 @@
   function handleTransformAll() {
     openTransformModal({
       selectedPath: []
+    })
+  }
+
+  function openJSONEditorModal(path: JSONPath, value: JSONValue) {
+    debug('openJSONEditorModal', { path, value })
+
+    modalOpen = true
+
+    // open a popup where you can edit the nested object/array
+    onJSONEditorModal({
+      // TODO: make the default mode of the JSONEditorModal configurable?
+      mode: isJSONArray(value) ? Mode.table : Mode.tree,
+      content: {
+        json: value
+      },
+      path,
+      onPatch: context.onPatch,
+      onClose: () => {
+        modalOpen = false
+        focus()
+      }
     })
   }
 
