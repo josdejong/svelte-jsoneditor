@@ -390,9 +390,9 @@
   }
 </script>
 
-<Modal>
-  <ModalRef bind:open />
-  <AbsolutePopup>
+<AbsolutePopup>
+  <Modal>
+    <ModalRef bind:open />
     <div class="jse-main" class:jse-focus={hasFocus}>
       {#key instanceId}
         <JSONEditorMode
@@ -426,7 +426,7 @@
         />
       {/key}
     </div>
-  </AbsolutePopup>
-</Modal>
+  </Modal>
+</AbsolutePopup>
 
 <style src="./JSONEditor.scss"></style>
