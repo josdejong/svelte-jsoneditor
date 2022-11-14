@@ -260,11 +260,11 @@
                 onRenderMenu={noop}
                 onError={console.error}
                 onChange={noop}
+                onChangeMode={noop}
                 onFocus={noop}
                 onBlur={noop}
                 onSortModal={noop}
                 onTransformModal={noop}
-                onRequestRepair={noop}
                 {onClassName}
                 validator={null}
                 {validationParser}
@@ -290,11 +290,11 @@
                 onRenderMenu={noop}
                 onError={console.error}
                 onChange={noop}
+                onChangeMode={noop}
                 onFocus={noop}
                 onBlur={noop}
                 onSortModal={noop}
                 onTransformModal={noop}
-                onRequestRepair={noop}
                 {onClassName}
                 validator={null}
                 {validationParser}
