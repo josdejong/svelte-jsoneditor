@@ -523,7 +523,7 @@
     expandWhenNotInitialized(json)
     text = undefined
     textIsRepaired = false
-    clearSelectionWhenNotExisting(json)
+    resetSelectionWhenNotExisting(json)
 
     addHistoryItem({
       previousJson,
@@ -574,6 +574,7 @@
         text = updatedText
         textIsRepaired = true
         parseError = undefined
+        resetSelectionWhenNotExisting(json)
       } catch (repairError) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
@@ -583,7 +584,7 @@
       }
     }
 
-    clearSelectionWhenNotExisting(json)
+    resetSelectionWhenNotExisting(json)
 
     addHistoryItem({
       previousJson,
@@ -608,7 +609,7 @@
     }
   }
 
-  function clearSelectionWhenNotExisting(json) {
+  function resetSelectionWhenNotExisting(json) {
     if (documentState.selection === undefined) {
       return
     }
@@ -621,10 +622,10 @@
       return
     }
 
-    debug('clearing selection: path does not exist anymore', documentState.selection)
+    debug('resetting selection: path does not exist anymore', documentState.selection)
     documentState = {
       ...documentState,
-      selection: undefined
+      selection: getInitialSelection(json, documentState)
     }
   }
 
@@ -757,7 +758,7 @@
     textIsRepaired = false
 
     // ensure the selection is valid
-    clearSelectionWhenNotExisting(json)
+    resetSelectionWhenNotExisting(json)
 
     history.add({
       undo: {
@@ -1662,7 +1663,7 @@
     textIsRepaired = false
 
     // make sure the selection is valid
-    clearSelectionWhenNotExisting(json)
+    resetSelectionWhenNotExisting(json)
 
     addHistoryItem({
       previousJson,
@@ -1716,7 +1717,7 @@
     }
 
     // ensure the selection is valid
-    clearSelectionWhenNotExisting(json)
+    resetSelectionWhenNotExisting(json)
 
     addHistoryItem({
       previousJson,
