@@ -3,9 +3,15 @@
 .jse-boolean-toggle {
   color: var(--jse-value-color-boolean);
   position: relative;
-  padding-left: $padding-half;
-  padding-top: 1px;
-  height: var(--jse-line-height);
+  height: 18px;
+  width: 18px;
+  vertical-align: top;
+
+  :global(svg) {
+    position: absolute;
+    top: 1px;
+    right: 0;
+  }
 }
 
 .jse-boolean-toggle:not(.jse-readonly) {
