@@ -196,7 +196,7 @@
 
   const showTreeEditor = useLocalStorage('svelte-jsoneditor-demo-showTreeEditor', true)
   const showTextEditor = useLocalStorage('svelte-jsoneditor-demo-showTextEditor', true)
-  const showRawContents = useLocalStorage('svelte-jsoneditor-demo-showRawContents', true)
+  const showRawContents = useLocalStorage('svelte-jsoneditor-demo-showRawContents', false)
   let height = '430px'
   const validate = useLocalStorage('svelte-jsoneditor-demo-validate', false)
   const validateArray = useLocalStorage('svelte-jsoneditor-demo-validate-array', false)
@@ -226,7 +226,7 @@
     'svelte-jsoneditor-demo-indentation',
     indentations[0].value
   )
-  const selectedParserId = useLocalStorage('svelte-jsoneditor-demo-parser', parsers[0].id)
+  const selectedParserId = useLocalStorage('svelte-jsoneditor-demo-parser', parsers[1].id)
   const selectedPathParserId = useLocalStorage(
     'svelte-jsoneditor-demo-path-parser',
     pathParsers[0].id
