@@ -4,18 +4,10 @@
 button.jse-validation-error {
   @include jsoneditor-button;
 
-  color: var(--jse-warning-color);
-  padding: 0 $input-padding;
+  padding: 0;
   margin: 0;
-  height: 18px;
-  width: 18px;
-  overflow: hidden;
-  position: relative;
   vertical-align: top;
+  display: inline-flex;
 
-  :global(svg) {
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
+  color: var(--jse-warning-color);
 }

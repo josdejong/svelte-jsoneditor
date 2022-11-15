@@ -1,17 +1,12 @@
 @import '../../../styles';
 
 .jse-boolean-toggle {
-  color: var(--jse-value-color-boolean);
-  position: relative;
-  height: 18px;
-  width: 18px;
+  padding: 0;
+  margin: 0;
   vertical-align: top;
+  display: inline-flex;
 
-  :global(svg) {
-    position: absolute;
-    top: 1px;
-    right: 0;
-  }
+  color: var(--jse-value-color-boolean);
 }
 
 .jse-boolean-toggle:not(.jse-readonly) {

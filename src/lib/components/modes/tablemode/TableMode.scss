@@ -11,7 +11,6 @@
   font-family: var(--jse-font-family-mono);
   font-size: var(--jse-font-size-mono);
   color: var(--jse-text-color);
-  line-height: var(--jse-line-height);
 
   &.no-main-menu {
     border-top: var(--jse-main-border);
@@ -102,7 +101,7 @@
           }
 
           :global(div) {
-            display: inline-block;
+            display: inline-flex;
           }
         }
       }
@@ -135,12 +134,25 @@
   }
 }
 
-// FIXME: this is ugly. give JSONValue an extra class instead
-.jse-table-cell :global(.jse-value) {
-  overflow-wrap: normal;
-  white-space: nowrap;
+.jse-table-cell {
+  // FIXME: this is ugly. give JSONValue an extra class instead?
+  :global(.jse-value) {
+    overflow-wrap: normal;
+    white-space: nowrap;
+    vertical-align: bottom;
 
-  &:first-child {
-    padding-left: 0;
+    &:first-child {
+      padding-left: 0;
+    }
+  }
+
+  // FIXME: this is ugly. give the ColorPickerButton an extra class instead?
+  :global(.jse-color-picker-button) {
+    margin-top: 2px;
+  }
+
+  // FIXME: this is ugly. give the BooleanToggle an extra class instead?
+  :global(.jse-boolean-toggle) {
+    margin-top: 1px;
   }
 }

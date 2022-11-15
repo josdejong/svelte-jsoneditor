@@ -1,14 +1,15 @@
 @import '../../../styles';
 
 .jse-color-picker-button {
-  $margin: 2px;
   font-size: var(--jse-font-size-mono);
 
   width: var(--jse-color-picker-button-size);
   height: var(--jse-color-picker-button-size);
   box-sizing: border-box;
   padding: 0;
-  margin: $margin;
+  margin: 0;
+  display: inline-flex;
+  vertical-align: top;
 
   border: 1px solid var(--jse-text-color);
   border-radius: 2px;
