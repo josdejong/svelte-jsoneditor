@@ -139,5 +139,8 @@
 .jse-table-cell :global(.jse-value) {
   overflow-wrap: normal;
   white-space: nowrap;
-  padding-left: 0;
+
+  &:first-child {
+    padding-left: 0;
+  }
 }

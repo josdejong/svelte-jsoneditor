@@ -5,8 +5,7 @@
   font-size: var(--jse-font-size-mono);
   line-height: var(--jse-line-height);
   border: none;
-  padding: 0;
-  padding-right: $padding-half;
+  padding: 0 $padding-half 0 0;
   background: transparent;
   color: inherit;
   cursor: pointer;
