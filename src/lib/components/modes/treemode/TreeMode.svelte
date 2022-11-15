@@ -519,7 +519,7 @@
     expandWhenNotInitialized(json)
     text = undefined
     textIsRepaired = false
-    clearSelectionWhenNotExisting(json)
+    resetSelectionWhenNotExisting(json)
 
     addHistoryItem({
       previousJson,
@@ -542,11 +542,11 @@
       return
     }
 
-    const isChanged = updatedText === text
+    const isChanged = updatedText !== text
 
     debug('update external text', { isChanged })
 
-    if (isChanged) {
+    if (!isChanged) {
       // no actual change, don't do anything
       return
     }
@@ -563,7 +563,7 @@
       text = updatedText
       textIsRepaired = false
       parseError = undefined
-      clearSelectionWhenNotExisting(json)
+      resetSelectionWhenNotExisting(json)
     } catch (err) {
       try {
         json = parser.parse(jsonrepair(updatedText))
@@ -571,14 +571,14 @@
         text = updatedText
         textIsRepaired = true
         parseError = undefined
-        clearSelectionWhenNotExisting(json)
+        resetSelectionWhenNotExisting(json)
       } catch (repairError) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
         text = externalContent.text
         textIsRepaired = false
         parseError = normalizeJsonParseError(text, err.message || err.toString())
-        clearSelectionWhenNotExisting(json)
+        resetSelectionWhenNotExisting(json)
       }
     }
 
@@ -605,7 +605,7 @@
     }
   }
 
-  function clearSelectionWhenNotExisting(json) {
+  function resetSelectionWhenNotExisting(json) {
     if (documentState.selection === undefined) {
       return
     }
@@ -618,10 +618,10 @@
       return
     }
 
-    debug('clearing selection: path does not exist anymore', documentState.selection)
+    debug('resetting selection: path does not exist anymore', documentState.selection)
     documentState = {
       ...documentState,
-      selection: undefined
+      selection: getInitialSelection(json, documentState)
     }
   }
 
@@ -754,7 +754,7 @@
     textIsRepaired = false
 
     // ensure the selection is valid
-    clearSelectionWhenNotExisting(json)
+    resetSelectionWhenNotExisting(json)
 
     history.add({
       undo: {
@@ -1630,7 +1630,7 @@
     textIsRepaired = false
 
     // make sure the selection is valid
-    clearSelectionWhenNotExisting(json)
+    resetSelectionWhenNotExisting(json)
 
     addHistoryItem({
       previousJson,
@@ -1684,7 +1684,7 @@
     }
 
     // ensure the selection is valid
-    clearSelectionWhenNotExisting(json)
+    resetSelectionWhenNotExisting(json)
 
     addHistoryItem({
       previousJson,
