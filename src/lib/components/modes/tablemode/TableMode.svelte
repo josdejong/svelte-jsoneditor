@@ -41,6 +41,7 @@
   } from 'immutable-json-patch'
   import { isTextContent, normalizeJsonParseError } from '../../../utils/jsonUtils'
   import {
+    calculateAbsolutePosition,
     calculateVisibleSection,
     clearSortedColumnWhenAffectedByOperations,
     getColumns,
@@ -77,7 +78,7 @@
   import { isValueSelection } from '$lib/logic/selection.js'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { createFocusTracker } from '$lib/components/controls/createFocusTracker'
-  import { onDestroy, onMount } from 'svelte'
+  import { onDestroy, onMount, tick } from 'svelte'
   import jsonrepair from 'jsonrepair'
   import Message from '$lib/components/controls/Message.svelte'
   import { faCheck, faCode } from '@fortawesome/free-solid-svg-icons'
@@ -85,13 +86,15 @@
   import memoizeOne from 'memoize-one'
   import { validateJSON } from '$lib/logic/validation'
   import ValidationErrorsOverview from '$lib/components/controls/ValidationErrorsOverview.svelte'
-  import { MAX_CHARACTERS_TEXT_PREVIEW } from '$lib/constants.js'
+  import { MAX_CHARACTERS_TEXT_PREVIEW, SCROLL_DURATION } from '$lib/constants.js'
   import { truncate } from '$lib/utils/stringUtils.js'
   import { getText } from '$lib/utils/jsonUtils.js'
   import { noop } from '$lib/utils/noop.js'
+  import { createJump } from '$lib/assets/jump.js/src/jump.js'
   import ValidationErrorIcon from '$lib/components/modes/treemode/ValidationErrorIcon.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
+  const jump = createJump()
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
 
@@ -277,7 +280,7 @@
     normalization,
     getJson: () => json,
     getDocumentState: () => documentState,
-    findElement: () => null, // FIXME: implement findElement?
+    findElement,
     findNextInside,
     focus,
     onPatch: handlePatch,
@@ -691,6 +694,70 @@
     return { json, text }
   }
 
+  /**
+   * Scroll the window vertically to the node with given path.
+   * Expand the path when needed.
+   */
+  export function scrollTo(path: JSONPath, scrollToWhenVisible = true) {
+    const top = calculateAbsolutePosition(path, columns, itemHeightsCache, defaultItemHeight)
+    const roughDistance = top - scrollTop
+    const elem = findElement(path)
+
+    debug('scrollTo', { path, top, scrollTop })
+
+    const viewPortRect = refContents.getBoundingClientRect()
+    if (elem && !scrollToWhenVisible) {
+      const elemRect = elem.getBoundingClientRect()
+      if (elemRect.bottom > viewPortRect.top && elemRect.top < viewPortRect.bottom) {
+        // element is fully or partially visible, don't scroll to it
+        return
+      }
+    }
+
+    const offset = -(viewPortRect.height / 4)
+
+    // FIXME: scroll horizontally when needed
+    // FIXME: scroll to the exact element (rough distance can be inexact)
+
+    if (elem) {
+      jump(elem, {
+        container: refContents,
+        offset,
+        duration: SCROLL_DURATION
+      })
+    } else {
+      jump(roughDistance, {
+        container: refContents,
+        offset,
+        duration: SCROLL_DURATION,
+        callback: () => {
+          tick().then(() => {
+            const newTop = calculateAbsolutePosition(
+              path,
+              columns,
+              itemHeightsCache,
+              defaultItemHeight
+            )
+
+            if (newTop !== top) {
+              scrollTo(path, scrollToWhenVisible)
+            }
+          })
+        }
+      })
+    }
+  }
+
+  /**
+   * Find the DOM element of a given path.
+   * Note that the path can only be found when the node is expanded.
+   */
+  export function findElement(path: JSONPath): Element | null {
+    return refContents
+      ? refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
+      : null
+  }
+
   function handleRequestRepair() {
     onChangeMode(Mode.text)
   }
@@ -796,7 +863,7 @@
 
     updateSelection(createValueSelection(error.path, false))
 
-    // scrollTo(error.path) // FIXME: scroll to selected error
+    scrollTo(error.path)
   }
 
   function openSortModal(selectedPath: JSONPath) {
@@ -926,11 +993,10 @@
 
     emitOnChange(previousContent, patchResult)
 
-    // FIXME: handle focus and selection
-    // focus()
-    // if (documentState.selection) {
-    //   scrollTo(documentState.selection.focusPath, false)
-    // }
+    focus()
+    if (documentState.selection) {
+      scrollTo(documentState.selection.focusPath, false)
+    }
   }
 
   function handleRedo() {
@@ -965,11 +1031,10 @@
 
     emitOnChange(previousContent, patchResult)
 
-    // FIXME: handle focus and selection
-    // focus()
-    // if (documentState.selection) {
-    //   scrollTo(documentState.selection.focusPath, false)
-    // }
+    focus()
+    if (documentState.selection) {
+      scrollTo(documentState.selection.focusPath, false)
+    }
   }
 
   function isPathSelected(path: JSONPath, selection: JSONSelection): boolean {

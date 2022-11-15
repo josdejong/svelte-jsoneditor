@@ -500,8 +500,9 @@
             if (index === 4) {
               item.random = -1
             }
-            if (index === 7) {
+            if (index === 7 || index === 802) {
               item.random = String(item.random)
+              item.long = String(item.long)
             }
             if (index === 9) {
               item.unknownProp = 'other'

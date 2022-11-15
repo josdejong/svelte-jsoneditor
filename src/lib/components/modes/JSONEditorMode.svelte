@@ -184,9 +184,11 @@
     }
   }
 
-  export function findElement(path: JSONPath): Element {
+  export function findElement(path: JSONPath): Element | null {
     if (refTreeMode) {
       return refTreeMode.findElement(path)
+    } else if (refTableMode) {
+      return refTableMode.findElement(path)
     } else {
       throw new Error(`Method findElement is not available in mode "${mode}"`)
     }

@@ -117,6 +117,24 @@ export function calculateVisibleSection(
   }
 }
 
+// TODO: write unit tests
+export function calculateAbsolutePosition(
+  path: JSONPath,
+  columns: JSONPath[],
+  itemHeights: Record<number, number>,
+  defaultItemHeight: number
+): number {
+  const { rowIndex } = toTableCellPosition(path, columns)
+
+  let top = 0
+  for (let currentIndex = 0; currentIndex < rowIndex; currentIndex++) {
+    top += itemHeights[currentIndex] || defaultItemHeight
+  }
+
+  // TODO: also calculate left
+  return top
+}
+
 function calculateAverageItemHeight(
   itemHeights: Record<number, number>,
   defaultItemHeight: number
