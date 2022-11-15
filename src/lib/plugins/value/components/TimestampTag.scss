@@ -1,10 +1,18 @@
 @import '../../../styles';
 
 .jse-timestamp {
+  position: relative;
   padding: 0;
   margin: 0;
-  height: var(--jse-line-height);
+  height: 18px;
+  width: 18px;
+  vertical-align: top;
 
   color: var(--jse-value-color-number);
-  border-radius: $border-radius;
+
+  :global(svg) {
+    position: absolute;
+    top: 1px;
+    right: 0;
+  }
 }
