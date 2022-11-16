@@ -6,6 +6,7 @@
   import { faTimes } from '@fortawesome/free-solid-svg-icons'
 
   export let title = 'Modal'
+  export let onClose: (() => void) | undefined
 
   const { close } = getContext('simple-modal')
 </script>
@@ -14,7 +15,17 @@
   <div class="jse-title">
     {title}
   </div>
-  <button type="button" class="jse-close" on:click={close}>
+  <button
+    type="button"
+    class="jse-close"
+    on:click={() => {
+      if (onClose) {
+        onClose()
+      } else {
+        close()
+      }
+    }}
+  >
     <Icon data={faTimes} />
   </button>
 </div>

@@ -1513,8 +1513,6 @@
 
     // open a popup where you can edit the nested object/array
     onJSONEditorModal({
-      // TODO: make the default mode of the JSONEditorModal configurable?
-      mode: isJSONArray(value) ? Mode.table : Mode.tree,
       content: {
         json: value
       },

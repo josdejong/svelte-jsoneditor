@@ -522,7 +522,6 @@ export interface SortModalCallback {
 }
 
 export interface JSONEditorModalCallback {
-  mode: Mode
   content: Content
   path: JSONPath
   onPatch: OnPatch

@@ -4,14 +4,14 @@
   import { getContext } from 'svelte'
   import Header from './Header.svelte'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-  import { compileJSONPointer } from 'immutable-json-patch'
+  import { compileJSONPointer, immutableJSONPatch, isJSONArray } from 'immutable-json-patch'
   import { createDebug } from '../../utils/debug'
   import type {
     Content,
+    JSONEditorModalCallback,
     JSONParser,
     JSONPathParser,
     OnClassName,
-    OnJSONEditorModal,
     OnPatch,
     OnRenderMenu,
     OnRenderValue,
@@ -23,9 +23,9 @@
   import JSONEditorRoot from '$lib/components/modes/JSONEditorRoot.svelte'
   import { noop } from '$lib/utils/noop.js'
   import { stringifyJSONPath } from '../../utils/pathUtils'
-  import { isEmpty } from 'lodash-es'
+  import { initial, isEmpty, last } from 'lodash-es'
   import { stripRootObject } from '$lib/utils/pathUtils'
-  import { toJSONContent } from '$lib'
+  import { isJSONContent, toJSONContent } from '$lib'
 
   const debug = createDebug('jsoneditor:JSONEditorModal')
 
@@ -36,7 +36,6 @@
   export let readOnly: boolean
   export let indentation: number | string
   export let tabSize: number
-  export let mode: Mode
   export let mainMenuBar: boolean
   export let navigationBar: boolean
   export let statusBar: boolean
@@ -52,18 +51,34 @@
   export let onClassName: OnClassName
   export let onRenderMenu: OnRenderMenu
 
-  // FIXME: test whether opening a modal on top of a modal works
   export let onSortModal: OnSortModal
   export let onTransformModal: OnTransformModal
-  export let onJSONEditorModal: OnJSONEditorModal
 
   const { close } = getContext('simple-modal')
 
-  $: pathDescription = !isEmpty(path)
-    ? stripRootObject(stringifyJSONPath(path))
+  interface ModalState {
+    mode: Mode
+    content: Content
+    relativePath: JSONPath
+  }
+
+  const rootState: ModalState = {
+    mode: determineMode(content),
+    content,
+    relativePath: path
+  }
+  let stack: ModalState[] = [rootState]
+
+  $: absolutePath = stack.flatMap((state) => state.relativePath)
+  $: pathDescription = !isEmpty(absolutePath)
+    ? stripRootObject(stringifyJSONPath(absolutePath))
     : '(whole document)'
 
   let error: string | undefined = undefined
+
+  function determineMode(content: Content): Mode {
+    return isJSONContent(content) && isJSONArray(content.json) ? Mode.table : Mode.tree
+  }
 
   function handleApply() {
     try {
@@ -72,30 +87,79 @@
       const operations: JSONPatchDocument = [
         {
           op: 'replace',
-          path: compileJSONPointer(path),
-          value: toJSONContent(content, parser).json // this can throw an error
+          path: compileJSONPointer(last(stack).relativePath),
+          value: toJSONContent(last(stack).content, parser).json // this can throw an error
         }
       ]
-      onPatch(operations)
 
-      close()
+      if (stack.length > 1) {
+        const parentContent = stack[stack.length - 2].content
+        const parentJson = toJSONContent(parentContent, parser).json
+        const updatedParentContent = {
+          json: immutableJSONPatch(parentJson, operations)
+        }
+
+        // after successfully updated, remove from the stack and apply the change
+        stack = initial(stack)
+        handleChange(updatedParentContent)
+      } else {
+        onPatch(operations)
+
+        close()
+      }
     } catch (err) {
       error = err.toString()
     }
   }
 
+  function handleClose() {
+    debug('handleClose')
+
+    if (stack.length > 1) {
+      // remove the last item from the stack
+      stack = initial(stack)
+    } else {
+      // this is the first modal, the root state, close the modal
+      close()
+    }
+  }
+
   function handleChange(updatedContent: Content) {
-    content = updatedContent
-    debug('onChange', updatedContent)
+    debug('handleChange', updatedContent)
+
+    const updatedState = {
+      ...last(stack),
+      content: updatedContent
+    }
+
+    stack = [...initial(stack), updatedState]
   }
 
   function handleChangeMode(newMode: Mode) {
-    mode = newMode
+    debug('handleChangeMode', newMode)
+
+    const updatedState = {
+      ...last(stack),
+      mode: newMode
+    }
+
+    stack = [...initial(stack), updatedState]
   }
 
   function handleError(newError: Error) {
     error = newError.toString()
     console.error(newError)
+  }
+
+  function handleJSONEditorModal({ content, path }: JSONEditorModalCallback) {
+    debug('handleJSONEditorModal', { content, path })
+
+    const nestedModalState = {
+      mode: determineMode(content),
+      content,
+      relativePath: path
+    }
+    stack = [...stack, nestedModalState]
   }
 
   function focus(element: HTMLElement) {
@@ -104,7 +168,10 @@
 </script>
 
 <div class="jse-modal jse-jsoneditor-modal">
-  <Header title="Edit nested content" />
+  <Header
+    title="Edit nested content {stack.length > 1 ? ` (${stack.length})` : ''}"
+    onClose={handleClose}
+  />
 
   <div class="jse-contents">
     <div class="jse-label">
@@ -117,8 +184,8 @@
     </div>
 
     <JSONEditorRoot
-      {mode}
-      {content}
+      mode={last(stack).mode}
+      content={last(stack).content}
       {readOnly}
       {indentation}
       {tabSize}
@@ -142,7 +209,7 @@
       {onRenderMenu}
       {onSortModal}
       {onTransformModal}
-      {onJSONEditorModal}
+      onJSONEditorModal={handleJSONEditorModal}
     />
 
     {#if error}
