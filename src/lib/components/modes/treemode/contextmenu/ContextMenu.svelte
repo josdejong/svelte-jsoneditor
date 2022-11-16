@@ -72,6 +72,11 @@
   $: hasSelection = selection != null
   $: rootSelected = hasSelection && isEmpty(selection.focusPath)
   $: focusValue = hasSelection ? getIn(json, selection.focusPath) : undefined
+  $: editValueText = Array.isArray(focusValue)
+    ? 'Edit array'
+    : isObject(focusValue)
+    ? 'Edit object'
+    : 'Edit value'
 
   $: hasSelectionContents =
     hasJson &&
@@ -229,7 +234,7 @@
   $: editValueDropdownItems = [
     {
       icon: faPen,
-      text: 'Edit value',
+      text: editValueText,
       title: 'Edit the value (Double-click on the value)',
       onClick: handleEditValue,
       disabled: !canEditValue
@@ -296,7 +301,8 @@
         on:click={handleEditValue}
         disabled={!canEditValue}
       >
-        <Icon data={faPen} /> Edit value
+        <Icon data={faPen} />
+        {editValueText}
       </button>
     </DropdownButton>
   </div>
