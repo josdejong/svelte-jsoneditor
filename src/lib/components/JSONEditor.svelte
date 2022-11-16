@@ -50,7 +50,7 @@
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { noop } from '../utils/noop'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils'
-  import JSONEditorMode from '$lib/components/modes/JSONEditorMode.svelte'
+  import JSONEditorRoot from '$lib/components/modes/JSONEditorRoot.svelte'
   import JSONEditorModal from '$lib/components/modals/JSONEditorModal.svelte'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
@@ -94,7 +94,7 @@
 
   let instanceId = uniqueId()
   let hasFocus = false
-  let refJSONEditorMode
+  let refJSONEditorRoot
   let open // svelte-simple-modal context open(...)
 
   $: {
@@ -167,18 +167,18 @@
 
     // Note that patch has an optional afterPatch callback.
     // right now we don's support this in the public API.
-    return refJSONEditorMode.patch(operations)
+    return refJSONEditorRoot.patch(operations)
   }
 
   export function expand(callback?: (path: JSONPath) => boolean): void {
-    refJSONEditorMode.expand(callback)
+    refJSONEditorRoot.expand(callback)
   }
 
   /**
    * Open the transform modal
    */
   export function transform(options: TransformModalOptions): void {
-    refJSONEditorMode.transform(options)
+    refJSONEditorRoot.transform(options)
   }
 
   /**
@@ -186,7 +186,7 @@
    * Returns a parse error or a list with validation warnings
    */
   export function validate(): ContentErrors {
-    return refJSONEditorMode.validate()
+    return refJSONEditorRoot.validate()
   }
 
   /**
@@ -201,23 +201,23 @@
    * will happen, and the contents will be returned as is.
    */
   export function acceptAutoRepair(): Content {
-    return refJSONEditorMode.acceptAutoRepair()
+    return refJSONEditorRoot.acceptAutoRepair()
   }
 
   export function scrollTo(path: JSONPath): void {
-    refJSONEditorMode.scrollTo(path)
+    refJSONEditorRoot.scrollTo(path)
   }
 
   export function findElement(path: JSONPath): Element {
-    return refJSONEditorMode.findElement(path)
+    return refJSONEditorRoot.findElement(path)
   }
 
   export function focus() {
-    refJSONEditorMode.focus()
+    refJSONEditorRoot.focus()
   }
 
   export function refresh() {
-    refJSONEditorMode.refresh()
+    refJSONEditorRoot.refresh()
   }
 
   export function updateProps(props: JSONEditorPropsOptional) {
@@ -395,8 +395,8 @@
     <ModalRef bind:open />
     <div class="jse-main" class:jse-focus={hasFocus}>
       {#key instanceId}
-        <JSONEditorMode
-          bind:this={refJSONEditorMode}
+        <JSONEditorRoot
+          bind:this={refJSONEditorRoot}
           {mode}
           {content}
           {readOnly}

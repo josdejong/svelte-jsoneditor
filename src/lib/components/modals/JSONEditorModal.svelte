@@ -20,7 +20,7 @@
     Validator
   } from '../../types'
   import { Mode } from '../../types'
-  import JSONEditorMode from '$lib/components/modes/JSONEditorMode.svelte'
+  import JSONEditorRoot from '$lib/components/modes/JSONEditorRoot.svelte'
   import { noop } from '$lib/utils/noop.js'
   import { stringifyJSONPath } from '../../utils/pathUtils'
   import { isEmpty } from 'lodash-es'
@@ -116,7 +116,7 @@
       <div class="jse-label-inner">Contents</div>
     </div>
 
-    <JSONEditorMode
+    <JSONEditorRoot
       {mode}
       {content}
       {readOnly}
