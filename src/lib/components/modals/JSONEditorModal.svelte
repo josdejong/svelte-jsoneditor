@@ -20,12 +20,12 @@
     Validator
   } from '../../types'
   import { Mode } from '../../types'
-  import JSONEditorRoot from '$lib/components/modes/JSONEditorRoot.svelte'
+  import JSONEditorRoot from '../modes/JSONEditorRoot.svelte'
   import { noop } from '$lib/utils/noop.js'
   import { stringifyJSONPath } from '../../utils/pathUtils'
   import { initial, isEmpty, last } from 'lodash-es'
   import { stripRootObject } from '$lib/utils/pathUtils'
-  import { isJSONContent, toJSONContent } from '$lib'
+  import { isJSONContent, toJSONContent } from '$lib/utils/jsonUtils'
 
   const debug = createDebug('jsoneditor:JSONEditorModal')
 

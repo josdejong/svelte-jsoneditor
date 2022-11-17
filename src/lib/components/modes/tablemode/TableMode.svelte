@@ -63,7 +63,7 @@
   import { createDebug } from '$lib/utils/debug'
   import { createDocumentState, documentStatePatch } from '$lib/logic/documentState'
   import { isObjectOrArray } from '$lib/utils/typeUtils.js'
-  import InlineValue from '$lib/components/modes/tablemode/tag/InlineValue.svelte'
+  import InlineValue from './tag/InlineValue.svelte'
   import { revertJSONPatchWithMoveOperations } from '$lib/logic/operations'
   import {
     createValueSelection,
@@ -72,7 +72,7 @@
     removeEditModeFromSelection
   } from '$lib/logic/selection'
   import { createHistory } from '$lib/logic/history'
-  import ColumnHeader from '$lib/components/modes/tablemode/ColumnHeader.svelte'
+  import ColumnHeader from './ColumnHeader.svelte'
   import { sortJson } from '$lib/logic/sort'
   import { encodeDataPath } from '$lib/utils/domUtils.js'
   import { isValueSelection } from '$lib/logic/selection.js'
@@ -80,18 +80,18 @@
   import { createFocusTracker } from '$lib/components/controls/createFocusTracker'
   import { onDestroy, onMount, tick } from 'svelte'
   import jsonrepair from 'jsonrepair'
-  import Message from '$lib/components/controls/Message.svelte'
+  import Message from '../../controls/Message.svelte'
   import { faCheck, faCode } from '@fortawesome/free-solid-svg-icons'
   import { measure } from '$lib/utils/timeUtils'
   import memoizeOne from 'memoize-one'
   import { validateJSON } from '$lib/logic/validation'
-  import ValidationErrorsOverview from '$lib/components/controls/ValidationErrorsOverview.svelte'
+  import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import { MAX_CHARACTERS_TEXT_PREVIEW, SCROLL_DURATION } from '$lib/constants.js'
   import { truncate } from '$lib/utils/stringUtils.js'
   import { getText } from '$lib/utils/jsonUtils.js'
   import { noop } from '$lib/utils/noop.js'
   import { createJump } from '$lib/assets/jump.js/src/jump.js'
-  import ValidationErrorIcon from '$lib/components/modes/treemode/ValidationErrorIcon.svelte'
+  import ValidationErrorIcon from '../treemode/ValidationErrorIcon.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
   const jump = createJump()

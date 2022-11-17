@@ -50,8 +50,8 @@
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { noop } from '../utils/noop'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils'
-  import JSONEditorRoot from '$lib/components/modes/JSONEditorRoot.svelte'
-  import JSONEditorModal from '$lib/components/modals/JSONEditorModal.svelte'
+  import JSONEditorRoot from './modes/JSONEditorRoot.svelte'
+  import JSONEditorModal from './modals/JSONEditorModal.svelte'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')

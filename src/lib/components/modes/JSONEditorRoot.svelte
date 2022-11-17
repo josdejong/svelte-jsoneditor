@@ -22,9 +22,9 @@
     Validator
   } from '$lib/types'
   import { Mode } from '$lib/types'
-  import TextMode from '$lib/components/modes/textmode/TextMode.svelte'
-  import TableMode from '$lib/components/modes/tablemode/TableMode.svelte'
-  import TreeMode from '$lib/components/modes/treemode/TreeMode.svelte'
+  import TextMode from './textmode/TextMode.svelte'
+  import TableMode from './tablemode/TableMode.svelte'
+  import TreeMode from './treemode/TreeMode.svelte'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { isMenuSpaceItem } from '$lib/typeguards'
 
