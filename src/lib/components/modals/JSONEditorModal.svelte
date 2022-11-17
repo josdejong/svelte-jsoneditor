@@ -81,11 +81,12 @@
   }
 
   function handleApply() {
+    debug('handleApply')
+
     if (readOnly) {
       return
     }
 
-    debug('handleApply')
     try {
       error = undefined
 
