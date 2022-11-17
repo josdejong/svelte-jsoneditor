@@ -30,6 +30,16 @@
     }
   }
 
+  .jse-actions {
+    gap: $padding;
+    align-items: center;
+
+    .jse-error {
+      flex: 1;
+      color: var(--jse-error-color);
+    }
+  }
+
   input {
     @include modal-input-mixin;
   }

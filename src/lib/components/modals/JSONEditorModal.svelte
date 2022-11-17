@@ -212,13 +212,13 @@
       onJSONEditorModal={handleJSONEditorModal}
     />
 
-    {#if error}
-      <div class="jse-error">
-        {error}
-      </div>
-    {/if}
-
     <div class="jse-actions">
+      {#if error}
+        <div class="jse-error">
+          {error}
+        </div>
+      {/if}
+
       <button type="button" class="jse-primary" on:click={handleApply} use:focus> Apply </button>
     </div>
   </div>
