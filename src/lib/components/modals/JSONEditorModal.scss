@@ -28,6 +28,13 @@
         }
       }
     }
+
+    .jse-modal-inline-editor {
+      flex: 1;
+      min-height: 0;
+      min-width: 0;
+      display: flex;
+    }
   }
 
   .jse-actions {
