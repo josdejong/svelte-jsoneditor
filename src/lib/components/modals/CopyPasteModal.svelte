@@ -13,7 +13,7 @@
 <div class="jse-modal jse-copy-paste">
   <Header title="Copying and pasting" />
 
-  <div class="jse-contents">
+  <div class="jse-modal-contents">
     <div>These actions are unavailable via the menu. Please use:</div>
 
     <div class="jse-shortcuts">

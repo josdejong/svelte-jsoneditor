@@ -87,7 +87,7 @@
 <div class="jse-modal jse-sort">
   <Header title={jsonIsArray ? 'Sort array items' : 'Sort object keys'} />
 
-  <div class="jse-contents">
+  <div class="jse-modal-contents">
     <table>
       <colgroup>
         <col width="25%" />

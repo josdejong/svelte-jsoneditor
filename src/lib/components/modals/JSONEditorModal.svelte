@@ -173,7 +173,7 @@
     onClose={handleClose}
   />
 
-  <div class="jse-contents">
+  <div class="jse-modal-contents">
     <div class="jse-label">
       <div class="jse-label-inner">Path</div>
     </div>

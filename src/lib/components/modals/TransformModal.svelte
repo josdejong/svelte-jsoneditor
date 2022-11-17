@@ -187,7 +187,7 @@
       {queryLanguageId}
       onChangeQueryLanguage={handleChangeQueryLanguage}
     />
-    <div class="jse-contents">
+    <div class="jse-modal-contents">
       <div class="jse-main-contents">
         <div class="jse-query-contents">
           <div class="jse-label">
