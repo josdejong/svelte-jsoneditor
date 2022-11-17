@@ -59,7 +59,7 @@ function defaultConvertValue(value: JavaScriptPrimitive): JSONPrimitive {
     typeof value === 'boolean' ||
     typeof value === 'string'
   ) {
-    return value
+    return value as JSONPrimitive
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
