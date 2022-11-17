@@ -39,7 +39,13 @@
       padding-top: $padding;
 
       button {
-        @include jsoneditor-button-primary;
+        &.jse-secondary {
+          @include jsoneditor-button-secondary;
+        }
+
+        &.jse-primary {
+          @include jsoneditor-button-primary;
+        }
       }
     }
   }

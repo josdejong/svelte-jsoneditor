@@ -120,6 +120,10 @@
   --jse-button-primary-background-highlight: var(--jse-theme-color-highlight);
   --jse-button-primary-background-disabled: #9d9d9d;
   --jse-button-primary-color: var(--jse-text-color-inverse);
+  --jse-button-secondary-background: #d3d3d3;
+  --jse-button-secondary-background-highlight: #e1e1e1;
+  --jse-button-secondary-background-disabled: #9d9d9d;
+  --jse-button-secondary-color: var(--jse-text-color);
   --jse-a-color: #156fc5;
   --jse-a-color-highlight: #0f508d;
 

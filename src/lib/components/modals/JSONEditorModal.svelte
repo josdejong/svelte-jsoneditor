@@ -26,6 +26,8 @@
   import { initial, isEmpty, last } from 'lodash-es'
   import { stripRootObject } from '$lib/utils/pathUtils'
   import { isJSONContent, toJSONContent } from '$lib/utils/jsonUtils'
+  import Icon from 'svelte-awesome'
+  import { faCaretLeft } from '@fortawesome/free-solid-svg-icons'
 
   const debug = createDebug('jsoneditor:JSONEditorModal')
 
@@ -124,6 +126,9 @@
     if (stack.length > 1) {
       // remove the last item from the stack
       stack = initial(stack)
+
+      // clear any error from the just closed state
+      error = undefined
     } else {
       // this is the first modal, the root state, close the modal
       close()
@@ -227,6 +232,11 @@
         </div>
       {/if}
 
+      {#if stack.length > 1}
+        <button type="button" class="jse-secondary" on:click={handleClose}>
+          <Icon data={faCaretLeft} /> Back
+        </button>
+      {/if}
       {#if !readOnly}
         <button type="button" class="jse-primary" on:click={handleApply} use:focus> Apply </button>
       {:else}

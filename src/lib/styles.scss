@@ -42,6 +42,23 @@ $errors-overview-max-height: 25%;
   }
 }
 
+@mixin jsoneditor-button-secondary {
+  @include jsoneditor-button;
+
+  background: var(--jse-button-secondary-background);
+  color: var(--jse-button-secondary-color);
+  padding: $padding $padding-double;
+  border-radius: $border-radius;
+
+  &:hover {
+    background: var(--jse-button-secondary-background-highlight);
+  }
+
+  &:disabled {
+    background: var(--jse-button-secondary-background-disabled);
+  }
+}
+
 @mixin modal-input-mixin {
   border: var(--jse-input-border);
   outline: none;

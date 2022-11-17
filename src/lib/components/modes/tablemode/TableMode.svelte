@@ -227,6 +227,7 @@
   }
 
   function clearSelectionWhenNotExisting(json: JSONValue) {
+    debug('clearSelectionWhenNotExisting', json, documentState.selection)
     if (documentState.selection === undefined) {
       return
     }

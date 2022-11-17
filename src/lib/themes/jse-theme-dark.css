@@ -86,6 +86,10 @@
   --jse-button-background: #808080;
   --jse-button-background-highlight: #7a7a7a;
   --jse-button-color: #e0e0e0;
+  --jse-button-secondary-background: #494949;
+  --jse-button-secondary-background-highlight: #5d5d5d;
+  --jse-button-secondary-background-disabled: #9d9d9d;
+  --jse-button-secondary-color: var(--jse-text-color);
   --jse-a-color: #55abff;
   --jse-a-color-highlight: #4387c9;
 
