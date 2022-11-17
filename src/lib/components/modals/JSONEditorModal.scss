@@ -45,6 +45,12 @@
       flex: 1;
       color: var(--jse-error-color);
     }
+
+    button {
+      &.jse-secondary {
+        @include jsoneditor-button-secondary;
+      }
+    }
   }
 
   input {
