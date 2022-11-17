@@ -117,6 +117,37 @@ export function calculateVisibleSection(
   }
 }
 
+// TODO: cleanup if we will not use it in the end
+// TODO: write unit tests
+export function calculateVisibleSectionApprox(
+  scrollTop: number,
+  viewPortHeight: number,
+  json: JSONValue | undefined,
+  defaultItemHeight: number
+): VisibleSection {
+  const itemCount = isJSONArray(json) ? json.length : 0
+  const averageItemHeight = defaultItemHeight
+
+  const viewPortTop = scrollTop
+  const startIndex = Math.floor(viewPortTop / defaultItemHeight)
+  const startHeight = startIndex * defaultItemHeight
+  const endIndex = Math.ceil((viewPortTop + viewPortHeight) / defaultItemHeight)
+  const visibleHeight = (endIndex - startIndex) * defaultItemHeight
+  const endHeight = (itemCount - endIndex) * defaultItemHeight
+
+  const visibleItems = isJSONArray(json) ? json.slice(startIndex, endIndex) : []
+
+  return {
+    startIndex,
+    endIndex,
+    startHeight,
+    endHeight,
+    averageItemHeight,
+    visibleHeight,
+    visibleItems
+  }
+}
+
 // TODO: write unit tests
 export function calculateAbsolutePosition(
   path: JSONPath,
@@ -262,8 +293,6 @@ export function groupValidationErrors(
         }
         groupByRow.columns[columnIndex].push(error)
       } else {
-        // TODO: handle the error "must have required property 'id'" -> find the columnIndex from that message
-
         groupByRow.row.push(error)
       }
     })

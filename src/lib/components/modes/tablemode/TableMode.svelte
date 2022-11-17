@@ -624,6 +624,8 @@
   }
 
   function handleScroll(event: Event) {
+    // debug('handleScroll', event.target['scrollTop'])
+
     scrollTop = event.target['scrollTop']
   }
 
