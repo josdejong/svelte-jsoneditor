@@ -81,6 +81,11 @@
   }
 
   function handleApply() {
+    if (readOnly) {
+      return
+    }
+
+    debug('handleApply')
     try {
       error = undefined
 
@@ -221,7 +226,11 @@
         </div>
       {/if}
 
-      <button type="button" class="jse-primary" on:click={handleApply} use:focus> Apply </button>
+      {#if !readOnly}
+        <button type="button" class="jse-primary" on:click={handleApply} use:focus> Apply </button>
+      {:else}
+        <button type="button" class="jse-primary" on:click={handleClose} use:focus> Close </button>
+      {/if}
     </div>
   </div>
 </div>

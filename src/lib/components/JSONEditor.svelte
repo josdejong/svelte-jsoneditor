@@ -332,10 +332,6 @@
   // The onJSONEditorModal method is located in JSONEditor to prevent circular references:
   //     JSONEditor -> TableMode -> JSONEditorModal -> JSONEditor
   function onJSONEditorModal({ content, path, onPatch, onClose }: JSONEditorModalCallback) {
-    if (readOnly) {
-      return
-    }
-
     debug('onJSONEditorModal', { content, path })
 
     open(

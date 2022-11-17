@@ -6,10 +6,13 @@
   font-family: inherit;
   font-size: inherit;
   color: inherit;
-  cursor: pointer;
   display: flex;
   gap: $padding;
   padding: 0;
+
+  &:not(&.jse-readonly) {
+    cursor: pointer;
+  }
 
   span.jse-column-sort-icon {
     height: 1em;

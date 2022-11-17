@@ -10,12 +10,17 @@
 
   export let path: JSONPath
   export let sortedColumn: SortedColumn | undefined
+  export let readOnly: boolean
   export let onSort: (sortedColumn: SortedColumn) => void
 
   $: sortDirection = isEqual(path, sortedColumn?.path) ? sortedColumn.sortDirection : undefined
   $: sortDirectionName = SORT_DIRECTION_NAMES[sortDirection]
 
   function handleSort() {
+    if (readOnly) {
+      return
+    }
+
     onSort({
       path,
       sortDirection: sortDirection === SortDirection.asc ? SortDirection.desc : SortDirection.asc
@@ -26,8 +31,9 @@
 <button
   type="button"
   class="jse-column-header"
+  class:jse-readonly={readOnly}
   on:click={handleSort}
-  title="Sort the data on this column"
+  title={!readOnly ? 'Sort the data on this column' : 'Column name'}
 >
   <span class="jse-column-name">
     {!isEmpty(path) ? stripRootObject(stringifyJSONPath(path)) : 'values'}

@@ -251,6 +251,10 @@
   const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // FIXME: implement support for search and replace
 
   function onSortByHeader(newSortedColumn: SortedColumn) {
+    if (readOnly) {
+      return
+    }
+
     debug('onSortByHeader', newSortedColumn)
 
     const rootPath = []
@@ -1095,6 +1099,7 @@
                   <ColumnHeader
                     path={column}
                     sortedColumn={documentState.sortedColumn}
+                    {readOnly}
                     onSort={onSortByHeader}
                   />
                 </th>
