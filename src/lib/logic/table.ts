@@ -79,29 +79,31 @@ export function calculateVisibleSection(
   const itemCount = isJSONArray(json) ? json.length : 0
   const averageItemHeight = calculateAverageItemHeight(itemHeights, defaultItemHeight)
 
+  const getItemHeight = (index: number) => itemHeights[index] || defaultItemHeight
+
   const viewPortTop = scrollTop
   let startIndex = 0
   let startHeight = 0
   while (startHeight < viewPortTop && startIndex < itemCount) {
-    startHeight += itemHeights[startIndex] || defaultItemHeight
+    startHeight += getItemHeight(startIndex)
     startIndex++
   }
   if (startIndex > 0) {
     // go one item back, else there is white space at the top for up to 1 missing item
     startIndex--
-    startHeight -= itemHeights[startIndex] || defaultItemHeight
+    startHeight -= getItemHeight(startIndex)
   }
 
   let endIndex = startIndex
   let visibleHeight = 0
   while (visibleHeight < viewPortHeight && endIndex < itemCount) {
-    visibleHeight += itemHeights[endIndex] || defaultItemHeight
+    visibleHeight += getItemHeight(endIndex)
     endIndex++
   }
 
   let endHeight = 0
   for (let i = endIndex; i < itemCount; i++) {
-    endHeight += itemHeights[i] || defaultItemHeight
+    endHeight += getItemHeight(i)
   }
 
   const visibleItems = isJSONArray(json) ? json.slice(startIndex, endIndex) : []
