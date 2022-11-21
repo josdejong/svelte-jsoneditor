@@ -184,6 +184,11 @@
 
   $: refreshScrollTop(json)
 
+  // TODO: cleanup
+  // $: {
+  //   debug('scrollTop', scrollTop, refContents?.scrollTop, refContents?.scrollHeight)
+  // }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function refreshScrollTop(_json: JSONValue | undefined) {
     // When the contents go from lots of items and scrollable contents to only a few items and
@@ -227,7 +232,6 @@
   }
 
   function clearSelectionWhenNotExisting(json: JSONValue) {
-    debug('clearSelectionWhenNotExisting', json, documentState.selection)
     if (documentState.selection === undefined) {
       return
     }
@@ -629,7 +633,7 @@
   }
 
   function handleScroll(event: Event) {
-    // debug('handleScroll', event.target['scrollTop'])
+    debug('handleScroll', { old: scrollTop, new: event.target['scrollTop'] })
 
     scrollTop = event.target['scrollTop']
   }

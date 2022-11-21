@@ -70,13 +70,14 @@
         }
 
         .jse-table-cell {
-          padding: 0 var(--jse-padding);
+          padding: 0 var(--jse-padding) 0 0;
           vertical-align: top;
           white-space: nowrap;
           height: var(--jse-line-height);
 
           &.jse-table-cell-header,
           &.jse-table-cell-gutter {
+            padding: 0 var(--jse-padding) 0 $padding-half;
             font-weight: normal;
             text-align: left;
             color: var(--jse-text-readonly);
@@ -101,6 +102,28 @@
 
           :global(div) {
             display: inline-flex;
+          }
+
+          // FIXME: this is ugly. give JSONValue an extra class instead?
+          :global(div.jse-value) {
+            overflow-wrap: normal;
+            white-space: nowrap;
+            vertical-align: top;
+            display: inline-block;
+
+            //&:first-child {
+            //  padding-left: 0;
+            //}
+          }
+
+          // FIXME: this is ugly. give the ColorPickerButton an extra class instead?
+          :global(.jse-color-picker-button) {
+            margin-top: 2px;
+          }
+
+          // FIXME: this is ugly. give the BooleanToggle an extra class instead?
+          :global(.jse-boolean-toggle) {
+            margin-top: 1px;
           }
         }
       }
@@ -130,28 +153,5 @@
     overflow: auto;
     white-space: pre-wrap;
     padding: 2px;
-  }
-}
-
-.jse-table-cell {
-  // FIXME: this is ugly. give JSONValue an extra class instead?
-  :global(.jse-value) {
-    overflow-wrap: normal;
-    white-space: nowrap;
-    vertical-align: bottom;
-
-    &:first-child {
-      padding-left: 0;
-    }
-  }
-
-  // FIXME: this is ugly. give the ColorPickerButton an extra class instead?
-  :global(.jse-color-picker-button) {
-    margin-top: 2px;
-  }
-
-  // FIXME: this is ugly. give the BooleanToggle an extra class instead?
-  :global(.jse-boolean-toggle) {
-    margin-top: 1px;
   }
 }

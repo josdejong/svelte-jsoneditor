@@ -10,7 +10,6 @@
     existsIn,
     getIn,
     immutableJSONPatch,
-    isJSONArray,
     isJSONPatchAdd,
     isJSONPatchReplace,
     parsePath
