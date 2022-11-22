@@ -913,6 +913,7 @@
       json,
       text,
       documentState,
+      keepSelection: false,
       readOnly,
       onChange,
       onPatch: handlePatch

@@ -857,6 +857,7 @@
       json,
       text,
       documentState,
+      keepSelection: true,
       readOnly,
       onChange,
       onPatch: handlePatch

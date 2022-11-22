@@ -178,6 +178,7 @@ export interface OnRemoveAction {
   json: JSONValue | undefined
   text: string | undefined
   documentState: DocumentState
+  keepSelection: boolean
   readOnly: boolean
   onChange: OnChange
   onPatch: OnPatch
@@ -188,6 +189,7 @@ export function onRemove({
   json,
   text,
   documentState,
+  keepSelection,
   readOnly,
   onChange,
   onPatch
@@ -228,7 +230,7 @@ export function onRemove({
     onPatch(operations, (patchedJson, patchedState) => ({
       state: {
         ...patchedState,
-        selection: newSelection
+        selection: keepSelection ? documentState.selection : newSelection
       }
     }))
   }
