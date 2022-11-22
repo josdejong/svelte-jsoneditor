@@ -9,44 +9,64 @@ import terser from '@rollup/plugin-terser'
 import sveltePreprocess from 'svelte-preprocess'
 
 const production = !process.env.ROLLUP_WATCH
-const packageFolder = 'package-vanilla'
-const file = path.join(packageFolder, 'index.js')
+
+export const packageFolder = 'package-vanilla'
+export const name = 'vanilla-jsoneditor'
+export const moduleFile = 'index.js'
+export const umdFile = 'index.umd.js'
+
+const plugins = [
+  svelte({
+    compilerOptions: {
+      // enable run-time checks when not in production
+      dev: !production
+    },
+
+    // we want to embed the CSS in the generated JS bundle
+    emitCss: false,
+
+    preprocess: sveltePreprocess()
+  }),
+
+  resolve({
+    browser: true
+  }),
+  commonjs(),
+  json(),
+
+  typescript({ sourceMap: true, inlineSources: true })
+]
 
 export default {
   input: 'src/lib/index-vanilla.ts',
   output: [
     {
-      file,
+      file: path.join(packageFolder, moduleFile),
       format: 'es',
       sourcemap: true,
-      inlineDynamicImports: true
+      inlineDynamicImports: true,
+      // output-specific plugins can only modify code after the main analysis of Rollup has completed
+      plugins: [
+        getBabelOutputPlugin({
+          presets: ['@babel/preset-env'],
+        }),
+        // minify
+        production && terser()
+      ]
+    },
+    {
+      name,
+      file: path.join(packageFolder, umdFile),
+      format: 'umd',
+      sourcemap: true,
+      inlineDynamicImports: true,
+      globals: {
+        [name]: 'JSONEditor',
+      },
+      plugins: [
+        production && terser()
+      ]
     }
   ],
-  plugins: [
-    svelte({
-      compilerOptions: {
-        // enable run-time checks when not in production
-        dev: !production
-      },
-
-      // we want to embed the CSS in the generated JS bundle
-      emitCss: false,
-
-      preprocess: sveltePreprocess()
-    }),
-
-    resolve({
-      browser: true
-    }),
-    commonjs(),
-    json(),
-
-    typescript({ sourceMap: true, inlineSources: true }),
-    getBabelOutputPlugin({
-      presets: ['@babel/preset-env']
-    }),
-
-    // minify
-    production && terser()
-  ]
+  plugins
 }
