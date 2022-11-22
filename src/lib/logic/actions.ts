@@ -243,7 +243,6 @@ export interface OnInsert {
   parser: JSONParser
   onPatch: OnPatch
   onReplaceJson: (updatedJson: JSONValue, afterPatch: AfterPatchCallback) => void
-  tick: () => Promise<void>
 }
 
 // TODO: write unit tests
@@ -255,8 +254,7 @@ export function onInsert({
   readOnly,
   parser,
   onPatch,
-  onReplaceJson,
-  tick
+  onReplaceJson
 }: OnInsert): void {
   if (readOnly || !documentState.selection) {
     return
@@ -315,9 +313,7 @@ export function onInsert({
     if (operation) {
       if (newValue === '') {
         // open the newly inserted value in edit mode
-        tick().then(() => {
-          setTimeout(() => insertActiveElementContents(refJsonEditor, '', true))
-        })
+        tick2(() => insertActiveElementContents(refJsonEditor, '', true))
       }
     }
   } else {
@@ -344,9 +340,9 @@ export interface OnInsertCharacter {
   onPatch: OnPatch
   onReplaceJson: (updatedJson: JSONValue, afterPatch: AfterPatchCallback) => void
   onSelect: OnSelect
-  tick: () => Promise<void>
 }
 
+// TODO: write unit tests
 export async function onInsertCharacter({
   char,
   refJsonEditor,
@@ -356,8 +352,7 @@ export async function onInsertCharacter({
   parser,
   onPatch,
   onReplaceJson,
-  onSelect,
-  tick
+  onSelect
 }: OnInsertCharacter) {
   // a regular key like a, A, _, etc is entered.
   // Replace selected contents with a new value having this first character as text
@@ -371,8 +366,7 @@ export async function onInsertCharacter({
     const replaceContents = !documentState.selection.edit
 
     onSelect({ ...documentState.selection, edit: true })
-    await tick()
-    setTimeout(() => insertActiveElementContents(refJsonEditor, char, replaceContents))
+    tick2(() => insertActiveElementContents(refJsonEditor, char, replaceContents))
     return
   }
 
@@ -385,8 +379,7 @@ export async function onInsertCharacter({
       readOnly,
       parser,
       onPatch,
-      onReplaceJson,
-      tick
+      onReplaceJson
     })
   } else if (char === '[') {
     onInsert({
@@ -397,8 +390,7 @@ export async function onInsertCharacter({
       readOnly,
       parser,
       onPatch,
-      onReplaceJson,
-      tick
+      onReplaceJson
     })
   } else {
     if (isValueSelection(documentState.selection)) {
@@ -408,8 +400,7 @@ export async function onInsertCharacter({
         const replaceContents = !documentState.selection.edit
 
         onSelect({ ...documentState.selection, edit: true })
-        await tick()
-        setTimeout(() => insertActiveElementContents(refJsonEditor, char, replaceContents))
+        tick2(() => insertActiveElementContents(refJsonEditor, char, replaceContents))
       } else {
         // TODO: replace the object/array with editing a text in edit mode?
         //  (Ideally this this should not create an entry in history though,
@@ -426,8 +417,7 @@ export async function onInsertCharacter({
         parser,
         onPatch,
         onReplaceJson,
-        onSelect,
-        tick
+        onSelect
       })
     }
   }
@@ -443,7 +433,6 @@ interface OnInsertValueWithCharacter {
   onPatch: OnPatch
   onReplaceJson: (updatedJson: JSONValue, afterPatch: AfterPatchCallback) => void
   onSelect: OnSelect
-  tick: () => Promise<void>
 }
 
 async function onInsertValueWithCharacter({
@@ -455,8 +444,7 @@ async function onInsertValueWithCharacter({
   parser,
   onPatch,
   onReplaceJson,
-  onSelect,
-  tick
+  onSelect
 }: OnInsertValueWithCharacter) {
   if (readOnly || !documentState.selection) {
     return
@@ -471,8 +459,7 @@ async function onInsertValueWithCharacter({
     readOnly,
     parser,
     onPatch,
-    onReplaceJson,
-    tick
+    onReplaceJson
   })
 
   // only replace contents when not yet in edit mode (can happen when entering
@@ -489,6 +476,10 @@ async function onInsertValueWithCharacter({
     onSelect(createKeySelection(path, true))
   }
 
-  await tick()
-  setTimeout(() => insertActiveElementContents(refJsonEditor, char, replaceContents))
+  tick2(() => insertActiveElementContents(refJsonEditor, char, replaceContents))
+}
+
+// set two timeouts, two ticks of delay. This allows Svelte to rerender the app for example
+function tick2(callback: () => void) {
+  setTimeout(() => setTimeout(callback))
 }

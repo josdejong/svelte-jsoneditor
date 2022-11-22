@@ -969,8 +969,7 @@
       readOnly,
       parser,
       onPatch: handlePatch,
-      onReplaceJson: handleReplaceJson,
-      tick
+      onReplaceJson: handleReplaceJson
     })
   }
 
@@ -1065,8 +1064,7 @@
       parser,
       onPatch: handlePatch,
       onReplaceJson: handleReplaceJson,
-      onSelect: updateSelection,
-      tick
+      onSelect: updateSelection
     })
   }
 

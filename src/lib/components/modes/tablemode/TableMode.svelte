@@ -873,8 +873,7 @@
       parser,
       onPatch: handlePatch,
       onReplaceJson: handleReplaceJson,
-      onSelect: updateSelection,
-      tick
+      onSelect: updateSelection
     })
   }
 
