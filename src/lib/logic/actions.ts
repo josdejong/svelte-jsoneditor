@@ -418,8 +418,7 @@ export async function onInsertCharacter({
         readOnly,
         parser,
         onPatch,
-        onReplaceJson,
-        onSelect
+        onReplaceJson
       })
     }
   }
@@ -434,7 +433,6 @@ interface OnInsertValueWithCharacter {
   parser: JSONParser
   onPatch: OnPatch
   onReplaceJson: (updatedJson: JSONValue, afterPatch: AfterPatchCallback) => void
-  onSelect: OnSelect
 }
 
 async function onInsertValueWithCharacter({
@@ -445,8 +443,7 @@ async function onInsertValueWithCharacter({
   readOnly,
   parser,
   onPatch,
-  onReplaceJson,
-  onSelect
+  onReplaceJson
 }: OnInsertValueWithCharacter) {
   if (readOnly || !documentState.selection) {
     return
@@ -468,20 +465,14 @@ async function onInsertValueWithCharacter({
   // multiple characters very quickly after each other due to the async handling)
   const replaceContents = !isEditingSelection(documentState.selection)
 
-  // next, open the new value in edit mode and apply the current character
-  const path = documentState.selection.focusPath
-  const parent = getIn(json, initial(path))
-
-  if (Array.isArray(parent) || !parent || isValueSelection(documentState.selection)) {
-    onSelect(createValueSelection(path, true))
-  } else {
-    onSelect(createKeySelection(path, true))
-  }
-
   tick2(() => insertActiveElementContents(refJsonEditor, char, replaceContents))
 }
 
-// set two timeouts, two ticks of delay. This allows Svelte to rerender the app for example
+/**
+ * set two timeouts, two ticks of delay.
+ * This allows to perform some action in the DOM *after* Svelte has re-rendered the app for example
+ * WARNING: try to avoid using this function, it is tricky to rely on it.
+ */
 function tick2(callback: () => void) {
   setTimeout(() => setTimeout(callback))
 }
