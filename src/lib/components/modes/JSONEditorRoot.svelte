@@ -12,6 +12,7 @@
     OnChangeMode,
     OnClassName,
     OnError,
+    OnExpand,
     OnFocus,
     OnJSONEditorModal,
     OnRenderMenu,
@@ -116,7 +117,7 @@
     }
   }
 
-  export function expand(callback?: (path: JSONPath) => boolean): void {
+  export function expand(callback?: OnExpand): void {
     if (refTreeMode) {
       return refTreeMode.expand(callback)
     } else {

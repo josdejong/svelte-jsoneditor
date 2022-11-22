@@ -726,9 +726,14 @@ export function updateSelectionInDocumentState(
 /**
  * Create a selection which selects the whole document
  */
-// TODO: write tests
+// TODO: write unit tests
 export function selectAll(): JSONSelection {
   return createValueSelection([], false)
+}
+
+// TODO: write unit tests
+export function hasSelectionContents(selection: JSONSelection | undefined): boolean {
+  return isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection)
 }
 
 /**

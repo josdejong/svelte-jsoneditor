@@ -214,6 +214,21 @@ export function setCursorToEnd(element) {
 }
 
 /**
+ * Insert (append or replace) the text contents of the current active element
+ */
+export function insertActiveElementContents(
+  container: HTMLElement,
+  text: string,
+  replaceContents: boolean
+) {
+  const activeElement = getWindow(container).document.activeElement
+  if (activeElement.isContentEditable) {
+    activeElement.textContent = replaceContents ? text : activeElement.textContent + text
+    setCursorToEnd(activeElement)
+  }
+}
+
+/**
  * Gets a DOM element's Window.  This is normally just the global `window`
  * variable, but if we opened a child window, it may be different.
  * @param {HTMLElement} element

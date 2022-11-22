@@ -5,15 +5,7 @@
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '$lib/utils/debug'
   import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
-  import {
-    compileJSONPointer,
-    existsIn,
-    getIn,
-    immutableJSONPatch,
-    isJSONPatchAdd,
-    isJSONPatchReplace,
-    parsePath
-  } from 'immutable-json-patch'
+  import { compileJSONPointer, existsIn, getIn, immutableJSONPatch } from 'immutable-json-patch'
   import jsonrepair from 'jsonrepair'
   import { initial, isEmpty, isEqual, last, noop, throttle, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
@@ -21,7 +13,6 @@
   import {
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
-    MAX_DOCUMENT_SIZE_EXPAND_ALL,
     MAX_SEARCH_RESULTS,
     SCROLL_DURATION,
     SEARCH_UPDATE_THROTTLE,
@@ -31,22 +22,19 @@
     collapsePath,
     createDocumentState,
     documentStatePatch,
+    expandAll,
+    expandMinimal,
     expandPath,
+    expandRecursive,
     expandSection,
     expandSingleItem,
     expandWithCallback,
+    getDefaultExpand,
     getEnforceString,
     setEnforceString
   } from '$lib/logic/documentState'
   import { createHistory } from '$lib/logic/history'
-  import {
-    createNewValue,
-    createRemoveOperations,
-    duplicate,
-    extract,
-    insert,
-    revertJSONPatchWithMoveOperations
-  } from '$lib/logic/operations'
+  import { duplicate, extract, revertJSONPatchWithMoveOperations } from '$lib/logic/operations'
   import {
     createSearchAndReplaceAllOperations,
     createSearchAndReplaceOperations,
@@ -71,13 +59,13 @@
     getSelectionPaths,
     getSelectionRight,
     getSelectionUp,
+    hasSelectionContents,
     isEditingSelection,
     isMultiSelection,
     isSelectionInsidePath,
     isValueSelection,
     removeEditModeFromSelection,
     selectAll,
-    selectionToPartialJson,
     updateSelectionInDocumentState
   } from '$lib/logic/selection'
   import { mapValidationErrors, validateJSON } from '$lib/logic/validation'
@@ -88,19 +76,16 @@
     findParentWithNodeName,
     getWindow,
     isChildOf,
-    isChildOfNodeName,
-    setCursorToEnd
+    isChildOfNodeName
   } from '$lib/utils/domUtils'
   import {
     convertValue,
-    isLargeContent,
     normalizeJsonParseError,
     parsePartialJson,
     repairPartialJson
   } from '$lib/utils/jsonUtils'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
-  import { isObject, isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils'
-  import copyToClipboard from '$lib/utils/copyToClipboard'
+  import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
@@ -131,6 +116,7 @@
     OnChangeMode,
     OnClassName,
     OnError,
+    OnExpand,
     OnFocus,
     OnJSONEditorModal,
     OnRenderMenu,
@@ -153,6 +139,7 @@
   import { MAX_CHARACTERS_TEXT_PREVIEW } from '../../../constants.js'
   import memoizeOne from 'memoize-one'
   import { measure } from '$lib/utils/timeUtils'
+  import { onCopy, onCut, onInsert, onInsertCharacter, onPaste, onRemove } from '$lib/logic/actions'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -252,18 +239,6 @@
   })
 
   let pastedJson: PastedJson
-
-  function expandMinimal(path: JSONPath) {
-    return path.length === 0 ? true : path.length === 1 && path[0] === '0' // first item of an array
-  }
-
-  function expandAll() {
-    return true
-  }
-
-  function getDefaultExpand(json) {
-    return isLargeContent({ json }, MAX_DOCUMENT_SIZE_EXPAND_ALL) ? expandMinimal : expandAll
-  }
 
   let showSearch = false
   let showReplace = false
@@ -397,7 +372,7 @@
   })
   let historyState = history.getState()
 
-  export function expand(callback = () => true) {
+  export function expand(callback: OnExpand = expandAll) {
     debug('expand')
 
     // clear the expanded state and visible sections (else you can't collapse anything)
@@ -522,7 +497,7 @@
     expandWhenNotInitialized(json)
     text = undefined
     textIsRepaired = false
-    resetSelectionWhenNotExisting(json)
+    clearSelectionWhenNotExisting(json)
 
     addHistoryItem({
       previousJson,
@@ -573,7 +548,7 @@
         text = updatedText
         textIsRepaired = true
         parseError = undefined
-        resetSelectionWhenNotExisting(json)
+        clearSelectionWhenNotExisting(json)
       } catch (repairError) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
@@ -583,7 +558,7 @@
       }
     }
 
-    resetSelectionWhenNotExisting(json)
+    clearSelectionWhenNotExisting(json)
 
     addHistoryItem({
       previousJson,
@@ -608,7 +583,7 @@
     }
   }
 
-  function resetSelectionWhenNotExisting(json) {
+  function clearSelectionWhenNotExisting(json) {
     if (documentState.selection === undefined) {
       return
     }
@@ -621,7 +596,7 @@
       return
     }
 
-    debug('resetting selection: path does not exist anymore', documentState.selection)
+    debug('clearing selection: path does not exist anymore', documentState.selection)
     documentState = {
       ...documentState,
       selection: getInitialSelection(json, documentState)
@@ -755,9 +730,10 @@
     documentState = newState
     text = undefined
     textIsRepaired = false
+    pastedJson = undefined
 
     // ensure the selection is valid
-    resetSelectionWhenNotExisting(json)
+    clearSelectionWhenNotExisting(json)
 
     history.add({
       undo: {
@@ -792,10 +768,6 @@
   // $: debug('json', json)
   // $: debug('state', state)
   // $: debug('selection', selection)
-
-  function hasSelectionContents(selection: JSONSelection | undefined): boolean {
-    return isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection)
-  }
 
   function handleEditKey() {
     if (readOnly || !documentState.selection) {
@@ -857,59 +829,40 @@
   }
 
   async function handleCut(indent = true) {
-    if (readOnly || !hasSelectionContents(documentState.selection)) {
-      return
-    }
-
-    const cutIndentation = indent ? indentation : null
-    const clipboard = selectionToPartialJson(json, documentState.selection, cutIndentation, parser)
-    if (clipboard == null) {
-      return
-    }
-
-    debug('cut', { selection: documentState.selection, clipboard, indent })
-
-    await copyToClipboard(clipboard)
-
-    const { operations, newSelection } = createRemoveOperations(json, documentState.selection)
-
-    handlePatch(operations, (patchedJson, patchedState) => ({
-      state: {
-        ...patchedState,
-        selection: newSelection
-      }
-    }))
+    await onCut({
+      json,
+      documentState,
+      indentation: indent ? indentation : undefined,
+      readOnly,
+      parser,
+      onPatch: handlePatch
+    })
   }
 
   async function handleCopy(indent = true) {
-    const copyIndentation = indent ? indentation : null
-    const clipboard = selectionToPartialJson(json, documentState.selection, copyIndentation, parser)
-    if (clipboard == null) {
-      return
-    }
-
-    debug('copy', { clipboard, indent })
-
-    await copyToClipboard(clipboard)
+    await onCopy({
+      json,
+      documentState,
+      indentation: indent ? indentation : undefined,
+      parser
+    })
   }
 
-  function handlePaste(event) {
+  function handlePaste(event: ClipboardEvent) {
     event.preventDefault()
-
-    if (readOnly) {
-      return
-    }
 
     const clipboardText = event.clipboardData.getData('text/plain')
 
-    try {
-      doPaste(clipboardText)
-    } catch (err) {
-      openRepairModal(clipboardText, (repairedText) => {
-        debug('repaired pasted text: ', repairedText)
-        doPaste(repairedText)
-      })
-    }
+    onPaste({
+      clipboardText,
+      json,
+      documentState,
+      readOnly,
+      parser,
+      onPatch: handlePatch,
+      onChangeText: handleChangeText,
+      openRepairModal
+    })
   }
 
   function handlePasteFromMenu() {
@@ -926,49 +879,6 @@
         onClose: () => focus()
       }
     )
-  }
-
-  function doPaste(clipboardText) {
-    if (json !== undefined) {
-      if (!documentState.selection) {
-        createDefaultSelection()
-      }
-
-      const operations = insert(json, documentState.selection, clipboardText, parser)
-
-      debug('paste', { clipboardText, operations, selection: documentState.selection })
-
-      handlePatch(operations, (patchedJson, patchedState) => {
-        let updatedState = patchedState
-
-        // expand newly inserted object/array
-        operations
-          .filter(
-            (operation) =>
-              (isJSONPatchAdd(operation) || isJSONPatchReplace(operation)) &&
-              isObjectOrArray(operation.value)
-          )
-          .forEach((operation) => {
-            const path = parsePath(json, operation.path)
-            updatedState = expandRecursive(patchedJson, updatedState, path)
-          })
-
-        return {
-          state: updatedState
-        }
-      })
-    } else {
-      debug('paste text', { clipboardText })
-
-      handleChangeText(clipboardText, (patchedJson, patchedState) => {
-        if (patchedJson) {
-          const path = []
-          return {
-            state: expandRecursive(patchedJson, patchedState, path)
-          }
-        }
-      })
-    }
   }
 
   function openRepairModal(text, onApply) {
@@ -999,46 +909,14 @@
   }
 
   function handleRemove() {
-    if (readOnly || !documentState.selection) {
-      return
-    }
-
-    // in case of a selected key or value, we change the selection to the whole
-    // entry to remove this, we do not want to clear a key or value only.
-    const removeSelection =
-      isKeySelection(documentState.selection) || isValueSelection(documentState.selection)
-        ? createMultiSelection(
-            json,
-            documentState.selection.anchorPath,
-            documentState.selection.focusPath
-          )
-        : documentState.selection
-
-    if (isEmpty(documentState.selection.focusPath)) {
-      // root selected -> clear complete document
-      debug('remove root', { selection: documentState.selection })
-
-      onChange(
-        { text: '', json: undefined },
-        { text, json },
-        {
-          contentErrors: validate(),
-          patchResult: null
-        }
-      )
-    } else {
-      // remove selection
-      const { operations, newSelection } = createRemoveOperations(json, removeSelection)
-
-      debug('remove', { operations, selection: documentState.selection, newSelection })
-
-      handlePatch(operations, (patchedJson, patchedState) => ({
-        state: {
-          ...patchedState,
-          selection: newSelection
-        }
-      }))
-    }
+    onRemove({
+      json,
+      text,
+      documentState,
+      readOnly,
+      onChange,
+      onPatch: handlePatch
+    })
   }
 
   function handleDuplicate() {
@@ -1082,82 +960,18 @@
     })
   }
 
-  function handleInsert(type: InsertType): void {
-    if (readOnly || !documentState.selection) {
-      return
-    }
-
-    const newValue = createNewValue(json, documentState.selection, type)
-
-    if (json !== undefined) {
-      const data = parser.stringify(newValue)
-      const operations = insert(json, documentState.selection, data, parser)
-      debug('handleInsert', { type, operations, newValue, data })
-
-      const operation = last(
-        operations.filter((operation) => operation.op === 'add' || operation.op === 'replace')
-      )
-
-      handlePatch(operations, (patchedJson, patchedState) => {
-        // TODO: extract determining the newSelection in a separate function
-        if (operation) {
-          const path = parsePath(patchedJson, operation.path)
-
-          if (isObjectOrArray(newValue)) {
-            return {
-              state: {
-                ...expandWithCallback(patchedJson, patchedState, path, expandAll),
-                selection: createInsideSelection(path)
-              }
-            }
-          }
-
-          if (newValue === '') {
-            // open the newly inserted value in edit mode
-            const parent = !isEmpty(path) ? getIn(patchedJson, initial(path)) : null
-
-            debug('test A', path, createInsideSelection(path))
-            return {
-              // expandPath is invoked to make sure that visibleSections is extended when needed
-              state: expandPath(
-                patchedJson,
-                {
-                  ...documentState,
-                  selection: isObject(parent)
-                    ? createKeySelection(path, true)
-                    : createValueSelection(path, true)
-                },
-                path
-              )
-            }
-          }
-
-          return undefined
-        }
-      })
-
-      debug('after patch')
-
-      if (operation) {
-        if (newValue === '') {
-          // open the newly inserted value in edit mode
-          tick().then(() => {
-            setTimeout(() => insertActiveElementContents('', true))
-          })
-        }
-      }
-    } else {
-      // document is empty or invalid (in that case it has text but no json)
-      debug('handleInsert', { type, newValue })
-
-      const path = []
-      handleReplaceJson(newValue, (patchedJson, patchedState) => ({
-        state: {
-          ...expandRecursive(patchedJson, patchedState, path),
-          selection: createInsideSelection(path)
-        }
-      }))
-    }
+  function handleInsert(insertType: InsertType): void {
+    onInsert({
+      insertType,
+      refJsonEditor,
+      json,
+      documentState,
+      readOnly,
+      parser,
+      onPatch: handlePatch,
+      onReplaceJson: handleReplaceJson,
+      tick
+    })
   }
 
   /**
@@ -1241,88 +1055,19 @@
     tick().then(handleContextMenu)
   }
 
-  /**
-   * Insert (append or replace) the text contents of the current active element
-   * @param {string} char
-   * @param {boolean} replaceContents
-   */
-  function insertActiveElementContents(char, replaceContents) {
-    const activeElement = getWindow(refJsonEditor).document.activeElement
-    if (activeElement.isContentEditable) {
-      activeElement.textContent = replaceContents ? char : activeElement.textContent + char
-      setCursorToEnd(activeElement)
-      // FIXME: should trigger an oninput, else the component will not update it's newKey/newValue variable
-    }
-  }
-
-  async function handleInsertCharacter(char) {
-    // a regular key like a, A, _, etc is entered.
-    // Replace selected contents with a new value having this first character as text
-    if (readOnly || !documentState.selection) {
-      return
-    }
-
-    if (isKeySelection(documentState.selection)) {
-      // only replace contents when not yet in edit mode (can happen when entering
-      // multiple characters very quickly after each other due to the async handling)
-      const replaceContents = !documentState.selection.edit
-
-      updateSelection({ ...documentState.selection, edit: true })
-      await tick()
-      setTimeout(() => insertActiveElementContents(char, replaceContents))
-      return
-    }
-
-    if (char === '{') {
-      handleInsert('object')
-    } else if (char === '[') {
-      handleInsert('array')
-    } else {
-      if (isValueSelection(documentState.selection)) {
-        if (!isObjectOrArray(getIn(json, documentState.selection.focusPath))) {
-          // only replace contents when not yet in edit mode (can happen when entering
-          // multiple characters very quickly after each other due to the async handling)
-          const replaceContents = !documentState.selection.edit
-
-          updateSelection({ ...documentState.selection, edit: true })
-          await tick()
-          setTimeout(() => insertActiveElementContents(char, replaceContents))
-        } else {
-          // TODO: replace the object/array with editing a text in edit mode?
-          //  (Ideally this this should not create an entry in history though,
-          //  which isn't really possible right now since we have to apply
-          //  a patch to change the object/array into a value)
-        }
-      } else {
-        await handleInsertValueWithCharacter(char)
-      }
-    }
-  }
-
-  async function handleInsertValueWithCharacter(char) {
-    if (readOnly || !documentState.selection) {
-      return
-    }
-
-    // first insert a new value
-    handleInsert('value')
-
-    // only replace contents when not yet in edit mode (can happen when entering
-    // multiple characters very quickly after each other due to the async handling)
-    const replaceContents = !isEditingSelection(documentState.selection)
-
-    // next, open the new value in edit mode and apply the current character
-    const path = documentState.selection.focusPath
-    const parent = getIn(json, initial(path))
-
-    if (Array.isArray(parent) || !parent || isValueSelection(documentState.selection)) {
-      updateSelection(createValueSelection(path, true))
-    } else {
-      updateSelection(createKeySelection(path, true))
-    }
-
-    await tick()
-    setTimeout(() => insertActiveElementContents(char, replaceContents))
+  async function handleInsertCharacter(char: string) {
+    await onInsertCharacter({
+      char,
+      refJsonEditor,
+      json,
+      documentState,
+      readOnly,
+      parser,
+      onPatch: handlePatch,
+      onReplaceJson: handleReplaceJson,
+      onSelect: updateSelection,
+      tick
+    })
   }
 
   function handleUndo() {
@@ -1635,11 +1380,7 @@
 
     debug('handlePatch', operations, afterPatch)
 
-    const patchResult = patch(operations, afterPatch)
-
-    pastedJson = undefined
-
-    return patchResult
+    return patch(operations, afterPatch)
   }
 
   function handleReplaceJson(updatedJson: JSONValue, afterPatch?: AfterPatchCallback) {
@@ -1660,7 +1401,7 @@
     textIsRepaired = false
 
     // make sure the selection is valid
-    resetSelectionWhenNotExisting(json)
+    clearSelectionWhenNotExisting(json)
 
     addHistoryItem({
       previousJson,
@@ -1714,7 +1455,7 @@
     }
 
     // ensure the selection is valid
-    resetSelectionWhenNotExisting(json)
+    clearSelectionWhenNotExisting(json)
 
     addHistoryItem({
       previousJson,
@@ -1727,25 +1468,6 @@
     const patchResult = null
 
     emitOnChange(previousContent, patchResult)
-  }
-
-  /**
-   * Expand recursively when the expanded contents is small enough,
-   * else expand in a minimalistic way
-   */
-  function expandRecursive(
-    json: JSONValue,
-    documentState: DocumentState,
-    path: JSONPath
-  ): DocumentState {
-    const expandContents = getIn(json, path)
-    const expandAllRecursive = !isLargeContent(
-      { json: expandContents },
-      MAX_DOCUMENT_SIZE_EXPAND_ALL
-    )
-    const expandCallback = expandAllRecursive ? expandAll : expandMinimal
-
-    return expandWithCallback(json, documentState, path, expandCallback)
   }
 
   /**
@@ -1843,7 +1565,7 @@
       event.preventDefault()
       handleCopy(false)
     }
-    // Ctrl+V (paste) is handled by the on:paste event
+    // Note: Ctrl+V (paste) is handled by the on:paste event
 
     if (combo === 'Ctrl+D') {
       event.preventDefault()

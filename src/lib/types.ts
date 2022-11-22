@@ -248,10 +248,12 @@ export type OnChange =
   | null
 export type OnSelect = (selection: JSONSelection) => void
 export type OnPatch = (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
+export type OnChangeText = (updatedText: string, afterPatch?: AfterPatchCallback) => void
 export type OnSort = (operations: JSONPatchDocument) => void
 export type OnFind = (findAndReplace: boolean) => void
 export type OnPaste = (pastedText: string) => void
 export type OnPasteJson = (pastedJson: { path: JSONPath; contents: JSONValue }) => void
+export type OnExpand = (path: JSONPath) => boolean
 export type OnRenderValue = (props: RenderValueProps) => RenderValueComponentDescription[]
 export type OnClassName = (path: JSONPath, value: JSONValue) => string | undefined
 export type OnChangeMode = (mode: Mode) => void
@@ -267,6 +269,7 @@ export type OnSortModal = (props: SortModalCallback) => void
 export type OnTransformModal = (props: TransformModalCallback) => void
 export type OnJSONEditorModal = (props: JSONEditorModalCallback) => void
 export type FindNextInside = (path: JSONPath) => JSONSelection | undefined
+export type RepairModalCallback = (repairedText: string) => void
 
 export interface SearchResult {
   items: ExtendedSearchResultItem[]

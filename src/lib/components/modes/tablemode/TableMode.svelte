@@ -39,7 +39,12 @@
     immutableJSONPatch,
     isJSONArray
   } from 'immutable-json-patch'
-  import { isTextContent, normalizeJsonParseError } from '../../../utils/jsonUtils'
+  import {
+    isTextContent,
+    normalizeJsonParseError,
+    parsePartialJson,
+    repairPartialJson
+  } from '../../../utils/jsonUtils'
   import {
     calculateAbsolutePosition,
     calculateVisibleSection,
@@ -61,12 +66,19 @@
     getWindow
   } from '../../../utils/domUtils'
   import { createDebug } from '$lib/utils/debug'
-  import { createDocumentState, documentStatePatch } from '$lib/logic/documentState'
-  import { isObjectOrArray } from '$lib/utils/typeUtils.js'
+  import {
+    createDocumentState,
+    documentStatePatch,
+    expandMinimal,
+    expandRecursive,
+    expandWithCallback
+  } from '$lib/logic/documentState'
+  import { isObjectOrArray, isUrl } from '$lib/utils/typeUtils.js'
   import InlineValue from './tag/InlineValue.svelte'
   import { revertJSONPatchWithMoveOperations } from '$lib/logic/operations'
   import {
     createValueSelection,
+    getInitialSelection,
     isEditingSelection,
     isPathInsideSelection,
     removeEditModeFromSelection
@@ -78,22 +90,29 @@
   import { isValueSelection } from '$lib/logic/selection.js'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { createFocusTracker } from '$lib/components/controls/createFocusTracker'
-  import { onDestroy, onMount, tick } from 'svelte'
+  import { getContext, onDestroy, onMount, tick } from 'svelte'
   import jsonrepair from 'jsonrepair'
   import Message from '../../controls/Message.svelte'
-  import { faCheck, faCode } from '@fortawesome/free-solid-svg-icons'
+  import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { measure } from '$lib/utils/timeUtils'
   import memoizeOne from 'memoize-one'
   import { validateJSON } from '$lib/logic/validation'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
-  import { MAX_CHARACTERS_TEXT_PREVIEW, SCROLL_DURATION } from '$lib/constants.js'
+  import {
+    MAX_CHARACTERS_TEXT_PREVIEW,
+    SCROLL_DURATION,
+    SIMPLE_MODAL_OPTIONS
+  } from '$lib/constants.js'
   import { truncate } from '$lib/utils/stringUtils.js'
   import { getText } from '$lib/utils/jsonUtils.js'
   import { noop } from '$lib/utils/noop.js'
   import { createJump } from '$lib/assets/jump.js/src/jump.js'
   import ValidationErrorIcon from '../treemode/ValidationErrorIcon.svelte'
+  import { onCopy, onCut, onInsertCharacter, onPaste, onRemove } from '$lib/logic/actions'
+  import JSONRepairModal from '$lib/components/modals/JSONRepairModal.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
+  const { open } = getContext('simple-modal')
   const jump = createJump()
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
@@ -153,6 +172,9 @@
   let json: JSONValue | undefined
   let text: string | undefined
   let parseError: ParseError | undefined = undefined
+  const rootPath = [] // create the array only once
+
+  let pastedJson: PastedJson
 
   $: applyExternalContent(externalContent)
 
@@ -247,13 +269,13 @@
     debug('clearing selection: path does not exist anymore', documentState.selection)
     documentState = {
       ...documentState,
-      selection: undefined
+      selection: getInitialSelection(json, documentState)
     }
   }
 
   let documentState = createDocumentState()
   let textIsRepaired = false
-  const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // FIXME: implement support for search and replace
+  const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // TODO: implement support for search and replace
 
   function onSortByHeader(newSortedColumn: SortedColumn) {
     if (readOnly) {
@@ -543,6 +565,7 @@
     documentState = newState
     text = undefined
     textIsRepaired = false
+    pastedJson = undefined
 
     history.add({
       undo: {
@@ -577,6 +600,10 @@
     operations: JSONPatchDocument,
     afterPatch?: AfterPatchCallback
   ): JSONPatchResult {
+    if (readOnly) {
+      return
+    }
+
     return patch(operations, afterPatch)
   }
 
@@ -606,11 +633,13 @@
   }
 
   function handleFind(findAndReplace: boolean) {
-    // FIXME: implement handleFind
+    // TODO: implement handleFind
   }
 
   function handlePasteJson(newPastedJson: PastedJson) {
-    // FIXME: implement handlePasteJson
+    debug('pasted json as text', newPastedJson)
+
+    pastedJson = newPastedJson
   }
 
   function findNextInside(path: JSONPath): JSONSelection {
@@ -769,14 +798,136 @@
       : null
   }
 
+  async function handleParsePastedJson() {
+    debug('apply pasted json', pastedJson)
+    const { path, contents } = pastedJson
+
+    // exit edit mode
+    updateSelection(createValueSelection(path, false))
+
+    await tick()
+
+    // replace the value with the JSON object/array
+    const operations: JSONPatchDocument = [
+      {
+        op: 'replace',
+        path: compileJSONPointer(path),
+        value: contents
+      }
+    ]
+
+    handlePatch(operations, (patchedJson, patchedState) => {
+      return {
+        state: expandRecursive(patchedJson, patchedState, path)
+      }
+    })
+  }
+
+  function handleClearPastedJson() {
+    debug('clear pasted json')
+    pastedJson = undefined
+  }
+
   function handleRequestRepair() {
     onChangeMode(Mode.text)
+  }
+
+  async function handleCut(indent: boolean) {
+    await onCut({
+      json,
+      documentState,
+      indentation: indent ? indentation : undefined,
+      readOnly,
+      parser,
+      onPatch: handlePatch
+    })
+  }
+
+  async function handleCopy(indent = true) {
+    await onCopy({
+      json,
+      documentState,
+      indentation: indent ? indentation : undefined,
+      parser
+    })
+  }
+
+  function handleRemove() {
+    onRemove({
+      json,
+      text,
+      documentState,
+      readOnly,
+      onChange,
+      onPatch: handlePatch
+    })
+  }
+
+  async function handleInsertCharacter(char: string) {
+    await onInsertCharacter({
+      char,
+      refJsonEditor,
+      json,
+      documentState,
+      readOnly,
+      parser,
+      onPatch: handlePatch,
+      onReplaceJson: handleReplaceJson,
+      onSelect: updateSelection,
+      tick
+    })
   }
 
   function handleKeyDown(event) {
     // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
     const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
     debug('keydown', { combo, key: event.key })
+
+    if (combo === 'Ctrl+X') {
+      // cut formatted
+      event.preventDefault()
+      handleCut(true)
+    }
+    if (combo === 'Ctrl+Shift+X') {
+      // cut compact
+      event.preventDefault()
+      handleCut(false)
+    }
+    if (combo === 'Ctrl+C') {
+      // copy formatted
+      event.preventDefault()
+      handleCopy(true)
+    }
+    if (combo === 'Ctrl+Shift+C') {
+      // copy compact
+      event.preventDefault()
+      handleCopy(false)
+    }
+    // Note: Ctrl+V (paste) is handled by the on:paste event
+
+    if (combo === 'Ctrl+D') {
+      event.preventDefault()
+      // handleDuplicate()
+      // TODO: implement duplicate
+    }
+    if (combo === 'Delete' || combo === 'Backspace') {
+      event.preventDefault()
+      handleRemove()
+    }
+    if (combo === 'Insert') {
+      event.preventDefault()
+      // TODO: implement insert
+    }
+    if (combo === 'Ctrl+A') {
+      event.preventDefault()
+      // updateSelection(selectAll())
+      // TODO: implement select all
+    }
+
+    if (combo === 'Ctrl+Q') {
+      // handleContextMenu(event)
+      // TODO: implement context menu
+    }
 
     if (combo === 'Left') {
       event.preventDefault()
@@ -836,6 +987,43 @@
       }
     }
 
+    const normalizedCombo = combo
+      .replace(/^Shift\+/, '') // replace 'Shift+A' with 'A'
+      .replace(/^Numpad_/, '') // replace 'Numpad_4' with '4'
+    if (normalizedCombo.length === 1 && documentState.selection) {
+      // a regular key like a, A, _, etc is entered.
+      // Replace selected contents with a new value having this first character as text
+      event.preventDefault()
+      handleInsertCharacter(event.key)
+      return
+    }
+
+    if (combo === 'Ctrl+Enter' && isValueSelection(documentState.selection)) {
+      const value = getIn(json, documentState.selection.focusPath)
+
+      if (isUrl(value)) {
+        // open url in new page
+        window.open(String(value), '_blank')
+      }
+    }
+
+    if (combo === 'Escape' && documentState.selection) {
+      event.preventDefault()
+      updateSelection(undefined)
+    }
+
+    if (combo === 'Ctrl+F') {
+      event.preventDefault()
+      // openFind(false)
+      // TODO: implement find
+    }
+
+    if (combo === 'Ctrl+H') {
+      event.preventDefault()
+      // openFind(true)
+      // TODO: implement find and replace
+    }
+
     if (combo === 'Ctrl+Z') {
       event.preventDefault()
 
@@ -849,24 +1037,110 @@
     }
   }
 
-  function handlePaste(event) {
+  function handlePaste(event: ClipboardEvent) {
     event.preventDefault()
-
-    if (readOnly) {
-      return
-    }
 
     const clipboardText = event.clipboardData.getData('text/plain')
 
-    // FIXME: implement handlePaste
-    // try {
-    //   doPaste(clipboardText)
-    // } catch (err) {
-    //   openRepairModal(clipboardText, (repairedText) => {
-    //     debug('repaired pasted text: ', repairedText)
-    //     doPaste(repairedText)
-    //   })
-    // }
+    onPaste({
+      clipboardText,
+      json,
+      documentState,
+      readOnly,
+      parser,
+      onPatch: handlePatch,
+      onChangeText: handleChangeText,
+      openRepairModal
+    })
+  }
+
+  // TODO: this function is duplicated from TreeMode. See if we can reuse the code instead
+  function handleReplaceJson(updatedJson: JSONValue, afterPatch?: AfterPatchCallback) {
+    const previousState = documentState
+    const previousJson = json
+    const previousText = text
+    const previousContent = { json, text }
+    const previousTextIsRepaired = textIsRepaired
+
+    const updatedState = expandWithCallback(json, documentState, rootPath, expandMinimal)
+
+    const callback =
+      typeof afterPatch === 'function' ? afterPatch(updatedJson, updatedState) : undefined
+
+    json = callback && callback.json !== undefined ? callback.json : updatedJson
+    documentState = callback && callback.state !== undefined ? callback.state : updatedState
+    text = undefined
+    textIsRepaired = false
+
+    // make sure the selection is valid
+    clearSelectionWhenNotExisting(json)
+
+    addHistoryItem({
+      previousJson,
+      previousState,
+      previousText,
+      previousTextIsRepaired
+    })
+
+    // we could work out a patchResult, or use patch(), but only when the previous and new
+    // contents are both json and not text. We go for simplicity and consistency here and
+    // do _not_ return a patchResult ever.
+    const patchResult = null
+
+    emitOnChange(previousContent, patchResult)
+  }
+
+  // TODO: this function is duplicated from TreeMode. See if we can reuse the code instead
+  function handleChangeText(updatedText: string, afterPatch?: AfterPatchCallback) {
+    debug('handleChangeText')
+
+    const previousState = documentState
+    const previousJson = json
+    const previousText = text
+    const previousContent = { json, text }
+    const previousTextIsRepaired = textIsRepaired
+
+    try {
+      json = parser.parse(updatedText)
+      documentState = expandWithCallback(json, documentState, rootPath, expandMinimal)
+      text = undefined
+      textIsRepaired = false
+    } catch (err) {
+      try {
+        json = parser.parse(jsonrepair(updatedText))
+        documentState = expandWithCallback(json, documentState, rootPath, expandMinimal)
+        text = updatedText
+        textIsRepaired = true
+      } catch (err) {
+        // no valid JSON, will show empty document or invalid json
+        json = undefined
+        documentState = createDocumentState({ json, expand: expandMinimal })
+        text = updatedText
+        textIsRepaired = false
+      }
+    }
+
+    if (typeof afterPatch === 'function') {
+      const callback = afterPatch(json, documentState)
+
+      json = callback && callback.json ? callback.json : json
+      documentState = callback && callback.state ? callback.state : documentState
+    }
+
+    // ensure the selection is valid
+    clearSelectionWhenNotExisting(json)
+
+    addHistoryItem({
+      previousJson,
+      previousState,
+      previousText,
+      previousTextIsRepaired
+    })
+
+    // no JSON patch actions available in text mode
+    const patchResult = null
+
+    emitOnChange(previousContent, patchResult)
   }
 
   function handleSelectValidationError(error: ValidationError) {
@@ -957,6 +1231,33 @@
         focus()
       }
     })
+  }
+
+  function openRepairModal(text, onApply) {
+    open(
+      JSONRepairModal,
+      {
+        text,
+        onParse: parsePartialJson,
+        onRepair: repairPartialJson,
+        onApply,
+        onRenderMenu
+      },
+      {
+        ...SIMPLE_MODAL_OPTIONS,
+        styleWindow: {
+          width: '600px',
+          height: '500px'
+        },
+        styleContent: {
+          padding: 0,
+          height: '100%'
+        }
+      },
+      {
+        onClose: () => focus()
+      }
+    )
   }
 
   function handleSortAll() {
@@ -1176,6 +1477,30 @@
         </table>
       </div>
 
+      {#if pastedJson}
+        <Message
+          type="info"
+          message={`You pasted a JSON ${
+            Array.isArray(pastedJson.contents) ? 'array' : 'object'
+          } as text`}
+          actions={[
+            {
+              icon: faWrench,
+              text: 'Paste as JSON instead',
+              // We use mousedown here instead of click: this message pops up
+              // whilst the user is editing a value. When clicking this button,
+              // the actual value is applied and the event is not propagated
+              // and an onClick on this button never happens.
+              onMouseDown: handleParsePastedJson
+            },
+            {
+              text: 'Leave as is',
+              onClick: handleClearPastedJson
+            }
+          ]}
+        />
+      {/if}
+
       {#if textIsRepaired}
         <Message
           type="success"
@@ -1218,7 +1543,7 @@
     {:else}
       <Message
         type="info"
-        message="The loaded JSON document is not an array and cannot be rendered in table mode."
+        message="The loaded JSON document is not an array with contents and cannot be rendered in table mode."
         actions={[
           {
             text: 'Edit in tree mode',

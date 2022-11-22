@@ -19,7 +19,7 @@ The library is written with Svelte, but can be used in plain JavaScript too and 
 - JSON schema validation and pluggable custom validation
 - Color highlighting, undo/redo, search and replace
 - Utilities like a color picker and timestamp tag
-- Handles large JSON documents up to 500 MB
+- Handles large JSON documents up to 512 MB
 
 ## Install
 

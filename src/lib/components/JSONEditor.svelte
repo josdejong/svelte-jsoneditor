@@ -37,6 +37,7 @@
     OnChangeStatus,
     OnClassName,
     OnError,
+    OnExpand,
     OnFocus,
     OnRenderMenu,
     OnRenderValue,
@@ -170,7 +171,7 @@
     return refJSONEditorRoot.patch(operations)
   }
 
-  export function expand(callback?: (path: JSONPath) => boolean): void {
+  export function expand(callback?: OnExpand): void {
     refJSONEditorRoot.expand(callback)
   }
 

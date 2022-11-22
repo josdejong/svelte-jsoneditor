@@ -25,7 +25,7 @@ import {
   startsWithJSONPointer
 } from 'immutable-json-patch'
 import { initial, isEqual, last } from 'lodash-es'
-import { DEFAULT_VISIBLE_SECTIONS } from '../constants.js'
+import { DEFAULT_VISIBLE_SECTIONS, MAX_DOCUMENT_SIZE_EXPAND_ALL } from '../constants.js'
 import { forEachIndex } from '../utils/arrayUtils.js'
 import { isObject, isObjectOrArray, isStringContainingPrimitiveValue } from '../utils/typeUtils.js'
 import {
@@ -40,18 +40,20 @@ import type {
   JSONParser,
   JSONPointerMap,
   JSONSelection,
+  OnExpand,
   Section,
   VisibleSection
 } from '../types'
 import { CaretType } from '../types.js'
 import { int } from '../utils/numberUtils.js'
+import { isLargeContent } from '$lib'
 
-type CreateSelection = (json: JSONValue, documentState: DocumentState) => JSONSelection
+type OnCreateSelection = (json: JSONValue, documentState: DocumentState) => JSONSelection
 
 export type CreateDocumentStateProps = {
   json: JSONValue
-  expand?: (path: JSONPath) => boolean
-  select?: CreateSelection
+  expand?: OnExpand
+  select?: OnCreateSelection
 }
 
 export function createDocumentState(props?: CreateDocumentStateProps): DocumentState {
@@ -147,7 +149,7 @@ export function expandWithCallback(
   json: JSONValue,
   documentState: DocumentState,
   path: JSONPath,
-  expandedCallback: (path: JSONPath) => boolean
+  expandedCallback: OnExpand
 ): DocumentState {
   const expandedMap = { ...documentState.expandedMap }
 
@@ -798,4 +800,36 @@ export function getNextVisiblePath(
   }
 
   return null
+}
+
+/**
+ * Expand recursively when the expanded contents is small enough,
+ * else expand in a minimalistic way
+ */
+// TODO: write unit test
+export function expandRecursive(
+  json: JSONValue,
+  documentState: DocumentState,
+  path: JSONPath
+): DocumentState {
+  const expandContents = getIn(json, path)
+  const expandAllRecursive = !isLargeContent({ json: expandContents }, MAX_DOCUMENT_SIZE_EXPAND_ALL)
+  const expandCallback = expandAllRecursive ? expandAll : expandMinimal
+
+  return expandWithCallback(json, documentState, path, expandCallback)
+}
+
+// TODO: write unit test
+export function expandMinimal(path: JSONPath): boolean {
+  return path.length === 0 ? true : path.length === 1 && path[0] === '0' // first item of an array
+}
+
+// TODO: write unit test
+export function expandAll(): boolean {
+  return true
+}
+
+// TODO: write unit test
+export function getDefaultExpand(json: JSONValue): OnExpand {
+  return isLargeContent({ json }, MAX_DOCUMENT_SIZE_EXPAND_ALL) ? expandMinimal : expandAll
 }
