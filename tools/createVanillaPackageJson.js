@@ -4,20 +4,25 @@ import path from 'path'
 import { readFileSync, writeFileSync } from 'fs'
 import { getAbsolutePath } from './getAbsolutePath.mjs'
 import { getFilesRecursively } from './getFilesRecursively.js'
-import { packageFolder, name, moduleFile as module, umdFile as main } from '../rollup.config.bundle.js'
+import {
+  packageFolder,
+  name,
+  moduleFile as module,
+  umdFile as main
+} from '../rollup.config.bundle.js'
 
 const vanillaPackageFolder = getAbsolutePath(import.meta.url, '..', packageFolder)
 
 // collect all file names and generate the exports map for package.json
 const exports = {
   '.': {
-    'browser': {
-      'import': './' + module,
-      'require': './' + main
+    browser: {
+      import: './' + module,
+      require: './' + main
     },
-    'import': './' + module,
-    'require': './' + main
-  },
+    import: './' + module,
+    require: './' + main
+  }
 }
 const filenames = getFilesRecursively(vanillaPackageFolder).concat([
   path.join(vanillaPackageFolder, 'package.json')

@@ -9,11 +9,10 @@ import terser from '@rollup/plugin-terser'
 import sveltePreprocess from 'svelte-preprocess'
 
 const production = !process.env.ROLLUP_WATCH
-
-export const packageFolder = 'package-vanilla'
-export const name = 'vanilla-jsoneditor'
-export const moduleFile = 'index.js'
-export const umdFile = 'index.umd.js'
+const packageFolder = 'package-vanilla'
+const name = 'vanilla-jsoneditor'
+const moduleFile = 'index.js'
+const umdFile = 'index.umd.js'
 
 const plugins = [
   svelte({
@@ -48,7 +47,7 @@ export default {
       // output-specific plugins can only modify code after the main analysis of Rollup has completed
       plugins: [
         getBabelOutputPlugin({
-          presets: ['@babel/preset-env'],
+          presets: ['@babel/preset-env']
         }),
         // minify
         production && terser()
@@ -61,12 +60,12 @@ export default {
       sourcemap: true,
       inlineDynamicImports: true,
       globals: {
-        [name]: 'JSONEditor',
+        [name]: 'JSONEditor'
       },
-      plugins: [
-        production && terser()
-      ]
+      plugins: [production && terser()]
     }
   ],
   plugins
 }
+
+export { packageFolder, name, moduleFile, umdFile }
