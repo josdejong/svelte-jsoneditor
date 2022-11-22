@@ -867,6 +867,7 @@
   async function handleInsertCharacter(char: string) {
     await onInsertCharacter({
       char,
+      selectInside: false,
       refJsonEditor,
       json,
       documentState,

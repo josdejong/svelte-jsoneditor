@@ -238,6 +238,7 @@ export function onRemove({
 
 export interface OnInsert {
   insertType: InsertType
+  selectInside: boolean
   refJsonEditor: HTMLElement
   json: JSONValue | undefined
   documentState: DocumentState
@@ -250,6 +251,7 @@ export interface OnInsert {
 // TODO: write unit tests
 export function onInsert({
   insertType,
+  selectInside,
   refJsonEditor,
   json,
   documentState,
@@ -282,7 +284,7 @@ export function onInsert({
           return {
             state: {
               ...expandWithCallback(patchedJson, patchedState, path, expandAll),
-              selection: createInsideSelection(path)
+              selection: selectInside ? createInsideSelection(path) : patchedState.selection
             }
           }
         }
@@ -334,6 +336,7 @@ export function onInsert({
 
 export interface OnInsertCharacter {
   char: string
+  selectInside: boolean
   refJsonEditor: HTMLElement
   json: JSONValue
   documentState: DocumentState
@@ -347,6 +350,7 @@ export interface OnInsertCharacter {
 // TODO: write unit tests
 export async function onInsertCharacter({
   char,
+  selectInside,
   refJsonEditor,
   json,
   documentState,
@@ -375,6 +379,7 @@ export async function onInsertCharacter({
   if (char === '{') {
     onInsert({
       insertType: 'object',
+      selectInside,
       refJsonEditor,
       json,
       documentState,
@@ -386,6 +391,7 @@ export async function onInsertCharacter({
   } else if (char === '[') {
     onInsert({
       insertType: 'array',
+      selectInside,
       refJsonEditor,
       json,
       documentState,
@@ -452,6 +458,7 @@ async function onInsertValueWithCharacter({
   // first insert a new value
   onInsert({
     insertType: 'value',
+    selectInside: false, // not relevant, we insert a value, not an object or array
     refJsonEditor,
     json,
     documentState,

@@ -964,6 +964,7 @@
   function handleInsert(insertType: InsertType): void {
     onInsert({
       insertType,
+      selectInside: true,
       refJsonEditor,
       json,
       documentState,
@@ -1058,6 +1059,7 @@
   async function handleInsertCharacter(char: string) {
     await onInsertCharacter({
       char,
+      selectInside: true,
       refJsonEditor,
       json,
       documentState,
