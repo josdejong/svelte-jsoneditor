@@ -38,6 +38,7 @@
     flex-direction: column;
     display: flex;
     overflow: auto;
+    overflow-anchor: none; // important to prevent Chrome from adjusting the scrollTop based on changing contents (causing an infinite loop)
 
     border-left: var(--jse-main-border);
     border-right: var(--jse-main-border);
