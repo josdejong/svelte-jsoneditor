@@ -45,7 +45,7 @@ export const createJump = () => {
 
   function scrollTo(top) {
     container.scrollTo
-      ? container.scrollTo(0, top) // window
+      ? container.scrollTo(container.scrollLeft, top) // window
       : (container.scrollTop = top) // custom container
   }
 
