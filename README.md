@@ -8,11 +8,12 @@ The library is written with Svelte, but can be used in plain JavaScript too and 
 
 ![JSONEditor tree mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_tree_mode_screenshot.png)
 ![JSONEditor text mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_text_mode_screenshot.png)
+![JSONEditor table mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_table_mode_screenshot.png)
 
 ## Features
 
 - View and edit JSON
-- Has a low level text mode and high level tree mode
+- Has a low level text mode and high level tree and table modes
 - Format (beautify) and compact JSON
 - Sort, query, filter, and transform JSON
 - Repair JSON
@@ -188,7 +189,7 @@ const editor = new JSONEditor({
 ### properties
 
 - `content: Content` Pass the JSON contents to be rendered in the JSONEditor. `Content` is an object containing a property `json` (a parsed JSON document) or `text` (a stringified JSON document). Only one of the two properties must be defined. You can pass both content types to the editor independent of in what mode it is.
-- `mode: 'tree' | 'text'`. Open the editor in `'tree'` mode (default) or `'text'` mode (formerly: `code` mode).
+- `mode: 'tree' | 'text' | 'table'`. Open the editor in `'tree'` mode (default), `'table'` mode, or `'text'` mode (formerly: `code` mode).
 - `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
 - `navigationBar: boolean` Show the navigation bar with, where you can see the selected path and navigate through your document from there. Default value is `true`.
 - `statusBar: boolean` Show a status bar at the bottom of the `'text'` editor, showing information about the cursor location and selected contents. Default value is `true`.
@@ -197,6 +198,7 @@ const editor = new JSONEditor({
 - `tabSize: number` When indentation is configured as a tab character (`indentation: '\t'`), `tabSize` configures how large a tab character is rendered. Default value is `4`. Only applicable to `text` mode.
 - `escapeControlCharacters: boolean`. False by default. When `true`, control characters like newline and tab are rendered as escaped characters `\n` and `\t`. Only applicable for `'tree'` mode, in `'text'` mode control characters are always escaped.
 - `escapeUnicodeCharacters: boolean`. False by default. When `true`, unicode characters like ☎ and 😀 are rendered escaped like `\u260e` and `\ud83d\ude00`.
+- `flattenColumns: boolean`. True by default. Only applicable to `'table'` mode. When `true`, nested object properties will be displayed each in their own column, with the nested path as column name. When `false`, nested objects will be rendered inline, and double-clicking them will open them in a popup.
 - `validator: function (json: JSONValue): ValidationError[]`. Validate the JSON document.
   For example use the built-in JSON Schema validator powered by Ajv:
 
@@ -231,7 +233,7 @@ const editor = new JSONEditor({
   Callback fired when an error occurs. Default implementation is to log an error in the console and show a simple alert message to the user.
 - `onChange(content: Content, previousContent: Content, changeStatus: { contentErrors: ContentErrors, patchResult: JSONPatchResult | null })`. The callback which is invoked on every change of the contents, both changes made by a user and programmatic changes made via methods like `.set()`, `.update()`, or `.patch()`.
   The returned `content` is sometimes of type `{ json }`, and sometimes of type `{ text }`. Which of the two is returned depends on the mode of the editor, the change that is applied, and the state of the document (valid, invalid, empty). Please be aware that `{ text }` can contain invalid JSON: whilst typing in `text` mode, a JSON document will be temporarily invalid, like when the user is typing a new string. The parameter `patchResult` is only returned on changes that can be represented as a JSON Patch document, and for example not when freely typing in `text` mode.
-- `onChangeMode(mode: 'tree' | 'text')`. Invoked when the mode is changed.
+- `onChangeMode(mode: 'tree' | 'text' | 'table')`. Invoked when the mode is changed.
 - `onClassName(path: Path, value: any): string | undefined`.
   Add a custom class name to specific nodes, based on their path and/or value.
 - `onRenderValue(props: RenderValueProps) : RenderValueComponentDescription[]`
@@ -251,7 +253,7 @@ const editor = new JSONEditor({
   }
   ```
 
-- `onRenderMenu(mode: 'tree' | 'text', items: MenuItem[]) : MenuItem[] | undefined`.
+- `onRenderMenu(mode: 'tree' | 'text' | 'table', items: MenuItem[]) : MenuItem[] | undefined`.
   Callback which can be used to make changes to the menu items. New items can
   be added, or existing items can be removed or reorganized. When the function
   returns `undefined`, the original `items` will be applied.
@@ -626,7 +628,7 @@ Install dependencies (once):
 npm install
 ```
 
-Start the demo project (at http://localhost:3000):
+Start the demo project (at http://localhost:5173):
 
 ```
 npm run dev
@@ -664,4 +666,6 @@ npm run release
 
 ## License
 
-Released under the [ISC license](LICENSE.md).
+`svelte-jsoneditor` is released as open source under the permissive the [ISC license](LICENSE.md).
+
+**If you are using `svelte-jsoneditor` commercially, there is a _social_ (but no legal) expectation that you help fund its maintenance. [Start here](https://github.com/sponsors/josdejong).**
