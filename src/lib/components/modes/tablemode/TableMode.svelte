@@ -663,6 +663,10 @@
 
   function handleScroll(event: Event) {
     scrollTop = event.target['scrollTop']
+    debug('handleScroll', {
+      scrollTop: event.target['scrollTop'],
+      scrollLeft: event.target['scrollLeft']
+    })
   }
 
   function handleMouseDown(event: Event) {
@@ -741,7 +745,7 @@
     const roughDistance = top - scrollTop
     const elem = findElement(path)
 
-    debug('scrollTo', { path, top, scrollTop })
+    debug('scrollTo', { path, top, scrollTop, elem })
 
     const viewPortRect = refContents.getBoundingClientRect()
     if (elem && !scrollToWhenVisible) {
@@ -757,11 +761,33 @@
     // FIXME: scroll horizontally when needed
     // FIXME: scroll to the exact element (rough distance can be inexact)
 
+    function horizontalScrollTo() {
+      // TODO: improve horizontal scrolling: animate and integrate with the vertical scrolling
+      const elem = findElement(path)
+      if (elem) {
+        const viewPortRect = refContents.getBoundingClientRect()
+        const elemRect = elem.getBoundingClientRect() // TODO: scroll to column instead of item (is always rendered)
+
+        if (elemRect.right > viewPortRect.right) {
+          const diff = elemRect.right - viewPortRect.right
+          refContents.scrollLeft += diff
+        }
+
+        if (elemRect.left < viewPortRect.left) {
+          const diff = viewPortRect.left - elemRect.left
+          refContents.scrollLeft -= diff
+        }
+      }
+    }
+
     if (elem) {
       jump(elem, {
         container: refContents,
         offset,
-        duration: SCROLL_DURATION
+        duration: SCROLL_DURATION,
+        callback: () => {
+          horizontalScrollTo()
+        }
       })
     } else {
       jump(roughDistance, {
@@ -779,6 +805,8 @@
 
             if (newTop !== top) {
               scrollTo(path, scrollToWhenVisible)
+            } else {
+              horizontalScrollTo()
             }
           })
         }
@@ -791,9 +819,7 @@
    * Note that the path can only be found when the node is expanded.
    */
   export function findElement(path: JSONPath): Element | null {
-    return refContents
-      ? refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
-      : null
+    return refContents ? refContents.querySelector(`td[data-path="${encodeDataPath(path)}"]`) : null
   }
 
   async function handleParsePastedJson() {
