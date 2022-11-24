@@ -55,7 +55,8 @@
     selectNextColumn,
     selectNextRow,
     selectPreviousColumn,
-    selectPreviousRow
+    selectPreviousRow,
+    toTableCellPosition
   } from '../../../logic/table.js'
   import { isEmpty, isEqual, uniqueId } from 'lodash-es'
   import JSONValueComponent from './JSONValue.svelte'
@@ -663,10 +664,6 @@
 
   function handleScroll(event: Event) {
     scrollTop = event.target['scrollTop']
-    debug('handleScroll', {
-      scrollTop: event.target['scrollTop'],
-      scrollLeft: event.target['scrollLeft']
-    })
   }
 
   function handleMouseDown(event: Event) {
@@ -761,32 +758,14 @@
     // FIXME: scroll horizontally when needed
     // FIXME: scroll to the exact element (rough distance can be inexact)
 
-    function horizontalScrollTo() {
-      // TODO: improve horizontal scrolling: animate and integrate with the vertical scrolling
-      const elem = findElement(path)
-      if (elem) {
-        const viewPortRect = refContents.getBoundingClientRect()
-        const elemRect = elem.getBoundingClientRect() // TODO: scroll to column instead of item (is always rendered)
-
-        if (elemRect.right > viewPortRect.right) {
-          const diff = elemRect.right - viewPortRect.right
-          refContents.scrollLeft += diff
-        }
-
-        if (elemRect.left < viewPortRect.left) {
-          const diff = viewPortRect.left - elemRect.left
-          refContents.scrollLeft -= diff
-        }
-      }
-    }
-
     if (elem) {
       jump(elem, {
         container: refContents,
         offset,
         duration: SCROLL_DURATION,
         callback: () => {
-          horizontalScrollTo()
+          // TODO: improve horizontal scrolling: animate and integrate with the vertical scrolling (jump)
+          scrollToHorizontal(path)
         }
       })
     } else {
@@ -806,12 +785,64 @@
             if (newTop !== top) {
               scrollTo(path, scrollToWhenVisible)
             } else {
-              horizontalScrollTo()
+              // TODO: improve horizontal scrolling: animate and integrate with the vertical scrolling (jump)
+              scrollToHorizontal(path)
             }
           })
         }
       })
     }
+  }
+
+  function scrollToVertical(path: JSONPath) {
+    const { rowIndex } = toTableCellPosition(path, columns)
+    const top = calculateAbsolutePosition(path, columns, itemHeightsCache, defaultItemHeight)
+    const bottom = top + (itemHeightsCache[rowIndex] || defaultItemHeight)
+
+    const headerHeight = defaultItemHeight
+    const viewPortRect = refContents.getBoundingClientRect()
+    const viewPortTop = scrollTop
+    const viewPortBottom = scrollTop + viewPortRect.height - headerHeight
+    debug('scrollToVertical', {
+      top,
+      bottom,
+      h: viewPortRect.height,
+      viewPortTop,
+      viewPortBottom
+    })
+
+    if (bottom > viewPortBottom) {
+      const diff = bottom - viewPortBottom
+      refContents.scrollTop += diff
+    }
+
+    if (top < viewPortTop) {
+      const diff = viewPortTop - top
+      refContents.scrollTop -= diff
+    }
+  }
+
+  function scrollToHorizontal(path: JSONPath) {
+    const elem = findElement(path)
+    if (elem) {
+      const viewPortRect = refContents.getBoundingClientRect()
+      const elemRect = elem.getBoundingClientRect() // TODO: scroll to column instead of item (is always rendered)
+
+      if (elemRect.right > viewPortRect.right) {
+        const diff = elemRect.right - viewPortRect.right
+        refContents.scrollLeft += diff
+      }
+
+      if (elemRect.left < viewPortRect.left) {
+        const diff = viewPortRect.left - elemRect.left
+        refContents.scrollLeft -= diff
+      }
+    }
+  }
+
+  function scrollIntoView(path: JSONPath) {
+    scrollToVertical(path)
+    scrollToHorizontal(path)
   }
 
   /**
@@ -960,7 +991,9 @@
       createDefaultSelectionWhenUndefined()
 
       if (documentState.selection) {
-        updateSelection(selectPreviousColumn(columns, documentState.selection))
+        const newSelection = selectPreviousColumn(columns, documentState.selection)
+        updateSelection(newSelection)
+        scrollIntoView(newSelection.focusPath)
       }
     }
 
@@ -970,7 +1003,9 @@
       createDefaultSelectionWhenUndefined()
 
       if (documentState.selection) {
-        updateSelection(selectNextColumn(columns, documentState.selection))
+        const newSelection = selectNextColumn(columns, documentState.selection)
+        updateSelection(newSelection)
+        scrollIntoView(newSelection.focusPath)
       }
     }
 
@@ -980,7 +1015,9 @@
       createDefaultSelectionWhenUndefined()
 
       if (documentState.selection) {
-        updateSelection(selectPreviousRow(columns, documentState.selection))
+        const newSelection = selectPreviousRow(columns, documentState.selection)
+        updateSelection(newSelection)
+        scrollIntoView(newSelection.focusPath)
       }
     }
 
@@ -990,7 +1027,9 @@
       createDefaultSelectionWhenUndefined()
 
       if (documentState.selection) {
-        updateSelection(selectNextRow(json, columns, documentState.selection))
+        const newSelection = selectNextRow(json, columns, documentState.selection)
+        updateSelection(newSelection)
+        scrollIntoView(newSelection.focusPath)
       }
     }
 
