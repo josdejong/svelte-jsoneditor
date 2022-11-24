@@ -111,7 +111,7 @@
   import { createJump } from '$lib/assets/jump.js/src/jump.js'
   import ValidationErrorIcon from '../treemode/ValidationErrorIcon.svelte'
   import { onCopy, onCut, onInsertCharacter, onPaste, onRemove } from '$lib/logic/actions'
-  import JSONRepairModal from '$lib/components/modals/JSONRepairModal.svelte'
+  import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext('simple-modal')
@@ -634,6 +634,8 @@
   }
 
   function handleFind(findAndReplace: boolean) {
+    debug('handleFind', findAndReplace)
+
     // TODO: implement handleFind
   }
 

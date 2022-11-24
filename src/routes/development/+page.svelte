@@ -8,7 +8,7 @@
     lodashQueryLanguage,
     ReadonlyValue,
     renderValue
-  } from '$lib'
+  } from 'svelte-jsoneditor'
   import { useLocalStorage } from '../../lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
   import { tick } from 'svelte'
@@ -16,7 +16,6 @@
   import { truncate } from '$lib/utils/stringUtils.js'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils'
   import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
-  import memoizeOne from 'memoize-one'
 
   // const LosslessJSON: JSONParser = { ... } // FIXME: make the types work
   const LosslessJSON = {

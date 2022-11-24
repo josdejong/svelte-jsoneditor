@@ -1,6 +1,6 @@
 import { isUrl, valueType } from '../../../../utils/typeUtils'
 import classnames from 'classnames'
-import type { JSONParser } from '$lib'
+import type { JSONParser } from '../../../../types'
 
 export function getValueClass(value: unknown, parser: JSONParser): string {
   const type = valueType(value, parser)

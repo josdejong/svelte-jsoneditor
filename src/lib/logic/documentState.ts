@@ -46,7 +46,7 @@ import type {
 } from '../types'
 import { CaretType } from '../types.js'
 import { int } from '../utils/numberUtils.js'
-import { isLargeContent } from '$lib'
+import { isLargeContent } from '../utils/jsonUtils.js'
 
 type OnCreateSelection = (json: JSONValue, documentState: DocumentState) => JSONSelection
 
