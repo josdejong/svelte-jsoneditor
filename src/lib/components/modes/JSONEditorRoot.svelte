@@ -91,13 +91,10 @@
     separator: true
   }
 
-  $: handleRenderMenu = (mode: 'tree' | 'text' | 'table' | 'repair', items: MenuItem[]) => {
-    const updatedItems =
-      mode === 'repair'
-        ? items
-        : isMenuSpaceItem(items[0])
-        ? modeMenuItems.concat(items) // menu is empty, readOnly mode
-        : modeMenuItems.concat(separatorMenuItem, items)
+  $: handleRenderMenu = (mode: 'tree' | 'text' | 'table', items: MenuItem[]) => {
+    const updatedItems = isMenuSpaceItem(items[0])
+      ? modeMenuItems.concat(items) // menu is empty, readOnly mode
+      : modeMenuItems.concat(separatorMenuItem, items)
 
     return onRenderMenu(mode, updatedItems) || updatedItems
   }

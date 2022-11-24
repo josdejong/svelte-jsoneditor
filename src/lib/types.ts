@@ -259,7 +259,7 @@ export type OnClassName = (path: JSONPath, value: JSONValue) => string | undefin
 export type OnChangeMode = (mode: Mode) => void
 export type OnContextMenu = (contextMenuProps: AbsolutePopupOptions) => void
 export type OnRenderMenu = (
-  mode: 'tree' | 'text' | 'table' | 'repair',
+  mode: 'tree' | 'text' | 'table',
   items: MenuItem[]
 ) => MenuItem[] | undefined
 export type OnError = (error: Error) => void

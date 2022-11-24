@@ -888,8 +888,7 @@
         text,
         onParse: parsePartialJson,
         onRepair: repairPartialJson,
-        onApply,
-        onRenderMenu
+        onApply
       },
       {
         ...SIMPLE_MODAL_OPTIONS,

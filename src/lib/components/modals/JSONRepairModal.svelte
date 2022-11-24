@@ -8,7 +8,6 @@
   export let onParse
   export let onRepair
   export let onApply
-  export let onRenderMenu
 
   const { close } = getContext('simple-modal')
 
@@ -29,7 +28,6 @@
     {onRepair}
     onApply={handleApply}
     onCancel={handleCancel}
-    {onRenderMenu}
   />
 </div>
 

@@ -803,13 +803,6 @@
     const viewPortRect = refContents.getBoundingClientRect()
     const viewPortTop = scrollTop
     const viewPortBottom = scrollTop + viewPortRect.height - headerHeight
-    debug('scrollToVertical', {
-      top,
-      bottom,
-      h: viewPortRect.height,
-      viewPortTop,
-      viewPortBottom
-    })
 
     if (bottom > viewPortBottom) {
       const diff = bottom - viewPortBottom
@@ -1304,8 +1297,7 @@
         text,
         onParse: parsePartialJson,
         onRepair: repairPartialJson,
-        onApply,
-        onRenderMenu
+        onApply
       },
       {
         ...SIMPLE_MODAL_OPTIONS,

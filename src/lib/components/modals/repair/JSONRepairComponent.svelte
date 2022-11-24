@@ -12,7 +12,6 @@
   import Message from '../../controls/Message.svelte'
   import { normalizeJsonParseError } from '../../../utils/jsonUtils.js'
   import Menu from '../../controls/Menu.svelte'
-  import { noop } from 'lodash-es'
 
   export let text = ''
   export let readOnly = false
@@ -21,7 +20,6 @@
   export let onChange = null
   export let onApply
   export let onCancel
-  export let onRenderMenu = noop
 
   const debug = createDebug('jsoneditor:JSONRepair')
 
@@ -93,7 +91,7 @@
     }
   }
 
-  $: defaultItems = [
+  $: items = [
     {
       space: true
     },
@@ -104,8 +102,6 @@
       onClick: onCancel
     }
   ]
-
-  $: items = onRenderMenu('repair', defaultItems) || defaultItems
 
   $: gotoAction = {
     icon: faArrowDown,
