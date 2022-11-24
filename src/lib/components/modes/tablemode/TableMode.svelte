@@ -1587,7 +1587,7 @@
       {/if}
 
       <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
-    {:else if parseError}
+    {:else if parseError && text !== undefined && text !== ''}
       <Message
         type="error"
         message="The loaded JSON document is invalid and could not be repaired automatically."
