@@ -42,6 +42,7 @@
   import {
     isTextContent,
     normalizeJsonParseError,
+    parseMemoizeOne,
     parsePartialJson,
     repairPartialJson
   } from '../../../utils/jsonUtils'
@@ -342,13 +343,13 @@
 
     if (isTextContent(content)) {
       try {
-        json = JSON.parse(content.text)
+        json = parseMemoizeOne(content.text, parser)
         text = content.text
         textIsRepaired = false
         parseError = undefined
       } catch (err) {
         try {
-          json = parser.parse(jsonrepair(content.text))
+          json = parseMemoizeOne(jsonrepair(content.text), parser)
           text = content.text
           textIsRepaired = true
           parseError = undefined
@@ -1157,13 +1158,13 @@
     const previousTextIsRepaired = textIsRepaired
 
     try {
-      json = parser.parse(updatedText)
+      json = parseMemoizeOne(updatedText, parser)
       documentState = expandWithCallback(json, documentState, [], expandMinimal)
       text = undefined
       textIsRepaired = false
     } catch (err) {
       try {
-        json = parser.parse(jsonrepair(updatedText))
+        json = parseMemoizeOne(jsonrepair(updatedText), parser)
         documentState = expandWithCallback(json, documentState, [], expandMinimal)
         text = updatedText
         textIsRepaired = true

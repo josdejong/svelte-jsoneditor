@@ -16,6 +16,7 @@
   import { truncate } from '$lib/utils/stringUtils.js'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils'
   import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
+  import memoizeOne from 'memoize-one'
 
   // const LosslessJSON: JSONParser = { ... } // FIXME: make the types work
   const LosslessJSON = {
@@ -197,7 +198,7 @@
   const showTreeEditor = useLocalStorage('svelte-jsoneditor-demo-showTreeEditor', true)
   const showTextEditor = useLocalStorage('svelte-jsoneditor-demo-showTextEditor', true)
   const showRawContents = useLocalStorage('svelte-jsoneditor-demo-showRawContents', false)
-  let height = '430px'
+  let height = '440px'
   const validate = useLocalStorage('svelte-jsoneditor-demo-validate', false)
   const validateArray = useLocalStorage('svelte-jsoneditor-demo-validate-array', false)
   const readOnly = useLocalStorage('svelte-jsoneditor-demo-readOnly', false)
@@ -478,7 +479,7 @@
       on:click={() => {
         content = {
           text: undefined,
-          json: [...new Array(1000)].map((value, index) => {
+          json: [...new Array(100)].map((value, index) => {
             const random = Math.round(Math.random() * 1000)
             const item = {
               id: index,
