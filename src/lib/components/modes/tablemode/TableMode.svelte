@@ -471,8 +471,6 @@
   $: updateValidationErrors(json, validator, parser, validationParser)
   $: groupedValidationErrors = groupValidationErrors(validationErrors, columns)
 
-  $: debug('groupedValidationErrors', groupedValidationErrors)
-
   // because onChange returns the validation errors and there is also a separate listener,
   // we would execute validation twice. Memoizing the last result solves this.
   const memoizedValidate = memoizeOne(validateJSON)
