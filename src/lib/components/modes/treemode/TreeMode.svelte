@@ -207,7 +207,6 @@
   let json: JSONValue | undefined
   let text: string | undefined
   let parseError: ParseError | undefined = undefined
-  const rootPath = [] // create the array only once
 
   function updateSelection(
     selection:
@@ -382,7 +381,7 @@
       visibleSectionsMap: {}
     }
 
-    documentState = expandWithCallback(json, cleanDocumentState, rootPath, callback)
+    documentState = expandWithCallback(json, cleanDocumentState, [], callback)
   }
 
   // two-way binding of externalContent and internal json and text (
@@ -579,7 +578,7 @@
   function expandWhenNotInitialized(json) {
     if (!documentStateInitialized) {
       documentStateInitialized = true
-      documentState = expandWithCallback(json, documentState, rootPath, getDefaultExpand(json))
+      documentState = expandWithCallback(json, documentState, [], getDefaultExpand(json))
     }
   }
 
@@ -1146,7 +1145,7 @@
     }
   }
 
-  function openSortModal(selectedPath) {
+  function openSortModal(rootPath: JSONPath) {
     if (readOnly) {
       return
     }
@@ -1156,15 +1155,15 @@
     onSortModal({
       id: sortModalId,
       json,
-      selectedPath,
-      onSort: async (operations) => {
-        debug('onSort', selectedPath, operations)
+      rootPath,
+      onSort: async ({ operations }) => {
+        debug('onSort', rootPath, operations)
 
         handlePatch(operations, (patchedJson, patchedState) => ({
           // expand the newly replaced array and select it
           state: {
-            ...expandRecursive(patchedJson, patchedState, selectedPath),
-            selection: createValueSelection(selectedPath, false)
+            ...expandRecursive(patchedJson, patchedState, rootPath),
+            selection: createValueSelection(rootPath, false)
           }
         }))
       },
@@ -1180,13 +1179,13 @@
       return
     }
 
-    const selectedPath = findRootPath(json, documentState.selection)
-    openSortModal(selectedPath)
+    const rootPath = findRootPath(json, documentState.selection)
+    openSortModal(rootPath)
   }
 
   function handleSortAll() {
-    const selectedPath = []
-    openSortModal(selectedPath)
+    const rootPath = []
+    openSortModal(rootPath)
   }
 
   /**
@@ -1194,7 +1193,7 @@
    */
   export function openTransformModal({
     id,
-    selectedPath,
+    rootPath,
     onTransform,
     onClose
   }: TransformModalOptions) {
@@ -1203,7 +1202,7 @@
     onTransformModal({
       id: id || transformModalId,
       json,
-      selectedPath,
+      rootPath,
       onTransform: onTransform
         ? (operations) => {
             onTransform({
@@ -1213,13 +1212,13 @@
             })
           }
         : (operations) => {
-            debug('onTransform', selectedPath, operations)
+            debug('onTransform', rootPath, operations)
 
             handlePatch(operations, (patchedJson, patchedState) => ({
               // expand the newly replaced array and select it
               state: {
-                ...expandRecursive(patchedJson, patchedState, selectedPath),
-                selection: createValueSelection(selectedPath, false)
+                ...expandRecursive(patchedJson, patchedState, rootPath),
+                selection: createValueSelection(rootPath, false)
               }
             }))
           },
@@ -1238,15 +1237,15 @@
       return
     }
 
-    const selectedPath = findRootPath(json, documentState.selection)
+    const rootPath = findRootPath(json, documentState.selection)
     openTransformModal({
-      selectedPath
+      rootPath
     })
   }
 
   function handleTransformAll() {
     openTransformModal({
-      selectedPath: []
+      rootPath: []
     })
   }
 
@@ -1390,7 +1389,7 @@
     const previousContent = { json, text }
     const previousTextIsRepaired = textIsRepaired
 
-    const updatedState = expandWithCallback(json, documentState, rootPath, expandMinimal)
+    const updatedState = expandWithCallback(json, documentState, [], expandMinimal)
 
     const callback =
       typeof afterPatch === 'function' ? afterPatch(updatedJson, updatedState) : undefined
@@ -1429,13 +1428,13 @@
 
     try {
       json = parser.parse(updatedText)
-      documentState = expandWithCallback(json, documentState, rootPath, expandMinimal)
+      documentState = expandWithCallback(json, documentState, [], expandMinimal)
       text = undefined
       textIsRepaired = false
     } catch (err) {
       try {
         json = parser.parse(jsonrepair(updatedText))
-        documentState = expandWithCallback(json, documentState, rootPath, expandMinimal)
+        documentState = expandWithCallback(json, documentState, [], expandMinimal)
         text = updatedText
         textIsRepaired = true
       } catch (err) {
@@ -2118,7 +2117,7 @@
       <div class="jse-contents" data-jsoneditor-scrollable-contents={true} bind:this={refContents}>
         <JSONNode
           value={json}
-          path={rootPath}
+          path={[]}
           expandedMap={documentState.expandedMap}
           enforceStringMap={documentState.enforceStringMap}
           visibleSectionsMap={documentState.visibleSectionsMap}

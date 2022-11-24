@@ -249,7 +249,12 @@ export type OnChange =
 export type OnSelect = (selection: JSONSelection) => void
 export type OnPatch = (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
 export type OnChangeText = (updatedText: string, afterPatch?: AfterPatchCallback) => void
-export type OnSort = (operations: JSONPatchDocument) => void
+export type OnSort = (params: {
+  operations: JSONPatchDocument
+  rootPath
+  itemPath: JSONPath
+  direction: 1 | -1
+}) => void
 export type OnFind = (findAndReplace: boolean) => void
 export type OnPaste = (pastedText: string) => void
 export type OnPasteJson = (pastedJson: { path: JSONPath; contents: JSONValue }) => void
@@ -269,7 +274,6 @@ export type OnSortModal = (props: SortModalCallback) => void
 export type OnTransformModal = (props: TransformModalCallback) => void
 export type OnJSONEditorModal = (props: JSONEditorModalCallback) => void
 export type FindNextInside = (path: JSONPath) => JSONSelection | undefined
-export type RepairModalCallback = (repairedText: string) => void
 
 export interface SearchResult {
   items: ExtendedSearchResultItem[]
@@ -499,7 +503,7 @@ export interface RenderValueComponentDescription {
 
 export interface TransformModalOptions {
   id?: string
-  selectedPath?: JSONPath
+  rootPath?: JSONPath
   onTransform?: (state: {
     operations: JSONPatchDocument
     json: JSONValue
@@ -510,7 +514,7 @@ export interface TransformModalOptions {
 
 export interface TransformModalCallback {
   id: string
-  selectedPath: JSONPath
+  rootPath: JSONPath
   json: JSONValue
   onTransform: (operations: JSONPatchDocument) => void
   onClose: () => void
@@ -519,7 +523,7 @@ export interface TransformModalCallback {
 export interface SortModalCallback {
   id: string
   json: JSONValue
-  selectedPath: JSONPath
+  rootPath: JSONPath
   onSort: OnSort
   onClose: () => void
 }

@@ -6,7 +6,7 @@
   import { faTimes } from '@fortawesome/free-solid-svg-icons'
 
   export let title = 'Modal'
-  export let onClose: (() => void) | undefined
+  export let onClose: (() => void) | undefined = undefined
 
   const { close } = getContext('simple-modal')
 </script>

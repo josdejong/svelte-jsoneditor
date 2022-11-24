@@ -53,6 +53,7 @@
     OnTransformModal,
     ParseError,
     RichValidationError,
+    TransformModalOptions,
     ValidationError,
     Validator
   } from '../../../types'
@@ -268,8 +269,8 @@
       onSortModal({
         id: sortModalId,
         json,
-        selectedPath: [],
-        onSort: async (operations) => {
+        rootPath: [],
+        onSort: async ({ operations }) => {
           debug('onSort', operations)
           patch(operations)
         },
@@ -285,13 +286,13 @@
 
   /**
    * This method is exposed via JSONEditor.transform
-   * @param {Object} options
-   * @property {string} [id]
-   * @property {JSONPath} [selectedPath]
-   * @property {({ operations: JSONPatchDocument, json: JSONValue, transformedJson: JSONValue }) => void} [onTransform]
-   * @property {() => void} [onClose]
    */
-  export function openTransformModal({ id, selectedPath, onTransform, onClose }) {
+  export function openTransformModal({
+    id,
+    rootPath,
+    onTransform,
+    onClose
+  }: TransformModalOptions) {
     try {
       const json = parser.parse(text)
 
@@ -300,7 +301,7 @@
       onTransformModal({
         id: id || transformModalId,
         json,
-        selectedPath,
+        rootPath,
         onTransform: onTransform
           ? (operations) => {
               onTransform({
@@ -332,7 +333,7 @@
     }
 
     openTransformModal({
-      selectedPath: []
+      rootPath: []
     })
   }
 

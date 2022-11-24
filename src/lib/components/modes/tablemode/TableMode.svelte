@@ -173,7 +173,6 @@
   let json: JSONValue | undefined
   let text: string | undefined
   let parseError: ParseError | undefined = undefined
-  const rootPath = [] // create the array only once
 
   let pastedJson: PastedJson
 
@@ -1119,7 +1118,7 @@
     const previousContent = { json, text }
     const previousTextIsRepaired = textIsRepaired
 
-    const updatedState = expandWithCallback(json, documentState, rootPath, expandMinimal)
+    const updatedState = expandWithCallback(json, documentState, [], expandMinimal)
 
     const callback =
       typeof afterPatch === 'function' ? afterPatch(updatedJson, updatedState) : undefined
@@ -1159,13 +1158,13 @@
 
     try {
       json = parser.parse(updatedText)
-      documentState = expandWithCallback(json, documentState, rootPath, expandMinimal)
+      documentState = expandWithCallback(json, documentState, [], expandMinimal)
       text = undefined
       textIsRepaired = false
     } catch (err) {
       try {
         json = parser.parse(jsonrepair(updatedText))
-        documentState = expandWithCallback(json, documentState, rootPath, expandMinimal)
+        documentState = expandWithCallback(json, documentState, [], expandMinimal)
         text = updatedText
         textIsRepaired = true
       } catch (err) {
@@ -1208,7 +1207,7 @@
     scrollTo(error.path)
   }
 
-  function openSortModal(selectedPath: JSONPath) {
+  function openSortModal(rootPath: JSONPath) {
     if (readOnly) {
       return
     }
@@ -1218,13 +1217,21 @@
     onSortModal({
       id: sortModalId,
       json,
-      selectedPath,
-      onSort: async (operations) => {
-        debug('onSort', selectedPath, operations)
+      rootPath,
+      onSort: async ({ operations, itemPath, direction }) => {
+        debug('onSort', operations, rootPath, itemPath, direction)
 
-        // TODO: mark the selected column as sorted (if there is a match)
-
-        handlePatch(operations)
+        handlePatch(operations, (patchedJson, patchedState) => {
+          return {
+            state: {
+              ...patchedState,
+              sortedColumn: {
+                path: itemPath,
+                sortDirection: direction === -1 ? SortDirection.desc : SortDirection.asc
+              }
+            }
+          }
+        })
       },
       onClose: () => {
         modalOpen = false
@@ -1238,7 +1245,7 @@
    */
   export function openTransformModal({
     id,
-    selectedPath,
+    rootPath,
     onTransform,
     onClose
   }: TransformModalOptions) {
@@ -1247,7 +1254,7 @@
     onTransformModal({
       id: id || transformModalId,
       json,
-      selectedPath,
+      rootPath,
       onTransform: onTransform
         ? (operations) => {
             onTransform({
@@ -1257,7 +1264,7 @@
             })
           }
         : (operations) => {
-            debug('onTransform', selectedPath, operations)
+            debug('onTransform', rootPath, operations)
 
             handlePatch(operations)
           },
@@ -1317,13 +1324,13 @@
   }
 
   function handleSortAll() {
-    const selectedPath = []
-    openSortModal(selectedPath)
+    const rootPath = []
+    openSortModal(rootPath)
   }
 
   function handleTransformAll() {
     openTransformModal({
-      selectedPath: []
+      rootPath: []
     })
   }
 

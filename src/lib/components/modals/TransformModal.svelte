@@ -32,7 +32,7 @@
 
   export let id = 'transform-modal-' + uniqueId()
   export let json: JSONValue
-  export let selectedPath: JSONPath = []
+  export let rootPath: JSONPath = []
 
   export let indentation: number | string
   export let escapeControlCharacters: boolean
@@ -50,12 +50,12 @@
 
   export let onTransform: OnPatch
 
-  $: selectedJson = getIn(json, selectedPath)
+  $: selectedJson = getIn(json, rootPath)
   $: selectedContent = { json: selectedJson }
 
   const { close } = getContext('simple-modal')
 
-  const stateId = `${id}:${compileJSONPointer(selectedPath)}`
+  const stateId = `${id}:${compileJSONPointer(rootPath)}`
 
   const state = transformModalState[stateId] || {}
 
@@ -136,7 +136,7 @@
       onTransform([
         {
           op: 'replace',
-          path: compileJSONPointer(selectedPath),
+          path: compileJSONPointer(rootPath),
           value: jsonTransformed
         }
       ])
@@ -205,8 +205,8 @@
             type="text"
             readonly
             title="Selected path"
-            value={!isEmpty(selectedPath)
-              ? stripRootObject(stringifyJSONPath(selectedPath))
+            value={!isEmpty(rootPath)
+              ? stripRootObject(stringifyJSONPath(rootPath))
               : '(whole document)'}
           />
 

@@ -19,13 +19,13 @@
 
   export let id: string
   export let json: JSONValue // the whole document
-  export let selectedPath: JSONPath
+  export let rootPath: JSONPath
   export let onSort: OnSort
 
   const { close } = getContext('simple-modal')
 
-  const stateId = `${id}:${compileJSONPointer(selectedPath)}`
-  const selectedJson = getIn(json, selectedPath)
+  const stateId = `${id}:${compileJSONPointer(rootPath)}`
+  const selectedJson = getIn(json, rootPath)
   $: jsonIsArray = Array.isArray(selectedJson)
   $: paths = jsonIsArray ? getNestedPaths(selectedJson) : undefined
   $: properties = paths ? paths.map(pathToOption) : undefined
@@ -68,10 +68,10 @@
     try {
       sortError = undefined
 
-      const path: JSONPath | undefined = selectedProperty?.value
+      const itemPath: JSONPath | undefined = selectedProperty?.value
       const direction = selectedDirection?.value
-      const operations = sortJson(json, selectedPath, path, direction)
-      onSort(operations)
+      const operations = sortJson(json, rootPath, itemPath, direction)
+      onSort({ operations, rootPath, itemPath, direction })
 
       close()
     } catch (err) {
@@ -102,8 +102,8 @@
               type="text"
               readonly
               title="Selected path"
-              value={!isEmpty(selectedPath)
-                ? stripRootObject(stringifyJSONPath(selectedPath))
+              value={!isEmpty(rootPath)
+                ? stripRootObject(stringifyJSONPath(rootPath))
                 : '(whole document)'}
             />
           </td>

@@ -272,13 +272,7 @@
 
   // The onTransformModal method is located in JSONEditor to prevent circular references:
   //     TreeMode -> TransformModal -> TreeMode
-  function onTransformModal({
-    id,
-    json,
-    selectedPath,
-    onTransform,
-    onClose
-  }: TransformModalCallback) {
+  function onTransformModal({ id, json, rootPath, onTransform, onClose }: TransformModalCallback) {
     if (readOnly) {
       return
     }
@@ -288,7 +282,7 @@
       {
         id,
         json,
-        selectedPath,
+        rootPath,
         indentation,
         escapeControlCharacters,
         escapeUnicodeCharacters,
@@ -310,7 +304,7 @@
   }
 
   // The onSortModal is positioned here for consistency with TransformModal
-  function onSortModal({ id, json, selectedPath, onSort, onClose }: SortModalCallback) {
+  function onSortModal({ id, json, rootPath, onSort, onClose }: SortModalCallback) {
     if (readOnly) {
       return
     }
@@ -320,7 +314,7 @@
       {
         id,
         json,
-        selectedPath,
+        rootPath,
         onSort
       },
       SORT_MODAL_OPTIONS,
