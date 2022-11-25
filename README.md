@@ -664,4 +664,6 @@ npm run release
 
 ## License
 
-Released under the [ISC license](LICENSE.md).
+`svelte-jsoneditor` is released as open source under the permissive the [ISC license](LICENSE.md).
+
+**If you are using `svelte-jsoneditor` commercially, there is a _social_ (but no legal) expectation that you help fund its maintenance. [Start here](https://github.com/sponsors/josdejong).**

@@ -10,6 +10,7 @@ export const AUTO_SCROLL_SPEED_NORMAL = 400 // pixels per second
 export const AUTO_SCROLL_SPEED_FAST = 1200 // pixels per second
 export const MAX_SEARCH_RESULTS = 1000
 export const ARRAY_SECTION_SIZE = 100
+export const MAX_VALIDATION_ERRORS = 100
 export const MAX_CHARACTERS_TEXT_PREVIEW = 20000
 export const DEFAULT_VISIBLE_SECTIONS: Section[] = [{ start: 0, end: ARRAY_SECTION_SIZE }]
 export const MAX_VALIDATABLE_SIZE = 100 * 1024 * 1024 // 1 MB

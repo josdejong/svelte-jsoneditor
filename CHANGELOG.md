@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.10.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.10.1...v0.10.2) (2022-11-17)
+
+
+### Bug Fixes
+
+* limit the number of rendered validation errors in the overview list ([b0ae546](https://github.com/josdejong/svelte-jsoneditor/commit/b0ae5461e8d69b7336bf1f1d8c4072c49280b15d))
+* reset the selection instead of clearing it when the selected contents are removed ([7c937f5](https://github.com/josdejong/svelte-jsoneditor/commit/7c937f534fd625aca481a22138fc55c9a30b7d5f))
+
 ### [0.10.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.10.0...v0.10.1) (2022-11-10)
 
 
