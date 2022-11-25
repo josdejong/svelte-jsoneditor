@@ -27,7 +27,7 @@
     }
 
     &.jse-hidden {
-      visibility: hidden;
+      display: none;
     }
 
     :global(.cm-editor) {
@@ -165,6 +165,15 @@
       box-sizing: border-box;
       font-family: var(--jse-font-family);
       font-size: var(--jse-font-size);
+    }
+
+    &.jse-preview {
+      flex: 1;
+      color: var(--jse-panel-color-readonly);
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      padding: 2px;
     }
   }
 }

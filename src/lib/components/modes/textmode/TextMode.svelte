@@ -61,6 +61,8 @@
   import { isContentParseError, isContentValidationErrors } from '../../../typeguards'
   import memoizeOne from 'memoize-one'
   import { validateText } from '../../../logic/validation'
+  import { MAX_CHARACTERS_TEXT_PREVIEW } from '$lib/constants.js'
+  import { truncate } from '$lib/utils/stringUtils.js'
 
   export let readOnly: boolean
   export let mainMenuBar: boolean
@@ -842,6 +844,10 @@
           }
         ]}
       />
+
+      <div class="jse-contents jse-preview">
+        {truncate(text || '', MAX_CHARACTERS_TEXT_PREVIEW)}
+      </div>
     {/if}
 
     <div class="jse-contents" class:jse-hidden={editorDisabled} bind:this={codeMirrorRef} />
