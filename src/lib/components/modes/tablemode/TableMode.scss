@@ -78,7 +78,6 @@
 
           &.jse-table-cell-header,
           &.jse-table-cell-gutter {
-            padding: 0 var(--jse-padding) 0 $padding-half;
             font-weight: normal;
             text-align: left;
             color: var(--jse-text-readonly);
@@ -86,6 +85,7 @@
           }
 
           &.jse-table-cell-header {
+            padding: 0;
             position: sticky;
             top: 0;
             z-index: 1;
@@ -94,6 +94,7 @@
           }
 
           &.jse-table-cell-gutter {
+            padding: 0 var(--jse-padding) 0 $padding-half;
             // FIXME: border and/or border shadow?
           }
 

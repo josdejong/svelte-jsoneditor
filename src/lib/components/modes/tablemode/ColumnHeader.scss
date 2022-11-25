@@ -8,7 +8,12 @@
   color: inherit;
   display: flex;
   gap: $padding;
-  padding: 0;
+  padding: $padding-half var(--jse-padding) $padding-half $padding-half;
+  width: 100%;
+
+  &:hover {
+    background: var(--jse-table-header-background-highlight);
+  }
 
   &:not(&.jse-readonly) {
     cursor: pointer;

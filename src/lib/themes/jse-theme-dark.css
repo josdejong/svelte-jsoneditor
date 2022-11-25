@@ -78,6 +78,7 @@
 
   /* contents: table */
   --jse-table-header-background: #333333;
+  --jse-table-header-background-highlight: #424242;
   --jse-table-row-odd-background: rgba(255, 255, 255, 0.1);
 
   /* controls in modals: inputs, buttons, and `a` */
