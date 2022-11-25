@@ -1601,7 +1601,7 @@
             ]
           : []}
       />
-      <div class="jse-preview">
+      <div class="jse-contents jse-preview">
         {truncate(text || '', MAX_CHARACTERS_TEXT_PREVIEW)}
       </div>
     {:else}
@@ -1615,7 +1615,7 @@
           }
         ]}
       />
-      <div class="jse-preview">
+      <div class="jse-contents jse-preview">
         {truncate(getText({ text, json }, indentation, parser), MAX_CHARACTERS_TEXT_PREVIEW)}
       </div>
     {/if}

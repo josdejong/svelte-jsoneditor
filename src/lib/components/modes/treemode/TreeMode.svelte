@@ -2094,7 +2094,7 @@
               ]
             : []}
         />
-        <div class="jse-preview">
+        <div class="jse-contents jse-preview">
           {truncate(text, MAX_CHARACTERS_TEXT_PREVIEW)}
         </div>
       {/if}
