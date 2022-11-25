@@ -111,20 +111,6 @@
             white-space: nowrap;
             vertical-align: top;
             display: inline-block;
-
-            //&:first-child {
-            //  padding-left: 0;
-            //}
-          }
-
-          // FIXME: this is ugly. give the ColorPickerButton an extra class instead?
-          :global(.jse-color-picker-button) {
-            margin-top: 2px;
-          }
-
-          // FIXME: this is ugly. give the BooleanToggle an extra class instead?
-          :global(.jse-boolean-toggle) {
-            margin-top: 1px;
           }
         }
       }
