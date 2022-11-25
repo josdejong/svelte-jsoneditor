@@ -475,28 +475,3 @@ const COLUMN_REGEX = /column (\d+)/
 export function isEqualParser(a: JSONParser, b: JSONParser): boolean {
   return a.parse === b.parse && a.stringify === b.stringify
 }
-
-// TODO: write unit tests
-/**
- * The global parseMemoizeOne is created for the case when a user has loaded
- * a large JSON document as text, and then switches between tree and table mode
- * without having made a change. In that case, the contents is still text, and
- * would be parsed again when switching to another mode.
- */
-export const parseMemoizeOne = (function () {
-  let lastJsonStr = undefined
-  let lastParse = undefined
-  let lastJson = undefined
-
-  return function parseMemoizeOne(jsonStr: string, parser: JSONParser) {
-    if (jsonStr === lastJsonStr && parser.parse === lastParse && lastJson !== undefined) {
-      return lastJson
-    }
-
-    lastJson = parser.parse(jsonStr)
-    lastJsonStr = jsonStr
-    lastParse = JSON.parse
-
-    return lastJson
-  }
-})()

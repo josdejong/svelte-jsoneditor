@@ -81,7 +81,6 @@
   import {
     convertValue,
     normalizeJsonParseError,
-    parseMemoizeOne,
     parsePartialJson,
     repairPartialJson
   } from '$lib/utils/jsonUtils'
@@ -536,14 +535,14 @@
     const previousTextIsRepaired = textIsRepaired
 
     try {
-      json = parseMemoizeOne(updatedText, parser)
+      json = parser.parse(updatedText)
       expandWhenNotInitialized(json)
       text = updatedText
       textIsRepaired = false
       parseError = undefined
     } catch (err) {
       try {
-        json = parseMemoizeOne(jsonrepair(updatedText), parser)
+        json = parser.parse(jsonrepair(updatedText))
         expandWhenNotInitialized(json)
         text = updatedText
         textIsRepaired = true
@@ -1428,13 +1427,13 @@
     const previousTextIsRepaired = textIsRepaired
 
     try {
-      json = parseMemoizeOne(updatedText, parser)
+      json = parser.parse(updatedText)
       documentState = expandWithCallback(json, documentState, [], expandMinimal)
       text = undefined
       textIsRepaired = false
     } catch (err) {
       try {
-        json = parseMemoizeOne(jsonrepair(updatedText), parser)
+        json = parser.parse(jsonrepair(updatedText))
         documentState = expandWithCallback(json, documentState, [], expandMinimal)
         text = updatedText
         textIsRepaired = true
