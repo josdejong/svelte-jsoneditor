@@ -53,6 +53,7 @@
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils'
   import JSONEditorRoot from './modes/JSONEditorRoot.svelte'
   import JSONEditorModal from './modals/JSONEditorModal.svelte'
+  import memoizeOne from 'memoize-one'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
@@ -104,6 +105,11 @@
       console.error('Error: ' + contentError)
     }
   }
+
+  // We memoize the last parse result for the case when the content is text and very large.
+  // In that case parsing takes a few seconds. When the user switches between tree and table mode,
+  // without having made a change, we do not want to parse the text again.
+  $: parseMemoizeOne = memoizeOne(parser.parse)
 
   // rerender the full editor when the parser changes. This is needed because
   // numeric state is hold at many places in the editor.
@@ -398,6 +404,7 @@
           {escapeUnicodeCharacters}
           {flattenColumns}
           {parser}
+          {parseMemoizeOne}
           {validator}
           {validationParser}
           {pathParser}

@@ -165,6 +165,7 @@
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
   export let parser: JSONParser
+  export let parseMemoizeOne: JSONParser['parse']
   export let validator: Validator | null
   export let validationParser: JSONParser
   export let pathParser: JSONPathParser
@@ -535,14 +536,14 @@
     const previousTextIsRepaired = textIsRepaired
 
     try {
-      json = parser.parse(updatedText)
+      json = parseMemoizeOne(updatedText)
       expandWhenNotInitialized(json)
       text = updatedText
       textIsRepaired = false
       parseError = undefined
     } catch (err) {
       try {
-        json = parser.parse(jsonrepair(updatedText))
+        json = parseMemoizeOne(jsonrepair(updatedText))
         expandWhenNotInitialized(json)
         text = updatedText
         textIsRepaired = true
@@ -1427,13 +1428,13 @@
     const previousTextIsRepaired = textIsRepaired
 
     try {
-      json = parser.parse(updatedText)
+      json = parseMemoizeOne(updatedText)
       documentState = expandWithCallback(json, documentState, [], expandMinimal)
       text = undefined
       textIsRepaired = false
     } catch (err) {
       try {
-        json = parser.parse(jsonrepair(updatedText))
+        json = parseMemoizeOne(jsonrepair(updatedText))
         documentState = expandWithCallback(json, documentState, [], expandMinimal)
         text = updatedText
         textIsRepaired = true

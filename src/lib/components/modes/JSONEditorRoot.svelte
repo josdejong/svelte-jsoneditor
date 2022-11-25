@@ -42,6 +42,7 @@
   export let escapeUnicodeCharacters: boolean
   export let flattenColumns: boolean
   export let parser: JSONParser
+  export let parseMemoizeOne: JSONParser['parse']
   export let validator: Validator | null
   export let validationParser: JSONParser
   export let pathParser: JSONPathParser
@@ -247,6 +248,7 @@
     {escapeUnicodeCharacters}
     {flattenColumns}
     {parser}
+    {parseMemoizeOne}
     {validator}
     {validationParser}
     {indentation}
@@ -272,6 +274,7 @@
     {escapeControlCharacters}
     {escapeUnicodeCharacters}
     {parser}
+    {parseMemoizeOne}
     {validator}
     {validationParser}
     {pathParser}
