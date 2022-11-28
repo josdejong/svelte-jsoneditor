@@ -112,8 +112,6 @@
 
   let content: Content = externalContent
   let text = getText(content, indentation, parser) // text is just a cached version of content.text or parsed content.json
-  let editorDisabled = disableTextEditor(text, acceptTooLarge)
-  $: isNewDocument = text.length === 0
 
   $: normalization = createNormalizationFunctions({
     escapeControlCharacters: false,
@@ -143,7 +141,9 @@
     try {
       codeMirrorView = createCodeMirrorView({
         target: codeMirrorRef,
-        initialText: !editorDisabled ? normalization.escapeValue(text) : '',
+        initialText: !disableTextEditor(text, acceptTooLarge)
+          ? normalization.escapeValue(text)
+          : '',
         readOnly,
         indentation
       })
@@ -557,32 +557,28 @@
 
   function setCodeMirrorContent(newContent: Content, forceUpdate = false) {
     const newText = getText(newContent, indentation, parser)
-
-    editorDisabled = disableTextEditor(newText, acceptTooLarge)
-    if (editorDisabled) {
-      debug('externalContent not applying text: editor is disabled')
-      return
-    }
-
     const isChanged = !isEqual(newContent, content)
-    debug('setCodeMirrorContent', { isChanged, forceUpdate })
-    if (!codeMirrorView || (!isChanged && !forceUpdate)) {
-      return
-    }
-
     const previousContent = content
     content = newContent
     text = newText
 
-    // keep state
-    // to reset state: codeMirrorView.setState(EditorState.create({doc: text, extensions: ...}))
-    codeMirrorView.dispatch({
-      changes: {
-        from: 0,
-        to: codeMirrorView.state.doc.length,
-        insert: normalization.escapeValue(text)
-      }
-    })
+    debug('setCodeMirrorContent', { isChanged, forceUpdate })
+
+    if (!codeMirrorView || (!isChanged && !forceUpdate)) {
+      return
+    }
+
+    if (!disableTextEditor(text, acceptTooLarge)) {
+      // keep state
+      // to reset state: codeMirrorView.setState(EditorState.create({doc: text, extensions: ...}))
+      codeMirrorView.dispatch({
+        changes: {
+          from: 0,
+          to: codeMirrorView.state.doc.length,
+          insert: normalization.escapeValue(text)
+        }
+      })
+    }
 
     updateCanUndoRedo()
     if (isChanged) {
@@ -729,7 +725,7 @@
   let jsonParseError: ParseError | null = null
 
   function linterCallback(): Diagnostic[] {
-    if (editorDisabled) {
+    if (disableTextEditor(text, acceptTooLarge)) {
       return []
     }
 
@@ -794,6 +790,8 @@
 
 <div class="jse-text-mode" class:no-main-menu={!mainMenuBar} bind:this={domTextMode}>
   {#if mainMenuBar}
+    {@const isNewDocument = text.length === 0}
+
     <TextMenu
       {readOnly}
       onFormat={handleFormat}
@@ -814,6 +812,10 @@
   {/if}
 
   {#if !isSSR}
+    {@const editorDisabled = disableTextEditor(text, acceptTooLarge)}
+
+    <div class="jse-contents" class:jse-hidden={editorDisabled} bind:this={codeMirrorRef} />
+
     {#if editorDisabled}
       <Message
         icon={faExclamationTriangle}
@@ -850,13 +852,11 @@
       </div>
     {/if}
 
-    <div class="jse-contents" class:jse-hidden={editorDisabled} bind:this={codeMirrorRef} />
-
-    {#if statusBar}
-      <StatusBar {editorState} />
-    {/if}
-
     {#if !editorDisabled}
+      {#if statusBar}
+        <StatusBar {editorState} />
+      {/if}
+
       {#if jsonParseError}
         <Message
           type="error"

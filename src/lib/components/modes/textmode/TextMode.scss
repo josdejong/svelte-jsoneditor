@@ -14,6 +14,7 @@
   .jse-contents {
     flex: 1;
     display: flex;
+    position: relative;
     flex-direction: column;
     overflow: hidden;
     min-width: 0;
@@ -27,7 +28,13 @@
     }
 
     &.jse-hidden {
-      display: none;
+      // the code mirror editor must stay rendered
+      // and must keep height, else it will get into
+      // an infinite loop when rendering it again.
+      visibility: hidden;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
 
     :global(.cm-editor) {
