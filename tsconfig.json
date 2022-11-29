@@ -31,5 +31,8 @@
       "svelte-jsoneditor": ["src/lib"]
     }
   },
-  "include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte"]
+  "include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte"],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
 }
