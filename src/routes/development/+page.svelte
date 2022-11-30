@@ -478,7 +478,7 @@
       on:click={() => {
         content = {
           text: undefined,
-          json: [...new Array(100)].map((value, index) => {
+          json: [...new Array(1000)].map((value, index) => {
             const random = Math.round(Math.random() * 1000)
             const item = {
               id: index,

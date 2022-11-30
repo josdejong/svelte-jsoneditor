@@ -111,6 +111,7 @@
   import ValidationErrorIcon from '../treemode/ValidationErrorIcon.svelte'
   import { onCopy, onCut, onInsertCharacter, onPaste, onRemove } from '$lib/logic/actions'
   import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
+  import { resizeObserver } from '$lib/actions/resizeObserver.js'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext('simple-modal')
@@ -203,7 +204,7 @@
     defaultItemHeight
   )
 
-  // $: debug('visibleSection', visibleSection) // TODO: cleanup
+  // $: debug('visibleSection', visibleSection, { viewPortHeight }) // TODO: cleanup
 
   $: refreshScrollTop(json)
 
@@ -1411,6 +1412,14 @@
     }
   }
 
+  function handleResizeContents(event: CustomEvent) {
+    viewPortHeight = event.detail.contentRect.height
+  }
+
+  function handleResizeRow(event: CustomEvent, rowIndex: number) {
+    itemHeightsCache[rowIndex] = event.detail.contentRect.height
+  }
+
   function isPathSelected(path: JSONPath, selection: JSONSelection): boolean {
     return selection ? selection.pointersMap[compileJSONPointer(path)] === true : false
   }
@@ -1451,7 +1460,8 @@
       <div
         class="jse-contents"
         bind:this={refContents}
-        bind:clientHeight={viewPortHeight}
+        use:resizeObserver
+        on:resize={handleResizeContents}
         on:scroll={handleScroll}
       >
         <table class="jse-table-main" cellpadding="0" cellspacing="0">
@@ -1482,21 +1492,24 @@
               {@const rowIndex = visibleSection.startIndex + visibleIndex}
               {@const validationErrorsByRow = groupedValidationErrors.rows[rowIndex]}
               <tr class="jse-table-row">
-                <th
-                  class="jse-table-cell jse-table-cell-gutter"
-                  bind:clientHeight={itemHeightsCache[rowIndex]}
-                >
-                  {rowIndex + 1}
-                  {#if !isEmpty(validationErrorsByRow?.row)}
-                    <ValidationErrorIcon
-                      validationError={mergeValidationErrors(
-                        [String(rowIndex)],
-                        validationErrorsByRow.row
-                      )}
-                      onExpand={noop}
-                    />
-                  {/if}
-                </th>
+                {#key rowIndex}
+                  <th
+                    class="jse-table-cell jse-table-cell-gutter"
+                    use:resizeObserver
+                    on:resize={(event) => handleResizeRow(event, rowIndex)}
+                  >
+                    {rowIndex + 1}
+                    {#if !isEmpty(validationErrorsByRow?.row)}
+                      <ValidationErrorIcon
+                        validationError={mergeValidationErrors(
+                          [String(rowIndex)],
+                          validationErrorsByRow.row
+                        )}
+                        onExpand={noop}
+                      />
+                    {/if}
+                  </th>
+                {/key}
                 {#each columns as column, columnIndex}
                   {@const path = [String(rowIndex)].concat(column)}
                   {@const value = getIn(item, column)}
