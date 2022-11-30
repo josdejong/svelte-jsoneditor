@@ -97,6 +97,7 @@ const metaCodes = {
   Shift: true
 }
 
+// see https://tutorial.eyehunts.com/js/javascript-keycode-list-event-which-event-key-event-code-values/
 const codes = {
   8: 'Backspace',
   9: 'Tab',
@@ -186,9 +187,12 @@ const codes = {
   144: 'Num_Lock',
   145: 'Scroll_Lock',
   186: ';',
+  59: ';', // For Firefox
   187: '=',
+  61: '=', // For Firefox
   188: ',',
   189: '-',
+  173: '-', // For Firefox
   190: '.',
   191: '/',
   192: '`',
