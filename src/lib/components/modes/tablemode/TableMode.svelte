@@ -1468,10 +1468,13 @@
           <tbody>
             <tr class="jse-table-row jse-table-row-header">
               <th class="jse-table-cell jse-table-cell-header">
-                {#if !isEmpty(groupedValidationErrors?.root)}<ValidationErrorIcon
-                    validationError={mergeValidationErrors([], groupedValidationErrors?.root)}
-                    onExpand={noop}
-                  />
+                {#if !isEmpty(groupedValidationErrors?.root)}
+                  <div class="jse-table-root-error">
+                    <ValidationErrorIcon
+                      validationError={mergeValidationErrors([], groupedValidationErrors?.root)}
+                      onExpand={noop}
+                    />
+                  </div>
                 {/if}
               </th>
               {#each columns as column}

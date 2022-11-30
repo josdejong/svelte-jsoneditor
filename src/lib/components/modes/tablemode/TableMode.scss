@@ -90,6 +90,11 @@
             top: 0;
             z-index: 1;
 
+            .jse-table-root-error {
+              // same padding as .jse-column-header
+              padding: $padding-half var(--jse-padding) $padding-half $padding-half;
+            }
+
             // FIXME: border and/or border shadow?
           }
 
