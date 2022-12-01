@@ -452,4 +452,4 @@
   {/if}
 </div>
 
-<style src="./ContextMenu.scss"></style>
+<style src="./TreeContextMenu.scss"></style>

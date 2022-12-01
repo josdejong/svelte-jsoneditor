@@ -91,7 +91,7 @@
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import CopyPasteModal from '../../modals/CopyPasteModal.svelte'
   import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
-  import ContextMenu from './contextmenu/ContextMenu.svelte'
+  import TreeContextMenu from './contextmenu/TreeContextMenu.svelte'
   import JSONNode from './JSONNode.svelte'
   import TreeMenu from './menu/TreeMenu.svelte'
   import Welcome from './Welcome.svelte'
@@ -1814,7 +1814,7 @@
 
     modalOpen = true
 
-    const popupId = openAbsolutePopup(ContextMenu, props, {
+    const popupId = openAbsolutePopup(TreeContextMenu, props, {
       left,
       top,
       offsetTop,
@@ -1862,7 +1862,7 @@
           showTip: false
         })
       } else {
-        // fallback on just displaying the ContextMenu top left
+        // fallback on just displaying the TreeContextMenu top left
         const rect = refContents?.getBoundingClientRect()
         if (rect) {
           openContextMenu({
