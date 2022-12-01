@@ -122,15 +122,8 @@ export type ClipboardValues = Array<{ key: string; value: JSONValue }>
  */
 export type FontAwesomeIcon = IconDefinition
 
-export interface DropdownButtonItem {
-  text: string
-  onClick: () => void
-  icon?: IconDefinition
-  title?: string
-  disabled?: boolean
-}
-
-export interface MenuButtonItem {
+export interface MenuButton {
+  type: 'button'
   onClick: () => void
   icon?: IconDefinition
   text?: string
@@ -139,15 +132,67 @@ export interface MenuButtonItem {
   disabled?: boolean
 }
 
+export interface MenuDropDownButton {
+  type: 'dropdown-button'
+  main: MenuButton
+  width?: string
+  items: MenuButton[]
+}
+
+/**
+ * @deprecated: DropdownButtonItem is renamed to MenuButton
+ */
+export type DropdownButtonItem = MenuButton
+
+/**
+ * @deprecated: MenuButtonItem is renamed to MenuButton
+ */
+export type MenuButtonItem = MenuButton
+
+export interface MenuLabel {
+  type: 'label'
+  text: string
+}
+
+export interface MenuSeparator {
+  type: 'separator'
+}
+
+/**
+ * @deprecated: MenuSeparatorItem is replaced with MenuSeparator
+ */
 export interface MenuSeparatorItem {
+  /**
+   * @deprecated: MenuSeparatorItem is replaced with MenuSeparator
+   */
   separator: true
 }
 
+export interface MenuSpace {
+  type: 'space'
+}
+
+/**
+ * @deprecated: MenuSpaceItem is replaced with MenuSpace
+ */
 export interface MenuSpaceItem {
+  /**
+   * @deprecated: MenuSpaceItem is replaced with MenuSpace
+   */
   space: true
 }
 
-export type MenuItem = MenuButtonItem | MenuSeparatorItem | MenuSpaceItem
+export type MenuItem = MenuButton | MenuSeparator | MenuSeparatorItem | MenuSpace | MenuSpaceItem
+
+export type ContextMenuColumn = {
+  type: 'column'
+  items: Array<MenuButton | MenuDropDownButton | MenuLabel | MenuSeparator>
+}
+export type ContextMenuRow = {
+  type: 'row'
+  items: Array<MenuButton | MenuDropDownButton | ContextMenuColumn>
+}
+export type ContextMenuItem = MenuButton | MenuSeparator | ContextMenuRow
 
 export interface MessageAction {
   text: string

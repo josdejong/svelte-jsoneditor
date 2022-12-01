@@ -25,6 +25,29 @@ $errors-overview-max-height: 25%;
   margin: 0;
 }
 
+@mixin jsoneditor-context-menu-button {
+  @include jsoneditor-button;
+
+  flex: 1;
+  white-space: nowrap;
+  padding: $padding;
+  color: inherit;
+
+  &:hover {
+    background: var(--jse-context-menu-background-highlight);
+  }
+
+  &:focus {
+    background: var(--jse-context-menu-background-highlight);
+    z-index: 1;
+  }
+
+  &:disabled {
+    color: var(--jse-context-menu-color-disabled);
+    background: unset;
+  }
+}
+
 @mixin jsoneditor-button-primary {
   @include jsoneditor-button;
 

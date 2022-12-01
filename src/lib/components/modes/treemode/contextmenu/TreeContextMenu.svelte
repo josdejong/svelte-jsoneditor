@@ -11,23 +11,20 @@
     faFilter,
     faPaste,
     faPen,
+    faPlus,
     faSortAmountDownAlt,
     faTimes
   } from '@fortawesome/free-solid-svg-icons'
   import type { JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { initial, isEmpty } from 'lodash-es'
-  import { onMount } from 'svelte'
-  import Icon from 'svelte-awesome'
-  import DropdownButton from '../../../controls/DropdownButton.svelte'
   import { canConvert, singleItemSelected } from '$lib/logic/selection'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
-  import { faCheckSquare, faLightbulb, faSquare } from '@fortawesome/free-regular-svg-icons'
-  import { findNearestElement } from '$lib/utils/domUtils'
-  import type { DocumentState, JSONParser } from '../../../../types'
-  import { isKeySelection, isMultiSelection, isValueSelection } from '../../../../logic/selection'
-  import { getEnforceString } from '../../../../logic/documentState'
+  import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
+  import type { ContextMenuItem, DocumentState, JSONParser } from '$lib/types'
+  import { isKeySelection, isMultiSelection, isValueSelection } from '$lib/logic/selection'
+  import { getEnforceString } from '$lib/logic/documentState'
+  import ContextMenu from '$lib/components/controls/contextmenu/ContextMenu.svelte'
 
   export let json: JSONValue
   export let documentState: DocumentState
@@ -51,20 +48,6 @@
   export let onInsertAfter
   export let onSort
   export let onTransform
-
-  let refContextMenu
-
-  onMount(() => {
-    setTimeout(() => {
-      const firstEnabledButton = [...refContextMenu.querySelectorAll('button')].find(
-        (button) => !button.disabled
-      )
-
-      if (firstEnabledButton) {
-        firstEnabledButton.focus()
-      }
-    })
-  })
 
   $: selection = documentState.selection
 
@@ -101,7 +84,7 @@
   $: canEnforceString = canEditValue && !isObjectOrArray(focusValue)
 
   $: convertMode = hasSelectionContents
-  $: insertOrConvertText = convertMode ? 'Convert to' : 'Insert'
+  $: insertOrConvertText = convertMode ? 'Convert to:' : 'Insert:'
   $: canInsertOrConvertStructure = convertMode ? false : hasSelection
   $: canInsertOrConvertObject = convertMode
     ? canConvert(selection) && !isObject(focusValue)
@@ -208,248 +191,242 @@
     onInsertAfter()
   }
 
-  function handleKeyDown(event) {
-    const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
-
-    if (combo === 'Up' || combo === 'Down' || combo === 'Left' || combo === 'Right') {
-      event.preventDefault()
-
-      const buttons: HTMLButtonElement[] = Array.from(
-        refContextMenu.querySelectorAll('button:not([disabled])')
-      )
-      const nearest = findNearestElement({
-        allElements: buttons,
-        currentElement: event.target,
-        direction: combo,
-        hasPrio: (element: HTMLButtonElement) => {
-          return element.getAttribute('data-type') !== 'jse-open-dropdown'
+  let items: ContextMenuItem[]
+  $: items = [
+    {
+      type: 'row',
+      items: [
+        {
+          type: 'button',
+          onClick: handleEditKey,
+          icon: faPen,
+          text: 'Edit key',
+          title: 'Edit the key (Double-click on the key)',
+          disabled: !canEditKey
+        },
+        {
+          type: 'dropdown-button',
+          main: {
+            type: 'button',
+            onClick: handleEditValue,
+            icon: faPen,
+            text: editValueText,
+            title: 'Edit the value (Double-click on the value)',
+            disabled: !canEditValue
+          },
+          width: '11em',
+          items: [
+            {
+              type: 'button',
+              icon: faPen,
+              text: editValueText,
+              title: 'Edit the value (Double-click on the value)',
+              onClick: handleEditValue,
+              disabled: !canEditValue
+            },
+            {
+              type: 'button',
+              icon: enforceString ? faCheckSquare : faSquare,
+              text: 'Enforce string',
+              title: 'Enforce keeping the value as string when it contains a numeric value',
+              onClick: handleToggleEnforceString,
+              disabled: !canEnforceString
+            }
+          ]
         }
-      })
-      if (nearest) {
-        nearest.focus()
-      }
-    }
-  }
-
-  $: editValueDropdownItems = [
+      ]
+    },
+    { type: 'separator' },
     {
-      icon: faPen,
-      text: editValueText,
-      title: 'Edit the value (Double-click on the value)',
-      onClick: handleEditValue,
-      disabled: !canEditValue
+      type: 'row',
+      items: [
+        {
+          type: 'dropdown-button',
+          main: {
+            type: 'button',
+            onClick: handleCut,
+            icon: faCut,
+            text: 'Cut',
+            title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
+            disabled: !hasSelectionContents
+          },
+          width: '10em',
+          items: [
+            {
+              type: 'button',
+              icon: faCut,
+              text: 'Cut formatted',
+              title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
+              onClick: handleCut,
+              disabled: !hasSelectionContents
+            },
+            {
+              type: 'button',
+              icon: faCut,
+              text: 'Cut compacted',
+              title: 'Cut selected contents, without indentation (Ctrl+Shift+X)',
+              onClick: handleCutCompact,
+              disabled: !hasSelectionContents
+            }
+          ]
+        },
+        {
+          type: 'dropdown-button',
+          main: {
+            type: 'button',
+            onClick: handleCopy,
+            icon: faCopy,
+            text: 'Copy',
+            title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
+            disabled: !hasSelectionContents
+          },
+          width: '12em',
+          items: [
+            {
+              type: 'button',
+              icon: faCopy,
+              text: 'Copy formatted',
+              title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
+              onClick: handleCopy,
+              disabled: !hasSelectionContents
+            },
+            {
+              type: 'button',
+              icon: faCopy,
+              text: 'Copy compacted',
+              title: 'Copy selected contents, without indentation (Ctrl+Shift+C)',
+              onClick: handleCopyCompact,
+              disabled: !hasSelectionContents
+            }
+          ]
+        },
+        {
+          type: 'button',
+          onClick: handlePaste,
+          icon: faPaste,
+          text: 'Paste',
+          title: 'Paste clipboard contents (Ctrl+V)',
+          disabled: !hasSelection
+        }
+      ]
+    },
+    { type: 'separator' },
+    {
+      type: 'row',
+      items: [
+        {
+          type: 'column',
+          items: [
+            {
+              type: 'button',
+              onClick: handleRemove,
+              icon: faTimes,
+              text: 'Remove',
+              title: 'Remove selected contents (Delete)',
+              disabled: !hasSelectionContents
+            },
+            {
+              type: 'button',
+              onClick: handleDuplicate,
+              icon: faClone,
+              text: 'Duplicate',
+              title: 'Duplicate selected contents (Ctrl+D)',
+              disabled: !canDuplicate
+            },
+            {
+              type: 'button',
+              onClick: handleExtract,
+              icon: faCropAlt,
+              text: 'Extract',
+              title: 'Extract selected contents',
+              disabled: !canExtract
+            },
+            {
+              type: 'button',
+              onClick: handleSort,
+              icon: faSortAmountDownAlt,
+              text: 'Sort',
+              title: 'Sort array or object contents',
+              disabled: !hasSelectionContents
+            },
+            {
+              type: 'button',
+              onClick: handleTransform,
+              icon: faFilter,
+              text: 'Transform',
+              title: 'Transform array or object contents (filter, sort, project)',
+              disabled: !hasSelectionContents
+            }
+          ]
+        },
+        {
+          type: 'column',
+          items: [
+            { type: 'label', text: insertOrConvertText },
+            {
+              type: 'button',
+              onClick: () => handleInsertOrConvert('structure'),
+              icon: faPlus,
+              text: 'Structure',
+              title: insertOrConvertText + ' structure',
+              disabled: !canInsertOrConvertStructure
+            },
+            {
+              type: 'button',
+              onClick: () => handleInsertOrConvert('object'),
+              icon: faPlus,
+              text: 'Object',
+              title: insertOrConvertText + ' structure',
+              disabled: !canInsertOrConvertObject
+            },
+            {
+              type: 'button',
+              onClick: () => handleInsertOrConvert('array'),
+              icon: faPlus,
+              text: 'Array',
+              title: insertOrConvertText + ' array',
+              disabled: !canInsertOrConvertArray
+            },
+            {
+              type: 'button',
+              onClick: () => handleInsertOrConvert('value'),
+              icon: faPlus,
+              text: 'Value',
+              title: insertOrConvertText + ' value',
+              disabled: !canInsertOrConvertValue
+            }
+          ]
+        }
+      ]
     },
     {
-      icon: enforceString ? faCheckSquare : faSquare,
-      text: 'Enforce string',
-      title: 'Enforce keeping the value as string when it contains a numeric value',
-      onClick: handleToggleEnforceString,
-      disabled: !canEnforceString
-    }
-  ]
-
-  $: cutDropdownItems = [
-    {
-      icon: faCut,
-      text: 'Cut formatted',
-      title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
-      onClick: handleCut,
-      disabled: !hasSelectionContents
+      type: 'separator'
     },
     {
-      icon: faCut,
-      text: 'Cut compacted',
-      title: 'Cut selected contents, without indentation (Ctrl+Shift+X)',
-      onClick: handleCutCompact,
-      disabled: !hasSelectionContents
-    }
-  ]
-
-  $: copyDropdownItems = [
-    {
-      icon: faCopy,
-      text: 'Copy formatted',
-      title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
-      onClick: handleCopy,
-      disabled: !hasSelectionContents
-    },
-    {
-      icon: faCopy,
-      text: 'Copy compacted',
-      title: 'Copy selected contents, without indentation (Ctrl+Shift+C)',
-      onClick: handleCopyCompact,
-      disabled: !hasSelectionContents
+      type: 'row',
+      items: [
+        {
+          type: 'button',
+          onClick: handleInsertBefore,
+          icon: faCaretSquareUp,
+          text: 'Insert before',
+          title: 'Select area before current entry to insert or paste contents',
+          disabled: !hasSelectionContents || rootSelected
+        },
+        {
+          type: 'button',
+          onClick: handleInsertAfter,
+          icon: faCaretSquareDown,
+          text: 'Insert after',
+          title: 'Select area after current entry to insert or paste contents',
+          disabled: !hasSelectionContents || rootSelected
+        }
+      ]
     }
   ]
 </script>
 
-<div class="jse-contextmenu" bind:this={refContextMenu} on:keydown={handleKeyDown}>
-  <div class="jse-row">
-    <button
-      type="button"
-      title="Edit the key (Double-click on the key)"
-      on:click={handleEditKey}
-      disabled={!canEditKey}
-    >
-      <Icon data={faPen} /> Edit key
-    </button>
-    <DropdownButton width="11em" items={editValueDropdownItems}>
-      <button
-        type="button"
-        slot="defaultItem"
-        title="Edit the value (Double-click on the value)"
-        on:click={handleEditValue}
-        disabled={!canEditValue}
-      >
-        <Icon data={faPen} />
-        {editValueText}
-      </button>
-    </DropdownButton>
-  </div>
-  <div class="jse-separator" />
-  <div class="jse-row">
-    <DropdownButton width="10em" items={cutDropdownItems}>
-      <button
-        type="button"
-        slot="defaultItem"
-        title="Cut selected contents, formatted with indentation (Ctrl+X)"
-        on:click={handleCut}
-        disabled={!hasSelectionContents}
-      >
-        <Icon data={faCut} /> Cut
-      </button>
-    </DropdownButton>
-    <DropdownButton width="12em" items={copyDropdownItems}>
-      <button
-        type="button"
-        slot="defaultItem"
-        title="Copy selected contents, formatted with indentation (Ctrl+C)"
-        on:click={handleCopy}
-        disabled={!hasSelectionContents}
-      >
-        <Icon data={faCopy} /> Copy
-      </button>
-    </DropdownButton>
-    <button
-      type="button"
-      title="Paste clipboard contents (Ctrl+V)"
-      on:click={handlePaste}
-      disabled={!hasSelection}
-    >
-      <Icon data={faPaste} /> Paste
-    </button>
-  </div>
-  <div class="jse-separator" />
-  <div class="jse-row">
-    <div class="jse-column">
-      <button
-        type="button"
-        title="Remove selected contents (Delete)"
-        on:click={handleRemove}
-        disabled={!hasSelectionContents}
-      >
-        <Icon data={faTimes} /> Remove
-      </button>
-      <button
-        type="button"
-        title="Duplicate selected contents (Ctrl+D)"
-        on:click={handleDuplicate}
-        disabled={!canDuplicate}
-      >
-        <Icon data={faClone} /> Duplicate
-      </button>
-      <button
-        type="button"
-        title="Extract selected contents"
-        on:click={handleExtract}
-        disabled={!canExtract}
-      >
-        <Icon data={faCropAlt} /> Extract
-      </button>
-      <button
-        type="button"
-        title="Sort array or object contents"
-        on:click={handleSort}
-        disabled={!hasSelectionContents}
-      >
-        <Icon data={faSortAmountDownAlt} /> Sort
-      </button>
-      <button
-        type="button"
-        title="Transform array or object contents (filter, sort, project)"
-        on:click={handleTransform}
-        disabled={!hasSelectionContents}
-      >
-        <Icon data={faFilter} /> Transform
-      </button>
-    </div>
-    <div class="jse-column">
-      <div class="jse-label">
-        {insertOrConvertText}:
-      </div>
-      <button
-        type="button"
-        on:click={() => handleInsertOrConvert('structure')}
-        title="{insertOrConvertText} structure"
-        disabled={!canInsertOrConvertStructure}
-      >
-        <span class="jse-insert"><span class="jse-plus">{'+'}</span></span> Structure
-      </button>
-      <button
-        type="button"
-        on:click={() => handleInsertOrConvert('object')}
-        title="{insertOrConvertText} object"
-        disabled={!canInsertOrConvertObject}
-      >
-        <span class="jse-insert">{'{}'}</span> Object
-      </button>
-      <button
-        type="button"
-        on:click={() => handleInsertOrConvert('array')}
-        title="{insertOrConvertText} array"
-        disabled={!canInsertOrConvertArray}
-      >
-        <span class="jse-insert">[]</span> Array
-      </button>
-      <button
-        type="button"
-        on:click={() => handleInsertOrConvert('value')}
-        title="{insertOrConvertText} value"
-        disabled={!canInsertOrConvertValue}
-      >
-        <span class="jse-insert"><span class="jse-quote">"</span></span> Value
-      </button>
-    </div>
-  </div>
-  <div class="jse-separator" />
-  <div class="jse-row">
-    <button
-      type="button"
-      title="Select area before current entry to insert or paste contents"
-      disabled={!hasSelectionContents || rootSelected}
-      on:click={handleInsertBefore}
-    >
-      <Icon data={faCaretSquareUp} /> Insert before
-    </button>
-    <button
-      type="button"
-      title="Select area after current entry to insert or paste contents"
-      disabled={!hasSelectionContents || rootSelected}
-      on:click={handleInsertAfter}
-    >
-      <Icon data={faCaretSquareDown} /> Insert after
-    </button>
-  </div>
-  {#if showTip}
-    <div class="jse-row">
-      <div class="jse-tip">
-        <div>
-          <Icon data={faLightbulb} />
-        </div>
-        <div>Tip: you can open this context menu via right-click or with Ctrl+Q</div>
-      </div>
-    </div>
-  {/if}
-</div>
-
-<style src="./TreeContextMenu.scss"></style>
+<ContextMenu
+  {items}
+  tip={showTip ? 'Tip: you can open this context menu via right-click or with Ctrl+Q' : undefined}
+/>

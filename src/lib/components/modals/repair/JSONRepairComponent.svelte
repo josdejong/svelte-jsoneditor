@@ -12,6 +12,7 @@
   import Message from '../../controls/Message.svelte'
   import { normalizeJsonParseError } from '../../../utils/jsonUtils.js'
   import Menu from '../../controls/Menu.svelte'
+  import type { MenuItem } from '$lib'
 
   export let text = ''
   export let readOnly = false
@@ -91,11 +92,13 @@
     }
   }
 
+  let items: MenuItem[]
   $: items = [
     {
-      space: true
+      type: 'space'
     },
     {
+      type: 'button',
       icon: faTimes,
       title: 'Cancel repair',
       className: 'jse-cancel',

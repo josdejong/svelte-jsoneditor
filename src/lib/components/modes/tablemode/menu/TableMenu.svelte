@@ -20,6 +20,7 @@
   $: defaultItems = !readOnly
     ? [
         {
+          type: 'button',
           icon: faSortAmountDownAlt,
           title: 'Sort',
           className: 'jse-sort',
@@ -27,6 +28,7 @@
           disabled: readOnly || json === undefined
         },
         {
+          type: 'button',
           icon: faFilter,
           title: 'Transform contents (filter, sort, project)',
           className: 'jse-transform',
@@ -34,9 +36,10 @@
           disabled: readOnly || json === undefined
         },
         {
-          separator: true
+          type: 'separator'
         },
         {
+          type: 'button',
           icon: faUndo,
           title: 'Undo (Ctrl+Z)',
           className: 'jse-undo',
@@ -44,6 +47,7 @@
           disabled: !historyState.canUndo
         },
         {
+          type: 'button',
           icon: faRedo,
           title: 'Redo (Ctrl+Shift+Z)',
           className: 'jse-redo',
@@ -51,12 +55,12 @@
           disabled: !historyState.canRedo
         },
         {
-          space: true
+          type: 'space'
         }
       ]
     : [
         {
-          space: true
+          type: 'space'
         }
       ]
 

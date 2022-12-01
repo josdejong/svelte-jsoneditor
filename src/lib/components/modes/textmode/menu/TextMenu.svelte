@@ -11,6 +11,7 @@
   import { faJSONEditorCompact, faJSONEditorFormat } from '$lib/img/customFontawesomeIcons'
   import Menu from '../../../controls/Menu.svelte'
   import { noop } from 'lodash-es'
+  import type { MenuItem } from '$lib'
 
   export let readOnly = false
   export let onFormat
@@ -28,10 +29,11 @@
   export let canTransform
   export let onRenderMenu = noop
 
-  /* @type {MenuItem[]} */
+  let defaultItems: MenuItem[]
   $: defaultItems = !readOnly
     ? [
         {
+          type: 'button',
           icon: faJSONEditorFormat,
           title: 'Format JSON: add proper indentation and new lines (Ctrl+I)',
           className: 'jse-format',
@@ -39,6 +41,7 @@
           disabled: readOnly || !canFormat
         },
         {
+          type: 'button',
           icon: faJSONEditorCompact,
           title: 'Compact JSON: remove all white spacing and new lines (Ctrl+Shift+I)',
           className: 'jse-compact',
@@ -46,9 +49,10 @@
           disabled: readOnly || !canCompact
         },
         {
-          separator: true
+          type: 'separator'
         },
         {
+          type: 'button',
           icon: faSortAmountDownAlt,
           title: 'Sort',
           className: 'jse-sort',
@@ -56,6 +60,7 @@
           disabled: readOnly || !canSort
         },
         {
+          type: 'button',
           icon: faFilter,
           title: 'Transform contents (filter, sort, project)',
           className: 'jse-transform',
@@ -63,15 +68,17 @@
           disabled: readOnly || !canTransform
         },
         {
+          type: 'button',
           icon: faSearch,
           title: 'Search (Ctrl+F)',
           className: 'jse-search',
           onClick: onToggleSearch
         },
         {
-          separator: true
+          type: 'separator'
         },
         {
+          type: 'button',
           icon: faUndo,
           title: 'Undo (Ctrl+Z)',
           className: 'jse-undo',
@@ -79,6 +86,7 @@
           disabled: !canUndo
         },
         {
+          type: 'button',
           icon: faRedo,
           title: 'Redo (Ctrl+Shift+Z)',
           className: 'jse-redo',
@@ -86,12 +94,12 @@
           disabled: !canRedo
         },
         {
-          space: true
+          type: 'space'
         }
       ]
     : [
         {
-          space: true
+          type: 'space'
         }
       ]
 

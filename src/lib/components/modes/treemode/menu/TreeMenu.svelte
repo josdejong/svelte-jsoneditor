@@ -46,7 +46,9 @@
     hasJson &&
     (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))
 
+  let expandMenuItem: MenuItem
   $: expandMenuItem = {
+    type: 'button',
     icon: faJSONEditorExpand,
     title: 'Expand all',
     className: 'jse-expand-all',
@@ -54,14 +56,19 @@
     disabled: !isObjectOrArray(json)
   }
 
+  let collapseMenuItem: MenuItem
   $: collapseMenuItem = {
+    type: 'button',
     icon: faJSONEditorCollapse,
     title: 'Collapse all',
     className: 'jse-collapse-all',
     onClick: onCollapseAll,
     disabled: !isObjectOrArray(json)
   }
+
+  let searchMenuItem: MenuItem
   $: searchMenuItem = {
+    type: 'button',
     icon: faSearch,
     title: 'Search (Ctrl+F)',
     className: 'jse-search',
@@ -75,9 +82,10 @@
         expandMenuItem,
         collapseMenuItem,
         {
-          separator: true
+          type: 'separator'
         },
         {
+          type: 'button',
           icon: faSortAmountDownAlt,
           title: 'Sort',
           className: 'jse-sort',
@@ -85,6 +93,7 @@
           disabled: readOnly || json === undefined
         },
         {
+          type: 'button',
           icon: faFilter,
           title: 'Transform contents (filter, sort, project)',
           className: 'jse-transform',
@@ -93,15 +102,17 @@
         },
         searchMenuItem,
         {
+          type: 'button',
           icon: faEllipsisV,
           title: CONTEXT_MENU_EXPLANATION,
           className: 'jse-contextmenu',
           onClick: onContextMenu
         },
         {
-          separator: true
+          type: 'separator'
         },
         {
+          type: 'button',
           icon: faUndo,
           title: 'Undo (Ctrl+Z)',
           className: 'jse-undo',
@@ -109,6 +120,7 @@
           disabled: !historyState.canUndo
         },
         {
+          type: 'button',
           icon: faRedo,
           title: 'Redo (Ctrl+Shift+Z)',
           className: 'jse-redo',
@@ -116,16 +128,17 @@
           disabled: !historyState.canRedo
         },
         {
-          space: true
+          type: 'space'
         }
       ]
     : [
         expandMenuItem,
         collapseMenuItem,
         {
-          separator: true
+          type: 'separator'
         },
         {
+          type: 'button',
           icon: faCopy,
           title: 'Copy (Ctrl+C)',
           className: 'jse-copy',
@@ -133,11 +146,11 @@
           disabled: !hasSelectionContents
         },
         {
-          separator: true
+          type: 'separator'
         },
         searchMenuItem,
         {
-          space: true
+          type: 'space'
         }
       ]
 
