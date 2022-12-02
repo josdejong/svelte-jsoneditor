@@ -5,7 +5,7 @@
   import Header from './Header.svelte'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, immutableJSONPatch, isJSONArray } from 'immutable-json-patch'
-  import { createDebug } from '../../utils/debug'
+  import { createDebug } from '$lib/utils/debug'
   import type {
     Content,
     JSONEditorModalCallback,
@@ -18,16 +18,16 @@
     OnSortModal,
     OnTransformModal,
     Validator
-  } from '../../types'
-  import { Mode } from '../../types'
+  } from '$lib/types'
+  import { Mode } from '$lib/types'
   import JSONEditorRoot from '../modes/JSONEditorRoot.svelte'
   import { noop } from '$lib/utils/noop.js'
-  import { stringifyJSONPath } from '../../utils/pathUtils'
+  import { stringifyJSONPath, stripRootObject } from '$lib/utils/pathUtils'
   import { initial, isEmpty, last } from 'lodash-es'
-  import { stripRootObject } from '$lib/utils/pathUtils'
   import { isJSONContent, toJSONContent } from '$lib/utils/jsonUtils'
   import Icon from 'svelte-awesome'
   import { faCaretLeft } from '@fortawesome/free-solid-svg-icons'
+  import memoizeOne from 'memoize-one'
 
   const debug = createDebug('jsoneditor:JSONEditorModal')
 
@@ -75,6 +75,9 @@
   $: pathDescription = !isEmpty(absolutePath)
     ? stripRootObject(stringifyJSONPath(absolutePath))
     : '(whole document)'
+
+  // not relevant in this Modal setting, but well
+  $: parseMemoizeOne = memoizeOne(parser.parse)
 
   let error: string | undefined = undefined
 
@@ -208,6 +211,7 @@
         {escapeUnicodeCharacters}
         {flattenColumns}
         {parser}
+        {parseMemoizeOne}
         {validator}
         {validationParser}
         {pathParser}
