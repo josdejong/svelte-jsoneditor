@@ -2,10 +2,10 @@
   import type { MenuDropDownButton } from '$lib/types'
   import DropdownButton from '$lib/components/controls/DropdownButton.svelte'
   import Icon from 'svelte-awesome'
-  import classnames from 'classnames'
+  import { classnames } from '$lib/utils/cssUtils.js'
 
   export let item: MenuDropDownButton
-  export let className: string | undefined
+  export let className: string | undefined = undefined
 </script>
 
 <DropdownButton width={item.width} items={item.items}>

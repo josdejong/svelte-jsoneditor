@@ -1,7 +1,6 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import classnames from 'classnames'
   import { initial } from 'lodash-es'
   import {
     createKeySelection,
@@ -17,6 +16,7 @@
   import type { JSONPath, JSONPointer } from 'immutable-json-patch'
   import { isKeySelection } from '$lib/logic/selection.js'
   import ContextMenuPointer from '$lib/components/controls/contextmenu/ContextMenuPointer.svelte'
+  import { classnames } from '$lib/utils/cssUtils'
 
   export let path: JSONPath
   export let pointer: JSONPointer

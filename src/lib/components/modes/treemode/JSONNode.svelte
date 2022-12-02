@@ -2,7 +2,6 @@
 
 <script lang="ts">
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
-  import classnames from 'classnames'
   import type {
     JSONArray,
     JSONObject,
@@ -74,6 +73,7 @@
   import { createMemoizePath } from '$lib/utils/pathUtils'
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
   import { isObject } from '$lib/utils/typeUtils.js'
+  import { classnames } from '$lib/utils/cssUtils.js'
 
   export let value: JSONValueType
   export let path: JSONPath

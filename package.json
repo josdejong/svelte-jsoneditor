@@ -63,7 +63,6 @@
     "@fortawesome/free-regular-svg-icons": "^6.2.1",
     "@fortawesome/free-solid-svg-icons": "^6.2.1",
     "ajv-dist": "^8.11.2",
-    "classnames": "^2.3.2",
     "codemirror": "^6.0.1",
     "diff-sequences": "^29.3.1",
     "immutable-json-patch": "^5.1.1",
