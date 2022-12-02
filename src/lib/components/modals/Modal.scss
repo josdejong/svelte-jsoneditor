@@ -16,6 +16,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  min-height: 0;
 
   font-family: var(--jse-font-family);
   font-size: var(--jse-font-size);
@@ -23,9 +25,11 @@
   background: var(--jse-modal-background);
   color: var(--jse-text-color);
 
-  .jse-contents {
+  .jse-modal-contents {
     padding: 20px;
     overflow: auto;
+    min-width: 0;
+    min-height: 0;
 
     .jse-actions {
       display: flex;
@@ -35,7 +39,9 @@
       padding-top: $padding;
 
       button {
-        @include jsoneditor-button-primary;
+        &.jse-primary {
+          @include jsoneditor-button-primary;
+        }
       }
     }
   }
@@ -67,6 +73,14 @@
 :global(.bg.jse-modal-bg .jse-modal-window.jse-modal-window-transform) {
   width: 1200px;
   height: 1200px;
+  max-height: 80%;
+  display: flex;
+}
+
+:global(.bg.jse-modal-bg .jse-modal-window.jse-modal-window-jsoneditor) {
+  width: 800px;
+  height: auto;
+  min-height: 500px;
   max-height: 80%;
   display: flex;
 }

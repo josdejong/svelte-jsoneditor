@@ -1,7 +1,6 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import classnames from 'classnames'
   import { initial } from 'lodash-es'
   import {
     createKeySelection,
@@ -15,8 +14,9 @@
   import type { ExtendedSearchResultItem, TreeModeContext } from '$lib/types'
   import { type JSONSelection } from '$lib/types'
   import type { JSONPath, JSONPointer } from 'immutable-json-patch'
-  import { isKeySelection } from '../../../logic/selection.js'
-  import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
+  import { isKeySelection } from '$lib/logic/selection.js'
+  import ContextMenuPointer from '$lib/components/controls/contextmenu/ContextMenuPointer.svelte'
+  import { classnames } from '$lib/utils/cssUtils'
 
   export let path: JSONPath
   export let pointer: JSONPointer
@@ -84,7 +84,7 @@
   </div>
 {/if}
 {#if !context.readOnly && isSelected && !isEditingKey}
-  <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
+  <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
 {/if}
 
 <style src="./JSONKey.scss"></style>

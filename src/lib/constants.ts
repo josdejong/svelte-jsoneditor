@@ -1,4 +1,5 @@
 import type { Section } from './types'
+import { SortDirection } from './types.js'
 
 export const SCROLL_DURATION = 300 // ms
 export const DEBOUNCE_DELAY = 300 // ms
@@ -12,6 +13,8 @@ export const MAX_SEARCH_RESULTS = 1000
 export const ARRAY_SECTION_SIZE = 100
 export const MAX_VALIDATION_ERRORS = 100
 export const MAX_CHARACTERS_TEXT_PREVIEW = 20000
+export const MAX_INLINE_OBJECT_CHARS = 50
+export const MAX_HEADER_NAME_CHARACTERS = 50
 export const DEFAULT_VISIBLE_SECTIONS: Section[] = [{ start: 0, end: ARRAY_SECTION_SIZE }]
 export const MAX_VALIDATABLE_SIZE = 100 * 1024 * 1024 // 1 MB
 export const MAX_AUTO_REPAIRABLE_SIZE = 1024 * 1024 // 1 MB
@@ -34,6 +37,11 @@ export const SORT_MODAL_OPTIONS = {
 export const TRANSFORM_MODAL_OPTIONS = {
   ...SIMPLE_MODAL_OPTIONS,
   classWindow: 'jse-modal-window jse-modal-window-transform'
+}
+
+export const JSONEDITOR_MODAL_OPTIONS = {
+  ...SIMPLE_MODAL_OPTIONS,
+  classWindow: 'jse-modal-window jse-modal-window-jsoneditor'
 }
 
 export const INSERT_EXPLANATION =
@@ -65,4 +73,9 @@ export const UPDATE_SELECTION = {
   NO: 'NO',
   SELF: 'SELF',
   NEXT_INSIDE: 'NEXT_INSIDE'
+}
+
+export const SORT_DIRECTION_NAMES = {
+  [SortDirection.asc]: 'ascending',
+  [SortDirection.desc]: 'descending'
 }

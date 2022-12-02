@@ -2,6 +2,7 @@
 
 import { isNumber } from './numberUtils.js'
 import type { JSONParser } from '../types.js'
+import type { JSONValue } from 'lossless-json'
 
 /**
  * Test whether a value is an Object (and not an Array or Class)
@@ -146,7 +147,7 @@ export function isUrl(text: unknown): boolean {
  * Convert contents of a string to the correct JSON type. This can be a string,
  * a number, a boolean, etc
  */
-export function stringConvert(str: string, parser: JSONParser): unknown {
+export function stringConvert(str: string, parser: JSONParser): JSONValue {
   if (str === '') {
     return ''
   }

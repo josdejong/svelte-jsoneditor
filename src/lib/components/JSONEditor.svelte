@@ -3,7 +3,11 @@
 <script lang="ts">
   import { createDebug } from '../utils/debug'
   import Modal from 'svelte-simple-modal'
-  import { SORT_MODAL_OPTIONS, TRANSFORM_MODAL_OPTIONS } from '../constants.js'
+  import {
+    JSONEDITOR_MODAL_OPTIONS,
+    SORT_MODAL_OPTIONS,
+    TRANSFORM_MODAL_OPTIONS
+  } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
   import {
     isEqualParser,
@@ -12,8 +16,6 @@
     validateContentType
   } from '../utils/jsonUtils'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
-  import TextMode from './modes/textmode/TextMode.svelte'
-  import TreeMode from './modes/treemode/TreeMode.svelte'
   import { javascriptQueryLanguage } from '../plugins/query/javascriptQueryLanguage.js'
   import { renderValue } from '$lib/plugins/value/renderValue'
   import { tick } from 'svelte'
@@ -23,12 +25,11 @@
   import type {
     Content,
     ContentErrors,
+    JSONEditorModalCallback,
     JSONEditorPropsOptional,
     JSONParser,
     JSONPatchResult,
     JSONPathParser,
-    MenuItem,
-    MenuSeparatorItem,
     OnBlur,
     OnChange,
     OnChangeMode,
@@ -36,6 +37,7 @@
     OnChangeStatus,
     OnClassName,
     OnError,
+    OnExpand,
     OnFocus,
     OnRenderMenu,
     OnRenderValue,
@@ -47,9 +49,11 @@
   } from '../types'
   import { Mode } from '../types'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-  import { isMenuSpaceItem } from '../typeguards'
-  import { noop } from 'lodash-es'
+  import { noop } from '../utils/noop'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils'
+  import JSONEditorRoot from './modes/JSONEditorRoot.svelte'
+  import JSONEditorModal from './modals/JSONEditorModal.svelte'
+  import memoizeOne from 'memoize-one'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
@@ -65,6 +69,7 @@
   export let statusBar = true
   export let escapeControlCharacters = false
   export let escapeUnicodeCharacters = false
+  export let flattenColumns = true
   export let parser: JSONParser = JSON
   export let validator: Validator | null = null
   export let validationParser: JSONParser = JSON
@@ -90,13 +95,8 @@
   export let onBlur: OnBlur = noop
 
   let instanceId = uniqueId()
-
   let hasFocus = false
-
-  let refJSONEditor
-  let refTreeMode
-  let refTextMode
-
+  let refJSONEditorRoot
   let open // svelte-simple-modal context open(...)
 
   $: {
@@ -105,6 +105,11 @@
       console.error('Error: ' + contentError)
     }
   }
+
+  // We memoize the last parse result for the case when the content is text and very large.
+  // In that case parsing takes a few seconds. When the user switches between tree and table mode,
+  // without having made a change, we do not want to parse the text again.
+  $: parseMemoizeOne = memoizeOne(parser.parse)
 
   // rerender the full editor when the parser changes. This is needed because
   // numeric state is hold at many places in the editor.
@@ -167,36 +172,20 @@
       }
     }
 
-    if (refTreeMode) {
-      // Note that tree mode has an optional afterPatch callback.
-      // right now we don's support this in the public API.
-      return refTreeMode.patch(operations)
-    }
-
-    if (refTextMode) {
-      return refTextMode.patch(operations)
-    }
+    // Note that patch has an optional afterPatch callback.
+    // right now we don's support this in the public API.
+    return refJSONEditorRoot.patch(operations)
   }
 
-  export function expand(callback?: (path: JSONPath) => boolean): void {
-    if (refTreeMode) {
-      return refTreeMode.expand(callback)
-    } else {
-      throw new Error(`Method expand is not available in mode "${mode}"`)
-    }
+  export function expand(callback?: OnExpand): void {
+    refJSONEditorRoot.expand(callback)
   }
 
   /**
    * Open the transform modal
    */
   export function transform(options: TransformModalOptions): void {
-    if (refTextMode) {
-      refTextMode.openTransformModal(options)
-    } else if (refTreeMode) {
-      refTreeMode.openTransformModal(options)
-    } else {
-      throw new Error(`Method transform is not available in mode "${mode}"`)
-    }
+    refJSONEditorRoot.transform(options)
   }
 
   /**
@@ -204,13 +193,7 @@
    * Returns a parse error or a list with validation warnings
    */
   export function validate(): ContentErrors {
-    if (refTextMode) {
-      return refTextMode.validate()
-    } else if (refTreeMode) {
-      return refTreeMode.validate()
-    } else {
-      throw new Error(`Method validate is not available in mode "${mode}"`)
-    }
+    return refJSONEditorRoot.validate()
   }
 
   /**
@@ -225,46 +208,23 @@
    * will happen, and the contents will be returned as is.
    */
   export function acceptAutoRepair(): Content {
-    if (refTreeMode) {
-      return refTreeMode.acceptAutoRepair()
-    } else {
-      return content
-    }
+    return refJSONEditorRoot.acceptAutoRepair()
   }
 
   export function scrollTo(path: JSONPath): void {
-    if (refTreeMode) {
-      return refTreeMode.scrollTo(path)
-    } else {
-      // TODO: implement scrollTo for text mode
-
-      throw new Error(`Method scrollTo is not available in mode "${mode}"`)
-    }
+    refJSONEditorRoot.scrollTo(path)
   }
 
   export function findElement(path: JSONPath): Element {
-    if (refTreeMode) {
-      return refTreeMode.findElement(path)
-    } else {
-      throw new Error(`Method findElement is not available in mode "${mode}"`)
-    }
+    return refJSONEditorRoot.findElement(path)
   }
 
   export function focus() {
-    if (refTextMode) {
-      refTextMode.focus()
-    } else if (refTreeMode) {
-      refTreeMode.focus()
-    }
+    refJSONEditorRoot.focus()
   }
 
   export function refresh() {
-    if (refTextMode) {
-      refTextMode.refresh()
-    } else {
-      // nothing to do in tree mode (also: don't throw an exception or so,
-      // that annoying having to reckon with that when using .refresh()).
-    }
+    refJSONEditorRoot.refresh()
   }
 
   export function updateProps(props: JSONEditorPropsOptional) {
@@ -281,20 +241,6 @@
     if (onChange) {
       onChange(updatedContent, previousContent, status)
     }
-  }
-
-  async function handleRequestRepair() {
-    mode = Mode.text
-
-    await tick()
-    onChangeMode(Mode.text)
-  }
-
-  async function handleSwitchToTreeMode() {
-    mode = Mode.tree
-
-    await tick()
-    onChangeMode(Mode.tree)
   }
 
   function handleFocus() {
@@ -324,40 +270,6 @@
     onChangeMode(newMode)
   }
 
-  let modeMenuItems: MenuItem[]
-  $: modeMenuItems = [
-    {
-      text: 'text',
-      title: `Switch to text mode (current mode: ${mode})`,
-      // check for 'code' mode is here for backward compatibility (deprecated since v0.4.0)
-      className:
-        'jse-group-button jse-first' +
-        (mode === Mode.text || mode === 'code' ? ' jse-selected' : ''),
-      onClick: () => toggleMode(Mode.text)
-    },
-    {
-      text: 'tree',
-      title: `Switch to tree mode (current mode: ${mode})`,
-      className: 'jse-group-button jse-last' + (mode === Mode.tree ? ' jse-selected' : ''),
-      onClick: () => toggleMode(Mode.tree)
-    }
-  ]
-
-  const separatorMenuItem: MenuSeparatorItem = {
-    separator: true
-  }
-
-  $: handleRenderMenu = (mode: 'tree' | 'text' | 'repair', items: MenuItem[]) => {
-    const updatedItems =
-      mode === 'repair'
-        ? items
-        : isMenuSpaceItem(items[0])
-        ? modeMenuItems.concat(items) // menu is empty, readOnly mode
-        : modeMenuItems.concat(separatorMenuItem, items)
-
-    return onRenderMenu(mode, updatedItems) || updatedItems
-  }
-
   function handleChangeQueryLanguage(newQueryLanguageId: string) {
     debug('handleChangeQueryLanguage', newQueryLanguageId)
     queryLanguageId = newQueryLanguageId
@@ -366,13 +278,7 @@
 
   // The onTransformModal method is located in JSONEditor to prevent circular references:
   //     TreeMode -> TransformModal -> TreeMode
-  function onTransformModal({
-    id,
-    json,
-    selectedPath,
-    onTransform,
-    onClose
-  }: TransformModalCallback) {
+  function onTransformModal({ id, json, rootPath, onTransform, onClose }: TransformModalCallback) {
     if (readOnly) {
       return
     }
@@ -382,10 +288,13 @@
       {
         id,
         json,
-        selectedPath,
+        rootPath,
+        indentation,
         escapeControlCharacters,
         escapeUnicodeCharacters,
         parser,
+        validationParser,
+        pathParser,
         queryLanguages,
         queryLanguageId,
         onChangeQueryLanguage: handleChangeQueryLanguage,
@@ -401,7 +310,7 @@
   }
 
   // The onSortModal is positioned here for consistency with TransformModal
-  function onSortModal({ id, json, selectedPath, onSort, onClose }: SortModalCallback) {
+  function onSortModal({ id, json, rootPath, onSort, onClose }: SortModalCallback) {
     if (readOnly) {
       return
     }
@@ -411,10 +320,54 @@
       {
         id,
         json,
-        selectedPath,
+        rootPath,
         onSort
       },
       SORT_MODAL_OPTIONS,
+      {
+        onClose
+      }
+    )
+  }
+
+  // The onJSONEditorModal method is located in JSONEditor to prevent circular references:
+  //     JSONEditor -> TableMode -> JSONEditorModal -> JSONEditor
+  function onJSONEditorModal({ content, path, onPatch, onClose }: JSONEditorModalCallback) {
+    debug('onJSONEditorModal', { content, path })
+
+    open(
+      JSONEditorModal,
+      {
+        content,
+        path,
+        onPatch,
+
+        readOnly,
+        indentation,
+        tabSize,
+        mainMenuBar,
+        navigationBar,
+        statusBar,
+        escapeControlCharacters,
+        escapeUnicodeCharacters,
+        flattenColumns,
+        parser,
+        validator: undefined, // TODO: support partial JSON validation?
+        validationParser,
+        pathParser,
+
+        // TODO: verify whether we need wrapper functions for the next
+        // onChange, // TODO: cleanup when indeed not needed
+        onRenderValue,
+        onClassName,
+        onRenderMenu,
+        // onError, // TODO: cleanup when indeed not needed
+        // onFocus, // TODO: cleanup when indeed not needed
+        // onBlur, // TODO: cleanup when indeed not needed
+        onSortModal,
+        onTransformModal
+      },
+      JSONEDITOR_MODAL_OPTIONS,
       {
         onClose
       }
@@ -432,64 +385,44 @@
   }
 </script>
 
-<Modal>
-  <ModalRef bind:open />
-  <AbsolutePopup>
-    <div class="jse-main" class:jse-focus={hasFocus} bind:this={refJSONEditor}>
+<AbsolutePopup>
+  <Modal>
+    <ModalRef bind:open />
+    <div class="jse-main" class:jse-focus={hasFocus}>
       {#key instanceId}
-        <!-- check for 'code' is here for backward compatibility (deprecated since v0.4.0) -->
-        {#if mode === Mode.text || mode === 'code'}
-          <TextMode
-            bind:this={refTextMode}
-            externalContent={content}
-            {readOnly}
-            {indentation}
-            {tabSize}
-            {mainMenuBar}
-            {statusBar}
-            {escapeUnicodeCharacters}
-            {parser}
-            {validator}
-            {validationParser}
-            onChange={handleChange}
-            onSwitchToTreeMode={handleSwitchToTreeMode}
-            {onError}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onRenderMenu={handleRenderMenu}
-            {onSortModal}
-            {onTransformModal}
-          />
-        {:else}
-          <!-- mode === Mode.tree -->
-          <TreeMode
-            bind:this={refTreeMode}
-            {readOnly}
-            {indentation}
-            externalContent={content}
-            {mainMenuBar}
-            {navigationBar}
-            {escapeControlCharacters}
-            {escapeUnicodeCharacters}
-            {parser}
-            {validator}
-            {validationParser}
-            {pathParser}
-            {onError}
-            onChange={handleChange}
-            onRequestRepair={handleRequestRepair}
-            {onRenderValue}
-            {onClassName}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            onRenderMenu={handleRenderMenu}
-            {onSortModal}
-            {onTransformModal}
-          />
-        {/if}
+        <JSONEditorRoot
+          bind:this={refJSONEditorRoot}
+          {mode}
+          {content}
+          {readOnly}
+          {indentation}
+          {tabSize}
+          {statusBar}
+          {mainMenuBar}
+          {navigationBar}
+          {escapeControlCharacters}
+          {escapeUnicodeCharacters}
+          {flattenColumns}
+          {parser}
+          {parseMemoizeOne}
+          {validator}
+          {validationParser}
+          {pathParser}
+          {onError}
+          onChange={handleChange}
+          onChangeMode={toggleMode}
+          {onRenderValue}
+          {onClassName}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          {onRenderMenu}
+          {onSortModal}
+          {onTransformModal}
+          {onJSONEditorModal}
+        />
       {/key}
     </div>
-  </AbsolutePopup>
-</Modal>
+  </Modal>
+</AbsolutePopup>
 
 <style src="./JSONEditor.scss"></style>

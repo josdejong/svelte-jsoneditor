@@ -4,12 +4,84 @@ import { sortBy } from 'lodash-es'
 import {
   fastPatchSort,
   sortArray,
+  sortJson,
   sortObjectKeys,
   sortOperationsMove,
   sortOperationsMoveAdvanced
 } from './sort.js'
 
 describe('sort', () => {
+  describe('sortJson', () => {
+    it('should sort an arbitrary json object in ascending order', () => {
+      const object = { b: 1, c: 1, a: 1 }
+
+      assert.deepStrictEqual(sortJson(object, undefined, undefined, 1), [
+        { op: 'move', from: '/a', path: '/a' },
+        { op: 'move', from: '/b', path: '/b' },
+        { op: 'move', from: '/c', path: '/c' }
+      ])
+    })
+
+    it('should sort an arbitrary json object in descending order', () => {
+      const object = { b: 1, c: 1, a: 1 }
+
+      assert.deepStrictEqual(sortJson(object, undefined, undefined, -1), [
+        { op: 'move', from: '/c', path: '/c' },
+        { op: 'move', from: '/b', path: '/b' },
+        { op: 'move', from: '/a', path: '/a' }
+      ])
+    })
+
+    it('should sort object keys using a rootPath', () => {
+      const object = {
+        root: {
+          path: { b: 1, c: 1, a: 1 }
+        }
+      }
+
+      assert.deepStrictEqual(sortJson(object, ['root', 'path']), [
+        { op: 'move', from: '/root/path/a', path: '/root/path/a' },
+        { op: 'move', from: '/root/path/b', path: '/root/path/b' },
+        { op: 'move', from: '/root/path/c', path: '/root/path/c' }
+      ])
+    })
+
+    it('should sort an array', () => {
+      assert.deepStrictEqual(sortJson([2, 3, 1]), [{ op: 'replace', path: '', value: [1, 2, 3] }])
+      assert.deepStrictEqual(sortJson([2, 3, 1], undefined, undefined, -1), [
+        { op: 'replace', path: '', value: [3, 2, 1] }
+      ])
+    })
+
+    it('should sort array by nested properties and a direction', () => {
+      const a = { data: { value: 1 } }
+      const b = { data: { value: 2 } }
+      const c = { data: { value: 3 } }
+
+      assert.deepStrictEqual(sortJson([b, a, c], undefined, ['data', 'value']), [
+        { op: 'replace', path: '', value: [a, b, c] }
+      ])
+      assert.deepStrictEqual(sortJson([b, a, c], undefined, ['data', 'value'], 1), [
+        { op: 'replace', path: '', value: [a, b, c] }
+      ])
+      assert.deepStrictEqual(sortJson([b, a, c], undefined, ['data', 'value'], -1), [
+        { op: 'replace', path: '', value: [c, b, a] }
+      ])
+    })
+
+    it('should sort array using a rootPath', () => {
+      const json = {
+        root: {
+          path: [2, 3, 1]
+        }
+      }
+
+      assert.deepStrictEqual(sortJson(json, ['root', 'path']), [
+        { op: 'replace', path: '/root/path', value: [1, 2, 3] }
+      ])
+    })
+  })
+
   it('should sort object keys', () => {
     const object = { b: 1, c: 1, a: 1 }
 
@@ -84,7 +156,7 @@ describe('sort', () => {
     ])
   })
 
-  it('should sort array by nested properties and custom direction', () => {
+  it('should sort array by nested properties and a direction', () => {
     const a = { data: { value: 1 } }
     const b = { data: { value: 2 } }
     const c = { data: { value: 3 } }

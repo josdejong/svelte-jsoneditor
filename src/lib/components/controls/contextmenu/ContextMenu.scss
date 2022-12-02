@@ -1,4 +1,4 @@
-@import '../../../../styles.scss';
+@import '../../../styles.scss';
 
 .jse-contextmenu {
   box-shadow: var(--jse-controls-box-shadow);
@@ -7,14 +7,6 @@
   font-size: var(--jse-font-size);
   background: var(--jse-context-menu-background);
   color: var(--jse-context-menu-color);
-
-  button {
-    @include jsoneditor-button;
-
-    &:focus {
-      background: var(--jse-context-menu-background-highlight);
-    }
-  }
 
   .jse-row {
     display: flex;
@@ -41,49 +33,12 @@
 
       display: flex;
       flex-direction: row;
-      align-items: center;
+      align-items: start;
       gap: $padding;
       border-radius: $border-radius;
 
-      div {
-        vertical-align: middle;
-      }
-    }
-
-    button {
-      flex: 1;
-      white-space: nowrap;
-      padding: $padding;
-      color: inherit;
-
-      &:hover {
-        background: var(--jse-context-menu-background-highlight);
-      }
-
-      &:disabled {
-        color: var(--jse-context-menu-color-disabled);
-        background: unset;
-      }
-
-      .jse-insert {
-        $size: 18px;
-
-        display: inline-block;
-        position: relative;
-        width: $size;
-        height: $size;
-
-        font-family: var(--jse-font-family-mono);
-        font-weight: bold;
-        font-size: 16px; // fixed, to stay the same as the icons
-
-        .jse-quote,
-        .jse-plus {
-          position: absolute;
-          top: -4px;
-          left: 2px;
-          font-size: 24px;
-        }
+      div.jse-tip-icon {
+        padding-top: $padding-half;
       }
     }
   }
@@ -96,11 +51,6 @@
 
     &:not(:last-child) {
       border-right: 1px solid var(--jse-context-menu-separator-color);
-    }
-
-    button {
-      text-align: left;
-      min-width: 130px;
     }
   }
 

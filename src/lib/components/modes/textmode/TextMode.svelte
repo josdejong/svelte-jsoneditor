@@ -45,20 +45,24 @@
     JSONPatchResult,
     OnBlur,
     OnChange,
+    OnChangeMode,
     OnError,
     OnFocus,
     OnRenderMenu,
+    OnSortModal,
+    OnTransformModal,
     ParseError,
     RichValidationError,
-    SortModalCallback,
-    TransformModalCallback,
+    TransformModalOptions,
     ValidationError,
     Validator
   } from '../../../types'
-  import { ValidationSeverity } from '../../../types'
+  import { Mode, ValidationSeverity } from '../../../types'
   import { isContentParseError, isContentValidationErrors } from '../../../typeguards'
   import memoizeOne from 'memoize-one'
   import { validateText } from '../../../logic/validation'
+  import { MAX_CHARACTERS_TEXT_PREVIEW } from '$lib/constants.js'
+  import { truncate } from '$lib/utils/stringUtils.js'
 
   export let readOnly: boolean
   export let mainMenuBar: boolean
@@ -71,13 +75,13 @@
   export let validator: Validator | null
   export let validationParser: JSONParser
   export let onChange: OnChange
-  export let onSwitchToTreeMode: () => void
+  export let onChangeMode: OnChangeMode
   export let onError: OnError
   export let onFocus: OnFocus
   export let onBlur: OnBlur
   export let onRenderMenu: OnRenderMenu
-  export let onSortModal: (props: SortModalCallback) => void
-  export let onTransformModal: (props: TransformModalCallback) => void
+  export let onSortModal: OnSortModal
+  export let onTransformModal: OnTransformModal
 
   const debug = createDebug('jsoneditor:TextMode')
 
@@ -108,8 +112,6 @@
 
   let content: Content = externalContent
   let text = getText(content, indentation, parser) // text is just a cached version of content.text or parsed content.json
-  let editorDisabled = disableTextEditor(text, acceptTooLarge)
-  $: isNewDocument = text.length === 0
 
   $: normalization = createNormalizationFunctions({
     escapeControlCharacters: false,
@@ -139,7 +141,9 @@
     try {
       codeMirrorView = createCodeMirrorView({
         target: codeMirrorRef,
-        initialText: !editorDisabled ? normalization.escapeValue(text) : '',
+        initialText: !disableTextEditor(text, acceptTooLarge)
+          ? normalization.escapeValue(text)
+          : '',
         readOnly,
         indentation
       })
@@ -267,8 +271,8 @@
       onSortModal({
         id: sortModalId,
         json,
-        selectedPath: [],
-        onSort: async (operations) => {
+        rootPath: [],
+        onSort: async ({ operations }) => {
           debug('onSort', operations)
           patch(operations)
         },
@@ -284,13 +288,13 @@
 
   /**
    * This method is exposed via JSONEditor.transform
-   * @param {Object} options
-   * @property {string} [id]
-   * @property {JSONPath} [selectedPath]
-   * @property {({ operations: JSONPatchDocument, json: JSONValue, transformedJson: JSONValue }) => void} [onTransform]
-   * @property {() => void} [onClose]
    */
-  export function openTransformModal({ id, selectedPath, onTransform, onClose }) {
+  export function openTransformModal({
+    id,
+    rootPath,
+    onTransform,
+    onClose
+  }: TransformModalOptions) {
     try {
       const json = parser.parse(text)
 
@@ -299,7 +303,7 @@
       onTransformModal({
         id: id || transformModalId,
         json,
-        selectedPath,
+        rootPath,
         onTransform: onTransform
           ? (operations) => {
               onTransform({
@@ -331,7 +335,7 @@
     }
 
     openTransformModal({
-      selectedPath: []
+      rootPath: []
     })
   }
 
@@ -371,6 +375,10 @@
   function handleAcceptTooLarge() {
     acceptTooLarge = true
     setCodeMirrorContent(externalContent, true)
+  }
+
+  function handleSwitchToTreeMode() {
+    onChangeMode(Mode.tree)
   }
 
   function cancelLoadTooLarge() {
@@ -549,32 +557,28 @@
 
   function setCodeMirrorContent(newContent: Content, forceUpdate = false) {
     const newText = getText(newContent, indentation, parser)
-
-    editorDisabled = disableTextEditor(newText, acceptTooLarge)
-    if (editorDisabled) {
-      debug('externalContent not applying text: editor is disabled')
-      return
-    }
-
     const isChanged = !isEqual(newContent, content)
-    debug('setCodeMirrorContent', { isChanged, forceUpdate })
-    if (!codeMirrorView || (!isChanged && !forceUpdate)) {
-      return
-    }
-
     const previousContent = content
     content = newContent
     text = newText
 
-    // keep state
-    // to reset state: codeMirrorView.setState(EditorState.create({doc: text, extensions: ...}))
-    codeMirrorView.dispatch({
-      changes: {
-        from: 0,
-        to: codeMirrorView.state.doc.length,
-        insert: normalization.escapeValue(text)
-      }
-    })
+    debug('setCodeMirrorContent', { isChanged, forceUpdate })
+
+    if (!codeMirrorView || (!isChanged && !forceUpdate)) {
+      return
+    }
+
+    if (!disableTextEditor(text, acceptTooLarge)) {
+      // keep state
+      // to reset state: codeMirrorView.setState(EditorState.create({doc: text, extensions: ...}))
+      codeMirrorView.dispatch({
+        changes: {
+          from: 0,
+          to: codeMirrorView.state.doc.length,
+          insert: normalization.escapeValue(text)
+        }
+      })
+    }
 
     updateCanUndoRedo()
     if (isChanged) {
@@ -721,7 +725,7 @@
   let jsonParseError: ParseError | null = null
 
   function linterCallback(): Diagnostic[] {
-    if (editorDisabled) {
+    if (disableTextEditor(text, acceptTooLarge)) {
       return []
     }
 
@@ -786,6 +790,8 @@
 
 <div class="jse-text-mode" class:no-main-menu={!mainMenuBar} bind:this={domTextMode}>
   {#if mainMenuBar}
+    {@const isNewDocument = text.length === 0}
+
     <TextMenu
       {readOnly}
       onFormat={handleFormat}
@@ -806,6 +812,10 @@
   {/if}
 
   {#if !isSSR}
+    {@const editorDisabled = disableTextEditor(text, acceptTooLarge)}
+
+    <div class="jse-contents" class:jse-hidden={editorDisabled} bind:this={codeMirrorRef} />
+
     {#if editorDisabled}
       <Message
         icon={faExclamationTriangle}
@@ -827,7 +837,7 @@
           {
             text: 'Open in tree mode',
             title: 'Open the document in tree mode. Tree mode can handle large documents.',
-            onClick: onSwitchToTreeMode
+            onClick: handleSwitchToTreeMode
           },
           {
             text: 'Cancel',
@@ -836,15 +846,17 @@
           }
         ]}
       />
-    {/if}
 
-    <div class="jse-contents" class:jse-hidden={editorDisabled} bind:this={codeMirrorRef} />
-
-    {#if statusBar}
-      <StatusBar {editorState} />
+      <div class="jse-contents jse-preview">
+        {truncate(text || '', MAX_CHARACTERS_TEXT_PREVIEW)}
+      </div>
     {/if}
 
     {#if !editorDisabled}
+      {#if statusBar}
+        <StatusBar {editorState} />
+      {/if}
+
       {#if jsonParseError}
         <Message
           type="error"

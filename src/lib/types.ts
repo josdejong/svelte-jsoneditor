@@ -24,7 +24,8 @@ export interface VisibleSection {
 
 export enum Mode {
   text = 'text',
-  tree = 'tree'
+  tree = 'tree',
+  table = 'table'
 }
 
 export enum SelectionType {
@@ -52,6 +53,7 @@ export interface DocumentState {
   enforceStringMap: JSONPointerMap<boolean>
   visibleSectionsMap: JSONPointerMap<VisibleSection[]>
   selection: JSONSelection | undefined
+  sortedColumn: SortedColumn | undefined
 }
 
 export interface JSONPatchResult {
@@ -120,15 +122,8 @@ export type ClipboardValues = Array<{ key: string; value: JSONValue }>
  */
 export type FontAwesomeIcon = IconDefinition
 
-export interface DropdownButtonItem {
-  text: string
-  onClick: () => void
-  icon?: IconDefinition
-  title?: string
-  disabled?: boolean
-}
-
-export interface MenuButtonItem {
+export interface MenuButton {
+  type: 'button'
   onClick: () => void
   icon?: IconDefinition
   text?: string
@@ -137,15 +132,67 @@ export interface MenuButtonItem {
   disabled?: boolean
 }
 
+export interface MenuDropDownButton {
+  type: 'dropdown-button'
+  main: MenuButton
+  width?: string
+  items: MenuButton[]
+}
+
+/**
+ * @deprecated: DropdownButtonItem is renamed to MenuButton
+ */
+export type DropdownButtonItem = MenuButton
+
+/**
+ * @deprecated: MenuButtonItem is renamed to MenuButton
+ */
+export type MenuButtonItem = MenuButton
+
+export interface MenuLabel {
+  type: 'label'
+  text: string
+}
+
+export interface MenuSeparator {
+  type: 'separator'
+}
+
+/**
+ * @deprecated: MenuSeparatorItem is replaced with MenuSeparator
+ */
 export interface MenuSeparatorItem {
+  /**
+   * @deprecated: MenuSeparatorItem is replaced with MenuSeparator
+   */
   separator: true
 }
 
+export interface MenuSpace {
+  type: 'space'
+}
+
+/**
+ * @deprecated: MenuSpaceItem is replaced with MenuSpace
+ */
 export interface MenuSpaceItem {
+  /**
+   * @deprecated: MenuSpaceItem is replaced with MenuSpace
+   */
   space: true
 }
 
-export type MenuItem = MenuButtonItem | MenuSeparatorItem | MenuSpaceItem
+export type MenuItem = MenuButton | MenuSeparator | MenuSeparatorItem | MenuSpace | MenuSpaceItem
+
+export type ContextMenuColumn = {
+  type: 'column'
+  items: Array<MenuButton | MenuDropDownButton | MenuLabel | MenuSeparator>
+}
+export type ContextMenuRow = {
+  type: 'row'
+  items: Array<MenuButton | MenuDropDownButton | ContextMenuColumn>
+}
+export type ContextMenuItem = MenuButton | MenuDropDownButton | MenuSeparator | ContextMenuRow
 
 export interface MessageAction {
   text: string
@@ -246,21 +293,32 @@ export type OnChange =
   | null
 export type OnSelect = (selection: JSONSelection) => void
 export type OnPatch = (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
-export type OnSort = (operations: JSONPatchDocument) => void
+export type OnChangeText = (updatedText: string, afterPatch?: AfterPatchCallback) => void
+export type OnSort = (params: {
+  operations: JSONPatchDocument
+  rootPath
+  itemPath: JSONPath
+  direction: 1 | -1
+}) => void
 export type OnFind = (findAndReplace: boolean) => void
 export type OnPaste = (pastedText: string) => void
 export type OnPasteJson = (pastedJson: { path: JSONPath; contents: JSONValue }) => void
+export type OnExpand = (path: JSONPath) => boolean
 export type OnRenderValue = (props: RenderValueProps) => RenderValueComponentDescription[]
 export type OnClassName = (path: JSONPath, value: JSONValue) => string | undefined
 export type OnChangeMode = (mode: Mode) => void
 export type OnContextMenu = (contextMenuProps: AbsolutePopupOptions) => void
 export type OnRenderMenu = (
-  mode: 'tree' | 'text' | 'repair',
+  mode: 'tree' | 'text' | 'table',
   items: MenuItem[]
-) => MenuItem[] | undefined | void
+) => MenuItem[] | undefined
 export type OnError = (error: Error) => void
 export type OnFocus = () => void
 export type OnBlur = () => void
+export type OnSortModal = (props: SortModalCallback) => void
+export type OnTransformModal = (props: TransformModalCallback) => void
+export type OnJSONEditorModal = (props: JSONEditorModalCallback) => void
+export type FindNextInside = (path: JSONPath) => JSONSelection | undefined
 
 export interface SearchResult {
   items: ExtendedSearchResultItem[]
@@ -379,22 +437,29 @@ export interface JSONEditorPropsOptional {
   onBlur?: OnBlur
 }
 
-export interface TreeModeContext {
+export interface JSONEditorContext {
   readOnly: boolean
   parser: JSONParser
   normalization: ValueNormalization
   getJson: () => JSONValue
   getDocumentState: () => DocumentState
   findElement: (path: JSONPath) => Element | null
+  findNextInside: FindNextInside
   focus: () => void
   onPatch: (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => JSONPatchResult
-  onInsert: (type: InsertType) => void
-  onExpand: (path: JSONPath, expanded: boolean, recursive?: boolean) => void
   onSelect: OnSelect
   onFind: OnFind
-  onExpandSection: (path: JSONPath, section: Section) => void
   onPasteJson: (newPastedJson: PastedJson) => void
   onRenderValue: OnRenderValue
+}
+
+export interface TreeModeContext extends JSONEditorContext {
+  getJson: () => JSONValue
+  getDocumentState: () => DocumentState
+  findElement: (path: JSONPath) => Element | null
+  onInsert: (type: InsertType) => void
+  onExpand: (path: JSONPath, expanded: boolean, recursive?: boolean) => void
+  onExpandSection: (path: JSONPath, section: Section) => void
   onContextMenu: OnContextMenu
   onClassName: OnClassName
   onDrag: (event: Event) => void
@@ -408,7 +473,6 @@ export interface RenderValuePropsOptional {
   enforceString?: boolean
   selection?: JSONSelection
   searchResultItems?: SearchResultItem[]
-  isSelected?: boolean
   isEditing?: boolean
   parser?: JSONParser
   normalization?: ValueNormalization
@@ -416,6 +480,7 @@ export interface RenderValuePropsOptional {
   onPasteJson?: OnPasteJson
   onSelect?: OnSelect
   onFind?: OnFind
+  findNextInside?: FindNextInside
   focus?: () => void
 }
 
@@ -426,7 +491,6 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   enforceString: boolean
   selection: JSONSelection | undefined
   searchResultItems: SearchResultItem[] | undefined
-  isSelected: boolean
   isEditing: boolean
   parser: JSONParser
   normalization: ValueNormalization
@@ -434,6 +498,7 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   onPasteJson: OnPasteJson
   onSelect: OnSelect
   onFind: OnFind
+  findNextInside: FindNextInside
   focus: () => void
 }
 
@@ -483,7 +548,7 @@ export interface RenderValueComponentDescription {
 
 export interface TransformModalOptions {
   id?: string
-  selectedPath?: JSONPath
+  rootPath?: JSONPath
   onTransform?: (state: {
     operations: JSONPatchDocument
     json: JSONValue
@@ -492,22 +557,40 @@ export interface TransformModalOptions {
   onClose?: () => void
 }
 
-export interface TransformModalCallback extends TransformModalOptions {
+export interface TransformModalCallback {
   id: string
-  selectedPath: JSONPath
+  rootPath: JSONPath
   json: JSONValue
-  onTransform: (state: {
-    operations: JSONPatchDocument
-    json: JSONValue
-    transformedJson: JSONValue
-  }) => void
+  onTransform: (operations: JSONPatchDocument) => void
   onClose: () => void
 }
 
 export interface SortModalCallback {
   id: string
   json: JSONValue
-  selectedPath: JSONPath
+  rootPath: JSONPath
   onSort: OnSort
   onClose: () => void
+}
+
+export interface JSONEditorModalCallback {
+  content: Content
+  path: JSONPath
+  onPatch: OnPatch
+  onClose: () => void
+}
+
+export enum SortDirection {
+  asc = 'asc',
+  desc = 'desc'
+}
+
+export interface TableCellIndex {
+  rowIndex: number
+  columnIndex: number
+}
+
+export interface SortedColumn {
+  path: JSONPath
+  sortDirection: SortDirection
 }

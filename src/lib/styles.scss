@@ -25,6 +25,37 @@ $errors-overview-max-height: 25%;
   margin: 0;
 }
 
+@mixin jsoneditor-context-menu-button {
+  @include jsoneditor-button;
+
+  flex: 1;
+  white-space: nowrap;
+  padding: $padding;
+  color: inherit;
+
+  &:hover {
+    background: var(--jse-context-menu-background-highlight);
+  }
+
+  &:focus {
+    background: var(--jse-context-menu-background-highlight);
+    z-index: 1;
+  }
+
+  &:disabled {
+    color: var(--jse-context-menu-color-disabled);
+    background: unset;
+  }
+
+  &.left {
+    text-align: left;
+  }
+
+  :global(svg) {
+    width: 16px;
+  }
+}
+
 @mixin jsoneditor-button-primary {
   @include jsoneditor-button;
 
@@ -39,5 +70,41 @@ $errors-overview-max-height: 25%;
 
   &:disabled {
     background: var(--jse-button-primary-background-disabled);
+  }
+}
+
+@mixin jsoneditor-button-secondary {
+  @include jsoneditor-button;
+
+  background: var(--jse-button-secondary-background);
+  color: var(--jse-button-secondary-color);
+  padding: $padding $padding-double;
+  border-radius: $border-radius;
+
+  &:hover {
+    background: var(--jse-button-secondary-background-highlight);
+  }
+
+  &:disabled {
+    background: var(--jse-button-secondary-background-disabled);
+  }
+}
+
+@mixin modal-input-mixin {
+  border: var(--jse-input-border);
+  outline: none;
+  box-sizing: border-box;
+  padding: $padding-half;
+  font-family: var(--jse-font-family-mono);
+  font-size: var(--jse-font-size-mono);
+  color: inherit;
+  background: var(--jse-input-background);
+
+  &:focus {
+    border: var(--jse-input-border-focus);
+  }
+
+  &:read-only {
+    background: var(--jse-input-background-readonly);
   }
 }

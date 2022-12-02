@@ -14,8 +14,7 @@
   import { faJSONEditorCollapse, faJSONEditorExpand } from '$lib/img/customFontawesomeIcons'
   import { isObjectOrArray } from '$lib/utils/typeUtils'
   import Menu from '../../../controls/Menu.svelte'
-  import { noop } from 'lodash-es'
-  import type { OnRenderMenu, JSONSelection } from '$lib/types'
+  import type { JSONSelection, MenuItem, OnRenderMenu } from '$lib/types'
   import type { JSONValue } from 'immutable-json-patch'
   import { isKeySelection, isMultiSelection, isValueSelection } from '../../../../logic/selection'
   import type { HistoryState } from '../../../../logic/history'
@@ -27,16 +26,15 @@
   export let showSearch = false
   export let historyState: HistoryState
 
-  export let onExpandAll
-  export let onCollapseAll
-  export let onUndo
-  export let onRedo
-  export let onSort
-  export let onTransform
-  export let onContextMenu
-  export let onCopy
-
-  export let onRenderMenu: OnRenderMenu = noop
+  export let onExpandAll: () => void
+  export let onCollapseAll: () => void
+  export let onUndo: () => void
+  export let onRedo: () => void
+  export let onSort: () => void
+  export let onTransform: () => void
+  export let onContextMenu: () => void
+  export let onCopy: () => void
+  export let onRenderMenu: OnRenderMenu
 
   function handleToggleSearch() {
     showSearch = !showSearch
@@ -48,7 +46,9 @@
     hasJson &&
     (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))
 
+  let expandMenuItem: MenuItem
   $: expandMenuItem = {
+    type: 'button',
     icon: faJSONEditorExpand,
     title: 'Expand all',
     className: 'jse-expand-all',
@@ -56,14 +56,19 @@
     disabled: !isObjectOrArray(json)
   }
 
+  let collapseMenuItem: MenuItem
   $: collapseMenuItem = {
+    type: 'button',
     icon: faJSONEditorCollapse,
     title: 'Collapse all',
     className: 'jse-collapse-all',
     onClick: onCollapseAll,
     disabled: !isObjectOrArray(json)
   }
+
+  let searchMenuItem: MenuItem
   $: searchMenuItem = {
+    type: 'button',
     icon: faSearch,
     title: 'Search (Ctrl+F)',
     className: 'jse-search',
@@ -71,15 +76,16 @@
     disabled: json === undefined
   }
 
-  /* @type {MenuItem[]} */
+  let defaultItems: MenuItem[]
   $: defaultItems = !readOnly
     ? [
         expandMenuItem,
         collapseMenuItem,
         {
-          separator: true
+          type: 'separator'
         },
         {
+          type: 'button',
           icon: faSortAmountDownAlt,
           title: 'Sort',
           className: 'jse-sort',
@@ -87,6 +93,7 @@
           disabled: readOnly || json === undefined
         },
         {
+          type: 'button',
           icon: faFilter,
           title: 'Transform contents (filter, sort, project)',
           className: 'jse-transform',
@@ -95,15 +102,17 @@
         },
         searchMenuItem,
         {
+          type: 'button',
           icon: faEllipsisV,
           title: CONTEXT_MENU_EXPLANATION,
           className: 'jse-contextmenu',
           onClick: onContextMenu
         },
         {
-          separator: true
+          type: 'separator'
         },
         {
+          type: 'button',
           icon: faUndo,
           title: 'Undo (Ctrl+Z)',
           className: 'jse-undo',
@@ -111,6 +120,7 @@
           disabled: !historyState.canUndo
         },
         {
+          type: 'button',
           icon: faRedo,
           title: 'Redo (Ctrl+Shift+Z)',
           className: 'jse-redo',
@@ -118,16 +128,17 @@
           disabled: !historyState.canRedo
         },
         {
-          space: true
+          type: 'space'
         }
       ]
     : [
         expandMenuItem,
         collapseMenuItem,
         {
-          separator: true
+          type: 'separator'
         },
         {
+          type: 'button',
           icon: faCopy,
           title: 'Copy (Ctrl+C)',
           className: 'jse-copy',
@@ -135,11 +146,11 @@
           disabled: !hasSelectionContents
         },
         {
-          separator: true
+          type: 'separator'
         },
         searchMenuItem,
         {
-          space: true
+          type: 'space'
         }
       ]
 

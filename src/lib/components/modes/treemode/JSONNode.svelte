@@ -2,7 +2,6 @@
 
 <script lang="ts">
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
-  import classnames from 'classnames'
   import type {
     JSONArray,
     JSONObject,
@@ -20,7 +19,7 @@
     HOVER_INSERT_INSIDE,
     INSERT_EXPLANATION
   } from '$lib/constants'
-  import { getVisibleCaretPositions } from '$lib/logic/documentState'
+  import { getEnforceString, getVisibleCaretPositions } from '$lib/logic/documentState'
   import { rename } from '$lib/logic/operations'
   import {
     createAfterSelection,
@@ -30,10 +29,14 @@
     fromSelectionType,
     getEndPath,
     getSelectionPaths,
+    getStartPath,
+    isAfterSelection,
     isInsideSelection,
     isKeySelection,
+    isMultiSelection,
     isPathInsideSelection,
-    isValueSelection
+    isValueSelection,
+    selectionIfOverlapping
   } from '$lib/logic/selection'
   import {
     encodeDataPath,
@@ -44,7 +47,7 @@
     isContentEditableDiv
   } from '$lib/utils/domUtils'
   import CollapsedItems from './CollapsedItems.svelte'
-  import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
+  import ContextMenuPointer from '$lib/components/controls/contextmenu/ContextMenuPointer.svelte'
   import JSONKey from './JSONKey.svelte'
   import JSONValue from './JSONValue.svelte'
   import { singleton } from './singleton.js'
@@ -65,18 +68,12 @@
     VisibleSection
   } from '$lib/types'
   import { SelectionType } from '$lib/types'
-  import {
-    getStartPath,
-    isAfterSelection,
-    isMultiSelection,
-    selectionIfOverlapping
-  } from '../../../logic/selection'
-  import { filterPointerOrUndefined } from '../../../utils/jsonPointer.js'
-  import { filterKeySearchResults, filterValueSearchResults } from '../../../logic/search.js'
-  import { createMemoizePath } from '../../../utils/pathUtils'
-  import { getEnforceString } from '../../../logic/documentState'
+  import { filterPointerOrUndefined } from '$lib/utils/jsonPointer.js'
+  import { filterKeySearchResults, filterValueSearchResults } from '$lib/logic/search.js'
+  import { createMemoizePath } from '$lib/utils/pathUtils'
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
   import { isObject } from '$lib/utils/typeUtils.js'
+  import { classnames } from '$lib/utils/cssUtils.js'
 
   export let value: JSONValueType
   export let path: JSONPath
@@ -638,6 +635,7 @@
                 {value.length}
                 {value.length === 1 ? 'item' : 'items'}
               </span>
+              &nbsp;
             {:else}
               <div class="jse-bracket">[</div>
               <button type="button" class="jse-tag" on:click={handleExpand}>
@@ -649,8 +647,8 @@
           </div>
         </div>
         {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
-          <div class="jse-context-menu-button-anchor">
-            <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
+          <div class="jse-context-menu-pointer-anchor">
+            <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
       </div>
@@ -684,7 +682,7 @@
             style={getIndentationStyle(path.length + 1)}
             title={INSERT_EXPLANATION}
           >
-            <ContextMenuButton
+            <ContextMenuPointer
               selected={isSelected && isInsideSelection(selection)}
               onContextMenu={handleInsertInsideOpenContextMenu}
             />
@@ -770,8 +768,8 @@
           </div>
         </div>
         {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
-          <div class="jse-context-menu-button-anchor">
-            <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
+          <div class="jse-context-menu-pointer-anchor">
+            <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
       </div>
@@ -805,7 +803,7 @@
             style={getIndentationStyle(path.length + 1)}
             title={INSERT_EXPLANATION}
           >
-            <ContextMenuButton
+            <ContextMenuPointer
               selected={isSelected && isInsideSelection(selection)}
               onContextMenu={handleInsertInsideOpenContextMenu}
             />
@@ -863,14 +861,13 @@
           {path}
           {value}
           {enforceString}
-          {isSelected}
           selection={isSelected ? selection : undefined}
           searchResultItems={filterValueSearchResults(searchResultItemsMap, pointer)}
           {context}
         />
         {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
-          <div class="jse-context-menu-button-anchor">
-            <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
+          <div class="jse-context-menu-pointer-anchor">
+            <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
       </div>
@@ -896,7 +893,7 @@
       style={indentationStyle}
       title={INSERT_EXPLANATION}
     >
-      <ContextMenuButton
+      <ContextMenuPointer
         selected={isSelected && isAfterSelection(selection)}
         onContextMenu={handleInsertAfterOpenContextMenu}
       />

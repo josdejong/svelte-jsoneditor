@@ -2,20 +2,27 @@
 
 <script lang="ts">
   import Icon from 'svelte-awesome'
-  import type { MenuItem } from '../../types'
+  import type { MenuItem } from '$lib/types'
+  import { isMenuSeparator, isMenuSpace } from '$lib/typeguards'
+  import { isMenuButton } from '$lib/typeguards.js'
 
   export let items: MenuItem[] = []
+
+  function unknownMenuItem(item: MenuItem): string {
+    console.error('Unknown type of menu item', item)
+    return '???'
+  }
 </script>
 
 <div class="jse-menu">
   <slot name="left" />
 
   {#each items as item}
-    {#if item.separator === true}
+    {#if isMenuSeparator(item)}
       <div class="jse-separator" />
-    {:else if item.space === true}
+    {:else if isMenuSpace(item)}
       <div class="jse-space" />
-    {:else}
+    {:else if isMenuButton(item)}
       <button
         type="button"
         class="jse-button {item.className}"
@@ -30,6 +37,8 @@
           {item.text}
         {/if}
       </button>
+    {:else}
+      {unknownMenuItem(item)}
     {/if}
   {/each}
 

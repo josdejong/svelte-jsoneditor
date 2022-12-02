@@ -4,10 +4,10 @@
 button.jse-validation-error {
   @include jsoneditor-button;
 
-  color: var(--jse-warning-color);
-  padding: 0 $input-padding;
+  padding: 0;
   margin: 0;
-  font-size: var(--jse-font-size-mono);
-  height: var(--jse-line-height);
-  overflow: hidden;
+  vertical-align: top;
+  display: inline-flex;
+
+  color: var(--jse-warning-color);
 }

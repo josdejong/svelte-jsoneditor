@@ -3,12 +3,12 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
   import { addNewLineSuffix, removeNewLineSuffix, setCursorToEnd } from '$lib/utils/domUtils'
-  import { keyComboFromEvent } from '../../utils/keyBindings'
-  import { createDebug } from '../../utils/debug'
-  import classnames from 'classnames'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings'
+  import { createDebug } from '$lib/utils/debug'
   import { noop } from 'lodash-es'
-  import { UPDATE_SELECTION } from '../../constants.js'
-  import type { OnFind, OnPaste } from '../../types'
+  import { UPDATE_SELECTION } from '$lib/constants.js'
+  import type { OnFind, OnPaste } from '$lib/types'
+  import { classnames } from '$lib/utils/cssUtils.js'
 
   const debug = createDebug('jsoneditor:EditableDiv')
 

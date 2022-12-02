@@ -100,7 +100,7 @@
 
   .jse-insert-area {
     &.jse-selected {
-      :global(.jse-context-menu-button) {
+      :global(.jse-context-menu-pointer) {
         background: $insert-area-background;
 
         &:hover {

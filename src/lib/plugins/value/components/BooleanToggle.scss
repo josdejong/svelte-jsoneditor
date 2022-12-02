@@ -1,11 +1,12 @@
 @import '../../../styles';
 
 .jse-boolean-toggle {
+  padding: 0;
+  margin: 1px 0 0;
+  vertical-align: top;
+  display: inline-flex;
+
   color: var(--jse-value-color-boolean);
-  position: relative;
-  padding-left: $padding-half;
-  padding-top: 1px;
-  height: var(--jse-line-height);
 }
 
 .jse-boolean-toggle:not(.jse-readonly) {

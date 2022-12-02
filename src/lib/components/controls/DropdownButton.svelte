@@ -5,9 +5,9 @@
   import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
   import { onDestroy, onMount } from 'svelte'
   import { keyComboFromEvent } from '../../utils/keyBindings'
-  import type { DropdownButtonItem } from '../../types'
+  import type { MenuButton } from '../../types'
 
-  export let items: DropdownButtonItem[] = []
+  export let items: MenuButton[] = []
   export let title: string | undefined = undefined
   export let width = '120px'
 
@@ -69,6 +69,7 @@
             on:click={() => item.onClick()}
             title={item.title}
             disabled={item.disabled}
+            class={item.className}
           >
             {#if item.icon}
               <Icon data={item.icon} />

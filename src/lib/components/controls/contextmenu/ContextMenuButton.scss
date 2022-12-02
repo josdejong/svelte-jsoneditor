@@ -1,0 +1,5 @@
+@import '../../../styles.scss';
+
+button.jse-context-menu-button {
+  @include jsoneditor-context-menu-button;
+}

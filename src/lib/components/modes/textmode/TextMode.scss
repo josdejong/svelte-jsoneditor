@@ -14,6 +14,7 @@
   .jse-contents {
     flex: 1;
     display: flex;
+    position: relative;
     flex-direction: column;
     overflow: hidden;
     min-width: 0;
@@ -27,7 +28,13 @@
     }
 
     &.jse-hidden {
+      // the code mirror editor must stay rendered
+      // and must keep height, else it will get into
+      // an infinite loop when rendering it again.
       visibility: hidden;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
 
     :global(.cm-editor) {
@@ -165,6 +172,15 @@
       box-sizing: border-box;
       font-family: var(--jse-font-family);
       font-size: var(--jse-font-size);
+    }
+
+    &.jse-preview {
+      flex: 1;
+      color: var(--jse-panel-color-readonly);
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      padding: 2px;
     }
   }
 }

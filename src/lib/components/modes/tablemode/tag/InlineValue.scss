@@ -1,0 +1,20 @@
+@import '../../../../styles';
+
+.jse-inline-value {
+  font-family: var(--jse-font-family-mono);
+  font-size: var(--jse-font-size-mono);
+  line-height: var(--jse-line-height);
+  border: none;
+  padding: 0 $padding-half;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--jse-hover-background-color);
+  }
+
+  &.jse-selected {
+    background: var(--jse-selection-background-color);
+  }
+}

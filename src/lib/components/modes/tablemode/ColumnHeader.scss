@@ -1,0 +1,25 @@
+@import '../../../styles';
+
+.jse-column-header {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  display: flex;
+  gap: $padding;
+  padding: $padding-half var(--jse-padding) $padding-half $padding-half;
+  width: 100%;
+
+  &:hover {
+    background: var(--jse-table-header-background-highlight);
+  }
+
+  &:not(&.jse-readonly) {
+    cursor: pointer;
+  }
+
+  span.jse-column-sort-icon {
+    height: 1em;
+  }
+}

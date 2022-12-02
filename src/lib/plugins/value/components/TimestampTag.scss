@@ -3,8 +3,8 @@
 .jse-timestamp {
   padding: 0;
   margin: 0;
-  height: var(--jse-line-height);
+  vertical-align: middle;
+  display: inline-flex;
 
   color: var(--jse-value-color-number);
-  border-radius: $border-radius;
 }

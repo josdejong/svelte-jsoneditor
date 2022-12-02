@@ -4,13 +4,13 @@
   import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
-  import type { JSONParser, OnPatch } from '../../../types'
+  import type { JSONParser, JSONSelection, OnPatch } from '../../../types'
 
   export let path: JSONPath
   export let value: JSONValue
   export let parser: JSONParser
   export let readOnly: boolean
-  export let isSelected: boolean
+  export let selection: JSONSelection | undefined
   export let onPatch: OnPatch
 
   export let options: Array<{ value: unknown; text: string }>
@@ -20,15 +20,15 @@
   let bindValue: JSONValue = value
   $: bindValue = value
 
-  function applyFocus(isSelected: boolean) {
-    if (isSelected) {
+  function applyFocus(selection: JSONSelection | undefined) {
+    if (selection) {
       if (refSelect) {
         refSelect.focus()
       }
     }
   }
 
-  $: applyFocus(isSelected)
+  $: applyFocus(selection)
 
   function handleSelect(event) {
     event.stopPropagation()
@@ -54,7 +54,7 @@
 
 <select
   class={`jse-enum-value ${getValueClass(bindValue, parser)}`}
-  class:jse-selected={isSelected}
+  class:jse-selected={selection !== undefined}
   bind:value={bindValue}
   bind:this={refSelect}
   on:change={handleSelect}

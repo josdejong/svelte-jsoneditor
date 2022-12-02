@@ -19,6 +19,7 @@
   import type {
     Content,
     JSONParser,
+    JSONPathParser,
     OnChangeQueryLanguage,
     OnClassName,
     OnPatch,
@@ -31,11 +32,14 @@
 
   export let id = 'transform-modal-' + uniqueId()
   export let json: JSONValue
-  export let selectedPath: JSONPath = []
+  export let rootPath: JSONPath = []
 
+  export let indentation: number | string
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
   export let parser: JSONParser
+  export let validationParser: JSONParser
+  export let pathParser: JSONPathParser
 
   export let queryLanguages: QueryLanguage[]
   export let queryLanguageId: string
@@ -46,12 +50,12 @@
 
   export let onTransform: OnPatch
 
-  $: selectedJson = getIn(json, selectedPath)
+  $: selectedJson = getIn(json, rootPath)
   $: selectedContent = { json: selectedJson }
 
   const { close } = getContext('simple-modal')
 
-  const stateId = `${id}:${compileJSONPointer(selectedPath)}`
+  const stateId = `${id}:${compileJSONPointer(rootPath)}`
 
   const state = transformModalState[stateId] || {}
 
@@ -132,7 +136,7 @@
       onTransform([
         {
           op: 'replace',
-          path: compileJSONPointer(selectedPath),
+          path: compileJSONPointer(rootPath),
           value: jsonTransformed
         }
       ])
@@ -183,7 +187,7 @@
       {queryLanguageId}
       onChangeQueryLanguage={handleChangeQueryLanguage}
     />
-    <div class="jse-contents">
+    <div class="jse-modal-contents">
       <div class="jse-main-contents">
         <div class="jse-query-contents">
           <div class="jse-label">
@@ -201,8 +205,8 @@
             type="text"
             readonly
             title="Selected path"
-            value={!isEmpty(selectedPath)
-              ? stripRootObject(stringifyJSONPath(selectedPath))
+            value={!isEmpty(rootPath)
+              ? stripRootObject(stringifyJSONPath(rootPath))
               : '(whole document)'}
           />
 
@@ -248,17 +252,23 @@
                 readOnly={true}
                 mainMenuBar={false}
                 navigationBar={false}
+                {indentation}
                 {escapeControlCharacters}
                 {escapeUnicodeCharacters}
                 {parser}
                 {onRenderValue}
+                onRenderMenu={noop}
                 onError={console.error}
                 onChange={noop}
+                onChangeMode={noop}
                 onFocus={noop}
                 onBlur={noop}
                 onSortModal={noop}
                 onTransformModal={noop}
                 {onClassName}
+                validator={null}
+                {validationParser}
+                {pathParser}
               />
             {/if}
           </div>
@@ -272,17 +282,23 @@
                 readOnly={true}
                 mainMenuBar={false}
                 navigationBar={false}
+                {indentation}
                 {escapeControlCharacters}
                 {escapeUnicodeCharacters}
                 {parser}
                 {onRenderValue}
+                onRenderMenu={noop}
                 onError={console.error}
                 onChange={noop}
+                onChangeMode={noop}
                 onFocus={noop}
                 onBlur={noop}
                 onSortModal={noop}
                 onTransformModal={noop}
                 {onClassName}
+                validator={null}
+                {validationParser}
+                {pathParser}
               />
             {:else}
               <div class="jse-preview jse-error">

@@ -1,0 +1,155 @@
+@import '../../../styles';
+
+.jse-table-mode {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: var(--jse-background-color);
+  min-width: 0;
+  min-height: 0;
+  font-family: var(--jse-font-family-mono);
+  font-size: var(--jse-font-size-mono);
+  color: var(--jse-text-color);
+
+  &.no-main-menu {
+    border-top: var(--jse-main-border);
+  }
+
+  .jse-hidden-input-label {
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+
+    .jse-hidden-input {
+      width: 0;
+      height: 0;
+      padding: 0;
+      border: 0;
+      outline: none;
+    }
+  }
+
+  .jse-contents {
+    flex: 1;
+    align-items: start;
+    flex-direction: column;
+    display: flex;
+    overflow: auto;
+    overflow-anchor: none; // important to prevent Chrome from adjusting the scrollTop based on changing contents (causing an infinite loop)
+
+    border-left: var(--jse-main-border);
+    border-right: var(--jse-main-border);
+
+    &:last-child {
+      border-bottom: var(--jse-main-border);
+    }
+
+    table.jse-table-main {
+      border-collapse: collapse;
+      border-spacing: 0;
+
+      .jse-table-invisible-start-section,
+      .jse-table-invisible-end-section {
+        td {
+          margin: 0;
+          padding: 0;
+        }
+      }
+
+      .jse-table-invisible-end-section {
+        td {
+          padding-bottom: $padding;
+        }
+      }
+
+      .jse-table-row {
+        &:hover {
+          background-color: var(--jse-table-row-odd-background);
+        }
+
+        .jse-table-cell {
+          padding: 0 var(--jse-padding) 0 0;
+          vertical-align: top;
+          white-space: nowrap;
+          height: var(--jse-line-height);
+
+          &.jse-table-cell-header,
+          &.jse-table-cell-gutter {
+            font-weight: normal;
+            text-align: left;
+            color: var(--jse-text-readonly);
+            background: var(--jse-table-header-background);
+          }
+
+          &.jse-table-cell-header {
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+
+            .jse-table-root-error {
+              // same padding as .jse-column-header
+              padding: $padding-half var(--jse-padding) $padding-half $padding-half;
+            }
+
+            // FIXME: border and/or border shadow?
+          }
+
+          &.jse-table-cell-gutter {
+            padding: 0 var(--jse-padding) 0 $padding-half;
+            // FIXME: border and/or border shadow?
+          }
+
+          &.jse-selected-value > :global(.jse-value) {
+            background: var(--jse-selection-background-color);
+          }
+
+          :global(div) {
+            display: inline-flex;
+          }
+
+          // FIXME: this is ugly. give JSONValue an extra class instead?
+          :global(div.jse-value) {
+            overflow-wrap: normal;
+            white-space: nowrap;
+            vertical-align: top;
+            display: inline-block;
+          }
+
+          .jse-context-menu-anchor {
+            position: relative;
+            vertical-align: top;
+          }
+        }
+      }
+    }
+
+    &.jse-contents-loading {
+      align-items: unset;
+
+      .jse-loading-space {
+        flex: 1;
+      }
+
+      .jse-loading {
+        flex: 2;
+        text-align: center;
+        color: var(--jse-panel-color-readonly);
+        box-sizing: border-box;
+        font-family: var(--jse-font-family);
+        font-size: var(--jse-font-size);
+      }
+    }
+  }
+
+  .jse-preview {
+    flex: 1;
+    color: var(--jse-panel-color-readonly);
+    overflow: auto;
+    white-space: pre-wrap;
+    padding: 2px;
+  }
+}

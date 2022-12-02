@@ -38,6 +38,10 @@
       background: var(--jse-context-menu-background-highlight);
     }
 
+    &:focus {
+      z-index: 1;
+    }
+
     &:disabled {
       color: var(--jse-context-menu-color-disabled);
       background: unset;

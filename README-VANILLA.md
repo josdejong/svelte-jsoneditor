@@ -19,7 +19,7 @@ This is the vanilla variant of `svelte-jsoneditor`, which can be used in vanilla
 - JSON schema validation and pluggable custom validation
 - Color highlighting, undo/redo, search and replace
 - Utilities like a color picker and timestamp tag
-- Handles large JSON documents up to 500 MB
+- Handles large JSON documents up to 512 MB
 
 ## Install
 
