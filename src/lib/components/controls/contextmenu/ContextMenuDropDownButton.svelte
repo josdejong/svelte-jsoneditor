@@ -2,7 +2,7 @@
   import type { MenuDropDownButton } from '$lib/types'
   import DropdownButton from '$lib/components/controls/DropdownButton.svelte'
   import Icon from 'svelte-awesome'
-  import classnames from "classnames";
+  import classnames from 'classnames'
 
   export let item: MenuDropDownButton
   export let className: string | undefined
@@ -10,7 +10,7 @@
 
 <DropdownButton width={item.width} items={item.items}>
   <button
-    class={classnames("jse-context-menu-button", className, item.main.className)}
+    class={classnames('jse-context-menu-button', className, item.main.className)}
     type="button"
     slot="defaultItem"
     title={item.main.title}

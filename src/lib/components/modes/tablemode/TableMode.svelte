@@ -120,6 +120,7 @@
   import { resizeObserver } from '$lib/actions/resizeObserver.js'
   import TableContextMenu from '$lib/components/modes/tablemode/contextmenu/TableContextMenu.svelte'
   import CopyPasteModal from '$lib/components/modals/CopyPasteModal.svelte'
+  import ContextMenuPointer from "$lib/components/controls/contextmenu/ContextMenuPointer.svelte";
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext('simple-modal')
@@ -1710,11 +1711,20 @@
                       <JSONValueComponent
                         {path}
                         value={value !== undefined ? value : ''}
-                        enforceString={getEnforceString(value, documentState.enforceStringMap, compileJSONPointer(path), context.parser)}
+                        enforceString={getEnforceString(
+                          value,
+                          documentState.enforceStringMap,
+                          compileJSONPointer(path),
+                          context.parser
+                        )}
                         selection={isSelected ? documentState.selection : undefined}
                         {searchResultItems}
                         {context}
-                      />{/if}{#if !isEmpty(validationErrorsByColumn)}
+                      />{/if}{#if !readOnly && isSelected && !documentState.selection.edit}
+                        <div class="jse-context-menu-anchor">
+                          <ContextMenuPointer selected={true} onContextMenu={openContextMenu} />
+                        </div>
+                      {/if}{#if !isEmpty(validationErrorsByColumn)}
                       <ValidationErrorIcon
                         validationError={mergeValidationErrors(path, validationErrorsByColumn)}
                         onExpand={noop}

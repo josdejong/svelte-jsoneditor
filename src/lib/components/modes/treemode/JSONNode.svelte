@@ -20,7 +20,7 @@
     HOVER_INSERT_INSIDE,
     INSERT_EXPLANATION
   } from '$lib/constants'
-  import { getVisibleCaretPositions } from '$lib/logic/documentState'
+  import { getEnforceString, getVisibleCaretPositions } from '$lib/logic/documentState'
   import { rename } from '$lib/logic/operations'
   import {
     createAfterSelection,
@@ -30,10 +30,14 @@
     fromSelectionType,
     getEndPath,
     getSelectionPaths,
+    getStartPath,
+    isAfterSelection,
     isInsideSelection,
     isKeySelection,
+    isMultiSelection,
     isPathInsideSelection,
-    isValueSelection
+    isValueSelection,
+    selectionIfOverlapping
   } from '$lib/logic/selection'
   import {
     encodeDataPath,
@@ -44,7 +48,7 @@
     isContentEditableDiv
   } from '$lib/utils/domUtils'
   import CollapsedItems from './CollapsedItems.svelte'
-  import ContextMenuPointer from './contextmenu/ContextMenuPointer.svelte'
+  import ContextMenuPointer from '$lib/components/controls/contextmenu/ContextMenuPointer.svelte'
   import JSONKey from './JSONKey.svelte'
   import JSONValue from './JSONValue.svelte'
   import { singleton } from './singleton.js'
@@ -65,16 +69,9 @@
     VisibleSection
   } from '$lib/types'
   import { SelectionType } from '$lib/types'
-  import {
-    getStartPath,
-    isAfterSelection,
-    isMultiSelection,
-    selectionIfOverlapping
-  } from '$lib/logic/selection'
   import { filterPointerOrUndefined } from '$lib/utils/jsonPointer.js'
   import { filterKeySearchResults, filterValueSearchResults } from '$lib/logic/search.js'
   import { createMemoizePath } from '$lib/utils/pathUtils'
-  import { getEnforceString } from '$lib/logic/documentState'
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
   import { isObject } from '$lib/utils/typeUtils.js'
 

@@ -3,11 +3,7 @@
 <script lang="ts">
   import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
   import Icon from 'svelte-awesome'
-  import {
-    CONTEXT_MENU_EXPLANATION,
-    CONTEXT_MENU_HEIGHT,
-    CONTEXT_MENU_WIDTH
-  } from '$lib/constants.js'
+  import { CONTEXT_MENU_EXPLANATION, CONTEXT_MENU_HEIGHT, CONTEXT_MENU_WIDTH } from '$lib/constants'
   import type { OnContextMenu } from '$lib/types'
 
   export let selected: boolean
@@ -45,4 +41,3 @@
 </button>
 
 <style src="./ContextMenuPointer.scss"></style>
-r

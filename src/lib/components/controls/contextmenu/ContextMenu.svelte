@@ -81,9 +81,9 @@
             <div class="jse-column">
               {#each rowItem.items as columnItem}
                 {#if isMenuButton(columnItem)}
-                  <ContextMenuButton className='left' item={columnItem} />
+                  <ContextMenuButton className="left" item={columnItem} />
                 {:else if isMenuDropDownButton(columnItem)}
-                  <ContextMenuDropDownButton className='left' item={columnItem} />
+                  <ContextMenuDropDownButton className="left" item={columnItem} />
                 {:else if isMenuSeparator(columnItem)}
                   <div class="jse-separator" />
                 {:else if isMenuLabel(columnItem)}
