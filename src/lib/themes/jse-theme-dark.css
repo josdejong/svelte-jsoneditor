@@ -38,9 +38,9 @@
   --jse-context-menu-background-highlight: #595959;
   --jse-context-menu-separator-color: #595959;
   --jse-context-menu-color: var(--jse-text-color);
-  --jse-context-menu-button-background: #737373;
-  --jse-context-menu-button-background-highlight: #818181;
-  --jse-context-menu-button-color: var(--jse-context-menu-color);
+  --jse-context-menu-pointer-background: #737373;
+  --jse-context-menu-pointer-background-highlight: #818181;
+  --jse-context-menu-pointer-color: var(--jse-context-menu-color);
 
   /* contents: json key and values */
   --jse-key-color: #9cdcfe;

@@ -10,10 +10,10 @@
     padding-bottom: $contents-padding;
     box-sizing: border-box;
 
-    > .jse-header-outer :global(.jse-context-menu-button),
-    > .jse-contents-outer > .jse-contents :global(.jse-context-menu-button) {
+    > .jse-header-outer :global(.jse-context-menu-pointer),
+    > .jse-contents-outer > .jse-contents :global(.jse-context-menu-pointer) {
       top: 0;
-      right: calc(-2px - var(--jse-context-menu-button-size));
+      right: calc(-2px - var(--jse-context-menu-pointer-size));
     }
 
     > .jse-contents-outer > .jse-contents {
@@ -98,7 +98,7 @@
     z-index: 1;
   }
 
-  .jse-context-menu-button-anchor {
+  .jse-context-menu-pointer-anchor {
     position: relative;
   }
 
@@ -115,7 +115,7 @@
     margin-right: $padding-half;
     outline: $height-half solid; // color depends on hovered/selected/inactive+selected
 
-    :global(.jse-context-menu-button) {
+    :global(.jse-context-menu-pointer) {
       right: -$height-half;
       background: var(--jse-selection-background-color);
     }
@@ -127,8 +127,8 @@
 
   @include json-node-selected-mixin(
     var(--jse-selection-background-color),
-    var(--jse-context-menu-button-background),
-    var(--jse-context-menu-button-background-highlight)
+    var(--jse-context-menu-pointer-background),
+    var(--jse-context-menu-pointer-background-highlight)
   );
 }
 

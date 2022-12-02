@@ -7,8 +7,8 @@
     CONTEXT_MENU_EXPLANATION,
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH
-  } from '../../../../constants.js'
-  import type { OnContextMenu } from '../../../../types'
+  } from '$lib/constants.js'
+  import type { OnContextMenu } from '$lib/types'
 
   export let selected: boolean
   export let onContextMenu: OnContextMenu
@@ -36,7 +36,7 @@
 
 <button
   type="button"
-  class="jse-context-menu-button"
+  class="jse-context-menu-pointer"
   class:jse-selected={selected}
   title={CONTEXT_MENU_EXPLANATION}
   on:click={handleClick}
@@ -44,4 +44,5 @@
   <Icon data={faCaretDown} />
 </button>
 
-<style src="./ContextMenuButton.scss"></style>
+<style src="./ContextMenuPointer.scss"></style>
+r

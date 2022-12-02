@@ -1852,7 +1852,7 @@
     } else {
       // type === 'keydown' (from the quick key Ctrl+Q)
       // or target is hidden input -> context menu button on keyboard
-      const anchor = refContents?.querySelector('.jse-context-menu-button.jse-selected')
+      const anchor = refContents?.querySelector('.jse-context-menu-pointer.jse-selected')
       if (anchor) {
         openContextMenu({
           anchor,

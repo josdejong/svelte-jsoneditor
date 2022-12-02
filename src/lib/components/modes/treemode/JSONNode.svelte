@@ -44,7 +44,7 @@
     isContentEditableDiv
   } from '$lib/utils/domUtils'
   import CollapsedItems from './CollapsedItems.svelte'
-  import ContextMenuButton from './contextmenu/ContextMenuButton.svelte'
+  import ContextMenuPointer from './contextmenu/ContextMenuPointer.svelte'
   import JSONKey from './JSONKey.svelte'
   import JSONValue from './JSONValue.svelte'
   import { singleton } from './singleton.js'
@@ -70,11 +70,11 @@
     isAfterSelection,
     isMultiSelection,
     selectionIfOverlapping
-  } from '../../../logic/selection'
-  import { filterPointerOrUndefined } from '../../../utils/jsonPointer.js'
-  import { filterKeySearchResults, filterValueSearchResults } from '../../../logic/search.js'
-  import { createMemoizePath } from '../../../utils/pathUtils'
-  import { getEnforceString } from '../../../logic/documentState'
+  } from '$lib/logic/selection'
+  import { filterPointerOrUndefined } from '$lib/utils/jsonPointer.js'
+  import { filterKeySearchResults, filterValueSearchResults } from '$lib/logic/search.js'
+  import { createMemoizePath } from '$lib/utils/pathUtils'
+  import { getEnforceString } from '$lib/logic/documentState'
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
   import { isObject } from '$lib/utils/typeUtils.js'
 
@@ -650,8 +650,8 @@
           </div>
         </div>
         {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
-          <div class="jse-context-menu-button-anchor">
-            <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
+          <div class="jse-context-menu-pointer-anchor">
+            <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
       </div>
@@ -685,7 +685,7 @@
             style={getIndentationStyle(path.length + 1)}
             title={INSERT_EXPLANATION}
           >
-            <ContextMenuButton
+            <ContextMenuPointer
               selected={isSelected && isInsideSelection(selection)}
               onContextMenu={handleInsertInsideOpenContextMenu}
             />
@@ -771,8 +771,8 @@
           </div>
         </div>
         {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
-          <div class="jse-context-menu-button-anchor">
-            <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
+          <div class="jse-context-menu-pointer-anchor">
+            <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
       </div>
@@ -806,7 +806,7 @@
             style={getIndentationStyle(path.length + 1)}
             title={INSERT_EXPLANATION}
           >
-            <ContextMenuButton
+            <ContextMenuPointer
               selected={isSelected && isInsideSelection(selection)}
               onContextMenu={handleInsertInsideOpenContextMenu}
             />
@@ -869,8 +869,8 @@
           {context}
         />
         {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
-          <div class="jse-context-menu-button-anchor">
-            <ContextMenuButton selected={true} onContextMenu={context.onContextMenu} />
+          <div class="jse-context-menu-pointer-anchor">
+            <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
       </div>
@@ -896,7 +896,7 @@
       style={indentationStyle}
       title={INSERT_EXPLANATION}
     >
-      <ContextMenuButton
+      <ContextMenuPointer
         selected={isSelected && isAfterSelection(selection)}
         onContextMenu={handleInsertAfterOpenContextMenu}
       />

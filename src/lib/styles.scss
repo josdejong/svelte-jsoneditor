@@ -50,6 +50,10 @@ $errors-overview-max-height: 25%;
   &.left {
     text-align: left;
   }
+
+  :global(svg) {
+    width: 16px;
+  }
 }
 
 @mixin jsoneditor-button-primary {
