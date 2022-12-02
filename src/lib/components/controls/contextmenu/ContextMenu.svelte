@@ -81,9 +81,9 @@
             <div class="jse-column">
               {#each rowItem.items as columnItem}
                 {#if isMenuButton(columnItem)}
-                  <ContextMenuButton item={columnItem} />
+                  <ContextMenuButton className='left' item={columnItem} />
                 {:else if isMenuDropDownButton(columnItem)}
-                  <ContextMenuDropDownButton item={columnItem} />
+                  <ContextMenuDropDownButton className='left' item={columnItem} />
                 {:else if isMenuSeparator(columnItem)}
                   <div class="jse-separator" />
                 {:else if isMenuLabel(columnItem)}
@@ -112,10 +112,10 @@
   {#if tip}
     <div class="jse-row">
       <div class="jse-tip">
-        <div>
+        <div class="jse-tip-icon">
           <Icon data={faLightbulb} />
         </div>
-        <div>{tip}</div>
+        <div class="jse-tip-text">{tip}</div>
       </div>
     </div>
   {/if}

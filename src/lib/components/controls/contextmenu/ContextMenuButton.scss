@@ -2,4 +2,8 @@
 
 button.jse-context-menu-button {
   @include jsoneditor-context-menu-button;
+
+  :global(svg) {
+    width: 16px;
+  }
 }

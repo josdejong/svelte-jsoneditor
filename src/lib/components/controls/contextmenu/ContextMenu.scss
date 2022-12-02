@@ -33,12 +33,12 @@
 
       display: flex;
       flex-direction: row;
-      align-items: center;
+      align-items: start;
       gap: $padding;
       border-radius: $border-radius;
 
-      div {
-        vertical-align: middle;
+      div.jse-tip-icon {
+        padding-top: $padding-half;
       }
     }
   }
@@ -51,15 +51,6 @@
 
     &:not(:last-child) {
       border-right: 1px solid var(--jse-context-menu-separator-color);
-    }
-
-    :global(button) {
-      text-align: left;
-      min-width: 130px;
-
-      :global(svg) {
-        width: 16px;
-      }
     }
   }
 

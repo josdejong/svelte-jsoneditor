@@ -808,7 +808,7 @@
       [
         {
           op: 'replace',
-          path: compileJSONPointer(path),
+          path: pointer,
           value: updatedValue as JSONValue
         }
       ],

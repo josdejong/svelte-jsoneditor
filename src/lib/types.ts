@@ -192,7 +192,7 @@ export type ContextMenuRow = {
   type: 'row'
   items: Array<MenuButton | MenuDropDownButton | ContextMenuColumn>
 }
-export type ContextMenuItem = MenuButton | MenuSeparator | ContextMenuRow
+export type ContextMenuItem = MenuButton | MenuDropDownButton | MenuSeparator | ContextMenuRow
 
 export interface MessageAction {
   text: string

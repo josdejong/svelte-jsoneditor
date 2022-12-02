@@ -3,15 +3,23 @@
 <script lang="ts">
   import type { MenuItem, OnRenderMenu } from '../../../../types'
   import Menu from '../../../controls/Menu.svelte'
-  import { faFilter, faRedo, faSortAmountDownAlt, faUndo } from '@fortawesome/free-solid-svg-icons'
+  import {
+    faEllipsisV,
+    faFilter,
+    faRedo,
+    faSortAmountDownAlt,
+    faUndo
+  } from '@fortawesome/free-solid-svg-icons'
   import type { JSONValue } from 'immutable-json-patch'
   import type { HistoryState } from '$lib/logic/history'
+  import { CONTEXT_MENU_EXPLANATION } from '$lib/constants'
 
   export let json: JSONValue | undefined
   export let readOnly: boolean
   export let historyState: HistoryState
   export let onSort: () => void
   export let onTransform: () => void
+  export let onContextMenu: () => void
   export let onUndo: () => void
   export let onRedo: () => void
   export let onRenderMenu: OnRenderMenu
@@ -34,6 +42,13 @@
           className: 'jse-transform',
           onClick: onTransform,
           disabled: readOnly || json === undefined
+        },
+        {
+          type: 'button',
+          icon: faEllipsisV,
+          title: CONTEXT_MENU_EXPLANATION,
+          className: 'jse-contextmenu',
+          onClick: onContextMenu
         },
         {
           type: 'separator'

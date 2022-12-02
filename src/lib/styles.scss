@@ -46,6 +46,10 @@ $errors-overview-max-height: 25%;
     color: var(--jse-context-menu-color-disabled);
     background: unset;
   }
+
+  &.left {
+    text-align: left;
+  }
 }
 
 @mixin jsoneditor-button-primary {

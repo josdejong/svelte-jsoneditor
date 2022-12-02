@@ -2,6 +2,7 @@
 
 <script lang="ts">
   import {
+    faArrowRightArrowLeft,
     faCaretSquareDown,
     faCaretSquareUp,
     faClone,
@@ -18,11 +19,16 @@
   import type { JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { initial, isEmpty } from 'lodash-es'
-  import { canConvert, singleItemSelected } from '$lib/logic/selection'
+  import {
+    canConvert,
+    isKeySelection,
+    isMultiSelection,
+    isValueSelection,
+    singleItemSelected
+  } from '$lib/logic/selection'
   import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
   import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
   import type { ContextMenuItem, DocumentState, JSONParser } from '$lib/types'
-  import { isKeySelection, isMultiSelection, isValueSelection } from '$lib/logic/selection'
   import { getEnforceString } from '$lib/logic/documentState'
   import ContextMenu from '$lib/components/controls/contextmenu/ContextMenu.svelte'
 
@@ -366,7 +372,7 @@
             {
               type: 'button',
               onClick: () => handleInsertOrConvert('structure'),
-              icon: faPlus,
+              icon: convertMode ? faArrowRightArrowLeft : faPlus,
               text: 'Structure',
               title: insertOrConvertText + ' structure',
               disabled: !canInsertOrConvertStructure
@@ -374,7 +380,7 @@
             {
               type: 'button',
               onClick: () => handleInsertOrConvert('object'),
-              icon: faPlus,
+              icon: convertMode ? faArrowRightArrowLeft : faPlus,
               text: 'Object',
               title: insertOrConvertText + ' structure',
               disabled: !canInsertOrConvertObject
@@ -382,7 +388,7 @@
             {
               type: 'button',
               onClick: () => handleInsertOrConvert('array'),
-              icon: faPlus,
+              icon: convertMode ? faArrowRightArrowLeft : faPlus,
               text: 'Array',
               title: insertOrConvertText + ' array',
               disabled: !canInsertOrConvertArray
@@ -390,7 +396,7 @@
             {
               type: 'button',
               onClick: () => handleInsertOrConvert('value'),
-              icon: faPlus,
+              icon: convertMode ? faArrowRightArrowLeft : faPlus,
               text: 'Value',
               title: insertOrConvertText + ' value',
               disabled: !canInsertOrConvertValue

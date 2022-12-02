@@ -2,6 +2,7 @@
 
 <script lang="ts">
   import type {
+    AbsolutePopupOptions,
     AfterPatchCallback,
     Content,
     ContentErrors,
@@ -28,8 +29,8 @@
     ValidationError,
     Validator,
     ValueNormalization
-  } from '../../../types'
-  import { Mode, SelectionType, SortDirection, ValidationSeverity } from '../../../types'
+  } from '$lib/types'
+  import { Mode, SelectionType, SortDirection, ValidationSeverity } from '$lib/types'
   import TableMenu from './menu/TableMenu.svelte'
   import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
   import {
@@ -57,24 +58,27 @@
     selectPreviousColumn,
     selectPreviousRow,
     toTableCellPosition
-  } from '../../../logic/table.js'
+  } from '$lib/logic/table.js'
   import { isEmpty, isEqual, uniqueId } from 'lodash-es'
   import JSONValueComponent from './JSONValue.svelte'
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
+    findParentWithNodeName,
     getDataPathFromTarget,
     getWindow
-  } from '../../../utils/domUtils'
+  } from '$lib/utils/domUtils'
   import { createDebug } from '$lib/utils/debug'
   import {
     createDocumentState,
     documentStatePatch,
     expandMinimal,
     expandRecursive,
-    expandWithCallback
+    expandWithCallback,
+    getEnforceString,
+    setEnforceString
   } from '$lib/logic/documentState'
-  import { isObjectOrArray, isUrl } from '$lib/utils/typeUtils.js'
+  import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils.js'
   import InlineValue from './tag/InlineValue.svelte'
   import { revertJSONPatchWithMoveOperations } from '$lib/logic/operations'
   import {
@@ -100,6 +104,8 @@
   import { validateJSON } from '$lib/logic/validation'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import {
+    CONTEXT_MENU_HEIGHT,
+    CONTEXT_MENU_WIDTH,
     MAX_CHARACTERS_TEXT_PREVIEW,
     SCROLL_DURATION,
     SIMPLE_MODAL_OPTIONS
@@ -112,9 +118,12 @@
   import { onCopy, onCut, onInsertCharacter, onPaste, onRemove } from '$lib/logic/actions'
   import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
   import { resizeObserver } from '$lib/actions/resizeObserver.js'
+  import TableContextMenu from '$lib/components/modes/tablemode/contextmenu/TableContextMenu.svelte'
+  import CopyPasteModal from '$lib/components/modals/CopyPasteModal.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext('simple-modal')
+  const { openAbsolutePopup, closeAbsolutePopup } = getContext('absolute-popup')
   const jump = createJump()
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
@@ -847,6 +856,159 @@
     return refContents ? refContents.querySelector(`td[data-path="${encodeDataPath(path)}"]`) : null
   }
 
+  function openContextMenu({
+    anchor,
+    left,
+    top,
+    width,
+    height,
+    offsetTop,
+    offsetLeft,
+    showTip
+  }: AbsolutePopupOptions) {
+    const props = {
+      json,
+      documentState: documentState,
+      parser,
+      showTip,
+
+      onEditValue: handleEditValue,
+      onToggleEnforceString: handleToggleEnforceString,
+      onCut: handleCut,
+      onCopy: handleCopy,
+      onPaste: handlePasteFromMenu,
+      onRemove: handleRemove,
+
+      onCloseContextMenu: function () {
+        closeAbsolutePopup(popupId)
+        focus()
+      }
+    }
+
+    modalOpen = true
+
+    const popupId = openAbsolutePopup(TableContextMenu, props, {
+      left,
+      top,
+      offsetTop,
+      offsetLeft,
+      width,
+      height,
+      anchor,
+      closeOnOuterClick: true,
+      onClose: () => {
+        modalOpen = false
+        focus()
+      }
+    })
+  }
+
+  function handleContextMenu(event) {
+    if (readOnly || isEditingSelection(documentState.selection)) {
+      return
+    }
+
+    if (event) {
+      event.stopPropagation()
+      event.preventDefault()
+    }
+
+    if (event && event.type === 'contextmenu' && event.target !== refHiddenInput) {
+      // right mouse click to open context menu
+      openContextMenu({
+        left: event.clientX,
+        top: event.clientY,
+        width: CONTEXT_MENU_WIDTH,
+        height: CONTEXT_MENU_HEIGHT,
+        showTip: false
+      })
+    } else {
+      // type === 'keydown' (from the quick key Ctrl+Q)
+      // or target is hidden input -> context menu button on keyboard
+      const anchor = refContents?.querySelector('.jse-table-cell.jse-selected-value')
+      if (anchor) {
+        openContextMenu({
+          anchor,
+          offsetTop: 2,
+          width: CONTEXT_MENU_WIDTH,
+          height: CONTEXT_MENU_HEIGHT,
+          showTip: false
+        })
+      } else {
+        // fallback on just displaying the TreeContextMenu top left
+        const rect = refContents?.getBoundingClientRect()
+        if (rect) {
+          openContextMenu({
+            top: rect.top + 2,
+            left: rect.left + 2,
+            width: CONTEXT_MENU_WIDTH,
+            height: CONTEXT_MENU_HEIGHT,
+            showTip: false
+          })
+        }
+      }
+    }
+
+    return false
+  }
+
+  function handleContextMenuFromTableMenu(event) {
+    if (readOnly) {
+      return
+    }
+
+    openContextMenu({
+      anchor: findParentWithNodeName(event.target, 'BUTTON'),
+      offsetTop: 0,
+      width: CONTEXT_MENU_WIDTH,
+      height: CONTEXT_MENU_HEIGHT,
+      showTip: true
+    })
+  }
+
+  function handleEditValue() {
+    if (readOnly || !documentState.selection) {
+      return
+    }
+
+    const path = documentState.selection.focusPath
+    const value = getIn(json, path)
+    if (isObjectOrArray(value)) {
+      openJSONEditorModal(path, value)
+    } else {
+      updateSelection(createValueSelection(path, true))
+    }
+  }
+
+  function handleToggleEnforceString() {
+    if (readOnly || !isValueSelection(documentState.selection)) {
+      return
+    }
+
+    const path = documentState.selection.focusPath
+    const pointer = compileJSONPointer(path)
+    const value = getIn(json, path)
+    const enforceString = !getEnforceString(value, documentState.enforceStringMap, pointer, parser)
+    const updatedValue = enforceString ? String(value) : stringConvert(String(value), parser)
+
+    debug('handleToggleEnforceString', { enforceString, value, updatedValue })
+
+    handlePatch(
+      [
+        {
+          op: 'replace',
+          path: pointer,
+          value: updatedValue as JSONValue
+        }
+      ],
+      (patchedJson, patchedState) => {
+        return {
+          state: setEnforceString(patchedState, pointer, enforceString)
+        }
+      }
+    )
+  }
+
   async function handleParsePastedJson() {
     debug('apply pasted json', pastedJson)
     const { path, contents } = pastedJson
@@ -865,11 +1027,23 @@
       }
     ]
 
-    handlePatch(operations, (patchedJson, patchedState) => {
-      return {
-        state: expandRecursive(patchedJson, patchedState, path)
+    handlePatch(operations)
+  }
+
+  function handlePasteFromMenu() {
+    open(
+      CopyPasteModal,
+      {},
+      {
+        ...SIMPLE_MODAL_OPTIONS,
+        styleWindow: {
+          width: '450px'
+        }
+      },
+      {
+        onClose: () => focus()
       }
-    })
+    )
   }
 
   function handleClearPastedJson() {
@@ -975,8 +1149,7 @@
     }
 
     if (combo === 'Ctrl+Q') {
-      // handleContextMenu(event)
-      // TODO: implement context menu
+      handleContextMenu(event)
     }
 
     if (combo === 'Left') {
@@ -1430,6 +1603,7 @@
   class:no-main-menu={!mainMenuBar}
   on:mousedown={handleMouseDown}
   on:keydown={handleKeyDown}
+  on:contextmenu={handleContextMenu}
   bind:this={refJsonEditor}
 >
   {#if mainMenuBar}
@@ -1441,6 +1615,7 @@
       onTransform={handleTransformAll}
       onUndo={handleUndo}
       onRedo={handleRedo}
+      onContextMenu={handleContextMenuFromTableMenu}
       {onRenderMenu}
     />
   {/if}
@@ -1535,7 +1710,7 @@
                       <JSONValueComponent
                         {path}
                         value={value !== undefined ? value : ''}
-                        enforceString={false}
+                        enforceString={getEnforceString(value, documentState.enforceStringMap, compileJSONPointer(path), context.parser)}
                         selection={isSelected ? documentState.selection : undefined}
                         {searchResultItems}
                         {context}
