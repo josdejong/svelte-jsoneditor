@@ -47,7 +47,7 @@
     isContentEditableDiv
   } from '$lib/utils/domUtils'
   import CollapsedItems from './CollapsedItems.svelte'
-  import ContextMenuPointer from '$lib/components/controls/contextmenu/ContextMenuPointer.svelte'
+  import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
   import JSONKey from './JSONKey.svelte'
   import JSONValue from './JSONValue.svelte'
   import { singleton } from './singleton.js'

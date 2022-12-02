@@ -30,7 +30,7 @@
   import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
   import type { ContextMenuItem, DocumentState, JSONParser } from '$lib/types'
   import { getEnforceString } from '$lib/logic/documentState'
-  import ContextMenu from '$lib/components/controls/contextmenu/ContextMenu.svelte'
+  import ContextMenu from '../../../../components/controls/contextmenu/ContextMenu.svelte'
 
   export let json: JSONValue
   export let documentState: DocumentState

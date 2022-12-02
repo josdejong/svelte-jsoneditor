@@ -117,9 +117,9 @@
   import { onCopy, onCut, onInsertCharacter, onPaste, onRemove } from '$lib/logic/actions'
   import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
   import { resizeObserver } from '$lib/actions/resizeObserver.js'
-  import TableContextMenu from '$lib/components/modes/tablemode/contextmenu/TableContextMenu.svelte'
-  import CopyPasteModal from '$lib/components/modals/CopyPasteModal.svelte'
-  import ContextMenuPointer from '$lib/components/controls/contextmenu/ContextMenuPointer.svelte'
+  import TableContextMenu from '../../../components/modes/tablemode/contextmenu/TableContextMenu.svelte'
+  import CopyPasteModal from '../../../components/modals/CopyPasteModal.svelte'
+  import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext('simple-modal')

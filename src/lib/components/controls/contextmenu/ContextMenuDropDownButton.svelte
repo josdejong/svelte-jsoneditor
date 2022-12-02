@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { MenuDropDownButton } from '$lib/types'
-  import DropdownButton from '$lib/components/controls/DropdownButton.svelte'
+  import DropdownButton from '../DropdownButton.svelte'
   import Icon from 'svelte-awesome'
   import { classnames } from '$lib/utils/cssUtils.js'
 

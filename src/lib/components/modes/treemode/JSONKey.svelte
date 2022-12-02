@@ -15,7 +15,7 @@
   import { type JSONSelection } from '$lib/types'
   import type { JSONPath, JSONPointer } from 'immutable-json-patch'
   import { isKeySelection } from '$lib/logic/selection.js'
-  import ContextMenuPointer from '$lib/components/controls/contextmenu/ContextMenuPointer.svelte'
+  import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
   import { classnames } from '$lib/utils/cssUtils'
 
   export let path: JSONPath
