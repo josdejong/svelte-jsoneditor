@@ -73,7 +73,6 @@
     createDocumentState,
     documentStatePatch,
     expandMinimal,
-    expandRecursive,
     expandWithCallback,
     getEnforceString,
     setEnforceString
