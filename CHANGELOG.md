@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.10.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.10.2...v0.10.3) (2022-12-05)
+
+
+### Bug Fixes
+
+* repair modal accidentally showing a mode toggle ([798f668](https://github.com/josdejong/svelte-jsoneditor/commit/798f668a63c4534ad008b209b9e0c03b31040fd3))
+* update to `lossless-json@2.0.3`, fix throwing an error in case of bad characters like a newline ([7f7b59e](https://github.com/josdejong/svelte-jsoneditor/commit/7f7b59eac6a965b3c5238f934a4ab4d1b3af152c))
+
 ### [0.10.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.10.1...v0.10.2) (2022-11-17)
 
 
