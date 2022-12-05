@@ -1,0 +1,14 @@
+@import '../../styles';
+
+.jse-json-preview {
+  flex: 1;
+  color: var(--jse-panel-color-readonly);
+  overflow: auto;
+  white-space: pre-wrap;
+  padding: 2px;
+
+  // TODO: JSONPreview shouldn't add borders I think
+  border-left: var(--jse-main-border);
+  border-right: var(--jse-main-border);
+  border-bottom: var(--jse-main-border);
+}

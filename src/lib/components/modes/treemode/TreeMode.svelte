@@ -135,11 +135,10 @@
   } from '$lib/types'
   import { Mode, ValidationSeverity } from '$lib/types'
   import { isAfterSelection, isInsideSelection, isKeySelection } from '../../../logic/selection'
-  import { truncate } from '../../../utils/stringUtils.js'
-  import { MAX_CHARACTERS_TEXT_PREVIEW } from '../../../constants.js'
   import memoizeOne from 'memoize-one'
   import { measure } from '$lib/utils/timeUtils'
   import { onCopy, onCut, onInsert, onInsertCharacter, onPaste, onRemove } from '$lib/logic/actions'
+  import JSONPreview from '$lib/components/controls/JSONPreview.svelte'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -2094,9 +2093,7 @@
               ]
             : []}
         />
-        <div class="jse-contents jse-preview">
-          {truncate(text, MAX_CHARACTERS_TEXT_PREVIEW)}
-        </div>
+        <JSONPreview {text} {json} {indentation} {parser} />
       {/if}
     {:else}
       <div class="jse-search-box-container">

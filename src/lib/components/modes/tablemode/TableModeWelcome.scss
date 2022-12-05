@@ -1,0 +1,53 @@
+@import '../../../styles';
+
+.jse-table-mode-welcome {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  align-items: center;
+
+  border-left: var(--jse-main-border);
+  border-right: var(--jse-main-border);
+
+  &:last-child {
+    border-bottom: var(--jse-main-border);
+  }
+
+  .jse-space.jse-before {
+    flex: 1;
+  }
+
+  .jse-nested-arrays {
+    display: flex;
+    flex-direction: column;
+    gap: $padding;
+    max-width: 300px;
+    margin: $padding;
+
+    font-family: var(--jse-font-family);
+    font-size: var(--jse-font-size);
+
+    .jse-nested-arrays-title {
+    }
+
+    .jse-nested-arrays-info {
+      color: var(--jse-panel-color-readonly);
+    }
+
+    button.jse-nested-array-action {
+      @include jsoneditor-button-primary;
+
+      text-align: left;
+
+      .jse-nested-array-count {
+        opacity: 0.5;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .jse-space.jse-after {
+    flex: 2;
+  }
+}

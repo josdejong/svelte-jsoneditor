@@ -105,12 +105,9 @@
   import {
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
-    MAX_CHARACTERS_TEXT_PREVIEW,
     SCROLL_DURATION,
     SIMPLE_MODAL_OPTIONS
   } from '$lib/constants.js'
-  import { truncate } from '$lib/utils/stringUtils.js'
-  import { getText } from '$lib/utils/jsonUtils.js'
   import { noop } from '$lib/utils/noop.js'
   import { createJump } from '$lib/assets/jump.js/src/jump.js'
   import ValidationErrorIcon from '../treemode/ValidationErrorIcon.svelte'
@@ -120,6 +117,8 @@
   import TableContextMenu from '../../../components/modes/tablemode/contextmenu/TableContextMenu.svelte'
   import CopyPasteModal from '../../../components/modals/CopyPasteModal.svelte'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
+  import TableModeWelcome from '$lib/components/modes/tablemode/TableModeWelcome.svelte'
+  import JSONPreview from '$lib/components/controls/JSONPreview.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext('simple-modal')
@@ -974,7 +973,7 @@
     const path = documentState.selection.focusPath
     const value = getIn(json, path)
     if (isObjectOrArray(value)) {
-      openJSONEditorModal(path, value)
+      openJSONEditorModal(path)
     } else {
       updateSelection(createValueSelection(path, true))
     }
@@ -1208,7 +1207,7 @@
         const value = getIn(json, path)
         if (isObjectOrArray(value)) {
           // edit nested object/array
-          openJSONEditorModal(path, value)
+          openJSONEditorModal(path)
         } else {
           if (!readOnly) {
             // go to value edit mode
@@ -1453,15 +1452,15 @@
     })
   }
 
-  function openJSONEditorModal(path: JSONPath, value: JSONValue) {
-    debug('openJSONEditorModal', { path, value })
+  function openJSONEditorModal(path: JSONPath) {
+    debug('openJSONEditorModal', { path })
 
     modalOpen = true
 
     // open a popup where you can edit the nested object/array
     onJSONEditorModal({
       content: {
-        json: value
+        json: getIn(json, path)
       },
       path,
       onPatch: context.onPatch,
@@ -1801,23 +1800,9 @@
             ]
           : []}
       />
-      <div class="jse-contents jse-preview">
-        {truncate(text || '', MAX_CHARACTERS_TEXT_PREVIEW)}
-      </div>
+      <JSONPreview text={text || ''} {json} {indentation} {parser} />
     {:else}
-      <Message
-        type="info"
-        message="The loaded JSON document is not an array with contents and cannot be rendered in table mode."
-        actions={[
-          {
-            text: 'Edit in tree mode',
-            onClick: () => onChangeMode(Mode.tree)
-          }
-        ]}
-      />
-      <div class="jse-contents jse-preview">
-        {truncate(getText({ text, json }, indentation, parser), MAX_CHARACTERS_TEXT_PREVIEW)}
-      </div>
+      <TableModeWelcome {text} {json} {readOnly} {parser} {openJSONEditorModal} {onChangeMode} />
     {/if}
   {:else}
     <div class="jse-contents jse-contents-loading">

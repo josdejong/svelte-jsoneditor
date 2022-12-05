@@ -396,3 +396,26 @@ export function operationAffectsSortedColumn(
 
   return true
 }
+
+/**
+ * Find nested arrays inside a JSON object
+ */
+export function findNestedArrays(json: JSONValue, maxLevel = 2): JSONPath[] {
+  const props = []
+
+  function recurse(value: JSONValue, path: JSONPath) {
+    if (isJSONObject(value) && path.length < maxLevel) {
+      Object.keys(value).forEach((key) => {
+        recurse(value[key], path.concat(key))
+      })
+    }
+
+    if (isJSONArray(value)) {
+      props.push(path)
+    }
+  }
+
+  recurse(json, [])
+
+  return props
+}

@@ -10,7 +10,7 @@
   export let value: JSONArray | JSONObject
   export let parser: JSONParser
   export let isSelected: boolean
-  export let onEdit: (path: JSONPath, value: JSONArray | JSONObject) => void
+  export let onEdit: (path: JSONPath) => void
 
   $: count = isJSONArray(value) ? value.length : Object.keys(value).length
   $: description = (isJSONArray(value) ? 'item' : 'prop') + (count === 1 ? '' : 's')
@@ -20,7 +20,7 @@
   type="button"
   class="jse-inline-value"
   class:jse-selected={isSelected}
-  on:dblclick={() => onEdit(path, value)}
+  on:dblclick={() => onEdit(path)}
 >
   {truncate(parser.stringify(value), MAX_INLINE_OBJECT_CHARS)}
 </button>

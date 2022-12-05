@@ -1,4 +1,5 @@
 import {
+  findNestedArrays,
   fromTableCellPosition,
   getColumns,
   getRecursiveKeys,
@@ -327,5 +328,61 @@ describe('table', () => {
       ),
       false
     )
+  })
+
+  describe('findNestedArrays', () => {
+    it('should a nested array', () => {
+      deepStrictEqual(
+        findNestedArrays({
+          array: [1, 2, 3]
+        }),
+        [['array']]
+      )
+    })
+
+    it('should find multiple nested arrays', () => {
+      deepStrictEqual(
+        findNestedArrays({
+          array1: [1, 2, 3],
+          array2: [1, 2, 3]
+        }),
+        [['array1'], ['array2']]
+      )
+    })
+
+    it('should find deeper nested arrays', () => {
+      deepStrictEqual(
+        findNestedArrays({
+          a: { b: [1, 2, 3] }
+        }),
+        [['a', 'b']]
+      )
+    })
+
+    it('should find root level array', () => {
+      deepStrictEqual(findNestedArrays([1, 2, 3]), [[]])
+    })
+
+    it('should respect maxLevel when finding a nested array', () => {
+      const json = {
+        array1: [],
+        level1: {
+          array2: [],
+          level2: {
+            array3: []
+          }
+        }
+      }
+
+      deepStrictEqual(findNestedArrays(json), [['array1'], ['level1', 'array2']])
+
+      deepStrictEqual(findNestedArrays(json, 1), [['array1']])
+
+      deepStrictEqual(findNestedArrays(json, 3), [
+        ['array1'],
+        ['level1', 'array2'],
+        ['level1', 'level2', 'array3']
+      ])
+    })
   })
 })
