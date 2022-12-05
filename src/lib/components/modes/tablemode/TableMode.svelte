@@ -117,8 +117,8 @@
   import TableContextMenu from '../../../components/modes/tablemode/contextmenu/TableContextMenu.svelte'
   import CopyPasteModal from '../../../components/modals/CopyPasteModal.svelte'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
-  import TableModeWelcome from '$lib/components/modes/tablemode/TableModeWelcome.svelte'
-  import JSONPreview from '$lib/components/controls/JSONPreview.svelte'
+  import TableModeWelcome from './TableModeWelcome.svelte'
+  import JSONPreview from '../../controls/JSONPreview.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext('simple-modal')

@@ -138,7 +138,7 @@
   import memoizeOne from 'memoize-one'
   import { measure } from '$lib/utils/timeUtils'
   import { onCopy, onCut, onInsert, onInsertCharacter, onPaste, onRemove } from '$lib/logic/actions'
-  import JSONPreview from '$lib/components/controls/JSONPreview.svelte'
+  import JSONPreview from '../../controls/JSONPreview.svelte'
 
   const debug = createDebug('jsoneditor:TreeMode')
 

@@ -7,8 +7,7 @@
   import type { JSONPath } from 'immutable-json-patch'
   import { getIn } from 'immutable-json-patch'
   import { isEmpty } from 'lodash-es'
-  import { stringifyJSONPath } from '$lib'
-  import { stripRootObject } from '$lib/utils/pathUtils.js'
+  import { stripRootObject, stringifyJSONPath } from '$lib/utils/pathUtils.js'
 
   export let text: string | undefined
   export let json: JSONValue | undefined
