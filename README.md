@@ -646,7 +646,6 @@ const config = {
 // ...
 ```
 
-
 ## Develop
 
 Clone the git repository
