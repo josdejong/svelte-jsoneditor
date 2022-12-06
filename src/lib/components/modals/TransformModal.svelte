@@ -38,6 +38,7 @@
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
   export let parser: JSONParser
+  export let parseMemoizeOne: JSONParser['parse']
   export let validationParser: JSONParser
   export let pathParser: JSONPathParser
 
@@ -256,6 +257,7 @@
                 {escapeControlCharacters}
                 {escapeUnicodeCharacters}
                 {parser}
+                {parseMemoizeOne}
                 {onRenderValue}
                 onRenderMenu={noop}
                 onError={console.error}
@@ -265,6 +267,7 @@
                 onBlur={noop}
                 onSortModal={noop}
                 onTransformModal={noop}
+                onJSONEditorModal={noop}
                 {onClassName}
                 validator={null}
                 {validationParser}
@@ -286,6 +289,7 @@
                 {escapeControlCharacters}
                 {escapeUnicodeCharacters}
                 {parser}
+                {parseMemoizeOne}
                 {onRenderValue}
                 onRenderMenu={noop}
                 onError={console.error}
@@ -295,6 +299,7 @@
                 onBlur={noop}
                 onSortModal={noop}
                 onTransformModal={noop}
+                onJSONEditorModal={noop}
                 {onClassName}
                 validator={null}
                 {validationParser}

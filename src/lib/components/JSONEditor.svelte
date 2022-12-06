@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import { createDebug } from '../utils/debug'
-  import Modal from 'svelte-simple-modal'
+  import Modal, { bind } from 'svelte-simple-modal'
   import {
     JSONEDITOR_MODAL_OPTIONS,
     SORT_MODAL_OPTIONS,
@@ -16,12 +16,11 @@
     validateContentType
   } from '../utils/jsonUtils'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
-  import { javascriptQueryLanguage } from '../plugins/query/javascriptQueryLanguage.js'
+  import { javascriptQueryLanguage } from '$lib/plugins/query/javascriptQueryLanguage.js'
   import { renderValue } from '$lib/plugins/value/renderValue'
   import { tick } from 'svelte'
   import TransformModal from './modals/TransformModal.svelte'
   import SortModal from './modals/SortModal.svelte'
-  import ModalRef from './modals/ModalRef.svelte'
   import type {
     Content,
     ContentErrors,
@@ -46,14 +45,16 @@
     TransformModalCallback,
     TransformModalOptions,
     Validator
-  } from '../types'
-  import { Mode } from '../types'
+  } from '$lib/types'
+  import { Mode } from '$lib/types'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { noop } from '../utils/noop'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils'
   import JSONEditorRoot from './modes/JSONEditorRoot.svelte'
   import JSONEditorModal from './modals/JSONEditorModal.svelte'
   import memoizeOne from 'memoize-one'
+  import type { Callbacks, Component } from 'svelte-simple-modal/types/Modal.svelte'
+  import ModalRef from '$lib/components/modals/ModalRef.svelte'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:Main')
@@ -98,6 +99,10 @@
   let hasFocus = false
   let refJSONEditorRoot
   let open // svelte-simple-modal context open(...)
+  let jsoneditorModalState: {
+    component: Component
+    callbacks: Partial<Callbacks>
+  } | null = null
 
   $: {
     const contentError = validateContentType(content)
@@ -293,6 +298,7 @@
         escapeControlCharacters,
         escapeUnicodeCharacters,
         parser,
+        parseMemoizeOne,
         validationParser,
         pathParser,
         queryLanguages,
@@ -335,9 +341,8 @@
   function onJSONEditorModal({ content, path, onPatch, onClose }: JSONEditorModalCallback) {
     debug('onJSONEditorModal', { content, path })
 
-    open(
-      JSONEditorModal,
-      {
+    jsoneditorModalState = {
+      component: bind(JSONEditorModal, {
         content,
         path,
         onPatch,
@@ -366,12 +371,16 @@
         // onBlur, // TODO: cleanup when indeed not needed
         onSortModal,
         onTransformModal
-      },
-      JSONEDITOR_MODAL_OPTIONS,
-      {
+      }),
+      callbacks: {
         onClose
       }
-    )
+    }
+  }
+
+  function closeJSONEditorModal() {
+    jsoneditorModalState?.callbacks?.onClose()
+    jsoneditorModalState = null
   }
 
   $: {
@@ -386,42 +395,48 @@
 </script>
 
 <AbsolutePopup>
-  <Modal>
-    <ModalRef bind:open />
-    <div class="jse-main" class:jse-focus={hasFocus}>
-      {#key instanceId}
-        <JSONEditorRoot
-          bind:this={refJSONEditorRoot}
-          {mode}
-          {content}
-          {readOnly}
-          {indentation}
-          {tabSize}
-          {statusBar}
-          {mainMenuBar}
-          {navigationBar}
-          {escapeControlCharacters}
-          {escapeUnicodeCharacters}
-          {flattenColumns}
-          {parser}
-          {parseMemoizeOne}
-          {validator}
-          {validationParser}
-          {pathParser}
-          {onError}
-          onChange={handleChange}
-          onChangeMode={toggleMode}
-          {onRenderValue}
-          {onClassName}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          {onRenderMenu}
-          {onSortModal}
-          {onTransformModal}
-          {onJSONEditorModal}
-        />
-      {/key}
-    </div>
+  <Modal
+    show={jsoneditorModalState?.component}
+    {...JSONEDITOR_MODAL_OPTIONS}
+    on:close={closeJSONEditorModal}
+  >
+    <Modal>
+      <ModalRef bind:open />
+      <div class="jse-main" class:jse-focus={hasFocus}>
+        {#key instanceId}
+          <JSONEditorRoot
+            bind:this={refJSONEditorRoot}
+            {mode}
+            {content}
+            {readOnly}
+            {indentation}
+            {tabSize}
+            {statusBar}
+            {mainMenuBar}
+            {navigationBar}
+            {escapeControlCharacters}
+            {escapeUnicodeCharacters}
+            {flattenColumns}
+            {parser}
+            {parseMemoizeOne}
+            {validator}
+            {validationParser}
+            {pathParser}
+            {onError}
+            onChange={handleChange}
+            onChangeMode={toggleMode}
+            {onRenderValue}
+            {onClassName}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            {onRenderMenu}
+            {onSortModal}
+            {onTransformModal}
+            {onJSONEditorModal}
+          />
+        {/key}
+      </div>
+    </Modal>
   </Modal>
 </AbsolutePopup>
 
