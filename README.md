@@ -618,6 +618,35 @@ The main reasons to create a new library instead of extending the existing one a
 - Tree mode: the classic tree mode of `josdejong/jsoneditor` is simple and straightforward, but also limited. The new tree mode of `josdejong/svelte-jsoneditor` allows for much more streamlined editing and interaction. It works quite similar to a Spreadsheet or text editor. Navigate and select using the Arrow and Shift+Arrow keys or by dragging with the mouse. Double-click (or press Enter) to start editing a key or value. Open the context menu by right-clicking on the item or selection you want to operate on. Use cut/copy/paste to move parts of the JSON around and interoperate with other applications.
 - Code or text mode: the Ace editor library is using an outdated module system (AMD) and the way it is bundled and published is hard to integrate in modern JavaScript projects. Code Mirror 6 is very straightforward to integrate, has much better performance, and is very extensible (paving the way for future features).
 
+## Known issues
+
+When the library gives compile errors in your Svelte setup, it could be related to Vite having trouble importing ESM/CommonJS libraries the right way. The error could look like:
+
+> SyntaxError: The requested module '/node_modules/json-source-map/index.js?v=fda884be' does not provide an export named 'default' (at jsonUtils.js?v=fda884be:2:8)
+
+A workaround is to add the following to your `vite.config.js` file ([read more](https://github.com/josdejong/svelte-jsoneditor/issues/185)):
+
+```js
+// ...
+
+/** @type {import('vite').UserConfig} */
+const config = {
+  // ...
+  optimizeDeps: {
+    include: [
+      'ajv-dist',
+      'immutable-json-patch',
+      'lodash-es',
+      '@fortawesome/free-regular-svg-icons',
+      'jmespath'
+    ]
+  }
+}
+
+// ...
+```
+
+
 ## Develop
 
 Clone the git repository
