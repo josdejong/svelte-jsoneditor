@@ -2,12 +2,12 @@
   import type { JSONValue } from 'lossless-json'
   import type { JSONParser, OnChangeMode } from '$lib/types'
   import { Mode } from '$lib/types'
-  import { isObjectOrArray, valueType } from '$lib/utils/typeUtils'
+  import { valueType } from '$lib/utils/typeUtils'
   import { findNestedArrays } from '$lib/logic/table'
   import type { JSONPath } from 'immutable-json-patch'
-  import { getIn } from 'immutable-json-patch'
+  import { getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
   import { isEmpty } from 'lodash-es'
-  import { stripRootObject, stringifyJSONPath } from '$lib/utils/pathUtils.js'
+  import { stringifyJSONPath, stripRootObject } from '$lib/utils/pathUtils.js'
 
   export let text: string | undefined
   export let json: JSONValue | undefined
@@ -19,16 +19,22 @@
   $: action = readOnly ? 'View' : 'Edit'
 
   let nestedArrayPaths: JSONPath[]
-  $: nestedArrayPaths = json ? findNestedArrays(json).slice(0, 99) : []
+  $: nestedArrayPaths = json
+    ? findNestedArrays(json)
+        .slice(0, 99)
+        .filter((path) => path.length > 0)
+    : []
   $: hasNestedArrays = !isEmpty(nestedArrayPaths)
 
   $: documentType = hasNestedArrays
     ? 'Object with nested arrays'
     : json === undefined && (text === '' || text === undefined)
     ? 'An empty document'
-    : !isObjectOrArray(json)
-    ? `A ${valueType(json, parser)}`
-    : 'An object'
+    : isJSONObject(json)
+    ? 'An object'
+    : isJSONArray(json) && isEmpty(json)
+    ? 'An empty array'
+    : `A ${valueType(json, parser)}`
 </script>
 
 <div class="jse-table-mode-welcome">
