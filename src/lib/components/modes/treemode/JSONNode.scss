@@ -118,6 +118,7 @@
     :global(.jse-context-menu-pointer) {
       right: -$height-half;
       background: var(--jse-selection-background-color);
+      z-index: 1; // prevent the next line half-overlapping the pointer
     }
 
     &.jse-hovered {
