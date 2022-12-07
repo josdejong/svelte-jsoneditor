@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.11.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.11.0...v0.11.1) (2022-12-07)
+
+
+### Bug Fixes
+
+* table mode landing page not handling an empty array correctly ([4b4d039](https://github.com/josdejong/svelte-jsoneditor/commit/4b4d0398333d59d95d6fd3e28a67038c3b8781ac))
+
 ## [0.11.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.10.4...v0.11.0) (2022-12-07)
 
 
