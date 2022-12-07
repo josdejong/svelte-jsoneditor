@@ -2,9 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-### [0.10.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.10.3...v0.10.4) (2022-12-05)
+## [0.11.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.10.4...v0.11.0) (2022-12-07)
 
-### [0.10.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.10.2...v0.10.3) (2022-12-05)
+
+### ⚠ BREAKING CHANGES
+
+* In the `TransformModalCallback`, the property `selectedPath` is renamed to `rootPath`. The css variables `--jse-context-menu-button-*` are renamed to `--jse-context-menu-pointer-*`.
+
+### Features
+
+* create a landing page for non-array content in table mode ([558d8c1](https://github.com/josdejong/svelte-jsoneditor/commit/558d8c1321b08de038623f158eab90d4875747f0))
+* implement table mode [#156](https://github.com/josdejong/svelte-jsoneditor/issues/156) ([#202](https://github.com/josdejong/svelte-jsoneditor/issues/202)) ([6fde147](https://github.com/josdejong/svelte-jsoneditor/commit/6fde14780624888e648b807207346d11437ef9ba))
+
+
+### Bug Fixes
+
+* [#187](https://github.com/josdejong/svelte-jsoneditor/issues/187) duplicate id's of svg's ([b95ac82](https://github.com/josdejong/svelte-jsoneditor/commit/b95ac82f56f9565d9779bf8bd9186c9adfb3565d))
+* support opening Sort and Transform modals from a JSONEditor modal ([4652c1f](https://github.com/josdejong/svelte-jsoneditor/commit/4652c1fe3b29b37638a2b2692099b58f49ae84a4))
+* unnecessary z-index on the context menu pointer ([5a6b2f6](https://github.com/josdejong/svelte-jsoneditor/commit/5a6b2f65fb5b17e7306cafbf19f1c50003759dae))
+* z-index issue with the table header ([8f6a7c7](https://github.com/josdejong/svelte-jsoneditor/commit/8f6a7c77fca5076152841da518a64c5f91652c60))
+
+### [0.10.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.10.3...v0.10.4) (2022-12-05)
 
 
 ### Bug Fixes
