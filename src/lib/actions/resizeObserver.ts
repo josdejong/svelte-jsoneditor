@@ -1,35 +1,39 @@
+// source: https://github.com/sveltejs/svelte/issues/7583
+
+let observer: ResizeObserver
+let callbacks: WeakMap<Element, (element: Element) => void>
+
 /**
- * Custom Svelte action
- *  - Uses Resize Observer API
- *  - Dispatch custom event when element is resized
+ * Example usage:
  *
- * Example usage: `<div use:watchResize on:resize={handleResize}></div>`
+ *   <script lang="ts">
+ *      let clientWidth = 0
+ *   </script>
  *
- * Source: https://github.com/jnruel/svelte-observe-resize
+ *   <div use:resizeObserver={element => clientWidth = element.clientWidth}>
+ *      My width is: {clientWidth}
+ *   </div>
  */
-export function resizeObserver(node: HTMLElement): { destroy: () => void } {
-  const observer = getSingletonResizeObserver()
-
-  observer.observe(node)
-
-  return {
-    destroy() {
-      observer.unobserve(node)
-    }
-  }
-}
-
-// Singleton observer for all nodes
-function getSingletonResizeObserver() {
-  if (!_singletonResizeObserver) {
-    _singletonResizeObserver = new ResizeObserver((entries) => {
-      entries.forEach((entry) => {
-        entry.target.dispatchEvent(new CustomEvent('resize', { detail: entry }))
-      })
+export function resizeObserver(element: Element, onResize: (element: Element) => void) {
+  if (!observer) {
+    callbacks = new WeakMap()
+    observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const onResize = callbacks.get(entry.target)
+        if (onResize) {
+          onResize(entry.target)
+        }
+      }
     })
   }
 
-  return _singletonResizeObserver
-}
+  callbacks.set(element, onResize)
+  observer.observe(element)
 
-let _singletonResizeObserver: ResizeObserver | undefined
+  return {
+    destroy: () => {
+      callbacks.delete(element)
+      observer.unobserve(element)
+    }
+  }
+}

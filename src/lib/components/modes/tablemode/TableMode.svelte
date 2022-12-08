@@ -1584,12 +1584,12 @@
     }
   }
 
-  function handleResizeContents(event: CustomEvent) {
-    viewPortHeight = event.detail.contentRect.height
+  function handleResizeContents(element: Element) {
+    viewPortHeight = element.getBoundingClientRect().height
   }
 
-  function handleResizeRow(event: CustomEvent, rowIndex: number) {
-    itemHeightsCache[rowIndex] = event.detail.contentRect.height
+  function handleResizeRow(element: Element, rowIndex: number) {
+    itemHeightsCache[rowIndex] = element.getBoundingClientRect().height
   }
 
   function isPathSelected(path: JSONPath, selection: JSONSelection): boolean {
@@ -1634,8 +1634,7 @@
       <div
         class="jse-contents"
         bind:this={refContents}
-        use:resizeObserver
-        on:resize={handleResizeContents}
+        use:resizeObserver={handleResizeContents}
         on:scroll={handleScroll}
       >
         <table class="jse-table-main" cellpadding="0" cellspacing="0">
@@ -1672,8 +1671,7 @@
                 {#key rowIndex}
                   <th
                     class="jse-table-cell jse-table-cell-gutter"
-                    use:resizeObserver
-                    on:resize={(event) => handleResizeRow(event, rowIndex)}
+                    use:resizeObserver={(element) => handleResizeRow(element, rowIndex)}
                   >
                     {rowIndex + 1}
                     {#if !isEmpty(validationErrorsByRow?.row)}
