@@ -29,7 +29,10 @@
   $: path = documentState.selection ? documentState.selection.focusPath : []
   $: hasNextItem = isObjectOrArray(getIn(json, path))
 
-  function scrollToLastItem(path) {
+  // we have an unused parameter path to trigger scrollToLastItem when path changes,
+  // see $: scrollToLastItem(path)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  function scrollToLastItem(path: JSONPath) {
     setTimeout(() => {
       if (refNavigationBar && refNavigationBar.scrollTo) {
         const left = refNavigationBar.scrollWidth - refNavigationBar.clientWidth

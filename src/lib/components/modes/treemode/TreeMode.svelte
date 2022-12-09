@@ -331,7 +331,9 @@
     }
   }
 
-  function applySearch() {
+  // we pass searchText and json as argument to trigger search when these variables change,
+  // via $: applySearchThrottled(searchText, json)
+  function applySearch(searchText: string, json: JSONValue) {
     if (searchText === '') {
       debug('clearing search result')
 
@@ -388,7 +390,6 @@
   // when receiving an updated prop, we have to update state for example
   $: applyExternalContent(externalContent)
 
-  // we pass non-used arguments searchText and json to trigger search when these variables change
   const applySearchThrottled = throttle(applySearch, SEARCH_UPDATE_THROTTLE)
   $: applySearchThrottled(searchText, json)
 
@@ -515,7 +516,7 @@
   }
 
   function applyExternalText(updatedText) {
-    if (updatedText === undefined || externalContent.json !== undefined) {
+    if (updatedText === undefined || externalContent['json'] !== undefined) {
       return
     }
 
@@ -551,7 +552,7 @@
       } catch (repairError) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
-        text = externalContent.text
+        text = externalContent['text']
         textIsRepaired = false
         parseError = normalizeJsonParseError(text, err.message || err.toString())
       }
