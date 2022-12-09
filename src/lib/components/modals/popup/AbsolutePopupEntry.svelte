@@ -112,7 +112,7 @@
     <div class="jse-absolute-popup-content" style={calculateStyle(refRootPopup, popup.options)}>
       <input
         type="text"
-        readonly="readonly"
+        readonly
         tabindex="-1"
         class="jse-hidden-input"
         bind:this={refHiddenInput}
