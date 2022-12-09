@@ -19,9 +19,9 @@
       class="jse-navigation-bar-dropdown-item"
       class:jse-selected={item === selectedItem}
       on:click|stopPropagation={() => onSelect(item)}
-      title={item}
+      title={item.toString()}
     >
-      {truncate(item, MAX_ITEM_CHARACTERS)}
+      {truncate(item.toString(), MAX_ITEM_CHARACTERS)}
     </button>
   {/each}
   {#if items.length > MAX_ITEMS}
