@@ -42,7 +42,7 @@
   }
 
   // trigger scrollToLastItem when path changes
-  $: scrollToLastItem(path)
+  $: scrollToLastItem()
 
   function getItems(path: JSONPath): string[] {
     debug('get items for path', path)
