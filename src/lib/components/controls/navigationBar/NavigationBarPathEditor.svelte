@@ -6,7 +6,7 @@
   import Icon from 'svelte-awesome'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { tooltip } from '../../controls/tooltip/tooltip'
-  import type { JSONPathParser, OnError } from '../../../types.ts'
+  import type { JSONPathParser, OnError } from '../../../types'
 
   const absolutePopupContext = getContext('absolute-popup')
 

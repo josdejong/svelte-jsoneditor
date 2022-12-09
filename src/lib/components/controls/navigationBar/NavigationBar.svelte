@@ -29,7 +29,7 @@
   $: path = documentState.selection ? documentState.selection.focusPath : []
   $: hasNextItem = isObjectOrArray(getIn(json, path))
 
-  function scrollToLastItem() {
+  function scrollToLastItem(path) {
     setTimeout(() => {
       if (refNavigationBar && refNavigationBar.scrollTo) {
         const left = refNavigationBar.scrollWidth - refNavigationBar.clientWidth
