@@ -421,11 +421,11 @@ export interface JSONEditorPropsOptional {
   statusBar?: boolean
   escapeControlCharacters?: boolean
   escapeUnicodeCharacters?: boolean
-  flattenColumns: true
-  parser: JSONParser
-  validator: Validator | null
-  validationParser: JSONParser
-  pathParser: JSONPathParser
+  flattenColumns?: true
+  parser?: JSONParser
+  validator?: Validator | null
+  validationParser?: JSONParser
+  pathParser?: JSONPathParser
 
   queryLanguages?: QueryLanguage[]
   queryLanguageId?: string
