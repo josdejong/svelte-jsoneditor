@@ -13,7 +13,7 @@ The library is written with Svelte, but can be used in plain JavaScript too and 
 ## Features
 
 - View and edit JSON
-- Has a low level text mode and high level tree and table modes
+- Has a low level text editor and high level tree view and table view
 - Format (beautify) and compact JSON
 - Sort, query, filter, and transform JSON
 - Repair JSON

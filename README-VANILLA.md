@@ -8,11 +8,12 @@ This is the vanilla variant of `svelte-jsoneditor`, which can be used in vanilla
 
 ![JSONEditor tree mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_tree_mode_screenshot.png)
 ![JSONEditor text mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_text_mode_screenshot.png)
+![JSONEditor table mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_table_mode_screenshot.png)
 
 ## Features
 
 - View and edit JSON
-- Has a low level text mode and high level tree mode
+- Has a low level text editor and high level tree view and table view
 - Format (beautify) and compact JSON
 - Sort, query, filter, and transform JSON
 - Repair JSON
