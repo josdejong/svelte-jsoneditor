@@ -1,6 +1,7 @@
 import type { JSONPatchDocument, JSONPath, JSONPointer, JSONValue } from 'immutable-json-patch'
 import type { SvelteComponentTyped } from 'svelte'
 import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
+import { parseJSONPath, stringifyJSONPath } from "$lib/utils/pathUtils";
 
 export type { JSONValue, JSONPointer, JSONPath, JSONPatchDocument } from 'immutable-json-patch'
 
@@ -421,7 +422,11 @@ export interface JSONEditorPropsOptional {
   statusBar?: boolean
   escapeControlCharacters?: boolean
   escapeUnicodeCharacters?: boolean
-  validator?: Validator
+  flattenColumns: true
+  parser: JSONParser
+  validator: Validator | null
+  validationParser: JSONParser
+  pathParser: JSONPathParser
 
   queryLanguages?: QueryLanguage[]
   queryLanguageId?: string
