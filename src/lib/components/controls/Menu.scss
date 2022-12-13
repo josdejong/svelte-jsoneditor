@@ -41,10 +41,10 @@
         border-right: none;
       }
 
-      padding: 0;
+      padding: 0 $padding-half;
       margin: $padding-half 0;
       height: calc(var(--jse-menu-button-size) - var(--jse-padding));
-      width: 40px;
+      width: auto;
 
       &.jse-first {
         margin-left: $padding-half;
