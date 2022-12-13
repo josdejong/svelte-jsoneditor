@@ -1,11 +1,13 @@
 import { cloneDeepWith, first, initial, isEmpty, last, times } from 'lodash-es'
 import {
   compileJSONPointer,
+  existsIn,
   getIn,
   isJSONArray,
   isJSONObject,
   isJSONPatchMove,
   isJSONPatchRemove,
+  isJSONPatchReplace,
   type JSONPatchDocument,
   type JSONPatchOperation,
   type JSONPath,
@@ -749,4 +751,33 @@ function createRevertMoveOperations(json: JSONValue, path: JSONPath): JSONPatchO
   }
 
   return []
+}
+
+/**
+ * Add operations to create parent objects when missing before replacing a nested value
+ */
+export function createNestedValueOperations(operations: JSONPatchOperation[], json: JSONValue) {
+  return operations.flatMap((operation) => {
+    if (isJSONPatchReplace(operation)) {
+      const path = parseJSONPointer(operation.path)
+      if (path.length > 0) {
+        const extendedOperations: JSONPatchOperation[] = [operation]
+
+        let parentPath = initial(path)
+        while (parentPath.length > 0 && !existsIn(json, parentPath)) {
+          extendedOperations.unshift({
+            op: 'add',
+            path: compileJSONPointer(parentPath),
+            value: {}
+          })
+
+          parentPath = initial(parentPath)
+        }
+
+        return extendedOperations
+      }
+    }
+
+    return operation
+  })
 }

@@ -1,6 +1,7 @@
 import assert from 'assert'
 import {
   clipboardToValues,
+  createNestedValueOperations,
   createNewValue,
   moveInsideParent,
   revertJSONPatchWithMoveOperations
@@ -281,6 +282,60 @@ describe('operations', () => {
 
       const revertedJson = immutableJSONPatch(updatedJson, revertOperations)
       assert.deepStrictEqual(revertedJson, json)
+    })
+  })
+
+  describe('createNestedValueOperations', () => {
+    it('should create parent object operation of a nest value when missing', () => {
+      const json = {}
+
+      const operations: JSONPatchOperation[] = [{ op: 'replace', path: '/nested/value', value: 42 }]
+      const updatedOperations = createNestedValueOperations(operations, json)
+
+      assert.deepStrictEqual(updatedOperations, [
+        { op: 'add', path: '/nested', value: {} },
+        { op: 'replace', path: '/nested/value', value: 42 }
+      ])
+    })
+
+    it('should create parent object operation of a nest value in an array when missing', () => {
+      const json = [{}, {}, {}]
+
+      const operations: JSONPatchOperation[] = [
+        { op: 'replace', path: '/2/nested/value', value: 42 }
+      ]
+      const updatedOperations = createNestedValueOperations(operations, json)
+
+      assert.deepStrictEqual(updatedOperations, [
+        { op: 'add', path: '/2/nested', value: {} },
+        { op: 'replace', path: '/2/nested/value', value: 42 }
+      ])
+    })
+
+    it('should create parent object operation of a deep nest value when missing', () => {
+      const json = {}
+
+      const operations: JSONPatchOperation[] = [
+        { op: 'replace', path: '/deep/nested/value', value: 42 }
+      ]
+      const updatedOperations = createNestedValueOperations(operations, json)
+
+      assert.deepStrictEqual(updatedOperations, [
+        { op: 'add', path: '/deep', value: {} },
+        { op: 'add', path: '/deep/nested', value: {} },
+        { op: 'replace', path: '/deep/nested/value', value: 42 }
+      ])
+    })
+
+    it('should not create parent objects when already existing', () => {
+      const json = { deep: { nested: {} } }
+
+      const operations: JSONPatchOperation[] = [
+        { op: 'replace', path: '/deep/nested/value', value: 42 }
+      ]
+      const updatedOperations = createNestedValueOperations(operations, json)
+
+      assert.deepStrictEqual(updatedOperations, operations)
     })
   })
 
