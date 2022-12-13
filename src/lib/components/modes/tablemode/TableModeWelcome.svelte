@@ -32,8 +32,8 @@
     ? 'An empty document'
     : isJSONObject(json)
     ? 'An object'
-    : isJSONArray(json) && isEmpty(json)
-    ? 'An empty array'
+    : isJSONArray(json)
+    ? 'An empty array' // note: can also be an array with objects but without properties
     : `A ${valueType(json, parser)}`
 </script>
 
