@@ -217,7 +217,7 @@
   }
 
   export function scrollTo(path: JSONPath): void {
-    refJSONEditorRoot.scrollTo(path)
+    return refJSONEditorRoot.scrollTo(path)
   }
 
   export function findElement(path: JSONPath): Element {
