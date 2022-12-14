@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.11.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.11.3...v0.11.4) (2022-12-14)
+
+
+### Bug Fixes
+
+* method `scrollTo` not returning a promise anymore (regression since v0.11.0) ([524799f](https://github.com/josdejong/svelte-jsoneditor/commit/524799f8126f6b0f4bb36f5c81087b57d8af7496))
+
 ### [0.11.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.11.2...v0.11.3) (2022-12-13)
 
 
