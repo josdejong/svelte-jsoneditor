@@ -6,7 +6,7 @@
   import { createDebug } from '$lib/utils/debug'
   import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, existsIn, getIn, immutableJSONPatch } from 'immutable-json-patch'
-  import jsonrepair from 'jsonrepair'
+  import { jsonrepair } from 'jsonrepair'
   import { initial, isEmpty, isEqual, last, noop, throttle, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
   import { createJump } from '$lib/assets/jump.js/src/jump'

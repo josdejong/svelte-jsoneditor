@@ -1,7 +1,7 @@
 import type { JSONObject, JSONPath, JSONValue } from 'immutable-json-patch'
 import { compileJSONPointer } from 'immutable-json-patch'
 import jsonSourceMap from 'json-source-map'
-import jsonrepair from 'jsonrepair'
+import { jsonrepair } from 'jsonrepair'
 import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
 import { arrayToObject, objectToArray } from './arrayUtils.js'
 import type {

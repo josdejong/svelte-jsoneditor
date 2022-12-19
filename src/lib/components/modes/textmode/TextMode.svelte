@@ -5,7 +5,7 @@
   import { createDebug } from '../../../utils/debug'
   import type { JSONPatchDocument } from 'immutable-json-patch'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
-  import jsonrepair from 'jsonrepair'
+  import { jsonrepair } from 'jsonrepair'
   import { debounce, isEqual, uniqueId } from 'lodash-es'
   import { onDestroy, onMount } from 'svelte'
   import {

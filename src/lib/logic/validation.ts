@@ -13,7 +13,7 @@ import { MAX_AUTO_REPAIRABLE_SIZE, MAX_VALIDATABLE_SIZE } from '../constants.js'
 import { measure } from '../utils/timeUtils.js'
 import { normalizeJsonParseError } from '../utils/jsonUtils.js'
 import { createDebug } from '../utils/debug.js'
-import jsonrepair from 'jsonrepair'
+import { jsonrepair } from 'jsonrepair'
 
 const debug = createDebug('validation')
 

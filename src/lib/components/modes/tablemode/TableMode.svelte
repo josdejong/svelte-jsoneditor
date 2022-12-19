@@ -95,7 +95,7 @@
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { createFocusTracker } from '$lib/components/controls/createFocusTracker'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
-  import jsonrepair from 'jsonrepair'
+  import { jsonrepair } from 'jsonrepair'
   import Message from '../../controls/Message.svelte'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { measure } from '$lib/utils/timeUtils'
