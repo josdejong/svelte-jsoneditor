@@ -112,15 +112,10 @@
     <th>Filter</th>
     <td>
       <div class="jse-horizontal">
+        <Select class="jse-filter-path" showChevron items={fieldOptions} bind:value={filterPath} />
         <Select
-          containerClasses="jse-filter-path"
-          showIndicator
-          items={fieldOptions}
-          bind:value={filterPath}
-        />
-        <Select
-          containerClasses="jse-filter-relation"
-          showIndicator
+          class="jse-filter-relation"
+          showChevron
           items={filterRelationOptions}
           bind:value={filterRelation}
         />
@@ -132,15 +127,10 @@
     <th>Sort</th>
     <td>
       <div class="jse-horizontal">
+        <Select class="jse-sort-path" showChevron items={fieldOptions} bind:value={sortPath} />
         <Select
-          containerClasses="jse-sort-path"
-          showIndicator
-          items={fieldOptions}
-          bind:value={sortPath}
-        />
-        <Select
-          containerClasses="jse-sort-direction"
-          showIndicator
+          class="jse-sort-direction"
+          showChevron
           items={sortDirectionOptions}
           bind:value={sortDirection}
         />
@@ -152,9 +142,9 @@
     <td>
       <div class="jse-horizontal">
         <Select
-          containerClasses="jse-projection-paths"
-          isMulti
-          showIndicator
+          class="jse-projection-paths"
+          multiple
+          showChevron
           items={projectionOptions}
           bind:value={projectionPaths}
         />

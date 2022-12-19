@@ -112,7 +112,7 @@
           <tr>
             <th>Property</th>
             <td>
-              <Select showIndicator items={properties} bind:value={selectedProperty} />
+              <Select showChevron items={properties} bind:value={selectedProperty} />
             </td>
           </tr>
         {/if}
@@ -120,10 +120,10 @@
           <th>Direction</th>
           <td>
             <Select
-              showIndicator
+              showChevron
+              clearable={false}
               items={directions}
               bind:value={selectedDirection}
-              isClearable={false}
             />
           </td>
         </tr>

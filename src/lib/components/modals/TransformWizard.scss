@@ -24,30 +24,30 @@ table.jse-transform-wizard {
         flex-direction: row;
         margin-bottom: $padding-half;
 
-        :global(.selectContainer.jse-filter-path) {
+        :global(.svelte-select.jse-filter-path) {
           flex: 4;
           margin-right: $padding-half;
         }
 
-        :global(.selectContainer.jse-filter-relation) {
+        :global(.svelte-select.jse-filter-relation) {
           flex: 1.5;
           margin-right: $padding-half;
         }
 
-        :global(.selectContainer.jse-sort-path) {
+        :global(.svelte-select.jse-sort-path) {
           flex: 3;
           margin-right: $padding-half;
         }
 
-        :global(.selectContainer.jse-sort-direction) {
+        :global(.svelte-select.jse-sort-direction) {
           flex: 1;
         }
 
-        :global(.selectContainer.jse-projection-paths) {
+        :global(.svelte-select.jse-projection-paths) {
           flex: 1;
         }
 
-        :global(.selectContainer input) {
+        :global(.svelte-select input) {
           box-sizing: border-box;
         }
 

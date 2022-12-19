@@ -2,16 +2,13 @@
 
 .jse-modal {
   // styling for the select box, svelte-select
-  // see docs: https://github.com/rob-balfre/svelte-select#styling
+  // see docs: https://github.com/rob-balfre/svelte-select#css-custom-properties-variables
   --height: 36px;
-  --multiItemHeight: 28px;
-  --multiItemMargin: 2px;
-  --multiItemPadding: 2px 8px;
-  --multiClearTop: 5px;
-  --multiItemBorderRadius: 6px;
-  --clearSelectTop: 2px;
-  --clearSelectBottom: 2px;
-  --indicatorTop: 8px;
+  --multi-item-height: 28px;
+  --multi-item-margin: 2px;
+  --multi-item-padding: 2px 8px;
+  --multi-item-border-radius: 6px;
+  --indicator-top: 8px;
 
   flex: 1;
   display: flex;
