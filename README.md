@@ -692,6 +692,14 @@ Publish to npm (will increase version number and publish to npm):
 npm run release
 ```
 
+Note that it will publish two npm packages: `svelte-jsoneditor` and `vanilla-jsoneditor`. You'll need to enter an npm one-time password twice.
+
+To try a build and see the change list, run:
+
+```
+npm run release-dry-run
+```
+
 ## License
 
 `svelte-jsoneditor` is released as open source under the permissive the [ISC license](LICENSE.md).
