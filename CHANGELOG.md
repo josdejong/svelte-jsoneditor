@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.11.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.11.4...v0.11.5) (2022-12-20)
+
+
+### Features
+
+* upgrade all dependencies, most notably `svelte-select@5, `@sveltejs/kit@1.0.0`, `vite@4.0.2` ([be135ee](https://github.com/josdejong/svelte-jsoneditor/commit/be135ee77c147e7dc59948955370973aa6c232db))
+* upgrade to `jsonrepair@3.0.0`, improving performance and repairing more cases ([8a315cf](https://github.com/josdejong/svelte-jsoneditor/commit/8a315cf8bee311fc2fcf46d37954a26568e5765f))
+
 ### [0.11.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.11.3...v0.11.4) (2022-12-14)
 
 

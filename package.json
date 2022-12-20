@@ -1,7 +1,7 @@
 {
   "name": "svelte-jsoneditor",
   "description": "A web-based tool to view, edit, format, transform, and validate JSON",
-  "version": "0.11.4",
+  "version": "0.11.5",
   "homepage": "https://jsoneditoronline.org",
   "repository": {
     "type": "git",
@@ -49,7 +49,7 @@
     "release:push": "git push && git push --tag",
     "release:publish:svelte-jsoneditor": "npm publish package/",
     "release:publish:vanilla-jsoneditor": "npm publish package-vanilla/",
-    "dry-run": "standard-version --dry-run"
+    "release-dry-run": "standard-version --dry-run"
   },
   "dependencies": {
     "@codemirror/commands": "^6.1.2",
@@ -68,11 +68,11 @@
     "immutable-json-patch": "^5.1.1",
     "jmespath": "^0.16.0",
     "json-source-map": "^0.6.1",
-    "jsonrepair": "^3.0.0",
+    "jsonrepair": "^3.0.1",
     "lodash-es": "^4.17.21",
     "memoize-one": "^6.0.0",
     "natural-compare-lite": "^1.4.0",
-    "sass": "^1.57.0",
+    "sass": "^1.57.1",
     "svelte": "^3.55.0",
     "svelte-awesome": "^3.0.1",
     "svelte-select": "^5.0.0",
@@ -97,8 +97,8 @@
     "@types/expect": "24.3.0",
     "@types/lodash-es": "4.17.6",
     "@types/mocha": "10.0.1",
-    "@typescript-eslint/eslint-plugin": "5.46.1",
-    "@typescript-eslint/parser": "5.46.1",
+    "@typescript-eslint/eslint-plugin": "5.47.0",
+    "@typescript-eslint/parser": "5.47.0",
     "cpy-cli": "4.2.0",
     "del-cli": "5.0.0",
     "eslint": "8.30.0",
