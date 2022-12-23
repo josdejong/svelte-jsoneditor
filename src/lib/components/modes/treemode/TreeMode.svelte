@@ -120,7 +120,7 @@
     OnFocus,
     OnJSONEditorModal,
     OnRenderMenu,
-    OnRenderValue,
+    OnRenderValue, OnSelect,
     OnSortModal,
     OnTransformModal,
     ParseError,
@@ -177,6 +177,7 @@
   export let onClassName: OnClassName | undefined
   export let onFocus: OnFocus
   export let onBlur: OnBlur
+  export let onSelect: OnSelect
   export let onSortModal: OnSortModal
   export let onTransformModal: OnTransformModal
   export let onJSONEditorModal: OnJSONEditorModal
@@ -215,15 +216,16 @@
       | ((selection: JSONSelection | undefined) => JSONSelection | undefined)
   ) {
     debug('updateSelection', selection)
-
     const updatedSelection =
       typeof selection === 'function' ? selection(documentState.selection) : selection
+
 
     if (!isEqual(updatedSelection, documentState.selection)) {
       documentState = {
         ...documentState,
         selection: updatedSelection
       }
+      if(onSelect) onSelect(updatedSelection)
     }
   }
 

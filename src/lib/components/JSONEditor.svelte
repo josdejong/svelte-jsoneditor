@@ -39,7 +39,7 @@
     OnExpand,
     OnFocus,
     OnRenderMenu,
-    OnRenderValue,
+    OnRenderValue, OnSelect,
     QueryLanguage,
     SortModalCallback,
     TransformModalCallback,
@@ -94,6 +94,7 @@
   }
   export let onFocus: OnFocus = noop
   export let onBlur: OnBlur = noop
+  export let onSelect: OnSelect = noop
 
   let instanceId = uniqueId()
   let hasFocus = false
@@ -429,6 +430,7 @@
             {onClassName}
             onFocus={handleFocus}
             onBlur={handleBlur}
+            {onSelect}
             {onRenderMenu}
             {onSortModal}
             {onTransformModal}

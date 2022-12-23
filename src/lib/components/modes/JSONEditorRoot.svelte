@@ -16,7 +16,7 @@
     OnFocus,
     OnJSONEditorModal,
     OnRenderMenu,
-    OnRenderValue,
+    OnRenderValue, OnSelect,
     OnSortModal,
     OnTransformModal,
     TransformModalOptions,
@@ -55,6 +55,7 @@
   export let onError: OnError
   export let onFocus: OnFocus
   export let onBlur: OnBlur
+  export let onSelect: OnSelect
   export let onSortModal: OnSortModal
   export let onTransformModal: OnTransformModal
   export let onJSONEditorModal: OnJSONEditorModal
@@ -260,6 +261,7 @@
     {onRenderValue}
     {onFocus}
     {onBlur}
+    {onSelect}
     onRenderMenu={handleRenderMenu}
     {onSortModal}
     {onTransformModal}
@@ -288,6 +290,7 @@
     {onClassName}
     {onFocus}
     {onBlur}
+    {onSelect}
     onRenderMenu={handleRenderMenu}
     {onSortModal}
     {onTransformModal}
