@@ -2,12 +2,12 @@ import { strictEqual } from 'assert'
 import { keyComboFromEvent } from './keyBindings.js'
 
 describe('keyBindings', () => {
-  it('keyComboFromEvent', () => {
-    const ctrlKey = true
-    const shiftKey = true
-    const altKey = true
-    const metaKey = true
+  const ctrlKey = true
+  const shiftKey = true
+  const altKey = true
+  const metaKey = true
 
+  it('keyComboFromEvent', () => {
     strictEqual(keyComboFromEvent(fakeEvent({ key: 'a' })), 'A')
     strictEqual(keyComboFromEvent(fakeEvent({ key: 'A' })), 'A')
     strictEqual(keyComboFromEvent(fakeEvent({ key: '=' })), '=')
@@ -21,6 +21,16 @@ describe('keyBindings', () => {
     strictEqual(keyComboFromEvent(fakeEvent({ ctrlKey, shiftKey, key: 'a' })), 'Ctrl+Shift+A')
     strictEqual(keyComboFromEvent(fakeEvent({ key: 'Control' })), '') // does not happen in practice
     strictEqual(keyComboFromEvent(fakeEvent({ ctrlKey, key: 'Control' })), 'Ctrl')
+  })
+
+  it('keyComboFromEvent with custom separator', () => {
+    const separator = '///'
+    strictEqual(keyComboFromEvent(fakeEvent({ key: 'a' }), separator), 'A')
+    strictEqual(keyComboFromEvent(fakeEvent({ ctrlKey, key: 'a' }), separator), 'Ctrl///A')
+    strictEqual(
+      keyComboFromEvent(fakeEvent({ ctrlKey, shiftKey, key: 'A' }), separator),
+      'Ctrl///Shift///A'
+    )
   })
 })
 
