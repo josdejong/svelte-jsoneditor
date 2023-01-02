@@ -8,32 +8,25 @@ describe('keyBindings', () => {
   const metaKey = true
 
   it('keyComboFromEvent', () => {
-    strictEqual(keyComboFromEvent(fakeEvent({ key: 'a' })), 'A')
-    strictEqual(keyComboFromEvent(fakeEvent({ key: 'A' })), 'A')
-    strictEqual(keyComboFromEvent(fakeEvent({ key: '=' })), '=')
-    strictEqual(keyComboFromEvent(fakeEvent({ shiftKey, key: '+' })), 'Shift++')
-    strictEqual(keyComboFromEvent(fakeEvent({ altKey, key: '=' })), 'Alt+=')
-    strictEqual(keyComboFromEvent(fakeEvent({ key: '-' })), '-')
-    strictEqual(keyComboFromEvent(fakeEvent({ shiftKey, key: '-' })), 'Shift+-')
-    strictEqual(keyComboFromEvent(fakeEvent({ ctrlKey, key: 'a' })), 'Ctrl+A')
-    strictEqual(keyComboFromEvent(fakeEvent({ metaKey, key: 'a' })), 'Ctrl+A')
-    strictEqual(keyComboFromEvent(fakeEvent({ shiftKey, key: 'a' })), 'Shift+A')
-    strictEqual(keyComboFromEvent(fakeEvent({ ctrlKey, shiftKey, key: 'a' })), 'Ctrl+Shift+A')
-    strictEqual(keyComboFromEvent(fakeEvent({ key: 'Control' })), '') // does not happen in practice
-    strictEqual(keyComboFromEvent(fakeEvent({ ctrlKey, key: 'Control' })), 'Ctrl')
+    strictEqual(keyComboFromEvent({ key: 'a' }), 'A')
+    strictEqual(keyComboFromEvent({ key: 'A' }), 'A')
+    strictEqual(keyComboFromEvent({ key: '=' }), '=')
+    strictEqual(keyComboFromEvent({ shiftKey, key: '+' }), 'Shift++')
+    strictEqual(keyComboFromEvent({ altKey, key: '=' }), 'Alt+=')
+    strictEqual(keyComboFromEvent({ key: '-' }), '-')
+    strictEqual(keyComboFromEvent({ shiftKey, key: '-' }), 'Shift+-')
+    strictEqual(keyComboFromEvent({ ctrlKey, key: 'a' }), 'Ctrl+A')
+    strictEqual(keyComboFromEvent({ metaKey, key: 'a' }), 'Ctrl+A')
+    strictEqual(keyComboFromEvent({ shiftKey, key: 'a' }), 'Shift+A')
+    strictEqual(keyComboFromEvent({ ctrlKey, shiftKey, key: 'a' }), 'Ctrl+Shift+A')
+    strictEqual(keyComboFromEvent({ key: 'Control' }), '') // does not happen in practice
+    strictEqual(keyComboFromEvent({ ctrlKey, key: 'Control' }), 'Ctrl')
   })
 
   it('keyComboFromEvent with custom separator', () => {
     const separator = '///'
-    strictEqual(keyComboFromEvent(fakeEvent({ key: 'a' }), separator), 'A')
-    strictEqual(keyComboFromEvent(fakeEvent({ ctrlKey, key: 'a' }), separator), 'Ctrl///A')
-    strictEqual(
-      keyComboFromEvent(fakeEvent({ ctrlKey, shiftKey, key: 'A' }), separator),
-      'Ctrl///Shift///A'
-    )
+    strictEqual(keyComboFromEvent({ key: 'a' }, separator), 'A')
+    strictEqual(keyComboFromEvent({ ctrlKey, key: 'a' }, separator), 'Ctrl///A')
+    strictEqual(keyComboFromEvent({ ctrlKey, shiftKey, key: 'A' }, separator), 'Ctrl///Shift///A')
   })
 })
-
-function fakeEvent(props: Record<string, unknown>): KeyboardEvent {
-  return props as unknown as KeyboardEvent
-}

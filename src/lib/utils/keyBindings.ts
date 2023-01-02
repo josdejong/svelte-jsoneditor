@@ -1,5 +1,14 @@
 // inspiration: https://github.com/andrepolischuk/keycomb
 
+// KeyComboEvent is a subset of KeyboardEvent
+export interface KeyComboEvent {
+  ctrlKey?: boolean
+  metaKey?: boolean
+  altKey?: boolean
+  shiftKey?: boolean
+  key: string
+}
+
 /**
  * Get the active key combination from a keyboard event.
  * For example returns "Ctrl+Shift+ArrowUp" or "Ctrl+A"
@@ -8,7 +17,7 @@
  * meta keys "Ctrl" ("Command" on Mac), and "Alt" ("Alt" or "Option" on Mac)
  * So pressing "Command" and "A"on Mac will return "Ctrl+A"
  */
-export function keyComboFromEvent(event: KeyboardEvent, separator = '+'): string {
+export function keyComboFromEvent(event: KeyComboEvent, separator = '+'): string {
   const combi = []
 
   if (event.ctrlKey) {
