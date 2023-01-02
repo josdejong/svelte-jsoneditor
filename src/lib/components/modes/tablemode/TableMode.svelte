@@ -1150,7 +1150,7 @@
       handleContextMenu(event)
     }
 
-    if (combo === 'Left') {
+    if (combo === 'ArrowLeft') {
       event.preventDefault()
 
       createDefaultSelectionWhenUndefined()
@@ -1162,7 +1162,7 @@
       }
     }
 
-    if (combo === 'Right') {
+    if (combo === 'ArrowRight') {
       event.preventDefault()
 
       createDefaultSelectionWhenUndefined()
@@ -1174,7 +1174,7 @@
       }
     }
 
-    if (combo === 'Up') {
+    if (combo === 'ArrowUp') {
       event.preventDefault()
 
       createDefaultSelectionWhenUndefined()
@@ -1186,7 +1186,7 @@
       }
     }
 
-    if (combo === 'Down') {
+    if (combo === 'ArrowDown') {
       event.preventDefault()
 
       createDefaultSelectionWhenUndefined()
@@ -1216,14 +1216,12 @@
       }
     }
 
-    const normalizedCombo = combo
-      .replace(/^Shift\+/, '') // replace 'Shift+A' with 'A'
-      .replace(/^Numpad_/, '') // replace 'Numpad_4' with '4'
+    const normalizedCombo = combo.replace(/^Shift\+/, '') // replace 'Shift+A' with 'A'
     if (normalizedCombo.length === 1 && documentState.selection) {
       // a regular key like a, A, _, etc is entered.
       // Replace selected contents with a new value having this first character as text
       event.preventDefault()
-      handleInsertCharacter(event.key)
+      handleInsertCharacter(normalizedCombo)
       return
     }
 

@@ -1587,7 +1587,7 @@
       handleContextMenu(event)
     }
 
-    if (combo === 'Up' || combo === 'Shift+Up') {
+    if (combo === 'ArrowUp' || combo === 'Shift+ArrowUp') {
       event.preventDefault()
 
       const newSelection = documentState.selection
@@ -1597,7 +1597,7 @@
       updateSelection(newSelection)
       scrollIntoView(newSelection.focusPath)
     }
-    if (combo === 'Down' || combo === 'Shift+Down') {
+    if (combo === 'ArrowDown' || combo === 'Shift+ArrowDown') {
       event.preventDefault()
 
       const newSelection = documentState.selection
@@ -1607,7 +1607,7 @@
       updateSelection(newSelection)
       scrollIntoView(newSelection.focusPath)
     }
-    if (combo === 'Left' || combo === 'Shift+Left') {
+    if (combo === 'ArrowLeft' || combo === 'Shift+ArrowLeft') {
       event.preventDefault()
 
       const newSelection = documentState.selection
@@ -1618,7 +1618,7 @@
       updateSelection(newSelection)
       scrollIntoView(newSelection.focusPath)
     }
-    if (combo === 'Right' || combo === 'Shift+Right') {
+    if (combo === 'ArrowRight' || combo === 'Shift+ArrowRight') {
       event.preventDefault()
 
       const newSelection = documentState.selection
@@ -1667,14 +1667,12 @@
       }
     }
 
-    const normalizedCombo = combo
-      .replace(/^Shift\+/, '') // replace 'Shift+A' with 'A'
-      .replace(/^Numpad_/, '') // replace 'Numpad_4' with '4'
+    const normalizedCombo = combo.replace(/^Shift\+/, '') // replace 'Shift+A' with 'A'
     if (normalizedCombo.length === 1 && documentState.selection) {
       // a regular key like a, A, _, etc is entered.
       // Replace selected contents with a new value having this first character as text
       event.preventDefault()
-      handleInsertCharacter(event.key)
+      handleInsertCharacter(normalizedCombo)
       return
     }
 

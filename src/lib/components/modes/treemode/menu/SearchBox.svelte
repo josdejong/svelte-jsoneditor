@@ -82,7 +82,7 @@
       onPrevious()
     }
 
-    if (combo === 'Ctrl+Enter' || combo === 'Command+Enter') {
+    if (combo === 'Ctrl+Enter') {
       event.preventDefault()
 
       if (showReplace) {

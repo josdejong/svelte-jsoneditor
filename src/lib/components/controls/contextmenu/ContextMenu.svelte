@@ -35,10 +35,18 @@
     })
   })
 
+  const directionByCombo: Record<string, 'Up' | 'Down' | 'Left' | 'Right'> = {
+    ArrowUp: 'Up',
+    ArrowDown: 'Down',
+    ArrowLeft: 'Left',
+    ArrowRight: 'Right'
+  }
+
   function handleKeyDown(event) {
     const combo = keyComboFromEvent(event)
+    const direction = directionByCombo[combo]
 
-    if (combo === 'Up' || combo === 'Down' || combo === 'Left' || combo === 'Right') {
+    if (typeof direction === 'string') {
       event.preventDefault()
 
       const buttons: HTMLButtonElement[] = Array.from(
@@ -47,7 +55,7 @@
       const nearest = findNearestElement({
         allElements: buttons,
         currentElement: event.target,
-        direction: combo,
+        direction,
         hasPrio: (element: HTMLButtonElement) => {
           return element.getAttribute('data-type') !== 'jse-open-dropdown'
         }
