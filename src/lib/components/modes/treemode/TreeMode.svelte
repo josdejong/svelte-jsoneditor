@@ -1540,8 +1540,7 @@
   }
 
   function handleKeyDown(event) {
-    // get key combo, and normalize key combo from Mac: replace "Command+X" with "Ctrl+X" etc
-    const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
+    const combo = keyComboFromEvent(event)
     const keepAnchorPath = event.shiftKey
     debug('keydown', { combo, key: event.key })
 

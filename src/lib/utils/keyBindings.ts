@@ -1,43 +1,43 @@
 // inspiration: https://github.com/andrepolischuk/keycomb
 
-// TODO: write unit tests for keyBindings
-
-// FIXME: implement an escape sequence for the separator +
-
-import { IS_MAC } from './navigatorUtils.js'
-
 /**
  * Get a named key from a key code.
  * For example:
  *     keyFromCode(65) returns 'A'
  *     keyFromCode(13) returns 'Enter'
  */
-export function nameFromKeyCode(code: string): string {
+export function nameFromKeyCode(code: number): string {
   return codes[code] || ''
 }
 
 /**
  * Get the active key combination from a keyboard event.
  * For example returns "Ctrl+Shift+Up" or "Ctrl+A"
- * @param {KeyboardEvent} event
- * @return {string}
+ *
+ * Returns the same output on both Windows and Mac:
+ * meta keys "Ctrl" ("Command" on Mac), "Shift", and "Alt" ("Alt" or "Option" on Mac)
+ * So pressing "Command" and "A"on Mac will return "Ctrl+A"
  */
-export function keyComboFromEvent(event) {
+export function keyComboFromEvent(event: KeyboardEvent): string {
   const combi = []
 
   if (event.ctrlKey) {
+    // Control on Windows
     combi.push('Ctrl')
   }
   if (event.metaKey) {
-    combi.push('Command')
+    // Command on Mac
+    combi.push('Ctrl')
   }
   if (event.altKey) {
-    combi.push(IS_MAC ? 'Option' : 'Alt')
+    // on Mac this is called Option
+    combi.push('Alt')
   }
   if (event.shiftKey) {
     combi.push('Shift')
   }
 
+  // TODO: use event.code instead
   const keyName = nameFromKeyCode(event.which)
   if (!metaCodes[keyName]) {
     // prevent output like 'Ctrl+Ctrl'

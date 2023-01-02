@@ -36,7 +36,7 @@
   })
 
   function handleKeyDown(event) {
-    const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
+    const combo = keyComboFromEvent(event)
 
     if (combo === 'Up' || combo === 'Down' || combo === 'Left' || combo === 'Right') {
       event.preventDefault()

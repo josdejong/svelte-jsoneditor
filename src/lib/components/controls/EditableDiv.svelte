@@ -65,7 +65,7 @@
   function handleValueKeyDown(event) {
     event.stopPropagation()
 
-    const combo = keyComboFromEvent(event).replace(/^Command\+/, 'Ctrl+')
+    const combo = keyComboFromEvent(event)
 
     if (combo === 'Escape') {
       // cancel changes (needed to prevent triggering a change onDestroy)
