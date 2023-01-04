@@ -1,5 +1,7 @@
 # svelte-jsoneditor
 
+English | [简体中文](./README-zh_CN.md) 
+
 A web-based tool to view, edit, format, transform, and validate JSON.
 
 Try it out: https://jsoneditoronline.org

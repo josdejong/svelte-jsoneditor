@@ -1,5 +1,7 @@
 # svelte-jsoneditor
 
+[English](./README.md) | 简体中文
+
 一种基于 Web 的工具，用于查看、编辑、格式化、转换和验证 JSON。
 
 试试看： https://jsoneditoronline.org
