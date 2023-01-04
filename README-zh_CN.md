@@ -335,25 +335,25 @@ const editor = new JSONEditor({
 - `focus()`. 给编辑器获取焦点。
 - `destroy()`. 销毁编辑器，将其从 DOM 中移除。
 
-### Utility functions
+### 公共函数
 
-- Rendering of values:
+- 渲染数据:
   - `renderValue`
   - `renderJSONSchemaEnum`
-  - Components:
+  - 组件:
     - `BooleanToggle`
     - `ColorPicker`
     - `EditableValue`
     - `EnumValue`
     - `ReadonlyValue`
     - `TimestampTag`
-- Validation:
+- 验证:
   - `createAjvValidator`
-- Query languages:
+- 查询语言:
   - `lodashQueryLanguage`
   - `javascriptQueryLanguage`
   - `jmespathQueryLanguage`
-- Content:
+- 内容:
   - `isContent`
   - `isTextContent`
   - `isJSONContent`
@@ -361,7 +361,7 @@ const editor = new JSONEditor({
   - `toTextContent`
   - `toJSONContent`
   - `estimateSerializedSize`
-- Selection:
+- 选择:
   - `isValueSelection`
   - `isKeySelection`
   - `isInsideSelection`
@@ -373,12 +373,12 @@ const editor = new JSONEditor({
   - `createInsideSelection`,
   - `createAfterSelection`
   - `createMultiSelection`
-- Parser:
+- 解析器:
   - `isEqualParser`
-- Path:
+- 路径:
   - `parseJSONPath`
   - `stringifyJSONPath`
-- Functions from [`immutable-json-patch`](https://github.com/josdejong/immutable-json-patch/):
+- 功能来自 [`immutable-json-patch`](https://github.com/josdejong/immutable-json-patch/):
   - `immutableJSONPatch`
   - `revertJSONPatch`
   - `parseJSONPointer`
@@ -393,7 +393,7 @@ const editor = new JSONEditor({
   - `existsIn`
   - `deleteIn`
 
-### Types
+### 类型
 
 ```ts
 type JSONValue = { [key: string]: JSONValue } | JSONValue[] | string | number | boolean | null
@@ -525,15 +525,15 @@ interface RenderValueComponentDescription {
 }
 ```
 
-## Styling
+## 样式
 
-The editor can be styled using the available CSS variables. A full list with all variables can be found here:
+可以使用可用的 CSS 变量来设置编辑器的样式。 可以在此处找到包含所有变量的完整列表：
 
 https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/themes/jse-theme-default.css
 
-### Custom theme color
+### 自定义主题颜色
 
-For example, to change the default blue theme color to anthracite:
+例如，要将默认的蓝色主题颜色更改为煤灰色：
 
 ```html
 <script>
@@ -560,16 +560,16 @@ For example, to change the default blue theme color to anthracite:
 </style>
 ```
 
-### Dark theme
+### 深色主题
 
-The editor comes with a built-in dark theme. To use this theme:
+该编辑器带有一个内置的深色主题。 要使用这个主题：
 
-- Load the css file of the dark theme: `themes/jse-theme-dark.css`
-- Add the class name `jse-theme-dark` of the dark theme to the HTML container element where the editor is loaded.
+- 加载深色主题的css文件：`themes/jse-theme-dark.css`
+- 添加类名  `jse-theme-dark`将深色主题添加到加载编辑器的 HTML 容器元素。
 
-It is possible to load styling of multiple themes, and toggle them by changing the class name (like `jse-theme-dark`) attached to the HTML container element.
+可以加载多个主题的样式，并通过更改类名来切换它们（比如 `jse-theme-dark`) 附加到 HTML 容器元素。
 
-Full Svelte example:
+完整的 Svelte 示例：
 
 ```html
 <script>
@@ -594,7 +594,7 @@ Full Svelte example:
 </style>
 ```
 
-## Differences between `josdejong/svelte-jsoneditor` and `josdejong/jsoneditor`
+##  `josdejong/svelte-jsoneditor` 之间的差异 `josdejong/jsoneditor`
 
 This library [`josdejong/svelte-jsoneditor`](https://github.com/josdejong/svelte-jsoneditor/) is the successor of [`josdejong/jsoneditor`](https://github.com/josdejong/jsoneditor). The main differences are:
 
@@ -613,13 +613,13 @@ The main reasons to create a new library instead of extending the existing one a
 - Tree mode: the classic tree mode of `josdejong/jsoneditor` is simple and straightforward, but also limited. The new tree mode of `josdejong/svelte-jsoneditor` allows for much more streamlined editing and interaction. It works quite similar to a Spreadsheet or text editor. Navigate and select using the Arrow and Shift+Arrow keys or by dragging with the mouse. Double-click (or press Enter) to start editing a key or value. Open the context menu by right-clicking on the item or selection you want to operate on. Use cut/copy/paste to move parts of the JSON around and interoperate with other applications.
 - Code or text mode: the Ace editor library is using an outdated module system (AMD) and the way it is bundled and published is hard to integrate in modern JavaScript projects. Code Mirror 6 is very straightforward to integrate, has much better performance, and is very extensible (paving the way for future features).
 
-## Known issues
+## 已知的问题
 
-When the library gives compile errors in your Svelte setup, it could be related to Vite having trouble importing ESM/CommonJS libraries the right way. The error could look like:
+当库在您的 Svelte 设置中出现编译错误时，可能与 Vite 无法正确导入 ESM/CommonJS 库有关。 错误可能类似于：
 
 > SyntaxError: The requested module '/node_modules/json-source-map/index.js?v=fda884be' does not provide an export named 'default' (at jsonUtils.js?v=fda884be:2:8)
 
-A workaround is to add the following to your `vite.config.js` file ([read more](https://github.com/josdejong/svelte-jsoneditor/issues/185)):
+解决方法是将以下内容添加到您的 `vite.config.js` 文件 ([阅读更多](https://github.com/josdejong/svelte-jsoneditor/issues/185)):
 
 ```js
 // ...
@@ -641,61 +641,61 @@ const config = {
 // ...
 ```
 
-## Develop
+## 开发
 
-Clone the git repository
+克隆 git 仓库
 
-Install dependencies (once):
+安装依赖项（一次）：
 
 ```
 npm install
 ```
 
-Start the demo project (at http://localhost:5173):
+启动演示项目 (打开 http://localhost:5173):
 
 ```
 npm run dev
 ```
 
-Build the library:
+构建库：
 
 ```
 npm run build
 ```
 
-Run unit tests:
+运行单元测试：
 
 ```
 npm test
 ```
 
-Run linter:
+运行 linter:
 
 ```
 npm run lint
 ```
 
-Automatically fix linting issues:
+自动修复 linting 问题：
 
 ```
 npm run format
 ```
 
-Publish to npm (will increase version number and publish to npm):
+发布到 npm（会增加版本号并发布到 npm）：
 
 ```
 npm run release
 ```
 
-Note that it will publish two npm packages: `svelte-jsoneditor` and `vanilla-jsoneditor`. You'll need to enter an npm one-time password twice.
+请注意，它将发布两个 npm 包： `svelte-jsoneditor`和 `vanilla-jsoneditor`. 您需要输入两次 npm 一次性密码。
 
-To try a build and see the change list, run:
+要尝试构建并查看更改列表，请运行：
 
 ```
 npm run release-dry-run
 ```
 
-## License
+## 许可证
 
 `svelte-jsoneditor` is released as open source under the permissive the [ISC license](LICENSE.md).
 
