@@ -87,7 +87,7 @@ npm install vanilla-jsoneditor
   }
 
   function handleChange(updatedContent, previousContent, { contentErrors, patchResult }) {
-    // content is an object { json: JSONValue } | { text: string }
+    // // 内容是一个对象 { json: JSONValue } | { text: string }
     console.log('onChange: ', { updatedContent, previousContent, contentErrors, patchResult })
     content = updatedContent
   }
@@ -126,15 +126,15 @@ npm install vanilla-jsoneditor
         props: {
           content,
           onChange: (updatedContent, previousContent, { contentErrors, patchResult }) => {
-            // content is an object { json: JSONValue } | { text: string }
+            // 内容是一个对象 { json: JSONValue } | { text: string }
             console.log('onChange', { updatedContent, previousContent, contentErrors, patchResult })
             content = updatedContent
           }
         }
       })
 
-      // use methods get, set, update, and onChange to get data in or out of the editor.
-      // Use updateProps to update properties.
+      // 使用方法 get、set、update 和 onChange 将数据传入或传出编辑器。
+      // 使用 updateProps 更新属性。
     </script>
   </body>
 </html>
