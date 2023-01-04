@@ -308,13 +308,13 @@ const editor = new JSONEditor({
 - `onFocus()` 当编辑器获得焦点时触发回调。
 - `onBlur()` 当编辑器失去焦点时触发回调。
 
-### methods
+### 方法
 
-- `get(): Content` Get the current JSON document.
-- `set(content: Content)` Replace the current content. Will reset the state of the editor. See also method `update(content)`.
-- `update(content: Content)` Update the loaded content, keeping the state of the editor (like expanded objects). You can also call `editor.updateProps({ content })`. See also method `set(content)`.
-- `patch(operations: JSONPatchDocument) : JSONPatchResult` Apply a JSON patch document to update the contents of the JSON document. A JSON patch document is a list with JSON Patch operations.
-- `updateProps(props: Object)` update some or all of the properties. Updated `content` can be passed too; this is equivalent to calling `update(content)`. Example:
+- `get(): Content` 获取当前的 JSON 文档。
+- `set(content: Content)` 替换当前内容。 将重置编辑器的状态。 另见方法 `update(content)`.
+- `update(content: Content)` 更新加载的内容，保持编辑器的状态（如展开的对象）。 你也可以使用 `editor.updateProps({ content })`. 另见方法 `set(content)`.
+- `patch(operations: JSONPatchDocument) : JSONPatchResult` 应用 JSON 补丁文档来更新 JSON 文档的内容。 一个 JSON 补丁文档是一个包含 JSON 补丁操作的列表。
+- `updateProps(props: Object)` 更新部分或全部属性。 也可以通过`content`更新， 这相当于调用` update(content)`. 例子：
 
   ```js
   editor.updateProps({
@@ -322,18 +322,18 @@ const editor = new JSONEditor({
   })
   ```
 
-- `expand([callback: (path: Path) => boolean])` Expand or collapse paths in the editor. The `callback` determines which paths will be expanded. If no `callback` is provided, all paths will be expanded. It is only possible to expand a path when all of its parent paths are expanded too. Examples:
-  - `editor.expand(path => true)` expand all
-  - `editor.expand(path => false)` collapse all
-  - `editor.expand(path => path.length < 2)` expand all paths up to 2 levels deep
-- `transform({ id?: string, rootPath?: [], onTransform: ({ operations: JSONPatchDocument, json: JSONValue, transformedJson: JSONValue }) => void, onClose: () => void })` programmatically trigger clicking of the transform button in the main menu, opening the transform model. If a callback `onTransform` is provided, it will replace the build-in logic to apply a transform, allowing you to process the transform operations in an alternative way. If provided, `onClose` callback will trigger when the transform modal closes, both after the user clicked apply or cancel. If an `id` is provided, the transform modal will load the previous status of this `id` instead of the status of the editors transform modal.
-- `scrollTo(path: Path)` Scroll the editor vertically such that the specified path comes into view. The path will be expanded when needed.
-- `findElement(path: Path)` Find the DOM element of a given path. Returns `null` when not found.
-- `acceptAutoRepair(): Content` In tree mode, invalid JSON is automatically repaired when loaded. When the repair was successful, the repaired contents are rendered but not yet applied to the document itself until the user clicks "Ok" or starts editing the data. Instead of accepting the repair, the user can also click "Repair manually instead". Invoking `.acceptAutoRepair()` will programmatically accept the repair. This will trigger an update, and the method itself also returns the updated contents. In case of `text` mode or when the editor is not in an "accept auto repair" status, nothing will happen, and the contents will be returned as is.
-- `refresh()`. Refresh rendering of the contents, for example after changing the font size. This is only available in `text` mode.
-- `validate() : ContentErrors`. Get all current parse errors and validation errors.
-- `focus()`. Give the editor focus.
-- `destroy()`. Destroy the editor, remove it from the DOM.
+- `expand([callback: (path: Path) => boolean])` 在编辑器中展开或折叠路径。 通过`callback`确定将展开哪些路径。 如果不提供 `callback`，所有展开所有路径。 只有当路径的所有父路径都已展开时，才有可能展开路径。 例子：
+  - `editor.expand(path => true)` 展开全部
+  - `editor.expand(path => false)` 折叠全部
+  - `editor.expand(path => path.length < 2)` 将所有路径展开到 2 级目录
+- `transform({ id?: string, rootPath?: [], onTransform: ({ operations: JSONPatchDocument, json: JSONValue, transformedJson: JSONValue }) => void, onClose: () => void })`  以编程方式触发单击主菜单中的变换按钮，打开变换模型。 如果提供了`onTransform`回调，它将替换内置逻辑以应用转换，允许您以替代方式处理转换操作。 如果提供了`onClose`回调， 回调将在转换模式关闭时触发，无论是在用户单击应用还是取消之后。 如果提供 `id`，转换模态将加载此的先前状态 `id`而不是编辑器转换模式的状态。
+- `scrollTo(path: Path)` 垂直滚动编辑器，使指定的路径出现在视图中。 路径将在需要时展开。
+- `findElement(path: Path)` 查找给定路径的 DOM 元素。 找不到的时候返回 `null`。
+- `acceptAutoRepair(): Content` 在树模式（tree mode）下，加载时自动修复无效的 JSON。 修复成功后，修复后的内容会呈现出来，但不会应用到文档本身，直到用户单击“Ok”或开始编辑数据。 除了接受修复，用户还可以单击“Repair manually instead(改为手动修复)”。 调用 `.acceptAutoRepair()`将以编程方式接受修复。 这将触发更新，方法本身也会返回更新后的内容。 的情况下 `text`模式或当编辑器不处于“接受自动修复”状态时，不会有任何反应，内容将原样返回。
+- `refresh()`. 刷新内容的呈现，例如在更改字体大小之后。 这仅适用于 `text`模式。
+- `validate() : ContentErrors`. 获取所有当前的解析错误和验证错误。
+- `focus()`. 给编辑器获取焦点。
+- `destroy()`. 销毁编辑器，将其从 DOM 中移除。
 
 ### Utility functions
 
