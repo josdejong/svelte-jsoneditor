@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.11.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.11.5...v0.11.6) (2023-01-07)
+
+
+### Bug Fixes
+
+* upgrade to jsonrepair@3.0.2 and lossless-json@2.0.5 containing an issue with unicode characters ([22cb40e](https://github.com/josdejong/svelte-jsoneditor/commit/22cb40e6972c3e8a93a3bad8730b6e8e82b374b3))
+
 ### [0.11.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.11.4...v0.11.5) (2022-12-20)
 
 
