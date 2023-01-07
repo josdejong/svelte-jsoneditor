@@ -1,5 +1,14 @@
 import easeInOutQuad from './easing.js'
 
+interface JumpOptions {
+  duration?: number | ((distance: number) => number)
+  offset?: number
+  callback?: () => void
+  easing?: (t: number, b: number, c: number, d: number) => number
+  a11y?: boolean
+  container?: Element | string
+}
+
 export const createJump = () => {
   // private variable cache
   // no variables are created during a jump, preventing memory leaks
@@ -103,7 +112,7 @@ export const createJump = () => {
 
   // API
 
-  function jump(target, options = {}) {
+  function jump(target: Element, options: JumpOptions = {}) {
     // resolve options, or use defaults
     duration = options.duration || 1000
     offset = options.offset || 0

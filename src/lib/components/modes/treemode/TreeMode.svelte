@@ -9,7 +9,7 @@
   import { jsonrepair } from 'jsonrepair'
   import { initial, isEmpty, isEqual, last, noop, throttle, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
-  import { createJump } from '$lib/assets/jump.js/src/jump'
+  import { createJump } from '$lib/assets/jump.js/src/jump.js'
   import {
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
