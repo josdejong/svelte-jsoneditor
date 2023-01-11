@@ -9,7 +9,7 @@ import {
   sortObjectKeys,
   sortOperationsMove,
   sortOperationsMoveAdvanced
-} from './sort.js'
+} from './sort'
 
 describe('sort', () => {
   describe('sortJson', () => {

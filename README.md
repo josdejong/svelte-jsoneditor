@@ -680,6 +680,12 @@ Run linter:
 npm run lint
 ```
 
+Run coverage:
+
+```
+npm run coverage
+```
+
 Automatically fix linting issues:
 
 ```
