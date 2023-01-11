@@ -19,8 +19,8 @@ import type {
   JSONSelection,
   SearchResult,
   SearchResultItem
-} from '../types'
-import { SearchField } from '../types.js'
+} from '$lib/types'
+import { SearchField } from '$lib/types.js'
 
 // TODO: comment
 // TODO: unit test
