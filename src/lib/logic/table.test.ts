@@ -1,3 +1,4 @@
+import { test, describe } from 'vitest'
 import {
   findNestedArrays,
   fromTableCellPosition,
@@ -31,13 +32,13 @@ describe('table', () => {
     }
   ]
 
-  it('should extract table columns from data without flattening', () => {
+  test('should extract table columns from data without flattening', () => {
     deepStrictEqual(getColumns(json, false), [['name'], ['address'], ['scores'], ['updated']])
     deepStrictEqual(getColumns(json, false, 1), [['name'], ['address'], ['scores']])
     deepStrictEqual(getColumns([1, 2, 3], false), [[]])
   })
 
-  it('should extract table columns from data with flattening', () => {
+  test('should extract table columns from data with flattening', () => {
     deepStrictEqual(getColumns(json, true), [
       ['name'],
       ['address', 'city'],
@@ -54,13 +55,13 @@ describe('table', () => {
     deepStrictEqual(getColumns([1, 2, 3], true), [[]])
   })
 
-  it('should return an empty array on non-array input', () => {
+  test('should return an empty array on non-array input', () => {
     deepStrictEqual(getColumns({} as JSONArray, false), [])
     deepStrictEqual(getColumns(null, false), [])
     deepStrictEqual(getColumns('foo' as unknown as JSONArray, false), [])
   })
 
-  it('should collect recursive keys from an object', () => {
+  test('should collect recursive keys from an object', () => {
     deepStrictEqual(getRecursiveKeys({ a: 1, b: 2 }), [['a'], ['b']])
     deepStrictEqual(
       getRecursiveKeys({ a: [1, 2, 3], b: { nested1: 4, nested2: { foo: 5, bar: [] } }, c: 42 }),
@@ -68,7 +69,7 @@ describe('table', () => {
     )
   })
 
-  it('should collect shallow keys from an object or value', () => {
+  test('should collect shallow keys from an object or value', () => {
     deepStrictEqual(getShallowKeys({ a: 1, b: 2, c: { d: 3 } }), [['a'], ['b'], ['c']])
     deepStrictEqual(getShallowKeys(42), [[]])
   })
@@ -80,7 +81,7 @@ describe('table', () => {
       { id: 2, name: 'Sarah', address: { city: 'Groningen' } }
     ]
 
-    it('toTableCellPosition', () => {
+    test('toTableCellPosition', () => {
       deepStrictEqual(toTableCellPosition(['2', 'id'], columns), {
         rowIndex: 2,
         columnIndex: 0
@@ -102,14 +103,14 @@ describe('table', () => {
       })
     })
 
-    it('toTableCellPosition of a non-flattened, nested item', () => {
+    test('toTableCellPosition of a non-flattened, nested item', () => {
       deepStrictEqual(toTableCellPosition(['2', 'other', 'nickname'], columns), {
         rowIndex: 2,
         columnIndex: 3
       })
     })
 
-    it('fromTableCellPosition', () => {
+    test('fromTableCellPosition', () => {
       deepStrictEqual(
         fromTableCellPosition(
           {
@@ -133,7 +134,7 @@ describe('table', () => {
       )
     })
 
-    it('selectPreviousRow', () => {
+    test('selectPreviousRow', () => {
       deepStrictEqual(
         selectPreviousRow(columns, createValueSelection(['2', 'id'], false)),
         createValueSelection(['1', 'id'], false)
@@ -145,7 +146,7 @@ describe('table', () => {
       )
     })
 
-    it('selectNextRow', () => {
+    test('selectNextRow', () => {
       deepStrictEqual(
         selectNextRow(json, columns, createValueSelection(['0', 'id'], false)),
         createValueSelection(['1', 'id'], false)
@@ -157,7 +158,7 @@ describe('table', () => {
       )
     })
 
-    it('selectPreviousColumn', () => {
+    test('selectPreviousColumn', () => {
       deepStrictEqual(
         selectPreviousColumn(columns, createValueSelection(['2', 'name'], false)),
         createValueSelection(['2', 'id'], false)
@@ -169,7 +170,7 @@ describe('table', () => {
       )
     })
 
-    it('selectNextColumn', () => {
+    test('selectNextColumn', () => {
       deepStrictEqual(
         selectNextColumn(columns, createValueSelection(['2', 'id'], false)),
         createValueSelection(['2', 'name'], false)
@@ -181,7 +182,7 @@ describe('table', () => {
       )
     })
 
-    it('stringifyTableCellPosition', () => {
+    test('stringifyTableCellPosition', () => {
       deepStrictEqual(stringifyTableCellPosition({ rowIndex: 2, columnIndex: 5 }), '2:5')
     })
   })
@@ -189,7 +190,7 @@ describe('table', () => {
   describe('groupValidationErrors', () => {
     const columns = [['id'], ['name'], ['address'], ['array']]
 
-    it('should put root errors in root', () => {
+    test('should put root errors in root', () => {
       const error: ValidationError = {
         message: 'must NOT have fewer than 999 items',
         path: [],
@@ -202,7 +203,7 @@ describe('table', () => {
       })
     })
 
-    it('should put cell errors in the right cell', () => {
+    test('should put cell errors in the right cell', () => {
       const error: ValidationError = {
         message: 'must be number',
         path: ['5', 'array', '2'],
@@ -222,7 +223,7 @@ describe('table', () => {
       })
     })
 
-    it('should put row errors in the row header', () => {
+    test('should put row errors in the row header', () => {
       const error: ValidationError = {
         message: 'should NOT have additional property: unknownProp',
         path: ['9'],
@@ -240,7 +241,7 @@ describe('table', () => {
       })
     })
 
-    it('should put missing nested required properties in the right column', () => {
+    test('should put missing nested required properties in the right column', () => {
       const error: ValidationError = {
         path: ['3', 'address'],
         message: "must have required property 'city'",
@@ -261,7 +262,7 @@ describe('table', () => {
     })
   })
 
-  it('mergeValidationErrors', () => {
+  test('mergeValidationErrors', () => {
     const path = ['2', 'object']
     const errors = [
       {
@@ -286,7 +287,7 @@ describe('table', () => {
     deepStrictEqual(mergeValidationErrors(path, []), undefined)
   })
 
-  it('operationAffectsSortedColumn', () => {
+  test('operationAffectsSortedColumn', () => {
     const columns = [['id'], ['name'], ['address'], ['array']]
     const sortedColumn: SortedColumn = {
       path: ['name'],
@@ -331,7 +332,7 @@ describe('table', () => {
   })
 
   describe('findNestedArrays', () => {
-    it('should a nested array', () => {
+    test('should a nested array', () => {
       deepStrictEqual(
         findNestedArrays({
           array: [1, 2, 3]
@@ -340,7 +341,7 @@ describe('table', () => {
       )
     })
 
-    it('should find multiple nested arrays', () => {
+    test('should find multiple nested arrays', () => {
       deepStrictEqual(
         findNestedArrays({
           array1: [1, 2, 3],
@@ -350,7 +351,7 @@ describe('table', () => {
       )
     })
 
-    it('should find deeper nested arrays', () => {
+    test('should find deeper nested arrays', () => {
       deepStrictEqual(
         findNestedArrays({
           a: { b: [1, 2, 3] }
@@ -359,11 +360,11 @@ describe('table', () => {
       )
     })
 
-    it('should find root level array', () => {
+    test('should find root level array', () => {
       deepStrictEqual(findNestedArrays([1, 2, 3]), [[]])
     })
 
-    it('should respect maxLevel when finding a nested array', () => {
+    test('should respect maxLevel when finding a nested array', () => {
       const json = {
         array1: [],
         level1: {

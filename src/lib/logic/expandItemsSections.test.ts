@@ -1,3 +1,4 @@
+import { test, describe } from 'vitest'
 import assert from 'assert'
 import { ARRAY_SECTION_SIZE } from '../constants.js'
 import {
@@ -8,20 +9,20 @@ import {
 } from './expandItemsSections.js'
 
 describe('expandItemsSections', () => {
-  it('should find the next round number', () => {
+  test('should find the next round number', () => {
     assert.strictEqual(nextRoundNumber(ARRAY_SECTION_SIZE / 2), ARRAY_SECTION_SIZE)
     assert.strictEqual(nextRoundNumber(ARRAY_SECTION_SIZE - 1), ARRAY_SECTION_SIZE)
     assert.strictEqual(nextRoundNumber(ARRAY_SECTION_SIZE), 2 * ARRAY_SECTION_SIZE)
   })
 
-  it('should find the current round number', () => {
+  test('should find the current round number', () => {
     assert.strictEqual(currentRoundNumber(ARRAY_SECTION_SIZE), ARRAY_SECTION_SIZE)
     assert.strictEqual(currentRoundNumber(0), 0)
     assert.strictEqual(currentRoundNumber(0.5 * ARRAY_SECTION_SIZE), 0)
     assert.strictEqual(currentRoundNumber(1.5 * ARRAY_SECTION_SIZE), ARRAY_SECTION_SIZE)
   })
 
-  it('should calculate expandable sections (start, middle, end)', () => {
+  test('should calculate expandable sections (start, middle, end)', () => {
     assert.deepStrictEqual(getExpandItemsSections(0, 1000), [
       { start: 0, end: 100 },
       { start: 500, end: 600 },
@@ -73,7 +74,7 @@ describe('expandItemsSections', () => {
     assert.deepStrictEqual(getExpandItemsSections(30, 70), [{ start: 30, end: 70 }])
   })
 
-  it('should apply expanding a new piece of selection', () => {
+  test('should apply expanding a new piece of selection', () => {
     // merge
     assert.deepStrictEqual(
       mergeSections([

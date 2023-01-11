@@ -1,8 +1,9 @@
+import { test, describe } from 'vitest'
 import assert from 'assert'
 import { formatSize } from './fileUtils.js'
 
 describe('fileUtils', () => {
-  it('should format a document size in a human readable way', () => {
+  test('should format a document size in a human readable way', () => {
     assert.strictEqual(formatSize(500), '500 B')
     assert.strictEqual(formatSize(900), '0.9 KB')
     assert.strictEqual(formatSize(77.89 * 1000), '77.9 KB')
@@ -13,7 +14,7 @@ describe('fileUtils', () => {
     assert.strictEqual(formatSize(1000 * 1000 * 1000 * 1000), '1.0 TB')
   })
 
-  it('should format a document size in a human readable way counting with 1024', () => {
+  test('should format a document size in a human readable way counting with 1024', () => {
     assert.strictEqual(formatSize(1024 * 1024, 1024), '1.0 MB')
   })
 })

@@ -1,3 +1,4 @@
+import { test, describe } from 'vitest'
 import { deepStrictEqual, notStrictEqual, strictEqual, throws } from 'assert'
 import {
   createLodashPropertySelector,
@@ -10,7 +11,7 @@ import {
 } from './pathUtils.js'
 
 describe('pathUtils', () => {
-  it('stringifyJSONPath', () => {
+  test('stringifyJSONPath', () => {
     strictEqual(stringifyJSONPath([]), '$')
     strictEqual(stringifyJSONPath(['']), "$['']")
     strictEqual(stringifyJSONPath(['foo']), '$.foo')
@@ -24,7 +25,7 @@ describe('pathUtils', () => {
     strictEqual(stringifyJSONPath(['foo', 'prop with \'".[']), "$.foo['prop with '\".[']")
   })
 
-  it('parseJSONPath', () => {
+  test('parseJSONPath', () => {
     deepStrictEqual(parseJSONPath('$'), [])
     deepStrictEqual(parseJSONPath("$['']"), [''])
     deepStrictEqual(parseJSONPath('$.foo'), ['foo'])
@@ -51,7 +52,7 @@ describe('pathUtils', () => {
     }, new SyntaxError('Cannot parse path: unexpected part " baz" at position 8'))
   })
 
-  it('createLodashPropertySelector', () => {
+  test('createLodashPropertySelector', () => {
     strictEqual(createLodashPropertySelector([]), "''")
     strictEqual(createLodashPropertySelector(['']), '[""]')
     strictEqual(createLodashPropertySelector(['foo']), "'foo'")
@@ -71,12 +72,12 @@ describe('pathUtils', () => {
     strictEqual(createLodashPropertySelector(['foo', 'prop with ".[']), '["foo","prop with \\".["]')
   })
 
-  it('stripRootObject', () => {
+  test('stripRootObject', () => {
     strictEqual(stripRootObject('$.foo.bar'), 'foo.bar')
     strictEqual(stripRootObject("$['foo'].bar"), "['foo'].bar")
   })
 
-  it('pathToOption', () => {
+  test('pathToOption', () => {
     deepStrictEqual(pathToOption([]), { value: [], label: '(whole item)' })
     deepStrictEqual(pathToOption(['users', '2', 'first name']), {
       value: ['users', '2', 'first name'],
@@ -84,7 +85,7 @@ describe('pathUtils', () => {
     })
   })
 
-  it('createPropertySelector', () => {
+  test('createPropertySelector', () => {
     strictEqual(createPropertySelector([]), '')
     strictEqual(createPropertySelector(['location', 'latitude']), '?.location?.latitude')
     strictEqual(createPropertySelector(['a', 'b']), '?.a?.b')
@@ -94,7 +95,7 @@ describe('pathUtils', () => {
     strictEqual(createPropertySelector(['a', '2']), '?.a?.[2]')
   })
 
-  it('createMemoizePath', () => {
+  test('createMemoizePath', () => {
     const memoizePath = createMemoizePath()
 
     const path1 = ['a', 'b']

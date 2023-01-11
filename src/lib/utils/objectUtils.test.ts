@@ -1,3 +1,4 @@
+import { test, describe } from 'vitest'
 import { deepStrictEqual, strictEqual } from 'assert'
 import { traverse } from './objectUtils.js'
 import { isEqual } from 'lodash-es'
@@ -12,7 +13,7 @@ describe('objectUtils', () => {
     e: 5
   }
 
-  it('traverse', () => {
+  test('traverse', () => {
     const logs = []
 
     traverse(json, (value, path, context) => {
@@ -32,7 +33,7 @@ describe('objectUtils', () => {
     ])
   })
 
-  it('stop traversing deeper by returning false', () => {
+  test('stop traversing deeper by returning false', () => {
     const json = {
       a: [1, 2],
       b: {

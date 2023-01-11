@@ -1,3 +1,4 @@
+import { test, describe } from 'vitest'
 import assert from 'assert'
 import { javascriptQueryLanguage } from './javascriptQueryLanguage.js'
 import { cloneDeep } from 'lodash-es'
@@ -13,7 +14,7 @@ const originalUsers = cloneDeep([user1, user3, user2])
 
 describe('javascriptQueryLanguage', () => {
   describe('createQuery and executeQuery', () => {
-    it('should create a and execute an empty query', () => {
+    test('should create a and execute an empty query', () => {
       const query = createQuery(users, {})
       const result = executeQuery(users, query)
       assert.deepStrictEqual(query, 'function query (data) {\n  return data\n}')
@@ -21,7 +22,7 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    it('should create and execute a filter query for a nested property', () => {
+    test('should create and execute a filter query for a nested property', () => {
       const query = createQuery(users, {
         filter: {
           path: ['user', 'name'],
@@ -42,7 +43,7 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original data
     })
 
-    it('should create and execute a filter query for a property with special characters in the name', () => {
+    test('should create and execute a filter query for a property with special characters in the name', () => {
       const data = users.map((item) => ({ 'user name!': item.user.name }))
       const originalData = cloneDeep(data)
 
@@ -66,7 +67,7 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(data, originalData) // must not touch the original data
     })
 
-    it('should create and execute a filter query for the whole array item', () => {
+    test('should create and execute a filter query for the whole array item', () => {
       const data = [2, 3, 1]
       const originalData = cloneDeep(data)
       const query = createQuery(data, {
@@ -89,7 +90,7 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(data, originalData) // must not touch the original data
     })
 
-    it('should create and execute a filter with booleans', () => {
+    test('should create and execute a filter with booleans', () => {
       const query = createQuery(users, {
         filter: {
           path: ['user', 'registered'],
@@ -110,7 +111,7 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    it('should create and execute a filter with null', () => {
+    test('should create and execute a filter with null', () => {
       const query = createQuery(users, {
         filter: {
           path: ['user', 'extra'],
@@ -131,7 +132,7 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    it('should create and execute a filter with undefined', () => {
+    test('should create and execute a filter with undefined', () => {
       const query = createQuery(users, {
         filter: {
           path: ['user', 'extra'],
@@ -152,7 +153,7 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    it('should create and execute a sort query in ascending direction', () => {
+    test('should create and execute a sort query in ascending direction', () => {
       const query = createQuery(users, {
         sort: {
           path: ['user', 'age'],
@@ -177,7 +178,7 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    it('should create and execute a sort query in descending direction', () => {
+    test('should create and execute a sort query in descending direction', () => {
       const query = createQuery(users, {
         sort: {
           path: ['user', 'age'],
@@ -202,7 +203,7 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    it('should create and execute a project query for a single property', () => {
+    test('should create and execute a project query for a single property', () => {
       const query = createQuery(users, {
         projection: {
           paths: [['user', 'name']]
@@ -222,7 +223,7 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    it('should create and execute a project query for a multiple properties', () => {
+    test('should create and execute a project query for a multiple properties', () => {
       const query = createQuery(users, {
         projection: {
           paths: [['user', 'name'], ['_id']]
@@ -249,7 +250,7 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    it('should create and execute a query with filter, sort and project', () => {
+    test('should create and execute a query with filter, sort and project', () => {
       const query = createQuery(users, {
         filter: {
           path: ['user', 'age'],
@@ -285,7 +286,7 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    it('should allow defining multiple functions', () => {
+    test('should allow defining multiple functions', () => {
       const query =
         'function square(x) {\n' +
         '  return x*x;\n' +
@@ -298,7 +299,7 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(result, 16)
     })
 
-    it('should throw an exception when function query is not defined in the query', () => {
+    test('should throw an exception when function query is not defined in the query', () => {
       assert.throws(() => {
         const query = 'function test (data) { return 42 }'
         const data = {}
@@ -307,7 +308,7 @@ describe('javascriptQueryLanguage', () => {
       }, /Error: Cannot execute query: expecting a function named 'query' but is undefined/)
     })
 
-    it('should return null when property is not found', () => {
+    test('should return null when property is not found', () => {
       const query = 'function query (data) {\n' + '  return data.foo\n' + '}'
       const data = {}
       const result = executeQuery(data, query)

@@ -1,3 +1,4 @@
+import { test, describe } from 'vitest'
 import assert from 'assert'
 import type { JSONPath } from 'immutable-json-patch'
 import { immutableJSONPatch } from 'immutable-json-patch'
@@ -15,7 +16,7 @@ import { SearchField } from '../types.js'
 import { createKeySelection, createValueSelection } from './selection.js'
 
 describe('search', () => {
-  it('search in JSON', () => {
+  test('search in JSON', () => {
     const json = {
       b: { c: 'a' },
       a: [{ a: 'b', c: 'a' }, 'e', 'a']
@@ -63,7 +64,7 @@ describe('search', () => {
     ])
   })
 
-  it('search should find multiple occurrences in JSON, case insensitive', () => {
+  test('search should find multiple occurrences in JSON, case insensitive', () => {
     const json = {
       'hello world': 'hello world, hello WORLD, world'
     }
@@ -103,7 +104,7 @@ describe('search', () => {
     ])
   })
 
-  it('should respect order of keys in document state in search', () => {
+  test('should respect order of keys in document state in search', () => {
     const json = {
       data: {
         text2: 'foo',
@@ -134,7 +135,7 @@ describe('search', () => {
     ])
   })
 
-  it('should limit search results to the provided max', () => {
+  test('should limit search results to the provided max', () => {
     const count = 10
     const json = Array(count).fill(42)
 
@@ -146,7 +147,7 @@ describe('search', () => {
     assert.deepStrictEqual(results.length, maxResults)
   })
 
-  it('should limit search results to the provided max in case of multiple matches in a single field', () => {
+  test('should limit search results to the provided max in case of multiple matches in a single field', () => {
     const maxResults = 4
 
     assert.deepStrictEqual(
@@ -161,7 +162,7 @@ describe('search', () => {
     )
   })
 
-  it('should find all case insensitive matches', () => {
+  test('should find all case insensitive matches', () => {
     const path = []
     const field = SearchField.value
 
@@ -190,7 +191,7 @@ describe('search', () => {
     )
   })
 
-  it('should split search results', () => {
+  test('should split search results', () => {
     const text = 'hello world, HELLO!'
     const searchTextLowerCase = 'hello'
     const path = []
@@ -234,11 +235,11 @@ describe('search', () => {
     ])
   })
 
-  it('should replace text', () => {
+  test('should replace text', () => {
     assert.strictEqual(replaceText('hello, world!', '***', 7, 12), 'hello, ***!')
   })
 
-  it('should create operations to replace a search result value', () => {
+  test('should create operations to replace a search result value', () => {
     const json = {
       before: 'text',
       'hello world': 'hello world, hello WORLD, world',
@@ -274,7 +275,7 @@ describe('search', () => {
     })
   })
 
-  it('should create operations to replace a search result key', () => {
+  test('should create operations to replace a search result key', () => {
     const json = {
       before: 'text',
       'hello world': 'hello world, hello WORLD, world',
@@ -307,7 +308,7 @@ describe('search', () => {
     })
   })
 
-  it('should create operations to replace with a numeric value', () => {
+  test('should create operations to replace with a numeric value', () => {
     const json = {
       value: 2
     }
@@ -337,7 +338,7 @@ describe('search', () => {
     })
   })
 
-  it('should create operations to replace with a boolean value', () => {
+  test('should create operations to replace with a boolean value', () => {
     const json = {
       value: 2
     }
@@ -367,7 +368,7 @@ describe('search', () => {
     })
   })
 
-  it('should create operations to replace with a null value', () => {
+  test('should create operations to replace with a null value', () => {
     const json = {
       value: 2
     }
@@ -397,7 +398,7 @@ describe('search', () => {
     })
   })
 
-  it('should create operations to replace a numeric value with a string', () => {
+  test('should create operations to replace a numeric value with a string', () => {
     const json = {
       value: 2
     }
@@ -421,11 +422,11 @@ describe('search', () => {
     })
   })
 
-  // it('should search inside a JSON object with LosslessNumbers', () => {
+  // test('should search inside a JSON object with LosslessNumbers', () => {
   //
   // })
 
-  it('should create operations to replace all search results', () => {
+  test('should create operations to replace all search results', () => {
     const json = {
       before: 'text',
       'hello world': {
@@ -472,7 +473,7 @@ describe('search', () => {
     })
   })
 
-  it('should create operations to replace all search results matching a numeric value', () => {
+  test('should create operations to replace all search results matching a numeric value', () => {
     const json = {
       value: 2
     }
@@ -502,7 +503,7 @@ describe('search', () => {
     })
   })
 
-  it('should create operations to replace all search results with a numeric value', () => {
+  test('should create operations to replace all search results with a numeric value', () => {
     const json = {
       value: 2
     }

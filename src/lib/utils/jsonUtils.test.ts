@@ -1,3 +1,4 @@
+import { test, describe } from 'vitest'
 import type { JSONParser } from '$lib/types.js'
 import { deepStrictEqual, strictEqual, deepEqual, throws } from 'assert'
 import { LosslessNumber, parse, stringify } from 'lossless-json'
@@ -25,7 +26,7 @@ describe('jsonUtils', () => {
 
   const jsonString2 = '{\n' + '  "id": 2,\n' + '  name: "Jo"\n' + '}'
 
-  it('should normalize an error from Chrome (1)', () => {
+  test('should normalize an error from Chrome (1)', () => {
     const errorMessage = 'Unexpected token i in JSON at position 4'
 
     deepStrictEqual(normalizeJsonParseError(jsonString, errorMessage), {
@@ -36,7 +37,7 @@ describe('jsonUtils', () => {
     })
   })
 
-  it('should normalize a parse error from Firefox (1)', () => {
+  test('should normalize a parse error from Firefox (1)', () => {
     const errorMessage = "expected property name or '}' at line 2 column 3 of the JSON data"
 
     deepStrictEqual(normalizeJsonParseError(jsonString, errorMessage), {
@@ -47,7 +48,7 @@ describe('jsonUtils', () => {
     })
   })
 
-  it('should normalize an error from Chrome (2)', () => {
+  test('should normalize an error from Chrome (2)', () => {
     const errorMessage = 'Unexpected token n in JSON at position 15'
 
     deepStrictEqual(normalizeJsonParseError(jsonString2, errorMessage), {
@@ -58,7 +59,7 @@ describe('jsonUtils', () => {
     })
   })
 
-  it('should normalize a parse error from Firefox (2)', () => {
+  test('should normalize a parse error from Firefox (2)', () => {
     const errorMessage = 'expected double-quoted property name at line 3 column 3 of the JSON data'
 
     deepStrictEqual(normalizeJsonParseError(jsonString2, errorMessage), {
@@ -69,12 +70,12 @@ describe('jsonUtils', () => {
     })
   })
 
-  it('should calculate the position from a line and column number', () => {
+  test('should calculate the position from a line and column number', () => {
     strictEqual(calculatePosition(jsonString, 1, 2), 4)
     strictEqual(calculatePosition(jsonString2, 2, 2), 15)
   })
 
-  it('should count occurrences of a specific character in a string', () => {
+  test('should count occurrences of a specific character in a string', () => {
     strictEqual(countCharacterOccurrences('1\n2\n3\n4\n', '\n'), 4)
     strictEqual(countCharacterOccurrences('1\n2\n3\n4\n', '\n', 0, 2), 1)
     strictEqual(countCharacterOccurrences('1\n2\n3\n4\n', '\n', 0, 3), 1)
@@ -82,7 +83,7 @@ describe('jsonUtils', () => {
     strictEqual(countCharacterOccurrences('1\n2\n3\n4\n', '\n', 6), 1)
   })
 
-  it('should parse partial JSON', () => {
+  test('should parse partial JSON', () => {
     deepStrictEqual(parsePartialJson('"hello world"', JSON.parse), 'hello world')
     deepStrictEqual(parsePartialJson('null', JSON.parse), null)
     deepStrictEqual(parsePartialJson('42', JSON.parse), 42)
@@ -102,7 +103,7 @@ describe('jsonUtils', () => {
     deepStrictEqual(parsePartialJson(partialJson + ',', JSON.parse), expected)
   })
 
-  it('should validate content type', () => {
+  test('should validate content type', () => {
     deepStrictEqual(validateContentType({ json: [1, 2, 3] }), null)
     deepStrictEqual(validateContentType({ text: '[1,2,3]' }), null)
 
@@ -126,13 +127,13 @@ describe('jsonUtils', () => {
   })
 
   describe('estimateSerializedSize', () => {
-    it('should estimate the size of a small document (1)', () => {
+    test('should estimate the size of a small document (1)', () => {
       const doc = { id: 2, name: 'Suzan' }
       strictEqual(JSON.stringify(doc).length, 23)
       strictEqual(estimateSerializedSize({ json: doc }), 23)
     })
 
-    it('should estimate the size of a small document (2)', () => {
+    test('should estimate the size of a small document (2)', () => {
       const doc = [
         { id: 1, name: 'Jo' },
         { id: 2, name: 'Suzan' },
@@ -142,13 +143,13 @@ describe('jsonUtils', () => {
       strictEqual(estimateSerializedSize({ json: doc }), 68)
     })
 
-    it('should estimate the size of a large document', () => {
+    test('should estimate the size of a large document', () => {
       const doc = createLargeDoc()
       strictEqual(JSON.stringify(doc).length, 5881)
       strictEqual(estimateSerializedSize({ json: doc }), 5881)
     })
 
-    it('should stop size estimation when exceeding the provided maxSize', () => {
+    test('should stop size estimation when exceeding the provided maxSize', () => {
       const doc = createLargeDoc()
 
       strictEqual(estimateSerializedSize({ json: doc }, 1000), 1004)
@@ -169,7 +170,7 @@ describe('jsonUtils', () => {
     }
   })
 
-  it('isLargeContent', () => {
+  test('isLargeContent', () => {
     const text = '[1,2,3,4,5,6,7,8,9,0]'
     const textContent = { text }
     const jsonContent = { json: JSON.parse(text) }
@@ -181,7 +182,7 @@ describe('jsonUtils', () => {
     strictEqual(isLargeContent(jsonContent, 10), true)
   })
 
-  it('isContent', () => {
+  test('isContent', () => {
     strictEqual(isContent({ text: '' }), true)
     strictEqual(isContent({ json: [] }), true)
     strictEqual(isContent({ text: '', json: [] }), true)
@@ -199,7 +200,7 @@ describe('jsonUtils', () => {
     strictEqual(isContent(c), false)
   })
 
-  it('isTextContent', () => {
+  test('isTextContent', () => {
     strictEqual(isTextContent({ text: '' }), true)
     strictEqual(isTextContent({ json: [] }), false)
     strictEqual(isTextContent({ text: '', json: [] }), true)
@@ -217,7 +218,7 @@ describe('jsonUtils', () => {
     strictEqual(isTextContent(c), false)
   })
 
-  it('isJSONContent', () => {
+  test('isJSONContent', () => {
     strictEqual(isJSONContent({ text: '' }), false)
     strictEqual(isJSONContent({ json: [] }), true)
     strictEqual(isJSONContent({ text: '', json: [] }), false) // text has precedence over json
@@ -235,7 +236,7 @@ describe('jsonUtils', () => {
     strictEqual(isJSONContent(c), false)
   })
 
-  it('toTextContent', () => {
+  test('toTextContent', () => {
     const textContent = { text: '[1,2,3]' }
     strictEqual(toTextContent(textContent), textContent)
     deepStrictEqual(toTextContent({ json: [1, 2, 3] }), textContent)
@@ -253,7 +254,7 @@ describe('jsonUtils', () => {
     )
   })
 
-  it('toJSONContent', () => {
+  test('toJSONContent', () => {
     const jsonContent = { json: [1, 2, 3] }
 
     deepStrictEqual(toJSONContent({ text: '[1,2,3]' }), jsonContent)
@@ -273,16 +274,16 @@ describe('jsonUtils', () => {
   })
 
   describe('convertValue', () => {
-    it('should convert an object to an array', () => {
+    test('should convert an object to an array', () => {
       deepStrictEqual(convertValue({ 2: 'c', 1: 'b', 0: 'a' }, 'array', JSON), ['a', 'b', 'c'])
     })
 
-    it('should convert an array to an array', () => {
+    test('should convert an array to an array', () => {
       const array = [1, 2, 3]
       strictEqual(convertValue(array, 'array', JSON), array)
     })
 
-    it('should convert a stringified object to an array', () => {
+    test('should convert a stringified object to an array', () => {
       deepStrictEqual(convertValue('{ "2": "c", "1": "b", "0": "a" }', 'array', JSON), [
         'a',
         'b',
@@ -290,40 +291,40 @@ describe('jsonUtils', () => {
       ])
     })
 
-    it('should convert a stringified array to an array', () => {
+    test('should convert a stringified array to an array', () => {
       deepStrictEqual(convertValue('[1,2,3]', 'array', JSON), [1, 2, 3])
     })
 
-    it('should return a reasonable array when a value cannot be parsed as JSON', () => {
+    test('should return a reasonable array when a value cannot be parsed as JSON', () => {
       const array = ['no valid json text']
       deepEqual(convertValue('no valid json text', 'array', JSON), array)
     })
 
-    it('should return an array with a null value when given invalid JSON value "null"', () => {
+    test('should return an array with a null value when given invalid JSON value "null"', () => {
       const array = [null]
       deepEqual(convertValue(null, 'array', JSON), array)
     })
 
-    it('should return an array with undefined value when given invalid JSON value "undefined"', () => {
+    test('should return an array with undefined value when given invalid JSON value "undefined"', () => {
       const array = [undefined]
       deepEqual(convertValue(undefined, 'array', JSON), array)
     })
 
-    it('should return an array with number value when given invalid JSON as number', () => {
+    test('should return an array with number value when given invalid JSON as number', () => {
       const array = [1]
       deepEqual(convertValue(1, 'array', JSON), array)
     })
 
-    it('should return an array with boolean value when given invalid JSON as boolean', () => {
+    test('should return an array with boolean value when given invalid JSON as boolean', () => {
       const array = [false]
       deepEqual(convertValue(false, 'array', JSON), array)
     })
 
-    it('should convert an array to an object', () => {
+    test('should convert an array to an object', () => {
       deepStrictEqual(convertValue(['a', 'b', 'c'], 'object', JSON), { 2: 'c', 1: 'b', 0: 'a' })
     })
 
-    it('should convert an object to an object', () => {
+    test('should convert an object to an object', () => {
       const object = {
         a: 1,
         b: 2
@@ -331,63 +332,63 @@ describe('jsonUtils', () => {
       strictEqual(convertValue(object, 'object', JSON), object)
     })
 
-    it('should convert a stringified object to an object', () => {
+    test('should convert a stringified object to an object', () => {
       deepStrictEqual(convertValue('{"a":1,"b":2}', 'object', JSON), { a: 1, b: 2 })
     })
 
-    it('should convert a stringified array to an object', () => {
+    test('should convert a stringified array to an object', () => {
       deepStrictEqual(convertValue('["a", "b", "c"]', 'object', JSON), { 2: 'c', 1: 'b', 0: 'a' })
     })
 
-    it('should return a reasonable object when a value cannot be parsed as JSON, putting the value in a "value" key', () => {
+    test('should return a reasonable object when a value cannot be parsed as JSON, putting the value in a "value" key', () => {
       const object = {
         value: 'no valid json text'
       }
       deepEqual(convertValue('no valid json text', 'object', JSON), object)
     })
 
-    it('should return a reasonable object with a null value under "value" when given invalid JSON value "null"', () => {
+    test('should return a reasonable object with a null value under "value" when given invalid JSON value "null"', () => {
       const object = {
         value: null
       }
       deepEqual(convertValue(null, 'object', JSON), object)
     })
 
-    it('should return a reasonable object with a undefined value under "value" when given invalid JSON value "undefined"', () => {
+    test('should return a reasonable object with a undefined value under "value" when given invalid JSON value "undefined"', () => {
       const object = {
         value: undefined
       }
       deepEqual(convertValue(undefined, 'object', JSON), object)
     })
 
-    it('should return a reasonable object with a number value under "value" when given invalid JSON of number', () => {
+    test('should return a reasonable object with a number value under "value" when given invalid JSON of number', () => {
       const object = {
         value: 1
       }
       deepEqual(convertValue(1, 'object', JSON), object)
     })
 
-    it('should return a reasonable object with a boolean value under "value" when given invalid JSON value of boolean', () => {
+    test('should return a reasonable object with a boolean value under "value" when given invalid JSON value of boolean', () => {
       const object = {
         value: false
       }
       deepEqual(convertValue(false, 'object', JSON), object)
     })
 
-    it('should convert an array to a value', () => {
+    test('should convert an array to a value', () => {
       deepStrictEqual(convertValue([1, 2, 3], 'value', JSON), '[1,2,3]')
     })
 
-    it('should convert an object to a value', () => {
+    test('should convert an object to a value', () => {
       deepStrictEqual(convertValue({ a: 1, b: 2 }, 'value', JSON), '{"a":1,"b":2}')
     })
 
-    it('should convert a value to a value', () => {
+    test('should convert a value to a value', () => {
       strictEqual(convertValue('foo', 'value', JSON), 'foo')
       strictEqual(convertValue(true, 'value', JSON), true)
     })
 
-    it('should test whether two parsers are equal', () => {
+    test('should test whether two parsers are equal', () => {
       // FIXME: should not be needed to cast to JSONParser
       const LosslessJSON = { parse, stringify } as JSONParser
       const LosslessJSON2 = { parse, stringify } as JSONParser

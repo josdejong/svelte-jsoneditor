@@ -1,3 +1,4 @@
+import { test, describe } from 'vitest'
 import { deepStrictEqual } from 'assert'
 import { mapValidationErrors, validateJSON, validateText } from './validation.js'
 import type { JSONParser, ValidationError } from '../types'
@@ -8,7 +9,7 @@ import { LosslessNumber } from 'lossless-json'
 const LosslessJSONParser = { parse, stringify } as JSONParser
 
 describe('validation', () => {
-  it('should create a map from a list with validation errors', () => {
+  test('should create a map from a list with validation errors', () => {
     const message1 = 'Number expected'
     const message2 = 'Year in the past expected'
     const message3 = 'Contains invalid data'
@@ -85,32 +86,32 @@ describe('validation', () => {
     const validLosslessJson = { count: new LosslessNumber('42') } as unknown as JSONValue
     const invalidLosslessJson = { foo: new LosslessNumber('42') } as unknown as JSONValue
 
-    it('should validateJSON with native parser and valid JSON', () => {
+    test('should validateJSON with native parser and valid JSON', () => {
       deepStrictEqual(validateJSON(validJson, myValidator, JSON, JSON), [])
     })
 
-    it('should validateJSON with native parser and invalid JSON', () => {
+    test('should validateJSON with native parser and invalid JSON', () => {
       deepStrictEqual(validateJSON(invalidJson, myValidator, JSON, JSON), [countValidationError])
     })
 
-    it('should validateJSON with lossless parser and valid JSON', () => {
+    test('should validateJSON with lossless parser and valid JSON', () => {
       deepStrictEqual(validateJSON(validLosslessJson, myValidator, LosslessJSONParser, JSON), [])
     })
 
-    it('should validateJSON with lossless parser and invalid JSON', () => {
+    test('should validateJSON with lossless parser and invalid JSON', () => {
       deepStrictEqual(validateJSON(invalidLosslessJson, myValidator, LosslessJSONParser, JSON), [
         countValidationError
       ])
     })
 
-    it('should validateJSON with two lossless parsers and invalid native JSON', () => {
+    test('should validateJSON with two lossless parsers and invalid native JSON', () => {
       deepStrictEqual(
         validateJSON(validJson, myLosslessValidator, LosslessJSONParser, LosslessJSONParser),
         [countLosslessValidationError]
       )
     })
 
-    it('should validateJSON with two lossless parsers and valid lossless JSON', () => {
+    test('should validateJSON with two lossless parsers and valid lossless JSON', () => {
       deepStrictEqual(
         validateJSON(
           validLosslessJson as unknown as JSONValue,
@@ -159,31 +160,31 @@ describe('validation', () => {
     const validText = '{ "count": 42 }'
     const invalidText = '{ "foo": 42 }'
 
-    it('should validateText with native parser and valid JSON', () => {
+    test('should validateText with native parser and valid JSON', () => {
       deepStrictEqual(validateText(validText, myValidator, JSON, JSON), {
         validationErrors: []
       })
     })
 
-    it('should validateText with native parser and invalid JSON', () => {
+    test('should validateText with native parser and invalid JSON', () => {
       deepStrictEqual(validateText(invalidText, myValidator, JSON, JSON), {
         validationErrors: [countValidationError]
       })
     })
 
-    it('should validateText with lossless parser and valid JSON', () => {
+    test('should validateText with lossless parser and valid JSON', () => {
       deepStrictEqual(validateText(validText, myValidator, LosslessJSONParser, JSON), {
         validationErrors: []
       })
     })
 
-    it('should validateText with lossless parser and invalid JSON', () => {
+    test('should validateText with lossless parser and invalid JSON', () => {
       deepStrictEqual(validateText(invalidText, myValidator, LosslessJSONParser, JSON), {
         validationErrors: [countValidationError]
       })
     })
 
-    it('should validateText with two lossless parsers and valid JSON', () => {
+    test('should validateText with two lossless parsers and valid JSON', () => {
       deepStrictEqual(
         validateText(validText, myLosslessValidator, LosslessJSONParser, LosslessJSONParser),
         {
@@ -192,7 +193,7 @@ describe('validation', () => {
       )
     })
 
-    it('should validateText with two lossless parsers and invalid JSON', () => {
+    test('should validateText with two lossless parsers and invalid JSON', () => {
       deepStrictEqual(
         validateText(invalidText, myLosslessValidator, LosslessJSONParser, LosslessJSONParser),
         {
@@ -201,7 +202,7 @@ describe('validation', () => {
       )
     })
 
-    it('should validateText with a non-repairable parse error', () => {
+    test('should validateText with a non-repairable parse error', () => {
       const invalidText = '{\n  "name": "Joe" ]'
 
       deepStrictEqual(validateText(invalidText, null, LosslessJSONParser, JSON), {
@@ -215,7 +216,7 @@ describe('validation', () => {
       })
     })
 
-    it('should validateText with a repairable parse error', () => {
+    test('should validateText with a repairable parse error', () => {
       const invalidText = '{\n  "name": "Joe"'
 
       deepStrictEqual(validateText(invalidText, null, LosslessJSONParser, JSON), {
@@ -230,7 +231,7 @@ describe('validation', () => {
       })
     })
 
-    it('should validateText with duplicate keys', () => {
+    test('should validateText with duplicate keys', () => {
       const duplicateKeysText = '{\n  "name": "Joe",\n  "age": 23,\n  "name": "Sarah"\n}'
 
       deepStrictEqual(validateText(duplicateKeysText, null, LosslessJSONParser, JSON), {

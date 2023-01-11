@@ -1,8 +1,9 @@
+import { test, describe } from 'vitest'
 import { strictEqual } from 'assert'
 import { isDigit } from './numberUtils.js'
 
 describe('numberUtils', () => {
-  it('isDigit', () => {
+  test('isDigit', () => {
     strictEqual(isDigit('0'), true)
     strictEqual(isDigit('5'), true)
     strictEqual(isDigit('9'), true)
