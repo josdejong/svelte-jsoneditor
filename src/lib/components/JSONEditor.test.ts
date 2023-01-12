@@ -8,6 +8,8 @@ describe('JSONEditor', () => {
     json: [{ id: 1 }, { id: 2, name: 'Joe' }, { id: 3 }]
   }
 
+  const originalResizeObserver = window.ResizeObserver
+
   beforeEach(() => {
     window.ResizeObserver =
       window.ResizeObserver ||
@@ -16,6 +18,10 @@ describe('JSONEditor', () => {
         observe: vi.fn(),
         unobserve: vi.fn()
       }))
+  })
+
+  afterEach(() => {
+    window.ResizeObserver = originalResizeObserver
   })
 
   test('render tree mode', () => {
