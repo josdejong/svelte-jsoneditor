@@ -5,3 +5,4 @@ node_modules
 /package
 /package-vanilla
 /.svelte-kit
+coverage

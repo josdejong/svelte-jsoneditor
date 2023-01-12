@@ -1,3 +1,4 @@
+import { test, describe } from 'vitest'
 import { createMultiSelection } from './selection.js'
 import { onMoveSelection } from './dragging.js'
 import type { MoveSelectionResult } from './dragging.js'
@@ -39,13 +40,13 @@ describe('dragging', () => {
       })
     }
 
-    it('move down (0 items)', () => {
+    test('move down (0 items)', () => {
       const { operations, offset } = doMoveSelection({ deltaY: 0.3 * itemHeight })
       strictEqual(offset, 0)
       deepStrictEqual(operations, undefined)
     })
 
-    it('move down (1 item)', () => {
+    test('move down (1 item)', () => {
       const { operations, offset } = doMoveSelection({
         deltaY: 0.75 * itemHeight
       })
@@ -62,7 +63,7 @@ describe('dragging', () => {
       })
     })
 
-    it('move down (recon with height)', () => {
+    test('move down (recon with height)', () => {
       const largeItemHeight = 3 * itemHeight
       const items = allItems.map((item) => {
         return isEqual(item.path, ['array', '6'])
@@ -74,7 +75,7 @@ describe('dragging', () => {
       strictEqual(doMoveSelection({ deltaY: 2.5 * itemHeight, items }).offset, 1)
     })
 
-    it('move down (2 items)', () => {
+    test('move down (2 items)', () => {
       const { operations, offset } = doMoveSelection({ deltaY: 1.7 * itemHeight })
       strictEqual(offset, 2)
       deepStrictEqual(immutableJSONPatch(json, operations), {
@@ -82,7 +83,7 @@ describe('dragging', () => {
       })
     })
 
-    it('move down (to bottom)', () => {
+    test('move down (to bottom)', () => {
       const { operations, offset } = doMoveSelection({ deltaY: 999 * itemHeight })
       strictEqual(offset, 4)
       deepStrictEqual(immutableJSONPatch(json, operations), {
@@ -90,13 +91,13 @@ describe('dragging', () => {
       })
     })
 
-    it('move up (0 items)', () => {
+    test('move up (0 items)', () => {
       const { operations, offset } = doMoveSelection({ deltaY: -0.3 * itemHeight })
       strictEqual(offset, 0)
       deepStrictEqual(operations, undefined)
     })
 
-    it('move up (1 item)', () => {
+    test('move up (1 item)', () => {
       const { operations, offset } = doMoveSelection({
         deltaY: -0.7 * itemHeight
       })
@@ -113,7 +114,7 @@ describe('dragging', () => {
       })
     })
 
-    it('move up (recon with height)', () => {
+    test('move up (recon with height)', () => {
       const largeItemHeight = 3 * itemHeight
       const items = allItems.map((item) => {
         return isEqual(item.path, ['array', '2'])
@@ -125,7 +126,7 @@ describe('dragging', () => {
       strictEqual(doMoveSelection({ deltaY: -2.5 * itemHeight, items }).offset, -1)
     })
 
-    it('move up (2 items)', () => {
+    test('move up (2 items)', () => {
       const { operations, offset } = doMoveSelection({ deltaY: -1.7 * itemHeight })
       strictEqual(offset, -2)
       deepStrictEqual(immutableJSONPatch(json, operations), {
@@ -133,7 +134,7 @@ describe('dragging', () => {
       })
     })
 
-    it('move up (to top)', () => {
+    test('move up (to top)', () => {
       const { operations, offset } = doMoveSelection({ deltaY: -999 * itemHeight })
       strictEqual(offset, -3)
       deepStrictEqual(immutableJSONPatch(json, operations), {
@@ -166,13 +167,13 @@ describe('dragging', () => {
       })
     }
 
-    it('move down (0 items)', () => {
+    test('move down (0 items)', () => {
       const { operations, offset } = doMoveSelection({ deltaY: 0.3 * itemHeight })
       strictEqual(offset, 0)
       strictEqual(operations, undefined)
     })
 
-    it('move down (1 item)', () => {
+    test('move down (1 item)', () => {
       const { operations, offset } = doMoveSelection({
         deltaY: 0.7 * itemHeight
       })
@@ -191,7 +192,7 @@ describe('dragging', () => {
       )
     })
 
-    it('move down (2 items)', () => {
+    test('move down (2 items)', () => {
       const { operations, offset } = doMoveSelection({
         deltaY: 1.7 * itemHeight
       })
@@ -204,7 +205,7 @@ describe('dragging', () => {
       )
     })
 
-    it('move down (to bottom)', () => {
+    test('move down (to bottom)', () => {
       const { operations, offset } = doMoveSelection({
         deltaY: 999 * itemHeight
       })
@@ -220,13 +221,13 @@ describe('dragging', () => {
       )
     })
 
-    it('move up (0 items)', () => {
+    test('move up (0 items)', () => {
       const { operations, offset } = doMoveSelection({ deltaY: -0.3 * itemHeight })
       strictEqual(offset, 0)
       strictEqual(operations, undefined)
     })
 
-    it('move up (1 item)', () => {
+    test('move up (1 item)', () => {
       const { operations, offset } = doMoveSelection({
         deltaY: -0.7 * itemHeight
       })
@@ -244,7 +245,7 @@ describe('dragging', () => {
       )
     })
 
-    it('move up (2 items)', () => {
+    test('move up (2 items)', () => {
       const { operations, offset } = doMoveSelection({
         deltaY: -1.7 * itemHeight
       })
@@ -257,7 +258,7 @@ describe('dragging', () => {
       )
     })
 
-    it('move up (to top)', () => {
+    test('move up (to top)', () => {
       const { operations, offset } = doMoveSelection({
         deltaY: -999 * itemHeight
       })

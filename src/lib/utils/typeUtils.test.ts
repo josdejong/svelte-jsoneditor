@@ -1,3 +1,4 @@
+import { test, describe } from 'vitest'
 import { strictEqual } from 'assert'
 import {
   isInteger,
@@ -24,7 +25,7 @@ describe('typeUtils', () => {
 
   const testClass = new TestClass(2, 3)
 
-  it('isObject', () => {
+  test('isObject', () => {
     strictEqual(isObject({}), true)
 
     strictEqual(isObject(null), false)
@@ -34,7 +35,7 @@ describe('typeUtils', () => {
     strictEqual(isObject(testClass), false)
   })
 
-  it('isObjectOrArray', () => {
+  test('isObjectOrArray', () => {
     strictEqual(isObjectOrArray({}), true)
     strictEqual(isObjectOrArray([]), true)
 
@@ -46,7 +47,7 @@ describe('typeUtils', () => {
 
   // TODO: write more unit tests
 
-  it('isTimestamp', () => {
+  test('isTimestamp', () => {
     strictEqual(isTimestamp(1574809200000), true)
     strictEqual(isTimestamp(1574809200000.2), false)
     strictEqual(isTimestamp(123), false)
@@ -67,7 +68,7 @@ describe('typeUtils', () => {
     strictEqual(isTimestamp(new MyNumberType('1574809200000')), true)
   })
 
-  it('stringConvert', () => {
+  test('stringConvert', () => {
     strictEqual(stringConvert('text', JSON), 'text')
     strictEqual(stringConvert('2.4', JSON), 2.4)
     strictEqual(stringConvert('-2.4', JSON), -2.4)
@@ -85,7 +86,7 @@ describe('typeUtils', () => {
     strictEqual(stringConvert('  ', JSON), '  ')
   })
 
-  it('valueType', () => {
+  test('valueType', () => {
     strictEqual(valueType(2, JSON), 'number')
     strictEqual(valueType(-2, JSON), 'number')
     strictEqual(valueType(2.4e3, JSON), 'number')
@@ -102,7 +103,7 @@ describe('typeUtils', () => {
     strictEqual(valueType(new LosslessNumber('-4.0'), LosslessJSONParser as JSON), 'number')
   })
 
-  it('isStringContainingPrimitiveValue', () => {
+  test('isStringContainingPrimitiveValue', () => {
     strictEqual(isStringContainingPrimitiveValue(22, JSON), false)
     strictEqual(isStringContainingPrimitiveValue('text', JSON), false)
     strictEqual(isStringContainingPrimitiveValue('2.4', JSON), true)
@@ -113,7 +114,7 @@ describe('typeUtils', () => {
     strictEqual(isStringContainingPrimitiveValue('null', JSON), true)
   })
 
-  it('isInteger', () => {
+  test('isInteger', () => {
     strictEqual(isInteger('4250'), true)
     strictEqual(isInteger('-4250'), true)
     strictEqual(isInteger('2.345'), false)

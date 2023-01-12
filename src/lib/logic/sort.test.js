@@ -1,3 +1,4 @@
+import { test, describe } from 'vitest'
 import assert from 'assert'
 import { immutableJSONPatch } from 'immutable-json-patch'
 import { sortBy } from 'lodash-es'
@@ -8,11 +9,11 @@ import {
   sortObjectKeys,
   sortOperationsMove,
   sortOperationsMoveAdvanced
-} from './sort.js'
+} from './sort'
 
 describe('sort', () => {
   describe('sortJson', () => {
-    it('should sort an arbitrary json object in ascending order', () => {
+    test('should sort an arbitrary json object in ascending order', () => {
       const object = { b: 1, c: 1, a: 1 }
 
       assert.deepStrictEqual(sortJson(object, undefined, undefined, 1), [
@@ -22,7 +23,7 @@ describe('sort', () => {
       ])
     })
 
-    it('should sort an arbitrary json object in descending order', () => {
+    test('should sort an arbitrary json object in descending order', () => {
       const object = { b: 1, c: 1, a: 1 }
 
       assert.deepStrictEqual(sortJson(object, undefined, undefined, -1), [
@@ -32,7 +33,7 @@ describe('sort', () => {
       ])
     })
 
-    it('should sort object keys using a rootPath', () => {
+    test('should sort object keys using a rootPath', () => {
       const object = {
         root: {
           path: { b: 1, c: 1, a: 1 }
@@ -46,14 +47,14 @@ describe('sort', () => {
       ])
     })
 
-    it('should sort an array', () => {
+    test('should sort an array', () => {
       assert.deepStrictEqual(sortJson([2, 3, 1]), [{ op: 'replace', path: '', value: [1, 2, 3] }])
       assert.deepStrictEqual(sortJson([2, 3, 1], undefined, undefined, -1), [
         { op: 'replace', path: '', value: [3, 2, 1] }
       ])
     })
 
-    it('should sort array by nested properties and a direction', () => {
+    test('should sort array by nested properties and a direction', () => {
       const a = { data: { value: 1 } }
       const b = { data: { value: 2 } }
       const c = { data: { value: 3 } }
@@ -69,7 +70,7 @@ describe('sort', () => {
       ])
     })
 
-    it('should sort array using a rootPath', () => {
+    test('should sort array using a rootPath', () => {
       const json = {
         root: {
           path: [2, 3, 1]
@@ -82,7 +83,7 @@ describe('sort', () => {
     })
   })
 
-  it('should sort object keys', () => {
+  test('should sort object keys', () => {
     const object = { b: 1, c: 1, a: 1 }
 
     assert.deepStrictEqual(sortObjectKeys(object), [
@@ -104,7 +105,7 @@ describe('sort', () => {
     ])
   })
 
-  it('should sort object keys using a rootPath', () => {
+  test('should sort object keys using a rootPath', () => {
     const object = {
       root: {
         path: { b: 1, c: 1, a: 1 }
@@ -118,7 +119,7 @@ describe('sort', () => {
     ])
   })
 
-  it('should sort object keys case insensitive', () => {
+  test('should sort object keys case insensitive', () => {
     const object = { B: 1, a: 1 }
 
     assert.deepStrictEqual(sortObjectKeys(object), [
@@ -127,24 +128,24 @@ describe('sort', () => {
     ])
   })
 
-  it('should sort array', () => {
+  test('should sort array', () => {
     assert.deepStrictEqual(sortArray([2, 3, 1]), [{ op: 'replace', path: '', value: [1, 2, 3] }])
     assert.deepStrictEqual(sortArray([2, 3, 1], undefined, undefined, -1), [
       { op: 'replace', path: '', value: [3, 2, 1] }
     ])
   })
 
-  it('should sort array using natural sort', () => {
+  test('should sort array using natural sort', () => {
     assert.deepStrictEqual(sortArray(['10', '2', '1']), [
       { op: 'replace', path: '', value: ['1', '2', '10'] }
     ])
   })
 
-  it('should sort array case insensitive', () => {
+  test('should sort array case insensitive', () => {
     assert.deepStrictEqual(sortArray(['B', 'a']), [{ op: 'replace', path: '', value: ['a', 'B'] }])
   })
 
-  it('should sort array using a rootPath', () => {
+  test('should sort array using a rootPath', () => {
     const json = {
       root: {
         path: [2, 3, 1]
@@ -156,7 +157,7 @@ describe('sort', () => {
     ])
   })
 
-  it('should sort array by nested properties and a direction', () => {
+  test('should sort array by nested properties and a direction', () => {
     const a = { data: { value: 1 } }
     const b = { data: { value: 2 } }
     const c = { data: { value: 3 } }
@@ -172,7 +173,7 @@ describe('sort', () => {
     ])
   })
 
-  it('should generate the move operations needed to sort given array', () => {
+  test('should generate the move operations needed to sort given array', () => {
     const comparator = (a, b) => a - b
 
     assert.deepStrictEqual(sortOperationsMove([1, 2, 3], comparator), [])
@@ -206,7 +207,7 @@ describe('sort', () => {
     assert.deepStrictEqual(immutableJSONPatch(array, operations), [0, 1, 2, 3, 4, 5])
   })
 
-  it('should generate the move operations to sort given array (2)', () => {
+  test('should generate the move operations to sort given array (2)', () => {
     const comparator = (a, b) => a - b
 
     assert.deepStrictEqual(sortOperationsMoveAdvanced([1, 2, 3, 6, 4, 5], comparator), [
@@ -238,7 +239,7 @@ describe('sort', () => {
     }
   })
 
-  it('should fast apply move operations', () => {
+  test('should fast apply move operations', () => {
     const comparator = (a, b) => a - b
 
     const array = [0, 1, 3, 5, 4, 2]
@@ -246,7 +247,7 @@ describe('sort', () => {
     assert.deepStrictEqual(fastPatchSort(array, operations), sortBy(array))
   })
 
-  it('should give the move operations needed to sort given array containing objects', () => {
+  test('should give the move operations needed to sort given array containing objects', () => {
     const comparator = (a, b) => a.id - b.id
 
     const actual = sortOperationsMove([{ id: 4 }, { id: 3 }, { id: 1 }, { id: 2 }], comparator)
@@ -260,7 +261,7 @@ describe('sort', () => {
     assert.deepStrictEqual(actual, expected)
   })
 
-  it('should give the move operations needed to sort given array containing objects (advanced)', () => {
+  test('should give the move operations needed to sort given array containing objects (advanced)', () => {
     const comparator = (a, b) => a.id - b.id
 
     const actual = sortOperationsMoveAdvanced(

@@ -1,3 +1,4 @@
+import { test, describe } from 'vitest'
 import assert from 'assert'
 import Ajv from 'ajv-dist'
 import { createAjvValidator } from './createAjvValidator.js'
@@ -82,7 +83,7 @@ const invalidJson = {
 }
 
 describe('createAjvValidator', () => {
-  it('should create a validate function', () => {
+  test('should create a validate function', () => {
     const validate = createAjvValidator({ schema, schemaDefinitions })
 
     assert.deepStrictEqual(validate(invalidJson), [
@@ -97,7 +98,7 @@ describe('createAjvValidator', () => {
     ])
   })
 
-  it('should pass additional Ajv options', () => {
+  test('should pass additional Ajv options', () => {
     const validate = createAjvValidator({
       schema,
       schemaDefinitions,
@@ -115,7 +116,7 @@ describe('createAjvValidator', () => {
     ])
   })
 
-  it('should apply additional Ajv configuration to the existing Ajv instance', () => {
+  test('should apply additional Ajv configuration to the existing Ajv instance', () => {
     const validate = createAjvValidator({
       schema,
       ajvOptions: {
@@ -137,7 +138,7 @@ describe('createAjvValidator', () => {
     ])
   })
 
-  it('should provide a custom Ajv instance', () => {
+  test('should provide a custom Ajv instance', () => {
     const validate = createAjvValidator({
       schema,
       onCreateAjv: () => {
@@ -164,7 +165,7 @@ describe('createAjvValidator', () => {
     ])
   })
 
-  it('should throw an error when using the deprecated API', () => {
+  test('should throw an error when using the deprecated API', () => {
     // Deprecation error for the API of v0.9.2 and older
     assert.throws(() => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment

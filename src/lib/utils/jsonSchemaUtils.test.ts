@@ -1,9 +1,10 @@
+import { test, describe } from 'vitest'
 import assert from 'assert'
 import { findEnum, findSchema, getJSONSchemaOptions } from './jsonSchemaUtils.js'
 
 describe('jsonSchemaUtils', () => {
   describe('getJSONSchemaOptions', () => {
-    it('should get the schema options', () => {
+    test('should get the schema options', () => {
       const schema = {
         properties: {
           job: {
@@ -26,7 +27,7 @@ describe('jsonSchemaUtils', () => {
   })
 
   describe('findSchema', () => {
-    it('should find schema', () => {
+    test('should find schema', () => {
       const schema = {
         type: 'object',
         properties: {
@@ -39,7 +40,7 @@ describe('jsonSchemaUtils', () => {
       assert.strictEqual(findSchema(schema, {}, path), schema.properties.child)
     })
 
-    it('should find schema inside an array item', () => {
+    test('should find schema inside an array item', () => {
       const schema = {
         properties: {
           job: {
@@ -68,7 +69,7 @@ describe('jsonSchemaUtils', () => {
       )
     })
 
-    it('should find schema within multi-level object properties', () => {
+    test('should find schema within multi-level object properties', () => {
       const schema = {
         type: 'object',
         properties: {
@@ -103,7 +104,7 @@ describe('jsonSchemaUtils', () => {
       )
     })
 
-    it('should find referenced schema within multi-level object properties', () => {
+    test('should find referenced schema within multi-level object properties', () => {
       const schema = {
         type: 'object',
         properties: {
@@ -133,7 +134,7 @@ describe('jsonSchemaUtils', () => {
       assert.deepStrictEqual(findSchema(schema, schemaDefinitions, path), expectedSchema)
     })
 
-    it('should find array referenced schema within multi-level object properties', () => {
+    test('should find array referenced schema within multi-level object properties', () => {
       const schema = {
         type: 'object',
         properties: {
@@ -166,7 +167,7 @@ describe('jsonSchemaUtils', () => {
       assert.deepStrictEqual(findSchema(schema, schemaDefinitions, path), expectedSchema)
     })
 
-    it('should return null for path that has no schema', () => {
+    test('should return null for path that has no schema', () => {
       const schema = {
         type: 'object',
         properties: {
@@ -186,7 +187,7 @@ describe('jsonSchemaUtils', () => {
       assert.strictEqual(findSchema(schema, {}, path), null)
     })
 
-    it('should find one of required properties', () => {
+    test('should find one of required properties', () => {
       const schema = {
         properties: {
           company: {
@@ -225,7 +226,7 @@ describe('jsonSchemaUtils', () => {
     })
 
     describe('with $ref', () => {
-      it('should find a referenced schema', () => {
+      test('should find a referenced schema', () => {
         const schema = {
           type: 'object',
           properties: {
@@ -242,7 +243,7 @@ describe('jsonSchemaUtils', () => {
         assert.strictEqual(findSchema(schema, { foo: fooSchema }, path), fooSchema)
       })
 
-      it('should find a referenced schema property', () => {
+      test('should find a referenced schema property', () => {
         const schema = {
           type: 'object',
           properties: {
@@ -266,7 +267,7 @@ describe('jsonSchemaUtils', () => {
         )
       })
 
-      it('should find a referenced schema definition', () => {
+      test('should find a referenced schema definition', () => {
         const schema = {
           type: 'object',
           properties: {
@@ -300,7 +301,7 @@ describe('jsonSchemaUtils', () => {
         )
       })
 
-      it('should find a referenced schema definition 2', () => {
+      test('should find a referenced schema definition 2', () => {
         const schema = {
           type: 'object',
           properties: {
@@ -334,7 +335,7 @@ describe('jsonSchemaUtils', () => {
         )
       })
 
-      it('should find a referenced schema definition 3', () => {
+      test('should find a referenced schema definition 3', () => {
         const schema = {
           type: 'object',
           properties: {
@@ -371,7 +372,7 @@ describe('jsonSchemaUtils', () => {
     })
 
     describe('with $ref to internal definition', () => {
-      it('should find a referenced schema', () => {
+      test('should find a referenced schema', () => {
         const schema = {
           $schema: 'http://json-schema.org/draft-07/schema#',
           type: 'object',
@@ -412,7 +413,7 @@ describe('jsonSchemaUtils', () => {
     })
 
     describe('with $ref to external definition', () => {
-      it('should find a referenced schema', () => {
+      test('should find a referenced schema', () => {
         const schema = {
           type: 'object',
           properties: {
@@ -443,7 +444,7 @@ describe('jsonSchemaUtils', () => {
       })
     })
     describe('with pattern properties', () => {
-      it('should find schema', () => {
+      test('should find schema', () => {
         const schema = {
           type: 'object',
           properties: {
@@ -465,7 +466,7 @@ describe('jsonSchemaUtils', () => {
         assert.strictEqual(findSchema(schema, {}, path), schema.properties.str, 'normal property')
       })
 
-      it('should find schema within multi-level object properties', () => {
+      test('should find schema within multi-level object properties', () => {
         const schema = {
           type: 'object',
           properties: {
@@ -509,7 +510,7 @@ describe('jsonSchemaUtils', () => {
         )
       })
 
-      it('should find schema for pattern properties', () => {
+      test('should find schema for pattern properties', () => {
         const schema = {
           type: 'object',
           patternProperties: {
@@ -537,7 +538,7 @@ describe('jsonSchemaUtils', () => {
         )
       })
 
-      it('should find schema for multi-level pattern properties', () => {
+      test('should find schema for multi-level pattern properties', () => {
         const schema = {
           type: 'object',
           patternProperties: {
@@ -580,7 +581,7 @@ describe('jsonSchemaUtils', () => {
         )
       })
 
-      it('should return null for path that has no schema', () => {
+      test('should return null for path that has no schema', () => {
         const schema = {
           type: 'object',
           properties: {
@@ -610,7 +611,7 @@ describe('jsonSchemaUtils', () => {
         assert.strictEqual(findSchema(schema, {}, path), null)
       })
 
-      it('should return additionalProperties schema', () => {
+      test('should return additionalProperties schema', () => {
         const schema = {
           type: 'object',
           properties: {
@@ -647,7 +648,7 @@ describe('jsonSchemaUtils', () => {
   })
 
   describe('findEnum', () => {
-    it('should find enum', () => {
+    test('should find enum', () => {
       const schema = {
         type: 'object',
         enum: [1, 2, 3]

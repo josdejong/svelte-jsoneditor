@@ -1,3 +1,4 @@
+import { test, describe } from 'vitest'
 import assert from 'assert'
 import {
   clipboardToValues,
@@ -13,19 +14,19 @@ import { immutableJSONPatch } from 'immutable-json-patch'
 
 describe('operations', () => {
   describe('createNewValue', () => {
-    it('should create a value of type "value"', () => {
+    test('should create a value of type "value"', () => {
       assert.strictEqual(createNewValue({}, null, 'value'), '')
     })
 
-    it('should create a value of type "object"', () => {
+    test('should create a value of type "object"', () => {
       assert.deepStrictEqual(createNewValue({}, null, 'object'), {})
     })
 
-    it('should create a value of type "array"', () => {
+    test('should create a value of type "array"', () => {
       assert.deepStrictEqual(createNewValue({}, null, 'array'), [])
     })
 
-    it('should create a simple value via type "structure"', () => {
+    test('should create a simple value via type "structure"', () => {
       const json = [1, 2, 3]
       const path = ['0']
       const selection = createMultiSelection(json, path, path)
@@ -33,7 +34,7 @@ describe('operations', () => {
       assert.deepStrictEqual(createNewValue(json, selection, 'structure'), '')
     })
 
-    it('should create a nested object via type "structure"', () => {
+    test('should create a nested object via type "structure"', () => {
       const json = [
         {
           a: 2,
@@ -56,7 +57,7 @@ describe('operations', () => {
     })
   })
 
-  it('should turn clipboard text into an array with key/value pairs', () => {
+  test('should turn clipboard text into an array with key/value pairs', () => {
     assert.deepStrictEqual(clipboardToValues('42', JSON), [{ key: 'New item', value: 42 }])
 
     assert.deepStrictEqual(clipboardToValues('Hello world', JSON), [
@@ -109,7 +110,7 @@ describe('operations', () => {
   })
 
   describe('moveInsideParent', () => {
-    it('should move a selection up inside an array', () => {
+    test('should move a selection up inside an array', () => {
       const json = { array: [0, 1, 2, 3, 4, 5] }
       const documentState = createDocumentState({
         json,
@@ -129,7 +130,7 @@ describe('operations', () => {
       assert.deepStrictEqual(updatedJson, { array: [0, 3, 4, 1, 2, 5] })
     })
 
-    it('should move a selection down inside an array', () => {
+    test('should move a selection down inside an array', () => {
       const json = { array: [0, 1, 2, 3, 4, 5] }
       const documentState = createDocumentState({
         json,
@@ -149,7 +150,7 @@ describe('operations', () => {
       assert.deepStrictEqual(updatedJson, { array: [0, 3, 4, 1, 2, 5] })
     })
 
-    it('should move a selection up inside an object', () => {
+    test('should move a selection up inside an object', () => {
       const json = { object: { a: 'a', b: 'b', c: 'c', d: 'd', e: 'e' } }
       const documentState = createDocumentState({
         json,
@@ -176,7 +177,7 @@ describe('operations', () => {
       assert.deepStrictEqual(Object.keys(updatedJson.object), ['a', 'c', 'd', 'b', 'e'])
     })
 
-    it('should move a selection down inside an object', () => {
+    test('should move a selection down inside an object', () => {
       const json = { object: { a: 'a', b: 'b', c: 'c', d: 'd', e: 'e' } }
       const documentState = createDocumentState({
         json,
@@ -211,7 +212,7 @@ describe('operations', () => {
   })
 
   describe('revertJSONPatchWithMoveOperations', () => {
-    it('should restore key order when reverting a remove operation ', () => {
+    test('should restore key order when reverting a remove operation ', () => {
       const json = {
         a: 2,
         b: 3,
@@ -235,7 +236,7 @@ describe('operations', () => {
       assert.deepStrictEqual(Object.keys(revertedJson), ['a', 'b', 'c'])
     })
 
-    it('should restore key order when reverting a move operation ', () => {
+    test('should restore key order when reverting a move operation ', () => {
       const json = {
         a: 2,
         b: 3,
@@ -261,7 +262,7 @@ describe('operations', () => {
       assert.deepStrictEqual(Object.keys(revertedJson), ['a', 'b', 'c', 'nested'])
     })
 
-    it('should restore correctly revert multiple remove operations in an array', () => {
+    test('should restore correctly revert multiple remove operations in an array', () => {
       const json = [0, 1, 2, 3, 4]
 
       const operations: JSONPatchOperation[] = [
@@ -286,7 +287,7 @@ describe('operations', () => {
   })
 
   describe('createNestedValueOperations', () => {
-    it('should create parent object operation of a nest value when missing', () => {
+    test('should create parent object operation of a nest value when missing', () => {
       const json = {}
 
       const operations: JSONPatchOperation[] = [{ op: 'replace', path: '/nested/value', value: 42 }]
@@ -298,7 +299,7 @@ describe('operations', () => {
       ])
     })
 
-    it('should create parent object operation of a nest value in an array when missing', () => {
+    test('should create parent object operation of a nest value in an array when missing', () => {
       const json = [{}, {}, {}]
 
       const operations: JSONPatchOperation[] = [
@@ -312,7 +313,7 @@ describe('operations', () => {
       ])
     })
 
-    it('should create parent object operation of a deep nest value when missing', () => {
+    test('should create parent object operation of a deep nest value when missing', () => {
       const json = {}
 
       const operations: JSONPatchOperation[] = [
@@ -327,7 +328,7 @@ describe('operations', () => {
       ])
     })
 
-    it('should not create parent objects when already existing', () => {
+    test('should not create parent objects when already existing', () => {
       const json = { deep: { nested: {} } }
 
       const operations: JSONPatchOperation[] = [

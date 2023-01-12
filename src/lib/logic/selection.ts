@@ -13,7 +13,7 @@ import {
   startsWithJSONPointer
 } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
-import { isObjectOrArray } from '../utils/typeUtils.js'
+import { isObjectOrArray } from '$lib/utils/typeUtils.js'
 import {
   collapsePath,
   getNextVisiblePath,
@@ -32,8 +32,8 @@ import type {
   MultiSelection,
   ValueSelection
 } from '../types.js'
-import { CaretType, SelectionType } from '../types.js'
-import { int } from '../utils/numberUtils.js'
+import { CaretType, SelectionType } from '$lib/types.js'
+import { int } from '$lib/utils/numberUtils.js'
 
 export function isAfterSelection(
   selection: JSONSelection | undefined

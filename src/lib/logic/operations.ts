@@ -34,7 +34,7 @@ import {
   isValueSelection,
   pathStartsWith
 } from './selection.js'
-import type { ClipboardValues, DragInsideAction, JSONParser, JSONSelection } from '../types'
+import type { ClipboardValues, DragInsideAction, JSONParser, JSONSelection } from '$lib/types'
 import { int } from '../utils/numberUtils.js'
 
 /**

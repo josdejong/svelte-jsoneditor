@@ -1,3 +1,4 @@
+import { test, describe } from 'vitest'
 import { strictEqual } from 'assert'
 import { keyComboFromEvent } from './keyBindings.js'
 
@@ -7,7 +8,7 @@ describe('keyBindings', () => {
   const altKey = true
   const metaKey = true
 
-  it('keyComboFromEvent', () => {
+  test('keyComboFromEvent', () => {
     strictEqual(keyComboFromEvent({ key: 'a' }), 'A')
     strictEqual(keyComboFromEvent({ key: 'A' }), 'A')
     strictEqual(keyComboFromEvent({ key: '=' }), '=')
@@ -23,7 +24,7 @@ describe('keyBindings', () => {
     strictEqual(keyComboFromEvent({ ctrlKey, key: 'Control' }), 'Ctrl')
   })
 
-  it('keyComboFromEvent with custom separator', () => {
+  test('keyComboFromEvent with custom separator', () => {
     const separator = '///'
     strictEqual(keyComboFromEvent({ key: 'a' }, separator), 'A')
     strictEqual(keyComboFromEvent({ ctrlKey, key: 'a' }, separator), 'Ctrl///A')

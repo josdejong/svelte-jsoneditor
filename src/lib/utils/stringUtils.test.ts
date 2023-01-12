@@ -1,3 +1,4 @@
+import { test, describe } from 'vitest'
 import assert from 'assert'
 import {
   compareStrings,
@@ -9,7 +10,7 @@ import {
 } from './stringUtils.js'
 
 describe('stringUtils', () => {
-  it('findUniqueName', () => {
+  test('findUniqueName', () => {
     assert.deepStrictEqual(findUniqueName('other', ['a', 'b', 'c']), 'other')
     assert.deepStrictEqual(findUniqueName('b', ['a', 'b', 'c']), 'b (copy)')
     assert.deepStrictEqual(findUniqueName('b', ['a', 'b', 'c', 'b (copy)']), 'b (copy 2)')
@@ -28,14 +29,14 @@ describe('stringUtils', () => {
     )
   })
 
-  it('toCapital', () => {
+  test('toCapital', () => {
     assert.deepStrictEqual(toCapital('hello'), 'Hello')
     assert.deepStrictEqual(toCapital('HEllo'), 'Hello')
     assert.deepStrictEqual(toCapital('HEllo'), 'Hello')
     assert.deepStrictEqual(toCapital(''), '')
   })
 
-  it('compareStrings', () => {
+  test('compareStrings', () => {
     assert.deepStrictEqual(compareStrings('a', 'b'), -1)
     assert.deepStrictEqual(compareStrings('b', 'a'), 1)
     assert.deepStrictEqual(compareStrings('a', 'a'), 0)
@@ -44,12 +45,12 @@ describe('stringUtils', () => {
     assert.deepStrictEqual(array.sort(compareStrings), ['a', 'b', 'c'])
   })
 
-  it('duplicateInText', () => {
+  test('duplicateInText', () => {
     assert.deepStrictEqual(duplicateInText('abcdef', 2, 4), 'abcdcdef')
     assert.deepStrictEqual(duplicateInText('abcdef', 4, 2), 'abcdcdef')
   })
 
-  it('should truncate long text', () => {
+  test('should truncate long text', () => {
     const text = 'Hello world'
 
     assert.deepStrictEqual(truncate(text, 100), text)
@@ -58,7 +59,7 @@ describe('stringUtils', () => {
     assert.deepStrictEqual(truncate(text, 8), 'Hello...')
   })
 
-  it('should parse a string', () => {
+  test('should parse a string', () => {
     assert.strictEqual(parseString('foo'), 'foo')
     assert.strictEqual(parseString('234foo'), '234foo')
     assert.strictEqual(parseString('  234'), 234)

@@ -1,4 +1,5 @@
 import assert from 'assert'
+import { test, describe } from 'vitest'
 import { jmespathQueryLanguage } from './jmespathQueryLanguage.js'
 import { cloneDeep } from 'lodash-es'
 
@@ -13,7 +14,7 @@ describe('jmespathQueryLanguage', () => {
     const users = [user1, user3, user2]
     const originalUsers = cloneDeep([user1, user3, user2])
 
-    it('should create a and execute an empty query', () => {
+    test('should create a and execute an empty query', () => {
       const query = createQuery(users, {})
       const result = executeQuery(users, query)
       assert.deepStrictEqual(query, '[*]')
@@ -21,7 +22,7 @@ describe('jmespathQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    it('should create and execute a filter query for a nested property', () => {
+    test('should create and execute a filter query for a nested property', () => {
       const query = createQuery(users, {
         filter: {
           path: ['user', 'name'],
@@ -36,7 +37,7 @@ describe('jmespathQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original data
     })
 
-    it('should create and execute a filter query for a property with sepcial characters in the name', () => {
+    test('should create and execute a filter query for a property with sepcial characters in the name', () => {
       const data = users.map((item) => ({ 'user name!': item.user.name }))
       const originalData = cloneDeep(data)
 
@@ -54,7 +55,7 @@ describe('jmespathQueryLanguage', () => {
       assert.deepStrictEqual(data, originalData) // must not touch the original data
     })
 
-    it('should create and execute a filter query for the whole array item', () => {
+    test('should create and execute a filter query for the whole array item', () => {
       const data = [2, 3, 1]
       const originalData = cloneDeep(data)
 
@@ -72,7 +73,7 @@ describe('jmespathQueryLanguage', () => {
       assert.deepStrictEqual(data, originalData) // must not touch the original data
     })
 
-    it('should create and execute a filter with booleans', () => {
+    test('should create and execute a filter with booleans', () => {
       const query = createQuery(users, {
         filter: {
           path: ['user', 'registered'],
@@ -87,7 +88,7 @@ describe('jmespathQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    it('should create and execute a filter with null', () => {
+    test('should create and execute a filter with null', () => {
       const query = createQuery(users, {
         filter: {
           path: ['user', 'extra'],
@@ -102,7 +103,7 @@ describe('jmespathQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    it('should create and execute a sort query in ascending direction', () => {
+    test('should create and execute a sort query in ascending direction', () => {
       const query = createQuery(users, {
         sort: {
           path: ['user', 'age'],
@@ -117,7 +118,7 @@ describe('jmespathQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    it('should create and execute a sort query in descending direction', () => {
+    test('should create and execute a sort query in descending direction', () => {
       const query = createQuery(users, {
         sort: {
           path: ['user', 'age'],
@@ -132,7 +133,7 @@ describe('jmespathQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    it('should create and execute a project query for a single property', () => {
+    test('should create and execute a project query for a single property', () => {
       const query = createQuery(users, {
         projection: {
           paths: [['user', 'name']]
@@ -146,7 +147,7 @@ describe('jmespathQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    it('should create and execute a project query for a multiple properties', () => {
+    test('should create and execute a project query for a multiple properties', () => {
       const query = createQuery(users, {
         projection: {
           paths: [['user', 'name'], ['_id']]
@@ -164,7 +165,7 @@ describe('jmespathQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    it('should create and execute a query with filter, sort and project', () => {
+    test('should create and execute a query with filter, sort and project', () => {
       const query = createQuery(users, {
         filter: {
           path: ['user', 'age'],
@@ -188,7 +189,7 @@ describe('jmespathQueryLanguage', () => {
     })
   })
 
-  it('should correctly escape and quote sort and projection fields', () => {
+  test('should correctly escape and quote sort and projection fields', () => {
     const item42 = {
       id: 42,
       nested: {
@@ -227,7 +228,7 @@ describe('jmespathQueryLanguage', () => {
     ])
   })
 
-  it('should return null when property is not found', () => {
+  test('should return null when property is not found', () => {
     const query = '@.foo'
     const data = {}
     const result = executeQuery(data, query)
