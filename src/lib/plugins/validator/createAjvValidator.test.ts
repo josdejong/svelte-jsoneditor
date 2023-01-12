@@ -1,6 +1,6 @@
 import { test, describe } from 'vitest'
 import assert from 'assert'
-import Ajv from 'ajv-dist'
+import Ajv from 'ajv'
 import { createAjvValidator } from './createAjvValidator.js'
 
 const schema = {

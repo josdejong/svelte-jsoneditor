@@ -1,6 +1,6 @@
 import type { Options, Schema } from 'ajv'
 import type Ajv from 'ajv'
-import AjvDist from 'ajv-dist'
+import AjvDist from 'ajv'
 import type { JSONValue } from 'immutable-json-patch'
 import { parsePath } from 'immutable-json-patch'
 import type { ValidationError, Validator } from '../../types'
