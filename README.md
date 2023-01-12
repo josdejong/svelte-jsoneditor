@@ -668,10 +668,16 @@ Build the library:
 npm run build
 ```
 
-Run unit tests:
+Run unit tests (in watch mode):
 
 ```
 npm test
+```
+
+Run unit tests and exit:
+
+```
+npm run test-ci
 ```
 
 Run linter:
@@ -680,7 +686,7 @@ Run linter:
 npm run lint
 ```
 
-Run coverage:
+Run coverage (coverage results will be generated in the folder `./coverage`):
 
 ```
 npm run coverage
