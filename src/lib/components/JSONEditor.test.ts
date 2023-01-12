@@ -26,7 +26,8 @@ describe('JSONEditor', () => {
       }
     })
 
-    expect(container.getElementsByClassName('jse-tree-mode').length).toBe(1)
+    const main = container.getElementsByClassName('jse-main')[0]
+    expect(main.firstChild).toHaveClass('jse-tree-mode')
     expect(screen.getByText('Joe')).toHaveClass('jse-value', 'jse-string')
     expect(container).toMatchSnapshot()
   })
@@ -39,7 +40,8 @@ describe('JSONEditor', () => {
       }
     })
 
-    expect(container.getElementsByClassName('jse-text-mode').length).toBe(1)
+    const main = container.getElementsByClassName('jse-main')[0]
+    expect(main.firstChild).toHaveClass('jse-text-mode')
     expect(screen.getByText('"Joe"').parentNode).toHaveClass('cm-line')
     expect(container).toMatchSnapshot()
   })
@@ -52,7 +54,8 @@ describe('JSONEditor', () => {
       }
     })
 
-    expect(container.getElementsByClassName('jse-table-mode').length).toBe(1)
+    const main = container.getElementsByClassName('jse-main')[0]
+    expect(main.firstChild).toHaveClass('jse-table-mode')
     expect(screen.getByText('Joe')).toHaveClass('jse-value', 'jse-string')
     expect(container).toMatchSnapshot()
   })
