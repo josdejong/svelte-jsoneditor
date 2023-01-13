@@ -6,6 +6,7 @@ export default defineConfig({
   test: {
     include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     globals: true,
-    environment: 'jsdom'
+    environment: 'jsdom',
+    threads: false // disabling threads is currently 50% faster
   }
 })
