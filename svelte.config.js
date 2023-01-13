@@ -12,7 +12,15 @@ const config = {
   },
 
   package: {
-    dir: 'package'
+    dir: 'package',
+    files: (filepath) => {
+      // ignore test and snapshot files
+      if (filepath.endsWith('.test.ts') || filepath.includes('__snapshots__')) {
+        return false
+      }
+
+      return true
+    }
   }
 }
 
