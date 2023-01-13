@@ -1,14 +1,14 @@
-import type { Options, Schema } from 'ajv'
 import type Ajv from 'ajv'
+import type { Options, Schema } from 'ajv'
 import AjvDist from 'ajv'
 import type { JSONValue } from 'immutable-json-patch'
 import { parsePath } from 'immutable-json-patch'
-import type { ValidationError, Validator } from '../../types'
-import { ValidationSeverity } from '../../types.js'
+import type { JSONSchema, JSONSchemaDefinitions, ValidationError, Validator } from '$lib/types'
+import { ValidationSeverity } from '$lib/types.js'
 
 export interface AjvValidatorOptions {
-  schema: JSONValue
-  schemaDefinitions?: JSONValue
+  schema: JSONSchema
+  schemaDefinitions?: JSONSchemaDefinitions
   ajvOptions?: Options
   onCreateAjv?: (ajv: Ajv) => Ajv | void
 }
@@ -69,7 +69,7 @@ function createAjvInstance(options: AjvValidatorOptions): Ajv {
 
   if (schemaDefinitions) {
     Object.keys(schemaDefinitions).forEach((ref) => {
-      ajv.addSchema(schemaDefinitions[ref], ref)
+      ajv.addSchema(schemaDefinitions[ref] as Schema, ref)
     })
   }
 

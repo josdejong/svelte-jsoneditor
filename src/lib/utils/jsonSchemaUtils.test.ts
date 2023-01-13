@@ -21,7 +21,7 @@ describe('jsonSchemaUtils', () => {
         }
       }
 
-      const options = getJSONSchemaOptions(schema, null, ['job', 1, 'company'])
+      const options = getJSONSchemaOptions(schema, null, ['job', '1', 'company'])
       assert.deepStrictEqual(options, ['test1', 'test2'])
     })
   })
@@ -61,10 +61,10 @@ describe('jsonSchemaUtils', () => {
 
       assert.strictEqual(findSchema(schema, {}, ['job']), schema.properties.job)
 
-      assert.strictEqual(findSchema(schema, {}, ['job', 0]), schema.properties.job.items)
+      assert.strictEqual(findSchema(schema, {}, ['job', '0']), schema.properties.job.items)
 
       assert.strictEqual(
-        findSchema(schema, {}, ['job', 0, 'company']),
+        findSchema(schema, {}, ['job', '0', 'company']),
         schema.properties.job.items.properties.company
       )
     })
@@ -160,7 +160,7 @@ describe('jsonSchemaUtils', () => {
           }
         }
       }
-      const path = ['aProperty', 0, 'enumProp']
+      const path = ['aProperty', '0', 'enumProp']
       const expectedSchema = {
         enum: [1, 2, 3]
       }
@@ -294,7 +294,7 @@ describe('jsonSchemaUtils', () => {
             }
           }
         }
-        const path = ['foo', 0]
+        const path = ['foo', '0']
         assert.strictEqual(
           findSchema(schema, { foo: fooSchema }, path),
           fooSchema.definitions.some_def
@@ -328,7 +328,7 @@ describe('jsonSchemaUtils', () => {
             }
           }
         }
-        const path = ['foo', 0, 'propA']
+        const path = ['foo', '0', 'propA']
         assert.strictEqual(
           findSchema(schema, { foo: fooSchema }, path),
           fooSchema.definitions.some_def.properties.propA
@@ -363,7 +363,7 @@ describe('jsonSchemaUtils', () => {
             }
           }
         }
-        const path = ['foo', 0, 'propA', 'propA1']
+        const path = ['foo', '2', 'propA', 'propA1']
         assert.strictEqual(
           findSchema(schema, { foo: fooSchema }, path),
           fooSchema.definitions.some_def.properties.propA.properties.propA1

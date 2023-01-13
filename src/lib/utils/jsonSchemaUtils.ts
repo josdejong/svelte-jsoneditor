@@ -1,11 +1,14 @@
+import type { JSONPath } from 'immutable-json-patch'
+import type { JSONSchema, JSONSchemaDefinitions, JSONSchemaEnum } from '$lib/types'
+
 /**
  * Find enum options for given path in a JSONSchema
- * @param {JSON} schema
- * @param {JSON} [schemaDefinitions=undefined]
- * @param {Path} path
- * @returns {Array<any> | null}
  */
-export function getJSONSchemaOptions(schema, schemaDefinitions, path) {
+export function getJSONSchemaOptions(
+  schema: JSONSchema,
+  schemaDefinitions: JSONSchemaDefinitions | undefined,
+  path: JSONPath
+): JSONSchemaEnum | null {
   const schemaForPath = findSchema(schema, schemaDefinitions || {}, path)
 
   return schemaForPath ? findEnum(schemaForPath) : null
@@ -16,18 +19,14 @@ export function getJSONSchemaOptions(schema, schemaDefinitions, path) {
  * one of the schemas composites (`oneOf`, `anyOf`, `allOf`)
  *
  * Source: https://github.com/josdejong/jsoneditor/blob/develop/src/js/Node.js
- *
- * @param  {Object} schema
- * @return {Array | null} Returns the enum when found, null otherwise.
- * @private
  */
-export function findEnum(schema) {
-  if (schema.enum) {
-    return schema.enum
+export function findEnum(schema: JSONSchema): JSONSchemaEnum | null {
+  if (Array.isArray(schema['enum'])) {
+    return schema['enum']
   }
 
-  const composite = schema.oneOf || schema.anyOf || schema.allOf
-  if (composite) {
+  const composite = schema['oneOf'] || schema['anyOf'] || schema['allOf']
+  if (Array.isArray(composite)) {
     const match = composite.filter((entry) => entry.enum)
     if (match.length > 0) {
       return match[0].enum
@@ -41,20 +40,13 @@ export function findEnum(schema) {
  * Return the part of a JSON schema matching given path.
  *
  * Source: https://github.com/josdejong/jsoneditor/blob/develop/src/js/Node.js
- *
- * @param {JSON} topLevelSchema
- * @param {JSON} schemaDefinitions
- * @param {Array.<string | number>} path
- * @param {Object} currentSchema
- * @return {Object | null}
- * @private
  */
 export function findSchema(
-  topLevelSchema,
-  schemaDefinitions,
-  path,
+  topLevelSchema: JSONSchema,
+  schemaDefinitions: JSONSchemaDefinitions,
+  path: JSONPath,
   currentSchema = topLevelSchema
-) {
+): JSONSchema | null {
   const nextPath = path.slice(1, path.length)
   const nextKey = path[0]
 
@@ -77,9 +69,9 @@ export function findSchema(
         currentSchema = topLevelSchema
         for (const segment of refPath) {
           if (segment in currentSchema) {
-            currentSchema = currentSchema[segment]
+            currentSchema = currentSchema[segment] as JSONSchema
           } else {
-            throw Error(`Unable to resovle reference ${ref}`)
+            throw Error(`Unable to resolve reference ${ref}`)
           }
         }
       } else if (ref.match(/#\//g)?.length === 1) {
@@ -107,38 +99,34 @@ export function findSchema(
       return currentSchema
     }
 
-    if (typeof nextKey === 'string') {
-      if (
-        typeof currentSchema.properties === 'object' &&
-        currentSchema.properties !== null &&
-        nextKey in currentSchema.properties
-      ) {
-        currentSchema = currentSchema.properties[nextKey]
-        return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
-      }
-      if (
-        typeof currentSchema.patternProperties === 'object' &&
-        currentSchema.patternProperties !== null
-      ) {
-        for (const prop in currentSchema.patternProperties) {
-          if (nextKey.match(prop)) {
-            currentSchema = currentSchema.patternProperties[prop]
-            return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
-          }
+    if (
+      typeof currentSchema.properties === 'object' &&
+      currentSchema.properties !== null &&
+      nextKey in currentSchema.properties
+    ) {
+      currentSchema = currentSchema.properties[nextKey]
+      return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
+    }
+
+    if (
+      typeof currentSchema.patternProperties === 'object' &&
+      currentSchema.patternProperties !== null
+    ) {
+      for (const prop in currentSchema.patternProperties) {
+        if (nextKey.match(prop)) {
+          currentSchema = currentSchema.patternProperties[prop]
+          return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
         }
       }
-      if (typeof currentSchema.additionalProperties === 'object') {
-        currentSchema = currentSchema.additionalProperties
-        return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
-      }
-      continue
     }
-    if (
-      typeof nextKey === 'number' &&
-      typeof currentSchema.items === 'object' &&
-      currentSchema.items !== null
-    ) {
-      currentSchema = currentSchema.items
+
+    if (typeof currentSchema.additionalProperties === 'object') {
+      currentSchema = currentSchema.additionalProperties as JSONSchema
+      return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
+    }
+
+    if (typeof currentSchema.items === 'object' && currentSchema.items !== null) {
+      currentSchema = currentSchema.items as JSONSchema
       return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
     }
   }

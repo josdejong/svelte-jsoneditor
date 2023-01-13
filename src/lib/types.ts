@@ -598,3 +598,9 @@ export interface SortedColumn {
   path: JSONPath
   sortDirection: SortDirection
 }
+
+// TODO: work out the JSONSchema type in detail.
+//  Ideally, we use use Schema from Ajv, but this interface isn't worked out either
+export type JSONSchema = Record<string, unknown>
+export type JSONSchemaDefinitions = Record<string, JSONSchema>
+export type JSONSchemaEnum = Array<unknown>
