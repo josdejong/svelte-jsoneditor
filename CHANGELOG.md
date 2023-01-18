@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.12.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.11.8...v0.12.0) (2023-01-18)
+
+
+### ⚠ BREAKING CHANGES
+
+* The TypeScript definitions of `createAjvValidator` and  `renderJSONSchemaEnum` are
+changed: passing `JSONSchema` and `JSONSchemaDefinitions` instead of `JSONValue`.
+
+### Bug Fixes
+
+* [#210](https://github.com/josdejong/svelte-jsoneditor/issues/210) `renderJSONSchemaEnum` not working enums inside an array ([887bf23](https://github.com/josdejong/svelte-jsoneditor/commit/887bf23c6aeb63de3a75b677f0545a51efc3c449))
+* cannot click the bottom right quarter of the context menu pointer ([b176f01](https://github.com/josdejong/svelte-jsoneditor/commit/b176f0101d3f860d54faa7c433050f69d28daa72))
+* minor updates of dependencies and devDependencies ([c654ed7](https://github.com/josdejong/svelte-jsoneditor/commit/c654ed7074ea01335f8a5db0e2fd447793a03bf4))
+* remove test files from the `svelte-jsoneditor` npm package ([fe21ffb](https://github.com/josdejong/svelte-jsoneditor/commit/fe21ffb8195417531e6f2103ffd0e9b2ff7e392c))
+* switch from `ajv-dist` to `ajv` again (works ok now with rollup and vite) ([f43a5fb](https://github.com/josdejong/svelte-jsoneditor/commit/f43a5fb364c161daea507693110d67b96bb19b67))
+* update dependencies and dev dependencies ([7229ae6](https://github.com/josdejong/svelte-jsoneditor/commit/7229ae62d7495614739de4593963707cbdd88e58))
+
 ### [0.11.8](https://github.com/josdejong/svelte-jsoneditor/compare/v0.11.7...v0.11.8) (2023-01-07)
 
 ### [0.11.7](https://github.com/josdejong/svelte-jsoneditor/compare/v0.11.6...v0.11.7) (2023-01-07)
