@@ -134,9 +134,13 @@
 
   // entry selected (key and value)
   &.jse-selected {
+    > .jse-header-outer > .jse-header > .jse-meta,
+    .jse-props .jse-header,
+    .jse-items .jse-header,
+    .jse-props .jse-contents,
+    .jse-items .jse-contents,
     .jse-header,
     .jse-contents,
-    .jse-meta,
     .jse-footer,
     :global(.jse-key),
     :global(.jse-value) {
