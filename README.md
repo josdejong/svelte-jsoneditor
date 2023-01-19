@@ -235,20 +235,21 @@ const editor = new JSONEditor({
   The returned `content` is sometimes of type `{ json }`, and sometimes of type `{ text }`. Which of the two is returned depends on the mode of the editor, the change that is applied, and the state of the document (valid, invalid, empty). Please be aware that `{ text }` can contain invalid JSON: whilst typing in `text` mode, a JSON document will be temporarily invalid, like when the user is typing a new string. The parameter `patchResult` is only returned on changes that can be represented as a JSON Patch document, and for example not when freely typing in `text` mode.
 - `onChangeMode(mode: 'tree' | 'text' | 'table')`. Invoked when the mode is changed.
 - `onClassName(path: Path, value: any): string | undefined`.
-   Add a custom class name to specific nodes, based on their path and/or value. Note that in the custom class, you can override CSS variables like `--jse-contents-background-color` to change the styling of a node, like the background color. Relevant variables are:
+  Add a custom class name to specific nodes, based on their path and/or value. Note that in the custom class, you can override CSS variables like `--jse-contents-background-color` to change the styling of a node, like the background color. Relevant variables are:
 
-   ```css 
-   --jse-contents-background-color
-   --jse-selection-background-color
-   --jse-selection-background-inactive-color
-   --jse-hover-background-color
-   --jse-context-menu-pointer-hover-background
-   --jse-context-menu-pointer-background
-   --jse-context-menu-pointer-background-highlight
-   --jse-collapsed-items-background-color
-   --jse-collapsed-items-selected-background-color
-   ```
-   To adjust the text color of keys or values, the color of the classes `.jse-key` and `.jse-value` can be overwritten.
+  ```css
+  --jse-contents-background-color
+  --jse-selection-background-color
+  --jse-selection-background-inactive-color
+  --jse-hover-background-color
+  --jse-context-menu-pointer-hover-background
+  --jse-context-menu-pointer-background
+  --jse-context-menu-pointer-background-highlight
+  --jse-collapsed-items-background-color
+  --jse-collapsed-items-selected-background-color
+  ```
+
+  To adjust the text color of keys or values, the color of the classes `.jse-key` and `.jse-value` can be overwritten.
 
 - `onRenderValue(props: RenderValueProps) : RenderValueComponentDescription[]`
 
