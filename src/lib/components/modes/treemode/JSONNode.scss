@@ -130,6 +130,8 @@
     }
   }
 
+  // TODO: simplify the styling for selected keys/values/multi (get rid of globals?)
+
   // entry selected (key and value)
   &.jse-selected {
     .jse-header,
