@@ -82,6 +82,8 @@
 
   /* contents: selected or hovered */
   --jse-contents-background-color: transparent;
+  --jse-contents-cursor: pointer;
+  --jse-contents-selected-cursor: grab;
   --jse-selection-background-color: #d3d3d3;
   --jse-selection-background-light-color: #e8e8e8;
   --jse-hover-background-color: rgba(0, 0, 0, 0.06);

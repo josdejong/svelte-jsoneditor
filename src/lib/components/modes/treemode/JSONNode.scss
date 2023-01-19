@@ -1,5 +1,4 @@
 @import '../../../styles';
-@import 'json-node-selected-mixin';
 
 .jse-json-node {
   position: relative;
@@ -114,12 +113,6 @@
     }
   }
 
-  @include json-node-selected-mixin(
-    var(--jse-selection-background-color),
-    var(--jse-context-menu-pointer-background),
-    var(--jse-context-menu-pointer-background-highlight)
-  );
-
   &:hover > .jse-contents-outer .jse-insert-selection-area:not(.jse-selected),
   .jse-header-outer:hover > .jse-insert-selection-area:not(.jse-selected),
   .jse-footer-outer:hover .jse-insert-selection-area:not(.jse-selected) {
@@ -134,6 +127,98 @@
     .jse-items .jse-contents,
     .jse-footer {
       background: var(--jse-hover-background-color);
+    }
+  }
+
+  // entry selected (key and value)
+  &.jse-selected {
+    .jse-header,
+    .jse-contents,
+    .jse-meta,
+    .jse-footer,
+    :global(.jse-key),
+    :global(.jse-value) {
+      background: var(--jse-selection-background-color);
+      cursor: var(--jse-contents-selected-cursor);
+    }
+
+    .jse-expand {
+      background: var(--jse-selection-background-color);
+    }
+  }
+
+  // key selected
+  &.jse-selected-key {
+    > .jse-contents-outer > .jse-contents > :global(.jse-identifier) > :global(.jse-key),
+    > .jse-header-outer > .jse-header > :global(.jse-identifier) > :global(.jse-key) {
+      background: var(--jse-selection-background-color);
+      cursor: var(--jse-contents-selected-cursor);
+    }
+  }
+
+  // value selected (part 1)
+  &.jse-selected-value > .jse-contents-outer > .jse-contents > :global(.jse-value) {
+    background: var(--jse-selection-background-color);
+    cursor: var(--jse-contents-selected-cursor);
+  }
+
+  :global(.jse-collapsed-items.jse-selected),
+  &.jse-selected :global(.jse-collapsed-items),
+  &.jse-selected-value :global(.jse-collapsed-items) {
+    // TODO: this css is copied from CollapsedItems.scss. Figure out how to reuse this smartly with CSS or SASS
+    background-color: var(--jse-selection-background-color);
+    cursor: var(--jse-contents-selected-cursor);
+
+    $shape-color: var(--jse-collapsed-items-selected-background-color);
+    background-image: linear-gradient($shape-color, $shape-color),
+      linear-gradient(to bottom right, transparent 50.5%, $shape-color 50.5%),
+      linear-gradient(to bottom left, transparent 50.5%, $shape-color 50.5%),
+      linear-gradient(to top right, transparent 50.5%, $shape-color 50.5%),
+      linear-gradient(to top left, transparent 50.5%, $shape-color 50.5%);
+  }
+
+  // value selected (part 2)
+  &.jse-selected-value {
+    .jse-meta,
+    > .jse-header-outer > .jse-header > .jse-meta,
+    > .jse-footer-outer > .jse-footer,
+    .jse-props .jse-contents,
+    .jse-props .jse-header,
+    .jse-props .jse-footer,
+    .jse-props .jse-expand,
+    .jse-items .jse-contents,
+    .jse-items .jse-header,
+    .jse-items .jse-footer,
+    .jse-items .jse-expand {
+      background: var(--jse-selection-background-color);
+
+      :global(.jse-key),
+      :global(.jse-value) {
+        background: var(--jse-selection-background-color);
+        cursor: var(--jse-contents-selected-cursor);
+      }
+    }
+  }
+
+  &.jse-readonly {
+    --jse-contents-selected-cursor: pointer;
+  }
+
+  .jse-insert-area {
+    &.jse-selected {
+      outline-color: var(--jse-context-menu-pointer-background);
+    }
+  }
+
+  .jse-insert-area {
+    &.jse-selected {
+      :global(.jse-context-menu-pointer) {
+        background: var(--jse-context-menu-pointer-background);
+
+        &:hover {
+          background: var(--jse-context-menu-pointer-background-highlight);
+        }
+      }
     }
   }
 }
