@@ -136,7 +136,8 @@
   const themes = [
     { value: 'jse-theme-default', label: 'default' },
     { value: 'jse-theme-dark', label: 'dark' },
-    { value: 'jse-theme-big', label: 'big' }
+    { value: 'jse-theme-big', label: 'big' },
+    { value: 'jse-theme-custom-contents', label: 'custom-contents' }
   ]
 
   const indentations = [
@@ -719,6 +720,16 @@ See https://github.com/sveltejs/kit/issues/981
 
     &.jse-theme-big {
       background: #ffe2d8;
+    }
+
+    &.jse-theme-custom-contents {
+      --jse-contents-background-color: #{hsl(76, 52, 70)};
+      --jse-selection-background-color: #{hsl(76, 42, 50)};
+      --jse-selection-background-light-color: #{hsl(76, 42, 60)};
+      --jse-hover-background-color: #{hsl(76, 42, 60)};
+      --jse-context-menu-pointer-hover-background: #{hsl(76, 52, 40)};
+      --jse-context-menu-pointer-background: #{hsl(76, 52, 30)};
+      --jse-context-menu-pointer-background-highlight: #{hsl(76, 52, 40)};
     }
   }
 
