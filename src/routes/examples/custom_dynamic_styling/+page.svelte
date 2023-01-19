@@ -47,11 +47,28 @@
     height: 400px;
   }
 
-  :global(.jse-json-node.custom-class-highlight .jse-contents) {
-    background: #bfff66;
+  :global(.custom-class-highlight) {
+    --jse-contents-background-color: #bfff66;
+    /*
+     * note: you can override more css variables to
+     * have the selection highlighted in the same theme.
+     *
+     * Relevant variables are:
+     *
+     *   --jse-contents-background-color
+     *   --jse-selection-background-color
+     *   --jse-selection-background-inactive-color
+     *   --jse-hover-background-color
+     *   --jse-context-menu-pointer-hover-background
+     *   --jse-context-menu-pointer-background
+     *   --jse-context-menu-pointer-background-highlight
+     *   --jse-collapsed-items-background-color
+     *   --jse-collapsed-items-selected-background-color
+     */
   }
 
   :global(.jse-json-node.custom-class-boolean .jse-value) {
     background: #ffb5c2;
+    color: #1a1a1a;
   }
 </style>
