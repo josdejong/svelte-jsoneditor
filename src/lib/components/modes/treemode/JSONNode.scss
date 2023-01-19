@@ -141,11 +141,8 @@
 // lighter selection color when the editor doesn't have focus
 :global(.jse-main:not(.jse-focus)) {
   .jse-json-node {
-    @include json-node-selected-mixin(
-      var(--jse-selection-background-light-color),
-      var(--jse-selection-background-color),
-      var(--jse-selection-background-color)
-    );
+    --jse-selection-background-color: var(--jse-selection-background-light-color);
+    --jse-context-menu-pointer-background: var(--jse-context-menu-pointer-hover-background);
   }
 }
 
