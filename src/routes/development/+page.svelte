@@ -730,6 +730,8 @@ See https://github.com/sveltejs/kit/issues/981
       --jse-context-menu-pointer-hover-background: #{hsl(76, 52%, 40%)};
       --jse-context-menu-pointer-background: #{hsl(76, 52%, 30%)};
       --jse-context-menu-pointer-background-highlight: #{hsl(76, 52%, 40%)};
+      --jse-collapsed-items-background-color: #{hsl(76, 42%, 60%)};
+      --jse-collapsed-items-selected-background-color: #{hsl(76, 42%, 45%)};
     }
   }
 

@@ -165,16 +165,8 @@
   :global(.jse-collapsed-items.jse-selected),
   &.jse-selected :global(.jse-collapsed-items),
   &.jse-selected-value :global(.jse-collapsed-items) {
-    // TODO: this css is copied from CollapsedItems.scss. Figure out how to reuse this smartly with CSS or SASS
     background-color: var(--jse-selection-background-color);
-    cursor: var(--jse-contents-selected-cursor);
-
-    $shape-color: var(--jse-collapsed-items-selected-background-color);
-    background-image: linear-gradient($shape-color, $shape-color),
-      linear-gradient(to bottom right, transparent 50.5%, $shape-color 50.5%),
-      linear-gradient(to bottom left, transparent 50.5%, $shape-color 50.5%),
-      linear-gradient(to top right, transparent 50.5%, $shape-color 50.5%),
-      linear-gradient(to top left, transparent 50.5%, $shape-color 50.5%);
+    --jse-collapsed-items-background-color: var(--jse-collapsed-items-selected-background-color);
   }
 
   // value selected (part 2)
