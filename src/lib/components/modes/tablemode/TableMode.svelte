@@ -18,7 +18,7 @@
     OnChangeMode,
     OnFocus,
     OnJSONEditorModal,
-    OnRenderMenu,
+    OnRenderMenuWithoutContext,
     OnRenderValue,
     OnSortModal,
     OnTransformModal,
@@ -144,7 +144,7 @@
   export let onChange: OnChange
   export let onChangeMode: OnChangeMode
   export let onRenderValue: OnRenderValue
-  export let onRenderMenu: OnRenderMenu
+  export let onRenderMenu: OnRenderMenuWithoutContext
   export let onFocus: OnFocus
   export let onBlur: OnBlur
   export let onSortModal: OnSortModal

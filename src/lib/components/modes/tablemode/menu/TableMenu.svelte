@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { MenuItem, OnRenderMenu } from '../../../../types'
+  import type { MenuItem, OnRenderMenuWithoutContext } from '$lib/types'
   import Menu from '../../../controls/Menu.svelte'
   import {
     faEllipsisV,
@@ -22,7 +22,7 @@
   export let onContextMenu: () => void
   export let onUndo: () => void
   export let onRedo: () => void
-  export let onRenderMenu: OnRenderMenu
+  export let onRenderMenu: OnRenderMenuWithoutContext
 
   let defaultItems: MenuItem[]
   $: defaultItems = !readOnly
@@ -80,7 +80,7 @@
       ]
 
   let items: MenuItem[]
-  $: items = onRenderMenu('table', defaultItems) || defaultItems
+  $: items = onRenderMenu(defaultItems) || defaultItems
 </script>
 
 <Menu {items} />

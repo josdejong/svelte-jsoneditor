@@ -422,6 +422,7 @@
             {validator}
             {validationParser}
             {pathParser}
+            insideModal={false}
             {onError}
             onChange={handleChange}
             onChangeMode={toggleMode}

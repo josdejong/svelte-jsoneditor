@@ -308,10 +308,12 @@ export type OnRenderValue = (props: RenderValueProps) => RenderValueComponentDes
 export type OnClassName = (path: JSONPath, value: JSONValue) => string | undefined
 export type OnChangeMode = (mode: Mode) => void
 export type OnContextMenu = (contextMenuProps: AbsolutePopupOptions) => void
-export type OnRenderMenu = (
-  mode: 'tree' | 'text' | 'table',
-  items: MenuItem[]
-) => MenuItem[] | undefined
+export type RenderMenuContext = {
+  mode: 'tree' | 'text' | 'table'
+  modal: boolean
+}
+export type OnRenderMenu = (items: MenuItem[], context: RenderMenuContext) => MenuItem[] | undefined
+export type OnRenderMenuWithoutContext = (items: MenuItem[]) => MenuItem[] | undefined
 export type OnError = (error: Error) => void
 export type OnFocus = () => void
 export type OnBlur = () => void

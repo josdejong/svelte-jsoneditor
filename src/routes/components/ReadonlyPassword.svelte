@@ -8,7 +8,6 @@
   export let value
   export let path
   export let readOnly
-  export let isSelected
   export let onSelect
 
   $: hiddenValue = '*'.repeat(String(value).length)
@@ -25,9 +24,8 @@
 </script>
 
 <div
-  class="jse-readonly-password"
+  class="jse-value jse-readonly-password"
   data-type="selectable-value"
-  class:selected={isSelected}
   on:dblclick={handleValueDoubleClick}
 >
   <Icon data={faLock} />
@@ -41,9 +39,5 @@
 
   .jse-readonly-password:hover {
     background: #ededed;
-  }
-
-  .jse-readonly-password.selected {
-    background: #d3d3d3;
   }
 </style>

@@ -16,6 +16,7 @@
     OnFocus,
     OnJSONEditorModal,
     OnRenderMenu,
+    OnRenderMenuWithoutContext,
     OnRenderValue,
     OnSortModal,
     OnTransformModal,
@@ -46,6 +47,7 @@
   export let validator: Validator | null
   export let validationParser: JSONParser
   export let pathParser: JSONPathParser
+  export let insideModal: boolean
 
   export let onChange: OnChange
   export let onRenderValue: OnRenderValue
@@ -95,12 +97,13 @@
     separator: true
   }
 
-  $: handleRenderMenu = (mode: 'tree' | 'text' | 'table', items: MenuItem[]) => {
+  let handleRenderMenu: OnRenderMenuWithoutContext
+  $: handleRenderMenu = (items: MenuItem[]) => {
     const updatedItems = isMenuSpaceItem(items[0])
       ? modeMenuItems.concat(items) // menu is empty, readOnly mode
       : modeMenuItems.concat(separatorMenuItem, items)
 
-    return onRenderMenu(mode, updatedItems) || updatedItems
+    return onRenderMenu(updatedItems, { mode, modal: insideModal }) || updatedItems
   }
 
   export function patch(operations: JSONPatchDocument): JSONPatchResult {
