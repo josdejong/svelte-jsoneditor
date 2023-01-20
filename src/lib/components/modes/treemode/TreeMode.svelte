@@ -1672,7 +1672,7 @@
       // a regular key like a, A, _, etc is entered.
       // Replace selected contents with a new value having this first character as text
       event.preventDefault()
-      handleInsertCharacter(normalizedCombo)
+      handleInsertCharacter(event.key)
       return
     }
 
