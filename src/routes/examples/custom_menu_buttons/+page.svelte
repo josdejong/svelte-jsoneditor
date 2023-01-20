@@ -25,7 +25,9 @@
     await copyToClipboard(contents)
   }
 
-  function handleRenderMenu(mode, items) {
+  function handleRenderMenu(items, context) {
+    console.log('handleRenderMenu', { items, context })
+
     const separator = {
       separator: true
     }

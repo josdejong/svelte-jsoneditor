@@ -48,7 +48,7 @@
     OnChangeMode,
     OnError,
     OnFocus,
-    OnRenderMenu,
+    OnRenderMenuWithoutContext,
     OnSortModal,
     OnTransformModal,
     ParseError,
@@ -79,7 +79,7 @@
   export let onError: OnError
   export let onFocus: OnFocus
   export let onBlur: OnBlur
-  export let onRenderMenu: OnRenderMenu
+  export let onRenderMenu: OnRenderMenuWithoutContext
   export let onSortModal: OnSortModal
   export let onTransformModal: OnTransformModal
 

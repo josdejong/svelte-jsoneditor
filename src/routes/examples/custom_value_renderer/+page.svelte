@@ -19,7 +19,7 @@
   ]
 
   function onRenderValue(props) {
-    const { path, value, readOnly, parser, isEditing, isSelected, onSelect, onPatch } = props
+    const { path, value, readOnly, parser, isEditing, selection, onSelect, onPatch } = props
 
     const key = props.path[props.path.length - 1]
     if (key === 'password' && !isEditing) {
@@ -30,7 +30,6 @@
             value,
             path,
             readOnly,
-            isSelected,
             onSelect
           }
         }
@@ -47,7 +46,7 @@
             readOnly,
             parser,
             onPatch,
-            isSelected,
+            selection,
             options: genderOptions
           }
         }

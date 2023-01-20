@@ -6,6 +6,7 @@
     jmespathQueryLanguage,
     JSONEditor,
     lodashQueryLanguage,
+    type MenuItem,
     ReadonlyValue,
     renderValue
   } from 'svelte-jsoneditor'
@@ -253,6 +254,7 @@
     enforceString,
     searchResultItems,
     isEditing,
+    parser,
     normalization,
     onPatch,
     onPasteJson,
@@ -269,6 +271,7 @@
           path,
           value,
           enforceString,
+          parser,
           normalization,
           onPatch,
           onPasteJson,
@@ -282,14 +285,14 @@
     if (!isEditing) {
       renderers.push({
         component: ReadonlyValue,
-        props: { path, value, readOnly, normalization, searchResultItems, onSelect }
+        props: { path, value, readOnly, parser, normalization, searchResultItems, onSelect }
       })
     }
 
     return renderers
   }
 
-  function onRenderMenu(mode, items) {
+  function onRenderMenu(items: MenuItem[], { mode }) {
     if (!import.meta.env.SSR) {
       console.log('onRenderMenu', mode, items)
     }

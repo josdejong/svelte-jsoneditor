@@ -14,7 +14,7 @@
   import { faJSONEditorCollapse, faJSONEditorExpand } from '$lib/img/customFontawesomeIcons'
   import { isObjectOrArray } from '$lib/utils/typeUtils'
   import Menu from '../../../controls/Menu.svelte'
-  import type { JSONSelection, MenuItem, OnRenderMenu } from '$lib/types'
+  import type { JSONSelection, MenuItem, OnRenderMenuWithoutContext } from '$lib/types'
   import type { JSONValue } from 'immutable-json-patch'
   import { isKeySelection, isMultiSelection, isValueSelection } from '../../../../logic/selection'
   import type { HistoryState } from '../../../../logic/history'
@@ -34,7 +34,7 @@
   export let onTransform: () => void
   export let onContextMenu: () => void
   export let onCopy: () => void
-  export let onRenderMenu: OnRenderMenu
+  export let onRenderMenu: OnRenderMenuWithoutContext
 
   function handleToggleSearch() {
     showSearch = !showSearch
@@ -154,7 +154,7 @@
         }
       ]
 
-  $: items = onRenderMenu('tree', defaultItems) || defaultItems
+  $: items = onRenderMenu(defaultItems) || defaultItems
 </script>
 
 <Menu {items} />

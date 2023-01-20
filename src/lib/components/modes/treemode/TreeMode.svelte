@@ -119,7 +119,7 @@
     OnExpand,
     OnFocus,
     OnJSONEditorModal,
-    OnRenderMenu,
+    OnRenderMenuWithoutContext,
     OnRenderValue,
     OnSortModal,
     OnTransformModal,
@@ -173,7 +173,7 @@
   export let onChange: OnChange
   export let onChangeMode: OnChangeMode
   export let onRenderValue: OnRenderValue
-  export let onRenderMenu: OnRenderMenu
+  export let onRenderMenu: OnRenderMenuWithoutContext
   export let onClassName: OnClassName | undefined
   export let onFocus: OnFocus
   export let onBlur: OnBlur
@@ -1672,7 +1672,7 @@
       // a regular key like a, A, _, etc is entered.
       // Replace selected contents with a new value having this first character as text
       event.preventDefault()
-      handleInsertCharacter(normalizedCombo)
+      handleInsertCharacter(event.key)
       return
     }
 

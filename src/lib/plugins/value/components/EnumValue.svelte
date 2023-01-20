@@ -5,6 +5,7 @@
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
   import type { JSONParser, JSONSelection, OnPatch } from '../../../types'
+  import { isValueSelection } from '$lib/logic/selection'
 
   export let path: JSONPath
   export let value: JSONValue
@@ -54,7 +55,7 @@
 
 <select
   class={`jse-enum-value ${getValueClass(bindValue, parser)}`}
-  class:jse-selected={selection !== undefined}
+  class:jse-selected={isValueSelection(selection)}
   bind:value={bindValue}
   bind:this={refSelect}
   on:change={handleSelect}
