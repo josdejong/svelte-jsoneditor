@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.13.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.12.0...v0.13.0) (2023-01-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* CSS variable `--jse-selection-background-light-color` is renamed to `--jse-selection-background-inactive-color`
+
+### Features
+
+* more flexible styling for contents in tree mode with new CSS variables ([e29f85e](https://github.com/josdejong/svelte-jsoneditor/commit/e29f85e1d5ac77993117225c862b8c056ad9a4ad))
+
+
+### Bug Fixes
+
+* update dependencies and devDependencies ([008dcd6](https://github.com/josdejong/svelte-jsoneditor/commit/008dcd655b8e680cebff7d163daa19b0327c9662))
+
 ## [0.12.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.11.8...v0.12.0) (2023-01-18)
 
 
