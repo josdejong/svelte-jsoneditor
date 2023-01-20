@@ -11,8 +11,8 @@ import {
   search,
   splitValue
 } from './search.js'
-import type { ExtendedSearchResultItem, SearchResultItem } from '../types.js'
-import { SearchField } from '../types.js'
+import type { ExtendedSearchResultItem, SearchResultItem } from '$lib/types.js'
+import { SearchField } from '$lib/types.js'
 import { createKeySelection, createValueSelection } from './selection.js'
 
 describe('search', () => {
@@ -22,8 +22,7 @@ describe('search', () => {
       a: [{ a: 'b', c: 'a' }, 'e', 'a']
     }
 
-    const documentState = createDocumentState()
-    const results = search('a', json, documentState)
+    const results = search('a', json)
 
     assert.deepStrictEqual(results, [
       {
@@ -69,8 +68,7 @@ describe('search', () => {
       'hello world': 'hello world, hello WORLD, world'
     }
 
-    const documentState = createDocumentState()
-    const results = search('world', json, documentState)
+    const results = search('world', json)
 
     assert.deepStrictEqual(results, [
       {
@@ -112,11 +110,7 @@ describe('search', () => {
       }
     }
 
-    const documentState = {
-      ...createDocumentState({ json, expand: () => true })
-    }
-
-    const results = search('foo', json, documentState)
+    const results = search('foo', json)
     assert.deepStrictEqual(results, [
       {
         path: ['data', 'text2'],
@@ -139,11 +133,11 @@ describe('search', () => {
     const count = 10
     const json = Array(count).fill(42)
 
-    const resultsAll = search('42', json, undefined)
+    const resultsAll = search('42', json)
     assert.deepStrictEqual(resultsAll.length, count)
 
     const maxResults = 4
-    const results = search('42', json, undefined, maxResults)
+    const results = search('42', json, maxResults)
     assert.deepStrictEqual(results.length, maxResults)
   })
 
@@ -151,19 +145,18 @@ describe('search', () => {
     const maxResults = 4
 
     assert.deepStrictEqual(
-      search('ha', { greeting: 'ha ha ha ha ha ha' }, createDocumentState(), maxResults).length,
+      search('ha', { greeting: 'ha ha ha ha ha ha' }, maxResults).length,
       maxResults
     )
 
     assert.deepStrictEqual(
-      search('ha', { 'ha ha ha ha ha ha': 'ha ha ha ha ha ha' }, createDocumentState(), maxResults)
-        .length,
+      search('ha', { 'ha ha ha ha ha ha': 'ha ha ha ha ha ha' }, maxResults).length,
       maxResults
     )
   })
 
   test('should find all case insensitive matches', () => {
-    const path = []
+    const path: JSONPath = []
     const field = SearchField.value
 
     assert.deepStrictEqual(
@@ -194,7 +187,7 @@ describe('search', () => {
   test('should split search results', () => {
     const text = 'hello world, HELLO!'
     const searchTextLowerCase = 'hello'
-    const path = []
+    const path: JSONPath = []
     const field = SearchField.value
     const searchResults = findAndCollectCaseInsensitiveMatches(
       text,
@@ -247,7 +240,7 @@ describe('search', () => {
     }
     const documentState = createDocumentState({ json, expand: () => true })
 
-    const results = search('world', json, documentState)
+    const results = search('world', json)
 
     const { operations, newSelection } = createSearchAndReplaceOperations(
       json,
@@ -283,7 +276,7 @@ describe('search', () => {
     }
     const documentState = createDocumentState({ json, expand: () => true })
 
-    const results = search('world', json, documentState)
+    const results = search('world', json)
 
     const { operations, newSelection } = createSearchAndReplaceOperations(
       json,
@@ -314,7 +307,7 @@ describe('search', () => {
     }
     const documentState = createDocumentState({ json, expand: () => true })
 
-    const results = search('2', json, documentState)
+    const results = search('2', json)
 
     const { operations } = createSearchAndReplaceOperations(
       json,
@@ -344,7 +337,7 @@ describe('search', () => {
     }
     const documentState = createDocumentState({ json, expand: () => true })
 
-    const results = search('2', json, documentState)
+    const results = search('2', json)
 
     const { operations } = createSearchAndReplaceOperations(
       json,
@@ -374,7 +367,7 @@ describe('search', () => {
     }
     const documentState = createDocumentState({ json, expand: () => true })
 
-    const results = search('2', json, documentState)
+    const results = search('2', json)
 
     const { operations } = createSearchAndReplaceOperations(
       json,
@@ -404,7 +397,7 @@ describe('search', () => {
     }
     const documentState = createDocumentState({ json, expand: () => true })
 
-    const results = search('2', json, documentState)
+    const results = search('2', json)
 
     const { operations } = createSearchAndReplaceOperations(
       json,

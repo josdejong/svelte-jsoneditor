@@ -3,7 +3,7 @@
  * Returns the response from the callback
  * The measured duration is returned via the onDuration callback
  */
-export function measure(callback, onDuration) {
+export function measure<T>(callback: () => T, onDuration: (duration: number) => void): T {
   const start = Date.now()
   const result = callback()
   const end = Date.now()

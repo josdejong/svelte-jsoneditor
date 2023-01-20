@@ -16,13 +16,13 @@ import {
   toTableCellPosition
 } from './table.js'
 import { deepStrictEqual } from 'assert'
-import type { JSONArray, JSONPath } from 'immutable-json-patch'
+import type { JSONArray, JSONPath, JSONValue } from 'immutable-json-patch'
 import { createValueSelection } from './selection.js'
-import type { SortedColumn, ValidationError } from '../types.js'
-import { SortDirection, ValidationSeverity } from '../types.js'
+import type { SortedColumn, ValidationError } from '$lib/types.js'
+import { SortDirection, ValidationSeverity } from '$lib/types.js'
 
 describe('table', () => {
-  const json = [
+  const json: JSONValue = [
     { name: 'Joe', address: { city: 'New York', street: 'Main street' }, scores: [1, 2, 3] },
     {
       name: 'Sarah',
@@ -57,8 +57,14 @@ describe('table', () => {
 
   test('should return an empty array on non-array input', () => {
     deepStrictEqual(getColumns({} as JSONArray, false), [])
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     deepStrictEqual(getColumns(null, false), [])
-    deepStrictEqual(getColumns('foo' as unknown as JSONArray, false), [])
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    deepStrictEqual(getColumns('foo', false), [])
   })
 
   test('should collect recursive keys from an object', () => {

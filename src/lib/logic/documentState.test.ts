@@ -1,5 +1,5 @@
 import assert, { deepStrictEqual } from 'assert'
-import { test, describe } from 'vitest'
+import { describe, test } from 'vitest'
 import { flatMap, isEqual, range, times } from 'lodash-es'
 import { ARRAY_SECTION_SIZE } from '../constants.js'
 import {
@@ -25,7 +25,7 @@ import {
   type JSONPointerMap,
   type VisibleSection
 } from '../types.js'
-import type { JSONValue, JSONPatchDocument } from 'immutable-json-patch'
+import type { JSONArray, JSONObject, JSONPatchDocument, JSONValue } from 'immutable-json-patch'
 import { compileJSONPointer, deleteIn, setIn } from 'immutable-json-patch'
 
 describe('documentState', () => {
@@ -444,7 +444,7 @@ describe('documentState', () => {
         { op: 'add', path: '/members/1', value: { id: 42, name: 'Julia' } }
       ])
 
-      assert.deepStrictEqual(res.json['members'], [
+      assert.deepStrictEqual((res.json as JSONObject)?.['members'], [
         { id: 1, name: 'Joe' },
         { id: 42, name: 'Julia' },
         { id: 2, name: 'Sarah' },
@@ -475,7 +475,7 @@ describe('documentState', () => {
         { op: 'add', path: '/members/-', value: { id: 4, name: 'John' } }
       ])
 
-      assert.deepStrictEqual(res.json['members'], [
+      assert.deepStrictEqual((res.json as JSONObject)['members'], [
         { id: 1, name: 'Joe' },
         { id: 2, name: 'Sarah' },
         { id: 3, name: 'Mark' },
@@ -668,7 +668,7 @@ describe('documentState', () => {
       const res = documentStatePatch(json, documentState, operations)
 
       // check order of keys
-      assert.deepStrictEqual(Object.keys(res.json), ['a', 'b', 'd'])
+      assert.deepStrictEqual(Object.keys(res.json as JSONObject), ['a', 'b', 'd'])
 
       // keep expanded state of existing keys
       assert.strictEqual(res.documentState.expandedMap[compileJSONPointer([])], true)
@@ -685,7 +685,10 @@ describe('documentState', () => {
         { op: 'copy', from: '/members/1', path: '/group/user' }
       ])
 
-      assert.deepStrictEqual(res.json, setIn(json, ['group', 'user'], json['members'][1]))
+      assert.deepStrictEqual(
+        res.json,
+        setIn(json, ['group', 'user'], ((json as JSONObject)['members'] as JSONArray)[1])
+      )
       assert.deepStrictEqual(res.documentState, {
         ...documentState,
         expandedMap: {
@@ -703,12 +706,12 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, {
-        group: json['group'],
+        group: (json as JSONObject)['group'],
         members: [
-          json['members'][0],
-          json['group']['details'],
-          json['members'][1],
-          json['members'][2]
+          ((json as JSONObject)['members'] as JSONArray)[0],
+          ((json as JSONObject)['group'] as JSONObject)['details'],
+          ((json as JSONObject)['members'] as JSONArray)[1],
+          ((json as JSONObject)['members'] as JSONArray)[2]
         ]
       })
 
@@ -732,7 +735,7 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, {
-        members: json['members'],
+        members: (json as JSONObject)['members'],
         group: {
           name: 'Group 1',
           location: 'Block C'
@@ -777,8 +780,12 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, {
-        group: json['group'],
-        members: [json['members'][1], json['members'][0], json['members'][2]]
+        group: (json as JSONObject)['group'],
+        members: [
+          ((json as JSONObject)['members'] as JSONArray)[1],
+          ((json as JSONObject)['members'] as JSONArray)[0],
+          ((json as JSONObject)['members'] as JSONArray)[2]
+        ]
       })
 
       // we have collapsed members[1], and after that moved it from index 1 to 0, so now members[0] should be collapsed
@@ -806,8 +813,12 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, {
-        group: json['group'],
-        members: [json['members'][1], json['members'][0], json['members'][2]]
+        group: (json as JSONObject)['group'],
+        members: [
+          ((json as JSONObject)['members'] as JSONArray)[1],
+          ((json as JSONObject)['members'] as JSONArray)[0],
+          ((json as JSONObject)['members'] as JSONArray)[2]
+        ]
       })
 
       // we have collapsed members[0], and after that moved it from index 0 to 1, so now members[1] should be collapsed
@@ -839,12 +850,12 @@ describe('documentState', () => {
           location: 'Block C'
         },
         members: [
-          json['members'][0],
+          ((json as JSONObject)['members'] as JSONArray)[0],
           {
             description: 'The first group'
           },
-          json['members'][1],
-          json['members'][2]
+          ((json as JSONObject)['members'] as JSONArray)[1],
+          ((json as JSONObject)['members'] as JSONArray)[2]
         ]
       })
 
@@ -874,10 +885,13 @@ describe('documentState', () => {
 
       assert.deepStrictEqual(res.json, {
         group: {
-          ...json['group'],
-          user: json['members'][1]
+          ...((json as JSONObject)['group'] as JSONObject),
+          user: ((json as JSONObject)['members'] as JSONArray)[1]
         },
-        members: [json['members'][0], json['members'][2]]
+        members: [
+          ((json as JSONObject)['members'] as JSONArray)[0],
+          ((json as JSONObject)['members'] as JSONArray)[2]
+        ]
       })
 
       // we have collapsed members[0], and after that moved it from index 0 to 1, so now members[1] should be collapsed
@@ -1131,7 +1145,7 @@ describe('documentState', () => {
  * Helper function to get the visible indices of an Array state
  */
 function getVisibleIndices(json: JSONValue, visibleSections: VisibleSection[]): number[] {
-  const visibleIndices = []
+  const visibleIndices: number[] = []
 
   if (Array.isArray(json)) {
     forEachVisibleIndex(json, visibleSections, (index) => {

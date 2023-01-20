@@ -104,7 +104,7 @@ export function findSchema(
       currentSchema.properties !== null &&
       nextKey in currentSchema.properties
     ) {
-      currentSchema = currentSchema.properties[nextKey]
+      currentSchema = (currentSchema.properties as Record<string, JSONSchema>)[nextKey]
       return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
     }
 
@@ -114,7 +114,7 @@ export function findSchema(
     ) {
       for (const prop in currentSchema.patternProperties) {
         if (nextKey.match(prop)) {
-          currentSchema = currentSchema.patternProperties[prop]
+          currentSchema = (currentSchema.patternProperties as Record<string, JSONSchema>)[prop]
           return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
         }
       }

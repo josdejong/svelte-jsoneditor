@@ -418,7 +418,7 @@ export function estimateSerializedSize(content: Content, maxSize = Infinity): nu
 
   let estimatedSize = 0
 
-  function recurse(json) {
+  function recurse(json: JSONValue) {
     if (Array.isArray(json)) {
       // open and close bracket, commas between items
       estimatedSize += 2 + (json.length - 1)

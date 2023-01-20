@@ -8,6 +8,8 @@ import {
   isJSONPatchMove,
   isJSONPatchRemove,
   isJSONPatchReplace,
+  type JSONPatchAdd,
+  type JSONPatchCopy,
   type JSONPatchDocument,
   type JSONPatchOperation,
   type JSONPath,
@@ -66,7 +68,7 @@ export function insertBefore(
     // 'object'
     const afterKey = last(path)
     const keys = Object.keys(parent)
-    const nextKeys = getNextKeys(keys, afterKey, true)
+    const nextKeys = afterKey !== undefined ? getNextKeys(keys, afterKey, true) : []
 
     return [
       // insert new values
@@ -76,7 +78,7 @@ export function insertBefore(
           op: 'add',
           path: compileJSONPointer(parentPath.concat(newProp)),
           value: entry.value
-        }
+        } as JSONPatchAdd
       }),
 
       // move all lower down keys so the inserted key will maintain its position
@@ -192,7 +194,7 @@ export function replace(
     const parentPath = initial(lastPath)
     const beforeKey = last(lastPath)
     const keys: string[] = Object.keys(parent)
-    const nextKeys = getNextKeys(keys, beforeKey, false)
+    const nextKeys = beforeKey !== undefined ? getNextKeys(keys, beforeKey, false) : []
     const removeKeys = new Set(paths.map((path) => last(path)))
     const filteredKeys = keys.filter((key) => !removeKeys.has(key))
 
@@ -207,7 +209,7 @@ export function replace(
           op: 'add',
           path: compileJSONPointer(parentPath.concat(newProp)),
           value: entry.value
-        }
+        } as JSONPatchAdd
       }),
 
       // move down operations
@@ -257,7 +259,7 @@ export function duplicate(json: JSONValue, paths: JSONPath[]): JSONPatchDocument
   } else if (isJSONObject(parent)) {
     // 'object'
     const keys = Object.keys(parent)
-    const nextKeys = getNextKeys(keys, beforeKey, false)
+    const nextKeys = beforeKey !== undefined ? getNextKeys(keys, beforeKey, false) : []
 
     return [
       // copy operations
@@ -269,7 +271,7 @@ export function duplicate(json: JSONValue, paths: JSONPath[]): JSONPatchDocument
           op: 'copy',
           from: compileJSONPointer(path),
           path: compileJSONPointer(parentPath.concat(newProp))
-        }
+        } as JSONPatchCopy
       }),
 
       // move down operations
@@ -448,7 +450,7 @@ export function insert(
 
 export function moveInsideParent(
   json: JSONValue,
-  selection: JSONSelection,
+  selection: JSONSelection | undefined,
   dragInsideAction: DragInsideAction
 ): JSONPatchDocument {
   const beforePath: JSONPath = dragInsideAction['beforePath']
@@ -461,6 +463,10 @@ export function moveInsideParent(
     !append &&
     !(beforePath && pathStartsWith(beforePath, parentPath) && beforePath.length > parentPath.length)
   ) {
+    return []
+  }
+
+  if (!selection) {
     return []
   }
 
@@ -522,11 +528,13 @@ export function moveInsideParent(
   } else {
     throw new Error('Cannot create move operations: parent must be an Object or Array')
   }
+
+  return []
 }
 
 export function createNewValue(
   json: JSONValue,
-  selection: JSONSelection,
+  selection: JSONSelection | undefined,
   valueType: 'object' | 'array' | 'structure' | 'value'
 ) {
   if (valueType === 'object') {
@@ -538,7 +546,7 @@ export function createNewValue(
   }
 
   if (valueType === 'structure') {
-    const parentPath = getParentPath(selection)
+    const parentPath = selection ? getParentPath(selection) : []
     const parent = getIn(json, parentPath)
 
     if (Array.isArray(parent) && !isEmpty(parent)) {

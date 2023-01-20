@@ -351,7 +351,7 @@
       debug('searching...', searchText)
 
       // console.time('search') // TODO: cleanup
-      const newResultItems = search(searchText, json, documentState, MAX_SEARCH_RESULTS)
+      const newResultItems = search(searchText, json, MAX_SEARCH_RESULTS)
       searchResult = updateSearchResult(json, newResultItems, searchResult)
       // console.timeEnd('search') // TODO: cleanup
 

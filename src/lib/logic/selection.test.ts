@@ -20,6 +20,7 @@ import {
 } from './selection.js'
 import { createDocumentState } from './documentState.js'
 import { type DocumentState, type JSONSelection, SelectionType } from '../types.js'
+import type { JSONValue } from 'lossless-json'
 
 describe('selection', () => {
   const json = {
@@ -543,7 +544,7 @@ describe('selection', () => {
   })
 
   test('getInitialSelection', () => {
-    function getInitialSelectionWithState(json) {
+    function getInitialSelectionWithState(json: JSONValue) {
       const documentState = createDocumentState({ json, expand: (path) => path.length <= 1 })
       return getInitialSelection(json, documentState)
     }

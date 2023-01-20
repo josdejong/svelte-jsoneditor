@@ -1,4 +1,5 @@
 import type {
+  JSONObject,
   JSONPatchDocument,
   JSONPatchOperation,
   JSONPath,
@@ -108,7 +109,6 @@ export function searchPrevious(searchResult: SearchResult): SearchResult {
 export function search(
   searchText: string,
   json: JSONValue,
-  documentState: DocumentState,
   maxResults = Infinity
 ): SearchResultItem[] {
   const results: SearchResultItem[] = []
@@ -303,7 +303,7 @@ export function createSearchAndReplaceAllOperations(
   parser: JSONParser
 ): { newSelection: JSONSelection; operations: JSONPatchDocument } {
   // TODO: to improve performance, we could reuse existing search results (except when hitting a maxResult limit)
-  const searchResultItems = search(searchText, json, documentState, Infinity /* maxResults */)
+  const searchResultItems = search(searchText, json, Infinity /* maxResults */)
 
   interface Match {
     path: JSONPath
@@ -346,7 +346,7 @@ export function createSearchAndReplaceAllOperations(
   })
 
   // step 3: call createSearchAndReplaceOperations for each of the matches
-  let allOperations = []
+  let allOperations: JSONPatchDocument = []
   let lastNewSelection = undefined
   deduplicatedMatches.forEach((match) => {
     // TODO: there is overlap with the logic of createSearchAndReplaceOperations. Can we extract and reuse this logic?
@@ -357,7 +357,7 @@ export function createSearchAndReplaceAllOperations(
       const parentPath = initial(path)
       const parent = getIn(json, parentPath)
       const oldKey = last(path)
-      const keys = Object.keys(parent)
+      const keys = Object.keys(parent as JSONObject)
       const newKey = replaceAllText(oldKey, replacementText, items)
 
       const operations = rename(parentPath, keys, oldKey, newKey)
@@ -404,15 +404,18 @@ export function createSearchAndReplaceAllOperations(
   }
 }
 
+export interface SplitValuePart {
+  text: string
+  type: 'normal' | 'highlight'
+  active: boolean
+}
+
 /**
  * Split the text into separate parts for each search result and the text
  * in between.
  */
-export function splitValue(
-  text: string,
-  matches: ExtendedSearchResultItem[]
-): Array<{ text: string; type: 'normal' | 'highlight'; active: boolean }> {
-  const parts = []
+export function splitValue(text: string, matches: ExtendedSearchResultItem[]): SplitValuePart[] {
+  const parts: SplitValuePart[] = []
 
   let previousEnd = 0
 
@@ -437,7 +440,7 @@ export function splitValue(
   }
 
   const lastMatch = last(matches)
-  if (lastMatch.end < text.length) {
+  if (lastMatch && lastMatch.end < text.length) {
     parts.push({
       type: 'normal',
       text: text.slice(lastMatch.end),

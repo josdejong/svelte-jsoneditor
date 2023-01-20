@@ -56,13 +56,15 @@ export function isTimestamp(value: unknown): boolean {
 
   // try getting the primitive value if that is different. For example when having a LosslessNumber
   try {
-    const valueOf = value.valueOf()
+    const valueOf = value ? value.valueOf() : value
     if (valueOf !== value) {
       return isTimestamp(valueOf)
     }
   } catch (err) {
     return false
   }
+
+  return false
 }
 
 /**

@@ -54,7 +54,12 @@ export async function onCut({
   parser,
   onPatch
 }: OnCutAction) {
-  if (readOnly || !hasSelectionContents(documentState.selection)) {
+  if (
+    readOnly ||
+    json === undefined ||
+    !documentState.selection ||
+    !hasSelectionContents(documentState.selection)
+  ) {
     return
   }
 

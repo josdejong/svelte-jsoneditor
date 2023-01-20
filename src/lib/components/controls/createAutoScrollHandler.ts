@@ -1,20 +1,20 @@
-import { createDebug } from '../../utils/debug'
+import { createDebug } from '$lib/utils/debug'
 import {
   AUTO_SCROLL_INTERVAL,
   AUTO_SCROLL_SPEED_FAST,
   AUTO_SCROLL_SPEED_NORMAL,
   AUTO_SCROLL_SPEED_SLOW
-} from '../../constants.js'
+} from '$lib/constants.js'
 
 const debug = createDebug('jsoneditor:AutoScrollHandler')
 
-export function createAutoScrollHandler(scrollableElement) {
+export function createAutoScrollHandler(scrollableElement: Element) {
   debug('createAutoScrollHandler', scrollableElement)
 
-  let autoScrollSpeed // pixels per second
-  let autoScrollTimer
+  let autoScrollSpeed: number | undefined // pixels per second
+  let autoScrollTimer: number | undefined
 
-  function calculateSpeed(diff) {
+  function calculateSpeed(diff: number) {
     return diff < 20
       ? AUTO_SCROLL_SPEED_SLOW
       : diff < 50
@@ -25,19 +25,19 @@ export function createAutoScrollHandler(scrollableElement) {
   function autoScrollCallback() {
     if (scrollableElement) {
       // debug('auto scroll...')
-      const diff = autoScrollSpeed * (AUTO_SCROLL_INTERVAL / 1000)
+      const diff = (autoScrollSpeed || 0) * (AUTO_SCROLL_INTERVAL / 1000)
 
       scrollableElement.scrollTop += diff
     }
   }
 
-  function startAutoScroll(speed) {
+  function startAutoScroll(speed: number) {
     if (!autoScrollTimer || speed !== autoScrollSpeed) {
       stopAutoScroll()
 
       debug('startAutoScroll', speed)
       autoScrollSpeed = speed
-      autoScrollTimer = setInterval(autoScrollCallback, AUTO_SCROLL_INTERVAL)
+      autoScrollTimer = setInterval(autoScrollCallback, AUTO_SCROLL_INTERVAL) as unknown as number
     }
   }
 
@@ -51,7 +51,7 @@ export function createAutoScrollHandler(scrollableElement) {
     }
   }
 
-  function onDrag(event) {
+  function onDrag(event: DragEvent) {
     if (scrollableElement) {
       const y = event.clientY
       const { top, bottom } = scrollableElement.getBoundingClientRect()

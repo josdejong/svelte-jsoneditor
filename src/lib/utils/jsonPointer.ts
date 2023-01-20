@@ -1,4 +1,4 @@
-import type { JSONPointerMap } from '../types'
+import type { JSONPointerMap } from '$lib/types'
 import type { JSONPointer } from 'immutable-json-patch'
 import { startsWithJSONPointer } from 'immutable-json-patch'
 
@@ -11,7 +11,7 @@ export function filterMapOrUndefined<T>(
     return undefined
   }
 
-  const filteredMap = {}
+  const filteredMap: JSONPointerMap<T> = {}
 
   for (const p of Object.keys(map)) {
     if (filter(p, map[p])) {

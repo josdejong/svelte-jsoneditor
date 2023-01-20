@@ -1,10 +1,11 @@
 import { isObject } from './typeUtils.js'
-import type { JSONArray, JSONObject } from 'immutable-json-patch'
+import type { JSONArray, JSONObject, JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 import { isEqual } from 'lodash-es'
+import type { JSONValue } from 'lossless-json'
 
 const MAX_ITEM_PATHS_COLLECTION = 10000
-const EMPTY_ARRAY = []
+const ROOT_PATH: JSONPath = []
 
 /**
  * Comparator to sort an array in ascending order
@@ -61,18 +62,17 @@ export function compareArrays<T>(a: Array<T>, b: Array<T>): number {
 
 /**
  * Get the paths of all nested properties in the items of an array
- * @param {JSONValue} array
- * @param {boolean} [includeObjects=false] If true, object and array paths are returned as well
- * @return {Path[]}
+ * @param array
+ * @param includeObjects If true, object and array paths are returned as well
  */
-export function getNestedPaths(array, includeObjects = false) {
-  const pointersMap = {}
+export function getNestedPaths(array: JSONValue, includeObjects = false): JSONPath[] {
+  const pointersMap: Record<string, boolean> = {}
 
   if (!Array.isArray(array)) {
     throw new TypeError('Array expected')
   }
 
-  function recurseNestedPaths(obj, path) {
+  function recurseNestedPaths(obj: JSONValue, path: JSONPath) {
     const isValue = !Array.isArray(obj) && !isObject(obj)
 
     if (isValue || (includeObjects && path.length > 0)) {
@@ -89,7 +89,7 @@ export function getNestedPaths(array, includeObjects = false) {
   const max = Math.min(array.length, MAX_ITEM_PATHS_COLLECTION)
   for (let i = 0; i < max; i++) {
     const item = array[i]
-    recurseNestedPaths(item, EMPTY_ARRAY)
+    recurseNestedPaths(item, ROOT_PATH)
   }
 
   const pathsArray = Object.keys(pointersMap).sort()

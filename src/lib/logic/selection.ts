@@ -652,7 +652,7 @@ export function createMultiSelection(
 export function selectionToPartialJson(
   json: JSONValue,
   selection: JSONSelection,
-  indentation: number | string | null,
+  indentation: number | string | undefined,
   parser: JSONParser
 ): string | null {
   if (isKeySelection(selection)) {
@@ -675,7 +675,7 @@ export function selectionToPartialJson(
     if (Array.isArray(parent)) {
       if (selection.paths.length === 1) {
         // do not suffix a single selected array item with a comma
-        const item = getIn(json, first(selection.paths))
+        const item = getIn(json, first(selection.paths) || [])
         return parser.stringify(item, null, indentation)
       } else {
         return selection.paths

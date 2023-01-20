@@ -10,7 +10,7 @@ import type {
   JSONSelection,
   MultiSelection,
   RenderedItem
-} from '../types'
+} from '$lib/types'
 
 export interface MoveSelectionProps {
   json: JSONValue
@@ -31,6 +31,14 @@ export function onMoveSelection({
   deltaY,
   items
 }: MoveSelectionProps): MoveSelectionResult {
+  if (!documentState.selection) {
+    return {
+      operations: undefined,
+      updatedSelection: undefined,
+      offset: 0
+    }
+  }
+
   const selection = documentState.selection
   const dragInsideAction =
     deltaY < 0
@@ -45,7 +53,7 @@ export function onMoveSelection({
     }
   }
 
-  const operations = moveInsideParent(json, documentState.selection, dragInsideAction)
+  const operations = moveInsideParent(json, selection, dragInsideAction)
 
   const path = initial(getStartPath(selection))
   const value = getIn(json, path)

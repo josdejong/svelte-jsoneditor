@@ -1,6 +1,7 @@
 import { test, describe } from 'vitest'
 import assert from 'assert'
 import { findEnum, findSchema, getJSONSchemaOptions } from './jsonSchemaUtils.js'
+import type { JSONPath } from 'immutable-json-patch'
 
 describe('jsonSchemaUtils', () => {
   describe('getJSONSchemaOptions', () => {
@@ -21,7 +22,7 @@ describe('jsonSchemaUtils', () => {
         }
       }
 
-      const options = getJSONSchemaOptions(schema, null, ['job', '1', 'company'])
+      const options = getJSONSchemaOptions(schema, undefined, ['job', '1', 'company'])
       assert.deepStrictEqual(options, ['test1', 'test2'])
     })
   })
@@ -88,7 +89,7 @@ describe('jsonSchemaUtils', () => {
           }
         }
       }
-      let path = []
+      let path: JSONPath = []
       assert.strictEqual(findSchema(schema, {}, path), schema)
       path = ['levelTwo']
       assert.strictEqual(findSchema(schema, {}, path), schema.properties.levelTwo)
@@ -460,7 +461,7 @@ describe('jsonSchemaUtils', () => {
             }
           }
         }
-        let path = []
+        let path: JSONPath = []
         assert.strictEqual(findSchema(schema, {}, path), schema, 'top level')
         path = ['str']
         assert.strictEqual(findSchema(schema, {}, path), schema.properties.str, 'normal property')
@@ -492,7 +493,7 @@ describe('jsonSchemaUtils', () => {
             }
           }
         }
-        let path = []
+        let path: JSONPath = []
         assert.strictEqual(findSchema(schema, {}, path), schema, 'top level')
         path = ['levelTwo']
         assert.strictEqual(findSchema(schema, {}, path), schema.properties.levelTwo, 'level two')

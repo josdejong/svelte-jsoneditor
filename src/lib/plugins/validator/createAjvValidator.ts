@@ -1,5 +1,5 @@
 import type Ajv from 'ajv'
-import type { Options, Schema } from 'ajv'
+import type { Options, Schema, ErrorObject } from 'ajv'
 import AjvDist from 'ajv'
 import type { JSONValue } from 'immutable-json-patch'
 import { parsePath } from 'immutable-json-patch'
@@ -76,10 +76,10 @@ function createAjvInstance(options: AjvValidatorOptions): Ajv {
   return ajv
 }
 
-function normalizeAjvError(json: JSONValue, ajvError): ValidationError {
+function normalizeAjvError(json: JSONValue, ajvError: ErrorObject): ValidationError {
   return {
     path: parsePath(json, ajvError.instancePath),
-    message: ajvError.message,
+    message: ajvError.message || 'Unknown error',
     severity: ValidationSeverity.warning
   }
 }
@@ -91,7 +91,7 @@ function normalizeAjvError(json: JSONValue, ajvError): ValidationError {
  * @param {Object} ajvError
  * @return {Object} Returns the error with improved message
  */
-function improveAjvError(ajvError) {
+function improveAjvError(ajvError: ErrorObject) {
   if (ajvError.keyword === 'enum' && Array.isArray(ajvError.schema)) {
     let enums = ajvError.schema
     if (enums) {

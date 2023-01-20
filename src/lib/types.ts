@@ -296,7 +296,7 @@ export type OnPatch = (operations: JSONPatchDocument, afterPatch?: AfterPatchCal
 export type OnChangeText = (updatedText: string, afterPatch?: AfterPatchCallback) => void
 export type OnSort = (params: {
   operations: JSONPatchDocument
-  rootPath
+  rootPath: JSONPath
   itemPath: JSONPath
   direction: 1 | -1
 }) => void
@@ -399,6 +399,7 @@ export interface PopupEntry {
 
 export interface AbsolutePopupOptions {
   anchor?: Element
+  position?: 'top' | 'left'
   left?: number
   top?: number
   width?: number

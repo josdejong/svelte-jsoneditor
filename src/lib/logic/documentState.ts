@@ -661,7 +661,7 @@ export function getEnforceString(
   return isStringContainingPrimitiveValue(value, parser)
 }
 
-export function getNextKeys(keys, key, includeKey = false) {
+export function getNextKeys(keys: string[], key: string, includeKey = false): string[] {
   const index = keys.indexOf(key)
   if (index !== -1) {
     return includeKey ? keys.slice(index) : keys.slice(index + 1)
