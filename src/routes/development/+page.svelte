@@ -136,7 +136,8 @@
   const themes = [
     { value: 'jse-theme-default', label: 'default' },
     { value: 'jse-theme-dark', label: 'dark' },
-    { value: 'jse-theme-big', label: 'big' }
+    { value: 'jse-theme-big', label: 'big' },
+    { value: 'jse-theme-custom-contents', label: 'custom-contents' }
   ]
 
   const indentations = [
@@ -719,6 +720,28 @@ See https://github.com/sveltejs/kit/issues/981
 
     &.jse-theme-big {
       background: #ffe2d8;
+    }
+
+    &.jse-theme-custom-contents {
+      $background-color: hsl(76, 52%, 70%);
+
+      --jse-contents-background-color: #{$background-color};
+      --jse-selection-background-color: #{desaturate(darken($background-color, 10%), 20%)};
+      --jse-selection-background-inactive-color: #{desaturate(darken($background-color, 5%), 10%)};
+      --jse-hover-background-color: #{desaturate(darken($background-color, 5%), 10%)};
+
+      --jse-context-menu-pointer-hover-background: #{desaturate(darken($background-color, 20%), 20%)};
+      --jse-context-menu-pointer-background-highlight: #{desaturate(
+          darken($background-color, 30%),
+          30%
+        )};
+      --jse-context-menu-pointer-background: #{desaturate(darken($background-color, 40%), 40%)};
+
+      --jse-collapsed-items-background-color: var(--jse-selection-background-inactive-color);
+      --jse-collapsed-items-selected-background-color: #{desaturate(
+          darken($background-color, 20%),
+          20%
+        )};
     }
   }
 

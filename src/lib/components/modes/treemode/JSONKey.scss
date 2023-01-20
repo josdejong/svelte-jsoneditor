@@ -9,6 +9,7 @@
   border-radius: 1px;
   vertical-align: top;
   color: var(--jse-key-color);
+  cursor: var(--jse-contents-cursor);
 
   word-break: normal;
   overflow-wrap: normal; // not anywhere as for JSONValue

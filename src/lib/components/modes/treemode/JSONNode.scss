@@ -1,5 +1,4 @@
 @import '../../../styles';
-@import 'json-node-selected-mixin';
 
 .jse-json-node {
   position: relative;
@@ -18,17 +17,6 @@
 
     > .jse-contents-outer > .jse-contents {
       padding-left: 0;
-    }
-  }
-
-  &.jse-hovered {
-    > .jse-header-outer > .jse-header > .jse-meta,
-    .jse-props .jse-header,
-    .jse-items .jse-header,
-    .jse-props .jse-contents,
-    .jse-items .jse-contents,
-    .jse-footer {
-      background: var(--jse-hover-background-color);
     }
   }
 
@@ -75,6 +63,12 @@
     padding-left: calc(var(--jse-indent-size) + $input-padding);
   }
 
+  .jse-header,
+  .jse-contents,
+  .jse-footer {
+    background: var(--jse-contents-background-color);
+  }
+
   .jse-insert-selection-area {
     visibility: hidden;
     padding: 0 $padding-half;
@@ -91,12 +85,6 @@
     }
   }
 
-  &:hover > .jse-contents-outer .jse-insert-selection-area:not(.jse-selected),
-  .jse-header-outer:hover > .jse-insert-selection-area:not(.jse-selected),
-  .jse-footer-outer:hover .jse-insert-selection-area:not(.jse-selected) {
-    visibility: visible;
-  }
-
   .jse-context-menu-pointer-anchor {
     position: relative;
   }
@@ -107,6 +95,7 @@
 
     display: flex;
     position: relative;
+    z-index: 1; // prevent the next line half-overlapping the pointer
 
     max-width: 250px;
     min-width: 100px;
@@ -116,30 +105,127 @@
 
     :global(.jse-context-menu-pointer) {
       right: -$height-half;
-      background: var(--jse-selection-background-color);
-      z-index: 1; // prevent the next line half-overlapping the pointer
+      background: var(--jse-context-menu-pointer-hover-background);
     }
 
     &.jse-hovered {
-      outline-color: var(--jse-selection-background-color);
+      outline-color: var(--jse-context-menu-pointer-hover-background);
     }
   }
 
-  @include json-node-selected-mixin(
-    var(--jse-selection-background-color),
-    var(--jse-context-menu-pointer-background),
-    var(--jse-context-menu-pointer-background-highlight)
-  );
+  &:hover > .jse-contents-outer .jse-insert-selection-area:not(.jse-selected),
+  .jse-header-outer:hover > .jse-insert-selection-area:not(.jse-selected),
+  .jse-footer-outer:hover .jse-insert-selection-area:not(.jse-selected) {
+    visibility: visible;
+  }
+
+  &.jse-hovered {
+    > .jse-header-outer > .jse-header > .jse-meta,
+    .jse-props .jse-header,
+    .jse-items .jse-header,
+    .jse-props .jse-contents,
+    .jse-items .jse-contents,
+    .jse-footer {
+      background: var(--jse-hover-background-color);
+    }
+  }
+
+  // TODO: simplify the styling for selected keys/values/multi (get rid of globals?)
+
+  // entry selected (key and value)
+  &.jse-selected {
+    > .jse-header-outer > .jse-header > .jse-meta,
+    .jse-props .jse-header,
+    .jse-items .jse-header,
+    .jse-props .jse-contents,
+    .jse-items .jse-contents,
+    .jse-header,
+    .jse-contents,
+    .jse-footer,
+    :global(.jse-key),
+    :global(.jse-value) {
+      background: var(--jse-selection-background-color);
+      cursor: var(--jse-contents-selected-cursor);
+    }
+
+    .jse-expand {
+      background: var(--jse-selection-background-color);
+    }
+  }
+
+  // key selected
+  &.jse-selected-key {
+    > .jse-contents-outer > .jse-contents > :global(.jse-identifier) > :global(.jse-key),
+    > .jse-header-outer > .jse-header > :global(.jse-identifier) > :global(.jse-key) {
+      background: var(--jse-selection-background-color);
+      cursor: var(--jse-contents-selected-cursor);
+    }
+  }
+
+  // value selected (part 1)
+  &.jse-selected-value > .jse-contents-outer > .jse-contents > :global(.jse-value) {
+    background: var(--jse-selection-background-color);
+    cursor: var(--jse-contents-selected-cursor);
+  }
+
+  :global(.jse-collapsed-items.jse-selected),
+  &.jse-selected :global(.jse-collapsed-items),
+  &.jse-selected-value :global(.jse-collapsed-items) {
+    background-color: var(--jse-selection-background-color);
+    --jse-collapsed-items-background-color: var(--jse-collapsed-items-selected-background-color);
+  }
+
+  // value selected (part 2)
+  &.jse-selected-value {
+    .jse-meta,
+    > .jse-header-outer > .jse-header > .jse-meta,
+    > .jse-footer-outer > .jse-footer,
+    .jse-props .jse-contents,
+    .jse-props .jse-header,
+    .jse-props .jse-footer,
+    .jse-props .jse-expand,
+    .jse-items .jse-contents,
+    .jse-items .jse-header,
+    .jse-items .jse-footer,
+    .jse-items .jse-expand {
+      background: var(--jse-selection-background-color);
+
+      :global(.jse-key),
+      :global(.jse-value) {
+        background: var(--jse-selection-background-color);
+        cursor: var(--jse-contents-selected-cursor);
+      }
+    }
+  }
+
+  &.jse-readonly {
+    --jse-contents-selected-cursor: pointer;
+  }
+
+  .jse-insert-area {
+    &.jse-selected {
+      outline-color: var(--jse-context-menu-pointer-background);
+    }
+  }
+
+  .jse-insert-area {
+    &.jse-selected {
+      :global(.jse-context-menu-pointer) {
+        background: var(--jse-context-menu-pointer-background);
+
+        &:hover {
+          background: var(--jse-context-menu-pointer-background-highlight);
+        }
+      }
+    }
+  }
 }
 
 // lighter selection color when the editor doesn't have focus
 :global(.jse-main:not(.jse-focus)) {
   .jse-json-node {
-    @include json-node-selected-mixin(
-      var(--jse-selection-background-light-color),
-      var(--jse-selection-background-color),
-      var(--jse-selection-background-color)
-    );
+    --jse-selection-background-color: var(--jse-selection-background-inactive-color);
+    --jse-context-menu-pointer-background: var(--jse-context-menu-pointer-hover-background);
   }
 }
 

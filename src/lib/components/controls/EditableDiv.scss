@@ -9,6 +9,7 @@ div.jse-editable-div {
   outline: none;
   border-radius: 1px;
   vertical-align: top;
+  cursor: text !important; // TODO: get rid of the !important
 
   word-break: normal;
   white-space: pre-wrap; // important for rendering multiple consecutive spaces

@@ -61,6 +61,7 @@
   --jse-context-menu-color: var(--jse-text-color-inverse);
   --jse-context-menu-color-disabled: #9d9d9d;
   --jse-context-menu-separator-color: #7a7a7a;
+  --jse-context-menu-pointer-hover-background: #b2b2b2;
   --jse-context-menu-pointer-background: var(--jse-context-menu-background);
   --jse-context-menu-pointer-background-highlight: var(--jse-context-menu-background-highlight);
   --jse-context-menu-pointer-color: var(--jse-context-menu-color);
@@ -80,8 +81,11 @@
   --jse-edit-outline: 2px solid #656565;
 
   /* contents: selected or hovered */
+  --jse-contents-background-color: transparent;
+  --jse-contents-cursor: pointer;
+  --jse-contents-selected-cursor: grab;
   --jse-selection-background-color: #d3d3d3;
-  --jse-selection-background-light-color: #e8e8e8;
+  --jse-selection-background-inactive-color: #e8e8e8;
   --jse-hover-background-color: rgba(0, 0, 0, 0.06);
   --jse-active-line-background-color: rgba(0, 0, 0, 0.06);
   --jse-search-match-background-color: #99ff7780;
