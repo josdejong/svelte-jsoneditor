@@ -367,7 +367,7 @@
   }
 
   function handleDragSelectionStart(event) {
-    if (context.readOnly) {
+    if (context.readOnly || !selection) {
       return
     }
 

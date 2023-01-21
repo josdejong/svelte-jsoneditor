@@ -41,7 +41,8 @@ export function updateSearchResult(
   const activeIndex =
     matchingActiveIndex !== -1
       ? matchingActiveIndex
-      : previousResult?.activeIndex < newResultItems.length
+      : previousResult?.activeIndex !== undefined &&
+        previousResult?.activeIndex < newResultItems.length
       ? previousResult?.activeIndex
       : newResultItems.length > 0
       ? 0
@@ -114,7 +115,7 @@ export function search(
   const results: SearchResultItem[] = []
   const path: JSONPath = [] // we reuse the same Array recursively, this is *much* faster than creating a new path every time
 
-  function onMatch(match) {
+  function onMatch(match: SearchResultItem) {
     if (results.length < maxResults) {
       results.push(match)
     }
@@ -240,15 +241,15 @@ export function createSearchAndReplaceOperations(
   replacementText: string,
   searchResultItem: SearchResultItem,
   parser: JSONParser
-): { newSelection: JSONSelection; operations: JSONPatchDocument } {
+): { newSelection: JSONSelection | undefined; operations: JSONPatchDocument } {
   const { field, path, start, end } = searchResultItem
 
   if (field === SearchField.key) {
     // replace a key
     const parentPath = initial(path)
     const parent = getIn(json, parentPath)
-    const oldKey = last(path)
-    const keys = Object.keys(parent)
+    const oldKey = last(path) as string
+    const keys = Object.keys(parent as JSONObject)
     const newKey = replaceText(oldKey, replacementText, start, end)
 
     const operations = rename(parentPath, keys, oldKey, newKey)
@@ -301,7 +302,7 @@ export function createSearchAndReplaceAllOperations(
   searchText: string,
   replacementText: string,
   parser: JSONParser
-): { newSelection: JSONSelection; operations: JSONPatchDocument } {
+): { newSelection: JSONSelection | undefined; operations: JSONPatchDocument } {
   // TODO: to improve performance, we could reuse existing search results (except when hitting a maxResult limit)
   const searchResultItems = search(searchText, json, Infinity /* maxResults */)
 
@@ -324,7 +325,7 @@ export function createSearchAndReplaceAllOperations(
         items: [item]
       })
     } else {
-      last(deduplicatedMatches).items.push(item)
+      ;(last(deduplicatedMatches) as Match).items.push(item)
     }
   }
 
@@ -356,7 +357,7 @@ export function createSearchAndReplaceAllOperations(
       // replace a key
       const parentPath = initial(path)
       const parent = getIn(json, parentPath)
-      const oldKey = last(path)
+      const oldKey = last(path) as string
       const keys = Object.keys(parent as JSONObject)
       const newKey = replaceAllText(oldKey, replacementText, items)
 

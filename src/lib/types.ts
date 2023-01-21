@@ -52,8 +52,8 @@ export interface DocumentState {
   expandedMap: JSONPointerMap<boolean>
   enforceStringMap: JSONPointerMap<boolean>
   visibleSectionsMap: JSONPointerMap<VisibleSection[]>
-  selection: JSONSelection | undefined
-  sortedColumn: SortedColumn | undefined
+  selection: JSONSelection | undefined // TODO: change undefined to null?
+  sortedColumn: SortedColumn | undefined // TODO: change undefined to null?
 }
 
 export interface JSONPatchResult {
@@ -66,7 +66,7 @@ export interface JSONPatchResult {
 export type AfterPatchCallback = (
   patchedJson: JSONValue,
   patchedState: DocumentState
-) => { json?: JSONValue; state?: DocumentState }
+) => { json?: JSONValue; state?: DocumentState } | undefined
 
 export interface MultiSelection {
   type: SelectionType.multi

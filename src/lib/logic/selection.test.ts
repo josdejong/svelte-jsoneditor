@@ -767,7 +767,7 @@ describe('selection', () => {
     test('should get selection from removing a key', () => {
       assert.deepStrictEqual(
         createSelectionFromOperations(json, [{ op: 'remove', path: '/str' }]),
-        null
+        undefined
       )
     })
 

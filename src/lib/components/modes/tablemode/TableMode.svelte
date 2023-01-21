@@ -1468,7 +1468,7 @@
     })
   }
 
-  function openRepairModal(text, onApply) {
+  function openRepairModal(text: string, onApply: (repairedText: string) => void) {
     open(
       JSONRepairModal,
       {
