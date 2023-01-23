@@ -18,48 +18,69 @@ export function isMenuSpaceItem(item: unknown): item is MenuSpaceItem {
 
 export function isMenuSpace(item: unknown): item is MenuSpace {
   // checking the .space property is for backward compatibility
-  return item && (item['type'] === 'space' || item['space'] === true)
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return item ? item['type'] === 'space' || item['space'] === true : false
 }
 
 export function isMenuSeparator(item: unknown): item is MenuSeparator {
   // checking the .separator property is for backward compatibility
-  return item && (item['type'] === 'separator' || item['separator'] === true)
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return item ? item['type'] === 'separator' || item['separator'] === true : false
 }
 
 export function isMenuLabel(item: unknown): item is MenuLabel {
-  return item && item['type'] === 'label' && typeof item['text'] === 'string'
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return item ? item['type'] === 'label' && typeof item['text'] === 'string' : false
 }
 
 export function isMenuButton(item: unknown): item is MenuButton {
   // for backward compatibility, we only check .onClick here and not item['type'] === 'button'
-  return item && typeof item['onClick'] === 'function'
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return item ? typeof item['onClick'] === 'function' : false
 }
 
 export function isMenuDropDownButton(item: unknown): item is MenuDropDownButton {
-  return (
-    item &&
-    item['type'] === 'dropdown-button' &&
-    isMenuButton(item['main']) &&
-    Array.isArray(item['items'])
-  )
+  return item
+    ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      item['type'] === 'dropdown-button' &&
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        isMenuButton(item['main']) &&
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        Array.isArray(item['items'])
+    : false
 }
 
 export function isContextMenuRow(item: unknown): item is ContextMenuRow {
-  return item && item['type'] === 'row' && Array.isArray(item['items'])
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return item ? item['type'] === 'row' && Array.isArray(item['items']) : false
 }
 
 export function isContextMenuColumn(item: unknown): item is ContextMenuColumn {
-  return item && item['type'] === 'column' && Array.isArray(item['items'])
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return item ? item['type'] === 'column' && Array.isArray(item['items']) : false
 }
 
 export function isContentParseError(
   contentErrors: ContentErrors
 ): contentErrors is ContentParseError {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   return typeof contentErrors['parseError'] === 'object' && contentErrors['parseError'] !== null
 }
 
 export function isContentValidationErrors(
   contentErrors: ContentErrors
 ): contentErrors is ContentValidationErrors {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   return Array.isArray(contentErrors['validationErrors'])
 }

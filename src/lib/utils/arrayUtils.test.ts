@@ -8,6 +8,7 @@ import {
   moveItems,
   objectToArray
 } from './arrayUtils.js'
+import type { JSONArray } from 'lossless-json'
 
 describe('arrayUtils', () => {
   test('compareArrays', () => {
@@ -26,7 +27,7 @@ describe('arrayUtils', () => {
 
   describe('getNestedPaths', () => {
     test('should extract all nested paths of an array containing objects', () => {
-      const json = [
+      const json: JSONArray = [
         { name: 'A', location: { latitude: 1, longitude: 2 } },
         { name: 'B', location: { latitude: 1, longitude: 2 } },
         { name: 'C', timestamp: 0 }
@@ -47,7 +48,7 @@ describe('arrayUtils', () => {
     })
 
     test('should extract all nested paths of an array containing objects, including objects', () => {
-      const json = [
+      const json: JSONArray = [
         { name: 'A', location: { latitude: 1, longitude: 2 } },
         { name: 'B', location: { latitude: 1, longitude: 2 } },
         { name: 'C', timestamp: 0 }

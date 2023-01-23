@@ -1,13 +1,14 @@
 import { writable } from 'svelte/store'
+import type { JSONValue } from 'lossless-json'
 
-export function useLocalStorage(key, defaultValue) {
+export function useLocalStorage(key: string, defaultValue: JSONValue) {
   const initialValue = loadFromLocalStorage(key, defaultValue)
   const store = writable(initialValue)
   store.subscribe((value) => saveToLocalStorage(key, value))
   return store
 }
 
-function loadFromLocalStorage(key, defaultValue) {
+function loadFromLocalStorage(key: string, defaultValue: JSONValue) {
   if (typeof localStorage === 'undefined') {
     return defaultValue
   }
@@ -21,7 +22,7 @@ function loadFromLocalStorage(key, defaultValue) {
   }
 }
 
-function saveToLocalStorage(key, value) {
+function saveToLocalStorage(key: string, value: JSONValue) {
   if (typeof localStorage === 'undefined') {
     return
   }

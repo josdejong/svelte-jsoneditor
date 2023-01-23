@@ -17,7 +17,7 @@ export function renderJSONSchemaEnum(
   props: RenderValueProps,
   schema: JSONSchema,
   schemaDefinitions?: JSONSchemaDefinitions
-): RenderValueComponentDescription[] {
+): RenderValueComponentDescription[] | null {
   const enumValues = getJSONSchemaOptions(schema, schemaDefinitions, props.path)
 
   if (enumValues) {

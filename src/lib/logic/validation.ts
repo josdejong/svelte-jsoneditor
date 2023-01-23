@@ -6,9 +6,9 @@ import type {
   NestedValidationError,
   ValidationError,
   Validator
-} from '../types.js'
-import { ValidationSeverity } from '../types.js'
-import { compileJSONPointer, type JSONValue } from 'immutable-json-patch'
+} from '$lib/types.js'
+import { ValidationSeverity } from '$lib/types.js'
+import { compileJSONPointer, type JSONPointer, type JSONValue } from 'immutable-json-patch'
 import { MAX_AUTO_REPAIRABLE_SIZE, MAX_VALIDATABLE_SIZE } from '../constants.js'
 import { measure } from '../utils/timeUtils.js'
 import { normalizeJsonParseError } from '../utils/jsonUtils.js'
@@ -26,7 +26,7 @@ const debug = createDebug('validation')
 export function mapValidationErrors(
   validationErrors: ValidationError[]
 ): JSONPointerMap<NestedValidationError> {
-  const map = {}
+  const map: Record<JSONPointer, ValidationError | NestedValidationError> = {}
 
   // first generate a map with the errors themselves
   validationErrors.forEach((validationError) => {
@@ -39,13 +39,14 @@ export function mapValidationErrors(
 
     while (parentPath.length > 0) {
       parentPath = initial(parentPath)
-      const parentPointer = compileJSONPointer(parentPath)
+      const parentPointer: JSONPointer = compileJSONPointer(parentPath)
 
       if (!(parentPointer in map)) {
         map[parentPointer] = {
           isChildError: true,
           path: parentPath,
-          message: 'Contains invalid data'
+          message: 'Contains invalid data',
+          severity: ValidationSeverity.warning
         }
       }
     }
@@ -139,7 +140,10 @@ export function validateText(
       (duration) => debug(`validate: checked whether repairable in ${duration} ms`)
     )
 
-    const parseError = normalizeJsonParseError(text, err.message || err.toString())
+    const parseError = normalizeJsonParseError(
+      text,
+      (err as Error).message || (err as Error).toString()
+    )
 
     return {
       parseError,

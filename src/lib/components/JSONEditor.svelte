@@ -379,7 +379,7 @@
   }
 
   function closeJSONEditorModal() {
-    jsoneditorModalState?.callbacks?.onClose()
+    jsoneditorModalState?.callbacks?.onClose?.()
     jsoneditorModalState = null
   }
 

@@ -1,5 +1,7 @@
 import type { JSONObject, JSONPath, JSONValue } from 'immutable-json-patch'
 import { compileJSONPointer } from 'immutable-json-patch'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import jsonSourceMap from 'json-source-map'
 import { jsonrepair } from 'jsonrepair'
 import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
@@ -418,7 +420,7 @@ export function estimateSerializedSize(content: Content, maxSize = Infinity): nu
 
   let estimatedSize = 0
 
-  function recurse(json) {
+  function recurse(json: JSONValue) {
     if (Array.isArray(json)) {
       // open and close bracket, commas between items
       estimatedSize += 2 + (json.length - 1)

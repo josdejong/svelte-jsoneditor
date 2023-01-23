@@ -1,8 +1,8 @@
 import jmespath from 'jmespath'
 import type { JSONPath, JSONValue } from 'immutable-json-patch'
 import { getIn } from 'immutable-json-patch'
-import { parseString } from '../../utils/stringUtils.js'
-import type { QueryLanguage, QueryLanguageOptions } from '../../types'
+import { parseString } from '$lib/utils/stringUtils.js'
+import type { QueryLanguage, QueryLanguageOptions } from '$lib/types'
 
 const description = `
 <p>

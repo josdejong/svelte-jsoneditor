@@ -1,9 +1,25 @@
-import { createDebug } from '../../utils/debug'
+import { createDebug } from '$lib/utils/debug'
 
 const debug = createDebug('jsoneditor:FocusTracker')
 
-export function createFocusTracker({ onMount, onDestroy, getWindow, hasFocus, onFocus, onBlur }) {
-  let blurTimeoutHandle
+export interface FocusTrackerProps {
+  onMount: (callback: () => void) => void
+  onDestroy: (callback: () => void) => void
+  getWindow: () => Window | null
+  hasFocus: () => boolean
+  onFocus: () => void
+  onBlur: () => void
+}
+
+export function createFocusTracker({
+  onMount,
+  onDestroy,
+  getWindow,
+  hasFocus,
+  onFocus,
+  onBlur
+}: FocusTrackerProps) {
+  let blurTimeoutHandle: number | undefined
   let focus = false
 
   function handleFocusIn() {
@@ -29,7 +45,7 @@ export function createFocusTracker({ onMount, onDestroy, getWindow, hasFocus, on
         debug('blur')
         focus = false
         onBlur()
-      })
+      }) as unknown as number
     }
   }
 

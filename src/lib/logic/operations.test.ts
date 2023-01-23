@@ -15,15 +15,15 @@ import { immutableJSONPatch } from 'immutable-json-patch'
 describe('operations', () => {
   describe('createNewValue', () => {
     test('should create a value of type "value"', () => {
-      assert.strictEqual(createNewValue({}, null, 'value'), '')
+      assert.strictEqual(createNewValue({}, undefined, 'value'), '')
     })
 
     test('should create a value of type "object"', () => {
-      assert.deepStrictEqual(createNewValue({}, null, 'object'), {})
+      assert.deepStrictEqual(createNewValue({}, undefined, 'object'), {})
     })
 
     test('should create a value of type "array"', () => {
-      assert.deepStrictEqual(createNewValue({}, null, 'array'), [])
+      assert.deepStrictEqual(createNewValue({}, undefined, 'array'), [])
     })
 
     test('should create a simple value via type "structure"', () => {

@@ -29,7 +29,11 @@
     setDomValue(value)
 
     // focus
-    setTimeout(() => setCursorToEnd(domValue))
+    setTimeout(() => {
+      if (domValue) {
+        setCursorToEnd(domValue)
+      }
+    })
   })
 
   onDestroy(() => {
@@ -43,10 +47,16 @@
   })
 
   function getDomValue(): string {
+    if (!domValue) {
+      return ''
+    }
     return removeNewLineSuffix(domValue.innerText)
   }
 
   function setDomValue(updatedValue: string) {
+    if (!domValue) {
+      return
+    }
     domValue.innerText = addNewLineSuffix(updatedValue)
   }
 

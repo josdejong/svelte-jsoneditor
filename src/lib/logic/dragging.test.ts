@@ -78,7 +78,7 @@ describe('dragging', () => {
     test('move down (2 items)', () => {
       const { operations, offset } = doMoveSelection({ deltaY: 1.7 * itemHeight })
       strictEqual(offset, 2)
-      deepStrictEqual(immutableJSONPatch(json, operations), {
+      deepStrictEqual(immutableJSONPatch(json, operations || []), {
         array: [0, 1, 2, 6, 7, 3, 4, 5, 8, 9]
       })
     })
@@ -86,7 +86,7 @@ describe('dragging', () => {
     test('move down (to bottom)', () => {
       const { operations, offset } = doMoveSelection({ deltaY: 999 * itemHeight })
       strictEqual(offset, 4)
-      deepStrictEqual(immutableJSONPatch(json, operations), {
+      deepStrictEqual(immutableJSONPatch(json, operations || []), {
         array: [0, 1, 2, 6, 7, 8, 9, 3, 4, 5]
       })
     })
@@ -129,7 +129,7 @@ describe('dragging', () => {
     test('move up (2 items)', () => {
       const { operations, offset } = doMoveSelection({ deltaY: -1.7 * itemHeight })
       strictEqual(offset, -2)
-      deepStrictEqual(immutableJSONPatch(json, operations), {
+      deepStrictEqual(immutableJSONPatch(json, operations || []), {
         array: [0, 3, 4, 5, 1, 2, 6, 7, 8, 9]
       })
     })
@@ -137,7 +137,7 @@ describe('dragging', () => {
     test('move up (to top)', () => {
       const { operations, offset } = doMoveSelection({ deltaY: -999 * itemHeight })
       strictEqual(offset, -3)
-      deepStrictEqual(immutableJSONPatch(json, operations), {
+      deepStrictEqual(immutableJSONPatch(json, operations || []), {
         array: [3, 4, 5, 0, 1, 2, 6, 7, 8, 9]
       })
     })
@@ -158,7 +158,13 @@ describe('dragging', () => {
       height: itemHeight
     }))
 
-    function doMoveSelection({ deltaY, items = allItems }) {
+    function doMoveSelection({
+      deltaY,
+      items = allItems
+    }: {
+      deltaY: number
+      items?: RenderedItem[]
+    }) {
       return onMoveSelection({
         json,
         documentState,
@@ -198,7 +204,7 @@ describe('dragging', () => {
       })
       strictEqual(offset, 2)
       deepStrictEqual(
-        JSON.stringify(immutableJSONPatch(json, operations)),
+        JSON.stringify(immutableJSONPatch(json, operations || [])),
         JSON.stringify({
           object: { a: 0, b: 1, f: 5, g: 6, c: 2, d: 3, e: 4 }
         })
@@ -210,11 +216,11 @@ describe('dragging', () => {
         deltaY: 999 * itemHeight
       })
       strictEqual(offset, 2)
-      deepStrictEqual(immutableJSONPatch(json, operations), {
+      deepStrictEqual(immutableJSONPatch(json, operations || []), {
         object: { a: 0, b: 1, f: 5, g: 6, c: 2, d: 3, e: 4 }
       })
       deepStrictEqual(
-        JSON.stringify(immutableJSONPatch(json, operations)),
+        JSON.stringify(immutableJSONPatch(json, operations || [])),
         JSON.stringify({
           object: { a: 0, b: 1, f: 5, g: 6, c: 2, d: 3, e: 4 }
         })
@@ -251,7 +257,7 @@ describe('dragging', () => {
       })
       strictEqual(offset, -2)
       deepStrictEqual(
-        JSON.stringify(immutableJSONPatch(json, operations)),
+        JSON.stringify(immutableJSONPatch(json, operations || [])),
         JSON.stringify({
           object: { c: 2, d: 3, e: 4, a: 0, b: 1, f: 5, g: 6 }
         })
@@ -264,7 +270,7 @@ describe('dragging', () => {
       })
       strictEqual(offset, -2)
       deepStrictEqual(
-        JSON.stringify(immutableJSONPatch(json, operations)),
+        JSON.stringify(immutableJSONPatch(json, operations || [])),
         JSON.stringify({
           object: { c: 2, d: 3, e: 4, a: 0, b: 1, f: 5, g: 6 }
         })

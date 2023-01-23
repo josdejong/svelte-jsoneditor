@@ -31,17 +31,20 @@ describe('validation', () => {
       '': {
         isChildError: true,
         path: [],
-        message: message3
+        message: message3,
+        severity: ValidationSeverity.warning
       },
       '/pupils': {
         isChildError: true,
         path: ['pupils'],
-        message: message3
+        message: message3,
+        severity: ValidationSeverity.warning
       },
       '/pupils/2': {
         isChildError: true,
         path: ['pupils', '2'],
-        message: message3
+        message: message3,
+        severity: ValidationSeverity.warning
       },
       '/pupils/2/age': error1,
       '/year': error2

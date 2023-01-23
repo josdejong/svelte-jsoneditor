@@ -194,6 +194,8 @@ describe('jsonUtils', () => {
     strictEqual(isContent(f), false)
 
     class C {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       text: '[]'
     }
     const c = new C()
@@ -212,6 +214,8 @@ describe('jsonUtils', () => {
     strictEqual(isTextContent(f), false)
 
     class C {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       text: '[]'
     }
     const c = new C()
@@ -226,10 +230,14 @@ describe('jsonUtils', () => {
     strictEqual(isJSONContent({}), false)
 
     const f = () => null
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     f.json = []
     strictEqual(isJSONContent(f), false)
 
     class C {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       json: []
     }
     const c = new C()
@@ -305,11 +313,6 @@ describe('jsonUtils', () => {
       deepEqual(convertValue(null, 'array', JSON), array)
     })
 
-    test('should return an array with undefined value when given invalid JSON value "undefined"', () => {
-      const array = [undefined]
-      deepEqual(convertValue(undefined, 'array', JSON), array)
-    })
-
     test('should return an array with number value when given invalid JSON as number', () => {
       const array = [1]
       deepEqual(convertValue(1, 'array', JSON), array)
@@ -352,13 +355,6 @@ describe('jsonUtils', () => {
         value: null
       }
       deepEqual(convertValue(null, 'object', JSON), object)
-    })
-
-    test('should return a reasonable object with a undefined value under "value" when given invalid JSON value "undefined"', () => {
-      const object = {
-        value: undefined
-      }
-      deepEqual(convertValue(undefined, 'object', JSON), object)
     })
 
     test('should return a reasonable object with a number value under "value" when given invalid JSON of number', () => {

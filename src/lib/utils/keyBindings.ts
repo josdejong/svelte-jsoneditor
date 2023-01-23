@@ -37,7 +37,7 @@ export function keyComboFromEvent(event: KeyComboEvent, separator = '+'): string
   }
 
   const keyName = event.key.length === 1 ? event.key.toUpperCase() : event.key
-  if (!metaKeys[keyName]) {
+  if (!(keyName in metaKeys)) {
     // prevent output like 'Ctrl+Ctrl'
     combi.push(keyName)
   }

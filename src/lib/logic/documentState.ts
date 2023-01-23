@@ -43,10 +43,10 @@ import type {
   OnExpand,
   Section,
   VisibleSection
-} from '../types'
-import { CaretType } from '../types.js'
+} from '$lib/types'
+import { CaretType } from '$lib/types.js'
 import { int } from '../utils/numberUtils.js'
-import { isLargeContent } from '../utils/jsonUtils.js'
+import { isLargeContent } from '$lib/utils/jsonUtils.js'
 
 type OnCreateSelection = (json: JSONValue, documentState: DocumentState) => JSONSelection
 
@@ -190,7 +190,10 @@ export function expandWithCallback(
   }
 
   const currentPath = path.slice()
-  recurse(getIn(json, path))
+  const value = getIn(json, path)
+  if (value !== undefined) {
+    recurse(value)
+  }
 
   return {
     ...documentState,
@@ -334,7 +337,7 @@ export function documentStateAdd(
   const parent = getIn(json, parentPath)
 
   if (isJSONArray(parent)) {
-    const index = int(last(path))
+    const index = int(last(path) as string)
 
     // shift all paths of the relevant parts of the state
     const expandedMap = shiftPath(documentState.expandedMap, parentPath, index, 1)
@@ -376,7 +379,7 @@ export function documentStateRemove(
   visibleSectionsMap = deletePath(visibleSectionsMap, path)
 
   if (isJSONArray(parent)) {
-    const index = int(last(path))
+    const index = int(last(path) as string)
 
     // shift all paths of the relevant parts of the state
     expandedMap = shiftPath(expandedMap, parentPath, index, -1)
@@ -439,7 +442,8 @@ export function documentStateMoveOrCopy(
   }
 
   // get the state that we will move or copy, and move it to the new location
-  const renamePointer = (pointer) => operation.path + pointer.substring(operation.from.length)
+  const renamePointer = (pointer: JSONPointer) =>
+    operation.path + pointer.substring(operation.from.length)
   const expandedMapCopy = movePath(
     filterPath(documentState.expandedMap, operation.from),
     renamePointer
@@ -586,7 +590,7 @@ export function cleanupNonExistingPaths<T>(
   json: JSONValue,
   map: JSONPointerMap<T>
 ): JSONPointerMap<T> {
-  const updatedMap = {}
+  const updatedMap: JSONPointerMap<T> = {}
 
   // TODO: for optimization, we could pass a filter callback which allows you to filter paths
   //  starting with a specific, so you don't need to invoke parseJSONPointer and existsIn for largest part
@@ -661,7 +665,7 @@ export function getEnforceString(
   return isStringContainingPrimitiveValue(value, parser)
 }
 
-export function getNextKeys(keys, key, includeKey = false) {
+export function getNextKeys(keys: string[], key: string, includeKey = false): string[] {
   const index = keys.indexOf(key)
   if (index !== -1) {
     return includeKey ? keys.slice(index) : keys.slice(index + 1)
@@ -813,6 +817,10 @@ export function expandRecursive(
   path: JSONPath
 ): DocumentState {
   const expandContents = getIn(json, path)
+  if (expandContents === undefined) {
+    return documentState
+  }
+
   const expandAllRecursive = !isLargeContent({ json: expandContents }, MAX_DOCUMENT_SIZE_EXPAND_ALL)
   const expandCallback = expandAllRecursive ? expandAll : expandMinimal
 

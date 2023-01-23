@@ -36,12 +36,12 @@
   // TODO: the binding with the select boxes is very cumbersome. Can we simplify this?
   let filterPath = queryOptions?.filter?.path ? pathToOption(queryOptions.filter.path) : null
   let filterRelation = queryOptions?.filter?.relation
-    ? filterRelationOptions.find((option) => option.value === queryOptions.filter.relation)
+    ? filterRelationOptions.find((option) => option.value === queryOptions.filter?.relation)
     : null
   let filterValue = queryOptions?.filter?.value || ''
   let sortPath = queryOptions?.sort?.path ? pathToOption(queryOptions.sort.path) : null
   let sortDirection = queryOptions?.sort?.direction
-    ? sortDirectionOptions.find((option) => option.value === queryOptions.sort.direction)
+    ? sortDirectionOptions.find((option) => option.value === queryOptions.sort?.direction)
     : null
   let projectionPaths = queryOptions?.projection?.paths
     ? queryOptions.projection.paths.map(pathToOption)

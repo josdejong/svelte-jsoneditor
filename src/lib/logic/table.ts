@@ -12,19 +12,19 @@ import type {
   SortedColumn,
   TableCellIndex,
   ValidationError
-} from '../types.js'
+} from '$lib/types.js'
 import { createValueSelection, pathStartsWith } from './selection.js'
 import { isNumber } from '../utils/numberUtils.js'
 import type { Dictionary } from 'lodash'
 import { stringifyJSONPath, stripRootObject } from '../utils/pathUtils.js'
-import { ValidationSeverity } from '../types.js'
+import { ValidationSeverity } from '$lib/types.js'
 
 export function getColumns(
   array: JSONArray,
   flatten: boolean,
   maxLookupCount = Math.min(isJSONArray(array) ? array.length : 0, 100)
 ): JSONPath[] {
-  const compiledPaths = new Set()
+  const compiledPaths: Set<string> = new Set()
 
   for (let i = 0; i < maxLookupCount; i++) {
     const paths: JSONPath[] = flatten ? getRecursiveKeys(array[i]) : getShallowKeys(array[i])
@@ -40,7 +40,7 @@ export function getShallowKeys(value: JSONValue): JSONPath[] {
 }
 
 export function getRecursiveKeys(value: JSONValue): JSONPath[] {
-  const paths = []
+  const paths: JSONPath[] = []
 
   function recurse(value: JSONValue, path: JSONPath) {
     if (isJSONObject(value)) {
@@ -179,7 +179,7 @@ function calculateAverageItemHeight(
     return defaultItemHeight
   }
 
-  const add = (a, b) => a + b
+  const add = (a: number, b: number) => a + b
   const total = values.reduce(add)
   return total / values.length
 }
@@ -401,7 +401,7 @@ export function operationAffectsSortedColumn(
  * Find nested arrays inside a JSON object
  */
 export function findNestedArrays(json: JSONValue, maxLevel = 2): JSONPath[] {
-  const props = []
+  const props: JSONPath[] = []
 
   function recurse(value: JSONValue, path: JSONPath) {
     if (isJSONObject(value) && path.length < maxLevel) {

@@ -2,6 +2,7 @@ import { test, describe } from 'vitest'
 import assert from 'assert'
 import Ajv from 'ajv'
 import { createAjvValidator } from './createAjvValidator.js'
+import type { JSONSchemaDefinitions } from '$lib/types'
 
 const schema = {
   title: 'Employee',
@@ -41,7 +42,7 @@ const schema = {
   required: ['firstName', 'lastName']
 }
 
-const schemaDefinitions = {
+const schemaDefinitions: JSONSchemaDefinitions = {
   job: {
     title: 'Job description',
     type: 'object',

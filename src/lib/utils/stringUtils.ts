@@ -29,7 +29,7 @@ export function toCapital(text: string): string {
   return text && text.length > 0 ? text[0].toUpperCase() + text.substring(1).toLowerCase() : text
 }
 
-export function compareStrings(a, b) {
+export function compareStrings(a: string, b: string): -1 | 0 | 1 {
   return a < b ? -1 : a > b ? 1 : 0
 }
 

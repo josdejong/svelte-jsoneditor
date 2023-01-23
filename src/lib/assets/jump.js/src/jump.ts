@@ -1,10 +1,13 @@
 import easeInOutQuad from './easing.js'
 
+type Easing = (t: number, b: number, c: number, d: number) => number
+type Duration = number | ((distance: number) => number)
+
 interface JumpOptions {
-  duration?: number | ((distance: number) => number)
+  duration?: Duration
   offset?: number
   callback?: () => void
-  easing?: (t: number, b: number, c: number, d: number) => number
+  easing?: Easing
   a11y?: boolean
   container?: Element | string
 }
@@ -13,37 +16,37 @@ export const createJump = () => {
   // private variable cache
   // no variables are created during a jump, preventing memory leaks
 
-  let container // container element to be scrolled       (node)
-  let element // element to scroll to                   (node)
+  let container: Element // container element to be scrolled       (node)
+  let element: Element | undefined // element to scroll to                   (node)
 
-  let start // where scroll starts                    (px)
-  let stop // where scroll stops                     (px)
+  let start: number // where scroll starts                    (px)
+  let stop: number // where scroll stops                     (px)
 
   let offset // adjustment from the stop position      (px)
-  let easing // easing function                        (function)
-  let a11y // accessibility support flag             (boolean)
+  let easing: Easing // easing function                        (function)
+  let a11y: boolean // accessibility support flag             (boolean)
 
-  let distance // distance of scroll                     (px)
-  let duration // scroll duration                        (ms)
+  let distance: number // distance of scroll                     (px)
+  let duration: number // scroll duration                        (ms)
 
-  let timeStart // time scroll started                    (ms)
-  let timeElapsed // time spent scrolling thus far          (ms)
+  let timeStart: number // time scroll started                    (ms)
+  let timeElapsed: number // time spent scrolling thus far          (ms)
 
-  let next // next scroll position                   (px)
+  let next: number // next scroll position                   (px)
 
-  let callback // to call when done scrolling            (function)
+  let callback: (() => void) | undefined // to call when done scrolling            (function)
 
-  let scrolling // true whilst scrolling                  (boolean)
+  let scrolling: boolean // true whilst scrolling                  (boolean)
 
   // scroll position helper
 
   function location() {
-    return container.scrollY || container.pageYOffset || container.scrollTop
+    return container.scrollTop
   }
 
   // element offset helper
 
-  function top(element) {
+  function top(element: Element) {
     const elementTop = element.getBoundingClientRect().top
     const containerTop = container.getBoundingClientRect ? container.getBoundingClientRect().top : 0
 
@@ -52,7 +55,7 @@ export const createJump = () => {
 
   // scrollTo helper
 
-  function scrollTo(top) {
+  function scrollTo(top: number) {
     container.scrollTo
       ? container.scrollTo(container.scrollLeft, top) // window
       : (container.scrollTop = top) // custom container
@@ -60,7 +63,7 @@ export const createJump = () => {
 
   // rAF loop helper
 
-  function loop(timeCurrent) {
+  function loop(timeCurrent: number) {
     // store time scroll started, if not started already
     if (!timeStart) {
       timeStart = timeCurrent
@@ -95,7 +98,8 @@ export const createJump = () => {
       element.setAttribute('tabindex', '-1')
 
       // focus the element
-      element.focus()
+      const htmlElement = element as HTMLElement
+      htmlElement.focus()
     }
 
     // if it exists, fire the callback
@@ -104,7 +108,7 @@ export const createJump = () => {
     }
 
     // reset time for next jump
-    timeStart = false
+    timeStart = 0
 
     // we're done scrolling
     scrolling = false
@@ -114,9 +118,9 @@ export const createJump = () => {
 
   function jump(target: Element, options: JumpOptions = {}) {
     // resolve options, or use defaults
-    duration = options.duration || 1000
+    duration = 1000
     offset = options.offset || 0
-    callback = options.callback // "undefined" is a suitable default, and won't be called
+    callback = undefined // "undefined" is a suitable default, and won't be called
     easing = options.easing || easeInOutQuad
     a11y = options.a11y || false
 
@@ -128,11 +132,11 @@ export const createJump = () => {
         break
 
       case 'string':
-        container = document.querySelector(options.container)
+        container = document.querySelector(options.container) as Element
         break
 
       default:
-        container = window
+        container = window.document.documentElement
     }
 
     // cache starting position
@@ -157,7 +161,7 @@ export const createJump = () => {
       // scroll to element (selector)
       // bounding rect is relative to the viewport
       case 'string':
-        element = document.querySelector(target)
+        element = document.querySelector(target) as unknown as Element
         stop = top(element)
         break
 
@@ -187,7 +191,7 @@ export const createJump = () => {
       requestAnimationFrame(loop)
     } else {
       // reset time for next jump
-      timeStart = false
+      timeStart = 0
     }
   }
 

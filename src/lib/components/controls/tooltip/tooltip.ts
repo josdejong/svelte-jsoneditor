@@ -1,6 +1,21 @@
 import Tooltip from './Tooltip.svelte'
+import type { SvelteComponentTyped } from 'svelte'
+import type { AbsolutePopupOptions } from '$lib/types'
 
-export function tooltip(node: Element, { text, openAbsolutePopup, closeAbsolutePopup }) {
+export interface TooltipOptions {
+  text: string
+  openAbsolutePopup: (
+    component: SvelteComponentTyped,
+    props: Record<string, unknown>,
+    options: AbsolutePopupOptions
+  ) => number
+  closeAbsolutePopup: (popupId: number | undefined) => void
+}
+
+export function tooltip(
+  node: Element,
+  { text, openAbsolutePopup, closeAbsolutePopup }: TooltipOptions
+) {
   let popupId: number | undefined
 
   function handleMouseEnter() {
@@ -9,7 +24,7 @@ export function tooltip(node: Element, { text, openAbsolutePopup, closeAbsoluteP
     }
 
     // opening popup will fail if there is already a popup open
-    popupId = openAbsolutePopup(Tooltip, props, {
+    popupId = openAbsolutePopup(Tooltip as unknown as SvelteComponentTyped, props, {
       position: 'top',
       width: 10 * text.length, // rough estimate of the width of the message
       offsetTop: 3,

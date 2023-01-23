@@ -351,7 +351,7 @@
       debug('searching...', searchText)
 
       // console.time('search') // TODO: cleanup
-      const newResultItems = search(searchText, json, documentState, MAX_SEARCH_RESULTS)
+      const newResultItems = search(searchText, json, MAX_SEARCH_RESULTS)
       searchResult = updateSearchResult(json, newResultItems, searchResult)
       // console.timeEnd('search') // TODO: cleanup
 
@@ -881,7 +881,7 @@
     )
   }
 
-  function openRepairModal(text, onApply) {
+  function openRepairModal(text: string, onApply: (repairedText: string) => void) {
     open(
       JSONRepairModal,
       {
@@ -1621,10 +1621,11 @@
     if (combo === 'ArrowRight' || combo === 'Shift+ArrowRight') {
       event.preventDefault()
 
-      const newSelection = documentState.selection
-        ? getSelectionRight(json, documentState, keepAnchorPath, !readOnly) ||
-          documentState.selection
-        : getInitialSelection(json, documentState)
+      const newSelection =
+        documentState.selection && json !== undefined
+          ? getSelectionRight(json, documentState, keepAnchorPath, !readOnly) ||
+            documentState.selection
+          : getInitialSelection(json, documentState)
 
       updateSelection(newSelection)
       scrollIntoView(newSelection.focusPath)

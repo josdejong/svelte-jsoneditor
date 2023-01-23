@@ -1,8 +1,8 @@
-import { SelectionType } from '../types.js'
-import type { ValueNormalization } from '../types.js'
+import type { ValueNormalization } from '$lib/types.js'
+import { SelectionType } from '$lib/types.js'
 import type { JSONPath } from 'immutable-json-patch'
-import { map, minBy } from 'lodash-es'
 import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
+import { map, minBy } from 'lodash-es'
 
 /**
  * Create serialization functions to escape and stringify text,
@@ -31,23 +31,23 @@ export function createNormalizationFunctions({
 }
 
 const normalizeControlAndUnicode = {
-  escapeValue: (value) => jsonEscapeUnicode(jsonEscapeControl(String(value))),
-  unescapeValue: (value) => jsonUnescapeControl(jsonUnescapeUnicode(value))
+  escapeValue: (value: unknown) => jsonEscapeUnicode(jsonEscapeControl(String(value))),
+  unescapeValue: (value: string) => jsonUnescapeControl(jsonUnescapeUnicode(value))
 }
 
 const normalizeControl = {
-  escapeValue: (value) => jsonEscapeControl(String(value)),
-  unescapeValue: (value) => jsonUnescapeControl(value)
+  escapeValue: (value: unknown) => jsonEscapeControl(String(value)),
+  unescapeValue: (value: string) => jsonUnescapeControl(value)
 }
 
 const normalizeUnicode = {
-  escapeValue: (value) => jsonEscapeUnicode(String(value)),
-  unescapeValue: (value) => jsonUnescapeUnicode(value)
+  escapeValue: (value: unknown) => jsonEscapeUnicode(String(value)),
+  unescapeValue: (value: string) => jsonUnescapeUnicode(value)
 }
 
 const normalizeNothing = {
-  escapeValue: (value) => String(value),
-  unescapeValue: (value) => value
+  escapeValue: (value: unknown) => String(value),
+  unescapeValue: (value: string) => value
 }
 
 /**
@@ -66,9 +66,11 @@ export function jsonEscapeUnicode(value: string): string {
 export function jsonUnescapeUnicode(value: string): string {
   return value.replace(/\\u[a-fA-F0-9]{4}/g, (x) => {
     try {
-      const unescaped = JSON.parse('"' + x + '"')
+      const unescaped: string = JSON.parse('"' + x + '"')
       // the resolved character can be a control character like " or \n,
       // that would result in invalid JSON, so we need to keep that escaped
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       return controlCharacters[unescaped] || unescaped
     } catch (err) {
       return x
@@ -103,12 +105,16 @@ const escapedControlCharacters = {
 
 export function jsonEscapeControl(value: string): string {
   return value.replace(/["\b\f\n\r\t\\]/g, (x) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     return controlCharacters[x] || x
   })
 }
 
 export function jsonUnescapeControl(value: string): string {
   return value.replace(/\\["bfnrt\\]/g, (x) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     return escapedControlCharacters[x] || x
   })
 }
@@ -142,37 +148,38 @@ export function removeReturnsAndSurroundingWhitespace(text: string): string {
   })
 }
 
-export function isChildOfNodeName(element, nodeName) {
+export function isChildOfNodeName(element: Element, nodeName: string): boolean {
   return isChildOf(element, (e) => e.nodeName.toUpperCase() === nodeName.toUpperCase())
 }
 
-export function isChildOfAttribute(element, name, value) {
+export function isChildOfAttribute(element: Element, name: string, value: string): boolean {
   return isChildOf(element, (e) => hasAttribute(e, name, value))
 }
 
 // test whether a DOM element is a content editable div
-export function isContentEditableDiv(element) {
+export function isContentEditableDiv(element: HTMLElement): boolean {
   return element.nodeName === 'DIV' && element.contentEditable === 'true'
 }
 
 // test whether a DOM element is an "input" with type "text"
-export function isTextInput(element) {
-  return element.nodeName === 'INPUT' && element.type && element.type.toLowerCase() === 'text'
+export function isTextInput(element: HTMLInputElement): boolean {
+  return (
+    element.nodeName === 'INPUT' &&
+    element.type !== undefined &&
+    element.type.toLowerCase() === 'text'
+  )
 }
 
-function hasAttribute(element, name, value) {
+function hasAttribute(element: Element, name: string, value: string): boolean {
   return typeof element.getAttribute === 'function' && element.getAttribute(name) === value
 }
 
 /**
- * Test if the element or one of it's parents has a certain predicate
+ * Test if the element or one of its parents has a certain predicate
  * Can be use for example to check whether the element or it's parent has
  * a specific attribute or nodeName.
- * @param {HTMLElement} element
- * @param {function (element: HTMLElement) : boolean} predicate
- * @returns {*}
  */
-export function isChildOf(element, predicate) {
+export function isChildOf(element: Element, predicate: (element: Element) => boolean): boolean {
   return !!findParent(element, predicate)
 }
 
@@ -184,11 +191,14 @@ export function isChildOf(element, predicate) {
  * @param {function (element: HTMLElement) : boolean} predicate
  * @returns {HTMLElement | undefined}
  */
-export function findParent(element, predicate) {
-  let e = element
+export function findParent(
+  element: Element,
+  predicate: (element: Element) => boolean
+): Element | undefined {
+  let e: Element | null = element
 
   while (e && !predicate(e)) {
-    e = e.parentNode
+    e = e.parentNode as Element
   }
 
   return e || undefined
@@ -199,7 +209,7 @@ export function findParent(element, predicate) {
  * Source: https://stackoverflow.com/questions/13513329/set-cursor-to-the-end-of-contenteditable-div
  * @param {HTMLElement} element
  */
-export function setCursorToEnd(element) {
+export function setCursorToEnd(element: HTMLElement) {
   if (element.firstChild == null) {
     element.focus()
     return
@@ -221,8 +231,16 @@ export function insertActiveElementContents(
   text: string,
   replaceContents: boolean
 ) {
-  const activeElement = getWindow(container).document.activeElement
-  if (activeElement.isContentEditable) {
+  const window = getWindow(container)
+  if (!window) {
+    return
+  }
+
+  const activeElement: HTMLElement | null = window.document.activeElement
+    ? (window.document.activeElement as HTMLElement)
+    : null
+
+  if (activeElement && activeElement.isContentEditable) {
     activeElement.textContent = replaceContents ? text : activeElement.textContent + text
     setCursorToEnd(activeElement)
   }
@@ -231,31 +249,23 @@ export function insertActiveElementContents(
 /**
  * Gets a DOM element's Window.  This is normally just the global `window`
  * variable, but if we opened a child window, it may be different.
- * @param {HTMLElement} element
- * @return {Window}
  */
-export function getWindow(element) {
-  return element && element.ownerDocument && element.ownerDocument.defaultView
+export function getWindow(element: Element): Window | null {
+  return element && element.ownerDocument ? element.ownerDocument.defaultView : null
 }
 
-/**
- * @param {HTMLElement} element
- * @return {boolean}
- */
-export function activeElementIsChildOf(element) {
+export function activeElementIsChildOf(element: Element) {
   const window = getWindow(element)
-  return isChildOf(window.document.activeElement, (e) => e === element)
+  const activeElement = window?.document.activeElement
+  return activeElement ? isChildOf(activeElement, (e) => e === element) : false
 }
 
 /**
  * Traverse over the parents of the element until a node is found with the
  * searched for node name. If the element itself contains the nodeName, the
  * element itself will be returned
- * @param {HTMLElement} element
- * @param {string} nodeName
- * @return {HTMLElement | undefined}
  */
-export function findParentWithNodeName(element, nodeName) {
+export function findParentWithNodeName(element: Element, nodeName: string): Element | undefined {
   return findParent(element, (e) => e.nodeName === nodeName)
 }
 
@@ -305,7 +315,8 @@ export function getDataPathFromTarget(target: HTMLElement): JSONPath | null {
     return element?.hasAttribute ? element.hasAttribute('data-path') : false
   })
 
-  return parent ? decodeDataPath(parent.getAttribute('data-path')) : null
+  const dataPath = parent?.getAttribute('data-path')
+  return dataPath ? decodeDataPath(dataPath) : null
 }
 
 /**
@@ -361,8 +372,8 @@ export function findNearestElement<T extends Element>({
     const diffY = (a.y - b.y) * weightY
     return Math.sqrt(diffX * diffX + diffY * diffY)
   }
-  const distanceToCurrent = (candidate) => distance(candidate, current)
-  const distanceToCurrentWeighted = (candidate) => distance(candidate, current, 10)
+  const distanceToCurrent = (candidate: CenterLocation) => distance(candidate, current)
+  const distanceToCurrentWeighted = (candidate: CenterLocation) => distance(candidate, current, 10)
 
   if (direction === 'Left' || direction === 'Right') {
     // First we find the first button left from the current button on the same row

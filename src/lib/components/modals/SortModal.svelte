@@ -27,7 +27,7 @@
   const stateId = `${id}:${compileJSONPointer(rootPath)}`
   const selectedJson = getIn(json, rootPath)
   $: jsonIsArray = Array.isArray(selectedJson)
-  $: paths = jsonIsArray ? getNestedPaths(selectedJson) : undefined
+  $: paths = jsonIsArray && selectedJson !== undefined ? getNestedPaths(selectedJson) : undefined
   $: properties = paths ? paths.map(pathToOption) : undefined
 
   const asc = {

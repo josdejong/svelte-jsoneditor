@@ -20,10 +20,16 @@ import type {
   OnChangeText,
   OnPatch,
   OnSelect
-} from '../types'
+} from '$lib/types'
 import type { JSONValue } from 'lossless-json'
 import { createDebug } from '$lib/utils/debug'
-import { getIn, isJSONPatchAdd, isJSONPatchReplace, parsePath } from 'immutable-json-patch'
+import {
+  getIn,
+  isJSONPatchAdd,
+  isJSONPatchReplace,
+  type JSONPath,
+  parsePath
+} from 'immutable-json-patch'
 import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
 import {
   expandAll,
@@ -54,7 +60,12 @@ export async function onCut({
   parser,
   onPatch
 }: OnCutAction) {
-  if (readOnly || !hasSelectionContents(documentState.selection)) {
+  if (
+    readOnly ||
+    json === undefined ||
+    !documentState.selection ||
+    !hasSelectionContents(documentState.selection)
+  ) {
     return
   }
 
@@ -78,7 +89,7 @@ export async function onCut({
 }
 
 export interface OnCopyAction {
-  json: JSONValue | undefined
+  json: JSONValue
   documentState: DocumentState
   indentation: string | number | undefined
   parser: JSONParser
@@ -96,6 +107,8 @@ export async function onCopy({ json, documentState, indentation, parser }: OnCop
   await copyToClipboard(clipboard)
 }
 
+type RepairModalCallback = (text: string, onApply: (repairedText: string) => void) => void
+
 interface OnPasteAction {
   clipboardText: string
   json: JSONValue | undefined
@@ -104,7 +117,7 @@ interface OnPasteAction {
   parser: JSONParser
   onPatch: OnPatch
   onChangeText: OnChangeText
-  openRepairModal: (clipboardText: string, RepairModalCallback) => void
+  openRepairModal: (clipboardText: string, callback: RepairModalCallback) => void
 }
 
 // TODO: write unit tests
@@ -155,9 +168,9 @@ export function onPaste({
 
       onChangeText(clipboardText, (patchedJson, patchedState) => {
         if (patchedJson) {
-          const path = []
+          const path: JSONPath = []
           return {
-            state: expandRecursive(patchedJson, patchedState, path)
+            state: expandRecursive(patchedJson, patchedState, path) as DocumentState
           }
         }
       })
@@ -201,7 +214,8 @@ export function onRemove({
   // in case of a selected key or value, we change the selection to the whole
   // entry to remove this, we do not want to clear a key or value only.
   const removeSelection =
-    isKeySelection(documentState.selection) || isValueSelection(documentState.selection)
+    json !== undefined &&
+    (isKeySelection(documentState.selection) || isValueSelection(documentState.selection))
       ? createMultiSelection(
           json,
           documentState.selection.anchorPath,
@@ -213,26 +227,30 @@ export function onRemove({
     // root selected -> clear complete document
     debug('remove root', { selection: documentState.selection })
 
-    onChange(
-      { text: '', json: undefined },
-      { text, json },
-      {
-        contentErrors: { validationErrors: [] },
-        patchResult: null
-      }
-    )
+    if (onChange) {
+      onChange(
+        { text: '', json: undefined },
+        json !== undefined ? { text, json } : { text: text || '', json },
+        {
+          contentErrors: { validationErrors: [] },
+          patchResult: null
+        }
+      )
+    }
   } else {
     // remove selection
-    const { operations, newSelection } = createRemoveOperations(json, removeSelection)
+    if (json !== undefined) {
+      const { operations, newSelection } = createRemoveOperations(json, removeSelection)
 
-    debug('remove', { operations, selection: documentState.selection, newSelection })
+      debug('remove', { operations, selection: documentState.selection, newSelection })
 
-    onPatch(operations, (patchedJson, patchedState) => ({
-      state: {
-        ...patchedState,
-        selection: keepSelection ? documentState.selection : newSelection
-      }
-    }))
+      onPatch(operations, (patchedJson, patchedState) => ({
+        state: {
+          ...patchedState,
+          selection: keepSelection ? documentState.selection : newSelection
+        }
+      }))
+    }
   }
 }
 
@@ -240,7 +258,7 @@ export interface OnInsert {
   insertType: InsertType
   selectInside: boolean
   refJsonEditor: HTMLElement
-  json: JSONValue | undefined
+  json: JSONValue
   documentState: DocumentState
   readOnly: boolean
   parser: JSONParser
@@ -324,7 +342,7 @@ export function onInsert({
     // document is empty or invalid (in that case it has text but no json)
     debug('onInsert', { insertType, newValue })
 
-    const path = []
+    const path: JSONPath = []
     onReplaceJson(newValue, (patchedJson, patchedState) => ({
       state: {
         ...expandRecursive(patchedJson, patchedState, path),

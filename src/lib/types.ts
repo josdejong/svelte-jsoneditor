@@ -52,8 +52,8 @@ export interface DocumentState {
   expandedMap: JSONPointerMap<boolean>
   enforceStringMap: JSONPointerMap<boolean>
   visibleSectionsMap: JSONPointerMap<VisibleSection[]>
-  selection: JSONSelection | undefined
-  sortedColumn: SortedColumn | undefined
+  selection: JSONSelection | undefined // TODO: change undefined to null?
+  sortedColumn: SortedColumn | undefined // TODO: change undefined to null?
 }
 
 export interface JSONPatchResult {
@@ -66,7 +66,7 @@ export interface JSONPatchResult {
 export type AfterPatchCallback = (
   patchedJson: JSONValue,
   patchedState: DocumentState
-) => { json?: JSONValue; state?: DocumentState }
+) => { json?: JSONValue; state?: DocumentState } | undefined
 
 export interface MultiSelection {
   type: SelectionType.multi
@@ -296,7 +296,7 @@ export type OnPatch = (operations: JSONPatchDocument, afterPatch?: AfterPatchCal
 export type OnChangeText = (updatedText: string, afterPatch?: AfterPatchCallback) => void
 export type OnSort = (params: {
   operations: JSONPatchDocument
-  rootPath
+  rootPath: JSONPath
   itemPath: JSONPath
   direction: 1 | -1
 }) => void
@@ -401,6 +401,7 @@ export interface PopupEntry {
 
 export interface AbsolutePopupOptions {
   anchor?: Element
+  position?: 'top' | 'left'
   left?: number
   top?: number
   width?: number
@@ -541,7 +542,7 @@ export interface DraggingState {
   initialContentTop: number
   selectionStartIndex: number
   selectionItemsCount: number
-  items: RenderedItem[] | null
+  items: RenderedItem[]
   offset: number
   didMoveItems: boolean
 }

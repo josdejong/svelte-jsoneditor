@@ -4,6 +4,8 @@ import {
   compileJSONPointer,
   getIn,
   isJSONArray,
+  isJSONPatchCopy,
+  isJSONPatchMove,
   parseFrom,
   parsePath,
   setIn
@@ -13,7 +15,7 @@ import naturalCompare from 'natural-compare-lite'
 import { int } from '../utils/numberUtils.js'
 import { isObject } from '../utils/typeUtils.js'
 
-export function caseInsensitiveNaturalCompare(a, b) {
+export function caseInsensitiveNaturalCompare(a: unknown, b: unknown) {
   const aLower = typeof a === 'string' ? a.toLowerCase() : a
   const bLower = typeof b === 'string' ? b.toLowerCase() : b
 
@@ -22,7 +24,7 @@ export function caseInsensitiveNaturalCompare(a, b) {
 
 /**
  * Sort a JSON object or array
- * @param json           The the JSON containg the (optionally nested)
+ * @param json           The the JSON containing the (optionally nested)
  *                       object to be sorted
  * @param [rootPath=[]]  Relative path when the array was located
  * @param [itemPath=[]]  Item path by which to sort items in case of an array
@@ -53,7 +55,7 @@ export function sortJson(
 
 /**
  * Sort the keys of an object
- * @param json           The the JSON containg the (optionally nested)
+ * @param json           The the JSON containing the (optionally nested)
  *                       object to be sorted
  * @param [rootPath=[]]  Relative path when the array was located
  * @param [direction=1]  Pass 1 to sort ascending, -1 to sort descending
@@ -66,7 +68,7 @@ export function sortObjectKeys(
   direction: 1 | -1 = 1
 ): JSONPatchDocument {
   const object = getIn(json, rootPath)
-  const keys = Object.keys(object)
+  const keys = Object.keys(object as unknown as Record<string, JSONValue>)
   const sortedKeys = keys.slice()
 
   sortedKeys.sort((keyA, keyB) => {
@@ -74,7 +76,7 @@ export function sortObjectKeys(
   })
 
   // TODO: can we make this more efficient? check if the first couple of keys are already in order and if so ignore them
-  const operations = []
+  const operations: JSONPatchDocument = []
   for (let i = 0; i < sortedKeys.length; i++) {
     const key = sortedKeys[i]
     const path = compileJSONPointer(rootPath.concat(key))
@@ -121,7 +123,7 @@ export function sortArray(
  * Create a comparator function to compare nested properties in an array
  */
 function createObjectComparator(propertyPath: JSONPath, direction: 1 | -1) {
-  return function comparator(a, b) {
+  return function comparator(a: JSONValue, b: JSONValue) {
     const valueA = getIn(a, propertyPath)
     const valueB = getIn(b, propertyPath)
 
@@ -134,6 +136,8 @@ function createObjectComparator(propertyPath: JSONPath, direction: 1 | -1) {
 
     if (typeof valueA !== 'string' && typeof valueB !== 'string') {
       // both values are a number, boolean, or null -> use simple, fast sorting
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       return valueA > valueB ? direction : valueA < valueB ? -direction : 0
     }
 
@@ -142,13 +146,10 @@ function createObjectComparator(propertyPath: JSONPath, direction: 1 | -1) {
 }
 
 /**
- * Create an a list with JSON Patch move operations
+ * Create a list with JSON Patch move operations
  * needed to sort the array contents.
- * @param {Array} array
- * @param {function (a, b) : number} comparator
- * @return {Array.<{ op: 'move', from: string, path: string }>}
  */
-export function sortOperationsMove(array, comparator) {
+export function sortOperationsMove<T>(array: T[], comparator: (a: T, b: T) => number) {
   const operations = []
   const sorted = []
 
@@ -180,12 +181,9 @@ export function sortOperationsMove(array, comparator) {
 /**
  * Create an array containing all move operations
  * needed to sort the array contents.
- * @param {Array} array
- * @param {function (a, b) : number} comparator
- * @return {Array.<{ op: 'move', from: string, path: string }>}
  */
-export function sortOperationsMoveAdvanced(array, comparator) {
-  const moves = []
+export function sortOperationsMoveAdvanced<T>(array: T[], comparator: (a: T, b: T) => number) {
+  const moves: { from: number; to: number }[] = []
 
   const sortedIndices = array
     .map((item, index) => ({ item, index }))
@@ -194,7 +192,7 @@ export function sortOperationsMoveAdvanced(array, comparator) {
 
   let bIndex = 0
 
-  function foundSubsequence(nCommon, aCommon, bCommon) {
+  function foundSubsequence(nCommon: number, aCommon: number, bCommon: number) {
     for (let b = bIndex; b < bCommon; b++) {
       moves.push({
         from: sortedIndices[b],
@@ -207,7 +205,7 @@ export function sortOperationsMoveAdvanced(array, comparator) {
 
   const size = array.length
 
-  function isCommon(aIndex, bIndex) {
+  function isCommon(aIndex: number, bIndex: number) {
     return aIndex === sortedIndices[bIndex]
   }
 
@@ -255,13 +253,9 @@ export function sortOperationsMoveAdvanced(array, comparator) {
  *
  * Throws an error when not all operations are move operation inside the same
  * array.
- *
- * @param {JSON} json
- * @param {JSONPatchDocument} operations
- * @returns {JSON}
  */
 // TODO: write unit tests
-export function fastPatchSort(json, operations) {
+export function fastPatchSort(json: JSONValue, operations: JSONPatchDocument): JSONValue {
   if (isEmpty(operations)) {
     // nothing to do :)
     return json
@@ -281,15 +275,18 @@ export function fastPatchSort(json, operations) {
   }
 
   // parse all paths
-  const parsedOperations: Array<{ from: JSONPath; path: JSONPath }> = operations.map(
+  const parsedOperations: Array<{ from: JSONPath | undefined; path: JSONPath }> = operations.map(
     (operation) => ({
-      from: parseFrom(operation.from),
+      from:
+        isJSONPatchCopy(operation) || isJSONPatchMove(operation)
+          ? parseFrom(operation.from)
+          : undefined,
       path: parsePath(json, operation.path)
     })
   )
 
   // validate whether the move actions take place in an array
-  const arrayPath = initial(first(parsedOperations).path)
+  const arrayPath = initial(first(parsedOperations)?.path)
   const array = getIn(json, arrayPath)
   if (!Array.isArray(array)) {
     throw new Error(
@@ -318,8 +315,8 @@ export function fastPatchSort(json, operations) {
   // apply the actual operations on the same array. Only copy the only array once
   const updatedArray = array.slice(0)
   parsedOperations.forEach((parsedOperation) => {
-    const fromIndex = int(last(parsedOperation.from))
-    const toIndex = int(last(parsedOperation.path))
+    const toIndex = int(last(parsedOperation.path) || '-1')
+    const fromIndex = int(last(parsedOperation.from) || '-1')
 
     const value = updatedArray.splice(fromIndex, 1)[0]
     updatedArray.splice(toIndex, 0, value)
