@@ -55,6 +55,7 @@
   import { onMoveSelection } from '$lib/logic/dragging'
   import { forEachIndex, moveItems } from '$lib/utils/arrayUtils'
   import type {
+    CaretPosition,
     DraggingState,
     ExtendedSearchResultItem,
     JSONNodeItem,
@@ -266,7 +267,7 @@
 
     // when right-clicking inside the current selection, do nothing: context menu will open
     // when left-clicking inside the current selection, do nothing: it can be the start of dragging
-    if (isPathInsideSelection(selection, path, anchorType)) {
+    if (selection && isPathInsideSelection(selection, path, anchorType)) {
       if (event.button === 0) {
         onDragSelectionStart(event)
       }
@@ -288,7 +289,9 @@
     } else {
       if (anchorType === SelectionType.multi) {
         if (root && event.target.hasAttribute('data-path')) {
-          const lastCaretPosition = last(getVisibleCaretPositions(value, documentState))
+          const lastCaretPosition = last(
+            getVisibleCaretPositions(value, documentState)
+          ) as CaretPosition
           context.onSelect(fromCaretPosition(lastCaretPosition))
         } else {
           context.onSelect(createMultiSelection(json, path, path))
@@ -328,7 +331,11 @@
 
         const json = context.getJson()
         context.onSelect(
-          createMultiSelection(json, singleton.selectionAnchor, singleton.selectionFocus)
+          createMultiSelection(
+            json,
+            singleton.selectionAnchor || singleton.selectionFocus,
+            singleton.selectionFocus
+          )
         )
       }
     }

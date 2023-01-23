@@ -15,5 +15,6 @@ interface Singleton {
   selectionAnchor: JSONPath | null
   selectionAnchorType: string | null
   selectionFocus: JSONPath | null
+
   dragging: boolean
 }

@@ -542,7 +542,7 @@ export interface DraggingState {
   initialContentTop: number
   selectionStartIndex: number
   selectionItemsCount: number
-  items: RenderedItem[] | null
+  items: RenderedItem[]
   offset: number
   didMoveItems: boolean
 }
