@@ -554,7 +554,7 @@
         const updatedContent = {
           json: { ...content.json, updated: '2022-09-01T10:13:44Z' }
         }
-        refTreeEditor.set(updatedContent)
+        refTreeEditor.update(updatedContent)
       }}
     >
       Update json in tree editor
