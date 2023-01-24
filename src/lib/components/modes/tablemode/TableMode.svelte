@@ -266,8 +266,8 @@
     }
   }
 
-  function clearSelectionWhenNotExisting(json: JSONValue) {
-    if (documentState.selection === undefined) {
+  function clearSelectionWhenNotExisting(json: JSONValue | undefined) {
+    if (documentState.selection === undefined || json === undefined) {
       return
     }
 
@@ -1382,7 +1382,7 @@
   }
 
   function openSortModal(rootPath: JSONPath) {
-    if (readOnly) {
+    if (readOnly || json === undefined) {
       return
     }
 
@@ -1392,7 +1392,7 @@
       id: sortModalId,
       json,
       rootPath,
-      onSort: async ({ operations, itemPath, direction }) => {
+      onSort: ({ operations, itemPath, direction }) => {
         debug('onSort', operations, rootPath, itemPath, direction)
 
         handlePatch(operations, (patchedJson, patchedState) => {
@@ -1423,12 +1423,16 @@
     onTransform,
     onClose
   }: TransformModalOptions) {
+    if (readOnly || json === undefined) {
+      return
+    }
+
     modalOpen = true
 
     onTransformModal({
       id: id || transformModalId,
       json,
-      rootPath,
+      rootPath: rootPath || [],
       onTransform: onTransform
         ? (operations) => {
             onTransform({
@@ -1460,7 +1464,7 @@
     // open a popup where you can edit the nested object/array
     onJSONEditorModal({
       content: {
-        json: getIn(json, path)
+        json: getIn(json as JSONValue, path) as JSONValue
       },
       path,
       onPatch: context.onPatch,

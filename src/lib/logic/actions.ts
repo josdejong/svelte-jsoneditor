@@ -356,7 +356,7 @@ export interface OnInsertCharacter {
   char: string
   selectInside: boolean
   refJsonEditor: HTMLElement
-  json: JSONValue
+  json: JSONValue | undefined
   documentState: DocumentState
   readOnly: boolean
   parser: JSONParser
@@ -380,7 +380,7 @@ export async function onInsertCharacter({
 }: OnInsertCharacter) {
   // a regular key like a, A, _, etc is entered.
   // Replace selected contents with a new value having this first character as text
-  if (readOnly || !documentState.selection) {
+  if (readOnly || !documentState.selection || !json) {
     return
   }
 

@@ -51,7 +51,7 @@ import { isLargeContent } from '$lib/utils/jsonUtils.js'
 type OnCreateSelection = (json: JSONValue, documentState: DocumentState) => JSONSelection
 
 export type CreateDocumentStateProps = {
-  json: JSONValue
+  json: JSONValue | undefined
   expand?: OnExpand
   select?: OnCreateSelection
 }
@@ -65,7 +65,7 @@ export function createDocumentState(props?: CreateDocumentStateProps): DocumentS
     sortedColumn: undefined
   }
 
-  if (props?.select) {
+  if (props?.select && props.json !== undefined) {
     documentState = {
       ...documentState,
       selection: props.select(props.json, documentState)
@@ -146,7 +146,7 @@ export function expandPath(
  * Nodes that are already expanded will be left untouched
  */
 export function expandWithCallback(
-  json: JSONValue,
+  json: JSONValue | undefined,
   documentState: DocumentState,
   path: JSONPath,
   expandedCallback: OnExpand
@@ -190,7 +190,7 @@ export function expandWithCallback(
   }
 
   const currentPath = path.slice()
-  const value = getIn(json, path)
+  const value = json !== undefined ? getIn(json, path) : json
   if (value !== undefined) {
     recurse(value)
   }

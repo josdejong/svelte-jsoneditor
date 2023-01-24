@@ -448,7 +448,7 @@ export interface JSONEditorContext {
   readOnly: boolean
   parser: JSONParser
   normalization: ValueNormalization
-  getJson: () => JSONValue
+  getJson: () => JSONValue | undefined
   getDocumentState: () => DocumentState
   findElement: (path: JSONPath) => Element | null
   findNextInside: FindNextInside
@@ -461,7 +461,7 @@ export interface JSONEditorContext {
 }
 
 export interface TreeModeContext extends JSONEditorContext {
-  getJson: () => JSONValue
+  getJson: () => JSONValue | undefined
   getDocumentState: () => DocumentState
   findElement: (path: JSONPath) => Element | null
   onInsert: (type: InsertType) => void
