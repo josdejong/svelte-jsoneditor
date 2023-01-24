@@ -36,6 +36,7 @@ describe('table', () => {
     deepStrictEqual(getColumns(json, false), [['name'], ['address'], ['scores'], ['updated']])
     deepStrictEqual(getColumns(json, false, 1), [['name'], ['address'], ['scores']])
     deepStrictEqual(getColumns([1, 2, 3], false), [[]])
+    deepStrictEqual(getColumns([], false), [])
   })
 
   test('should extract table columns from data with flattening', () => {
@@ -53,6 +54,12 @@ describe('table', () => {
       ['scores']
     ])
     deepStrictEqual(getColumns([1, 2, 3], true), [[]])
+  })
+
+  test('should extract table columns from non-homogeneous data', () => {
+    const data: JSONArray = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5, name: 'Sarah' }]
+
+    expect(getColumns(data, true, 2)).toEqual([['id'], ['name']])
   })
 
   test('should return an empty array on non-array input', () => {

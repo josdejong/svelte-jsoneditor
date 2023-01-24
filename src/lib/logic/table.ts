@@ -26,8 +26,15 @@ export function getColumns(
 ): JSONPath[] {
   const compiledPaths: Set<string> = new Set()
 
+  // We read samples spread through the whole array, from begin to end.
+  // When the array is sorted, and a specific field is present only at the last
+  // couple of items of the array or in the middle, we want to pick that up too.
+  const iEnd = isJSONArray(array) ? array.length - 1 : 0
   for (let i = 0; i < maxLookupCount; i++) {
-    const paths: JSONPath[] = flatten ? getRecursiveKeys(array[i]) : getShallowKeys(array[i])
+    const index = i === 0 ? 0 : Math.floor(iEnd / i)
+    const paths: JSONPath[] = flatten
+      ? getRecursiveKeys(array[index])
+      : getShallowKeys(array[index])
 
     paths.forEach((path) => compiledPaths.add(compileJSONPointer(path)))
   }
