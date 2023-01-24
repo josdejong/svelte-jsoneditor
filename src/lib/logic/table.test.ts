@@ -6,6 +6,7 @@ import {
   getRecursiveKeys,
   getShallowKeys,
   groupValidationErrors,
+  maintainColumnOrder,
   mergeValidationErrors,
   operationAffectsSortedColumn,
   selectNextColumn,
@@ -60,6 +61,18 @@ describe('table', () => {
     const data: JSONArray = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5, name: 'Sarah' }]
 
     expect(getColumns(data, true, 2)).toEqual([['id'], ['name']])
+  })
+
+  test('should maintain the column order', () => {
+    const previous = [['id'], ['name']]
+
+    expect(maintainColumnOrder([['name'], ['id']], previous)).toEqual([['id'], ['name']])
+    expect(maintainColumnOrder([['address'], ['name'], ['id']], previous)).toEqual([
+      ['id'],
+      ['name'],
+      ['address']
+    ])
+    expect(maintainColumnOrder([['address'], ['id']], previous)).toEqual([['id'], ['address']])
   })
 
   test('should return an empty array on non-array input', () => {

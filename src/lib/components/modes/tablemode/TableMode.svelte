@@ -52,6 +52,7 @@
     clearSortedColumnWhenAffectedByOperations,
     getColumns,
     groupValidationErrors,
+    maintainColumnOrder,
     mergeValidationErrors,
     selectNextColumn,
     selectNextRow,
@@ -188,8 +189,10 @@
 
   $: applyExternalContent(externalContent)
 
-  let columns: JSONPath[]
-  $: columns = isJSONArray(json) ? getColumns(json, flattenColumns) : []
+  let columns: JSONPath[] = []
+  $: columns = isJSONArray(json)
+    ? maintainColumnOrder(getColumns(json, flattenColumns), columns)
+    : []
 
   $: containsValidArray = json && !isEmpty(columns)
 

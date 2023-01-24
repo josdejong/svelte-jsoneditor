@@ -13,11 +13,11 @@ import type {
   TableCellIndex,
   ValidationError
 } from '$lib/types.js'
+import { ValidationSeverity } from '$lib/types.js'
 import { createValueSelection, pathStartsWith } from './selection.js'
 import { isNumber } from '../utils/numberUtils.js'
 import type { Dictionary } from 'lodash'
 import { stringifyJSONPath, stripRootObject } from '../utils/pathUtils.js'
-import { ValidationSeverity } from '$lib/types.js'
 
 export function getColumns(
   array: JSONArray,
@@ -40,6 +40,30 @@ export function getColumns(
   }
 
   return Array.from(compiledPaths).map(parseJSONPointer)
+}
+
+export function maintainColumnOrder(
+  newColumns: JSONPath[],
+  previousColumns: JSONPath[]
+): JSONPath[] {
+  const orderedColumns = new Set(previousColumns.map(compileJSONPointer))
+  const newColumnsSet = new Set(newColumns.map(compileJSONPointer))
+
+  // delete the columns that are gone now
+  for (const column of orderedColumns) {
+    if (!newColumnsSet.has(column)) {
+      orderedColumns.delete(column)
+    }
+  }
+
+  // append the new columns to the end
+  for (const column of newColumnsSet) {
+    if (!orderedColumns.has(column)) {
+      orderedColumns.add(column)
+    }
+  }
+
+  return [...orderedColumns].map(parseJSONPointer)
 }
 
 export function getShallowKeys(value: JSONValue): JSONPath[] {
