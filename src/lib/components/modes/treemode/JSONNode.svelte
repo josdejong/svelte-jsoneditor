@@ -256,6 +256,10 @@
     event.stopPropagation()
     event.preventDefault()
 
+    // due to event.stopPropagation here and there, the focus tracker does not receive this mouse event.
+    // make sure the editor has focus
+    context.focus()
+
     // we attach the mousemove and mouseup event listeners to the global document,
     // so we will not miss if the mouse events happen outside the editor
     document.addEventListener('mousemove', handleMouseMoveGlobal, true)
@@ -300,9 +304,6 @@
         context.onSelect(fromSelectionType(json, anchorType, path))
       }
     }
-
-    // make sure the editor has focus
-    context.focus()
   }
 
   function handleMouseMove(event) {
