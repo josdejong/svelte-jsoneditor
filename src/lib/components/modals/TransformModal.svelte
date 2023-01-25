@@ -27,6 +27,7 @@
     QueryLanguage
   } from '../../types'
   import { stripRootObject } from '$lib/utils/pathUtils'
+  import { onEscape } from '$lib/actions/onEscape.js'
 
   const debug = createDebug('jsoneditor:TransformModal')
 
@@ -181,7 +182,7 @@
   }
 </script>
 
-<div class="jse-modal jse-transform">
+<div class="jse-modal jse-transform" use:onEscape={close}>
   <AbsolutePopup>
     <TransformModalHeader
       {queryLanguages}

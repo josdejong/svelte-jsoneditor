@@ -57,7 +57,7 @@
   import ModalRef from '../components/modals/ModalRef.svelte'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
-  const debug = createDebug('jsoneditor:Main')
+  const debug = createDebug('jsoneditor:JSONEditor')
 
   export let content: Content = { text: '' }
 
@@ -398,9 +398,10 @@
   <Modal
     show={jsoneditorModalState?.component}
     {...JSONEDITOR_MODAL_OPTIONS}
+    closeOnEsc={false}
     on:close={closeJSONEditorModal}
   >
-    <Modal>
+    <Modal closeOnEsc={false}>
       <ModalRef bind:open />
       <div class="jse-main" class:jse-focus={hasFocus}>
         {#key instanceId}

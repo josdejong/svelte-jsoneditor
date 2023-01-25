@@ -14,6 +14,7 @@
   import { createDebug } from '../../utils/debug'
   import type { OnSort } from '../../types'
   import { stripRootObject } from '$lib/utils/pathUtils.js'
+  import { onEscape } from '$lib/actions/onEscape.js'
 
   const debug = createDebug('jsoneditor:SortModal')
 
@@ -84,7 +85,7 @@
   }
 </script>
 
-<div class="jse-modal jse-sort">
+<div class="jse-modal jse-sort" use:onEscape={close}>
   <Header title={jsonIsArray ? 'Sort array items' : 'Sort object keys'} />
 
   <div class="jse-modal-contents">

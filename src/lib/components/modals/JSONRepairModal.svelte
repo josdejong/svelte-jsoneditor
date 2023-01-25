@@ -1,8 +1,9 @@
 <svelte:options immutable={true} />
 
-<script lang="js">
+<script lang="ts">
   import { getContext } from 'svelte'
   import JSONRepairComponent from './repair/JSONRepairComponent.svelte'
+  import { onEscape } from '$lib/actions/onEscape.js'
 
   export let text
   export let onParse
@@ -21,7 +22,7 @@
   }
 </script>
 
-<div class="jse-modal jse-repair">
+<div class="jse-modal jse-repair" use:onEscape={close}>
   <JSONRepairComponent
     bind:text
     {onParse}

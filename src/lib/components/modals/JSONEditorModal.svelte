@@ -28,6 +28,7 @@
   import Icon from 'svelte-awesome'
   import { faCaretLeft } from '@fortawesome/free-solid-svg-icons'
   import memoizeOne from 'memoize-one'
+  import { onEscape } from '$lib/actions/onEscape.js'
 
   const debug = createDebug('jsoneditor:JSONEditorModal')
 
@@ -181,7 +182,7 @@
   }
 </script>
 
-<div class="jse-modal jse-jsoneditor-modal">
+<div class="jse-modal jse-jsoneditor-modal" use:onEscape={handleClose}>
   <Header
     title="Edit nested content {stack.length > 1 ? ` (${stack.length})` : ''}"
     onClose={handleClose}
