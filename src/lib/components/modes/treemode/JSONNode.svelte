@@ -287,8 +287,9 @@
 
     if (event.shiftKey) {
       // Shift+Click will select multiple entries
-      if (selection) {
-        context.onSelect(createMultiSelection(json, selection.anchorPath, path))
+      const fullSelection = context.getDocumentState().selection
+      if (fullSelection) {
+        context.onSelect(createMultiSelection(json, fullSelection.anchorPath, path))
       }
     } else {
       if (anchorType === SelectionType.multi) {
