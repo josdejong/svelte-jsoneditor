@@ -1,4 +1,4 @@
-import {isEmpty, last} from 'lodash-es'
+import { isEmpty, last } from 'lodash-es'
 
 type Callback = () => void
 
