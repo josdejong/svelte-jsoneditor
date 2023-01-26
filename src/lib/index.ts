@@ -55,6 +55,10 @@ export { isEqualParser } from './utils/jsonUtils.js'
 // path
 export { parseJSONPath, stringifyJSONPath } from './utils/pathUtils.js'
 
+// actions
+export { resizeObserver } from './actions/resizeObserver.js'
+export { onEscape } from './actions/onEscape.js'
+
 // immutable-json-patch
 export {
   immutableJSONPatch,
