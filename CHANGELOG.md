@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.14.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.0...v0.14.1) (2023-01-26)
+
+
+### Features
+
+* implement duplicating, inserting, and removing rows in table mode ([9b691d1](https://github.com/josdejong/svelte-jsoneditor/commit/9b691d1536ba2d52b42e6da24b28a89b6bfb17ca))
+
+
+### Bug Fixes
+
+* close only the top modal instead of all modals on Escape ([b102843](https://github.com/josdejong/svelte-jsoneditor/commit/b102843dcc7ae411944ea745c4edd868a593dbde))
+* editor cannot get focus by clicking selected key or value ([7e83a36](https://github.com/josdejong/svelte-jsoneditor/commit/7e83a36b1c9301ce965ba6cc874fe575f6525a75))
+* improve detection of column names in large arrays with non-homogeneous data ([5704325](https://github.com/josdejong/svelte-jsoneditor/commit/5704325cfc2759e879a34de3e075cd0610d8f75c))
+* maintain order of columns after sorting the contents ([23bbf56](https://github.com/josdejong/svelte-jsoneditor/commit/23bbf56db274062e5d03906963e7e24bbcaab78c))
+* multi-select via Shift+Click not working in tree mode ([aafd933](https://github.com/josdejong/svelte-jsoneditor/commit/aafd933d48672cd2f37a9811183ca4f093fcd4d7))
+
 ## [0.14.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.13.1...v0.14.0) (2023-01-20)
 
 
