@@ -10,7 +10,15 @@ import {
   selectionToPartialJson
 } from '$lib/logic/selection'
 import copyToClipboard from '$lib/utils/copyToClipboard'
-import { createNewValue, createRemoveOperations, insert } from '$lib/logic/operations'
+import {
+  append,
+  createNewValue,
+  createRemoveOperations,
+  duplicate,
+  insert,
+  insertBefore,
+  removeAll
+} from '$lib/logic/operations'
 import type {
   AfterPatchCallback,
   DocumentState,
@@ -25,8 +33,10 @@ import type { JSONValue } from 'lossless-json'
 import { createDebug } from '$lib/utils/debug'
 import {
   getIn,
+  isJSONObject,
   isJSONPatchAdd,
   isJSONPatchReplace,
+  type JSONArray,
   type JSONPath,
   parsePath
 } from 'immutable-json-patch'
@@ -39,6 +49,7 @@ import {
 } from '$lib/logic/documentState'
 import { initial, isEmpty, last } from 'lodash-es'
 import { insertActiveElementContents } from '$lib/utils/domUtils'
+import { fromTableCellPosition, toTableCellPosition } from '$lib/logic/table'
 
 const debug = createDebug('jsoneditor:actions')
 
@@ -252,6 +263,216 @@ export function onRemove({
       }))
     }
   }
+}
+
+export interface OnDuplicateRowAction {
+  json: JSONValue | undefined
+  documentState: DocumentState
+  columns: JSONPath[]
+  readOnly: boolean
+  onPatch: OnPatch
+}
+
+/**
+ * This function assumes that the json holds the Array that we're duplicating a row for,
+ * it cannot duplicate something in some nested array
+ */
+// TODO: write unit tests
+export function onDuplicateRow({
+  json,
+  documentState,
+  columns,
+  readOnly,
+  onPatch
+}: OnDuplicateRowAction) {
+  if (
+    readOnly ||
+    json === undefined ||
+    !documentState.selection ||
+    !hasSelectionContents(documentState.selection)
+  ) {
+    return
+  }
+
+  const { rowIndex, columnIndex } = toTableCellPosition(documentState.selection.focusPath, columns)
+
+  debug('duplicate row', { rowIndex })
+
+  const rowPath = [String(rowIndex)]
+  const operations = duplicate(json, [rowPath])
+
+  onPatch(operations, (patchedJson, patchedState) => {
+    const newRowIndex = rowIndex < (json as JSONArray).length ? rowIndex + 1 : rowIndex
+    const newPath = fromTableCellPosition({ rowIndex: newRowIndex, columnIndex }, columns)
+    const newSelection = createValueSelection(newPath, false)
+
+    return {
+      state: {
+        ...patchedState,
+        selection: newSelection
+      }
+    }
+  })
+}
+
+export interface OnInsertBeforeRowAction {
+  json: JSONValue | undefined
+  documentState: DocumentState
+  columns: JSONPath[]
+  readOnly: boolean
+  onPatch: OnPatch
+}
+
+/**
+ * This function assumes that the json holds the Array that we're duplicating a row for,
+ * it cannot duplicate something in some nested array
+ */
+// TODO: write unit tests
+export function onInsertBeforeRow({
+  json,
+  documentState,
+  columns,
+  readOnly,
+  onPatch
+}: OnInsertBeforeRowAction) {
+  if (
+    readOnly ||
+    json === undefined ||
+    !documentState.selection ||
+    !hasSelectionContents(documentState.selection)
+  ) {
+    return
+  }
+
+  const { rowIndex } = toTableCellPosition(documentState.selection.focusPath, columns)
+
+  debug('insert before row', { rowIndex })
+
+  const rowPath = [String(rowIndex)]
+  const newValue = isJSONObject((json as JSONArray)[0]) ? {} : ''
+  const values = [{ key: '', value: newValue }]
+  const operations = insertBefore(json, rowPath, values)
+
+  onPatch(operations)
+}
+
+export interface OnInsertAfterRowAction {
+  json: JSONValue | undefined
+  documentState: DocumentState
+  columns: JSONPath[]
+  readOnly: boolean
+  onPatch: OnPatch
+}
+
+/**
+ * This function assumes that the json holds the Array that we're duplicating a row for,
+ * it cannot duplicate something in some nested array
+ */
+// TODO: write unit tests
+export function onInsertAfterRow({
+  json,
+  documentState,
+  columns,
+  readOnly,
+  onPatch
+}: OnInsertAfterRowAction) {
+  if (
+    readOnly ||
+    json === undefined ||
+    !documentState.selection ||
+    !hasSelectionContents(documentState.selection)
+  ) {
+    return
+  }
+
+  const { rowIndex, columnIndex } = toTableCellPosition(documentState.selection.focusPath, columns)
+
+  debug('insert after row', { rowIndex })
+
+  const nextRowIndex = rowIndex + 1
+  const nextRowPath = [String(nextRowIndex)]
+  const newValue = isJSONObject((json as JSONArray)[0]) ? {} : ''
+  const values = [{ key: '', value: newValue }]
+
+  const operations =
+    nextRowIndex < (json as JSONArray).length
+      ? insertBefore(json, nextRowPath, values)
+      : append(json, [], values)
+
+  onPatch(operations, (patchedJson, patchedState) => {
+    const nextPath = fromTableCellPosition({ rowIndex: nextRowIndex, columnIndex }, columns)
+    const newSelection = createValueSelection(nextPath, false)
+
+    return {
+      state: {
+        ...patchedState,
+        selection: newSelection
+      }
+    }
+  })
+}
+
+export interface OnRemoveRowAction {
+  json: JSONValue | undefined
+  documentState: DocumentState
+  columns: JSONPath[]
+  readOnly: boolean
+  onPatch: OnPatch
+}
+
+/**
+ * This function assumes that the json holds the Array that we're duplicating a row for,
+ * it cannot duplicate something in some nested array
+ */
+// TODO: write unit tests
+export function onRemoveRow({
+  json,
+  documentState,
+  columns,
+  readOnly,
+  onPatch
+}: OnRemoveRowAction) {
+  if (
+    readOnly ||
+    json === undefined ||
+    !documentState.selection ||
+    !hasSelectionContents(documentState.selection)
+  ) {
+    return
+  }
+
+  const { rowIndex, columnIndex } = toTableCellPosition(documentState.selection.focusPath, columns)
+
+  debug('remove row', { rowIndex })
+
+  const rowPath = [String(rowIndex)]
+  const operations = removeAll([rowPath])
+
+  onPatch(operations, (patchedJson, patchedState) => {
+    const newRowIndex =
+      rowIndex < (patchedJson as JSONArray).length
+        ? rowIndex
+        : rowIndex > 0
+        ? rowIndex - 1
+        : undefined
+
+    const newSelection =
+      newRowIndex !== undefined
+        ? createValueSelection(
+            fromTableCellPosition({ rowIndex: newRowIndex, columnIndex }, columns),
+            false
+          )
+        : undefined
+
+    debug('remove row new selection', { rowIndex, newRowIndex, newSelection })
+
+    return {
+      state: {
+        ...patchedState,
+        selection: newSelection
+      }
+    }
+  })
 }
 
 export interface OnInsert {

@@ -1,7 +1,15 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { faCopy, faCut, faPaste, faPen, faTimes } from '@fortawesome/free-solid-svg-icons'
+  import {
+    faClone,
+    faCopy,
+    faCut,
+    faPaste,
+    faPen,
+    faPlus,
+    faTrashCan
+  } from '@fortawesome/free-solid-svg-icons'
   import type { JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { initial, isEmpty } from 'lodash-es'
@@ -18,26 +26,31 @@
   import { getEnforceString } from '$lib/logic/documentState'
   import ContextMenu from '../../../../components/controls/contextmenu/ContextMenu.svelte'
 
-  export let json: JSONValue
+  export let json: JSONValue | undefined
   export let documentState: DocumentState
   export let parser: JSONParser
 
-  export let showTip
+  export let showTip: boolean
 
-  export let onCloseContextMenu
-  export let onEditValue
-  export let onToggleEnforceString
-  export let onCut
-  export let onCopy
-  export let onPaste
-  export let onRemove
+  export let onCloseContextMenu: () => void
+  export let onEditValue: () => void
+  export let onToggleEnforceString: () => void
+  export let onCut: (indent: boolean) => void
+  export let onCopy: (indent: boolean) => void
+  export let onPaste: () => void
+  export let onRemove: () => void
+  export let onDuplicateRow: () => void
+  export let onInsertBeforeRow: () => void
+  export let onInsertAfterRow: () => void
+  export let onRemoveRow: () => void
 
   $: selection = documentState.selection
 
   $: hasJson = json !== undefined
   $: hasSelection = selection != null
-  $: rootSelected = hasSelection && isEmpty(selection.focusPath)
-  $: focusValue = hasSelection ? getIn(json, selection.focusPath) : undefined
+  $: rootSelected = selection != null && isEmpty(selection.focusPath)
+  $: focusValue =
+    json !== undefined && selection != null ? getIn(json, selection.focusPath) : undefined
   $: editValueText = Array.isArray(focusValue)
     ? 'Edit array'
     : isObject(focusValue)
@@ -57,7 +70,7 @@
     !rootSelected // must not be root
 
   $: canEditKey =
-    hasJson &&
+    json !== undefined &&
     selection != null &&
     singleItemSelected(selection) &&
     !rootSelected &&
@@ -129,46 +142,71 @@
     onRemove()
   }
 
+  function handleDuplicateRow() {
+    onCloseContextMenu()
+    onDuplicateRow()
+  }
+
+  function handleInsertBeforeRow() {
+    onCloseContextMenu()
+    onInsertBeforeRow()
+  }
+
+  function handleInsertAfterRow() {
+    onCloseContextMenu()
+    onInsertAfterRow()
+  }
+
+  function handleRemoveRow() {
+    onCloseContextMenu()
+    onRemoveRow()
+  }
+
   let items: ContextMenuItem[]
   $: items = [
     {
       type: 'row',
       items: [
         {
-          type: 'column',
+          type: 'dropdown-button',
+          main: {
+            type: 'button',
+            onClick: handleEditValue,
+            icon: faPen,
+            text: editValueText,
+            title: 'Edit the value (Double-click on the value)',
+            disabled: !canEditValue
+          },
+          width: '11em',
           items: [
             {
-              type: 'dropdown-button',
-              main: {
-                type: 'button',
-                onClick: handleEditValue,
-                icon: faPen,
-                text: editValueText,
-                title: 'Edit the value (Double-click on the value)',
-                disabled: !canEditValue
-              },
-              width: '11em',
-              items: [
-                {
-                  type: 'button',
-                  icon: faPen,
-                  text: editValueText,
-                  title: 'Edit the value (Double-click on the value)',
-                  onClick: handleEditValue,
-                  disabled: !canEditValue
-                },
-                {
-                  type: 'button',
-                  icon: enforceString ? faCheckSquare : faSquare,
-                  text: 'Enforce string',
-                  title: 'Enforce keeping the value as string when it contains a numeric value',
-                  onClick: handleToggleEnforceString,
-                  disabled: !canEnforceString
-                }
-              ]
+              type: 'button',
+              icon: faPen,
+              text: editValueText,
+              title: 'Edit the value (Double-click on the value)',
+              onClick: handleEditValue,
+              disabled: !canEditValue
             },
-            { type: 'separator' },
-
+            {
+              type: 'button',
+              icon: enforceString ? faCheckSquare : faSquare,
+              text: 'Enforce string',
+              title: 'Enforce keeping the value as string when it contains a numeric value',
+              onClick: handleToggleEnforceString,
+              disabled: !canEnforceString
+            }
+          ]
+        }
+      ]
+    },
+    { type: 'separator' },
+    {
+      type: 'row',
+      items: [
+        {
+          type: 'column',
+          items: [
+            { type: 'label', text: 'Table cell:' },
             {
               type: 'dropdown-button',
               main: {
@@ -237,14 +275,51 @@
               title: 'Paste clipboard contents (Ctrl+V)',
               disabled: !hasSelection
             },
-            { type: 'separator' },
             {
               type: 'button',
               onClick: handleRemove,
-              icon: faTimes,
+              icon: faTrashCan,
               text: 'Remove',
               title: 'Remove selected contents (Delete)',
               disabled: !hasSelectionContents
+            }
+          ]
+        },
+        {
+          type: 'column',
+          items: [
+            { type: 'label', text: 'Table row:' },
+            {
+              type: 'button',
+              onClick: handleDuplicateRow,
+              icon: faClone,
+              text: 'Duplicate',
+              title: 'Duplicate the current row',
+              disabled: !hasSelection
+            },
+            {
+              type: 'button',
+              onClick: handleInsertBeforeRow,
+              icon: faPlus,
+              text: 'Insert before',
+              title: 'Insert a row before the current row',
+              disabled: !hasSelection
+            },
+            {
+              type: 'button',
+              onClick: handleInsertAfterRow,
+              icon: faPlus,
+              text: 'Insert after',
+              title: 'Insert a row after the current row',
+              disabled: !hasSelection
+            },
+            {
+              type: 'button',
+              onClick: handleRemoveRow,
+              icon: faTrashCan,
+              text: 'Remove row',
+              title: 'Remove current row',
+              disabled: !hasSelection
             }
           ]
         }

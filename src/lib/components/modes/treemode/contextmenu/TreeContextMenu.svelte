@@ -14,7 +14,7 @@
     faPen,
     faPlus,
     faSortAmountDownAlt,
-    faTimes
+    faTrashCan
   } from '@fortawesome/free-solid-svg-icons'
   import type { JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
@@ -325,14 +325,6 @@
           items: [
             {
               type: 'button',
-              onClick: handleRemove,
-              icon: faTimes,
-              text: 'Remove',
-              title: 'Remove selected contents (Delete)',
-              disabled: !hasSelectionContents
-            },
-            {
-              type: 'button',
               onClick: handleDuplicate,
               icon: faClone,
               text: 'Duplicate',
@@ -361,6 +353,14 @@
               icon: faFilter,
               text: 'Transform',
               title: 'Transform array or object contents (filter, sort, project)',
+              disabled: !hasSelectionContents
+            },
+            {
+              type: 'button',
+              onClick: handleRemove,
+              icon: faTrashCan,
+              text: 'Remove',
+              title: 'Remove selected contents (Delete)',
               disabled: !hasSelectionContents
             }
           ]

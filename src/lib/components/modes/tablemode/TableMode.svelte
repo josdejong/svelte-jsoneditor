@@ -112,7 +112,17 @@
   import { noop } from '$lib/utils/noop.js'
   import { createJump } from '$lib/assets/jump.js/src/jump.js'
   import ValidationErrorIcon from '../treemode/ValidationErrorIcon.svelte'
-  import { onCopy, onCut, onInsertCharacter, onPaste, onRemove } from '$lib/logic/actions'
+  import {
+    onCopy,
+    onCut,
+    onDuplicateRow,
+    onInsertAfterRow,
+    onInsertBeforeRow,
+    onInsertCharacter,
+    onPaste,
+    onRemove,
+    onRemoveRow
+  } from '$lib/logic/actions'
   import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
   import { resizeObserver } from '$lib/actions/resizeObserver.js'
   import TableContextMenu from '../../../components/modes/tablemode/contextmenu/TableContextMenu.svelte'
@@ -880,6 +890,10 @@
       onCopy: handleCopy,
       onPaste: handlePasteFromMenu,
       onRemove: handleRemove,
+      onDuplicateRow: handleDuplicateRow,
+      onInsertBeforeRow: handleInsertBeforeRow,
+      onInsertAfterRow: handleInsertAfterRow,
+      onRemoveRow: handleRemoveRow,
 
       onCloseContextMenu: function () {
         closeAbsolutePopup(popupId)
@@ -1069,6 +1083,10 @@
   }
 
   async function handleCopy(indent = true) {
+    if (json === undefined) {
+      return
+    }
+
     await onCopy({
       json,
       documentState,
@@ -1087,6 +1105,22 @@
       onChange,
       onPatch: handlePatch
     })
+  }
+
+  function handleDuplicateRow() {
+    onDuplicateRow({ json, documentState, columns, readOnly, onPatch: handlePatch })
+  }
+
+  function handleInsertBeforeRow() {
+    onInsertBeforeRow({ json, documentState, columns, readOnly, onPatch: handlePatch })
+  }
+
+  function handleInsertAfterRow() {
+    onInsertAfterRow({ json, documentState, columns, readOnly, onPatch: handlePatch })
+  }
+
+  function handleRemoveRow() {
+    onRemoveRow({ json, documentState, columns, readOnly, onPatch: handlePatch })
   }
 
   async function handleInsertCharacter(char: string) {

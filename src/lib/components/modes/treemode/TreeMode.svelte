@@ -840,6 +840,10 @@
   }
 
   async function handleCopy(indent = true) {
+    if (json === undefined) {
+      return
+    }
+
     await onCopy({
       json,
       documentState,
@@ -922,6 +926,8 @@
   function handleDuplicate() {
     if (
       readOnly ||
+      json === undefined ||
+      !documentState.selection ||
       !hasSelectionContents(documentState.selection) ||
       isEmpty(documentState.selection.focusPath) // root selected, cannot duplicate
     ) {
@@ -961,6 +967,10 @@
   }
 
   function handleInsert(insertType: InsertType): void {
+    if (json === undefined) {
+      return
+    }
+
     onInsert({
       insertType,
       selectInside: true,
@@ -1147,7 +1157,7 @@
   }
 
   function openSortModal(rootPath: JSONPath) {
-    if (readOnly) {
+    if (readOnly || json === undefined) {
       return
     }
 
@@ -1198,6 +1208,10 @@
     onTransform,
     onClose
   }: TransformModalOptions) {
+    if (json === undefined || !rootPath) {
+      return
+    }
+
     modalOpen = true
 
     onTransformModal({
