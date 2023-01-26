@@ -78,11 +78,12 @@ export function isTimestamp(value: unknown): boolean {
  * Source: https://stackoverflow.com/questions/6386090/validating-css-color-names/33184805
  */
 export function getColorCSS(color: string): string | null {
-  // TODO: test performance impact of this function
-  const colorStyleElement = window.document.createElement('div')
+  const div = window.document.createElement('div')
 
-  colorStyleElement.style.color = color
-  return colorStyleElement.style.color.split(/\s+/).join('').toLowerCase() || null
+  div.style.color = color
+
+  const applied = div.style.color
+  return applied !== '' ? applied.replace(/\s+/g, '').toLowerCase() : null
 }
 
 /**

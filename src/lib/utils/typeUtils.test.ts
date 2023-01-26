@@ -1,6 +1,8 @@
 import { test, describe } from 'vitest'
 import { strictEqual } from 'assert'
 import {
+  getColorCSS,
+  isColor,
   isInteger,
   isObject,
   isObjectOrArray,
@@ -120,5 +122,25 @@ describe('typeUtils', () => {
     strictEqual(isInteger('2.345'), false)
     strictEqual(isInteger('2a'), false)
     strictEqual(isInteger('abc'), false)
+  })
+
+  test('getColorCSS', () => {
+    expect(getColorCSS('red')).toBe('red')
+    expect(getColorCSS('dodgerblue')).toBe('dodgerblue')
+    expect(getColorCSS('#fff')).toBe('rgb(255,255,255)')
+    expect(getColorCSS('#82b92c')).toBe('rgb(130,185,44)')
+    expect(getColorCSS('rgba(255, 0, 0, 0.5)')).toBe('rgba(255,0,0,0.5)')
+    expect(getColorCSS('#ff000066')).toBe('rgba(255,0,0,0.4)')
+    expect(getColorCSS('#a')).toBe(null)
+    expect(getColorCSS('foo')).toBe(null)
+    expect(getColorCSS('red  ')).toBe(null)
+    expect(getColorCSS('  ')).toBe(null)
+  })
+
+  test('isColor', () => {
+    expect(isColor('red')).toBe(true)
+    expect(isColor('#82b92c')).toBe(true)
+    expect(isColor('foo')).toBe(false)
+    expect(isColor('')).toBe(false)
   })
 })
