@@ -479,7 +479,7 @@ export interface OnInsert {
   insertType: InsertType
   selectInside: boolean
   refJsonEditor: HTMLElement
-  json: JSONValue
+  json: JSONValue | undefined
   documentState: DocumentState
   readOnly: boolean
   parser: JSONParser
@@ -601,7 +601,7 @@ export async function onInsertCharacter({
 }: OnInsertCharacter) {
   // a regular key like a, A, _, etc is entered.
   // Replace selected contents with a new value having this first character as text
-  if (readOnly || !documentState.selection || !json) {
+  if (readOnly || !documentState.selection) {
     return
   }
 
@@ -640,7 +640,7 @@ export async function onInsertCharacter({
       onReplaceJson
     })
   } else {
-    if (isValueSelection(documentState.selection)) {
+    if (isValueSelection(documentState.selection) && json !== undefined) {
       if (!isObjectOrArray(getIn(json, documentState.selection.focusPath))) {
         // only replace contents when not yet in edit mode (can happen when entering
         // multiple characters very quickly after each other due to the async handling)
@@ -672,7 +672,7 @@ export async function onInsertCharacter({
 interface OnInsertValueWithCharacter {
   char: string
   refJsonEditor: HTMLElement
-  json: JSONValue
+  json: JSONValue | undefined
   documentState: DocumentState
   readOnly: boolean
   parser: JSONParser

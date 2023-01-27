@@ -534,7 +534,7 @@ export function moveInsideParent(
 }
 
 export function createNewValue(
-  json: JSONValue,
+  json: JSONValue | undefined,
   selection: JSONSelection | undefined,
   valueType: 'object' | 'array' | 'structure' | 'value'
 ) {
@@ -546,7 +546,7 @@ export function createNewValue(
     return []
   }
 
-  if (valueType === 'structure') {
+  if (valueType === 'structure' && json !== undefined) {
     const parentPath = selection ? getParentPath(selection) : []
     const parent = getIn(json, parentPath)
 
