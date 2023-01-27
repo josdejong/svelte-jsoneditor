@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.14.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.2...v0.14.3) (2023-01-27)
+
+
+### Bug Fixes
+
+* creating a new object or array by typing `{` or `]` broken (regression since `v0.14.1`) ([f7b5f92](https://github.com/josdejong/svelte-jsoneditor/commit/f7b5f925d7ae64aadad34007b82abc239127f537))
+
 ### [0.14.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.1...v0.14.2) (2023-01-26)
 
 
