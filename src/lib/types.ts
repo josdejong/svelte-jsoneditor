@@ -240,10 +240,10 @@ export interface ContentValidationErrors {
 export type ContentErrors = ContentParseError | ContentValidationErrors
 
 export interface RichValidationError extends ValidationError {
-  line?: number
-  column?: number
-  from: number
-  to: number
+  line: number | null
+  column: number | null
+  from: number | null
+  to: number | null
   actions: Array<{ name: string; apply: () => void }> | null
 }
 

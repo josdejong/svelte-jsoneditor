@@ -2,8 +2,8 @@
 
 <script lang="ts">
   import { faExclamationTriangle, faWrench } from '@fortawesome/free-solid-svg-icons'
-  import { createDebug } from '../../../utils/debug'
-  import type { JSONPatchDocument } from 'immutable-json-patch'
+  import { createDebug } from '$lib/utils/debug'
+  import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import { jsonrepair } from 'jsonrepair'
   import { debounce, isEqual, uniqueId } from 'lodash-es'
@@ -14,7 +14,7 @@
     JSON_STATUS_VALID,
     MAX_DOCUMENT_SIZE_TEXT_MODE,
     TEXT_MODE_ONCHANGE_DELAY
-  } from '../../../constants'
+  } from '$lib/constants'
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
@@ -35,6 +35,8 @@
   import { json as jsonLang } from '@codemirror/lang-json'
   import { indentUnit } from '@codemirror/language'
   import { closeSearchPanel, openSearchPanel, search } from '@codemirror/search'
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   import jsonSourceMap from 'json-source-map'
   import StatusBar from './StatusBar.svelte'
   import { highlighter } from './codemirror/codemirror-theme'
@@ -206,11 +208,11 @@
     }
   }
 
-  function handleFormat() {
+  function handleFormat(): boolean {
     debug('format')
 
     if (readOnly) {
-      return
+      return false
     }
 
     try {
@@ -218,16 +220,19 @@
       setCodeMirrorContent({
         text: parser.stringify(json, null, indentation)
       })
+      return true
     } catch (err) {
       onError(err)
     }
+
+    return false
   }
 
-  function handleCompact() {
+  function handleCompact(): boolean {
     debug('compact')
 
     if (readOnly) {
-      return
+      return false
     }
 
     try {
@@ -235,9 +240,12 @@
       setCodeMirrorContent({
         text: parser.stringify(json)
       })
+      return true
     } catch (err) {
       onError(err)
     }
+
+    return false
   }
 
   function handleRepair() {
@@ -252,7 +260,7 @@
         text: jsonrepair(text)
       })
       jsonStatus = JSON_STATUS_VALID
-      jsonParseError = undefined
+      jsonParseError = null
     } catch (err) {
       onError(err)
     }
@@ -303,19 +311,19 @@
       onTransformModal({
         id: id || transformModalId,
         json,
-        rootPath,
-        onTransform: onTransform
-          ? (operations) => {
-              onTransform({
-                operations,
-                json,
-                transformedJson: immutableJSONPatch(json, operations)
-              })
-            }
-          : (operations) => {
-              debug('onTransform', operations)
-              patch(operations)
-            },
+        rootPath: rootPath || [],
+        onTransform: (operations) => {
+          if (onTransform) {
+            onTransform({
+              operations,
+              json,
+              transformedJson: immutableJSONPatch(json, operations)
+            })
+          } else {
+            debug('onTransform', operations)
+            patch(operations)
+          }
+        },
         onClose: () => {
           modalOpen = false
           focus()
@@ -525,11 +533,11 @@
     const { line, column, position, message } = parseError
 
     return {
-      path: null,
+      path: [] as JSONPath,
       line,
       column,
-      from: position || 0,
-      to: position || 0,
+      from: position,
+      to: position,
       severity: ValidationSeverity.error,
       message,
       actions:
@@ -546,12 +554,11 @@
 
   function toDiagnostic(error: RichValidationError): Diagnostic {
     return {
-      from: error.from,
-      to: error.to,
-      message: error.message,
-      actions: error.actions,
-      severity: error.severity,
-      source: undefined
+      from: error.from || 0,
+      to: error.to || 0,
+      message: error.message || '',
+      actions: error.actions as Diagnostic['actions'],
+      severity: error.severity
     }
   }
 
@@ -716,7 +723,7 @@
   }
 
   function disableTextEditor(text: string, acceptTooLarge: boolean): boolean {
-    const tooLarge = text && text.length > MAX_DOCUMENT_SIZE_TEXT_MODE
+    const tooLarge = text ? text.length > MAX_DOCUMENT_SIZE_TEXT_MODE : false
     return tooLarge && !acceptTooLarge
   }
 
