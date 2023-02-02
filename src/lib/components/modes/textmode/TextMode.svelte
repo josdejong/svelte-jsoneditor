@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { faExclamationTriangle, faWrench } from '@fortawesome/free-solid-svg-icons'
+  import { faExclamationTriangle, faTimes, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '$lib/utils/debug'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
@@ -65,6 +65,8 @@
   import { validateText } from '../../../logic/validation'
   import { MAX_CHARACTERS_TEXT_PREVIEW } from '$lib/constants.js'
   import { truncate } from '$lib/utils/stringUtils.js'
+  import { needsFormatting } from '$lib/utils/jsonUtils.js'
+  import { faJSONEditorFormat } from '$lib/img/customFontawesomeIcons.js'
 
   export let readOnly: boolean
   export let mainMenuBar: boolean
@@ -104,6 +106,7 @@
 
   let onChangeDisabled = false
   let acceptTooLarge = false
+  let askToFormat = true
 
   let validationErrors: ValidationError[] = []
   const linterCompartment = new Compartment()
@@ -220,6 +223,8 @@
       setCodeMirrorContent({
         text: parser.stringify(json, null, indentation)
       })
+      askToFormat = true
+
       return true
     } catch (err) {
       onError(err)
@@ -240,6 +245,8 @@
       setCodeMirrorContent({
         text: parser.stringify(json)
       })
+      askToFormat = false
+
       return true
     } catch (err) {
       onError(err)
@@ -590,6 +597,7 @@
     updateCanUndoRedo()
     if (isChanged) {
       emitOnChange(content, previousContent)
+      askToFormat = true
     }
   }
 
@@ -778,6 +786,12 @@
     return contentErrors
   }
 
+  function handlePaste() {
+    if (!askToFormat) {
+      askToFormat = true
+    }
+  }
+
   // because onChange returns the validation errors and there is also a separate listener,
   // we would execute validation twice. Memoizing the last result solves this.
   const memoizedValidateText = memoizeOne(validateText)
@@ -795,7 +809,12 @@
       : []
 </script>
 
-<div class="jse-text-mode" class:no-main-menu={!mainMenuBar} bind:this={domTextMode}>
+<div
+  class="jse-text-mode"
+  class:no-main-menu={!mainMenuBar}
+  bind:this={domTextMode}
+  on:paste={handlePaste}
+>
   {#if mainMenuBar}
     {@const isNewDocument = text.length === 0}
 
@@ -870,6 +889,28 @@
           icon={faExclamationTriangle}
           message={jsonParseError.message}
           actions={repairActions}
+          onClick={() => handleSelectParseError(jsonParseError)}
+        />
+      {/if}
+
+      {#if !jsonParseError && askToFormat && needsFormatting(text)}
+        <Message
+          type="success"
+          message="Do you want to format the JSON?"
+          actions={[
+            {
+              icon: faJSONEditorFormat,
+              text: 'Format',
+              title: 'Format JSON: add proper indentation and new lines (Ctrl+I)',
+              onClick: handleFormat
+            },
+            {
+              icon: faTimes,
+              text: 'No thanks',
+              title: 'Close this message',
+              onClick: () => (askToFormat = false)
+            }
+          ]}
           onClick={() => handleSelectParseError(jsonParseError)}
         />
       {/if}
