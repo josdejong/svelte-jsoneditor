@@ -3,6 +3,7 @@
 $search-size: 28px;
 $button-width: 20px;
 $padding-section-left: 32px;
+$input-min-width: 50px;
 
 .jse-search-box {
   border: var(--jse-panel-border);
@@ -54,6 +55,8 @@ $padding-section-left: 32px;
       padding: 0 $input-padding;
       margin: 0;
       flex: 1;
+      width: 0;
+      min-width: $input-min-width;
       outline: none;
     }
 
