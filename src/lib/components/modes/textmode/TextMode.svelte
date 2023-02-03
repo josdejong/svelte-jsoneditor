@@ -597,7 +597,6 @@
     updateCanUndoRedo()
     if (isChanged) {
       emitOnChange(content, previousContent)
-      askToFormat = true
     }
   }
 
@@ -786,12 +785,6 @@
     return contentErrors
   }
 
-  function handlePaste() {
-    if (!askToFormat) {
-      askToFormat = true
-    }
-  }
-
   // because onChange returns the validation errors and there is also a separate listener,
   // we would execute validation twice. Memoizing the last result solves this.
   const memoizedValidateText = memoizeOne(validateText)
@@ -809,12 +802,7 @@
       : []
 </script>
 
-<div
-  class="jse-text-mode"
-  class:no-main-menu={!mainMenuBar}
-  bind:this={domTextMode}
-  on:paste={handlePaste}
->
+<div class="jse-text-mode" class:no-main-menu={!mainMenuBar} bind:this={domTextMode}>
   {#if mainMenuBar}
     {@const isNewDocument = text.length === 0}
 
