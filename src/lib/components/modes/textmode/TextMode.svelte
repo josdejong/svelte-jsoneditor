@@ -899,7 +899,6 @@
               onClick: () => (askToFormat = false)
             }
           ]}
-          onClick={() => handleSelectParseError(jsonParseError)}
         />
       {/if}
 

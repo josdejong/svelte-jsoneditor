@@ -8,7 +8,7 @@
   display: flex;
   gap: $padding;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: stretch;
 
   &.jse-success {
     background: var(--jse-message-success-background);
@@ -16,8 +16,13 @@
   }
 
   .jse-text {
+    display: flex;
     flex: 1;
     min-width: 60%;
+    align-items: center;
+
+    .jse-text-centered {
+    }
 
     &.jse-clickable {
       cursor: pointer;
