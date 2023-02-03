@@ -477,3 +477,14 @@ const COLUMN_REGEX = /column (\d+)/
 export function isEqualParser(a: JSONParser, b: JSONParser): boolean {
   return a.parse === b.parse && a.stringify === b.stringify
 }
+
+/**
+ * Apply a fast and cheap heuristic to determine whether the content needs formatting (i.e. is compact).
+ */
+export function needsFormatting(jsonText: string): boolean {
+  // the check for the length>2 is because an empty array or object does not need formatting
+  return NEEDS_FORMATTING_REGEX.test(jsonText) && jsonText.length > 2
+}
+
+// regex that matches the start of an object or array, followed by a non-whitespace character
+const NEEDS_FORMATTING_REGEX = /^[[{]\S/

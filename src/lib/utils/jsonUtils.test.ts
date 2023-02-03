@@ -11,6 +11,7 @@ import {
   isEqualParser,
   isJSONContent,
   isLargeContent,
+  needsFormatting,
   isTextContent,
   normalizeJsonParseError,
   parsePartialJson,
@@ -393,6 +394,31 @@ describe('jsonUtils', () => {
       strictEqual(isEqualParser(LosslessJSON, LosslessJSON), true)
       strictEqual(isEqualParser(LosslessJSON, LosslessJSON2), true)
       strictEqual(isEqualParser(LosslessJSON, JSON), false)
+    })
+  })
+
+  describe('needsFormatting', () => {
+    test('should check whether a JSON string can use formatting', () => {
+      expect(needsFormatting('[1,2,3]')).toBe(true)
+      expect(needsFormatting('{"a":1,"b":2}')).toBe(true)
+
+      expect(needsFormatting('[]')).toBe(false)
+      expect(needsFormatting('{}')).toBe(false)
+
+      expect(needsFormatting('')).toBe(false)
+      expect(needsFormatting('[\n1,\n  2,\n  3\n]')).toBe(false)
+      expect(needsFormatting('{\n  "a":true,\n  "b":false\n}')).toBe(false)
+      expect(needsFormatting('\n[1,2,3]')).toBe(false)
+
+      expect(needsFormatting('1234')).toBe(false)
+      expect(needsFormatting('"abc"')).toBe(false)
+      expect(needsFormatting('true')).toBe(false)
+      expect(needsFormatting('false')).toBe(false)
+      expect(needsFormatting('null')).toBe(false)
+
+      // cannot detect partially formatted content
+      expect(needsFormatting('[1, 2, 3]')).toBe(true)
+      expect(needsFormatting('{"a":1, "b":2}')).toBe(true)
     })
   })
 })
