@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.14.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.3...v0.14.4) (2023-02-03)
+
+
+### Features
+
+* add a "Show me" button to the message of the parse error ([347910a](https://github.com/josdejong/svelte-jsoneditor/commit/347910a675578f724b7188a8ff901611944cbafe))
+* show a message "Do you want to format the JSON?" when loading compact JSON ([42c6c95](https://github.com/josdejong/svelte-jsoneditor/commit/42c6c95ecdc8a8856e67d7ef1753693627aee8de))
+
+
+### Bug Fixes
+
+* [#219](https://github.com/josdejong/svelte-jsoneditor/issues/219) horizontal scrollbar visible in search box ([d3ffdef](https://github.com/josdejong/svelte-jsoneditor/commit/d3ffdef065e2dcb98fe1cae981e741fbfa136d08))
+* improve styling of the message text ([e8a86d9](https://github.com/josdejong/svelte-jsoneditor/commit/e8a86d97792993306700bdb447724a287993da7f))
+
 ### [0.14.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.2...v0.14.3) (2023-01-27)
 
 
