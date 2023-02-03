@@ -1,7 +1,12 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { faExclamationTriangle, faTimes, faWrench } from '@fortawesome/free-solid-svg-icons'
+  import {
+    faExclamationTriangle,
+    faEye,
+    faTimes,
+    faWrench
+  } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '$lib/utils/debug'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
@@ -789,6 +794,19 @@
   // we would execute validation twice. Memoizing the last result solves this.
   const memoizedValidateText = memoizeOne(validateText)
 
+  function handleShowMe() {
+    if (jsonParseError) {
+      handleSelectParseError(jsonParseError)
+    }
+  }
+
+  const repairActionShowMe = {
+    icon: faEye,
+    text: 'Show me',
+    title: 'Move to the parse error location',
+    onClick: handleShowMe
+  }
+
   $: repairActions =
     jsonStatus === JSON_STATUS_REPAIRABLE && !readOnly
       ? [
@@ -797,9 +815,10 @@
             text: 'Auto repair',
             title: 'Automatically repair JSON',
             onClick: handleRepair
-          }
+          },
+          repairActionShowMe
         ]
-      : []
+      : [repairActionShowMe]
 </script>
 
 <div class="jse-text-mode" class:no-main-menu={!mainMenuBar} bind:this={domTextMode}>
@@ -877,7 +896,7 @@
           icon={faExclamationTriangle}
           message={jsonParseError.message}
           actions={repairActions}
-          onClick={() => handleSelectParseError(jsonParseError)}
+          onClick={handleShowMe}
         />
       {/if}
 
