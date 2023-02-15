@@ -145,10 +145,12 @@
   --jse-message-action-background-highlight: rgba(255, 255, 255, 0.3);
 
   /* svelte-select */
-  --itemIsActiveBG: #3883fa;
+  --item-is-active-bg: #3883fa;
   --border: 1px solid #d8dbdf;
-  --borderRadius: 3px;
+  --border-radius: 3px;
   --background: #fff;
+  --padding: 0 10px;
+  --multi-select-padding: 0 10px;
 
   /* color picker */
   --jse-color-picker-background: var(--jse-panel-background);

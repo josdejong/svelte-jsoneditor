@@ -24,6 +24,15 @@ table.jse-transform-wizard {
         flex-direction: row;
         margin-bottom: $padding-half;
 
+        // svelte-select
+        // TODO: this styling should be configured globally
+        :global(.svelte-select .multi-item) {
+          align-items: center;
+        }
+        :global(.svelte-select .value-container) {
+          gap: 0 !important;
+        }
+
         :global(.svelte-select.jse-filter-path) {
           flex: 4;
           margin-right: $padding-half;
