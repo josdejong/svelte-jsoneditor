@@ -43,13 +43,13 @@
   let sortDirection = queryOptions?.sort?.direction
     ? sortDirectionOptions.find((option) => option.value === queryOptions.sort?.direction)
     : null
-  let projectionPaths = queryOptions?.projection?.paths
-    ? queryOptions.projection.paths.map(pathToOption)
-    : null
 
-  $: fieldPath = queryOptions?.filter?.path
-    ? fieldOptions.find((option) => isEqual(option.value, queryOptions?.filter?.path))
-    : null
+  $: projectionPaths =
+    queryOptions?.projection?.paths && projectionOptions
+      ? queryOptions.projection.paths
+          .map((path) => projectionOptions.find((option) => isEqual(option.value, path)))
+          .filter((option) => !!option)
+      : null
 
   function changeFilterPath(path: JSONPath) {
     if (!isEqual(queryOptions?.filter?.path, path)) {
