@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.14.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.4...v0.14.5) (2023-02-15)
+
+
+### Features
+
+* update dependencies and devDependencies ([d0e2568](https://github.com/josdejong/svelte-jsoneditor/commit/d0e2568540efcc7d2066044bbd2d3673902fe6c6))
+
+
+### Bug Fixes
+
+* styling issues of the selection dropdown in dark mode ([886330e](https://github.com/josdejong/svelte-jsoneditor/commit/886330e75879ccdd383a9f324646b96ae9406019))
+* the "Pick" field in the Transform Wizard not restoring the previously selected fields correctly ([635f662](https://github.com/josdejong/svelte-jsoneditor/commit/635f6624c21a194b5ce96805c9c3a12f1238b234))
+
 ### [0.14.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.3...v0.14.4) (2023-02-03)
 
 
