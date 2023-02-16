@@ -72,6 +72,7 @@
   import { truncate } from '$lib/utils/stringUtils.js'
   import { needsFormatting } from '$lib/utils/jsonUtils.js'
   import { faJSONEditorFormat } from '$lib/img/customFontawesomeIcons.js'
+  import { indentationMarkers } from '@replit/codemirror-indentation-markers'
 
   export let readOnly: boolean
   export let mainMenuBar: boolean
@@ -491,6 +492,7 @@
         lintGutter(),
         basicSetup,
         highlighter,
+        indentationMarkers(),
         EditorView.domEventHandlers({
           dblclick: handleDoubleClick
         }),
