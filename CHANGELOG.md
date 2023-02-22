@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.14.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.5...v0.14.6) (2023-02-22)
+
+
+### Features
+
+* add indentation guide line in text mode (fixes [#225](https://github.com/josdejong/svelte-jsoneditor/issues/225)) ([09f2575](https://github.com/josdejong/svelte-jsoneditor/commit/09f257568567eb1b01ff68b955d69bebe54cff95))
+* change the JavaScript and Lodash query languages to generate immutable, chained queries ([3e92c10](https://github.com/josdejong/svelte-jsoneditor/commit/3e92c1048791f44d58c8b1636bb0e1bfeb914c74))
+
+
+### Bug Fixes
+
+* jmespathQueryLanguage not working with non-native JSON data types like LosslessNumber ([e2c8e3d](https://github.com/josdejong/svelte-jsoneditor/commit/e2c8e3dfc9242f4883dd3f1261a0b5a0b6abd71c))
+
 ### [0.14.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.4...v0.14.5) (2023-02-15)
 
 
