@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.14.9](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.8...v0.14.9) (2023-02-22)
+
+
+### Bug Fixes
+
+* throw an error when forgetting to end a Lodash `_.chain(...)` with `.value()` ([f76e4e8](https://github.com/josdejong/svelte-jsoneditor/commit/f76e4e8bf047680835a34cc5236e3b19d4df9f73))
+
 ### [0.14.8](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.7...v0.14.8) (2023-02-22)
 
 
