@@ -1,7 +1,10 @@
 import assert from 'assert'
-import { test, describe } from 'vitest'
+import { describe, test } from 'vitest'
 import { jmespathQueryLanguage } from './jmespathQueryLanguage.js'
 import { cloneDeep } from 'lodash-es'
+import { LosslessNumber, parse, stringify } from 'lossless-json'
+import type { JSONValue } from 'immutable-json-patch'
+import type { JSONParser } from '$lib/types'
 
 const { createQuery, executeQuery } = jmespathQueryLanguage
 
@@ -16,7 +19,7 @@ describe('jmespathQueryLanguage', () => {
 
     test('should create a and execute an empty query', () => {
       const query = createQuery(users, {})
-      const result = executeQuery(users, query)
+      const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(query, '[*]')
       assert.deepStrictEqual(result, users)
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
@@ -32,7 +35,7 @@ describe('jmespathQueryLanguage', () => {
       })
       assert.deepStrictEqual(query, '[? user.name == `"Bob"`]')
 
-      const result = executeQuery(users, query)
+      const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, [user2])
       assert.deepStrictEqual(users, originalUsers) // must not touch the original data
     })
@@ -50,7 +53,7 @@ describe('jmespathQueryLanguage', () => {
       })
       assert.deepStrictEqual(query, '[? "user name!" == `"Bob"`]')
 
-      const result = executeQuery(data, query)
+      const result = executeQuery(data, query, JSON)
       assert.deepStrictEqual(result, [{ 'user name!': 'Bob' }])
       assert.deepStrictEqual(data, originalData) // must not touch the original data
     })
@@ -68,7 +71,7 @@ describe('jmespathQueryLanguage', () => {
       })
       assert.deepStrictEqual(query, '[? @ == `1`]')
 
-      const result = executeQuery(data, query)
+      const result = executeQuery(data, query, JSON)
       assert.deepStrictEqual(result, [1])
       assert.deepStrictEqual(data, originalData) // must not touch the original data
     })
@@ -83,7 +86,7 @@ describe('jmespathQueryLanguage', () => {
       })
       assert.deepStrictEqual(query, '[? user.registered == `true`]')
 
-      const result = executeQuery(users, query)
+      const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, [user1, user2])
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
@@ -98,7 +101,7 @@ describe('jmespathQueryLanguage', () => {
       })
       assert.deepStrictEqual(query, '[? user.extra != `null`]')
 
-      const result = executeQuery(users, query)
+      const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, [user2])
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
@@ -112,7 +115,7 @@ describe('jmespathQueryLanguage', () => {
       })
       assert.deepStrictEqual(query, '[*] | sort_by(@, &user.age)')
 
-      const result = executeQuery(users, query)
+      const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, [user1, user2, user3])
 
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
@@ -127,7 +130,7 @@ describe('jmespathQueryLanguage', () => {
       })
       assert.deepStrictEqual(query, '[*] | reverse(sort_by(@, &user.age))')
 
-      const result = executeQuery(users, query)
+      const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, [user3, user2, user1])
 
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
@@ -141,7 +144,7 @@ describe('jmespathQueryLanguage', () => {
       })
       assert.deepStrictEqual(query, '[*].user.name')
 
-      const result = executeQuery(users, query)
+      const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, ['Stuart', 'Kevin', 'Bob'])
 
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
@@ -155,7 +158,7 @@ describe('jmespathQueryLanguage', () => {
       })
       assert.deepStrictEqual(query, '[*].{name: user.name, _id: _id}')
 
-      const result = executeQuery(users, query)
+      const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, [
         { name: 'Stuart', _id: '1' },
         { name: 'Kevin', _id: '3' },
@@ -182,7 +185,7 @@ describe('jmespathQueryLanguage', () => {
       })
       assert.deepStrictEqual(query, '[? user.age <= `7`] | sort_by(@, &user.name) | [*].user.name')
 
-      const result = executeQuery(users, query)
+      const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, ['Bob', 'Stuart'])
 
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
@@ -220,7 +223,7 @@ describe('jmespathQueryLanguage', () => {
         '| [*].{id: id, "complex \\"field\\" \'name\'": nested."complex \\"field\\" \'name\'"}'
     )
 
-    const result = executeQuery(json, query)
+    const result = executeQuery(json, query, JSON)
 
     assert.deepStrictEqual(result, [
       { id: 0, 'complex "field" \'name\'': 0 },
@@ -231,7 +234,23 @@ describe('jmespathQueryLanguage', () => {
   test('should return null when property is not found', () => {
     const query = '@.foo'
     const data = {}
-    const result = executeQuery(data, query)
+    const result = executeQuery(data, query, JSON)
     assert.deepStrictEqual(result, null)
+  })
+
+  test('should work with alternative parsers and non-native JSON data types', () => {
+    const LosslessJSONParser = { parse, stringify } as JSONParser
+
+    const data = [new LosslessNumber('4'), new LosslessNumber('7'), new LosslessNumber('5')]
+    const query = createQuery(data as unknown as JSONValue, {
+      sort: {
+        path: [],
+        direction: 'asc'
+      }
+    })
+
+    // JMESPath does not support LosslessNumber, and executeQuery will convert into numbers first
+    const result = executeQuery(data as unknown as JSONValue, query, LosslessJSONParser)
+    assert.deepStrictEqual(result, [4, 5, 7])
   })
 })

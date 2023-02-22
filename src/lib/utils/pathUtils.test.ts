@@ -53,7 +53,7 @@ describe('pathUtils', () => {
   })
 
   test('createLodashPropertySelector', () => {
-    strictEqual(createLodashPropertySelector([]), "''")
+    strictEqual(createLodashPropertySelector([]), '')
     strictEqual(createLodashPropertySelector(['']), '[""]')
     strictEqual(createLodashPropertySelector(['foo']), "'foo'")
     strictEqual(createLodashPropertySelector(['foo', 'bar']), "'foo.bar'")

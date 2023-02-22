@@ -1,4 +1,4 @@
-import { test, describe } from 'vitest'
+import { describe, test } from 'vitest'
 import assert from 'assert'
 import {
   arrayStartsWith,
@@ -8,7 +8,7 @@ import {
   moveItems,
   objectToArray
 } from './arrayUtils.js'
-import type { JSONArray } from 'lossless-json'
+import type { JSONArray } from 'immutable-json-patch'
 
 describe('arrayUtils', () => {
   test('compareArrays', () => {

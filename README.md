@@ -474,7 +474,7 @@ interface QueryLanguage {
   name: string
   description: string
   createQuery: (json: JSONValue, queryOptions: QueryLanguageOptions) => string
-  executeQuery: (json: JSONValue, query: string) => JSONValue
+  executeQuery: (json: JSONValue, query: string, parser: JSONParser) => JSONValue
 }
 
 interface QueryLanguageOptions {

@@ -2,7 +2,7 @@
 
 import { isNumber } from './numberUtils.js'
 import type { JSONParser } from '../types.js'
-import type { JSONValue } from 'lossless-json'
+import type { JSONValue } from 'immutable-json-patch'
 
 /**
  * Test whether a value is an Object (and not an Array or Class)

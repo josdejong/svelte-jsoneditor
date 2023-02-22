@@ -119,7 +119,9 @@ export function pathToOption(path: JSONPath): { value: JSONPath; label: string }
  *     ["data", 2, "nested property", "name"]
  */
 export function createLodashPropertySelector(path: JSONPath): string {
-  return path.every((prop) => integerNumberRegex.test(prop) || javaScriptPropertyRegex.test(prop))
+  return path.length === 0
+    ? ''
+    : path.every((prop) => integerNumberRegex.test(prop) || javaScriptPropertyRegex.test(prop))
     ? "'" + path.map(stringifyJSONPathProp).join('').replace(/^\./, '') + "'"
     : JSON.stringify(path)
 }

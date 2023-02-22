@@ -72,7 +72,7 @@
       : getSelectedQueryLanguage(queryLanguageId).createQuery(json, state.queryOptions || {})
   let isManual = state.isManual || false
 
-  let previewError = undefined
+  let previewError: string | undefined = undefined
   let previewContent: Content = { text: '' }
 
   function getSelectedQueryLanguage(queryLanguageId: string): QueryLanguage {
@@ -98,13 +98,17 @@
       debug('previewTransform', {
         query
       })
-      const jsonTransformed = getSelectedQueryLanguage(queryLanguageId).executeQuery(json, query)
+      const jsonTransformed = getSelectedQueryLanguage(queryLanguageId).executeQuery(
+        json,
+        query,
+        parser
+      )
 
       previewContent = { json: jsonTransformed }
       previewError = undefined
     } catch (err) {
       previewContent = { text: '' }
-      previewError = err
+      previewError = err.toString()
     }
   }
 
@@ -132,7 +136,8 @@
       debug('handleTransform', { query })
       const jsonTransformed = getSelectedQueryLanguage(queryLanguageId).executeQuery(
         selectedJson,
-        query
+        query,
+        parser
       )
 
       onTransform([
@@ -308,7 +313,7 @@
               />
             {:else}
               <div class="jse-preview jse-error">
-                {previewError.toString()}
+                {previewError}
               </div>
             {/if}
           </div>

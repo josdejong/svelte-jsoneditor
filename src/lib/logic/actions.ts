@@ -29,7 +29,6 @@ import type {
   OnPatch,
   OnSelect
 } from '$lib/types'
-import type { JSONValue } from 'lossless-json'
 import { createDebug } from '$lib/utils/debug'
 import {
   getIn,
@@ -38,6 +37,7 @@ import {
   isJSONPatchReplace,
   type JSONArray,
   type JSONPath,
+  type JSONValue,
   parsePath
 } from 'immutable-json-patch'
 import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'

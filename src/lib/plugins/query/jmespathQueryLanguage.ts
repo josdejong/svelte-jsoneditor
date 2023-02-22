@@ -2,7 +2,8 @@ import jmespath from 'jmespath'
 import type { JSONPath, JSONValue } from 'immutable-json-patch'
 import { getIn } from 'immutable-json-patch'
 import { parseString } from '$lib/utils/stringUtils.js'
-import type { QueryLanguage, QueryLanguageOptions } from '$lib/types'
+import type { JSONParser, QueryLanguage, QueryLanguageOptions } from '$lib/types'
+import { isEqualParser } from '$lib/utils/jsonUtils'
 
 const description = `
 <p>
@@ -97,8 +98,11 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
 /**
  * Execute a JMESPath query, returns the transformed JSON
  */
-function executeQuery(json: JSONValue, query: string): JSONValue {
-  return jmespath.search(json, query)
+function executeQuery(json: JSONValue, query: string, parser: JSONParser): JSONValue {
+  // JMESPath cannot handle non-native JSON data types like LosslessNumber
+  const preprocessedJson = isEqualParser(parser, JSON) ? json : JSON.parse(parser.stringify(json))
+
+  return jmespath.search(preprocessedJson, query)
 }
 
 // TODO: unit test stringifyPathForJmespath

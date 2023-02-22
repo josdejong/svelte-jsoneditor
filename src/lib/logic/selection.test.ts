@@ -1,4 +1,4 @@
-import { test, describe } from 'vitest'
+import { describe, test } from 'vitest'
 import assert from 'assert'
 import {
   createAfterSelection,
@@ -20,7 +20,7 @@ import {
 } from './selection.js'
 import { createDocumentState } from './documentState.js'
 import { type DocumentState, type JSONSelection, SelectionType } from '../types.js'
-import type { JSONValue } from 'lossless-json'
+import type { JSONValue } from 'immutable-json-patch'
 
 describe('selection', () => {
   const json = {
