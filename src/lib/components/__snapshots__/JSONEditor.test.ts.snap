@@ -728,7 +728,7 @@ exports[`JSONEditor > render text mode 1`] = `
           class="jse-contents s-3uQaJztNTBaC"
         >
           <div
-            class="cm-editor ͼ1 ͼ2 ͼ4"
+            class="cm-editor ͼ1 ͼ2 ͼ4 ͼt"
           >
             <div
               aria-live="polite"
@@ -908,13 +908,13 @@ exports[`JSONEditor > render text mode 1`] = `
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: var(--indent-marker-active-bg-part) 0.5ch"
+                  style="--indent-markers: "
                 >
                     {
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: var(--indent-marker-active-bg-part) 0.5ch,var(--indent-marker-bg-part) 2.5ch"
+                  style="--indent-markers: var(--indent-marker-bg-part) 2.5ch"
                 >
                       
                   <span
@@ -931,19 +931,19 @@ exports[`JSONEditor > render text mode 1`] = `
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: var(--indent-marker-active-bg-part) 0.5ch"
+                  style="--indent-markers: "
                 >
                     },
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: var(--indent-marker-active-bg-part) 0.5ch"
+                  style="--indent-markers: "
                 >
                     {
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: var(--indent-marker-active-bg-part) 0.5ch,var(--indent-marker-bg-part) 2.5ch"
+                  style="--indent-markers: var(--indent-marker-bg-part) 2.5ch"
                 >
                       
                   <span
@@ -961,7 +961,7 @@ exports[`JSONEditor > render text mode 1`] = `
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: var(--indent-marker-active-bg-part) 0.5ch,var(--indent-marker-bg-part) 2.5ch"
+                  style="--indent-markers: var(--indent-marker-bg-part) 2.5ch"
                 >
                       
                   <span
@@ -978,19 +978,19 @@ exports[`JSONEditor > render text mode 1`] = `
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: var(--indent-marker-active-bg-part) 0.5ch"
+                  style="--indent-markers: "
                 >
                     },
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: var(--indent-marker-active-bg-part) 0.5ch"
+                  style="--indent-markers: "
                 >
                     {
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: var(--indent-marker-active-bg-part) 0.5ch,var(--indent-marker-bg-part) 2.5ch"
+                  style="--indent-markers: var(--indent-marker-bg-part) 2.5ch"
                 >
                       
                   <span
@@ -1007,7 +1007,7 @@ exports[`JSONEditor > render text mode 1`] = `
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: var(--indent-marker-active-bg-part) 0.5ch"
+                  style="--indent-markers: "
                 >
                     }
                 </div>
