@@ -512,9 +512,7 @@
         editableCompartment.of(EditorView.editable.of(!readOnly)),
         tabSizeCompartment.of(EditorState.tabSize.of(tabSize)),
         indentUnitCompartment.of(createIndentUnit(indentation)),
-        themeCompartment.of(
-          EditorView.theme({}, { dark: hasDarkTheme() })
-        ),
+        themeCompartment.of(EditorView.theme({}, { dark: hasDarkTheme() })),
         EditorView.lineWrapping
       ]
     })

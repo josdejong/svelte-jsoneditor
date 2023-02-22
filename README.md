@@ -621,14 +621,13 @@ When updating CSS variables dynamically, it is necessary to refresh the via `edi
 ```html
 <script>
   let editorRef
-  
+
   function refresh() {
     editorRef?.refresh()
   }
 </script>
-<JSONEditor bind:this={editorRef} ... />
+<JSONEditor bind:this="{editorRef}" ... />
 ```
-
 
 ## Differences between `josdejong/svelte-jsoneditor` and `josdejong/jsoneditor`
 
