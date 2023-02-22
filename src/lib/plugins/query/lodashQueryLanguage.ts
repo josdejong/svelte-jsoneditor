@@ -26,7 +26,7 @@ export const lodashQueryLanguage: QueryLanguage = {
 
 function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): string {
   const { filter, sort, projection } = queryOptions
-  const queryParts = []
+  const queryParts = ['  return _.chain(data)\n']
 
   if (filter && filter.path && filter.relation && filter.value) {
     // Note that the comparisons embrace type coercion,
@@ -41,16 +41,12 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
         ? `${filter.value}n` // bigint
         : filter.value
 
-    queryParts.push(
-      `  data = _.filter(data, ${actualValueGetter} ${filter.relation} ${filterValueStr})\n`
-    )
+    queryParts.push(`    .filter(${actualValueGetter} ${filter.relation} ${filterValueStr})\n`)
   }
 
   if (sort && sort.path && sort.direction) {
     queryParts.push(
-      `  data = _.orderBy(data, [${createLodashPropertySelector(sort.path)}], ['${
-        sort.direction
-      }'])\n`
+      `    .orderBy([${createLodashPropertySelector(sort.path)}], ['${sort.direction}'])\n`
     )
   }
 
@@ -61,16 +57,16 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
       // Note that we do not use _.pick() here because this function doesn't flatten the results
       const paths = projection.paths.map((path) => {
         const name = last(path) || 'item' // 'item' in case of having selected the whole item
-        return `    ${JSON.stringify(name)}: item${createPropertySelector(path)}`
+        return `      ${JSON.stringify(name)}: item${createPropertySelector(path)}`
       })
-      queryParts.push(`  data = _.map(data, item => ({\n${paths.join(',\n')}\n  }))\n`)
+      queryParts.push(`    .map(item => ({\n${paths.join(',\n')}\n    }))\n`)
     } else {
       const path = projection.paths[0]
-      queryParts.push(`  data = _.map(data, item => item${createPropertySelector(path)})\n`)
+      queryParts.push(`    .map(item => item${createPropertySelector(path)})\n`)
     }
   }
 
-  queryParts.push('  return data\n')
+  queryParts.push('    .value()\n')
 
   return `function query (data) {\n${queryParts.join('')}}`
 }

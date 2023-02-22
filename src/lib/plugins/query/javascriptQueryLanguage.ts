@@ -20,7 +20,7 @@ export const javascriptQueryLanguage: QueryLanguage = {
 
 function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): string {
   const { filter, sort, projection } = queryOptions
-  const queryParts = []
+  const queryParts = ['  return data\n']
 
   if (filter && filter.path && filter.relation && filter.value) {
     // Note that the comparisons embrace type coercion,
@@ -35,30 +35,30 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
         ? `${filter.value}n` // bigint
         : filter.value
 
-    queryParts.push(
-      `  data = data.filter(${actualValueGetter} ${filter.relation} ${filterValueStr})\n`
-    )
+    queryParts.push(`    .filter(${actualValueGetter} ${filter.relation} ${filterValueStr})\n`)
   }
 
   if (sort && sort.path && sort.direction) {
     if (sort.direction === 'desc') {
       queryParts.push(
-        `  data = data.slice().sort((a, b) => {\n` +
-          `    // sort descending\n` +
-          `    const valueA = a${createPropertySelector(sort.path)}\n` +
-          `    const valueB = b${createPropertySelector(sort.path)}\n` +
-          `    return valueA > valueB ? -1 : valueA < valueB ? 1 : 0\n` +
-          `  })\n`
+        `    .slice()\n` +
+          `    .sort((a, b) => {\n` +
+          `      // sort descending\n` +
+          `      const valueA = a${createPropertySelector(sort.path)}\n` +
+          `      const valueB = b${createPropertySelector(sort.path)}\n` +
+          `      return valueA > valueB ? -1 : valueA < valueB ? 1 : 0\n` +
+          `    })\n`
       )
     } else {
       // sort direction 'asc'
       queryParts.push(
-        `  data = data.slice().sort((a, b) => {\n` +
-          `    // sort ascending\n` +
-          `    const valueA = a${createPropertySelector(sort.path)}\n` +
-          `    const valueB = b${createPropertySelector(sort.path)}\n` +
-          `    return valueA > valueB ? 1 : valueA < valueB ? -1 : 0\n` +
-          `  })\n`
+        `    .slice()\n` +
+          `    .sort((a, b) => {\n` +
+          `      // sort ascending\n` +
+          `      const valueA = a${createPropertySelector(sort.path)}\n` +
+          `      const valueB = b${createPropertySelector(sort.path)}\n` +
+          `      return valueA > valueB ? 1 : valueA < valueB ? -1 : 0\n` +
+          `    })\n`
       )
     }
   }
@@ -70,18 +70,16 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
       const paths = projection.paths.map((path) => {
         const name = path[path.length - 1] || 'item' // 'item' in case of having selected the whole item
         const item = `item${createPropertySelector(path)}`
-        return `    ${JSON.stringify(name)}: ${item}`
+        return `      ${JSON.stringify(name)}: ${item}`
       })
 
-      queryParts.push(`  data = data.map(item => ({\n${paths.join(',\n')}})\n  )\n`)
+      queryParts.push(`    .map(item => ({\n${paths.join(',\n')}})\n    )\n`)
     } else {
       const item = `item${createPropertySelector(projection.paths[0])}`
 
-      queryParts.push(`  data = data.map(item => ${item})\n`)
+      queryParts.push(`    .map(item => ${item})\n`)
     }
   }
-
-  queryParts.push('  return data\n')
 
   return `function query (data) {\n${queryParts.join('')}}`
 }

@@ -20,7 +20,10 @@ describe('lodashQueryLanguage', () => {
     test('should create a and execute an empty query', () => {
       const query = createQuery(users, {})
       const result = executeQuery(users, query, JSON)
-      assert.deepStrictEqual(query, 'function query (data) {\n  return data\n}')
+      assert.deepStrictEqual(
+        query,
+        'function query (data) {\n  return _.chain(data)\n    .value()\n}'
+      )
       assert.deepStrictEqual(result, users)
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
@@ -39,8 +42,9 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          "  data = _.filter(data, item => item?.user?.name == 'Bob')\n" +
-          '  return data\n' +
+          '  return _.chain(data)\n' +
+          "    .filter(item => item?.user?.name == 'Bob')\n" +
+          '    .value()\n' +
           '}'
       )
 
@@ -63,8 +67,9 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = _.filter(data, item => item?.["user name!"] == \'Bob\')\n' +
-          '  return data\n' +
+          '  return _.chain(data)\n' +
+          '    .filter(item => item?.["user name!"] == \'Bob\')\n' +
+          '    .value()\n' +
           '}'
       )
 
@@ -86,8 +91,9 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = _.filter(data, item => item == 1)\n' +
-          '  return data\n' +
+          '  return _.chain(data)\n' +
+          '    .filter(item => item == 1)\n' +
+          '    .value()\n' +
           '}'
       )
 
@@ -107,8 +113,9 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = _.filter(data, item => item?.user?.registered == true)\n' +
-          '  return data\n' +
+          '  return _.chain(data)\n' +
+          '    .filter(item => item?.user?.registered == true)\n' +
+          '    .value()\n' +
           '}'
       )
 
@@ -128,8 +135,9 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = _.filter(data, item => item?.user?.extra != null)\n' +
-          '  return data\n' +
+          '  return _.chain(data)\n' +
+          '    .filter(item => item?.user?.extra != null)\n' +
+          '    .value()\n' +
           '}'
       )
 
@@ -149,8 +157,9 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = _.filter(data, item => item?.user?.extra != undefined)\n' +
-          '  return data\n' +
+          '  return _.chain(data)\n' +
+          '    .filter(item => item?.user?.extra != undefined)\n' +
+          '    .value()\n' +
           '}'
       )
 
@@ -169,8 +178,9 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          "  data = _.orderBy(data, ['user.age'], ['asc'])\n" +
-          '  return data\n' +
+          '  return _.chain(data)\n' +
+          "    .orderBy(['user.age'], ['asc'])\n" +
+          '    .value()\n' +
           '}'
       )
 
@@ -189,8 +199,9 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          "  data = _.orderBy(data, ['user.age'], ['desc'])\n" +
-          '  return data\n' +
+          '  return _.chain(data)\n' +
+          "    .orderBy(['user.age'], ['desc'])\n" +
+          '    .value()\n' +
           '}'
       )
 
@@ -208,8 +219,9 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = _.map(data, item => item?.user?.name)\n' +
-          '  return data\n' +
+          '  return _.chain(data)\n' +
+          '    .map(item => item?.user?.name)\n' +
+          '    .value()\n' +
           '}'
       )
 
@@ -227,11 +239,12 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = _.map(data, item => ({\n' +
-          '    "name": item?.user?.name,\n' +
-          '    "_id": item?._id\n' +
-          '  }))\n' +
-          '  return data\n' +
+          '  return _.chain(data)\n' +
+          '    .map(item => ({\n' +
+          '      "name": item?.user?.name,\n' +
+          '      "_id": item?._id\n' +
+          '    }))\n' +
+          '    .value()\n' +
           '}'
       )
 
@@ -264,10 +277,11 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = _.filter(data, item => item?.user?.age <= 7)\n' +
-          "  data = _.orderBy(data, ['user.name'], ['asc'])\n" +
-          '  data = _.map(data, item => item?.user?.name)\n' +
-          '  return data\n' +
+          '  return _.chain(data)\n' +
+          '    .filter(item => item?.user?.age <= 7)\n' +
+          "    .orderBy(['user.name'], ['asc'])\n" +
+          '    .map(item => item?.user?.name)\n' +
+          '    .value()\n' +
           '}'
       )
 
@@ -299,8 +313,9 @@ describe('lodashQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = _.orderBy(data, [["nested","complex \\"field\\" \'name\'"]], [\'asc\'])\n' +
-          '  return data\n' +
+          '  return _.chain(data)\n' +
+          '    .orderBy([["nested","complex \\"field\\" \'name\'"]], [\'asc\'])\n' +
+          '    .value()\n' +
           '}'
       )
 

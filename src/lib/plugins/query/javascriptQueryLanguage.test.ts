@@ -35,8 +35,8 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          "  data = data.filter(item => item?.user?.name == 'Bob')\n" +
           '  return data\n' +
+          "    .filter(item => item?.user?.name == 'Bob')\n" +
           '}'
       )
 
@@ -59,8 +59,8 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.filter(item => item?.["user name!"] == \'Bob\')\n' +
           '  return data\n' +
+          '    .filter(item => item?.["user name!"] == \'Bob\')\n' +
           '}'
       )
 
@@ -81,10 +81,7 @@ describe('javascriptQueryLanguage', () => {
       })
       assert.deepStrictEqual(
         query,
-        'function query (data) {\n' +
-          '  data = data.filter(item => item == 1)\n' +
-          '  return data\n' +
-          '}'
+        'function query (data) {\n  return data\n    .filter(item => item == 1)\n}'
       )
 
       const result = executeQuery(data, query, JSON)
@@ -103,8 +100,8 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.filter(item => item?.user?.registered == true)\n' +
           '  return data\n' +
+          '    .filter(item => item?.user?.registered == true)\n' +
           '}'
       )
 
@@ -124,8 +121,8 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.filter(item => item?.user?.extra != null)\n' +
           '  return data\n' +
+          '    .filter(item => item?.user?.extra != null)\n' +
           '}'
       )
 
@@ -145,8 +142,8 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.filter(item => item?.user?.extra != undefined)\n' +
           '  return data\n' +
+          '    .filter(item => item?.user?.extra != undefined)\n' +
           '}'
       )
 
@@ -165,13 +162,14 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.slice().sort((a, b) => {\n' +
-          '    // sort ascending\n' +
-          '    const valueA = a?.user?.age\n' +
-          '    const valueB = b?.user?.age\n' +
-          '    return valueA > valueB ? 1 : valueA < valueB ? -1 : 0\n' +
-          '  })\n' +
           '  return data\n' +
+          '    .slice()\n' +
+          '    .sort((a, b) => {\n' +
+          '      // sort ascending\n' +
+          '      const valueA = a?.user?.age\n' +
+          '      const valueB = b?.user?.age\n' +
+          '      return valueA > valueB ? 1 : valueA < valueB ? -1 : 0\n' +
+          '    })\n' +
           '}'
       )
 
@@ -190,13 +188,14 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.slice().sort((a, b) => {\n' +
-          '    // sort descending\n' +
-          '    const valueA = a?.user?.age\n' +
-          '    const valueB = b?.user?.age\n' +
-          '    return valueA > valueB ? -1 : valueA < valueB ? 1 : 0\n' +
-          '  })\n' +
           '  return data\n' +
+          '    .slice()\n' +
+          '    .sort((a, b) => {\n' +
+          '      // sort descending\n' +
+          '      const valueA = a?.user?.age\n' +
+          '      const valueB = b?.user?.age\n' +
+          '      return valueA > valueB ? -1 : valueA < valueB ? 1 : 0\n' +
+          '    })\n' +
           '}'
       )
 
@@ -215,8 +214,8 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.map(item => item?.user?.name)\n' +
           '  return data\n' +
+          '    .map(item => item?.user?.name)\n' +
           '}'
       )
 
@@ -235,11 +234,11 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.map(item => ({\n' +
-          '    "name": item?.user?.name,\n' +
-          '    "_id": item?._id})\n' +
-          '  )\n' +
           '  return data\n' +
+          '    .map(item => ({\n' +
+          '      "name": item?.user?.name,\n' +
+          '      "_id": item?._id})\n' +
+          '    )\n' +
           '}'
       )
 
@@ -271,15 +270,16 @@ describe('javascriptQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         'function query (data) {\n' +
-          '  data = data.filter(item => item?.user?.age <= 7)\n' +
-          '  data = data.slice().sort((a, b) => {\n' +
-          '    // sort ascending\n' +
-          '    const valueA = a?.user?.name\n' +
-          '    const valueB = b?.user?.name\n' +
-          '    return valueA > valueB ? 1 : valueA < valueB ? -1 : 0\n' +
-          '  })\n' +
-          '  data = data.map(item => item?.user?.name)\n' +
           '  return data\n' +
+          '    .filter(item => item?.user?.age <= 7)\n' +
+          '    .slice()\n' +
+          '    .sort((a, b) => {\n' +
+          '      // sort ascending\n' +
+          '      const valueA = a?.user?.name\n' +
+          '      const valueB = b?.user?.name\n' +
+          '      return valueA > valueB ? 1 : valueA < valueB ? -1 : 0\n' +
+          '    })\n' +
+          '    .map(item => item?.user?.name)\n' +
           '}'
       )
 
