@@ -185,8 +185,8 @@
   const validator = createAjvValidator({ schema })
   const arrayValidator = createAjvValidator({ schema: arraySchema })
 
-  let refTreeEditor
-  let refTextEditor
+  let refTreeEditor: JSONEditor | undefined
+  let refTextEditor: JSONEditor | undefined
 
   // for debugging
   $: if (typeof window !== 'undefined') {
@@ -336,6 +336,15 @@
       props: {}
     })
   }
+
+  function refresh() {
+    if (refTreeEditor) {
+      refTreeEditor.refresh()
+    }
+    if (refTextEditor) {
+      refTextEditor.refresh()
+    }
+  }
 </script>
 
 <svelte:head>
@@ -359,7 +368,7 @@
       Height: <input type="text" bind:value={height} />
     </label>
     <label>
-      Theme: <select bind:value={$selectedTheme}>
+      Theme: <select bind:value={$selectedTheme} on:change={refresh}>
         {#each themes as theme}
           <option value={theme.value}>{theme.label}</option>
         {/each}

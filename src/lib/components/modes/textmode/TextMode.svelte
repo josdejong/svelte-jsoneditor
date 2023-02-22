@@ -12,7 +12,7 @@
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import { jsonrepair } from 'jsonrepair'
   import { debounce, isEqual, uniqueId } from 'lodash-es'
-  import { onDestroy, onMount } from 'svelte'
+  import { onDestroy, onMount, tick } from 'svelte'
   import {
     JSON_STATUS_INVALID,
     JSON_STATUS_REPAIRABLE,
@@ -120,6 +120,7 @@
   const readOnlyCompartment = new Compartment()
   const indentUnitCompartment = new Compartment()
   const tabSizeCompartment = new Compartment()
+  const themeCompartment = new Compartment()
 
   let content: Content = externalContent
   let text = getText(content, indentation, parser) // text is just a cached version of content.text or parsed content.json
@@ -492,7 +493,7 @@
         lintGutter(),
         basicSetup,
         highlighter,
-        indentationMarkers(),
+        indentationMarkers({ hideFirstIndent: true }),
         EditorView.domEventHandlers({
           dblclick: handleDoubleClick
         }),
@@ -511,6 +512,9 @@
         editableCompartment.of(EditorView.editable.of(!readOnly)),
         tabSizeCompartment.of(EditorState.tabSize.of(tabSize)),
         indentUnitCompartment.of(createIndentUnit(indentation)),
+        themeCompartment.of(
+          EditorView.theme({}, { dark: hasDarkTheme() })
+        ),
         EditorView.lineWrapping
       ]
     })
@@ -525,6 +529,12 @@
 
   function getCodeMirrorValue() {
     return codeMirrorView ? normalization.unescapeValue(codeMirrorView.state.doc.toString()) : ''
+  }
+
+  function hasDarkTheme() {
+    return codeMirrorRef
+      ? getComputedStyle(codeMirrorRef).getPropertyValue('--jse-theme').includes('dark')
+      : false
   }
 
   function toRichValidationError(validationError: ValidationError): RichValidationError {
@@ -613,16 +623,10 @@
    */
   export function refresh() {
     debug('refresh')
-    const index = codeMirrorView.state.doc.length
 
-    // a trick to force Code Mirror to re-render the gutter values:
-    // insert a space at the end and then remove it again
-    codeMirrorView.dispatch({
-      changes: { from: index, to: index, insert: ' ' }
-    })
-    codeMirrorView.dispatch({
-      changes: { from: index, to: index + 1, insert: '' }
-    })
+    // update the theme (light/dark), but also, as a side effect,
+    // refresh the font size of the line numbers in the gutter
+    updateTheme()
   }
 
   function forceUpdateText() {
@@ -703,6 +707,21 @@
         ]
       })
     }
+  }
+
+  function updateTheme() {
+    // we check the theme on the next tick, to make sure the page
+    // is re-rendered with (possibly) changed CSS variables
+    tick().then(() => {
+      if (codeMirrorView) {
+        const dark = hasDarkTheme()
+        debug('updateTheme', { dark })
+
+        codeMirrorView.dispatch({
+          effects: [themeCompartment.reconfigure(EditorView.theme({}, { dark }))]
+        })
+      }
+    })
   }
 
   function createIndentUnit(indentation: number | string): Extension {

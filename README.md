@@ -614,6 +614,22 @@ Full Svelte example:
 </style>
 ```
 
+### Updating styles dynamically
+
+When updating CSS variables dynamically, it is necessary to refresh the via `editorRef.refresh()` to update the font-size of the line numbers in the gutter and update the colors of the indentation markers in `text` mode:
+
+```html
+<script>
+  let editorRef
+  
+  function refresh() {
+    editorRef?.refresh()
+  }
+</script>
+<JSONEditor bind:this={editorRef} ... />
+```
+
+
 ## Differences between `josdejong/svelte-jsoneditor` and `josdejong/jsoneditor`
 
 This library [`josdejong/svelte-jsoneditor`](https://github.com/josdejong/svelte-jsoneditor/) is the successor of [`josdejong/jsoneditor`](https://github.com/josdejong/jsoneditor). The main differences are:

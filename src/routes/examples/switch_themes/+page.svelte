@@ -30,9 +30,10 @@
   }
 
   let editorRef
-  function handleChangeFontSize() {
-    // call refresh to make sure the line numbers in the gutter are resized too
-    editorRef.refresh()
+  function refresh() {
+    // call refresh to make sure the line numbers in the gutter are resized too,
+    // and the color of the indentation markers is updated
+    editorRef?.refresh()
   }
 
   $: console.log('contents changed:', content)
@@ -48,7 +49,7 @@
   <p>You can customize the styling of the editor using CSS variables</p>
 
   <p>
-    Theme: <select bind:value={selectedTheme}>
+    Theme: <select bind:value={selectedTheme} on:change={refresh}>
       {#each themes as theme}
         <option value={theme.value}>{theme.label}</option>
       {/each}
@@ -56,7 +57,7 @@
   </p>
   <p>
     Font size:
-    <select bind:value={selectedFontSize} on:change={handleChangeFontSize}>
+    <select bind:value={selectedFontSize} on:change={refresh}>
       {#each fontSizes as fontSize}
         <option value={fontSize.value}>{fontSize.label}</option>
       {/each}
