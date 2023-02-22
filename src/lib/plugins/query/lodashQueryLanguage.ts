@@ -2,7 +2,7 @@ import * as _ from 'lodash-es'
 import { last } from 'lodash-es'
 import { createLodashPropertySelector, createPropertySelector } from '../../utils/pathUtils.js'
 import { parseString } from '../../utils/stringUtils.js'
-import type { QueryLanguage, QueryLanguageOptions } from '../../types'
+import type { QueryLanguage, QueryLanguageOptions } from '../../types.js'
 import type { JSONValue } from 'immutable-json-patch'
 import { isInteger } from '../../utils/typeUtils.js'
 
@@ -72,6 +72,8 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
 }
 
 function executeQuery(json: JSONValue, query: string): JSONValue {
+  validate(query)
+
   // FIXME: replace unsafe new Function with a JS based query language
   //  As long as we don't persist or fetch queries, there is no security risk.
   // TODO: only import the most relevant subset of lodash instead of the full library?
@@ -92,4 +94,22 @@ function executeQuery(json: JSONValue, query: string): JSONValue {
 
   const output = queryFn(json)
   return output !== undefined ? output : null
+}
+
+function validate(query: string) {
+  // It is very common to forget to end a lodash chain with .value()
+  // This lets the JSON Editor crash though.
+  // Therefore, we do a simple validation (not a guarantee)
+  const chainCount = query.match(/_\.chain\(/g)?.length
+  const valueCount = query.match(/\.value\(\)/g)?.length
+
+  if (chainCount !== valueCount) {
+    throw new Error('Cannot execute query: Lodash _.chain(...) must end with .value()')
+  }
+}
+
+export function isLodashChain(value: unknown): boolean {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return value ? value.__chain__ === true : false
 }

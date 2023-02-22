@@ -389,6 +389,20 @@ describe('lodashQueryLanguage', () => {
       }, /Error: Cannot execute query: expecting a function named 'query' but is undefined/)
     })
 
+    test('should throw an exception when query contains a lodash chain without .value()', () => {
+      assert.throws(() => {
+        executeQuery([], 'function query (data) { return _.chain(data) }', JSON)
+      }, /Error: Cannot execute query: Lodash _\.chain\(\.\.\.\) must end with \.value\(\)/)
+
+      assert.throws(() => {
+        executeQuery(
+          [],
+          'function query (data) { return _.chain(data).map(item => 2 * item) }',
+          JSON
+        )
+      }, /Error: Cannot execute query: Lodash _\.chain\(\.\.\.\) must end with \.value\(\)/)
+    })
+
     test('should return null when property is not found', () => {
       const query = 'function query (data) {\n' + '  return data.foo\n' + '}'
       const data = {}

@@ -1,4 +1,4 @@
-import { test, describe } from 'vitest'
+import { describe, test } from 'vitest'
 import { deepStrictEqual, strictEqual } from 'assert'
 import { traverse } from './objectUtils.js'
 import { isEqual } from 'lodash-es'
