@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.14.8](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.7...v0.14.8) (2023-02-22)
+
+
+### Bug Fixes
+
+* ensure dark indentation markers when using dark theme ([f7b936e](https://github.com/josdejong/svelte-jsoneditor/commit/f7b936ef65293813a9e744b12123101d80a08e78))
+
 ### [0.14.7](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.6...v0.14.7) (2023-02-22)
 
 
