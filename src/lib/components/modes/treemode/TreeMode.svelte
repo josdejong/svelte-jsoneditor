@@ -77,13 +77,13 @@
     getWindow,
     isChildOf,
     isChildOfNodeName
-  } from '$lib/utils/domUtils'
+  } from '$lib/utils/domUtils.js'
   import {
     convertValue,
     normalizeJsonParseError,
     parsePartialJson,
     repairPartialJson
-  } from '$lib/utils/jsonUtils'
+  } from '$lib/utils/jsonUtils.js'
   import { keyComboFromEvent } from '$lib/utils/keyBindings'
   import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'

@@ -45,7 +45,7 @@
     normalizeJsonParseError,
     parsePartialJson,
     repairPartialJson
-  } from '../../../utils/jsonUtils'
+  } from '../../../utils/jsonUtils.js'
   import {
     calculateAbsolutePosition,
     calculateVisibleSection,

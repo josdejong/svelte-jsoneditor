@@ -14,7 +14,7 @@
     isJSONContent,
     isTextContent,
     validateContentType
-  } from '../utils/jsonUtils'
+  } from '../utils/jsonUtils.js'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import { javascriptQueryLanguage } from '$lib/plugins/query/javascriptQueryLanguage.js'
   import { renderValue } from '$lib/plugins/value/renderValue'

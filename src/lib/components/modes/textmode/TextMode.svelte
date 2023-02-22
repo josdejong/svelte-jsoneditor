@@ -26,7 +26,7 @@
     getWindow
   } from '$lib/utils/domUtils'
   import { formatSize } from '$lib/utils/fileUtils'
-  import { findTextLocation, getText } from '$lib/utils/jsonUtils'
+  import { findTextLocation, getText } from '$lib/utils/jsonUtils.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'

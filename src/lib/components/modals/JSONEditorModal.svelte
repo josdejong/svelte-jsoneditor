@@ -24,7 +24,7 @@
   import { noop } from '$lib/utils/noop.js'
   import { stringifyJSONPath, stripRootObject } from '$lib/utils/pathUtils'
   import { initial, isEmpty, last } from 'lodash-es'
-  import { isJSONContent, toJSONContent } from '$lib/utils/jsonUtils'
+  import { isJSONContent, toJSONContent } from '$lib/utils/jsonUtils.js'
   import Icon from 'svelte-awesome'
   import { faCaretLeft } from '@fortawesome/free-solid-svg-icons'
   import memoizeOne from 'memoize-one'
