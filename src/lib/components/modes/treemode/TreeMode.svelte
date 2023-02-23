@@ -208,7 +208,7 @@
   let text: string | undefined
   let parseError: ParseError | undefined = undefined
 
-  function updateSelection(
+  export function updateSelection(
     selection:
       | JSONSelection
       | undefined

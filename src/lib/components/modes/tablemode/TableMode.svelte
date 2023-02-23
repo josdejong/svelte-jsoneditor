@@ -257,7 +257,7 @@
     }
   }
 
-  function updateSelection(
+ export function updateSelection(
     selection:
       | JSONSelection
       | undefined

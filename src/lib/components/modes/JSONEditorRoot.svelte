@@ -5,6 +5,7 @@
     JSONParser,
     JSONPatchResult,
     JSONPathParser,
+    JSONSelection,
     MenuItem,
     MenuSeparatorItem,
     OnBlur,
@@ -189,6 +190,20 @@
       // TODO: implement scrollTo for text mode
 
       throw new Error(`Method scrollTo is not available in mode "${mode}"`)
+    }
+  }
+
+  export function updateSelection(
+    selection:
+      | JSONSelection
+      | undefined
+      | ((selection: JSONSelection | undefined) => JSONSelection | undefined)
+  ) : void {
+    if (refTreeMode) {
+      return refTreeMode.updateSelection(selection)
+    } else {
+      // TODO: implement scrollTo for text mode
+      throw new Error(`Method updateSelection is not available in mode "${mode}"`)
     }
   }
 

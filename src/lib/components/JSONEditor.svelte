@@ -29,6 +29,7 @@
     JSONParser,
     JSONPatchResult,
     JSONPathParser,
+    JSONSelection,
     OnBlur,
     OnChange,
     OnChangeMode,
@@ -218,6 +219,13 @@
 
   export function scrollTo(path: JSONPath): void {
     return refJSONEditorRoot.scrollTo(path)
+  }
+
+  export function updateSelection(selection:
+      | JSONSelection
+      | undefined
+      | ((selection: JSONSelection | undefined) => JSONSelection | undefined)): void {
+    return refJSONEditorRoot.updateSelection(selection)
   }
 
   export function findElement(path: JSONPath): Element {
