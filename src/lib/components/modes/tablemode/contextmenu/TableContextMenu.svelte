@@ -34,6 +34,7 @@
 
   export let onCloseContextMenu: () => void
   export let onEditValue: () => void
+  export let onEditRow: () => void
   export let onToggleEnforceString: () => void
   export let onCut: (indent: boolean) => void
   export let onCopy: (indent: boolean) => void
@@ -51,11 +52,6 @@
   $: rootSelected = selection != null && isEmpty(selection.focusPath)
   $: focusValue =
     json !== undefined && selection != null ? getIn(json, selection.focusPath) : undefined
-  $: editValueText = Array.isArray(focusValue)
-    ? 'Edit array'
-    : isObject(focusValue)
-    ? 'Edit object'
-    : 'Edit value'
 
   $: hasSelectionContents =
     hasJson &&
@@ -105,6 +101,11 @@
   function handleEditValue() {
     onCloseContextMenu()
     onEditValue()
+  }
+
+  function handleEditRow() {
+    onCloseContextMenu()
+    onEditRow()
   }
 
   function handleToggleEnforceString() {
@@ -164,41 +165,6 @@
 
   let items: ContextMenuItem[]
   $: items = [
-    {
-      type: 'row',
-      items: [
-        {
-          type: 'dropdown-button',
-          main: {
-            type: 'button',
-            onClick: handleEditValue,
-            icon: faPen,
-            text: editValueText,
-            title: 'Edit the value (Double-click on the value)',
-            disabled: !canEditValue
-          },
-          width: '11em',
-          items: [
-            {
-              type: 'button',
-              icon: faPen,
-              text: editValueText,
-              title: 'Edit the value (Double-click on the value)',
-              onClick: handleEditValue,
-              disabled: !canEditValue
-            },
-            {
-              type: 'button',
-              icon: enforceString ? faCheckSquare : faSquare,
-              text: 'Enforce string',
-              title: 'Enforce keeping the value as string when it contains a numeric value',
-              onClick: handleToggleEnforceString,
-              disabled: !canEnforceString
-            }
-          ]
-        }
-      ]
-    },
     { type: 'separator' },
     {
       type: 'row',
@@ -207,6 +173,36 @@
           type: 'column',
           items: [
             { type: 'label', text: 'Table cell:' },
+            {
+              type: 'dropdown-button',
+              main: {
+                type: 'button',
+                onClick: handleEditValue,
+                icon: faPen,
+                text: 'Edit',
+                title: 'Edit the value (Double-click on the value)',
+                disabled: !canEditValue
+              },
+              width: '11em',
+              items: [
+                {
+                  type: 'button',
+                  icon: faPen,
+                  text: 'Edit',
+                  title: 'Edit the value (Double-click on the value)',
+                  onClick: handleEditValue,
+                  disabled: !canEditValue
+                },
+                {
+                  type: 'button',
+                  icon: enforceString ? faCheckSquare : faSquare,
+                  text: 'Enforce string',
+                  title: 'Enforce keeping the value as string when it contains a numeric value',
+                  onClick: handleToggleEnforceString,
+                  disabled: !canEnforceString
+                }
+              ]
+            },
             {
               type: 'dropdown-button',
               main: {
@@ -291,9 +287,17 @@
             { type: 'label', text: 'Table row:' },
             {
               type: 'button',
+              onClick: handleEditRow,
+              icon: faPen,
+              text: 'Edit row',
+              title: 'Edit the current row',
+              disabled: !hasSelectionContents
+            },
+            {
+              type: 'button',
               onClick: handleDuplicateRow,
               icon: faClone,
-              text: 'Duplicate',
+              text: 'Duplicate row',
               title: 'Duplicate the current row',
               disabled: !hasSelection
             },
