@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.14.10](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.9...v0.14.10) (2023-02-24)
+
+
+### Features
+
+* implement a "Duplicate row" action in the context menu of table mode ([4211a14](https://github.com/josdejong/svelte-jsoneditor/commit/4211a14ffaa4b64b58ff4ecbbde18e232bf9c48e))
+
+
+### Bug Fixes
+
+* [#226](https://github.com/josdejong/svelte-jsoneditor/issues/226) export typeguards `isContentParseError` and `isContentValidationErrors` ([0c8189f](https://github.com/josdejong/svelte-jsoneditor/commit/0c8189fadd74af83a3a17aa7b6efdf0c95ef1561))
+* table mode broken due to a wrong import (regression since v0.14.6) ([1e48fe5](https://github.com/josdejong/svelte-jsoneditor/commit/1e48fe50ac2ed613682330e628b1dcfbc224c0c5))
+
 ### [0.14.9](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.8...v0.14.9) (2023-02-22)
 
 
