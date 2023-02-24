@@ -398,6 +398,12 @@ const editor = new JSONEditor({
 - Path:
   - `parseJSONPath`
   - `stringifyJSONPath`
+- Actions:
+  - `resizeObserver`
+  - `onEscape`
+- Typeguards:
+  - `isContentParseError`
+  - `isContentValidationErrors`
 - Functions from [`immutable-json-patch`](https://github.com/josdejong/immutable-json-patch/):
   - `immutableJSONPatch`
   - `revertJSONPatch`
