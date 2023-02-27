@@ -159,8 +159,6 @@
         readOnly,
         indentation
       })
-
-      focus()
     } catch (err) {
       // TODO: report error to the user
       console.error(err)
