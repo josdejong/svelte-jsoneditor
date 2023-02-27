@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* implement a "Duplicate row" action in the context menu of table mode ([4211a14](https://github.com/josdejong/svelte-jsoneditor/commit/4211a14ffaa4b64b58ff4ecbbde18e232bf9c48e))
+* implement an "Edit row" action in the context menu of table mode ([4211a14](https://github.com/josdejong/svelte-jsoneditor/commit/4211a14ffaa4b64b58ff4ecbbde18e232bf9c48e))
 
 
 ### Bug Fixes
