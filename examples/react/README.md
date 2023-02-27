@@ -1,38 +1,103 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Using with React
 
-## Getting Started
+### First, create a React component to wrap the vanilla-jsoneditor
 
-First, run the development server:
+Depending on whether you are using JavaScript of TypeScript, create either a JSX or TSX file:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+```typescript
+//
+// JSONEditorReact.tsx
+//
+import { useEffect, useRef } from "react";
+import { JSONEditor, JSONEditorPropsOptional } from "vanilla-jsoneditor";
+
+const JSONEditorReact = (props: JSONEditorPropsOptional) => {
+  const editorDivRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<JSONEditor | null>();  
+  useEffect(() => {
+    if (editorDivRef.current && !editorRef.current) {
+      editorRef.current = new JSONEditor({
+        target: editorDivRef.current,
+        props,
+      });
+    }
+  }, [editorDivRef, editorRef, props]);  
+  return <div ref={editorDivRef} />;
+};
+
+export default JSONEditorReact;
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```javascript
+//
+// JSONEditorReact.jsx
+//
+import { useEffect, useRef } from "react";
+import { JSONEditor, JSONEditorPropsOptional } from "vanilla-jsoneditor";
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+const JSONEditorReact = (props) => {
+  const editorDivRef = useRef(null);
+  const editorRef = useRef();  
+  useEffect(() => {
+    if (editorDivRef.current && !editorRef.current) {
+      editorRef.current = new JSONEditor({
+        target: editorDivRef.current,
+        props,
+      });
+    }
+  }, [editorDivRef, editorRef, props]);  
+  return <div ref={editorDivRef} />;
+};
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+export default JSONEditorReact;
+```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+### Import and use the React component
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+If you are using NextJS, you will need to use a dynamic import to only render the component in the browser (disabling server-side rendering of the wrapper), as shown below in a NextJS TypeScript example.
 
-## Learn More
+If you are using React in an conventional non-NextJS browser app, you can import the component using a standard import statement like `import JSONEditorReact from '../JSONEditorReact'`
 
-To learn more about Next.js, take a look at the following resources:
+```typescript
+//
+// Demo.tsx for use with NextJS
+//
+import dynamic from 'next/dynamic';
+import { useCallback, useState } from 'react';
+import { Content, OnChangeStatus } from 'vanilla-jsoneditor';
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+//
+// In NextJS the JSONEditor needs to be imported
+// dynamically in order to turn off server-side
+// rendering of the component
+//
+const JSONEditorReact = dynamic(() => import('../JSONEditorReact'), { ssr: false });
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+const initialContent = { 
+  "hello": "world",
+  "count": 1,
+  "foo": [
+    "bar",
+    "car",
+  ],
+};
 
-## Deploy on Vercel
+export default function Demo() {
+  const [jsonContent, setJsonContent] = useState<Content>({ json: initialContent });
+  const handler = useCallback((content: Content, previousContent: Content, status: OnChangeStatus) => {
+    setJsonContent(content);
+  }, [setJsonContent]);
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+  return (
+    <div>
+      <JSONEditorReact
+        content={jsonContent}
+        onChange={handler}
+      />
+      <div>
+        { JSON.stringify(jsonContent) }
+      </div>
+    </div>
+  )
+}
+```
