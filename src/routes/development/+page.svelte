@@ -694,10 +694,10 @@
         <div class="data">
           text contents:
           <pre>
-						<code>
-						{truncate(content.text, 1e5)}
-						</code>
-					</pre>
+            <code>
+              {truncate(content.text, 1e5)}
+            </code>
+          </pre>
         </div>
       {/if}
     </div>
