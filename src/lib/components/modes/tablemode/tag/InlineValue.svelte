@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { isJSONArray, JSONArray, JSONObject, JSONPath } from 'immutable-json-patch'
+  import { isJSONArray } from 'immutable-json-patch'
+  import type { JSONArray, JSONObject, JSONPath } from 'immutable-json-patch'
   import type { JSONParser } from '$lib/types'
   import { truncate } from '$lib/utils/stringUtils.js'
   import { MAX_INLINE_OBJECT_CHARS } from '$lib/constants.js'

@@ -59,6 +59,9 @@ export { parseJSONPath, stringifyJSONPath } from './utils/pathUtils.js'
 export { resizeObserver } from './actions/resizeObserver.js'
 export { onEscape } from './actions/onEscape.js'
 
+// typeguards
+export { isContentParseError, isContentValidationErrors } from './typeguards.js'
+
 // immutable-json-patch
 export {
   immutableJSONPatch,

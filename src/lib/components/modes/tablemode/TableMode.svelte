@@ -885,6 +885,7 @@
       showTip,
 
       onEditValue: handleEditValue,
+      onEditRow: handleEditRow,
       onToggleEnforceString: handleToggleEnforceString,
       onCut: handleCut,
       onCopy: handleCopy,
@@ -994,6 +995,16 @@
     } else {
       updateSelection(createValueSelection(path, true))
     }
+  }
+
+  function handleEditRow() {
+    if (readOnly || !documentState.selection) {
+      return
+    }
+
+    const path = documentState.selection.focusPath
+    const pathRow = path.slice(0, 1)
+    openJSONEditorModal(pathRow)
   }
 
   function handleToggleEnforceString() {
