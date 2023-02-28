@@ -35,7 +35,6 @@ describe('table', () => {
 
   test('should extract table columns from data without flattening', () => {
     deepStrictEqual(getColumns(json, false), [['name'], ['address'], ['scores'], ['updated']])
-    deepStrictEqual(getColumns(json, false, 1), [['name'], ['address'], ['scores']])
     deepStrictEqual(getColumns([1, 2, 3], false), [[]])
     deepStrictEqual(getColumns([], false), [])
   })
@@ -48,19 +47,19 @@ describe('table', () => {
       ['scores'],
       ['updated']
     ])
-    deepStrictEqual(getColumns(json, true, 1), [
-      ['name'],
-      ['address', 'city'],
-      ['address', 'street'],
-      ['scores']
-    ])
     deepStrictEqual(getColumns([1, 2, 3], true), [[]])
   })
 
   test('should extract table columns from non-homogeneous data', () => {
     const data: JSONArray = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5, name: 'Sarah' }]
 
-    expect(getColumns(data, true, 2)).toEqual([['id'], ['name']])
+    expect(getColumns(data, true)).toEqual([['id'], ['name']])
+  })
+
+  test('should extract table columns from conflicting data structures', () => {
+    const data: JSONArray = [{ item: 1 }, { item: { id: 1, name: 'Sarah' } }]
+
+    expect(getColumns(data, true)).toEqual([['item'], ['item', 'id'], ['item', 'name']])
   })
 
   test('should maintain the column order', () => {

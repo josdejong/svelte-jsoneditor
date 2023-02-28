@@ -19,27 +19,71 @@ import { isNumber } from '../utils/numberUtils.js'
 import type { Dictionary } from 'lodash'
 import { stringifyJSONPath, stripRootObject } from '../utils/pathUtils.js'
 
-export function getColumns(
-  array: JSONArray,
-  flatten: boolean,
-  maxLookupCount = Math.min(isJSONArray(array) ? array.length : 0, 100)
-): JSONPath[] {
-  const compiledPaths: Set<string> = new Set()
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+type NestedObject = Record<string, NestedObject>
 
-  // We read samples spread through the whole array, from begin to end.
-  // When the array is sorted, and a specific field is present only at the last
-  // couple of items of the array or in the middle, we want to pick that up too.
-  const iEnd = isJSONArray(array) ? array.length - 1 : 0
-  for (let i = 0; i < maxLookupCount; i++) {
-    const index = i === 0 ? 0 : Math.floor(iEnd / i)
-    const paths: JSONPath[] = flatten
-      ? getRecursiveKeys(array[index])
-      : getShallowKeys(array[index])
+const endOfPath = Symbol('path')
 
-    paths.forEach((path) => compiledPaths.add(compileJSONPointer(path)))
+export function getColumns(array: JSONArray, flatten: boolean): JSONPath[] {
+  const merged: NestedObject = {}
+
+  if (Array.isArray(array)) {
+    array.forEach((item) => {
+      if (isJSONObject(item)) {
+        _recurseObject(item, merged, flatten)
+      } else {
+        merged[endOfPath] = true
+      }
+    })
   }
 
-  return Array.from(compiledPaths).map(parseJSONPointer)
+  const paths: JSONPath[] = []
+  if (endOfPath in merged) {
+    paths.push([])
+  }
+  _collectPaths(merged, [], paths, flatten)
+
+  return paths
+}
+
+// internal function for getColumns
+// mutates the argument merged
+function _recurseObject(object: NestedObject, merged: NestedObject, flatten: boolean): void {
+  for (const key in object) {
+    const value = object[key]
+    const valueMerged = merged[key] || (merged[key] = {})
+
+    if (isJSONObject(value) && flatten) {
+      _recurseObject(value, valueMerged, flatten)
+    } else {
+      if (valueMerged[endOfPath] === undefined) {
+        valueMerged[endOfPath] = true
+      }
+    }
+  }
+}
+
+// internal function for getColumns
+// mutates the argument paths
+function _collectPaths(
+  object: NestedObject,
+  parentPath: JSONPath,
+  paths: JSONPath[],
+  flatten: boolean
+): void {
+  for (const key in object) {
+    const path = parentPath.concat(key)
+    const value = object[key]
+
+    if (value && value[endOfPath] === true) {
+      paths.push(path)
+    }
+
+    if (isJSONObject(value) && flatten) {
+      _collectPaths(value, path, paths, flatten)
+    }
+  }
 }
 
 export function maintainColumnOrder(
