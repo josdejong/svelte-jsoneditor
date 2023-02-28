@@ -164,9 +164,7 @@ describe('validation', () => {
     const invalidText = '{ "foo": 42 }'
 
     test('should validateText with native parser and valid JSON', () => {
-      deepStrictEqual(validateText(validText, myValidator, JSON, JSON), {
-        validationErrors: []
-      })
+      deepStrictEqual(validateText(validText, myValidator, JSON, JSON), null)
     })
 
     test('should validateText with native parser and invalid JSON', () => {
@@ -176,9 +174,7 @@ describe('validation', () => {
     })
 
     test('should validateText with lossless parser and valid JSON', () => {
-      deepStrictEqual(validateText(validText, myValidator, LosslessJSONParser, JSON), {
-        validationErrors: []
-      })
+      deepStrictEqual(validateText(validText, myValidator, LosslessJSONParser, JSON), null)
     })
 
     test('should validateText with lossless parser and invalid JSON', () => {
@@ -190,9 +186,7 @@ describe('validation', () => {
     test('should validateText with two lossless parsers and valid JSON', () => {
       deepStrictEqual(
         validateText(validText, myLosslessValidator, LosslessJSONParser, LosslessJSONParser),
-        {
-          validationErrors: []
-        }
+        null
       )
     })
 

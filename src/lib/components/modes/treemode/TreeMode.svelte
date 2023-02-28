@@ -436,7 +436,7 @@
     )
   }
 
-  export function validate(): ContentErrors {
+  export function validate(): ContentErrors | null {
     debug('validate')
 
     if (parseError) {
@@ -449,9 +449,7 @@
     // make sure the validation results are up-to-date
     // normally, they are only updated on the next tick after the json is changed
     updateValidationErrors(json, validator, parser, validationParser)
-    return {
-      validationErrors
-    }
+    return !isEmpty(validationErrors) ? { validationErrors } : null
   }
 
   export function getJson() {

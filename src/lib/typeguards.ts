@@ -1,5 +1,4 @@
 import type {
-  ContentErrors,
   ContentParseError,
   ContentValidationErrors,
   ContextMenuColumn,
@@ -11,6 +10,7 @@ import type {
   MenuSpace,
   MenuSpaceItem
 } from './types.js'
+import { isObject } from '$lib/utils/typeUtils'
 
 export function isMenuSpaceItem(item: unknown): item is MenuSpaceItem {
   return isMenuSpace(item)
@@ -69,18 +69,12 @@ export function isContextMenuColumn(item: unknown): item is ContextMenuColumn {
   return item ? item['type'] === 'column' && Array.isArray(item['items']) : false
 }
 
-export function isContentParseError(
-  contentErrors: ContentErrors
-): contentErrors is ContentParseError {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  return typeof contentErrors['parseError'] === 'object' && contentErrors['parseError'] !== null
+export function isContentParseError(contentErrors: unknown): contentErrors is ContentParseError {
+  return isObject(contentErrors) && isObject(contentErrors['parseError'])
 }
 
 export function isContentValidationErrors(
-  contentErrors: ContentErrors
+  contentErrors: unknown
 ): contentErrors is ContentValidationErrors {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  return Array.isArray(contentErrors['validationErrors'])
+  return isObject(contentErrors) && Array.isArray(contentErrors['validationErrors'])
 }

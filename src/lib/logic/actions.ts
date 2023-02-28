@@ -243,7 +243,7 @@ export function onRemove({
         { text: '', json: undefined },
         json !== undefined ? { text, json } : { text: text || '', json },
         {
-          contentErrors: { validationErrors: [] },
+          contentErrors: null,
           patchResult: null
         }
       )
