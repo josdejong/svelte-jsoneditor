@@ -151,7 +151,7 @@
    * Validate the contents of the editor using the configured validator.
    * Returns a parse error or a list with validation warnings
    */
-  export function validate(): ContentErrors {
+  export function validate(): ContentErrors | null {
     if (refTextMode) {
       return refTextMode.validate()
     } else if (refTreeMode) {

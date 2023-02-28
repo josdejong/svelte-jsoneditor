@@ -780,7 +780,7 @@
     return []
   }
 
-  export function validate(): ContentErrors {
+  export function validate(): ContentErrors | null {
     debug('validate:start')
 
     onChangeCodeMirrorValueDebounced.flush()
@@ -799,7 +799,7 @@
     } else {
       jsonStatus = JSON_STATUS_VALID
       jsonParseError = null
-      validationErrors = contentErrors.validationErrors
+      validationErrors = contentErrors?.validationErrors || []
     }
 
     debug('validate:end')
