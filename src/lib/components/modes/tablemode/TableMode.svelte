@@ -130,6 +130,7 @@
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
   import TableModeWelcome from './TableModeWelcome.svelte'
   import JSONPreview from '../../controls/JSONPreview.svelte'
+  import RefreshColumnHeader from '$lib/components/modes/tablemode/RefreshColumnHeader.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext('simple-modal')
@@ -199,12 +200,14 @@
 
   $: applyExternalContent(externalContent)
 
+  let maxSampleCount = 10_000
   let columns: JSONPath[] = []
   $: columns = isJSONArray(json)
-    ? maintainColumnOrder(getColumns(json, flattenColumns), columns)
+    ? maintainColumnOrder(getColumns(json, flattenColumns, maxSampleCount), columns)
     : []
 
   $: containsValidArray = json && !isEmpty(columns)
+  $: showRefreshButton = Array.isArray(json) && json.length > maxSampleCount
 
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
@@ -1707,6 +1710,15 @@
                   />
                 </th>
               {/each}
+              {#if showRefreshButton}
+                <th class="jse-table-cell jse-table-cell-header">
+                  <RefreshColumnHeader
+                    count={json.length}
+                    {maxSampleCount}
+                    onRefresh={() => (maxSampleCount = Infinity)}
+                  />
+                </th>
+              {/if}
             </tr>
             <tr class="jse-table-invisible-start-section">
               <td style:height={visibleSection.startHeight + 'px'} colspan={columns.length} />
@@ -1775,6 +1787,9 @@
                     {/if}
                   </td>
                 {/each}
+                {#if showRefreshButton}
+                  <td class="jse-table-cell" />
+                {/if}
               </tr>
             {/each}
 

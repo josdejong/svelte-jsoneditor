@@ -254,7 +254,6 @@ exports[`JSONEditor > render table mode 1`] = `
                      
                   </button>
                   <!--&lt;ColumnHeader&gt;-->
-                   
                 </th>
                 <th
                   class="jse-table-cell jse-table-cell-header s-kw5t6hk3mCrZ"
@@ -272,8 +271,8 @@ exports[`JSONEditor > render table mode 1`] = `
                      
                   </button>
                   <!--&lt;ColumnHeader&gt;-->
-                   
                 </th>
+                 
               </tr>
                
               <tr
@@ -330,6 +329,7 @@ exports[`JSONEditor > render table mode 1`] = `
                   
                   
                 </td>
+                 
               </tr>
               <tr
                 class="jse-table-row s-kw5t6hk3mCrZ"
@@ -375,6 +375,7 @@ exports[`JSONEditor > render table mode 1`] = `
                   
                   
                 </td>
+                 
               </tr>
               <tr
                 class="jse-table-row s-kw5t6hk3mCrZ"
@@ -420,6 +421,7 @@ exports[`JSONEditor > render table mode 1`] = `
                   
                   
                 </td>
+                 
               </tr>
                
               <tr

@@ -18,6 +18,7 @@ import { createValueSelection, pathStartsWith } from './selection.js'
 import { isNumber } from '../utils/numberUtils.js'
 import type { Dictionary } from 'lodash'
 import { stringifyJSONPath, stripRootObject } from '../utils/pathUtils.js'
+import { forEachSample } from '$lib/utils/arrayUtils'
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -25,11 +26,18 @@ type NestedObject = Record<string, NestedObject>
 
 const endOfPath = Symbol('path')
 
-export function getColumns(array: JSONArray, flatten: boolean): JSONPath[] {
+export function getColumns(
+  array: JSONArray,
+  flatten: boolean,
+  maxSampleCount = Infinity
+): JSONPath[] {
   const merged: NestedObject = {}
 
   if (Array.isArray(array)) {
-    array.forEach((item) => {
+    // We read samples spread through the whole array, from begin to end.
+    // When the array is sorted, and a specific field is present only at the last
+    // couple of items of the array or in the middle, we want to pick that up too.
+    forEachSample(array, maxSampleCount, (item) => {
       if (isJSONObject(item)) {
         _recurseObject(item, merged, flatten)
       } else {
