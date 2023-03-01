@@ -119,7 +119,7 @@
     "prettier-plugin-svelte": "2.9.0",
     "rollup": "3.17.3",
     "rollup-plugin-dts": "5.2.0",
-    "rollup-plugin-svelte": "7.1.3",
+    "rollup-plugin-svelte": "7.1.2",
     "standard-version": "9.5.0",
     "svelte-check": "3.0.4",
     "svelte-preprocess": "5.0.1",
