@@ -19,6 +19,7 @@ import { isNumber } from '../utils/numberUtils.js'
 import type { Dictionary } from 'lodash'
 import { stringifyJSONPath, stripRootObject } from '../utils/pathUtils.js'
 import { forEachSample } from '$lib/utils/arrayUtils.js'
+import { isObject } from '$lib/utils/typeUtils.js'
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -38,7 +39,7 @@ export function getColumns(
     // When the array is sorted, and a specific field is present only at the last
     // couple of items of the array or in the middle, we want to pick that up too.
     forEachSample(array, maxSampleCount, (item) => {
-      if (isJSONObject(item)) {
+      if (isObject(item)) {
         _recurseObject(item, merged, flatten)
       } else {
         merged[endOfPath] = true
@@ -62,7 +63,7 @@ function _recurseObject(object: NestedObject, merged: NestedObject, flatten: boo
     const value = object[key]
     const valueMerged = merged[key] || (merged[key] = {})
 
-    if (isJSONObject(value) && flatten) {
+    if (isObject(value) && flatten) {
       _recurseObject(value, valueMerged, flatten)
     } else {
       if (valueMerged[endOfPath] === undefined) {
