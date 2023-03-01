@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.15.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.10...v0.15.0) (2023-03-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* when there are no validation errors, the return value of
+method `validate()` and parameter `contentErrors` in callback `onChange` is
+now `null` instead of `{ validationErrors: [] }`.
+
+### Features
+
+* faster `getColumns` without sampling ([0937718](https://github.com/josdejong/svelte-jsoneditor/commit/0937718fb5c30b996a955aa24ca336163d92877c))
+* sample the array to detect headers (fast) and have a button to enforce checking all items ([452d168](https://github.com/josdejong/svelte-jsoneditor/commit/452d168595eef1b24d38d9c97f7d74eadb5ee243))
+
+
+### Bug Fixes
+
+* [#226](https://github.com/josdejong/svelte-jsoneditor/issues/226) return `null` instead of `{ validationErrors: [] }` when there are no validation errors ([395dbd1](https://github.com/josdejong/svelte-jsoneditor/commit/395dbd10b0fac21876b500295668bc0b5ef94010))
+* [#231](https://github.com/josdejong/svelte-jsoneditor/issues/231) code mode grabbing focus on creation ([5df57ee](https://github.com/josdejong/svelte-jsoneditor/commit/5df57eea7a8c6600efb4f8f1a41ad338fce77e0a))
+* update dependencies and devDependencies ([9275c34](https://github.com/josdejong/svelte-jsoneditor/commit/9275c3494e4fcf45bd370f9ff77554d9193db4ac))
+
 ### [0.14.10](https://github.com/josdejong/svelte-jsoneditor/compare/v0.14.9...v0.14.10) (2023-02-24)
 
 
