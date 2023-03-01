@@ -1,6 +1,6 @@
 import { sortBy } from 'lodash-es'
 import { ARRAY_SECTION_SIZE } from '../constants.js'
-import type { Section } from '../types'
+import type { Section } from '$lib/types.js'
 
 /**
  * Create sections that can be expanded.

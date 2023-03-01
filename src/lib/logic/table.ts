@@ -18,7 +18,7 @@ import { createValueSelection, pathStartsWith } from './selection.js'
 import { isNumber } from '../utils/numberUtils.js'
 import type { Dictionary } from 'lodash'
 import { stringifyJSONPath, stripRootObject } from '../utils/pathUtils.js'
-import { forEachSample } from '$lib/utils/arrayUtils'
+import { forEachSample } from '$lib/utils/arrayUtils.js'
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore

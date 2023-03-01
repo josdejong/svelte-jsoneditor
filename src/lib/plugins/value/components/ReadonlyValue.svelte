@@ -1,11 +1,11 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { isUrl } from '$lib/utils/typeUtils'
-  import { createValueSelection } from '../../../logic/selection'
+  import { isUrl } from '$lib/utils/typeUtils.js'
+  import { createValueSelection } from '$lib/logic/selection.js'
   import SearchResultHighlighter from '../../../components/modes/treemode/highlight/SearchResultHighlighter.svelte'
-  import { getValueClass } from './utils/getValueClass'
-  import { addNewLineSuffix } from '$lib/utils/domUtils'
+  import { getValueClass } from './utils/getValueClass.js'
+  import { addNewLineSuffix } from '$lib/utils/domUtils.js'
   import type {
     ExtendedSearchResultItem,
     JSONParser,
@@ -13,7 +13,7 @@
     JSONValue,
     OnSelect,
     ValueNormalization
-  } from '../../../types'
+  } from '$lib/types.js'
 
   export let path: JSONPath
   export let value: JSONValue

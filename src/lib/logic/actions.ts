@@ -8,8 +8,8 @@ import {
   isKeySelection,
   isValueSelection,
   selectionToPartialJson
-} from '$lib/logic/selection'
-import copyToClipboard from '$lib/utils/copyToClipboard'
+} from '$lib/logic/selection.js'
+import copyToClipboard from '$lib/utils/copyToClipboard.js'
 import {
   append,
   createNewValue,
@@ -18,7 +18,7 @@ import {
   insert,
   insertBefore,
   removeAll
-} from '$lib/logic/operations'
+} from '$lib/logic/operations.js'
 import type {
   AfterPatchCallback,
   DocumentState,
@@ -29,7 +29,7 @@ import type {
   OnPatch,
   OnSelect
 } from '$lib/types'
-import { createDebug } from '$lib/utils/debug'
+import { createDebug } from '$lib/utils/debug.js'
 import {
   getIn,
   isJSONObject,
@@ -40,16 +40,16 @@ import {
   type JSONValue,
   parsePath
 } from 'immutable-json-patch'
-import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
+import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
 import {
   expandAll,
   expandPath,
   expandRecursive,
   expandWithCallback
-} from '$lib/logic/documentState'
+} from '$lib/logic/documentState.js'
 import { initial, isEmpty, last } from 'lodash-es'
-import { insertActiveElementContents } from '$lib/utils/domUtils'
-import { fromTableCellPosition, toTableCellPosition } from '$lib/logic/table'
+import { insertActiveElementContents } from '$lib/utils/domUtils.js'
+import { fromTableCellPosition, toTableCellPosition } from '$lib/logic/table.js'
 
 const debug = createDebug('jsoneditor:actions')
 

@@ -9,12 +9,12 @@
   import { DEBOUNCE_DELAY } from '../../constants.js'
   import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
-  import { stringifyJSONPath } from '../../utils/pathUtils.js'
+  import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
   import { transformModalState } from './transformModalState.js'
   import TransformWizard from './TransformWizard.svelte'
   import TransformModalHeader from './TransformModalHeader.svelte'
   import AbsolutePopup from './popup/AbsolutePopup.svelte'
-  import { createDebug } from '../../utils/debug'
+  import { createDebug } from '$lib/utils/debug.js'
   import TreeMode from '../modes/treemode/TreeMode.svelte'
   import type {
     Content,
@@ -25,8 +25,8 @@
     OnPatch,
     OnRenderValue,
     QueryLanguage
-  } from '../../types'
-  import { stripRootObject } from '$lib/utils/pathUtils'
+  } from '$lib/types.js'
+  import { stripRootObject } from '$lib/utils/pathUtils.js'
   import { onEscape } from '$lib/actions/onEscape.js'
 
   const debug = createDebug('jsoneditor:TransformModal')

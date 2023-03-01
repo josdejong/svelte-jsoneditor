@@ -1,9 +1,9 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler'
+  import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler.js'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
-  import { createDebug } from '$lib/utils/debug'
+  import { createDebug } from '$lib/utils/debug.js'
   import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, existsIn, getIn, immutableJSONPatch } from 'immutable-json-patch'
   import { jsonrepair } from 'jsonrepair'
@@ -17,7 +17,7 @@
     SCROLL_DURATION,
     SEARCH_UPDATE_THROTTLE,
     SIMPLE_MODAL_OPTIONS
-  } from '$lib/constants'
+  } from '$lib/constants.js'
   import {
     collapsePath,
     createDocumentState,
@@ -32,9 +32,9 @@
     getDefaultExpand,
     getEnforceString,
     setEnforceString
-  } from '$lib/logic/documentState'
-  import { createHistory } from '$lib/logic/history'
-  import { duplicate, extract, revertJSONPatchWithMoveOperations } from '$lib/logic/operations'
+  } from '$lib/logic/documentState.js'
+  import { createHistory } from '$lib/logic/history.js'
+  import { duplicate, extract, revertJSONPatchWithMoveOperations } from '$lib/logic/operations.js'
   import {
     createSearchAndReplaceAllOperations,
     createSearchAndReplaceOperations,
@@ -42,7 +42,7 @@
     searchNext,
     searchPrevious,
     updateSearchResult
-  } from '$lib/logic/search'
+  } from '$lib/logic/search.js'
   import {
     canConvert,
     createAfterSelection,
@@ -67,8 +67,8 @@
     removeEditModeFromSelection,
     selectAll,
     updateSelectionInDocumentState
-  } from '$lib/logic/selection'
-  import { mapValidationErrors, validateJSON } from '$lib/logic/validation'
+  } from '$lib/logic/selection.js'
+  import { mapValidationErrors, validateJSON } from '$lib/logic/validation.js'
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
@@ -84,8 +84,8 @@
     parsePartialJson,
     repairPartialJson
   } from '$lib/utils/jsonUtils.js'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings'
-  import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
+  import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
@@ -133,11 +133,18 @@
     Validator,
     ValueNormalization
   } from '$lib/types'
-  import { Mode, ValidationSeverity } from '$lib/types'
-  import { isAfterSelection, isInsideSelection, isKeySelection } from '../../../logic/selection'
+  import { Mode, ValidationSeverity } from '$lib/types.js'
+  import { isAfterSelection, isInsideSelection, isKeySelection } from '$lib/logic/selection.js'
   import memoizeOne from 'memoize-one'
-  import { measure } from '$lib/utils/timeUtils'
-  import { onCopy, onCut, onInsert, onInsertCharacter, onPaste, onRemove } from '$lib/logic/actions'
+  import { measure } from '$lib/utils/timeUtils.js'
+  import {
+    onCopy,
+    onCut,
+    onInsert,
+    onInsertCharacter,
+    onPaste,
+    onRemove
+  } from '$lib/logic/actions.js'
   import JSONPreview from '../../controls/JSONPreview.svelte'
 
   const debug = createDebug('jsoneditor:TreeMode')

@@ -2,13 +2,13 @@
 
 <script lang="ts">
   import type { JSONPath } from 'immutable-json-patch'
-  import type { SortedColumn } from '../../../types'
-  import { SortDirection } from '../../../types'
+  import type { SortedColumn } from '$lib/types.js'
+  import { SortDirection } from '$lib/types.js'
   import { stringifyJSONPath, stripRootObject } from '../../../utils/pathUtils.js'
   import Icon from 'svelte-awesome'
   import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons'
   import { isEmpty, isEqual } from 'lodash-es'
-  import { SORT_DIRECTION_NAMES } from '../../../constants'
+  import { SORT_DIRECTION_NAMES } from '$lib/constants.js'
   import { truncate } from '$lib/utils/stringUtils.js'
   import { MAX_HEADER_NAME_CHARACTERS } from '$lib/constants.js'
 

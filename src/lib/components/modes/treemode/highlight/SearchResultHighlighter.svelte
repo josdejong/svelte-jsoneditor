@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { splitValue } from '$lib/logic/search'
-  import { addNewLineSuffix } from '$lib/utils/domUtils'
+  import { splitValue } from '$lib/logic/search.js'
+  import { addNewLineSuffix } from '$lib/utils/domUtils.js'
   import type { ExtendedSearchResultItem } from '$lib/types'
 
   export let text: string
