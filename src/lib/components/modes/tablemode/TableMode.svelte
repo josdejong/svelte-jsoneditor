@@ -130,7 +130,7 @@
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
   import TableModeWelcome from './TableModeWelcome.svelte'
   import JSONPreview from '../../controls/JSONPreview.svelte'
-  import RefreshColumnHeader from '$lib/components/modes/tablemode/RefreshColumnHeader.svelte'
+  import RefreshColumnHeader from './RefreshColumnHeader.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext('simple-modal')

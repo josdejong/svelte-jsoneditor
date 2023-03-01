@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`JSONEditor > render table mode 1`] = `
 <body>
@@ -743,14 +743,14 @@ exports[`JSONEditor > render text mode 1`] = `
               <div
                 aria-hidden="true"
                 class="cm-gutters"
-                style="min-height: 126px; position: sticky;"
+                style="min-height: 168px; position: sticky;"
               >
                 <div
                   class="cm-gutter cm-gutter-lint"
                 >
                   <div
                     class="cm-gutterElement cm-activeLineGutter"
-                    style="height: 10.5px;"
+                    style="height: 14px;"
                   />
                 </div>
                 <div
@@ -764,73 +764,73 @@ exports[`JSONEditor > render text mode 1`] = `
                   </div>
                   <div
                     class="cm-gutterElement cm-activeLineGutter"
-                    style="height: 10.5px;"
+                    style="height: 14px;"
                   >
                     1
                   </div>
                   <div
                     class="cm-gutterElement"
-                    style="height: 10.5px;"
+                    style="height: 14px;"
                   >
                     2
                   </div>
                   <div
                     class="cm-gutterElement"
-                    style="height: 10.5px;"
+                    style="height: 14px;"
                   >
                     3
                   </div>
                   <div
                     class="cm-gutterElement"
-                    style="height: 10.5px;"
+                    style="height: 14px;"
                   >
                     4
                   </div>
                   <div
                     class="cm-gutterElement"
-                    style="height: 10.5px;"
+                    style="height: 14px;"
                   >
                     5
                   </div>
                   <div
                     class="cm-gutterElement"
-                    style="height: 10.5px;"
+                    style="height: 14px;"
                   >
                     6
                   </div>
                   <div
                     class="cm-gutterElement"
-                    style="height: 10.5px;"
+                    style="height: 14px;"
                   >
                     7
                   </div>
                   <div
                     class="cm-gutterElement"
-                    style="height: 10.5px;"
+                    style="height: 14px;"
                   >
                     8
                   </div>
                   <div
                     class="cm-gutterElement"
-                    style="height: 10.5px;"
+                    style="height: 14px;"
                   >
                     9
                   </div>
                   <div
                     class="cm-gutterElement"
-                    style="height: 10.5px;"
+                    style="height: 14px;"
                   >
                     10
                   </div>
                   <div
                     class="cm-gutterElement"
-                    style="height: 10.5px;"
+                    style="height: 14px;"
                   >
                     11
                   </div>
                   <div
                     class="cm-gutterElement"
-                    style="height: 10.5px;"
+                    style="height: 14px;"
                   >
                     12
                   </div>
@@ -850,7 +850,7 @@ exports[`JSONEditor > render text mode 1`] = `
                   </div>
                   <div
                     class="cm-gutterElement cm-activeLineGutter"
-                    style="height: 10.5px;"
+                    style="height: 14px;"
                   >
                     <span
                       title="Fold line"
@@ -860,7 +860,7 @@ exports[`JSONEditor > render text mode 1`] = `
                   </div>
                   <div
                     class="cm-gutterElement"
-                    style="height: 10.5px;"
+                    style="height: 14px;"
                   >
                     <span
                       title="Fold line"
@@ -870,7 +870,7 @@ exports[`JSONEditor > render text mode 1`] = `
                   </div>
                   <div
                     class="cm-gutterElement"
-                    style="height: 10.5px; margin-top: 21px;"
+                    style="height: 14px; margin-top: 28px;"
                   >
                     <span
                       title="Fold line"
@@ -880,7 +880,7 @@ exports[`JSONEditor > render text mode 1`] = `
                   </div>
                   <div
                     class="cm-gutterElement"
-                    style="height: 10.5px; margin-top: 31.5px;"
+                    style="height: 14px; margin-top: 42px;"
                   >
                     <span
                       title="Fold line"

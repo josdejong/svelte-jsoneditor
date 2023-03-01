@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
   import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'

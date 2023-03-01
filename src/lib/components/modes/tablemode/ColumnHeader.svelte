@@ -1,3 +1,5 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
   import type { JSONPath } from 'immutable-json-patch'
   import type { SortedColumn } from '../../../types'
