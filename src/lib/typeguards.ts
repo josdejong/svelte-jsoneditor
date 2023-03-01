@@ -10,7 +10,7 @@ import type {
   MenuSpace,
   MenuSpaceItem
 } from './types.js'
-import { isObject } from '$lib/utils/typeUtils'
+import { isObject } from '$lib/utils/typeUtils.js'
 
 export function isMenuSpaceItem(item: unknown): item is MenuSpaceItem {
   return isMenuSpace(item)
