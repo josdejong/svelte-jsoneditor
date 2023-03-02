@@ -6,17 +6,17 @@
     createKeySelection,
     createValueSelection,
     isEditingSelection
-  } from '$lib/logic/selection'
+  } from '$lib/logic/selection.js'
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
-  import { addNewLineSuffix } from '$lib/utils/domUtils'
-  import { UPDATE_SELECTION } from '$lib/constants'
-  import type { ExtendedSearchResultItem, TreeModeContext } from '$lib/types'
-  import { type JSONSelection } from '$lib/types'
+  import { addNewLineSuffix } from '$lib/utils/domUtils.js'
+  import { UPDATE_SELECTION } from '$lib/constants.js'
+  import type { ExtendedSearchResultItem, TreeModeContext } from '$lib/types.js'
+  import { type JSONSelection } from '$lib/types.js'
   import type { JSONPath, JSONPointer } from 'immutable-json-patch'
   import { isKeySelection } from '$lib/logic/selection.js'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
-  import { classnames } from '$lib/utils/cssUtils'
+  import { classnames } from '$lib/utils/cssUtils.js'
 
   export let path: JSONPath
   export let pointer: JSONPointer

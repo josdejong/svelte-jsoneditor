@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from 'fs'
-import { getAbsolutePath } from './getAbsolutePath.mjs'
+import { getAbsolutePath } from './utils/getAbsolutePath.mjs'
 
 const declareModuleSection = `declare module '*.svelte' {
     export { SvelteComponentDev as default } from 'svelte/internal';

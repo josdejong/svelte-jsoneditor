@@ -3,8 +3,7 @@
 <script lang="ts">
   import Icon from 'svelte-awesome'
   import type { MenuItem } from '$lib/types'
-  import { isMenuSeparator, isMenuSpace } from '$lib/typeguards'
-  import { isMenuButton } from '$lib/typeguards.js'
+  import { isMenuButton, isMenuSeparator, isMenuSpace } from '$lib/typeguards.js'
 
   export let items: MenuItem[] = []
 

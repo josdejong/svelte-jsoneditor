@@ -4,6 +4,7 @@ import {
   arrayStartsWith,
   arrayToObject,
   compareArrays,
+  forEachSample,
   getNestedPaths,
   moveItems,
   objectToArray
@@ -129,6 +130,32 @@ describe('arrayUtils', () => {
       assert.deepStrictEqual(moveItems([1, 2, 3, 4, 5], 1, 1, 1), [1, 3, 2, 4, 5])
       assert.deepStrictEqual(moveItems([1, 2, 3, 4, 5], 1, 2, 1), [1, 4, 2, 3, 5])
       assert.deepStrictEqual(moveItems([1, 2, 3, 4, 5], 1, 2, 2), [1, 4, 5, 2, 3])
+    })
+  })
+
+  describe('forEachSample', () => {
+    function sample<T>(array: T[], maxSampleCount: number): T[] {
+      const sampled: T[] = []
+
+      forEachSample(array, maxSampleCount, (item) => sampled.push(item))
+
+      return sampled
+    }
+
+    test('should sample an array', () => {
+      expect(sample([0, 1, 2, 3], Infinity)).toEqual([0, 1, 2, 3])
+      expect(sample([0, 1, 2, 3], 100)).toEqual([0, 1, 2, 3])
+      expect(sample([0, 1, 2, 3], 2)).toEqual([0, 3])
+      expect(sample([0, 1, 2, 3], 1)).toEqual([0])
+      expect(sample([0, 1, 2, 3], 0)).toEqual([])
+
+      expect(sample([0, 1, 2, 3, 4], 2)).toEqual([0, 4])
+      expect(sample([0, 1, 2, 3, 4], 3)).toEqual([0, 2, 4])
+      expect(sample([0, 1, 2, 3, 4], 4)).toEqual([0, 1, 2, 4])
+
+      expect(sample([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 4)).toEqual([0, 3, 6, 9])
+
+      expect(sample([], 4)).toEqual([])
     })
   })
 })

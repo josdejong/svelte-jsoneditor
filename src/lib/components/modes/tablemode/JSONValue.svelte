@@ -8,8 +8,8 @@
     SearchResultItem
   } from '$lib/types'
   import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
-  import { isEditingSelection, isValueSelection } from '$lib/logic/selection'
-  import { createNestedValueOperations } from '$lib/logic/operations'
+  import { isEditingSelection, isValueSelection } from '$lib/logic/selection.js'
+  import { createNestedValueOperations } from '$lib/logic/operations.js'
 
   export let path: JSONPath
   export let value: JSONValue

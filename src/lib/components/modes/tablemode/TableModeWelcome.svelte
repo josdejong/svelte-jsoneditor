@@ -1,10 +1,12 @@
+<svelte:options immutable={true} />
+
 <script lang="ts">
   import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
-  import type { JSONParser, OnChangeMode } from '$lib/types'
-  import { Mode } from '$lib/types'
-  import { valueType } from '$lib/utils/typeUtils'
-  import { findNestedArrays } from '$lib/logic/table'
+  import type { JSONParser, OnChangeMode } from '$lib/types.js'
+  import { Mode } from '$lib/types.js'
+  import { valueType } from '$lib/utils/typeUtils.js'
+  import { findNestedArrays } from '$lib/logic/table.js'
   import { isEmpty } from 'lodash-es'
   import { stringifyJSONPath, stripRootObject } from '$lib/utils/pathUtils.js'
 

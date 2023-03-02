@@ -3,9 +3,9 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import Icon from 'svelte-awesome'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
   import { faLightbulb } from '@fortawesome/free-regular-svg-icons'
-  import { findNearestElement } from '$lib/utils/domUtils'
+  import { findNearestElement } from '$lib/utils/domUtils.js'
   import type { ContextMenuItem, MenuItem } from '$lib/types.js'
   import {
     isContextMenuColumn,

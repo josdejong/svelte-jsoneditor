@@ -24,12 +24,12 @@
     TransformModalOptions,
     Validator
   } from '$lib/types'
-  import { Mode } from '$lib/types'
+  import { Mode } from '$lib/types.js'
   import TextMode from './textmode/TextMode.svelte'
   import TableMode from './tablemode/TableMode.svelte'
   import TreeMode from './treemode/TreeMode.svelte'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-  import { isMenuSpaceItem } from '$lib/typeguards'
+  import { isMenuSpaceItem } from '$lib/typeguards.js'
 
   export let content: Content
 
@@ -152,7 +152,7 @@
    * Validate the contents of the editor using the configured validator.
    * Returns a parse error or a list with validation warnings
    */
-  export function validate(): ContentErrors {
+  export function validate(): ContentErrors | null {
     if (refTextMode) {
       return refTextMode.validate()
     } else if (refTreeMode) {

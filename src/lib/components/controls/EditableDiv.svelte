@@ -2,9 +2,9 @@
 
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
-  import { addNewLineSuffix, removeNewLineSuffix, setCursorToEnd } from '$lib/utils/domUtils'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings'
-  import { createDebug } from '$lib/utils/debug'
+  import { addNewLineSuffix, removeNewLineSuffix, setCursorToEnd } from '$lib/utils/domUtils.js'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
+  import { createDebug } from '$lib/utils/debug.js'
   import { noop } from 'lodash-es'
   import { UPDATE_SELECTION } from '$lib/constants.js'
   import type { OnFind, OnPaste } from '$lib/types'

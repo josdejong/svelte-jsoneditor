@@ -2,8 +2,8 @@
 
 import path from 'path'
 import { readFileSync, writeFileSync } from 'fs'
-import { getAbsolutePath } from './getAbsolutePath.mjs'
-import { getFilesRecursively } from './getFilesRecursively.js'
+import { getAbsolutePath } from './utils/getAbsolutePath.mjs'
+import { getFilesRecursively } from './utils/getFilesRecursively.js'
 
 const vanillaPackageFolder = getAbsolutePath(import.meta.url, '..', 'package-vanilla')
 

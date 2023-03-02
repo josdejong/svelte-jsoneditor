@@ -1,4 +1,4 @@
-import { initial } from 'lodash-es'
+import { initial, isEmpty } from 'lodash-es'
 import type {
   ContentErrors,
   JSONParser,
@@ -82,7 +82,7 @@ export function validateText(
   validator: Validator | null,
   parser: JSONParser,
   validationParser: JSONParser
-): ContentErrors {
+): ContentErrors | null {
   debug('validateText')
 
   if (text.length > MAX_VALIDATABLE_SIZE) {
@@ -99,9 +99,7 @@ export function validateText(
 
   if (text.length === 0) {
     // new, empty document, do not try to parse
-    return {
-      validationErrors: []
-    }
+    return null
   }
 
   try {
@@ -113,9 +111,7 @@ export function validateText(
     )
 
     if (!validator) {
-      return {
-        validationErrors: []
-      }
+      return null
     }
 
     // if needed, parse with the validationParser to be able to feed the json to the validator
@@ -133,7 +129,7 @@ export function validateText(
       (duration) => debug(`validate: validated json in ${duration} ms`)
     )
 
-    return { validationErrors }
+    return !isEmpty(validationErrors) ? { validationErrors } : null
   } catch (err) {
     const isRepairable = measure(
       () => canAutoRepair(text, parser),

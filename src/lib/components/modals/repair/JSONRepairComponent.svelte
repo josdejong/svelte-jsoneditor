@@ -8,11 +8,11 @@
     faTimes,
     faWrench
   } from '@fortawesome/free-solid-svg-icons'
-  import { createDebug } from '../../../utils/debug'
+  import { createDebug } from '$lib/utils/debug.js'
   import Message from '../../controls/Message.svelte'
-  import { normalizeJsonParseError } from '../../../utils/jsonUtils.js'
+  import { normalizeJsonParseError } from '$lib/utils/jsonUtils.js'
   import Menu from '../../controls/Menu.svelte'
-  import type { MenuItem } from '$lib'
+  import type { MenuItem } from '$lib/types.js'
 
   export let text = ''
   export let readOnly = false
