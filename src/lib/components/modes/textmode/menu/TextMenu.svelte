@@ -8,7 +8,7 @@
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
-  import { faJSONEditorCompact, faJSONEditorFormat } from '$lib/img/customFontawesomeIcons'
+  import { faJSONEditorCompact, faJSONEditorFormat } from '$lib/img/customFontawesomeIcons.js'
   import Menu from '../../../controls/Menu.svelte'
   import type { MenuItem, OnRenderMenuWithoutContext } from '$lib/types'
 

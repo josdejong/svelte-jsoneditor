@@ -3,11 +3,11 @@
 <script lang="ts">
   import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
-  import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils'
-  import { createValueSelection } from '../../../logic/selection'
-  import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass'
+  import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils.js'
+  import { createValueSelection } from '$lib/logic/selection.js'
+  import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass.js'
   import EditableDiv from '../../../components/controls/EditableDiv.svelte'
-  import { UPDATE_SELECTION } from '../../../constants.js'
+  import { UPDATE_SELECTION } from '$lib/constants.js'
   import type {
     FindNextInside,
     JSONParser,
@@ -16,7 +16,7 @@
     OnPatch,
     OnSelect,
     ValueNormalization
-  } from '../../../types'
+  } from '$lib/types.js'
   import { isEqual } from 'lodash-es'
 
   export let path: JSONPath

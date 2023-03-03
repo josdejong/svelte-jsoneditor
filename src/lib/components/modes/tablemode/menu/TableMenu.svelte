@@ -12,7 +12,7 @@
   } from '@fortawesome/free-solid-svg-icons'
   import type { JSONValue } from 'immutable-json-patch'
   import type { HistoryState } from '$lib/logic/history'
-  import { CONTEXT_MENU_EXPLANATION } from '$lib/constants'
+  import { CONTEXT_MENU_EXPLANATION } from '$lib/constants.js'
 
   export let json: JSONValue | undefined
   export let readOnly: boolean

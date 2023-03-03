@@ -9,7 +9,7 @@ import {
   sortObjectKeys,
   sortOperationsMove,
   sortOperationsMoveAdvanced
-} from './sort'
+} from './sort.js'
 
 describe('sort', () => {
   describe('sortJson', () => {
@@ -174,7 +174,7 @@ describe('sort', () => {
   })
 
   test('should generate the move operations needed to sort given array', () => {
-    const comparator = (a, b) => a - b
+    const comparator = (a: number, b: number) => a - b
 
     assert.deepStrictEqual(sortOperationsMove([1, 2, 3], comparator), [])
 
@@ -208,7 +208,7 @@ describe('sort', () => {
   })
 
   test('should generate the move operations to sort given array (2)', () => {
-    const comparator = (a, b) => a - b
+    const comparator = (a: number, b: number) => a - b
 
     assert.deepStrictEqual(sortOperationsMoveAdvanced([1, 2, 3, 6, 4, 5], comparator), [
       { op: 'move', from: '/3', path: '/5' }
@@ -240,7 +240,7 @@ describe('sort', () => {
   })
 
   test('should fast apply move operations', () => {
-    const comparator = (a, b) => a - b
+    const comparator = (a: number, b: number) => a - b
 
     const array = [0, 1, 3, 5, 4, 2]
     const operations = sortOperationsMoveAdvanced(array, comparator)
@@ -248,7 +248,7 @@ describe('sort', () => {
   })
 
   test('should give the move operations needed to sort given array containing objects', () => {
-    const comparator = (a, b) => a.id - b.id
+    const comparator = (a: { id: number }, b: { id: number }) => a.id - b.id
 
     const actual = sortOperationsMove([{ id: 4 }, { id: 3 }, { id: 1 }, { id: 2 }], comparator)
 
@@ -262,7 +262,7 @@ describe('sort', () => {
   })
 
   test('should give the move operations needed to sort given array containing objects (advanced)', () => {
-    const comparator = (a, b) => a.id - b.id
+    const comparator = (a: { id: number }, b: { id: number }) => a.id - b.id
 
     const actual = sortOperationsMoveAdvanced(
       [{ id: 4 }, { id: 3 }, { id: 1 }, { id: 2 }],

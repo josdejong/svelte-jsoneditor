@@ -1,5 +1,11 @@
 import diffSequence from '../generated/diffSequence.js'
-import type { JSONArray, JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
+import type {
+  JSONArray,
+  JSONPatchDocument,
+  JSONPatchOperation,
+  JSONPath,
+  JSONValue
+} from 'immutable-json-patch'
 import {
   compileJSONPointer,
   getIn,
@@ -149,8 +155,11 @@ function createObjectComparator(propertyPath: JSONPath, direction: 1 | -1) {
  * Create a list with JSON Patch move operations
  * needed to sort the array contents.
  */
-export function sortOperationsMove<T>(array: T[], comparator: (a: T, b: T) => number) {
-  const operations = []
+export function sortOperationsMove<T>(
+  array: T[],
+  comparator: (a: T, b: T) => number
+): JSONPatchOperation[] {
+  const operations: JSONPatchOperation[] = []
   const sorted = []
 
   // TODO: rewrite the function to pass a callback instead of returning an array?
@@ -182,7 +191,10 @@ export function sortOperationsMove<T>(array: T[], comparator: (a: T, b: T) => nu
  * Create an array containing all move operations
  * needed to sort the array contents.
  */
-export function sortOperationsMoveAdvanced<T>(array: T[], comparator: (a: T, b: T) => number) {
+export function sortOperationsMoveAdvanced<T>(
+  array: T[],
+  comparator: (a: T, b: T) => number
+): JSONPatchOperation[] {
   const moves: { from: number; to: number }[] = []
 
   const sortedIndices = array

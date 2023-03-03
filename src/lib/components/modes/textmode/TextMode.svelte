@@ -7,7 +7,7 @@
     faTimes,
     faWrench
   } from '@fortawesome/free-solid-svg-icons'
-  import { createDebug } from '$lib/utils/debug'
+  import { createDebug } from '$lib/utils/debug.js'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import { jsonrepair } from 'jsonrepair'
@@ -19,13 +19,13 @@
     JSON_STATUS_VALID,
     MAX_DOCUMENT_SIZE_TEXT_MODE,
     TEXT_MODE_ONCHANGE_DELAY
-  } from '$lib/constants'
+  } from '$lib/constants.js'
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
     getWindow
-  } from '$lib/utils/domUtils'
-  import { formatSize } from '$lib/utils/fileUtils'
+  } from '$lib/utils/domUtils.js'
+  import { formatSize } from '$lib/utils/fileUtils.js'
   import { findTextLocation, getText } from '$lib/utils/jsonUtils.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
@@ -44,7 +44,7 @@
   // @ts-ignore
   import jsonSourceMap from 'json-source-map'
   import StatusBar from './StatusBar.svelte'
-  import { highlighter } from './codemirror/codemirror-theme'
+  import { highlighter } from './codemirror/codemirror-theme.js'
   import type {
     Content,
     ContentErrors,
@@ -63,11 +63,11 @@
     TransformModalOptions,
     ValidationError,
     Validator
-  } from '../../../types'
-  import { Mode, ValidationSeverity } from '../../../types'
-  import { isContentParseError, isContentValidationErrors } from '../../../typeguards'
+  } from '$lib/types.js'
+  import { Mode, ValidationSeverity } from '$lib/types.js'
+  import { isContentParseError, isContentValidationErrors } from '$lib/typeguards.js'
   import memoizeOne from 'memoize-one'
-  import { validateText } from '../../../logic/validation'
+  import { validateText } from '$lib/logic/validation.js'
   import { MAX_CHARACTERS_TEXT_PREVIEW } from '$lib/constants.js'
   import { truncate } from '$lib/utils/stringUtils.js'
   import { needsFormatting } from '$lib/utils/jsonUtils.js'
@@ -780,7 +780,7 @@
     return []
   }
 
-  export function validate(): ContentErrors {
+  export function validate(): ContentErrors | null {
     debug('validate:start')
 
     onChangeCodeMirrorValueDebounced.flush()
@@ -799,7 +799,7 @@
     } else {
       jsonStatus = JSON_STATUS_VALID
       jsonParseError = null
-      validationErrors = contentErrors.validationErrors
+      validationErrors = contentErrors?.validationErrors || []
     }
 
     debug('validate:end')

@@ -1,8 +1,8 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { limit } from '../../../utils/arrayUtils'
-  import { truncate } from '../../../utils/stringUtils'
+  import { limit } from '$lib/utils/arrayUtils.js'
+  import { truncate } from '$lib/utils/stringUtils.js'
 
   export let items: (string | number)[]
   export let selectedItem: string | number

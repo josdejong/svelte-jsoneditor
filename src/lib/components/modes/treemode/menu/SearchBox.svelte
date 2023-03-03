@@ -12,8 +12,8 @@
     faSearch,
     faTimes
   } from '@fortawesome/free-solid-svg-icons'
-  import { DEBOUNCE_DELAY, MAX_SEARCH_RESULTS } from '$lib/constants'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings'
+  import { DEBOUNCE_DELAY, MAX_SEARCH_RESULTS } from '$lib/constants.js'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
 
   export let show = false
   export let searching: boolean

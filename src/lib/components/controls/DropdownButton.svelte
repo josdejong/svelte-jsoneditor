@@ -4,8 +4,8 @@
   import Icon from 'svelte-awesome'
   import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
   import { onDestroy, onMount } from 'svelte'
-  import { keyComboFromEvent } from '../../utils/keyBindings'
-  import type { MenuButton } from '../../types'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
+  import type { MenuButton } from '$lib/types.js'
 
   export let items: MenuButton[] = []
   export let title: string | undefined = undefined

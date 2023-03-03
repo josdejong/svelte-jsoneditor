@@ -19,11 +19,11 @@
     isMultiSelection,
     isValueSelection,
     singleItemSelected
-  } from '$lib/logic/selection'
-  import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
+  } from '$lib/logic/selection.js'
+  import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
   import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
   import type { ContextMenuItem, DocumentState, JSONParser } from '$lib/types'
-  import { getEnforceString } from '$lib/logic/documentState'
+  import { getEnforceString } from '$lib/logic/documentState.js'
   import ContextMenu from '../../../../components/controls/contextmenu/ContextMenu.svelte'
 
   export let json: JSONValue | undefined

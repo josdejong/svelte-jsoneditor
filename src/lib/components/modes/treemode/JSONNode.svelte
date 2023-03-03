@@ -18,9 +18,9 @@
     HOVER_INSERT_AFTER,
     HOVER_INSERT_INSIDE,
     INSERT_EXPLANATION
-  } from '$lib/constants'
-  import { getEnforceString, getVisibleCaretPositions } from '$lib/logic/documentState'
-  import { rename } from '$lib/logic/operations'
+  } from '$lib/constants.js'
+  import { getEnforceString, getVisibleCaretPositions } from '$lib/logic/documentState.js'
+  import { rename } from '$lib/logic/operations.js'
   import {
     createAfterSelection,
     createInsideSelection,
@@ -37,7 +37,7 @@
     isPathInsideSelection,
     isValueSelection,
     selectionIfOverlapping
-  } from '$lib/logic/selection'
+  } from '$lib/logic/selection.js'
   import {
     encodeDataPath,
     getDataPathFromTarget,
@@ -45,15 +45,15 @@
     isChildOfAttribute,
     isChildOfNodeName,
     isContentEditableDiv
-  } from '$lib/utils/domUtils'
+  } from '$lib/utils/domUtils.js'
   import CollapsedItems from './CollapsedItems.svelte'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
   import JSONKey from './JSONKey.svelte'
   import JSONValue from './JSONValue.svelte'
   import { singleton } from './singleton.js'
-  import { createDebug } from '$lib/utils/debug'
-  import { onMoveSelection } from '$lib/logic/dragging'
-  import { forEachIndex, moveItems } from '$lib/utils/arrayUtils'
+  import { createDebug } from '$lib/utils/debug.js'
+  import { onMoveSelection } from '$lib/logic/dragging.js'
+  import { forEachIndex, moveItems } from '$lib/utils/arrayUtils.js'
   import type {
     CaretPosition,
     DraggingState,
@@ -68,10 +68,10 @@
     ValidationError,
     VisibleSection
   } from '$lib/types'
-  import { SelectionType } from '$lib/types'
+  import { SelectionType } from '$lib/types.js'
   import { filterPointerOrUndefined } from '$lib/utils/jsonPointer.js'
   import { filterKeySearchResults, filterValueSearchResults } from '$lib/logic/search.js'
-  import { createMemoizePath } from '$lib/utils/pathUtils'
+  import { createMemoizePath } from '$lib/utils/pathUtils.js'
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
   import { isObject } from '$lib/utils/typeUtils.js'
   import { classnames } from '$lib/utils/cssUtils.js'

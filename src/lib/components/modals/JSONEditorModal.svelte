@@ -5,7 +5,7 @@
   import Header from './Header.svelte'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, immutableJSONPatch, isJSONArray } from 'immutable-json-patch'
-  import { createDebug } from '$lib/utils/debug'
+  import { createDebug } from '$lib/utils/debug.js'
   import type {
     Content,
     JSONEditorModalCallback,
@@ -19,10 +19,10 @@
     OnTransformModal,
     Validator
   } from '$lib/types'
-  import { Mode } from '$lib/types'
+  import { Mode } from '$lib/types.js'
   import JSONEditorRoot from '../modes/JSONEditorRoot.svelte'
   import { noop } from '$lib/utils/noop.js'
-  import { stringifyJSONPath, stripRootObject } from '$lib/utils/pathUtils'
+  import { stringifyJSONPath, stripRootObject } from '$lib/utils/pathUtils.js'
   import { initial, isEmpty, last } from 'lodash-es'
   import { isJSONContent, toJSONContent } from '$lib/utils/jsonUtils.js'
   import Icon from 'svelte-awesome'

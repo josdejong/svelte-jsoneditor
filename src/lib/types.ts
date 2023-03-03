@@ -285,7 +285,7 @@ export interface QueryLanguageOptions {
 
 export type OnChangeQueryLanguage = (queryLanguageId: string) => void
 export interface OnChangeStatus {
-  contentErrors: ContentErrors
+  contentErrors: ContentErrors | null
   patchResult: JSONPatchResult | null
 }
 export type OnChange =

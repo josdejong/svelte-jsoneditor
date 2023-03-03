@@ -63,6 +63,12 @@ describe('table', () => {
     expect(getColumns(data, true, 2)).toEqual([['id'], ['name']])
   })
 
+  test('should extract table columns from conflicting data structures', () => {
+    const data: JSONArray = [{ item: 1 }, { item: { id: 1, name: 'Sarah' } }]
+
+    expect(getColumns(data, true)).toEqual([['item'], ['item', 'id'], ['item', 'name']])
+  })
+
   test('should maintain the column order', () => {
     const previous = [['id'], ['name']]
 

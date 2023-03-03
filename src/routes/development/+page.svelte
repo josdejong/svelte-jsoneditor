@@ -10,12 +10,12 @@
     ReadonlyValue,
     renderValue
   } from 'svelte-jsoneditor'
-  import { useLocalStorage } from '../../lib/utils/localStorageUtils.js'
+  import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
   import { tick } from 'svelte'
   import { parse, stringify } from 'lossless-json'
   import { truncate } from '$lib/utils/stringUtils.js'
-  import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils'
+  import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils.js'
   import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 
   // const LosslessJSON: JSONParser = { ... } // FIXME: make the types work
@@ -501,7 +501,10 @@
                 value: random
               },
               array: [index, 1, 7, 3],
-              long: 9223372000000000000n + BigInt(random)
+              long:
+                selectedParser.id === 'LosslessJSON'
+                  ? 9223372000000000000n + BigInt(random)
+                  : Number(9223372000000000000n + BigInt(random))
             }
 
             // introduce some validation issues

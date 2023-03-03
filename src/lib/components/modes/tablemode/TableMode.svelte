@@ -30,7 +30,7 @@
     Validator,
     ValueNormalization
   } from '$lib/types'
-  import { Mode, SelectionType, SortDirection, ValidationSeverity } from '$lib/types'
+  import { Mode, SelectionType, SortDirection, ValidationSeverity } from '$lib/types.js'
   import TableMenu from './menu/TableMenu.svelte'
   import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
   import {
@@ -68,8 +68,8 @@
     findParentWithNodeName,
     getDataPathFromTarget,
     getWindow
-  } from '$lib/utils/domUtils'
-  import { createDebug } from '$lib/utils/debug'
+  } from '$lib/utils/domUtils.js'
+  import { createDebug } from '$lib/utils/debug.js'
   import {
     createDocumentState,
     documentStatePatch,
@@ -77,31 +77,31 @@
     expandWithCallback,
     getEnforceString,
     setEnforceString
-  } from '$lib/logic/documentState'
+  } from '$lib/logic/documentState.js'
   import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils.js'
   import InlineValue from './tag/InlineValue.svelte'
-  import { revertJSONPatchWithMoveOperations } from '$lib/logic/operations'
+  import { revertJSONPatchWithMoveOperations } from '$lib/logic/operations.js'
   import {
     createValueSelection,
     getInitialSelection,
     isEditingSelection,
     isPathInsideSelection,
     removeEditModeFromSelection
-  } from '$lib/logic/selection'
-  import { createHistory } from '$lib/logic/history'
+  } from '$lib/logic/selection.js'
+  import { createHistory } from '$lib/logic/history.js'
   import ColumnHeader from './ColumnHeader.svelte'
-  import { sortJson } from '$lib/logic/sort'
+  import { sortJson } from '$lib/logic/sort.js'
   import { encodeDataPath } from '$lib/utils/domUtils.js'
   import { isValueSelection } from '$lib/logic/selection.js'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings'
-  import { createFocusTracker } from '$lib/components/controls/createFocusTracker'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
+  import { createFocusTracker } from '$lib/components/controls/createFocusTracker.js'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
   import { jsonrepair } from 'jsonrepair'
   import Message from '../../controls/Message.svelte'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
-  import { measure } from '$lib/utils/timeUtils'
+  import { measure } from '$lib/utils/timeUtils.js'
   import memoizeOne from 'memoize-one'
-  import { validateJSON } from '$lib/logic/validation'
+  import { validateJSON } from '$lib/logic/validation.js'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import {
     CONTEXT_MENU_HEIGHT,
@@ -122,7 +122,7 @@
     onPaste,
     onRemove,
     onRemoveRow
-  } from '$lib/logic/actions'
+  } from '$lib/logic/actions.js'
   import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
   import { resizeObserver } from '$lib/actions/resizeObserver.js'
   import TableContextMenu from '../../../components/modes/tablemode/contextmenu/TableContextMenu.svelte'
@@ -130,6 +130,7 @@
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
   import TableModeWelcome from './TableModeWelcome.svelte'
   import JSONPreview from '../../controls/JSONPreview.svelte'
+  import RefreshColumnHeader from './RefreshColumnHeader.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext('simple-modal')
@@ -199,12 +200,14 @@
 
   $: applyExternalContent(externalContent)
 
+  let maxSampleCount = 10_000
   let columns: JSONPath[] = []
   $: columns = isJSONArray(json)
-    ? maintainColumnOrder(getColumns(json, flattenColumns), columns)
+    ? maintainColumnOrder(getColumns(json, flattenColumns, maxSampleCount), columns)
     : []
 
   $: containsValidArray = json && !isEmpty(columns)
+  $: showRefreshButton = Array.isArray(json) && json.length > maxSampleCount
 
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
@@ -527,7 +530,7 @@
     )
   }
 
-  export function validate(): ContentErrors {
+  export function validate(): ContentErrors | null {
     debug('validate')
 
     if (parseError) {
@@ -540,9 +543,7 @@
     // make sure the validation results are up-to-date
     // normally, they are only updated on the next tick after the json is changed
     updateValidationErrors(json, validator, parser, validationParser)
-    return {
-      validationErrors
-    }
+    return !isEmpty(validationErrors) ? { validationErrors } : null
   }
 
   export function patch(
@@ -1709,6 +1710,15 @@
                   />
                 </th>
               {/each}
+              {#if showRefreshButton}
+                <th class="jse-table-cell jse-table-cell-header">
+                  <RefreshColumnHeader
+                    count={json.length}
+                    {maxSampleCount}
+                    onRefresh={() => (maxSampleCount = Infinity)}
+                  />
+                </th>
+              {/if}
             </tr>
             <tr class="jse-table-invisible-start-section">
               <td style:height={visibleSection.startHeight + 'px'} colspan={columns.length} />
@@ -1777,6 +1787,9 @@
                     {/if}
                   </td>
                 {/each}
+                {#if showRefreshButton}
+                  <td class="jse-table-cell" />
+                {/if}
               </tr>
             {/each}
 

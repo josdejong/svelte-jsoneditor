@@ -166,3 +166,22 @@ export function moveItems<T>(array: T[], index: number, count: number, offset: n
   copy.splice.apply(copy, [index + offset, 0, ...moving])
   return copy
 }
+
+/**
+ * Take samples out of a large array, equally spread from start till end
+ */
+export function forEachSample<T>(
+  array: T[],
+  maxSampleCount: number,
+  callback: (item: T, index: number, array: T[]) => void
+) {
+  if (array.length < maxSampleCount) {
+    array.forEach(callback)
+  } else {
+    const step = maxSampleCount > 1 ? (array.length - 1) / (maxSampleCount - 1) : array.length
+    for (let i = 0; i < maxSampleCount; i++) {
+      const index = Math.floor(i * step)
+      callback(array[index], index, array)
+    }
+  }
+}

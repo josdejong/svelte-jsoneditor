@@ -1,7 +1,7 @@
 <script>
   import { JSONEditor } from 'svelte-jsoneditor'
   import { faCopy } from '@fortawesome/free-regular-svg-icons'
-  import copyToClipboard from '$lib/utils/copyToClipboard'
+  import copyToClipboard from '$lib/utils/copyToClipboard.js'
 
   let content = {
     text: undefined, // can be used to pass a stringified JSON document instead

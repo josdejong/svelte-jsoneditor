@@ -1,4 +1,4 @@
-import { createDebug } from '$lib/utils/debug'
+import { createDebug } from '$lib/utils/debug.js'
 
 const debug = createDebug('jsoneditor:FocusTracker')
 

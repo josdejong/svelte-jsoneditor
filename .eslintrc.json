@@ -2,7 +2,7 @@
   "root": true,
   "parser": "@typescript-eslint/parser",
   "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
-  "plugins": ["svelte3", "@typescript-eslint"],
+  "plugins": ["svelte3", "@typescript-eslint", "import"],
   "ignorePatterns": [],
   "overrides": [
     {
@@ -10,6 +10,9 @@
       "processor": "svelte3/svelte3"
     }
   ],
+  "rules": {
+    "import/extensions": ["error", "ignorePackages"]
+  },
   "settings": {
     "svelte3/typescript": true
   },

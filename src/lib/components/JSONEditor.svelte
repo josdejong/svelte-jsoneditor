@@ -1,7 +1,7 @@
 <svelte:options accessors={false} immutable={true} />
 
 <script lang="ts">
-  import { createDebug } from '../utils/debug'
+  import { createDebug } from '../utils/debug.js'
   import Modal, { bind } from 'svelte-simple-modal'
   import {
     JSONEDITOR_MODAL_OPTIONS,
@@ -17,7 +17,7 @@
   } from '../utils/jsonUtils.js'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import { javascriptQueryLanguage } from '$lib/plugins/query/javascriptQueryLanguage.js'
-  import { renderValue } from '$lib/plugins/value/renderValue'
+  import { renderValue } from '$lib/plugins/value/renderValue.js'
   import { tick } from 'svelte'
   import TransformModal from './modals/TransformModal.svelte'
   import SortModal from './modals/SortModal.svelte'
@@ -46,10 +46,10 @@
     TransformModalOptions,
     Validator
   } from '$lib/types'
-  import { Mode } from '$lib/types'
+  import { Mode } from '$lib/types.js'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-  import { noop } from '../utils/noop'
-  import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils'
+  import { noop } from '../utils/noop.js'
+  import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils.js'
   import JSONEditorRoot from './modes/JSONEditorRoot.svelte'
   import JSONEditorModal from './modals/JSONEditorModal.svelte'
   import memoizeOne from 'memoize-one'
@@ -197,7 +197,7 @@
    * Validate the contents of the editor using the configured validator.
    * Returns a parse error or a list with validation warnings
    */
-  export function validate(): ContentErrors {
+  export function validate(): ContentErrors | null {
     return refJSONEditorRoot.validate()
   }
 

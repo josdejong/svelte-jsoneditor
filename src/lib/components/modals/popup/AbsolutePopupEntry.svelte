@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { AbsolutePopupOptions, PopupEntry } from '../../../types'
+  import type { AbsolutePopupOptions, PopupEntry } from '$lib/types.js'
   import { onMount } from 'svelte'
-  import { isChildOf } from '../../../utils/domUtils'
-  import { keyComboFromEvent } from '../../../utils/keyBindings'
+  import { isChildOf } from '$lib/utils/domUtils.js'
+  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
 
   export let popup: PopupEntry
   export let closeAbsolutePopup: (popupId: number) => void
