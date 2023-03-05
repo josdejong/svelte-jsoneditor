@@ -71,6 +71,7 @@ Remark: for usage in a Svelte project, install `svelte-jsoneditor` instead.
   </body>
 </html>
 ```
+
 ## Use (React example, including NextJS)
 
 ### First, create a React component to wrap the vanilla-jsoneditor
@@ -83,24 +84,40 @@ Depending on whether you are using JavaScript of TypeScript, create either a JSX
 //
 // JSONEditorReact.tsx
 //
-import { useEffect, useRef } from "react";
-import { JSONEditor, JSONEditorPropsOptional } from "vanilla-jsoneditor";
+import { useEffect, useRef } from "react"
+import { JSONEditor, JSONEditorPropsOptional } from "vanilla-jsoneditor"
 
-const JSONEditorReact = (props: JSONEditorPropsOptional) => {
-  const editorDivRef = useRef<HTMLDivElement>(null);
-  const editorRef = useRef<JSONEditor | null>();  
+const JSONEditorReact: React.FC<JSONEditorPropsOptional> = (props) => {
+  const refContainer = useRef<HTMLDivElement>(null)
+  const refEditor = useRef<JSONEditor | null>(null)
+
   useEffect(() => {
-    if (editorDivRef.current && !editorRef.current) {
-      editorRef.current = new JSONEditor({
-        target: editorDivRef.current,
-        props,
-      });
-    }
-  }, [editorDivRef, editorRef, props]);  
-  return <div ref={editorDivRef} />;
-};
+    // create editor
+    refEditor.current = new JSONEditor({
+      target: refContainer.current!,
+      props: {}
+    })
 
-export default JSONEditorReact;
+    return () => {
+      // destroy editor
+      if (refEditor.current) {
+        refEditor.current.destroy()
+        refEditor.current = null
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    // update props
+    if (refEditor.current) {
+      refEditor.current.updateProps(props)
+    }
+  }, [props])
+
+  return <div ref={refContainer} />
+}
+
+export default JSONEditorReact
 ```
 
 ### JavaScript
@@ -108,24 +125,40 @@ export default JSONEditorReact;
 //
 // JSONEditorReact.jsx
 //
-import { useEffect, useRef } from "react";
-import { JSONEditor, JSONEditorPropsOptional } from "vanilla-jsoneditor";
+import { useEffect, useRef } from "react"
+import { JSONEditor, JSONEditorPropsOptional } from "vanilla-jsoneditor"
 
 const JSONEditorReact = (props) => {
-  const editorDivRef = useRef(null);
-  const editorRef = useRef();  
-  useEffect(() => {
-    if (editorDivRef.current && !editorRef.current) {
-      editorRef.current = new JSONEditor({
-        target: editorDivRef.current,
-        props,
-      });
-    }
-  }, [editorDivRef, editorRef, props]);  
-  return <div ref={editorDivRef} />;
-};
+  const refContainer = useRef(null)
+  const refEditor = useRef(null)
 
-export default JSONEditorReact;
+  useEffect(() => {
+    // create editor
+    refEditor.current = new JSONEditor({
+      target: refContainer.current,
+      props: {}
+    })
+
+    return () => {
+      // destroy editor
+      if (refEditor.current) {
+        refEditor.current.destroy()
+        refEditor.current = null
+      }
+    }
+  }, [])
+
+  // update props
+  useEffect(() => {
+    if (refEditor.current) {
+      refEditor.current.updateProps(props)
+    }
+  }, [props])
+
+  return <div ref={refContainer} />
+}
+
+export default JSONEditorReact
 ```
 
 ### Import and use the React component
@@ -138,41 +171,36 @@ If you are using React in an conventional non-NextJS browser app, you can import
 //
 // Demo.tsx for use with NextJS
 //
-import dynamic from 'next/dynamic';
-import { useCallback, useState } from 'react';
-import { Content, OnChangeStatus } from 'vanilla-jsoneditor';
+import dynamic from 'next/dynamic'
+import { useCallback, useState } from 'react'
+import { Content, OnChangeStatus, toTextContent } from 'vanilla-jsoneditor'
 
 //
 // In NextJS the JSONEditor needs to be imported
 // dynamically in order to turn off server-side
 // rendering of the component
 //
-const JSONEditorReact = dynamic(() => import('../JSONEditorReact'), { ssr: false });
+const JSONEditorReact = dynamic(() => import('../JSONEditorReact'), { ssr: false })
 
-const initialContent = { 
-  "hello": "world",
-  "count": 1,
-  "foo": [
-    "bar",
-    "car",
-  ],
-};
+const initialContent = {
+  hello: 'world',
+  count: 1,
+  foo: ['bar', 'car']
+}
 
 export default function Demo() {
-  const [jsonContent, setJsonContent] = useState<Content>({ json: initialContent });
-  const handler = useCallback((content: Content, previousContent: Content, status: OnChangeStatus) => {
-    setJsonContent(content);
-  }, [setJsonContent]);
+  const [jsonContent, setJsonContent] = useState<Content>({ json: initialContent })
+  const handler = useCallback(
+    (content: Content, previousContent: Content, status: OnChangeStatus) => {
+      setJsonContent(content)
+    },
+    [jsonContent]
+  )
 
   return (
     <div>
-      <JSONEditorReact
-        content={jsonContent}
-        onChange={handler}
-      />
-      <div>
-        { JSON.stringify(jsonContent) }
-      </div>
+      <JSONEditorReact content={jsonContent} onChange={handler} />
+      <div>{toTextContent(jsonContent).text}</div>
     </div>
   )
 }
