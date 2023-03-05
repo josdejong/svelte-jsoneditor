@@ -77,6 +77,8 @@ Remark: for usage in a Svelte project, install `svelte-jsoneditor` instead.
 
 Depending on whether you are using JavaScript of TypeScript, create either a JSX or TSX file:
 
+### TypeScript:
+
 ```typescript
 //
 // JSONEditorReact.tsx
@@ -101,6 +103,7 @@ const JSONEditorReact = (props: JSONEditorPropsOptional) => {
 export default JSONEditorReact;
 ```
 
+### JavaScript
 ```javascript
 //
 // JSONEditorReact.jsx
