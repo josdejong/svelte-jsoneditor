@@ -84,8 +84,8 @@ Depending on whether you are using JavaScript of TypeScript, create either a JSX
 //
 // JSONEditorReact.tsx
 //
-import { useEffect, useRef } from "react"
-import { JSONEditor, JSONEditorPropsOptional } from "vanilla-jsoneditor"
+import { useEffect, useRef } from 'react'
+import { JSONEditor, JSONEditorPropsOptional } from 'vanilla-jsoneditor'
 
 const JSONEditorReact: React.FC<JSONEditorPropsOptional> = (props) => {
   const refContainer = useRef<HTMLDivElement>(null)
@@ -121,12 +121,13 @@ export default JSONEditorReact
 ```
 
 ### JavaScript
+
 ```javascript
 //
 // JSONEditorReact.jsx
 //
-import { useEffect, useRef } from "react"
-import { JSONEditor, JSONEditorPropsOptional } from "vanilla-jsoneditor"
+import { useEffect, useRef } from 'react'
+import { JSONEditor, JSONEditorPropsOptional } from 'vanilla-jsoneditor'
 
 const JSONEditorReact = (props) => {
   const refContainer = useRef(null)
