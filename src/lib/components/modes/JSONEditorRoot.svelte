@@ -185,9 +185,10 @@
   export function scrollTo(path: JSONPath): void {
     if (refTreeMode) {
       return refTreeMode.scrollTo(path)
+    } else if (refTableMode) {
+      return refTableMode.scrollTo(path)
     } else {
       // TODO: implement scrollTo for text mode
-
       throw new Error(`Method scrollTo is not available in mode "${mode}"`)
     }
   }
