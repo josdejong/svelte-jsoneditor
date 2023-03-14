@@ -1292,9 +1292,9 @@
    * Scroll the window vertically to the node with given path.
    * Expand the path when needed.
    */
-  export async function scrollTo(path: JSONPath, scrollToWhenVisible = true) {
+  export async function scrollTo(path: JSONPath, scrollToWhenVisible = true): Promise<void> {
     documentState = expandPath(json, documentState, initial(path))
-    await tick()
+    await tick() // await rerender
 
     const elem = findElement(path)
     if (elem) {
@@ -1305,17 +1305,22 @@
       if (!scrollToWhenVisible) {
         if (elemRect.bottom > viewPortRect.top && elemRect.top < viewPortRect.bottom) {
           // element is fully or partially visible, don't scroll to it
-          return
+          return Promise.resolve()
         }
       }
 
       const offset = -(viewPortRect.height / 4)
 
-      jump(elem, {
-        container: refContents,
-        offset,
-        duration: SCROLL_DURATION
+      return new Promise<void>((resolve) => {
+        jump(elem, {
+          container: refContents,
+          offset,
+          duration: SCROLL_DURATION,
+          callback: () => resolve()
+        })
       })
+    } else {
+      return Promise.resolve()
     }
   }
 

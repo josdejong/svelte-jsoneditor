@@ -330,11 +330,13 @@ const editor = new JSONEditor({
 
 ### methods
 
+Note that most methods are asynchronous and will resolve after the editor is re-rendered (on the next `tick`). 
+
 - `get(): Content` Get the current JSON document.
-- `set(content: Content)` Replace the current content. Will reset the state of the editor. See also method `update(content)`.
-- `update(content: Content)` Update the loaded content, keeping the state of the editor (like expanded objects). You can also call `editor.updateProps({ content })`. See also method `set(content)`.
-- `patch(operations: JSONPatchDocument) : JSONPatchResult` Apply a JSON patch document to update the contents of the JSON document. A JSON patch document is a list with JSON Patch operations.
-- `updateProps(props: Object)` update some or all of the properties. Updated `content` can be passed too; this is equivalent to calling `update(content)`. Example:
+- `set(content: Content): Promise<void>` Replace the current content. Will reset the state of the editor. See also method `update(content)`.
+- `update(content: Content): Promise<void>` Update the loaded content, keeping the state of the editor (like expanded objects). You can also call `editor.updateProps({ content })`. See also method `set(content)`.
+- `patch(operations: JSONPatchDocument) : Promise<JSONPatchResult>` Apply a JSON patch document to update the contents of the JSON document. A JSON patch document is a list with JSON Patch operations.
+- `updateProps(props: Object): Promise<void>` update some or all of the properties. Updated `content` can be passed too; this is equivalent to calling `update(content)`. Example:
 
   ```js
   editor.updateProps({
@@ -342,18 +344,18 @@ const editor = new JSONEditor({
   })
   ```
 
-- `expand([callback: (path: Path) => boolean])` Expand or collapse paths in the editor. The `callback` determines which paths will be expanded. If no `callback` is provided, all paths will be expanded. It is only possible to expand a path when all of its parent paths are expanded too. Examples:
+- `expand([callback: (path: Path) => boolean]): Promise<void>` Expand or collapse paths in the editor. The `callback` determines which paths will be expanded. If no `callback` is provided, all paths will be expanded. It is only possible to expand a path when all of its parent paths are expanded too. Examples:
   - `editor.expand(path => true)` expand all
   - `editor.expand(path => false)` collapse all
   - `editor.expand(path => path.length < 2)` expand all paths up to 2 levels deep
 - `transform({ id?: string, rootPath?: [], onTransform: ({ operations: JSONPatchDocument, json: JSONValue, transformedJson: JSONValue }) => void, onClose: () => void })` programmatically trigger clicking of the transform button in the main menu, opening the transform model. If a callback `onTransform` is provided, it will replace the build-in logic to apply a transform, allowing you to process the transform operations in an alternative way. If provided, `onClose` callback will trigger when the transform modal closes, both after the user clicked apply or cancel. If an `id` is provided, the transform modal will load the previous status of this `id` instead of the status of the editors transform modal.
-- `scrollTo(path: Path)` Scroll the editor vertically such that the specified path comes into view. Only applicable to modes `tree` and `table`. The path will be expanded when needed.
+- `scrollTo(path: Path): Promise<void>` Scroll the editor vertically such that the specified path comes into view. Only applicable to modes `tree` and `table`. The path will be expanded when needed. The returned Promise is resolved after scrolling is finished.
 - `findElement(path: Path)` Find the DOM element of a given path. Returns `null` when not found.
-- `acceptAutoRepair(): Content` In tree mode, invalid JSON is automatically repaired when loaded. When the repair was successful, the repaired contents are rendered but not yet applied to the document itself until the user clicks "Ok" or starts editing the data. Instead of accepting the repair, the user can also click "Repair manually instead". Invoking `.acceptAutoRepair()` will programmatically accept the repair. This will trigger an update, and the method itself also returns the updated contents. In case of `text` mode or when the editor is not in an "accept auto repair" status, nothing will happen, and the contents will be returned as is.
-- `refresh()`. Refresh rendering of the contents, for example after changing the font size. This is only available in `text` mode.
+- `acceptAutoRepair(): Promise<Content>` In tree mode, invalid JSON is automatically repaired when loaded. When the repair was successful, the repaired contents are rendered but not yet applied to the document itself until the user clicks "Ok" or starts editing the data. Instead of accepting the repair, the user can also click "Repair manually instead". Invoking `.acceptAutoRepair()` will programmatically accept the repair. This will trigger an update, and the method itself also returns the updated contents. In case of `text` mode or when the editor is not in an "accept auto repair" status, nothing will happen, and the contents will be returned as is.
+- `refresh(): Promise<void>`. Refresh rendering of the contents, for example after changing the font size. This is only available in `text` mode.
 - `validate() : ContentErrors | null`. Get all current parse errors and validation errors.
-- `focus()`. Give the editor focus.
-- `destroy()`. Destroy the editor, remove it from the DOM.
+- `focus(): Promise<void>`. Give the editor focus.
+- `destroy(): Promise<void>`. Destroy the editor, remove it from the DOM.
 
 ### Utility functions
 

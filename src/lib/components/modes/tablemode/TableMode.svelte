@@ -760,7 +760,7 @@
    * Scroll the window vertically to the node with given path.
    * Expand the path when needed.
    */
-  export function scrollTo(path: JSONPath, scrollToWhenVisible = true) {
+  export function scrollTo(path: JSONPath, scrollToWhenVisible = true): Promise<void> {
     const top = calculateAbsolutePosition(path, columns, itemHeightsCache, defaultItemHeight)
     const roughDistance = top - scrollTop
     const elem = findElement(path)
@@ -782,22 +782,27 @@
     // FIXME: scroll to the exact element (rough distance can be inexact)
 
     if (elem) {
-      jump(elem, {
-        container: refContents,
-        offset,
-        duration: SCROLL_DURATION,
-        callback: () => {
-          // TODO: improve horizontal scrolling: animate and integrate with the vertical scrolling (jump)
-          scrollToHorizontal(path)
-        }
+      return new Promise((resolve) => {
+        jump(elem, {
+          container: refContents,
+          offset,
+          duration: SCROLL_DURATION,
+          callback: () => {
+            // TODO: improve horizontal scrolling: animate and integrate with the vertical scrolling (jump)
+            scrollToHorizontal(path)
+            resolve()
+          }
+        })
       })
     } else {
-      jump(roughDistance, {
-        container: refContents,
-        offset,
-        duration: SCROLL_DURATION,
-        callback: () => {
-          tick().then(() => {
+      return new Promise((resolve) => {
+        jump(roughDistance, {
+          container: refContents,
+          offset,
+          duration: SCROLL_DURATION,
+          callback: async () => {
+            await tick()
+
             const newTop = calculateAbsolutePosition(
               path,
               columns,
@@ -806,13 +811,15 @@
             )
 
             if (newTop !== top) {
-              scrollTo(path, scrollToWhenVisible)
+              await scrollTo(path, scrollToWhenVisible)
             } else {
               // TODO: improve horizontal scrolling: animate and integrate with the vertical scrolling (jump)
               scrollToHorizontal(path)
             }
-          })
-        }
+
+            resolve()
+          }
+        })
       })
     }
   }
