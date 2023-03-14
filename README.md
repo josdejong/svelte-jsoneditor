@@ -330,7 +330,7 @@ const editor = new JSONEditor({
 
 ### methods
 
-Note that most methods are asynchronous and will resolve after the editor is re-rendered (on the next `tick`). 
+Note that most methods are asynchronous and will resolve after the editor is re-rendered (on the next `tick`).
 
 - `get(): Content` Get the current JSON document.
 - `set(content: Content): Promise<void>` Replace the current content. Will reset the state of the editor. See also method `update(content)`.
