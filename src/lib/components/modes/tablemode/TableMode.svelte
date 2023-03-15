@@ -383,7 +383,10 @@
           json = undefined
           text = externalContent.text
           textIsRepaired = false
-          parseError = normalizeJsonParseError(text, err.message || err.toString())
+          parseError =
+            text !== undefined && text !== ''
+              ? normalizeJsonParseError(text, err.message || err.toString())
+              : undefined
         }
       }
     } else {
@@ -588,6 +591,7 @@
     text = undefined
     textIsRepaired = false
     pastedJson = undefined
+    parseError = undefined
 
     history.add({
       undo: {
@@ -1354,6 +1358,7 @@
     documentState = callback && callback.state !== undefined ? callback.state : updatedState
     text = undefined
     textIsRepaired = false
+    parseError = undefined
 
     // make sure the selection is valid
     clearSelectionWhenNotExisting(json)
@@ -1388,18 +1393,22 @@
       documentState = expandWithCallback(json, documentState, [], expandMinimal)
       text = undefined
       textIsRepaired = false
+      parseError = undefined
     } catch (err) {
       try {
         json = parseMemoizeOne(jsonrepair(updatedText))
         documentState = expandWithCallback(json, documentState, [], expandMinimal)
         text = updatedText
         textIsRepaired = true
-      } catch (err) {
+        parseError = undefined
+      } catch (repairError) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
         documentState = createDocumentState({ json, expand: expandMinimal })
         text = updatedText
         textIsRepaired = false
+        parseError =
+          text !== '' ? normalizeJsonParseError(text, err.message || err.toString()) : undefined
       }
     }
 
@@ -1585,6 +1594,7 @@
     documentState = item.undo.state
     text = item.undo.text
     textIsRepaired = item.undo.textIsRepaired
+    parseError = undefined
 
     debug('undo', { item, json })
 
@@ -1623,6 +1633,7 @@
     documentState = item.redo.state
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired
+    parseError = undefined
 
     debug('redo', { item, json })
 
