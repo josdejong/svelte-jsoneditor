@@ -1748,7 +1748,7 @@
                     class="jse-table-cell jse-table-cell-gutter"
                     use:resizeObserver={(element) => handleResizeRow(element, rowIndex)}
                   >
-                    {rowIndex + 1}
+                    {rowIndex}
                     {#if !isEmpty(validationErrorsByRow?.row)}
                       <ValidationErrorIcon
                         validationError={mergeValidationErrors(
