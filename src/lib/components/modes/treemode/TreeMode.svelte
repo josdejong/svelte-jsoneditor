@@ -1214,15 +1214,13 @@
   /**
    * This method is exposed via JSONEditor.transform
    */
-  export function openTransformModal({
-    id,
-    rootPath,
-    onTransform,
-    onClose
-  }: TransformModalOptions) {
-    if (json === undefined || !rootPath) {
+  export function openTransformModal(options: TransformModalOptions) {
+    if (json === undefined) {
       return
     }
+
+    const { id, onTransform, onClose } = options
+    const rootPath = options.rootPath || []
 
     modalOpen = true
 
@@ -1230,25 +1228,25 @@
       id: id || transformModalId,
       json,
       rootPath,
-      onTransform: onTransform
-        ? (operations) => {
-            onTransform({
-              operations,
-              json,
-              transformedJson: immutableJSONPatch(json, operations)
-            })
-          }
-        : (operations) => {
-            debug('onTransform', rootPath, operations)
+      onTransform: (operations) => {
+        if (onTransform) {
+          onTransform({
+            operations,
+            json: json as JSONValue,
+            transformedJson: immutableJSONPatch(json as JSONValue, operations)
+          })
+        } else {
+          debug('onTransform', rootPath, operations)
 
-            handlePatch(operations, (patchedJson, patchedState) => ({
-              // expand the newly replaced array and select it
-              state: {
-                ...expandRecursive(patchedJson, patchedState, rootPath),
-                selection: createValueSelection(rootPath, false)
-              }
-            }))
-          },
+          handlePatch(operations, (patchedJson, patchedState) => ({
+            // expand the newly replaced array and select it
+            state: {
+              ...expandRecursive(patchedJson, patchedState, rootPath),
+              selection: createValueSelection(rootPath, false)
+            }
+          }))
+        }
+      },
       onClose: () => {
         modalOpen = false
         focus()

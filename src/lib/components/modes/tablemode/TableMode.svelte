@@ -1479,15 +1479,13 @@
   /**
    * This method is exposed via JSONEditor.transform
    */
-  export function openTransformModal({
-    id,
-    rootPath,
-    onTransform,
-    onClose
-  }: TransformModalOptions) {
-    if (readOnly || json === undefined) {
+  export function openTransformModal(options: TransformModalOptions) {
+    if (json === undefined) {
       return
     }
+
+    const { id, onTransform, onClose } = options
+    const rootPath = options.rootPath || []
 
     modalOpen = true
 
@@ -1495,19 +1493,19 @@
       id: id || transformModalId,
       json,
       rootPath: rootPath || [],
-      onTransform: onTransform
-        ? (operations) => {
-            onTransform({
-              operations,
-              json,
-              transformedJson: immutableJSONPatch(json, operations)
-            })
-          }
-        : (operations) => {
-            debug('onTransform', rootPath, operations)
+      onTransform: (operations) => {
+        if (onTransform) {
+          onTransform({
+            operations,
+            json: json as JSONValue,
+            transformedJson: immutableJSONPatch(json as JSONValue, operations)
+          })
+        } else {
+          debug('onTransform', rootPath, operations)
 
-            handlePatch(operations)
-          },
+          handlePatch(operations)
+        }
+      },
       onClose: () => {
         modalOpen = false
         focus()
