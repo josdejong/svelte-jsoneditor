@@ -291,7 +291,7 @@ exports[`JSONEditor > render table mode 1`] = `
                 <th
                   class="jse-table-cell jse-table-cell-gutter s-kw5t6hk3mCrZ"
                 >
-                  1
+                  0
                    
                 </th>
                  
@@ -337,7 +337,7 @@ exports[`JSONEditor > render table mode 1`] = `
                 <th
                   class="jse-table-cell jse-table-cell-gutter s-kw5t6hk3mCrZ"
                 >
-                  2
+                  1
                    
                 </th>
                  
@@ -383,7 +383,7 @@ exports[`JSONEditor > render table mode 1`] = `
                 <th
                   class="jse-table-cell jse-table-cell-gutter s-kw5t6hk3mCrZ"
                 >
-                  3
+                  2
                    
                 </th>
                  
