@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.16.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.16.0...v0.16.1) (2023-03-24)
+
+
+### Bug Fixes
+
+* change the row numbering in table mode to zero based for consistency ([d923268](https://github.com/josdejong/svelte-jsoneditor/commit/d923268b2d550e2779051bb43b08d3daee8f91fe))
+* give the optional `rootPath` option of `transform` a default value ([b38db6c](https://github.com/josdejong/svelte-jsoneditor/commit/b38db6c1e3b3b7ff87a92bd61049a5a193ac713a))
+
 ## [0.16.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.15.1...v0.16.0) (2023-03-15)
 
 
