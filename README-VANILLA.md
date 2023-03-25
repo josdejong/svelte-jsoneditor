@@ -170,18 +170,35 @@ If you are using React in an conventional non-NextJS browser app, you can import
 
 ```typescript
 //
-// Demo.tsx for use with NextJS
+// demo.tsx for use with NextJS
 //
 import dynamic from 'next/dynamic'
 import { useCallback, useState } from 'react'
-import { Content, OnChangeStatus, toTextContent } from 'vanilla-jsoneditor'
 
 //
-// In NextJS the JSONEditor needs to be imported
-// dynamically in order to turn off server-side
-// rendering of the component
+// In NextJS, when using TypeScript, type definitions 
+// can be imported from 'vanilla-jsoneditor' using a
+// conventional import statement (prefixed with 'type',
+// as shown below), but only types can be imported this
+// way. When using NextJS, React components and helper
+// functions must be imported dynamically using { ssr: false }
+// as shown elsewhere in this example.
+//
+import type { Content, OnChangeStatus } from 'vanilla-jsoneditor'
+
+//
+// In NextJS, the JSONEditor component must be wrapped in
+// a component that is dynamically in order to turn off 
+// server-side rendering of the component. This is neccessary
+// because the vanilla-jsoneditor code attempts to use 
+// browser-only JavaScript capabilities not available 
+// during server-side rendering. Any helper functions 
+// provided by vanilla-jsoneditor, such as toTextContent, 
+// must also only be used in dynamically imported, 
+// ssr: false components when using NextJS.
 //
 const JSONEditorReact = dynamic(() => import('../JSONEditorReact'), { ssr: false })
+const TextContent = dynamic(() => import('../TextContent'), { ssr: false })
 
 const initialContent = {
   hello: 'world',
@@ -201,8 +218,28 @@ export default function Demo() {
   return (
     <div>
       <JSONEditorReact content={jsonContent} onChange={handler} />
-      <div>{toTextContent(jsonContent).text}</div>
+      <TextContent content={jsonContent} />
     </div>
   )
 }
+```
+
+```typescript
+//
+// ToTextContent.tsx 
+//
+// (wrapper around toTextContent for use with NextJS)
+//
+import { Content, toTextContent } from 'vanilla-jsoneditor'
+
+interface IOwnProps {
+  content: Content;
+}
+const TextContent = (props: IOwnProps) => {
+  const { content } = props;
+
+  return <p>The contents of the editor, converted to a text string, are: { toTextContent(content).text }</p>
+}
+
+export default TextContent
 ```
