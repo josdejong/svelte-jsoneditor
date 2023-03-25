@@ -617,12 +617,12 @@
    * Force refreshing the editor, for example after changing the font size
    * to update the positioning of the line numbers in the gutter
    */
-  export function refresh() {
+  export async function refresh(): Promise<void> {
     debug('refresh')
 
     // update the theme (light/dark), but also, as a side effect,
     // refresh the font size of the line numbers in the gutter
-    updateTheme()
+    await updateTheme()
   }
 
   function forceUpdateText() {
@@ -705,19 +705,19 @@
     }
   }
 
-  function updateTheme() {
+  async function updateTheme(): Promise<void> {
     // we check the theme on the next tick, to make sure the page
     // is re-rendered with (possibly) changed CSS variables
-    tick().then(() => {
-      if (codeMirrorView) {
-        const dark = hasDarkTheme()
-        debug('updateTheme', { dark })
+    await tick()
 
-        codeMirrorView.dispatch({
-          effects: [themeCompartment.reconfigure(EditorView.theme({}, { dark }))]
-        })
-      }
-    })
+    if (codeMirrorView) {
+      const dark = hasDarkTheme()
+      debug('updateTheme', { dark })
+
+      codeMirrorView.dispatch({
+        effects: [themeCompartment.reconfigure(EditorView.theme({}, { dark }))]
+      })
+    }
   }
 
   function createIndentUnit(indentation: number | string): Extension {

@@ -502,6 +502,7 @@
     expandWhenNotInitialized(json)
     text = undefined
     textIsRepaired = false
+    parseError = undefined
     clearSelectionWhenNotExisting(json)
 
     addHistoryItem({
@@ -559,7 +560,10 @@
         json = undefined
         text = externalContent['text']
         textIsRepaired = false
-        parseError = normalizeJsonParseError(text, err.message || err.toString())
+        parseError =
+          text !== undefined && text !== ''
+            ? normalizeJsonParseError(text, err.message || err.toString())
+            : undefined
       }
     }
 
@@ -736,6 +740,7 @@
     text = undefined
     textIsRepaired = false
     pastedJson = undefined
+    parseError = undefined
 
     // ensure the selection is valid
     clearSelectionWhenNotExisting(json)
@@ -1105,6 +1110,7 @@
     documentState = item.undo.state
     text = item.undo.text
     textIsRepaired = item.undo.textIsRepaired
+    parseError = undefined
 
     debug('undo', { item, json, documentState })
 
@@ -1143,6 +1149,7 @@
     documentState = item.redo.state
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired
+    parseError = undefined
 
     debug('redo', { item, json, documentState })
 
@@ -1207,15 +1214,13 @@
   /**
    * This method is exposed via JSONEditor.transform
    */
-  export function openTransformModal({
-    id,
-    rootPath,
-    onTransform,
-    onClose
-  }: TransformModalOptions) {
-    if (json === undefined || !rootPath) {
+  export function openTransformModal(options: TransformModalOptions) {
+    if (json === undefined) {
       return
     }
+
+    const { id, onTransform, onClose } = options
+    const rootPath = options.rootPath || []
 
     modalOpen = true
 
@@ -1223,25 +1228,25 @@
       id: id || transformModalId,
       json,
       rootPath,
-      onTransform: onTransform
-        ? (operations) => {
-            onTransform({
-              operations,
-              json,
-              transformedJson: immutableJSONPatch(json, operations)
-            })
-          }
-        : (operations) => {
-            debug('onTransform', rootPath, operations)
+      onTransform: (operations) => {
+        if (onTransform) {
+          onTransform({
+            operations,
+            json: json as JSONValue,
+            transformedJson: immutableJSONPatch(json as JSONValue, operations)
+          })
+        } else {
+          debug('onTransform', rootPath, operations)
 
-            handlePatch(operations, (patchedJson, patchedState) => ({
-              // expand the newly replaced array and select it
-              state: {
-                ...expandRecursive(patchedJson, patchedState, rootPath),
-                selection: createValueSelection(rootPath, false)
-              }
-            }))
-          },
+          handlePatch(operations, (patchedJson, patchedState) => ({
+            // expand the newly replaced array and select it
+            state: {
+              ...expandRecursive(patchedJson, patchedState, rootPath),
+              selection: createValueSelection(rootPath, false)
+            }
+          }))
+        }
+      },
       onClose: () => {
         modalOpen = false
         focus()
@@ -1292,9 +1297,9 @@
    * Scroll the window vertically to the node with given path.
    * Expand the path when needed.
    */
-  export async function scrollTo(path: JSONPath, scrollToWhenVisible = true) {
+  export async function scrollTo(path: JSONPath, scrollToWhenVisible = true): Promise<void> {
     documentState = expandPath(json, documentState, initial(path))
-    await tick()
+    await tick() // await rerender
 
     const elem = findElement(path)
     if (elem) {
@@ -1305,17 +1310,22 @@
       if (!scrollToWhenVisible) {
         if (elemRect.bottom > viewPortRect.top && elemRect.top < viewPortRect.bottom) {
           // element is fully or partially visible, don't scroll to it
-          return
+          return Promise.resolve()
         }
       }
 
       const offset = -(viewPortRect.height / 4)
 
-      jump(elem, {
-        container: refContents,
-        offset,
-        duration: SCROLL_DURATION
+      return new Promise<void>((resolve) => {
+        jump(elem, {
+          container: refContents,
+          offset,
+          duration: SCROLL_DURATION,
+          callback: () => resolve()
+        })
       })
+    } else {
+      return Promise.resolve()
     }
   }
 
@@ -1418,6 +1428,7 @@
     documentState = callback && callback.state !== undefined ? callback.state : updatedState
     text = undefined
     textIsRepaired = false
+    parseError = undefined
 
     // make sure the selection is valid
     clearSelectionWhenNotExisting(json)
@@ -1451,18 +1462,22 @@
       documentState = expandWithCallback(json, documentState, [], expandMinimal)
       text = undefined
       textIsRepaired = false
+      parseError = undefined
     } catch (err) {
       try {
         json = parseMemoizeOne(jsonrepair(updatedText))
         documentState = expandWithCallback(json, documentState, [], expandMinimal)
         text = updatedText
         textIsRepaired = true
-      } catch (err) {
+        parseError = undefined
+      } catch (repairError) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
         documentState = createDocumentState({ json, expand: expandMinimal })
         text = updatedText
         textIsRepaired = false
+        parseError =
+          text !== '' ? normalizeJsonParseError(text, err.message || err.toString()) : undefined
       }
     }
 

@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.16.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.16.0...v0.16.1) (2023-03-24)
+
+
+### Bug Fixes
+
+* change the row numbering in table mode to zero based for consistency ([d923268](https://github.com/josdejong/svelte-jsoneditor/commit/d923268b2d550e2779051bb43b08d3daee8f91fe))
+* give the optional `rootPath` option of `transform` a default value ([b38db6c](https://github.com/josdejong/svelte-jsoneditor/commit/b38db6c1e3b3b7ff87a92bd61049a5a193ac713a))
+
+## [0.16.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.15.1...v0.16.0) (2023-03-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* Methods `set`, `update`, `patch`, `expand`, `acceptAutoRepair`, `scrollTo`, `focus`, `refresh`,
+`updateProps` and `destroy` are now async and return a Promise.
+
+### Features
+
+* implement the public method `scrollTo` for mode `table` ([a615548](https://github.com/josdejong/svelte-jsoneditor/commit/a615548aa26470d0535d1e1ddb781654b44f3315))
+* update dependencies `svelte-awesome` and `svelte-select` and some devDependencies ([05acdcf](https://github.com/josdejong/svelte-jsoneditor/commit/05acdcfaf03b69aae3a82f10bf2bc3532ebe61c1))
+
+
+### Bug Fixes
+
+* [#189](https://github.com/josdejong/svelte-jsoneditor/issues/189) setup eslint to enforce `.js` file extensions on all imports ([cf37451](https://github.com/josdejong/svelte-jsoneditor/commit/cf37451e46c56e637924095ab11d6883ade08289))
+* [#236](https://github.com/josdejong/svelte-jsoneditor/issues/236) change the public methods to return a Promise`, resolving after the editor is re-rendered ([dbfb1a6](https://github.com/josdejong/svelte-jsoneditor/commit/dbfb1a68a3104b38dbb45338fc1fdae075038930))
+* [#237](https://github.com/josdejong/svelte-jsoneditor/issues/237) parse error in case of empty text, and parse error not cleared on change ([31e9e50](https://github.com/josdejong/svelte-jsoneditor/commit/31e9e50f461cc8bd21d746df1948d645f7d5e118))
+
 ### [0.15.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.15.0...v0.15.1) (2023-03-01)
 
 

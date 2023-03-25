@@ -182,12 +182,13 @@
     }
   }
 
-  export function scrollTo(path: JSONPath): void {
+  export function scrollTo(path: JSONPath): Promise<void> {
     if (refTreeMode) {
       return refTreeMode.scrollTo(path)
+    } else if (refTableMode) {
+      return refTableMode.scrollTo(path)
     } else {
       // TODO: implement scrollTo for text mode
-
       throw new Error(`Method scrollTo is not available in mode "${mode}"`)
     }
   }
@@ -212,9 +213,9 @@
     }
   }
 
-  export function refresh() {
+  export async function refresh(): Promise<void> {
     if (refTextMode) {
-      refTextMode.refresh()
+      await refTextMode.refresh()
     } else {
       // nothing to do in tree or table mode (also: don't throw an exception or so,
       // that annoying having to reckon with that when using .refresh()).

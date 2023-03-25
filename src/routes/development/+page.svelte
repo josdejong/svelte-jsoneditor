@@ -179,6 +179,11 @@
         stringify: compileJSONPointer
       },
       label: 'JSONPointer'
+    },
+    {
+      id: 'JSON',
+      value: JSON,
+      label: 'JSON'
     }
   ]
 
