@@ -226,7 +226,7 @@ export default function Demo() {
 
 ```typescript
 //
-// ToTextContent.tsx
+// TextContent.tsx
 //
 // (wrapper around toTextContent for use with NextJS)
 //
