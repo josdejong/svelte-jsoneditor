@@ -10,7 +10,6 @@
   import Icon from 'svelte-awesome'
   import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
   import type { ValidationError } from '$lib/types.js'
-  import { stripRootObject } from '$lib/utils/pathUtils.js'
   import { MAX_VALIDATION_ERRORS } from '$lib/constants.js'
   import { limit } from '$lib/utils/arrayUtils.js'
 
@@ -47,7 +46,7 @@
                 <Icon data={faExclamationTriangle} />
               </td>
               <td>
-                {stripRootObject(stringifyJSONPath(validationError.path))}
+                {stringifyJSONPath(validationError.path)}
               </td>
               <td>
                 {validationError.message}

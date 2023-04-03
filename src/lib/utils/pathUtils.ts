@@ -2,102 +2,82 @@ import { isEmpty, memoize } from 'lodash-es'
 import type { JSONPath } from 'immutable-json-patch'
 
 /**
- * Stringify a path like:
- *
- *     ["data", "2", "nested property", "name"]
- *
- * into a JSON path string like:
- *
- *     "$.data[2]['nested property'].name"
+ **
+ * Stringify an array with a path like ['items', '3', 'name'] into string like 'items[3].name'
+ * Note that we allow all characters in a property name, like "item with spaces[3].name",
+ * so this path is not usable as-is in JavaScript.
  */
 export function stringifyJSONPath(path: JSONPath): string {
-  return '$' + path.map(stringifyJSONPathProp).join('')
-}
-
-/**
- * Stringify a single property of a JSON path. See also stringifyJSONPath
- */
-export function stringifyJSONPathProp(prop: string): string {
-  if (integerNumberRegex.test(prop)) {
-    return '[' + prop + ']'
-  } else if (javaScriptPropertyRegex.test(prop)) {
-    return '.' + prop
-  } else {
-    const propStr = JSON.stringify(prop)
-    // remove enclosing double quotes, and unescape escaped double qoutes \"
-    const jsonPathStr = propStr.substring(1, propStr.length - 1).replace(/\\"/g, '"')
-    return "['" + jsonPathStr + "']"
-  }
-}
-
-/**
- * Strip the leading '$' and '.' from a JSONPath, for example:
- *
- *   "$.data[2].nested.property"
- *
- * will be changed into:
- *
- *   "data[2].nested.property"
- *
- * See also prependRootObject
- */
-export function stripRootObject(path: string): string {
   return path
-    .replace(/^\$/, '') // remove any leading $ character
-    .replace(/^\./, '') // remove any leading dot
+    .map((p, index) => {
+      return integerNumberRegex.test(p)
+        ? '[' + p + ']'
+        : /[.[\]]/.test(p) || p === '' // match any character . or [ or ] and handle an empty string
+        ? '["' + escapeQuotes(p) + '"]'
+        : (index > 0 ? '.' : '') + p
+    })
+    .join('')
+}
+
+function escapeQuotes(prop: string): string {
+  return prop.replace(/"/g, '\\"')
 }
 
 /**
- * Add $ and . at the start of a JSON path when missing
- * This is the opposite of stripRootObject
+ * Parse a JSON path like 'items[3].name' into a path like ['items', '3', 'name']
  */
-export function prependRootObject(path: string): string {
-  if (path.startsWith('$')) {
-    return path
-  }
+export function parseJSONPath(pathStr: string): JSONPath {
+  const path: JSONPath = []
+  let i = 0
 
-  return !path.startsWith('[') && !path.startsWith('.') ? '$.' + path : '$' + path
-}
-
-/**
- * Parse a string into a JSONPath. For example the input:
- *
- *   "$.data[2]['nested property'].name"
- *
- * will return:
- *
- *   ["data", "2", "nested property", "name"]
- *
- */
-export function parseJSONPath(path: string): JSONPath {
-  let remainder = prependRootObject(path.trim()).substring(1) // strip the leading $
-
-  const jsonPath: JSONPath = []
-
-  while (remainder.length > 0) {
-    const match = remainder.match(regexJsonPathProp)
-
-    if (!match) {
-      throw new SyntaxError(
-        `Cannot parse path: unexpected part "${remainder}" at position ${
-          path.length - remainder.length
-        }`
-      )
+  while (i < pathStr.length) {
+    if (pathStr[i] === '.') {
+      i++
     }
 
-    jsonPath.push(match[1] || match[2] || match[3])
-    remainder = remainder.substring(match[0].length)
+    if (pathStr[i] === '[') {
+      i++
+
+      if (pathStr[i] === '"') {
+        i++
+        path.push(parseProp((c) => c === '"', true))
+        eatCharacter('"')
+      } else {
+        path.push(parseProp((c) => c === ']'))
+      }
+
+      eatCharacter(']')
+    } else {
+      path.push(parseProp((c) => c === '.' || c === '['))
+    }
   }
 
-  return jsonPath
-}
+  function parseProp(isEnd: (char: string) => boolean, unescape = false) {
+    let prop = ''
 
-const regexJsonPathDotProp = '^\\.([A-zA-Z$_][a-zA-Z$_0-9]*)' // matches ".foo" at the start
-const regexJsonPathArrayIndex = '^\\[([0-9]+)]' // matches "[123]" at the start
-const regexJsonPathArrayProp = "^\\['(.*)']" // matches "['foo-bar baz']" at the start
-const regexJsonPathProp = new RegExp(
-  [regexJsonPathDotProp, regexJsonPathArrayIndex, regexJsonPathArrayProp].join('|')
-)
+    while (i < pathStr.length && !isEnd(pathStr[i])) {
+      if (unescape && pathStr[i] === '\\' && pathStr[i + 1] === '"') {
+        // escaped double quote
+        prop += '"'
+        i += 2
+      } else {
+        prop += pathStr[i]
+        i++
+      }
+    }
+
+    return prop
+  }
+
+  function eatCharacter(char: string) {
+    if (pathStr[i] !== char) {
+      throw new SyntaxError(`Invalid JSON path: ${char} expected at position ${i}`)
+    }
+    i++
+  }
+
+  return path
+}
 
 /**
  * Convert a JSONPath into an option for use in a select box
@@ -105,25 +85,42 @@ const regexJsonPathProp = new RegExp(
 export function pathToOption(path: JSONPath): { value: JSONPath; label: string } {
   return {
     value: path,
-    label: isEmpty(path) ? '(whole item)' : stripRootObject(stringifyJSONPath(path))
+    label: isEmpty(path) ? '(whole item)' : stringifyJSONPath(path)
   }
 }
 
 /**
  * Stringify a JSON path into a lodash path like:
  *
+ *     ["data", 2, "nested property", "name"]
+ *
+ * into a lodash path like:
+ *
  *     "data[2].nested.name"
  *
- * or
- *
- *     ["data", 2, "nested property", "name"]
  */
 export function createLodashPropertySelector(path: JSONPath): string {
   return path.length === 0
     ? ''
     : path.every((prop) => integerNumberRegex.test(prop) || javaScriptPropertyRegex.test(prop))
-    ? "'" + path.map(stringifyJSONPathProp).join('').replace(/^\./, '') + "'"
+    ? "'" + path.map(stringifyLodashProperty).join('').replace(/^\./, '') + "'"
     : JSON.stringify(path)
+}
+
+/**
+ * Stringify a single property of a JSON path. See also createLodashPropertySelector
+ */
+function stringifyLodashProperty(prop: string): string {
+  if (integerNumberRegex.test(prop)) {
+    return '[' + prop + ']'
+  } else if (javaScriptPropertyRegex.test(prop)) {
+    return '.' + prop
+  } else {
+    const propStr = JSON.stringify(prop)
+    // remove enclosing double quotes, and unescape escaped double quotes \"
+    const jsonPathStr = propStr.substring(1, propStr.length - 1).replace(/\\"/g, '"')
+    return "['" + jsonPathStr + "']"
+  }
 }
 
 /**
