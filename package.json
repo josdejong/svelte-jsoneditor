@@ -17,7 +17,8 @@
   "exports": {
     ".": {
       "types": "./index.d.ts",
-      "svelte": "./index.js"
+      "svelte": "./index.js",
+      "module": "./index.js"
     },
     "./themes/jse-theme-dark.css": "./themes/jse-theme-dark.css",
     "./themes/jse-theme-default.css": "./themes/jse-theme-default.css",
