@@ -68,6 +68,7 @@
   export let mainMenuBar = true
   export let navigationBar = true
   export let statusBar = true
+  export let askToFormat = true
   export let escapeControlCharacters = false
   export let escapeUnicodeCharacters = false
   export let flattenColumns = true
@@ -373,6 +374,7 @@
         mainMenuBar,
         navigationBar,
         statusBar,
+        askToFormat,
         escapeControlCharacters,
         escapeUnicodeCharacters,
         flattenColumns,
@@ -433,6 +435,7 @@
             {indentation}
             {tabSize}
             {statusBar}
+            {askToFormat}
             {mainMenuBar}
             {navigationBar}
             {escapeControlCharacters}

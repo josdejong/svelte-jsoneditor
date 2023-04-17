@@ -77,6 +77,7 @@
   export let readOnly: boolean
   export let mainMenuBar: boolean
   export let statusBar: boolean
+  export let askToFormat: boolean
   export let externalContent: Content
   export let indentation: number | string
   export let tabSize: number
@@ -112,7 +113,6 @@
 
   let onChangeDisabled = false
   let acceptTooLarge = false
-  let askToFormat = true
 
   let validationErrors: ValidationError[] = []
   const linterCompartment = new Compartment()

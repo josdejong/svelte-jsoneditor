@@ -39,6 +39,7 @@
   export let mainMenuBar: boolean
   export let navigationBar: boolean
   export let statusBar: boolean
+  export let askToFormat: boolean
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
   export let flattenColumns: boolean
@@ -232,6 +233,7 @@
     {tabSize}
     {mainMenuBar}
     {statusBar}
+    {askToFormat}
     {escapeUnicodeCharacters}
     {parser}
     {validator}
