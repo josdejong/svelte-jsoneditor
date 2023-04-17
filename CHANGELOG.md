@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.17.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.16.1...v0.17.0) (2023-04-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* The pointers to entry files and the exports map in the package.json file have been changed. This is just an under-the-hood change for most use cases.
+
+### Features
+
+* change `stringifyJSONPath` and `parseJSONPath` to have a more human friendly output ([f0f8b80](https://github.com/josdejong/svelte-jsoneditor/commit/f0f8b805873c6c0ba48340df236755963eacf93e))
+* update dependencies and devDependencies ([f32281f](https://github.com/josdejong/svelte-jsoneditor/commit/f32281f37c1780a8bca047a16d31e4b2083542e9))
+* update dependencies including @sveltejs/package, changing the package structure ([#258](https://github.com/josdejong/svelte-jsoneditor/issues/258)) ([78603d4](https://github.com/josdejong/svelte-jsoneditor/commit/78603d4e47549c45530c4763b95a1364d7144f94))
+
 ### [0.16.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.16.0...v0.16.1) (2023-03-24)
 
 
