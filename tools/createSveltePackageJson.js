@@ -3,26 +3,17 @@
 import path from 'path'
 import { readFileSync, writeFileSync } from 'fs'
 import { getAbsolutePath } from './utils/getAbsolutePath.mjs'
-import { generateExports } from './utils/generateExports.mjs'
 
-const vanillaPackageFolder = getAbsolutePath(import.meta.url, '..', 'package-vanilla')
-
-const exports = generateExports(vanillaPackageFolder)
+const sveltePackageFolder = getAbsolutePath(import.meta.url, '..', 'package')
 
 // generate a package.json
 const pkg = JSON.parse(String(readFileSync(getAbsolutePath(import.meta.url, '..', 'package.json'))))
 const vanillaPackage = {
   ...pkg,
-  name: 'vanilla-jsoneditor',
   scripts: {},
-  dependencies: {},
-  devDependencies: {},
-  exports: {
-    '.': './index.js',
-    ...exports
-  }
+  devDependencies: {}
 }
 writeFileSync(
-  path.join(vanillaPackageFolder, 'package.json'),
+  path.join(sveltePackageFolder, 'package.json'),
   JSON.stringify(vanillaPackage, null, 2)
 )
