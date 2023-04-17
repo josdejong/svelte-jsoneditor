@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.0...v0.17.1) (2023-04-17)
+
+
+### Features
+
+* make the option `askToFormat` configurable (fix [#252](https://github.com/josdejong/svelte-jsoneditor/issues/252)) ([5e5494f](https://github.com/josdejong/svelte-jsoneditor/commit/5e5494f97da667dc5c8295665dc263b48867f077))
+
+
+### Bug Fixes
+
+* [#142](https://github.com/josdejong/svelte-jsoneditor/issues/142) cannot select contents in readOnly text mode ([99922dc](https://github.com/josdejong/svelte-jsoneditor/commit/99922dc3f5f981a742bb2a2b31151bfe1c09ecb3))
+* [#251](https://github.com/josdejong/svelte-jsoneditor/issues/251) enable search in text mode when readOnly ([50f8889](https://github.com/josdejong/svelte-jsoneditor/commit/50f8889597466ec8027c07dda3d4e613684aa9dc))
+* update dependencies (`jsonrepair` and `@codemirror/view`) ([5ff1306](https://github.com/josdejong/svelte-jsoneditor/commit/5ff130610867d69832722cd3b9b4b9ac40d4e57d))
+
 ## [0.17.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.16.1...v0.17.0) (2023-04-17)
 
 
