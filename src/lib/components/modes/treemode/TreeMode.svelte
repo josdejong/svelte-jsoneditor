@@ -588,9 +588,9 @@
 
   function expandWhenNotInitialized(json) {
     if (!documentStateInitialized) {
-        documentStateInitialized = true
-        const shouldExpand = startExpanded ? expandAll : getDefaultExpand(json);
-        documentState = expandWithCallback(json, documentState, [], shouldExpand)
+      documentStateInitialized = true
+      const shouldExpand = startExpanded ? expandAll : getDefaultExpand(json)
+      documentState = expandWithCallback(json, documentState, [], shouldExpand)
     }
   }
 
