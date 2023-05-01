@@ -72,6 +72,7 @@
   export let escapeControlCharacters = false
   export let escapeUnicodeCharacters = false
   export let flattenColumns = true
+  export let startExpanded = false
   export let parser: JSONParser = JSON
   export let validator: Validator | null = null
   export let validationParser: JSONParser = JSON
@@ -441,6 +442,7 @@
             {escapeControlCharacters}
             {escapeUnicodeCharacters}
             {flattenColumns}
+            {startExpanded}
             {parser}
             {parseMemoizeOne}
             {validator}

@@ -221,6 +221,7 @@
     false
   )
   const flattenColumns = useLocalStorage('svelte-jsoneditor-demo-flattenColumns', false)
+  const startExpanded = useLocalStorage('svelte-jsoneditor-demo-startExpanded', false)
   const useCustomValueRenderer = useLocalStorage(
     'svelte-jsoneditor-demo-useCustomValueRenderer',
     false
@@ -411,6 +412,9 @@
     </label>
     <label>
       <input type="checkbox" bind:checked={$readOnly} /> readOnly
+    </label>
+    <label>
+      <input type="checkbox" bind:checked={$startExpanded} /> startExpanded
     </label>
     <label>
       <input type="checkbox" bind:checked={$useCustomValueRenderer} /> Custom onRenderValue
@@ -638,6 +642,7 @@
             escapeControlCharacters={$escapeControlCharacters}
             escapeUnicodeCharacters={$escapeUnicodeCharacters}
             flattenColumns={$flattenColumns}
+            startExpanded={$startExpanded}
             readOnly={$readOnly}
             indentation={$selectedIndentation}
             tabSize={$tabSize}

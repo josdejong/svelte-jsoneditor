@@ -170,6 +170,7 @@
   export let navigationBar: boolean
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
+  export let startExpanded: boolean
   export let parser: JSONParser
   export let parseMemoizeOne: JSONParser['parse']
   export let validator: Validator | null
@@ -587,8 +588,10 @@
 
   function expandWhenNotInitialized(json) {
     if (!documentStateInitialized) {
-      documentStateInitialized = true
-      documentState = expandWithCallback(json, documentState, [], getDefaultExpand(json))
+        documentStateInitialized = true
+        console.log({ startExpanded });
+        const shouldExpand = startExpanded ? expandAll : getDefaultExpand(json);
+        documentState = expandWithCallback(json, documentState, [], shouldExpand)
     }
   }
 
