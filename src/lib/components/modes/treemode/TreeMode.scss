@@ -14,15 +14,13 @@
   line-height: var(--jse-line-height);
 
   .jse-hidden-input-label {
-    position: fixed;
-    right: 0;
-    top: 0;
-    width: 0;
-    height: 0;
-
     .jse-hidden-input {
-      width: 0;
-      height: 0;
+      position: fixed;
+      top: -10px;
+      left: -10px;
+      // important: width and height must be larger than zero, else Safari gives problems: scrolls to top when the editor gets focus, see https://github.com/josdejong/svelte-jsoneditor/issues/238
+      width: 1px;
+      height: 1px;
       padding: 0;
       border: 0;
       outline: none;
