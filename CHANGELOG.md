@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.1...v0.17.2) (2023-05-03)
+
+
+### Features
+
+* update dependencies (codemirror, sass) ([aeb9af5](https://github.com/josdejong/svelte-jsoneditor/commit/aeb9af585753a6847e5239afefbbf6b985d3e6c6))
+
+
+### Bug Fixes
+
+* [#238](https://github.com/josdejong/svelte-jsoneditor/issues/238) editor scrolls the browser page to top on Safari when getting focus ([20129f8](https://github.com/josdejong/svelte-jsoneditor/commit/20129f87e43e639c75b70383771d11e2df6431e7))
+
 ### [0.17.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.0...v0.17.1) (2023-04-17)
 
 
