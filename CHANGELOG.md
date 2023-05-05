@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.2...v0.17.3) (2023-05-05)
+
+
+### Features
+
+* update dependencies (jsonrepair and dev dependencies) ([d2c424a](https://github.com/josdejong/svelte-jsoneditor/commit/d2c424a14997d515b1cee4d26d0e30b7bbae1c1e))
+
 ### [0.17.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.1...v0.17.2) (2023-05-03)
 
 
