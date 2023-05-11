@@ -40,7 +40,9 @@ npm install vanilla-jsoneditor
 
 ### Examples
 
-- Svelte examples: [/src/routes/examples](/src/routes/examples)
+- Svelte:
+  - Playground: https://www.sveltelab.dev/q1l38ztdys4at87
+  - Examples: [/src/routes/examples](/src/routes/examples)
 - Plain JavaScript examples: [/examples/browser](/examples/browser)
 - React example: https://codesandbox.io/s/svelte-jsoneditor-react-59wxz
 - Vue example: https://codesandbox.io/s/svelte-jsoneditor-vue-toln3w
