@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.3...v0.17.4) (2023-05-18)
+
+
+### Bug Fixes
+
+* [#275](https://github.com/josdejong/svelte-jsoneditor/issues/275) flush debounced changes in `text` mode before blur and destroy ([e8270e9](https://github.com/josdejong/svelte-jsoneditor/commit/e8270e99354cc965dea209a23f60dd5c9000ca57))
+
 ### [0.17.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.2...v0.17.3) (2023-05-05)
 
 
