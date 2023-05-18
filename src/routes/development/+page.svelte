@@ -650,6 +650,8 @@
             onChange={onChangeTree}
             onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
             {onChangeMode}
+            onFocus={() => console.log('onFocus tree')}
+            onBlur={() => console.log('onBlur tree', { content: refTreeEditor.get() })}
           />
         {/if}
       </div>
@@ -700,6 +702,8 @@
             onChange={onChangeText}
             onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
             {onChangeMode}
+            onFocus={() => console.log('onFocus text')}
+            onBlur={() => console.log('onBlur text', { content: refTextEditor.get() })}
           />
         {/if}
       </div>

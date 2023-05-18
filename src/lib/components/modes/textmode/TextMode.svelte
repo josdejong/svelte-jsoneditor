@@ -188,13 +188,20 @@
   // This is used to track whether the editor still has focus
   let modalOpen = false
 
+  onDestroy(() => {
+    flush()
+  })
+
   createFocusTracker({
     onMount,
     onDestroy,
     getWindow: () => getWindow(domTextMode),
     hasFocus: () => (modalOpen && document.hasFocus()) || activeElementIsChildOf(domTextMode),
     onFocus,
-    onBlur
+    onBlur: () => {
+      flush()
+      onBlur()
+    }
   })
 
   export function patch(operations: JSONPatchDocument): JSONPatchResult {
@@ -737,6 +744,10 @@
     TEXT_MODE_ONCHANGE_DELAY
   )
 
+  function flush() {
+    onChangeCodeMirrorValueDebounced.flush()
+  }
+
   function emitOnChange(content: Content, previousContent: Content) {
     if (onChange) {
       onChange(content, previousContent, {
@@ -778,7 +789,7 @@
   export function validate(): ContentErrors | null {
     debug('validate:start')
 
-    onChangeCodeMirrorValueDebounced.flush()
+    flush()
 
     const contentErrors = memoizedValidateText(
       normalization.escapeValue(text),
