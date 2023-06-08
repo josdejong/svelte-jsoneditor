@@ -901,6 +901,7 @@
             onClick: cancelLoadTooLarge
           }
         ]}
+        onClose={focus}
       />
 
       <div class="jse-contents jse-preview">
@@ -920,6 +921,7 @@
           message={jsonParseError.message}
           actions={repairActions}
           onClick={handleShowMe}
+          onClose={focus}
         />
       {/if}
 
@@ -941,6 +943,7 @@
               onClick: () => (askToFormat = false)
             }
           ]}
+          onClose={focus}
         />
       {/if}
 

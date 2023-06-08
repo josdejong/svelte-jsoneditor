@@ -4,12 +4,18 @@
   import Icon from 'svelte-awesome'
   import type { MessageAction } from '$lib/types'
   import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
+  import { onDestroy } from 'svelte'
 
   export let type: 'success' | 'error' = 'success' // 'success' or 'error'
   export let icon: IconDefinition | undefined = undefined
   export let message: string | undefined = undefined
   export let actions: MessageAction[] = []
   export let onClick: (() => void) | undefined = undefined
+  export let onClose: (() => void) | undefined = undefined
+
+  if (onClose) {
+    onDestroy(onClose)
+  }
 
   function handleClick() {
     if (onClick) {

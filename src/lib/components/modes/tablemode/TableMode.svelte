@@ -1837,6 +1837,10 @@
               onClick: handleClearPastedJson
             }
           ]}
+          onClose={() => {
+            // TODO: the need for setTimeout is ugly
+            setTimeout(focus)
+          }}
         />
       {/if}
 
@@ -1858,6 +1862,7 @@
                 }
               ]
             : []}
+          onClose={focus}
         />
       {/if}
 

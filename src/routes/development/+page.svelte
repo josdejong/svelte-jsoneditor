@@ -543,7 +543,7 @@
     <button
       on:click={() => {
         content = {
-          text: 'abc',
+          text: '[1,2,3',
           json: undefined
         }
       }}
