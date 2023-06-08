@@ -241,7 +241,7 @@ export function onRemove({
     if (onChange) {
       onChange(
         { text: '', json: undefined },
-        json !== undefined ? { text, json } : { text: text || '', json },
+        json !== undefined ? { text: undefined, json } : { text: text || '', json },
         {
           contentErrors: null,
           patchResult: null
