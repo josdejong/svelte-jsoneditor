@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.4...v0.17.5) (2023-06-08)
+
+
+### Bug Fixes
+
+* keep focus on the editor after clicking a message action button ([aeb5d8f](https://github.com/josdejong/svelte-jsoneditor/commit/aeb5d8f9da13054cdd61cc866edad7b3f128eb66))
+* start typing in an empty document in tree mode throwing an error ([747f2b4](https://github.com/josdejong/svelte-jsoneditor/commit/747f2b4d78c5c30c0f08ac6fea4823ba6d537be2))
+* throw an error when a custom Ajv instance provided via `onCreateAjv` is configured wrongly ([78771cd](https://github.com/josdejong/svelte-jsoneditor/commit/78771cd3a3326bbdb56f400648bafe3c306f6b65))
+
 ### [0.17.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.3...v0.17.4) (2023-05-18)
 
 
