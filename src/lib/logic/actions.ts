@@ -567,7 +567,7 @@ export function onInsert({
     onReplaceJson(newValue, (patchedJson, patchedState) => ({
       state: {
         ...expandRecursive(patchedJson, patchedState, path),
-        selection: createInsideSelection(path)
+        selection: createValueSelection(path, true)
       }
     }))
   }
@@ -655,6 +655,7 @@ export async function onInsertCharacter({
         //  a patch to change the object/array into a value)
       }
     } else {
+      debug('onInsertValueWithCharacter', { char })
       await onInsertValueWithCharacter({
         char,
         refJsonEditor,
