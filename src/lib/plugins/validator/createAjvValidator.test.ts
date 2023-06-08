@@ -166,6 +166,15 @@ describe('createAjvValidator', () => {
     ])
   })
 
+  test('should throw an error when providing a wrongly configured Ajv instance', () => {
+    assert.throws(() => {
+      createAjvValidator({
+        schema,
+        onCreateAjv: () => new Ajv({ verbose: false })
+      })
+    }, /Ajv must be configured with the option verbose=true/)
+  })
+
   test('should throw an error when using the deprecated API', () => {
     // Deprecation error for the API of v0.9.2 and older
     assert.throws(() => {

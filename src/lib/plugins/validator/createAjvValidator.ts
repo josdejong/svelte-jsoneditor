@@ -45,6 +45,11 @@ export function createAjvValidator(options: AjvValidatorOptions): Validator {
   let ajv = createAjvInstance(options)
   if (options.onCreateAjv !== undefined) {
     ajv = options.onCreateAjv(ajv) || ajv
+
+    // validate whether ajv is configured correctly (this is needed to enhance error messages)
+    if (ajv.opts.verbose === false) {
+      throw new Error('Ajv must be configured with the option verbose=true')
+    }
   }
 
   const validateAjv = ajv.compile(options.schema as Schema)
