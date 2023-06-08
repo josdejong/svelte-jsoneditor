@@ -108,3 +108,23 @@ $errors-overview-max-height: 25%;
     background: var(--jse-input-background-readonly);
   }
 }
+
+@mixin jse-column-header-mixin {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  display: flex;
+  gap: $padding;
+  padding: $padding-half var(--jse-padding) $padding-half $padding-half;
+  width: 100%;
+
+  &:hover {
+    background: var(--jse-table-header-background-highlight);
+  }
+
+  &:not(&.jse-readonly) {
+    cursor: pointer;
+  }
+}

@@ -20,4 +20,4 @@
   <Icon data={faRotate} />
 </button>
 
-<style src="./ColumnHeader.scss"></style>
+<style src="./RefreshColumnHeader.scss"></style>
