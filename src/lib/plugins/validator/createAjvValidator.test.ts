@@ -175,6 +175,16 @@ describe('createAjvValidator', () => {
     }, /Ajv must be configured with the option verbose=true/)
   })
 
+  test('should throw an error when providing a schema that contains an error', () => {
+    const invalidSchema = { type: 'foo' }
+
+    assert.throws(() => {
+      createAjvValidator({
+        schema: invalidSchema
+      })
+    }, /schema is invalid: data\/type must be equal to one of the allowed values, data\/type must be array, data\/type must match a schema in anyOf/)
+  })
+
   test('should throw an error when using the deprecated API', () => {
     // Deprecation error for the API of v0.9.2 and older
     assert.throws(() => {

@@ -54,6 +54,10 @@ export function createAjvValidator(options: AjvValidatorOptions): Validator {
 
   const validateAjv = ajv.compile(options.schema as Schema)
 
+  if (validateAjv.errors) {
+    throw validateAjv.errors[0]
+  }
+
   return function validate(json: JSONValue): ValidationError[] {
     validateAjv(json)
     const ajvErrors = validateAjv.errors || []
