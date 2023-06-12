@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.5...v0.17.6) (2023-06-12)
+
+
+### Features
+
+* update dependencies and devDependencies ([fc8ef83](https://github.com/josdejong/svelte-jsoneditor/commit/fc8ef8340e1a6f825bf335000a7f4b70ce2c8182))
+
+
+### Bug Fixes
+
+* let `createAjvValidator` throw an error when the JSON schema contains an error ([7cfb233](https://github.com/josdejong/svelte-jsoneditor/commit/7cfb233d92862a34557537cef7840926976b40e1))
+* unused CSS selector `".jse-column-header span.jse-column-sort-icon"` ([51c1d54](https://github.com/josdejong/svelte-jsoneditor/commit/51c1d5441085581402cc916e9479c2c91d5c068e))
+
 ### [0.17.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.4...v0.17.5) (2023-06-08)
 
 
