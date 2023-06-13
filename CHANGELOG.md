@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.7](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.6...v0.17.7) (2023-06-13)
+
+
+### Bug Fixes
+
+* [#278](https://github.com/josdejong/svelte-jsoneditor/issues/278) cannot filter debugging output ([b2317a5](https://github.com/josdejong/svelte-jsoneditor/commit/b2317a5db900b77644d992f2f14c97e1de31c3c5))
+
 ### [0.17.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.5...v0.17.6) (2023-06-12)
 
 
