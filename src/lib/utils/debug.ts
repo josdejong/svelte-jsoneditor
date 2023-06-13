@@ -15,24 +15,35 @@
  * localStorage of your browser:
  *
  *     localStorage['debug'] = '*'
+ *     localStorage['debug'] = 'jsoneditor:*'
+ *     localStorage['debug'] = 'jsoneditor:TreeMode'
  *
- * The actual value of 'debug' is not used. You can choose other conditions to
+ * The actual value of 'debug' is used to filter the debug messages.
+ * The value can end with a '*' wild card to match any remaining text.
+ *
+ * By providing a value for `enabled`, you can choose conditions to
  * enable/disable debugging if you want, for example some flag determining
  * whether in development or production.
  */
 export function createDebug(
   namespace: string,
-  enabled = !!tryReadLocalStorage('debug')
+  enabled = enableDebug(namespace)
 ): (...args: unknown[]) => void {
-  if (enabled) {
-    const color = selectColor(namespace)
-
-    return function debug(...args) {
-      console.log(`%c${namespace}`, `color:${color}`, ...args)
-    }
-  } else {
+  if (!enabled) {
     return noop
   }
+
+  const color = selectColor(namespace)
+
+  return function debug(...args) {
+    console.log(`%c${namespace}`, `color:${color}`, ...args)
+  }
+}
+
+function enableDebug(namespace: string) {
+  const debug = tryReadLocalStorage('debug')
+
+  return debug?.endsWith('*') ? namespace.startsWith(debug.slice(0, -1)) : namespace === debug
 }
 
 function noop() {
