@@ -117,6 +117,10 @@ Browser example loading the ES module:
     <script type="module">
       import { JSONEditor } from 'vanilla-jsoneditor'
 
+      // Or use it through a CDN
+      //import { JSONEditor } from 'https://unpkg.com/vanilla-jsoneditor@0.17.7/index.js'
+      //import { JSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor@0.17.7/index.min.js'
+
       let content = {
         text: undefined,
         json: {
