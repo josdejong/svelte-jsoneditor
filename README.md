@@ -43,7 +43,9 @@ npm install vanilla-jsoneditor
 - Svelte:
   - Playground: https://www.sveltelab.dev/q1l38ztdys4at87
   - Examples: [/src/routes/examples](/src/routes/examples)
-- Plain JavaScript examples: [/examples/browser](/examples/browser)
+- Plain JavaScript examples:
+  - Try it out: https://jsbin.com/gatibux/edit?html,output 
+  - Examples: [/examples/browser](/examples/browser)
 - React example: https://codesandbox.io/s/svelte-jsoneditor-react-59wxz
 - Vue example: https://codesandbox.io/s/svelte-jsoneditor-vue-toln3w
 
@@ -117,9 +119,9 @@ Browser example loading the ES module:
     <script type="module">
       import { JSONEditor } from 'vanilla-jsoneditor'
 
-      // Or use it through a CDN
-      //import { JSONEditor } from 'https://unpkg.com/vanilla-jsoneditor@0.17.7/index.js'
-      //import { JSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor@0.17.7/index.min.js'
+      // Or use it through a CDN (not recommended for use in production):
+      // import { JSONEditor } from 'https://unpkg.com/vanilla-jsoneditor/index.js'
+      // import { JSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor/index.js'
 
       let content = {
         text: undefined,

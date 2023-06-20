@@ -46,6 +46,10 @@ Remark: for usage in a Svelte project, install `svelte-jsoneditor` instead.
     <script type="module">
       import { JSONEditor } from 'vanilla-jsoneditor'
 
+      // Or use it through a CDN (not recommended for use in production):
+      // import { JSONEditor } from 'https://unpkg.com/vanilla-jsoneditor/index.js'
+      // import { JSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor/index.js'
+
       let content = {
         text: undefined,
         json: {
