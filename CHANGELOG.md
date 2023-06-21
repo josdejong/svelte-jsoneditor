@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.8](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.7...v0.17.8) (2023-06-21)
+
+
+### Bug Fixes
+
+* method `scrollTo` not always expanding an invisible section of an array ([bda3922](https://github.com/josdejong/svelte-jsoneditor/commit/bda39222fdcd9ec58a4c077dea4245c6fa6fe133))
+* update dependencies (`codemirror`, `jsonrepair`, `sass`, and others) ([3054f96](https://github.com/josdejong/svelte-jsoneditor/commit/3054f964c52ddeb44b486dabb1a804c95c5395e7))
+
 ### [0.17.7](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.6...v0.17.7) (2023-06-13)
 
 
