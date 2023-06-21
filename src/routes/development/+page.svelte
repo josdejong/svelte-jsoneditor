@@ -560,6 +560,13 @@
     >
       Set unrepairable text
     </button>
+    <button
+      on:click={() => {
+        refTreeEditor.scrollTo(['669', 'array'])
+      }}
+    >
+      Scroll to [669, 'array']
+    </button>
   </p>
   <p class="buttons">
     <button

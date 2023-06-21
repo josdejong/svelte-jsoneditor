@@ -101,6 +101,7 @@ export function forEachVisibleIndex(
 
 /**
  * Expand all nodes on given path
+ * The end of the path itself is not expanded
  */
 export function expandPath(
   json: JSONValue,
@@ -110,7 +111,7 @@ export function expandPath(
   const expandedMap: JSONPointerMap<boolean> = { ...documentState.expandedMap }
   const visibleSectionsMap = { ...documentState.visibleSectionsMap }
 
-  for (let i = 0; i <= path.length; i++) {
+  for (let i = 0; i < path.length; i++) {
     const partialPath = path.slice(0, i)
     const partialPointer = compileJSONPointer(partialPath)
 

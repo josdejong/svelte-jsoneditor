@@ -1298,7 +1298,7 @@
    * Expand the path when needed.
    */
   export async function scrollTo(path: JSONPath, scrollToWhenVisible = true): Promise<void> {
-    documentState = expandPath(json, documentState, initial(path))
+    documentState = expandPath(json, documentState, path)
     await tick() // await rerender
 
     const elem = findElement(path)
