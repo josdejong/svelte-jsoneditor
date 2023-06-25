@@ -331,7 +331,9 @@
         onChangeQueryLanguage: handleChangeQueryLanguage,
         onRenderValue,
         onClassName,
-        onTransform
+        onTransform,
+        onIgnoreKey,
+        onSortKey
       },
       TRANSFORM_MODAL_OPTIONS,
       {

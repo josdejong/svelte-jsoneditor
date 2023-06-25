@@ -50,6 +50,9 @@
   export let onClassName: OnClassName
 
   export let onTransform: OnPatch
+  export let onIgnoreKey: (path: JSONPath) => void
+  export let onSortKey: (path: JSONPath) => void
+
 
   $: selectedJson = getIn(json, rootPath)
   $: selectedContent = { json: selectedJson }
@@ -275,12 +278,8 @@
                 validator={null}
                 {validationParser}
                 {pathParser}
-                onIgnoreKey={(path) => {
-                  console.log('onIgnoreKey', path)
-                }}
-                onSortKey={path => {
-                  console.log('onSortKey', path)
-                }}
+                {onIgnoreKey}
+                {onSortKey}
               />
             {/if}
           </div>
