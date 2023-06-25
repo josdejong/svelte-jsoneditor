@@ -443,6 +443,8 @@ export interface JSONEditorPropsOptional {
   onError?: OnError
   onFocus?: OnFocus
   onBlur?: OnBlur
+  onIgnoreKey?: (path: JSONPath) => void
+  onSortKey?: (path: JSONPath) => void
 }
 
 export interface JSONEditorContext {

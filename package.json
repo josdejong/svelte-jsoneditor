@@ -1,8 +1,8 @@
 {
-  "name": "@1pone/svelte-jsoneditor",
+  "name": "@arextest/svelte-jsoneditor",
   "description": "A web-based tool to view, edit, format, transform, and validate JSON",
-  "version": "0.17.8",
-  "homepage": "https://jsoneditoronline.org",
+  "version": "0.17.11",
+  "homepage": "https://github.com/1pone/svelte-jsoneditor.git",
   "repository": {
     "type": "git",
     "url": "https://github.com/1pone/svelte-jsoneditor.git"
@@ -68,11 +68,12 @@
     "release:version": "standard-version",
     "release:build": "npm run build",
     "release:push": "git push && git push --tag",
-    "release:publish:svelte-jsoneditor": "npm publish package/",
-    "release:publish:vanilla-jsoneditor": "npm publish package-vanilla/",
+    "release:publish:svelte-jsoneditor": "npm publish package/ --access=public",
+    "release:publish:vanilla-jsoneditor": "npm publish package-vanilla/ --access=public",
     "release-dry-run": "standard-version --dry-run"
   },
   "dependencies": {
+    "@arextest/svelte-jsoneditor": "link:",
     "@codemirror/commands": "^6.2.4",
     "@codemirror/lang-json": "^6.0.1",
     "@codemirror/language": "^6.8.0",

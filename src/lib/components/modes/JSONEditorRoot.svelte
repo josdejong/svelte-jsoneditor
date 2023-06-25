@@ -61,7 +61,6 @@
   export let onSortModal: OnSortModal
   export let onTransformModal: OnTransformModal
   export let onJSONEditorModal: OnJSONEditorModal
-
   export let onIgnoreKey: (path: JSONPath) => void
   export let onSortKey: (path: JSONPath) => void
 

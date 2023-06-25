@@ -13,7 +13,7 @@ const exports = generateExports(vanillaPackageFolder)
 const pkg = JSON.parse(String(readFileSync(getAbsolutePath(import.meta.url, '..', 'package.json'))))
 const vanillaPackage = {
   ...pkg,
-  name: 'vanilla-jsoneditor',
+  name: '@arextest/vanilla-jsoneditor',
   scripts: {},
   dependencies: {},
   devDependencies: {},

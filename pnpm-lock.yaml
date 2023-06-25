@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@arextest/svelte-jsoneditor': 'link:'
   '@babel/core': 7.22.5
   '@babel/preset-env': 7.22.5
   '@codemirror/commands': ^6.2.4
@@ -75,6 +76,7 @@ specifiers:
   vitest: 0.32.2
 
 dependencies:
+  '@arextest/svelte-jsoneditor': 'link:'
   '@codemirror/commands': 6.2.4
   '@codemirror/lang-json': 6.0.1
   '@codemirror/language': 6.8.0

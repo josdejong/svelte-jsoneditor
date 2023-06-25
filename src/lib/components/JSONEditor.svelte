@@ -55,7 +55,6 @@
   import memoizeOne from 'memoize-one'
   import type { Callbacks, Component } from 'svelte-simple-modal/types/Modal.svelte'
   import ModalRef from '../components/modals/ModalRef.svelte'
-  import TreeMode from "$lib/components/modes/treemode/TreeMode.svelte";
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:JSONEditor')

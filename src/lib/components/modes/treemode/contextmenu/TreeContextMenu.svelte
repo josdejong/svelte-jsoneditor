@@ -466,5 +466,5 @@
 
 <ContextMenu
   {items}
-  tip={showTip ? 'Tip: you can open this context menu via right-click or with Ctrl+Q' : undefined}
 />
+<!--  tip={showTip ? 'Tip: you can open this context menu via right-click or with Ctrl+Q' : undefined}-->
