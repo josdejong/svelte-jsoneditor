@@ -55,6 +55,7 @@
   import memoizeOne from 'memoize-one'
   import type { Callbacks, Component } from 'svelte-simple-modal/types/Modal.svelte'
   import ModalRef from '../components/modals/ModalRef.svelte'
+  import TreeMode from "$lib/components/modes/treemode/TreeMode.svelte";
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:JSONEditor')
@@ -95,6 +96,9 @@
   }
   export let onFocus: OnFocus = noop
   export let onBlur: OnBlur = noop
+
+  export let onIgnoreKey: (path: JSONPath) => void
+  export let onSortKey: (path: JSONPath) => void
 
   let instanceId = uniqueId()
   let hasFocus = false
@@ -458,6 +462,8 @@
             {onSortModal}
             {onTransformModal}
             {onJSONEditorModal}
+            {onIgnoreKey}
+            {onSortKey}
           />
         {/key}
       </div>

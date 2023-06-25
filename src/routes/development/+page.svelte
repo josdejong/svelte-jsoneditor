@@ -659,6 +659,12 @@
             {onChangeMode}
             onFocus={() => console.log('onFocus tree')}
             onBlur={() => console.log('onBlur tree', { content: refTreeEditor.get() })}
+            onIgnoreKey={(path) => {
+              console.log('onIgnoreKey', path)
+            }}
+            onSortKey={(path) => {
+              console.log('onSortKey', path)
+            }}
           />
         {/if}
       </div>

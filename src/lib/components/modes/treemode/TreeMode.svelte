@@ -187,6 +187,8 @@
   export let onSortModal: OnSortModal
   export let onTransformModal: OnTransformModal
   export let onJSONEditorModal: OnJSONEditorModal
+  export let onIgnoreKey: (path: JSONPath) => void
+  export let onSortKey: (path: JSONPath) => void
 
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
@@ -778,6 +780,22 @@
   // $: debug('json', json)
   // $: debug('state', state)
   // $: debug('selection', selection)
+
+  function handleIgnoreKey() {
+    if (readOnly || !documentState.selection) {
+      return
+    }
+    const path = documentState.selection.focusPath
+    onIgnoreKey?.(path)
+  }
+
+  function handleSortKey() {
+    if (readOnly || !documentState.selection) {
+      return
+    }
+    const path = documentState.selection.focusPath
+    onSortKey?.(path)
+  }
 
   function handleEditKey() {
     if (readOnly || !documentState.selection) {
@@ -1818,6 +1836,8 @@
       parser,
       showTip,
 
+      onIgnoreKey: handleIgnoreKey,
+      onSortKey: handleSortKey,
       onEditKey: handleEditKey,
       onEditValue: handleEditValue,
       onToggleEnforceString: handleToggleEnforceString,

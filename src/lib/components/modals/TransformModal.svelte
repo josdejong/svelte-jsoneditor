@@ -275,6 +275,12 @@
                 validator={null}
                 {validationParser}
                 {pathParser}
+                onIgnoreKey={(path) => {
+                  console.log('onIgnoreKey', path)
+                }}
+                onSortKey={path => {
+                  console.log('onSortKey', path)
+                }}
               />
             {/if}
           </div>

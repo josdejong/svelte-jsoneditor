@@ -1,11 +1,11 @@
 {
-  "name": "svelte-jsoneditor",
+  "name": "@1pone/svelte-jsoneditor",
   "description": "A web-based tool to view, edit, format, transform, and validate JSON",
   "version": "0.17.8",
   "homepage": "https://jsoneditoronline.org",
   "repository": {
     "type": "git",
-    "url": "https://github.com/josdejong/svelte-jsoneditor.git"
+    "url": "https://github.com/1pone/svelte-jsoneditor.git"
   },
   "type": "module",
   "svelte": "./index.js",
@@ -82,6 +82,7 @@
     "@codemirror/view": "^6.13.2",
     "@fortawesome/free-regular-svg-icons": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
+    "@lezer/highlight": "^1.1.6",
     "@replit/codemirror-indentation-markers": "6.4.2",
     "ajv": "^8.12.0",
     "codemirror": "^6.0.1",

@@ -23,12 +23,12 @@
     TransformModalOptions,
     Validator
   } from '$lib/types'
-  import { Mode } from '$lib/types.js'
+  import {Mode} from '$lib/types.js'
   import TextMode from './textmode/TextMode.svelte'
   import TableMode from './tablemode/TableMode.svelte'
   import TreeMode from './treemode/TreeMode.svelte'
-  import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-  import { isMenuSpaceItem } from '$lib/typeguards.js'
+  import type {JSONPatchDocument, JSONPath} from 'immutable-json-patch'
+  import {isMenuSpaceItem} from '$lib/typeguards.js'
 
   export let content: Content
 
@@ -61,6 +61,9 @@
   export let onSortModal: OnSortModal
   export let onTransformModal: OnTransformModal
   export let onJSONEditorModal: OnJSONEditorModal
+
+  export let onIgnoreKey: (path: JSONPath) => void
+  export let onSortKey: (path: JSONPath) => void
 
   let refTreeMode
   let refTableMode
@@ -104,7 +107,7 @@
       ? modeMenuItems.concat(items) // menu is empty, readOnly mode
       : modeMenuItems.concat(separatorMenuItem, items)
 
-    return onRenderMenu(updatedItems, { mode, modal: insideModal }) || updatedItems
+    return onRenderMenu(updatedItems, {mode, modal: insideModal}) || updatedItems
   }
 
   export function patch(operations: JSONPatchDocument): JSONPatchResult {
@@ -298,5 +301,7 @@
     {onSortModal}
     {onTransformModal}
     {onJSONEditorModal}
+    {onIgnoreKey}
+    {onSortKey}
   />
 {/if}
