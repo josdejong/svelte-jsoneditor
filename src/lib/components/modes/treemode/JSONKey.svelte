@@ -27,10 +27,10 @@
 
   export let context: TreeModeContext
 
-  $: isSelected = selection
+  $: isNodeSelected = selection
     ? selection.pointersMap[pointer] === true && isKeySelection(selection)
     : undefined
-  $: isEditingKey = isSelected && isEditingSelection(selection)
+  $: isEditingKey = isNodeSelected && isEditingSelection(selection)
 
   function handleKeyDoubleClick(event) {
     if (!isEditingKey && !context.readOnly) {
@@ -83,7 +83,7 @@
     {/if}
   </div>
 {/if}
-{#if !context.readOnly && isSelected && !isEditingKey}
+{#if !context.readOnly && isNodeSelected && !isEditingKey}
   <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
 {/if}
 

@@ -112,8 +112,8 @@
   let validationError: ValidationError | undefined
   $: validationError = validationErrorsMap ? validationErrorsMap[pointer] : undefined
 
-  let isSelected: boolean
-  $: isSelected = selection ? selection.pointersMap[pointer] === true : false
+  let isNodeSelected: boolean
+  $: isNodeSelected = selection ? selection.pointersMap[pointer] === true : false
 
   $: root = path.length === 0
 
@@ -605,9 +605,9 @@
   )}
   data-path={encodeDataPath(path)}
   class:jse-root={root}
-  class:jse-selected={isSelected && isMultiSelection(selection)}
-  class:jse-selected-key={isSelected && isKeySelection(selection)}
-  class:jse-selected-value={isSelected && isValueSelection(selection)}
+  class:jse-selected={isNodeSelected && isMultiSelection(selection)}
+  class:jse-selected-key={isNodeSelected && isKeySelection(selection)}
+  class:jse-selected-value={isNodeSelected && isValueSelection(selection)}
   class:jse-readonly={context.readOnly}
   class:jse-hovered={hover === HOVER_COLLECTION}
   on:mousedown={handleMouseDown}
@@ -655,7 +655,7 @@
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
+        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="jse-context-menu-pointer-anchor">
             <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -682,17 +682,17 @@
     </div>
     {#if expanded}
       <div class="jse-items">
-        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || (isSelected && isInsideSelection(selection)))}
+        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || (isNodeSelected && isInsideSelection(selection)))}
           <div
             class="jse-insert-area jse-inside"
             class:jse-hovered={hover === HOVER_INSERT_INSIDE}
-            class:jse-selected={isSelected && isInsideSelection(selection)}
+            class:jse-selected={isNodeSelected && isInsideSelection(selection)}
             data-type="insert-selection-area-inside"
             style={getIndentationStyle(path.length + 1)}
             title={INSERT_EXPLANATION}
           >
             <ContextMenuPointer
-              selected={isSelected && isInsideSelection(selection)}
+              selected={isNodeSelected && isInsideSelection(selection)}
               onContextMenu={handleInsertInsideOpenContextMenu}
             />
           </div>
@@ -776,7 +776,7 @@
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
+        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="jse-context-menu-pointer-anchor">
             <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -803,17 +803,17 @@
     </div>
     {#if expanded}
       <div class="jse-props">
-        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || (isSelected && isInsideSelection(selection)))}
+        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || (isNodeSelected && isInsideSelection(selection)))}
           <div
             class="jse-insert-area jse-inside"
             class:jse-hovered={hover === HOVER_INSERT_INSIDE}
-            class:jse-selected={isSelected && isInsideSelection(selection)}
+            class:jse-selected={isNodeSelected && isInsideSelection(selection)}
             data-type="insert-selection-area-inside"
             style={getIndentationStyle(path.length + 1)}
             title={INSERT_EXPLANATION}
           >
             <ContextMenuPointer
-              selected={isSelected && isInsideSelection(selection)}
+              selected={isNodeSelected && isInsideSelection(selection)}
               onContextMenu={handleInsertInsideOpenContextMenu}
             />
           </div>
@@ -870,11 +870,11 @@
           {path}
           {value}
           {enforceString}
-          selection={isSelected ? selection : undefined}
+          selection={isNodeSelected ? selection : undefined}
           searchResultItems={filterValueSearchResults(searchResultItemsMap, pointer)}
           {context}
         />
-        {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
+        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
           <div class="jse-context-menu-pointer-anchor">
             <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -893,17 +893,17 @@
       {/if}
     </div>
   {/if}
-  {#if !context.readOnly && (hover === HOVER_INSERT_AFTER || (isSelected && isAfterSelection(selection)))}
+  {#if !context.readOnly && (hover === HOVER_INSERT_AFTER || (isNodeSelected && isAfterSelection(selection)))}
     <div
       class="jse-insert-area jse-after"
       class:jse-hovered={hover === HOVER_INSERT_AFTER}
-      class:jse-selected={isSelected && isAfterSelection(selection)}
+      class:jse-selected={isNodeSelected && isAfterSelection(selection)}
       data-type="insert-selection-area-after"
       style={indentationStyle}
       title={INSERT_EXPLANATION}
     >
       <ContextMenuPointer
-        selected={isSelected && isAfterSelection(selection)}
+        selected={isNodeSelected && isAfterSelection(selection)}
         onContextMenu={handleInsertAfterOpenContextMenu}
       />
     </div>
