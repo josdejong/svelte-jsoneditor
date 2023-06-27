@@ -550,10 +550,10 @@
 
     if (isChildOfAttribute(event.target, 'data-type', 'selectable-value')) {
       hover = HOVER_COLLECTION
-    } else if (isChildOfAttribute(event.target, 'data-type', 'insert-selection-area-inside')) {
-      hover = HOVER_INSERT_INSIDE
-    } else if (isChildOfAttribute(event.target, 'data-type', 'insert-selection-area-after')) {
-      hover = HOVER_INSERT_AFTER
+    // } else if (isChildOfAttribute(event.target, 'data-type', 'insert-selection-area-inside')) {
+    //   hover = HOVER_INSERT_INSIDE
+    // } else if (isChildOfAttribute(event.target, 'data-type', 'insert-selection-area-after')) {
+    //   hover = HOVER_INSERT_AFTER
     }
 
     clearTimeout(hoverTimer)
@@ -682,21 +682,21 @@
     </div>
     {#if expanded}
       <div class="jse-items">
-        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || (isSelected && isInsideSelection(selection)))}
-          <div
-            class="jse-insert-area jse-inside"
-            class:jse-hovered={hover === HOVER_INSERT_INSIDE}
-            class:jse-selected={isSelected && isInsideSelection(selection)}
-            data-type="insert-selection-area-inside"
-            style={getIndentationStyle(path.length + 1)}
-            title={INSERT_EXPLANATION}
-          >
-            <ContextMenuPointer
-              selected={isSelected && isInsideSelection(selection)}
-              onContextMenu={handleInsertInsideOpenContextMenu}
-            />
-          </div>
-        {/if}
+        <!--{#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || (isSelected && isInsideSelection(selection)))}-->
+        <!--  <div-->
+        <!--    class="jse-insert-area jse-inside"-->
+        <!--    class:jse-hovered={hover === HOVER_INSERT_INSIDE}-->
+        <!--    class:jse-selected={isSelected && isInsideSelection(selection)}-->
+        <!--    data-type="insert-selection-area-inside"-->
+        <!--    style={getIndentationStyle(path.length + 1)}-->
+        <!--    title={INSERT_EXPLANATION}-->
+        <!--  >-->
+        <!--    <ContextMenuPointer-->
+        <!--      selected={isSelected && isInsideSelection(selection)}-->
+        <!--      onContextMenu={handleInsertInsideOpenContextMenu}-->
+        <!--    />-->
+        <!--  </div>-->
+        <!--{/if}-->
         {#each visibleSections || DEFAULT_VISIBLE_SECTIONS as visibleSection, sectionIndex (sectionIndex)}
           {#each getItems(path, value, visibleSection, expandedMap, enforceStringMap, visibleSectionsMap, validationErrorsMap, searchResultItemsMap, selection, dragging) as item (item.index)}
             <svelte:self
@@ -776,11 +776,11 @@
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
-          <div class="jse-context-menu-pointer-anchor">
-            <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
-          </div>
-        {/if}
+        <!--{#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}-->
+        <!--  <div class="jse-context-menu-pointer-anchor">-->
+        <!--    <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />-->
+        <!--  </div>-->
+        <!--{/if}-->
       </div>
       {#if validationError && (!expanded || !validationError.isChildError)}
         <ValidationErrorIcon {validationError} onExpand={handleExpand} />
@@ -803,21 +803,21 @@
     </div>
     {#if expanded}
       <div class="jse-props">
-        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || (isSelected && isInsideSelection(selection)))}
-          <div
-            class="jse-insert-area jse-inside"
-            class:jse-hovered={hover === HOVER_INSERT_INSIDE}
-            class:jse-selected={isSelected && isInsideSelection(selection)}
-            data-type="insert-selection-area-inside"
-            style={getIndentationStyle(path.length + 1)}
-            title={INSERT_EXPLANATION}
-          >
-            <ContextMenuPointer
-              selected={isSelected && isInsideSelection(selection)}
-              onContextMenu={handleInsertInsideOpenContextMenu}
-            />
-          </div>
-        {/if}
+        <!--{#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || (isSelected && isInsideSelection(selection)))}-->
+        <!--  <div-->
+        <!--    class="jse-insert-area jse-inside"-->
+        <!--    class:jse-hovered={hover === HOVER_INSERT_INSIDE}-->
+        <!--    class:jse-selected={isSelected && isInsideSelection(selection)}-->
+        <!--    data-type="insert-selection-area-inside"-->
+        <!--    style={getIndentationStyle(path.length + 1)}-->
+        <!--    title={INSERT_EXPLANATION}-->
+        <!--  >-->
+        <!--    <ContextMenuPointer-->
+        <!--      selected={isSelected && isInsideSelection(selection)}-->
+        <!--      onContextMenu={handleInsertInsideOpenContextMenu}-->
+        <!--    />-->
+        <!--  </div>-->
+        <!--{/if}-->
         {#each getProps(path, value, expandedMap, enforceStringMap, visibleSectionsMap, validationErrorsMap, searchResultItemsMap, selection, dragging) as prop}
           <svelte:self
             value={prop.value}
@@ -874,11 +874,11 @@
           searchResultItems={filterValueSearchResults(searchResultItemsMap, pointer)}
           {context}
         />
-        {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
-          <div class="jse-context-menu-pointer-anchor">
-            <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
-          </div>
-        {/if}
+        <!--{#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}-->
+        <!--  <div class="jse-context-menu-pointer-anchor">-->
+        <!--    <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />-->
+        <!--  </div>-->
+        <!--{/if}-->
       </div>
       {#if validationError}
         <ValidationErrorIcon {validationError} onExpand={handleExpand} />
@@ -893,21 +893,21 @@
       {/if}
     </div>
   {/if}
-  {#if !context.readOnly && (hover === HOVER_INSERT_AFTER || (isSelected && isAfterSelection(selection)))}
-    <div
-      class="jse-insert-area jse-after"
-      class:jse-hovered={hover === HOVER_INSERT_AFTER}
-      class:jse-selected={isSelected && isAfterSelection(selection)}
-      data-type="insert-selection-area-after"
-      style={indentationStyle}
-      title={INSERT_EXPLANATION}
-    >
-      <ContextMenuPointer
-        selected={isSelected && isAfterSelection(selection)}
-        onContextMenu={handleInsertAfterOpenContextMenu}
-      />
-    </div>
-  {/if}
+  <!--{#if !context.readOnly && (hover === HOVER_INSERT_AFTER || (isSelected && isAfterSelection(selection)))}-->
+  <!--  <div-->
+  <!--    class="jse-insert-area jse-after"-->
+  <!--    class:jse-hovered={hover === HOVER_INSERT_AFTER}-->
+  <!--    class:jse-selected={isSelected && isAfterSelection(selection)}-->
+  <!--    data-type="insert-selection-area-after"-->
+  <!--    style={indentationStyle}-->
+  <!--    title={INSERT_EXPLANATION}-->
+  <!--  >-->
+  <!--    <ContextMenuPointer-->
+  <!--      selected={isSelected && isAfterSelection(selection)}-->
+  <!--      onContextMenu={handleInsertAfterOpenContextMenu}-->
+  <!--    />-->
+  <!--  </div>-->
+  <!--{/if}-->
 </div>
 
 <style src="./JSONNode.scss"></style>
