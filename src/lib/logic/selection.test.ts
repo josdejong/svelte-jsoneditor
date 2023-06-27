@@ -89,12 +89,7 @@ describe('selection', () => {
           ['a', 'b'],
           ['a', 'c'],
           ['a', 'd']
-        ],
-        pointersMap: {
-          '/a/b': true,
-          '/a/c': true,
-          '/a/d': true
-        }
+        ]
       }),
       ['a']
     )
@@ -118,12 +113,7 @@ describe('selection', () => {
           ['a', 'b'],
           ['a', 'c'],
           ['a', 'd']
-        ],
-        pointersMap: {
-          '/a/b': true,
-          '/a/c': true,
-          '/a/d': true
-        }
+        ]
       }),
       ['a']
     )
@@ -219,10 +209,7 @@ describe('selection', () => {
           type: SelectionType.multi,
           anchorPath: ['path'],
           focusPath: ['path'],
-          paths: [['path']],
-          pointersMap: {
-            '/path': true
-          }
+          paths: [['path']]
         }
       )
     })
@@ -280,10 +267,7 @@ describe('selection', () => {
           type: SelectionType.multi,
           anchorPath: ['path'],
           focusPath: ['path'],
-          paths: [['path']],
-          pointersMap: {
-            '/path': true
-          }
+          paths: [['path']]
         }
       )
     })
@@ -553,56 +537,38 @@ describe('selection', () => {
       type: SelectionType.value,
       anchorPath: [],
       focusPath: [],
-      edit: false,
-      pointersMap: {
-        '': true
-      }
+      edit: false
     })
     assert.deepStrictEqual(getInitialSelectionWithState([]), {
       type: SelectionType.value,
       anchorPath: [],
       focusPath: [],
-      edit: false,
-      pointersMap: {
-        '': true
-      }
+      edit: false
     })
     assert.deepStrictEqual(getInitialSelectionWithState('test'), {
       type: SelectionType.value,
       anchorPath: [],
       focusPath: [],
-      edit: false,
-      pointersMap: {
-        '': true
-      }
+      edit: false
     })
 
     assert.deepStrictEqual(getInitialSelectionWithState({ a: 2, b: 3 }), {
       type: SelectionType.key,
       anchorPath: ['a'],
       focusPath: ['a'],
-      edit: false,
-      pointersMap: {
-        '/a': true
-      }
+      edit: false
     })
     assert.deepStrictEqual(getInitialSelectionWithState({ a: {} }), {
       type: SelectionType.key,
       anchorPath: ['a'],
       focusPath: ['a'],
-      edit: false,
-      pointersMap: {
-        '/a': true
-      }
+      edit: false
     })
     assert.deepStrictEqual(getInitialSelectionWithState([2, 3, 4]), {
       type: SelectionType.value,
       anchorPath: ['0'],
       focusPath: ['0'],
-      edit: false,
-      pointersMap: {
-        '/0': true
-      }
+      edit: false
     })
   })
 
@@ -783,17 +749,23 @@ describe('selection', () => {
     test('should determine whether a selection is relevant for given pointer', () => {
       const selection = createMultiSelection(json, ['obj', 'arr', '0'], ['obj', 'arr', '2'])
 
-      assert.deepStrictEqual(selectionIfOverlapping(selection, ''), selection)
-      assert.deepStrictEqual(selectionIfOverlapping(selection, '/obj'), selection)
-      assert.deepStrictEqual(selectionIfOverlapping(selection, '/obj/arr'), selection)
-      assert.deepStrictEqual(selectionIfOverlapping(selection, '/obj/arr/0'), selection)
-      assert.deepStrictEqual(selectionIfOverlapping(selection, '/obj/arr/1'), selection)
-      assert.deepStrictEqual(selectionIfOverlapping(selection, '/obj/arr/2'), selection)
-      assert.deepStrictEqual(selectionIfOverlapping(selection, '/obj/arr/2/first'), selection)
-      assert.deepStrictEqual(selectionIfOverlapping(selection, '/obj/arr/2/last'), selection)
-      assert.deepStrictEqual(selectionIfOverlapping(selection, '/str'), undefined)
-      assert.deepStrictEqual(selectionIfOverlapping(selection, '/nill'), undefined)
-      assert.deepStrictEqual(selectionIfOverlapping(selection, '/bool'), undefined)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, []), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, ['obj']), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, ['obj', 'arr']), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, ['obj', 'arr', '0']), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, ['obj', 'arr', '1']), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, ['obj', 'arr', '2']), selection)
+      assert.deepStrictEqual(
+        selectionIfOverlapping(selection, ['obj', 'arr', '2', 'first']),
+        selection
+      )
+      assert.deepStrictEqual(
+        selectionIfOverlapping(selection, ['obj', 'arr', '2', 'last']),
+        selection
+      )
+      assert.deepStrictEqual(selectionIfOverlapping(selection, ['str']), undefined)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, ['nill']), undefined)
+      assert.deepStrictEqual(selectionIfOverlapping(selection, ['bool']), undefined)
     })
   })
 })

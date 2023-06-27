@@ -8,10 +8,8 @@ import {
   type JSONPatchDocument,
   type JSONPatchOperation,
   type JSONPath,
-  type JSONPointer,
   type JSONValue,
-  parsePath,
-  startsWithJSONPointer
+  parsePath
 } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import { isObjectOrArray } from '$lib/utils/typeUtils.js'
@@ -28,6 +26,7 @@ import type {
   DocumentState,
   InsideSelection,
   JSONParser,
+  JSONPointerMap,
   JSONSelection,
   KeySelection,
   MultiSelection,
@@ -157,16 +156,8 @@ export function isPathInsideSelection(
     return false
   }
 
-  const p = path.slice(0)
-
   if (isMultiSelection(selection)) {
-    while (p.length > 0) {
-      if (selection.pointersMap[compileJSONPointer(p)] === true) {
-        return true
-      }
-
-      p.pop()
-    }
+    return selection.paths.some((selectionPath) => pathStartsWith(path, selectionPath))
   }
 
   if (isKeySelection(selection)) {
@@ -525,26 +516,32 @@ export function createSelectionFromOperations(
     type: SelectionType.multi,
     paths,
     anchorPath: first(paths) as JSONPath,
-    focusPath: last(paths) as JSONPath,
-    pointersMap: createPointersMap(paths)
+    focusPath: last(paths) as JSONPath
   }
 }
 
+// TODO: cleanup if not used
 // TODO: write unit tests
-export function createPointersMap(paths: JSONPath[]): { [pointer: JSONPointer]: boolean } {
-  const pointersMap: { [pointer: JSONPointer]: boolean } = {}
+export function createSelectionMap(
+  selection: JSONSelection | undefined
+): JSONPointerMap<boolean> | undefined {
+  if (selection === undefined) {
+    return undefined
+  }
 
-  paths.forEach((path) => {
-    pointersMap[compileJSONPointer(path)] = true
-  })
+  if (isMultiSelection(selection)) {
+    const pointersMap: JSONPointerMap<boolean> = {}
 
-  return pointersMap
-}
+    selection.paths.forEach((path) => {
+      pointersMap[compileJSONPointer(path)] = true
+    })
 
-// TODO: write unit tests
-export function createSinglePointersMap(path: JSONPath): { [pointer: JSONPointer]: boolean } {
+    return pointersMap
+  }
+
+  // key, value, after, inside selection
   return {
-    [compileJSONPointer(path)]: true
+    [compileJSONPointer(selection.focusPath)]: true
   }
 }
 
@@ -614,7 +611,6 @@ export function createKeySelection(path: JSONPath, edit: boolean): KeySelection 
     type: SelectionType.key,
     anchorPath: path,
     focusPath: path,
-    pointersMap: createSinglePointersMap(path),
     edit
   }
 }
@@ -624,7 +620,6 @@ export function createValueSelection(path: JSONPath, edit: boolean): ValueSelect
     type: SelectionType.value,
     anchorPath: path,
     focusPath: path,
-    pointersMap: createSinglePointersMap(path),
     edit
   }
 }
@@ -633,8 +628,7 @@ export function createInsideSelection(path: JSONPath): InsideSelection {
   return {
     type: SelectionType.inside,
     anchorPath: path,
-    focusPath: path,
-    pointersMap: createSinglePointersMap(path)
+    focusPath: path
   }
 }
 
@@ -642,8 +636,7 @@ export function createAfterSelection(path: JSONPath): AfterSelection {
   return {
     type: SelectionType.after,
     anchorPath: path,
-    focusPath: path,
-    pointersMap: createSinglePointersMap(path)
+    focusPath: path
   }
 }
 
@@ -665,8 +658,7 @@ export function createMultiSelection(
     type: SelectionType.multi,
     anchorPath: focusPathLast ? (first(paths) as JSONPath) : (last(paths) as JSONPath),
     focusPath: focusPathLast ? (last(paths) as JSONPath) : (first(paths) as JSONPath),
-    paths,
-    pointersMap: createPointersMap(paths)
+    paths
   }
 }
 
@@ -813,15 +805,38 @@ export function fromSelectionType(
 
 export function selectionIfOverlapping(
   selection: JSONSelection | undefined,
-  pointer: JSONPointer
+  path: JSONPath
 ): JSONSelection | undefined {
   if (!selection) {
     return undefined
   }
 
-  return Object.keys(selection.pointersMap).some(
-    (p) => startsWithJSONPointer(p, pointer) || startsWithJSONPointer(pointer, p)
-  )
-    ? selection
-    : undefined
+  const overlap = isMultiSelection(selection)
+    ? selection.paths.some((selectionPath) => pathsOverlap(selectionPath, path))
+    : pathsOverlap(selection.focusPath, path)
+
+  return overlap ? selection : undefined
+}
+
+// TODO: write unit test
+export function pathsOverlap(path1: JSONPath, path2: JSONPath): boolean {
+  let i = 0
+  const iMax = Math.min(path1.length, path2.length)
+
+  while (path1[i] === path2[i] && i < iMax) {
+    i++
+  }
+
+  return i === path1.length || i === path2.length
+}
+
+// TODO: write some unit tests
+export function pathInSelection(path: JSONPath, selection: JSONSelection | undefined): boolean {
+  if (!selection) {
+    return false
+  }
+
+  return isMultiSelection(selection)
+    ? selection.paths.some((p) => isEqual(p, path)) // Note: this is relatively slow
+    : isEqual(selection.focusPath, path)
 }

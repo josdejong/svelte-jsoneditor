@@ -36,6 +36,7 @@
     isMultiSelection,
     isPathInsideSelection,
     isValueSelection,
+    pathInSelection,
     selectionIfOverlapping
   } from '$lib/logic/selection.js'
   import {
@@ -113,7 +114,7 @@
   $: validationError = validationErrorsMap ? validationErrorsMap[pointer] : undefined
 
   let isNodeSelected: boolean
-  $: isNodeSelected = selection ? selection.pointersMap[pointer] === true : false
+  $: isNodeSelected = pathInSelection(path, selection)
 
   $: root = path.length === 0
 
@@ -136,19 +137,19 @@
     dragging: DraggingState
   ): JSONNodeProp[] {
     let props = Object.keys(object).map((key) => {
+      const keyPath = memoizePath(path.concat(key))
       const keyPointer = appendToJSONPointer(pointer, key)
       return {
         key,
         value: object[key],
-        path: memoizePath(path.concat(key)),
-        pointer: keyPointer,
+        path: keyPath,
         expandedMap: filterPointerOrUndefined(expandedMap, keyPointer),
         enforceStringMap: filterPointerOrUndefined(enforceStringMap, keyPointer),
         visibleSectionsMap: filterPointerOrUndefined(visibleSectionsMap, keyPointer),
         validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, keyPointer),
         keySearchResultItemsMap: filterKeySearchResults(searchResultItemsMap, keyPointer),
         valueSearchResultItemsMap: filterPointerOrUndefined(searchResultItemsMap, keyPointer),
-        selection: selectionIfOverlapping(selection, keyPointer)
+        selection: selectionIfOverlapping(selection, keyPath)
       }
     })
 
@@ -183,19 +184,19 @@
     let items: JSONNodeItem[] = []
 
     for (let index = start; index < end; index++) {
+      const itemPath = memoizePath(path.concat(String(index)))
       const itemPointer = appendToJSONPointer(pointer, index)
 
       items.push({
         index,
         value: array[index],
-        path: memoizePath(path.concat(String(index))),
-        pointer: itemPointer,
+        path: itemPath,
         expandedMap: filterPointerOrUndefined(expandedMap, itemPointer),
         enforceStringMap: filterPointerOrUndefined(enforceStringMap, itemPointer),
         visibleSectionsMap: filterPointerOrUndefined(visibleSectionsMap, itemPointer),
         validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, itemPointer),
         searchResultItemsMap: filterPointerOrUndefined(searchResultItemsMap, itemPointer),
-        selection: selectionIfOverlapping(selection, itemPointer)
+        selection: selectionIfOverlapping(selection, itemPath)
       })
     }
 
@@ -722,7 +723,6 @@
               {sectionIndex}
               total={value.length}
               {path}
-              {pointer}
               onExpandSection={context.onExpandSection}
               {selection}
             />
@@ -834,7 +834,6 @@
             <div slot="identifier" class="jse-identifier">
               <JSONKey
                 path={prop.path}
-                pointer={prop.pointer}
                 key={prop.key}
                 selection={prop.selection}
                 searchResultItems={prop.keySearchResultItemsMap}

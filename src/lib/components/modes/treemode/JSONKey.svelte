@@ -1,11 +1,12 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { initial } from 'lodash-es'
+  import { initial, isEqual } from 'lodash-es'
   import {
     createKeySelection,
     createValueSelection,
-    isEditingSelection
+    isEditingSelection,
+    isKeySelection
   } from '$lib/logic/selection.js'
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
@@ -13,13 +14,11 @@
   import { UPDATE_SELECTION } from '$lib/constants.js'
   import type { ExtendedSearchResultItem, TreeModeContext } from '$lib/types.js'
   import { type JSONSelection } from '$lib/types.js'
-  import type { JSONPath, JSONPointer } from 'immutable-json-patch'
-  import { isKeySelection } from '$lib/logic/selection.js'
+  import type { JSONPath } from 'immutable-json-patch'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
   import { classnames } from '$lib/utils/cssUtils.js'
 
   export let path: JSONPath
-  export let pointer: JSONPointer
   export let key: string
   export let selection: JSONSelection | undefined
   export let searchResultItems: ExtendedSearchResultItem[] | undefined
@@ -27,10 +26,10 @@
 
   export let context: TreeModeContext
 
-  $: isNodeSelected = selection
-    ? selection.pointersMap[pointer] === true && isKeySelection(selection)
+  $: isKeySelected = selection
+    ? isKeySelection(selection) && isEqual(selection.focusPath, path)
     : undefined
-  $: isEditingKey = isNodeSelected && isEditingSelection(selection)
+  $: isEditingKey = isKeySelected && selection && isEditingSelection(selection)
 
   function handleKeyDoubleClick(event) {
     if (!isEditingKey && !context.readOnly) {
@@ -83,7 +82,7 @@
     {/if}
   </div>
 {/if}
-{#if !context.readOnly && isNodeSelected && !isEditingKey}
+{#if !context.readOnly && isKeySelected && !isEditingKey}
   <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
 {/if}
 

@@ -73,28 +73,24 @@ export interface MultiSelection {
   paths: JSONPath[]
   anchorPath: JSONPath
   focusPath: JSONPath
-  pointersMap: { [pointer: JSONPointer]: boolean }
 }
 
 export interface AfterSelection {
   type: SelectionType.after
   anchorPath: JSONPath
   focusPath: JSONPath
-  pointersMap: { [pointer: JSONPointer]: boolean }
 }
 
 export interface InsideSelection {
   type: SelectionType.inside
   anchorPath: JSONPath
   focusPath: JSONPath
-  pointersMap: { [pointer: JSONPointer]: boolean }
 }
 
 export interface KeySelection {
   type: SelectionType.key
   anchorPath: JSONPath
   focusPath: JSONPath
-  pointersMap: { [pointer: JSONPointer]: boolean }
   edit?: boolean
 }
 
@@ -102,7 +98,6 @@ export interface ValueSelection {
   type: SelectionType.value
   anchorPath: JSONPath
   focusPath: JSONPath
-  pointersMap: { [pointer: JSONPointer]: boolean }
   edit?: boolean
 }
 
@@ -514,7 +509,6 @@ export interface JSONNodeProp {
   key: string
   value: JSONValue
   path: JSONPath
-  pointer: JSONPointer
   expandedMap: JSONPointerMap<boolean> | undefined
   enforceStringMap: JSONPointerMap<boolean> | undefined
   visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
@@ -528,7 +522,6 @@ export interface JSONNodeItem {
   index: number
   value: JSONValue
   path: JSONPath
-  pointer: JSONPointer
   expandedMap: JSONPointerMap<boolean> | undefined
   enforceStringMap: JSONPointerMap<boolean> | undefined
   visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined

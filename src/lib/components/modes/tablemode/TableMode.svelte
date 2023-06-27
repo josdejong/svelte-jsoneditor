@@ -65,6 +65,7 @@
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
+    encodeDataPath,
     findParentWithNodeName,
     getDataPathFromTarget,
     getWindow
@@ -86,13 +87,13 @@
     getInitialSelection,
     isEditingSelection,
     isPathInsideSelection,
+    isValueSelection,
+    pathInSelection,
     removeEditModeFromSelection
   } from '$lib/logic/selection.js'
   import { createHistory } from '$lib/logic/history.js'
   import ColumnHeader from './ColumnHeader.svelte'
   import { sortJson } from '$lib/logic/sort.js'
-  import { encodeDataPath } from '$lib/utils/domUtils.js'
-  import { isValueSelection } from '$lib/logic/selection.js'
   import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
   import { createFocusTracker } from '$lib/components/controls/createFocusTracker.js'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
@@ -1657,10 +1658,6 @@
   function handleResizeRow(element: Element, rowIndex: number) {
     itemHeightsCache[rowIndex] = element.getBoundingClientRect().height
   }
-
-  function isPathSelected(path: JSONPath, selection: JSONSelection): boolean {
-    return selection ? selection.pointersMap[compileJSONPointer(path)] === true : false
-  }
 </script>
 
 <div
@@ -1763,7 +1760,7 @@
                 {#each columns as column, columnIndex}
                   {@const path = [String(rowIndex)].concat(column)}
                   {@const value = getIn(item, column)}
-                  {@const isSelected = isPathSelected(path, documentState.selection)}
+                  {@const isSelected = pathInSelection(path, documentState.selection)}
                   {@const validationErrorsByColumn = validationErrorsByRow?.columns[columnIndex]}
                   <td
                     class="jse-table-cell"
