@@ -444,6 +444,7 @@ export interface JSONEditorPropsOptional {
   onFocus?: OnFocus
   onBlur?: OnBlur
   onIgnoreKey?: (path: JSONPath) => void
+  onGlobalIgnoreKey?: (path: JSONPath) => void
   onSortKey?: (path: JSONPath) => void
 }
 
