@@ -188,6 +188,7 @@
   export let onTransformModal: OnTransformModal
   export let onJSONEditorModal: OnJSONEditorModal
   export let onIgnoreKey: (path: JSONPath) => void
+  export let onGlobalIgnoreKey: (path: JSONPath) => void
   export let onSortKey: (path: JSONPath) => void
 
   // modalOpen is true when one of the modals is open.
@@ -787,6 +788,14 @@
     }
     const path = documentState.selection.focusPath
     onIgnoreKey?.(path)
+  }
+
+  function handleGlobalIgnoreKey() {
+    if (readOnly || !documentState.selection) {
+      return
+    }
+    const path = documentState.selection.focusPath
+    onGlobalIgnoreKey?.(path)
   }
 
   function handleSortKey() {
@@ -1837,6 +1846,7 @@
       showTip,
 
       onIgnoreKey: handleIgnoreKey,
+      onGlobalIgnoreKey: handleGlobalIgnoreKey,
       onSortKey: handleSortKey,
       onEditKey: handleEditKey,
       onEditValue: handleEditValue,

@@ -62,6 +62,7 @@
   export let onTransformModal: OnTransformModal
   export let onJSONEditorModal: OnJSONEditorModal
   export let onIgnoreKey: (path: JSONPath) => void
+  export let onGlobalIgnoreKey: (path: JSONPath) => void
   export let onSortKey: (path: JSONPath) => void
 
   let refTreeMode
@@ -301,6 +302,7 @@
     {onTransformModal}
     {onJSONEditorModal}
     {onIgnoreKey}
+    {onGlobalIgnoreKey}
     {onSortKey}
   />
 {/if}

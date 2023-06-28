@@ -662,6 +662,9 @@
             onIgnoreKey={(path) => {
               console.log('onIgnoreKey', path)
             }}
+            onGlobalIgnoreKey={(path) => {
+              console.log('onGlobalIgnoreKey', path)
+            }}
             onSortKey={(path) => {
               console.log('onSortKey', path)
             }}

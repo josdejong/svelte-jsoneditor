@@ -97,6 +97,7 @@
   export let onBlur: OnBlur = noop
 
   export let onIgnoreKey: (path: JSONPath) => void
+  export let onGlobalIgnoreKey: (path: JSONPath) => void
   export let onSortKey: (path: JSONPath) => void
 
   let instanceId = uniqueId()
@@ -332,6 +333,7 @@
         onClassName,
         onTransform,
         onIgnoreKey,
+        onGlobalIgnoreKey,
         onSortKey
       },
       TRANSFORM_MODAL_OPTIONS,
@@ -464,6 +466,7 @@
             {onTransformModal}
             {onJSONEditorModal}
             {onIgnoreKey}
+            {onGlobalIgnoreKey}
             {onSortKey}
           />
         {/key}

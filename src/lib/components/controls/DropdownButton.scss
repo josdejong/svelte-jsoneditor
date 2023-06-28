@@ -53,8 +53,10 @@
   .jse-dropdown-items {
     display: none;
     position: absolute;
-    top: 100%;
-    left: 0;
+    top: 0;
+    left: 100%;
+    //top: 100%;
+    //left: 0;
     z-index: 1;
     background: $background;
     color: var(--jse-context-menu-color);

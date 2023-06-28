@@ -51,6 +51,7 @@
 
   export let onTransform: OnPatch
   export let onIgnoreKey: (path: JSONPath) => void
+  export let onGlobalIgnoreKey: (path: JSONPath) => void
   export let onSortKey: (path: JSONPath) => void
 
 
@@ -279,6 +280,7 @@
                 {validationParser}
                 {pathParser}
                 {onIgnoreKey}
+                {onGlobalIgnoreKey}
                 {onSortKey}
               />
             {/if}
@@ -312,6 +314,9 @@
                 validator={null}
                 {validationParser}
                 {pathParser}
+                {onIgnoreKey}
+                {onGlobalIgnoreKey}
+                {onSortKey}
               />
             {:else}
               <div class="jse-preview jse-error">

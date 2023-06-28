@@ -14,7 +14,8 @@
     faPen,
     faPlus,
     faSortAmountDownAlt,
-    faTrashCan
+    faTrashCan,
+    faBan, faSort
   } from '@fortawesome/free-solid-svg-icons'
   import type {JSONValue} from 'immutable-json-patch'
   import {compileJSONPointer, getIn} from 'immutable-json-patch'
@@ -39,6 +40,7 @@
   export let showTip
 
   export let onIgnoreKey
+  export let onGlobalIgnoreKey
   export let onSortKey
   export let onCloseContextMenu
   export let onEditKey
@@ -114,9 +116,16 @@
       )
       : false
 
+  $: canSort = hasJson && selection != null && Array.isArray(focusValue)
+
   function handleIgnoreKey() {
     onCloseContextMenu()
     onIgnoreKey()
+  }
+
+  function handleGlobalIgnoreKey() {
+    onCloseContextMenu()
+    onGlobalIgnoreKey()
   }
 
   function handleSortKey() {
@@ -212,18 +221,34 @@
   let items: ContextMenuItem[]
   $: items = [
     {
-      type:'row',
+      type: 'row',
       items: [{
         type: 'column',
         items: [{
+          type: 'dropdown-button',
+          width: '11em',
+          main: {
+            type: 'button',
+            icon: faBan,
+            text: 'Ignore Key',
+            onClick: handleIgnoreKey,
+          },
+          items: [{
+            type: 'button',
+            icon: faBan,
+            text: 'Ignore to Interface',
+            onClick: handleIgnoreKey,
+          }, {
+            type: 'button',
+            icon: faBan,
+            text: 'Ignore to Global',
+            onClick: handleGlobalIgnoreKey,
+          }]
+        }, {
           type: 'button',
-          icon: faPen,
-          text: 'Ignore Key',
-          onClick: handleIgnoreKey,
-        },{
-          type: 'button',
-          icon: faPen,
+          icon: faSort,
           text: 'Sort Key',
+          disabled: !canSort,
           onClick: handleSortKey,
         }],
       }]
