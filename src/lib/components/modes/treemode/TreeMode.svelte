@@ -2091,7 +2091,7 @@
   {#if navigationBar}
     <NavigationBar
       {json}
-      {documentState}
+      selection={documentState.selection}
       onSelect={handleNavigationBarSelect}
       {onError}
       {pathParser}

@@ -8,7 +8,7 @@
   import { createMultiSelection } from '$lib/logic/selection.js'
   import { createDebug } from '$lib/utils/debug.js'
   import { caseInsensitiveNaturalCompare } from '$lib/logic/sort.js'
-  import type { DocumentState, JSONPathParser, OnError, OnSelect } from '$lib/types.js'
+  import type { JSONPathParser, JSONSelection, OnError, OnSelect } from '$lib/types.js'
   import Icon from 'svelte-awesome'
   import { faClose, faEdit } from '@fortawesome/free-solid-svg-icons'
   import NavigationBarItem from './NavigationBarItem.svelte'
@@ -17,7 +17,7 @@
   const debug = createDebug('jsoneditor:NavigationBar')
 
   export let json: JSONValue
-  export let documentState: DocumentState
+  export let selection: JSONSelection | undefined
   export let onSelect: OnSelect
   export let onError: OnError
   export let pathParser: JSONPathParser
@@ -26,7 +26,7 @@
   let refEditButton: HTMLButtonElement | undefined
   let editing = false
 
-  $: path = documentState.selection ? documentState.selection.focusPath : []
+  $: path = selection ? selection.focusPath : []
   $: hasNextItem = isObjectOrArray(getIn(json, path))
 
   // we have an unused parameter path to trigger scrollToLastItem when path changes,
