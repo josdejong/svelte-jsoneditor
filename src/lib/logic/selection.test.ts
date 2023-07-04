@@ -761,6 +761,32 @@ describe('selection', () => {
     })
   })
 
+  test('createMultiSelection', () => {
+    assert.deepStrictEqual(createMultiSelection(['obj', 'arr', '0'], ['obj', 'arr', '2']), {
+      type: SelectionType.multi,
+      anchorPath: ['obj', 'arr', '0'],
+      focusPath: ['obj', 'arr', '2']
+    })
+
+    assert.deepStrictEqual(createMultiSelection(['obj', 'arr', '2'], ['obj', 'arr', '0']), {
+      type: SelectionType.multi,
+      anchorPath: ['obj', 'arr', '2'],
+      focusPath: ['obj', 'arr', '0']
+    })
+
+    assert.deepStrictEqual(createMultiSelection(['obj', 'arr', '0'], ['obj', 'arr']), {
+      type: SelectionType.multi,
+      anchorPath: ['obj', 'arr'],
+      focusPath: ['obj', 'arr']
+    })
+
+    assert.deepStrictEqual(createMultiSelection(['obj', 'nested', '0'], ['arr', '2']), {
+      type: SelectionType.multi,
+      anchorPath: ['obj'],
+      focusPath: ['arr']
+    })
+  })
+
   describe('selectionIfOverlapping', () => {
     test('should determine whether a selection is relevant for given pointer', () => {
       const selection = createMultiSelection(['obj', 'arr', '0'], ['obj', 'arr', '2'])
