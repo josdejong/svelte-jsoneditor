@@ -29,6 +29,7 @@ import {
   createValueSelection,
   getEndPath,
   getParentPath,
+  getSelectionPaths,
   getStartPath,
   isAfterSelection,
   isInsideSelection,
@@ -230,7 +231,7 @@ export function replace(
  * and object property
  */
 export function duplicate(json: JSONValue, paths: JSONPath[]): JSONPatchDocument {
-  // FIXME: here we assume selection.paths is sorted correctly, that's a dangerous assumption
+  // FIXME: here we assume paths is sorted correctly, that's a dangerous assumption
   const lastPath = last(paths)
 
   if (isEmpty(lastPath)) {
@@ -304,7 +305,7 @@ export function extract(json: JSONValue, selection: JSONSelection): JSONPatchDoc
     const parent = getIn(json, parentPath)
 
     if (isJSONArray(parent)) {
-      const value = selection.paths.map((path) => {
+      const value = getSelectionPaths(json, selection).map((path) => {
         const index = int(last(path) as string)
         return parent[index]
       })
@@ -319,7 +320,7 @@ export function extract(json: JSONValue, selection: JSONSelection): JSONPatchDoc
     } else if (isJSONObject(parent)) {
       // object
       const value: JSONObject = {}
-      selection.paths.forEach((path) => {
+      getSelectionPaths(json, selection).forEach((path) => {
         const key = String(last(path))
         value[key] = parent[key]
       })
@@ -389,7 +390,7 @@ export function insert(
   if (isMultiSelection(selection)) {
     const newValues = clipboardToValues(clipboardText, parser)
 
-    return replace(json, selection.paths, newValues)
+    return replace(json, getSelectionPaths(json, selection), newValues)
   }
 
   if (isAfterSelection(selection)) {
@@ -471,8 +472,8 @@ export function moveInsideParent(
     return []
   }
 
-  const startPath = getStartPath(selection)
-  const endPath = getEndPath(selection)
+  const startPath = getStartPath(json, selection)
+  const endPath = getEndPath(json, selection)
   const startKey = last(startPath) as string
   const endKey = last(endPath) as string
   const toKey: string | undefined = beforePath ? beforePath[parentPath.length] : undefined
@@ -676,8 +677,9 @@ export function createRemoveOperations(
   }
 
   if (isMultiSelection(selection)) {
-    const operations = removeAll(selection.paths)
-    const lastPath = last(selection.paths)
+    const paths = getSelectionPaths(json, selection)
+    const operations = removeAll(paths)
+    const lastPath = last(paths)
 
     if (isEmpty(lastPath)) {
       // there is no parent, this is the root document
@@ -692,7 +694,7 @@ export function createRemoveOperations(
     const parent = getIn(json, parentPath)
 
     if (isJSONArray(parent)) {
-      const firstPath = first(selection.paths)
+      const firstPath = first(paths)
       const index = int(last(firstPath) as string)
       const newSelection =
         index === 0
@@ -703,7 +705,7 @@ export function createRemoveOperations(
     } else if (isJSONObject(parent)) {
       // parent is object
       const keys = Object.keys(parent)
-      const firstPath = first(selection.paths)
+      const firstPath = first(paths)
       const key = last(firstPath) as string
       const index = keys.indexOf(key)
       const previousKey = keys[index - 1]

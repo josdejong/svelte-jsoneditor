@@ -700,7 +700,7 @@
       // when clicking inside the current selection, editing a value, do nothing
       if (
         isEditingSelection(documentState.selection) &&
-        isPathInsideSelection(documentState.selection, path, SelectionType.value)
+        isPathInsideSelection(json, documentState.selection, path, SelectionType.value)
       ) {
         return
       }
@@ -1760,7 +1760,7 @@
                 {#each columns as column, columnIndex}
                   {@const path = [String(rowIndex)].concat(column)}
                   {@const value = getIn(item, column)}
-                  {@const isSelected = pathInSelection(path, documentState.selection)}
+                  {@const isSelected = pathInSelection(json, documentState.selection, path)}
                   {@const validationErrorsByColumn = validationErrorsByRow?.columns[columnIndex]}
                   <td
                     class="jse-table-cell"

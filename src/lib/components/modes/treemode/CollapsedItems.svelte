@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import { getExpandItemsSections } from '$lib/logic/expandItemsSections.js'
-  import type { JSONSelection, Section, VisibleSection } from '$lib/types'
+  import type { JSONSelection, Section, VisibleSection, JSONEditorContext } from '$lib/types.js'
   import type { JSONPath } from 'immutable-json-patch'
   import { pathInSelection } from '$lib/logic/selection.js'
 
@@ -12,13 +12,14 @@
   export let path: JSONPath
   export let selection: JSONSelection | undefined
   export let onExpandSection: (path: JSONPath, section: Section) => void
+  export let context: JSONEditorContext
 
   $: visibleSection = visibleSections[sectionIndex]
 
   $: startIndex = visibleSection.end
   $: endIndex = visibleSections[sectionIndex + 1] ? visibleSections[sectionIndex + 1].start : total
 
-  $: selected = pathInSelection(path.concat(String(startIndex)), selection)
+  $: selected = pathInSelection(context.getJson(), selection, path.concat(String(startIndex)))
 
   $: expandItemsSections = getExpandItemsSections(startIndex, endIndex)
 

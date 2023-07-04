@@ -950,7 +950,7 @@
 
     debug('duplicate', { selection: documentState.selection })
 
-    const operations = duplicate(json, getSelectionPaths(documentState.selection))
+    const operations = duplicate(json, getSelectionPaths(json, documentState.selection))
 
     handlePatch(operations)
   }
@@ -1072,7 +1072,7 @@
       return
     }
 
-    const path = getEndPath(documentState.selection)
+    const path = getEndPath(json, documentState.selection)
 
     debug('insert after', path)
 

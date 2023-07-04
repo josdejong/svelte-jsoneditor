@@ -114,7 +114,7 @@
   $: validationError = validationErrorsMap ? validationErrorsMap[pointer] : undefined
 
   let isNodeSelected: boolean
-  $: isNodeSelected = pathInSelection(path, selection)
+  $: isNodeSelected = pathInSelection(context.getJson(), selection, path)
 
   $: root = path.length === 0
 
@@ -149,7 +149,7 @@
         validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, keyPointer),
         keySearchResultItemsMap: filterKeySearchResults(searchResultItemsMap, keyPointer),
         valueSearchResultItemsMap: filterPointerOrUndefined(searchResultItemsMap, keyPointer),
-        selection: selectionIfOverlapping(selection, keyPath)
+        selection: selectionIfOverlapping(context.getJson(), selection, keyPath)
       }
     })
 
@@ -196,7 +196,7 @@
         visibleSectionsMap: filterPointerOrUndefined(visibleSectionsMap, itemPointer),
         validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, itemPointer),
         searchResultItemsMap: filterPointerOrUndefined(searchResultItemsMap, itemPointer),
-        selection: selectionIfOverlapping(selection, itemPath)
+        selection: selectionIfOverlapping(context.getJson(), selection, itemPath)
       })
     }
 
@@ -272,7 +272,7 @@
 
     // when right-clicking inside the current selection, do nothing: context menu will open
     // when left-clicking inside the current selection, do nothing: it can be the start of dragging
-    if (selection && isPathInsideSelection(selection, path, anchorType)) {
+    if (selection && isPathInsideSelection(json, selection, path, anchorType)) {
       if (event.button === 0) {
         onDragSelectionStart(event)
       }
@@ -401,9 +401,9 @@
       return
     }
 
-    const initialPath = getStartPath(selection)
-    const selectionStartIndex = items.findIndex((item) => isEqual(item.path, initialPath))
     const json = context.getJson()
+    const initialPath = getStartPath(json, selection)
+    const selectionStartIndex = items.findIndex((item) => isEqual(item.path, initialPath))
     const documentState = context.getDocumentState()
     const { offset } = onMoveSelection({
       json,
@@ -417,7 +417,7 @@
       initialClientY: event.clientY,
       initialContentTop: findContentTop(),
       selectionStartIndex,
-      selectionItemsCount: getSelectionPaths(selection).length,
+      selectionItemsCount: getSelectionPaths(json, selection).length,
       items,
       offset,
       didMoveItems: false // whether items have been moved during dragging or not
@@ -515,8 +515,8 @@
     }
 
     if (Array.isArray(value)) {
-      const startPath = getStartPath(selection)
-      const endPath = getEndPath(selection)
+      const startPath = getStartPath(context.getJson(), selection)
+      const endPath = getEndPath(context.getJson(), selection)
       const startIndex = last(startPath)
       const endIndex = last(endPath)
 
@@ -725,6 +725,7 @@
               {path}
               onExpandSection={context.onExpandSection}
               {selection}
+              {context}
             />
           {/if}
         {/each}
