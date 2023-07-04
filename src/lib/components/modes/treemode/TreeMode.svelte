@@ -7,7 +7,7 @@
   import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, existsIn, getIn, immutableJSONPatch } from 'immutable-json-patch'
   import { jsonrepair } from 'jsonrepair'
-  import { initial, isEmpty, isEqual, last, noop, throttle, uniqueId } from 'lodash-es'
+  import { initial, isEmpty, isEqual, noop, throttle, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
   import { createJump } from '$lib/assets/jump.js/src/jump.js'
   import {
@@ -52,6 +52,7 @@
     createSelectionFromOperations,
     createValueSelection,
     findRootPath,
+    getEndPath,
     getInitialSelection,
     getSelectionDown,
     getSelectionLeft,
@@ -60,8 +61,12 @@
     getSelectionRight,
     getSelectionUp,
     hasSelectionContents,
+    isAfterSelection,
     isEditingSelection,
+    isInsideSelection,
+    isKeySelection,
     isMultiSelection,
+    isMultiSelectionWithOneItem,
     isSelectionInsidePath,
     isValueSelection,
     removeEditModeFromSelection,
@@ -134,7 +139,6 @@
     ValueNormalization
   } from '$lib/types'
   import { Mode, ValidationSeverity } from '$lib/types.js'
-  import { isAfterSelection, isInsideSelection, isKeySelection } from '$lib/logic/selection.js'
   import memoizeOne from 'memoize-one'
   import { measure } from '$lib/utils/timeUtils.js'
   import {
@@ -1064,9 +1068,11 @@
   }
 
   function handleInsertAfter() {
-    const path = isMultiSelection(documentState.selection)
-      ? last(documentState.selection.paths)
-      : documentState.selection.focusPath
+    if (!documentState.selection) {
+      return
+    }
+
+    const path = getEndPath(documentState.selection)
 
     debug('insert after', path)
 
@@ -1667,11 +1673,7 @@
 
     if (combo === 'Enter' && documentState.selection) {
       // when the selection consists of a single Array item, change selection to editing its value
-      if (
-        !readOnly &&
-        isMultiSelection(documentState.selection) &&
-        documentState.selection.paths.length === 1
-      ) {
+      if (!readOnly && isMultiSelectionWithOneItem(documentState.selection)) {
         const path = documentState.selection.focusPath
         const parent = getIn(json, initial(path))
         if (Array.isArray(parent)) {
