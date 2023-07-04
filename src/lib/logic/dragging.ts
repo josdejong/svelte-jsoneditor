@@ -156,5 +156,5 @@ function createUpdatedArraySelection({
   const anchorPath = items[startIndex + offset]?.path
   const focusPath = items[endIndex + offset]?.path
 
-  return createMultiSelection(json, anchorPath, focusPath)
+  return createMultiSelection(anchorPath, focusPath)
 }

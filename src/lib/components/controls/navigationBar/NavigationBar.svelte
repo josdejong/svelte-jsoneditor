@@ -73,7 +73,7 @@
   function handleSelect(path: JSONPath) {
     debug('select path', JSON.stringify(path))
 
-    onSelect(createMultiSelection(json, path, path))
+    onSelect(createMultiSelection(path, path))
   }
 
   function toggleEditing() {

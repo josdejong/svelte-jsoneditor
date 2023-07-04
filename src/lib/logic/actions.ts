@@ -148,7 +148,7 @@ export function onPaste({
 
   function doPaste(pastedText: string) {
     if (json !== undefined) {
-      const selection = documentState.selection || createMultiSelection(json || {}, [], [])
+      const selection = documentState.selection || createMultiSelection([], [])
 
       const operations = insert(json, selection, pastedText, parser)
 
@@ -227,11 +227,7 @@ export function onRemove({
   const removeSelection =
     json !== undefined &&
     (isKeySelection(documentState.selection) || isValueSelection(documentState.selection))
-      ? createMultiSelection(
-          json,
-          documentState.selection.anchorPath,
-          documentState.selection.focusPath
-        )
+      ? createMultiSelection(documentState.selection.anchorPath, documentState.selection.focusPath)
       : documentState.selection
 
   if (isEmpty(documentState.selection.focusPath)) {

@@ -290,7 +290,7 @@
       // Shift+Click will select multiple entries
       const fullSelection = context.getDocumentState().selection
       if (fullSelection) {
-        context.onSelect(createMultiSelection(json, fullSelection.anchorPath, path))
+        context.onSelect(createMultiSelection(fullSelection.anchorPath, path))
       }
     } else {
       if (anchorType === SelectionType.multi) {
@@ -300,7 +300,7 @@
           ) as CaretPosition
           context.onSelect(fromCaretPosition(lastCaretPosition))
         } else {
-          context.onSelect(createMultiSelection(json, path, path))
+          context.onSelect(createMultiSelection(path, path))
         }
       } else {
         context.onSelect(fromSelectionType(json, anchorType, path))
@@ -335,7 +335,6 @@
         const json = context.getJson()
         context.onSelect(
           createMultiSelection(
-            json,
             singleton.selectionAnchor || singleton.selectionFocus,
             singleton.selectionFocus
           )

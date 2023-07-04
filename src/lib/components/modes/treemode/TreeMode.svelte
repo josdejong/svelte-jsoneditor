@@ -698,7 +698,7 @@
 
     documentState = {
       ...documentState,
-      selection: createMultiSelection(json || {}, [], [])
+      selection: createMultiSelection([], [])
     }
   }
 

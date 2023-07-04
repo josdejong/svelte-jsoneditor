@@ -70,7 +70,6 @@ export type AfterPatchCallback = (
 
 export interface MultiSelection {
   type: SelectionType.multi
-  paths: JSONPath[]
   anchorPath: JSONPath
   focusPath: JSONPath
 }

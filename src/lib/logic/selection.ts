@@ -62,7 +62,7 @@ export function isMultiSelection(
 }
 
 export function isMultiSelectionWithOneItem(selection: JSONSelection | undefined): boolean {
-  return isMultiSelection(selection) && selection.focusPath === selection.anchorPath
+  return isMultiSelection(selection) && isEqual(selection.focusPath, selection.anchorPath)
 }
 
 /**
@@ -268,10 +268,10 @@ export function getSelectionUp(
   if (keepAnchorPath) {
     // multi selection
     if (isAfterSelection(selection) || isInsideSelection(selection)) {
-      return createMultiSelection(json, selection.anchorPath, selection.anchorPath)
+      return createMultiSelection(selection.anchorPath, selection.anchorPath)
     }
 
-    return createMultiSelection(json, selection.anchorPath, focusPath)
+    return createMultiSelection(selection.anchorPath, focusPath)
   }
 
   if (isKeySelection(selection)) {
@@ -292,16 +292,16 @@ export function getSelectionUp(
   if (isAfterSelection(selection)) {
     // select the node itself, not the previous node,
     // FIXME: when after an expanded object/array, should go to the last item inside the object/array
-    return createMultiSelection(json, path, path)
+    return createMultiSelection(path, path)
   }
 
   if (isInsideSelection(selection)) {
     // select the node itself, not the previous node,
-    return createMultiSelection(json, path, path)
+    return createMultiSelection(path, path)
   }
 
   // multi selection -> select previous node
-  return createMultiSelection(json, anchorPath, focusPath)
+  return createMultiSelection(anchorPath, focusPath)
 }
 
 export function getSelectionDown(
@@ -339,14 +339,14 @@ export function getSelectionDown(
     }
 
     if (isAfterSelection(selection)) {
-      return createMultiSelection(json, nextPathAfter, nextPathAfter)
+      return createMultiSelection(nextPathAfter, nextPathAfter)
     }
 
     if (isInsideSelection(selection)) {
-      return createMultiSelection(json, anchorPath, focusPath)
+      return createMultiSelection(anchorPath, focusPath)
     }
 
-    return createMultiSelection(json, selection.anchorPath, nextPathAfter)
+    return createMultiSelection(selection.anchorPath, nextPathAfter)
   }
 
   if (isKeySelection(selection)) {
@@ -366,11 +366,11 @@ export function getSelectionDown(
 
   // TODO: simplify, this is redundant, same as next
   if (isInsideSelection(selection)) {
-    return createMultiSelection(json, anchorPath, focusPath)
+    return createMultiSelection(anchorPath, focusPath)
   }
 
   // selection type MULTI or AFTER
-  return createMultiSelection(json, nextPath, nextPath)
+  return createMultiSelection(nextPath, nextPath)
 }
 
 /**
@@ -443,7 +443,7 @@ export function getSelectionLeft(
 
   if (keepAnchorPath) {
     if (!isMultiSelection(selection)) {
-      return createMultiSelection(json, selection.anchorPath, selection.focusPath)
+      return createMultiSelection(selection.anchorPath, selection.focusPath)
     }
 
     return null
@@ -457,7 +457,7 @@ export function getSelectionLeft(
   const parent = getIn(json, parentPath)
 
   if (isValueSelection(selection) && Array.isArray(parent)) {
-    return createMultiSelection(json, selection.focusPath, selection.focusPath)
+    return createMultiSelection(selection.focusPath, selection.focusPath)
   }
 
   if (isMultiSelection(selection) && !Array.isArray(parent)) {
@@ -482,7 +482,7 @@ export function getSelectionRight(
 
   if (keepAnchorPath) {
     if (!isMultiSelection(selection)) {
-      return createMultiSelection(json, selection.anchorPath, selection.focusPath)
+      return createMultiSelection(selection.anchorPath, selection.focusPath)
     }
 
     return null
@@ -569,7 +569,6 @@ export function createSelectionFromOperations(
 
   return {
     type: SelectionType.multi,
-    paths,
     anchorPath: first(paths) as JSONPath,
     focusPath: last(paths) as JSONPath
   }
@@ -669,26 +668,15 @@ export function createAfterSelection(path: JSONPath): AfterSelection {
   }
 }
 
-export function createMultiSelection(
-  json: JSONValue,
-  anchorPath: JSONPath,
-  focusPath: JSONPath
-): MultiSelection {
-  // FIXME: remove expanding selection upfront
-  const paths = getSelectionPaths(json, { type: SelectionType.multi, anchorPath, focusPath })
-
-  // the original anchorPath or focusPath may be somewhere inside the
-  // returned paths: when one of the two paths is inside an object and the
-  // other is outside. Then the selection is enlarged to span the whole object.
-  const focusPathLast =
-    pathStartsWith(focusPath, last(paths) as JSONPath) ||
-    pathStartsWith(anchorPath, first(paths) as JSONPath)
+export function createMultiSelection(anchorPath: JSONPath, focusPath: JSONPath): MultiSelection {
+  // normalize the paths to both be a child of a shared parent
+  const sharedPath = findSharedPath(anchorPath, focusPath)
+  const isParent = anchorPath.length > sharedPath.length && focusPath.length > sharedPath.length
 
   return {
     type: SelectionType.multi,
-    anchorPath: focusPathLast ? (first(paths) as JSONPath) : (last(paths) as JSONPath),
-    focusPath: focusPathLast ? (last(paths) as JSONPath) : (first(paths) as JSONPath),
-    paths
+    anchorPath: isParent ? sharedPath.concat(anchorPath[sharedPath.length]) : sharedPath,
+    focusPath: isParent ? sharedPath.concat(focusPath[sharedPath.length]) : sharedPath
   }
 }
 
@@ -825,7 +813,7 @@ export function fromSelectionType(
     case SelectionType.inside:
       return createInsideSelection(path)
     case SelectionType.multi:
-      return createMultiSelection(json, path, path)
+      return createMultiSelection(path, path)
   }
 }
 
