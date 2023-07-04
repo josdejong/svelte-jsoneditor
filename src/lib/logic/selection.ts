@@ -193,7 +193,7 @@ export function getStartPath(json: JSONValue, selection: JSONSelection): JSONPat
 export function getEndPath(json: JSONValue, selection: JSONSelection): JSONPath {
   const startPath = getStartPath(json, selection)
 
-  return isEqual(startPath, selection.focusPath) ? selection.anchorPath : selection.focusPath
+  return isEqual(startPath, selection.focusPath) ? getAnchorPath(selection) : selection.focusPath
 }
 
 // TODO: write unit test
@@ -268,10 +268,10 @@ export function getSelectionUp(
   if (keepAnchorPath) {
     // multi selection
     if (isAfterSelection(selection) || isInsideSelection(selection)) {
-      return createMultiSelection(selection.anchorPath, selection.anchorPath)
+      return createMultiSelection(selection.focusPath, selection.focusPath)
     }
 
-    return createMultiSelection(selection.anchorPath, focusPath)
+    return createMultiSelection(getAnchorPath(selection), focusPath)
   }
 
   if (isKeySelection(selection)) {
@@ -346,7 +346,7 @@ export function getSelectionDown(
       return createMultiSelection(anchorPath, focusPath)
     }
 
-    return createMultiSelection(selection.anchorPath, nextPathAfter)
+    return createMultiSelection(getAnchorPath(selection), nextPathAfter)
   }
 
   if (isKeySelection(selection)) {
@@ -443,7 +443,7 @@ export function getSelectionLeft(
 
   if (keepAnchorPath) {
     if (!isMultiSelection(selection)) {
-      return createMultiSelection(selection.anchorPath, selection.focusPath)
+      return createMultiSelection(selection.focusPath, selection.focusPath)
     }
 
     return null
@@ -482,7 +482,7 @@ export function getSelectionRight(
 
   if (keepAnchorPath) {
     if (!isMultiSelection(selection)) {
-      return createMultiSelection(selection.anchorPath, selection.focusPath)
+      return createMultiSelection(selection.focusPath, selection.focusPath)
     }
 
     return null
@@ -637,7 +637,6 @@ export function removeEditModeFromSelection(documentState: DocumentState): Docum
 export function createKeySelection(path: JSONPath, edit: boolean): KeySelection {
   return {
     type: SelectionType.key,
-    anchorPath: path,
     focusPath: path,
     edit
   }
@@ -646,7 +645,6 @@ export function createKeySelection(path: JSONPath, edit: boolean): KeySelection 
 export function createValueSelection(path: JSONPath, edit: boolean): ValueSelection {
   return {
     type: SelectionType.value,
-    anchorPath: path,
     focusPath: path,
     edit
   }
@@ -655,7 +653,6 @@ export function createValueSelection(path: JSONPath, edit: boolean): ValueSelect
 export function createInsideSelection(path: JSONPath): InsideSelection {
   return {
     type: SelectionType.inside,
-    anchorPath: path,
     focusPath: path
   }
 }
@@ -663,7 +660,6 @@ export function createInsideSelection(path: JSONPath): InsideSelection {
 export function createAfterSelection(path: JSONPath): AfterSelection {
   return {
     type: SelectionType.after,
-    anchorPath: path,
     focusPath: path
   }
 }
@@ -873,7 +869,6 @@ export function pathInSelection(
 
 // TODO: write some unit tests
 export function getFocusPath(selection: JSONSelection): JSONPath {
-  // TODO: refactor
   return selection.focusPath
 }
 

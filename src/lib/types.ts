@@ -76,26 +76,22 @@ export interface MultiSelection {
 
 export interface AfterSelection {
   type: SelectionType.after
-  anchorPath: JSONPath
   focusPath: JSONPath
 }
 
 export interface InsideSelection {
   type: SelectionType.inside
-  anchorPath: JSONPath
   focusPath: JSONPath
 }
 
 export interface KeySelection {
   type: SelectionType.key
-  anchorPath: JSONPath
   focusPath: JSONPath
   edit?: boolean
 }
 
 export interface ValueSelection {
   type: SelectionType.value
-  anchorPath: JSONPath
   focusPath: JSONPath
   edit?: boolean
 }

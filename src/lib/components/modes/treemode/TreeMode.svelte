@@ -52,7 +52,9 @@
     createSelectionFromOperations,
     createValueSelection,
     findRootPath,
+    getAnchorPath,
     getEndPath,
+    getFocusPath,
     getInitialSelection,
     getSelectionDown,
     getSelectionLeft,
@@ -603,8 +605,8 @@
 
     if (
       documentState.selection &&
-      existsIn(json, documentState.selection.anchorPath) &&
-      existsIn(json, documentState.selection.focusPath)
+      existsIn(json, getAnchorPath(documentState.selection)) &&
+      existsIn(json, getFocusPath(documentState.selection))
     ) {
       return
     }
@@ -1024,7 +1026,7 @@
     }
 
     try {
-      const path = documentState.selection.anchorPath
+      const path = getAnchorPath(documentState.selection)
       const currentValue: JSONValue = getIn(json, path)
       const convertedValue = convertValue(currentValue, type, parser)
       if (convertedValue === currentValue) {

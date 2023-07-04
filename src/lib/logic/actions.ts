@@ -227,7 +227,7 @@ export function onRemove({
   const removeSelection =
     json !== undefined &&
     (isKeySelection(documentState.selection) || isValueSelection(documentState.selection))
-      ? createMultiSelection(documentState.selection.anchorPath, documentState.selection.focusPath)
+      ? createMultiSelection(documentState.selection.focusPath, documentState.selection.focusPath)
       : documentState.selection
 
   if (isEmpty(documentState.selection.focusPath)) {

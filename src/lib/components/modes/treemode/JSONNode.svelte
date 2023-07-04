@@ -27,6 +27,7 @@
     createMultiSelection,
     fromCaretPosition,
     fromSelectionType,
+    getAnchorPath,
     getEndPath,
     getSelectionPaths,
     getStartPath,
@@ -290,7 +291,7 @@
       // Shift+Click will select multiple entries
       const fullSelection = context.getDocumentState().selection
       if (fullSelection) {
-        context.onSelect(createMultiSelection(fullSelection.anchorPath, path))
+        context.onSelect(createMultiSelection(getAnchorPath(fullSelection), path))
       }
     } else {
       if (anchorType === SelectionType.multi) {

@@ -84,6 +84,8 @@
   import { revertJSONPatchWithMoveOperations } from '$lib/logic/operations.js'
   import {
     createValueSelection,
+    getAnchorPath,
+    getFocusPath,
     getInitialSelection,
     isEditingSelection,
     isPathInsideSelection,
@@ -287,8 +289,8 @@
 
     if (
       documentState.selection &&
-      existsIn(json, documentState.selection.anchorPath) &&
-      existsIn(json, documentState.selection.focusPath)
+      existsIn(json, getAnchorPath(documentState.selection)) &&
+      existsIn(json, getFocusPath(documentState.selection))
     ) {
       return
     }
