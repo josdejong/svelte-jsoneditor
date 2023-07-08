@@ -2,8 +2,4 @@
 
 .jse-column-header {
   @include jse-column-header-mixin;
-
-  span.jse-column-sort-icon {
-    height: 1em;
-  }
 }

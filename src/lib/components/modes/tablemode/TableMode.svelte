@@ -383,7 +383,10 @@
           json = undefined
           text = externalContent.text
           textIsRepaired = false
-          parseError = normalizeJsonParseError(text, err.message || err.toString())
+          parseError =
+            text !== undefined && text !== ''
+              ? normalizeJsonParseError(text, err.message || err.toString())
+              : undefined
         }
       }
     } else {
@@ -588,6 +591,7 @@
     text = undefined
     textIsRepaired = false
     pastedJson = undefined
+    parseError = undefined
 
     history.add({
       undo: {
@@ -760,7 +764,7 @@
    * Scroll the window vertically to the node with given path.
    * Expand the path when needed.
    */
-  export function scrollTo(path: JSONPath, scrollToWhenVisible = true) {
+  export function scrollTo(path: JSONPath, scrollToWhenVisible = true): Promise<void> {
     const top = calculateAbsolutePosition(path, columns, itemHeightsCache, defaultItemHeight)
     const roughDistance = top - scrollTop
     const elem = findElement(path)
@@ -782,22 +786,27 @@
     // FIXME: scroll to the exact element (rough distance can be inexact)
 
     if (elem) {
-      jump(elem, {
-        container: refContents,
-        offset,
-        duration: SCROLL_DURATION,
-        callback: () => {
-          // TODO: improve horizontal scrolling: animate and integrate with the vertical scrolling (jump)
-          scrollToHorizontal(path)
-        }
+      return new Promise((resolve) => {
+        jump(elem, {
+          container: refContents,
+          offset,
+          duration: SCROLL_DURATION,
+          callback: () => {
+            // TODO: improve horizontal scrolling: animate and integrate with the vertical scrolling (jump)
+            scrollToHorizontal(path)
+            resolve()
+          }
+        })
       })
     } else {
-      jump(roughDistance, {
-        container: refContents,
-        offset,
-        duration: SCROLL_DURATION,
-        callback: () => {
-          tick().then(() => {
+      return new Promise((resolve) => {
+        jump(roughDistance, {
+          container: refContents,
+          offset,
+          duration: SCROLL_DURATION,
+          callback: async () => {
+            await tick()
+
             const newTop = calculateAbsolutePosition(
               path,
               columns,
@@ -806,13 +815,15 @@
             )
 
             if (newTop !== top) {
-              scrollTo(path, scrollToWhenVisible)
+              await scrollTo(path, scrollToWhenVisible)
             } else {
               // TODO: improve horizontal scrolling: animate and integrate with the vertical scrolling (jump)
               scrollToHorizontal(path)
             }
-          })
-        }
+
+            resolve()
+          }
+        })
       })
     }
   }
@@ -1347,6 +1358,7 @@
     documentState = callback && callback.state !== undefined ? callback.state : updatedState
     text = undefined
     textIsRepaired = false
+    parseError = undefined
 
     // make sure the selection is valid
     clearSelectionWhenNotExisting(json)
@@ -1381,18 +1393,22 @@
       documentState = expandWithCallback(json, documentState, [], expandMinimal)
       text = undefined
       textIsRepaired = false
+      parseError = undefined
     } catch (err) {
       try {
         json = parseMemoizeOne(jsonrepair(updatedText))
         documentState = expandWithCallback(json, documentState, [], expandMinimal)
         text = updatedText
         textIsRepaired = true
-      } catch (err) {
+        parseError = undefined
+      } catch (repairError) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
         documentState = createDocumentState({ json, expand: expandMinimal })
         text = updatedText
         textIsRepaired = false
+        parseError =
+          text !== '' ? normalizeJsonParseError(text, err.message || err.toString()) : undefined
       }
     }
 
@@ -1463,15 +1479,13 @@
   /**
    * This method is exposed via JSONEditor.transform
    */
-  export function openTransformModal({
-    id,
-    rootPath,
-    onTransform,
-    onClose
-  }: TransformModalOptions) {
-    if (readOnly || json === undefined) {
+  export function openTransformModal(options: TransformModalOptions) {
+    if (json === undefined) {
       return
     }
+
+    const { id, onTransform, onClose } = options
+    const rootPath = options.rootPath || []
 
     modalOpen = true
 
@@ -1479,19 +1493,19 @@
       id: id || transformModalId,
       json,
       rootPath: rootPath || [],
-      onTransform: onTransform
-        ? (operations) => {
-            onTransform({
-              operations,
-              json,
-              transformedJson: immutableJSONPatch(json, operations)
-            })
-          }
-        : (operations) => {
-            debug('onTransform', rootPath, operations)
+      onTransform: (operations) => {
+        if (onTransform) {
+          onTransform({
+            operations,
+            json: json as JSONValue,
+            transformedJson: immutableJSONPatch(json as JSONValue, operations)
+          })
+        } else {
+          debug('onTransform', rootPath, operations)
 
-            handlePatch(operations)
-          },
+          handlePatch(operations)
+        }
+      },
       onClose: () => {
         modalOpen = false
         focus()
@@ -1578,6 +1592,7 @@
     documentState = item.undo.state
     text = item.undo.text
     textIsRepaired = item.undo.textIsRepaired
+    parseError = undefined
 
     debug('undo', { item, json })
 
@@ -1616,6 +1631,7 @@
     documentState = item.redo.state
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired
+    parseError = undefined
 
     debug('redo', { item, json })
 
@@ -1732,7 +1748,7 @@
                     class="jse-table-cell jse-table-cell-gutter"
                     use:resizeObserver={(element) => handleResizeRow(element, rowIndex)}
                   >
-                    {rowIndex + 1}
+                    {rowIndex}
                     {#if !isEmpty(validationErrorsByRow?.row)}
                       <ValidationErrorIcon
                         validationError={mergeValidationErrors(
@@ -1821,6 +1837,10 @@
               onClick: handleClearPastedJson
             }
           ]}
+          onClose={() => {
+            // TODO: the need for setTimeout is ugly
+            setTimeout(focus)
+          }}
         />
       {/if}
 
@@ -1842,6 +1862,7 @@
                 }
               ]
             : []}
+          onClose={focus}
         />
       {/if}
 

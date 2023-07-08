@@ -1,4 +1,4 @@
-import { test, describe } from 'vitest'
+import { describe, test } from 'vitest'
 import { deepStrictEqual, notStrictEqual, strictEqual, throws } from 'assert'
 import {
   createLodashPropertySelector,
@@ -6,50 +6,51 @@ import {
   createPropertySelector,
   parseJSONPath,
   pathToOption,
-  stringifyJSONPath,
-  stripRootObject
+  stringifyJSONPath
 } from './pathUtils.js'
 
 describe('pathUtils', () => {
   test('stringifyJSONPath', () => {
-    strictEqual(stringifyJSONPath([]), '$')
-    strictEqual(stringifyJSONPath(['']), "$['']")
-    strictEqual(stringifyJSONPath(['foo']), '$.foo')
-    strictEqual(stringifyJSONPath(['foo', 'bar']), '$.foo.bar')
-    strictEqual(stringifyJSONPath(['foo', '2']), '$.foo[2]')
-    strictEqual(stringifyJSONPath(['foo', '2', 'bar']), '$.foo[2].bar')
-    strictEqual(stringifyJSONPath(['foo', '2', 'bar_baz']), '$.foo[2].bar_baz')
-    strictEqual(stringifyJSONPath(['2']), '$[2]')
-    strictEqual(stringifyJSONPath(['foo', 'prop-with-hyphens']), "$.foo['prop-with-hyphens']")
-    strictEqual(stringifyJSONPath(['foo', 'prop with spaces']), "$.foo['prop with spaces']")
-    strictEqual(stringifyJSONPath(['foo', 'prop with \'".[']), "$.foo['prop with '\".[']")
+    strictEqual(stringifyJSONPath([]), '')
+    strictEqual(stringifyJSONPath(['']), '[""]')
+    strictEqual(stringifyJSONPath(['foo']), 'foo')
+    strictEqual(stringifyJSONPath(['foo', 'bar']), 'foo.bar')
+    strictEqual(stringifyJSONPath(['foo', '2']), 'foo[2]')
+    strictEqual(stringifyJSONPath(['foo', '2', 'bar']), 'foo[2].bar')
+    strictEqual(stringifyJSONPath(['foo', '2', 'bar_baz']), 'foo[2].bar_baz')
+    strictEqual(stringifyJSONPath(['2']), '[2]')
+    strictEqual(stringifyJSONPath(['foo', 'prop-with-hyphens']), 'foo.prop-with-hyphens')
+    strictEqual(stringifyJSONPath(['foo', 'prop with spaces']), 'foo.prop with spaces')
+    strictEqual(stringifyJSONPath(['foo', 'prop with \'"][']), 'foo["prop with \'\\"]["]')
+    strictEqual(stringifyJSONPath(['foo', 'prop with ."']), 'foo["prop with .\\""]')
+    strictEqual(stringifyJSONPath(['foo', 'prop with "']), 'foo.prop with "')
   })
 
   test('parseJSONPath', () => {
-    deepStrictEqual(parseJSONPath('$'), [])
-    deepStrictEqual(parseJSONPath("$['']"), [''])
-    deepStrictEqual(parseJSONPath('$.foo'), ['foo'])
-    deepStrictEqual(parseJSONPath('$.foo.bar'), ['foo', 'bar'])
-    deepStrictEqual(parseJSONPath('$.foo[2]'), ['foo', '2'])
-    deepStrictEqual(parseJSONPath('$.foo[2].bar'), ['foo', '2', 'bar'])
-    deepStrictEqual(parseJSONPath('$.foo[2].bar_baz'), ['foo', '2', 'bar_baz'])
-    deepStrictEqual(parseJSONPath('$[2]'), ['2'])
-    deepStrictEqual(parseJSONPath("$.foo['prop-with-hyphens']"), ['foo', 'prop-with-hyphens'])
-    deepStrictEqual(parseJSONPath("$.foo['prop with spaces']"), ['foo', 'prop with spaces'])
-    deepStrictEqual(parseJSONPath("$.foo['prop with '\".[']"), ['foo', 'prop with \'".['])
+    deepStrictEqual(parseJSONPath(''), [])
+    deepStrictEqual(parseJSONPath('[""]'), [''])
+    deepStrictEqual(parseJSONPath('foo'), ['foo'])
+    deepStrictEqual(parseJSONPath('foo.bar'), ['foo', 'bar'])
+    deepStrictEqual(parseJSONPath('foo[2]'), ['foo', '2'])
+    deepStrictEqual(parseJSONPath('foo[2].bar'), ['foo', '2', 'bar'])
+    deepStrictEqual(parseJSONPath('foo[2].bar_baz'), ['foo', '2', 'bar_baz'])
+    deepStrictEqual(parseJSONPath('[2]'), ['2'])
+    deepStrictEqual(parseJSONPath('foo.prop-with-hyphens'), ['foo', 'prop-with-hyphens'])
+    deepStrictEqual(parseJSONPath('["prop.with.dot"]'), ['prop.with.dot'])
+    deepStrictEqual(parseJSONPath('["prop with space"]'), ['prop with space'])
+    deepStrictEqual(parseJSONPath('["prop with \'\\"]["]'), ['prop with \'"]['])
+    deepStrictEqual(parseJSONPath('["prop with \\""]'), ['prop with "'])
+    deepStrictEqual(parseJSONPath('\\"'), ['\\"']) // we only unescape when inside a string
 
-    // with missing root document or initial dot or enclosing whitespace
+    // with initial dot or enclosing whitespace
     deepStrictEqual(parseJSONPath('.foo.bar'), ['foo', 'bar'])
     deepStrictEqual(parseJSONPath('foo.bar'), ['foo', 'bar'])
     deepStrictEqual(parseJSONPath('[2]'), ['2'])
-    deepStrictEqual(parseJSONPath(' $[2]  '), ['2'])
+    deepStrictEqual(parseJSONPath(' [2]  '), [' ', '2', '  ']) // This is odd but better than ignoring whitespace in general
 
     throws(() => {
-      parseJSONPath('["hello"]')
-    }, new SyntaxError('Cannot parse path: unexpected part "["hello"]" at position 0'))
-    throws(() => {
-      parseJSONPath('.foo.bar baz')
-    }, new SyntaxError('Cannot parse path: unexpected part " baz" at position 8'))
+      parseJSONPath('["hello"wrong quote"]')
+    }, new SyntaxError('Invalid JSON path: ] expected at position 8'))
   })
 
   test('createLodashPropertySelector', () => {
@@ -72,16 +73,11 @@ describe('pathUtils', () => {
     strictEqual(createLodashPropertySelector(['foo', 'prop with ".[']), '["foo","prop with \\".["]')
   })
 
-  test('stripRootObject', () => {
-    strictEqual(stripRootObject('$.foo.bar'), 'foo.bar')
-    strictEqual(stripRootObject("$['foo'].bar"), "['foo'].bar")
-  })
-
   test('pathToOption', () => {
     deepStrictEqual(pathToOption([]), { value: [], label: '(whole item)' })
     deepStrictEqual(pathToOption(['users', '2', 'first name']), {
       value: ['users', '2', 'first name'],
-      label: "users[2]['first name']"
+      label: 'users[2].first name'
     })
   })
 

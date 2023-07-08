@@ -22,7 +22,7 @@
   import { Mode } from '$lib/types.js'
   import JSONEditorRoot from '../modes/JSONEditorRoot.svelte'
   import { noop } from '$lib/utils/noop.js'
-  import { stringifyJSONPath, stripRootObject } from '$lib/utils/pathUtils.js'
+  import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
   import { initial, isEmpty, last } from 'lodash-es'
   import { isJSONContent, toJSONContent } from '$lib/utils/jsonUtils.js'
   import Icon from 'svelte-awesome'
@@ -42,6 +42,7 @@
   export let mainMenuBar: boolean
   export let navigationBar: boolean
   export let statusBar: boolean
+  export let askToFormat: boolean
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
   export let flattenColumns: boolean
@@ -73,9 +74,7 @@
   let stack: ModalState[] = [rootState]
 
   $: absolutePath = stack.flatMap((state) => state.relativePath)
-  $: pathDescription = !isEmpty(absolutePath)
-    ? stripRootObject(stringifyJSONPath(absolutePath))
-    : '(whole document)'
+  $: pathDescription = !isEmpty(absolutePath) ? stringifyJSONPath(absolutePath) : '(whole document)'
 
   // not relevant in this Modal setting, but well
   $: parseMemoizeOne = memoizeOne(parser.parse)
@@ -206,6 +205,7 @@
         {indentation}
         {tabSize}
         {statusBar}
+        {askToFormat}
         {mainMenuBar}
         {navigationBar}
         {escapeControlCharacters}

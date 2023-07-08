@@ -17,7 +17,7 @@ import { ValidationSeverity } from '$lib/types.js'
 import { createValueSelection, pathStartsWith } from './selection.js'
 import { isNumber } from '../utils/numberUtils.js'
 import type { Dictionary } from 'lodash'
-import { stringifyJSONPath, stripRootObject } from '../utils/pathUtils.js'
+import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
 import { forEachSample } from '$lib/utils/arrayUtils.js'
 import { isObject } from '$lib/utils/typeUtils.js'
 
@@ -412,7 +412,7 @@ export function mergeValidationErrors(
       'Multiple validation issues: ' +
       validationErrors
         .map((error) => {
-          return stripRootObject(stringifyJSONPath(error.path)) + ' ' + error.message
+          return stringifyJSONPath(error.path) + ' ' + error.message
         })
         .join(', '),
     severity: ValidationSeverity.warning

@@ -77,6 +77,7 @@
   export let readOnly: boolean
   export let mainMenuBar: boolean
   export let statusBar: boolean
+  export let askToFormat: boolean
   export let externalContent: Content
   export let indentation: number | string
   export let tabSize: number
@@ -112,11 +113,9 @@
 
   let onChangeDisabled = false
   let acceptTooLarge = false
-  let askToFormat = true
 
   let validationErrors: ValidationError[] = []
   const linterCompartment = new Compartment()
-  const editableCompartment = new Compartment() // needed to prevent a mobile keyboard from opening when readonly
   const readOnlyCompartment = new Compartment()
   const indentUnitCompartment = new Compartment()
   const tabSizeCompartment = new Compartment()
@@ -189,13 +188,20 @@
   // This is used to track whether the editor still has focus
   let modalOpen = false
 
+  onDestroy(() => {
+    flush()
+  })
+
   createFocusTracker({
     onMount,
     onDestroy,
     getWindow: () => getWindow(domTextMode),
     hasFocus: () => (modalOpen && document.hasFocus()) || activeElementIsChildOf(domTextMode),
     onFocus,
-    onBlur
+    onBlur: () => {
+      flush()
+      onBlur()
+    }
   })
 
   export function patch(operations: JSONPatchDocument): JSONPatchResult {
@@ -507,7 +513,6 @@
           top: true
         }),
         readOnlyCompartment.of(EditorState.readOnly.of(readOnly)),
-        editableCompartment.of(EditorView.editable.of(!readOnly)),
         tabSizeCompartment.of(EditorState.tabSize.of(tabSize)),
         indentUnitCompartment.of(createIndentUnit(indentation)),
         themeCompartment.of(EditorView.theme({}, { dark: hasDarkTheme() })),
@@ -617,12 +622,12 @@
    * Force refreshing the editor, for example after changing the font size
    * to update the positioning of the line numbers in the gutter
    */
-  export function refresh() {
+  export async function refresh(): Promise<void> {
     debug('refresh')
 
     // update the theme (light/dark), but also, as a side effect,
     // refresh the font size of the line numbers in the gutter
-    updateTheme()
+    await updateTheme()
   }
 
   function forceUpdateText() {
@@ -697,27 +702,24 @@
       debug('updateReadOnly', readOnly)
 
       codeMirrorView.dispatch({
-        effects: [
-          readOnlyCompartment.reconfigure(EditorState.readOnly.of(readOnly)),
-          editableCompartment.reconfigure(EditorView.editable.of(!readOnly))
-        ]
+        effects: [readOnlyCompartment.reconfigure(EditorState.readOnly.of(readOnly))]
       })
     }
   }
 
-  function updateTheme() {
+  async function updateTheme(): Promise<void> {
     // we check the theme on the next tick, to make sure the page
     // is re-rendered with (possibly) changed CSS variables
-    tick().then(() => {
-      if (codeMirrorView) {
-        const dark = hasDarkTheme()
-        debug('updateTheme', { dark })
+    await tick()
 
-        codeMirrorView.dispatch({
-          effects: [themeCompartment.reconfigure(EditorView.theme({}, { dark }))]
-        })
-      }
-    })
+    if (codeMirrorView) {
+      const dark = hasDarkTheme()
+      debug('updateTheme', { dark })
+
+      codeMirrorView.dispatch({
+        effects: [themeCompartment.reconfigure(EditorView.theme({}, { dark }))]
+      })
+    }
   }
 
   function createIndentUnit(indentation: number | string): Extension {
@@ -741,6 +743,10 @@
     onChangeCodeMirrorValue,
     TEXT_MODE_ONCHANGE_DELAY
   )
+
+  function flush() {
+    onChangeCodeMirrorValueDebounced.flush()
+  }
 
   function emitOnChange(content: Content, previousContent: Content) {
     if (onChange) {
@@ -783,7 +789,7 @@
   export function validate(): ContentErrors | null {
     debug('validate:start')
 
-    onChangeCodeMirrorValueDebounced.flush()
+    flush()
 
     const contentErrors = memoizedValidateText(
       normalization.escapeValue(text),
@@ -895,6 +901,7 @@
             onClick: cancelLoadTooLarge
           }
         ]}
+        onClose={focus}
       />
 
       <div class="jse-contents jse-preview">
@@ -914,6 +921,7 @@
           message={jsonParseError.message}
           actions={repairActions}
           onClick={handleShowMe}
+          onClose={focus}
         />
       {/if}
 
@@ -935,6 +943,7 @@
               onClick: () => (askToFormat = false)
             }
           ]}
+          onClose={focus}
         />
       {/if}
 

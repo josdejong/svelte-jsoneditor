@@ -8,7 +8,7 @@
   import { valueType } from '$lib/utils/typeUtils.js'
   import { findNestedArrays } from '$lib/logic/table.js'
   import { isEmpty } from 'lodash-es'
-  import { stringifyJSONPath, stripRootObject } from '$lib/utils/pathUtils.js'
+  import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
 
   export let text: string | undefined
   export let json: JSONValue | undefined
@@ -59,7 +59,7 @@
         class="jse-nested-array-action"
         on:click={() => openJSONEditorModal(nestedArrayPath)}
       >
-        {action} "{stripRootObject(stringifyJSONPath(nestedArrayPath))}"
+        {action} "{stringifyJSONPath(nestedArrayPath)}"
         <span class="jse-nested-array-count">({count} {count !== 1 ? 'items' : 'item'})</span>
       </button>
     {/each}

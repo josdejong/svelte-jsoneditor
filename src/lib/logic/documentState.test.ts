@@ -970,28 +970,24 @@ describe('documentState', () => {
   describe('expandPath', () => {
     const json = {
       array: [1, 2, { c: 6 }],
-      object: { a: 4, b: 5 },
+      object: { a: 4, b: 5, nested: { c: 6 } },
       value: 'hello'
     }
 
     test('should expand root path', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState(), []).expandedMap, {
-        '': true
-      })
+      assert.deepStrictEqual(expandPath(json, createDocumentState(), []).expandedMap, {})
     })
 
     test('should expand an array', () => {
       assert.deepStrictEqual(expandPath(json, createDocumentState(), ['array']).expandedMap, {
-        '': true,
-        '/array': true
+        '': true
       })
     })
 
     test('should expand an object inside an array', () => {
       assert.deepStrictEqual(expandPath(json, createDocumentState(), ['array', '2']).expandedMap, {
         '': true,
-        '/array': true,
-        '/array/2': true
+        '/array': true
       })
     })
 
@@ -1004,14 +1000,23 @@ describe('documentState', () => {
 
     test('should expand an object', () => {
       assert.deepStrictEqual(expandPath(json, createDocumentState(), ['object']).expandedMap, {
-        '': true,
-        '/object': true
+        '': true
       })
+    })
+
+    test('should expand a nested object', () => {
+      assert.deepStrictEqual(
+        expandPath(json, createDocumentState(), ['object', 'nested']).expandedMap,
+        {
+          '': true,
+          '/object': true
+        }
+      )
     })
 
     test('should expand visible section of an array if needed', () => {
       const json = {
-        largeArray: range(0, 500)
+        largeArray: range(0, 500).map((index) => ({ id: index }))
       }
 
       assert.deepStrictEqual(expandPath(json, createDocumentState(), ['largeArray', '120']), {

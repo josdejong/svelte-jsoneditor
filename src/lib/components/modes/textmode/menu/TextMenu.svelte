@@ -28,6 +28,14 @@
   export let canTransform
   export let onRenderMenu: OnRenderMenuWithoutContext
 
+  const searchItem: MenuItem = {
+    type: 'button',
+    icon: faSearch,
+    title: 'Search (Ctrl+F)',
+    className: 'jse-search',
+    onClick: onToggleSearch
+  }
+
   let defaultItems: MenuItem[]
   $: defaultItems = !readOnly
     ? [
@@ -66,13 +74,7 @@
           onClick: onTransform,
           disabled: readOnly || !canTransform
         },
-        {
-          type: 'button',
-          icon: faSearch,
-          title: 'Search (Ctrl+F)',
-          className: 'jse-search',
-          onClick: onToggleSearch
-        },
+        searchItem,
         {
           type: 'separator'
         },
@@ -97,6 +99,7 @@
         }
       ]
     : [
+        searchItem,
         {
           type: 'space'
         }

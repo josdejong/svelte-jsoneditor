@@ -120,7 +120,7 @@ export const createJump = () => {
     // resolve options, or use defaults
     duration = 1000
     offset = options.offset || 0
-    callback = undefined // "undefined" is a suitable default, and won't be called
+    callback = options.callback // "undefined" is a suitable default, and won't be called
     easing = options.easing || easeInOutQuad
     a11y = options.a11y || false
 

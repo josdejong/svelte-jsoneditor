@@ -211,6 +211,7 @@
   const mainMenuBar = useLocalStorage('svelte-jsoneditor-demo-mainMenuBar', true)
   const navigationBar = useLocalStorage('svelte-jsoneditor-demo-navigationBar', true)
   const statusBar = useLocalStorage('svelte-jsoneditor-demo-statusBar', true)
+  const askToFormat = useLocalStorage('svelte-jsoneditor-demo-askToFormat', true)
   const escapeControlCharacters = useLocalStorage(
     'svelte-jsoneditor-demo-escapeControlCharacters',
     false
@@ -397,6 +398,9 @@
       <input type="checkbox" bind:checked={$statusBar} /> statusBar
     </label>
     <label>
+      <input type="checkbox" bind:checked={$askToFormat} /> askToFormat
+    </label>
+    <label>
       <input type="checkbox" bind:checked={$escapeControlCharacters} /> escapeControlCharacters
     </label>
     <label>
@@ -539,7 +543,7 @@
     <button
       on:click={() => {
         content = {
-          text: 'abc',
+          text: '[1,2,3',
           json: undefined
         }
       }}
@@ -555,6 +559,13 @@
       }}
     >
       Set unrepairable text
+    </button>
+    <button
+      on:click={() => {
+        refTreeEditor.scrollTo(['669', 'array'])
+      }}
+    >
+      Scroll to [669, 'array']
     </button>
   </p>
   <p class="buttons">
@@ -630,6 +641,7 @@
             mainMenuBar={$mainMenuBar}
             navigationBar={$navigationBar}
             statusBar={$statusBar}
+            askToFormat={$askToFormat}
             escapeControlCharacters={$escapeControlCharacters}
             escapeUnicodeCharacters={$escapeUnicodeCharacters}
             flattenColumns={$flattenColumns}
@@ -645,6 +657,8 @@
             onChange={onChangeTree}
             onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
             {onChangeMode}
+            onFocus={() => console.log('onFocus tree')}
+            onBlur={() => console.log('onBlur tree', { content: refTreeEditor.get() })}
           />
         {/if}
       </div>
@@ -678,6 +692,7 @@
             mainMenuBar={$mainMenuBar}
             navigationBar={$navigationBar}
             statusBar={$statusBar}
+            askToFormat={$askToFormat}
             escapeControlCharacters={$escapeControlCharacters}
             escapeUnicodeCharacters={$escapeUnicodeCharacters}
             flattenColumns={$flattenColumns}
@@ -694,6 +709,8 @@
             onChange={onChangeText}
             onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
             {onChangeMode}
+            onFocus={() => console.log('onFocus text')}
+            onBlur={() => console.log('onBlur text', { content: refTextEditor.get() })}
           />
         {/if}
       </div>

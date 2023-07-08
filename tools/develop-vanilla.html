@@ -232,7 +232,7 @@
         testEditor.set({ text: '' })
       }
 
-      document.getElementById('patchJson').onclick = function handleClearJson() {
+      document.getElementById('patchJson').onclick = async function handleClearJson() {
         const operations = [
           {
             op: 'replace',
@@ -241,10 +241,10 @@
           }
         ]
 
-        testEditor.patch(operations)
+        await testEditor.patch(operations)
       }
 
-      document.getElementById('patchJson2').onclick = function handleClearJson() {
+      document.getElementById('patchJson2').onclick = async function handleClearJson() {
         const operations = [
           {
             op: 'replace',
@@ -253,10 +253,10 @@
           }
         ]
 
-        testEditor.patch(operations)
+        await testEditor.patch(operations)
       }
 
-      document.getElementById('moveJson').onclick = function handleMoveJson() {
+      document.getElementById('moveJson').onclick = async function handleMoveJson() {
         const operations = [
           {
             op: 'move',
@@ -265,7 +265,7 @@
           }
         ]
 
-        testEditor.patch(operations)
+        await testEditor.patch(operations)
       }
 
       document.getElementById('loadFile').onchange = function loadFile(event) {
@@ -379,12 +379,12 @@
         testEditor.update({ text: invalidStr })
       }
 
-      document.getElementById('scrollToPath').onclick = () => {
-        testEditor.scrollTo(['object', 'nested', 'name'])
+      document.getElementById('scrollToPath').onclick = async () => {
+        await testEditor.scrollTo(['object', 'nested', 'name'])
       }
 
-      document.getElementById('acceptAutoRepair').onclick = () => {
-        const content = testEditor.acceptAutoRepair()
+      document.getElementById('acceptAutoRepair').onclick = async () => {
+        const content = await testEditor.acceptAutoRepair()
         console.log('acceptAutoRepair', content)
       }
 

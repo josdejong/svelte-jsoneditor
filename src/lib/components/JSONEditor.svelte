@@ -69,6 +69,7 @@
   export let mainMenuBar = true
   export let navigationBar = true
   export let statusBar = true
+  export let askToFormat = true
   export let escapeControlCharacters = false
   export let escapeUnicodeCharacters = false
   export let flattenColumns = true
@@ -141,7 +142,7 @@
     return content
   }
 
-  export function set(newContent: Content) {
+  export async function set(newContent: Content): Promise<void> {
     debug('set')
 
     const contentError = validateContentType(newContent)
@@ -153,9 +154,11 @@
     instanceId = uniqueId()
 
     content = newContent
+
+    await tick() // await rerender
   }
 
-  export function update(updatedContent: Content) {
+  export async function update(updatedContent: Content): Promise<void> {
     debug('update')
 
     const contentError = validateContentType(updatedContent)
@@ -164,9 +167,11 @@
     }
 
     content = updatedContent
+
+    await tick() // await rerender
   }
 
-  export function patch(operations: JSONPatchDocument): JSONPatchResult {
+  export async function patch(operations: JSONPatchDocument): Promise<JSONPatchResult> {
     if (isTextContent(content)) {
       try {
         content = {
@@ -180,11 +185,17 @@
 
     // Note that patch has an optional afterPatch callback.
     // right now we don's support this in the public API.
-    return refJSONEditorRoot.patch(operations)
+    const result = refJSONEditorRoot.patch(operations)
+
+    await tick() // await rerender
+
+    return result
   }
 
-  export function expand(callback?: OnExpand): void {
+  export async function expand(callback?: OnExpand): Promise<void> {
     refJSONEditorRoot.expand(callback)
+
+    await tick() // await rerender
   }
 
   /**
@@ -213,12 +224,16 @@
    * mode or when the editor is not in an "accept auto repair" status, nothing
    * will happen, and the contents will be returned as is.
    */
-  export function acceptAutoRepair(): Content {
-    return refJSONEditorRoot.acceptAutoRepair()
+  export async function acceptAutoRepair(): Promise<Content> {
+    const content = refJSONEditorRoot.acceptAutoRepair()
+
+    await tick() // await rerender
+
+    return content
   }
 
-  export function scrollTo(path: JSONPath): void {
-    return refJSONEditorRoot.scrollTo(path)
+  export async function scrollTo(path: JSONPath): Promise<void> {
+    await refJSONEditorRoot.scrollTo(path)
   }
 
   export function updateSelection(selection:
@@ -232,20 +247,26 @@
     return refJSONEditorRoot.findElement(path)
   }
 
-  export function focus() {
+  export async function focus(): Promise<void> {
     refJSONEditorRoot.focus()
+
+    await tick() // await rerender
   }
 
-  export function refresh() {
-    refJSONEditorRoot.refresh()
+  export async function refresh(): Promise<void> {
+    await refJSONEditorRoot.refresh()
   }
 
-  export function updateProps(props: JSONEditorPropsOptional) {
+  export async function updateProps(props: JSONEditorPropsOptional): Promise<void> {
     this.$set(props)
+
+    await tick() // await rerender
   }
 
-  export function destroy() {
+  export async function destroy() {
     this.$destroy()
+
+    await tick() // await destroying
   }
 
   function handleChange(updatedContent: Content, previousContent: Content, status: OnChangeStatus) {
@@ -361,6 +382,7 @@
         mainMenuBar,
         navigationBar,
         statusBar,
+        askToFormat,
         escapeControlCharacters,
         escapeUnicodeCharacters,
         flattenColumns,
@@ -421,6 +443,7 @@
             {indentation}
             {tabSize}
             {statusBar}
+            {askToFormat}
             {mainMenuBar}
             {navigationBar}
             {escapeControlCharacters}

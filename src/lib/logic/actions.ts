@@ -241,7 +241,7 @@ export function onRemove({
     if (onChange) {
       onChange(
         { text: '', json: undefined },
-        json !== undefined ? { text, json } : { text: text || '', json },
+        json !== undefined ? { text: undefined, json } : { text: text || '', json },
         {
           contentErrors: null,
           patchResult: null
@@ -567,7 +567,7 @@ export function onInsert({
     onReplaceJson(newValue, (patchedJson, patchedState) => ({
       state: {
         ...expandRecursive(patchedJson, patchedState, path),
-        selection: createInsideSelection(path)
+        selection: createValueSelection(path, true)
       }
     }))
   }
@@ -655,6 +655,7 @@ export async function onInsertCharacter({
         //  a patch to change the object/array into a value)
       }
     } else {
+      debug('onInsertValueWithCharacter', { char })
       await onInsertValueWithCharacter({
         char,
         refJsonEditor,

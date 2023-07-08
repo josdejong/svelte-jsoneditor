@@ -422,6 +422,7 @@ export interface JSONEditorPropsOptional {
   mainMenuBar?: boolean
   navigationBar?: boolean
   statusBar?: boolean
+  askToFormat?: boolean
   escapeControlCharacters?: boolean
   escapeUnicodeCharacters?: boolean
   flattenColumns?: true
