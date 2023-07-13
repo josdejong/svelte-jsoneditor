@@ -211,15 +211,14 @@ export function isSelectionInsidePath(selection: JSONSelection, path: JSONPath):
 export function getSelectionUp(
   json: JSONValue,
   documentState: DocumentState,
-  keepAnchorPath = false,
-  useFocusPath = false
+  keepAnchorPath = false
 ): JSONSelection | null {
   const selection = documentState.selection
   if (!selection) {
     return null
   }
 
-  const path = useFocusPath ? getFocusPath(selection) : getStartPath(json, selection)
+  const path = keepAnchorPath ? getFocusPath(selection) : getStartPath(json, selection)
   const previousPath = getPreviousVisiblePath(json, documentState, path)
 
   if (previousPath === null) {
@@ -271,37 +270,32 @@ export function getSelectionUp(
 export function getSelectionDown(
   json: JSONValue,
   documentState: DocumentState,
-  keepAnchorPath = false,
-  useFocusPath = false
+  keepAnchorPath = false
 ): JSONSelection | null {
   const selection = documentState.selection
   if (!selection) {
     return null
   }
   // TODO: this function is too large, break it down in two separate functions: one for keepAnchorPath = true, and one for keepAnchorPath = false?
-  const path = useFocusPath ? getFocusPath(selection) : getEndPath(json, selection)
+  const path = keepAnchorPath ? getFocusPath(selection) : getEndPath(json, selection)
   const nextPath = getNextVisiblePath(json, documentState, path)
   const anchorPath = nextPath
   const focusPath = nextPath
 
-  if (nextPath === null || anchorPath == null || focusPath == null) {
+  // if the focusPath is an Array or object, we must not step into it but
+  // over it, we pass state with this array/object collapsed
+  const collapsedState = isObjectOrArray(getIn(json, path))
+    ? collapsePath(documentState, path)
+    : documentState
+
+  const nextPathAfter = getNextVisiblePath(json, collapsedState, path)
+
+  if (nextPathAfter === null || anchorPath == null || focusPath == null) {
     return null
   }
 
   if (keepAnchorPath) {
-    // if the focusPath is an Array or object, we must not step into it but
-    // over it, we pass state with this array/object collapsed
-    const collapsedState = isObjectOrArray(getIn(json, path))
-      ? collapsePath(documentState, path)
-      : documentState
-
-    const nextPathAfter = getNextVisiblePath(json, collapsedState, path)
-
     // multi selection
-    if (nextPathAfter === null) {
-      return null
-    }
-
     if (isAfterSelection(selection)) {
       return createMultiSelection(nextPathAfter, nextPathAfter)
     }
@@ -314,7 +308,7 @@ export function getSelectionDown(
   }
 
   if (isKeySelection(selection)) {
-    const parentPath = initial(nextPath)
+    const parentPath = initial(nextPath) // not nextPathAfter!
     const parent = getIn(json, parentPath)
     if (Array.isArray(parent)) {
       // switch to value selection: array has no keys
@@ -334,7 +328,7 @@ export function getSelectionDown(
   }
 
   // selection type MULTI or AFTER
-  return createMultiSelection(nextPath, nextPath)
+  return createMultiSelection(nextPathAfter, nextPathAfter)
 }
 
 /**

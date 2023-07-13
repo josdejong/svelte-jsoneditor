@@ -1634,7 +1634,7 @@
       event.preventDefault()
 
       const newSelection = documentState.selection
-        ? getSelectionUp(json, documentState, keepAnchorPath, true) || documentState.selection
+        ? getSelectionUp(json, documentState, keepAnchorPath) || documentState.selection
         : getInitialSelection(json, documentState)
 
       updateSelection(newSelection)
@@ -1644,7 +1644,7 @@
       event.preventDefault()
 
       const newSelection = documentState.selection
-        ? getSelectionDown(json, documentState, keepAnchorPath, true) || documentState.selection
+        ? getSelectionDown(json, documentState, keepAnchorPath) || documentState.selection
         : getInitialSelection(json, documentState)
 
       updateSelection(newSelection)
