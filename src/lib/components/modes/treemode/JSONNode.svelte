@@ -36,7 +36,6 @@
     isInsideSelection,
     isKeySelection,
     isMultiSelection,
-    isPathInsideSelection,
     isValueSelection,
     pathInSelection,
     selectionIfOverlapping
@@ -272,9 +271,15 @@
     const json = context.getJson()
     const documentState = context.getDocumentState()
 
-    // when right-clicking inside the current selection, do nothing: context menu will open
-    // when left-clicking inside the current selection, do nothing: it can be the start of dragging
-    if (selection && isPathInsideSelection(json, selection, path, anchorType)) {
+    if (
+      selection &&
+      anchorType !== SelectionType.after &&
+      anchorType !== SelectionType.inside &&
+      (selection.type === anchorType || selection.type === SelectionType.multi) &&
+      pathInSelection(json, selection, path)
+    ) {
+      // when right-clicking inside the current selection, do nothing: context menu will open
+      // when left-clicking inside the current selection, do nothing: it can be the start of dragging
       if (event.button === 0) {
         onDragSelectionStart(event)
       }

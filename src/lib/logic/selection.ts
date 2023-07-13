@@ -208,46 +208,6 @@ export function isSelectionInsidePath(selection: JSONSelection, path: JSONPath):
   )
 }
 
-// TODO: write unit test
-export function isPathInsideSelection(
-  json: JSONValue | undefined,
-  selection: JSONSelection | undefined,
-  path: JSONPath,
-  anchorType: string
-): boolean {
-  if (!selection || !json) {
-    return false
-  }
-
-  if (isMultiSelection(selection)) {
-    return selectionMatchesPredicate(json, selection, (selectionPath) =>
-      pathStartsWith(path, selectionPath)
-    )
-  }
-
-  if (isKeySelection(selection)) {
-    return anchorType === SelectionType.key && isEqual(selection.path, path)
-  }
-
-  if (isValueSelection(selection)) {
-    if (anchorType === SelectionType.value && isEqual(selection.path, path)) {
-      return true
-    }
-
-    if (
-      pathStartsWith(path, selection.path) &&
-      path.length > selection.path.length &&
-      (anchorType === SelectionType.key ||
-        anchorType === SelectionType.value ||
-        anchorType === SelectionType.multi)
-    ) {
-      return true
-    }
-  }
-
-  return false
-}
-
 export function getSelectionUp(
   json: JSONValue,
   documentState: DocumentState,
@@ -867,7 +827,9 @@ export function pathInSelection(
   }
 
   if (isMultiSelection(selection)) {
-    return selectionMatchesPredicate(json, selection, (p) => isEqual(p, path))
+    return selectionMatchesPredicate(json, selection, (selectionPath) =>
+      pathStartsWith(path, selectionPath)
+    )
   }
 
   return false
