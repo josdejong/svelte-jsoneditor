@@ -5,7 +5,7 @@
   import { existsIn, getIn } from 'immutable-json-patch'
   import { range } from 'lodash-es'
   import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
-  import { createMultiSelection } from '$lib/logic/selection.js'
+  import { createMultiSelection, getFocusPath } from '$lib/logic/selection.js'
   import { createDebug } from '$lib/utils/debug.js'
   import { caseInsensitiveNaturalCompare } from '$lib/logic/sort.js'
   import type { JSONPathParser, JSONSelection, OnError, OnSelect } from '$lib/types.js'
@@ -26,7 +26,7 @@
   let refEditButton: HTMLButtonElement | undefined
   let editing = false
 
-  $: path = selection ? selection.focusPath : []
+  $: path = selection ? getFocusPath(selection) : []
   $: hasNextItem = isObjectOrArray(getIn(json, path))
 
   // we have an unused parameter path to trigger scrollToLastItem when path changes,

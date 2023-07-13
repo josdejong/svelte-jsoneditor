@@ -4,7 +4,7 @@
   import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils.js'
-  import { createValueSelection } from '$lib/logic/selection.js'
+  import { createValueSelection, getFocusPath } from '$lib/logic/selection.js'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass.js'
   import EditableDiv from '../../../components/controls/EditableDiv.svelte'
   import { UPDATE_SELECTION } from '$lib/constants.js'
@@ -48,7 +48,7 @@
         // Leave the selection as is when it is no longer the path that we were editing here
         // This happens for example when the user clicks or double-clicks on another value
         // whilst editing a value
-        if (!isEqual(path, patchedState.selection.focusPath)) {
+        if (patchedState.selection && !isEqual(path, getFocusPath(patchedState.selection))) {
           return undefined
         }
 

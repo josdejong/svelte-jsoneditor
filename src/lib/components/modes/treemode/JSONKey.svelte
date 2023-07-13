@@ -27,7 +27,7 @@
   export let context: TreeModeContext
 
   $: isKeySelected = selection
-    ? isKeySelection(selection) && isEqual(selection.focusPath, path)
+    ? isKeySelection(selection) && isEqual(selection.path, path)
     : undefined
   $: isEditingKey = isKeySelected && selection && isEditingSelection(selection)
 

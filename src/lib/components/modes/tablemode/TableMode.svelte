@@ -1003,7 +1003,7 @@
       return
     }
 
-    const path = documentState.selection.focusPath
+    const path = getFocusPath(documentState.selection)
     const value = getIn(json, path)
     if (isObjectOrArray(value)) {
       openJSONEditorModal(path)
@@ -1017,7 +1017,7 @@
       return
     }
 
-    const path = documentState.selection.focusPath
+    const path = getFocusPath(documentState.selection)
     const pathRow = path.slice(0, 1)
     openJSONEditorModal(pathRow)
   }
@@ -1027,7 +1027,7 @@
       return
     }
 
-    const path = documentState.selection.focusPath
+    const path = documentState.selection.path
     const pointer = compileJSONPointer(path)
     const value = getIn(json, path)
     const enforceString = !getEnforceString(value, documentState.enforceStringMap, pointer, parser)
@@ -1221,7 +1221,7 @@
       if (documentState.selection) {
         const newSelection = selectPreviousColumn(columns, documentState.selection)
         updateSelection(newSelection)
-        scrollIntoView(newSelection.focusPath)
+        scrollIntoView(getFocusPath(newSelection))
       }
     }
 
@@ -1233,7 +1233,7 @@
       if (documentState.selection) {
         const newSelection = selectNextColumn(columns, documentState.selection)
         updateSelection(newSelection)
-        scrollIntoView(newSelection.focusPath)
+        scrollIntoView(getFocusPath(newSelection))
       }
     }
 
@@ -1245,7 +1245,7 @@
       if (documentState.selection) {
         const newSelection = selectPreviousRow(columns, documentState.selection)
         updateSelection(newSelection)
-        scrollIntoView(newSelection.focusPath)
+        scrollIntoView(getFocusPath(newSelection))
       }
     }
 
@@ -1257,7 +1257,7 @@
       if (documentState.selection) {
         const newSelection = selectNextRow(json, columns, documentState.selection)
         updateSelection(newSelection)
-        scrollIntoView(newSelection.focusPath)
+        scrollIntoView(getFocusPath(newSelection))
       }
     }
 
@@ -1265,7 +1265,7 @@
       if (isValueSelection(documentState.selection)) {
         event.preventDefault()
 
-        const path = documentState.selection.focusPath
+        const path = documentState.selection.path
         const value = getIn(json, path)
         if (isObjectOrArray(value)) {
           // edit nested object/array
@@ -1289,7 +1289,7 @@
     }
 
     if (combo === 'Ctrl+Enter' && isValueSelection(documentState.selection)) {
-      const value = getIn(json, documentState.selection.focusPath)
+      const value = getIn(json, documentState.selection.path)
 
       if (isUrl(value)) {
         // open url in new page
@@ -1610,7 +1610,7 @@
 
     focus()
     if (documentState.selection) {
-      scrollTo(documentState.selection.focusPath, false)
+      scrollTo(getFocusPath(documentState.selection), false)
     }
   }
 
@@ -1649,7 +1649,7 @@
 
     focus()
     if (documentState.selection) {
-      scrollTo(documentState.selection.focusPath, false)
+      scrollTo(getFocusPath(documentState.selection), false)
     }
   }
 

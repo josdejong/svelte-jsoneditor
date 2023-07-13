@@ -15,6 +15,7 @@
   import { initial, isEmpty } from 'lodash-es'
   import {
     canConvert,
+    getFocusPath,
     isKeySelection,
     isMultiSelection,
     isValueSelection,
@@ -49,9 +50,9 @@
 
   $: hasJson = json !== undefined
   $: hasSelection = selection != null
-  $: rootSelected = selection != null && isEmpty(selection.focusPath)
+  $: rootSelected = selection != null && isEmpty(getFocusPath(selection))
   $: focusValue =
-    json !== undefined && selection != null ? getIn(json, selection.focusPath) : undefined
+    json !== undefined && selection != null ? getIn(json, getFocusPath(selection)) : undefined
 
   $: hasSelectionContents =
     hasJson &&
@@ -70,7 +71,7 @@
     selection != null &&
     singleItemSelected(selection) &&
     !rootSelected &&
-    !Array.isArray(getIn(json, initial(selection.focusPath)))
+    !Array.isArray(getIn(json, initial(getFocusPath(selection))))
 
   $: canEditValue = hasJson && selection != null && singleItemSelected(selection)
   $: canEnforceString = canEditValue && !isObjectOrArray(focusValue)
@@ -93,7 +94,7 @@
       ? getEnforceString(
           focusValue,
           documentState.enforceStringMap,
-          compileJSONPointer(selection.focusPath),
+          compileJSONPointer(getFocusPath(selection)),
           parser
         )
       : false

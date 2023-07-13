@@ -14,7 +14,7 @@ import type {
   ValidationError
 } from '$lib/types.js'
 import { ValidationSeverity } from '$lib/types.js'
-import { createValueSelection, pathStartsWith } from './selection.js'
+import { createValueSelection, getFocusPath, pathStartsWith } from './selection.js'
 import { isNumber } from '../utils/numberUtils.js'
 import type { Dictionary } from 'lodash'
 import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
@@ -269,7 +269,7 @@ function calculateAverageItemHeight(
 }
 
 export function selectPreviousRow(columns: JSONPath[], selection: JSONSelection): JSONSelection {
-  const { rowIndex, columnIndex } = toTableCellPosition(selection.focusPath, columns)
+  const { rowIndex, columnIndex } = toTableCellPosition(getFocusPath(selection), columns)
 
   if (rowIndex > 0) {
     const previousPosition = { rowIndex: rowIndex - 1, columnIndex }
@@ -285,7 +285,7 @@ export function selectNextRow(
   columns: JSONPath[],
   selection: JSONSelection
 ): JSONSelection {
-  const { rowIndex, columnIndex } = toTableCellPosition(selection.focusPath, columns)
+  const { rowIndex, columnIndex } = toTableCellPosition(getFocusPath(selection), columns)
 
   if (rowIndex < (json as JSONArray).length - 1) {
     const nextPosition = { rowIndex: rowIndex + 1, columnIndex }
@@ -297,7 +297,7 @@ export function selectNextRow(
 }
 
 export function selectPreviousColumn(columns: JSONPath[], selection: JSONSelection): JSONSelection {
-  const { rowIndex, columnIndex } = toTableCellPosition(selection.focusPath, columns)
+  const { rowIndex, columnIndex } = toTableCellPosition(getFocusPath(selection), columns)
 
   if (columnIndex > 0) {
     const previousPosition = { rowIndex, columnIndex: columnIndex - 1 }
@@ -309,7 +309,7 @@ export function selectPreviousColumn(columns: JSONPath[], selection: JSONSelecti
 }
 
 export function selectNextColumn(columns: JSONPath[], selection: JSONSelection): JSONSelection {
-  const { rowIndex, columnIndex } = toTableCellPosition(selection.focusPath, columns)
+  const { rowIndex, columnIndex } = toTableCellPosition(getFocusPath(selection), columns)
 
   if (columnIndex < columns.length - 1) {
     const nextPosition = { rowIndex, columnIndex: columnIndex + 1 }

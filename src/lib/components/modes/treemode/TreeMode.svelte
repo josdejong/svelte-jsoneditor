@@ -790,7 +790,7 @@
       return
     }
 
-    updateSelection(createKeySelection(documentState.selection.focusPath, true))
+    updateSelection(createKeySelection(getFocusPath(documentState.selection), true))
   }
 
   function handleEditValue() {
@@ -798,7 +798,7 @@
       return
     }
 
-    const path = documentState.selection.focusPath
+    const path = getFocusPath(documentState.selection)
     const value = getIn(json, path)
     if (isObjectOrArray(value)) {
       openJSONEditorModal(path, value)
@@ -812,7 +812,7 @@
       return
     }
 
-    const path = documentState.selection.focusPath
+    const path = getFocusPath(documentState.selection)
     const pointer = compileJSONPointer(path)
     const value = getIn(json, path)
     const enforceString = !getEnforceString(value, documentState.enforceStringMap, pointer, parser)
@@ -945,7 +945,7 @@
       json === undefined ||
       !documentState.selection ||
       !hasSelectionContents(documentState.selection) ||
-      isEmpty(documentState.selection.focusPath) // root selected, cannot duplicate
+      isEmpty(getFocusPath(documentState.selection)) // root selected, cannot duplicate
     ) {
       return
     }
@@ -962,7 +962,7 @@
       readOnly ||
       !documentState.selection ||
       (!isMultiSelection(documentState.selection) && !isValueSelection(documentState.selection)) ||
-      isEmpty(documentState.selection.focusPath) // root selected, cannot extract
+      isEmpty(getFocusPath(documentState.selection)) // root selected, cannot extract
     ) {
       return
     }
@@ -1006,7 +1006,7 @@
   function handleInsertFromContextMenu(type) {
     if (isKeySelection(documentState.selection)) {
       // in this case, we do not want to rename the key, but replace the property
-      updateSelection(createValueSelection(documentState.selection.focusPath, false))
+      updateSelection(createValueSelection(documentState.selection.path, false))
     }
 
     handleInsert(type)
@@ -1043,7 +1043,7 @@
       handlePatch(operations, (patchedJson, patchedState) => {
         // expand converted object/array
         return {
-          state: expandRecursive(patchedJson, patchedState, documentState.selection.focusPath)
+          state: expandRecursive(patchedJson, patchedState, getFocusPath(documentState.selection))
         }
       })
     } catch (err) {
@@ -1053,13 +1053,14 @@
 
   function handleInsertBefore() {
     const selectionBefore = getSelectionUp(json, documentState, false)
-    const parentPath = initial(documentState.selection.focusPath)
+    const parentPath = initial(getFocusPath(documentState.selection))
 
     if (
-      !isEmpty(selectionBefore.focusPath) &&
-      isEqual(parentPath, initial(selectionBefore.focusPath))
+      selectionBefore &&
+      !isEmpty(getFocusPath(selectionBefore)) &&
+      isEqual(parentPath, initial(getFocusPath(selectionBefore)))
     ) {
-      updateSelection(createAfterSelection(selectionBefore.focusPath))
+      updateSelection(createAfterSelection(getFocusPath(selectionBefore)))
     } else {
       updateSelection(createInsideSelection(parentPath))
     }
@@ -1133,7 +1134,7 @@
 
     focus()
     if (documentState.selection) {
-      scrollTo(documentState.selection.focusPath, false)
+      scrollTo(getFocusPath(documentState.selection), false)
     }
   }
 
@@ -1172,7 +1173,7 @@
 
     focus()
     if (documentState.selection) {
-      scrollTo(documentState.selection.focusPath, false)
+      scrollTo(getFocusPath(documentState.selection), false)
     }
   }
 
@@ -1637,7 +1638,7 @@
         : getInitialSelection(json, documentState)
 
       updateSelection(newSelection)
-      scrollIntoView(newSelection.focusPath)
+      scrollIntoView(getFocusPath(newSelection))
     }
     if (combo === 'ArrowDown' || combo === 'Shift+ArrowDown') {
       event.preventDefault()
@@ -1647,7 +1648,7 @@
         : getInitialSelection(json, documentState)
 
       updateSelection(newSelection)
-      scrollIntoView(newSelection.focusPath)
+      scrollIntoView(getFocusPath(newSelection))
     }
     if (combo === 'ArrowLeft' || combo === 'Shift+ArrowLeft') {
       event.preventDefault()
@@ -1658,7 +1659,7 @@
         : getInitialSelection(json, documentState)
 
       updateSelection(newSelection)
-      scrollIntoView(newSelection.focusPath)
+      scrollIntoView(getFocusPath(newSelection))
     }
     if (combo === 'ArrowRight' || combo === 'Shift+ArrowRight') {
       event.preventDefault()
@@ -1670,7 +1671,7 @@
           : getInitialSelection(json, documentState)
 
       updateSelection(newSelection)
-      scrollIntoView(newSelection.focusPath)
+      scrollIntoView(getFocusPath(newSelection))
     }
 
     if (combo === 'Enter' && documentState.selection) {
@@ -1693,10 +1694,10 @@
       if (isValueSelection(documentState.selection)) {
         event.preventDefault()
 
-        const value = getIn(json, documentState.selection.focusPath)
+        const value = getIn(json, documentState.selection.path)
         if (isObjectOrArray(value)) {
           // expand object/array
-          handleExpand(documentState.selection.focusPath, true)
+          handleExpand(documentState.selection.path, true)
         } else {
           if (!readOnly) {
             // go to value edit mode
@@ -1726,7 +1727,7 @@
     }
 
     if (combo === 'Ctrl+Enter' && isValueSelection(documentState.selection)) {
-      const value = getIn(json, documentState.selection.focusPath)
+      const value = getIn(json, documentState.selection.path)
 
       if (isUrl(value)) {
         // open url in new page
@@ -1967,7 +1968,7 @@
     updateSelection(newSelection)
 
     focus()
-    scrollTo(newSelection.focusPath)
+    scrollTo(getFocusPath(newSelection))
   }
 
   export function focus() {

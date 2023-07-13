@@ -29,6 +29,7 @@
     fromSelectionType,
     getAnchorPath,
     getEndPath,
+    getFocusPath,
     getSelectionPaths,
     getStartPath,
     isAfterSelection,
@@ -381,7 +382,7 @@
       return
     }
 
-    const selectionParentPath = initial(selection.focusPath)
+    const selectionParentPath = initial(getFocusPath(selection))
     if (!isEqual(path, selectionParentPath)) {
       // pass to parent
       onDragSelectionStart(event)
@@ -656,7 +657,7 @@
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
+        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
             <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -777,7 +778,7 @@
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
+        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
             <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -874,7 +875,7 @@
           searchResultItems={filterValueSearchResults(searchResultItemsMap, pointer)}
           {context}
         />
-        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
+        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
             <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>

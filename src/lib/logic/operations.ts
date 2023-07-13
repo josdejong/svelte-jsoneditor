@@ -28,6 +28,7 @@ import {
   createSelectionFromOperations,
   createValueSelection,
   getEndPath,
+  getFocusPath,
   getParentPath,
   getSelectionPaths,
   getStartPath,
@@ -294,7 +295,7 @@ export function extract(json: JSONValue, selection: JSONSelection): JSONPatchDoc
     return [
       {
         op: 'move',
-        from: compileJSONPointer(selection.focusPath),
+        from: compileJSONPointer(selection.path),
         path: ''
       }
     ]
@@ -351,10 +352,10 @@ export function insert(
   if (isKeySelection(selection)) {
     // rename key
     const clipboard = parseAndRepairOrUndefined(clipboardText, parser)
-    const parentPath = initial(selection.focusPath)
+    const parentPath = initial(selection.path)
     const parent = getIn(json, parentPath)
     const keys = Object.keys(parent as JSONObject)
-    const oldKey = last(selection.focusPath) as string
+    const oldKey = last(selection.path) as string
     const newKey = typeof clipboard === 'string' ? clipboard : clipboardText
 
     return rename(parentPath, keys, oldKey, newKey)
@@ -369,7 +370,7 @@ export function insert(
       return [
         {
           op: 'replace',
-          path: compileJSONPointer(selection.focusPath),
+          path: compileJSONPointer(getFocusPath(selection)),
           value: parsePartialJson(clipboardText, (text) =>
             parseAndRepair(text, parser)
           ) as JSONValue
@@ -380,7 +381,7 @@ export function insert(
       return [
         {
           op: 'replace',
-          path: compileJSONPointer(selection.focusPath),
+          path: compileJSONPointer(getFocusPath(selection)),
           value: clipboardText
         }
       ]
@@ -395,7 +396,7 @@ export function insert(
 
   if (isAfterSelection(selection)) {
     const newValues = clipboardToValues(clipboardText, parser)
-    const path = selection.focusPath
+    const path = selection.path
     const parentPath = initial(path)
     const parent = getIn(json, parentPath)
 
@@ -424,7 +425,7 @@ export function insert(
 
   if (isInsideSelection(selection)) {
     const newValues = clipboardToValues(clipboardText, parser)
-    const path = selection.focusPath
+    const path = selection.path
     const value = getIn(json, path)
 
     if (isJSONArray(value)) {
@@ -462,7 +463,7 @@ export function moveInsideParent(
   const beforePath = 'beforePath' in dragInsideAction ? dragInsideAction['beforePath'] : undefined
   const append = 'append' in dragInsideAction ? dragInsideAction['append'] : undefined
 
-  const parentPath = initial(selection.focusPath)
+  const parentPath = initial(getFocusPath(selection))
   const parent = getIn(json, parentPath)
 
   if (
@@ -652,10 +653,10 @@ export function createRemoveOperations(
 ): { newSelection: JSONSelection | undefined; operations: JSONPatchDocument } {
   if (isKeySelection(selection)) {
     // FIXME: DOESN'T work yet
-    const parentPath = initial(selection.focusPath)
+    const parentPath = initial(selection.path)
     const parent = getIn(json, parentPath)
     const keys = Object.keys(parent as JSONObject)
-    const oldKey = last(selection.focusPath) as string
+    const oldKey = last(selection.path) as string
     const newKey = ''
 
     const operations = rename(parentPath, keys, oldKey, newKey)
@@ -668,7 +669,7 @@ export function createRemoveOperations(
     const operations: JSONPatchDocument = [
       {
         op: 'replace',
-        path: compileJSONPointer(selection.focusPath),
+        path: compileJSONPointer(selection.path),
         value: ''
       }
     ]

@@ -551,33 +551,33 @@ describe('selection', () => {
 
     assert.deepStrictEqual(getInitialSelectionWithState({}), {
       type: SelectionType.value,
-      focusPath: [],
+      path: [],
       edit: false
     })
     assert.deepStrictEqual(getInitialSelectionWithState([]), {
       type: SelectionType.value,
-      focusPath: [],
+      path: [],
       edit: false
     })
     assert.deepStrictEqual(getInitialSelectionWithState('test'), {
       type: SelectionType.value,
-      focusPath: [],
+      path: [],
       edit: false
     })
 
     assert.deepStrictEqual(getInitialSelectionWithState({ a: 2, b: 3 }), {
       type: SelectionType.key,
-      focusPath: ['a'],
+      path: ['a'],
       edit: false
     })
     assert.deepStrictEqual(getInitialSelectionWithState({ a: {} }), {
       type: SelectionType.key,
-      focusPath: ['a'],
+      path: ['a'],
       edit: false
     })
     assert.deepStrictEqual(getInitialSelectionWithState([2, 3, 4]), {
       type: SelectionType.value,
-      focusPath: ['0'],
+      path: ['0'],
       edit: false
     })
   })
