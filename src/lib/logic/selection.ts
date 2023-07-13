@@ -81,20 +81,6 @@ export function getSelectionPaths(json: JSONValue, selection: JSONSelection): JS
   return paths
 }
 
-export function selectionMatchesPredicate(
-  json: JSONValue | undefined,
-  selection: JSONSelection | undefined,
-  predicate: (path: JSONPath) => boolean
-): boolean {
-  return (
-    iterateOverSelection(json, selection, (selectionPath) => {
-      if (predicate(selectionPath)) {
-        return true
-      }
-    }) || false
-  )
-}
-
 /**
  * Expand a selection start and end into an array containing all paths
  * between (and including) start and end.
@@ -122,6 +108,10 @@ export function iterateOverSelection<T>(
     return callback(anchorPath)
   } else {
     // multiple nodes
+    if (json === undefined) {
+      return undefined
+    }
+
     const sharedPath = findSharedPath(anchorPath, focusPath)
 
     if (anchorPath.length === sharedPath.length || focusPath.length === sharedPath.length) {
@@ -129,38 +119,33 @@ export function iterateOverSelection<T>(
       return callback(sharedPath)
     }
 
-    if (!json) {
+    const selection = createMultiSelection(anchorPath, focusPath)
+    const startPath = getStartPath(json, selection)
+    const endPath = getEndPath(json, selection)
+
+    const startIndex = getChildIndex(json, selection, startPath)
+    const endIndex = getChildIndex(json, selection, endPath)
+
+    if (startIndex === -1 || endIndex === -1) {
       return undefined
     }
 
-    const anchorKey = anchorPath[sharedPath.length]
-    const focusKey = focusPath[sharedPath.length]
     const value = getIn(json, sharedPath)
 
     if (isJSONObject(value)) {
       const keys = Object.keys(value)
-      const anchorIndex = keys.indexOf(anchorKey)
-      const focusIndex = keys.indexOf(focusKey)
 
-      if (anchorIndex !== -1 && focusIndex !== -1) {
-        const startIndex = Math.min(anchorIndex, focusIndex)
-        const endIndex = Math.max(anchorIndex, focusIndex)
-
-        for (let i = startIndex; i <= endIndex; i++) {
-          const value = callback(sharedPath.concat(keys[i]))
-          if (value !== undefined) {
-            return value
-          }
+      for (let i = startIndex; i <= endIndex; i++) {
+        const value = callback(sharedPath.concat(keys[i]))
+        if (value !== undefined) {
+          return value
         }
-
-        return undefined
       }
+
+      return undefined
     }
 
     if (isJSONArray(value)) {
-      const startIndex = Math.min(int(anchorKey), int(focusKey))
-      const endIndex = Math.max(int(anchorKey), int(focusKey))
-
       for (let i = startIndex; i <= endIndex; i++) {
         const value = callback(sharedPath.concat(String(i)))
         if (value !== undefined) {
@@ -184,20 +169,25 @@ export function getParentPath(selection: JSONSelection): JSONPath {
 }
 
 export function getStartPath(json: JSONValue, selection: JSONSelection): JSONPath {
-  return (
-    iterateOverSelection(json, selection, (selectionPath) => {
-      // we directly return the first selection path
-      return selectionPath
-    }) || getFocusPath(selection)
-  )
+  if (!isMultiSelection(selection)) {
+    return selection.path
+  }
+
+  const anchorIndex = getChildIndex(json, selection, selection.anchorPath)
+  const focusIndex = getChildIndex(json, selection, selection.focusPath)
+
+  return focusIndex < anchorIndex ? selection.focusPath : selection.anchorPath
 }
 
 export function getEndPath(json: JSONValue, selection: JSONSelection): JSONPath {
-  const startPath = getStartPath(json, selection)
+  if (!isMultiSelection(selection)) {
+    return selection.path
+  }
 
-  return isEqual(startPath, getFocusPath(selection))
-    ? getAnchorPath(selection)
-    : getFocusPath(selection)
+  const anchorIndex = getChildIndex(json, selection, selection.anchorPath)
+  const focusIndex = getChildIndex(json, selection, selection.focusPath)
+
+  return focusIndex > anchorIndex ? selection.focusPath : selection.anchorPath
 }
 
 // TODO: write unit test
@@ -782,23 +772,16 @@ export function selectionIfOverlapping(
     return undefined
   }
 
-  const overlap = selectionMatchesPredicate(json, selection, (selectionPath) =>
-    pathsOverlap(selectionPath, path)
-  )
-
-  return overlap ? selection : undefined
-}
-
-// TODO: write unit test
-export function pathsOverlap(path1: JSONPath, path2: JSONPath): boolean {
-  let i = 0
-  const iMax = Math.min(path1.length, path2.length)
-
-  while (path1[i] === path2[i] && i < iMax) {
-    i++
+  if (pathInSelection(json, selection, path)) {
+    return selection
   }
 
-  return i === path1.length || i === path2.length
+  const sharedPath = isMultiSelection(selection) ? initial(selection.focusPath) : selection.path
+  if (pathStartsWith(sharedPath, path)) {
+    return selection
+  }
+
+  return undefined
 }
 
 export function pathInSelection(
@@ -810,17 +793,54 @@ export function pathInSelection(
     return false
   }
 
-  if (isKeySelection(selection)) {
+  if (isKeySelection(selection) || isInsideSelection(selection) || isAfterSelection(selection)) {
     return isEqual(selection.path, path)
   }
 
-  if (isValueSelection(selection) || isMultiSelection(selection)) {
-    return selectionMatchesPredicate(json, selection, (selectionPath) =>
-      pathStartsWith(path, selectionPath)
-    )
+  if (isValueSelection(selection)) {
+    return pathStartsWith(path, selection.path)
+  }
+
+  if (isMultiSelection(selection)) {
+    const startPath = getStartPath(json, selection)
+    const endPath = getEndPath(json, selection)
+    const parentPath = initial(selection.focusPath)
+
+    if (!pathStartsWith(path, parentPath) || path.length <= parentPath.length) {
+      return false
+    }
+
+    const startIndex = getChildIndex(json, selection, startPath)
+    const endIndex = getChildIndex(json, selection, endPath)
+    const pathIndex = getChildIndex(json, selection, path)
+    return pathIndex !== -1 && pathIndex >= startIndex && pathIndex <= endIndex
   }
 
   return false
+}
+
+function getChildIndex(json: JSONValue, selection: MultiSelection, path: JSONPath): number {
+  const parentPath = initial(selection.focusPath)
+  if (!pathStartsWith(path, parentPath) || path.length <= parentPath.length) {
+    return -1
+  }
+
+  const key = path[parentPath.length]
+  const parent = getIn(json, parentPath)
+
+  if (isJSONObject(parent)) {
+    const keys = Object.keys(parent)
+    return keys.indexOf(key)
+  }
+
+  if (isJSONArray(parent)) {
+    const index = int(key)
+    if (index < parent.length) {
+      return index
+    }
+  }
+
+  return -1
 }
 
 // TODO: write some unit tests

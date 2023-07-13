@@ -25,6 +25,7 @@ import type { JSONValue } from 'immutable-json-patch'
 
 describe('selection', () => {
   const json = {
+    start: true,
     obj: {
       arr: [1, 2, { first: 3, last: 4 }]
     },
@@ -817,7 +818,55 @@ describe('selection', () => {
   })
 
   describe('selectionIfOverlapping', () => {
-    test('should determine whether a selection is relevant for given pointer', () => {
+    test('should determine whether a KeySelection is relevant for given pointer', () => {
+      const selection = createKeySelection(['obj', 'arr'], false)
+
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, []), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj']), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj', 'arr']), selection)
+      assert.deepStrictEqual(
+        selectionIfOverlapping(json, selection, ['obj', 'arr', '0']),
+        undefined
+      )
+    })
+
+    test('should determine whether a ValueSelection is relevant for given pointer', () => {
+      const selection = createValueSelection(['obj', 'arr'], false)
+
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, []), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj']), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj', 'arr']), selection)
+      assert.deepStrictEqual(
+        selectionIfOverlapping(json, selection, ['obj', 'arr', '0']),
+        selection
+      )
+    })
+
+    test('should determine whether a AfterSelection is relevant for given pointer', () => {
+      const selection = createAfterSelection(['obj', 'arr'])
+
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, []), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj']), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj', 'arr']), selection)
+      assert.deepStrictEqual(
+        selectionIfOverlapping(json, selection, ['obj', 'arr', '0']),
+        undefined
+      )
+    })
+
+    test('should determine whether an InsideSelection is relevant for given pointer', () => {
+      const selection = createInsideSelection(['obj', 'arr'])
+
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, []), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj']), selection)
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj', 'arr']), selection)
+      assert.deepStrictEqual(
+        selectionIfOverlapping(json, selection, ['obj', 'arr', '0']),
+        undefined
+      )
+    })
+
+    test('should determine whether a MultiSelection is relevant for given pointer', () => {
       const selection = createMultiSelection(['obj', 'arr', '0'], ['obj', 'arr', '2'])
 
       assert.deepStrictEqual(selectionIfOverlapping(json, selection, []), selection)
@@ -866,20 +915,20 @@ describe('selection', () => {
 
     test('should determine path in selection for an InsideSelection', () => {
       const selection = createInsideSelection(['obj'])
-      assert.strictEqual(pathInSelection(json, selection, ['obj']), false)
+      assert.strictEqual(pathInSelection(json, selection, ['obj']), true)
       assert.strictEqual(pathInSelection(json, selection, ['str']), false)
       assert.strictEqual(pathInSelection(json, selection, ['obj', 'arr', '1']), false)
     })
 
     test('should determine path in selection for an AfterSelection', () => {
       const selection = createAfterSelection(['obj'])
-      assert.strictEqual(pathInSelection(json, selection, ['obj']), false)
+      assert.strictEqual(pathInSelection(json, selection, ['obj']), true)
       assert.strictEqual(pathInSelection(json, selection, ['str']), false)
       assert.strictEqual(pathInSelection(json, selection, ['obj', 'arr', '1']), false)
     })
 
     test('should determine path in selection for a MultiSelection', () => {
-      const selection = createMultiSelection(['obj'], ['nill'])
+      const selection = createMultiSelection(['start'], ['nill'])
       assert.strictEqual(pathInSelection(json, selection, ['obj']), true)
       assert.strictEqual(pathInSelection(json, selection, ['str']), true)
       assert.strictEqual(pathInSelection(json, selection, ['bool']), false)
