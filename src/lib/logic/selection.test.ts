@@ -16,7 +16,8 @@ import {
   getSelectionRight,
   getSelectionUp,
   selectionIfOverlapping,
-  selectionToPartialJson
+  selectionToPartialJson,
+  pathInSelection
 } from './selection.js'
 import { createDocumentState } from './documentState.js'
 import { type DocumentState, type JSONSelection, SelectionType } from '../types.js'
@@ -845,6 +846,52 @@ describe('selection', () => {
       assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['str']), undefined)
       assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['nill']), undefined)
       assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['bool']), undefined)
+    })
+  })
+
+  describe('pathInSelection', () => {
+    test('should determine path in selection for a KeySelection', () => {
+      const selection = createKeySelection(['obj'], false)
+      assert.strictEqual(pathInSelection(json, selection, ['obj']), true)
+      assert.strictEqual(pathInSelection(json, selection, ['str']), false)
+      assert.strictEqual(pathInSelection(json, selection, ['obj', 'arr', '1']), false)
+    })
+
+    test('should determine path in selection for a ValueSelection', () => {
+      const selection = createValueSelection(['obj'], false)
+      assert.strictEqual(pathInSelection(json, selection, ['obj']), true)
+      assert.strictEqual(pathInSelection(json, selection, ['str']), false)
+      assert.strictEqual(pathInSelection(json, selection, ['obj', 'arr', '1']), true)
+    })
+
+    test('should determine path in selection for an InsideSelection', () => {
+      const selection = createInsideSelection(['obj'])
+      assert.strictEqual(pathInSelection(json, selection, ['obj']), false)
+      assert.strictEqual(pathInSelection(json, selection, ['str']), false)
+      assert.strictEqual(pathInSelection(json, selection, ['obj', 'arr', '1']), false)
+    })
+
+    test('should determine path in selection for an AfterSelection', () => {
+      const selection = createAfterSelection(['obj'])
+      assert.strictEqual(pathInSelection(json, selection, ['obj']), false)
+      assert.strictEqual(pathInSelection(json, selection, ['str']), false)
+      assert.strictEqual(pathInSelection(json, selection, ['obj', 'arr', '1']), false)
+    })
+
+    test('should determine path in selection for a MultiSelection', () => {
+      const selection = createMultiSelection(['obj'], ['nill'])
+      assert.strictEqual(pathInSelection(json, selection, ['obj']), true)
+      assert.strictEqual(pathInSelection(json, selection, ['str']), true)
+      assert.strictEqual(pathInSelection(json, selection, ['bool']), false)
+      assert.strictEqual(pathInSelection(json, selection, ['obj', 'arr', '1']), true)
+    })
+
+    test('should determine path in selection for a MultiSelection with one item', () => {
+      const selection = createMultiSelection(['obj'], ['obj'])
+      assert.strictEqual(pathInSelection(json, selection, ['obj']), true)
+      assert.strictEqual(pathInSelection(json, selection, ['str']), false)
+      assert.strictEqual(pathInSelection(json, selection, ['bool']), false)
+      assert.strictEqual(pathInSelection(json, selection, ['obj', 'arr', '1']), true)
     })
   })
 })

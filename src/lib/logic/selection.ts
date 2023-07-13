@@ -801,26 +801,20 @@ export function pathsOverlap(path1: JSONPath, path2: JSONPath): boolean {
   return i === path1.length || i === path2.length
 }
 
-// TODO: write some unit tests
 export function pathInSelection(
   json: JSONValue | undefined,
   selection: JSONSelection | undefined,
   path: JSONPath
 ): boolean {
-  if (!selection || json === undefined) {
+  if (json === undefined || !selection) {
     return false
   }
 
-  if (isEqual(getFocusPath(selection), path)) {
-    // key, value, etc
-    return true
+  if (isKeySelection(selection)) {
+    return isEqual(selection.path, path)
   }
 
-  if (isMultiSelectionWithOneItem(selection)) {
-    return isEqual(selection.focusPath, path)
-  }
-
-  if (isMultiSelection(selection)) {
+  if (isValueSelection(selection) || isMultiSelection(selection)) {
     return selectionMatchesPredicate(json, selection, (selectionPath) =>
       pathStartsWith(path, selectionPath)
     )
