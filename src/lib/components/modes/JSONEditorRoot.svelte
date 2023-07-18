@@ -6,7 +6,7 @@
     JSONPatchResult,
     JSONPathParser,
     MenuItem,
-    MenuSeparatorItem,
+    MenuSeparator,
     OnBlur,
     OnChange,
     OnChangeMode,
@@ -18,6 +18,7 @@
     OnRenderMenu,
     OnRenderMenuWithoutContext,
     OnRenderValue,
+    OnSelect,
     OnSortModal,
     OnTransformModal,
     TransformModalOptions,
@@ -51,10 +52,11 @@
   export let insideModal: boolean
 
   export let onChange: OnChange
+  export let onChangeMode: OnChangeMode
+  export let onSelect: OnSelect
   export let onRenderValue: OnRenderValue
   export let onClassName: OnClassName
   export let onRenderMenu: OnRenderMenu
-  export let onChangeMode: OnChangeMode
   export let onError: OnError
   export let onFocus: OnFocus
   export let onBlur: OnBlur
@@ -94,8 +96,8 @@
     }
   ]
 
-  const separatorMenuItem: MenuSeparatorItem = {
-    separator: true
+  const separatorMenuItem: MenuSeparator = {
+    type: 'separator'
   }
 
   let handleRenderMenu: OnRenderMenuWithoutContext
@@ -239,6 +241,7 @@
     {validator}
     {validationParser}
     {onChange}
+    {onSelect}
     {onChangeMode}
     {onError}
     {onFocus}
@@ -263,6 +266,7 @@
     {indentation}
     {onChange}
     {onChangeMode}
+    {onSelect}
     {onRenderValue}
     {onFocus}
     {onBlur}
@@ -290,6 +294,7 @@
     {onError}
     {onChange}
     {onChangeMode}
+    {onSelect}
     {onRenderValue}
     {onClassName}
     {onFocus}

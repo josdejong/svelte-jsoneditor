@@ -28,7 +28,7 @@ import type {
   OnChange,
   OnChangeText,
   OnPatch,
-  OnSelect
+  OnJSONSelect
 } from '$lib/types'
 import { createDebug } from '$lib/utils/debug.js'
 import {
@@ -589,7 +589,7 @@ export interface OnInsertCharacter {
   parser: JSONParser
   onPatch: OnPatch
   onReplaceJson: (updatedJson: JSONValue, afterPatch: AfterPatchCallback) => void
-  onSelect: OnSelect
+  onSelect: OnJSONSelect
 }
 
 // TODO: write unit tests

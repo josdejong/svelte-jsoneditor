@@ -33,7 +33,8 @@ export enum SelectionType {
   inside = 'inside',
   key = 'key',
   value = 'value',
-  multi = 'multi'
+  multi = 'multi',
+  text = 'text' // in text mode
 }
 
 export enum CaretType {
@@ -102,6 +103,15 @@ export type JSONSelection =
   | InsideSelection
   | KeySelection
   | ValueSelection
+
+// TextSelection is an extension of EditorSelection from CodeMirror
+export interface TextSelection {
+  type: SelectionType.text
+  ranges: { anchor: number; focus: number }[]
+  mainIndex: number
+}
+
+export type JSONEditorSelection = JSONSelection | TextSelection
 
 export type JSONPointerMap<T> = { [pointer: JSONPointer]: T }
 
@@ -281,7 +291,8 @@ export interface OnChangeStatus {
 export type OnChange =
   | ((content: Content, previousContent: Content, status: OnChangeStatus) => void)
   | null
-export type OnSelect = (selection: JSONSelection) => void
+export type OnJSONSelect = (selection: JSONSelection) => void
+export type OnSelect = (selection: JSONEditorSelection | undefined) => void
 export type OnPatch = (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
 export type OnChangeText = (updatedText: string, afterPatch?: AfterPatchCallback) => void
 export type OnSort = (params: {
@@ -445,7 +456,7 @@ export interface JSONEditorContext {
   findNextInside: FindNextInside
   focus: () => void
   onPatch: (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => JSONPatchResult
-  onSelect: OnSelect
+  onSelect: OnJSONSelect
   onFind: OnFind
   onPasteJson: (newPastedJson: PastedJson) => void
   onRenderValue: OnRenderValue
@@ -476,7 +487,7 @@ export interface RenderValuePropsOptional {
   normalization?: ValueNormalization
   onPatch?: TreeModeContext['onPatch']
   onPasteJson?: OnPasteJson
-  onSelect?: OnSelect
+  onSelect?: OnJSONSelect
   onFind?: OnFind
   findNextInside?: FindNextInside
   focus?: () => void
@@ -494,7 +505,7 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   normalization: ValueNormalization
   onPatch: TreeModeContext['onPatch']
   onPasteJson: OnPasteJson
-  onSelect: OnSelect
+  onSelect: OnJSONSelect
   onFind: OnFind
   findNextInside: FindNextInside
   focus: () => void

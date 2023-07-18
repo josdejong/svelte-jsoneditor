@@ -128,6 +128,7 @@
     OnJSONEditorModal,
     OnRenderMenuWithoutContext,
     OnRenderValue,
+    OnSelect,
     OnSortModal,
     OnTransformModal,
     ParseError,
@@ -185,6 +186,7 @@
   export let onError: OnError
   export let onChange: OnChange
   export let onChangeMode: OnChangeMode
+  export let onSelect: OnSelect
   export let onRenderValue: OnRenderValue
   export let onRenderMenu: OnRenderMenuWithoutContext
   export let onClassName: OnClassName | undefined
@@ -236,6 +238,10 @@
       documentState = {
         ...documentState,
         selection: updatedSelection
+      }
+
+      if (onSelect) {
+        onSelect(updatedSelection)
       }
     }
   }

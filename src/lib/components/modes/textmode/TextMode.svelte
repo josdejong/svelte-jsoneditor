@@ -17,6 +17,7 @@
     JSON_STATUS_INVALID,
     JSON_STATUS_REPAIRABLE,
     JSON_STATUS_VALID,
+    MAX_CHARACTERS_TEXT_PREVIEW,
     MAX_DOCUMENT_SIZE_TEXT_MODE,
     TEXT_MODE_ONCHANGE_DELAY
   } from '$lib/constants.js'
@@ -26,7 +27,7 @@
     getWindow
   } from '$lib/utils/domUtils.js'
   import { formatSize } from '$lib/utils/fileUtils.js'
-  import { findTextLocation, getText } from '$lib/utils/jsonUtils.js'
+  import { findTextLocation, getText, needsFormatting } from '$lib/utils/jsonUtils.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
@@ -56,6 +57,7 @@
     OnError,
     OnFocus,
     OnRenderMenuWithoutContext,
+    OnSelect,
     OnSortModal,
     OnTransformModal,
     ParseError,
@@ -64,13 +66,11 @@
     ValidationError,
     Validator
   } from '$lib/types.js'
-  import { Mode, ValidationSeverity } from '$lib/types.js'
+  import { Mode, SelectionType, ValidationSeverity } from '$lib/types.js'
   import { isContentParseError, isContentValidationErrors } from '$lib/typeguards.js'
   import memoizeOne from 'memoize-one'
   import { validateText } from '$lib/logic/validation.js'
-  import { MAX_CHARACTERS_TEXT_PREVIEW } from '$lib/constants.js'
   import { truncate } from '$lib/utils/stringUtils.js'
-  import { needsFormatting } from '$lib/utils/jsonUtils.js'
   import { faJSONEditorFormat } from '$lib/img/customFontawesomeIcons.js'
   import { indentationMarkers } from '@replit/codemirror-indentation-markers'
 
@@ -87,6 +87,7 @@
   export let validationParser: JSONParser
   export let onChange: OnChange
   export let onChangeMode: OnChangeMode
+  export let onSelect: OnSelect
   export let onError: OnError
   export let onFocus: OnFocus
   export let onBlur: OnBlur
@@ -506,6 +507,10 @@
 
           if (update.docChanged) {
             onChangeCodeMirrorValueDebounced()
+          } else if (update.selectionSet) {
+            // note that emitOnSelect is invoked in onChangeCodeMirrorValue too,
+            // right after firing onChange. Hence the else if here, we do not want to fire it twice.
+            emitOnSelect()
           }
         }),
         jsonLang(),
@@ -663,6 +668,7 @@
 
     updateCanUndoRedo()
     emitOnChange(content, previousContent)
+    emitOnSelect()
   }
 
   function updateLinter(validator) {
@@ -753,6 +759,16 @@
       onChange(content, previousContent, {
         contentErrors: validate(),
         patchResult: null
+      })
+    }
+  }
+
+  function emitOnSelect() {
+    if (onSelect) {
+      onSelect({
+        type: SelectionType.text,
+        ranges: editorState.selection.ranges.map(({ anchor, head }) => ({ anchor, focus: head })),
+        mainIndex: editorState.selection.mainIndex
       })
     }
   }

@@ -24,47 +24,57 @@ import type {
   CaretPosition,
   DocumentState,
   InsideSelection,
+  JSONEditorSelection,
   JSONParser,
   JSONSelection,
   KeySelection,
   MultiSelection,
+  TextSelection,
   ValueSelection
 } from '../types.js'
 import { CaretType, SelectionType } from '$lib/types.js'
 import { int } from '$lib/utils/numberUtils.js'
 
 export function isAfterSelection(
-  selection: JSONSelection | undefined
+  selection: JSONEditorSelection | undefined
 ): selection is AfterSelection {
   return (selection && selection.type === SelectionType.after) || false
 }
 
 export function isInsideSelection(
-  selection: JSONSelection | undefined
+  selection: JSONEditorSelection | undefined
 ): selection is InsideSelection {
   return (selection && selection.type === SelectionType.inside) || false
 }
 
-export function isKeySelection(selection: JSONSelection | undefined): selection is KeySelection {
+export function isKeySelection(
+  selection: JSONEditorSelection | undefined
+): selection is KeySelection {
   return (selection && selection.type === SelectionType.key) || false
 }
 
 export function isValueSelection(
-  selection: JSONSelection | undefined
+  selection: JSONEditorSelection | undefined
 ): selection is ValueSelection {
   return (selection && selection.type === SelectionType.value) || false
 }
 
 export function isMultiSelection(
-  selection: JSONSelection | undefined
+  selection: JSONEditorSelection | undefined
 ): selection is MultiSelection {
   return (selection && selection.type === SelectionType.multi) || false
 }
 
 export function isMultiSelectionWithOneItem(
-  selection: JSONSelection | undefined
+  selection: JSONEditorSelection | undefined
 ): selection is MultiSelection {
   return isMultiSelection(selection) && isEqual(selection.focusPath, selection.anchorPath)
+}
+
+export function isTextSelection(
+  selection: JSONEditorSelection | undefined
+): selection is TextSelection {
+  return (selection && selection.type === SelectionType.text) || false
 }
 
 /**
@@ -759,6 +769,7 @@ export function fromSelectionType(
     case SelectionType.inside:
       return createInsideSelection(path)
     case SelectionType.multi:
+    case SelectionType.text: // type `text` is not applicable, but we need to handle all types
       return createMultiSelection(path, path)
   }
 }

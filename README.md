@@ -313,6 +313,10 @@ const editor = new JSONEditor({
     }
     ```
 
+- `onSelect: (selection: JSONEditorSelection | undefined) => void`
+
+  Callback invoked when the selection is changed by the user. When the selection is removed, the callback is invoked with `undefined` as argument. In `text` mode, a `TextSelection` will be fired. In `tree` and `table` mode, a `JSONSelection` will be fired (which can be `MultiSelection`, `KeySelection`, `ValueSelection`, `InsideSelection`, or `AfterSelection`). Use typeguards like `isTextSelection` and `isValueSelection` to check what type the selection has.
+
 - `queryLanguages: QueryLanguage[]`.  
    Configure one or multiple query language that can be used in the Transform modal. The library comes with three languages:
 

@@ -40,6 +40,7 @@
     OnFocus,
     OnRenderMenu,
     OnRenderValue,
+    OnSelect,
     QueryLanguage,
     SortModalCallback,
     TransformModalCallback,
@@ -85,6 +86,7 @@
 
   export let onChangeQueryLanguage: OnChangeQueryLanguage = noop
   export let onChange: OnChange = null
+  export let onSelect: OnSelect = null
   export let onRenderValue: OnRenderValue = renderValue
   export let onClassName: OnClassName = () => undefined
   export let onRenderMenu: OnRenderMenu = noop
@@ -450,6 +452,7 @@
             {onError}
             onChange={handleChange}
             onChangeMode={toggleMode}
+            {onSelect}
             {onRenderValue}
             {onClassName}
             onFocus={handleFocus}

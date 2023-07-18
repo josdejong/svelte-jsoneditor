@@ -5,6 +5,7 @@
     javascriptQueryLanguage,
     jmespathQueryLanguage,
     JSONEditor,
+    type JSONEditorSelection,
     lodashQueryLanguage,
     type MenuItem,
     ReadonlyValue,
@@ -320,6 +321,14 @@
       contentErrors,
       patchResult
     })
+  }
+
+  function onSelectTree(selection: JSONEditorSelection) {
+    console.log('onSelectTree', selection)
+  }
+
+  function onSelectText(selection: JSONEditorSelection) {
+    console.log('onSelectText', selection)
   }
 
   function onChangeMode(mode) {
@@ -655,6 +664,7 @@
             bind:queryLanguageId
             {onRenderMenu}
             onChange={onChangeTree}
+            onSelect={onSelectTree}
             onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
             {onChangeMode}
             onFocus={() => console.log('onFocus tree')}
@@ -707,6 +717,7 @@
             {onChangeQueryLanguage}
             {onRenderMenu}
             onChange={onChangeText}
+            onSelect={onSelectText}
             onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
             {onChangeMode}
             onFocus={() => console.log('onFocus text')}

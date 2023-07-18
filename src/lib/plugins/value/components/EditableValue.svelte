@@ -14,7 +14,7 @@
     OnFind,
     OnPasteJson,
     OnPatch,
-    OnSelect,
+    OnJSONSelect,
     ValueNormalization
   } from '$lib/types.js'
   import { isEqual } from 'lodash-es'
@@ -26,7 +26,7 @@
   export let enforceString: boolean
   export let onPatch: OnPatch
   export let onPasteJson: OnPasteJson
-  export let onSelect: OnSelect
+  export let onSelect: OnJSONSelect
   export let onFind: OnFind
   export let focus: () => void
   export let findNextInside: FindNextInside

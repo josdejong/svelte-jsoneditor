@@ -20,6 +20,7 @@
     OnJSONEditorModal,
     OnRenderMenuWithoutContext,
     OnRenderValue,
+    OnSelect,
     OnSortModal,
     OnTransformModal,
     ParseError,
@@ -157,6 +158,7 @@
   export let indentation: number | string
   export let onChange: OnChange
   export let onChangeMode: OnChangeMode
+  export let onSelect: OnSelect
   export let onRenderValue: OnRenderValue
   export let onRenderMenu: OnRenderMenuWithoutContext
   export let onFocus: OnFocus
@@ -277,6 +279,10 @@
       documentState = {
         ...documentState,
         selection: updatedSelection
+      }
+
+      if (onSelect) {
+        onSelect(updatedSelection)
       }
     }
   }
