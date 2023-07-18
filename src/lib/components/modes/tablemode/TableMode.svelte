@@ -10,6 +10,7 @@
     ExtendedSearchResultItem,
     HistoryItem,
     JSONEditorContext,
+    JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
     JSONSelection,
@@ -147,6 +148,7 @@
 
   export let readOnly: boolean
   export let externalContent: Content
+  export let externalSelection: JSONEditorSelection | undefined
   export let mainMenuBar: boolean
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
@@ -203,6 +205,7 @@
   let pastedJson: PastedJson
 
   $: applyExternalContent(externalContent)
+  $: applyExternalSelection(externalSelection)
 
   let maxSampleCount = 10_000
   let columns: JSONPath[] = []
@@ -423,6 +426,24 @@
     const patchResult = null
 
     emitOnChange(previousContent, patchResult)
+  }
+
+  function applyExternalSelection(externalSelection: JSONEditorSelection | undefined) {
+    if (!isEqual(documentState.selection, externalSelection)) {
+      debug('applyExternalSelection', externalSelection)
+
+      if (!isValueSelection(externalSelection)) {
+        return
+      }
+
+      // check whether the selection is a leaf, and not an object (that would select multiple cells)
+      const value = getIn(json, externalSelection.path)
+      if (isObjectOrArray(value)) {
+        return
+      }
+
+      updateSelection(externalSelection)
+    }
   }
 
   // TODO: addHistoryItem is a duplicate of addHistoryItem in TreeMode.svelte. Can we extract and reuse this logic?

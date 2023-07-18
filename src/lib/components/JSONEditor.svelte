@@ -26,6 +26,7 @@
     ContentErrors,
     JSONEditorModalCallback,
     JSONEditorPropsOptional,
+    JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
     JSONPathParser,
@@ -61,6 +62,7 @@
   const debug = createDebug('jsoneditor:JSONEditor')
 
   export let content: Content = { text: '' }
+  export let selection: JSONEditorSelection | undefined = undefined
 
   export let readOnly = false
   export let indentation: number | string = 2
@@ -193,6 +195,10 @@
     return result
   }
 
+  export async function select(newSelection: JSONEditorSelection | undefined) {
+    selection = newSelection
+  }
+
   export async function expand(callback?: OnExpand): Promise<void> {
     refJSONEditorRoot.expand(callback)
 
@@ -268,6 +274,14 @@
 
     if (onChange) {
       onChange(updatedContent, previousContent, status)
+    }
+  }
+
+  function handleSelect(updatedSelection: JSONEditorSelection | undefined) {
+    selection = updatedSelection
+
+    if (onSelect) {
+      onSelect(updatedSelection)
     }
   }
 
@@ -433,6 +447,7 @@
             bind:this={refJSONEditorRoot}
             {mode}
             {content}
+            {selection}
             {readOnly}
             {indentation}
             {tabSize}
@@ -452,7 +467,7 @@
             {onError}
             onChange={handleChange}
             onChangeMode={toggleMode}
-            {onSelect}
+            onSelect={handleSelect}
             {onRenderValue}
             {onClassName}
             onFocus={handleFocus}

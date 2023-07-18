@@ -33,7 +33,7 @@
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import TextMenu from './menu/TextMenu.svelte'
   import { basicSetup, EditorView } from 'codemirror'
-  import { Compartment, EditorState, type Extension } from '@codemirror/state'
+  import { Compartment, EditorSelection, EditorState, type Extension } from '@codemirror/state'
   import { keymap, ViewUpdate } from '@codemirror/view'
   import { indentWithTab, redo, redoDepth, undo, undoDepth } from '@codemirror/commands'
   import type { Diagnostic } from '@codemirror/lint'
@@ -49,6 +49,7 @@
   import type {
     Content,
     ContentErrors,
+    JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
     OnBlur,
@@ -73,12 +74,14 @@
   import { truncate } from '$lib/utils/stringUtils.js'
   import { faJSONEditorFormat } from '$lib/img/customFontawesomeIcons.js'
   import { indentationMarkers } from '@replit/codemirror-indentation-markers'
+  import { isTextSelection } from '$lib/logic/selection.js'
 
   export let readOnly: boolean
   export let mainMenuBar: boolean
   export let statusBar: boolean
   export let askToFormat: boolean
   export let externalContent: Content
+  export let externalSelection: JSONEditorSelection | undefined
   export let indentation: number | string
   export let tabSize: number
   export let escapeUnicodeCharacters: boolean
@@ -131,6 +134,7 @@
   })
 
   $: setCodeMirrorContent(externalContent)
+  $: applyExternalSelection(externalSelection)
   $: updateLinter(validator)
   $: updateIndentation(indentation)
   $: updateTabSize(tabSize)
@@ -492,6 +496,7 @@
 
     const state = EditorState.create({
       doc: initialText,
+      selection: toCodeMirrorSelection(externalSelection),
       extensions: [
         keymap.of([indentWithTab, formatCompactKeyBinding]),
         linterCompartment.of(createLinter()),
@@ -621,6 +626,26 @@
     if (isChanged) {
       emitOnChange(content, previousContent)
     }
+  }
+
+  function applyExternalSelection(externalSelection: JSONEditorSelection | undefined) {
+    if (!isTextSelection(externalSelection)) {
+      return
+    }
+
+    const selection = toCodeMirrorSelection(externalSelection)
+    if (codeMirrorView && selection && (!editorState || !editorState.selection.eq(selection))) {
+      debug('applyExternalSelection', selection)
+
+      // note that we cannot clear the selection (we could maybe set the cursor to 0 but that's not really what we want)
+      codeMirrorView.dispatch({ selection })
+    }
+  }
+
+  function toCodeMirrorSelection(
+    selection: JSONEditorSelection | undefined
+  ): EditorSelection | undefined {
+    return isTextSelection(selection) ? EditorSelection.fromJSON(selection) : undefined
   }
 
   /**
@@ -767,8 +792,7 @@
     if (onSelect) {
       onSelect({
         type: SelectionType.text,
-        ranges: editorState.selection.ranges.map(({ anchor, head }) => ({ anchor, focus: head })),
-        mainIndex: editorState.selection.mainIndex
+        ...editorState.selection.toJSON()
       })
     }
   }

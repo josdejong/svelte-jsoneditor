@@ -104,11 +104,12 @@ export type JSONSelection =
   | KeySelection
   | ValueSelection
 
-// TextSelection is an extension of EditorSelection from CodeMirror
+// TextSelection is the result of EditorSelection.toJSON() from CodeMirror,
+// with an additional `type` property
 export interface TextSelection {
   type: SelectionType.text
-  ranges: { anchor: number; focus: number }[]
-  mainIndex: number
+  ranges: { anchor: number; head: number }[]
+  main: number
 }
 
 export type JSONEditorSelection = JSONSelection | TextSelection

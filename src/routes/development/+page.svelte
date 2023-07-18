@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     createAjvValidator,
+    createValueSelection,
     EditableValue,
     javascriptQueryLanguage,
     jmespathQueryLanguage,
@@ -9,7 +10,8 @@
     lodashQueryLanguage,
     type MenuItem,
     ReadonlyValue,
-    renderValue
+    renderValue,
+    SelectionType
   } from 'svelte-jsoneditor'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
@@ -80,6 +82,9 @@
 }`,
     json: undefined
   }
+
+  let selectionTree = undefined
+  let selectionText = undefined
 
   const schema = {
     title: 'Employee',
@@ -205,6 +210,7 @@
   const showTreeEditor = useLocalStorage('svelte-jsoneditor-demo-showTreeEditor', true)
   const showTextEditor = useLocalStorage('svelte-jsoneditor-demo-showTextEditor', true)
   const showRawContents = useLocalStorage('svelte-jsoneditor-demo-showRawContents', false)
+  const showSelection = useLocalStorage('svelte-jsoneditor-demo-showSelection', false)
   let height = '440px'
   const validate = useLocalStorage('svelte-jsoneditor-demo-validate', false)
   const validateArray = useLocalStorage('svelte-jsoneditor-demo-validate-array', false)
@@ -574,7 +580,43 @@
         refTreeEditor.scrollTo(['669', 'array'])
       }}
     >
-      Scroll to [669, 'array']
+      Scroll to ['669', 'array']
+    </button>
+    <button
+      on:click={() => {
+        selectionTree = createValueSelection(['object', 'a'], false)
+        refTreeEditor.focus()
+      }}
+    >
+      Select ['object', 'a']
+    </button>
+    <button
+      on:click={() => {
+        refTreeEditor.select(createValueSelection(['669', 'name'], false))
+        refTreeEditor.focus()
+      }}
+    >
+      Select ['669', 'name']
+    </button>
+    <button
+      on:click={() => {
+        refTextEditor.select({
+          type: SelectionType.text,
+          ranges: [{ anchor: 5, head: 12 }],
+          main: 0
+        })
+        refTextEditor.focus()
+      }}
+    >
+      Select char 5 to 12
+    </button>
+    <button
+      on:click={() => {
+        refTreeEditor.select(undefined)
+        refTextEditor.select(undefined)
+      }}
+    >
+      Select nothing
     </button>
   </p>
   <p class="buttons">
@@ -626,6 +668,9 @@
     <label>
       <input type="checkbox" bind:checked={$showRawContents} /> Show raw contents (at the bottom)
     </label>
+    <label>
+      <input type="checkbox" bind:checked={$showSelection} /> Show selection (at the bottom)
+    </label>
   </p>
 
   <div class="columns">
@@ -646,6 +691,7 @@
           <JSONEditor
             bind:this={refTreeEditor}
             bind:content
+            bind:selection={selectionTree}
             bind:mode={leftEditorMode}
             mainMenuBar={$mainMenuBar}
             navigationBar={$navigationBar}
@@ -673,6 +719,13 @@
         {/if}
       </div>
 
+      {#if $showSelection}
+        <div class="data">
+          selection:
+          <pre><code>{JSON.stringify(selectionTree, null, 2)}</code></pre>
+        </div>
+      {/if}
+
       {#if $showRawContents}
         <div class="data">
           json contents:
@@ -699,6 +752,7 @@
             bind:this={refTextEditor}
             mode="text"
             bind:content
+            bind:selection={selectionText}
             mainMenuBar={$mainMenuBar}
             navigationBar={$navigationBar}
             statusBar={$statusBar}
@@ -725,6 +779,13 @@
           />
         {/if}
       </div>
+
+      {#if $showSelection}
+        <div class="data">
+          selection:
+          <pre><code>{JSON.stringify(selectionText, null, 2)}</code></pre>
+        </div>
+      {/if}
 
       {#if $showRawContents}
         <div class="data">

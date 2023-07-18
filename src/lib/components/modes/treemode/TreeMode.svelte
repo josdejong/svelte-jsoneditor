@@ -70,6 +70,7 @@
     isMultiSelection,
     isMultiSelectionWithOneItem,
     isSelectionInsidePath,
+    isTextSelection,
     isValueSelection,
     removeEditModeFromSelection,
     selectAll,
@@ -112,6 +113,7 @@
     DocumentState,
     HistoryItem,
     InsertType,
+    JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
     JSONPathParser,
@@ -173,6 +175,7 @@
 
   export let readOnly: boolean
   export let externalContent: Content
+  export let externalSelection: JSONEditorSelection | undefined
   export let mainMenuBar: boolean
   export let navigationBar: boolean
   export let escapeControlCharacters: boolean
@@ -409,6 +412,8 @@
   // when receiving an updated prop, we have to update state for example
   $: applyExternalContent(externalContent)
 
+  $: applyExternalSelection(externalSelection)
+
   const applySearchThrottled = throttle(applySearch, SEARCH_UPDATE_THROTTLE)
   $: applySearchThrottled(searchText, json)
 
@@ -595,6 +600,18 @@
     const patchResult = null
 
     emitOnChange(previousContent, patchResult)
+  }
+
+  function applyExternalSelection(externalSelection: JSONEditorSelection | undefined) {
+    if (!isEqual(documentState.selection, externalSelection)) {
+      debug('applyExternalSelection', externalSelection)
+
+      if (isTextSelection(externalSelection)) {
+        return
+      }
+
+      updateSelection(externalSelection)
+    }
   }
 
   function expandWhenNotInitialized(json) {

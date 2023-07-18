@@ -2,6 +2,7 @@
   import type {
     Content,
     ContentErrors,
+    JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
     JSONPathParser,
@@ -32,6 +33,7 @@
   import { isMenuSpaceItem } from '$lib/typeguards.js'
 
   export let content: Content
+  export let selection: JSONEditorSelection | undefined
 
   export let readOnly: boolean
   export let indentation: number | string
@@ -230,6 +232,7 @@
   <TextMode
     bind:this={refTextMode}
     externalContent={content}
+    externalSelection={selection}
     {readOnly}
     {indentation}
     {tabSize}
@@ -254,6 +257,7 @@
   <TableMode
     bind:this={refTableMode}
     externalContent={content}
+    externalSelection={selection}
     {readOnly}
     {mainMenuBar}
     {escapeControlCharacters}
@@ -280,6 +284,7 @@
   <TreeMode
     bind:this={refTreeMode}
     externalContent={content}
+    externalSelection={selection}
     {readOnly}
     {indentation}
     {mainMenuBar}
