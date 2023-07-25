@@ -60,7 +60,7 @@ export { resizeObserver } from './actions/resizeObserver.js'
 export { onEscape } from './actions/onEscape.js'
 
 // typeguards
-export { isContentParseError, isContentValidationErrors } from './typeguards.js'
+export * from './typeguards.js'
 
 // immutable-json-patch
 export {
