@@ -5,7 +5,7 @@
     JSONParser,
     JSONPatchResult,
     JSONPathParser,
-    MenuItem,
+    MenuItem, MenuSeparator,
     MenuSeparatorItem,
     OnBlur,
     OnChange,
@@ -62,9 +62,9 @@
   export let onTransformModal: OnTransformModal
   export let onJSONEditorModal: OnJSONEditorModal
 
-  let refTreeMode
-  let refTableMode
-  let refTextMode
+  let refTreeMode: TreeMode | undefined
+  let refTableMode: TableMode | undefined
+  let refTextMode: TextMode | undefined
 
   let modeMenuItems: MenuItem[]
   $: modeMenuItems = [
@@ -94,8 +94,8 @@
     }
   ]
 
-  const separatorMenuItem: MenuSeparatorItem = {
-    separator: true
+  const separatorMenuItem: MenuSeparator = {
+    type: 'separator'
   }
 
   let handleRenderMenu: OnRenderMenuWithoutContext

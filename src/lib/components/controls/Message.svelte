@@ -6,7 +6,7 @@
   import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
   import { onDestroy } from 'svelte'
 
-  export let type: 'success' | 'error' = 'success' // 'success' or 'error'
+  export let type: 'success' | 'error' | 'warning' | 'info' = 'success'
   export let icon: IconDefinition | undefined = undefined
   export let message: string | undefined = undefined
   export let actions: MessageAction[] = []
@@ -26,7 +26,7 @@
 
 <div class="jse-message jse-{type}">
   <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <div class="jse-text" class:jse-clickable={!!onClick} on:click={handleClick}>
+  <div role="button" tabindex="0" class="jse-text" class:jse-clickable={!!onClick} on:click={handleClick}>
     <div class="jse-text-centered">
       {#if icon}
         <Icon data={icon} />

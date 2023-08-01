@@ -72,7 +72,7 @@
     valueClass = onValueClass(newValue)
   }
 
-  function handleValueKeyDown(event) {
+  function handleValueKeyDown(event: KeyboardEvent) {
     event.stopPropagation()
 
     const combo = keyComboFromEvent(event)
@@ -104,7 +104,7 @@
   }
 
   function handleValuePaste(event: ClipboardEvent) {
-    if (!onPaste) {
+    if (!onPaste || !event.clipboardData) {
       return
     }
 
@@ -134,6 +134,8 @@
 </script>
 
 <div
+  role="textbox"
+  tabindex="0"
   class={classnames('jse-editable-div', valueClass, { 'jse-short-text': shortText })}
   contenteditable="true"
   spellcheck="false"

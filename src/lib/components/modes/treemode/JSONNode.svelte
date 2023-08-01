@@ -85,12 +85,12 @@
   export let searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
   export let selection: JSONSelection | undefined
   export let context: TreeModeContext
-  export let onDragSelectionStart
+  export let onDragSelectionStart: MouseEvent
 
   const debug = createDebug('jsoneditor:JSONNode')
 
-  let hover = undefined
-  let hoverTimer = undefined
+  let hover: string | undefined = undefined
+  let hoverTimer: number | undefined = undefined
   let dragging: DraggingState | undefined = undefined
 
   // important to prevent creating a new path for all children with every re-render,
@@ -375,7 +375,7 @@
     return clientOffset - contentOffset
   }
 
-  function handleDragSelectionStart(event) {
+  function handleDragSelectionStart(event: MouseEvent) {
     if (context.readOnly || !selection) {
       return
     }
@@ -465,7 +465,7 @@
       })
 
       if (operations) {
-        context.onPatch(operations, (patchedJson, patchedState) => ({
+        context.onPatch(operations, (_, patchedState) => ({
           state: {
             ...patchedState,
             selection: updatedSelection || selection
@@ -598,12 +598,15 @@
 </script>
 
 <div
+  role="treeitem"
+  tabindex="0"
   class={classnames(
     'jse-json-node',
     { 'jse-expanded': expanded },
     context.onClassName(path, value)
   )}
   data-path={encodeDataPath(path)}
+  aria-selected={isSelected}
   class:jse-root={root}
   class:jse-selected={isSelected && isMultiSelection(selection)}
   class:jse-selected-key={isSelected && isKeySelection(selection)}

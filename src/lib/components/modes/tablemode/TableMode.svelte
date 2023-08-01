@@ -169,9 +169,9 @@
     escapeUnicodeCharacters
   })
 
-  let refJsonEditor
-  let refContents
-  let refHiddenInput
+  let refJsonEditor: HTMLDivElement
+  let refContents: HTMLDivElement
+  let refHiddenInput: HTMLInputElement
 
   createFocusTracker({
     onMount,
@@ -1663,7 +1663,9 @@
   }
 </script>
 
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <div
+  role="table"
   class="jse-table-mode"
   class:no-main-menu={!mainMenuBar}
   on:mousedown={handleMouseDown}
@@ -1881,7 +1883,7 @@
             ]
           : []}
       />
-      <JSONPreview text={text || ''} {json} {indentation} {parser} />
+      <JSONPreview text={text} {json} {indentation} {parser} />
     {:else}
       <TableModeWelcome {text} {json} {readOnly} {parser} {openJSONEditorModal} {onChangeMode} />
     {/if}

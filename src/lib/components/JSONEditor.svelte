@@ -98,7 +98,7 @@
 
   let instanceId = uniqueId()
   let hasFocus = false
-  let refJSONEditorRoot
+  let refJSONEditorRoot: JSONEditorRoot
   let open // svelte-simple-modal context open(...)
   let jsoneditorModalState: {
     component: Component
@@ -235,7 +235,7 @@
     await refJSONEditorRoot.scrollTo(path)
   }
 
-  export function findElement(path: JSONPath): Element {
+  export function findElement(path: JSONPath): Element | null {
     return refJSONEditorRoot.findElement(path)
   }
 

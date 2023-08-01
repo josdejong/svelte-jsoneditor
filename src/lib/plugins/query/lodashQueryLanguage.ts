@@ -107,9 +107,3 @@ function validate(query: string) {
     throw new Error('Cannot execute query: Lodash _.chain(...) must end with .value()')
   }
 }
-
-export function isLodashChain(value: unknown): boolean {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  return value ? value.__chain__ === true : false
-}
