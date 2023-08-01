@@ -1,25 +1,26 @@
 {
   "root": true,
-  "parser": "@typescript-eslint/parser",
-  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
-  "plugins": ["svelte3", "@typescript-eslint", "import"],
-  "ignorePatterns": [],
-  "overrides": [
-    {
-      "files": ["*.svelte"],
-      "processor": "svelte3/svelte3"
-    }
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:svelte/recommended",
+    "prettier"
   ],
-  "rules": {
-    "import/extensions": ["error", "ignorePackages"]
-  },
-  "settings": {
-    "svelte3/typescript": true
-  },
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
+    "extraFileExtensions": [".svelte"],
     "sourceType": "module",
     "ecmaVersion": 2019
   },
+  "overrides": [
+    {
+      "files": ["*.svelte"],
+      "parser": "svelte-eslint-parser",
+      "parserOptions": {
+        "parser": "@typescript-eslint/parser"
+      }
+    }
+  ],
   "env": {
     "browser": true,
     "es2017": true,
