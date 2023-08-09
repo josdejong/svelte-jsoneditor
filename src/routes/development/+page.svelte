@@ -141,6 +141,14 @@
     { value: 'jse-theme-custom-contents', label: 'custom-contents' }
   ]
 
+  const languages = [
+    {
+      value: 'cn', label: '中文'
+    },{
+    value: 'en', label: "English"
+    }
+  ]
+
   const indentations = [
     { value: 2, label: '2 spaces' },
     { value: 3, label: '3 spaces' },
@@ -230,6 +238,7 @@
     true
   )
   const selectedTheme = useLocalStorage('svelte-jsoneditor-demo-theme', themes[0].value)
+  const selectedLanguage = useLocalStorage('svelte-jsoneditor-demo-language', languages[0].value)
   const selectedIndentation = useLocalStorage(
     'svelte-jsoneditor-demo-indentation',
     indentations[0].value
@@ -379,6 +388,13 @@
           <option value={theme.value}>{theme.label}</option>
         {/each}
       </select>
+    </label>
+    <label>
+      language: <select bind:value={$selectedLanguage} on:change={refresh}>
+      {#each languages as language}
+        <option value={language.value}>{language.label}</option>
+      {/each}
+    </select>
     </label>
   </p>
   <p>
@@ -633,8 +649,10 @@
         </select>
       </p>
       <div class="tree-editor" style="height: {height}">
+
         {#if $showTreeEditor}
           <JSONEditor
+            language={$selectedLanguage}
             bind:this={refTreeEditor}
             bind:content
             bind:mode={leftEditorMode}
@@ -659,14 +677,14 @@
             {onChangeMode}
             onFocus={() => console.log('onFocus tree')}
             onBlur={() => console.log('onBlur tree', { content: refTreeEditor.get() })}
-            onIgnoreKey={(path) => {
-              console.log('onIgnoreKey', path)
+            onIgnoreKey={(path, type) => {
+              console.log('onIgnoreKey', path,type)
             }}
-            onGlobalIgnoreKey={(path) => {
-              console.log('onGlobalIgnoreKey', path)
+            onSortKey={(path, type) => {
+              console.log('onSortKey', path, type)
             }}
-            onSortKey={(path) => {
-              console.log('onSortKey', path)
+            onReferenceKey= {(path, type) => {
+              console.log('onReferenceKey', path,  type)
             }}
           />
         {/if}

@@ -22,29 +22,30 @@
   import TransformModal from './modals/TransformModal.svelte'
   import SortModal from './modals/SortModal.svelte'
   import type {
-    Content,
-    ContentErrors,
-    JSONEditorModalCallback,
-    JSONEditorPropsOptional,
-    JSONParser,
-    JSONPatchResult,
-    JSONPathParser,
-    OnBlur,
-    OnChange,
-    OnChangeMode,
-    OnChangeQueryLanguage,
-    OnChangeStatus,
-    OnClassName,
-    OnError,
-    OnExpand,
-    OnFocus,
-    OnRenderMenu,
-    OnRenderValue,
-    QueryLanguage,
-    SortModalCallback,
-    TransformModalCallback,
-    TransformModalOptions,
-    Validator
+      CompareConfigType,
+      Content,
+      ContentErrors,
+      JSONEditorModalCallback,
+      JSONEditorPropsOptional,
+      JSONParser,
+      JSONPatchResult,
+      JSONPathParser,
+      OnBlur,
+      OnChange,
+      OnChangeMode,
+      OnChangeQueryLanguage,
+      OnChangeStatus,
+      OnClassName,
+      OnError,
+      OnExpand,
+      OnFocus,
+      OnRenderMenu,
+      OnRenderValue,
+      QueryLanguage,
+      SortModalCallback,
+      TransformModalCallback,
+      TransformModalOptions,
+      Validator
   } from '$lib/types'
   import { Mode } from '$lib/types.js'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
@@ -59,6 +60,7 @@
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:JSONEditor')
 
+  export let language: "cn" | 'en' = 'en'
   export let content: Content = { text: '' }
 
   export let readOnly = false
@@ -96,9 +98,9 @@
   export let onFocus: OnFocus = noop
   export let onBlur: OnBlur = noop
 
-  export let onIgnoreKey: (path: JSONPath) => void
-  export let onGlobalIgnoreKey: (path: JSONPath) => void
-  export let onSortKey: (path: JSONPath) => void
+  export let onIgnoreKey: (path: JSONPath, type?: CompareConfigType) => void
+  export let onReferenceKey: (path: JSONPath, type?: CompareConfigType) => void
+  export let onSortKey: (path: JSONPath, type?: CompareConfigType) => void
 
   let instanceId = uniqueId()
   let hasFocus = false
@@ -333,8 +335,8 @@
         onClassName,
         onTransform,
         onIgnoreKey,
-        onGlobalIgnoreKey,
-        onSortKey
+        onSortKey,
+        onReferenceKey,
       },
       TRANSFORM_MODAL_OPTIONS,
       {
@@ -371,6 +373,7 @@
 
     jsoneditorModalState = {
       component: bind(JSONEditorModal, {
+        language,
         content,
         path,
         onPatch,
@@ -436,6 +439,7 @@
         {#key instanceId}
           <JSONEditorRoot
             bind:this={refJSONEditorRoot}
+            {language}
             {mode}
             {content}
             {readOnly}
@@ -466,8 +470,8 @@
             {onTransformModal}
             {onJSONEditorModal}
             {onIgnoreKey}
-            {onGlobalIgnoreKey}
             {onSortKey}
+            {onReferenceKey}
           />
         {/key}
       </div>

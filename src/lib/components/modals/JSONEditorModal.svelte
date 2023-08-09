@@ -31,7 +31,7 @@
   import { onEscape } from '$lib/actions/onEscape.js'
 
   const debug = createDebug('jsoneditor:JSONEditorModal')
-
+  export let language:'en'|'cn'
   export let content: Content // the nested document
   export let path: JSONPath
   export let onPatch: OnPatch
@@ -201,6 +201,7 @@
       <JSONEditorRoot
         mode={last(stack).mode}
         content={last(stack).content}
+        {language}
         {readOnly}
         {indentation}
         {tabSize}

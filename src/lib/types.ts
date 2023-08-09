@@ -2,6 +2,9 @@ import type { JSONPatchDocument, JSONPath, JSONPointer, JSONValue } from 'immuta
 import type { SvelteComponentTyped } from 'svelte'
 import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 
+export type Language = 'en' | 'cn'
+export type CompareConfigType = 'global' | 'interface' | 'dependency'
+
 export type { JSONValue, JSONPointer, JSONPath, JSONPatchDocument } from 'immutable-json-patch'
 
 export type TextContent = { text: string } | { json: undefined; text: string }
@@ -414,6 +417,7 @@ export interface AbsolutePopupOptions {
 }
 
 export interface JSONEditorPropsOptional {
+  language?: Language
   content?: Content
   readOnly?: boolean
   indentation?: number | string
@@ -443,9 +447,9 @@ export interface JSONEditorPropsOptional {
   onError?: OnError
   onFocus?: OnFocus
   onBlur?: OnBlur
-  onIgnoreKey?: (path: JSONPath) => void
-  onGlobalIgnoreKey?: (path: JSONPath) => void
-  onSortKey?: (path: JSONPath) => void
+  onIgnoreKey?: (path: JSONPath, type?: CompareConfigType) => void
+  onSortKey?: (path: JSONPath, type?: CompareConfigType) => void
+  onReferenceKey?: (path: JSONPath, type?: CompareConfigType) => void
 }
 
 export interface JSONEditorContext {

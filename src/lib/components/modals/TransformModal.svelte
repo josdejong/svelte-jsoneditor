@@ -27,6 +27,7 @@
     QueryLanguage
   } from '$lib/types.js'
   import { onEscape } from '$lib/actions/onEscape.js'
+  import type {CompareConfigType} from "$lib/types.js";
 
   const debug = createDebug('jsoneditor:TransformModal')
 
@@ -50,9 +51,9 @@
   export let onClassName: OnClassName
 
   export let onTransform: OnPatch
-  export let onIgnoreKey: (path: JSONPath) => void
-  export let onGlobalIgnoreKey: (path: JSONPath) => void
-  export let onSortKey: (path: JSONPath) => void
+  export let onIgnoreKey: (path: JSONPath, type?: CompareConfigType) => void
+  export let onSortKey: (path: JSONPath, type?: CompareConfigType) => void
+  export let onReferenceKey: (path: JSONPath, type?: CompareConfigType) => void
 
 
   $: selectedJson = getIn(json, rootPath)
@@ -280,8 +281,8 @@
                 {validationParser}
                 {pathParser}
                 {onIgnoreKey}
-                {onGlobalIgnoreKey}
                 {onSortKey}
+                {onReferenceKey}
               />
             {/if}
           </div>
@@ -315,8 +316,8 @@
                 {validationParser}
                 {pathParser}
                 {onIgnoreKey}
-                {onGlobalIgnoreKey}
                 {onSortKey}
+                {onReferenceKey}
               />
             {:else}
               <div class="jse-preview jse-error">

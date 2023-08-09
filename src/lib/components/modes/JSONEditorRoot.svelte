@@ -1,35 +1,37 @@
 <script lang="ts">
-  import type {
-    Content,
-    ContentErrors,
-    JSONParser,
-    JSONPatchResult,
-    JSONPathParser,
-    MenuItem,
-    MenuSeparatorItem,
-    OnBlur,
-    OnChange,
-    OnChangeMode,
-    OnClassName,
-    OnError,
-    OnExpand,
-    OnFocus,
-    OnJSONEditorModal,
-    OnRenderMenu,
-    OnRenderMenuWithoutContext,
-    OnRenderValue,
-    OnSortModal,
-    OnTransformModal,
-    TransformModalOptions,
-    Validator
-  } from '$lib/types'
+    import type {
+        CompareConfigType,
+        Content,
+        ContentErrors,
+        Language,
+        JSONParser,
+        JSONPatchResult,
+        JSONPathParser,
+        MenuItem,
+        MenuSeparatorItem,
+        OnBlur,
+        OnChange,
+        OnChangeMode,
+        OnClassName,
+        OnError,
+        OnExpand,
+        OnFocus,
+        OnJSONEditorModal,
+        OnRenderMenu,
+        OnRenderMenuWithoutContext,
+        OnRenderValue,
+        OnSortModal,
+        OnTransformModal,
+        TransformModalOptions,
+        Validator
+    } from '$lib/types'
   import {Mode} from '$lib/types.js'
   import TextMode from './textmode/TextMode.svelte'
   import TableMode from './tablemode/TableMode.svelte'
   import TreeMode from './treemode/TreeMode.svelte'
   import type {JSONPatchDocument, JSONPath} from 'immutable-json-patch'
   import {isMenuSpaceItem} from '$lib/typeguards.js'
-
+  export let language: Language
   export let content: Content
 
   export let readOnly: boolean
@@ -61,9 +63,9 @@
   export let onSortModal: OnSortModal
   export let onTransformModal: OnTransformModal
   export let onJSONEditorModal: OnJSONEditorModal
-  export let onIgnoreKey: (path: JSONPath) => void
-  export let onGlobalIgnoreKey: (path: JSONPath) => void
-  export let onSortKey: (path: JSONPath) => void
+  export let onIgnoreKey: (path: JSONPath, type?: CompareConfigType) => void
+  export let onReferenceKey: (path: JSONPath, type?: CompareConfigType) => void
+  export let onSortKey: (path: JSONPath, type?: CompareConfigType) => void
 
   let refTreeMode
   let refTableMode
@@ -279,6 +281,7 @@
   <TreeMode
     bind:this={refTreeMode}
     externalContent={content}
+    {language}
     {readOnly}
     {indentation}
     {mainMenuBar}
@@ -302,7 +305,7 @@
     {onTransformModal}
     {onJSONEditorModal}
     {onIgnoreKey}
-    {onGlobalIgnoreKey}
     {onSortKey}
+    {onReferenceKey}
   />
 {/if}
