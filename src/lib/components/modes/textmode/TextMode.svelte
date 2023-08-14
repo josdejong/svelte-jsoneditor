@@ -514,7 +514,7 @@
             onChangeCodeMirrorValueDebounced()
           } else if (update.selectionSet) {
             // note that emitOnSelect is invoked in onChangeCodeMirrorValue too,
-            // right after firing onChange. Hence the else if here, we do not want to fire it twice.
+            // right after firing onChange. Hence, the else if here, we do not want to fire it twice.
             emitOnSelect()
           }
         }),
@@ -787,12 +787,10 @@
   }
 
   function emitOnSelect() {
-    if (onSelect) {
-      onSelect({
-        type: SelectionType.text,
-        ...editorState.selection.toJSON()
-      })
-    }
+    onSelect({
+      type: SelectionType.text,
+      ...editorState.selection.toJSON()
+    })
   }
 
   function disableTextEditor(text: string, acceptTooLarge: boolean): boolean {

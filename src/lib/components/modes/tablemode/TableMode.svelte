@@ -284,9 +284,7 @@
         selection: updatedSelection
       }
 
-      if (onSelect) {
-        onSelect(updatedSelection)
-      }
+      onSelect(updatedSelection)
     }
   }
 
