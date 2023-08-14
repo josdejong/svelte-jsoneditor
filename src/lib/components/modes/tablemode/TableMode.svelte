@@ -88,7 +88,6 @@
     createValueSelection,
     getAnchorPath,
     getFocusPath,
-    getInitialSelection,
     isEditingSelection,
     isValueSelection,
     pathInSelection,
