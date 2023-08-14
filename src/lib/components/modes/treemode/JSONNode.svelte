@@ -500,7 +500,7 @@
     selection: JSONSelection,
     visibleSections: VisibleSection[]
   ): RenderedItem[] | null {
-    const items = []
+    const items: RenderedItem[] = []
 
     function addHeight(prop: string) {
       const itemPath = path.concat(prop)
@@ -541,7 +541,7 @@
     return items
   }
 
-  function handleMouseOver(event) {
+  function handleMouseOver(event: MouseEvent) {
     if (singleton.selecting || singleton.dragging) {
       return
     }
@@ -559,7 +559,7 @@
     clearTimeout(hoverTimer)
   }
 
-  function handleMouseOut(event) {
+  function handleMouseOut(event: MouseEvent) {
     event.stopPropagation()
 
     // to prevent "flickering" in the hovering state when hovering on the edge
@@ -568,7 +568,7 @@
     hoverTimer = setTimeout(() => (hover = undefined))
   }
 
-  function handleInsertInside(event) {
+  function handleInsertInside(event: MouseEvent) {
     if (!event.shiftKey) {
       event.stopPropagation()
       event.preventDefault()
@@ -577,7 +577,7 @@
     }
   }
 
-  function handleInsertAfter(event) {
+  function handleInsertAfter(event: MouseEvent) {
     if (!event.shiftKey) {
       event.stopPropagation()
       event.preventDefault()
