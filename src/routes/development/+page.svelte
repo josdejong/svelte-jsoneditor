@@ -730,12 +730,12 @@
         <div class="data">
           json contents:
           <pre>
-					<code>
-					{content.json !== undefined
+            <code>
+            {content.json !== undefined
                 ? truncate(selectedParser.stringify(content.json, null, 2), 1e5)
                 : 'undefined'}
-					</code>
-				</pre>
+            </code>
+          </pre>
         </div>
       {/if}
     </div>
@@ -792,7 +792,7 @@
           text contents:
           <pre>
             <code>
-              {truncate(content.text, 1e5)}
+              {content.text ? truncate(content.text, 1e5) : content.text}
             </code>
           </pre>
         </div>
