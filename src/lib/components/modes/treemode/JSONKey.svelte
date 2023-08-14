@@ -71,7 +71,12 @@
     onFind={context.onFind}
   />
 {:else}
-  <div role="none" data-type="selectable-key" class={getKeyClass(key)} on:dblclick={handleKeyDoubleClick}>
+  <div
+    role="none"
+    data-type="selectable-key"
+    class={getKeyClass(key)}
+    on:dblclick={handleKeyDoubleClick}
+  >
     {#if searchResultItems}
       <SearchResultHighlighter text={context.normalization.escapeValue(key)} {searchResultItems} />
     {:else}
