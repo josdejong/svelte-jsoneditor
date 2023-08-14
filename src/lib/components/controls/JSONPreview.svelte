@@ -10,7 +10,7 @@
   export let indentation: number | string
   export let parser: JSONParser
 
-  $: content = json !== undefined ? { json} : { text: text || '' }
+  $: content = json !== undefined ? { json } : { text: text || '' }
   $: truncated = truncate(getText(content, indentation, parser), MAX_CHARACTERS_TEXT_PREVIEW)
 </script>
 

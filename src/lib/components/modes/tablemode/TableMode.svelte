@@ -1908,7 +1908,7 @@
             ]
           : []}
       />
-      <JSONPreview text={text} {json} {indentation} {parser} />
+      <JSONPreview {text} {json} {indentation} {parser} />
     {:else}
       <TableModeWelcome {text} {json} {readOnly} {parser} {openJSONEditorModal} {onChangeMode} />
     {/if}

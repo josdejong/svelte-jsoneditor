@@ -6,7 +6,7 @@
     JSONParser,
     JSONPatchResult,
     JSONPathParser,
-    MenuItem, MenuSeparator,
+    MenuItem,
     MenuSeparator,
     OnBlur,
     OnChange,
