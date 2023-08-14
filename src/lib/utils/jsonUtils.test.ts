@@ -1,4 +1,4 @@
-import { test, describe } from 'vitest'
+import { test, describe, expect } from 'vitest'
 import type { JSONParser } from '$lib/types.js'
 import { deepStrictEqual, strictEqual, deepEqual, throws } from 'assert'
 import { LosslessNumber, parse, stringify } from 'lossless-json'
