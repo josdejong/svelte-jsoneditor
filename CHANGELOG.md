@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.9](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.8...v0.17.9) (2023-08-14)
+
+
+### Bug Fixes
+
+* [#163](https://github.com/josdejong/svelte-jsoneditor/issues/163) implement method `.select()` and callback `onSelect` ([#299](https://github.com/josdejong/svelte-jsoneditor/issues/299)) ([69a9698](https://github.com/josdejong/svelte-jsoneditor/commit/69a96983a80e2fe9900739245b37c1eac622eab0))
+* export all typeguard functions like `isMenuButton` ([53e671d](https://github.com/josdejong/svelte-jsoneditor/commit/53e671d0543eeaa8dd8bcbb020aacef26214e49c))
+* resolve failed import in example "custom menu buttons" ([#287](https://github.com/josdejong/svelte-jsoneditor/issues/287)) ([8da09a4](https://github.com/josdejong/svelte-jsoneditor/commit/8da09a472efd10c052c154c56b5c5b8b68e4981e))
+
 ### [0.17.8](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.7...v0.17.8) (2023-06-21)
 
 
