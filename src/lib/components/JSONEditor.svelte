@@ -197,6 +197,8 @@
 
   export async function select(newSelection: JSONEditorSelection | null) {
     selection = newSelection
+
+    await tick() // await rerender
   }
 
   export async function expand(callback?: OnExpand): Promise<void> {

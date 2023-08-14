@@ -20,6 +20,7 @@
   import { truncate } from '$lib/utils/stringUtils.js'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils.js'
   import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
+  import { toJSONContent } from '$lib/utils/jsonUtils.js'
 
   // const LosslessJSON: JSONParser = { ... } // FIXME: make the types work
   const LosslessJSON = {
@@ -629,7 +630,7 @@
     </button>
     <button
       on:click={() => {
-        const content = refTreeEditor.get()
+        const content = toJSONContent(refTreeEditor.get(), LosslessJSON)
         const updatedContent = {
           json: { ...content.json, updated: '2022-09-01T10:13:44Z' }
         }

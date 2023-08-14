@@ -38,6 +38,7 @@
     isMultiSelection,
     isValueSelection,
     pathInSelection,
+    isEditingSelection,
     selectionIfOverlapping
   } from '$lib/logic/selection.js'
   import {
@@ -77,7 +78,6 @@
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
   import { isObject } from '$lib/utils/typeUtils.js'
   import { classnames } from '$lib/utils/cssUtils.js'
-  import { isEditingSelection } from '$lib'
 
   export let value: JSONValueType
   export let path: JSONPath

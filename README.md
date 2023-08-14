@@ -520,14 +520,14 @@ interface RenderValuePropsOptional {
   value?: JSONValue
   readOnly?: boolean
   enforceString?: boolean
-  selection?: Selection
+  selection?: JSONSelection
   searchResultItems?: SearchResultItem[]
   isSelected?: boolean
   isEditing?: boolean
   normalization?: ValueNormalization
   onPatch?: TreeModeContext['onPatch']
   onPasteJson?: (pastedJson: { path: Path; contents: JSONValue }) => void
-  onSelect?: (selection: Selection) => void
+  onSelect?: (selection: JSONSelection) => void
   onFind?: (findAndReplace: boolean) => void
   focus?: () => void
 }
@@ -537,14 +537,14 @@ interface RenderValueProps extends RenderValuePropsOptional {
   value: JSONValue
   readOnly: boolean
   enforceString: boolean | undefined
-  selection: Selection | undefined
+  selection: JSONSelection | null
   searchResultItems: SearchResultItem[] | undefined
   isSelected: boolean
   isEditing: boolean
   normalization: ValueNormalization
   onPatch: (patch: JSONPatchDocument, afterPatch?: AfterPatchCallback) => JSONPatchResult
   onPasteJson: (pastedJson: { path: Path; contents: JSONValue }) => void
-  onSelect: (selection: Selection) => void
+  onSelect: (selection: JSONSelection) => void
   onFind: (findAndReplace: boolean) => void
   focus: () => void
 }

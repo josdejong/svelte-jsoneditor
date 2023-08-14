@@ -468,7 +468,7 @@ export function onRemoveRow({
             fromTableCellPosition({ rowIndex: newRowIndex, columnIndex }, columns),
             false
           )
-        : undefined
+        : null
 
     debug('remove row new selection', { rowIndex, newRowIndex, newSelection })
 
