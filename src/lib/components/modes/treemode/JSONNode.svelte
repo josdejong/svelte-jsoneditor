@@ -606,14 +606,14 @@
 
 <div
   role="treeitem"
-  tabindex="0"
+  tabindex="-1"
   class={classnames(
     'jse-json-node',
     { 'jse-expanded': expanded },
     context.onClassName(path, value)
   )}
   data-path={encodeDataPath(path)}
-  aria-selected={isSelected}
+  aria-selected={isNodeSelected}
   class:jse-root={root}
   class:jse-selected={isNodeSelected && isMultiSelection(selection)}
   class:jse-selected-key={isNodeSelected && isKeySelection(selection)}
@@ -675,15 +675,15 @@
         <ValidationErrorIcon {validationError} onExpand={handleExpand} />
       {/if}
       {#if expanded}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
+          role="none"
           class="jse-insert-selection-area jse-inside"
           data-type="insert-selection-area-inside"
           on:click={handleInsertInside}
         />
       {:else}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
+          role="none"
           class="jse-insert-selection-area jse-after"
           data-type="insert-selection-area-after"
           on:click={handleInsertAfter}
@@ -744,8 +744,8 @@
           <span class="jse-bracket">]</span>
         </div>
         {#if !root}
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
+            role="none"
             class="jse-insert-selection-area jse-after"
             data-type="insert-selection-area-after"
             on:click={handleInsertAfter}
@@ -796,15 +796,15 @@
         <ValidationErrorIcon {validationError} onExpand={handleExpand} />
       {/if}
       {#if expanded}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
+          role="none"
           class="jse-insert-selection-area jse-inside"
           data-type="insert-selection-area-inside"
           on:click={handleInsertInside}
         />
       {:else if !root}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
+          role="none"
           class="jse-insert-selection-area jse-after"
           data-type="insert-selection-area-after"
           on:click={handleInsertAfter}
@@ -859,8 +859,8 @@
           <div class="jse-bracket">&rbrace;</div>
         </div>
         {#if !root}
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
+            role="none"
             class="jse-insert-selection-area jse-after"
             data-type="insert-selection-area-after"
             on:click={handleInsertAfter}
@@ -893,8 +893,8 @@
         <ValidationErrorIcon {validationError} onExpand={handleExpand} />
       {/if}
       {#if !root}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
+          role="none"
           class="jse-insert-selection-area jse-after"
           data-type="insert-selection-area-after"
           on:click={handleInsertAfter}

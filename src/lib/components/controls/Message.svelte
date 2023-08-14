@@ -28,7 +28,7 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div
     role="button"
-    tabindex="0"
+    tabindex="-1"
     class="jse-text"
     class:jse-clickable={!!onClick}
     on:click={handleClick}

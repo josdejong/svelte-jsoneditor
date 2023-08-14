@@ -2088,7 +2088,7 @@
 
 <div
   role="tree"
-  tabindex="0"
+  tabindex="-1"
   class="jse-tree-mode"
   class:no-main-menu={!mainMenuBar}
   on:keydown={handleKeyDown}

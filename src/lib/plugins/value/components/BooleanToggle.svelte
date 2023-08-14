@@ -33,6 +33,9 @@
 </script>
 
 <div
+  role="checkbox"
+  tabindex="-1"
+  aria-checked={value === true}
   class="jse-boolean-toggle"
   class:jse-readonly={readOnly}
   on:mousedown={toggleBooleanValue}

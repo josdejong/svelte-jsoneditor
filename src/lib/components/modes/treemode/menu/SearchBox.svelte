@@ -128,6 +128,7 @@
 
 {#if show}
   <div class="jse-search-box">
+    <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <form class="jse-search-form" on:submit={handleSubmit} on:keydown={handleKeyDown}>
       {#if !readOnly}
         <button

@@ -72,7 +72,7 @@
   }
 </script>
 
-<div class="jse-contextmenu" bind:this={refContextMenu} on:keydown={handleKeyDown}>
+<div role="menu" tabindex="-1" class="jse-contextmenu" bind:this={refContextMenu} on:keydown={handleKeyDown}>
   {#each items as item}
     {#if isMenuButton(item)}
       <ContextMenuButton {item} />

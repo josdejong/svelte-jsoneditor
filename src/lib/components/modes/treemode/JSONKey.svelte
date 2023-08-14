@@ -12,8 +12,7 @@
   import EditableDiv from '../../controls/EditableDiv.svelte'
   import { addNewLineSuffix } from '$lib/utils/domUtils.js'
   import { UPDATE_SELECTION } from '$lib/constants.js'
-  import type { ExtendedSearchResultItem, TreeModeContext } from '$lib/types.js'
-  import { type JSONSelection } from '$lib/types.js'
+  import type { ExtendedSearchResultItem, JSONSelection, TreeModeContext } from '$lib/types.js'
   import type { JSONPath } from 'immutable-json-patch'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
   import { classnames } from '$lib/utils/cssUtils.js'
@@ -72,7 +71,7 @@
     onFind={context.onFind}
   />
 {:else}
-  <div data-type="selectable-key" class={getKeyClass(key)} on:dblclick={handleKeyDoubleClick}>
+  <div role="none" data-type="selectable-key" class={getKeyClass(key)} on:dblclick={handleKeyDoubleClick}>
     {#if searchResultItems}
       <SearchResultHighlighter text={context.normalization.escapeValue(key)} {searchResultItems} />
     {:else}
