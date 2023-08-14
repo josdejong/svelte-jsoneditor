@@ -27,15 +27,18 @@
     createMultiSelection,
     fromCaretPosition,
     fromSelectionType,
+    getAnchorPath,
     getEndPath,
+    getFocusPath,
     getSelectionPaths,
     getStartPath,
     isAfterSelection,
     isInsideSelection,
     isKeySelection,
     isMultiSelection,
-    isPathInsideSelection,
     isValueSelection,
+    pathInSelection,
+    isEditingSelection,
     selectionIfOverlapping
   } from '$lib/logic/selection.js'
   import {
@@ -83,7 +86,7 @@
   export let visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
   export let validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   export let searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
-  export let selection: JSONSelection | undefined
+  export let selection: JSONSelection | null
   export let context: TreeModeContext
   export let onDragSelectionStart: MouseEvent
 
@@ -112,8 +115,8 @@
   let validationError: ValidationError | undefined
   $: validationError = validationErrorsMap ? validationErrorsMap[pointer] : undefined
 
-  let isSelected: boolean
-  $: isSelected = selection ? selection.pointersMap[pointer] === true : false
+  let isNodeSelected: boolean
+  $: isNodeSelected = pathInSelection(context.getJson(), selection, path)
 
   $: root = path.length === 0
 
@@ -132,23 +135,23 @@
     visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined,
     validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined,
     searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
-    selection: JSONSelection | undefined,
-    dragging: DraggingState
+    selection: JSONSelection | null,
+    dragging: DraggingState | undefined
   ): JSONNodeProp[] {
     let props = Object.keys(object).map((key) => {
+      const keyPath = memoizePath(path.concat(key))
       const keyPointer = appendToJSONPointer(pointer, key)
       return {
         key,
         value: object[key],
-        path: memoizePath(path.concat(key)),
-        pointer: keyPointer,
+        path: keyPath,
         expandedMap: filterPointerOrUndefined(expandedMap, keyPointer),
         enforceStringMap: filterPointerOrUndefined(enforceStringMap, keyPointer),
         visibleSectionsMap: filterPointerOrUndefined(visibleSectionsMap, keyPointer),
         validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, keyPointer),
         keySearchResultItemsMap: filterKeySearchResults(searchResultItemsMap, keyPointer),
         valueSearchResultItemsMap: filterPointerOrUndefined(searchResultItemsMap, keyPointer),
-        selection: selectionIfOverlapping(selection, keyPointer)
+        selection: selectionIfOverlapping(context.getJson(), selection, keyPath)
       }
     })
 
@@ -175,27 +178,27 @@
     visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined,
     validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined,
     searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
-    selection: JSONSelection | undefined,
-    dragging: DraggingState
+    selection: JSONSelection | null,
+    dragging: DraggingState | undefined
   ): JSONNodeItem[] {
     const start = visibleSection.start
     const end = Math.min(visibleSection.end, array.length)
     let items: JSONNodeItem[] = []
 
     for (let index = start; index < end; index++) {
+      const itemPath = memoizePath(path.concat(String(index)))
       const itemPointer = appendToJSONPointer(pointer, index)
 
       items.push({
         index,
         value: array[index],
-        path: memoizePath(path.concat(String(index))),
-        pointer: itemPointer,
+        path: itemPath,
         expandedMap: filterPointerOrUndefined(expandedMap, itemPointer),
         enforceStringMap: filterPointerOrUndefined(enforceStringMap, itemPointer),
         visibleSectionsMap: filterPointerOrUndefined(visibleSectionsMap, itemPointer),
         validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, itemPointer),
         searchResultItemsMap: filterPointerOrUndefined(searchResultItemsMap, itemPointer),
-        selection: selectionIfOverlapping(selection, itemPointer)
+        selection: selectionIfOverlapping(context.getJson(), selection, itemPath)
       })
     }
 
@@ -269,9 +272,15 @@
     const json = context.getJson()
     const documentState = context.getDocumentState()
 
-    // when right-clicking inside the current selection, do nothing: context menu will open
-    // when left-clicking inside the current selection, do nothing: it can be the start of dragging
-    if (selection && isPathInsideSelection(selection, path, anchorType)) {
+    if (
+      selection &&
+      anchorType !== SelectionType.after &&
+      anchorType !== SelectionType.inside &&
+      (selection.type === anchorType || selection.type === SelectionType.multi) &&
+      pathInSelection(json, selection, path)
+    ) {
+      // when right-clicking inside the current selection, do nothing: context menu will open
+      // when left-clicking inside the current selection, do nothing: it can be the start of dragging
       if (event.button === 0) {
         onDragSelectionStart(event)
       }
@@ -289,7 +298,7 @@
       // Shift+Click will select multiple entries
       const fullSelection = context.getDocumentState().selection
       if (fullSelection) {
-        context.onSelect(createMultiSelection(json, fullSelection.anchorPath, path))
+        context.onSelect(createMultiSelection(getAnchorPath(fullSelection), path))
       }
     } else {
       if (anchorType === SelectionType.multi) {
@@ -299,7 +308,7 @@
           ) as CaretPosition
           context.onSelect(fromCaretPosition(lastCaretPosition))
         } else {
-          context.onSelect(createMultiSelection(json, path, path))
+          context.onSelect(createMultiSelection(path, path))
         }
       } else {
         context.onSelect(fromSelectionType(json, anchorType, path))
@@ -331,10 +340,8 @@
         singleton.selectionFocus = path
         singleton.selectionAnchorType = selectionType // TODO: this is a bit ugly
 
-        const json = context.getJson()
         context.onSelect(
           createMultiSelection(
-            json,
             singleton.selectionAnchor || singleton.selectionFocus,
             singleton.selectionFocus
           )
@@ -380,7 +387,7 @@
       return
     }
 
-    const selectionParentPath = initial(selection.focusPath)
+    const selectionParentPath = initial(getFocusPath(selection))
     if (!isEqual(path, selectionParentPath)) {
       // pass to parent
       onDragSelectionStart(event)
@@ -400,9 +407,9 @@
       return
     }
 
-    const initialPath = getStartPath(selection)
-    const selectionStartIndex = items.findIndex((item) => isEqual(item.path, initialPath))
     const json = context.getJson()
+    const initialPath = getStartPath(json, selection)
+    const selectionStartIndex = items.findIndex((item) => isEqual(item.path, initialPath))
     const documentState = context.getDocumentState()
     const { offset } = onMoveSelection({
       json,
@@ -416,7 +423,7 @@
       initialClientY: event.clientY,
       initialContentTop: findContentTop(),
       selectionStartIndex,
-      selectionItemsCount: getSelectionPaths(selection).length,
+      selectionItemsCount: getSelectionPaths(json, selection).length,
       items,
       offset,
       didMoveItems: false // whether items have been moved during dragging or not
@@ -514,8 +521,8 @@
     }
 
     if (Array.isArray(value)) {
-      const startPath = getStartPath(selection)
-      const endPath = getEndPath(selection)
+      const startPath = getStartPath(context.getJson(), selection)
+      const endPath = getEndPath(context.getJson(), selection)
       const startIndex = last(startPath)
       const endIndex = last(endPath)
 
@@ -608,9 +615,9 @@
   data-path={encodeDataPath(path)}
   aria-selected={isSelected}
   class:jse-root={root}
-  class:jse-selected={isSelected && isMultiSelection(selection)}
-  class:jse-selected-key={isSelected && isKeySelection(selection)}
-  class:jse-selected-value={isSelected && isValueSelection(selection)}
+  class:jse-selected={isNodeSelected && isMultiSelection(selection)}
+  class:jse-selected-key={isNodeSelected && isKeySelection(selection)}
+  class:jse-selected-value={isNodeSelected && isValueSelection(selection)}
   class:jse-readonly={context.readOnly}
   class:jse-hovered={hover === HOVER_COLLECTION}
   on:mousedown={handleMouseDown}
@@ -658,7 +665,7 @@
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
+        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
             <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -685,17 +692,17 @@
     </div>
     {#if expanded}
       <div class="jse-items">
-        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || (isSelected && isInsideSelection(selection)))}
+        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || (isNodeSelected && isInsideSelection(selection)))}
           <div
             class="jse-insert-area jse-inside"
             class:jse-hovered={hover === HOVER_INSERT_INSIDE}
-            class:jse-selected={isSelected && isInsideSelection(selection)}
+            class:jse-selected={isNodeSelected && isInsideSelection(selection)}
             data-type="insert-selection-area-inside"
             style={getIndentationStyle(path.length + 1)}
             title={INSERT_EXPLANATION}
           >
             <ContextMenuPointer
-              selected={isSelected && isInsideSelection(selection)}
+              selected={isNodeSelected && isInsideSelection(selection)}
               onContextMenu={handleInsertInsideOpenContextMenu}
             />
           </div>
@@ -725,9 +732,9 @@
               {sectionIndex}
               total={value.length}
               {path}
-              {pointer}
               onExpandSection={context.onExpandSection}
               {selection}
+              {context}
             />
           {/if}
         {/each}
@@ -779,7 +786,7 @@
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
+        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
             <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -806,17 +813,17 @@
     </div>
     {#if expanded}
       <div class="jse-props">
-        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || (isSelected && isInsideSelection(selection)))}
+        {#if !context.readOnly && (hover === HOVER_INSERT_INSIDE || (isNodeSelected && isInsideSelection(selection)))}
           <div
             class="jse-insert-area jse-inside"
             class:jse-hovered={hover === HOVER_INSERT_INSIDE}
-            class:jse-selected={isSelected && isInsideSelection(selection)}
+            class:jse-selected={isNodeSelected && isInsideSelection(selection)}
             data-type="insert-selection-area-inside"
             style={getIndentationStyle(path.length + 1)}
             title={INSERT_EXPLANATION}
           >
             <ContextMenuPointer
-              selected={isSelected && isInsideSelection(selection)}
+              selected={isNodeSelected && isInsideSelection(selection)}
               onContextMenu={handleInsertInsideOpenContextMenu}
             />
           </div>
@@ -837,7 +844,6 @@
             <div slot="identifier" class="jse-identifier">
               <JSONKey
                 path={prop.path}
-                pointer={prop.pointer}
                 key={prop.key}
                 selection={prop.selection}
                 searchResultItems={prop.keySearchResultItemsMap}
@@ -873,11 +879,11 @@
           {path}
           {value}
           {enforceString}
-          selection={isSelected ? selection : undefined}
+          selection={isNodeSelected ? selection : null}
           searchResultItems={filterValueSearchResults(searchResultItemsMap, pointer)}
           {context}
         />
-        {#if !context.readOnly && isSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(selection.focusPath, path)}
+        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !isEditingSelection(selection) && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
             <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -896,17 +902,17 @@
       {/if}
     </div>
   {/if}
-  {#if !context.readOnly && (hover === HOVER_INSERT_AFTER || (isSelected && isAfterSelection(selection)))}
+  {#if !context.readOnly && (hover === HOVER_INSERT_AFTER || (isNodeSelected && isAfterSelection(selection)))}
     <div
       class="jse-insert-area jse-after"
       class:jse-hovered={hover === HOVER_INSERT_AFTER}
-      class:jse-selected={isSelected && isAfterSelection(selection)}
+      class:jse-selected={isNodeSelected && isAfterSelection(selection)}
       data-type="insert-selection-area-after"
       style={indentationStyle}
       title={INSERT_EXPLANATION}
     >
       <ContextMenuPointer
-        selected={isSelected && isAfterSelection(selection)}
+        selected={isNodeSelected && isAfterSelection(selection)}
         onContextMenu={handleInsertAfterOpenContextMenu}
       />
     </div>

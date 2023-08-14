@@ -11,7 +11,7 @@
     JSONParser,
     JSONPath,
     JSONValue,
-    OnSelect,
+    OnJSONSelect,
     ValueNormalization
   } from '$lib/types.js'
 
@@ -20,7 +20,7 @@
   export let readOnly: boolean
   export let normalization: ValueNormalization
   export let parser: JSONParser
-  export let onSelect: OnSelect
+  export let onSelect: OnJSONSelect
 
   export let searchResultItems: ExtendedSearchResultItem[] | undefined
 

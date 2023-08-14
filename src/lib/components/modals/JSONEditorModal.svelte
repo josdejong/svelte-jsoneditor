@@ -9,6 +9,7 @@
   import type {
     Content,
     JSONEditorModalCallback,
+    JSONEditorSelection,
     JSONParser,
     JSONPathParser,
     OnClassName,
@@ -72,6 +73,7 @@
     relativePath: path
   }
   let stack: ModalState[] = [rootState]
+  let selection: JSONEditorSelection | null = null
 
   $: absolutePath = stack.flatMap((state) => state.relativePath)
   $: pathDescription = !isEmpty(absolutePath) ? stringifyJSONPath(absolutePath) : '(whole document)'
@@ -95,11 +97,13 @@
     try {
       error = undefined
 
+      const path = last(stack).relativePath
+      const content = last(stack).content
       const operations: JSONPatchDocument = [
         {
           op: 'replace',
-          path: compileJSONPointer(last(stack).relativePath),
-          value: toJSONContent(last(stack).content, parser).json // this can throw an error
+          path: compileJSONPointer(path),
+          value: toJSONContent(content, parser).json // this can throw an error
         }
       ]
 
@@ -112,6 +116,7 @@
 
         // after successfully updated, remove from the stack and apply the change
         stack = initial(stack)
+        selection = null // TODO: restore the selection, like selection = createValueSelection(path, false)
         handleChange(updatedParentContent)
       } else {
         onPatch(operations)
@@ -201,6 +206,7 @@
       <JSONEditorRoot
         mode={last(stack).mode}
         content={last(stack).content}
+        {selection}
         {readOnly}
         {indentation}
         {tabSize}
@@ -220,6 +226,9 @@
         onError={handleError}
         onChange={handleChange}
         onChangeMode={handleChangeMode}
+        onSelect={(newSelection) => {
+          selection = newSelection
+        }}
         {onRenderValue}
         {onClassName}
         onFocus={noop}

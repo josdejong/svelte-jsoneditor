@@ -17,6 +17,7 @@
     JSON_STATUS_INVALID,
     JSON_STATUS_REPAIRABLE,
     JSON_STATUS_VALID,
+    MAX_CHARACTERS_TEXT_PREVIEW,
     MAX_DOCUMENT_SIZE_TEXT_MODE,
     TEXT_MODE_ONCHANGE_DELAY
   } from '$lib/constants.js'
@@ -26,13 +27,13 @@
     getWindow
   } from '$lib/utils/domUtils.js'
   import { formatSize } from '$lib/utils/fileUtils.js'
-  import { findTextLocation, getText } from '$lib/utils/jsonUtils.js'
+  import { findTextLocation, getText, needsFormatting } from '$lib/utils/jsonUtils.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import TextMenu from './menu/TextMenu.svelte'
   import { basicSetup, EditorView } from 'codemirror'
-  import { Compartment, EditorState, type Extension } from '@codemirror/state'
+  import { Compartment, EditorSelection, EditorState, type Extension } from '@codemirror/state'
   import { keymap, ViewUpdate } from '@codemirror/view'
   import { indentWithTab, redo, redoDepth, undo, undoDepth } from '@codemirror/commands'
   import type { Diagnostic } from '@codemirror/lint'
@@ -48,6 +49,7 @@
   import type {
     Content,
     ContentErrors,
+    JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
     OnBlur,
@@ -56,6 +58,7 @@
     OnError,
     OnFocus,
     OnRenderMenuWithoutContext,
+    OnSelect,
     OnSortModal,
     OnTransformModal,
     ParseError,
@@ -64,21 +67,21 @@
     ValidationError,
     Validator
   } from '$lib/types.js'
-  import { Mode, ValidationSeverity } from '$lib/types.js'
+  import { Mode, SelectionType, ValidationSeverity } from '$lib/types.js'
   import { isContentParseError, isContentValidationErrors } from '$lib/typeguards.js'
   import memoizeOne from 'memoize-one'
   import { validateText } from '$lib/logic/validation.js'
-  import { MAX_CHARACTERS_TEXT_PREVIEW } from '$lib/constants.js'
   import { truncate } from '$lib/utils/stringUtils.js'
-  import { needsFormatting } from '$lib/utils/jsonUtils.js'
   import { faJSONEditorFormat } from '$lib/img/customFontawesomeIcons.js'
   import { indentationMarkers } from '@replit/codemirror-indentation-markers'
+  import { isTextSelection } from '$lib/logic/selection.js'
 
   export let readOnly: boolean
   export let mainMenuBar: boolean
   export let statusBar: boolean
   export let askToFormat: boolean
   export let externalContent: Content
+  export let externalSelection: JSONEditorSelection | null
   export let indentation: number | string
   export let tabSize: number
   export let escapeUnicodeCharacters: boolean
@@ -87,6 +90,7 @@
   export let validationParser: JSONParser
   export let onChange: OnChange
   export let onChangeMode: OnChangeMode
+  export let onSelect: OnSelect
   export let onError: OnError
   export let onFocus: OnFocus
   export let onBlur: OnBlur
@@ -130,6 +134,7 @@
   })
 
   $: setCodeMirrorContent(externalContent)
+  $: applyExternalSelection(externalSelection)
   $: updateLinter(validator)
   $: updateIndentation(indentation)
   $: updateTabSize(tabSize)
@@ -491,6 +496,7 @@
 
     const state = EditorState.create({
       doc: initialText,
+      selection: toCodeMirrorSelection(externalSelection),
       extensions: [
         keymap.of([indentWithTab, formatCompactKeyBinding]),
         linterCompartment.of(createLinter()),
@@ -506,6 +512,10 @@
 
           if (update.docChanged) {
             onChangeCodeMirrorValueDebounced()
+          } else if (update.selectionSet) {
+            // note that emitOnSelect is invoked in onChangeCodeMirrorValue too,
+            // right after firing onChange. Hence, the else if here, we do not want to fire it twice.
+            emitOnSelect()
           }
         }),
         jsonLang(),
@@ -618,6 +628,24 @@
     }
   }
 
+  function applyExternalSelection(externalSelection: JSONEditorSelection | null) {
+    if (!isTextSelection(externalSelection)) {
+      return
+    }
+
+    const selection = toCodeMirrorSelection(externalSelection)
+    if (codeMirrorView && selection && (!editorState || !editorState.selection.eq(selection))) {
+      debug('applyExternalSelection', selection)
+
+      // note that we cannot clear the selection (we could maybe set the cursor to 0 but that's not really what we want)
+      codeMirrorView.dispatch({ selection })
+    }
+  }
+
+  function toCodeMirrorSelection(selection: JSONEditorSelection | null): EditorSelection | null {
+    return isTextSelection(selection) ? EditorSelection.fromJSON(selection) : null
+  }
+
   /**
    * Force refreshing the editor, for example after changing the font size
    * to update the positioning of the line numbers in the gutter
@@ -663,6 +691,7 @@
 
     updateCanUndoRedo()
     emitOnChange(content, previousContent)
+    emitOnSelect()
   }
 
   function updateLinter(validator) {
@@ -755,6 +784,13 @@
         patchResult: null
       })
     }
+  }
+
+  function emitOnSelect() {
+    onSelect({
+      type: SelectionType.text,
+      ...editorState.selection.toJSON()
+    })
   }
 
   function disableTextEditor(text: string, acceptTooLarge: boolean): boolean {

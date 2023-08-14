@@ -21,7 +21,7 @@ export interface MoveSelectionProps {
 
 export interface MoveSelectionResult {
   operations: JSONPatchDocument | undefined
-  updatedSelection: JSONSelection | undefined
+  updatedSelection: JSONSelection | null
   offset: number
 }
 
@@ -34,7 +34,7 @@ export function onMoveSelection({
   if (!documentState.selection) {
     return {
       operations: undefined,
-      updatedSelection: undefined,
+      updatedSelection: null,
       offset: 0
     }
   }
@@ -48,14 +48,14 @@ export function onMoveSelection({
   if (!dragInsideAction || dragInsideAction.offset === 0) {
     return {
       operations: undefined,
-      updatedSelection: undefined,
+      updatedSelection: null,
       offset: 0
     }
   }
 
   const operations = moveInsideParent(json, selection, dragInsideAction)
 
-  const path = initial(getStartPath(selection))
+  const path = initial(getStartPath(json, selection))
   const value = getIn(json, path)
   if (Array.isArray(value)) {
     const updatedSelection = createUpdatedArraySelection({
@@ -74,18 +74,19 @@ export function onMoveSelection({
     // object
     return {
       operations,
-      updatedSelection: undefined,
+      updatedSelection: null,
       offset: dragInsideAction.offset
     }
   }
 }
 
 function findSwapPathUp({
+  json,
   items,
   selection,
   deltaY
 }: DragInsideProps): DragInsideAction | undefined {
-  const initialPath = getStartPath(selection)
+  const initialPath = getStartPath(json, selection)
   const initialIndex = items.findIndex((item) => isEqual(item.path, initialPath))
 
   const prevHeight = () => items[index - 1]?.height
@@ -110,7 +111,7 @@ function findSwapPathDown({
   selection,
   deltaY
 }: DragInsideProps): DragInsideAction | undefined {
-  const initialPath = getEndPath(selection)
+  const initialPath = getEndPath(json, selection)
   const initialIndex = items.findIndex((item) => isEqual(item.path, initialPath))
 
   let cumulativeHeight = 0
@@ -146,8 +147,8 @@ function createUpdatedArraySelection({
   selection,
   offset
 }: UpdatedArraySelectionProps): MultiSelection {
-  const startPath = getStartPath(selection)
-  const endPath = getEndPath(selection)
+  const startPath = getStartPath(json, selection)
+  const endPath = getEndPath(json, selection)
 
   const startIndex = items.findIndex((item) => isEqual(item.path, startPath))
   const endIndex = items.findIndex((item) => isEqual(item.path, endPath))
@@ -155,5 +156,5 @@ function createUpdatedArraySelection({
   const anchorPath = items[startIndex + offset]?.path
   const focusPath = items[endIndex + offset]?.path
 
-  return createMultiSelection(json, anchorPath, focusPath)
+  return createMultiSelection(anchorPath, focusPath)
 }

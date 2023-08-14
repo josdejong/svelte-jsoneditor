@@ -33,7 +33,8 @@ export enum SelectionType {
   inside = 'inside',
   key = 'key',
   value = 'value',
-  multi = 'multi'
+  multi = 'multi',
+  text = 'text' // in text mode
 }
 
 export enum CaretType {
@@ -52,8 +53,8 @@ export interface DocumentState {
   expandedMap: JSONPointerMap<boolean>
   enforceStringMap: JSONPointerMap<boolean>
   visibleSectionsMap: JSONPointerMap<VisibleSection[]>
-  selection: JSONSelection | undefined // TODO: change undefined to null?
-  sortedColumn: SortedColumn | undefined // TODO: change undefined to null?
+  selection: JSONSelection | null
+  sortedColumn: SortedColumn | null
 }
 
 export interface JSONPatchResult {
@@ -70,39 +71,29 @@ export type AfterPatchCallback = (
 
 export interface MultiSelection {
   type: SelectionType.multi
-  paths: JSONPath[]
   anchorPath: JSONPath
   focusPath: JSONPath
-  pointersMap: { [pointer: JSONPointer]: boolean }
 }
 
 export interface AfterSelection {
   type: SelectionType.after
-  anchorPath: JSONPath
-  focusPath: JSONPath
-  pointersMap: { [pointer: JSONPointer]: boolean }
+  path: JSONPath
 }
 
 export interface InsideSelection {
   type: SelectionType.inside
-  anchorPath: JSONPath
-  focusPath: JSONPath
-  pointersMap: { [pointer: JSONPointer]: boolean }
+  path: JSONPath
 }
 
 export interface KeySelection {
   type: SelectionType.key
-  anchorPath: JSONPath
-  focusPath: JSONPath
-  pointersMap: { [pointer: JSONPointer]: boolean }
+  path: JSONPath
   edit?: boolean
 }
 
 export interface ValueSelection {
   type: SelectionType.value
-  anchorPath: JSONPath
-  focusPath: JSONPath
-  pointersMap: { [pointer: JSONPointer]: boolean }
+  path: JSONPath
   edit?: boolean
 }
 
@@ -112,6 +103,16 @@ export type JSONSelection =
   | InsideSelection
   | KeySelection
   | ValueSelection
+
+// TextSelection is the result of EditorSelection.toJSON() from CodeMirror,
+// with an additional `type` property
+export interface TextSelection {
+  type: SelectionType.text
+  ranges: { anchor: number; head: number }[]
+  main: number
+}
+
+export type JSONEditorSelection = JSONSelection | TextSelection
 
 export type JSONPointerMap<T> = { [pointer: JSONPointer]: T }
 
@@ -291,7 +292,8 @@ export interface OnChangeStatus {
 export type OnChange =
   | ((content: Content, previousContent: Content, status: OnChangeStatus) => void)
   | null
-export type OnSelect = (selection: JSONSelection) => void
+export type OnJSONSelect = (selection: JSONSelection) => void
+export type OnSelect = (selection: JSONEditorSelection | null) => void
 export type OnPatch = (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
 export type OnChangeText = (updatedText: string, afterPatch?: AfterPatchCallback) => void
 export type OnSort = (params: {
@@ -320,7 +322,7 @@ export type OnBlur = () => void
 export type OnSortModal = (props: SortModalCallback) => void
 export type OnTransformModal = (props: TransformModalCallback) => void
 export type OnJSONEditorModal = (props: JSONEditorModalCallback) => void
-export type FindNextInside = (path: JSONPath) => JSONSelection | undefined
+export type FindNextInside = (path: JSONPath) => JSONSelection | null
 
 export interface SearchResult {
   items: ExtendedSearchResultItem[]
@@ -455,7 +457,7 @@ export interface JSONEditorContext {
   findNextInside: FindNextInside
   focus: () => void
   onPatch: (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => JSONPatchResult
-  onSelect: OnSelect
+  onSelect: OnJSONSelect
   onFind: OnFind
   onPasteJson: (newPastedJson: PastedJson) => void
   onRenderValue: OnRenderValue
@@ -479,14 +481,14 @@ export interface RenderValuePropsOptional {
   value?: JSONValue
   readOnly?: boolean
   enforceString?: boolean
-  selection?: JSONSelection
+  selection?: JSONSelection | null
   searchResultItems?: SearchResultItem[]
   isEditing?: boolean
   parser?: JSONParser
   normalization?: ValueNormalization
   onPatch?: TreeModeContext['onPatch']
   onPasteJson?: OnPasteJson
-  onSelect?: OnSelect
+  onSelect?: OnJSONSelect
   onFind?: OnFind
   findNextInside?: FindNextInside
   focus?: () => void
@@ -497,14 +499,14 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   value: JSONValue
   readOnly: boolean
   enforceString: boolean
-  selection: JSONSelection | undefined
+  selection: JSONSelection | null
   searchResultItems: SearchResultItem[] | undefined
   isEditing: boolean
   parser: JSONParser
   normalization: ValueNormalization
   onPatch: TreeModeContext['onPatch']
   onPasteJson: OnPasteJson
-  onSelect: OnSelect
+  onSelect: OnJSONSelect
   onFind: OnFind
   findNextInside: FindNextInside
   focus: () => void
@@ -514,27 +516,25 @@ export interface JSONNodeProp {
   key: string
   value: JSONValue
   path: JSONPath
-  pointer: JSONPointer
   expandedMap: JSONPointerMap<boolean> | undefined
   enforceStringMap: JSONPointerMap<boolean> | undefined
   visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
   validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   keySearchResultItemsMap: ExtendedSearchResultItem[] | undefined
   valueSearchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
-  selection: JSONSelection | undefined
+  selection: JSONSelection | null
 }
 
 export interface JSONNodeItem {
   index: number
   value: JSONValue
   path: JSONPath
-  pointer: JSONPointer
   expandedMap: JSONPointerMap<boolean> | undefined
   enforceStringMap: JSONPointerMap<boolean> | undefined
   visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
   validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
-  selection: JSONSelection | undefined
+  selection: JSONSelection | null
 }
 
 export interface DraggingState {
