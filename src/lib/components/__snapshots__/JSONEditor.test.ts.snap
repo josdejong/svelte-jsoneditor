@@ -13,6 +13,7 @@ exports[`JSONEditor > render table mode 1`] = `
     >
       <div
         class="jse-table-mode s-kw5t6hk3mCrZ"
+        role="table"
       >
         <div
           class="jse-menu s-kJert7_5e4tU"
@@ -302,6 +303,8 @@ exports[`JSONEditor > render table mode 1`] = `
                   <div
                     class="jse-value jse-number s-47RMrES3SuSW"
                     data-type="selectable-value"
+                    role="button"
+                    tabindex="-1"
                   >
                     1
                   </div>
@@ -319,6 +322,8 @@ exports[`JSONEditor > render table mode 1`] = `
                   <div
                     class="jse-value jse-string jse-empty s-47RMrES3SuSW"
                     data-type="selectable-value"
+                    role="button"
+                    tabindex="-1"
                   >
                     
                   </div>
@@ -348,6 +353,8 @@ exports[`JSONEditor > render table mode 1`] = `
                   <div
                     class="jse-value jse-number s-47RMrES3SuSW"
                     data-type="selectable-value"
+                    role="button"
+                    tabindex="-1"
                   >
                     2
                   </div>
@@ -365,6 +372,8 @@ exports[`JSONEditor > render table mode 1`] = `
                   <div
                     class="jse-value jse-string s-47RMrES3SuSW"
                     data-type="selectable-value"
+                    role="button"
+                    tabindex="-1"
                   >
                     Joe
                   </div>
@@ -394,6 +403,8 @@ exports[`JSONEditor > render table mode 1`] = `
                   <div
                     class="jse-value jse-number s-47RMrES3SuSW"
                     data-type="selectable-value"
+                    role="button"
+                    tabindex="-1"
                   >
                     3
                   </div>
@@ -411,6 +422,8 @@ exports[`JSONEditor > render table mode 1`] = `
                   <div
                     class="jse-value jse-string jse-empty s-47RMrES3SuSW"
                     data-type="selectable-value"
+                    role="button"
+                    tabindex="-1"
                   >
                     
                   </div>
@@ -1073,6 +1086,8 @@ exports[`JSONEditor > render tree mode 1`] = `
     >
       <div
         class="jse-tree-mode s-pqW_GSISPpzB"
+        role="tree"
+        tabindex="-1"
       >
         <div
           class="jse-menu s-kJert7_5e4tU"
@@ -1457,8 +1472,11 @@ exports[`JSONEditor > render tree mode 1`] = `
           data-jsoneditor-scrollable-contents="true"
         >
           <div
+            aria-selected="false"
             class="jse-json-node jse-expanded s-BfIc3EpAoT-Y jse-root"
             data-path=""
+            role="treeitem"
+            tabindex="-1"
           >
             <div
               class="jse-header-outer s-BfIc3EpAoT-Y"
@@ -1528,6 +1546,7 @@ exports[`JSONEditor > render tree mode 1`] = `
               <div
                 class="jse-insert-selection-area jse-inside s-BfIc3EpAoT-Y"
                 data-type="insert-selection-area-inside"
+                role="none"
               />
             </div>
              
@@ -1538,8 +1557,11 @@ exports[`JSONEditor > render tree mode 1`] = `
               
               
               <div
+                aria-selected="false"
                 class="jse-json-node jse-expanded s-BfIc3EpAoT-Y"
                 data-path="%2F0"
+                role="treeitem"
+                tabindex="-1"
               >
                 <div
                   class="jse-header-outer s-BfIc3EpAoT-Y"
@@ -1614,6 +1636,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                   <div
                     class="jse-insert-selection-area jse-inside s-BfIc3EpAoT-Y"
                     data-type="insert-selection-area-inside"
+                    role="none"
                   />
                 </div>
                  
@@ -1622,8 +1645,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                 >
                    
                   <div
+                    aria-selected="false"
                     class="jse-json-node s-BfIc3EpAoT-Y"
                     data-path="%2F0%2Fid"
+                    role="treeitem"
+                    tabindex="-1"
                   >
                     <div
                       class="jse-contents-outer s-BfIc3EpAoT-Y"
@@ -1639,6 +1665,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                           <div
                             class="jse-key s-CQ5_eFrkJG3D"
                             data-type="selectable-key"
+                            role="none"
                           >
                             id
                           </div>
@@ -1657,6 +1684,8 @@ exports[`JSONEditor > render tree mode 1`] = `
                         <div
                           class="jse-value jse-number s-47RMrES3SuSW"
                           data-type="selectable-value"
+                          role="button"
+                          tabindex="-1"
                         >
                           1
                         </div>
@@ -1671,6 +1700,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                       <div
                         class="jse-insert-selection-area jse-after s-BfIc3EpAoT-Y"
                         data-type="insert-selection-area-after"
+                        role="none"
                       />
                     </div>
                      
@@ -1696,6 +1726,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                   <div
                     class="jse-insert-selection-area jse-after s-BfIc3EpAoT-Y"
                     data-type="insert-selection-area-after"
+                    role="none"
                   />
                 </div>
                 
@@ -1704,8 +1735,11 @@ exports[`JSONEditor > render tree mode 1`] = `
               <!--&lt;JSONNode&gt;-->
               
               <div
+                aria-selected="false"
                 class="jse-json-node jse-expanded s-BfIc3EpAoT-Y"
                 data-path="%2F1"
+                role="treeitem"
+                tabindex="-1"
               >
                 <div
                   class="jse-header-outer s-BfIc3EpAoT-Y"
@@ -1780,6 +1814,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                   <div
                     class="jse-insert-selection-area jse-inside s-BfIc3EpAoT-Y"
                     data-type="insert-selection-area-inside"
+                    role="none"
                   />
                 </div>
                  
@@ -1788,8 +1823,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                 >
                    
                   <div
+                    aria-selected="false"
                     class="jse-json-node s-BfIc3EpAoT-Y"
                     data-path="%2F1%2Fid"
+                    role="treeitem"
+                    tabindex="-1"
                   >
                     <div
                       class="jse-contents-outer s-BfIc3EpAoT-Y"
@@ -1805,6 +1843,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                           <div
                             class="jse-key s-CQ5_eFrkJG3D"
                             data-type="selectable-key"
+                            role="none"
                           >
                             id
                           </div>
@@ -1823,6 +1862,8 @@ exports[`JSONEditor > render tree mode 1`] = `
                         <div
                           class="jse-value jse-number s-47RMrES3SuSW"
                           data-type="selectable-value"
+                          role="button"
+                          tabindex="-1"
                         >
                           2
                         </div>
@@ -1837,14 +1878,18 @@ exports[`JSONEditor > render tree mode 1`] = `
                       <div
                         class="jse-insert-selection-area jse-after s-BfIc3EpAoT-Y"
                         data-type="insert-selection-area-after"
+                        role="none"
                       />
                     </div>
                      
                   </div>
                   <!--&lt;JSONNode&gt;-->
                   <div
+                    aria-selected="false"
                     class="jse-json-node s-BfIc3EpAoT-Y"
                     data-path="%2F1%2Fname"
+                    role="treeitem"
+                    tabindex="-1"
                   >
                     <div
                       class="jse-contents-outer s-BfIc3EpAoT-Y"
@@ -1860,6 +1905,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                           <div
                             class="jse-key s-CQ5_eFrkJG3D"
                             data-type="selectable-key"
+                            role="none"
                           >
                             name
                           </div>
@@ -1878,6 +1924,8 @@ exports[`JSONEditor > render tree mode 1`] = `
                         <div
                           class="jse-value jse-string s-47RMrES3SuSW"
                           data-type="selectable-value"
+                          role="button"
+                          tabindex="-1"
                         >
                           Joe
                         </div>
@@ -1892,6 +1940,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                       <div
                         class="jse-insert-selection-area jse-after s-BfIc3EpAoT-Y"
                         data-type="insert-selection-area-after"
+                        role="none"
                       />
                     </div>
                      
@@ -1917,6 +1966,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                   <div
                     class="jse-insert-selection-area jse-after s-BfIc3EpAoT-Y"
                     data-type="insert-selection-area-after"
+                    role="none"
                   />
                 </div>
                 
@@ -1925,8 +1975,11 @@ exports[`JSONEditor > render tree mode 1`] = `
               <!--&lt;JSONNode&gt;-->
               
               <div
+                aria-selected="false"
                 class="jse-json-node jse-expanded s-BfIc3EpAoT-Y"
                 data-path="%2F2"
+                role="treeitem"
+                tabindex="-1"
               >
                 <div
                   class="jse-header-outer s-BfIc3EpAoT-Y"
@@ -2001,6 +2054,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                   <div
                     class="jse-insert-selection-area jse-inside s-BfIc3EpAoT-Y"
                     data-type="insert-selection-area-inside"
+                    role="none"
                   />
                 </div>
                  
@@ -2009,8 +2063,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                 >
                    
                   <div
+                    aria-selected="false"
                     class="jse-json-node s-BfIc3EpAoT-Y"
                     data-path="%2F2%2Fid"
+                    role="treeitem"
+                    tabindex="-1"
                   >
                     <div
                       class="jse-contents-outer s-BfIc3EpAoT-Y"
@@ -2026,6 +2083,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                           <div
                             class="jse-key s-CQ5_eFrkJG3D"
                             data-type="selectable-key"
+                            role="none"
                           >
                             id
                           </div>
@@ -2044,6 +2102,8 @@ exports[`JSONEditor > render tree mode 1`] = `
                         <div
                           class="jse-value jse-number s-47RMrES3SuSW"
                           data-type="selectable-value"
+                          role="button"
+                          tabindex="-1"
                         >
                           3
                         </div>
@@ -2058,6 +2118,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                       <div
                         class="jse-insert-selection-area jse-after s-BfIc3EpAoT-Y"
                         data-type="insert-selection-area-after"
+                        role="none"
                       />
                     </div>
                      
@@ -2083,6 +2144,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                   <div
                     class="jse-insert-selection-area jse-after s-BfIc3EpAoT-Y"
                     data-type="insert-selection-area-after"
+                    role="none"
                   />
                 </div>
                 
