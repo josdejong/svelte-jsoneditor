@@ -1,7 +1,6 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { isJSONArray } from 'immutable-json-patch'
   import type { JSONArray, JSONObject, JSONPath } from 'immutable-json-patch'
   import type { JSONParser } from '$lib/types'
   import { truncate } from '$lib/utils/stringUtils.js'
@@ -12,9 +11,6 @@
   export let parser: JSONParser
   export let isSelected: boolean
   export let onEdit: (path: JSONPath) => void
-
-  $: count = isJSONArray(value) ? value.length : Object.keys(value).length
-  $: description = (isJSONArray(value) ? 'item' : 'prop') + (count === 1 ? '' : 's')
 </script>
 
 <button

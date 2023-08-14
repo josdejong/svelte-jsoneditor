@@ -200,6 +200,7 @@
             <div class="jse-label-inner">Language</div>
           </div>
           <div class="jse-description">
+            <!-- eslint-disable-next-line svelte/no-at-html-tags -->
             {@html getSelectedQueryLanguage(queryLanguageId).description}
           </div>
 

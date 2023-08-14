@@ -12,16 +12,14 @@
   } from '@fortawesome/free-solid-svg-icons'
   import type { JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
-  import { initial, isEmpty } from 'lodash-es'
   import {
-    canConvert,
     getFocusPath,
     isKeySelection,
     isMultiSelection,
     isValueSelection,
     singleItemSelected
   } from '$lib/logic/selection.js'
-  import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
+  import { isObjectOrArray } from '$lib/utils/typeUtils.js'
   import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
   import type { ContextMenuItem, DocumentState, JSONParser } from '$lib/types'
   import { getEnforceString } from '$lib/logic/documentState.js'
@@ -50,43 +48,14 @@
 
   $: hasJson = json !== undefined
   $: hasSelection = !!selection
-  $: rootSelected = selection && isEmpty(getFocusPath(selection))
   $: focusValue = json !== undefined && selection ? getIn(json, getFocusPath(selection)) : undefined
 
   $: hasSelectionContents =
     hasJson &&
     (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))
 
-  $: canDuplicate = hasJson && hasSelectionContents && !rootSelected // must not be root
-
-  $: canExtract =
-    hasJson &&
-    selection != null &&
-    (isMultiSelection(selection) || isValueSelection(selection)) &&
-    !rootSelected // must not be root
-
-  $: canEditKey =
-    json !== undefined &&
-    selection != null &&
-    singleItemSelected(selection) &&
-    !rootSelected &&
-    !Array.isArray(getIn(json, initial(getFocusPath(selection))))
-
   $: canEditValue = hasJson && selection != null && singleItemSelected(selection)
   $: canEnforceString = canEditValue && !isObjectOrArray(focusValue)
-
-  $: convertMode = hasSelectionContents
-  $: insertOrConvertText = convertMode ? 'Convert to:' : 'Insert:'
-  $: canInsertOrConvertStructure = convertMode ? false : hasSelection
-  $: canInsertOrConvertObject = convertMode
-    ? canConvert(selection) && !isObject(focusValue)
-    : hasSelection
-  $: canInsertOrConvertArray = convertMode
-    ? canConvert(selection) && !Array.isArray(focusValue)
-    : hasSelection
-  $: canInsertOrConvertValue = convertMode
-    ? canConvert(selection) && isObjectOrArray(focusValue)
-    : hasSelection
 
   $: enforceString =
     selection != null

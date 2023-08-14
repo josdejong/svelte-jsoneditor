@@ -92,11 +92,12 @@
 
 <div class="jse-navigation-bar" bind:this={refNavigationBar}>
   {#if !editing}
+    <!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -->
     {#each path as item, index (index)}
       <NavigationBarItem {getItems} {path} {index} onSelect={handleSelect} />
     {/each}
     {#if hasNextItem}
-      <NavigationBarItem {getItems} {path} index={undefined} onSelect={handleSelect} />
+      <NavigationBarItem {getItems} {path} index={path.length} onSelect={handleSelect} />
     {/if}
   {:else}
     <NavigationBarPathEditor

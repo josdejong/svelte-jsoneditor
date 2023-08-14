@@ -416,7 +416,6 @@
   $: applySearchThrottled(searchText, json)
 
   let textIsRepaired = false
-  $: textIsUnrepairable = text !== undefined && json === undefined
 
   let validationErrors: ValidationError[] = []
   $: updateValidationErrors(json, validator, parser, validationParser)
