@@ -344,7 +344,7 @@
       const path = activeItem.path
       documentState = {
         ...expandPath(json, documentState, path),
-        selection: undefined // navigation path of current selection would be confusing
+        selection: null // navigation path of current selection would be confusing
       }
       await tick()
       await scrollTo(path)

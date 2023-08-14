@@ -54,7 +54,7 @@ export interface DocumentState {
   enforceStringMap: JSONPointerMap<boolean>
   visibleSectionsMap: JSONPointerMap<VisibleSection[]>
   selection: JSONSelection | null
-  sortedColumn: SortedColumn | undefined // TODO: change undefined to null?
+  sortedColumn: SortedColumn | null
 }
 
 export interface JSONPatchResult {

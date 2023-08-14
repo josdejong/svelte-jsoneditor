@@ -262,7 +262,7 @@
     if (documentState.sortedColumn) {
       documentState = {
         ...documentState,
-        sortedColumn: undefined
+        sortedColumn: null
       }
     }
   }

@@ -12,15 +12,16 @@
   import { truncate } from '$lib/utils/stringUtils.js'
 
   export let path: JSONPath
-  export let sortedColumn: SortedColumn | undefined
+  export let sortedColumn: SortedColumn | null
   export let readOnly: boolean
   export let onSort: (sortedColumn: SortedColumn) => void
 
   // TODO: improve truncating of long column names when they are a deeply nested path: the last item from the path should be visible, and halfway the path is least interesting
   $: columnName = !isEmpty(path) ? stringifyJSONPath(path) : 'values'
 
-  $: sortDirection = isEqual(path, sortedColumn?.path) ? sortedColumn.sortDirection : undefined
-  $: sortDirectionName = SORT_DIRECTION_NAMES[sortDirection]
+  $: sortDirection =
+    sortedColumn && isEqual(path, sortedColumn?.path) ? sortedColumn.sortDirection : undefined
+  $: sortDirectionName = sortDirection ? SORT_DIRECTION_NAMES[sortDirection] : undefined
 
   function handleSort() {
     if (readOnly) {

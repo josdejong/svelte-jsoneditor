@@ -448,7 +448,7 @@ export function clearSortedColumnWhenAffectedByOperations(
   if (mustBeCleared) {
     return {
       ...documentState,
-      sortedColumn: undefined
+      sortedColumn: null
     }
   }
 
@@ -456,7 +456,7 @@ export function clearSortedColumnWhenAffectedByOperations(
 }
 
 export function operationAffectsSortedColumn(
-  sortedColumn: SortedColumn | undefined,
+  sortedColumn: SortedColumn | null,
   operation: JSONPatchOperation,
   columns: JSONPath[]
 ): boolean {
