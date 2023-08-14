@@ -108,7 +108,7 @@ The library provides a standalone bundle of the editor via the npm library `vani
 Browser example loading the ES module:
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <title>JSONEditor</title>

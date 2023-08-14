@@ -35,7 +35,7 @@ Remark: for usage in a Svelte project, install `svelte-jsoneditor` instead.
 ## Use (Browser example loading the ES module):
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <title>JSONEditor</title>
