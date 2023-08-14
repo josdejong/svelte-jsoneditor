@@ -81,7 +81,7 @@
   export let statusBar: boolean
   export let askToFormat: boolean
   export let externalContent: Content
-  export let externalSelection: JSONEditorSelection | undefined
+  export let externalSelection: JSONEditorSelection | null
   export let indentation: number | string
   export let tabSize: number
   export let escapeUnicodeCharacters: boolean
@@ -628,7 +628,7 @@
     }
   }
 
-  function applyExternalSelection(externalSelection: JSONEditorSelection | undefined) {
+  function applyExternalSelection(externalSelection: JSONEditorSelection | null) {
     if (!isTextSelection(externalSelection)) {
       return
     }
@@ -642,10 +642,8 @@
     }
   }
 
-  function toCodeMirrorSelection(
-    selection: JSONEditorSelection | undefined
-  ): EditorSelection | undefined {
-    return isTextSelection(selection) ? EditorSelection.fromJSON(selection) : undefined
+  function toCodeMirrorSelection(selection: JSONEditorSelection | null): EditorSelection | null {
+    return isTextSelection(selection) ? EditorSelection.fromJSON(selection) : null
   }
 
   /**

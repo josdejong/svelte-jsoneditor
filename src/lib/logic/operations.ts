@@ -345,7 +345,7 @@ export function extract(json: JSONValue, selection: JSONSelection): JSONPatchDoc
 // TODO: write unit tests
 export function insert(
   json: JSONValue,
-  selection: JSONSelection | undefined,
+  selection: JSONSelection | null,
   clipboardText: string,
   parser: JSONParser
 ): JSONPatchDocument {
@@ -453,7 +453,7 @@ export function insert(
 
 export function moveInsideParent(
   json: JSONValue,
-  selection: JSONSelection | undefined,
+  selection: JSONSelection | null,
   dragInsideAction: DragInsideAction
 ): JSONPatchDocument {
   if (!selection) {
@@ -537,7 +537,7 @@ export function moveInsideParent(
 
 export function createNewValue(
   json: JSONValue | undefined,
-  selection: JSONSelection | undefined,
+  selection: JSONSelection | null,
   valueType: 'object' | 'array' | 'structure' | 'value'
 ) {
   if (valueType === 'object') {
@@ -650,7 +650,7 @@ export function clipboardToValues(clipboardText: string, parser: JSONParser): Cl
 export function createRemoveOperations(
   json: JSONValue,
   selection: JSONSelection
-): { newSelection: JSONSelection | undefined; operations: JSONPatchDocument } {
+): { newSelection: JSONSelection | null; operations: JSONPatchDocument } {
   if (isKeySelection(selection)) {
     // FIXME: DOESN'T work yet
     const parentPath = initial(selection.path)

@@ -62,7 +62,7 @@
   const debug = createDebug('jsoneditor:JSONEditor')
 
   export let content: Content = { text: '' }
-  export let selection: JSONEditorSelection | undefined = undefined
+  export let selection: JSONEditorSelection | null = null
 
   export let readOnly = false
   export let indentation: number | string = 2
@@ -88,7 +88,7 @@
 
   export let onChangeQueryLanguage: OnChangeQueryLanguage = noop
   export let onChange: OnChange = null
-  export let onSelect: OnSelect = null
+  export let onSelect: OnSelect = noop
   export let onRenderValue: OnRenderValue = renderValue
   export let onClassName: OnClassName = () => undefined
   export let onRenderMenu: OnRenderMenu = noop
@@ -195,7 +195,7 @@
     return result
   }
 
-  export async function select(newSelection: JSONEditorSelection | undefined) {
+  export async function select(newSelection: JSONEditorSelection | null) {
     selection = newSelection
   }
 
@@ -277,12 +277,10 @@
     }
   }
 
-  function handleSelect(updatedSelection: JSONEditorSelection | undefined) {
+  function handleSelect(updatedSelection: JSONEditorSelection | null) {
     selection = updatedSelection
 
-    if (onSelect) {
-      onSelect(updatedSelection)
-    }
+    onSelect(updatedSelection)
   }
 
   function handleFocus() {

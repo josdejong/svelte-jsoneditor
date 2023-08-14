@@ -77,6 +77,7 @@
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
   import { isObject } from '$lib/utils/typeUtils.js'
   import { classnames } from '$lib/utils/cssUtils.js'
+  import { isEditingSelection } from '$lib'
 
   export let value: JSONValueType
   export let path: JSONPath
@@ -85,7 +86,7 @@
   export let visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
   export let validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   export let searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
-  export let selection: JSONSelection | undefined
+  export let selection: JSONSelection | null
   export let context: TreeModeContext
   export let onDragSelectionStart
 
@@ -134,8 +135,8 @@
     visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined,
     validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined,
     searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
-    selection: JSONSelection | undefined,
-    dragging: DraggingState
+    selection: JSONSelection | null,
+    dragging: DraggingState | undefined
   ): JSONNodeProp[] {
     let props = Object.keys(object).map((key) => {
       const keyPath = memoizePath(path.concat(key))
@@ -177,8 +178,8 @@
     visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined,
     validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined,
     searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
-    selection: JSONSelection | undefined,
-    dragging: DraggingState
+    selection: JSONSelection | null,
+    dragging: DraggingState | undefined
   ): JSONNodeItem[] {
     const start = visibleSection.start
     const end = Math.min(visibleSection.end, array.length)
@@ -339,7 +340,6 @@
         singleton.selectionFocus = path
         singleton.selectionAnchorType = selectionType // TODO: this is a bit ugly
 
-        const json = context.getJson()
         context.onSelect(
           createMultiSelection(
             singleton.selectionAnchor || singleton.selectionFocus,
@@ -876,11 +876,11 @@
           {path}
           {value}
           {enforceString}
-          selection={isNodeSelected ? selection : undefined}
+          selection={isNodeSelected ? selection : null}
           searchResultItems={filterValueSearchResults(searchResultItemsMap, pointer)}
           {context}
         />
-        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(getFocusPath(selection), path)}
+        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !isEditingSelection(selection) && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
             <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>

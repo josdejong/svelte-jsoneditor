@@ -33,7 +33,7 @@
   import { isMenuSpaceItem } from '$lib/typeguards.js'
 
   export let content: Content
-  export let selection: JSONEditorSelection | undefined
+  export let selection: JSONEditorSelection | null
 
   export let readOnly: boolean
   export let indentation: number | string

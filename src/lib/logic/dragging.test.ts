@@ -151,7 +151,7 @@ describe('dragging', () => {
     const documentState = createDocumentState({
       json,
       expand: () => true,
-      select: (json) => createMultiSelection(['object', 'c'], ['object', 'e'])
+      select: () => createMultiSelection(['object', 'c'], ['object', 'e'])
     })
     const allItems = Object.keys(json.object).map((key) => ({
       path: ['object', key],

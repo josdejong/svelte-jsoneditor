@@ -59,9 +59,9 @@
   $: selection = documentState.selection
 
   $: hasJson = json !== undefined
-  $: hasSelection = selection != null
-  $: rootSelected = hasSelection && isEmpty(getFocusPath(selection))
-  $: focusValue = hasSelection ? getIn(json, getFocusPath(selection)) : undefined
+  $: hasSelection = !!selection
+  $: rootSelected = selection && isEmpty(getFocusPath(selection))
+  $: focusValue = selection ? getIn(json, getFocusPath(selection)) : undefined
   $: editValueText = Array.isArray(focusValue)
     ? 'Edit array'
     : isObject(focusValue)

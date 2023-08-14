@@ -779,7 +779,7 @@ describe('selection', () => {
     test('should get selection from removing a key', () => {
       assert.deepStrictEqual(
         createSelectionFromOperations(json, [{ op: 'remove', path: '/str' }]),
-        undefined
+        null
       )
     })
 
@@ -824,10 +824,7 @@ describe('selection', () => {
       assert.deepStrictEqual(selectionIfOverlapping(json, selection, []), selection)
       assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj']), selection)
       assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj', 'arr']), selection)
-      assert.deepStrictEqual(
-        selectionIfOverlapping(json, selection, ['obj', 'arr', '0']),
-        undefined
-      )
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj', 'arr', '0']), null)
     })
 
     test('should determine whether a ValueSelection is relevant for given pointer', () => {
@@ -848,10 +845,7 @@ describe('selection', () => {
       assert.deepStrictEqual(selectionIfOverlapping(json, selection, []), selection)
       assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj']), selection)
       assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj', 'arr']), selection)
-      assert.deepStrictEqual(
-        selectionIfOverlapping(json, selection, ['obj', 'arr', '0']),
-        undefined
-      )
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj', 'arr', '0']), null)
     })
 
     test('should determine whether an InsideSelection is relevant for given pointer', () => {
@@ -860,10 +854,7 @@ describe('selection', () => {
       assert.deepStrictEqual(selectionIfOverlapping(json, selection, []), selection)
       assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj']), selection)
       assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj', 'arr']), selection)
-      assert.deepStrictEqual(
-        selectionIfOverlapping(json, selection, ['obj', 'arr', '0']),
-        undefined
-      )
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['obj', 'arr', '0']), null)
     })
 
     test('should determine whether a MultiSelection is relevant for given pointer', () => {
@@ -892,9 +883,9 @@ describe('selection', () => {
         selectionIfOverlapping(json, selection, ['obj', 'arr', '2', 'last']),
         selection
       )
-      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['str']), undefined)
-      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['nill']), undefined)
-      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['bool']), undefined)
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['str']), null)
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['nill']), null)
+      assert.deepStrictEqual(selectionIfOverlapping(json, selection, ['bool']), null)
     })
   })
 

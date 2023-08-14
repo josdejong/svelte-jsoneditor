@@ -148,7 +148,7 @@
 
   export let readOnly: boolean
   export let externalContent: Content
-  export let externalSelection: JSONEditorSelection | undefined
+  export let externalSelection: JSONEditorSelection | null
   export let mainMenuBar: boolean
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
@@ -270,13 +270,13 @@
   function updateSelection(
     selection:
       | JSONSelection
-      | undefined
-      | ((selection: JSONSelection | undefined) => JSONSelection | undefined)
+      | null
+      | ((selection: JSONSelection | null) => JSONSelection | null | void | undefined)
   ) {
     debug('updateSelection', selection)
 
     const updatedSelection =
-      typeof selection === 'function' ? selection(documentState.selection) : selection
+      typeof selection === 'function' ? selection(documentState.selection) || null : selection
 
     if (!isEqual(updatedSelection, documentState.selection)) {
       documentState = {
@@ -291,12 +291,11 @@
   }
 
   function clearSelectionWhenNotExisting(json: JSONValue | undefined) {
-    if (documentState.selection === undefined || json === undefined) {
+    if (!documentState.selection || json === undefined) {
       return
     }
 
     if (
-      documentState.selection &&
       existsIn(json, getAnchorPath(documentState.selection)) &&
       existsIn(json, getFocusPath(documentState.selection))
     ) {
@@ -428,7 +427,7 @@
     emitOnChange(previousContent, patchResult)
   }
 
-  function applyExternalSelection(externalSelection: JSONEditorSelection | undefined) {
+  function applyExternalSelection(externalSelection: JSONEditorSelection | null) {
     if (!isEqual(documentState.selection, externalSelection)) {
       debug('applyExternalSelection', externalSelection)
 
@@ -740,14 +739,14 @@
     }
   }
 
-  function createDefaultSelection(): JSONSelection | undefined {
+  function createDefaultSelection(): JSONSelection | null {
     if (isJSONArray(json) && !isEmpty(json) && !isEmpty(columns)) {
       // Select the first row, first column
       const path = ['0', ...columns[0]]
 
       return createValueSelection(path, false)
     } else {
-      return undefined
+      return null
     }
   }
 
@@ -1325,7 +1324,7 @@
 
     if (combo === 'Escape' && documentState.selection) {
       event.preventDefault()
-      updateSelection(undefined)
+      updateSelection(null)
     }
 
     if (combo === 'Ctrl+F') {
@@ -1813,10 +1812,10 @@
                           compileJSONPointer(path),
                           context.parser
                         )}
-                        selection={isSelected ? documentState.selection : undefined}
+                        selection={isSelected ? documentState.selection : null}
                         {searchResultItems}
                         {context}
-                      />{/if}{#if !readOnly && isSelected && !documentState.selection.edit}
+                      />{/if}{#if !readOnly && isSelected && !isEditingSelection(documentState.selection)}
                       <div class="jse-context-menu-anchor">
                         <ContextMenuPointer selected={true} onContextMenu={openContextMenu} />
                       </div>

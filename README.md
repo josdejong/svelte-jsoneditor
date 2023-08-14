@@ -197,7 +197,7 @@ const editor = new JSONEditor({
 ### properties
 
 - `content: Content` Pass the JSON contents to be rendered in the JSONEditor. `Content` is an object containing a property `json` (a parsed JSON document) or `text` (a stringified JSON document). Only one of the two properties must be defined. You can pass both content types to the editor independent of in what mode it is.
-- `selection: JSONEditorSelection | undefined` The current selected contents. Not every mode can represent every selection type. The `tree` mode supports `MultiSelection`, `KeySelection`, `ValueSelection`, `InsideSelection`, or `AfterSelection`. The `table` mode supports `ValueSelection`, and `text` mode supports `TextSelection.`.
+- `selection: JSONEditorSelection | null` The current selected contents. Not every mode can represent every selection type. The `tree` mode supports `MultiSelection`, `KeySelection`, `ValueSelection`, `InsideSelection`, or `AfterSelection`. The `table` mode supports `ValueSelection`, and `text` mode supports `TextSelection.`.
 - `mode: 'tree' | 'text' | 'table'`. Open the editor in `'tree'` mode (default), `'table'` mode, or `'text'` mode (formerly: `code` mode).
 - `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
 - `navigationBar: boolean` Show the navigation bar with, where you can see the selected path and navigate through your document from there. Default value is `true`.
@@ -314,7 +314,7 @@ const editor = new JSONEditor({
     }
     ```
 
-- `onSelect: (selection: JSONEditorSelection | undefined) => void`
+- `onSelect: (selection: JSONEditorSelection | null) => void`
 
   Callback invoked when the selection is changed by the user. When the selection is removed, the callback is invoked with `undefined` as argument. In `text` mode, a `TextSelection` will be fired. In `tree` and `table` mode, a `JSONSelection` will be fired (which can be `MultiSelection`, `KeySelection`, `ValueSelection`, `InsideSelection`, or `AfterSelection`). Use typeguards like `isTextSelection` and `isValueSelection` to check what type the selection has.
 
@@ -368,7 +368,7 @@ Note that most methods are asynchronous and will resolve after the editor is re-
 - `acceptAutoRepair(): Promise<Content>` In tree mode, invalid JSON is automatically repaired when loaded. When the repair was successful, the repaired contents are rendered but not yet applied to the document itself until the user clicks "Ok" or starts editing the data. Instead of accepting the repair, the user can also click "Repair manually instead". Invoking `.acceptAutoRepair()` will programmatically accept the repair. This will trigger an update, and the method itself also returns the updated contents. In case of `text` mode or when the editor is not in an "accept auto repair" status, nothing will happen, and the contents will be returned as is.
 - `refresh(): Promise<void>`. Refresh rendering of the contents, for example after changing the font size. This is only available in `text` mode.
 - `validate() : ContentErrors | null`. Get all current parse errors and validation errors.
-- `select(newSelection: JSONEditorSelection | undefined)` change the current selection. See also option `selection`.
+- `select(newSelection: JSONEditorSelection | null)` change the current selection. See also option `selection`.
 - `focus(): Promise<void>`. Give the editor focus.
 - `destroy(): Promise<void>`. Destroy the editor, remove it from the DOM.
 

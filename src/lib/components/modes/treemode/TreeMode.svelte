@@ -175,7 +175,7 @@
 
   export let readOnly: boolean
   export let externalContent: Content
-  export let externalSelection: JSONEditorSelection | undefined
+  export let externalSelection: JSONEditorSelection | null
   export let mainMenuBar: boolean
   export let navigationBar: boolean
   export let escapeControlCharacters: boolean
@@ -229,13 +229,13 @@
   function updateSelection(
     selection:
       | JSONSelection
-      | undefined
-      | ((selection: JSONSelection | undefined) => JSONSelection | undefined)
+      | null
+      | ((selection: JSONSelection | null) => JSONSelection | null | undefined | void)
   ) {
     debug('updateSelection', selection)
 
     const updatedSelection =
-      typeof selection === 'function' ? selection(documentState.selection) : selection
+      typeof selection === 'function' ? selection(documentState.selection) || null : selection
 
     if (!isEqual(updatedSelection, documentState.selection)) {
       documentState = {
@@ -243,9 +243,7 @@
         selection: updatedSelection
       }
 
-      if (onSelect) {
-        onSelect(updatedSelection)
-      }
+      onSelect(updatedSelection)
     }
   }
 
@@ -602,7 +600,7 @@
     emitOnChange(previousContent, patchResult)
   }
 
-  function applyExternalSelection(externalSelection: JSONEditorSelection | undefined) {
+  function applyExternalSelection(externalSelection: JSONEditorSelection | null) {
     if (!isEqual(documentState.selection, externalSelection)) {
       debug('applyExternalSelection', externalSelection)
 
@@ -622,12 +620,11 @@
   }
 
   function clearSelectionWhenNotExisting(json) {
-    if (documentState.selection === undefined) {
+    if (!documentState.selection) {
       return
     }
 
     if (
-      documentState.selection &&
       existsIn(json, getAnchorPath(documentState.selection)) &&
       existsIn(json, getFocusPath(documentState.selection))
     ) {
@@ -1066,7 +1063,9 @@
       handlePatch(operations, (patchedJson, patchedState) => {
         // expand converted object/array
         return {
-          state: expandRecursive(patchedJson, patchedState, getFocusPath(documentState.selection))
+          state: documentState.selection
+            ? expandRecursive(patchedJson, patchedState, getFocusPath(documentState.selection))
+            : documentState
         }
       })
     } catch (err) {
@@ -1075,6 +1074,10 @@
   }
 
   function handleInsertBefore() {
+    if (!documentState.selection) {
+      return
+    }
+
     const selectionBefore = getSelectionUp(json, documentState, false)
     const parentPath = initial(getFocusPath(documentState.selection))
 
@@ -1559,7 +1562,7 @@
       // check whether the selection is still visible and not collapsed
       if (isSelectionInsidePath(documentState.selection, path)) {
         // remove selection when not visible anymore
-        updateSelection(undefined)
+        updateSelection(null)
       }
     }
 
@@ -1760,7 +1763,7 @@
 
     if (combo === 'Escape' && documentState.selection) {
       event.preventDefault()
-      updateSelection(undefined)
+      updateSelection(null)
     }
 
     if (combo === 'Ctrl+F') {
@@ -2040,7 +2043,7 @@
     }
   }
 
-  function findNextInside(path: JSONPath): JSONSelection {
+  function findNextInside(path: JSONPath): JSONSelection | null {
     return getSelectionNextInside(json, documentState, path)
   }
 

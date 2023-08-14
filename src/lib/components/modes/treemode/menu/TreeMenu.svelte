@@ -20,7 +20,7 @@
   import type { HistoryState } from '$lib/logic/history.js'
 
   export let json: JSONValue
-  export let selection: JSONSelection | undefined
+  export let selection: JSONSelection | null
 
   export let readOnly: boolean
   export let showSearch = false
@@ -41,7 +41,7 @@
   }
 
   $: hasJson = json !== undefined
-  $: hasSelection = selection != null
+  $: hasSelection = !!selection
   $: hasSelectionContents =
     hasJson &&
     (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))

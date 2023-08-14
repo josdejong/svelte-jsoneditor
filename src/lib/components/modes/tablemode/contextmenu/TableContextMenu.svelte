@@ -49,10 +49,9 @@
   $: selection = documentState.selection
 
   $: hasJson = json !== undefined
-  $: hasSelection = selection != null
-  $: rootSelected = selection != null && isEmpty(getFocusPath(selection))
-  $: focusValue =
-    json !== undefined && selection != null ? getIn(json, getFocusPath(selection)) : undefined
+  $: hasSelection = !!selection
+  $: rootSelected = selection && isEmpty(getFocusPath(selection))
+  $: focusValue = json !== undefined && selection ? getIn(json, getFocusPath(selection)) : undefined
 
   $: hasSelectionContents =
     hasJson &&

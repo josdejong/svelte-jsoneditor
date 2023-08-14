@@ -10,7 +10,7 @@
   export let sectionIndex: number
   export let total: number
   export let path: JSONPath
-  export let selection: JSONSelection | undefined
+  export let selection: JSONSelection | null
   export let onExpandSection: (path: JSONPath, section: Section) => void
   export let context: JSONEditorContext
 

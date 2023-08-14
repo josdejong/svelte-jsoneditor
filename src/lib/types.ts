@@ -53,7 +53,7 @@ export interface DocumentState {
   expandedMap: JSONPointerMap<boolean>
   enforceStringMap: JSONPointerMap<boolean>
   visibleSectionsMap: JSONPointerMap<VisibleSection[]>
-  selection: JSONSelection | undefined // TODO: change undefined to null?
+  selection: JSONSelection | null
   sortedColumn: SortedColumn | undefined // TODO: change undefined to null?
 }
 
@@ -293,7 +293,7 @@ export type OnChange =
   | ((content: Content, previousContent: Content, status: OnChangeStatus) => void)
   | null
 export type OnJSONSelect = (selection: JSONSelection) => void
-export type OnSelect = (selection: JSONEditorSelection | undefined) => void
+export type OnSelect = (selection: JSONEditorSelection | null) => void
 export type OnPatch = (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
 export type OnChangeText = (updatedText: string, afterPatch?: AfterPatchCallback) => void
 export type OnSort = (params: {
@@ -322,7 +322,7 @@ export type OnBlur = () => void
 export type OnSortModal = (props: SortModalCallback) => void
 export type OnTransformModal = (props: TransformModalCallback) => void
 export type OnJSONEditorModal = (props: JSONEditorModalCallback) => void
-export type FindNextInside = (path: JSONPath) => JSONSelection | undefined
+export type FindNextInside = (path: JSONPath) => JSONSelection | null
 
 export interface SearchResult {
   items: ExtendedSearchResultItem[]
@@ -481,7 +481,7 @@ export interface RenderValuePropsOptional {
   value?: JSONValue
   readOnly?: boolean
   enforceString?: boolean
-  selection?: JSONSelection
+  selection?: JSONSelection | null
   searchResultItems?: SearchResultItem[]
   isEditing?: boolean
   parser?: JSONParser
@@ -499,7 +499,7 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   value: JSONValue
   readOnly: boolean
   enforceString: boolean
-  selection: JSONSelection | undefined
+  selection: JSONSelection | null
   searchResultItems: SearchResultItem[] | undefined
   isEditing: boolean
   parser: JSONParser
@@ -522,7 +522,7 @@ export interface JSONNodeProp {
   validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   keySearchResultItemsMap: ExtendedSearchResultItem[] | undefined
   valueSearchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
-  selection: JSONSelection | undefined
+  selection: JSONSelection | null
 }
 
 export interface JSONNodeItem {
@@ -534,7 +534,7 @@ export interface JSONNodeItem {
   visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
   validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
-  selection: JSONSelection | undefined
+  selection: JSONSelection | null
 }
 
 export interface DraggingState {

@@ -83,8 +83,8 @@
     json: undefined
   }
 
-  let selectionTree = undefined
-  let selectionText = undefined
+  let selectionTree = null
+  let selectionText = null
 
   const schema = {
     title: 'Employee',
@@ -612,8 +612,8 @@
     </button>
     <button
       on:click={() => {
-        refTreeEditor.select(undefined)
-        refTextEditor.select(undefined)
+        refTreeEditor.select(null)
+        refTextEditor.select(null)
       }}
     >
       Select nothing

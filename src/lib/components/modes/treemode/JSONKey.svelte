@@ -20,16 +20,14 @@
 
   export let path: JSONPath
   export let key: string
-  export let selection: JSONSelection | undefined
+  export let selection: JSONSelection | null
   export let searchResultItems: ExtendedSearchResultItem[] | undefined
   export let onUpdateKey: (oldKey: string, newKey: string) => string
 
   export let context: TreeModeContext
 
-  $: isKeySelected = selection
-    ? isKeySelection(selection) && isEqual(selection.path, path)
-    : undefined
-  $: isEditingKey = isKeySelected && selection && isEditingSelection(selection)
+  $: isKeySelected = selection ? isKeySelection(selection) && isEqual(selection.path, path) : false
+  $: isEditingKey = isKeySelected && isEditingSelection(selection)
 
   function handleKeyDoubleClick(event) {
     if (!isEditingKey && !context.readOnly) {
@@ -38,7 +36,7 @@
     }
   }
 
-  function getKeyClass(key) {
+  function getKeyClass(key: string) {
     return classnames('jse-key', {
       'jse-empty': key === ''
     })

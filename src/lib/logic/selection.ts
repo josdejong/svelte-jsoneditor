@@ -36,44 +36,40 @@ import { CaretType, SelectionType } from '$lib/types.js'
 import { int } from '$lib/utils/numberUtils.js'
 
 export function isAfterSelection(
-  selection: JSONEditorSelection | undefined
+  selection: JSONEditorSelection | null
 ): selection is AfterSelection {
   return (selection && selection.type === SelectionType.after) || false
 }
 
 export function isInsideSelection(
-  selection: JSONEditorSelection | undefined
+  selection: JSONEditorSelection | null
 ): selection is InsideSelection {
   return (selection && selection.type === SelectionType.inside) || false
 }
 
-export function isKeySelection(
-  selection: JSONEditorSelection | undefined
-): selection is KeySelection {
+export function isKeySelection(selection: JSONEditorSelection | null): selection is KeySelection {
   return (selection && selection.type === SelectionType.key) || false
 }
 
 export function isValueSelection(
-  selection: JSONEditorSelection | undefined
+  selection: JSONEditorSelection | null
 ): selection is ValueSelection {
   return (selection && selection.type === SelectionType.value) || false
 }
 
 export function isMultiSelection(
-  selection: JSONEditorSelection | undefined
+  selection: JSONEditorSelection | null
 ): selection is MultiSelection {
   return (selection && selection.type === SelectionType.multi) || false
 }
 
 export function isMultiSelectionWithOneItem(
-  selection: JSONEditorSelection | undefined
+  selection: JSONEditorSelection | null
 ): selection is MultiSelection {
   return isMultiSelection(selection) && isEqual(selection.focusPath, selection.anchorPath)
 }
 
-export function isTextSelection(
-  selection: JSONEditorSelection | undefined
-): selection is TextSelection {
+export function isTextSelection(selection: JSONEditorSelection | null): selection is TextSelection {
   return (selection && selection.type === SelectionType.text) || false
 }
 
@@ -103,7 +99,7 @@ export function getSelectionPaths(json: JSONValue, selection: JSONSelection): JS
  */
 export function iterateOverSelection<T>(
   json: JSONValue | undefined,
-  selection: JSONSelection | undefined,
+  selection: JSONSelection | null,
   callback: (path: JSONPath) => void | undefined | T
 ): void | undefined | T {
   if (!selection) {
@@ -483,7 +479,7 @@ export function getInitialSelection(json: JSONValue, documentState: DocumentStat
 export function createSelectionFromOperations(
   json: JSONValue,
   operations: JSONPatchDocument
-): JSONSelection | undefined {
+): JSONSelection | null {
   if (operations.length === 1) {
     const operation = first(operations) as JSONPatchOperation
     if (operation.op === 'replace' || operation.op === 'move') {
@@ -522,7 +518,7 @@ export function createSelectionFromOperations(
     .map((operation) => parsePath(json, operation.path))
 
   if (isEmpty(paths)) {
-    return undefined
+    return null
   }
 
   // TODO: make this function robust against operations which do not have consecutive paths or have wrongly ordered paths
@@ -548,7 +544,7 @@ export function findSharedPath(path1: JSONPath, path2: JSONPath): JSONPath {
   return path1.slice(0, i)
 }
 
-export function singleItemSelected(selection: JSONSelection | undefined): boolean {
+export function singleItemSelected(selection: JSONSelection | null): boolean {
   return (
     isKeySelection(selection) ||
     isValueSelection(selection) ||
@@ -642,7 +638,7 @@ export function createMultiSelection(anchorPath: JSONPath, focusPath: JSONPath):
  */
 export function selectionToPartialJson(
   json: JSONValue,
-  selection: JSONSelection | undefined,
+  selection: JSONSelection | null,
   indentation: number | string | undefined,
   parser: JSONParser
 ): string | null {
@@ -691,20 +687,16 @@ export function selectionToPartialJson(
   return null
 }
 
-export function isEditingSelection(selection: JSONSelection | undefined): boolean {
-  return (
-    selection !== undefined &&
-    (isKeySelection(selection) || isValueSelection(selection)) &&
-    selection.edit === true
-  )
+export function isEditingSelection(selection: JSONSelection | null): boolean {
+  return (isKeySelection(selection) || isValueSelection(selection)) && selection.edit === true
 }
 
 export function updateSelectionInDocumentState(
   documentState: DocumentState,
-  selection: JSONSelection | undefined,
+  selection: JSONSelection | null,
   replaceIfUndefined = true
 ): DocumentState {
-  if (selection === undefined && !replaceIfUndefined) {
+  if (!selection && !replaceIfUndefined) {
     return documentState
   }
 
@@ -723,7 +715,7 @@ export function selectAll(): JSONSelection {
 }
 
 // TODO: write unit tests
-export function hasSelectionContents(selection: JSONSelection | undefined): boolean {
+export function hasSelectionContents(selection: JSONSelection | null): boolean {
   return isKeySelection(selection) || isValueSelection(selection) || isMultiSelection(selection)
 }
 
@@ -731,7 +723,7 @@ export function hasSelectionContents(selection: JSONSelection | undefined): bool
  * Test whether the current selection can be converted.
  * That is the case when the selection is a key/value, or a multi selection with only one path
  */
-export function canConvert(selection: JSONSelection): boolean {
+export function canConvert(selection: JSONSelection | null): boolean {
   return (
     isKeySelection(selection) ||
     isValueSelection(selection) ||
@@ -776,11 +768,11 @@ export function fromSelectionType(
 
 export function selectionIfOverlapping(
   json: JSONValue | undefined,
-  selection: JSONSelection | undefined,
+  selection: JSONSelection | null,
   path: JSONPath
-): JSONSelection | undefined {
+): JSONSelection | null {
   if (!selection) {
-    return undefined
+    return null
   }
 
   if (pathInSelection(json, selection, path)) {
@@ -792,12 +784,12 @@ export function selectionIfOverlapping(
     return selection
   }
 
-  return undefined
+  return null
 }
 
 export function pathInSelection(
   json: JSONValue | undefined,
-  selection: JSONSelection | undefined,
+  selection: JSONSelection | null,
   path: JSONPath
 ): boolean {
   if (json === undefined || !selection) {
