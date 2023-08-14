@@ -303,7 +303,7 @@
     debug('clearing selection: path does not exist anymore', documentState.selection)
     documentState = {
       ...documentState,
-      selection: getInitialSelection(json, documentState)
+      selection: null // TODO: try find the closest cell that still exists (similar to getInitialSelection)
     }
   }
 
@@ -429,17 +429,21 @@
     if (!isEqual(documentState.selection, externalSelection)) {
       debug('applyExternalSelection', externalSelection)
 
-      if (!isValueSelection(externalSelection)) {
-        return
+      if (externalSelection === null) {
+        updateSelection(externalSelection)
       }
 
-      // check whether the selection is a leaf, and not an object (that would select multiple cells)
-      const value = getIn(json, externalSelection.path)
-      if (isObjectOrArray(value)) {
-        return
+      if (isValueSelection(externalSelection)) {
+        // check whether the selection is a leaf, and not an object (that would select multiple cells)
+        const value = getIn(json, externalSelection.path)
+        if (isObjectOrArray(value)) {
+          return
+        }
+
+        updateSelection(externalSelection)
       }
 
-      updateSelection(externalSelection)
+      // we ignore other selection types like key or inline
     }
   }
 

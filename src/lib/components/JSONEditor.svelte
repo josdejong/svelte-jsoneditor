@@ -398,15 +398,9 @@
         validator: undefined, // TODO: support partial JSON validation?
         validationParser,
         pathParser,
-
-        // TODO: verify whether we need wrapper functions for the next
-        // onChange, // TODO: cleanup when indeed not needed
         onRenderValue,
         onClassName,
         onRenderMenu,
-        // onError, // TODO: cleanup when indeed not needed
-        // onFocus, // TODO: cleanup when indeed not needed
-        // onBlur, // TODO: cleanup when indeed not needed
         onSortModal,
         onTransformModal
       }),
