@@ -26,6 +26,7 @@
     ContentErrors,
     JSONEditorModalCallback,
     JSONEditorPropsOptional,
+    JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
     JSONPathParser,
@@ -40,6 +41,7 @@
     OnFocus,
     OnRenderMenu,
     OnRenderValue,
+    OnSelect,
     QueryLanguage,
     SortModalCallback,
     TransformModalCallback,
@@ -60,6 +62,7 @@
   const debug = createDebug('jsoneditor:JSONEditor')
 
   export let content: Content = { text: '' }
+  export let selection: JSONEditorSelection | null = null
 
   export let readOnly = false
   export let indentation: number | string = 2
@@ -85,6 +88,7 @@
 
   export let onChangeQueryLanguage: OnChangeQueryLanguage = noop
   export let onChange: OnChange = null
+  export let onSelect: OnSelect = noop
   export let onRenderValue: OnRenderValue = renderValue
   export let onClassName: OnClassName = () => undefined
   export let onRenderMenu: OnRenderMenu = noop
@@ -191,6 +195,12 @@
     return result
   }
 
+  export async function select(newSelection: JSONEditorSelection | null) {
+    selection = newSelection
+
+    await tick() // await rerender
+  }
+
   export async function expand(callback?: OnExpand): Promise<void> {
     refJSONEditorRoot.expand(callback)
 
@@ -267,6 +277,12 @@
     if (onChange) {
       onChange(updatedContent, previousContent, status)
     }
+  }
+
+  function handleSelect(updatedSelection: JSONEditorSelection | null) {
+    selection = updatedSelection
+
+    onSelect(updatedSelection)
   }
 
   function handleFocus() {
@@ -382,15 +398,9 @@
         validator: undefined, // TODO: support partial JSON validation?
         validationParser,
         pathParser,
-
-        // TODO: verify whether we need wrapper functions for the next
-        // onChange, // TODO: cleanup when indeed not needed
         onRenderValue,
         onClassName,
         onRenderMenu,
-        // onError, // TODO: cleanup when indeed not needed
-        // onFocus, // TODO: cleanup when indeed not needed
-        // onBlur, // TODO: cleanup when indeed not needed
         onSortModal,
         onTransformModal
       }),
@@ -431,6 +441,7 @@
             bind:this={refJSONEditorRoot}
             {mode}
             {content}
+            {selection}
             {readOnly}
             {indentation}
             {tabSize}
@@ -450,6 +461,7 @@
             {onError}
             onChange={handleChange}
             onChangeMode={toggleMode}
+            onSelect={handleSelect}
             {onRenderValue}
             {onClassName}
             onFocus={handleFocus}

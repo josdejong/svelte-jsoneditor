@@ -1,14 +1,17 @@
 <script lang="ts">
   import {
     createAjvValidator,
+    createValueSelection,
     EditableValue,
     javascriptQueryLanguage,
     jmespathQueryLanguage,
     JSONEditor,
+    type JSONEditorSelection,
     lodashQueryLanguage,
     type MenuItem,
     ReadonlyValue,
-    renderValue
+    renderValue,
+    SelectionType
   } from 'svelte-jsoneditor'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
@@ -17,6 +20,7 @@
   import { truncate } from '$lib/utils/stringUtils.js'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils.js'
   import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
+  import { toJSONContent } from '$lib/utils/jsonUtils.js'
 
   // const LosslessJSON: JSONParser = { ... } // FIXME: make the types work
   const LosslessJSON = {
@@ -79,6 +83,9 @@
 }`,
     json: undefined
   }
+
+  let selectionTree = null
+  let selectionText = null
 
   const schema = {
     title: 'Employee',
@@ -204,6 +211,7 @@
   const showTreeEditor = useLocalStorage('svelte-jsoneditor-demo-showTreeEditor', true)
   const showTextEditor = useLocalStorage('svelte-jsoneditor-demo-showTextEditor', true)
   const showRawContents = useLocalStorage('svelte-jsoneditor-demo-showRawContents', false)
+  const showSelection = useLocalStorage('svelte-jsoneditor-demo-showSelection', false)
   let height = '440px'
   const validate = useLocalStorage('svelte-jsoneditor-demo-validate', false)
   const validateArray = useLocalStorage('svelte-jsoneditor-demo-validate-array', false)
@@ -320,6 +328,14 @@
       contentErrors,
       patchResult
     })
+  }
+
+  function onSelectTree(selection: JSONEditorSelection) {
+    console.log('onSelectTree', selection)
+  }
+
+  function onSelectText(selection: JSONEditorSelection) {
+    console.log('onSelectText', selection)
   }
 
   function onChangeMode(mode) {
@@ -565,7 +581,43 @@
         refTreeEditor.scrollTo(['669', 'array'])
       }}
     >
-      Scroll to [669, 'array']
+      Scroll to ['669', 'array']
+    </button>
+    <button
+      on:click={() => {
+        selectionTree = createValueSelection(['object', 'a'], false)
+        refTreeEditor.focus()
+      }}
+    >
+      Select ['object', 'a']
+    </button>
+    <button
+      on:click={() => {
+        refTreeEditor.select(createValueSelection(['669', 'name'], false))
+        refTreeEditor.focus()
+      }}
+    >
+      Select ['669', 'name']
+    </button>
+    <button
+      on:click={() => {
+        refTextEditor.select({
+          type: SelectionType.text,
+          ranges: [{ anchor: 5, head: 12 }],
+          main: 0
+        })
+        refTextEditor.focus()
+      }}
+    >
+      Select char 5 to 12
+    </button>
+    <button
+      on:click={() => {
+        refTreeEditor.select(null)
+        refTextEditor.select(null)
+      }}
+    >
+      Select nothing
     </button>
   </p>
   <p class="buttons">
@@ -578,7 +630,7 @@
     </button>
     <button
       on:click={() => {
-        const content = refTreeEditor.get()
+        const content = toJSONContent(refTreeEditor.get(), LosslessJSON)
         const updatedContent = {
           json: { ...content.json, updated: '2022-09-01T10:13:44Z' }
         }
@@ -617,6 +669,9 @@
     <label>
       <input type="checkbox" bind:checked={$showRawContents} /> Show raw contents (at the bottom)
     </label>
+    <label>
+      <input type="checkbox" bind:checked={$showSelection} /> Show selection (at the bottom)
+    </label>
   </p>
 
   <div class="columns">
@@ -637,6 +692,7 @@
           <JSONEditor
             bind:this={refTreeEditor}
             bind:content
+            bind:selection={selectionTree}
             bind:mode={leftEditorMode}
             mainMenuBar={$mainMenuBar}
             navigationBar={$navigationBar}
@@ -655,6 +711,7 @@
             bind:queryLanguageId
             {onRenderMenu}
             onChange={onChangeTree}
+            onSelect={onSelectTree}
             onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
             {onChangeMode}
             onFocus={() => console.log('onFocus tree')}
@@ -663,16 +720,23 @@
         {/if}
       </div>
 
+      {#if $showSelection}
+        <div class="data">
+          selection:
+          <pre><code>{JSON.stringify(selectionTree, null, 2)}</code></pre>
+        </div>
+      {/if}
+
       {#if $showRawContents}
         <div class="data">
           json contents:
           <pre>
-					<code>
-					{content.json !== undefined
+            <code>
+            {content.json !== undefined
                 ? truncate(selectedParser.stringify(content.json, null, 2), 1e5)
                 : 'undefined'}
-					</code>
-				</pre>
+            </code>
+          </pre>
         </div>
       {/if}
     </div>
@@ -689,6 +753,7 @@
             bind:this={refTextEditor}
             mode="text"
             bind:content
+            bind:selection={selectionText}
             mainMenuBar={$mainMenuBar}
             navigationBar={$navigationBar}
             statusBar={$statusBar}
@@ -707,6 +772,7 @@
             {onChangeQueryLanguage}
             {onRenderMenu}
             onChange={onChangeText}
+            onSelect={onSelectText}
             onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
             {onChangeMode}
             onFocus={() => console.log('onFocus text')}
@@ -715,12 +781,19 @@
         {/if}
       </div>
 
+      {#if $showSelection}
+        <div class="data">
+          selection:
+          <pre><code>{JSON.stringify(selectionText, null, 2)}</code></pre>
+        </div>
+      {/if}
+
       {#if $showRawContents}
         <div class="data">
           text contents:
           <pre>
             <code>
-              {truncate(content.text, 1e5)}
+              {content.text ? truncate(content.text, 1e5) : content.text}
             </code>
           </pre>
         </div>

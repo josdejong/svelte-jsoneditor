@@ -10,6 +10,7 @@
     ExtendedSearchResultItem,
     HistoryItem,
     JSONEditorContext,
+    JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
     JSONSelection,
@@ -20,6 +21,7 @@
     OnJSONEditorModal,
     OnRenderMenuWithoutContext,
     OnRenderValue,
+    OnSelect,
     OnSortModal,
     OnTransformModal,
     ParseError,
@@ -30,7 +32,7 @@
     Validator,
     ValueNormalization
   } from '$lib/types'
-  import { Mode, SelectionType, SortDirection, ValidationSeverity } from '$lib/types.js'
+  import { Mode, SortDirection, ValidationSeverity } from '$lib/types.js'
   import TableMenu from './menu/TableMenu.svelte'
   import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
   import {
@@ -65,6 +67,7 @@
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
+    encodeDataPath,
     findParentWithNodeName,
     getDataPathFromTarget,
     getWindow
@@ -83,16 +86,16 @@
   import { revertJSONPatchWithMoveOperations } from '$lib/logic/operations.js'
   import {
     createValueSelection,
-    getInitialSelection,
+    getAnchorPath,
+    getFocusPath,
     isEditingSelection,
-    isPathInsideSelection,
+    isValueSelection,
+    pathInSelection,
     removeEditModeFromSelection
   } from '$lib/logic/selection.js'
   import { createHistory } from '$lib/logic/history.js'
   import ColumnHeader from './ColumnHeader.svelte'
   import { sortJson } from '$lib/logic/sort.js'
-  import { encodeDataPath } from '$lib/utils/domUtils.js'
-  import { isValueSelection } from '$lib/logic/selection.js'
   import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
   import { createFocusTracker } from '$lib/components/controls/createFocusTracker.js'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
@@ -144,6 +147,7 @@
 
   export let readOnly: boolean
   export let externalContent: Content
+  export let externalSelection: JSONEditorSelection | null
   export let mainMenuBar: boolean
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
@@ -155,6 +159,7 @@
   export let indentation: number | string
   export let onChange: OnChange
   export let onChangeMode: OnChangeMode
+  export let onSelect: OnSelect
   export let onRenderValue: OnRenderValue
   export let onRenderMenu: OnRenderMenuWithoutContext
   export let onFocus: OnFocus
@@ -199,6 +204,7 @@
   let pastedJson: PastedJson
 
   $: applyExternalContent(externalContent)
+  $: applyExternalSelection(externalSelection)
 
   let maxSampleCount = 10_000
   let columns: JSONPath[] = []
@@ -255,7 +261,7 @@
     if (documentState.sortedColumn) {
       documentState = {
         ...documentState,
-        sortedColumn: undefined
+        sortedColumn: null
       }
     }
   }
@@ -263,31 +269,32 @@
   function updateSelection(
     selection:
       | JSONSelection
-      | undefined
-      | ((selection: JSONSelection | undefined) => JSONSelection | undefined)
+      | null
+      | ((selection: JSONSelection | null) => JSONSelection | null | void | undefined)
   ) {
     debug('updateSelection', selection)
 
     const updatedSelection =
-      typeof selection === 'function' ? selection(documentState.selection) : selection
+      typeof selection === 'function' ? selection(documentState.selection) || null : selection
 
     if (!isEqual(updatedSelection, documentState.selection)) {
       documentState = {
         ...documentState,
         selection: updatedSelection
       }
+
+      onSelect(updatedSelection)
     }
   }
 
   function clearSelectionWhenNotExisting(json: JSONValue | undefined) {
-    if (documentState.selection === undefined || json === undefined) {
+    if (!documentState.selection || json === undefined) {
       return
     }
 
     if (
-      documentState.selection &&
-      existsIn(json, documentState.selection.anchorPath) &&
-      existsIn(json, documentState.selection.focusPath)
+      existsIn(json, getAnchorPath(documentState.selection)) &&
+      existsIn(json, getFocusPath(documentState.selection))
     ) {
       return
     }
@@ -295,7 +302,7 @@
     debug('clearing selection: path does not exist anymore', documentState.selection)
     documentState = {
       ...documentState,
-      selection: getInitialSelection(json, documentState)
+      selection: null // TODO: try find the closest cell that still exists (similar to getInitialSelection)
     }
   }
 
@@ -415,6 +422,28 @@
     const patchResult = null
 
     emitOnChange(previousContent, patchResult)
+  }
+
+  function applyExternalSelection(externalSelection: JSONEditorSelection | null) {
+    if (!isEqual(documentState.selection, externalSelection)) {
+      debug('applyExternalSelection', externalSelection)
+
+      if (externalSelection === null) {
+        updateSelection(externalSelection)
+      }
+
+      if (isValueSelection(externalSelection)) {
+        // check whether the selection is a leaf, and not an object (that would select multiple cells)
+        const value = getIn(json, externalSelection.path)
+        if (isObjectOrArray(value)) {
+          return
+        }
+
+        updateSelection(externalSelection)
+      }
+
+      // we ignore other selection types like key or inline
+    }
   }
 
   // TODO: addHistoryItem is a duplicate of addHistoryItem in TreeMode.svelte. Can we extract and reuse this logic?
@@ -699,7 +728,7 @@
       // when clicking inside the current selection, editing a value, do nothing
       if (
         isEditingSelection(documentState.selection) &&
-        isPathInsideSelection(documentState.selection, path, SelectionType.value)
+        pathInSelection(json, documentState.selection, path)
       ) {
         return
       }
@@ -711,14 +740,14 @@
     }
   }
 
-  function createDefaultSelection(): JSONSelection | undefined {
+  function createDefaultSelection(): JSONSelection | null {
     if (isJSONArray(json) && !isEmpty(json) && !isEmpty(columns)) {
       // Select the first row, first column
       const path = ['0', ...columns[0]]
 
       return createValueSelection(path, false)
     } else {
-      return undefined
+      return null
     }
   }
 
@@ -1000,7 +1029,7 @@
       return
     }
 
-    const path = documentState.selection.focusPath
+    const path = getFocusPath(documentState.selection)
     const value = getIn(json, path)
     if (isObjectOrArray(value)) {
       openJSONEditorModal(path)
@@ -1014,7 +1043,7 @@
       return
     }
 
-    const path = documentState.selection.focusPath
+    const path = getFocusPath(documentState.selection)
     const pathRow = path.slice(0, 1)
     openJSONEditorModal(pathRow)
   }
@@ -1024,7 +1053,7 @@
       return
     }
 
-    const path = documentState.selection.focusPath
+    const path = documentState.selection.path
     const pointer = compileJSONPointer(path)
     const value = getIn(json, path)
     const enforceString = !getEnforceString(value, documentState.enforceStringMap, pointer, parser)
@@ -1218,7 +1247,7 @@
       if (documentState.selection) {
         const newSelection = selectPreviousColumn(columns, documentState.selection)
         updateSelection(newSelection)
-        scrollIntoView(newSelection.focusPath)
+        scrollIntoView(getFocusPath(newSelection))
       }
     }
 
@@ -1230,7 +1259,7 @@
       if (documentState.selection) {
         const newSelection = selectNextColumn(columns, documentState.selection)
         updateSelection(newSelection)
-        scrollIntoView(newSelection.focusPath)
+        scrollIntoView(getFocusPath(newSelection))
       }
     }
 
@@ -1242,7 +1271,7 @@
       if (documentState.selection) {
         const newSelection = selectPreviousRow(columns, documentState.selection)
         updateSelection(newSelection)
-        scrollIntoView(newSelection.focusPath)
+        scrollIntoView(getFocusPath(newSelection))
       }
     }
 
@@ -1254,7 +1283,7 @@
       if (documentState.selection) {
         const newSelection = selectNextRow(json, columns, documentState.selection)
         updateSelection(newSelection)
-        scrollIntoView(newSelection.focusPath)
+        scrollIntoView(getFocusPath(newSelection))
       }
     }
 
@@ -1262,7 +1291,7 @@
       if (isValueSelection(documentState.selection)) {
         event.preventDefault()
 
-        const path = documentState.selection.focusPath
+        const path = documentState.selection.path
         const value = getIn(json, path)
         if (isObjectOrArray(value)) {
           // edit nested object/array
@@ -1286,7 +1315,7 @@
     }
 
     if (combo === 'Ctrl+Enter' && isValueSelection(documentState.selection)) {
-      const value = getIn(json, documentState.selection.focusPath)
+      const value = getIn(json, documentState.selection.path)
 
       if (isUrl(value)) {
         // open url in new page
@@ -1296,7 +1325,7 @@
 
     if (combo === 'Escape' && documentState.selection) {
       event.preventDefault()
-      updateSelection(undefined)
+      updateSelection(null)
     }
 
     if (combo === 'Ctrl+F') {
@@ -1607,7 +1636,7 @@
 
     focus()
     if (documentState.selection) {
-      scrollTo(documentState.selection.focusPath, false)
+      scrollTo(getFocusPath(documentState.selection), false)
     }
   }
 
@@ -1646,7 +1675,7 @@
 
     focus()
     if (documentState.selection) {
-      scrollTo(documentState.selection.focusPath, false)
+      scrollTo(getFocusPath(documentState.selection), false)
     }
   }
 
@@ -1656,10 +1685,6 @@
 
   function handleResizeRow(element: Element, rowIndex: number) {
     itemHeightsCache[rowIndex] = element.getBoundingClientRect().height
-  }
-
-  function isPathSelected(path: JSONPath, selection: JSONSelection): boolean {
-    return selection ? selection.pointersMap[compileJSONPointer(path)] === true : false
   }
 </script>
 
@@ -1763,7 +1788,7 @@
                 {#each columns as column, columnIndex}
                   {@const path = [String(rowIndex)].concat(column)}
                   {@const value = getIn(item, column)}
-                  {@const isSelected = isPathSelected(path, documentState.selection)}
+                  {@const isSelected = pathInSelection(json, documentState.selection, path)}
                   {@const validationErrorsByColumn = validationErrorsByRow?.columns[columnIndex]}
                   <td
                     class="jse-table-cell"
@@ -1788,10 +1813,10 @@
                           compileJSONPointer(path),
                           context.parser
                         )}
-                        selection={isSelected ? documentState.selection : undefined}
+                        selection={isSelected ? documentState.selection : null}
                         {searchResultItems}
                         {context}
-                      />{/if}{#if !readOnly && isSelected && !documentState.selection.edit}
+                      />{/if}{#if !readOnly && isSelected && !isEditingSelection(documentState.selection)}
                       <div class="jse-context-menu-anchor">
                         <ContextMenuPointer selected={true} onContextMenu={openContextMenu} />
                       </div>

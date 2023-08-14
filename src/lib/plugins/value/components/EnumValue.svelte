@@ -11,7 +11,7 @@
   export let value: JSONValue
   export let parser: JSONParser
   export let readOnly: boolean
-  export let selection: JSONSelection | undefined
+  export let selection: JSONSelection | null
   export let onPatch: OnPatch
 
   export let options: Array<{ value: unknown; text: string }>
@@ -21,7 +21,7 @@
   let bindValue: JSONValue = value
   $: bindValue = value
 
-  function applyFocus(selection: JSONSelection | undefined) {
+  function applyFocus(selection: JSONSelection | null) {
     if (selection) {
       if (refSelect) {
         refSelect.focus()

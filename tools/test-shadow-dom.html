@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>JSONEditor | Shadow DOM</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/vanilla-jsoneditor@0.17.0/themes/jse-theme-default.css"
+    />
+
+    <script type="module">
+      import { JSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor@0.17.0/index.js'
+
+      class JSONEditorElement extends HTMLElement {
+        constructor() {
+          super()
+
+          const shadow = this.attachShadow({ mode: 'open' })
+          const target = document.createElement('div')
+
+          const style = document.createElement('style')
+          style.textContent = `
+          div.shadow-dom-editor {
+            width: 500px;
+            height: 500px;
+          }`
+          shadow.appendChild(style)
+
+          target.className = 'shadow-dom-editor'
+          shadow.append(target)
+
+          const editor = new JSONEditor({
+            target,
+            props: {
+              content: {
+                json: [1, 2, 3]
+              }
+            }
+          })
+        }
+      }
+
+      customElements.define('json-editor', JSONEditorElement)
+    </script>
+  </head>
+  <body>
+    <h1>JSONEditor in Shadow DOM</h1>
+
+    <p style="background: red; color: white">
+      FIXME: JSONEditor is currently not fully working in Shadow DOM
+    </p>
+
+    <json-editor></json-editor>
+  </body>
+</html>

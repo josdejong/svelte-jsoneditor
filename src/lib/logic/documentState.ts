@@ -61,8 +61,8 @@ export function createDocumentState(props?: CreateDocumentStateProps): DocumentS
     expandedMap: {},
     enforceStringMap: {},
     visibleSectionsMap: {},
-    selection: undefined,
-    sortedColumn: undefined
+    selection: null,
+    sortedColumn: null
   }
 
   if (props?.select && props.json !== undefined) {

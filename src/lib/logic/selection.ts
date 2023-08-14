@@ -1,5 +1,4 @@
 import {
-  compileJSONPointer,
   getIn,
   isJSONArray,
   isJSONObject,
@@ -8,10 +7,8 @@ import {
   type JSONPatchDocument,
   type JSONPatchOperation,
   type JSONPath,
-  type JSONPointer,
   type JSONValue,
-  parsePath,
-  startsWithJSONPointer
+  parsePath
 } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import { isObjectOrArray } from '$lib/utils/typeUtils.js'
@@ -27,96 +24,142 @@ import type {
   CaretPosition,
   DocumentState,
   InsideSelection,
+  JSONEditorSelection,
   JSONParser,
   JSONSelection,
   KeySelection,
   MultiSelection,
+  TextSelection,
   ValueSelection
 } from '../types.js'
 import { CaretType, SelectionType } from '$lib/types.js'
 import { int } from '$lib/utils/numberUtils.js'
 
 export function isAfterSelection(
-  selection: JSONSelection | undefined
+  selection: JSONEditorSelection | null
 ): selection is AfterSelection {
   return (selection && selection.type === SelectionType.after) || false
 }
 
 export function isInsideSelection(
-  selection: JSONSelection | undefined
+  selection: JSONEditorSelection | null
 ): selection is InsideSelection {
   return (selection && selection.type === SelectionType.inside) || false
 }
 
-export function isKeySelection(selection: JSONSelection | undefined): selection is KeySelection {
+export function isKeySelection(selection: JSONEditorSelection | null): selection is KeySelection {
   return (selection && selection.type === SelectionType.key) || false
 }
 
 export function isValueSelection(
-  selection: JSONSelection | undefined
+  selection: JSONEditorSelection | null
 ): selection is ValueSelection {
   return (selection && selection.type === SelectionType.value) || false
 }
 
 export function isMultiSelection(
-  selection: JSONSelection | undefined
+  selection: JSONEditorSelection | null
 ): selection is MultiSelection {
   return (selection && selection.type === SelectionType.multi) || false
+}
+
+export function isMultiSelectionWithOneItem(
+  selection: JSONEditorSelection | null
+): selection is MultiSelection {
+  return isMultiSelection(selection) && isEqual(selection.focusPath, selection.anchorPath)
+}
+
+export function isTextSelection(selection: JSONEditorSelection | null): selection is TextSelection {
+  return (selection && selection.type === SelectionType.text) || false
 }
 
 /**
  * Expand a selection start and end into an array containing all paths
  * between (and including) start and end
  */
-export function expandSelection(
-  json: JSONValue,
-  anchorPath: JSONPath,
-  focusPath: JSONPath
-): JSONPath[] {
+export function getSelectionPaths(json: JSONValue, selection: JSONSelection): JSONPath[] {
+  const paths: JSONPath[] = []
+
+  iterateOverSelection(json, selection, (path) => {
+    paths.push(path)
+  })
+
+  return paths
+}
+
+/**
+ * Expand a selection start and end into an array containing all paths
+ * between (and including) start and end.
+ *
+ * The function iterates always from start to end, independent of the order
+ * of focusPath and anchorPath.
+ *
+ * When the callback returns something other than undefined, the iteration is
+ * canceled and the value returned by the callback is returned by iterateOverSelection.
+ */
+export function iterateOverSelection<T>(
+  json: JSONValue | undefined,
+  selection: JSONSelection | null,
+  callback: (path: JSONPath) => void | undefined | T
+): void | undefined | T {
+  if (!selection) {
+    return undefined
+  }
+
+  const anchorPath = getAnchorPath(selection)
+  const focusPath = getFocusPath(selection)
+
   if (isEqual(anchorPath, focusPath)) {
     // just a single node
-    return [anchorPath]
+    return callback(anchorPath)
   } else {
     // multiple nodes
+    if (json === undefined) {
+      return undefined
+    }
+
     const sharedPath = findSharedPath(anchorPath, focusPath)
 
     if (anchorPath.length === sharedPath.length || focusPath.length === sharedPath.length) {
       // a parent and a child, like ['arr', 1] and ['arr']
-      return [sharedPath]
+      return callback(sharedPath)
     }
 
-    const anchorKey = anchorPath[sharedPath.length]
-    const focusKey = focusPath[sharedPath.length]
+    const selection = createMultiSelection(anchorPath, focusPath)
+    const startPath = getStartPath(json, selection)
+    const endPath = getEndPath(json, selection)
+
+    const startIndex = getChildIndex(json, selection, startPath)
+    const endIndex = getChildIndex(json, selection, endPath)
+
+    if (startIndex === -1 || endIndex === -1) {
+      return undefined
+    }
+
     const value = getIn(json, sharedPath)
 
     if (isJSONObject(value)) {
       const keys = Object.keys(value)
-      const anchorIndex = keys.indexOf(anchorKey)
-      const focusIndex = keys.indexOf(focusKey)
 
-      if (anchorIndex !== -1 && focusIndex !== -1) {
-        const startIndex = Math.min(anchorIndex, focusIndex)
-        const endIndex = Math.max(anchorIndex, focusIndex)
-        const paths = []
-
-        for (let i = startIndex; i <= endIndex; i++) {
-          paths.push(sharedPath.concat(keys[i]))
+      for (let i = startIndex; i <= endIndex; i++) {
+        const value = callback(sharedPath.concat(keys[i]))
+        if (value !== undefined) {
+          return value
         }
-
-        return paths
       }
+
+      return undefined
     }
 
     if (isJSONArray(value)) {
-      const startIndex = Math.min(int(anchorKey), int(focusKey))
-      const endIndex = Math.max(int(anchorKey), int(focusKey))
-      const paths = []
-
       for (let i = startIndex; i <= endIndex; i++) {
-        paths.push(sharedPath.concat(String(i)))
+        const value = callback(sharedPath.concat(String(i)))
+        if (value !== undefined) {
+          return value
+        }
       }
 
-      return paths
+      return undefined
     }
   }
 
@@ -125,88 +168,53 @@ export function expandSelection(
 
 export function getParentPath(selection: JSONSelection): JSONPath {
   if (isInsideSelection(selection)) {
-    return selection.focusPath
+    return selection.path
   } else {
-    return initial(selection.focusPath)
+    return initial(getFocusPath(selection))
   }
 }
 
-export function getStartPath(selection: JSONSelection): JSONPath {
-  return isMultiSelection(selection) ? (first(selection.paths) as JSONPath) : selection.focusPath
+export function getStartPath(json: JSONValue, selection: JSONSelection): JSONPath {
+  if (!isMultiSelection(selection)) {
+    return selection.path
+  }
+
+  const anchorIndex = getChildIndex(json, selection, selection.anchorPath)
+  const focusIndex = getChildIndex(json, selection, selection.focusPath)
+
+  return focusIndex < anchorIndex ? selection.focusPath : selection.anchorPath
 }
 
-export function getEndPath(selection: JSONSelection): JSONPath {
-  return isMultiSelection(selection) ? (last(selection.paths) as JSONPath) : selection.focusPath
+export function getEndPath(json: JSONValue, selection: JSONSelection): JSONPath {
+  if (!isMultiSelection(selection)) {
+    return selection.path
+  }
+
+  const anchorIndex = getChildIndex(json, selection, selection.anchorPath)
+  const focusIndex = getChildIndex(json, selection, selection.focusPath)
+
+  return focusIndex > anchorIndex ? selection.focusPath : selection.anchorPath
 }
 
 // TODO: write unit test
 export function isSelectionInsidePath(selection: JSONSelection, path: JSONPath): boolean {
   return (
-    pathStartsWith(selection.focusPath, path) &&
-    (selection.focusPath.length > path.length || isInsideSelection(selection))
+    pathStartsWith(getFocusPath(selection), path) &&
+    (getFocusPath(selection).length > path.length || isInsideSelection(selection))
   )
-}
-
-// TODO: write unit test
-export function isPathInsideSelection(
-  selection: JSONSelection,
-  path: JSONPath,
-  anchorType: string
-): boolean {
-  if (!selection) {
-    return false
-  }
-
-  const p = path.slice(0)
-
-  if (isMultiSelection(selection)) {
-    while (p.length > 0) {
-      if (selection.pointersMap[compileJSONPointer(p)] === true) {
-        return true
-      }
-
-      p.pop()
-    }
-  }
-
-  if (isKeySelection(selection)) {
-    return anchorType === SelectionType.key && isEqual(selection.focusPath, path)
-  }
-
-  if (isValueSelection(selection)) {
-    if (anchorType === SelectionType.value && isEqual(selection.focusPath, path)) {
-      return true
-    }
-
-    if (
-      pathStartsWith(path, selection.focusPath) &&
-      path.length > selection.focusPath.length &&
-      (anchorType === SelectionType.key ||
-        anchorType === SelectionType.value ||
-        anchorType === SelectionType.multi)
-    ) {
-      return true
-    }
-  }
-
-  return false
 }
 
 export function getSelectionUp(
   json: JSONValue,
   documentState: DocumentState,
-  keepAnchorPath = false,
-  useFocusPath = false
+  keepAnchorPath = false
 ): JSONSelection | null {
   const selection = documentState.selection
   if (!selection) {
     return null
   }
 
-  const path =
-    !useFocusPath && isMultiSelection(selection)
-      ? (first(selection.paths) as JSONPath)
-      : selection.focusPath
+  const path = keepAnchorPath ? getFocusPath(selection) : getStartPath(json, selection)
   const previousPath = getPreviousVisiblePath(json, documentState, path)
 
   if (previousPath === null) {
@@ -219,10 +227,10 @@ export function getSelectionUp(
   if (keepAnchorPath) {
     // multi selection
     if (isAfterSelection(selection) || isInsideSelection(selection)) {
-      return createMultiSelection(json, selection.anchorPath, selection.anchorPath)
+      return createMultiSelection(selection.path, selection.path)
     }
 
-    return createMultiSelection(json, selection.anchorPath, focusPath)
+    return createMultiSelection(getAnchorPath(selection), focusPath)
   }
 
   if (isKeySelection(selection)) {
@@ -243,68 +251,60 @@ export function getSelectionUp(
   if (isAfterSelection(selection)) {
     // select the node itself, not the previous node,
     // FIXME: when after an expanded object/array, should go to the last item inside the object/array
-    return createMultiSelection(json, path, path)
+    return createMultiSelection(path, path)
   }
 
   if (isInsideSelection(selection)) {
     // select the node itself, not the previous node,
-    return createMultiSelection(json, path, path)
+    return createMultiSelection(path, path)
   }
 
   // multi selection -> select previous node
-  return createMultiSelection(json, anchorPath, focusPath)
+  return createMultiSelection(anchorPath, focusPath)
 }
 
 export function getSelectionDown(
   json: JSONValue,
   documentState: DocumentState,
-  keepAnchorPath = false,
-  useFocusPath = false
+  keepAnchorPath = false
 ): JSONSelection | null {
   const selection = documentState.selection
   if (!selection) {
     return null
   }
   // TODO: this function is too large, break it down in two separate functions: one for keepAnchorPath = true, and one for keepAnchorPath = false?
-  const path =
-    !useFocusPath && isMultiSelection(selection)
-      ? (last(selection.paths) as JSONPath)
-      : selection.focusPath
+  const path = keepAnchorPath ? getFocusPath(selection) : getEndPath(json, selection)
   const nextPath = getNextVisiblePath(json, documentState, path)
   const anchorPath = nextPath
   const focusPath = nextPath
 
-  if (nextPath === null || anchorPath == null || focusPath == null) {
+  // if the focusPath is an Array or object, we must not step into it but
+  // over it, we pass state with this array/object collapsed
+  const collapsedState = isObjectOrArray(getIn(json, path))
+    ? collapsePath(documentState, path)
+    : documentState
+
+  const nextPathAfter = getNextVisiblePath(json, collapsedState, path)
+
+  if (nextPathAfter === null || anchorPath == null || focusPath == null) {
     return null
   }
 
   if (keepAnchorPath) {
-    // if the focusPath is an Array or object, we must not step into it but
-    // over it, we pass state with this array/object collapsed
-    const collapsedState = isObjectOrArray(getIn(json, path))
-      ? collapsePath(documentState, path)
-      : documentState
-
-    const nextPathAfter = getNextVisiblePath(json, collapsedState, path)
-
     // multi selection
-    if (nextPathAfter === null) {
-      return null
-    }
-
     if (isAfterSelection(selection)) {
-      return createMultiSelection(json, nextPathAfter, nextPathAfter)
+      return createMultiSelection(nextPathAfter, nextPathAfter)
     }
 
     if (isInsideSelection(selection)) {
-      return createMultiSelection(json, anchorPath, focusPath)
+      return createMultiSelection(anchorPath, focusPath)
     }
 
-    return createMultiSelection(json, selection.anchorPath, nextPathAfter)
+    return createMultiSelection(getAnchorPath(selection), nextPathAfter)
   }
 
   if (isKeySelection(selection)) {
-    const parentPath = initial(nextPath)
+    const parentPath = initial(nextPath) // not nextPathAfter!
     const parent = getIn(json, parentPath)
     if (Array.isArray(parent)) {
       // switch to value selection: array has no keys
@@ -320,11 +320,11 @@ export function getSelectionDown(
 
   // TODO: simplify, this is redundant, same as next
   if (isInsideSelection(selection)) {
-    return createMultiSelection(json, anchorPath, focusPath)
+    return createMultiSelection(anchorPath, focusPath)
   }
 
   // selection type MULTI or AFTER
-  return createMultiSelection(json, nextPath, nextPath)
+  return createMultiSelection(nextPathAfter, nextPathAfter)
 }
 
 /**
@@ -367,7 +367,9 @@ export function findCaretAndSiblings(
   const visibleCaretPositions = getVisibleCaretPositions(json, documentState, includeInside)
 
   const index = visibleCaretPositions.findIndex((caret) => {
-    return isEqual(caret.path, selection.focusPath) && String(caret.type) === String(selection.type)
+    return (
+      isEqual(caret.path, getFocusPath(selection)) && String(caret.type) === String(selection.type)
+    )
   })
 
   return {
@@ -397,7 +399,7 @@ export function getSelectionLeft(
 
   if (keepAnchorPath) {
     if (!isMultiSelection(selection)) {
-      return createMultiSelection(json, selection.anchorPath, selection.focusPath)
+      return createMultiSelection(selection.path, selection.path)
     }
 
     return null
@@ -407,11 +409,11 @@ export function getSelectionLeft(
     return fromCaretPosition(previous)
   }
 
-  const parentPath = initial(selection.focusPath)
+  const parentPath = initial(getFocusPath(selection))
   const parent = getIn(json, parentPath)
 
   if (isValueSelection(selection) && Array.isArray(parent)) {
-    return createMultiSelection(json, selection.focusPath, selection.focusPath)
+    return createMultiSelection(selection.path, selection.path)
   }
 
   if (isMultiSelection(selection) && !Array.isArray(parent)) {
@@ -436,7 +438,7 @@ export function getSelectionRight(
 
   if (keepAnchorPath) {
     if (!isMultiSelection(selection)) {
-      return createMultiSelection(json, selection.anchorPath, selection.focusPath)
+      return createMultiSelection(selection.path, selection.path)
     }
 
     return null
@@ -477,7 +479,7 @@ export function getInitialSelection(json: JSONValue, documentState: DocumentStat
 export function createSelectionFromOperations(
   json: JSONValue,
   operations: JSONPatchDocument
-): JSONSelection | undefined {
+): JSONSelection | null {
   if (operations.length === 1) {
     const operation = first(operations) as JSONPatchOperation
     if (operation.op === 'replace' || operation.op === 'move') {
@@ -516,35 +518,15 @@ export function createSelectionFromOperations(
     .map((operation) => parsePath(json, operation.path))
 
   if (isEmpty(paths)) {
-    return undefined
+    return null
   }
 
   // TODO: make this function robust against operations which do not have consecutive paths or have wrongly ordered paths
 
   return {
     type: SelectionType.multi,
-    paths,
     anchorPath: first(paths) as JSONPath,
-    focusPath: last(paths) as JSONPath,
-    pointersMap: createPointersMap(paths)
-  }
-}
-
-// TODO: write unit tests
-export function createPointersMap(paths: JSONPath[]): { [pointer: JSONPointer]: boolean } {
-  const pointersMap: { [pointer: JSONPointer]: boolean } = {}
-
-  paths.forEach((path) => {
-    pointersMap[compileJSONPointer(path)] = true
-  })
-
-  return pointersMap
-}
-
-// TODO: write unit tests
-export function createSinglePointersMap(path: JSONPath): { [pointer: JSONPointer]: boolean } {
-  return {
-    [compileJSONPointer(path)]: true
+    focusPath: last(paths) as JSONPath
   }
 }
 
@@ -562,19 +544,18 @@ export function findSharedPath(path1: JSONPath, path2: JSONPath): JSONPath {
   return path1.slice(0, i)
 }
 
-export function singleItemSelected(selection: JSONSelection | undefined): boolean {
+export function singleItemSelected(selection: JSONSelection | null): boolean {
   return (
-    selection !== undefined &&
-    (isKeySelection(selection) ||
-      isValueSelection(selection) ||
-      (isMultiSelection(selection) && selection.paths.length === 1))
+    isKeySelection(selection) ||
+    isValueSelection(selection) ||
+    isMultiSelectionWithOneItem(selection)
   )
 }
 
 export function findRootPath(json: JSONValue, selection: JSONSelection): JSONPath {
-  return singleItemSelected(selection) && isObjectOrArray(getIn(json, selection.focusPath))
-    ? selection.focusPath
-    : initial(selection.focusPath) // the parent path of the paths
+  return singleItemSelected(selection) && isObjectOrArray(getIn(json, getFocusPath(selection)))
+    ? getFocusPath(selection)
+    : initial(getFocusPath(selection)) // the parent path of the paths
 }
 
 // TODO: unit test
@@ -612,9 +593,7 @@ export function removeEditModeFromSelection(documentState: DocumentState): Docum
 export function createKeySelection(path: JSONPath, edit: boolean): KeySelection {
   return {
     type: SelectionType.key,
-    anchorPath: path,
-    focusPath: path,
-    pointersMap: createSinglePointersMap(path),
+    path,
     edit
   }
 }
@@ -622,9 +601,7 @@ export function createKeySelection(path: JSONPath, edit: boolean): KeySelection 
 export function createValueSelection(path: JSONPath, edit: boolean): ValueSelection {
   return {
     type: SelectionType.value,
-    anchorPath: path,
-    focusPath: path,
-    pointersMap: createSinglePointersMap(path),
+    path,
     edit
   }
 }
@@ -632,41 +609,26 @@ export function createValueSelection(path: JSONPath, edit: boolean): ValueSelect
 export function createInsideSelection(path: JSONPath): InsideSelection {
   return {
     type: SelectionType.inside,
-    anchorPath: path,
-    focusPath: path,
-    pointersMap: createSinglePointersMap(path)
+    path
   }
 }
 
 export function createAfterSelection(path: JSONPath): AfterSelection {
   return {
     type: SelectionType.after,
-    anchorPath: path,
-    focusPath: path,
-    pointersMap: createSinglePointersMap(path)
+    path
   }
 }
 
-export function createMultiSelection(
-  json: JSONValue,
-  anchorPath: JSONPath,
-  focusPath: JSONPath
-): MultiSelection {
-  const paths = expandSelection(json, anchorPath, focusPath)
-
-  // the original anchorPath or focusPath may be somewhere inside the
-  // returned paths: when one of the two paths is inside an object and the
-  // other is outside. Then the selection is enlarged to span the whole object.
-  const focusPathLast =
-    pathStartsWith(focusPath, last(paths) as JSONPath) ||
-    pathStartsWith(anchorPath, first(paths) as JSONPath)
+export function createMultiSelection(anchorPath: JSONPath, focusPath: JSONPath): MultiSelection {
+  // normalize the paths to both be a child of a shared parent
+  const sharedPath = findSharedPath(anchorPath, focusPath)
+  const isParent = anchorPath.length > sharedPath.length && focusPath.length > sharedPath.length
 
   return {
     type: SelectionType.multi,
-    anchorPath: focusPathLast ? (first(paths) as JSONPath) : (last(paths) as JSONPath),
-    focusPath: focusPathLast ? (last(paths) as JSONPath) : (first(paths) as JSONPath),
-    paths,
-    pointersMap: createPointersMap(paths)
+    anchorPath: isParent ? sharedPath.concat(anchorPath[sharedPath.length]) : sharedPath,
+    focusPath: isParent ? sharedPath.concat(focusPath[sharedPath.length]) : sharedPath
   }
 }
 
@@ -676,16 +638,16 @@ export function createMultiSelection(
  */
 export function selectionToPartialJson(
   json: JSONValue,
-  selection: JSONSelection | undefined,
+  selection: JSONSelection | null,
   indentation: number | string | undefined,
   parser: JSONParser
 ): string | null {
   if (isKeySelection(selection)) {
-    return String(last(selection.focusPath))
+    return String(last(selection.path))
   }
 
   if (isValueSelection(selection)) {
-    const value = getIn(json, selection.focusPath)
+    const value = getIn(json, selection.path)
     return typeof value === 'string' ? value : parser.stringify(value, null, indentation) // TODO: customizable indentation?
   }
 
@@ -698,12 +660,12 @@ export function selectionToPartialJson(
     const parentPath = getParentPath(selection)
     const parent = getIn(json, parentPath)
     if (Array.isArray(parent)) {
-      if (selection.paths.length === 1) {
+      if (isMultiSelectionWithOneItem(selection)) {
         // do not suffix a single selected array item with a comma
-        const item = getIn(json, first(selection.paths) || [])
+        const item = getIn(json, selection.focusPath)
         return parser.stringify(item, null, indentation)
       } else {
-        return selection.paths
+        return getSelectionPaths(json, selection)
           .map((path) => {
             const item = getIn(json, path)
             return `${parser.stringify(item, null, indentation)},`
@@ -712,7 +674,7 @@ export function selectionToPartialJson(
       }
     } else {
       // parent is Object
-      return selection.paths
+      return getSelectionPaths(json, selection)
         .map((path) => {
           const key = last(path)
           const value = getIn(json, path)
@@ -725,20 +687,16 @@ export function selectionToPartialJson(
   return null
 }
 
-export function getSelectionPaths(selection: JSONSelection): JSONPath[] {
-  return isMultiSelection(selection) ? selection.paths : [selection.focusPath]
-}
-
-export function isEditingSelection(selection: JSONSelection): boolean {
+export function isEditingSelection(selection: JSONSelection | null): boolean {
   return (isKeySelection(selection) || isValueSelection(selection)) && selection.edit === true
 }
 
 export function updateSelectionInDocumentState(
   documentState: DocumentState,
-  selection: JSONSelection | undefined,
+  selection: JSONSelection | null,
   replaceIfUndefined = true
 ): DocumentState {
-  if (selection === undefined && !replaceIfUndefined) {
+  if (!selection && !replaceIfUndefined) {
     return documentState
   }
 
@@ -757,24 +715,20 @@ export function selectAll(): JSONSelection {
 }
 
 // TODO: write unit tests
-export function hasSelectionContents(selection: JSONSelection | undefined): boolean {
-  return isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection)
+export function hasSelectionContents(selection: JSONSelection | null): boolean {
+  return isKeySelection(selection) || isValueSelection(selection) || isMultiSelection(selection)
 }
 
 /**
  * Test whether the current selection can be converted.
  * That is the case when the selection is a key/value, or a multi selection with only one path
  */
-export function canConvert(selection: JSONSelection): boolean {
-  if (isKeySelection(selection) || isValueSelection(selection)) {
-    return true
-  }
-
-  if (isMultiSelection(selection) && selection.paths.length === 1) {
-    return true
-  }
-
-  return false
+export function canConvert(selection: JSONSelection | null): boolean {
+  return (
+    isKeySelection(selection) ||
+    isValueSelection(selection) ||
+    isMultiSelectionWithOneItem(selection)
+  )
 }
 
 // TODO: unit test
@@ -807,21 +761,97 @@ export function fromSelectionType(
     case SelectionType.inside:
       return createInsideSelection(path)
     case SelectionType.multi:
-      return createMultiSelection(json, path, path)
+    case SelectionType.text: // type `text` is not applicable, but we need to handle all types
+      return createMultiSelection(path, path)
   }
 }
 
 export function selectionIfOverlapping(
-  selection: JSONSelection | undefined,
-  pointer: JSONPointer
-): JSONSelection | undefined {
+  json: JSONValue | undefined,
+  selection: JSONSelection | null,
+  path: JSONPath
+): JSONSelection | null {
   if (!selection) {
-    return undefined
+    return null
   }
 
-  return Object.keys(selection.pointersMap).some(
-    (p) => startsWithJSONPointer(p, pointer) || startsWithJSONPointer(pointer, p)
-  )
-    ? selection
-    : undefined
+  if (pathInSelection(json, selection, path)) {
+    return selection
+  }
+
+  const sharedPath = isMultiSelection(selection) ? initial(selection.focusPath) : selection.path
+  if (pathStartsWith(sharedPath, path)) {
+    return selection
+  }
+
+  return null
+}
+
+export function pathInSelection(
+  json: JSONValue | undefined,
+  selection: JSONSelection | null,
+  path: JSONPath
+): boolean {
+  if (json === undefined || !selection) {
+    return false
+  }
+
+  if (isKeySelection(selection) || isInsideSelection(selection) || isAfterSelection(selection)) {
+    return isEqual(selection.path, path)
+  }
+
+  if (isValueSelection(selection)) {
+    return pathStartsWith(path, selection.path)
+  }
+
+  if (isMultiSelection(selection)) {
+    const startPath = getStartPath(json, selection)
+    const endPath = getEndPath(json, selection)
+    const parentPath = initial(selection.focusPath)
+
+    if (!pathStartsWith(path, parentPath) || path.length <= parentPath.length) {
+      return false
+    }
+
+    const startIndex = getChildIndex(json, selection, startPath)
+    const endIndex = getChildIndex(json, selection, endPath)
+    const pathIndex = getChildIndex(json, selection, path)
+    return pathIndex !== -1 && pathIndex >= startIndex && pathIndex <= endIndex
+  }
+
+  return false
+}
+
+function getChildIndex(json: JSONValue, selection: MultiSelection, path: JSONPath): number {
+  const parentPath = initial(selection.focusPath)
+  if (!pathStartsWith(path, parentPath) || path.length <= parentPath.length) {
+    return -1
+  }
+
+  const key = path[parentPath.length]
+  const parent = getIn(json, parentPath)
+
+  if (isJSONObject(parent)) {
+    const keys = Object.keys(parent)
+    return keys.indexOf(key)
+  }
+
+  if (isJSONArray(parent)) {
+    const index = int(key)
+    if (index < parent.length) {
+      return index
+    }
+  }
+
+  return -1
+}
+
+// TODO: write some unit tests
+export function getFocusPath(selection: JSONSelection): JSONPath {
+  return isMultiSelection(selection) ? selection.focusPath : selection.path
+}
+
+// TODO: write some unit tests
+export function getAnchorPath(selection: JSONSelection): JSONPath {
+  return isMultiSelection(selection) ? selection.anchorPath : selection.path
 }

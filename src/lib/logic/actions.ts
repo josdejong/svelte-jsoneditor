@@ -3,6 +3,7 @@ import {
   createKeySelection,
   createMultiSelection,
   createValueSelection,
+  getFocusPath,
   hasSelectionContents,
   isEditingSelection,
   isKeySelection,
@@ -27,7 +28,7 @@ import type {
   OnChange,
   OnChangeText,
   OnPatch,
-  OnSelect
+  OnJSONSelect
 } from '$lib/types'
 import { createDebug } from '$lib/utils/debug.js'
 import {
@@ -148,7 +149,7 @@ export function onPaste({
 
   function doPaste(pastedText: string) {
     if (json !== undefined) {
-      const selection = documentState.selection || createMultiSelection(json || {}, [], [])
+      const selection = documentState.selection || createMultiSelection([], [])
 
       const operations = insert(json, selection, pastedText, parser)
 
@@ -227,14 +228,10 @@ export function onRemove({
   const removeSelection =
     json !== undefined &&
     (isKeySelection(documentState.selection) || isValueSelection(documentState.selection))
-      ? createMultiSelection(
-          json,
-          documentState.selection.anchorPath,
-          documentState.selection.focusPath
-        )
+      ? createMultiSelection(documentState.selection.path, documentState.selection.path)
       : documentState.selection
 
-  if (isEmpty(documentState.selection.focusPath)) {
+  if (isEmpty(getFocusPath(documentState.selection))) {
     // root selected -> clear complete document
     debug('remove root', { selection: documentState.selection })
 
@@ -294,7 +291,10 @@ export function onDuplicateRow({
     return
   }
 
-  const { rowIndex, columnIndex } = toTableCellPosition(documentState.selection.focusPath, columns)
+  const { rowIndex, columnIndex } = toTableCellPosition(
+    getFocusPath(documentState.selection),
+    columns
+  )
 
   debug('duplicate row', { rowIndex })
 
@@ -344,7 +344,7 @@ export function onInsertBeforeRow({
     return
   }
 
-  const { rowIndex } = toTableCellPosition(documentState.selection.focusPath, columns)
+  const { rowIndex } = toTableCellPosition(getFocusPath(documentState.selection), columns)
 
   debug('insert before row', { rowIndex })
 
@@ -385,7 +385,10 @@ export function onInsertAfterRow({
     return
   }
 
-  const { rowIndex, columnIndex } = toTableCellPosition(documentState.selection.focusPath, columns)
+  const { rowIndex, columnIndex } = toTableCellPosition(
+    getFocusPath(documentState.selection),
+    columns
+  )
 
   debug('insert after row', { rowIndex })
 
@@ -441,7 +444,10 @@ export function onRemoveRow({
     return
   }
 
-  const { rowIndex, columnIndex } = toTableCellPosition(documentState.selection.focusPath, columns)
+  const { rowIndex, columnIndex } = toTableCellPosition(
+    getFocusPath(documentState.selection),
+    columns
+  )
 
   debug('remove row', { rowIndex })
 
@@ -462,7 +468,7 @@ export function onRemoveRow({
             fromTableCellPosition({ rowIndex: newRowIndex, columnIndex }, columns),
             false
           )
-        : undefined
+        : null
 
     debug('remove row new selection', { rowIndex, newRowIndex, newSelection })
 
@@ -583,7 +589,7 @@ export interface OnInsertCharacter {
   parser: JSONParser
   onPatch: OnPatch
   onReplaceJson: (updatedJson: JSONValue, afterPatch: AfterPatchCallback) => void
-  onSelect: OnSelect
+  onSelect: OnJSONSelect
 }
 
 // TODO: write unit tests
@@ -641,7 +647,7 @@ export async function onInsertCharacter({
     })
   } else {
     if (isValueSelection(documentState.selection) && json !== undefined) {
-      if (!isObjectOrArray(getIn(json, documentState.selection.focusPath))) {
+      if (!isObjectOrArray(getIn(json, documentState.selection.path))) {
         // only replace contents when not yet in edit mode (can happen when entering
         // multiple characters very quickly after each other due to the async handling)
         const replaceContents = !documentState.selection.edit

@@ -67,6 +67,7 @@
       <button id="expandAll">expand all</button>
       <button id="expand2">expand 2 levels</button>
       <button id="collapseAll">collapse all</button>
+      <button id="selectPath">select ["array", "3", "time"]</button>
     </p>
     <p>
       <label for="mainMenuBar">
@@ -164,6 +165,7 @@
         },
         onChange: ({ json, text }) => console.log('onChange', { json, text }),
         onChangeMode: (mode) => console.log('onChangeMode', mode),
+        onSelect: (newSelection) => console.log('onSelect', newSelection),
         onFocus: () => console.log('onFocus'),
         onBlur: () => console.log('onBlur'),
         onTransform: (operations) => console.log('onTransform', operations),
@@ -297,6 +299,14 @@
 
       document.getElementById('collapseAll').onclick = function () {
         testEditor.expand(() => false)
+      }
+
+      document.getElementById('selectPath').onclick = function () {
+        testEditor.select({
+          type: 'value',
+          path: ['array', '3', 'time'],
+          edit: false
+        })
       }
 
       document.getElementById('mainMenuBar').onclick = function (event) {

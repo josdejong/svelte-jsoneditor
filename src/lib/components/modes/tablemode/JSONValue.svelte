@@ -15,7 +15,7 @@
   export let value: JSONValue
   export let context: JSONEditorContext
   export let enforceString: boolean
-  export let selection: JSONSelection | undefined
+  export let selection: JSONSelection | null
   export let searchResultItems: SearchResultItem[] | undefined
 
   function handlePatch(operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) {

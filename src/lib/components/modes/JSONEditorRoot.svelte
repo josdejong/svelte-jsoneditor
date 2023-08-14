@@ -2,11 +2,12 @@
   import type {
     Content,
     ContentErrors,
+    JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
     JSONPathParser,
     MenuItem,
-    MenuSeparatorItem,
+    MenuSeparator,
     OnBlur,
     OnChange,
     OnChangeMode,
@@ -18,6 +19,7 @@
     OnRenderMenu,
     OnRenderMenuWithoutContext,
     OnRenderValue,
+    OnSelect,
     OnSortModal,
     OnTransformModal,
     TransformModalOptions,
@@ -31,6 +33,7 @@
   import { isMenuSpaceItem } from '$lib/typeguards.js'
 
   export let content: Content
+  export let selection: JSONEditorSelection | null
 
   export let readOnly: boolean
   export let indentation: number | string
@@ -51,10 +54,11 @@
   export let insideModal: boolean
 
   export let onChange: OnChange
+  export let onChangeMode: OnChangeMode
+  export let onSelect: OnSelect
   export let onRenderValue: OnRenderValue
   export let onClassName: OnClassName
   export let onRenderMenu: OnRenderMenu
-  export let onChangeMode: OnChangeMode
   export let onError: OnError
   export let onFocus: OnFocus
   export let onBlur: OnBlur
@@ -94,8 +98,8 @@
     }
   ]
 
-  const separatorMenuItem: MenuSeparatorItem = {
-    separator: true
+  const separatorMenuItem: MenuSeparator = {
+    type: 'separator'
   }
 
   let handleRenderMenu: OnRenderMenuWithoutContext
@@ -228,6 +232,7 @@
   <TextMode
     bind:this={refTextMode}
     externalContent={content}
+    externalSelection={selection}
     {readOnly}
     {indentation}
     {tabSize}
@@ -239,6 +244,7 @@
     {validator}
     {validationParser}
     {onChange}
+    {onSelect}
     {onChangeMode}
     {onError}
     {onFocus}
@@ -251,6 +257,7 @@
   <TableMode
     bind:this={refTableMode}
     externalContent={content}
+    externalSelection={selection}
     {readOnly}
     {mainMenuBar}
     {escapeControlCharacters}
@@ -263,6 +270,7 @@
     {indentation}
     {onChange}
     {onChangeMode}
+    {onSelect}
     {onRenderValue}
     {onFocus}
     {onBlur}
@@ -276,6 +284,7 @@
   <TreeMode
     bind:this={refTreeMode}
     externalContent={content}
+    externalSelection={selection}
     {readOnly}
     {indentation}
     {mainMenuBar}
@@ -290,6 +299,7 @@
     {onError}
     {onChange}
     {onChangeMode}
+    {onSelect}
     {onRenderValue}
     {onClassName}
     {onFocus}

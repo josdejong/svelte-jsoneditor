@@ -15,21 +15,21 @@ import { immutableJSONPatch } from 'immutable-json-patch'
 describe('operations', () => {
   describe('createNewValue', () => {
     test('should create a value of type "value"', () => {
-      assert.strictEqual(createNewValue({}, undefined, 'value'), '')
+      assert.strictEqual(createNewValue({}, null, 'value'), '')
     })
 
     test('should create a value of type "object"', () => {
-      assert.deepStrictEqual(createNewValue({}, undefined, 'object'), {})
+      assert.deepStrictEqual(createNewValue({}, null, 'object'), {})
     })
 
     test('should create a value of type "array"', () => {
-      assert.deepStrictEqual(createNewValue({}, undefined, 'array'), [])
+      assert.deepStrictEqual(createNewValue({}, null, 'array'), [])
     })
 
     test('should create a simple value via type "structure"', () => {
       const json = [1, 2, 3]
       const path = ['0']
-      const selection = createMultiSelection(json, path, path)
+      const selection = createMultiSelection(path, path)
 
       assert.deepStrictEqual(createNewValue(json, selection, 'structure'), '')
     })
@@ -45,7 +45,7 @@ describe('operations', () => {
         }
       ]
       const path = ['0']
-      const selection = createMultiSelection(json, path, path)
+      const selection = createMultiSelection(path, path)
 
       assert.deepStrictEqual(createNewValue(json, selection, 'structure'), {
         a: '',
@@ -114,7 +114,7 @@ describe('operations', () => {
       const json = { array: [0, 1, 2, 3, 4, 5] }
       const documentState = createDocumentState({
         json,
-        select: (json) => createMultiSelection(json, ['array', '3'], ['array', '4'])
+        select: () => createMultiSelection(['array', '3'], ['array', '4'])
       })
       const path = ['array', '1']
       const operations = moveInsideParent(json, documentState.selection, {
@@ -134,7 +134,7 @@ describe('operations', () => {
       const json = { array: [0, 1, 2, 3, 4, 5] }
       const documentState = createDocumentState({
         json,
-        select: (json) => createMultiSelection(json, ['array', '1'], ['array', '2'])
+        select: () => createMultiSelection(['array', '1'], ['array', '2'])
       })
       const path = ['array', '4']
       const operations = moveInsideParent(json, documentState.selection, {
@@ -154,7 +154,7 @@ describe('operations', () => {
       const json = { object: { a: 'a', b: 'b', c: 'c', d: 'd', e: 'e' } }
       const documentState = createDocumentState({
         json,
-        select: (json) => createMultiSelection(json, ['object', 'c'], ['object', 'd']),
+        select: () => createMultiSelection(['object', 'c'], ['object', 'd']),
         expand: () => true
       })
       const path = ['object', 'b']
@@ -181,7 +181,7 @@ describe('operations', () => {
       const json = { object: { a: 'a', b: 'b', c: 'c', d: 'd', e: 'e' } }
       const documentState = createDocumentState({
         json,
-        select: (json) => createMultiSelection(json, ['object', 'b'], ['object', 'c']),
+        select: () => createMultiSelection(['object', 'b'], ['object', 'c']),
         expand: () => true
       })
       const path = ['object', 'e']

@@ -196,7 +196,8 @@ const editor = new JSONEditor({
 
 ### properties
 
-- `content: Content` Pass the JSON contents to be rendered in the JSONEditor. `Content` is an object containing a property `json` (a parsed JSON document) or `text` (a stringified JSON document). Only one of the two properties must be defined. You can pass both content types to the editor independent of in what mode it is.
+- `content: Content` Pass the JSON contents to be rendered in the JSONEditor. `Content` is an object containing a property `json` (a parsed JSON document) or `text` (a stringified JSON document). Only one of the two properties must be defined. You can pass both content types to the editor independent of in what mode it is. You can use two-way binding via `bind:content`.
+- `selection: JSONEditorSelection | null` The current selected contents. You can use two-way binding using `bind:selection`. The `tree` mode supports `MultiSelection`, `KeySelection`, `ValueSelection`, `InsideSelection`, or `AfterSelection`. The `table` mode supports `ValueSelection`, and `text` mode supports `TextSelection.`.
 - `mode: 'tree' | 'text' | 'table'`. Open the editor in `'tree'` mode (default), `'table'` mode, or `'text'` mode (formerly: `code` mode).
 - `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
 - `navigationBar: boolean` Show the navigation bar with, where you can see the selected path and navigate through your document from there. Default value is `true`.
@@ -313,6 +314,10 @@ const editor = new JSONEditor({
     }
     ```
 
+- `onSelect: (selection: JSONEditorSelection | null) => void`
+
+  Callback invoked when the selection is changed. When the selection is removed, the callback is invoked with `undefined` as argument. In `text` mode, a `TextSelection` will be fired. In `tree` and `table` mode, a `JSONSelection` will be fired (which can be `MultiSelection`, `KeySelection`, `ValueSelection`, `InsideSelection`, or `AfterSelection`). Use typeguards like `isTextSelection` and `isValueSelection` to check what type the selection has.
+
 - `queryLanguages: QueryLanguage[]`.  
    Configure one or multiple query language that can be used in the Transform modal. The library comes with three languages:
 
@@ -363,6 +368,7 @@ Note that most methods are asynchronous and will resolve after the editor is re-
 - `acceptAutoRepair(): Promise<Content>` In tree mode, invalid JSON is automatically repaired when loaded. When the repair was successful, the repaired contents are rendered but not yet applied to the document itself until the user clicks "Ok" or starts editing the data. Instead of accepting the repair, the user can also click "Repair manually instead". Invoking `.acceptAutoRepair()` will programmatically accept the repair. This will trigger an update, and the method itself also returns the updated contents. In case of `text` mode or when the editor is not in an "accept auto repair" status, nothing will happen, and the contents will be returned as is.
 - `refresh(): Promise<void>`. Refresh rendering of the contents, for example after changing the font size. This is only available in `text` mode.
 - `validate() : ContentErrors | null`. Get all current parse errors and validation errors.
+- `select(newSelection: JSONEditorSelection | null)` change the current selection. See also option `selection`.
 - `focus(): Promise<void>`. Give the editor focus.
 - `destroy(): Promise<void>`. Destroy the editor, remove it from the DOM.
 
@@ -432,135 +438,9 @@ Note that most methods are asynchronous and will resolve after the editor is re-
 
 ### Types
 
-```ts
-type JSONValue = { [key: string]: JSONValue } | JSONValue[] | string | number | boolean | null
+The TypeScript types (like `Content`, `JSONSelection`, and `JSONPatchOperation`) are defined in the following source file:
 
-type TextContent = { text: string }
-type JSONContent = { json: JSONValue }
-type Content = JSONContent | TextContent
-
-type JSONParser = JSON
-
-interface JSONPathParser {
-  parse: (pathStr) => JSONPath
-  stringify: (path: JSONPath) => string
-}
-
-type JSONPatchDocument = JSONPatchOperation[]
-
-type JSONPatchOperation = {
-  op: 'add' | 'remove' | 'replace' | 'copy' | 'move' | 'test'
-  path: string
-  from?: string
-  value?: JSONValue
-}
-
-type JSONPatchResult = {
-  json: JSONValue
-  previousJson: JSONValue
-  undo: JSONPatchDocument
-  redo: JSONPatchDocument
-}
-
-interface ParseError {
-  position: number | null
-  line: number | null
-  column: number | null
-  message: string
-}
-
-interface ValidationError {
-  path: JSONPath
-  message: string
-  severity: ValidationSeverity
-}
-
-interface ContentParseError {
-  parseError: ParseError
-  isRepairable: boolean
-}
-
-interface ContentValidationErrors {
-  validationErrors: ValidationError[]
-}
-
-type ContentErrors = ContentParseError | ContentValidationErrors
-
-interface QueryLanguage {
-  id: string
-  name: string
-  description: string
-  createQuery: (json: JSONValue, queryOptions: QueryLanguageOptions) => string
-  executeQuery: (json: JSONValue, query: string, parser: JSONParser) => JSONValue
-}
-
-interface QueryLanguageOptions {
-  filter?: {
-    path?: string[]
-    relation?: '==' | '!=' | '<' | '<=' | '>' | '>='
-    value?: string
-  }
-  sort?: {
-    path?: string[]
-    direction?: 'asc' | 'desc'
-  }
-  projection?: {
-    paths?: string[][]
-  }
-}
-
-interface RenderValuePropsOptional {
-  path?: Path
-  value?: JSONValue
-  readOnly?: boolean
-  enforceString?: boolean
-  selection?: Selection
-  searchResultItems?: SearchResultItem[]
-  isSelected?: boolean
-  isEditing?: boolean
-  normalization?: ValueNormalization
-  onPatch?: TreeModeContext['onPatch']
-  onPasteJson?: (pastedJson: { path: Path; contents: JSONValue }) => void
-  onSelect?: (selection: Selection) => void
-  onFind?: (findAndReplace: boolean) => void
-  focus?: () => void
-}
-
-interface RenderValueProps extends RenderValuePropsOptional {
-  path: Path
-  value: JSONValue
-  readOnly: boolean
-  enforceString: boolean | undefined
-  selection: Selection | undefined
-  searchResultItems: SearchResultItem[] | undefined
-  isSelected: boolean
-  isEditing: boolean
-  normalization: ValueNormalization
-  onPatch: (patch: JSONPatchDocument, afterPatch?: AfterPatchCallback) => JSONPatchResult
-  onPasteJson: (pastedJson: { path: Path; contents: JSONValue }) => void
-  onSelect: (selection: Selection) => void
-  onFind: (findAndReplace: boolean) => void
-  focus: () => void
-}
-
-type ValueNormalization = {
-  escapeValue: (any) => string
-  unescapeValue: (string) => string
-}
-
-type SearchResultItem = {
-  path: Path
-  field: Symbol
-  fieldIndex: number
-  start: number
-  end: number
-}
-
-interface RenderValueComponentDescription {
-  component: SvelteComponent
-  props: RenderValuePropsOptional
-}
-```
+https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/types.ts
 
 ## Styling
 
