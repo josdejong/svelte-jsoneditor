@@ -1,12 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import {
-    faExclamationTriangle,
-    faEye,
-    faTimes,
-    faWrench
-  } from '@fortawesome/free-solid-svg-icons'
+  import { faExclamationTriangle, faEye, faTimes, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '$lib/utils/debug.js'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
@@ -21,26 +16,57 @@
     MAX_DOCUMENT_SIZE_TEXT_MODE,
     TEXT_MODE_ONCHANGE_DELAY
   } from '$lib/constants.js'
-  import {
-    activeElementIsChildOf,
-    createNormalizationFunctions,
-    getWindow
-  } from '$lib/utils/domUtils.js'
+  import { activeElementIsChildOf, createNormalizationFunctions, getWindow } from '$lib/utils/domUtils.js'
   import { formatSize } from '$lib/utils/fileUtils.js'
   import { findTextLocation, getText, needsFormatting } from '$lib/utils/jsonUtils.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import TextMenu from './menu/TextMenu.svelte'
-  import { basicSetup, EditorView } from 'codemirror'
   import { Compartment, EditorSelection, EditorState, type Extension } from '@codemirror/state'
-  import { keymap, ViewUpdate } from '@codemirror/view'
-  import { indentWithTab, redo, redoDepth, undo, undoDepth } from '@codemirror/commands'
+  import {
+    crosshairCursor,
+    drawSelection,
+    dropCursor,
+    EditorView,
+    highlightActiveLine,
+    highlightActiveLineGutter,
+    highlightSpecialChars,
+    keymap,
+    lineNumbers,
+    rectangularSelection,
+    ViewUpdate
+  } from '@codemirror/view'
+  import {
+    defaultKeymap,
+    history,
+    historyKeymap,
+    indentWithTab,
+    redo,
+    redoDepth,
+    undo,
+    undoDepth
+  } from '@codemirror/commands'
   import type { Diagnostic } from '@codemirror/lint'
-  import { linter, lintGutter } from '@codemirror/lint'
+  import { linter, lintGutter, lintKeymap } from '@codemirror/lint'
   import { json as jsonLang } from '@codemirror/lang-json'
-  import { indentUnit } from '@codemirror/language'
-  import { closeSearchPanel, openSearchPanel, search } from '@codemirror/search'
+  import {
+    bracketMatching,
+    defaultHighlightStyle,
+    foldGutter,
+    foldKeymap,
+    indentOnInput,
+    indentUnit,
+    syntaxHighlighting
+  } from '@codemirror/language'
+  import {
+    closeSearchPanel,
+    highlightSelectionMatches,
+    openSearchPanel,
+    search,
+    searchKeymap
+  } from '@codemirror/search'
+  import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } from '@codemirror/autocomplete'
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   import jsonSourceMap from 'json-source-map'
@@ -501,7 +527,32 @@
         keymap.of([indentWithTab, formatCompactKeyBinding]),
         linterCompartment.of(createLinter()),
         lintGutter(),
-        basicSetup,
+        lineNumbers(),
+        highlightActiveLineGutter(),
+        highlightSpecialChars(),
+        history(),
+        foldGutter(),
+        drawSelection(),
+        dropCursor(),
+        EditorState.allowMultipleSelections.of(true),
+        indentOnInput(),
+        syntaxHighlighting(defaultHighlightStyle, {fallback: true}),
+        bracketMatching(),
+        closeBrackets(),
+        autocompletion(),
+        rectangularSelection(),
+        crosshairCursor(),
+        highlightActiveLine(),
+        highlightSelectionMatches(),
+        keymap.of([
+          ...closeBracketsKeymap,
+          ...defaultKeymap,
+          ...searchKeymap,
+          ...historyKeymap,
+          ...foldKeymap,
+          ...completionKeymap,
+          ...lintKeymap
+        ]),
         highlighter,
         indentationMarkers({ hideFirstIndent: true }),
         EditorView.domEventHandlers({
