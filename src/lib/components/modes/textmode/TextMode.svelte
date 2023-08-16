@@ -1,7 +1,12 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { faExclamationTriangle, faEye, faTimes, faWrench } from '@fortawesome/free-solid-svg-icons'
+  import {
+    faExclamationTriangle,
+    faEye,
+    faTimes,
+    faWrench
+  } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '$lib/utils/debug.js'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
@@ -16,7 +21,11 @@
     MAX_DOCUMENT_SIZE_TEXT_MODE,
     TEXT_MODE_ONCHANGE_DELAY
   } from '$lib/constants.js'
-  import { activeElementIsChildOf, createNormalizationFunctions, getWindow } from '$lib/utils/domUtils.js'
+  import {
+    activeElementIsChildOf,
+    createNormalizationFunctions,
+    getWindow
+  } from '$lib/utils/domUtils.js'
   import { formatSize } from '$lib/utils/fileUtils.js'
   import { findTextLocation, getText, needsFormatting } from '$lib/utils/jsonUtils.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
@@ -66,7 +75,12 @@
     search,
     searchKeymap
   } from '@codemirror/search'
-  import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap } from '@codemirror/autocomplete'
+  import {
+    autocompletion,
+    closeBrackets,
+    closeBracketsKeymap,
+    completionKeymap
+  } from '@codemirror/autocomplete'
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   import jsonSourceMap from 'json-source-map'
@@ -536,7 +550,7 @@
         dropCursor(),
         EditorState.allowMultipleSelections.of(true),
         indentOnInput(),
-        syntaxHighlighting(defaultHighlightStyle, {fallback: true}),
+        syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
         bracketMatching(),
         closeBrackets(),
         autocompletion(),
