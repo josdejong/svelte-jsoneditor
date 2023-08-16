@@ -253,6 +253,7 @@
             {#if showOriginal}
               <TreeMode
                 externalContent={selectedContent}
+                externalSelection={null}
                 readOnly={true}
                 mainMenuBar={false}
                 navigationBar={false}
@@ -266,6 +267,7 @@
                 onError={console.error}
                 onChange={noop}
                 onChangeMode={noop}
+                onSelect={noop}
                 onFocus={noop}
                 onBlur={noop}
                 onSortModal={noop}
@@ -285,6 +287,7 @@
             {#if !previewError}
               <TreeMode
                 externalContent={previewContent}
+                externalSelection={null}
                 readOnly={true}
                 mainMenuBar={false}
                 navigationBar={false}
@@ -298,6 +301,7 @@
                 onError={console.error}
                 onChange={noop}
                 onChangeMode={noop}
+                onSelect={noop}
                 onFocus={noop}
                 onBlur={noop}
                 onSortModal={noop}
