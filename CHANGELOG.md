@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.10](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.9...v0.17.10) (2023-08-16)
+
+
+### Bug Fixes
+
+* [#301](https://github.com/josdejong/svelte-jsoneditor/issues/301) TransformModal broken (regression since `v0.17.9`) ([b13a52f](https://github.com/josdejong/svelte-jsoneditor/commit/b13a52f1a128069609b087d2c533e6d2d3dd30fe))
+
 ### [0.17.9](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.8...v0.17.9) (2023-08-14)
 
 
