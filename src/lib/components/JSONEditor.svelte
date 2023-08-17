@@ -99,8 +99,9 @@
   export let onBlur: OnBlur = noop
 
   export let onIgnoreKey: (path: JSONPath, type?: CompareConfigType) => void
-  export let onReferenceKey: (path: JSONPath, type?: CompareConfigType) => void
   export let onSortKey: (path: JSONPath, type?: CompareConfigType) => void
+  export let onReferenceKey: (path: JSONPath, type?: CompareConfigType) => void
+  export let onCompressKey: (path: JSONPath, type?: CompareConfigType) => void
 
   let instanceId = uniqueId()
   let hasFocus = false
@@ -337,6 +338,7 @@
         onIgnoreKey,
         onSortKey,
         onReferenceKey,
+        onCompressKey
       },
       TRANSFORM_MODAL_OPTIONS,
       {
@@ -472,6 +474,7 @@
             {onIgnoreKey}
             {onSortKey}
             {onReferenceKey}
+            {onCompressKey}
           />
         {/key}
       </div>

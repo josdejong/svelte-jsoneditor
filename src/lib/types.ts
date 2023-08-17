@@ -450,6 +450,7 @@ export interface JSONEditorPropsOptional {
   onIgnoreKey?: (path: JSONPath, type?: CompareConfigType) => void
   onSortKey?: (path: JSONPath, type?: CompareConfigType) => void
   onReferenceKey?: (path: JSONPath, type?: CompareConfigType) => void
+  onCompressKey?: (path: JSONPath, type?: CompareConfigType) => void
 }
 
 export interface JSONEditorContext {

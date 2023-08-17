@@ -54,6 +54,7 @@
   export let onIgnoreKey: (path: JSONPath, type?: CompareConfigType) => void
   export let onSortKey: (path: JSONPath, type?: CompareConfigType) => void
   export let onReferenceKey: (path: JSONPath, type?: CompareConfigType) => void
+  export let onCompressKey: (path: JSONPath, type?: CompareConfigType) => void
 
 
   $: selectedJson = getIn(json, rootPath)
@@ -283,6 +284,7 @@
                 {onIgnoreKey}
                 {onSortKey}
                 {onReferenceKey}
+                {onCompressKey}
               />
             {/if}
           </div>
@@ -318,6 +320,7 @@
                 {onIgnoreKey}
                 {onSortKey}
                 {onReferenceKey}
+                {onCompressKey}
               />
             {:else}
               <div class="jse-preview jse-error">

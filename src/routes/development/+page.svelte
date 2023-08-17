@@ -686,6 +686,9 @@
             onReferenceKey= {(path, type) => {
               console.log('onReferenceKey', path,  type)
             }}
+            onCompressKey= {(path, type) => {
+              console.log('onCompressKey', path,  type)
+            }}
           />
         {/if}
       </div>

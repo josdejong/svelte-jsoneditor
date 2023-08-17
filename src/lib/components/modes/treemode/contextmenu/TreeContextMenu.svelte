@@ -42,6 +42,7 @@
     export let onIgnoreKey: ((type?: CompareConfigType) => void) | undefined
     export let onSortKey: ((type?: CompareConfigType) => void) | undefined
     export let onReferenceKey: ((type?: CompareConfigType) => void) | undefined
+    export let onCompressKey: ((type?: CompareConfigType) => void) | undefined
     export let onCloseContextMenu
     export let onEditKey
     export let onEditValue
@@ -117,6 +118,8 @@
             : false
 
     $: canSort = hasJson && selection != null && Array.isArray(focusValue)
+    $: canCompress = hasJson && selection != null && !isObjectOrArray(focusValue)
+
 
     function handleIgnoreKey(type?: CompareConfigType) {
         onCloseContextMenu()
@@ -131,6 +134,11 @@
     function handleReferenceKey(type?: CompareConfigType) {
         onCloseContextMenu()
         onReferenceKey?.(type)
+    }
+
+    function handleCompressKey(type?: CompareConfigType) {
+        onCloseContextMenu()
+        onCompressKey?.(type)
     }
 
     function handleEditKey() {
@@ -251,6 +259,11 @@
                     text: 'Reference Key',
                     disabled: !canSort,
                     onClick: () => handleReferenceKey(),
+                }] : []).concat(onCompressKey ? [{
+                  type: 'button',
+                  text: 'CompressKey Key',
+                  disabled: !canCompress,
+                  onClick: () => handleCompressKey(),
                 }] : []),
             }]
         }
@@ -286,6 +299,11 @@
                     text: '添加映射',
                     disabled: !canSort,
                     onClick: () => handleReferenceKey(),
+                }] : []).concat(onCompressKey ? [{
+                  type: 'button',
+                  text: '添加压缩',
+                  disabled: !canCompress,
+                  onClick: () => handleCompressKey(),
                 }] : []),
             }]
         }
