@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.18.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.10...v0.18.0) (2023-08-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* - Upgraded to Svelte 4 providing improved TypeScript types.
+- Dropped re-exporting types and utility functions from `immutable-json-patch`
+  and `svelte`. Instead, import them directly from the library itself.
+- Dropped deprecated types `FontAwesomeIcon` (use `IconDefinition` instead),
+  `DropdownButtonItem`, `MenuButtonItem`, `MenuSeparatorItem`, `MenuSpaceItem`,
+  and typeguard `isMenuSpaceItem`.
+- The `vanilla-package` does not embed types of dependencies anymore and instead,
+  imports the dependencies and use the types from there.
+- Drop official support for Node.js 16
+
+### Features
+
+* describe breaking changes ([962dbf0](https://github.com/josdejong/svelte-jsoneditor/commit/962dbf0dc31def0d77840cca48f1429bdc892a03))
+* upgrade to Svelte 4, improve TypeScript types ([4d0451e](https://github.com/josdejong/svelte-jsoneditor/commit/4d0451e981f3d6bc10ca338ed5c03b5b9a4f51fd))
+
 ### [0.17.10](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.9...v0.17.10) (2023-08-16)
 
 
