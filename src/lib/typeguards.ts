@@ -7,14 +7,9 @@ import type {
   MenuDropDownButton,
   MenuLabel,
   MenuSeparator,
-  MenuSpace,
-  MenuSpaceItem
+  MenuSpace
 } from './types.js'
 import { isObject } from '$lib/utils/typeUtils.js'
-
-export function isMenuSpaceItem(item: unknown): item is MenuSpaceItem {
-  return isMenuSpace(item)
-}
 
 export function isMenuSpace(item: unknown): item is MenuSpace {
   // checking the .space property is for backward compatibility

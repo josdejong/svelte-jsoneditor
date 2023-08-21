@@ -118,11 +118,6 @@ export type JSONPointerMap<T> = { [pointer: JSONPointer]: T }
 
 export type ClipboardValues = Array<{ key: string; value: JSONValue }>
 
-/**
- * @deprecated Use IconDefinition instead of FontAwesomeIcon
- */
-export type FontAwesomeIcon = IconDefinition
-
 export interface MenuButton {
   type: 'button'
   onClick: () => void
@@ -140,16 +135,6 @@ export interface MenuDropDownButton {
   items: MenuButton[]
 }
 
-/**
- * @deprecated: DropdownButtonItem is renamed to MenuButton
- */
-export type DropdownButtonItem = MenuButton
-
-/**
- * @deprecated: MenuButtonItem is renamed to MenuButton
- */
-export type MenuButtonItem = MenuButton
-
 export interface MenuLabel {
   type: 'label'
   text: string
@@ -159,31 +144,11 @@ export interface MenuSeparator {
   type: 'separator'
 }
 
-/**
- * @deprecated: MenuSeparatorItem is replaced with MenuSeparator
- */
-export interface MenuSeparatorItem {
-  /**
-   * @deprecated: MenuSeparatorItem is replaced with MenuSeparator
-   */
-  separator: true
-}
-
 export interface MenuSpace {
   type: 'space'
 }
 
-/**
- * @deprecated: MenuSpaceItem is replaced with MenuSpace
- */
-export interface MenuSpaceItem {
-  /**
-   * @deprecated: MenuSpaceItem is replaced with MenuSpace
-   */
-  space: true
-}
-
-export type MenuItem = MenuButton | MenuSeparator | MenuSeparatorItem | MenuSpace | MenuSpaceItem
+export type MenuItem = MenuButton | MenuSeparator | MenuSpace
 
 export type ContextMenuColumn = {
   type: 'column'
