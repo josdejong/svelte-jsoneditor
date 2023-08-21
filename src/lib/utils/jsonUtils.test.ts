@@ -275,7 +275,7 @@ describe('jsonUtils', () => {
 
     throws(() => {
       toJSONContent({ text: '[1,2,3' })
-    }, /SyntaxError: Unexpected end of JSON input/)
+    }, /(SyntaxError: Unexpected end of JSON input)|(SyntaxError: Expected ',' or ']' after array element in JSON at position 6)/)
 
     throws(() => {
       toJSONContent({ text: '[1,2,3' }, LosslessJSONParser as JSONParser)
