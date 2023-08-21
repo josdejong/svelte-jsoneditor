@@ -19,8 +19,7 @@ export default {
       file,
       format: 'es',
       sourcemap: true,
-      inlineDynamicImports: true,
-      compact: true
+      inlineDynamicImports: true
     }
   ],
   plugins: [
@@ -48,6 +47,6 @@ export default {
     }),
 
     // minify
-    production && terser({ compress: true })
+    production && terser()
   ]
 }
