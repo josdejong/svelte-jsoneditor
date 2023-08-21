@@ -275,11 +275,11 @@ describe('jsonUtils', () => {
 
     throws(() => {
       toJSONContent({ text: '[1,2,3' })
-    }, new SyntaxError('Unexpected end of JSON input'))
+    }, /SyntaxError: Unexpected end of JSON input/)
 
     throws(() => {
       toJSONContent({ text: '[1,2,3' }, LosslessJSONParser as JSONParser)
-    }, new SyntaxError("Array item or end of array ']' expected but reached end of input at position 6"))
+    }, /SyntaxError: Array item or end of array ']' expected but reached end of input at position 6/)
   })
 
   describe('convertValue', () => {

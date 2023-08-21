@@ -50,7 +50,7 @@ describe('pathUtils', () => {
 
     throws(() => {
       parseJSONPath('["hello"wrong quote"]')
-    }, new SyntaxError('Invalid JSON path: ] expected at position 8'))
+    }, /SyntaxError: Invalid JSON path: ] expected at position 8/)
   })
 
   test('createLodashPropertySelector', () => {
