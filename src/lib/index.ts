@@ -61,20 +61,3 @@ export { onEscape } from './actions/onEscape.js'
 
 // typeguards
 export * from './typeguards.js'
-
-// immutable-json-patch
-export {
-  immutableJSONPatch,
-  revertJSONPatch,
-  parseJSONPointer,
-  parsePath,
-  parseFrom,
-  compileJSONPointer,
-  compileJSONPointerProp,
-  getIn,
-  setIn,
-  updateIn,
-  insertAt,
-  existsIn,
-  deleteIn
-} from 'immutable-json-patch'

@@ -423,7 +423,7 @@ Note that most methods are asynchronous and will resolve after the editor is re-
 - Typeguards:
   - `isContentParseError`
   - `isContentValidationErrors`
-- Functions from [`immutable-json-patch`](https://github.com/josdejong/immutable-json-patch/):
+- More: you can install [`immutable-json-patch`](https://github.com/josdejong/immutable-json-patch/) and use its functions:
   - `immutableJSONPatch`
   - `revertJSONPatch`
   - `parseJSONPointer`
