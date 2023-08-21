@@ -40,7 +40,6 @@
     "build:svelte:prepare": "svelte-kit sync",
     "build:svelte:package": "svelte-package -o package",
     "build:svelte:copy:files": "cpy README.md CHANGELOG.md LICENSE.md SECURITY.md package",
-    "build:svelte:delete:files": "del-cli package/index-vanilla.js package/index-vanilla.d.ts",
     "build:svelte:package-json": "node tools/createSveltePackageJson.js",
     "build:vanilla": "npm-run-all build:vanilla:**",
     "build:vanilla:clean": "del-cli package-vanilla",
