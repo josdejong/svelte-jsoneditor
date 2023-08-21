@@ -105,6 +105,8 @@ Or one-way binding:
 
 The library provides a standalone bundle of the editor via the npm library `vanilla-jsoneditor` (instead of `svelte-jsoneditor`) which can be used in any browser environment and framework. In a framework like React, Vue, or Angular, you'll need to write some wrapper code around the class interface.
 
+Note that the `vanilla-jsoneditor` package contains all dependencies. These are purely needed for the TypeScript types that they export.
+
 Browser example loading the ES module:
 
 ```html
