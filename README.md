@@ -633,7 +633,7 @@ Publish to npm (will increase version number and publish to npm):
 npm run release
 ```
 
-Note that it will publish two npm packages: `svelte-jsoneditor` and `vanilla-jsoneditor`. You'll need to enter an npm one-time password twice.
+Note that it will publish two npm packages: `svelte-jsoneditor` and `vanilla-jsoneditor`. You'll need to enter a one-time password for npm.
 
 To try a build and see the change list, run:
 
