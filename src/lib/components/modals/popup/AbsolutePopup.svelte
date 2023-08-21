@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import { createDebug } from '$lib/utils/debug.js'
-  import { setContext, type SvelteComponentTyped } from 'svelte'
+  import { setContext, SvelteComponent } from 'svelte'
   import type { AbsolutePopupOptions, PopupEntry } from '$lib/types'
   import { uniqueId } from '$lib/utils/uniqueId.js'
   import AbsolutePopupEntry from './AbsolutePopupEntry.svelte'
@@ -12,7 +12,7 @@
   let popups: PopupEntry[] = []
 
   function openAbsolutePopup(
-    component: SvelteComponentTyped,
+    component: typeof SvelteComponent,
     props: Record<string, unknown>,
     options: AbsolutePopupOptions
   ): number {

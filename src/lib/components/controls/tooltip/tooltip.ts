@@ -1,11 +1,11 @@
 import Tooltip from './Tooltip.svelte'
-import type { SvelteComponentTyped } from 'svelte'
+import type { SvelteComponent } from 'svelte'
 import type { AbsolutePopupOptions } from '$lib/types'
 
 export interface TooltipOptions {
   text: string
   openAbsolutePopup: (
-    component: SvelteComponentTyped,
+    component: typeof SvelteComponent,
     props: Record<string, unknown>,
     options: AbsolutePopupOptions
   ) => number
@@ -24,7 +24,7 @@ export function tooltip(
     }
 
     // opening popup will fail if there is already a popup open
-    popupId = openAbsolutePopup(Tooltip as unknown as SvelteComponentTyped, props, {
+    popupId = openAbsolutePopup(Tooltip, props, {
       position: 'top',
       width: 10 * text.length, // rough estimate of the width of the message
       offsetTop: 3,

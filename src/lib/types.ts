@@ -1,5 +1,5 @@
 import type { JSONPatchDocument, JSONPath, JSONPointer, JSONValue } from 'immutable-json-patch'
-import type { SvelteComponentTyped } from 'svelte'
+import type { SvelteComponent } from 'svelte'
 import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 
 export type { JSONValue, JSONPointer, JSONPath, JSONPatchDocument } from 'immutable-json-patch'
@@ -396,7 +396,7 @@ export type InsertType = 'value' | 'object' | 'array' | 'structure'
 
 export interface PopupEntry {
   id: number
-  component: SvelteComponentTyped
+  component: SvelteComponent
   props: Record<string, unknown>
   options: AbsolutePopupOptions
 }
@@ -548,9 +548,8 @@ export interface DraggingState {
   didMoveItems: boolean
 }
 
-// TODO: can we define proper generic types here?
 export interface RenderValueComponentDescription {
-  component: SvelteComponentTyped
+  component: typeof SvelteComponent<RenderValuePropsOptional>
   props: Record<string, unknown>
 }
 

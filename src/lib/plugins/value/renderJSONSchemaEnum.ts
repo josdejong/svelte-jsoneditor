@@ -6,7 +6,6 @@ import type {
   RenderValueComponentDescription,
   RenderValueProps
 } from '$lib/types'
-import type { SvelteComponentTyped } from 'svelte'
 
 /**
  * Search the JSON schema for enums defined at given props.path. If found,
@@ -36,7 +35,7 @@ export function renderJSONSchemaEnum(
 
     return [
       {
-        component: EnumValue as unknown as SvelteComponentTyped, // TODO: casting should not be needed
+        component: EnumValue,
         props: {
           value,
           path,

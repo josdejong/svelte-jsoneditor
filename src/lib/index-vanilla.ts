@@ -1,2 +1,2 @@
-export { SvelteComponentTyped } from 'svelte'
+export { SvelteComponent } from 'svelte'
 export * from './index.js'
