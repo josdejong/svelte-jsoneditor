@@ -21,8 +21,17 @@ div.jse-collapsed-items {
     linear-gradient(to top right, $transparent-color 50.5%, $background-color 50.5%),
     linear-gradient(to top left, $transparent-color 50.5%, $background-color 50.5%);
   background-repeat: repeat, repeat-x, repeat-x, repeat-x, repeat-x;
-  background-position: 0 0, $size 0, $size 0, $size 100%, $size 100%;
-  background-size: auto auto, 2 * $size 2 * $size, 2 * $size 2 * $size, 2 * $size 2 * $size,
+  background-position:
+    0 0,
+    $size 0,
+    $size 0,
+    $size 100%,
+    $size 100%;
+  background-size:
+    auto auto,
+    2 * $size 2 * $size,
+    2 * $size 2 * $size,
+    2 * $size 2 * $size,
     2 * $size 2 * $size;
   background-clip: padding-box, border-box, border-box, border-box, border-box;
   background-origin: padding-box, border-box, border-box, border-box, border-box;

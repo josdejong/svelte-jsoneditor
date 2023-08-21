@@ -32,15 +32,55 @@
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import TextMenu from './menu/TextMenu.svelte'
-  import { basicSetup, EditorView } from 'codemirror'
   import { Compartment, EditorSelection, EditorState, type Extension } from '@codemirror/state'
-  import { keymap, ViewUpdate } from '@codemirror/view'
-  import { indentWithTab, redo, redoDepth, undo, undoDepth } from '@codemirror/commands'
+  import {
+    crosshairCursor,
+    drawSelection,
+    dropCursor,
+    EditorView,
+    highlightActiveLine,
+    highlightActiveLineGutter,
+    highlightSpecialChars,
+    keymap,
+    lineNumbers,
+    rectangularSelection,
+    ViewUpdate
+  } from '@codemirror/view'
+  import {
+    defaultKeymap,
+    history,
+    historyKeymap,
+    indentWithTab,
+    redo,
+    redoDepth,
+    undo,
+    undoDepth
+  } from '@codemirror/commands'
   import type { Diagnostic } from '@codemirror/lint'
-  import { linter, lintGutter } from '@codemirror/lint'
+  import { linter, lintGutter, lintKeymap } from '@codemirror/lint'
   import { json as jsonLang } from '@codemirror/lang-json'
-  import { indentUnit } from '@codemirror/language'
-  import { closeSearchPanel, openSearchPanel, search } from '@codemirror/search'
+  import {
+    bracketMatching,
+    defaultHighlightStyle,
+    foldGutter,
+    foldKeymap,
+    indentOnInput,
+    indentUnit,
+    syntaxHighlighting
+  } from '@codemirror/language'
+  import {
+    closeSearchPanel,
+    highlightSelectionMatches,
+    openSearchPanel,
+    search,
+    searchKeymap
+  } from '@codemirror/search'
+  import {
+    autocompletion,
+    closeBrackets,
+    closeBracketsKeymap,
+    completionKeymap
+  } from '@codemirror/autocomplete'
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   import jsonSourceMap from 'json-source-map'
@@ -501,7 +541,32 @@
         keymap.of([indentWithTab, formatCompactKeyBinding]),
         linterCompartment.of(createLinter()),
         lintGutter(),
-        basicSetup,
+        lineNumbers(),
+        highlightActiveLineGutter(),
+        highlightSpecialChars(),
+        history(),
+        foldGutter(),
+        drawSelection(),
+        dropCursor(),
+        EditorState.allowMultipleSelections.of(true),
+        indentOnInput(),
+        syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
+        bracketMatching(),
+        closeBrackets(),
+        autocompletion(),
+        rectangularSelection(),
+        crosshairCursor(),
+        highlightActiveLine(),
+        highlightSelectionMatches(),
+        keymap.of([
+          ...closeBracketsKeymap,
+          ...defaultKeymap,
+          ...searchKeymap,
+          ...historyKeymap,
+          ...foldKeymap,
+          ...completionKeymap,
+          ...lintKeymap
+        ]),
         highlighter,
         indentationMarkers({ hideFirstIndent: true }),
         EditorView.domEventHandlers({

@@ -24,6 +24,8 @@
 </script>
 
 <div
+  role="button"
+  tabindex="-1"
   class="jse-value jse-readonly-password"
   data-type="selectable-value"
   on:dblclick={handleValueDoubleClick}

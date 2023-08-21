@@ -45,6 +45,8 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
+  role="button"
+  tabindex="-1"
   data-type="selectable-value"
   class={getValueClass(value, parser)}
   on:click={handleValueClick}

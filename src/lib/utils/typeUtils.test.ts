@@ -1,4 +1,4 @@
-import { test, describe } from 'vitest'
+import { test, describe, expect } from 'vitest'
 import { strictEqual } from 'assert'
 import {
   getColorCSS,

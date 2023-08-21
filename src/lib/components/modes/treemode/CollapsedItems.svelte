@@ -36,6 +36,7 @@
 </script>
 
 <div
+  role="none"
   class="jse-collapsed-items"
   class:jse-selected={selected}
   on:mousemove={handleMouseMove}

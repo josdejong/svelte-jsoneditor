@@ -103,6 +103,7 @@
 />
 
 <div
+  role="none"
   bind:this={refRootPopup}
   class="jse-absolute-popup"
   on:mousedown={handleMouseDownInside}

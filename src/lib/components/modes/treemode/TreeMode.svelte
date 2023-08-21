@@ -167,9 +167,9 @@
 
   const { openAbsolutePopup, closeAbsolutePopup } = getContext('absolute-popup')
 
-  let refContents
-  let refHiddenInput
-  let refJsonEditor
+  let refContents: HTMLDivElement
+  let refHiddenInput: HTMLInputElement
+  let refJsonEditor: HTMLDivElement
   let hasFocus = false
   const jump = createJump()
 
@@ -264,7 +264,7 @@
   let searching = false
   let searchText = ''
 
-  async function handleSearchText(text) {
+  async function handleSearchText(text: string) {
     debug('search text updated', text)
     searchText = text
     await tick() // await for the search results to be updated
@@ -283,11 +283,11 @@
     await focusActiveSearchResult()
   }
 
-  async function handleReplace(text, replacementText) {
+  async function handleReplace(text: string, replacementText: string) {
     const activeItem = searchResult?.activeItem
     debug('handleReplace', { replacementText, activeItem })
 
-    if (!activeItem) {
+    if (!activeItem || json === undefined) {
       return
     }
 
@@ -308,7 +308,7 @@
     await focusActiveSearchResult()
   }
 
-  async function handleReplaceAll(text, replacementText) {
+  async function handleReplaceAll(text: string, replacementText: string) {
     debug('handleReplaceAll', { text, replacementText })
 
     const { operations, newSelection } = createSearchAndReplaceAllOperations(
@@ -340,7 +340,7 @@
 
     debug('focusActiveSearchResult', searchResult)
 
-    if (activeItem) {
+    if (activeItem && json !== undefined) {
       const path = activeItem.path
       documentState = {
         ...expandPath(json, documentState, path),
@@ -416,7 +416,6 @@
   $: applySearchThrottled(searchText, json)
 
   let textIsRepaired = false
-  $: textIsUnrepairable = text !== undefined && json === undefined
 
   let validationErrors: ValidationError[] = []
   $: updateValidationErrors(json, validator, parser, validationParser)
@@ -482,7 +481,7 @@
     return documentState
   }
 
-  function applyExternalContent(updatedContent) {
+  function applyExternalContent(updatedContent: Content) {
     if (updatedContent.json !== undefined) {
       applyExternalJson(updatedContent.json)
     }
@@ -492,7 +491,7 @@
     }
   }
 
-  function applyExternalJson(updatedJson) {
+  function applyExternalJson(updatedJson: JSONValue | undefined) {
     if (updatedJson === undefined) {
       return
     }
@@ -507,7 +506,7 @@
       return
     }
 
-    const previousContent = { json, text }
+    const previousContent: Content = { json, text }
     const previousState = documentState
     const previousJson = json
     const previousText = text
@@ -536,7 +535,7 @@
     emitOnChange(previousContent, patchResult)
   }
 
-  function applyExternalText(updatedText) {
+  function applyExternalText(updatedText: string | undefined) {
     if (updatedText === undefined || externalContent['json'] !== undefined) {
       return
     }
@@ -550,7 +549,7 @@
       return
     }
 
-    const previousContent = { json, text }
+    const previousContent: Content = { json, text }
     const previousJson = json
     const previousState = documentState
     const previousText = text
@@ -612,14 +611,14 @@
     }
   }
 
-  function expandWhenNotInitialized(json) {
+  function expandWhenNotInitialized(json: JSONValue) {
     if (!documentStateInitialized) {
       documentStateInitialized = true
       documentState = expandWithCallback(json, documentState, [], getDefaultExpand(json))
     }
   }
 
-  function clearSelectionWhenNotExisting(json) {
+  function clearSelectionWhenNotExisting(json: JSONValue) {
     if (!documentState.selection) {
       return
     }
@@ -1020,10 +1019,7 @@
     })
   }
 
-  /**
-   * @param {'value' | 'object' | 'array' | 'structure'} type
-   */
-  function handleInsertFromContextMenu(type) {
+  function handleInsertFromContextMenu(type: 'value' | 'object' | 'array' | 'structure') {
     if (isKeySelection(documentState.selection)) {
       // in this case, we do not want to rename the key, but replace the property
       updateSelection(createValueSelection(documentState.selection.path, false))
@@ -1032,10 +1028,7 @@
     handleInsert(type)
   }
 
-  /**
-   * @param {'value' | 'object' | 'array'} type
-   */
-  function handleConvert(type) {
+  function handleConvert(type: 'value' | 'object' | 'array') {
     if (readOnly || !documentState.selection) {
       return
     }
@@ -2093,6 +2086,8 @@
 <svelte:window on:mousedown={handleWindowMouseDown} />
 
 <div
+  role="tree"
+  tabindex="-1"
   class="jse-tree-mode"
   class:no-main-menu={!mainMenuBar}
   on:keydown={handleKeyDown}
@@ -2133,7 +2128,7 @@
     <label class="jse-hidden-input-label">
       <input
         type="text"
-        readonly="readonly"
+        readonly={true}
         tabindex="-1"
         class="jse-hidden-input"
         bind:this={refHiddenInput}
@@ -2201,6 +2196,7 @@
             {
               icon: faWrench,
               text: 'Paste as JSON instead',
+              title: 'Replace the value with the pasted JSON',
               // We use mousedown here instead of click: this message pops up
               // whilst the user is editing a value. When clicking this button,
               // the actual value is applied and the event is not propagated
@@ -2209,6 +2205,7 @@
             },
             {
               text: 'Leave as is',
+              title: 'Keep the JSON embedded in the value',
               onClick: handleClearPastedJson
             }
           ]}

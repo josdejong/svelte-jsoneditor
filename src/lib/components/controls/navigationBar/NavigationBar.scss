@@ -34,7 +34,9 @@
     &.editing {
       background: var(--jse-panel-button-background-highlight);
       color: var(--jse-panel-button-color-highlight);
-      transition: color 0.2s ease-in, background 0.2s ease-in;
+      transition:
+        color 0.2s ease-in,
+        background 0.2s ease-in;
     }
 
     .jse-navigation-bar-space {

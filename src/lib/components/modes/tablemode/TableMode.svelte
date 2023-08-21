@@ -174,9 +174,9 @@
     escapeUnicodeCharacters
   })
 
-  let refJsonEditor
-  let refContents
-  let refHiddenInput
+  let refJsonEditor: HTMLDivElement
+  let refContents: HTMLDivElement
+  let refHiddenInput: HTMLInputElement
 
   createFocusTracker({
     onMount,
@@ -218,6 +218,7 @@
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
   let modalOpen = false
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let hasFocus = false
 
   let itemHeightsCache: Record<number, number> = {}
@@ -1688,7 +1689,9 @@
   }
 </script>
 
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <div
+  role="table"
   class="jse-table-mode"
   class:no-main-menu={!mainMenuBar}
   on:mousedown={handleMouseDown}
@@ -1906,7 +1909,7 @@
             ]
           : []}
       />
-      <JSONPreview text={text || ''} {json} {indentation} {parser} />
+      <JSONPreview {text} {json} {indentation} {parser} />
     {:else}
       <TableModeWelcome {text} {json} {readOnly} {parser} {openJSONEditorModal} {onChangeMode} />
     {/if}

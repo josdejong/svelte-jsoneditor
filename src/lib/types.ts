@@ -1,8 +1,6 @@
-import type { JSONPatchDocument, JSONPath, JSONPointer, JSONValue } from 'immutable-json-patch'
-import type { SvelteComponentTyped } from 'svelte'
+import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
+import type { SvelteComponent } from 'svelte'
 import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
-
-export type { JSONValue, JSONPointer, JSONPath, JSONPatchDocument } from 'immutable-json-patch'
 
 export type TextContent = { text: string } | { json: undefined; text: string }
 
@@ -114,14 +112,10 @@ export interface TextSelection {
 
 export type JSONEditorSelection = JSONSelection | TextSelection
 
+type JSONPointer = string // Would like to use "import type { JSONPointer } from 'immutable-json-patch'" but that gives compile warnings
 export type JSONPointerMap<T> = { [pointer: JSONPointer]: T }
 
 export type ClipboardValues = Array<{ key: string; value: JSONValue }>
-
-/**
- * @deprecated Use IconDefinition instead of FontAwesomeIcon
- */
-export type FontAwesomeIcon = IconDefinition
 
 export interface MenuButton {
   type: 'button'
@@ -140,16 +134,6 @@ export interface MenuDropDownButton {
   items: MenuButton[]
 }
 
-/**
- * @deprecated: DropdownButtonItem is renamed to MenuButton
- */
-export type DropdownButtonItem = MenuButton
-
-/**
- * @deprecated: MenuButtonItem is renamed to MenuButton
- */
-export type MenuButtonItem = MenuButton
-
 export interface MenuLabel {
   type: 'label'
   text: string
@@ -159,31 +143,11 @@ export interface MenuSeparator {
   type: 'separator'
 }
 
-/**
- * @deprecated: MenuSeparatorItem is replaced with MenuSeparator
- */
-export interface MenuSeparatorItem {
-  /**
-   * @deprecated: MenuSeparatorItem is replaced with MenuSeparator
-   */
-  separator: true
-}
-
 export interface MenuSpace {
   type: 'space'
 }
 
-/**
- * @deprecated: MenuSpaceItem is replaced with MenuSpace
- */
-export interface MenuSpaceItem {
-  /**
-   * @deprecated: MenuSpaceItem is replaced with MenuSpace
-   */
-  space: true
-}
-
-export type MenuItem = MenuButton | MenuSeparator | MenuSeparatorItem | MenuSpace | MenuSpaceItem
+export type MenuItem = MenuButton | MenuSeparator | MenuSpace
 
 export type ContextMenuColumn = {
   type: 'column'
@@ -396,7 +360,7 @@ export type InsertType = 'value' | 'object' | 'array' | 'structure'
 
 export interface PopupEntry {
   id: number
-  component: SvelteComponentTyped
+  component: typeof SvelteComponent
   props: Record<string, unknown>
   options: AbsolutePopupOptions
 }
@@ -548,9 +512,8 @@ export interface DraggingState {
   didMoveItems: boolean
 }
 
-// TODO: can we define proper generic types here?
 export interface RenderValueComponentDescription {
-  component: SvelteComponentTyped
+  component: typeof SvelteComponent<RenderValuePropsOptional>
   props: Record<string, unknown>
 }
 

@@ -41,7 +41,6 @@
   }
 
   $: hasJson = json !== undefined
-  $: hasSelection = !!selection
   $: hasSelectionContents =
     hasJson &&
     (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))

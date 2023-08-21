@@ -30,7 +30,7 @@
   import TableMode from './tablemode/TableMode.svelte'
   import TreeMode from './treemode/TreeMode.svelte'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-  import { isMenuSpaceItem } from '$lib/typeguards.js'
+  import { isMenuSpace } from '$lib/typeguards.js'
 
   export let content: Content
   export let selection: JSONEditorSelection | null
@@ -66,9 +66,9 @@
   export let onTransformModal: OnTransformModal
   export let onJSONEditorModal: OnJSONEditorModal
 
-  let refTreeMode
-  let refTableMode
-  let refTextMode
+  let refTreeMode: TreeMode | undefined
+  let refTableMode: TableMode | undefined
+  let refTextMode: TextMode | undefined
 
   let modeMenuItems: MenuItem[]
   $: modeMenuItems = [
@@ -104,7 +104,7 @@
 
   let handleRenderMenu: OnRenderMenuWithoutContext
   $: handleRenderMenu = (items: MenuItem[]) => {
-    const updatedItems = isMenuSpaceItem(items[0])
+    const updatedItems = isMenuSpace(items[0])
       ? modeMenuItems.concat(items) // menu is empty, readOnly mode
       : modeMenuItems.concat(separatorMenuItem, items)
 

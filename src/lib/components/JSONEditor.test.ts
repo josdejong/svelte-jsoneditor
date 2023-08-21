@@ -1,4 +1,4 @@
-import { test, describe, expect, vi } from 'vitest'
+import { beforeEach, afterEach, test, describe, expect, vi } from 'vitest'
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/svelte'
 import JSONEditor from './JSONEditor.svelte'

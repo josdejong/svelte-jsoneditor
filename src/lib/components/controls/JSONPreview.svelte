@@ -9,10 +9,13 @@
   export let json: JSONValue | undefined
   export let indentation: number | string
   export let parser: JSONParser
+
+  $: content = json !== undefined ? { json } : { text: text || '' }
+  $: truncated = truncate(getText(content, indentation, parser), MAX_CHARACTERS_TEXT_PREVIEW)
 </script>
 
 <div class="jse-json-preview">
-  {truncate(getText({ text, json }, indentation, parser), MAX_CHARACTERS_TEXT_PREVIEW)}
+  {truncated}
 </div>
 
 <style src="./JSONPreview.scss"></style>

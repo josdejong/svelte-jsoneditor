@@ -88,12 +88,12 @@
   export let searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
   export let selection: JSONSelection | null
   export let context: TreeModeContext
-  export let onDragSelectionStart
+  export let onDragSelectionStart: MouseEvent
 
   const debug = createDebug('jsoneditor:JSONNode')
 
-  let hover = undefined
-  let hoverTimer = undefined
+  let hover: string | undefined = undefined
+  let hoverTimer: number | undefined = undefined
   let dragging: DraggingState | undefined = undefined
 
   // important to prevent creating a new path for all children with every re-render,
@@ -382,7 +382,7 @@
     return clientOffset - contentOffset
   }
 
-  function handleDragSelectionStart(event) {
+  function handleDragSelectionStart(event: MouseEvent) {
     if (context.readOnly || !selection) {
       return
     }
@@ -472,7 +472,7 @@
       })
 
       if (operations) {
-        context.onPatch(operations, (patchedJson, patchedState) => ({
+        context.onPatch(operations, (_, patchedState) => ({
           state: {
             ...patchedState,
             selection: updatedSelection || selection
@@ -507,7 +507,7 @@
     selection: JSONSelection,
     visibleSections: VisibleSection[]
   ): RenderedItem[] | null {
-    const items = []
+    const items: RenderedItem[] = []
 
     function addHeight(prop: string) {
       const itemPath = path.concat(prop)
@@ -548,7 +548,7 @@
     return items
   }
 
-  function handleMouseOver(event) {
+  function handleMouseOver(event: MouseEvent) {
     if (singleton.selecting || singleton.dragging) {
       return
     }
@@ -566,7 +566,7 @@
     clearTimeout(hoverTimer)
   }
 
-  function handleMouseOut(event) {
+  function handleMouseOut(event: MouseEvent) {
     event.stopPropagation()
 
     // to prevent "flickering" in the hovering state when hovering on the edge
@@ -575,7 +575,7 @@
     hoverTimer = setTimeout(() => (hover = undefined))
   }
 
-  function handleInsertInside(event) {
+  function handleInsertInside(event: MouseEvent) {
     if (!event.shiftKey) {
       event.stopPropagation()
       event.preventDefault()
@@ -584,7 +584,7 @@
     }
   }
 
-  function handleInsertAfter(event) {
+  function handleInsertAfter(event: MouseEvent) {
     if (!event.shiftKey) {
       event.stopPropagation()
       event.preventDefault()
@@ -605,12 +605,15 @@
 </script>
 
 <div
+  role="treeitem"
+  tabindex="-1"
   class={classnames(
     'jse-json-node',
     { 'jse-expanded': expanded },
     context.onClassName(path, value)
   )}
   data-path={encodeDataPath(path)}
+  aria-selected={isNodeSelected}
   class:jse-root={root}
   class:jse-selected={isNodeSelected && isMultiSelection(selection)}
   class:jse-selected-key={isNodeSelected && isKeySelection(selection)}
@@ -672,15 +675,15 @@
         <ValidationErrorIcon {validationError} onExpand={handleExpand} />
       {/if}
       {#if expanded}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
+          role="none"
           class="jse-insert-selection-area jse-inside"
           data-type="insert-selection-area-inside"
           on:click={handleInsertInside}
         />
       {:else}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
+          role="none"
           class="jse-insert-selection-area jse-after"
           data-type="insert-selection-area-after"
           on:click={handleInsertAfter}
@@ -741,8 +744,8 @@
           <span class="jse-bracket">]</span>
         </div>
         {#if !root}
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
+            role="none"
             class="jse-insert-selection-area jse-after"
             data-type="insert-selection-area-after"
             on:click={handleInsertAfter}
@@ -793,15 +796,15 @@
         <ValidationErrorIcon {validationError} onExpand={handleExpand} />
       {/if}
       {#if expanded}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
+          role="none"
           class="jse-insert-selection-area jse-inside"
           data-type="insert-selection-area-inside"
           on:click={handleInsertInside}
         />
       {:else if !root}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
+          role="none"
           class="jse-insert-selection-area jse-after"
           data-type="insert-selection-area-after"
           on:click={handleInsertAfter}
@@ -856,8 +859,8 @@
           <div class="jse-bracket">&rbrace;</div>
         </div>
         {#if !root}
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div
+            role="none"
             class="jse-insert-selection-area jse-after"
             data-type="insert-selection-area-after"
             on:click={handleInsertAfter}
@@ -890,8 +893,8 @@
         <ValidationErrorIcon {validationError} onExpand={handleExpand} />
       {/if}
       {#if !root}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div
+          role="none"
           class="jse-insert-selection-area jse-after"
           data-type="insert-selection-area-after"
           on:click={handleInsertAfter}

@@ -5,15 +5,15 @@
   export let onChange: (newColor: string) => void
   export let showOnTop: boolean
 
-  let ref: Element | undefined
-  let colorPicker
+  let ref: HTMLElement | undefined
+  let destroyColorPicker = () => {}
 
   onMount(async () => {
     // Dynamically import VanillaPicker, because it requires `document` to be defined,
     // and that is not supported server side
     const VanillaPicker = (await import('vanilla-picker'))?.default
 
-    colorPicker = new VanillaPicker({
+    const colorPicker = new VanillaPicker({
       parent: ref,
       color,
       popup: showOnTop ? 'top' : 'bottom',
@@ -28,12 +28,14 @@
     })
 
     colorPicker.show()
+
+    destroyColorPicker = () => {
+      colorPicker.destroy()
+    }
   })
 
   onDestroy(() => {
-    if (colorPicker) {
-      colorPicker.destroy()
-    }
+    destroyColorPicker()
   })
 </script>
 
