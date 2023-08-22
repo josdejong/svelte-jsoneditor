@@ -117,8 +117,8 @@
             )
             : false
 
-    $: canSort = hasJson && selection != null && Array.isArray(focusValue)
-    $: canCompress = hasJson && selection != null && !isObjectOrArray(focusValue)
+    $: isArrayNode = hasJson && selection != null && Array.isArray(focusValue)
+    $: isLeafNode = hasJson && selection != null && !isObjectOrArray(focusValue)
 
 
     function handleIgnoreKey(type?: CompareConfigType) {
@@ -252,17 +252,17 @@
                 }] : []).concat(onSortKey ? [{
                     type: 'button',
                     text: 'Sort Key',
-                    disabled: !canSort,
+                    disabled: !isArrayNode,
                     onClick: () => handleSortKey(),
                 }] : []).concat(onReferenceKey ? [{
                     type: 'button',
                     text: 'Reference Key',
-                    disabled: !canSort,
+                    disabled: !isLeafNode,
                     onClick: () => handleReferenceKey(),
                 }] : []).concat(onCompressKey ? [{
                   type: 'button',
-                  text: 'CompressKey Key',
-                  disabled: !canCompress,
+                  text: 'Compress Key',
+                  disabled: !isLeafNode,
                   onClick: () => handleCompressKey(),
                 }] : []),
             }]
@@ -292,17 +292,17 @@
                 },] : []).concat(onSortKey ? [{
                     type: 'button',
                     text: '添加排序',
-                    disabled: !canSort,
+                    disabled: !isArrayNode,
                     onClick: () => handleSortKey(),
                 }] : []).concat(onReferenceKey ? [{
                     type: 'button',
                     text: '添加映射',
-                    disabled: !canSort,
+                    disabled: !isLeafNode,
                     onClick: () => handleReferenceKey(),
                 }] : []).concat(onCompressKey ? [{
                   type: 'button',
                   text: '添加压缩',
-                  disabled: !canCompress,
+                  disabled: !isLeafNode,
                   onClick: () => handleCompressKey(),
                 }] : []),
             }]
