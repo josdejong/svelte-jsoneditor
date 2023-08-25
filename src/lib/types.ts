@@ -1,4 +1,4 @@
-import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
+import type { JSONPatchDocument, JSONPath, JSONValue, JSONPointer } from 'immutable-json-patch'
 import type { SvelteComponent } from 'svelte'
 import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 
@@ -112,8 +112,7 @@ export interface TextSelection {
 
 export type JSONEditorSelection = JSONSelection | TextSelection
 
-type JSONPointer = string // Would like to use "import type { JSONPointer } from 'immutable-json-patch'" but that gives compile warnings
-export type JSONPointerMap<T> = { [pointer: JSONPointer]: T }
+export type JSONPointerMap<T> = Record<JSONPointer, T>
 
 export type ClipboardValues = Array<{ key: string; value: JSONValue }>
 
