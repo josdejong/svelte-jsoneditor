@@ -6,7 +6,12 @@
   import SearchResultHighlighter from '../../../components/modes/treemode/highlight/SearchResultHighlighter.svelte'
   import { getValueClass } from './utils/getValueClass.js'
   import { addNewLineSuffix } from '$lib/utils/domUtils.js'
-  import type { ExtendedSearchResultItem, JSONParser, OnJSONSelect, ValueNormalization } from '$lib/types.js'
+  import type {
+    ExtendedSearchResultItem,
+    JSONParser,
+    OnJSONSelect,
+    ValueNormalization
+  } from '$lib/types.js'
   import type { JSONPath, JSONValue } from 'immutable-json-patch'
 
   export let path: JSONPath
