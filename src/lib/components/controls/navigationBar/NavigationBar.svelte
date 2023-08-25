@@ -23,7 +23,6 @@
   export let pathParser: JSONPathParser
 
   let refNavigationBar: Element | undefined
-  let refEditButton: HTMLButtonElement | undefined
   let editing = false
 
   $: path = selection ? getFocusPath(selection) : []
@@ -117,7 +116,6 @@
     class:editing
     title={editing ? 'Cancel editing the selected path' : 'Edit the selected path'}
     on:click={toggleEditing}
-    bind:this={refEditButton}
   >
     <span class="jse-navigation-bar-space">
       <!-- ensure the right height (arrows have less height than the text) -->
