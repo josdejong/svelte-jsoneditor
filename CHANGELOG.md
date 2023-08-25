@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.18.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.18.0...v0.18.1) (2023-08-25)
+
+
+### Bug Fixes
+
+* [#300](https://github.com/josdejong/svelte-jsoneditor/issues/300) change the homepage in package.json to the Github repo ([b1977e5](https://github.com/josdejong/svelte-jsoneditor/commit/b1977e50475362278afc1e57eb2333bd69b5f69d))
+* [#304](https://github.com/josdejong/svelte-jsoneditor/issues/304) missing type `JSONPointer` internally ([e23abbc](https://github.com/josdejong/svelte-jsoneditor/commit/e23abbc3690799f5a53600c109630de31f05f953))
+
 ## [0.18.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.17.10...v0.18.0) (2023-08-21)
 
 
