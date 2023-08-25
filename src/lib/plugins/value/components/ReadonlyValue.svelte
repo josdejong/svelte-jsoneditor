@@ -6,14 +6,8 @@
   import SearchResultHighlighter from '../../../components/modes/treemode/highlight/SearchResultHighlighter.svelte'
   import { getValueClass } from './utils/getValueClass.js'
   import { addNewLineSuffix } from '$lib/utils/domUtils.js'
-  import type {
-    ExtendedSearchResultItem,
-    JSONParser,
-    JSONPath,
-    JSONValue,
-    OnJSONSelect,
-    ValueNormalization
-  } from '$lib/types.js'
+  import type { ExtendedSearchResultItem, JSONParser, OnJSONSelect, ValueNormalization } from '$lib/types.js'
+  import type { JSONPath, JSONValue } from 'immutable-json-patch'
 
   export let path: JSONPath
   export let value: JSONValue
@@ -26,7 +20,7 @@
 
   $: valueIsUrl = isUrl(value)
 
-  function handleValueClick(event) {
+  function handleValueClick(event: MouseEvent) {
     if (typeof value === 'string' && valueIsUrl && event.ctrlKey) {
       event.preventDefault()
       event.stopPropagation()
@@ -35,7 +29,7 @@
     }
   }
 
-  function handleValueDoubleClick(event) {
+  function handleValueDoubleClick(event: MouseEvent) {
     if (!readOnly) {
       event.preventDefault()
       onSelect(createValueSelection(path, true))
