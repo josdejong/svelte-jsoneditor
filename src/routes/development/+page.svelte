@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+    type Content,
     createAjvValidator,
     createValueSelection,
     EditableValue,
@@ -7,10 +8,16 @@
     jmespathQueryLanguage,
     JSONEditor,
     type JSONEditorSelection,
+    type JSONParser,
     lodashQueryLanguage,
     type MenuItem,
+    Mode,
+    type OnChangeStatus,
     ReadonlyValue,
+    type RenderMenuContext,
     renderValue,
+    type RenderValueComponentDescription,
+    type RenderValuePropsOptional,
     SelectionType
   } from 'svelte-jsoneditor'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
@@ -19,16 +26,24 @@
   import { parse, stringify } from 'lossless-json'
   import { truncate } from '$lib/utils/stringUtils.js'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils.js'
-  import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
+  import {
+    compileJSONPointer,
+    isJSONObject,
+    type JSONArray,
+    type JSONObject,
+    parseJSONPointer
+  } from 'immutable-json-patch'
   import { toJSONContent } from '$lib/utils/jsonUtils.js'
+  import { isJSONContent, isTextContent } from '$lib'
+  import type { ChangeEventHandler } from 'svelte/elements.js'
 
   // const LosslessJSON: JSONParser = { ... } // FIXME: make the types work
   const LosslessJSON = {
     parse,
     stringify
-  }
+  } as JSONParser
 
-  let content = {
+  let content: Content = {
     text: `{
   "boolean": true,
   "color": "#82b92c",
@@ -84,8 +99,8 @@
     json: undefined
   }
 
-  let selectionTree = null
-  let selectionText = null
+  let selectionTree: JSONEditorSelection | null = null
+  let selectionText: JSONEditorSelection | null = null
 
   const schema = {
     title: 'Employee',
@@ -157,7 +172,13 @@
     { value: '\t', label: '1 tab' }
   ]
 
-  const parsers = [
+  interface ParserOption {
+    id: string
+    value: JSONParser
+    label: string
+  }
+
+  const parsers: ParserOption[] = [
     {
       id: 'JSON',
       value: JSON,
@@ -202,10 +223,14 @@
 
   // for debugging
   $: if (typeof window !== 'undefined') {
-    window['refTreeEditor'] = refTreeEditor
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    window.refTreeEditor = refTreeEditor
   }
   $: if (typeof window !== 'undefined') {
-    window['refTextEditor'] = refTextEditor
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    window.refTextEditor = refTextEditor
   }
 
   const showTreeEditor = useLocalStorage('svelte-jsoneditor-demo-showTreeEditor', true)
@@ -248,15 +273,18 @@
     pathParsers[0].id
   )
   const tabSize = useLocalStorage('svelte-jsoneditor-demo-tabSize', indentations[0].value)
-  let leftEditorMode = 'tree'
+  let leftEditorMode: Mode = Mode.tree
 
   $: queryLanguages = $multipleQueryLanguages
     ? [javascriptQueryLanguage, lodashQueryLanguage, jmespathQueryLanguage]
     : [javascriptQueryLanguage]
   let queryLanguageId = javascriptQueryLanguage.id // TODO: store in local storage
 
-  $: selectedParser = parsers.find((parser) => parser.id === $selectedParserId).value
-  $: selectedPathParser = pathParsers.find((parser) => parser.id === $selectedPathParserId).value
+  let selectedParser: JSONParser
+  $: selectedParser =
+    parsers.find((parser) => parser.id === $selectedParserId)?.value || parsers[0].value
+  $: selectedPathParser =
+    pathParsers.find((parser) => parser.id === $selectedPathParserId)?.value || pathParsers[0].value
 
   $: selectedValidator = $validate ? validator : $validateArray ? arrayValidator : undefined
 
@@ -275,8 +303,8 @@
     onSelect,
     onFind,
     focus
-  }) {
-    const renderers = []
+  }: RenderValuePropsOptional): RenderValueComponentDescription[] {
+    const renderers: RenderValueComponentDescription[] = []
 
     if (isEditing) {
       renderers.push({
@@ -306,13 +334,19 @@
     return renderers
   }
 
-  function onRenderMenu(items: MenuItem[], { mode }) {
+  function onRenderMenu(items: MenuItem[], { mode }: RenderMenuContext) {
     if (!import.meta.env.SSR) {
       console.log('onRenderMenu', mode, items)
     }
+
+    return items
   }
 
-  function onChangeTree(content, previousContent, { contentErrors, patchResult }) {
+  function onChangeTree(
+    content: Content,
+    previousContent: Content,
+    { contentErrors, patchResult }: OnChangeStatus
+  ) {
     console.log('onChangeTree', {
       content,
       previousContent,
@@ -321,7 +355,11 @@
     })
   }
 
-  function onChangeText(content, previousContent, { contentErrors, patchResult }) {
+  function onChangeText(
+    content: Content,
+    previousContent: Content,
+    { contentErrors, patchResult }: OnChangeStatus
+  ) {
     console.log('onChangeText', {
       content,
       previousContent,
@@ -330,19 +368,19 @@
     })
   }
 
-  function onSelectTree(selection: JSONEditorSelection) {
+  function onSelectTree(selection: JSONEditorSelection | null) {
     console.log('onSelectTree', selection)
   }
 
-  function onSelectText(selection: JSONEditorSelection) {
+  function onSelectText(selection: JSONEditorSelection | null) {
     console.log('onSelectText', selection)
   }
 
-  function onChangeMode(mode) {
+  function onChangeMode(mode: Mode) {
     console.log('onChangeMode', mode)
   }
 
-  function onChangeQueryLanguage(newQueryLanguageId) {
+  function onChangeQueryLanguage(newQueryLanguageId: string) {
     console.log('onChangeQueryLanguage', newQueryLanguageId)
     queryLanguageId = newQueryLanguageId
   }
@@ -353,7 +391,13 @@
       '_blank',
       `location=no,toolbar=no,menubar=no,status=no,directories=no,width=${500},height=${600},left=${0},top=${0},editorWind=yes`
     )
-    window['popupEditor'] = new JSONEditor({
+    if (!popupWindow) {
+      return
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    window.popupEditor = new JSONEditor({
       target: popupWindow.document.body,
       props: {}
     })
@@ -366,6 +410,76 @@
     if (refTextEditor) {
       refTextEditor.refresh()
     }
+  }
+
+  function generateLongArray(): JSONArray {
+    return [...new Array(1000)].map((value, index) => {
+      const random = Math.round(Math.random() * 1000)
+      const item: Record<string, unknown> = {
+        id: index,
+        name: 'Item ' + index,
+        random,
+        'nested object': {
+          value: random
+        },
+        array: [index, 1, 7, 3],
+        long:
+          selectedParser.stringify === stringify
+            ? 9223372000000000000n + BigInt(random)
+            : Number(9223372000000000000n + BigInt(random))
+      }
+
+      // introduce some validation issues
+      if (index === 3) {
+        const array = item.array as Array<string | null>
+        array[2] = 'oopsie'
+        array[3] = null
+        delete item['id']
+      }
+      if (index === 4) {
+        item.random = -1
+      }
+      if (index === 7 || index === 802) {
+        item.random = String(item.random)
+        item.long = String(item.long)
+      }
+      if (index === 9) {
+        item.unknownProp = 'other'
+      }
+
+      return item as JSONObject
+    })
+  }
+
+  const handleOpenFile: ChangeEventHandler<HTMLInputElement> = (event) => {
+    const target = event.target as HTMLInputElement
+
+    console.log('loadFile', target.files)
+    console.time('load file')
+
+    const reader = new window.FileReader()
+    const file = target.files?.[0]
+    if (!file) {
+      return
+    }
+
+    reader.onload = function (event: ProgressEvent<FileReader>) {
+      console.timeEnd('load file')
+
+      if (!event.target) {
+        return
+      }
+
+      console.time('parse and render')
+
+      content = {
+        text: String(event.target?.result),
+        json: undefined
+      }
+
+      tick().then(() => console.timeEnd('parse and render'))
+    }
+    reader.readAsText(file)
   }
 </script>
 
@@ -465,7 +579,6 @@
     <button
       on:click={() => {
         content = {
-          text: undefined,
           json: [1, 2, 3, 4, 5]
         }
       }}
@@ -516,41 +629,7 @@
       on:click={() => {
         content = {
           text: undefined,
-          json: [...new Array(1000)].map((value, index) => {
-            const random = Math.round(Math.random() * 1000)
-            const item = {
-              id: index,
-              name: 'Item ' + index,
-              random,
-              'nested object': {
-                value: random
-              },
-              array: [index, 1, 7, 3],
-              long:
-                selectedParser.id === 'LosslessJSON'
-                  ? 9223372000000000000n + BigInt(random)
-                  : Number(9223372000000000000n + BigInt(random))
-            }
-
-            // introduce some validation issues
-            if (index === 3) {
-              item.array[2] = 'oopsie'
-              item.array[3] = null
-              delete item['id']
-            }
-            if (index === 4) {
-              item.random = -1
-            }
-            if (index === 7 || index === 802) {
-              item.random = String(item.random)
-              item.long = String(item.long)
-            }
-            if (index === 9) {
-              item.unknownProp = 'other'
-            }
-
-            return item
-          })
+          json: generateLongArray()
         }
       }}
     >
@@ -578,7 +657,7 @@
     </button>
     <button
       on:click={() => {
-        refTreeEditor.scrollTo(['669', 'array'])
+        refTreeEditor?.scrollTo(['669', 'array'])
       }}
     >
       Scroll to ['669', 'array']
@@ -586,35 +665,35 @@
     <button
       on:click={() => {
         selectionTree = createValueSelection(['object', 'a'], false)
-        refTreeEditor.focus()
+        refTreeEditor?.focus()
       }}
     >
       Select ['object', 'a']
     </button>
     <button
       on:click={() => {
-        refTreeEditor.select(createValueSelection(['669', 'name'], false))
-        refTreeEditor.focus()
+        refTreeEditor?.select(createValueSelection(['669', 'name'], false))
+        refTreeEditor?.focus()
       }}
     >
       Select ['669', 'name']
     </button>
     <button
       on:click={() => {
-        refTextEditor.select({
+        refTextEditor?.select({
           type: SelectionType.text,
           ranges: [{ anchor: 5, head: 12 }],
           main: 0
         })
-        refTextEditor.focus()
+        refTextEditor?.focus()
       }}
     >
       Select char 5 to 12
     </button>
     <button
       on:click={() => {
-        refTreeEditor.select(null)
-        refTextEditor.select(null)
+        refTreeEditor?.select(null)
+        refTextEditor?.select(null)
       }}
     >
       Select nothing
@@ -623,46 +702,30 @@
   <p class="buttons">
     <button
       on:click={() => {
-        refTreeEditor.patch([{ op: 'add', path: '/updated', value: '2022-09-01T10:13:44Z' }])
+        refTreeEditor?.patch([{ op: 'add', path: '/updated', value: '2022-09-01T10:13:44Z' }])
       }}
     >
       Patch json in tree editor
     </button>
     <button
       on:click={() => {
-        const content = toJSONContent(refTreeEditor.get(), LosslessJSON)
-        const updatedContent = {
-          json: { ...content.json, updated: '2022-09-01T10:13:44Z' }
+        if (!refTreeEditor) {
+          return
         }
-        refTreeEditor.update(updatedContent)
+
+        const content = toJSONContent(refTreeEditor.get(), LosslessJSON)
+        if (isJSONObject(content.json)) {
+          const updatedContent = {
+            json: { ...content.json, updated: '2022-09-01T10:13:44Z' }
+          }
+          refTreeEditor.update(updatedContent)
+        }
       }}
     >
       Update json in tree editor
     </button>
     <button on:click={openInWindow}>Open editor in new window</button>
-    <input
-      type="file"
-      on:change={(event) => {
-        console.log('loadFile', event.target.files)
-        console.time('load file')
-
-        const reader = new window.FileReader()
-        const file = event.target.files[0]
-        reader.onload = function (event) {
-          console.timeEnd('load file')
-
-          console.time('parse and render')
-
-          content = {
-            text: event.target.result,
-            json: undefined
-          }
-
-          tick().then(() => console.timeEnd('parse and render'))
-        }
-        reader.readAsText(file)
-      }}
-    />
+    <input type="file" on:change={handleOpenFile} />
   </p>
 
   <p>
@@ -715,7 +778,7 @@
             onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
             {onChangeMode}
             onFocus={() => console.log('onFocus tree')}
-            onBlur={() => console.log('onBlur tree', { content: refTreeEditor.get() })}
+            onBlur={() => console.log('onBlur tree', { content: refTreeEditor?.get() })}
           />
         {/if}
       </div>
@@ -732,7 +795,7 @@
           json contents:
           <pre>
             <code>
-            {content.json !== undefined
+            {isJSONContent(content)
                 ? truncate(selectedParser.stringify(content.json, null, 2), 1e5)
                 : 'undefined'}
             </code>
@@ -751,7 +814,7 @@
         {#if $showTextEditor}
           <JSONEditor
             bind:this={refTextEditor}
-            mode="text"
+            mode={Mode.text}
             bind:content
             bind:selection={selectionText}
             mainMenuBar={$mainMenuBar}
@@ -776,7 +839,7 @@
             onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
             {onChangeMode}
             onFocus={() => console.log('onFocus text')}
-            onBlur={() => console.log('onBlur text', { content: refTextEditor.get() })}
+            onBlur={() => console.log('onBlur text', { content: refTextEditor?.get() })}
           />
         {/if}
       </div>
@@ -793,7 +856,7 @@
           text contents:
           <pre>
             <code>
-              {content.text ? truncate(content.text, 1e5) : content.text}
+              {isTextContent(content) ? truncate(content.text, 1e5) : undefined}
             </code>
           </pre>
         </div>

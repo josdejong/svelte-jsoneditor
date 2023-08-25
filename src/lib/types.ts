@@ -311,16 +311,16 @@ export interface ExtendedSearchResultItem extends SearchResultItem {
   active: boolean
 }
 
+export type EscapeValue = (value: unknown) => string
+
+export type UnescapeValue = (escapedValue: string) => string
+
 export interface ValueNormalization {
-  escapeValue: (unescapedValue: unknown) => string
-  unescapeValue: (escapedValue: string) => string
+  escapeValue: EscapeValue
+  unescapeValue: UnescapeValue
 }
 
 export type PastedJson = { contents: JSONValue; path: JSONPath } | undefined
-
-export type EscapeValue = (value: JSONValue) => string
-
-export type UnescapeValue = (escapedValue: string) => string
 
 export interface DragInsideProps {
   json: JSONValue
