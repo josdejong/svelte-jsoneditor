@@ -91,6 +91,7 @@
     isEditingSelection,
     isValueSelection,
     pathInSelection,
+    pathStartsWith,
     removeEditModeFromSelection
   } from '$lib/logic/selection.js'
   import { createHistory } from '$lib/logic/history.js'
@@ -429,21 +430,7 @@
     if (!isEqual(documentState.selection, externalSelection)) {
       debug('applyExternalSelection', externalSelection)
 
-      if (externalSelection === null) {
-        updateSelection(externalSelection)
-      }
-
-      if (isValueSelection(externalSelection)) {
-        // check whether the selection is a leaf, and not an object (that would select multiple cells)
-        const value = getIn(json, externalSelection.path)
-        if (isObjectOrArray(value)) {
-          return
-        }
-
-        updateSelection(externalSelection)
-      }
-
-      // we ignore other selection types like key or inline
+      updateSelection(externalSelection)
     }
   }
 
@@ -1791,13 +1778,14 @@
                 {#each columns as column, columnIndex}
                   {@const path = [String(rowIndex)].concat(column)}
                   {@const value = getIn(item, column)}
-                  {@const isSelected = pathInSelection(json, documentState.selection, path)}
+                  {@const isSelected =
+                    isValueSelection(documentState.selection) &&
+                    pathStartsWith(documentState.selection.path, path)}
                   {@const validationErrorsByColumn = validationErrorsByRow?.columns[columnIndex]}
                   <td
                     class="jse-table-cell"
                     data-path={encodeDataPath(path)}
-                    class:jse-selected-value={isSelected &&
-                      isValueSelection(documentState.selection)}
+                    class:jse-selected-value={isSelected}
                   >
                     {#if isObjectOrArray(value)}
                       <InlineValue
