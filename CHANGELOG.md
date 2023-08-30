@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.18.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.18.2...v0.18.3) (2023-08-30)
+
+
+### Bug Fixes
+
+* restore the selection when going back when having multiple JSONEditor modals ([085a9d3](https://github.com/josdejong/svelte-jsoneditor/commit/085a9d31de26f4f41ee04b5aab68f1f9164042c7))
+* sometimes multiple cells selected in Table mode ([c7705f6](https://github.com/josdejong/svelte-jsoneditor/commit/c7705f6e99e6aba525bc7d17b26dc17add56645c))
+
 ### [0.18.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.18.1...v0.18.2) (2023-08-25)
 
 
