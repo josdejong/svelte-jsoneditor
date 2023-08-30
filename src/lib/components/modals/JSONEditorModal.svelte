@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { getContext } from 'svelte'
+  import { getContext, tick } from 'svelte'
   import Header from './Header.svelte'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, immutableJSONPatch, isJSONArray } from 'immutable-json-patch'
@@ -30,6 +30,7 @@
   import { faCaretLeft } from '@fortawesome/free-solid-svg-icons'
   import memoizeOne from 'memoize-one'
   import { onEscape } from '$lib/actions/onEscape.js'
+  import { getFocusPath } from '$lib/logic/selection.js'
 
   const debug = createDebug('jsoneditor:JSONEditorModal')
 
@@ -64,17 +65,21 @@
   interface ModalState {
     mode: Mode
     content: Content
+    selection: JSONEditorSelection | null
     relativePath: JSONPath
   }
+
+  let refEditor: JSONEditorRoot
 
   const rootState: ModalState = {
     mode: determineMode(content),
     content,
+    selection: null,
     relativePath: path
   }
   let stack: ModalState[] = [rootState]
-  let selection: JSONEditorSelection | null = null
 
+  $: currentState = last(stack) || rootState
   $: absolutePath = stack.flatMap((state) => state.relativePath)
   $: pathDescription = !isEmpty(absolutePath) ? stringifyJSONPath(absolutePath) : '(whole document)'
 
@@ -87,6 +92,13 @@
     return isJSONContent(content) && isJSONArray(content.json) ? Mode.table : Mode.tree
   }
 
+  function scrollToSelection() {
+    const selection: JSONPath | null = last(stack)?.selection || null
+    if (selection) {
+      refEditor.scrollTo(getFocusPath(selection))
+    }
+  }
+
   function handleApply() {
     debug('handleApply')
 
@@ -97,8 +109,8 @@
     try {
       error = undefined
 
-      const path = last(stack).relativePath
-      const content = last(stack).content
+      const path = currentState.relativePath
+      const content = currentState.content
       const operations: JSONPatchDocument = [
         {
           op: 'replace',
@@ -114,17 +126,18 @@
           json: immutableJSONPatch(parentJson, operations)
         }
 
-        // after successfully updated, remove from the stack and apply the change
-        stack = initial(stack)
-        selection = null // TODO: restore the selection, like selection = createValueSelection(path, false)
-        handleChange(updatedParentContent)
+        // after successfully updated, remove from the stack and apply the change to the parent
+        const parentState = stack[stack.length - 2] || rootState
+        const updatedParentState: ModalState = { ...parentState, content: updatedParentContent }
+        stack = [...stack.slice(0, stack.length - 2), updatedParentState]
+        tick().then(scrollToSelection)
       } else {
         onPatch(operations)
 
         close()
       }
     } catch (err) {
-      error = err.toString()
+      error = String(err)
     }
   }
 
@@ -134,6 +147,7 @@
     if (stack.length > 1) {
       // remove the last item from the stack
       stack = initial(stack)
+      tick().then(scrollToSelection)
 
       // clear any error from the just closed state
       error = undefined
@@ -147,8 +161,19 @@
     debug('handleChange', updatedContent)
 
     const updatedState = {
-      ...last(stack),
+      ...currentState,
       content: updatedContent
+    }
+
+    stack = [...initial(stack), updatedState]
+  }
+
+  function handleChangeSelection(newSelection: JSONEditorSelection | null) {
+    debug('handleChangeSelection', newSelection)
+
+    const updatedState = {
+      ...currentState,
+      selection: newSelection
     }
 
     stack = [...initial(stack), updatedState]
@@ -158,7 +183,7 @@
     debug('handleChangeMode', newMode)
 
     const updatedState = {
-      ...last(stack),
+      ...currentState,
       mode: newMode
     }
 
@@ -176,6 +201,7 @@
     const nestedModalState = {
       mode: determineMode(content),
       content,
+      selection: null,
       relativePath: path
     }
     stack = [...stack, nestedModalState]
@@ -204,9 +230,10 @@
 
     <div class="jse-modal-inline-editor">
       <JSONEditorRoot
-        mode={last(stack).mode}
-        content={last(stack).content}
-        {selection}
+        bind:this={refEditor}
+        mode={currentState.mode}
+        content={currentState.content}
+        selection={currentState.selection}
         {readOnly}
         {indentation}
         {tabSize}
@@ -226,9 +253,7 @@
         onError={handleError}
         onChange={handleChange}
         onChangeMode={handleChangeMode}
-        onSelect={(newSelection) => {
-          selection = newSelection
-        }}
+        onSelect={handleChangeSelection}
         {onRenderValue}
         {onClassName}
         onFocus={noop}
