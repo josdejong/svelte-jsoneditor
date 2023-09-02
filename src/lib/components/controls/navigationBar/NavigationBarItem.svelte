@@ -6,8 +6,10 @@
   import NavigationBarDropdown from '../../../components/controls/navigationBar/NavigationBarDropdown.svelte'
   import { getContext } from 'svelte'
   import type { JSONPath } from 'immutable-json-patch'
+  import type { AbsolutePopupContext } from '$lib/types'
 
-  const { openAbsolutePopup, closeAbsolutePopup } = getContext('absolute-popup')
+  const { openAbsolutePopup, closeAbsolutePopup } =
+    getContext<AbsolutePopupContext>('absolute-popup')
 
   export let path: JSONPath
   export let index: number
@@ -21,7 +23,7 @@
   $: itemPath = path.slice(0, index)
   $: selectedItem = path[index]
 
-  function handleSelectItem(item) {
+  function handleSelectItem(item: string) {
     closeAbsolutePopup(popupId)
     onSelect(itemPath.concat(item))
   }

@@ -5,7 +5,8 @@
   import Icon from 'svelte-awesome'
   import { faCog, faTimes } from '@fortawesome/free-solid-svg-icons'
   import SelectQueryLanguage from '../controls/selectQueryLanguage/SelectQueryLanguage.svelte'
-  import type { OnChangeQueryLanguage, QueryLanguage } from '$lib/types.js'
+  import type { AbsolutePopupContext, OnChangeQueryLanguage, QueryLanguage } from '$lib/types.js'
+  import type { Context } from 'svelte-simple-modal'
 
   export let queryLanguages: QueryLanguage[]
   export let queryLanguageId: string
@@ -14,14 +15,15 @@
   let refConfigButton: HTMLButtonElement | undefined
   let popupId: number | undefined
 
-  const { close } = getContext('simple-modal')
-  const { openAbsolutePopup, closeAbsolutePopup } = getContext('absolute-popup')
+  const { close } = getContext<Context>('simple-modal')
+  const { openAbsolutePopup, closeAbsolutePopup } =
+    getContext<AbsolutePopupContext>('absolute-popup')
 
   function openConfig() {
     const props = {
       queryLanguages,
       queryLanguageId,
-      onChangeQueryLanguage: (selectedQueryLanguage) => {
+      onChangeQueryLanguage: (selectedQueryLanguage: QueryLanguage) => {
         closeAbsolutePopup(popupId)
         onChangeQueryLanguage(selectedQueryLanguage)
       }
@@ -50,7 +52,7 @@
       <Icon data={faCog} />
     </button>
   {/if}
-  <button type="button" class="jse-close" on:click={close}>
+  <button type="button" class="jse-close" on:click={() => close()}>
     <Icon data={faTimes} />
   </button>
 </div>

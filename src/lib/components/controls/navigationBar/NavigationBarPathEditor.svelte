@@ -6,9 +6,9 @@
   import Icon from 'svelte-awesome'
   import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
   import { tooltip } from '../../controls/tooltip/tooltip.js'
-  import type { JSONPathParser, OnError } from '$lib/types.js'
+  import type { AbsolutePopupContext, JSONPathParser, OnError } from '$lib/types.js'
 
-  const absolutePopupContext = getContext('absolute-popup')
+  const absolutePopupContext = getContext<AbsolutePopupContext>('absolute-popup')
 
   export let path: JSONPath
   export let pathParser: JSONPathParser
@@ -17,13 +17,13 @@
   export let onError: OnError
   export let pathExists: (path: JSONPath) => boolean
 
-  let inputRef
+  let inputRef: HTMLInputElement
   let inputPath: string
   let validationActive = false
   $: inputPath = pathParser.stringify(path)
   $: inputValidationError = validationActive ? parseAndValidate(inputPath).error : undefined
 
-  let copiedTimer = undefined
+  let copiedTimer: number | undefined = undefined
   let copied = false
   const copiedDelay = 1000 // ms
 

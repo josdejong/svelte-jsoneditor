@@ -5,8 +5,9 @@
   import { faClock } from '@fortawesome/free-regular-svg-icons'
   import { getContext } from 'svelte'
   import { tooltip } from '$lib/components/controls/tooltip/tooltip.js'
+  import type { AbsolutePopupContext } from '$lib/types'
 
-  const absolutePopupContext = getContext('absolute-popup')
+  const absolutePopupContext = getContext<AbsolutePopupContext>('absolute-popup')
 
   export let value: number
 

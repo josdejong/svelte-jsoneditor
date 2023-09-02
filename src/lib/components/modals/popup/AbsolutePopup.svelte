@@ -3,7 +3,7 @@
 <script lang="ts">
   import { createDebug } from '$lib/utils/debug.js'
   import { setContext, SvelteComponent } from 'svelte'
-  import type { AbsolutePopupOptions, PopupEntry } from '$lib/types'
+  import type { AbsolutePopupOptions, PopupEntry, AbsolutePopupContext } from '$lib/types'
   import { uniqueId } from '$lib/utils/uniqueId.js'
   import AbsolutePopupEntry from './AbsolutePopupEntry.svelte'
 
@@ -45,7 +45,7 @@
 
   $: debug('popups', popups)
 
-  setContext('absolute-popup', { openAbsolutePopup, closeAbsolutePopup })
+  setContext<AbsolutePopupContext>('absolute-popup', { openAbsolutePopup, closeAbsolutePopup })
 </script>
 
 {#each popups as popup}

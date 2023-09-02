@@ -7,9 +7,9 @@
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getContext } from 'svelte'
   import ColorPickerPopup from '../../../components/controls/ColorPickerPopup.svelte'
-  import type { OnPatch } from '$lib/types.js'
+  import type { AbsolutePopupContext, OnPatch } from '$lib/types.js'
 
-  const { openAbsolutePopup } = getContext('absolute-popup')
+  const { openAbsolutePopup } = getContext<AbsolutePopupContext>('absolute-popup')
 
   export let path: JSONPath
   export let value: string
@@ -35,7 +35,7 @@
     focus()
   }
 
-  function openColorPicker(event) {
+  function openColorPicker(event: MouseEvent) {
     if (readOnly) {
       return
     }

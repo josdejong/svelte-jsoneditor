@@ -12,8 +12,9 @@
   // <ModalRef bind:open bind:close />
   //
   import { getContext } from 'svelte'
+  import type { Context } from 'svelte-simple-modal'
 
-  const context = getContext('simple-modal')
+  const context = getContext<Context>('simple-modal')
 
   export const open = context.open
   export const close = context.close

@@ -2,6 +2,7 @@
 
 <script lang="ts">
   import type {
+    AbsolutePopupContext,
     AbsolutePopupOptions,
     AfterPatchCallback,
     Content,
@@ -135,10 +136,12 @@
   import TableModeWelcome from './TableModeWelcome.svelte'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import RefreshColumnHeader from './RefreshColumnHeader.svelte'
+  import type { Context } from 'svelte-simple-modal'
 
   const debug = createDebug('jsoneditor:TableMode')
-  const { open } = getContext('simple-modal')
-  const { openAbsolutePopup, closeAbsolutePopup } = getContext('absolute-popup')
+  const { open } = getContext<Context>('simple-modal')
+  const { openAbsolutePopup, closeAbsolutePopup } =
+    getContext<AbsolutePopupContext>('absolute-popup')
   const jump = createJump()
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()

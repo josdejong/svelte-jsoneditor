@@ -4,13 +4,14 @@
   import { getContext } from 'svelte'
   import JSONRepairComponent from './repair/JSONRepairComponent.svelte'
   import { onEscape } from '$lib/actions/onEscape.js'
+  import type { Context } from 'svelte-simple-modal'
 
   export let text
   export let onParse
   export let onRepair
   export let onApply
 
-  const { close } = getContext('simple-modal')
+  const { close } = getContext<Context>('simple-modal')
 
   function handleApply(repairedText) {
     close()

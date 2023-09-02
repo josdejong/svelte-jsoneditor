@@ -31,6 +31,7 @@
   import memoizeOne from 'memoize-one'
   import { onEscape } from '$lib/actions/onEscape.js'
   import { getFocusPath } from '$lib/logic/selection.js'
+  import type { Context } from 'svelte-simple-modal'
 
   const debug = createDebug('jsoneditor:JSONEditorModal')
 
@@ -60,7 +61,7 @@
   export let onSortModal: OnSortModal
   export let onTransformModal: OnTransformModal
 
-  const { close } = getContext('simple-modal')
+  const { close } = getContext<Context>('simple-modal')
 
   interface ModalState {
     mode: Mode

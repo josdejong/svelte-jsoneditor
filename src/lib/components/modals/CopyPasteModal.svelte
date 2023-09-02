@@ -4,8 +4,9 @@
   import { getContext } from 'svelte'
   import { IS_MAC } from '../../utils/navigatorUtils.js'
   import Header from './Header.svelte'
+  import type { Context } from 'svelte-simple-modal'
 
-  const { close } = getContext('simple-modal')
+  const { close } = getContext<Context>('simple-modal')
 
   const ctrl = IS_MAC ? '⌘' : 'Ctrl'
 </script>

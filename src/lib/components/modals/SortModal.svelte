@@ -14,6 +14,7 @@
   import { createDebug } from '$lib/utils/debug.js'
   import type { OnSort } from '$lib/types.js'
   import { onEscape } from '$lib/actions/onEscape.js'
+  import type { Context } from 'svelte-simple-modal'
 
   const debug = createDebug('jsoneditor:SortModal')
 
@@ -22,7 +23,7 @@
   export let rootPath: JSONPath
   export let onSort: OnSort
 
-  const { close } = getContext('simple-modal')
+  const { close } = getContext<Context>('simple-modal')
 
   const stateId = `${id}:${compileJSONPointer(rootPath)}`
   const selectedJson = getIn(json, rootPath)

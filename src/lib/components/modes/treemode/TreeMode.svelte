@@ -106,6 +106,7 @@
   import NavigationBar from '../../controls/navigationBar/NavigationBar.svelte'
   import SearchBox from './menu/SearchBox.svelte'
   import type {
+    AbsolutePopupContext,
     AbsolutePopupOptions,
     AfterPatchCallback,
     Content,
@@ -155,17 +156,19 @@
     onRemove
   } from '$lib/logic/actions.js'
   import JSONPreview from '../../controls/JSONPreview.svelte'
+  import type { Context } from 'svelte-simple-modal'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
   const isSSR = typeof window === 'undefined'
   debug('isSSR:', isSSR)
 
-  const { open } = getContext('simple-modal')
+  const { open } = getContext<Context>('simple-modal')
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
 
-  const { openAbsolutePopup, closeAbsolutePopup } = getContext('absolute-popup')
+  const { openAbsolutePopup, closeAbsolutePopup } =
+    getContext<AbsolutePopupContext>('absolute-popup')
 
   let refContents: HTMLDivElement
   let refHiddenInput: HTMLInputElement

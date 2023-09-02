@@ -150,9 +150,9 @@
   const isSSR = typeof window === 'undefined'
   debug('isSSR:', isSSR)
 
-  let codeMirrorRef
-  let codeMirrorView
-  let domTextMode
+  let codeMirrorRef: HTMLDivElement
+  let domTextMode: HTMLDivElement
+  let codeMirrorView: EditorView
   let editorState: EditorState
 
   let onChangeDisabled = false
@@ -457,10 +457,7 @@
     onChangeCodeMirrorValue()
   }
 
-  /**
-   * @param {ValidationError} validationError
-   **/
-  function handleSelectValidationError(validationError) {
+  function handleSelectValidationError(validationError: ValidationError) {
     debug('select validation error', validationError)
 
     const richValidationError = toRichValidationError(validationError)
@@ -486,11 +483,7 @@
     focus()
   }
 
-  /**
-   * @param {number} anchor
-   * @param {number} head
-   **/
-  function setSelection(anchor, head) {
+  function setSelection(anchor: number, head: number) {
     debug('setSelection', { anchor, head })
 
     if (codeMirrorView) {
@@ -503,7 +496,7 @@
     }
   }
 
-  function handleDoubleClick(event, view) {
+  function handleDoubleClick(event: MouseEvent, view: EditorView) {
     // When the user double-clicked right from a bracket [ or {,
     // select the contents of the array or object
     if (view.state.selection.ranges.length === 1) {
@@ -531,7 +524,17 @@
     return linter(linterCallback, { delay: TEXT_MODE_ONCHANGE_DELAY })
   }
 
-  function createCodeMirrorView({ target, initialText, readOnly, indentation }) {
+  function createCodeMirrorView({
+    target,
+    initialText,
+    readOnly,
+    indentation
+  }: {
+    target: HTMLDivElement
+    initialText: string
+    readOnly: boolean
+    indentation: number | string
+  }): EditorView {
     debug('Create CodeMirror editor', { readOnly, indentation })
 
     const state = EditorState.create({
@@ -707,8 +710,10 @@
     }
   }
 
-  function toCodeMirrorSelection(selection: JSONEditorSelection | null): EditorSelection | null {
-    return isTextSelection(selection) ? EditorSelection.fromJSON(selection) : null
+  function toCodeMirrorSelection(
+    selection: JSONEditorSelection | null
+  ): EditorSelection | undefined {
+    return isTextSelection(selection) ? EditorSelection.fromJSON(selection) : undefined
   }
 
   /**
@@ -759,7 +764,7 @@
     emitOnSelect()
   }
 
-  function updateLinter(validator) {
+  function updateLinter(validator: Validator | null) {
     debug('updateLinter', validator)
 
     if (!codeMirrorView) {
@@ -771,7 +776,7 @@
     })
   }
 
-  function updateIndentation(indentation) {
+  function updateIndentation(indentation: number | string) {
     if (codeMirrorView) {
       debug('updateIndentation', indentation)
 
@@ -791,7 +796,7 @@
     }
   }
 
-  function updateReadOnly(readOnly) {
+  function updateReadOnly(readOnly: boolean) {
     if (codeMirrorView) {
       debug('updateReadOnly', readOnly)
 

@@ -24,9 +24,11 @@
     OnClassName,
     OnPatch,
     OnRenderValue,
-    QueryLanguage
+    QueryLanguage,
+    QueryLanguageOptions
   } from '$lib/types.js'
   import { onEscape } from '$lib/actions/onEscape.js'
+  import type { Context } from 'svelte-simple-modal'
 
   const debug = createDebug('jsoneditor:TransformModal')
 
@@ -54,7 +56,7 @@
   $: selectedJson = getIn(json, rootPath)
   $: selectedContent = { json: selectedJson }
 
-  const { close } = getContext('simple-modal')
+  const { close } = getContext<Context>('simple-modal')
 
   const stateId = `${id}:${compileJSONPointer(rootPath)}`
 
@@ -78,7 +80,7 @@
     return queryLanguages.find((item) => item.id === queryLanguageId) || queryLanguages[0]
   }
 
-  function updateQueryByWizard(newQueryOptions) {
+  function updateQueryByWizard(newQueryOptions: QueryLanguageOptions) {
     queryOptions = newQueryOptions
     query = getSelectedQueryLanguage(queryLanguageId).createQuery(json, newQueryOptions)
     isManual = false
@@ -107,7 +109,7 @@
       previewError = undefined
     } catch (err) {
       previewContent = { text: '' }
-      previewError = err.toString()
+      previewError = String(err)
     }
   }
 
@@ -153,7 +155,7 @@
       // button when creating a preview was successful
       console.error(err)
       previewContent = { text: '' }
-      previewError = err.toString()
+      previewError = String(err)
     }
   }
 

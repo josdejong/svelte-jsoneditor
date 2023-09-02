@@ -3,9 +3,9 @@
   import Icon from 'svelte-awesome'
   import { getContext } from 'svelte'
   import { tooltip } from '../../controls/tooltip/tooltip.js'
-  import type { ValidationError } from '$lib/types.js'
+  import type { AbsolutePopupContext, ValidationError } from '$lib/types.js'
 
-  const absolutePopupContext = getContext('absolute-popup')
+  const absolutePopupContext = getContext<AbsolutePopupContext>('absolute-popup')
 
   export let validationError: ValidationError
   export let onExpand: (event: Event) => void

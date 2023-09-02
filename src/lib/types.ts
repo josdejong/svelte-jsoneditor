@@ -378,6 +378,15 @@ export interface AbsolutePopupOptions {
   onClose?: () => void
 }
 
+export interface AbsolutePopupContext {
+  openAbsolutePopup: (
+    component: typeof SvelteComponent,
+    props: Record<string, unknown>,
+    options: AbsolutePopupOptions
+  ) => number
+  closeAbsolutePopup: (popupId: number | undefined) => void
+}
+
 export interface JSONEditorPropsOptional {
   content?: Content
   readOnly?: boolean
