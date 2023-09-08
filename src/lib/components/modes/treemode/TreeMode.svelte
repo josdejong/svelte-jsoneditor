@@ -194,6 +194,7 @@
     export let onSortKey: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
     export let onReferenceKey: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
     export let onCompressKey: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
+    export let onDiffMatch:  ((path: JSONPath, type?: CompareConfigType) => void) | undefined
 
     // modalOpen is true when one of the modals is open.
     // This is used to track whether the editor still has focus
@@ -816,6 +817,14 @@
         }
         const path = documentState.selection.focusPath
         onCompressKey?.(path, type)
+    }
+
+    function handleDiffMatch(type?: CompareConfigType) {
+      if (readOnly || !documentState.selection) {
+        return
+      }
+      const path = documentState.selection.focusPath
+      onDiffMatch?.(path, type)
     }
 
     function handleEditKey() {
@@ -1857,10 +1866,13 @@
             parser,
             showTip,
             language,
+
             onIgnoreKey: onIgnoreKey && handleIgnoreKey,
             onSortKey: onSortKey &&  handleSortKey,
             onReferenceKey: onReferenceKey && handleReferenceKey,
             onCompressKey: onCompressKey && handleCompressKey,
+            onDiffMatch: onDiffMatch && handleDiffMatch,
+
             onEditKey: handleEditKey,
             onEditValue: handleEditValue,
             onToggleEnforceString: handleToggleEnforceString,

@@ -43,6 +43,8 @@
     export let onSortKey: ((type?: CompareConfigType) => void) | undefined
     export let onReferenceKey: ((type?: CompareConfigType) => void) | undefined
     export let onCompressKey: ((type?: CompareConfigType) => void) | undefined
+    export let onDiffMatch: ((type?: CompareConfigType) => void) | undefined
+
     export let onCloseContextMenu
     export let onEditKey
     export let onEditValue
@@ -139,6 +141,11 @@
     function handleCompressKey(type?: CompareConfigType) {
         onCloseContextMenu()
         onCompressKey?.(type)
+    }
+
+    function handleDiffMatch(type?: CompareConfigType){
+      onCloseContextMenu()
+      onDiffMatch?.(type)
     }
 
     function handleEditKey() {
@@ -264,6 +271,11 @@
                   text: 'Compress Key',
                   disabled: !isLeafNode,
                   onClick: () => handleCompressKey(),
+                }] : []).concat(onDiffMatch ? [{
+                  type: 'button',
+                  text: 'Diff Match',
+                  disabled: !isLeafNode,
+                  onClick: () => handleDiffMatch(),
                 }] : []),
             }]
         }
@@ -304,6 +316,11 @@
                   text: '添加压缩',
                   disabled: !isLeafNode,
                   onClick: () => handleCompressKey(),
+                }] : []).concat(onDiffMatch ? [{
+                  type: 'button',
+                  text: '显示差异',
+                  disabled: !isLeafNode,
+                  onClick: () => handleDiffMatch(),
                 }] : []),
             }]
         }

@@ -689,6 +689,9 @@
             onCompressKey= {(path, type) => {
               console.log('onCompressKey', path,  type)
             }}
+            onDiffMatch= {(path, type) => {
+              console.log('onDiffMatch', path,  type)
+            }}
           />
         {/if}
       </div>
