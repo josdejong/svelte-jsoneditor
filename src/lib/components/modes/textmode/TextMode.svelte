@@ -115,6 +115,7 @@
   import { faJSONEditorFormat } from '$lib/img/customFontawesomeIcons.js'
   import { indentationMarkers } from '@replit/codemirror-indentation-markers'
   import { isTextSelection } from '$lib/logic/selection.js'
+  import { wrappedLineIndent } from 'codemirror-wrapped-line-indent'
 
   export let readOnly: boolean
   export let mainMenuBar: boolean
@@ -594,7 +595,8 @@
         tabSizeCompartment.of(EditorState.tabSize.of(tabSize)),
         indentUnitCompartment.of(createIndentUnit(indentation)),
         themeCompartment.of(EditorView.theme({}, { dark: hasDarkTheme() })),
-        EditorView.lineWrapping
+        EditorView.lineWrapping,
+        wrappedLineIndent
       ]
     })
 
@@ -748,7 +750,7 @@
     }
 
     const codeMirrorText = getCodeMirrorValue()
-
+    
     const isChanged = codeMirrorText !== text
     debug('onChangeCodeMirrorValue', { isChanged })
     if (!isChanged) {
