@@ -750,7 +750,7 @@
     }
 
     const codeMirrorText = getCodeMirrorValue()
-    
+
     const isChanged = codeMirrorText !== text
     debug('onChangeCodeMirrorValue', { isChanged })
     if (!isChanged) {

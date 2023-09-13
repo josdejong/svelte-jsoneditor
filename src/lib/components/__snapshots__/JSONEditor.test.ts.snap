@@ -913,7 +913,7 @@ exports[`JSONEditor > render text mode 1`] = `
                 data-language="json"
                 role="textbox"
                 spellcheck="false"
-                style="tab-size: 4"
+                style="tab-size: 4;"
                 translate="no"
               >
                 <div
@@ -923,13 +923,13 @@ exports[`JSONEditor > render text mode 1`] = `
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat"
+                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat;"
                 >
                     {
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat,repeating-linear-gradient(to right, var(--indent-marker-bg-color) 0 1px, transparent 1px 2ch) 2.5ch/calc(2ch - 1px) no-repeat"
+                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat,repeating-linear-gradient(to right, var(--indent-marker-bg-color) 0 1px, transparent 1px 2ch) 2.5ch/calc(2ch - 1px) no-repeat;"
                 >
                       
                   <span
@@ -946,19 +946,19 @@ exports[`JSONEditor > render text mode 1`] = `
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat"
+                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat;"
                 >
                     },
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat"
+                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat;"
                 >
                     {
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat,repeating-linear-gradient(to right, var(--indent-marker-bg-color) 0 1px, transparent 1px 2ch) 2.5ch/calc(2ch - 1px) no-repeat"
+                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat,repeating-linear-gradient(to right, var(--indent-marker-bg-color) 0 1px, transparent 1px 2ch) 2.5ch/calc(2ch - 1px) no-repeat;"
                 >
                       
                   <span
@@ -976,7 +976,7 @@ exports[`JSONEditor > render text mode 1`] = `
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat,repeating-linear-gradient(to right, var(--indent-marker-bg-color) 0 1px, transparent 1px 2ch) 2.5ch/calc(2ch - 1px) no-repeat"
+                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat,repeating-linear-gradient(to right, var(--indent-marker-bg-color) 0 1px, transparent 1px 2ch) 2.5ch/calc(2ch - 1px) no-repeat;"
                 >
                       
                   <span
@@ -993,19 +993,19 @@ exports[`JSONEditor > render text mode 1`] = `
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat"
+                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat;"
                 >
                     },
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat"
+                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat;"
                 >
                     {
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat,repeating-linear-gradient(to right, var(--indent-marker-bg-color) 0 1px, transparent 1px 2ch) 2.5ch/calc(2ch - 1px) no-repeat"
+                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat,repeating-linear-gradient(to right, var(--indent-marker-bg-color) 0 1px, transparent 1px 2ch) 2.5ch/calc(2ch - 1px) no-repeat;"
                 >
                       
                   <span
@@ -1022,7 +1022,7 @@ exports[`JSONEditor > render text mode 1`] = `
                 </div>
                 <div
                   class="cm-indent-markers cm-line"
-                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat"
+                  style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat;"
                 >
                     }
                 </div>
