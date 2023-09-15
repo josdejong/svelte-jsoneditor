@@ -1172,7 +1172,7 @@
       selectInside: false,
       refJsonEditor,
       json,
-      documentState,
+      selection: documentState.selection,
       readOnly,
       parser,
       onPatch: handlePatch,
@@ -1352,7 +1352,7 @@
     onPaste({
       clipboardText,
       json,
-      documentState,
+      selection: documentState.selection,
       readOnly,
       parser,
       onPatch: handlePatch,
@@ -1686,6 +1686,7 @@
   class:no-main-menu={!mainMenuBar}
   on:mousedown={handleMouseDown}
   on:keydown={handleKeyDown}
+  on:paste={handlePaste}
   on:contextmenu={handleContextMenu}
   bind:this={refJsonEditor}
 >
@@ -1711,7 +1712,6 @@
         tabindex="-1"
         class="jse-hidden-input"
         bind:this={refHiddenInput}
-        on:paste={handlePaste}
       />
     </label>
     {#if containsValidArray}

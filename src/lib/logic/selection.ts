@@ -471,7 +471,7 @@ export function getInitialSelection(json: JSONValue, documentState: DocumentStat
   }
 
   const path = visiblePaths[index]
-  return path.length === 0 || Array.isArray(getIn(json, initial(path)))
+  return path === undefined || path.length === 0 || Array.isArray(getIn(json, initial(path)))
     ? createValueSelection(path, false) // Array items and root object/array do not have a key, so select value in that case
     : createKeySelection(path, false)
 }

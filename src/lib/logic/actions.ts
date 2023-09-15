@@ -28,7 +28,8 @@ import type {
   OnChange,
   OnChangeText,
   OnPatch,
-  OnJSONSelect
+  OnJSONSelect,
+  JSONSelection
 } from '$lib/types'
 import { createDebug } from '$lib/utils/debug.js'
 import {
@@ -124,7 +125,7 @@ type RepairModalCallback = (text: string, onApply: (repairedText: string) => voi
 interface OnPasteAction {
   clipboardText: string
   json: JSONValue | undefined
-  documentState: DocumentState
+  selection: JSONSelection | null
   readOnly: boolean
   parser: JSONParser
   onPatch: OnPatch
@@ -136,7 +137,7 @@ interface OnPasteAction {
 export function onPaste({
   clipboardText,
   json,
-  documentState,
+  selection,
   readOnly,
   parser,
   onPatch,
@@ -149,11 +150,11 @@ export function onPaste({
 
   function doPaste(pastedText: string) {
     if (json !== undefined) {
-      const selection = documentState.selection || createMultiSelection([], [])
+      const selectionNonNull = selection || createValueSelection([], false)
 
-      const operations = insert(json, selection, pastedText, parser)
+      const operations = insert(json, selectionNonNull, pastedText, parser)
 
-      debug('paste', { pastedText, operations, selection })
+      debug('paste', { pastedText, operations, selectionNonNull })
 
       onPatch(operations, (patchedJson, patchedState) => {
         let updatedState = patchedState
@@ -486,7 +487,7 @@ export interface OnInsert {
   selectInside: boolean
   refJsonEditor: HTMLElement
   json: JSONValue | undefined
-  documentState: DocumentState
+  selection: JSONSelection | null
   readOnly: boolean
   parser: JSONParser
   onPatch: OnPatch
@@ -499,21 +500,21 @@ export function onInsert({
   selectInside,
   refJsonEditor,
   json,
-  documentState,
+  selection,
   readOnly,
   parser,
   onPatch,
   onReplaceJson
 }: OnInsert): void {
-  if (readOnly || !documentState.selection) {
+  if (readOnly) {
     return
   }
 
-  const newValue = createNewValue(json, documentState.selection, insertType)
+  const newValue = createNewValue(json, selection, insertType)
 
   if (json !== undefined) {
     const data = parser.stringify(newValue)
-    const operations = insert(json, documentState.selection, data, parser)
+    const operations = insert(json, selection, data, parser)
     debug('onInsert', { insertType, operations, newValue, data })
 
     const operation = last(
@@ -543,7 +544,7 @@ export function onInsert({
             state: expandPath(
               patchedJson,
               {
-                ...documentState,
+                ...patchedState,
                 selection: isObject(parent)
                   ? createKeySelection(path, true)
                   : createValueSelection(path, true)
@@ -584,7 +585,7 @@ export interface OnInsertCharacter {
   selectInside: boolean
   refJsonEditor: HTMLElement
   json: JSONValue | undefined
-  documentState: DocumentState
+  selection: JSONSelection | null
   readOnly: boolean
   parser: JSONParser
   onPatch: OnPatch
@@ -598,7 +599,7 @@ export async function onInsertCharacter({
   selectInside,
   refJsonEditor,
   json,
-  documentState,
+  selection,
   readOnly,
   parser,
   onPatch,
@@ -607,16 +608,16 @@ export async function onInsertCharacter({
 }: OnInsertCharacter) {
   // a regular key like a, A, _, etc is entered.
   // Replace selected contents with a new value having this first character as text
-  if (readOnly || !documentState.selection) {
+  if (readOnly) {
     return
   }
 
-  if (isKeySelection(documentState.selection)) {
+  if (isKeySelection(selection)) {
     // only replace contents when not yet in edit mode (can happen when entering
     // multiple characters very quickly after each other due to the async handling)
-    const replaceContents = !documentState.selection.edit
+    const replaceContents = !selection.edit
 
-    onSelect({ ...documentState.selection, edit: true })
+    onSelect({ ...selection, edit: true })
     tick2(() => insertActiveElementContents(refJsonEditor, char, replaceContents))
     return
   }
@@ -627,7 +628,7 @@ export async function onInsertCharacter({
       selectInside,
       refJsonEditor,
       json,
-      documentState,
+      selection,
       readOnly,
       parser,
       onPatch,
@@ -639,20 +640,20 @@ export async function onInsertCharacter({
       selectInside,
       refJsonEditor,
       json,
-      documentState,
+      selection,
       readOnly,
       parser,
       onPatch,
       onReplaceJson
     })
   } else {
-    if (isValueSelection(documentState.selection) && json !== undefined) {
-      if (!isObjectOrArray(getIn(json, documentState.selection.path))) {
+    if (isValueSelection(selection) && json !== undefined) {
+      if (!isObjectOrArray(getIn(json, selection.path))) {
         // only replace contents when not yet in edit mode (can happen when entering
         // multiple characters very quickly after each other due to the async handling)
-        const replaceContents = !documentState.selection.edit
+        const replaceContents = !selection.edit
 
-        onSelect({ ...documentState.selection, edit: true })
+        onSelect({ ...selection, edit: true })
         tick2(() => insertActiveElementContents(refJsonEditor, char, replaceContents))
       } else {
         // TODO: replace the object/array with editing a text in edit mode?
@@ -666,7 +667,7 @@ export async function onInsertCharacter({
         char,
         refJsonEditor,
         json,
-        documentState,
+        selection,
         readOnly,
         parser,
         onPatch,
@@ -680,7 +681,7 @@ interface OnInsertValueWithCharacter {
   char: string
   refJsonEditor: HTMLElement
   json: JSONValue | undefined
-  documentState: DocumentState
+  selection: JSONSelection | null
   readOnly: boolean
   parser: JSONParser
   onPatch: OnPatch
@@ -691,13 +692,13 @@ async function onInsertValueWithCharacter({
   char,
   refJsonEditor,
   json,
-  documentState,
+  selection,
   readOnly,
   parser,
   onPatch,
   onReplaceJson
 }: OnInsertValueWithCharacter) {
-  if (readOnly || !documentState.selection) {
+  if (readOnly) {
     return
   }
 
@@ -707,7 +708,7 @@ async function onInsertValueWithCharacter({
     selectInside: false, // not relevant, we insert a value, not an object or array
     refJsonEditor,
     json,
-    documentState,
+    selection,
     readOnly,
     parser,
     onPatch,
@@ -716,7 +717,7 @@ async function onInsertValueWithCharacter({
 
   // only replace contents when not yet in edit mode (can happen when entering
   // multiple characters very quickly after each other due to the async handling)
-  const replaceContents = !isEditingSelection(documentState.selection)
+  const replaceContents = !isEditingSelection(selection)
 
   tick2(() => insertActiveElementContents(refJsonEditor, char, replaceContents))
 }

@@ -722,7 +722,7 @@
 
     documentState = {
       ...documentState,
-      selection: createMultiSelection([], [])
+      selection: createValueSelection([], false)
     }
   }
 
@@ -898,7 +898,7 @@
     onPaste({
       clipboardText,
       json,
-      documentState,
+      selection: documentState.selection,
       readOnly,
       parser,
       onPatch: handlePatch,
@@ -1014,7 +1014,7 @@
       selectInside: true,
       refJsonEditor,
       json,
-      documentState,
+      selection: documentState.selection,
       readOnly,
       parser,
       onPatch: handlePatch,
@@ -1112,7 +1112,7 @@
       selectInside: true,
       refJsonEditor,
       json,
-      documentState,
+      selection: documentState.selection,
       readOnly,
       parser,
       onPatch: handlePatch,
@@ -2095,6 +2095,7 @@
   class:no-main-menu={!mainMenuBar}
   on:keydown={handleKeyDown}
   on:mousedown={handleMouseDown}
+  on:paste={handlePaste}
   on:contextmenu={handleContextMenu}
   bind:this={refJsonEditor}
 >
@@ -2135,7 +2136,6 @@
         tabindex="-1"
         class="jse-hidden-input"
         bind:this={refHiddenInput}
-        on:paste={handlePaste}
       />
     </label>
     {#if json === undefined}

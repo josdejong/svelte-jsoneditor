@@ -47,6 +47,7 @@ import type {
 import { CaretType } from '$lib/types.js'
 import { int } from '../utils/numberUtils.js'
 import { isLargeContent } from '$lib/utils/jsonUtils.js'
+import { createValueSelection } from './selection.js'
 
 type OnCreateSelection = (json: JSONValue, documentState: DocumentState) => JSONSelection
 
@@ -61,7 +62,7 @@ export function createDocumentState(props?: CreateDocumentStateProps): DocumentS
     expandedMap: {},
     enforceStringMap: {},
     visibleSectionsMap: {},
-    selection: null,
+    selection: createValueSelection([], false),
     sortedColumn: null
   }
 
