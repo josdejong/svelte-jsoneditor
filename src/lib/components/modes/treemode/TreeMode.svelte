@@ -48,7 +48,6 @@
     createAfterSelection,
     createInsideSelection,
     createKeySelection,
-    createMultiSelection,
     createSelectionFromOperations,
     createValueSelection,
     findRootPath,
