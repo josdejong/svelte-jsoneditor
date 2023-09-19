@@ -14,8 +14,12 @@
       <div class="jse-welcome-info">
         You can paste clipboard data using <b>Ctrl+V</b>, or use the following options:
       </div>
-      <button title={"Create an empty JSON object (press '{')"} on:click={() => onCreateObject()}>Create object</button>
-      <button title={"Create an empty JSON array (press '[')"} on:click={() => onCreateArray()}>Create array</button>
+      <button title={"Create an empty JSON object (press '{')"} on:click={() => onCreateObject()}
+        >Create object</button
+      >
+      <button title={"Create an empty JSON array (press '[')"} on:click={() => onCreateArray()}
+        >Create array</button
+      >
     {/if}
   </div>
   <div class="jse-space jse-after" />
