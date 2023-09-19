@@ -110,6 +110,8 @@
   }
 
   function handleValuePaste(event: ClipboardEvent) {
+    event.stopPropagation()
+
     if (!onPaste || !event.clipboardData) {
       return
     }
