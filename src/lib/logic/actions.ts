@@ -25,11 +25,11 @@ import type {
   DocumentState,
   InsertType,
   JSONParser,
+  JSONSelection,
   OnChange,
   OnChangeText,
-  OnPatch,
   OnJSONSelect,
-  JSONSelection
+  OnPatch
 } from '$lib/types'
 import { createDebug } from '$lib/utils/debug.js'
 import {
@@ -562,8 +562,8 @@ export function onInsert({
 
     if (operation) {
       if (newValue === '') {
-        // open the newly inserted value in edit mode
-        tick2(() => insertActiveElementContents(refJsonEditor, '', true))
+        // open the newly inserted value in edit mode (can be cancelled via ESC this way)
+        tick2(() => insertActiveElementContents(refJsonEditor, '', true, refreshEditableDiv))
       }
     }
   } else {
@@ -620,7 +620,10 @@ export async function onInsertCharacter({
     const replaceContents = !selection.edit
 
     onSelect({ ...selection, edit: true })
-    tick2(() => insertActiveElementContents(refJsonEditor, char, replaceContents))
+    tick2(() =>
+      // We use this way via insertActiveElementContents, so we can cancel via ESC
+      insertActiveElementContents(refJsonEditor, char, replaceContents, refreshEditableDiv)
+    )
     return
   }
 
@@ -656,7 +659,10 @@ export async function onInsertCharacter({
         const replaceContents = !selection.edit
 
         onSelect({ ...selection, edit: true })
-        tick2(() => insertActiveElementContents(refJsonEditor, char, replaceContents))
+        tick2(() =>
+          // We use this way via insertActiveElementContents, so we can cancel via ESC
+          insertActiveElementContents(refJsonEditor, char, replaceContents, refreshEditableDiv)
+        )
       } else {
         // TODO: replace the object/array with editing a text in edit mode?
         //  (Ideally this this should not create an entry in history though,
@@ -721,7 +727,7 @@ async function onInsertValueWithCharacter({
   // multiple characters very quickly after each other due to the async handling)
   const replaceContents = !isEditingSelection(selection)
 
-  tick2(() => insertActiveElementContents(refJsonEditor, char, replaceContents))
+  tick2(() => insertActiveElementContents(refJsonEditor, char, replaceContents, refreshEditableDiv))
 }
 
 /**
@@ -731,4 +737,14 @@ async function onInsertValueWithCharacter({
  */
 function tick2(callback: () => void) {
   setTimeout(() => setTimeout(callback))
+}
+
+function refreshEditableDiv(element: HTMLElement) {
+  // We force a refresh because when changing the text of the editable div programmatically,
+  // the DIV doesn't get a trigger to update it's class
+  // TODO: come up with a better solution
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  element?.refresh()
 }

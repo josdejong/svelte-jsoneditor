@@ -229,7 +229,8 @@ export function setCursorToEnd(element: HTMLElement) {
 export function insertActiveElementContents(
   container: HTMLElement,
   text: string,
-  replaceContents: boolean
+  replaceContents: boolean,
+  onActiveElement?: (activeElement: HTMLElement) => void
 ) {
   const window = getWindow(container)
   if (!window) {
@@ -242,7 +243,11 @@ export function insertActiveElementContents(
 
   if (activeElement && activeElement.isContentEditable) {
     activeElement.textContent = replaceContents ? text : activeElement.textContent + text
+    console.log('UPDATED TEXT', replaceContents ? text : activeElement.textContent + text)
     setCursorToEnd(activeElement)
+    if (onActiveElement) {
+      onActiveElement(activeElement)
+    }
   }
 }
 

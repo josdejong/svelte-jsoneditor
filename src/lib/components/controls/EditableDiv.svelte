@@ -21,7 +21,8 @@
   export let onValueClass: (value: string) => string = () => ''
 
   let domValue: HTMLDivElement | undefined
-  let valueClass = onValueClass(value)
+  let valueClass: string
+  $: valueClass = onValueClass(value)
   let closed = false
 
   onMount(() => {
@@ -32,6 +33,11 @@
     setTimeout(() => {
       if (domValue) {
         setCursorToEnd(domValue)
+
+        // The refresh method can be used to update the classnames for example
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        domValue.refresh = handleValueInput
       }
     })
   })
