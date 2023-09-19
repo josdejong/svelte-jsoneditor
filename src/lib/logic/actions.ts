@@ -574,7 +574,9 @@ export function onInsert({
     onReplaceJson(newValue, (patchedJson, patchedState) => ({
       state: {
         ...expandRecursive(patchedJson, patchedState, path),
-        selection: createValueSelection(path, true)
+        selection: isObjectOrArray(newValue)
+          ? createInsideSelection(path)
+          : createValueSelection(path, true)
       }
     }))
   }
