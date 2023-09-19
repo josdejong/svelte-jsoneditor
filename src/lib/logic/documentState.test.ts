@@ -388,7 +388,7 @@ describe('documentState', () => {
       const documentState: DocumentState = {
         ...createDocumentState({ json, expand: () => true }),
         visibleSectionsMap: {
-          '/members': [{ start: 0, end: 2 }]
+          '/members': [{ start: 0, end: 3 }]
         }
       }
 
@@ -463,7 +463,7 @@ describe('documentState', () => {
           '/members/3': true
         },
         visibleSectionsMap: {
-          '/members': [{ start: 0, end: 3 }]
+          '/members': [{ start: 0, end: 4 }]
         }
       })
     })
@@ -492,7 +492,7 @@ describe('documentState', () => {
           '': true
         },
         visibleSectionsMap: {
-          '': [{ start: 0, end: 4 }]
+          '': [{ start: 0, end: 5 }]
         }
       }
 
@@ -501,7 +501,7 @@ describe('documentState', () => {
       assert.deepStrictEqual(res.documentState, {
         ...documentState,
         visibleSectionsMap: {
-          '': [{ start: 0, end: 5 }]
+          '': [{ start: 0, end: 6 }]
         }
       })
     })
@@ -548,7 +548,7 @@ describe('documentState', () => {
         ...documentState,
         expandedMap: deleteIn(documentState.expandedMap, ['/members/2']), // [2] is moved to [1]
         visibleSectionsMap: {
-          '/members': [{ start: 0, end: 1 }]
+          '/members': [{ start: 0, end: 2 }]
         }
       })
     })
@@ -565,7 +565,7 @@ describe('documentState', () => {
         ...documentState,
         expandedMap: deleteIn(documentState.expandedMap, ['/members/2']), // [2] is moved to [1]
         visibleSectionsMap: {
-          '/members': [{ start: 0, end: 1 }]
+          '/members': [{ start: 0, end: 2 }]
         }
       })
     })
@@ -722,7 +722,7 @@ describe('documentState', () => {
           '/members/3': true
         },
         visibleSectionsMap: {
-          '/members': [{ start: 0, end: 3 }]
+          '/members': [{ start: 0, end: 4 }]
         }
       })
     })
@@ -871,7 +871,7 @@ describe('documentState', () => {
           '/members/3': true
         },
         visibleSectionsMap: {
-          '/members': [{ start: 0, end: 3 }]
+          '/members': [{ start: 0, end: 4 }]
         }
       })
     })
@@ -907,7 +907,7 @@ describe('documentState', () => {
           '/members/1': true
         },
         visibleSectionsMap: {
-          '/members': [{ start: 0, end: 1 }]
+          '/members': [{ start: 0, end: 2 }]
         }
       })
     })
@@ -940,7 +940,7 @@ describe('documentState', () => {
 
     test('should insert at the end of a visible section', () => {
       assert.deepStrictEqual(shiftVisibleSections(visibleSections, 2, 1), [
-        { start: 0, end: 3 },
+        { start: 0, end: 2 },
         { start: 5, end: 7 }
       ])
     })
@@ -959,10 +959,35 @@ describe('documentState', () => {
       ])
     })
 
-    test('should remove at the end of a visible section', () => {
+    test('should remove inside an invisible section (start)', () => {
       assert.deepStrictEqual(shiftVisibleSections(visibleSections, 2, -1), [
-        { start: 0, end: 1 },
+        { start: 0, end: 2 },
         { start: 3, end: 5 }
+      ])
+    })
+
+    test('should remove inside an invisible section (middle)', () => {
+      assert.deepStrictEqual(shiftVisibleSections(visibleSections, 3, -1), [
+        { start: 0, end: 2 },
+        { start: 3, end: 5 }
+      ])
+    })
+
+    test('should remove inside an invisible section (end)', () => {
+      assert.deepStrictEqual(shiftVisibleSections(visibleSections, 4, -1), [
+        { start: 0, end: 2 },
+        { start: 4, end: 5 }
+      ])
+    })
+
+    test('should merge visible sections when adjacent', () => {
+      const visibleSections2 = [
+        { start: 0, end: 100 },
+        { start: 200, end: 300 }
+      ]
+
+      assert.deepStrictEqual(shiftVisibleSections(visibleSections2, 100, -100), [
+        { start: 0, end: 200 }
       ])
     })
   })

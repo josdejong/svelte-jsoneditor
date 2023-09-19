@@ -648,12 +648,33 @@ export function shiftVisibleSections(
   index: number,
   offset: number
 ): VisibleSection[] {
-  return visibleSections.map((section) => {
+  const shiftedSections = visibleSections.map((section) => {
     return {
       start: section.start > index ? section.start + offset : section.start,
-      end: section.end >= index ? section.end + offset : section.end
+      end: section.end > index ? section.end + offset : section.end
     }
   })
+
+  return mergeAdjacentSections(shiftedSections)
+}
+
+// merge adjacent sections like [{start:0, end:100}, {start:100, end:200}] into [{start:0, end:200}]
+function mergeAdjacentSections(visibleSections: VisibleSection[]): VisibleSection[] {
+  const merged = visibleSections.slice(0)
+
+  let i = 1
+  while (i < merged.length) {
+    if (merged[i - 1].end === merged[i].start) {
+      merged[i - 1] = {
+        start: merged[i - 1].start,
+        end: merged[i].end
+      }
+      merged.splice(i)
+    }
+    i++
+  }
+
+  return merged
 }
 
 export function getEnforceString(
