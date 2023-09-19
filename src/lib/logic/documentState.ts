@@ -44,10 +44,10 @@ import type {
   Section,
   VisibleSection
 } from '$lib/types'
+import { SelectionType } from '$lib/types'
 import { CaretType } from '$lib/types.js'
 import { int } from '../utils/numberUtils.js'
 import { isLargeContent } from '$lib/utils/jsonUtils.js'
-import { createValueSelection } from './selection.js'
 
 type OnCreateSelection = (json: JSONValue, documentState: DocumentState) => JSONSelection
 
@@ -62,7 +62,11 @@ export function createDocumentState(props?: CreateDocumentStateProps): DocumentS
     expandedMap: {},
     enforceStringMap: {},
     visibleSectionsMap: {},
-    selection: createValueSelection([], false),
+    selection: {
+      type: SelectionType.value,
+      path: [],
+      edit: false
+    },
     sortedColumn: null
   }
 

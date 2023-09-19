@@ -214,26 +214,36 @@ export function getSelectionUp(
     return null
   }
 
-  const path = keepAnchorPath ? getFocusPath(selection) : getStartPath(json, selection)
-  const previousPath = getPreviousVisiblePath(json, documentState, path)
-
-  if (previousPath === null) {
-    return null
-  }
-
-  const anchorPath = previousPath
-  const focusPath = previousPath
+  const focusPath = keepAnchorPath ? getFocusPath(selection) : getStartPath(json, selection)
+  const previousPath = getPreviousVisiblePath(json, documentState, focusPath)
 
   if (keepAnchorPath) {
-    // multi selection
-    if (isAfterSelection(selection) || isInsideSelection(selection)) {
-      return createMultiSelection(selection.path, selection.path)
+    // create a multi-selection with multiple nodes
+    if (isInsideSelection(selection) || isAfterSelection(selection)) {
+      return previousPath !== null ? createMultiSelection(focusPath, focusPath) : null
     }
 
-    return createMultiSelection(getAnchorPath(selection), focusPath)
+    return previousPath !== null
+      ? createMultiSelection(getAnchorPath(selection), previousPath)
+      : null
+  }
+
+  if (isAfterSelection(selection)) {
+    // select the node itself, not the previous node,
+    // FIXME: when after an expanded object/array, should go to the last item inside the object/array
+    return createValueSelection(focusPath, false)
+  }
+
+  if (isInsideSelection(selection)) {
+    // select the node itself, not the previous node,
+    return createValueSelection(focusPath, false)
   }
 
   if (isKeySelection(selection)) {
+    if (previousPath == null || previousPath.length === 0) {
+      return null
+    }
+
     const parentPath = initial(previousPath)
     const parent = getIn(json, parentPath)
     if (Array.isArray(parent) || isEmpty(previousPath)) {
@@ -245,22 +255,14 @@ export function getSelectionUp(
   }
 
   if (isValueSelection(selection)) {
+    return previousPath !== null ? createValueSelection(previousPath, false) : null
+  }
+
+  if (previousPath !== null) {
     return createValueSelection(previousPath, false)
   }
 
-  if (isAfterSelection(selection)) {
-    // select the node itself, not the previous node,
-    // FIXME: when after an expanded object/array, should go to the last item inside the object/array
-    return createMultiSelection(path, path)
-  }
-
-  if (isInsideSelection(selection)) {
-    // select the node itself, not the previous node,
-    return createMultiSelection(path, path)
-  }
-
-  // multi selection -> select previous node
-  return createMultiSelection(anchorPath, focusPath)
+  return null
 }
 
 export function getSelectionDown(
@@ -272,59 +274,68 @@ export function getSelectionDown(
   if (!selection) {
     return null
   }
-  // TODO: this function is too large, break it down in two separate functions: one for keepAnchorPath = true, and one for keepAnchorPath = false?
-  const path = keepAnchorPath ? getFocusPath(selection) : getEndPath(json, selection)
-  const nextPath = getNextVisiblePath(json, documentState, path)
-  const anchorPath = nextPath
-  const focusPath = nextPath
+  const focusPath = keepAnchorPath ? getFocusPath(selection) : getEndPath(json, selection)
 
   // if the focusPath is an Array or object, we must not step into it but
   // over it, we pass state with this array/object collapsed
-  const collapsedState = isObjectOrArray(getIn(json, path))
-    ? collapsePath(documentState, path)
+  const collapsedState = isObjectOrArray(getIn(json, focusPath))
+    ? collapsePath(documentState, focusPath)
     : documentState
 
-  const nextPathAfter = getNextVisiblePath(json, collapsedState, path)
-
-  if (nextPathAfter === null || anchorPath == null || focusPath == null) {
-    return null
-  }
+  const nextPath = getNextVisiblePath(json, documentState, focusPath)
+  const nextPathAfter = getNextVisiblePath(json, collapsedState, focusPath)
 
   if (keepAnchorPath) {
-    // multi selection
-    if (isAfterSelection(selection)) {
-      return createMultiSelection(nextPathAfter, nextPathAfter)
-    }
-
+    // create a multi-selection with multiple nodes
     if (isInsideSelection(selection)) {
-      return createMultiSelection(anchorPath, focusPath)
+      return nextPath !== null ? createMultiSelection(nextPath, nextPath) : null
     }
 
-    return createMultiSelection(getAnchorPath(selection), nextPathAfter)
+    if (isAfterSelection(selection)) {
+      return nextPathAfter !== null ? createMultiSelection(nextPathAfter, nextPathAfter) : null
+    }
+
+    return nextPathAfter !== null
+      ? createMultiSelection(getAnchorPath(selection), nextPathAfter)
+      : null
+  }
+
+  if (isAfterSelection(selection)) {
+    return nextPathAfter !== null ? createValueSelection(nextPathAfter, false) : null
+  }
+
+  if (isInsideSelection(selection)) {
+    return nextPath !== null ? createValueSelection(nextPath, false) : null
+  }
+
+  if (isValueSelection(selection)) {
+    return nextPath !== null ? createValueSelection(nextPath, false) : null
   }
 
   if (isKeySelection(selection)) {
+    if (nextPath === null || nextPath.length === 0) {
+      return null
+    }
+
     const parentPath = initial(nextPath) // not nextPathAfter!
     const parent = getIn(json, parentPath)
     if (Array.isArray(parent)) {
       // switch to value selection: array has no keys
-      return createValueSelection(focusPath, false)
+      return createValueSelection(nextPath, false)
     } else {
-      return createKeySelection(focusPath, false)
+      return createKeySelection(nextPath, false)
     }
   }
 
-  if (isValueSelection(selection)) {
-    return createValueSelection(focusPath, false)
+  if (isMultiSelection(selection)) {
+    return nextPathAfter !== null
+      ? createValueSelection(nextPathAfter, false)
+      : nextPath !== null
+      ? createValueSelection(nextPath, false)
+      : null
   }
 
-  // TODO: simplify, this is redundant, same as next
-  if (isInsideSelection(selection)) {
-    return createMultiSelection(anchorPath, focusPath)
-  }
-
-  // selection type MULTI or AFTER
-  return createMultiSelection(nextPathAfter, nextPathAfter)
+  return null
 }
 
 /**
