@@ -828,6 +828,13 @@ describe('selection', () => {
       )
     })
 
+    test('should get selection from renaming the last key of an object', () => {
+      assert.deepStrictEqual(
+        createSelectionFromOperations(json, [{ op: 'move', from: '/arr', path: '/arrRenamed' }]),
+        createKeySelection(['arrRenamed'], false)
+      )
+    })
+
     test('should get selection from removing a key', () => {
       assert.deepStrictEqual(
         createSelectionFromOperations(json, [{ op: 'remove', path: '/str' }]),

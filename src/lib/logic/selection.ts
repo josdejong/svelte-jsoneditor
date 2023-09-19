@@ -493,8 +493,8 @@ export function createSelectionFromOperations(
 ): JSONSelection | null {
   if (operations.length === 1) {
     const operation = first(operations) as JSONPatchOperation
-    if (operation.op === 'replace' || operation.op === 'move') {
-      // replaced value
+    if (operation.op === 'replace') {
+      // a replaced value
       const path = parsePath(json, operation.path)
 
       return createValueSelection(path, false)
