@@ -444,7 +444,7 @@
           newValidationErrors = [
             {
               path: [],
-              message: 'Failed to validate: ' + err.message,
+              message: 'Failed to validate: ' + (err as Error).message,
               severity: ValidationSeverity.warning
             }
           ]
@@ -578,7 +578,7 @@
         textIsRepaired = false
         parseError =
           text !== undefined && text !== ''
-            ? normalizeJsonParseError(text, err.message || err.toString())
+            ? normalizeJsonParseError(text, (err as Error).message || String(err))
             : undefined
       }
     }
@@ -995,7 +995,7 @@
     handlePatch(operations, (patchedJson, patchedState) => {
       if (isObjectOrArray(patchedJson)) {
         // expand extracted object/array
-        const path = []
+        const path: JSONPath = []
         return {
           state: expandRecursive(patchedJson, patchedState, path)
         }
@@ -1064,7 +1064,7 @@
         }
       })
     } catch (err) {
-      onError(err)
+      onError(err as Error)
     }
   }
 
@@ -1237,7 +1237,7 @@
   }
 
   function handleSortAll() {
-    const rootPath = []
+    const rootPath: JSONPath = []
     openSortModal(rootPath)
   }
 
@@ -1507,7 +1507,9 @@
         text = updatedText
         textIsRepaired = false
         parseError =
-          text !== '' ? normalizeJsonParseError(text, err.message || err.toString()) : undefined
+          text !== ''
+            ? normalizeJsonParseError(text, (err as Error).message || String(err))
+            : undefined
       }
     }
 
@@ -1603,7 +1605,7 @@
     pastedJson = newPastedJson
   }
 
-  function handleKeyDown(event) {
+  function handleKeyDown(event: KeyboardEvent) {
     const combo = keyComboFromEvent(event)
     const keepAnchorPath = event.shiftKey
     debug('keydown', { combo, key: event.key })
@@ -1953,6 +1955,10 @@
 
   async function handleParsePastedJson() {
     debug('apply pasted json', pastedJson)
+    if (!pastedJson) {
+      return
+    }
+
     const { path, contents } = pastedJson
 
     // exit edit mode
@@ -2044,7 +2050,7 @@
 
   $: autoScrollHandler = refContents ? createAutoScrollHandler(refContents) : undefined
 
-  function handleDrag(event) {
+  function handleDrag(event: DragEvent) {
     if (autoScrollHandler) {
       autoScrollHandler.onDrag(event)
     }
