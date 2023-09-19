@@ -71,7 +71,8 @@
     encodeDataPath,
     findParentWithNodeName,
     getDataPathFromTarget,
-    getWindow
+    getWindow,
+    isChildOfNodeName
   } from '$lib/utils/domUtils.js'
   import { createDebug } from '$lib/utils/debug.js'
   import {
@@ -713,7 +714,7 @@
     scrollTop = event.target['scrollTop']
   }
 
-  function handleMouseDown(event: Event) {
+  function handleMouseDown(event: MouseEvent) {
     const path = event?.target ? getDataPathFromTarget(event.target as HTMLElement) : undefined
     if (path) {
       // when clicking inside the current selection, editing a value, do nothing
@@ -726,9 +727,18 @@
 
       updateSelection(createValueSelection(path, false))
 
-      focus()
       event.preventDefault()
     }
+
+    // TODO: ugly to have two setTimeout here. Without it, hiddenInput will blur
+    setTimeout(() => {
+      setTimeout(() => {
+        // for example when clicking on the empty area in the main menu
+        if (!hasFocus && !isChildOfNodeName(event.target as Element, 'BUTTON')) {
+          focus()
+        }
+      })
+    })
   }
 
   function createDefaultSelection(): JSONSelection | null {
