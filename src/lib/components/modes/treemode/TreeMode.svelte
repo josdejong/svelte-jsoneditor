@@ -1783,11 +1783,11 @@
       // TODO: find a better way to restore focus
       // TODO: implement a proper TypeScript solution to check whether this is an element with blur, focus, select
       const activeElement = document.activeElement as HTMLInputElement
-      if (activeElement && activeElement.blur && activeElement.focus) {
+      if (activeElement && activeElement.blur && activeElement.select) {
         activeElement.blur()
         setTimeout(() => {
           handleUndo()
-          setTimeout(() => activeElement.select())
+          setTimeout(() => activeElement?.select())
         })
       } else {
         handleUndo()
@@ -1800,11 +1800,11 @@
       // TODO: find a better way to restore focus
       // TODO: implement a proper TypeScript solution to check whether this is an element with blur, focus, select
       const activeElement = document.activeElement as HTMLInputElement
-      if (activeElement && activeElement.blur && activeElement.focus) {
+      if (activeElement && activeElement.blur && activeElement.select) {
         activeElement.blur()
         setTimeout(() => {
           handleRedo()
-          setTimeout(() => activeElement.select())
+          setTimeout(() => activeElement?.select())
         })
       } else {
         handleRedo()
