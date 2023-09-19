@@ -26,10 +26,11 @@
         .filter((path) => path.length > 0)
     : []
   $: hasNestedArrays = !isEmpty(nestedArrayPaths)
+  $: isEmptyDocument = json === undefined && (text === '' || text === undefined)
 
   $: documentType = hasNestedArrays
     ? 'Object with nested arrays'
-    : json === undefined && (text === '' || text === undefined)
+    : isEmptyDocument
     ? 'An empty document'
     : isJSONObject(json)
     ? 'An object'
@@ -48,7 +49,12 @@
         An object cannot be opened in table mode. You can open a nested array instead, or open the
         document in tree mode.
       {:else}
-        {documentType} cannot be opened in table mode. You can open the document in tree mode instead.
+        {documentType} cannot be opened in table mode.
+      {/if}
+      {#if isEmptyDocument && !readOnly}
+        You can open the document in tree mode instead, or paste a JSON Array using <b>Ctrl+V</b>.
+      {:else}
+        You can open the document in tree mode instead.
       {/if}
     </div>
     {#each nestedArrayPaths as nestedArrayPath}

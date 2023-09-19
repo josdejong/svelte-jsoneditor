@@ -2,7 +2,7 @@
 
 .jse-welcome {
   flex: 1;
-  overflow: auto; // FIXME: overflow doesn't work (try giving editor 100px height)
+  overflow: auto;
   font-family: var(--jse-font-family);
   font-size: var(--jse-font-size);
 
@@ -26,24 +26,21 @@
   }
 
   .jse-contents {
+    display: flex;
+    flex-direction: column;
+    max-width: 300px;
     margin: 2em $padding 0;
-    color: var(--jse-panel-color-readonly);
+    gap: $padding;
 
-    ul {
-      $list-padding: 10px;
+    .jse-welcome-title {
+    }
 
-      list-style: '●';
-      list-style-position: outside;
-      padding-left: 2 * $list-padding;
+    .jse-welcome-info {
+      color: var(--jse-panel-color-readonly);
+    }
 
-      li {
-        padding-left: $list-padding;
-
-        span.jse-bold {
-          font-family: var(--jse-font-family-mono);
-          font-weight: bold;
-        }
-      }
+    button {
+      @include jsoneditor-button-primary;
     }
   }
 }

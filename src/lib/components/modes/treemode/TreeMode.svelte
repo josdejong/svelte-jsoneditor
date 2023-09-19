@@ -1027,6 +1027,10 @@
       updateSelection(createValueSelection(documentState.selection.path, false))
     }
 
+    if (!documentState.selection) {
+      updateSelection(getInitialSelection(json, documentState))
+    }
+
     handleInsert(type)
   }
 
@@ -2145,7 +2149,17 @@
     </label>
     {#if json === undefined}
       {#if text === '' || text === undefined}
-        <Welcome {readOnly} />
+        <Welcome
+          {readOnly}
+          onCreateObject={() => {
+            focus()
+            handleInsertCharacter('{')
+          }}
+          onCreateArray={() => {
+            focus()
+            handleInsertCharacter('[')
+          }}
+        />
       {:else}
         <Message
           type="error"
