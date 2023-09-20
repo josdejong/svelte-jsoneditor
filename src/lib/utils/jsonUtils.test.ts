@@ -17,7 +17,8 @@ import {
   parsePartialJson,
   toJSONContent,
   toTextContent,
-  validateContentType
+  validateContentType,
+  parseAndRepairOrUndefined
 } from './jsonUtils.js'
 
 const LosslessJSONParser = { parse, stringify }
@@ -419,6 +420,15 @@ describe('jsonUtils', () => {
       // cannot detect partially formatted content
       expect(needsFormatting('[1, 2, 3]')).toBe(true)
       expect(needsFormatting('{"a":1, "b":2}')).toBe(true)
+    })
+  })
+
+  describe('parseAndRepairOrUndefined', () => {
+    test('repair partial JSON', () => {
+      expect(parseAndRepairOrUndefined('[1,2', JSON)).toEqual([1, 2])
+      expect(parseAndRepairOrUndefined('[1,2}', JSON)).toEqual(undefined)
+      expect(parseAndRepairOrUndefined('hello world', JSON)).toEqual('hello world')
+      // expect(parseAndRepairOrUndefined('0123', JSON)).toEqual('0123') // FIXME
     })
   })
 })

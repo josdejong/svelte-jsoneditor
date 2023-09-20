@@ -6,14 +6,14 @@
   import { onEscape } from '$lib/actions/onEscape.js'
   import type { Context } from 'svelte-simple-modal'
 
-  export let text
-  export let onParse
-  export let onRepair
-  export let onApply
+  export let text: string
+  export let onParse: (text: string) => void
+  export let onRepair: (text: string) => string
+  export let onApply: (repairedText: string) => void
 
   const { close } = getContext<Context>('simple-modal')
 
-  function handleApply(repairedText) {
+  function handleApply(repairedText: string) {
     close()
     onApply(repairedText)
   }

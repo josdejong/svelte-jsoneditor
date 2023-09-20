@@ -16,32 +16,31 @@
 
   export let text = ''
   export let readOnly = false
-  export let onParse
-  export let onRepair
-  export let onChange = null
-  export let onApply
-  export let onCancel
+  export let onParse: (text: string) => void
+  export let onRepair: (text: string) => string
+  export let onChange: ((updatedText: string) => void) | null = null
+  export let onApply: (repairedText: string) => void
+  export let onCancel: () => void
 
   const debug = createDebug('jsoneditor:JSONRepair')
 
-  let domJsonRepair
-  let domTextArea
+  let domTextArea: HTMLTextAreaElement
 
   $: error = getErrorMessage(text)
   $: repairable = isRepairable(text)
 
   $: debug('error', error)
 
-  function getErrorMessage(jsonText) {
+  function getErrorMessage(jsonText: string) {
     try {
       onParse(jsonText)
       return null
     } catch (err) {
-      return normalizeJsonParseError(jsonText, err.message)
+      return normalizeJsonParseError(jsonText, (err as Error).message)
     }
   }
 
-  function isRepairable(jsonText) {
+  function isRepairable(jsonText: string) {
     try {
       onRepair(jsonText)
       return true
@@ -60,10 +59,10 @@
     }
   }
 
-  function handleChange(event) {
+  function handleChange(event: Event & { currentTarget: EventTarget & HTMLTextAreaElement }) {
     debug('handleChange')
 
-    const value = event.target.value
+    const value = (event.target as HTMLTextAreaElement).value
 
     if (text === value) {
       return
@@ -134,7 +133,7 @@
   ]
 </script>
 
-<div class="jse-json-repair-component" bind:this={domJsonRepair}>
+<div class="jse-json-repair-component">
   <Menu {items}>
     <div slot="left" class="jse-info">Repair invalid JSON, then click apply</div>
   </Menu>
@@ -155,14 +154,13 @@
   {/if}
   <textarea
     bind:this={domTextArea}
-    value={text}
     on:input={handleChange}
     readonly={readOnly}
     class="jse-json-text"
     autocomplete="off"
     autocapitalize="off"
-    spellcheck="false"
-  />
+    spellcheck="false">{text}</textarea
+  >
 </div>
 
 <style src="./JSONRepairComponent.scss"></style>

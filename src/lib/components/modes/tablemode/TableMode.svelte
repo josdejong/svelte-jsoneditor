@@ -324,7 +324,7 @@
 
     debug('onSortByHeader', newSortedColumn)
 
-    const rootPath = []
+    const rootPath: JSONPath = []
     const direction = newSortedColumn.sortDirection === SortDirection.desc ? -1 : 1
     const operations = sortJson(json, rootPath, newSortedColumn.path, direction)
     handlePatch(operations, (patchedJson, patchedState) => {
@@ -399,7 +399,7 @@
           textIsRepaired = false
           parseError =
             text !== undefined && text !== ''
-              ? normalizeJsonParseError(text, err.message || err.toString())
+              ? normalizeJsonParseError(text, (err as Error).message || String(err))
               : undefined
         }
       }
@@ -540,7 +540,7 @@
           newValidationErrors = [
             {
               path: [],
-              message: 'Failed to validate: ' + err.message,
+              message: 'Failed to validate: ' + (err as Error).message,
               severity: ValidationSeverity.warning
             }
           ]
@@ -665,18 +665,20 @@
 
     // make sure we cannot send an invalid contents like having both
     // json and text defined, or having none defined
-    if (text !== undefined) {
-      const content = { text, json: undefined }
-      onChange(content, previousContent, {
-        contentErrors: validate(),
-        patchResult
-      })
-    } else if (json !== undefined) {
-      const content = { text: undefined, json }
-      onChange(content, previousContent, {
-        contentErrors: validate(),
-        patchResult
-      })
+    if (onChange) {
+      if (text !== undefined) {
+        const content = { text, json: undefined }
+        onChange(content, previousContent, {
+          contentErrors: validate(),
+          patchResult
+        })
+      } else if (json !== undefined) {
+        const content = { text: undefined, json }
+        onChange(content, previousContent, {
+          contentErrors: validate(),
+          patchResult
+        })
+      }
     }
   }
 
@@ -963,7 +965,7 @@
     })
   }
 
-  function handleContextMenu(event) {
+  function handleContextMenu(event: MouseEvent) {
     if (readOnly || isEditingSelection(documentState.selection)) {
       return
     }
@@ -1081,6 +1083,10 @@
 
   async function handleParsePastedJson() {
     debug('apply pasted json', pastedJson)
+    if (!pastedJson) {
+      return
+    }
+
     const { path, contents } = pastedJson
 
     // exit edit mode
@@ -1439,7 +1445,9 @@
         text = updatedText
         textIsRepaired = false
         parseError =
-          text !== '' ? normalizeJsonParseError(text, err.message || err.toString()) : undefined
+          text !== ''
+            ? normalizeJsonParseError(text, (err as Error).message || String(err))
+            : undefined
       }
     }
 
@@ -1593,7 +1601,7 @@
   }
 
   function handleSortAll() {
-    const rootPath = []
+    const rootPath: JSONPath = []
     openSortModal(rootPath)
   }
 
