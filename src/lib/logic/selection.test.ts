@@ -756,7 +756,7 @@ describe('selection', () => {
         indentation,
         JSON
       ),
-      `2,\n${objArr2},`
+      `2,\n${objArr2},` as string
     )
 
     assert.deepStrictEqual(
