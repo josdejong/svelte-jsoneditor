@@ -88,6 +88,7 @@
   import {
     convertValue,
     normalizeJsonParseError,
+    parseAndRepair,
     parsePartialJson,
     repairPartialJson
   } from '$lib/utils/jsonUtils.js'
@@ -927,7 +928,7 @@
       JSONRepairModal,
       {
         text,
-        onParse: parsePartialJson,
+        onParse: (text: string) => parsePartialJson(text, (t) => parseAndRepair(t, parser)),
         onRepair: repairPartialJson,
         onApply
       },
