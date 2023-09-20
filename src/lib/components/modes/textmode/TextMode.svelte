@@ -475,11 +475,13 @@
     debug('select parse error', parseError)
 
     const richParseError = toRichParseError(parseError, false)
+    const from = richParseError.from != null ? richParseError.from : 0
+    const to = richParseError.to != null ? richParseError.to : 0
 
     // we take "to" as head, not as anchor, because the scrollIntoView will
     // move to the head, and when a large whole object is selected as a whole,
     // we want to scroll to the start of the object and not the end
-    setSelection(richParseError.from, richParseError.to)
+    setSelection(from, to)
 
     focus()
   }

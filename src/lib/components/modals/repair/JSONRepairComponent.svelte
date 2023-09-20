@@ -51,8 +51,9 @@
   }
 
   function goToError() {
-    if (domTextArea && error && error.position != null) {
-      domTextArea.setSelectionRange(error.position, error.position)
+    if (domTextArea && error) {
+      const position = error.position != null ? error.position : 0
+      domTextArea.setSelectionRange(position, position)
       setTimeout(() => {
         domTextArea.focus()
       })
