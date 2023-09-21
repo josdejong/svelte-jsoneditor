@@ -26,7 +26,7 @@ export const SIMPLE_MODAL_OPTIONS = {
   classBg: 'jse-modal-bg',
   classWindow: 'jse-modal-window',
   classWindowWrap: 'jse-modal-window-wrap',
-  classContent: 'jse-modal-content'
+  classContent: 'jse-modal-container'
 }
 
 export const SORT_MODAL_OPTIONS = {

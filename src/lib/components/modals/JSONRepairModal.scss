@@ -1,13 +1,5 @@
 @import '../../styles';
+@import 'Modal';
 
 .jse-modal.jse-repair {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-
-  font-family: var(--jse-font-family);
-  font-size: var(--jse-font-size);
-  line-height: normal;
-  background: var(--jse-background-color);
-  color: var(--jse-text-color);
 }

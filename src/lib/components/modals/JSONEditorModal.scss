@@ -3,9 +3,6 @@
 
 .jse-modal.jse-jsoneditor-modal {
   .jse-modal-contents {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
     padding-top: 0;
 
     --jse-theme-color: var(--jse-modal-theme-color);
@@ -31,7 +28,7 @@
 
     .jse-modal-inline-editor {
       flex: 1;
-      min-height: 0;
+      min-height: 150px;
       min-width: 0;
       display: flex;
     }

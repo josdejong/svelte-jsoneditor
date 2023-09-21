@@ -23,6 +23,9 @@
   color: var(--jse-text-color);
 
   .jse-modal-contents {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     padding: 20px;
     overflow: auto;
     min-width: 0;
@@ -78,13 +81,13 @@
   width: 800px;
   height: auto;
   min-height: 500px;
-  max-height: 80%;
+  max-height: calc(100vh - 6rem);
   display: flex;
 }
 
-:global(.bg.jse-modal-bg .jse-modal-content) {
+:global(.bg.jse-modal-bg .jse-modal-container) {
   flex: 1;
   display: flex;
-  max-height: calc(100vh - 6rem);
+  flex-direction: column;
   padding: 0;
 }
