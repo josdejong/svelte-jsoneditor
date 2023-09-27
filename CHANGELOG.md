@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.18.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.18.5...v0.18.6) (2023-09-27)
+
+
+### Bug Fixes
+
+* broken import due to missing file extension ([0f734c5](https://github.com/josdejong/svelte-jsoneditor/commit/0f734c593e4784b3b39621c029ef614ac4350e50))
+
 ### [0.18.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.18.4...v0.18.5) (2023-09-27)
 
 
