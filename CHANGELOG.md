@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.18.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.18.4...v0.18.5) (2023-09-27)
+
+
+### Features
+
+* update dependencies, most notably `jsonrepair` and `codemirror` ([f6306b0](https://github.com/josdejong/svelte-jsoneditor/commit/f6306b00ef6144d75593a98e0867b5a7c185156a))
+
+
+### Bug Fixes
+
+* [#312](https://github.com/josdejong/svelte-jsoneditor/issues/312) "Show me" button throwing an error when no position was provided in the error message ([d839e95](https://github.com/josdejong/svelte-jsoneditor/commit/d839e95c59ce18ff59ac0ad338019da9dc542a18))
+* [#312](https://github.com/josdejong/svelte-jsoneditor/issues/312) the "Show me" button throwing an error when no position was provided in the error message ([36d7934](https://github.com/josdejong/svelte-jsoneditor/commit/36d79345b294e31bde53cb83b6586928c653601f))
+* minor styling issues with modals ([97d2d94](https://github.com/josdejong/svelte-jsoneditor/commit/97d2d9407d6f389962ae59a808eb3353308232f2))
+* update dependencies, most notably `codemirror` and `jsonrepair` ([439eb8a](https://github.com/josdejong/svelte-jsoneditor/commit/439eb8ae8a6a2dfe8fa8ec71f0d5c53e28b7c4a0))
+
 ### [0.18.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.18.3...v0.18.4) (2023-09-19)
 
 
