@@ -181,7 +181,7 @@
   })
 
   let refJsonEditor: HTMLDivElement
-  let refContents: HTMLDivElement
+  let refContents: HTMLDivElement | undefined
   let refHiddenInput: HTMLInputElement
 
   createFocusTracker({
@@ -241,14 +241,7 @@
     defaultItemHeight
   )
 
-  // $: debug('visibleSection', visibleSection, { viewPortHeight }) // TODO: cleanup
-
   $: refreshScrollTop(json)
-
-  // TODO: cleanup
-  // $: {
-  //   debug('scrollTop', scrollTop, refContents?.scrollTop, refContents?.scrollHeight)
-  // }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function refreshScrollTop(_json: JSONValue | undefined) {
@@ -804,12 +797,16 @@
 
     debug('scrollTo', { path, top, scrollTop, elem })
 
+    if (!refContents) {
+      return Promise.resolve()
+    }
+
     const viewPortRect = refContents.getBoundingClientRect()
     if (elem && !scrollToWhenVisible) {
       const elemRect = elem.getBoundingClientRect()
       if (elemRect.bottom > viewPortRect.top && elemRect.top < viewPortRect.bottom) {
         // element is fully or partially visible, don't scroll to it
-        return
+        return Promise.resolve()
       }
     }
 
@@ -862,6 +859,10 @@
   }
 
   function scrollToVertical(path: JSONPath) {
+    if (!refContents) {
+      return
+    }
+
     const { rowIndex } = toTableCellPosition(path, columns)
     const top = calculateAbsolutePosition(path, columns, itemHeightsCache, defaultItemHeight)
     const bottom = top + (itemHeightsCache[rowIndex] || defaultItemHeight)
@@ -884,19 +885,21 @@
 
   function scrollToHorizontal(path: JSONPath) {
     const elem = findElement(path)
-    if (elem) {
-      const viewPortRect = refContents.getBoundingClientRect()
-      const elemRect = elem.getBoundingClientRect() // TODO: scroll to column instead of item (is always rendered)
+    if (!elem || !refContents) {
+      return
+    }
 
-      if (elemRect.right > viewPortRect.right) {
-        const diff = elemRect.right - viewPortRect.right
-        refContents.scrollLeft += diff
-      }
+    const viewPortRect = refContents.getBoundingClientRect()
+    const elemRect = elem.getBoundingClientRect() // TODO: scroll to column instead of item (is always rendered)
 
-      if (elemRect.left < viewPortRect.left) {
-        const diff = viewPortRect.left - elemRect.left
-        refContents.scrollLeft -= diff
-      }
+    if (elemRect.right > viewPortRect.right) {
+      const diff = elemRect.right - viewPortRect.right
+      refContents.scrollLeft += diff
+    }
+
+    if (elemRect.left < viewPortRect.left) {
+      const diff = viewPortRect.left - elemRect.left
+      refContents.scrollLeft -= diff
     }
   }
 

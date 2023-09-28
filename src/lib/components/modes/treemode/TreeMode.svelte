@@ -170,7 +170,7 @@
   const { openAbsolutePopup, closeAbsolutePopup } =
     getContext<AbsolutePopupContext>('absolute-popup')
 
-  let refContents: HTMLDivElement
+  let refContents: HTMLDivElement | undefined
   let refHiddenInput: HTMLInputElement
   let refJsonEditor: HTMLDivElement
   let hasFocus = false
@@ -1337,31 +1337,32 @@
     await tick() // await rerender
 
     const elem = findElement(path)
-    if (elem) {
-      debug('scrollTo', { path, elem, refContents })
 
-      const viewPortRect = refContents.getBoundingClientRect()
-      const elemRect = elem.getBoundingClientRect()
-      if (!scrollToWhenVisible) {
-        if (elemRect.bottom > viewPortRect.top && elemRect.top < viewPortRect.bottom) {
-          // element is fully or partially visible, don't scroll to it
-          return Promise.resolve()
-        }
-      }
+    debug('scrollTo', { path, elem, refContents })
 
-      const offset = -(viewPortRect.height / 4)
-
-      return new Promise<void>((resolve) => {
-        jump(elem, {
-          container: refContents,
-          offset,
-          duration: SCROLL_DURATION,
-          callback: () => resolve()
-        })
-      })
-    } else {
+    if (!elem || !refContents) {
       return Promise.resolve()
     }
+
+    const viewPortRect = refContents.getBoundingClientRect()
+    const elemRect = elem.getBoundingClientRect()
+    if (!scrollToWhenVisible) {
+      if (elemRect.bottom > viewPortRect.top && elemRect.top < viewPortRect.bottom) {
+        // element is fully or partially visible, don't scroll to it
+        return Promise.resolve()
+      }
+    }
+
+    const offset = -(viewPortRect.height / 4)
+
+    return new Promise<void>((resolve) => {
+      jump(elem, {
+        container: refContents,
+        offset,
+        duration: SCROLL_DURATION,
+        callback: () => resolve()
+      })
+    })
   }
 
   /**
