@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.18.7](https://github.com/josdejong/svelte-jsoneditor/compare/v0.18.6...v0.18.7) (2023-09-28)
+
+
+### Bug Fixes
+
+* [#315](https://github.com/josdejong/svelte-jsoneditor/issues/315) cannot paste text in the search box input field in tree mode ([a9a2dc3](https://github.com/josdejong/svelte-jsoneditor/commit/a9a2dc32e22707d636b25587426a70518dcf069c))
+
 ### [0.18.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.18.5...v0.18.6) (2023-09-27)
 
 
