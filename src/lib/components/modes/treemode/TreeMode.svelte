@@ -1820,7 +1820,7 @@
     // TODO: ugly to have two setTimeout here. Without it, hiddenInput will blur
     setTimeout(() => {
       setTimeout(() => {
-        if (!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) {
+        if ((!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) || event.target.nodeName === 'DIV') {
           // for example when clicking on the empty area in the main menu
           focus()
 
@@ -2106,7 +2106,6 @@
   class:no-main-menu={!mainMenuBar}
   on:keydown={handleKeyDown}
   on:mousedown={handleMouseDown}
-  on:paste={handlePaste}
   on:contextmenu={handleContextMenu}
   bind:this={refJsonEditor}
 >
@@ -2147,6 +2146,7 @@
         tabindex="-1"
         class="jse-hidden-input"
         bind:this={refHiddenInput}
+        on:paste={handlePaste}
       />
     </label>
     {#if json === undefined}

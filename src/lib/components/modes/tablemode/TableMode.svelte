@@ -730,7 +730,7 @@
     setTimeout(() => {
       setTimeout(() => {
         // for example when clicking on the empty area in the main menu
-        if (!hasFocus && !isChildOfNodeName(event.target as Element, 'BUTTON')) {
+        if ((!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) || event.target.nodeName === 'DIV') {
           focus()
         }
       })
@@ -1708,7 +1708,6 @@
   class:no-main-menu={!mainMenuBar}
   on:mousedown={handleMouseDown}
   on:keydown={handleKeyDown}
-  on:paste={handlePaste}
   on:contextmenu={handleContextMenu}
   bind:this={refJsonEditor}
 >
@@ -1730,10 +1729,11 @@
     <label class="jse-hidden-input-label">
       <input
         type="text"
-        readonly="readonly"
+        readonly={true}
         tabindex="-1"
         class="jse-hidden-input"
         bind:this={refHiddenInput}
+        on:paste={handlePaste}
       />
     </label>
     {#if containsValidArray}
