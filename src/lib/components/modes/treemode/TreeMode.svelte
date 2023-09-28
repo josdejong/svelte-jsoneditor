@@ -1820,7 +1820,10 @@
     // TODO: ugly to have two setTimeout here. Without it, hiddenInput will blur
     setTimeout(() => {
       setTimeout(() => {
-        if ((!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) || event.target.nodeName === 'DIV') {
+        if (
+          (!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) ||
+          event.target.nodeName === 'DIV'
+        ) {
           // for example when clicking on the empty area in the main menu
           focus()
 
