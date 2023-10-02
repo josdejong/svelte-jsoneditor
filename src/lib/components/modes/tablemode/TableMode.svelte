@@ -730,10 +730,7 @@
     setTimeout(() => {
       setTimeout(() => {
         // for example when clicking on the empty area in the main menu
-        if (
-          (!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) ||
-          event.target.nodeName === 'DIV'
-        ) {
+        if (!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) {
           focus()
         }
       })

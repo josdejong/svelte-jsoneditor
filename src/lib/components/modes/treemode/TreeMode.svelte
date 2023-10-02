@@ -1820,10 +1820,7 @@
     // TODO: ugly to have two setTimeout here. Without it, hiddenInput will blur
     setTimeout(() => {
       setTimeout(() => {
-        if (
-          (!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) ||
-          event.target.nodeName === 'DIV'
-        ) {
+        if (!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) {
           // for example when clicking on the empty area in the main menu
           focus()
 
@@ -2163,6 +2160,12 @@
           onCreateArray={() => {
             focus()
             handleInsertCharacter('[')
+          }}
+          onClick={() => {
+            // FIXME: this is a workaround for the editor not putting the focus on refHiddenInput
+            //  when clicking in the welcome screen (only occurs in 'tree' mode,
+            //  so you cannot paste a document from clipboard.
+            focus()
           }}
         />
       {:else}
