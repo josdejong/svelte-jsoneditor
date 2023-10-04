@@ -128,3 +128,17 @@ $errors-overview-max-height: 25%;
     cursor: pointer;
   }
 }
+
+@mixin jse-modal-style {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+
+  font-family: var(--jse-font-family);
+  font-size: var(--jse-font-size);
+  line-height: normal;
+  background: var(--jse-modal-background);
+  color: var(--jse-text-color);
+}
