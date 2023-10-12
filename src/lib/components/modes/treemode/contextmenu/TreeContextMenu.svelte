@@ -123,7 +123,7 @@
     $: isLeafNode = hasJson && selection != null && !isObjectOrArray(focusValue)
 
 
-    function handleIgnoreKey(type?: CompareConfigType) {
+    function handleIgnoreKey(type?: CompareConfigType| 'temporary') {
         onCloseContextMenu()
         onIgnoreKey?.(type)
     }
@@ -255,6 +255,10 @@
                         type: 'button',
                         text: 'Ignore to Interface / Dependency',
                         onClick: () => handleIgnoreKey('interface'),
+                    },{
+                      type: 'button',
+                      text: 'Temporary Ignore(7d)',
+                      onClick: () => handleIgnoreKey('temporary'),
                     }]
                 }] : []).concat(onSortKey ? [{
                     type: 'button',
@@ -300,6 +304,10 @@
                         type: 'button',
                         text: "忽略至接口 / 依赖",
                         onClick: () => handleIgnoreKey('interface'),
+                    },{
+                      type: 'button',
+                      text: '临时忽略(7天)',
+                      onClick: () => handleIgnoreKey('temporary'),
                     }]
                 },] : []).concat(onSortKey ? [{
                     type: 'button',
