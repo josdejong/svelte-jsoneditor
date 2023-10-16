@@ -74,7 +74,7 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
 
       query +=
         path.length === 0
-          ? '' // edge case, selecting projection of "whole item"
+          ? '' // edge case, selecting projection of the item root
           : '.' + stringifyPathForJmespath(path)
     } else if (projection.paths.length > 1) {
       query +=

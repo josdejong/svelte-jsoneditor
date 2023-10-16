@@ -718,7 +718,7 @@ export function updateSelectionInDocumentState(
 }
 
 /**
- * Create a selection which selects the whole document
+ * Create a selection which selects the root of the document
  */
 // TODO: write unit tests
 export function selectAll(): JSONSelection {

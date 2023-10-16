@@ -82,7 +82,7 @@
 
   $: currentState = last(stack) || rootState
   $: absolutePath = stack.flatMap((state) => state.relativePath)
-  $: pathDescription = !isEmpty(absolutePath) ? stringifyJSONPath(absolutePath) : '(whole document)'
+  $: pathDescription = !isEmpty(absolutePath) ? stringifyJSONPath(absolutePath) : '(document root)'
 
   // not relevant in this Modal setting, but well
   $: parseMemoizeOne = memoizeOne(parser.parse)

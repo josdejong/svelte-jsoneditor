@@ -56,7 +56,7 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
     if (projection.paths.length > 1) {
       // Note that we do not use _.pick() here because this function doesn't flatten the results
       const paths = projection.paths.map((path) => {
-        const name = last(path) || 'item' // 'item' in case of having selected the whole item
+        const name = last(path) || 'item' // 'item' in case of having selected the item root
         return `      ${JSON.stringify(name)}: item${createPropertySelector(path)}`
       })
       queryParts.push(`    .map(item => ({\n${paths.join(',\n')}\n    }))\n`)

@@ -103,7 +103,7 @@
               type="text"
               readonly
               title="Selected path"
-              value={!isEmpty(rootPath) ? stringifyJSONPath(rootPath) : '(whole document)'}
+              value={!isEmpty(rootPath) ? stringifyJSONPath(rootPath) : '(document root)'}
             />
           </td>
         </tr>

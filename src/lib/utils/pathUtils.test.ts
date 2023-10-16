@@ -74,7 +74,7 @@ describe('pathUtils', () => {
   })
 
   test('pathToOption', () => {
-    deepStrictEqual(pathToOption([]), { value: [], label: '(whole item)' })
+    deepStrictEqual(pathToOption([]), { value: [], label: '(item root)' })
     deepStrictEqual(pathToOption(['users', '2', 'first name']), {
       value: ['users', '2', 'first name'],
       label: 'users[2].first name'

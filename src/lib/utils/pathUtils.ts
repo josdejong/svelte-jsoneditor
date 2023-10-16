@@ -85,7 +85,7 @@ export function parseJSONPath(pathStr: string): JSONPath {
 export function pathToOption(path: JSONPath): { value: JSONPath; label: string } {
   return {
     value: path,
-    label: isEmpty(path) ? '(whole item)' : stringifyJSONPath(path)
+    label: isEmpty(path) ? '(item root)' : stringifyJSONPath(path)
   }
 }
 

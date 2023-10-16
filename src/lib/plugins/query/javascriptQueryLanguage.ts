@@ -68,7 +68,7 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
     // and use that when building the query to make it more readable.
     if (projection.paths.length > 1) {
       const paths = projection.paths.map((path) => {
-        const name = path[path.length - 1] || 'item' // 'item' in case of having selected the whole item
+        const name = path[path.length - 1] || 'item' // 'item' in case of having selected the item root
         const item = `item${createPropertySelector(path)}`
         return `      ${JSON.stringify(name)}: ${item}`
       })
