@@ -8,6 +8,7 @@
     lodashQueryLanguage,
     type MenuItem,
     ReadonlyValue,
+    ReadonlyPassword,
     renderValue
   } from 'svelte-jsoneditor'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
@@ -299,7 +300,7 @@
 
     if (!isEditing) {
       renderers.push({
-        component: ReadonlyValue,
+        component: ReadonlyPassword,
         props: { path, value, readOnly, parser, normalization, searchResultItems, onSelect }
       })
     }
