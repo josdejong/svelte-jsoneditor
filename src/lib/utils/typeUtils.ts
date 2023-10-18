@@ -8,9 +8,9 @@ import type { JSONValue } from 'immutable-json-patch'
  * Test whether a value is an Object (and not an Array or Class)
  */
 export function isObject(value: unknown): value is Record<string, unknown> {
-  return (
-    typeof value === 'object' && value !== null && value.constructor === Object // do not match on classes or Array
-  )
+  // note that we check constructor.name, not constructor === Object,
+  // so we can use objects created in a different JS realm like an iframe.
+  return typeof value === 'object' && value !== null && value.constructor.name === 'Object'
 }
 
 /**
@@ -18,10 +18,12 @@ export function isObject(value: unknown): value is Record<string, unknown> {
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function isObjectOrArray(value: unknown): value is Object | Array<unknown> {
+  // Note that we check constructor.name, not constructor === Object,
+  // so we can use objects created in a different JS realm like an iframe.
   return (
     typeof value === 'object' &&
     value !== null &&
-    (value.constructor === Object || value.constructor === Array)
+    (value.constructor.name === 'Object' || value.constructor.name === 'Array')
   )
 }
 
