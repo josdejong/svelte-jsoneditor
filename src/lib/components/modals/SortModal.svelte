@@ -134,7 +134,7 @@
         class="jse-primary"
         on:click={handleSort}
         use:focus
-        disabled={jsonIsArray && (properties && properties?.length > 1) ? !selectedProperty : false}
+        disabled={jsonIsArray && properties && properties?.length > 1 ? !selectedProperty : false}
       >
         Sort
       </button>
