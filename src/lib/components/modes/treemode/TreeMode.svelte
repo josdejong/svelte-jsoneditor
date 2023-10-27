@@ -858,12 +858,12 @@
     )
   }
 
-  export function acceptAutoRepair() {
+  export function acceptAutoRepair(): Content {
     if (textIsRepaired && json !== undefined) {
       handleReplaceJson(json)
     }
 
-    return { json, text }
+    return json !== undefined ? { json } : { text: text || '' }
   }
 
   async function handleCut(indent = true) {
@@ -2177,6 +2177,7 @@
                 {
                   icon: faCode,
                   text: 'Repair manually',
+                  title: 'Open the document in "code" mode and repair it manually',
                   onClick: handleRequestRepair
                 }
               ]
@@ -2255,11 +2256,13 @@
                 {
                   icon: faCheck,
                   text: 'Ok',
+                  title: 'Accept the repaired document',
                   onClick: acceptAutoRepair
                 },
                 {
                   icon: faCode,
                   text: 'Repair manually instead',
+                  title: 'Leave the document unchanged and repair it manually instead',
                   onClick: handleRequestRepair
                 }
               ]

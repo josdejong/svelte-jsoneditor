@@ -1017,7 +1017,7 @@
     return false
   }
 
-  function handleContextMenuFromTableMenu(event) {
+  function handleContextMenuFromTableMenu(event: Event) {
     if (readOnly) {
       return
     }
@@ -1769,7 +1769,7 @@
               {#if showRefreshButton}
                 <th class="jse-table-cell jse-table-cell-header">
                   <RefreshColumnHeader
-                    count={json.length}
+                    count={Array.isArray(json) ? json.length : 0}
                     {maxSampleCount}
                     onRefresh={() => (maxSampleCount = Infinity)}
                   />
@@ -1867,6 +1867,7 @@
             {
               icon: faWrench,
               text: 'Paste as JSON instead',
+              title: 'Paste the text as JSON instead of a single value',
               // We use mousedown here instead of click: this message pops up
               // whilst the user is editing a value. When clicking this button,
               // the actual value is applied and the event is not propagated
@@ -1875,6 +1876,7 @@
             },
             {
               text: 'Leave as is',
+              title: 'Keep the pasted content as a single value',
               onClick: handleClearPastedJson
             }
           ]}
@@ -1894,11 +1896,13 @@
                 {
                   icon: faCheck,
                   text: 'Ok',
+                  title: 'Accept the repaired document',
                   onClick: acceptAutoRepair
                 },
                 {
                   icon: faCode,
                   text: 'Repair manually instead',
+                  title: 'Leave the document unchanged and repair it manually instead',
                   onClick: handleRequestRepair
                 }
               ]
@@ -1917,6 +1921,7 @@
               {
                 icon: faCode,
                 text: 'Repair manually',
+                title: 'Open the document in "code" mode and repair it manually',
                 onClick: handleRequestRepair
               }
             ]

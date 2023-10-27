@@ -57,6 +57,7 @@
   import memoizeOne from 'memoize-one'
   import type { Callbacks, Component } from 'svelte-simple-modal/types/Modal.svelte'
   import ModalRef from '../components/modals/ModalRef.svelte'
+  import type { Open } from 'svelte-simple-modal/types/Modal.svelte.js'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:JSONEditor')
@@ -103,7 +104,7 @@
   let instanceId = uniqueId()
   let hasFocus = false
   let refJSONEditorRoot: JSONEditorRoot
-  let open // svelte-simple-modal context open(...)
+  let open: Open // svelte-simple-modal context open(...)
   let jsoneditorModalState: {
     component: Component
     callbacks: Partial<Callbacks>
@@ -260,12 +261,16 @@
   }
 
   export async function updateProps(props: JSONEditorPropsOptional): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     this.$set(props)
 
     await tick() // await rerender
   }
 
   export async function destroy() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     this.$destroy()
 
     await tick() // await destroying

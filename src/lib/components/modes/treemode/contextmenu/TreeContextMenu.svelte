@@ -29,7 +29,7 @@
   } from '$lib/logic/selection.js'
   import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
   import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
-  import type { ContextMenuItem, DocumentState, JSONParser } from '$lib/types'
+  import type { ContextMenuItem, DocumentState, InsertType, JSONParser } from '$lib/types'
   import { getEnforceString } from '$lib/logic/documentState.js'
   import ContextMenu from '../../../../components/controls/contextmenu/ContextMenu.svelte'
 
@@ -37,30 +37,30 @@
   export let documentState: DocumentState
   export let parser: JSONParser
 
-  export let showTip
+  export let showTip: boolean
 
-  export let onCloseContextMenu
-  export let onEditKey
-  export let onEditValue
-  export let onToggleEnforceString
-  export let onCut
-  export let onCopy
-  export let onPaste
-  export let onRemove
-  export let onDuplicate
-  export let onExtract
-  export let onInsertBefore
-  export let onInsert
-  export let onConvert
-  export let onInsertAfter
-  export let onSort
-  export let onTransform
+  export let onCloseContextMenu: () => void
+  export let onEditKey: () => void
+  export let onEditValue: () => void
+  export let onToggleEnforceString: () => void
+  export let onCut: (indent: boolean) => void
+  export let onCopy: (indent: boolean) => void
+  export let onPaste: () => void
+  export let onRemove: () => void
+  export let onDuplicate: () => void
+  export let onExtract: () => void
+  export let onInsertBefore: () => void
+  export let onInsert: (type: InsertType) => void
+  export let onConvert: (type: InsertType) => void
+  export let onInsertAfter: () => void
+  export let onSort: () => void
+  export let onTransform: () => void
 
   $: selection = documentState.selection
 
   $: hasJson = json !== undefined
   $: hasSelection = !!selection
-  $: rootSelected = selection && isEmpty(getFocusPath(selection))
+  $: rootSelected = selection ? isEmpty(getFocusPath(selection)) : false
   $: focusValue = selection ? getIn(json, getFocusPath(selection)) : undefined
   $: editValueText = Array.isArray(focusValue)
     ? 'Edit array'
@@ -104,7 +104,7 @@
     : hasSelection
 
   $: enforceString =
-    selection != null
+    selection != null && focusValue
       ? getEnforceString(
           focusValue,
           documentState.enforceStringMap,
@@ -168,7 +168,7 @@
     onExtract()
   }
 
-  function handleInsertOrConvert(type) {
+  function handleInsertOrConvert(type: InsertType) {
     onCloseContextMenu()
 
     if (hasSelectionContents) {

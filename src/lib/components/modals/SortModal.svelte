@@ -8,7 +8,7 @@
   import { getNestedPaths } from '$lib/utils/arrayUtils.js'
   import { pathToOption, stringifyJSONPath } from '../../utils/pathUtils.js'
   import { sortJson } from '$lib/logic/sort.js'
-  import { sortModalState } from './sortModalState.js'
+  import { sortModalStates } from './sortModalStates'
   import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { createDebug } from '$lib/utils/debug.js'
@@ -41,42 +41,33 @@
   }
   const directions = [asc, desc]
 
-  let selectedProperty =
-    (sortModalState[stateId] && sortModalState[stateId].selectedProperty) || undefined
-  let selectedDirection =
-    (sortModalState[stateId] && sortModalState[stateId].selectedDirection) || asc
+  let selectedProperty = sortModalStates[stateId]?.selectedProperty
+  let selectedDirection = sortModalStates[stateId]?.selectedDirection || asc
   let sortError: string | undefined = undefined
-
-  $: {
-    // if there is only one option, select it and do not render the select box
-    if (selectedProperty === undefined && properties && properties.length === 1) {
-      selectedProperty = properties[0]
-    }
-  }
 
   $: {
     // remember the selected values for the next time we open the SortModal
     // just in memory, not persisted
-    sortModalState[stateId] = {
+    sortModalStates[stateId] = {
       selectedProperty,
       selectedDirection
     }
 
-    debug('store state in memory', stateId, sortModalState[stateId])
+    debug('store state in memory', stateId, sortModalStates[stateId])
   }
 
   function handleSort() {
     try {
       sortError = undefined
 
-      const itemPath: JSONPath | undefined = selectedProperty?.value
+      const itemPath: JSONPath = selectedProperty?.value || properties?.[0]?.value || []
       const direction = selectedDirection?.value
       const operations = sortJson(json, rootPath, itemPath, direction)
       onSort({ operations, rootPath, itemPath, direction })
 
       close()
     } catch (err) {
-      sortError = err.toString()
+      sortError = String(err)
     }
   }
 
@@ -107,7 +98,7 @@
             />
           </td>
         </tr>
-        {#if jsonIsArray && (properties.length > 1 || selectedProperty === undefined)}
+        {#if jsonIsArray && ((properties && properties?.length > 1) || selectedProperty === undefined)}
           <tr>
             <th>Property</th>
             <td>
@@ -143,7 +134,7 @@
         class="jse-primary"
         on:click={handleSort}
         use:focus
-        disabled={jsonIsArray ? !selectedProperty : false}
+        disabled={jsonIsArray && (properties && properties?.length > 1) ? !selectedProperty : false}
       >
         Sort
       </button>

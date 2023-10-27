@@ -10,7 +10,7 @@
   import type { JSONPath, JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
-  import { transformModalState } from './transformModalState.js'
+  import { transformModalStates, transformModalStateShared } from './transformModalStates.js'
   import TransformWizard from './TransformWizard.svelte'
   import TransformModalHeader from './TransformModalHeader.svelte'
   import AbsolutePopup from './popup/AbsolutePopup.svelte'
@@ -53,18 +53,20 @@
 
   export let onTransform: OnPatch
 
+  let selectedJson: JSONValue | undefined
   $: selectedJson = getIn(json, rootPath)
-  $: selectedContent = { json: selectedJson }
+  let selectedContent: Content
+  $: selectedContent = selectedJson ? { json: selectedJson } : { text: '' }
 
   const { close } = getContext<Context>('simple-modal')
 
   const stateId = `${id}:${compileJSONPointer(rootPath)}`
 
-  const state = transformModalState[stateId] || {}
+  const state = transformModalStates[stateId] || {}
 
   // showWizard is not stored inside a stateId
-  let showWizard = transformModalState.showWizard !== false
-  let showOriginal = transformModalState.showOriginal !== false
+  let showWizard = transformModalStateShared.showWizard !== false
+  let showOriginal = transformModalStateShared.showOriginal !== false
 
   let queryOptions = state.queryOptions || {}
   let query =
@@ -88,17 +90,24 @@
     debug('updateQueryByWizard', { queryOptions, query, isManual })
   }
 
-  function handleChangeQuery(event) {
-    query = event.target.value
+  function handleChangeQuery(event: Event) {
+    query = (event.target as HTMLTextAreaElement).value
     isManual = true
     debug('handleChangeQuery', { query, isManual })
   }
 
-  function previewTransform(json: JSONValue, query: string) {
+  function previewTransform(json: JSONValue | undefined, query: string) {
+    if (json === undefined) {
+      previewContent = { text: '' }
+      previewError = 'Error: No JSON'
+      return
+    }
+
     try {
       debug('previewTransform', {
         query
       })
+
       const jsonTransformed = getSelectedQueryLanguage(queryLanguageId).executeQuery(
         json,
         query,
@@ -122,17 +131,23 @@
   $: {
     // remember the selected values for the next time we open the SortModal
     // just in memory, not persisted
-    transformModalState[stateId] = {
+    transformModalStates[stateId] = {
       queryOptions,
       query,
       queryLanguageId,
       isManual
     }
 
-    debug('store state in memory', stateId, transformModalState[stateId])
+    debug('store state in memory', stateId, transformModalStates[stateId])
   }
 
   function handleTransform() {
+    if (selectedJson === undefined) {
+      previewContent = { text: '' }
+      previewError = 'Error: No JSON'
+      return
+    }
+
     try {
       debug('handleTransform', { query })
       const jsonTransformed = getSelectedQueryLanguage(queryLanguageId).executeQuery(
@@ -163,14 +178,14 @@
     showWizard = !showWizard
 
     // not stored inside a stateId
-    transformModalState.showWizard = showWizard
+    transformModalStateShared.showWizard = showWizard
   }
 
   function toggleShowOriginal() {
     showOriginal = !showOriginal
 
     // not stored inside a stateId
-    transformModalState.showOriginal = showOriginal
+    transformModalStateShared.showOriginal = showOriginal
   }
 
   function focus(element: HTMLElement) {
@@ -236,12 +251,9 @@
           <div class="jse-label">
             <div class="jse-label-inner">Query</div>
           </div>
-          <textarea
-            class="jse-query"
-            spellcheck="false"
-            value={query}
-            on:input={handleChangeQuery}
-          />
+          <textarea class="jse-query" spellcheck="false" on:input={handleChangeQuery}
+            >{query}</textarea
+          >
         </div>
         <div class="jse-data-contents" class:jse-hide-original-data={!showOriginal}>
           <div class="jse-original-data" class:jse-hide={!showOriginal}>
@@ -266,7 +278,7 @@
                 {parser}
                 {parseMemoizeOne}
                 {onRenderValue}
-                onRenderMenu={noop}
+                onRenderMenu={() => undefined}
                 onError={console.error}
                 onChange={noop}
                 onChangeMode={noop}
@@ -300,7 +312,7 @@
                 {parser}
                 {parseMemoizeOne}
                 {onRenderValue}
-                onRenderMenu={noop}
+                onRenderMenu={() => undefined}
                 onError={console.error}
                 onChange={noop}
                 onChangeMode={noop}

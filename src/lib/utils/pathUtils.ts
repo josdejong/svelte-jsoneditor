@@ -1,5 +1,6 @@
 import { isEmpty, memoize } from 'lodash-es'
 import type { JSONPath } from 'immutable-json-patch'
+import type { PathOption } from '$lib/types.js'
 
 /**
  **
@@ -82,7 +83,7 @@ export function parseJSONPath(pathStr: string): JSONPath {
 /**
  * Convert a JSONPath into an option for use in a select box
  */
-export function pathToOption(path: JSONPath): { value: JSONPath; label: string } {
+export function pathToOption(path: JSONPath): PathOption {
   return {
     value: path,
     label: isEmpty(path) ? '(item root)' : stringifyJSONPath(path)

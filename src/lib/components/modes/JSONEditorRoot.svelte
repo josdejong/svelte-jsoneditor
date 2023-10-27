@@ -79,7 +79,7 @@
       // check for 'code' mode is here for backward compatibility (deprecated since v0.4.0)
       className:
         'jse-group-button jse-first' +
-        (mode === Mode.text || mode === 'code' ? ' jse-selected' : ''),
+        (mode === Mode.text || (mode as string) === 'code' ? ' jse-selected' : ''),
       onClick: () => onChangeMode(Mode.text)
     },
     {
@@ -127,6 +127,8 @@
     if (refTextMode) {
       return refTextMode.patch(operations)
     }
+
+    throw new Error(`Method patch is not available in mode "${mode}"`)
   }
 
   export function expand(callback?: OnExpand): void {

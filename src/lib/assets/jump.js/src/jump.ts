@@ -116,7 +116,7 @@ export const createJump = () => {
 
   // API
 
-  function jump(target: Element, options: JumpOptions = {}) {
+  function jump(target: Element | number | string, options: JumpOptions = {}) {
     // resolve options, or use defaults
     duration = 1000
     offset = options.offset || 0

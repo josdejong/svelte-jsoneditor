@@ -42,6 +42,16 @@ export enum CaretType {
   inside = 'inside'
 }
 
+export interface PathOption {
+  value: JSONPath
+  label: string
+}
+
+export interface NumberOption {
+  value: 1 | -1
+  label: string
+}
+
 export interface CaretPosition {
   path: JSONPath
   type: CaretType // TODO: refactor this to use SelectionType here, then we can simplify the util functions to turn this into a selection
