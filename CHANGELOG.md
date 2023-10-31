@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.18.11](https://github.com/josdejong/svelte-jsoneditor/compare/v0.18.10...v0.18.11) (2023-10-31)
+
+
+### Features
+
+* update codemirror, jsonrepair, and other dependencies ([90d1b77](https://github.com/josdejong/svelte-jsoneditor/commit/90d1b774533b9a2c9716ef580eb0af045974ef56))
+
+
+### Bug Fixes
+
+* [#321](https://github.com/josdejong/svelte-jsoneditor/issues/321) editor not accepting JSON created in a different JavaScript realm like an iframe ([06fb84c](https://github.com/josdejong/svelte-jsoneditor/commit/06fb84cced17b5b603897e21f30c4c083015190d))
+* bottom margin of welcome screen in tree and table mode ([7d1eb02](https://github.com/josdejong/svelte-jsoneditor/commit/7d1eb027abf8e7776d40d48c5371dc372af409ff))
+* editor sometimes losing track on whether it has focus ([410f997](https://github.com/josdejong/svelte-jsoneditor/commit/410f997b075a274b6e8691db4c3831c71602dbe3))
+* svelte giving warnings about creating components with unknown properties ([627170a](https://github.com/josdejong/svelte-jsoneditor/commit/627170a3e621a5ddb0abc1aa016b0a4334bc3837))
+
 ### [0.18.10](https://github.com/josdejong/svelte-jsoneditor/compare/v0.18.9...v0.18.10) (2023-10-17)
 
 
