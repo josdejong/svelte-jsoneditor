@@ -103,6 +103,7 @@
   export let onReferenceKey: (path: JSONPath, type?: CompareConfigType) => void
   export let onCompressKey: (path: JSONPath, type?: CompareConfigType) => void
   export let onDiffMatch: (path: JSONPath, type?: CompareConfigType) => void
+  export let onNodeDecode: (path: JSONPath) => void
 
   let instanceId = uniqueId()
   let hasFocus = false
@@ -340,7 +341,8 @@
         onSortKey,
         onReferenceKey,
         onCompressKey,
-        onDiffMatch
+        onDiffMatch,
+        onNodeDecode
       },
       TRANSFORM_MODAL_OPTIONS,
       {
@@ -478,6 +480,7 @@
             {onReferenceKey}
             {onCompressKey}
             {onDiffMatch}
+            {onNodeDecode}
           />
         {/key}
       </div>

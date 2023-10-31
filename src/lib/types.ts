@@ -453,6 +453,7 @@ export interface JSONEditorPropsOptional {
   onReferenceKey?: (path: JSONPath, type?: CompareConfigType) => void
   onCompressKey?: (path: JSONPath, type?: CompareConfigType) => void
   onDiffMatch?: (path: JSONPath, type?: CompareConfigType) => void
+  onNodeDecode?: (path: JSONPath) => void
 }
 
 export interface JSONEditorContext {

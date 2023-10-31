@@ -68,6 +68,7 @@
   export let onSortKey: (path: JSONPath, type?: CompareConfigType) => void
   export let onCompressKey: (path: JSONPath, type?: CompareConfigType) => void
   export let onDiffMatch: (path: JSONPath, type?: CompareConfigType) => void
+  export let onNodeDecode: (path: JSONPath) => void
 
   let refTreeMode
   let refTableMode
@@ -311,5 +312,6 @@
     {onReferenceKey}
     {onCompressKey}
     {onDiffMatch}
+    {onNodeDecode}
   />
 {/if}

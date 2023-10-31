@@ -196,6 +196,8 @@
     export let onCompressKey: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
     export let onDiffMatch:  ((path: JSONPath, type?: CompareConfigType) => void) | undefined
 
+    export let onNodeDecode: ((path: JSONPath) => void) | undefined
+
     // modalOpen is true when one of the modals is open.
     // This is used to track whether the editor still has focus
     let modalOpen = false
@@ -825,6 +827,14 @@
       }
       const path = documentState.selection.focusPath
       onDiffMatch?.(path, type)
+    }
+
+    function handleNodeDecode(){
+        if (readOnly || !documentState.selection) {
+            return
+        }
+        const path = documentState.selection.focusPath
+        onNodeDecode?.(path)
     }
 
     function handleEditKey() {
@@ -1872,6 +1882,7 @@
             onReferenceKey: onReferenceKey && handleReferenceKey,
             onCompressKey: onCompressKey && handleCompressKey,
             onDiffMatch: onDiffMatch && handleDiffMatch,
+            onNodeDecode: onNodeDecode && handleNodeDecode,
 
             onEditKey: handleEditKey,
             onEditValue: handleEditValue,

@@ -1,7 +1,7 @@
 {
   "name": "@arextest/svelte-jsoneditor",
   "description": "A web-based tool to view, edit, format, transform, and validate JSON",
-  "version": "0.17.25",
+  "version": "0.17.26",
   "homepage": "https://github.com/1pone/svelte-jsoneditor.git",
   "repository": {
     "type": "git",

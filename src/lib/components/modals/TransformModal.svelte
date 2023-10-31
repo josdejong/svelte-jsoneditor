@@ -56,6 +56,8 @@
   export let onReferenceKey: (path: JSONPath, type?: CompareConfigType) => void
   export let onCompressKey: (path: JSONPath, type?: CompareConfigType) => void
   export let onDiffMatch: (path: JSONPath, type?: CompareConfigType) => void
+  export let onNodeDecode: (path: JSONPath) => void
+
 
   $: selectedJson = getIn(json, rootPath)
   $: selectedContent = { json: selectedJson }
@@ -286,6 +288,7 @@
                 {onReferenceKey}
                 {onCompressKey}
                 {onDiffMatch}
+                {onNodeDecode}
               />
             {/if}
           </div>
@@ -323,6 +326,7 @@
                 {onReferenceKey}
                 {onCompressKey}
                 {onDiffMatch}
+                {onNodeDecode}
               />
             {:else}
               <div class="jse-preview jse-error">
