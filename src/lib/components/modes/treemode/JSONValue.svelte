@@ -34,5 +34,7 @@
 </script>
 
 {#each renderers as renderer}
-  <svelte:component this={renderer.component} {...renderer.props} />
+  {#key renderer.component}
+    <svelte:component this={renderer.component} {...renderer.props} />
+  {/key}
 {/each}
