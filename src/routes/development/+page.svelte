@@ -680,12 +680,16 @@
     </button>
     <button
       on:click={() => {
-        refTextEditor?.select({
+        if (!refTextEditor) {
+          alert('Open the text editor first (right panel)')
+          return
+        }
+        refTextEditor.select({
           type: SelectionType.text,
           ranges: [{ anchor: 5, head: 12 }],
           main: 0
         })
-        refTextEditor?.focus()
+        refTextEditor.focus()
       }}
     >
       Select char 5 to 12
