@@ -4,6 +4,7 @@ import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 
 export type Language = 'en' | 'cn'
 export type CompareConfigType = 'global' | 'interface' | 'dependency'
+export type NodeDecodeType = 'base64' | 'zstd'
 
 export type { JSONValue, JSONPointer, JSONPath, JSONPatchDocument } from 'immutable-json-patch'
 

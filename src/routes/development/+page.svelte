@@ -693,8 +693,8 @@
             onDiffMatch= {(path, type) => {
               console.log('onDiffMatch', path,  type)
             }}
-            onNodeDecode={(path) => {
-              console.log('onNodeDecode', path)
+            onNodeDecode={(path, type) => {
+              console.log('onNodeDecode', path, type)
           }}
           />
         {/if}

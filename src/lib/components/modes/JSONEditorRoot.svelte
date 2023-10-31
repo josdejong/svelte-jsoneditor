@@ -1,30 +1,30 @@
 <script lang="ts">
-    import type {
-        CompareConfigType,
-        Content,
-        ContentErrors,
-        Language,
-        JSONParser,
-        JSONPatchResult,
-        JSONPathParser,
-        MenuItem,
-        MenuSeparatorItem,
-        OnBlur,
-        OnChange,
-        OnChangeMode,
-        OnClassName,
-        OnError,
-        OnExpand,
-        OnFocus,
-        OnJSONEditorModal,
-        OnRenderMenu,
-        OnRenderMenuWithoutContext,
-        OnRenderValue,
-        OnSortModal,
-        OnTransformModal,
-        TransformModalOptions,
-        Validator
-    } from '$lib/types'
+  import type {
+    CompareConfigType,
+    Content,
+    ContentErrors,
+    Language,
+    JSONParser,
+    JSONPatchResult,
+    JSONPathParser,
+    MenuItem,
+    MenuSeparatorItem,
+    OnBlur,
+    OnChange,
+    OnChangeMode,
+    OnClassName,
+    OnError,
+    OnExpand,
+    OnFocus,
+    OnJSONEditorModal,
+    OnRenderMenu,
+    OnRenderMenuWithoutContext,
+    OnRenderValue,
+    OnSortModal,
+    OnTransformModal,
+    TransformModalOptions,
+    Validator, NodeDecodeType
+  } from '$lib/types'
   import {Mode} from '$lib/types.js'
   import TextMode from './textmode/TextMode.svelte'
   import TableMode from './tablemode/TableMode.svelte'
@@ -68,7 +68,7 @@
   export let onSortKey: (path: JSONPath, type?: CompareConfigType) => void
   export let onCompressKey: (path: JSONPath, type?: CompareConfigType) => void
   export let onDiffMatch: (path: JSONPath, type?: CompareConfigType) => void
-  export let onNodeDecode: (path: JSONPath) => void
+  export let onNodeDecode: (path: JSONPath, type?: NodeDecodeType) => void
 
   let refTreeMode
   let refTableMode

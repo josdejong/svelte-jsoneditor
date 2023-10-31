@@ -29,7 +29,7 @@
       JSONEditorPropsOptional,
       JSONParser,
       JSONPatchResult,
-      JSONPathParser,
+      JSONPathParser, NodeDecodeType,
       OnBlur,
       OnChange,
       OnChangeMode,
@@ -103,7 +103,7 @@
   export let onReferenceKey: (path: JSONPath, type?: CompareConfigType) => void
   export let onCompressKey: (path: JSONPath, type?: CompareConfigType) => void
   export let onDiffMatch: (path: JSONPath, type?: CompareConfigType) => void
-  export let onNodeDecode: (path: JSONPath) => void
+  export let onNodeDecode: (path: JSONPath, type?: NodeDecodeType) => void
 
   let instanceId = uniqueId()
   let hasFocus = false

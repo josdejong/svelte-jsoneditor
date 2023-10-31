@@ -98,41 +98,41 @@
     import NavigationBar from '../../controls/navigationBar/NavigationBar.svelte'
     import SearchBox from './menu/SearchBox.svelte'
     import type {
-        AbsolutePopupOptions,
-        AfterPatchCallback,
-        CompareConfigType,
-        Content,
-        ContentErrors,
-        DocumentState,
-        HistoryItem,
-        InsertType,
-        JSONParser,
-        JSONPatchResult,
-        JSONPathParser,
-        JSONPointerMap,
-        JSONSelection,
-        NestedValidationError,
-        OnBlur,
-        OnChange,
-        OnChangeMode,
-        OnClassName,
-        OnError,
-        OnExpand,
-        OnFocus,
-        OnJSONEditorModal,
-        OnRenderMenuWithoutContext,
-        OnRenderValue,
-        OnSortModal,
-        OnTransformModal,
-        ParseError,
-        PastedJson,
-        SearchResult,
-        Section,
-        TransformModalOptions,
-        TreeModeContext,
-        ValidationError,
-        Validator,
-        ValueNormalization
+      AbsolutePopupOptions,
+      AfterPatchCallback,
+      CompareConfigType,
+      Content,
+      ContentErrors,
+      DocumentState,
+      HistoryItem,
+      InsertType,
+      JSONParser,
+      JSONPatchResult,
+      JSONPathParser,
+      JSONPointerMap,
+      JSONSelection,
+      NestedValidationError, NodeDecodeType,
+      OnBlur,
+      OnChange,
+      OnChangeMode,
+      OnClassName,
+      OnError,
+      OnExpand,
+      OnFocus,
+      OnJSONEditorModal,
+      OnRenderMenuWithoutContext,
+      OnRenderValue,
+      OnSortModal,
+      OnTransformModal,
+      ParseError,
+      PastedJson,
+      SearchResult,
+      Section,
+      TransformModalOptions,
+      TreeModeContext,
+      ValidationError,
+      Validator,
+      ValueNormalization
     } from '$lib/types'
     import {Mode, ValidationSeverity} from '$lib/types.js'
     import {isAfterSelection, isInsideSelection, isKeySelection} from '$lib/logic/selection.js'
@@ -196,7 +196,7 @@
     export let onCompressKey: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
     export let onDiffMatch:  ((path: JSONPath, type?: CompareConfigType) => void) | undefined
 
-    export let onNodeDecode: ((path: JSONPath) => void) | undefined
+    export let onNodeDecode: ((path: JSONPath, type?: NodeDecodeType) => void) | undefined
 
     // modalOpen is true when one of the modals is open.
     // This is used to track whether the editor still has focus
@@ -829,12 +829,12 @@
       onDiffMatch?.(path, type)
     }
 
-    function handleNodeDecode(){
+    function handleNodeDecode(type?: NodeDecodeType){
         if (readOnly || !documentState.selection) {
             return
         }
         const path = documentState.selection.focusPath
-        onNodeDecode?.(path)
+        onNodeDecode?.(path, type)
     }
 
     function handleEditKey() {

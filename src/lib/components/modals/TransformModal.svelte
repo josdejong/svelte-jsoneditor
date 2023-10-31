@@ -17,14 +17,14 @@
   import { createDebug } from '$lib/utils/debug.js'
   import TreeMode from '../modes/treemode/TreeMode.svelte'
   import type {
-    Content,
-    JSONParser,
-    JSONPathParser,
-    OnChangeQueryLanguage,
-    OnClassName,
-    OnPatch,
-    OnRenderValue,
-    QueryLanguage
+      Content,
+      JSONParser,
+      JSONPathParser, NodeDecodeType,
+      OnChangeQueryLanguage,
+      OnClassName,
+      OnPatch,
+      OnRenderValue,
+      QueryLanguage
   } from '$lib/types.js'
   import { onEscape } from '$lib/actions/onEscape.js'
   import type {CompareConfigType} from "$lib/types.js";
@@ -56,7 +56,7 @@
   export let onReferenceKey: (path: JSONPath, type?: CompareConfigType) => void
   export let onCompressKey: (path: JSONPath, type?: CompareConfigType) => void
   export let onDiffMatch: (path: JSONPath, type?: CompareConfigType) => void
-  export let onNodeDecode: (path: JSONPath) => void
+  export let onNodeDecode: (path: JSONPath, type?: NodeDecodeType) => void
 
 
   $: selectedJson = getIn(json, rootPath)
