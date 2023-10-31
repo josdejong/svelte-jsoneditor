@@ -311,6 +311,7 @@ exports[`JSONEditor > render table mode 1`] = `
                   <!--&lt;ReadonlyValue&gt;-->
                   
                   
+                  
                   <!--&lt;JSONValue&gt;-->
                   
                   
@@ -328,6 +329,7 @@ exports[`JSONEditor > render table mode 1`] = `
                     
                   </div>
                   <!--&lt;ReadonlyValue&gt;-->
+                  
                   
                   
                   <!--&lt;JSONValue&gt;-->
@@ -361,6 +363,7 @@ exports[`JSONEditor > render table mode 1`] = `
                   <!--&lt;ReadonlyValue&gt;-->
                   
                   
+                  
                   <!--&lt;JSONValue&gt;-->
                   
                   
@@ -378,6 +381,7 @@ exports[`JSONEditor > render table mode 1`] = `
                     Joe
                   </div>
                   <!--&lt;ReadonlyValue&gt;-->
+                  
                   
                   
                   <!--&lt;JSONValue&gt;-->
@@ -411,6 +415,7 @@ exports[`JSONEditor > render table mode 1`] = `
                   <!--&lt;ReadonlyValue&gt;-->
                   
                   
+                  
                   <!--&lt;JSONValue&gt;-->
                   
                   
@@ -428,6 +433,7 @@ exports[`JSONEditor > render table mode 1`] = `
                     
                   </div>
                   <!--&lt;ReadonlyValue&gt;-->
+                  
                   
                   
                   <!--&lt;JSONValue&gt;-->
@@ -1692,6 +1698,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                         <!--&lt;ReadonlyValue&gt;-->
                         
                         
+                        
                         <!--&lt;JSONValue&gt;-->
                          
                       </div>
@@ -1870,6 +1877,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                         <!--&lt;ReadonlyValue&gt;-->
                         
                         
+                        
                         <!--&lt;JSONValue&gt;-->
                          
                       </div>
@@ -1930,6 +1938,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                           Joe
                         </div>
                         <!--&lt;ReadonlyValue&gt;-->
+                        
                         
                         
                         <!--&lt;JSONValue&gt;-->
@@ -2108,6 +2117,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                           3
                         </div>
                         <!--&lt;ReadonlyValue&gt;-->
+                        
                         
                         
                         <!--&lt;JSONValue&gt;-->
