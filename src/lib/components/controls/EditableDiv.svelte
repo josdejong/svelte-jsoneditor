@@ -6,15 +6,15 @@
   import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
   import { createDebug } from '$lib/utils/debug.js'
   import { noop } from 'lodash-es'
-  import { UPDATE_SELECTION } from '$lib/constants.js'
   import type { OnFind, OnPaste } from '$lib/types'
+  import { UpdateSelectionAfterChange } from '$lib/types'
   import { classnames } from '$lib/utils/cssUtils.js'
 
   const debug = createDebug('jsoneditor:EditableDiv')
 
   export let value: string
   export let shortText = false
-  export let onChange: (newValue: string, updateSelection: string) => void
+  export let onChange: (newValue: string, updateSelection: UpdateSelectionAfterChange) => void
   export let onCancel: () => void
   export let onFind: OnFind
   export let onPaste: OnPaste = noop
@@ -30,16 +30,20 @@
     setDomValue(value)
 
     // focus
-    setTimeout(() => {
-      if (domValue) {
-        setCursorToEnd(domValue)
+    if (domValue) {
+      setCursorToEnd(domValue)
 
-        // The refresh method can be used to update the classnames for example
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        domValue.refresh = handleValueInput
-      }
-    })
+      // The refresh method can be used to update the classnames for example
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      domValue.refresh = handleValueInput
+
+      // The cancel method can be used to cancel editing, without firing a change
+      // when the contents did change in the meantime. It is the same as pressing ESC
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      domValue.cancel = handleCancel
+    }
   })
 
   onDestroy(() => {
@@ -48,7 +52,7 @@
     debug('onDestroy', { closed, value, newValue })
 
     if (!closed && newValue !== value) {
-      onChange(newValue, UPDATE_SELECTION.NO)
+      onChange(newValue, UpdateSelectionAfterChange.no)
     }
   })
 
@@ -78,16 +82,20 @@
     valueClass = onValueClass(newValue)
   }
 
+  function handleCancel() {
+    // cancel changes (needed to prevent triggering a change onDestroy)
+    closed = true
+
+    onCancel()
+  }
+
   function handleValueKeyDown(event: KeyboardEvent) {
     event.stopPropagation()
 
     const combo = keyComboFromEvent(event)
 
     if (combo === 'Escape') {
-      // cancel changes (needed to prevent triggering a change onDestroy)
-      closed = true
-
-      onCancel()
+      handleCancel()
     }
 
     if (combo === 'Enter' || combo === 'Tab') {
@@ -95,7 +103,7 @@
       closed = true
 
       const newValue = getDomValue()
-      onChange(newValue, UPDATE_SELECTION.NEXT_INSIDE)
+      onChange(newValue, UpdateSelectionAfterChange.nextInside)
     }
 
     if (combo === 'Ctrl+F') {
@@ -133,9 +141,13 @@
     if (document.hasFocus() && !closed) {
       closed = true
       if (newValue !== value) {
-        onChange(newValue, UPDATE_SELECTION.SELF)
+        onChange(newValue, UpdateSelectionAfterChange.self)
       } else {
-        onCancel()
+        // Note that we do not fire an onCancel here: a blur action
+        // is caused by the user clicking somewhere else. If we apply
+        // onCancel now, we would override the selection that the user
+        // wants by clicking somewhere else in the editor (since `blur`
+        // is occurring *after* `mousedown`).
       }
     }
   }

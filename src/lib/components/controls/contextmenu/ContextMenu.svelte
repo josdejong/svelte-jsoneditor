@@ -21,18 +21,16 @@
   export let items: ContextMenuItem[]
   export let tip: string | undefined
 
-  let refContextMenu
+  let refContextMenu: HTMLDivElement
 
   onMount(() => {
-    setTimeout(() => {
-      const firstEnabledButton = [...refContextMenu.querySelectorAll('button')].find(
-        (button) => !button.disabled
-      )
+    const firstEnabledButton = Array.from(refContextMenu.querySelectorAll('button')).find(
+      (button) => !button.disabled
+    )
 
-      if (firstEnabledButton) {
-        firstEnabledButton.focus()
-      }
-    })
+    if (firstEnabledButton) {
+      firstEnabledButton.focus()
+    }
   })
 
   const directionByCombo: Record<string, 'Up' | 'Down' | 'Left' | 'Right'> = {
@@ -44,9 +42,9 @@
 
   function handleKeyDown(event) {
     const combo = keyComboFromEvent(event)
-    const direction = directionByCombo[combo]
+    const direction: 'Up' | 'Down' | 'Left' | 'Right' | undefined = directionByCombo[combo]
 
-    if (typeof direction === 'string') {
+    if (direction && event.target) {
       event.preventDefault()
 
       const buttons: HTMLButtonElement[] = Array.from(

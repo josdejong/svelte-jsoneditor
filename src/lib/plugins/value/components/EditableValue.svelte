@@ -7,16 +7,16 @@
   import { createValueSelection, getFocusPath } from '$lib/logic/selection.js'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass.js'
   import EditableDiv from '../../../components/controls/EditableDiv.svelte'
-  import { UPDATE_SELECTION } from '$lib/constants.js'
   import type {
     FindNextInside,
     JSONParser,
     OnFind,
+    OnJSONSelect,
     OnPasteJson,
     OnPatch,
-    OnJSONSelect,
     ValueNormalization
   } from '$lib/types.js'
+  import { UpdateSelectionAfterChange } from '$lib/types.js'
   import { isEqual } from 'lodash-es'
 
   export let path: JSONPath
@@ -35,7 +35,7 @@
     return enforceString ? value : stringConvert(value, parser)
   }
 
-  function handleChangeValue(newValue: string, updateSelection: string) {
+  function handleChangeValue(newValue: string, updateSelection: UpdateSelectionAfterChange) {
     onPatch(
       [
         {
@@ -53,7 +53,7 @@
         }
 
         const selection =
-          updateSelection === UPDATE_SELECTION.NEXT_INSIDE
+          updateSelection === UpdateSelectionAfterChange.nextInside
             ? findNextInside(path)
             : createValueSelection(path, false)
 
@@ -66,9 +66,7 @@
       }
     )
 
-    if (updateSelection !== UPDATE_SELECTION.SELF) {
-      focus()
-    }
+    focus()
   }
 
   function handleCancelChange() {
@@ -82,7 +80,7 @@
       if (isObjectOrArray(pastedJson)) {
         onPasteJson({
           path,
-          contents: pastedJson
+          contents: pastedJson as JSONValue
         })
       }
     } catch (err) {

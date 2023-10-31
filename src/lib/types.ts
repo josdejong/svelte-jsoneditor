@@ -574,6 +574,12 @@ export enum SortDirection {
   desc = 'desc'
 }
 
+export enum UpdateSelectionAfterChange {
+  no = 'no',
+  self = 'self',
+  nextInside = 'nextInside'
+}
+
 export interface TableCellIndex {
   rowIndex: number
   columnIndex: number

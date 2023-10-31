@@ -28,7 +28,7 @@
       }
     ])
 
-    setTimeout(focus)
+    focus()
   }
 </script>
 

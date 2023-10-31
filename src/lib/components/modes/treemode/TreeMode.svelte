@@ -83,7 +83,8 @@
     findParentWithNodeName,
     getWindow,
     isChildOf,
-    isChildOfNodeName
+    isChildOfNodeName,
+    isEditableDivRef
   } from '$lib/utils/domUtils.js'
   import {
     convertValue,
@@ -1334,7 +1335,7 @@
    */
   export async function scrollTo(path: JSONPath, scrollToWhenVisible = true): Promise<void> {
     documentState = expandPath(json, documentState, path)
-    await tick() // await rerender
+    await tick() // await rerender (else the element we want to scroll to does not yet exist)
 
     const elem = findElement(path)
 
@@ -1570,11 +1571,7 @@
     }
 
     // set focus to the hidden input, so we can capture quick keys like Ctrl+X, Ctrl+C, Ctrl+V
-    setTimeout(() => {
-      if (!activeElementIsChildOf(refJsonEditor)) {
-        focus()
-      }
-    })
+    focus()
   }
 
   function handleExpandAll() {
@@ -1781,59 +1778,26 @@
 
     if (combo === 'Ctrl+Z') {
       event.preventDefault()
-
-      // TODO: find a better way to restore focus
-      // TODO: implement a proper TypeScript solution to check whether this is an element with blur, focus, select
-      const activeElement = document.activeElement as HTMLInputElement
-      if (activeElement && activeElement.blur && activeElement.select) {
-        activeElement.blur()
-        setTimeout(() => {
-          handleUndo()
-          setTimeout(() => activeElement?.select())
-        })
-      } else {
-        handleUndo()
-      }
+      handleUndo()
     }
 
     if (combo === 'Ctrl+Shift+Z') {
       event.preventDefault()
-
-      // TODO: find a better way to restore focus
-      // TODO: implement a proper TypeScript solution to check whether this is an element with blur, focus, select
-      const activeElement = document.activeElement as HTMLInputElement
-      if (activeElement && activeElement.blur && activeElement.select) {
-        activeElement.blur()
-        setTimeout(() => {
-          handleRedo()
-          setTimeout(() => activeElement?.select())
-        })
-      } else {
-        handleRedo()
-      }
+      handleRedo()
     }
   }
 
-  function handleMouseDown(event) {
+  function handleMouseDown(event: MouseEvent & { target: HTMLDivElement }) {
     debug('handleMouseDown', event)
 
-    // TODO: ugly to have two setTimeout here. Without it, hiddenInput will blur
-    setTimeout(() => {
-      setTimeout(() => {
-        if (!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) {
-          // for example when clicking on the empty area in the main menu
-          focus()
+    if (!isChildOfNodeName(event.target, 'BUTTON') && !event.target.isContentEditable) {
+      // for example when clicking on the empty area in the main menu
+      focus()
 
-          if (
-            !documentState.selection &&
-            json === undefined &&
-            (text === '' || text === undefined)
-          ) {
-            createDefaultSelection()
-          }
-        }
-      })
-    })
+      if (!documentState.selection && json === undefined && (text === '' || text === undefined)) {
+        createDefaultSelection()
+      }
+    }
   }
 
   function openContextMenu({
@@ -1966,11 +1930,13 @@
     }
 
     const { path, contents } = pastedJson
+    pastedJson = undefined
 
     // exit edit mode
-    updateSelection(createValueSelection(path, false))
-
-    await tick()
+    const refEditableDiv = refContents?.querySelector('.jse-editable-div') || null
+    if (isEditableDivRef(refEditableDiv)) {
+      refEditableDiv.cancel()
+    }
 
     // replace the value with the JSON object/array
     const operations: JSONPatchDocument = [
@@ -1986,11 +1952,15 @@
         state: expandRecursive(patchedJson, patchedState, path)
       }
     })
+
+    // TODO: get rid of the setTimeout here
+    setTimeout(focus)
   }
 
   function handleClearPastedJson() {
     debug('clear pasted json')
     pastedJson = undefined
+    focus()
   }
 
   function handleRequestRepair() {
@@ -2035,17 +2005,10 @@
           refHiddenInput.blur()
         }
 
-        // This is ugly: we need to wait until the EditableDiv has triggered onSelect,
-        //  and have onSelect call refHiddenInput.focus(). After that we can call blur()
-        //  to remove the focus.
-        // TODO: find a better solution
-        tick().then(() => {
-          setTimeout(() => {
-            if (refHiddenInput) {
-              refHiddenInput.blur()
-            }
-          })
-        })
+        debug('blur (outside editor)')
+        if (refHiddenInput) {
+          refHiddenInput.blur()
+        }
       }
     }
   }
@@ -2240,10 +2203,6 @@
               onClick: handleClearPastedJson
             }
           ]}
-          onClose={() => {
-            // TODO: the need for setTimeout is ugly
-            setTimeout(focus)
-          }}
         />
       {/if}
 

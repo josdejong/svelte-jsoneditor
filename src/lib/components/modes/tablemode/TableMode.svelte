@@ -73,7 +73,8 @@
     findParentWithNodeName,
     getDataPathFromTarget,
     getWindow,
-    isChildOfNodeName
+    isChildOfNodeName,
+    isEditableDivRef
   } from '$lib/utils/domUtils.js'
   import { createDebug } from '$lib/utils/debug.js'
   import {
@@ -697,6 +698,7 @@
   }
 
   export function focus() {
+    debug('focus')
     // with just .focus(), sometimes the input doesn't react on onpaste events
     // in Chrome when having a large document open and then doing cut/paste.
     // Calling both .focus() and .select() did solve this issue.
@@ -710,7 +712,7 @@
     scrollTop = event.target['scrollTop']
   }
 
-  function handleMouseDown(event: MouseEvent) {
+  function handleMouseDown(event: MouseEvent & { target: HTMLDivElement }) {
     const path = event?.target ? getDataPathFromTarget(event.target as HTMLElement) : undefined
     if (path) {
       // when clicking inside the current selection, editing a value, do nothing
@@ -726,15 +728,10 @@
       event.preventDefault()
     }
 
-    // TODO: ugly to have two setTimeout here. Without it, hiddenInput will blur
-    setTimeout(() => {
-      setTimeout(() => {
-        // for example when clicking on the empty area in the main menu
-        if (!hasFocus && !isChildOfNodeName(event.target, 'BUTTON')) {
-          focus()
-        }
-      })
-    })
+    // for example when clicking on the empty area in the main menu
+    if (!isChildOfNodeName(event.target, 'BUTTON') && !event.target.isContentEditable) {
+      focus()
+    }
   }
 
   function createDefaultSelection(): JSONSelection | null {
@@ -1017,7 +1014,7 @@
     return false
   }
 
-  function handleContextMenuFromTableMenu(event: Event) {
+  function handleContextMenuFromTableMenu(event: Event & { target: HTMLDivElement }) {
     if (readOnly) {
       return
     }
@@ -1093,9 +1090,10 @@
     const { path, contents } = pastedJson
 
     // exit edit mode
-    updateSelection(createValueSelection(path, false))
-
-    await tick()
+    const refEditableDiv = refContents?.querySelector('.jse-editable-div') || null
+    if (isEditableDivRef(refEditableDiv)) {
+      refEditableDiv.cancel()
+    }
 
     // replace the value with the JSON object/array
     const operations: JSONPatchDocument = [
@@ -1107,6 +1105,9 @@
     ]
 
     handlePatch(operations)
+
+    // TODO: get rid of the setTimeout here
+    setTimeout(focus)
   }
 
   function handlePasteFromMenu() {
@@ -1128,6 +1129,7 @@
   function handleClearPastedJson() {
     debug('clear pasted json')
     pastedJson = undefined
+    focus()
   }
 
   function handleRequestRepair() {
@@ -1880,10 +1882,6 @@
               onClick: handleClearPastedJson
             }
           ]}
-          onClose={() => {
-            // TODO: the need for setTimeout is ugly
-            setTimeout(focus)
-          }}
         />
       {/if}
 

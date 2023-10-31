@@ -11,8 +11,8 @@
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
   import { addNewLineSuffix } from '$lib/utils/domUtils.js'
-  import { UPDATE_SELECTION } from '$lib/constants.js'
   import type { ExtendedSearchResultItem, JSONSelection, TreeModeContext } from '$lib/types.js'
+  import { UpdateSelectionAfterChange } from '$lib/types.js'
   import type { JSONPath } from 'immutable-json-patch'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
   import { classnames } from '$lib/utils/cssUtils.js'
@@ -28,7 +28,9 @@
   $: isKeySelected = selection ? isKeySelection(selection) && isEqual(selection.path, path) : false
   $: isEditingKey = isKeySelected && isEditingSelection(selection)
 
-  function handleKeyDoubleClick(event) {
+  function handleKeyDoubleClick(
+    event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }
+  ) {
     if (!isEditingKey && !context.readOnly) {
       event.preventDefault()
       context.onSelect(createKeySelection(path, true))
@@ -41,17 +43,17 @@
     })
   }
 
-  function handleChangeValue(newKey, updateSelection) {
+  function handleChangeValue(newKey: string, updateSelection: UpdateSelectionAfterChange) {
     const updatedKey = onUpdateKey(key, context.normalization.unescapeValue(newKey))
     const updatedPath = initial(path).concat(updatedKey)
 
     context.onSelect(
-      updateSelection === UPDATE_SELECTION.NEXT_INSIDE
+      updateSelection === UpdateSelectionAfterChange.nextInside
         ? createValueSelection(updatedPath, false)
         : createKeySelection(updatedPath, false)
     )
 
-    if (updateSelection !== UPDATE_SELECTION.SELF) {
+    if (updateSelection !== UpdateSelectionAfterChange.self) {
       context.focus()
     }
   }

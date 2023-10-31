@@ -42,9 +42,11 @@ export function createFocusTracker({
       // The focusIn handler will cancel any pending blur timer in those cases
       clearTimeout(blurTimeoutHandle)
       blurTimeoutHandle = setTimeout(() => {
-        debug('blur')
-        focus = false
-        onBlur()
+        if (!hasFocus()) {
+          debug('blur')
+          focus = false
+          onBlur()
+        }
       }) as unknown as number
     }
   }

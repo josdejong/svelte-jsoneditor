@@ -312,7 +312,7 @@
     mode = newMode
 
     await tick()
-    focus()
+    await focus()
 
     onChangeMode(newMode)
   }

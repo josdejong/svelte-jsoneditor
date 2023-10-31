@@ -53,9 +53,7 @@
     if (domTextArea && error) {
       const position = error.position != null ? error.position : 0
       domTextArea.setSelectionRange(position, position)
-      setTimeout(() => {
-        domTextArea.focus()
-      })
+      domTextArea.focus()
     }
   }
 

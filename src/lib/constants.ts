@@ -68,13 +68,6 @@ export const JSON_STATUS_INVALID = 'invalid'
 export const CONTEXT_MENU_HEIGHT = (40 + 2) * 8 // px
 export const CONTEXT_MENU_WIDTH = 260 // px
 
-// TODO: change UPDATE_SELECTION into an enum
-export const UPDATE_SELECTION = {
-  NO: 'NO',
-  SELF: 'SELF',
-  NEXT_INSIDE: 'NEXT_INSIDE'
-}
-
 export const SORT_DIRECTION_NAMES = {
   [SortDirection.asc]: 'ascending',
   [SortDirection.desc]: 'descending'
