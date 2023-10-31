@@ -18,7 +18,7 @@
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import { javascriptQueryLanguage } from '$lib/plugins/query/javascriptQueryLanguage.js'
   import { renderValue } from '$lib/plugins/value/renderValue.js'
-  import { tick } from 'svelte'
+  import { onMount, tick } from 'svelte'
   import TransformModal from './modals/TransformModal.svelte'
   import SortModal from './modals/SortModal.svelte'
   import type {
@@ -65,6 +65,7 @@
   export let content: Content = { text: '' }
   export let selection: JSONEditorSelection | null = null
 
+  export let immutable = false
   export let readOnly = false
   export let indentation: number | string = 2
   export let tabSize = 4
@@ -110,6 +111,10 @@
     callbacks: Partial<Callbacks>
   } | null = null
 
+  onMount(() => {
+    content = cloneWhenMutable(content)
+  })
+
   $: {
     const contentError = validateContentType(content)
     if (contentError) {
@@ -142,8 +147,19 @@
     }
   }
 
+  function cloneWhenMutable(content: Content): Content {
+    if (immutable || isTextContent(content)) {
+      return content
+    }
+
+    debug('cloning content')
+    return {
+      json: parser.parse(parser.stringify(content.json))
+    }
+  }
+
   export function get(): Content {
-    return content
+    return cloneWhenMutable(content)
   }
 
   export async function set(newContent: Content): Promise<void> {
@@ -157,7 +173,7 @@
     // new editor id -> will re-create the editor
     instanceId = uniqueId()
 
-    content = newContent
+    content = cloneWhenMutable(newContent)
 
     await tick() // await rerender
   }
@@ -170,7 +186,7 @@
       throw new Error(contentError)
     }
 
-    content = updatedContent
+    content = cloneWhenMutable(updatedContent)
 
     await tick() // await rerender
   }
@@ -280,7 +296,7 @@
     content = updatedContent
 
     if (onChange) {
-      onChange(updatedContent, previousContent, status)
+      onChange(cloneWhenMutable(updatedContent), previousContent, status)
     }
   }
 

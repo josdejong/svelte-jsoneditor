@@ -500,8 +500,7 @@
       return
     }
 
-    // TODO: this is inefficient. Make an optional flag promising that the updates are immutable so we don't have to do a deep equality check? First do some profiling!
-    const isChanged = !isEqual(json, updatedJson)
+    const isChanged = json !== updatedJson
 
     debug('update external json', { isChanged, currentlyText: json === undefined })
 

@@ -240,6 +240,7 @@
   let height = '440px'
   const validate = useLocalStorage('svelte-jsoneditor-demo-validate', false)
   const validateArray = useLocalStorage('svelte-jsoneditor-demo-validate-array', false)
+  const immutable = useLocalStorage('svelte-jsoneditor-demo-immutable', true)
   const readOnly = useLocalStorage('svelte-jsoneditor-demo-readOnly', false)
   const mainMenuBar = useLocalStorage('svelte-jsoneditor-demo-mainMenuBar', true)
   const navigationBar = useLocalStorage('svelte-jsoneditor-demo-navigationBar', true)
@@ -540,6 +541,9 @@
       <input type="checkbox" bind:checked={$flattenColumns} /> flattenColumns
     </label>
     <label>
+      <input type="checkbox" bind:checked={$immutable} /> immutable
+    </label>
+    <label>
       <input type="checkbox" bind:checked={$readOnly} /> readOnly
     </label>
     <label>
@@ -657,6 +661,18 @@
     </button>
     <button
       on:click={() => {
+        if (!content.json) {
+          alert('Cannot do this, first change the content to be JSON instead of text')
+          return
+        }
+        content.json.object.a = 'b (Mutated!)'
+        refTreeEditor.update(content)
+      }}
+    >
+      Mutate ['object', 'a']
+    </button>
+    <button
+      on:click={() => {
         refTreeEditor?.scrollTo(['669', 'array'])
       }}
     >
@@ -768,6 +784,7 @@
             escapeControlCharacters={$escapeControlCharacters}
             escapeUnicodeCharacters={$escapeUnicodeCharacters}
             flattenColumns={$flattenColumns}
+            immutable={$immutable}
             readOnly={$readOnly}
             indentation={$selectedIndentation}
             tabSize={$tabSize}
@@ -828,6 +845,7 @@
             escapeControlCharacters={$escapeControlCharacters}
             escapeUnicodeCharacters={$escapeUnicodeCharacters}
             flattenColumns={$flattenColumns}
+            immutable={$immutable}
             readOnly={$readOnly}
             indentation={$selectedIndentation}
             tabSize={$tabSize}

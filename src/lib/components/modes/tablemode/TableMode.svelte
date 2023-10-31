@@ -359,7 +359,7 @@
     const currentContent = { json }
     const isChanged = isTextContent(content)
       ? content.text !== text
-      : !isEqual(currentContent.json, content.json)
+      : currentContent.json !== content.json
 
     debug('update external content', { isChanged })
 

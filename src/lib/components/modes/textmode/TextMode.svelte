@@ -11,7 +11,7 @@
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import { jsonrepair } from 'jsonrepair'
-  import { debounce, isEqual, uniqueId } from 'lodash-es'
+  import { debounce, uniqueId } from 'lodash-es'
   import { onDestroy, onMount, tick } from 'svelte'
   import {
     JSON_STATUS_INVALID,
@@ -671,7 +671,7 @@
 
   function setCodeMirrorContent(newContent: Content, forceUpdate = false) {
     const newText = getText(newContent, indentation, parser)
-    const isChanged = !isEqual(newContent, content)
+    const isChanged = newText !== getText(content, indentation, parser)
     const previousContent = content
     content = newContent
     text = newText
