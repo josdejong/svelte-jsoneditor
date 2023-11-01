@@ -200,15 +200,15 @@ describe('validation', () => {
     })
 
     test('should validateText with a non-repairable parse error', () => {
-      const invalidText = '{\n  "name": "Joe" ]'
+      const invalidText = '{\n  "name": "Joe" }[]'
 
       deepStrictEqual(validateText(invalidText, null, LosslessJSONParser, JSON), {
         isRepairable: false,
         parseError: {
-          column: 16,
+          column: 17,
           line: 1,
-          message: "Comma ',' expected after value but got ']' at line 2 column 17",
-          position: 18
+          message: "Expected end of input but got '[' at line 2 column 18",
+          position: 19
         }
       })
     })

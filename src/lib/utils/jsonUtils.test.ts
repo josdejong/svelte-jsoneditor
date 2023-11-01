@@ -426,7 +426,7 @@ describe('jsonUtils', () => {
   describe('parseAndRepairOrUndefined', () => {
     test('repair partial JSON', () => {
       expect(parseAndRepairOrUndefined('[1,2', JSON)).toEqual([1, 2])
-      expect(parseAndRepairOrUndefined('[1,2}', JSON)).toEqual(undefined)
+      expect(parseAndRepairOrUndefined('[1,2][]', JSON)).toEqual(undefined)
       expect(parseAndRepairOrUndefined('hello world', JSON)).toEqual('hello world')
       // expect(parseAndRepairOrUndefined('0123', JSON)).toEqual('0123') // FIXME
     })

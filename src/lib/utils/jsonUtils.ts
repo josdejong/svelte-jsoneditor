@@ -15,13 +15,12 @@ import type {
   TextLocation
 } from '../types'
 import { int } from './numberUtils.js'
-import type { JavaScriptValue } from 'lossless-json'
 
 /**
  * Parse the JSON. if this fails, try to repair and parse.
  * Throws an exception when the JSON is invalid and could not be parsed.
  */
-export function parseAndRepair(jsonText: string, parser: JSONParser): JavaScriptValue {
+export function parseAndRepair(jsonText: string, parser: JSONParser): unknown {
   try {
     return parser.parse(jsonText)
   } catch (err) {
@@ -37,7 +36,7 @@ export function parseAndRepair(jsonText: string, parser: JSONParser): JavaScript
 export function parseAndRepairOrUndefined(
   partialJson: string,
   parser: JSONParser
-): JavaScriptValue | undefined {
+): unknown | undefined {
   try {
     return parseAndRepair(partialJson, parser)
   } catch (err) {
@@ -46,10 +45,7 @@ export function parseAndRepairOrUndefined(
 }
 
 // TODO: deduplicate the logic in repairPartialJson and parseAndRepairPartialJson ?
-export function parsePartialJson(
-  partialJson: string,
-  parse: (text: string) => JavaScriptValue
-): JavaScriptValue {
+export function parsePartialJson(partialJson: string, parse: (text: string) => unknown): unknown {
   // for now: dumb brute force approach: simply try out a few things...
 
   // remove trailing comma
