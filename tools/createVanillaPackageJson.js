@@ -50,6 +50,7 @@ const vanillaPackage = {
   exports: {
     ...exports,
     '.': {
+      require: './index.js'
       types: './index.d.ts',
       module: './index.js'
     }
