@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.18.12](https://github.com/josdejong/svelte-jsoneditor/compare/v0.18.11...v0.18.12) (2023-11-08)
+
+
+### Features
+
+* update to `jsonrepair@3.4.0` ([9ede6ea](https://github.com/josdejong/svelte-jsoneditor/commit/9ede6ea53c91e80e542c86e24dd3d34c70415cd8))
+
+
+### Bug Fixes
+
+* [#331](https://github.com/josdejong/svelte-jsoneditor/issues/331) changing contents during the `onChange` callback throws a selection error ([6e511fa](https://github.com/josdejong/svelte-jsoneditor/commit/6e511faf3a0e0b70a316efa5fc756c79893fa027))
+* [#337](https://github.com/josdejong/svelte-jsoneditor/issues/337) some menu styling issues ([2eec4e6](https://github.com/josdejong/svelte-jsoneditor/commit/2eec4e6c4806a21a0badb32d04edd442baf6665e))
+* `onChange` event not fired after calling `editor.set(...)` (see [#318](https://github.com/josdejong/svelte-jsoneditor/issues/318)) ([afaca42](https://github.com/josdejong/svelte-jsoneditor/commit/afaca423561360f307802d2eb3ed36a6d887a35f))
+* update codemirror and a couple of devDependencies ([7173333](https://github.com/josdejong/svelte-jsoneditor/commit/71733336b6db16be61b77a4ec4301cff3b7707c7))
+* use mono font in JSON Preview ([b07d08d](https://github.com/josdejong/svelte-jsoneditor/commit/b07d08d9c6bd6a13d797ba1fb51efc6b657e8947))
+
 ### [0.18.11](https://github.com/josdejong/svelte-jsoneditor/compare/v0.18.10...v0.18.11) (2023-10-31)
 
 
