@@ -2,6 +2,8 @@
 
 .jse-json-preview {
   flex: 1;
+  font-family: var(--jse-font-family-mono);
+  font-size: var(--jse-font-size-mono);
   color: var(--jse-panel-color-readonly);
   overflow: auto;
   white-space: pre-wrap;
