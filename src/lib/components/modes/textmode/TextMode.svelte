@@ -765,7 +765,13 @@
 
     updateCanUndoRedo()
     emitOnChange(content, previousContent)
-    emitOnSelect()
+
+    // We emit OnSelect on the next tick to cater for the case where
+    // the user changes the content directly inside the OnChange callback.
+    // This change will be dispatched by Svelte on the next tick. Before
+    // that tick, emitOnSelect would be fired based on the "old" contents,
+    // which may be out of range when the replacement by the user is shorter.
+    tick().then(emitOnSelect)
   }
 
   function updateLinter(validator: Validator | null) {
