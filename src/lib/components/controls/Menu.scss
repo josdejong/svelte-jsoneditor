@@ -2,24 +2,34 @@
 
 .jse-menu {
   background: var(--jse-theme-color);
-  border-bottom: 1px solid var(--jse-theme-color);
+  font-family: var(--jse-font-family);
+  font-size: var(--jse-font-size-main-menu);
   color: var(--jse-menu-color);
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: stretch;
   position: relative;
 
   // FIXME: should utilize the generic styling in styles.scss
   .jse-button {
-    width: var(--jse-menu-button-size);
-    height: var(--jse-menu-button-size);
+    font-family: inherit;
+    font-size: inherit;
+    line-height: 1.5em;
     border: none;
     background: transparent;
     color: inherit;
     cursor: pointer;
+
+    width: var(--jse-menu-button-size);
+    height: var(--jse-menu-button-size);
     padding: $padding-half;
     margin: 0;
     border-radius: 0;
+
+    display: inline-flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
 
     &:hover,
     &:focus {
@@ -36,15 +46,15 @@
     &.jse-group-button {
       $group-button-color: var(--jse-menu-color);
 
+      width: auto;
+      height: calc(var(--jse-menu-button-size) - $padding);
+      margin: $padding-half 0;
+      padding: 0 $padding-half 1px; // 1px bottom padding for better center alignment (text baseline)
       border: 1px solid $group-button-color;
+
       &:not(.jse-last) {
         border-right: none;
       }
-
-      padding: 0 $padding-half;
-      margin: $padding-half 0;
-      height: calc(var(--jse-menu-button-size) - var(--jse-padding));
-      width: auto;
 
       &.jse-first {
         margin-left: $padding-half;
@@ -75,9 +85,7 @@
 
     background: var(--jse-menu-color);
     opacity: 0.3;
-    box-sizing: border-box;
     width: 1px;
-    height: calc(var(--jse-menu-button-size) - 2 * $margin);
     margin: $margin;
   }
 }
