@@ -31,12 +31,12 @@
   $: documentType = hasNestedArrays
     ? 'Object with nested arrays'
     : isEmptyDocument
-    ? 'An empty document'
-    : isJSONObject(json)
-    ? 'An object'
-    : isJSONArray(json)
-    ? 'An empty array' // note: can also be an array with objects but without properties
-    : `A ${valueType(json, parser)}`
+      ? 'An empty document'
+      : isJSONObject(json)
+        ? 'An object'
+        : isJSONArray(json)
+          ? 'An empty array' // note: can also be an array with objects but without properties
+          : `A ${valueType(json, parser)}`
 </script>
 
 <div class="jse-table-mode-welcome">

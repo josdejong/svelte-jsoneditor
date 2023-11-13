@@ -559,8 +559,8 @@ export function createNewValue(
           return Array.isArray(value)
             ? []
             : isObject(value)
-            ? undefined // leave object as is, will recurse into it
-            : ''
+              ? undefined // leave object as is, will recurse into it
+              : ''
         })
       } else {
         // just a primitive value

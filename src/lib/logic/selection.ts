@@ -331,8 +331,8 @@ export function getSelectionDown(
     return nextPathAfter !== null
       ? createValueSelection(nextPathAfter, false)
       : nextPath !== null
-      ? createValueSelection(nextPath, false)
-      : null
+        ? createValueSelection(nextPath, false)
+        : null
   }
 
   return null

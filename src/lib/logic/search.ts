@@ -42,11 +42,11 @@ export function updateSearchResult(
     matchingActiveIndex !== -1
       ? matchingActiveIndex
       : previousResult?.activeIndex !== undefined &&
-        previousResult?.activeIndex < newResultItems.length
-      ? previousResult?.activeIndex
-      : newResultItems.length > 0
-      ? 0
-      : -1
+          previousResult?.activeIndex < newResultItems.length
+        ? previousResult?.activeIndex
+        : newResultItems.length > 0
+          ? 0
+          : -1
 
   const items: ExtendedSearchResultItem[] = newResultItems.map((item, index) => {
     return { ...item, active: index === activeIndex }
@@ -68,8 +68,8 @@ export function searchNext(searchResult: SearchResult): SearchResult {
     searchResult.activeIndex < searchResult.items.length - 1
       ? searchResult.activeIndex + 1
       : searchResult.items.length > 0
-      ? 0
-      : -1
+        ? 0
+        : -1
 
   const nextActiveItem = searchResult.items[nextActiveIndex]
 

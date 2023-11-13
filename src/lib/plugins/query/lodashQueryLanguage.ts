@@ -38,8 +38,8 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
       typeof filterValue === 'string'
         ? `'${filter.value}'`
         : isInteger(filter.value) && !Number.isSafeInteger(filterValue)
-        ? `${filter.value}n` // bigint
-        : filter.value
+          ? `${filter.value}n` // bigint
+          : filter.value
 
     queryParts.push(`    .filter(${actualValueGetter} ${filter.relation} ${filterValueStr})\n`)
   }
