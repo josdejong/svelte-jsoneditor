@@ -47,14 +47,7 @@ const vanillaPackage = {
   dependencies: usedDependencies, // needed for the TypeScript types
   devDependencies: {},
   svelte: undefined,
-  exports: {
-    ...exports,
-    '.': {
-      require: './index.js'
-      types: './index.d.ts',
-      module: './index.js'
-    }
-  }
+  exports: './index.js'
 }
 
 writeFileSync(
