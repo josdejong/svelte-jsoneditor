@@ -157,9 +157,10 @@
     // new editor id -> will re-create the editor
     instanceId = uniqueId()
 
-    content = newContent
+    await tick() // await re-render (creating the new editor)
 
-    await tick() // await rerender
+    // update content *after* re-render, so that the new editor will trigger an onChange event
+    content = newContent
   }
 
   export async function update(updatedContent: Content): Promise<void> {

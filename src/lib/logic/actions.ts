@@ -460,8 +460,8 @@ export function onRemoveRow({
       rowIndex < (patchedJson as JSONArray).length
         ? rowIndex
         : rowIndex > 0
-        ? rowIndex - 1
-        : undefined
+          ? rowIndex - 1
+          : undefined
 
     const newSelection =
       newRowIndex !== undefined

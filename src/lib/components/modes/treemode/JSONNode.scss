@@ -2,6 +2,8 @@
 
 .jse-json-node {
   position: relative;
+  font-family: var(--jse-font-family-mono);
+  font-size: var(--jse-font-size-mono);
   color: var(--jse-text-color);
 
   &.jse-root {

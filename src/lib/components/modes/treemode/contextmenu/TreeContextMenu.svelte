@@ -65,8 +65,8 @@
   $: editValueText = Array.isArray(focusValue)
     ? 'Edit array'
     : isObject(focusValue)
-    ? 'Edit object'
-    : 'Edit value'
+      ? 'Edit object'
+      : 'Edit value'
 
   $: hasSelectionContents =
     hasJson &&

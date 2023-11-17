@@ -14,8 +14,8 @@ export function stringifyJSONPath(path: JSONPath): string {
       return integerNumberRegex.test(p)
         ? '[' + p + ']'
         : /[.[\]]/.test(p) || p === '' // match any character . or [ or ] and handle an empty string
-        ? '["' + escapeQuotes(p) + '"]'
-        : (index > 0 ? '.' : '') + p
+          ? '["' + escapeQuotes(p) + '"]'
+          : (index > 0 ? '.' : '') + p
     })
     .join('')
 }
@@ -104,8 +104,8 @@ export function createLodashPropertySelector(path: JSONPath): string {
   return path.length === 0
     ? ''
     : path.every((prop) => integerNumberRegex.test(prop) || javaScriptPropertyRegex.test(prop))
-    ? "'" + path.map(stringifyLodashProperty).join('').replace(/^\./, '') + "'"
-    : JSON.stringify(path)
+      ? "'" + path.map(stringifyLodashProperty).join('').replace(/^\./, '') + "'"
+      : JSON.stringify(path)
 }
 
 /**
