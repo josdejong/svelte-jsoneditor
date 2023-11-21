@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.19.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.18.13...v0.19.0) (2023-11-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* Changes in the package exports
+
+### Features
+
+* additional classes for improved CSS targeting ([4392f2c](https://github.com/josdejong/svelte-jsoneditor/commit/4392f2c6523bfb5913615e8d954ceb579b70b99f))
+* package exports not working in Jest ([77697b3](https://github.com/josdejong/svelte-jsoneditor/commit/77697b3962775e09cfe514ef16b51269618dc2d4))
+
+
+### Bug Fixes
+
+* [#334](https://github.com/josdejong/svelte-jsoneditor/issues/334) package exports not working in Jest ([3058c66](https://github.com/josdejong/svelte-jsoneditor/commit/3058c66c6536eaf2902f799a2e59054dbb7d4df2))
+* wrong font in table mode ([dd448c5](https://github.com/josdejong/svelte-jsoneditor/commit/dd448c5fff9283a4d8d34da9e9afd0ebd9857173))
+
 ### [0.18.13](https://github.com/josdejong/svelte-jsoneditor/compare/v0.18.12...v0.18.13) (2023-11-13)
 
 
