@@ -32,7 +32,7 @@
 {#if !isEmpty(validationErrors)}
   <div class="jse-validation-errors-overview">
     {#if expanded || count === 1}
-      <table class='jse-validation-errors-overview-expanded'>
+      <table class="jse-validation-errors-overview-expanded">
         <tbody>
           {#each limit(validationErrors, MAX_VALIDATION_ERRORS) as validationError, index}
             <tr
@@ -45,10 +45,10 @@
               <td class="jse-validation-error-icon">
                 <Icon data={faExclamationTriangle} />
               </td>
-              <td class='jse-validation-error-path'>
+              <td class="jse-validation-error-path">
                 {stringifyJSONPath(validationError.path)}
               </td>
-              <td class='jse-validation-error-message'>
+              <td class="jse-validation-error-message">
                 {validationError.message}
               </td>
               <td class="jse-validation-error-action">
@@ -77,13 +77,13 @@
         </tbody>
       </table>
     {:else}
-      <table class='jse-validation-errors-overview-collapsed'>
+      <table class="jse-validation-errors-overview-collapsed">
         <tbody>
           <tr class="jse-validation-error" on:click={expand}>
             <td class="jse-validation-error-icon">
               <Icon data={faExclamationTriangle} />
             </td>
-            <td class='jse-validation-error-count'>
+            <td class="jse-validation-error-count">
               {count} validation errors
               <div class="jse-validation-errors-expand">
                 <Icon data={faAngleRight} />
