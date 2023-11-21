@@ -1,6 +1,7 @@
 .DS_Store
 .eslintcache
 .idea
+.nyc_output
 node_modules
 /package
 /package-vanilla

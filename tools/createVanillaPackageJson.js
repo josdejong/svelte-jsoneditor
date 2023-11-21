@@ -4,11 +4,8 @@ import path from 'path'
 import assert from 'assert'
 import { readFileSync, writeFileSync } from 'fs'
 import { getAbsolutePath } from './utils/getAbsolutePath.mjs'
-import { generateExports } from './utils/generateExports.mjs'
 
 const vanillaPackageFolder = getAbsolutePath(import.meta.url, '..', 'package-vanilla')
-
-const exports = generateExports(vanillaPackageFolder)
 
 const pkg = JSON.parse(String(readFileSync(getAbsolutePath(import.meta.url, '..', 'package.json'))))
 const typesPath = getAbsolutePath(import.meta.url, '..', 'package-vanilla', 'index.d.ts')
@@ -48,11 +45,8 @@ const vanillaPackage = {
   devDependencies: {},
   svelte: undefined,
   exports: {
-    ...exports,
-    '.': {
-      types: './index.d.ts',
-      module: './index.js'
-    }
+    ...pkg.exports,
+    './index.js.map': './index.js.map'
   }
 }
 

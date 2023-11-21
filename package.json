@@ -15,11 +15,9 @@
   "sideEffects": false,
   "license": "ISC",
   "exports": {
-    ".": {
-      "types": "./index.d.ts",
-      "svelte": "./index.js",
-      "module": "./index.js"
-    },
+    ".": "./index.js",
+    "./index.d.ts": "./index.d.ts",
+    "./index.js": "./index.js",
     "./themes/jse-theme-dark.css": "./themes/jse-theme-dark.css",
     "./themes/jse-theme-default.css": "./themes/jse-theme-default.css",
     "./CHANGELOG.md": "./CHANGELOG.md",
