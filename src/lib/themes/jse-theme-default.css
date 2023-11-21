@@ -1,4 +1,5 @@
-.jse-main {
+.jse-main,
+.jse-main + :global(.jse-absolute-popup) {
   --jse-theme: light;
 
   /* over all fonts, sizes, and colors */

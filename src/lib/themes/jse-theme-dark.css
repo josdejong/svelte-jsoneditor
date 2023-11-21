@@ -1,4 +1,5 @@
-.jse-theme-dark {
+.jse-theme-dark .jse-main,
+.jse-theme-dark .jse-main + .jse-absolute-popup {
   --jse-theme: dark;
 
   /* over all fonts, sizes, and colors */
