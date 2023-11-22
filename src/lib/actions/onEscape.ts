@@ -21,7 +21,7 @@ function handleKeyDown(event: KeyboardEvent) {
  * This is useful for example when opening a model on top of another modal:
  * you only want the top modal to close on Escape, and not the second modal.
  */
-export function onEscape(element: Element, callback: Callback) {
+export function onEscape(element: Element | null, callback: Callback) {
   if (isEmpty(callbacks)) {
     window.addEventListener('keydown', handleKeyDown)
   }
