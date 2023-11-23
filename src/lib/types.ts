@@ -281,7 +281,7 @@ export type OnPasteJson = (pastedJson: { path: JSONPath; contents: JSONValue }) 
 export type OnExpand = (path: JSONPath) => boolean
 export type OnRenderValue = (props: RenderValueProps) => RenderValueComponentDescription[]
 export type OnClassName = (path: JSONPath, value: JSONValue) => string | undefined
-export type OnHover = (path: JSONPath, value: JSONValue) => string | undefined
+export type OnHover = (path: JSONPath, value: JSONValue) => void
 export type OnChangeMode = (mode: Mode) => void
 export type OnContextMenu = (contextMenuProps: AbsolutePopupOptions) => void
 export type RenderMenuContext = {
