@@ -12,7 +12,6 @@
     JSONEditorSelection,
     JSONParser,
     JSONPathParser,
-    JSONSelection,
     OnClassName,
     OnPatch,
     OnRenderMenu,
