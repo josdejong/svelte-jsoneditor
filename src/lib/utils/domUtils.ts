@@ -243,7 +243,6 @@ export function insertActiveElementContents(
 
   if (activeElement && activeElement.isContentEditable) {
     activeElement.textContent = replaceContents ? text : activeElement.textContent + text
-    console.log('UPDATED TEXT', replaceContents ? text : activeElement.textContent + text)
     setCursorToEnd(activeElement)
     if (onActiveElement) {
       onActiveElement(activeElement)

@@ -12,6 +12,7 @@
     JSONEditorSelection,
     JSONParser,
     JSONPathParser,
+    JSONSelection,
     OnClassName,
     OnPatch,
     OnRenderMenu,
@@ -94,7 +95,7 @@
   }
 
   function scrollToSelection() {
-    const selection: JSONPath | null = last(stack)?.selection || null
+    const selection: JSONEditorSelection | null = last(stack)?.selection || null
     if (selection) {
       refEditor.scrollTo(getFocusPath(selection))
     }
