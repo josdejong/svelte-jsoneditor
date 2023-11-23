@@ -553,6 +553,7 @@
       return
     }
 
+    context.onHover(path, value)
     event.stopPropagation()
 
     if (isChildOfAttribute(event.target, 'data-type', 'selectable-value')) {

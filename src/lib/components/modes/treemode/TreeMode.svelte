@@ -126,6 +126,7 @@
     OnChange,
     OnChangeMode,
     OnClassName,
+    OnHover,
     OnError,
     OnExpand,
     OnFocus,
@@ -197,6 +198,7 @@
   export let onRenderValue: OnRenderValue
   export let onRenderMenu: OnRenderMenuWithoutContext
   export let onClassName: OnClassName | undefined
+  export let onHover: OnHover | undefined
   export let onFocus: OnFocus
   export let onBlur: OnBlur
   export let onSortModal: OnSortModal
@@ -2053,6 +2055,7 @@
     onRenderValue,
     onContextMenu: openContextMenu,
     onClassName: onClassName || (() => undefined),
+    onHover: onHover || (() => undefined),
     onDrag: handleDrag,
     onDragEnd: handleDragEnd
   }

@@ -23,6 +23,10 @@
       return 'custom-class-boolean'
     }
   }
+
+   function handleHover(path, value) {
+    console.log('custom hover', path, value);
+  }
 </script>
 
 <svelte:head>
@@ -34,11 +38,11 @@
 <p>
   You can apply dynamic styling depending on the document contents using <code>onClassName</code>.
   In this example, all boolean values get a red background, and nodes with paths
-  <code>/string</code> and <code>/object/c</code> get a green background.
+  <code>/string</code> and <code>/object/c</code> get a green background and a console.log on hover.
 </p>
 
 <div class="editor">
-  <JSONEditor bind:content onClassName={handleClassName} />
+  <JSONEditor bind:content onClassName={handleClassName} onHover={handleHover} />
 </div>
 
 <style>

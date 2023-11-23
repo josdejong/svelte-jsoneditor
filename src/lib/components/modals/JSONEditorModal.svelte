@@ -13,6 +13,7 @@
     JSONParser,
     JSONPathParser,
     OnClassName,
+    OnHover,
     OnPatch,
     OnRenderMenu,
     OnRenderValue,
@@ -56,6 +57,7 @@
 
   export let onRenderValue: OnRenderValue
   export let onClassName: OnClassName
+  export let onHover: OnHover
   export let onRenderMenu: OnRenderMenu
 
   export let onSortModal: OnSortModal
@@ -257,6 +259,7 @@
         onSelect={handleChangeSelection}
         {onRenderValue}
         {onClassName}
+        {onHover}
         onFocus={noop}
         onBlur={noop}
         {onRenderMenu}

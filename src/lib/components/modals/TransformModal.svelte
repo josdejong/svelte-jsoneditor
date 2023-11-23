@@ -22,6 +22,7 @@
     JSONPathParser,
     OnChangeQueryLanguage,
     OnClassName,
+    OnHover,
     OnPatch,
     OnRenderValue,
     QueryLanguage,
@@ -50,6 +51,7 @@
 
   export let onRenderValue: OnRenderValue
   export let onClassName: OnClassName
+  export let onHover: OnHover
 
   export let onTransform: OnPatch
 
@@ -289,6 +291,7 @@
                 onTransformModal={noop}
                 onJSONEditorModal={noop}
                 {onClassName}
+                {onHover}
                 validator={null}
                 {validationParser}
                 {pathParser}
@@ -323,6 +326,7 @@
                 onTransformModal={noop}
                 onJSONEditorModal={noop}
                 {onClassName}
+                {onHover}
                 validator={null}
                 {validationParser}
                 {pathParser}

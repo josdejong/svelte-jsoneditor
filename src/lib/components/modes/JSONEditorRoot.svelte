@@ -12,6 +12,7 @@
     OnChange,
     OnChangeMode,
     OnClassName,
+    OnHover,
     OnError,
     OnExpand,
     OnFocus,
@@ -58,6 +59,7 @@
   export let onSelect: OnSelect
   export let onRenderValue: OnRenderValue
   export let onClassName: OnClassName
+  export let onHover: OnHover
   export let onRenderMenu: OnRenderMenu
   export let onError: OnError
   export let onFocus: OnFocus
@@ -304,6 +306,7 @@
     {onSelect}
     {onRenderValue}
     {onClassName}
+    {onHover}
     {onFocus}
     {onBlur}
     onRenderMenu={handleRenderMenu}

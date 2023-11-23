@@ -7,3 +7,4 @@ node_modules
 /package-vanilla
 /.svelte-kit
 coverage
+.nvmrc

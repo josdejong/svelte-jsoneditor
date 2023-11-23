@@ -36,6 +36,7 @@
     OnChangeQueryLanguage,
     OnChangeStatus,
     OnClassName,
+    OnHover,
     OnError,
     OnExpand,
     OnFocus,
@@ -92,6 +93,7 @@
   export let onSelect: OnSelect = noop
   export let onRenderValue: OnRenderValue = renderValue
   export let onClassName: OnClassName = () => undefined
+  export let onHover: OnHover = () => undefined
   export let onRenderMenu: OnRenderMenu = noop
   export let onChangeMode: OnChangeMode = noop
   export let onError: OnError = (err) => {
@@ -349,6 +351,7 @@
         onChangeQueryLanguage: handleChangeQueryLanguage,
         onRenderValue,
         onClassName,
+        onHover,
         onTransform
       },
       TRANSFORM_MODAL_OPTIONS,
@@ -406,6 +409,7 @@
         pathParser,
         onRenderValue,
         onClassName,
+        onHover,
         onRenderMenu,
         onSortModal,
         onTransformModal
@@ -470,6 +474,7 @@
             onSelect={handleSelect}
             {onRenderValue}
             {onClassName}
+            {onHover}
             onFocus={handleFocus}
             onBlur={handleBlur}
             {onRenderMenu}
