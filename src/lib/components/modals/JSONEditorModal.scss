@@ -5,8 +5,8 @@
   .jse-modal-contents {
     padding-top: 0;
 
-    --jse-theme-color: var(--jse-modal-theme-color);
-    --jse-theme-color-highlight: var(--jse-modal-theme-color-highlight);
+    --jse-theme-color: $modal-theme-color;
+    --jse-theme-color-highlight: $modal-theme-color-highlight;
 
     .jse-label {
       font-weight: bold;
@@ -40,7 +40,7 @@
 
     .jse-error {
       flex: 1;
-      color: var(--jse-error-color);
+      color: $error-color;
     }
 
     button {

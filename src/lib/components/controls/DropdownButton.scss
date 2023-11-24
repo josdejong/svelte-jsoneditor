@@ -4,8 +4,8 @@
   flex: 1;
   line-height: normal;
 
-  $background: var(--jse-context-menu-background);
-  $background-highlight: var(--jse-context-menu-background-highlight);
+  $background: $context-menu-background;
+  $background-highlight: $context-menu-background-highlight;
 
   @include jsoneditor-button;
   position: relative;
@@ -27,15 +27,15 @@
     @include jsoneditor-button;
 
     width: 2em;
-    background: var(--jse-context-menu-background);
-    color: var(--jse-context-menu-color);
+    background: $context-menu-background;
+    color: $context-menu-color;
 
     &.jse-visible {
       background: $background;
     }
 
     &:hover {
-      background: var(--jse-context-menu-background-highlight);
+      background: $context-menu-background-highlight;
     }
 
     &:focus {
@@ -43,7 +43,7 @@
     }
 
     &:disabled {
-      color: var(--jse-context-menu-color-disabled);
+      color: $context-menu-color-disabled;
       background: unset;
     }
 
@@ -57,8 +57,8 @@
     left: 0;
     z-index: 1;
     background: $background;
-    color: var(--jse-context-menu-color);
-    box-shadow: var(--jse-controls-box-shadow);
+    color: $context-menu-color;
+    box-shadow: $controls-box-shadow;
 
     &.jse-visible {
       display: block;
@@ -77,7 +77,7 @@
       }
 
       &:disabled {
-        color: var(--jse-context-menu-color-disabled);
+        color: $context-menu-color-disabled;
         background: unset;
       }
     }

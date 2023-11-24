@@ -5,10 +5,10 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  background: var(--jse-background-color);
+  background: $background-color;
 
   &.no-main-menu {
-    border-top: var(--jse-main-border);
+    border-top: $main-border;
   }
 
   .jse-contents {
@@ -20,11 +20,11 @@
     min-width: 0;
     min-height: 0;
 
-    border-left: var(--jse-main-border);
-    border-right: var(--jse-main-border);
+    border-left: $main-border;
+    border-right: $main-border;
 
     &:last-child {
-      border-bottom: var(--jse-main-border);
+      border-bottom: $main-border;
     }
 
     &.jse-hidden {
@@ -42,87 +42,87 @@
       overflow: hidden;
 
       :global(.cm-scroller) {
-        font-family: var(--jse-font-family-mono);
-        font-size: var(--jse-font-size-mono);
-        line-height: var(--jse-line-height);
-        color: var(--jse-delimiter-color);
+        font-family: $font-family-mono;
+        font-size: $font-size-mono;
+        line-height: $line-height;
+        color: $delimiter-color;
       }
 
       :global(.cm-gutters) {
-        background: var(--jse-panel-background);
-        color: var(--jse-panel-color-readonly);
-        border-right: var(--jse-panel-border);
+        background: $panel-background;
+        color: $panel-color-readonly;
+        border-right: $panel-border;
       }
 
       :global(.cm-activeLine),
       :global(.cm-activeLineGutter) {
-        background: var(--jse-active-line-background-color);
+        background: $active-line-background-color;
       }
 
       :global(.cm-selectionBackground) {
-        background: var(--jse-selection-background-color);
+        background: $selection-background-color;
       }
 
       :global(.cm-searchMatch) {
-        background-color: var(--jse-search-match-color);
-        outline: var(--jse-search-match-outline);
+        background-color: $search-match-color;
+        outline: $search-match-outline;
       }
 
       :global(.cm-searchMatch.cm-searchMatch-selected) {
-        background-color: var(--jse-search-match-active-color);
-        outline: var(--jse-search-match-active-outline);
+        background-color: $search-match-active-color;
+        outline: $search-match-active-outline;
       }
 
       :global(.cm-selectionMatch) {
-        background-color: var(--jse-search-match-background-color);
+        background-color: $search-match-background-color;
       }
 
       :global(.cm-foldPlaceholder) {
-        background: var(--jse-tag-background);
-        color: var(--jse-tag-color);
+        background: $tag-background;
+        color: $tag-color;
         border: none;
         padding: 0 $padding;
       }
 
       :global(.cm-tooltip) {
-        font-size: var(--jse-font-size);
-        font-family: var(--jse-font-family);
-        color: var(--jse-tooltip-color);
-        background: var(--jse-tooltip-background);
-        border: var(--jse-tooltip-border);
+        font-size: $font-size;
+        font-family: $font-family;
+        color: $tooltip-color;
+        background: $tooltip-background;
+        border: $tooltip-border;
       }
 
       :global(.cm-diagnosticAction) {
-        background: var(--jse-tooltip-action-button-color);
-        background: var(--jse-tooltip-action-button-background);
+        background: $tooltip-action-button-color;
+        background: $tooltip-action-button-background;
       }
 
       :global(.cm-panels) {
-        border-bottom: var(--jse-panel-border);
+        border-bottom: $panel-border;
       }
 
       :global(.cm-search) {
-        background: var(--jse-panel-background);
-        color: var(--jse-panel-color);
-        font-family: var(--jse-font-family);
-        font-size: var(--jse-font-size);
+        background: $panel-background;
+        color: $panel-color;
+        font-family: $font-family;
+        font-size: $font-size;
       }
 
       :global(.cm-search input) {
-        font-family: var(--jse-font-family);
-        font-size: var(--jse-font-size-text-mode-search);
-        color: var(--jse-input-color);
-        border: var(--jse-input-border);
-        background: var(--jse-input-background);
+        font-family: $font-family;
+        font-size: $font-size-text-mode-search;
+        color: $input-color;
+        border: $input-border;
+        background: $input-background;
         margin-right: 2px;
       }
 
       :global(.cm-search button) {
-        font-family: var(--jse-font-family);
-        font-size: var(--jse-font-size-text-mode-search);
+        font-family: $font-family;
+        font-size: $font-size-text-mode-search;
 
-        color: var(--jse-panel-button-color);
-        background: var(--jse-panel-button-background);
+        color: $panel-button-color;
+        background: $panel-button-background;
 
         border: none;
         cursor: pointer;
@@ -131,14 +131,14 @@
         margin: 0;
 
         &:hover {
-          color: var(--jse-panel-button-color-highlight);
-          background: var(--jse-panel-button-background-highlight);
+          color: $panel-button-color-highlight;
+          background: $panel-button-background-highlight;
         }
       }
 
       :global(.cm-search label) {
-        font-family: var(--jse-font-family);
-        font-size: var(--jse-font-size-text-mode-search);
+        font-family: $font-family;
+        font-size: $font-size-text-mode-search;
         padding-left: $padding;
       }
 
@@ -157,7 +157,7 @@
       }
 
       :global(.cm-cursor-primary) {
-        border-color: var(--jse-text-color);
+        border-color: $text-color;
       }
     }
 
@@ -168,17 +168,17 @@
     .jse-loading {
       flex: 2;
       text-align: center;
-      color: var(--jse-panel-color-readonly);
+      color: $panel-color-readonly;
       box-sizing: border-box;
-      font-family: var(--jse-font-family);
-      font-size: var(--jse-font-size);
+      font-family: $font-family;
+      font-size: $font-size;
     }
 
     &.jse-preview {
       flex: 1;
-      font-family: var(--jse-font-family-mono);
-      font-size: var(--jse-font-size-mono);
-      color: var(--jse-panel-color-readonly);
+      font-family: $font-family-mono;
+      font-size: $font-size-mono;
+      color: $panel-color-readonly;
       overflow: auto;
       white-space: pre-wrap;
       word-break: break-word;

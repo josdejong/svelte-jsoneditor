@@ -2,11 +2,11 @@
 
 div.jse-collapsed-items {
   $transparent-color: transparent;
-  $background-color: var(--jse-collapsed-items-background-color);
-  $color: var(--jse-collapsed-items-link-color);
+  $background-color: $collapsed-items-background-color;
+  $color: $collapsed-items-link-color;
 
-  font-family: var(--jse-font-family);
-  font-size: var(--jse-font-size);
+  font-family: $font-family;
+  font-size: $font-size;
   color: $color;
 
   // https://sharkcoder.com/visual/borders
@@ -14,7 +14,7 @@ div.jse-collapsed-items {
   padding: $padding-half;
   border: $size solid transparent;
   border-width: $size 0;
-  background-color: var(--jse-contents-background-color);
+  background-color: $contents-background-color;
   background-image: linear-gradient($background-color, $background-color),
     linear-gradient(to bottom right, $transparent-color 50.5%, $background-color 50.5%),
     linear-gradient(to bottom left, $transparent-color 50.5%, $background-color 50.5%),
@@ -60,7 +60,7 @@ div.jse-collapsed-items {
 
     &:hover,
     &:focus {
-      color: var(--jse-collapsed-items-link-color-highlight);
+      color: $collapsed-items-link-color-highlight;
     }
   }
 }

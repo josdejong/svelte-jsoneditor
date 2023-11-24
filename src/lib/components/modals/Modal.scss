@@ -43,7 +43,7 @@
   height: 100%;
   top: 0;
   left: 0;
-  background: var(--jse-modal-overlay-background);
+  background: $modal-overlay-background;
 }
 
 :global(.bg.jse-modal-bg .jse-modal-window-wrap) {

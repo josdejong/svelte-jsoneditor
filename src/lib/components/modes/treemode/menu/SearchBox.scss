@@ -6,14 +6,14 @@ $padding-section-left: 32px;
 $input-min-width: 50px;
 
 .jse-search-box {
-  border: var(--jse-panel-border);
+  border: $panel-border;
   border-radius: $border-radius;
 
-  font-family: var(--jse-font-family);
-  font-size: var(--jse-font-size);
-  background: var(--jse-panel-background);
-  color: var(--jse-panel-color-readonly);
-  box-shadow: var(--jse-controls-box-shadow);
+  font-family: $font-family;
+  font-size: $font-size;
+  background: $panel-background;
+  color: $panel-color-readonly;
+  box-shadow: $controls-box-shadow;
   display: inline-block;
   width: 400px;
   max-width: 100%;
@@ -37,20 +37,20 @@ $input-min-width: 50px;
       margin: 0;
       cursor: pointer;
 
-      color: var(--jse-panel-button-color);
-      background: var(--jse-panel-button-background);
+      color: $panel-button-color;
+      background: $panel-button-background;
 
       &:hover {
-        color: var(--jse-panel-button-color-highlight);
-        background: var(--jse-panel-button-background-highlight);
+        color: $panel-button-color-highlight;
+        background: $panel-button-background-highlight;
       }
     }
 
     input {
-      color: var(--jse-panel-color);
-      border: var(--jse-input-border);
+      color: $panel-color;
+      border: $input-border;
       border-radius: $border-radius;
-      background: var(--jse-input-background);
+      background: $input-background;
       height: $search-size;
       padding: 0 $input-padding;
       margin: 0;
@@ -63,7 +63,7 @@ $input-min-width: 50px;
     .jse-replace-toggle {
       padding: $padding $padding-half;
       min-width: 20px;
-      background: var(--jse-panel-button-background-highlight);
+      background: $panel-button-background-highlight;
     }
 
     .jse-search-contents {

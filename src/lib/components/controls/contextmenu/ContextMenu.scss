@@ -1,12 +1,12 @@
 @import '../../../styles.scss';
 
 .jse-contextmenu {
-  box-shadow: var(--jse-controls-box-shadow);
+  box-shadow: $controls-box-shadow;
 
-  font-family: var(--jse-font-family);
-  font-size: var(--jse-font-size);
-  background: var(--jse-context-menu-background);
-  color: var(--jse-context-menu-color);
+  font-family: $font-family;
+  font-size: $font-size;
+  background: $context-menu-background;
+  color: $context-menu-color;
 
   .jse-row {
     display: flex;
@@ -18,14 +18,14 @@
       flex: 1;
       white-space: nowrap;
       padding: $padding;
-      color: var(--jse-context-menu-color-disabled);
+      color: $context-menu-color-disabled;
       line-height: normal;
     }
 
     div.jse-tip {
       flex: 1;
-      background: var(--jse-context-menu-tip-background);
-      color: var(--jse-context-menu-tip-color);
+      background: $context-menu-tip-background;
+      color: $context-menu-tip-color;
       margin: $padding-half;
       padding: $padding-half $padding;
       font-size: 80%;
@@ -50,13 +50,13 @@
     align-items: stretch;
 
     &:not(:last-child) {
-      border-right: 1px solid var(--jse-context-menu-separator-color);
+      border-right: 1px solid $context-menu-separator-color;
     }
   }
 
   .jse-separator {
     width: 100%;
     height: 1px;
-    background: var(--jse-context-menu-separator-color);
+    background: $context-menu-separator-color;
   }
 }

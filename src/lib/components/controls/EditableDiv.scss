@@ -20,7 +20,7 @@ div.jse-editable-div {
   }
 
   &[contenteditable='true'] {
-    outline: var(--jse-edit-outline);
+    outline: $edit-outline;
     background: inherit !important;
     position: relative;
     border-radius: 0;
@@ -29,13 +29,13 @@ div.jse-editable-div {
 
   &.jse-empty {
     &:not(:focus) {
-      outline: 1px dotted var(--jse-tag-background);
+      outline: 1px dotted $tag-background;
       -moz-outline-radius: 2px;
     }
 
     &::after {
       pointer-events: none;
-      color: var(--jse-tag-background);
+      color: $tag-background;
     }
   }
 }

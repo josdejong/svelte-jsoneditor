@@ -25,6 +25,11 @@
 
   // TODO: this is duplicated from the same function in JSONNode
   function getIndentationStyle(level) {
+    /**
+     * @todo This does not work with the SCSS variable usages. This should be moved to SCSS
+     * Note that this type of problem can be solved without JS, in pure CSS, using CSS Counters
+     * https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_counter_styles/Using_CSS_counters
+     */
     return `margin-left: calc(${level} * var(--jse-indent-size))`
   }
 

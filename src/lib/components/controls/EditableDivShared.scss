@@ -2,33 +2,33 @@
 
 .jse-value {
   &.jse-string {
-    color: var(--jse-value-color-string);
+    color: $value-color-string;
   }
 
   &.jse-object,
   &.jse-array {
     min-width: 16px;
-    color: var(--jse-delimiter-color);
+    color: $delimiter-color;
   }
 
   &.jse-number {
-    color: var(--jse-value-color-number);
+    color: $value-color-number;
   }
 
   &.jse-boolean {
-    color: var(--jse-value-color-boolean);
+    color: $value-color-boolean;
   }
 
   &.jse-null {
-    color: var(--jse-value-color-null);
+    color: $value-color-null;
   }
 
   &.jse-invalid {
-    color: var(--jse-text-color);
+    color: $text-color;
   }
 
   &.jse-url {
-    color: var(--jse-value-color-url);
+    color: $value-color-url;
     text-decoration: underline;
   }
 }
