@@ -154,12 +154,12 @@
   $message-action-background-highlight: var(--jse-message-action-background-highlight, rgba(255, 255, 255, 0.3));
 
   /* svelte-select */
-  $svelte-select-item-is-active-bg: var(--jse-item-is-active-bg, var(--item-is-active-bg, #3883fa));
-  $svelte-select-border: var(--jse-svelte-select-border, var(--border, 1px solid #d8dbdf));
-  $svelte-select-border-radius: var(--jse-svelte-select-border-radius, var(--border-radius, 3px));
-  $svelte-select-background: var(--jse-svelte-select-background, var(--background, #fff));
-  $svelte-select-padding: var(--jse-svelte-select-padding, var(--padding, 0 10px));
-  $svelte-select-multi-select-padding: var(--jse-svelte-select-multi-select-padding, var(--multi-select-padding, 0 10px));
+  $svelte-select-item-is-active-bg: var(--jse-item-is-active-bg, #3883fa);
+  $svelte-select-border: var(--jse-svelte-select-border, 1px solid #d8dbdf);
+  $svelte-select-border-radius: var(--jse-svelte-select-border-radius, 3px);
+  $svelte-select-background: var(--jse-svelte-select-background, #fff);
+  $svelte-select-padding: var(--jse-svelte-select-padding, 0 10px);
+  $svelte-select-multi-select-padding: var(--jse-svelte-select-multi-select-padding, 0 10px);
 
   /* color picker */
   $color-picker-background: var(--jse-color-picker-background, $panel-background);
