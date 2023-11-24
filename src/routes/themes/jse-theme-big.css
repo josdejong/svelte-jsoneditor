@@ -9,7 +9,7 @@
   --jse-font-size-mono: 28px;
   --jse-padding: 10px;
 
-  --jse-button-primary-background: $theme-color;
+  --jse-button-primary-background: var(--jse-theme-color);
   --jse-button-primary-background-highlight: #e74c1c;
   --itemIsActiveBG: #fd5e2d;
 
@@ -22,11 +22,11 @@
   --jse-message-success-color: #9ac45d;
 
   --jse-context-menu-pointer-size: 32px;
-  --jse-context-menu-background: $theme-color;
+  --jse-context-menu-background: var(--jse-theme-color);
   --jse-context-menu-background-highlight: #ea3600;
-  --jse-context-menu-pointer-background: $context-menu-background;
-  --jse-context-menu-pointer-background-highlight: $context-menu-background-highlight;
-  --jse-context-menu-pointer-color: $context-menu-color;
+  --jse-context-menu-pointer-background: var(--jse-context-menu-background);
+  --jse-context-menu-pointer-background-highlight: var(--jse-context-menu-background-highlight);
+  --jse-context-menu-pointer-color: var(--jse-context-menu-color);
   --jse-context-menu-color: #fff;
   --jse-context-menu-color-disabled: rgba(255, 255, 255, 0.4);
   --jse-context-menu-separator-color: rgba(255, 255, 255, 0.2);
