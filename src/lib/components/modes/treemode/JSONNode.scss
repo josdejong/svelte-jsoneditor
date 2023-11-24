@@ -30,6 +30,7 @@
   .jse-header-outer,
   .jse-footer-outer {
     display: flex;
+    margin-left: calc(var(--level) * $indent-size);
   }
 
   .jse-header {
@@ -45,6 +46,7 @@
 
   .jse-contents-outer {
     display: flex;
+    margin-left: calc(var(--level) * $indent-size);
   }
 
   .jse-header,

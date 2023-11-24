@@ -1,6 +1,7 @@
 @import '../../../styles';
 
 div.jse-collapsed-items {
+  margin-left: calc(var(--level) * $indent-size);
   $transparent-color: transparent;
   $background-color: $collapsed-items-background-color;
   $color: $collapsed-items-link-color;

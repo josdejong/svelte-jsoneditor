@@ -23,16 +23,6 @@
 
   $: expandItemsSections = getExpandItemsSections(startIndex, endIndex)
 
-  // TODO: this is duplicated from the same function in JSONNode
-  function getIndentationStyle(level) {
-    /**
-     * @todo This does not work with the SCSS variable usages. This should be moved to SCSS
-     * Note that this type of problem can be solved without JS, in pure CSS, using CSS Counters
-     * https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_counter_styles/Using_CSS_counters
-     */
-    return `margin-left: calc(${level} * var(--jse-indent-size))`
-  }
-
   function handleMouseMove(event) {
     // prevent the whole array from being selected whilst dragging over
     // a section with collapsed items
@@ -45,7 +35,7 @@
   class="jse-collapsed-items"
   class:jse-selected={selected}
   on:mousemove={handleMouseMove}
-  style={getIndentationStyle(path.length + 2)}
+  style:--level={path.length + 2}
 >
   <div>
     <div class="jse-text">Items {startIndex}-{endIndex}</div>
