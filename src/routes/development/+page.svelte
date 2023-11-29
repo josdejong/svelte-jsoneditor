@@ -679,7 +679,7 @@
             onFocus={() => console.log('onFocus tree')}
             onBlur={() => console.log('onBlur tree', { content: refTreeEditor.get() })}
             onIgnoreKey={(path, type) => {
-              console.log('onIgnoreKey', path,type)
+              console.log('onIgnoreKey', path, type)
             }}
             onSortKey={(path, type) => {
               console.log('onSortKey', path, type)

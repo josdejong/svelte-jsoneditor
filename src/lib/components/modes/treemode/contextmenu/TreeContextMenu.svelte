@@ -70,29 +70,29 @@
     $: rootSelected = hasSelection && isEmpty(selection.focusPath)
     $: focusValue = hasSelection ? getIn(json, selection.focusPath) : undefined
     $: editValueText = Array.isArray(focusValue)
-        ? 'Edit array'
-        : isObject(focusValue)
-            ? 'Edit object'
-            : 'Edit value'
+            ? 'Edit array'
+            : isObject(focusValue)
+                    ? 'Edit object'
+                    : 'Edit value'
 
     $: hasSelectionContents =
-        hasJson &&
-        (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))
+            hasJson &&
+            (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))
 
     $: canDuplicate = hasJson && hasSelectionContents && !rootSelected // must not be root
 
     $: canExtract =
-        hasJson &&
-        selection != null &&
-        (isMultiSelection(selection) || isValueSelection(selection)) &&
-        !rootSelected // must not be root
+            hasJson &&
+            selection != null &&
+            (isMultiSelection(selection) || isValueSelection(selection)) &&
+            !rootSelected // must not be root
 
     $: canEditKey =
-        hasJson &&
-        selection != null &&
-        singleItemSelected(selection) &&
-        !rootSelected &&
-        !Array.isArray(getIn(json, initial(selection.focusPath)))
+            hasJson &&
+            selection != null &&
+            singleItemSelected(selection) &&
+            !rootSelected &&
+            !Array.isArray(getIn(json, initial(selection.focusPath)))
 
     $: canEditValue = hasJson && selection != null && singleItemSelected(selection)
     $: canEnforceString = canEditValue && !isObjectOrArray(focusValue)
@@ -101,30 +101,30 @@
     $: insertOrConvertText = convertMode ? 'Convert to:' : 'Insert:'
     $: canInsertOrConvertStructure = convertMode ? false : hasSelection
     $: canInsertOrConvertObject = convertMode
-        ? canConvert(selection) && !isObject(focusValue)
-        : hasSelection
+            ? canConvert(selection) && !isObject(focusValue)
+            : hasSelection
     $: canInsertOrConvertArray = convertMode
-        ? canConvert(selection) && !Array.isArray(focusValue)
-        : hasSelection
+            ? canConvert(selection) && !Array.isArray(focusValue)
+            : hasSelection
     $: canInsertOrConvertValue = convertMode
-        ? canConvert(selection) && isObjectOrArray(focusValue)
-        : hasSelection
+            ? canConvert(selection) && isObjectOrArray(focusValue)
+            : hasSelection
 
     $: enforceString =
-        selection != null
-            ? getEnforceString(
-                focusValue,
-                documentState.enforceStringMap,
-                compileJSONPointer(selection.focusPath),
-                parser
-            )
-            : false
+            selection != null
+                    ? getEnforceString(
+                            focusValue,
+                            documentState.enforceStringMap,
+                            compileJSONPointer(selection.focusPath),
+                            parser
+                    )
+                    : false
 
     $: isArrayNode = hasJson && selection != null && Array.isArray(focusValue)
     $: isLeafNode = hasJson && selection != null && !isObjectOrArray(focusValue)
 
 
-    function handleIgnoreKey(type?: CompareConfigType| 'temporary') {
+    function handleIgnoreKey(type?: CompareConfigType | 'temporary') {
         onCloseContextMenu()
         onIgnoreKey?.(type)
     }
@@ -144,14 +144,14 @@
         onCompressKey?.(type)
     }
 
-    function handleDiffMatch(type?: CompareConfigType){
-      onCloseContextMenu()
-      onDiffMatch?.(type)
+    function handleDiffMatch(type?: CompareConfigType) {
+        onCloseContextMenu()
+        onDiffMatch?.(type)
     }
 
-    function handleNodeDecode(){
-      onCloseContextMenu()
-      onNodeDecode()
+    function handleNodeDecode() {
+        onCloseContextMenu()
+        onNodeDecode()
     }
 
     function handleEditKey() {
@@ -245,28 +245,36 @@
             type: 'row',
             items: [{
                 type: 'column',
-                items: ([] as any).concat(onIgnoreKey ? [{
-                    type: 'dropdown-button',
-                    width: '17em',
-                    main: {
-                        type: 'button',
-                        text: 'Ignore Key',
-                        onClick: () => handleIgnoreKey(),
-                    },
-                    items: [{
-                        type: 'button',
-                        text: 'Ignore to Global',
-                        onClick: () => handleIgnoreKey('global'),
-                    }, {
-                        type: 'button',
-                        text: 'Ignore to Interface / Dependency',
-                        onClick: () => handleIgnoreKey('interface'),
-                    },{
-                      type: 'button',
-                      text: 'Temporary Ignore(7d)',
-                      onClick: () => handleIgnoreKey('temporary'),
-                    }]
-                }] : []).concat(onSortKey ? [{
+                items: ([] as any).concat(typeof onIgnoreKey === 'function' ?
+                        (onIgnoreKey.length === 1 ?
+                                [{
+                                    type: 'dropdown-button',
+                                    width: '17em',
+                                    main: {
+                                        type: 'button',
+                                        text: 'Ignore Key',
+                                        onClick: () => handleIgnoreKey(),
+                                    },
+                                    items: [{
+                                        type: 'button',
+                                        text: 'Ignore to Global',
+                                        onClick: () => handleIgnoreKey('global'),
+                                    }, {
+                                        type: 'button',
+                                        text: 'Ignore to Interface / Dependency',
+                                        onClick: () => handleIgnoreKey('interface'),
+                                    }, {
+                                        type: 'button',
+                                        text: 'Temporary Ignore(7d)',
+                                        onClick: () => handleIgnoreKey('temporary'),
+                                    }]
+                                }] : [ // 当 onIgnoreKey 没有 type 入参的时候，取消二级菜单的展示
+                                    {
+                                        type: 'button',
+                                        text: 'Ignore Key',
+                                        onClick: () => handleIgnoreKey(),
+                                    }
+                                ]) : []).concat(onSortKey ? [{
                     type: 'button',
                     text: 'Sort Key',
                     disabled: !isArrayNode,
@@ -277,20 +285,20 @@
                     disabled: !isLeafNode,
                     onClick: () => handleReferenceKey(),
                 }] : []).concat(onCompressKey ? [{
-                  type: 'button',
-                  text: 'Compress Key',
-                  disabled: !isLeafNode,
-                  onClick: () => handleCompressKey(),
+                    type: 'button',
+                    text: 'Compress Key',
+                    disabled: !isLeafNode,
+                    onClick: () => handleCompressKey(),
                 }] : []).concat(onDiffMatch ? [{
-                  type: 'button',
-                  text: 'Diff Match',
-                  disabled: !isLeafNode,
-                  onClick: () => handleDiffMatch(),
+                    type: 'button',
+                    text: 'Diff Match',
+                    disabled: !isLeafNode,
+                    onClick: () => handleDiffMatch(),
                 }] : []).concat(onNodeDecode ? [{
-                  type: 'button',
-                  text: 'Base64 Decode',
-                  disabled: !isLeafNode,
-                  onClick: () => handleNodeDecode(),
+                    type: 'button',
+                    text: 'Base64 Decode',
+                    disabled: !isLeafNode,
+                    onClick: () => handleNodeDecode(),
                 }] : []),
             }]
         }
@@ -315,10 +323,10 @@
                         type: 'button',
                         text: "忽略至接口 / 依赖",
                         onClick: () => handleIgnoreKey('interface'),
-                    },{
-                      type: 'button',
-                      text: '临时忽略(7天)',
-                      onClick: () => handleIgnoreKey('temporary'),
+                    }, {
+                        type: 'button',
+                        text: '临时忽略(7天)',
+                        onClick: () => handleIgnoreKey('temporary'),
                     }]
                 },] : []).concat(onSortKey ? [{
                     type: 'button',
@@ -331,20 +339,20 @@
                     disabled: !isLeafNode,
                     onClick: () => handleReferenceKey(),
                 }] : []).concat(onCompressKey ? [{
-                  type: 'button',
-                  text: '添加压缩',
-                  disabled: !isLeafNode,
-                  onClick: () => handleCompressKey(),
+                    type: 'button',
+                    text: '添加压缩',
+                    disabled: !isLeafNode,
+                    onClick: () => handleCompressKey(),
                 }] : []).concat(onDiffMatch ? [{
-                  type: 'button',
-                  text: '显示差异',
-                  disabled: !isLeafNode,
-                  onClick: () => handleDiffMatch(),
+                    type: 'button',
+                    text: '显示差异',
+                    disabled: !isLeafNode,
+                    onClick: () => handleDiffMatch(),
                 }] : []).concat(onNodeDecode ? [{
-                  type: 'button',
-                  text: 'Base64 解析',
-                  disabled: !isLeafNode,
-                  onClick: () => handleNodeDecode(),
+                    type: 'button',
+                    text: 'Base64 解析',
+                    disabled: !isLeafNode,
+                    onClick: () => handleNodeDecode(),
                 }] : []),
             }]
         }

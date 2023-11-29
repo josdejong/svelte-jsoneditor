@@ -98,41 +98,41 @@
     import NavigationBar from '../../controls/navigationBar/NavigationBar.svelte'
     import SearchBox from './menu/SearchBox.svelte'
     import type {
-      AbsolutePopupOptions,
-      AfterPatchCallback,
-      CompareConfigType,
-      Content,
-      ContentErrors,
-      DocumentState,
-      HistoryItem,
-      InsertType,
-      JSONParser,
-      JSONPatchResult,
-      JSONPathParser,
-      JSONPointerMap,
-      JSONSelection,
-      NestedValidationError, NodeDecodeType,
-      OnBlur,
-      OnChange,
-      OnChangeMode,
-      OnClassName,
-      OnError,
-      OnExpand,
-      OnFocus,
-      OnJSONEditorModal,
-      OnRenderMenuWithoutContext,
-      OnRenderValue,
-      OnSortModal,
-      OnTransformModal,
-      ParseError,
-      PastedJson,
-      SearchResult,
-      Section,
-      TransformModalOptions,
-      TreeModeContext,
-      ValidationError,
-      Validator,
-      ValueNormalization
+        AbsolutePopupOptions,
+        AfterPatchCallback,
+        CompareConfigType,
+        Content,
+        ContentErrors,
+        DocumentState,
+        HistoryItem,
+        InsertType,
+        JSONParser,
+        JSONPatchResult,
+        JSONPathParser,
+        JSONPointerMap,
+        JSONSelection,
+        NestedValidationError, NodeDecodeType,
+        OnBlur,
+        OnChange,
+        OnChangeMode,
+        OnClassName,
+        OnError,
+        OnExpand,
+        OnFocus,
+        OnJSONEditorModal,
+        OnRenderMenuWithoutContext,
+        OnRenderValue,
+        OnSortModal,
+        OnTransformModal,
+        ParseError,
+        PastedJson,
+        SearchResult,
+        Section,
+        TransformModalOptions,
+        TreeModeContext,
+        ValidationError,
+        Validator,
+        ValueNormalization
     } from '$lib/types'
     import {Mode, ValidationSeverity} from '$lib/types.js'
     import {isAfterSelection, isInsideSelection, isKeySelection} from '$lib/logic/selection.js'
@@ -194,7 +194,7 @@
     export let onSortKey: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
     export let onReferenceKey: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
     export let onCompressKey: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
-    export let onDiffMatch:  ((path: JSONPath, type?: CompareConfigType) => void) | undefined
+    export let onDiffMatch: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
 
     export let onNodeDecode: ((path: JSONPath, type?: NodeDecodeType) => void) | undefined
 
@@ -226,15 +226,15 @@
     let parseError: ParseError | undefined = undefined
 
     function updateSelection(
-            selection:
-                    | JSONSelection
-                    | undefined
-                    | ((selection: JSONSelection | undefined) => JSONSelection | undefined)
+        selection:
+            | JSONSelection
+            | undefined
+            | ((selection: JSONSelection | undefined) => JSONSelection | undefined)
     ) {
         debug('updateSelection', selection)
 
         const updatedSelection =
-                typeof selection === 'function' ? selection(documentState.selection) : selection
+            typeof selection === 'function' ? selection(documentState.selection) : selection
 
         if (!isEqual(updatedSelection, documentState.selection)) {
             documentState = {
@@ -289,11 +289,11 @@
         }
 
         const {operations, newSelection} = createSearchAndReplaceOperations(
-                json,
-                documentState,
-                replacementText,
-                activeItem,
-                parser
+            json,
+            documentState,
+            replacementText,
+            activeItem,
+            parser
         )
 
         handlePatch(operations, (patchedJson, patchedState) => ({
@@ -309,11 +309,11 @@
         debug('handleReplaceAll', {text, replacementText})
 
         const {operations, newSelection} = createSearchAndReplaceAllOperations(
-                json,
-                documentState,
-                text,
-                replacementText,
-                parser
+            json,
+            documentState,
+            text,
+            replacementText,
+            parser
         )
 
         handlePatch(operations, (patchedJson, patchedState) => ({
@@ -424,32 +424,32 @@
     const memoizedValidate = memoizeOne(validateJSON)
 
     function updateValidationErrors(
-            json: JSONValue,
-            validator: Validator | null,
-            parser: JSONParser,
-            validationParser: JSONParser
+        json: JSONValue,
+        validator: Validator | null,
+        parser: JSONParser,
+        validationParser: JSONParser
     ) {
         measure(
-                () => {
-                    let newValidationErrors: ValidationError[]
-                    try {
-                        newValidationErrors = memoizedValidate(json, validator, parser, validationParser)
-                    } catch (err) {
-                        newValidationErrors = [
-                            {
-                                path: [],
-                                message: 'Failed to validate: ' + err.message,
-                                severity: ValidationSeverity.warning
-                            }
-                        ]
-                    }
+            () => {
+                let newValidationErrors: ValidationError[]
+                try {
+                    newValidationErrors = memoizedValidate(json, validator, parser, validationParser)
+                } catch (err) {
+                    newValidationErrors = [
+                        {
+                            path: [],
+                            message: 'Failed to validate: ' + err.message,
+                            severity: ValidationSeverity.warning
+                        }
+                    ]
+                }
 
-                    if (!isEqual(newValidationErrors, validationErrors)) {
-                        debug('validationErrors changed:', newValidationErrors)
-                        validationErrors = newValidationErrors
-                    }
-                },
-                (duration) => debug(`validationErrors updated in ${duration} ms`)
+                if (!isEqual(newValidationErrors, validationErrors)) {
+                    debug('validationErrors changed:', newValidationErrors)
+                    validationErrors = newValidationErrors
+                }
+            },
+            (duration) => debug(`validationErrors updated in ${duration} ms`)
         )
     }
 
@@ -571,9 +571,9 @@
                 text = externalContent['text']
                 textIsRepaired = false
                 parseError =
-                        text !== undefined && text !== ''
-                                ? normalizeJsonParseError(text, err.message || err.toString())
-                                : undefined
+                    text !== undefined && text !== ''
+                        ? normalizeJsonParseError(text, err.message || err.toString())
+                        : undefined
             }
         }
 
@@ -608,9 +608,9 @@
         }
 
         if (
-                documentState.selection &&
-                existsIn(json, documentState.selection.anchorPath) &&
-                existsIn(json, documentState.selection.focusPath)
+            documentState.selection &&
+            existsIn(json, documentState.selection.anchorPath) &&
+            existsIn(json, documentState.selection.focusPath)
         ) {
             return
         }
@@ -709,8 +709,8 @@
     }
 
     export function patch(
-            operations: JSONPatchDocument,
-            afterPatch?: AfterPatchCallback
+        operations: JSONPatchDocument,
+        afterPatch?: AfterPatchCallback
     ): JSONPatchResult {
         debug('patch', operations, afterPatch)
 
@@ -726,26 +726,26 @@
 
         // execute the patch operations
         const undo: JSONPatchDocument = revertJSONPatchWithMoveOperations(
-                json,
-                operations
+            json,
+            operations
         ) as JSONPatchDocument
         const patched = documentStatePatch(json, documentState, operations)
 
         // update the selection based on the operations
         const updatedSelection = createSelectionFromOperations(json, operations)
         const patchedDocumentState = updateSelectionInDocumentState(
-                patched.documentState,
-                updatedSelection,
-                false
+            patched.documentState,
+            updatedSelection,
+            false
         )
         debug('patch updatedSelection', updatedSelection)
 
         const callback =
-                typeof afterPatch === 'function' ? afterPatch(patched.json, patchedDocumentState) : undefined
+            typeof afterPatch === 'function' ? afterPatch(patched.json, patchedDocumentState) : undefined
 
         json = callback && callback.json !== undefined ? callback.json : patched.json
         const newState =
-                callback && callback.state !== undefined ? callback.state : patchedDocumentState
+            callback && callback.state !== undefined ? callback.state : patchedDocumentState
         documentState = newState
         text = undefined
         textIsRepaired = false
@@ -789,12 +789,19 @@
     // $: debug('state', state)
     // $: debug('selection', selection)
 
-    function handleIgnoreKey(type?: CompareConfigType) {
+    // 当 onIgnoreKey 传参只有一个的时候，取消二级菜单的展示
+    let handleIgnoreKey = onIgnoreKey?.length === 2 ? function createIgnoreKeyHandle(type?: CompareConfigType) {
         if (readOnly || !documentState.selection) {
             return
         }
         const path = documentState.selection.focusPath
         onIgnoreKey?.(path, type)
+    } : function createIgnoreKeyHandle() {
+        if (readOnly || !documentState.selection) {
+            return
+        }
+        const path = documentState.selection.focusPath
+        onIgnoreKey?.(path)
     }
 
     function handleSortKey(type?: CompareConfigType) {
@@ -822,14 +829,14 @@
     }
 
     function handleDiffMatch(type?: CompareConfigType) {
-      if (readOnly || !documentState.selection) {
-        return
-      }
-      const path = documentState.selection.focusPath
-      onDiffMatch?.(path, type)
+        if (readOnly || !documentState.selection) {
+            return
+        }
+        const path = documentState.selection.focusPath
+        onDiffMatch?.(path, type)
     }
 
-    function handleNodeDecode(type?: NodeDecodeType){
+    function handleNodeDecode(type?: NodeDecodeType) {
         if (readOnly || !documentState.selection) {
             return
         }
@@ -873,18 +880,18 @@
         debug('handleToggleEnforceString', {enforceString, value, updatedValue})
 
         handlePatch(
-                [
-                    {
-                        op: 'replace',
-                        path: pointer,
-                        value: updatedValue as JSONValue
-                    }
-                ],
-                (patchedJson, patchedState) => {
-                    return {
-                        state: setEnforceString(patchedState, pointer, enforceString)
-                    }
+            [
+                {
+                    op: 'replace',
+                    path: pointer,
+                    value: updatedValue as JSONValue
                 }
+            ],
+            (patchedJson, patchedState) => {
+                return {
+                    state: setEnforceString(patchedState, pointer, enforceString)
+                }
+            }
         )
     }
 
@@ -939,43 +946,43 @@
 
     function handlePasteFromMenu() {
         open(
-                CopyPasteModal,
-                {},
-                {
-                    ...SIMPLE_MODAL_OPTIONS,
-                    styleWindow: {
-                        width: '450px'
-                    }
-                },
-                {
-                    onClose: () => focus()
+            CopyPasteModal,
+            {},
+            {
+                ...SIMPLE_MODAL_OPTIONS,
+                styleWindow: {
+                    width: '450px'
                 }
+            },
+            {
+                onClose: () => focus()
+            }
         )
     }
 
     function openRepairModal(text: string, onApply: (repairedText: string) => void) {
         open(
-                JSONRepairModal,
-                {
-                    text,
-                    onParse: parsePartialJson,
-                    onRepair: repairPartialJson,
-                    onApply
+            JSONRepairModal,
+            {
+                text,
+                onParse: parsePartialJson,
+                onRepair: repairPartialJson,
+                onApply
+            },
+            {
+                ...SIMPLE_MODAL_OPTIONS,
+                styleWindow: {
+                    width: '600px',
+                    height: '500px'
                 },
-                {
-                    ...SIMPLE_MODAL_OPTIONS,
-                    styleWindow: {
-                        width: '600px',
-                        height: '500px'
-                    },
-                    styleContent: {
-                        padding: 0,
-                        height: '100%'
-                    }
-                },
-                {
-                    onClose: () => focus()
+                styleContent: {
+                    padding: 0,
+                    height: '100%'
                 }
+            },
+            {
+                onClose: () => focus()
+            }
         )
     }
 
@@ -993,11 +1000,11 @@
 
     function handleDuplicate() {
         if (
-                readOnly ||
-                json === undefined ||
-                !documentState.selection ||
-                !hasSelectionContents(documentState.selection) ||
-                isEmpty(documentState.selection.focusPath) // root selected, cannot duplicate
+            readOnly ||
+            json === undefined ||
+            !documentState.selection ||
+            !hasSelectionContents(documentState.selection) ||
+            isEmpty(documentState.selection.focusPath) // root selected, cannot duplicate
         ) {
             return
         }
@@ -1011,10 +1018,10 @@
 
     function handleExtract() {
         if (
-                readOnly ||
-                !documentState.selection ||
-                (!isMultiSelection(documentState.selection) && !isValueSelection(documentState.selection)) ||
-                isEmpty(documentState.selection.focusPath) // root selected, cannot extract
+            readOnly ||
+            !documentState.selection ||
+            (!isMultiSelection(documentState.selection) && !isValueSelection(documentState.selection)) ||
+            isEmpty(documentState.selection.focusPath) // root selected, cannot extract
         ) {
             return
         }
@@ -1108,8 +1115,8 @@
         const parentPath = initial(documentState.selection.focusPath)
 
         if (
-                !isEmpty(selectionBefore.focusPath) &&
-                isEqual(parentPath, initial(selectionBefore.focusPath))
+            !isEmpty(selectionBefore.focusPath) &&
+            isEqual(parentPath, initial(selectionBefore.focusPath))
         ) {
             updateSelection(createAfterSelection(selectionBefore.focusPath))
         } else {
@@ -1123,8 +1130,8 @@
 
     function handleInsertAfter() {
         const path = isMultiSelection(documentState.selection)
-                ? last(documentState.selection.paths)
-                : documentState.selection.focusPath
+            ? last(documentState.selection.paths)
+            : documentState.selection.focusPath
 
         debug('insert after', path)
 
@@ -1393,8 +1400,8 @@
      */
     export function findElement(path: JSONPath): Element | null {
         return refContents
-                ? refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
-                : null
+            ? refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
+            : null
     }
 
     /**
@@ -1412,8 +1419,8 @@
         const elemRect = elem.getBoundingClientRect()
         const margin = 20
         const elemHeight = isObjectOrArray(getIn(json, path))
-                ? margin // do not use real height when array or object
-                : elemRect.height
+            ? margin // do not use real height when array or object
+            : elemRect.height
 
         if (elemRect.top < viewPortRect.top + margin) {
             // scroll down
@@ -1458,8 +1465,8 @@
     }
 
     function handlePatch(
-            operations: JSONPatchDocument,
-            afterPatch?: AfterPatchCallback
+        operations: JSONPatchDocument,
+        afterPatch?: AfterPatchCallback
     ): JSONPatchResult {
         if (readOnly) {
             return
@@ -1480,7 +1487,7 @@
         const updatedState = expandWithCallback(json, documentState, [], expandMinimal)
 
         const callback =
-                typeof afterPatch === 'function' ? afterPatch(updatedJson, updatedState) : undefined
+            typeof afterPatch === 'function' ? afterPatch(updatedJson, updatedState) : undefined
 
         json = callback && callback.json !== undefined ? callback.json : updatedJson
         documentState = callback && callback.state !== undefined ? callback.state : updatedState
@@ -1535,7 +1542,7 @@
                 text = updatedText
                 textIsRepaired = false
                 parseError =
-                        text !== '' ? normalizeJsonParseError(text, err.message || err.toString()) : undefined
+                    text !== '' ? normalizeJsonParseError(text, err.message || err.toString()) : undefined
             }
         }
 
@@ -1683,8 +1690,8 @@
             event.preventDefault()
 
             const newSelection = documentState.selection
-                    ? getSelectionUp(json, documentState, keepAnchorPath, true) || documentState.selection
-                    : getInitialSelection(json, documentState)
+                ? getSelectionUp(json, documentState, keepAnchorPath, true) || documentState.selection
+                : getInitialSelection(json, documentState)
 
             updateSelection(newSelection)
             scrollIntoView(newSelection.focusPath)
@@ -1693,8 +1700,8 @@
             event.preventDefault()
 
             const newSelection = documentState.selection
-                    ? getSelectionDown(json, documentState, keepAnchorPath, true) || documentState.selection
-                    : getInitialSelection(json, documentState)
+                ? getSelectionDown(json, documentState, keepAnchorPath, true) || documentState.selection
+                : getInitialSelection(json, documentState)
 
             updateSelection(newSelection)
             scrollIntoView(newSelection.focusPath)
@@ -1703,9 +1710,9 @@
             event.preventDefault()
 
             const newSelection = documentState.selection
-                    ? getSelectionLeft(json, documentState, keepAnchorPath, !readOnly) ||
-                    documentState.selection
-                    : getInitialSelection(json, documentState)
+                ? getSelectionLeft(json, documentState, keepAnchorPath, !readOnly) ||
+                documentState.selection
+                : getInitialSelection(json, documentState)
 
             updateSelection(newSelection)
             scrollIntoView(newSelection.focusPath)
@@ -1714,10 +1721,10 @@
             event.preventDefault()
 
             const newSelection =
-                    documentState.selection && json !== undefined
-                            ? getSelectionRight(json, documentState, keepAnchorPath, !readOnly) ||
-                            documentState.selection
-                            : getInitialSelection(json, documentState)
+                documentState.selection && json !== undefined
+                    ? getSelectionRight(json, documentState, keepAnchorPath, !readOnly) ||
+                    documentState.selection
+                    : getInitialSelection(json, documentState)
 
             updateSelection(newSelection)
             scrollIntoView(newSelection.focusPath)
@@ -1726,9 +1733,9 @@
         if (combo === 'Enter' && documentState.selection) {
             // when the selection consists of a single Array item, change selection to editing its value
             if (
-                    !readOnly &&
-                    isMultiSelection(documentState.selection) &&
-                    documentState.selection.paths.length === 1
+                !readOnly &&
+                isMultiSelection(documentState.selection) &&
+                documentState.selection.paths.length === 1
             ) {
                 const path = documentState.selection.focusPath
                 const parent = getIn(json, initial(path))
@@ -1770,8 +1777,8 @@
         }
 
         if (
-                combo === 'Enter' &&
-                (isAfterSelection(documentState.selection) || isInsideSelection(documentState.selection))
+            combo === 'Enter' &&
+            (isAfterSelection(documentState.selection) || isInsideSelection(documentState.selection))
         ) {
             // Enter on an insert area -> open the area in edit mode
             event.preventDefault()
@@ -1849,9 +1856,9 @@
                     focus()
 
                     if (
-                            !documentState.selection &&
-                            json === undefined &&
-                            (text === '' || text === undefined)
+                        !documentState.selection &&
+                        json === undefined &&
+                        (text === '' || text === undefined)
                     ) {
                         createDefaultSelection()
                     }
@@ -1878,7 +1885,7 @@
             language,
 
             onIgnoreKey: onIgnoreKey && handleIgnoreKey,
-            onSortKey: onSortKey &&  handleSortKey,
+            onSortKey: onSortKey && handleSortKey,
             onReferenceKey: onReferenceKey && handleReferenceKey,
             onCompressKey: onCompressKey && handleCompressKey,
             onDiffMatch: onDiffMatch && handleDiffMatch,
