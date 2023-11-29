@@ -246,6 +246,9 @@
             items: [{
                 type: 'column',
                 items: ([] as any).concat(typeof onIgnoreKey === 'function' ?
+                        // It's bad, The vanilla compiled function inputs
+                        // will change, resulting in an inaccurate judgment
+                        // based on the number of inputs.
                         (onIgnoreKey.length === 1 ?
                                 [{
                                     type: 'dropdown-button',
@@ -307,28 +310,36 @@
             type: 'row',
             items: [{
                 type: 'column',
-                items: ([] as any).concat(onIgnoreKey ? [{
-                    type: 'dropdown-button',
-                    width: '10em',
-                    main: {
-                        type: 'button',
-                        text: '添加忽略',
-                        onClick: () => handleIgnoreKey(),
-                    },
-                    items: [{
-                        type: 'button',
-                        text: "忽略至全局",
-                        onClick: () => handleIgnoreKey('global'),
-                    }, {
-                        type: 'button',
-                        text: "忽略至接口 / 依赖",
-                        onClick: () => handleIgnoreKey('interface'),
-                    }, {
-                        type: 'button',
-                        text: '临时忽略(7天)',
-                        onClick: () => handleIgnoreKey('temporary'),
-                    }]
-                },] : []).concat(onSortKey ? [{
+                items: ([] as any).concat(typeof onIgnoreKey === 'function' ?
+                    (onIgnoreKey.length === 1 ?
+                        [{
+                            type: 'dropdown-button',
+                            width: '10em',
+                            main: {
+                                type: 'button',
+                                text: '添加忽略',
+                                onClick: () => handleIgnoreKey(),
+                            },
+                            items: [{
+                                type: 'button',
+                                text: "忽略至全局",
+                                onClick: () => handleIgnoreKey('global'),
+                            }, {
+                                type: 'button',
+                                text: "忽略至接口 / 依赖",
+                                onClick: () => handleIgnoreKey('interface'),
+                            }, {
+                                type: 'button',
+                                text: '临时忽略(7天)',
+                                onClick: () => handleIgnoreKey('temporary'),
+                            }]
+                        }] : [ // 当 onIgnoreKey 没有 type 入参的时候，取消二级菜单的展示
+                            {
+                                type: 'button',
+                                text: '添加忽略',
+                                onClick: () => handleIgnoreKey(),
+                            }
+                        ]) : []).concat(onSortKey ? [{
                     type: 'button',
                     text: '添加排序',
                     disabled: !isArrayNode,

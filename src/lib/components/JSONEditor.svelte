@@ -29,7 +29,7 @@
       JSONEditorPropsOptional,
       JSONParser,
       JSONPatchResult,
-      JSONPathParser, NodeDecodeType,
+      JSONPathParser,
       OnBlur,
       OnChange,
       OnChangeMode,
