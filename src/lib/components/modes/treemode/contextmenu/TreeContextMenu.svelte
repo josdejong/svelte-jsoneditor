@@ -29,7 +29,7 @@
     } from '$lib/logic/selection.js'
     import {isObject, isObjectOrArray} from '$lib/utils/typeUtils.js'
     import {faCheckSquare, faSquare} from '@fortawesome/free-regular-svg-icons'
-    import type {ContextMenuItem, DocumentState, JSONParser, NodeDecodeType} from '$lib/types'
+    import type {ContextMenuItem, DocumentState, JSONParser} from '$lib/types'
     import {getEnforceString} from '$lib/logic/documentState.js'
     import ContextMenu from '../../../../components/controls/contextmenu/ContextMenu.svelte'
     import type {CompareConfigType} from "$lib/types";
@@ -44,7 +44,7 @@
     export let onReferenceKey: ((type?: CompareConfigType) => void) | undefined
     export let onCompressKey: ((type?: CompareConfigType) => void) | undefined
     export let onDiffMatch: ((type?: CompareConfigType) => void) | undefined
-    export let onNodeDecode: ((type?: NodeDecodeType) => void) | undefined
+    export let onNodeDecode: (() => void) | undefined
 
     export let onCloseContextMenu
     export let onEditKey
@@ -149,9 +149,9 @@
       onDiffMatch?.(type)
     }
 
-    function handleNodeDecode(type?: NodeDecodeType){
+    function handleNodeDecode(){
       onCloseContextMenu()
-      onNodeDecode?.(type)
+      onNodeDecode()
     }
 
     function handleEditKey() {
@@ -287,22 +287,10 @@
                   disabled: !isLeafNode,
                   onClick: () => handleDiffMatch(),
                 }] : []).concat(onNodeDecode ? [{
-                  type: 'dropdown-button',
-                  width: '10em',
-                  main: {
-                    type: 'button',
-                    text: 'Node Decode',
-                    onClick: () => handleNodeDecode(),
-                  },
-                  items: [{
-                    type: 'button',
-                    text: "base64",
-                    onClick: () => handleNodeDecode('base64'),
-                  }, {
-                    type: 'button',
-                    text: "zstd",
-                    onClick: () => handleNodeDecode('zstd'),
-                  }]
+                  type: 'button',
+                  text: 'Base64 Decode',
+                  disabled: !isLeafNode,
+                  onClick: () => handleNodeDecode(),
                 }] : []),
             }]
         }
@@ -353,23 +341,10 @@
                   disabled: !isLeafNode,
                   onClick: () => handleDiffMatch(),
                 }] : []).concat(onNodeDecode ? [{
-                  type: 'dropdown-button',
-                  width: '10em',
-                  main: {
-                    type: 'button',
-                    text: '节点解析',
-                    onClick: () => handleNodeDecode(),
-
-                  },
-                  items: [{
-                    type: 'button',
-                    text: "base64",
-                    onClick: () => handleNodeDecode('base64'),
-                  }, {
-                    type: 'button',
-                    text: "zstd",
-                    onClick: () => handleNodeDecode('zstd'),
-                  }]
+                  type: 'button',
+                  text: 'Base64 解析',
+                  disabled: !isLeafNode,
+                  onClick: () => handleNodeDecode(),
                 }] : []),
             }]
         }
