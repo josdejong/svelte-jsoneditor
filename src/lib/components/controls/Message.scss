@@ -1,8 +1,8 @@
 @import '../../styles.scss';
 
 .jse-message {
-  font-family: var(--jse-font-family-mono);
-  font-size: var(--jse-font-size-mono);
+  font-family: $font-family-mono;
+  font-size: $font-size-mono;
 
   padding: $padding;
   display: flex;
@@ -11,8 +11,8 @@
   align-items: stretch;
 
   &.jse-success {
-    background: var(--jse-message-success-background);
-    color: var(--jse-message-success-color);
+    background: $message-success-background;
+    color: $message-success-color;
   }
 
   .jse-text {
@@ -34,18 +34,18 @@
   }
 
   &.jse-error {
-    background: var(--jse-message-error-background);
-    color: var(--jse-message-error-color);
+    background: $message-error-background;
+    color: $message-error-color;
   }
 
   &.jse-warning {
-    background: var(--jse-message-warning-background);
-    color: var(--jse-message-warning-color);
+    background: $message-warning-background;
+    color: $message-warning-color;
   }
 
   &.jse-info {
-    background: var(--jse-message-info-background);
-    color: var(--jse-message-info-color);
+    background: $message-info-background;
+    color: $message-info-color;
   }
 
   .jse-actions {
@@ -55,13 +55,13 @@
     button.jse-action {
       @include jsoneditor-button;
 
-      background: var(--jse-message-action-background);
+      background: $message-action-background;
       color: inherit;
 
       padding: $padding-half $padding;
 
       &:hover {
-        background: var(--jse-message-action-background-highlight);
+        background: $message-action-background-highlight;
       }
     }
   }

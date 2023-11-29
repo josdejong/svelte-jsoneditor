@@ -1,12 +1,15 @@
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { tags } from '@lezer/highlight'
 
+/**
+ * @todo FIX THIS, these variables do not use our SCSS defaults
+ */
 const highlightStyle = HighlightStyle.define([
-  { tag: tags.propertyName, color: 'var(--jse-key-color)' }, // keys
-  { tag: tags.number, color: 'var(--jse-value-color-number)' },
-  { tag: tags.bool, color: 'var(--jse-value-color-boolean)' },
-  { tag: tags.string, color: 'var(--jse-value-color-string)' },
-  { tag: tags.keyword, color: 'var(--jse-value-color-null)' } // null
+  { tag: tags.propertyName, color: 'var(--internal-key-color)' }, // keys
+  { tag: tags.number, color: 'var(--internal-value-color-number)' },
+  { tag: tags.bool, color: 'var(--internal-value-color-boolean)' },
+  { tag: tags.string, color: 'var(--internal-value-color-string)' },
+  { tag: tags.keyword, color: 'var(--internal-value-color-null)' } // null
 ])
 
 export const highlighter = syntaxHighlighting(highlightStyle)

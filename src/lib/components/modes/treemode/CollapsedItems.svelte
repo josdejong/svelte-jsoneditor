@@ -23,11 +23,6 @@
 
   $: expandItemsSections = getExpandItemsSections(startIndex, endIndex)
 
-  // TODO: this is duplicated from the same function in JSONNode
-  function getIndentationStyle(level) {
-    return `margin-left: calc(${level} * var(--jse-indent-size))`
-  }
-
   function handleMouseMove(event) {
     // prevent the whole array from being selected whilst dragging over
     // a section with collapsed items
@@ -40,7 +35,7 @@
   class="jse-collapsed-items"
   class:jse-selected={selected}
   on:mousemove={handleMouseMove}
-  style={getIndentationStyle(path.length + 2)}
+  style:--level={path.length + 2}
 >
   <div>
     <div class="jse-text">Items {startIndex}-{endIndex}</div>
