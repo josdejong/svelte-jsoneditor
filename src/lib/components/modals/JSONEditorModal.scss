@@ -5,8 +5,8 @@
   .jse-modal-contents {
     padding-top: 0;
 
-    --jse-theme-color: $modal-theme-color;
-    --jse-theme-color-highlight: $modal-theme-color-highlight;
+    --jse-theme-color: #{$modal-theme-color};
+    --jse-theme-color-highlight: #{$modal-theme-color-highlight};
 
     .jse-label {
       font-weight: bold;
