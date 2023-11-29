@@ -98,6 +98,7 @@
     display: flex;
     position: relative;
     z-index: 1; // prevent the next line half-overlapping the pointer
+    margin-left: calc(var(--level) * $indent-size);
 
     max-width: 250px;
     min-width: 100px;
