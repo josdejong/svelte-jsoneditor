@@ -111,7 +111,7 @@
         JSONPathParser,
         JSONPointerMap,
         JSONSelection,
-        NestedValidationError, NodeDecodeType,
+        NestedValidationError,
         OnBlur,
         OnChange,
         OnChangeMode,
@@ -191,12 +191,12 @@
     export let onTransformModal: OnTransformModal
     export let onJSONEditorModal: OnJSONEditorModal
     export let onIgnoreKey: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
-    export let onSortKey: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
-    export let onReferenceKey: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
-    export let onCompressKey: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
-    export let onDiffMatch: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
+    export let onSortKey: ((path: JSONPath) => void) | undefined
+    export let onReferenceKey: ((path: JSONPath) => void) | undefined
+    export let onCompressKey: ((path: JSONPath) => void) | undefined
+    export let onDiffMatch: ((path: JSONPath) => void) | undefined
 
-    export let onNodeDecode: ((path: JSONPath, type?: NodeDecodeType) => void) | undefined
+    export let onNodeDecode: ((path: JSONPath) => void) | undefined
 
     // modalOpen is true when one of the modals is open.
     // This is used to track whether the editor still has focus
@@ -789,59 +789,61 @@
     // $: debug('state', state)
     // $: debug('selection', selection)
 
+    console.log('TreeMode', onIgnoreKey)
+
     // 当 onIgnoreKey 传参只有一个的时候，取消二级菜单的展示
-    let handleIgnoreKey = onIgnoreKey?.length === 2 ? function createIgnoreKeyHandle(type?: CompareConfigType) {
-        if (readOnly || !documentState.selection) {
-            return
-        }
-        const path = documentState.selection.focusPath
-        onIgnoreKey?.(path, type)
-    } : function createIgnoreKeyHandle() {
+    let handleIgnoreKey = onIgnoreKey?.length === 1 ? function createIgnoreKeyHandle() {
         if (readOnly || !documentState.selection) {
             return
         }
         const path = documentState.selection.focusPath
         onIgnoreKey?.(path)
-    }
-
-    function handleSortKey(type?: CompareConfigType) {
+    } : function createIgnoreKeyHandle(type?: CompareConfigType) {
         if (readOnly || !documentState.selection) {
             return
         }
         const path = documentState.selection.focusPath
-        onSortKey?.(path, type)
+        onIgnoreKey?.(path, type)
     }
 
-    function handleReferenceKey(type?: CompareConfigType) {
+    function handleSortKey() {
         if (readOnly || !documentState.selection) {
             return
         }
         const path = documentState.selection.focusPath
-        onReferenceKey?.(path, type)
+        onSortKey?.(path)
     }
 
-    function handleCompressKey(type?: CompareConfigType) {
+    function handleReferenceKey() {
         if (readOnly || !documentState.selection) {
             return
         }
         const path = documentState.selection.focusPath
-        onCompressKey?.(path, type)
+        onReferenceKey?.(path)
     }
 
-    function handleDiffMatch(type?: CompareConfigType) {
+    function handleCompressKey() {
         if (readOnly || !documentState.selection) {
             return
         }
         const path = documentState.selection.focusPath
-        onDiffMatch?.(path, type)
+        onCompressKey?.(path)
     }
 
-    function handleNodeDecode(type?: NodeDecodeType) {
+    function handleDiffMatch() {
         if (readOnly || !documentState.selection) {
             return
         }
         const path = documentState.selection.focusPath
-        onNodeDecode?.(path, type)
+        onDiffMatch?.(path)
+    }
+
+    function handleNodeDecode() {
+        if (readOnly || !documentState.selection) {
+            return
+        }
+        const path = documentState.selection.focusPath
+        onNodeDecode?.(path)
     }
 
     function handleEditKey() {

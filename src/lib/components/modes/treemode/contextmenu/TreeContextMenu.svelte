@@ -40,10 +40,10 @@
 
     export let language: "en" | "cn"
     export let onIgnoreKey: ((type?: CompareConfigType) => void) | undefined
-    export let onSortKey: ((type?: CompareConfigType) => void) | undefined
-    export let onReferenceKey: ((type?: CompareConfigType) => void) | undefined
-    export let onCompressKey: ((type?: CompareConfigType) => void) | undefined
-    export let onDiffMatch: ((type?: CompareConfigType) => void) | undefined
+    export let onSortKey: (() => void) | undefined
+    export let onReferenceKey: (() => void) | undefined
+    export let onCompressKey: (() => void) | undefined
+    export let onDiffMatch: (() => void) | undefined
     export let onNodeDecode: (() => void) | undefined
 
     export let onCloseContextMenu
@@ -124,29 +124,29 @@
     $: isLeafNode = hasJson && selection != null && !isObjectOrArray(focusValue)
 
 
-    function handleIgnoreKey(type?: CompareConfigType | 'temporary') {
+    function handleIgnoreKey(type?: CompareConfigType ) {
         onCloseContextMenu()
         onIgnoreKey?.(type)
     }
 
-    function handleSortKey(type?: CompareConfigType) {
+    function handleSortKey() {
         onCloseContextMenu()
-        onSortKey?.(type)
+        onSortKey?.()
     }
 
-    function handleReferenceKey(type?: CompareConfigType) {
+    function handleReferenceKey() {
         onCloseContextMenu()
-        onReferenceKey?.(type)
+        onReferenceKey?.()
     }
 
-    function handleCompressKey(type?: CompareConfigType) {
+    function handleCompressKey() {
         onCloseContextMenu()
-        onCompressKey?.(type)
+        onCompressKey?.()
     }
 
-    function handleDiffMatch(type?: CompareConfigType) {
+    function handleDiffMatch() {
         onCloseContextMenu()
-        onDiffMatch?.(type)
+        onDiffMatch?.()
     }
 
     function handleNodeDecode() {

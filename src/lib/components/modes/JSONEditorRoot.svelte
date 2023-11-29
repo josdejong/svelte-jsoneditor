@@ -23,7 +23,7 @@
     OnSortModal,
     OnTransformModal,
     TransformModalOptions,
-    Validator, NodeDecodeType
+    Validator
   } from '$lib/types'
   import {Mode} from '$lib/types.js'
   import TextMode from './textmode/TextMode.svelte'
@@ -64,11 +64,11 @@
   export let onTransformModal: OnTransformModal
   export let onJSONEditorModal: OnJSONEditorModal
   export let onIgnoreKey: (path: JSONPath, type?: CompareConfigType) => void
-  export let onReferenceKey: (path: JSONPath, type?: CompareConfigType) => void
-  export let onSortKey: (path: JSONPath, type?: CompareConfigType) => void
-  export let onCompressKey: (path: JSONPath, type?: CompareConfigType) => void
-  export let onDiffMatch: (path: JSONPath, type?: CompareConfigType) => void
-  export let onNodeDecode: (path: JSONPath, type?: NodeDecodeType) => void
+  export let onReferenceKey: (path: JSONPath) => void
+  export let onSortKey: (path: JSONPath) => void
+  export let onCompressKey: (path: JSONPath) => void
+  export let onDiffMatch: (path: JSONPath) => void
+  export let onNodeDecode: (path: JSONPath) => void
 
   let refTreeMode
   let refTableMode
