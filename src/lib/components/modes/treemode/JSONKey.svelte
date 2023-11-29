@@ -64,7 +64,7 @@
   }
 </script>
 
-{#if isEditingKey}
+{#if !context.readOnly && isEditingKey}
   <EditableDiv
     value={context.normalization.escapeValue(key)}
     shortText

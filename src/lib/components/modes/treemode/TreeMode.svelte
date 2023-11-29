@@ -1702,7 +1702,7 @@
 
     if (combo === 'Enter' && documentState.selection) {
       // when the selection consists of a single Array item, change selection to editing its value
-      if (!readOnly && isMultiSelectionWithOneItem(documentState.selection)) {
+      if (isMultiSelectionWithOneItem(documentState.selection)) {
         const path = documentState.selection.focusPath
         const parent = getIn(json, initial(path))
         if (Array.isArray(parent)) {
@@ -1711,7 +1711,7 @@
         }
       }
 
-      if (!readOnly && isKeySelection(documentState.selection)) {
+      if (isKeySelection(documentState.selection)) {
         // go to key edit mode
         event.preventDefault()
         updateSelection({ ...documentState.selection, edit: true })
@@ -1725,10 +1725,8 @@
           // expand object/array
           handleExpand(documentState.selection.path, true)
         } else {
-          if (!readOnly) {
-            // go to value edit mode
-            updateSelection({ ...documentState.selection, edit: true })
-          }
+          // go to value edit mode
+          updateSelection({ ...documentState.selection, edit: true })
         }
       }
     }

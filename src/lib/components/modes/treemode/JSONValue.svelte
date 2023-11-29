@@ -12,7 +12,7 @@
   export let selection: JSONSelection | null
   export let searchResultItems: SearchResultItem[] | undefined
 
-  $: isEditing = !context.readOnly && isValueSelection(selection) && isEditingSelection(selection)
+  $: isEditing = isValueSelection(selection) && isEditingSelection(selection)
 
   $: renderers = context.onRenderValue({
     path,
