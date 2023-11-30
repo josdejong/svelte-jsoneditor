@@ -159,6 +159,7 @@
   $svelte-select-border-radius: var(--jse-svelte-select-border-radius, 3px);
   $svelte-select-background: var(--jse-svelte-select-background, #fff);
   $svelte-select-padding: var(--jse-svelte-select-padding, 0 10px);
+  $svelte-select-font-size: var(--jse-svelte-select-font-size, $font-size);
   $svelte-select-multi-select-padding: var(--jse-svelte-select-multi-select-padding, 0 10px);
 
   /* color picker */

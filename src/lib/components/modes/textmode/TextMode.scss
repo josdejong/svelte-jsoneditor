@@ -1,7 +1,7 @@
 @import '../../../styles';
 
 .jse-text-mode {
-  --internal-key-color: #{$value-color-number};
+  --internal-key-color: #{$key-color};
   --internal-value-color-number: #{$value-color-number};
   --internal-value-color-boolean: #{$value-color-boolean};
   --internal-value-color-string: #{$value-color-string};
