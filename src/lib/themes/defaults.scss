@@ -52,8 +52,15 @@ $modal-overlay-background: var(--jse-overlay-background, rgba(0, 0, 0, 0.3));
 $modal-code-background: var(--jse-modal-code-background, rgba(0, 0, 0, 0.05));
 
 /* jsoneditor modal */
-$modal-theme-color: var(--jse-modal-theme-color, #707070);
-$modal-theme-color-highlight: var(--jse-modal-theme-color-highlight, #646464);
+/* deprecated since 2023-12-04: --jse-modal-theme-color has been renamed to --jse-modal-editor-theme-color */
+$modal-editor-theme-color: var(
+  --jse-modal-editor-theme-color,
+  var(--jse-modal-theme-color, #707070)
+);
+$modal-editor-theme-color-highlight: var(
+  --jse-modal-editor-theme-color-highlight,
+  var(--jse-modal-theme-color-highlight, #646464)
+);
 
 /* tooltip in text mode */
 $tooltip-color: var(--jse-tooltip-color, $text-color);
