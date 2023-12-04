@@ -6,6 +6,7 @@
   --jse-theme-color-highlight: #467cd2;
   --jse-background-color: #1e1e1e;
   --jse-text-color: #d4d4d4;
+  --jse-text-color-inverse: #4d4d4d;
 
   /* main, menu, modal */
   --jse-main-border: 1px solid #4f4f4f;

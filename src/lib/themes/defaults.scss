@@ -27,6 +27,9 @@ $font-family-mono: var(
 
 $font-size-mono: var(--jse-font-size-mono, 14px);
 
+$black: #4d4d4d;
+$white: #fff;
+
 $font-size: var(--jse-font-size, 16px);
 $font-size-main-menu: var(--jse-font-size-main-menu, 14px);
 $font-size-text-mode-search: var(--jse-font-size-text-mode-search, 80%);
@@ -36,10 +39,10 @@ $color-picker-button-size: var(--jse-color-picker-button-size, 1em);
 $padding: var(--jse-padding, 10px);
 $theme-color: var(--jse-theme-color, #3883fa);
 $theme-color-highlight: var(--jse-theme-color-highlight, #5f9dff);
-$background-color: var(--jse-background-color, #fff);
-$text-color: var(--jse-text-color, #4d4d4d);
+$background-color: var(--jse-background-color, $white);
+$text-color: var(--jse-text-color, $black);
 $text-readonly: var(--jse-text-readonly, #8d8d8d);
-$text-color-inverse: var(--jse-text-color-inverse, #fff);
+$text-color-inverse: var(--jse-text-color-inverse, $white);
 $error-color: var(--jse-error-color, #ee5341);
 $warning-color: var(--jse-warning-color, #fdc539);
 
@@ -67,7 +70,7 @@ $tooltip-color: var(--jse-tooltip-color, $text-color);
 $tooltip-background: var(--jse-tooltip-background, $modal-background);
 $tooltip-border: var(--jse-tooltip-border, $main-border);
 $tooltip-action-button-color: var(--jse-tooltip-action-button-color, $text-color-inverse);
-$tooltip-action-button-background: var(--jse-tooltip-action-button-background, #4d4d4d);
+$tooltip-action-button-background: var(--jse-tooltip-action-button-background, $black);
 
 /* panels: navigation bar, gutter, search box */
 $panel-background: var(--jse-panel-background, #ebebeb);
@@ -183,13 +186,13 @@ $a-color-highlight: var(--jse-a-color-highlight, #0f508d);
 
 /* messages */
 $message-error-background: var(--jse-message-error-background, $error-color);
-$message-error-color: var(--jse-message-error-color, $text-color-inverse);
+$message-error-color: var(--jse-message-error-color, $white);
 $message-warning-background: var(--jse-message-warning-background, #ffde5c);
-$message-warning-color: var(--jse-message-warning-color, $text-color);
+$message-warning-color: var(--jse-message-warning-color, $black);
 $message-success-background: var(--message-success-background, #9ac45d);
-$message-success-color: var(--jse-message-success-color, $text-color-inverse);
+$message-success-color: var(--jse-message-success-color, $white);
 $message-info-background: var(--jse-message-info-background, #4f91ff);
-$message-info-color: var(--jse-message-info-color, $text-color-inverse);
+$message-info-color: var(--jse-message-info-color, $white);
 $message-action-background: var(--jse-message-action-background, rgba(255, 255, 255, 0.2));
 $message-action-background-highlight: var(
   --jse-message-action-background-highlight,
@@ -200,7 +203,7 @@ $message-action-background-highlight: var(
 $svelte-select-item-is-active-bg: var(--jse-item-is-active-bg, #3883fa);
 $svelte-select-border: var(--jse-svelte-select-border, 1px solid #d8dbdf);
 $svelte-select-border-radius: var(--jse-svelte-select-border-radius, 3px);
-$svelte-select-background: var(--jse-svelte-select-background, #fff);
+$svelte-select-background: var(--jse-svelte-select-background, $white);
 $svelte-select-padding: var(--jse-svelte-select-padding, 0 10px);
 $svelte-select-font-size: var(--jse-svelte-select-font-size, $font-size);
 $svelte-select-multi-select-padding: var(--jse-svelte-select-multi-select-padding, 0 10px);
