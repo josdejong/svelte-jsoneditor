@@ -175,7 +175,7 @@
   &.jse-selected :global(.jse-collapsed-items),
   &.jse-selected-value :global(.jse-collapsed-items) {
     background-color: $selection-background-color;
-    --jse-collapsed-items-background-color: $collapsed-items-selected-background-color;
+    --jse-collapsed-items-background-color: #{$collapsed-items-selected-background-color};
   }
 
   // value selected (part 2)
@@ -227,8 +227,8 @@
 // lighter selection color when the editor doesn't have focus
 :global(.jse-main:not(.jse-focus)) {
   .jse-json-node {
-    --jse-selection-background-color: $selection-background-inactive-color;
-    --jse-context-menu-pointer-background: $context-menu-pointer-hover-background;
+    --jse-selection-background-color: #{$selection-background-inactive-color};
+    --jse-context-menu-pointer-background: #{$context-menu-pointer-hover-background};
   }
 }
 
