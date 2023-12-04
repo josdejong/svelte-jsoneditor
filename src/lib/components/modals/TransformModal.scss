@@ -132,7 +132,7 @@
     box-shadow: none;
     box-sizing: border-box;
 
-    --jse-main-border: $input-border;
+    --jse-main-border: #{$input-border};
   }
 
   input,

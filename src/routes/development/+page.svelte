@@ -914,7 +914,7 @@ See https://github.com/sveltejs/kit/issues/981
         )};
       --jse-context-menu-pointer-background: #{desaturate(darken($background-color, 40%), 40%)};
 
-      --jse-collapsed-items-background-color: $selection-background-inactive-color;
+      --jse-collapsed-items-background-color: #{desaturate(darken($background-color, 5%), 10%)};
       --jse-collapsed-items-selected-background-color: #{desaturate(
           darken($background-color, 20%),
           20%
