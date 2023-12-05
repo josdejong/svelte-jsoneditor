@@ -681,19 +681,22 @@
             onIgnoreKey={(path, type) => {
               console.log('onIgnoreKey', path,type)
             }}
-            onSortKey={(path, type) => {
-              console.log('onSortKey', path, type)
+            onIgnoreKeyMono= {(path) => {
+              console.log('onIgnoreKeyMono', path)
             }}
-            onReferenceKey= {(path, type) => {
-              console.log('onReferenceKey', path,  type)
+            onSortKey={(path) => {
+              console.log('onSortKey', path)
             }}
-            onCompressKey= {(path, type) => {
-              console.log('onCompressKey', path,  type)
+            onReferenceKey= {(path) => {
+              console.log('onReferenceKey', path)
             }}
-            onDiffMatch= {(path, type) => {
-              console.log('onDiffMatch', path,  type)
+            onCompressKey= {(path) => {
+              console.log('onCompressKey', path)
             }}
-            onNodeDecode={(path, type) => {
+            onDiffMatch= {(path) => {
+              console.log('onDiffMatch', path)
+            }}
+            onNodeDecode={(path) => {
               console.log('onNodeDecode', path, type)
           }}
           />

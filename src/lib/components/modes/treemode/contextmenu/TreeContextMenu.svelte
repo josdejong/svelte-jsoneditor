@@ -29,7 +29,7 @@
     } from '$lib/logic/selection.js'
     import {isObject, isObjectOrArray} from '$lib/utils/typeUtils.js'
     import {faCheckSquare, faSquare} from '@fortawesome/free-regular-svg-icons'
-    import type {ContextMenuItem, DocumentState, JSONParser, NodeDecodeType} from '$lib/types'
+    import type {ContextMenuItem, DocumentState, JSONParser} from '$lib/types'
     import {getEnforceString} from '$lib/logic/documentState.js'
     import ContextMenu from '../../../../components/controls/contextmenu/ContextMenu.svelte'
     import type {CompareConfigType} from "$lib/types";
@@ -40,11 +40,12 @@
 
     export let language: "en" | "cn"
     export let onIgnoreKey: ((type?: CompareConfigType) => void) | undefined
-    export let onSortKey: ((type?: CompareConfigType) => void) | undefined
-    export let onReferenceKey: ((type?: CompareConfigType) => void) | undefined
-    export let onCompressKey: ((type?: CompareConfigType) => void) | undefined
-    export let onDiffMatch: ((type?: CompareConfigType) => void) | undefined
-    export let onNodeDecode: ((type?: NodeDecodeType) => void) | undefined
+    export let onIgnoreKeyMono: (() => void) | undefined
+    export let onSortKey: (() => void) | undefined
+    export let onReferenceKey: (() => void) | undefined
+    export let onCompressKey: (() => void) | undefined
+    export let onDiffMatch: (() => void) | undefined
+    export let onNodeDecode: (() => void) | undefined
 
     export let onCloseContextMenu
     export let onEditKey
@@ -124,119 +125,39 @@
     $: isLeafNode = hasJson && selection != null && !isObjectOrArray(focusValue)
 
 
-    function handleIgnoreKey(type?: CompareConfigType| 'temporary') {
+    function handleIgnoreKey(type?: CompareConfigType ) {
         onCloseContextMenu()
         onIgnoreKey?.(type)
     }
 
-    function handleSortKey(type?: CompareConfigType) {
+    function handleIgnoreKeyMono(){
         onCloseContextMenu()
-        onSortKey?.(type)
+        onIgnoreKeyMono?.()
     }
 
-    function handleReferenceKey(type?: CompareConfigType) {
+    function handleSortKey() {
         onCloseContextMenu()
-        onReferenceKey?.(type)
+        onSortKey?.()
     }
 
-    function handleCompressKey(type?: CompareConfigType) {
+    function handleReferenceKey() {
         onCloseContextMenu()
-        onCompressKey?.(type)
+        onReferenceKey?.()
     }
 
-    function handleDiffMatch(type?: CompareConfigType){
+    function handleCompressKey() {
+        onCloseContextMenu()
+        onCompressKey?.()
+    }
+
+    function handleDiffMatch(){
       onCloseContextMenu()
-      onDiffMatch?.(type)
+      onDiffMatch?.()
     }
 
-    function handleNodeDecode(type?: NodeDecodeType){
+    function handleNodeDecode(){
       onCloseContextMenu()
-      onNodeDecode?.(type)
-    }
-
-    function handleEditKey() {
-        onCloseContextMenu()
-        onEditKey()
-    }
-
-    function handleEditValue() {
-        onCloseContextMenu()
-        onEditValue()
-    }
-
-    function handleToggleEnforceString() {
-        onCloseContextMenu()
-        onToggleEnforceString()
-    }
-
-    function handleCut() {
-        onCloseContextMenu()
-        onCut(true)
-    }
-
-    function handleCutCompact() {
-        onCloseContextMenu()
-        onCut(false)
-    }
-
-    function handleCopy() {
-        onCloseContextMenu()
-        onCopy(true)
-    }
-
-    function handleCopyCompact() {
-        onCloseContextMenu()
-        onCopy(false)
-    }
-
-    function handlePaste() {
-        onCloseContextMenu()
-        onPaste()
-    }
-
-    function handleRemove() {
-        onCloseContextMenu()
-        onRemove()
-    }
-
-    function handleDuplicate() {
-        onCloseContextMenu()
-        onDuplicate()
-    }
-
-    function handleExtract() {
-        onCloseContextMenu()
-        onExtract()
-    }
-
-    function handleInsertOrConvert(type) {
-        onCloseContextMenu()
-
-        if (hasSelectionContents) {
-            onConvert(type)
-        } else {
-            onInsert(type)
-        }
-    }
-
-    function handleSort() {
-        onCloseContextMenu()
-        onSort()
-    }
-
-    function handleTransform() {
-        onCloseContextMenu()
-        onTransform()
-    }
-
-    function handleInsertBefore() {
-        onCloseContextMenu()
-        onInsertBefore()
-    }
-
-    function handleInsertAfter() {
-        onCloseContextMenu()
-        onInsertAfter()
+      onNodeDecode?.()
     }
 
     let items: ContextMenuItem[]
@@ -266,6 +187,10 @@
                       text: 'Temporary Ignore(7d)',
                       onClick: () => handleIgnoreKey('temporary'),
                     }]
+                }] : []).concat(onIgnoreKeyMono ? [{
+                    type: 'button',
+                    text: 'Ignore Key',
+                    onClick: () => handleIgnoreKeyMono(),
                 }] : []).concat(onSortKey ? [{
                     type: 'button',
                     text: 'Sort Key',
@@ -287,22 +212,9 @@
                   disabled: !isLeafNode,
                   onClick: () => handleDiffMatch(),
                 }] : []).concat(onNodeDecode ? [{
-                  type: 'dropdown-button',
-                  width: '10em',
-                  main: {
                     type: 'button',
                     text: 'Node Decode',
                     onClick: () => handleNodeDecode(),
-                  },
-                  items: [{
-                    type: 'button',
-                    text: "base64",
-                    onClick: () => handleNodeDecode('base64'),
-                  }, {
-                    type: 'button',
-                    text: "zstd",
-                    onClick: () => handleNodeDecode('zstd'),
-                  }]
                 }] : []),
             }]
         }
@@ -332,7 +244,11 @@
                       text: '临时忽略(7天)',
                       onClick: () => handleIgnoreKey('temporary'),
                     }]
-                },] : []).concat(onSortKey ? [{
+                },] : []).concat(onIgnoreKeyMono ? [{
+                    type: 'button',
+                    text: '添加忽略',
+                    onClick: () => handleIgnoreKeyMono(),
+                }] : []).concat(onSortKey ? [{
                     type: 'button',
                     text: '添加排序',
                     disabled: !isArrayNode,
@@ -353,260 +269,15 @@
                   disabled: !isLeafNode,
                   onClick: () => handleDiffMatch(),
                 }] : []).concat(onNodeDecode ? [{
-                  type: 'dropdown-button',
-                  width: '10em',
-                  main: {
                     type: 'button',
                     text: '节点解析',
                     onClick: () => handleNodeDecode(),
-
-                  },
-                  items: [{
-                    type: 'button',
-                    text: "base64",
-                    onClick: () => handleNodeDecode('base64'),
-                  }, {
-                    type: 'button',
-                    text: "zstd",
-                    onClick: () => handleNodeDecode('zstd'),
-                  }]
                 }] : []),
             }]
         }
         ,
     ]
-    // $: items = [
-    //   {
-    //     type: 'row',
-    //     items: [
-    //       {
-    //         type: 'button',
-    //         onClick: handleEditKey,
-    //         icon: faPen,
-    //         text: 'Edit key',
-    //         title: 'Edit the key (Double-click on the key)',
-    //         disabled: !canEditKey
-    //       },
-    //       {
-    //         type: 'dropdown-button',
-    //         main: {
-    //           type: 'button',
-    //           onClick: handleEditValue,
-    //           icon: faPen,
-    //           text: editValueText,
-    //           title: 'Edit the value (Double-click on the value)',
-    //           disabled: !canEditValue
-    //         },
-    //         width: '11em',
-    //         items: [
-    //           {
-    //             type: 'button',
-    //             icon: faPen,
-    //             text: editValueText,
-    //             title: 'Edit the value (Double-click on the value)',
-    //             onClick: handleEditValue,
-    //             disabled: !canEditValue
-    //           },
-    //           {
-    //             type: 'button',
-    //             icon: enforceString ? faCheckSquare : faSquare,
-    //             text: 'Enforce string',
-    //             title: 'Enforce keeping the value as string when it contains a numeric value',
-    //             onClick: handleToggleEnforceString,
-    //             disabled: !canEnforceString
-    //           }
-    //         ]
-    //       }
-    //     ]
-    //   },
-    //   {type: 'separator'},
-    //   {
-    //     type: 'row',
-    //     items: [
-    //       {
-    //         type: 'dropdown-button',
-    //         main: {
-    //           type: 'button',
-    //           onClick: handleCut,
-    //           icon: faCut,
-    //           text: 'Cut',
-    //           title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
-    //           disabled: !hasSelectionContents
-    //         },
-    //         width: '10em',
-    //         items: [
-    //           {
-    //             type: 'button',
-    //             icon: faCut,
-    //             text: 'Cut formatted',
-    //             title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
-    //             onClick: handleCut,
-    //             disabled: !hasSelectionContents
-    //           },
-    //           {
-    //             type: 'button',
-    //             icon: faCut,
-    //             text: 'Cut compacted',
-    //             title: 'Cut selected contents, without indentation (Ctrl+Shift+X)',
-    //             onClick: handleCutCompact,
-    //             disabled: !hasSelectionContents
-    //           }
-    //         ]
-    //       },
-    //       {
-    //         type: 'dropdown-button',
-    //         main: {
-    //           type: 'button',
-    //           onClick: handleCopy,
-    //           icon: faCopy,
-    //           text: 'Copy',
-    //           title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
-    //           disabled: !hasSelectionContents
-    //         },
-    //         width: '12em',
-    //         items: [
-    //           {
-    //             type: 'button',
-    //             icon: faCopy,
-    //             text: 'Copy formatted',
-    //             title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
-    //             onClick: handleCopy,
-    //             disabled: !hasSelectionContents
-    //           },
-    //           {
-    //             type: 'button',
-    //             icon: faCopy,
-    //             text: 'Copy compacted',
-    //             title: 'Copy selected contents, without indentation (Ctrl+Shift+C)',
-    //             onClick: handleCopyCompact,
-    //             disabled: !hasSelectionContents
-    //           }
-    //         ]
-    //       },
-    //       {
-    //         type: 'button',
-    //         onClick: handlePaste,
-    //         icon: faPaste,
-    //         text: 'Paste',
-    //         title: 'Paste clipboard contents (Ctrl+V)',
-    //         disabled: !hasSelection
-    //       }
-    //     ]
-    //   },
-    //   {type: 'separator'},
-    //   {
-    //     type: 'row',
-    //     items: [
-    //       {
-    //         type: 'column',
-    //         items: [
-    //           {
-    //             type: 'button',
-    //             onClick: handleDuplicate,
-    //             icon: faClone,
-    //             text: 'Duplicate',
-    //             title: 'Duplicate selected contents (Ctrl+D)',
-    //             disabled: !canDuplicate
-    //           },
-    //           {
-    //             type: 'button',
-    //             onClick: handleExtract,
-    //             icon: faCropAlt,
-    //             text: 'Extract',
-    //             title: 'Extract selected contents',
-    //             disabled: !canExtract
-    //           },
-    //           {
-    //             type: 'button',
-    //             onClick: handleSort,
-    //             icon: faSortAmountDownAlt,
-    //             text: 'Sort',
-    //             title: 'Sort array or object contents',
-    //             disabled: !hasSelectionContents
-    //           },
-    //           {
-    //             type: 'button',
-    //             onClick: handleTransform,
-    //             icon: faFilter,
-    //             text: 'Transform',
-    //             title: 'Transform array or object contents (filter, sort, project)',
-    //             disabled: !hasSelectionContents
-    //           },
-    //           {
-    //             type: 'button',
-    //             onClick: handleRemove,
-    //             icon: faTrashCan,
-    //             text: 'Remove',
-    //             title: 'Remove selected contents (Delete)',
-    //             disabled: !hasSelectionContents
-    //           }
-    //         ]
-    //       },
-    //       {
-    //         type: 'column',
-    //         items: [
-    //           {type: 'label', text: insertOrConvertText},
-    //           {
-    //             type: 'button',
-    //             onClick: () => handleInsertOrConvert('structure'),
-    //             icon: convertMode ? faArrowRightArrowLeft : faPlus,
-    //             text: 'Structure',
-    //             title: insertOrConvertText + ' structure',
-    //             disabled: !canInsertOrConvertStructure
-    //           },
-    //           {
-    //             type: 'button',
-    //             onClick: () => handleInsertOrConvert('object'),
-    //             icon: convertMode ? faArrowRightArrowLeft : faPlus,
-    //             text: 'Object',
-    //             title: insertOrConvertText + ' structure',
-    //             disabled: !canInsertOrConvertObject
-    //           },
-    //           {
-    //             type: 'button',
-    //             onClick: () => handleInsertOrConvert('array'),
-    //             icon: convertMode ? faArrowRightArrowLeft : faPlus,
-    //             text: 'Array',
-    //             title: insertOrConvertText + ' array',
-    //             disabled: !canInsertOrConvertArray
-    //           },
-    //           {
-    //             type: 'button',
-    //             onClick: () => handleInsertOrConvert('value'),
-    //             icon: convertMode ? faArrowRightArrowLeft : faPlus,
-    //             text: 'Value',
-    //             title: insertOrConvertText + ' value',
-    //             disabled: !canInsertOrConvertValue
-    //           }
-    //         ]
-    //       }
-    //     ]
-    //   },
-    //   {
-    //     type: 'separator'
-    //   },
-    //   {
-    //     type: 'row',
-    //     items: [
-    //       {
-    //         type: 'button',
-    //         onClick: handleInsertBefore,
-    //         icon: faCaretSquareUp,
-    //         text: 'Insert before',
-    //         title: 'Select area before current entry to insert or paste contents',
-    //         disabled: !hasSelectionContents || rootSelected
-    //       },
-    //       {
-    //         type: 'button',
-    //         onClick: handleInsertAfter,
-    //         icon: faCaretSquareDown,
-    //         text: 'Insert after',
-    //         title: 'Select area after current entry to insert or paste contents',
-    //         disabled: !hasSelectionContents || rootSelected
-    //       }
-    //     ]
-    //   }
-    // ]
+
 </script>
 
 <ContextMenu

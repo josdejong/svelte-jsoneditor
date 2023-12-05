@@ -111,7 +111,7 @@
       JSONPathParser,
       JSONPointerMap,
       JSONSelection,
-      NestedValidationError, NodeDecodeType,
+      NestedValidationError,
       OnBlur,
       OnChange,
       OnChangeMode,
@@ -191,12 +191,13 @@
     export let onTransformModal: OnTransformModal
     export let onJSONEditorModal: OnJSONEditorModal
     export let onIgnoreKey: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
-    export let onSortKey: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
-    export let onReferenceKey: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
-    export let onCompressKey: ((path: JSONPath, type?: CompareConfigType) => void) | undefined
-    export let onDiffMatch:  ((path: JSONPath, type?: CompareConfigType) => void) | undefined
+    export let onIgnoreKeyMono: ((path: JSONPath) => void) | undefined
+    export let onSortKey: ((path: JSONPath) => void) | undefined
+    export let onReferenceKey: ((path: JSONPath) => void) | undefined
+    export let onCompressKey: ((path: JSONPath) => void) | undefined
+    export let onDiffMatch:  ((path: JSONPath) => void) | undefined
 
-    export let onNodeDecode: ((path: JSONPath, type?: NodeDecodeType) => void) | undefined
+    export let onNodeDecode: ((path: JSONPath) => void) | undefined
 
     // modalOpen is true when one of the modals is open.
     // This is used to track whether the editor still has focus
@@ -797,44 +798,52 @@
         onIgnoreKey?.(path, type)
     }
 
-    function handleSortKey(type?: CompareConfigType) {
+    function handleIgnoreKeyMono () {
         if (readOnly || !documentState.selection) {
             return
         }
         const path = documentState.selection.focusPath
-        onSortKey?.(path, type)
+        onIgnoreKeyMono?.(path)
     }
 
-    function handleReferenceKey(type?: CompareConfigType) {
+    function handleSortKey() {
         if (readOnly || !documentState.selection) {
             return
         }
         const path = documentState.selection.focusPath
-        onReferenceKey?.(path, type)
+        onSortKey?.(path)
     }
 
-    function handleCompressKey(type?: CompareConfigType) {
+    function handleReferenceKey() {
         if (readOnly || !documentState.selection) {
             return
         }
         const path = documentState.selection.focusPath
-        onCompressKey?.(path, type)
+        onReferenceKey?.(path )
     }
 
-    function handleDiffMatch(type?: CompareConfigType) {
+    function handleCompressKey() {
+        if (readOnly || !documentState.selection) {
+            return
+        }
+        const path = documentState.selection.focusPath
+        onCompressKey?.(path)
+    }
+
+    function handleDiffMatch() {
       if (readOnly || !documentState.selection) {
         return
       }
       const path = documentState.selection.focusPath
-      onDiffMatch?.(path, type)
+      onDiffMatch?.(path)
     }
 
-    function handleNodeDecode(type?: NodeDecodeType){
+    function handleNodeDecode(){
         if (readOnly || !documentState.selection) {
             return
         }
         const path = documentState.selection.focusPath
-        onNodeDecode?.(path, type)
+        onNodeDecode?.(path)
     }
 
     function handleEditKey() {
@@ -1878,6 +1887,7 @@
             language,
 
             onIgnoreKey: onIgnoreKey && handleIgnoreKey,
+            onIgnoreKeyMono: onIgnoreKeyMono && handleIgnoreKeyMono,
             onSortKey: onSortKey &&  handleSortKey,
             onReferenceKey: onReferenceKey && handleReferenceKey,
             onCompressKey: onCompressKey && handleCompressKey,

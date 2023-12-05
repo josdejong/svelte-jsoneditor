@@ -3,8 +3,7 @@ import type { SvelteComponentTyped } from 'svelte'
 import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 
 export type Language = 'en' | 'cn'
-export type CompareConfigType = 'global' | 'interface' | 'dependency'
-export type NodeDecodeType = 'base64' | 'zstd'
+export type CompareConfigType = 'global' | 'interface' | 'dependency' | 'temporary'
 
 export type { JSONValue, JSONPointer, JSONPath, JSONPatchDocument } from 'immutable-json-patch'
 
@@ -450,10 +449,11 @@ export interface JSONEditorPropsOptional {
   onBlur?: OnBlur
   // CustomMenuHandler
   onIgnoreKey?: (path: JSONPath, type?: CompareConfigType) => void
-  onSortKey?: (path: JSONPath, type?: CompareConfigType) => void
-  onReferenceKey?: (path: JSONPath, type?: CompareConfigType) => void
-  onCompressKey?: (path: JSONPath, type?: CompareConfigType) => void
-  onDiffMatch?: (path: JSONPath, type?: CompareConfigType) => void
+  onIgnoreKeyMono?: (path: JSONPath) => void
+  onSortKey?: (path: JSONPath) => void
+  onReferenceKey?: (path: JSONPath) => void
+  onCompressKey?: (path: JSONPath) => void
+  onDiffMatch?: (path: JSONPath) => void
   onNodeDecode?: (path: JSONPath) => void
 }
 
