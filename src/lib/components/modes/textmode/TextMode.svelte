@@ -43,8 +43,7 @@
     highlightSpecialChars,
     keymap,
     lineNumbers,
-    rectangularSelection,
-    ViewUpdate
+    rectangularSelection
   } from '@codemirror/view'
   import {
     defaultKeymap,
@@ -578,7 +577,7 @@
         EditorView.domEventHandlers({
           dblclick: handleDoubleClick
         }),
-        EditorView.updateListener.of((update: ViewUpdate) => {
+        EditorView.updateListener.of((update) => {
           editorState = update.state
 
           if (update.docChanged) {
