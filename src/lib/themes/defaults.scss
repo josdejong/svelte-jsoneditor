@@ -78,7 +78,6 @@ $panel-color: var(--jse-panel-color, $text-color);
 $panel-color-readonly: var(--jse-panel-color-readonly, #b2b2b2);
 $panel-border: var(--jse-panel-border, $main-border);
 
-// @todo check if this works as expected, since inherit is not a value that works as expected in CSS custom property land
 $panel-button-color: var(--jse-panel-button-color, inherit);
 $panel-button-background: var(--jse-panel-button-background, transparent);
 $panel-button-color-highlight: var(--panel-button-color-highlight, $text-color);
@@ -108,7 +107,6 @@ $context-menu-pointer-color: var(--jse-context-menu-pointer-color, $context-menu
 $context-menu-pointer-size: var(--jse-context-menu-pointer-size, calc(1em + 4px));
 $context-menu-tip-background: var(--jse-context-menu-tip-background, rgba(255, 255, 255, 0.2));
 
-// @todo check if this works as expected, since inherit is not a value that works as expected in CSS custom property land
 $context-menu-tip-color: var(--context-menu-tip-color, inherit);
 
 /* contents: json key and values */
@@ -160,7 +158,7 @@ $table-row-odd-background: var(--jse-table-row-odd-background, rgba(0, 0, 0, 0.0
 $controls-box-shadow: var(--jse-controls-box-shadow, 0 2px 6px 0 rgba(0, 0, 0, 0.24));
 $input-background: var(--jse-input-background, $background-color);
 $input-background-readonly: var(--jse-input-background-readonly, transparent);
-$input-color: var(--jse-input-color, green);
+$input-color: var(--jse-input-color, $text-color);
 $input-border: var(--jse-input-border, 1px solid #d8dbdf);
 $input-border-focus: var(
   --jse-input-border-focus,

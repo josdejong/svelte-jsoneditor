@@ -9,7 +9,10 @@
 
   .jse-menu {
     .jse-info {
-      padding: 0 $padding;
+      padding: $padding-half;
+      font-family: $font-family;
+      font-size: $font-size;
+      vertical-align: center;
     }
   }
 
@@ -19,7 +22,7 @@
     padding: $contents-padding;
     font-family: $font-family-mono;
     font-size: $font-size-mono;
-    background: $background-color;
+    background: $input-background;
     color: $text-color;
 
     resize: none;
