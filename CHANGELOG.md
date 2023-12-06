@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.20.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.19.0...v0.20.0) (2023-12-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* When using `vanilla-jsoneditor` directly in the browser, you now have to `import { JSONEditor } from 'vanilla-jsoneditor/standalone.js'` instead of `import { JSONEditor } from 'vanilla-jsoneditor'`. For projects with a build setup (React, Vue, Angular) it should be a drop-in replacement.
+* CSS variables are no longer defined globally, and the file `themes/jse-theme-default.css` is now removed (replaced by an internal `defaults.scss`). The provided dark theme still works as-is. The CSS variable `--jse-modal-theme-color` has been renamed to `--jse-modal-editor-theme-color`, and `--jse-modal-theme-color-highlight` has been renamed to `--jse-modal-editor-theme-color-highlight`.
+
+### Features
+
+* export one bundle with and one without external dependencies in `vanilla-jsoneditor` ([#353](https://github.com/josdejong/svelte-jsoneditor/issues/353)) ([9c1ad15](https://github.com/josdejong/svelte-jsoneditor/commit/9c1ad157a45f10d03fcc17f94ef0e82a66b5313e))
+* update dependencies `codemirror`, `fontawesome`, `svelte-awesome`, and dev dependencies ([75596ae](https://github.com/josdejong/svelte-jsoneditor/commit/75596ae2639df022a6fb0954ca517450e6c50f4c))
+* use SCSS variables internally ([#344](https://github.com/josdejong/svelte-jsoneditor/issues/344)) ([ec4b788](https://github.com/josdejong/svelte-jsoneditor/commit/ec4b788e493b3ea0acc787687a63b4ff4b987024))
+
+
+### Bug Fixes
+
+* allow `isEditing` property to be true when in `readOnly` mode (see [#342](https://github.com/josdejong/svelte-jsoneditor/issues/342)) ([3b0bdb7](https://github.com/josdejong/svelte-jsoneditor/commit/3b0bdb7d40a4814c2f9498c4a9607d639071745b))
+* cleanup a console.log ([005f189](https://github.com/josdejong/svelte-jsoneditor/commit/005f1896d8d05772435194c8d80bdf1244edf249))
+* make argument `element` of helper function `onEscape` optional ([6eb9b82](https://github.com/josdejong/svelte-jsoneditor/commit/6eb9b823cdace19b5d389f8fdf8fb09db21874b0))
+* styling issue with a button text color in dark mode ([4ff40f9](https://github.com/josdejong/svelte-jsoneditor/commit/4ff40f97d4726a8afbdb736601b866ab5500af61))
+
 ## [0.19.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.18.13...v0.19.0) (2023-11-21)
 
 
