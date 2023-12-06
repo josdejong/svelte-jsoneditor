@@ -57,7 +57,7 @@ exports[`JSONEditor > render table mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="14.222222222222221"
               role="presentation"
               style=""
@@ -86,7 +86,7 @@ exports[`JSONEditor > render table mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -115,7 +115,7 @@ exports[`JSONEditor > render table mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -149,7 +149,7 @@ exports[`JSONEditor > render table mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -179,7 +179,7 @@ exports[`JSONEditor > render table mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -530,7 +530,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -559,7 +559,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -592,7 +592,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="14.222222222222221"
               role="presentation"
               style=""
@@ -621,7 +621,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -650,7 +650,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -684,7 +684,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -714,7 +714,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -753,7 +753,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <div
               aria-live="polite"
-              style="position: fixed; top: -10000px;"
+              class="cm-announced"
             />
             <div
               class="cm-scroller"
@@ -1137,7 +1137,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -1166,7 +1166,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -1199,7 +1199,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="14.222222222222221"
               role="presentation"
               style=""
@@ -1228,7 +1228,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -1257,7 +1257,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -1286,7 +1286,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -1320,7 +1320,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -1350,7 +1350,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -1394,7 +1394,7 @@ exports[`JSONEditor > render tree mode 1`] = `
             >
               <svg
                 aria-label=""
-                class="fa-icon s-0fuyeY-3QfUe"
+                class="fa-icon s-T5YyQewRBd7n"
                 height="16"
                 role="presentation"
                 style=""
@@ -1432,7 +1432,7 @@ exports[`JSONEditor > render tree mode 1`] = `
              
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -1498,7 +1498,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                 >
                   <svg
                     aria-label=""
-                    class="fa-icon s-0fuyeY-3QfUe"
+                    class="fa-icon s-T5YyQewRBd7n"
                     height="16"
                     role="presentation"
                     style=""
@@ -1583,7 +1583,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                     >
                       <svg
                         aria-label=""
-                        class="fa-icon s-0fuyeY-3QfUe"
+                        class="fa-icon s-T5YyQewRBd7n"
                         height="16"
                         role="presentation"
                         style=""
@@ -1761,7 +1761,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                     >
                       <svg
                         aria-label=""
-                        class="fa-icon s-0fuyeY-3QfUe"
+                        class="fa-icon s-T5YyQewRBd7n"
                         height="16"
                         role="presentation"
                         style=""
@@ -2002,7 +2002,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                     >
                       <svg
                         aria-label=""
-                        class="fa-icon s-0fuyeY-3QfUe"
+                        class="fa-icon s-T5YyQewRBd7n"
                         height="16"
                         role="presentation"
                         style=""
