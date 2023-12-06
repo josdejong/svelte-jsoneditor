@@ -101,13 +101,27 @@ Or one-way binding:
 </div>
 ```
 
-### Standalone bundle (use in React, Vue, Angular, plain JavaScript, ...)
+### Vanilla bundle (use in React, Vue, Angular, plain JavaScript, ...)
 
-The library provides a standalone bundle of the editor via the npm library `vanilla-jsoneditor` (instead of `svelte-jsoneditor`) which can be used in any browser environment and framework. In a framework like React, Vue, or Angular, you'll need to write some wrapper code around the class interface.
+The library provides a vanilla bundle of the editor via the npm library `vanilla-jsoneditor` (instead of `svelte-jsoneditor`) which can be used in any browser environment and framework. In a framework like React, Vue, or Angular, you'll need to write some wrapper code around the class interface.
 
-Note that the `vanilla-jsoneditor` package contains all dependencies. These are purely needed for the TypeScript types that they export.
+If you have a setup for your project with a bundler (like Vite, Rollup, or Webpack), it is best to use the default ES import:
 
-Browser example loading the ES module:
+```ts
+// for use in a React, Vue, or Angular project
+import { JSONEditor } from 'vanilla-jsoneditor'
+```
+
+If you want to use the library straight in the browser, use the provided standalone ES bundle:
+
+```ts
+// for use directly in the browser
+import { JSONEditor } from 'vanilla-jsoneditor/standalone.js'
+```
+
+The standalone bundle contains all dependencies of `vanilla-jsoneditor`, for example `lodash-es` and `Ajv`. If you use some of these dependencies in your project too, it means that they will be bundled twice in your web application, leading to a needlessly large application size. In general, it is preferable to use the default `import { JSONEditor } from 'vanilla-jsoneditor'` so dependencies can be reused.
+
+Browser example loading the standalone ES module:
 
 ```html
 <!doctype html>
@@ -119,11 +133,11 @@ Browser example loading the ES module:
     <div id="jsoneditor"></div>
 
     <script type="module">
-      import { JSONEditor } from 'vanilla-jsoneditor'
+      import { JSONEditor } from 'vanilla-jsoneditor/standalone.js'
 
       // Or use it through a CDN (not recommended for use in production):
-      // import { JSONEditor } from 'https://unpkg.com/vanilla-jsoneditor/index.js'
-      // import { JSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor/index.js'
+      // import { JSONEditor } from 'https://unpkg.com/vanilla-jsoneditor/standalone.js'
+      // import { JSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor/standalone.js'
 
       let content = {
         text: undefined,
@@ -180,7 +194,7 @@ Svelte component:
 JavasScript class:
 
 ```js
-import { JSONEditor } from 'vanilla-jsoneditor'
+import { JSONEditor } from 'vanilla-jsoneditor' // or 'vanilla-jsoneditor/standalone.js'
 
 const content = { text: '[1,2,3]' }
 
