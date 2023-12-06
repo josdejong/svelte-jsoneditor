@@ -21,8 +21,8 @@
         width: 100%;
         box-sizing: border-box;
         padding: 6px 16px; // TODO: define variables for those props
-        border: var(--jse-input-border);
-        border-radius: var(--jse-input-radius);
+        border: $input-border;
+        border-radius: $input-radius;
         font-family: inherit;
         font-size: inherit;
         background: inherit;
@@ -30,7 +30,7 @@
         outline: none;
 
         &:read-only {
-          background: var(--jse-input-background-readonly);
+          background: $input-background-readonly;
         }
       }
 
@@ -44,7 +44,7 @@
     height: 200px; // Trick for the property select box dropdown to be fully visible
 
     .jse-error {
-      color: var(--jse-error-color);
+      color: $error-color;
     }
   }
 }

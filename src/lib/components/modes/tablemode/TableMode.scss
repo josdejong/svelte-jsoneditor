@@ -5,16 +5,16 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  background: var(--jse-background-color);
+  background: $background-color;
   min-width: 0;
   min-height: 0;
-  font-family: var(--jse-font-family-mono);
-  font-size: var(--jse-font-size-mono);
-  color: var(--jse-text-color);
-  line-height: var(--jse-line-height);
+  font-family: $font-family-mono;
+  font-size: $font-size-mono;
+  color: $text-color;
+  line-height: $line-height;
 
   &.no-main-menu {
-    border-top: var(--jse-main-border);
+    border-top: $main-border;
   }
 
   .jse-hidden-input-label {
@@ -41,11 +41,11 @@
     overflow: auto;
     overflow-anchor: none; // important to prevent Chrome from adjusting the scrollTop based on changing contents (causing an infinite loop)
 
-    border-left: var(--jse-main-border);
-    border-right: var(--jse-main-border);
+    border-left: $main-border;
+    border-right: $main-border;
 
     &:last-child {
-      border-bottom: var(--jse-main-border);
+      border-bottom: $main-border;
     }
 
     table.jse-table-main {
@@ -68,21 +68,21 @@
 
       .jse-table-row {
         &:hover {
-          background-color: var(--jse-table-row-odd-background);
+          background-color: $table-row-odd-background;
         }
 
         .jse-table-cell {
-          padding: 0 var(--jse-padding) 0 0;
+          padding: 0 $padding 0 0;
           vertical-align: top;
           white-space: nowrap;
-          height: var(--jse-line-height);
+          height: $line-height;
 
           &.jse-table-cell-header,
           &.jse-table-cell-gutter {
             font-weight: normal;
             text-align: left;
-            color: var(--jse-text-readonly);
-            background: var(--jse-table-header-background);
+            color: $text-readonly;
+            background: $table-header-background;
           }
 
           &.jse-table-cell-header {
@@ -92,19 +92,19 @@
 
             .jse-table-root-error {
               // same padding as .jse-column-header
-              padding: $padding-half var(--jse-padding) $padding-half $padding-half;
+              padding: $padding-half $padding $padding-half $padding-half;
             }
 
             // FIXME: border and/or border shadow?
           }
 
           &.jse-table-cell-gutter {
-            padding: 0 var(--jse-padding) 0 $padding-half;
+            padding: 0 $padding 0 $padding-half;
             // FIXME: border and/or border shadow?
           }
 
           &.jse-selected-value > :global(.jse-value) {
-            background: var(--jse-selection-background-color);
+            background: $selection-background-color;
           }
 
           :global(div) {
@@ -137,10 +137,10 @@
       .jse-loading {
         flex: 2;
         text-align: center;
-        color: var(--jse-panel-color-readonly);
+        color: $panel-color-readonly;
         box-sizing: border-box;
-        font-family: var(--jse-font-family);
-        font-size: var(--jse-font-size);
+        font-family: $font-family;
+        font-size: $font-size;
       }
     }
   }

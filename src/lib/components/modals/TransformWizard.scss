@@ -63,14 +63,14 @@ table.jse-transform-wizard {
         .jse-filter-value {
           flex: 4;
           padding: 4px 8px;
-          border: var(--jse-input-border);
-          border-radius: var(--jse-input-radius);
+          border: $input-border;
+          border-radius: $input-radius;
           outline: none;
-          background: var(--jse-input-background);
+          background: $input-background;
           color: inherit;
 
           &:focus {
-            border: var(--jse-input-border-focus);
+            border: $input-border-focus;
           }
         }
       }

@@ -1482,11 +1482,11 @@ exports[`JSONEditor > render tree mode 1`] = `
             class="jse-json-node jse-expanded s-BfIc3EpAoT-Y jse-root"
             data-path=""
             role="treeitem"
+            style="--level: 0;"
             tabindex="-1"
           >
             <div
               class="jse-header-outer s-BfIc3EpAoT-Y"
-              style="margin-left: calc(0 * var(--jse-indent-size))"
             >
               <div
                 class="jse-header s-BfIc3EpAoT-Y"
@@ -1567,11 +1567,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                 class="jse-json-node jse-expanded s-BfIc3EpAoT-Y"
                 data-path="%2F0"
                 role="treeitem"
+                style="--level: 1;"
                 tabindex="-1"
               >
                 <div
                   class="jse-header-outer s-BfIc3EpAoT-Y"
-                  style="margin-left: calc(1 * var(--jse-indent-size))"
                 >
                   <div
                     class="jse-header s-BfIc3EpAoT-Y"
@@ -1655,11 +1655,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                     class="jse-json-node s-BfIc3EpAoT-Y"
                     data-path="%2F0%2Fid"
                     role="treeitem"
+                    style="--level: 2;"
                     tabindex="-1"
                   >
                     <div
                       class="jse-contents-outer s-BfIc3EpAoT-Y"
-                      style="margin-left: calc(2 * var(--jse-indent-size))"
                     >
                       <div
                         class="jse-contents s-BfIc3EpAoT-Y"
@@ -1717,7 +1717,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                  
                 <div
                   class="jse-footer-outer s-BfIc3EpAoT-Y"
-                  style="margin-left: calc(1 * var(--jse-indent-size))"
                 >
                   <div
                     class="jse-footer s-BfIc3EpAoT-Y"
@@ -1746,11 +1745,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                 class="jse-json-node jse-expanded s-BfIc3EpAoT-Y"
                 data-path="%2F1"
                 role="treeitem"
+                style="--level: 1;"
                 tabindex="-1"
               >
                 <div
                   class="jse-header-outer s-BfIc3EpAoT-Y"
-                  style="margin-left: calc(1 * var(--jse-indent-size))"
                 >
                   <div
                     class="jse-header s-BfIc3EpAoT-Y"
@@ -1834,11 +1833,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                     class="jse-json-node s-BfIc3EpAoT-Y"
                     data-path="%2F1%2Fid"
                     role="treeitem"
+                    style="--level: 2;"
                     tabindex="-1"
                   >
                     <div
                       class="jse-contents-outer s-BfIc3EpAoT-Y"
-                      style="margin-left: calc(2 * var(--jse-indent-size))"
                     >
                       <div
                         class="jse-contents s-BfIc3EpAoT-Y"
@@ -1897,11 +1896,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                     class="jse-json-node s-BfIc3EpAoT-Y"
                     data-path="%2F1%2Fname"
                     role="treeitem"
+                    style="--level: 2;"
                     tabindex="-1"
                   >
                     <div
                       class="jse-contents-outer s-BfIc3EpAoT-Y"
-                      style="margin-left: calc(2 * var(--jse-indent-size))"
                     >
                       <div
                         class="jse-contents s-BfIc3EpAoT-Y"
@@ -1959,7 +1958,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                  
                 <div
                   class="jse-footer-outer s-BfIc3EpAoT-Y"
-                  style="margin-left: calc(1 * var(--jse-indent-size))"
                 >
                   <div
                     class="jse-footer s-BfIc3EpAoT-Y"
@@ -1988,11 +1986,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                 class="jse-json-node jse-expanded s-BfIc3EpAoT-Y"
                 data-path="%2F2"
                 role="treeitem"
+                style="--level: 1;"
                 tabindex="-1"
               >
                 <div
                   class="jse-header-outer s-BfIc3EpAoT-Y"
-                  style="margin-left: calc(1 * var(--jse-indent-size))"
                 >
                   <div
                     class="jse-header s-BfIc3EpAoT-Y"
@@ -2076,11 +2074,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                     class="jse-json-node s-BfIc3EpAoT-Y"
                     data-path="%2F2%2Fid"
                     role="treeitem"
+                    style="--level: 2;"
                     tabindex="-1"
                   >
                     <div
                       class="jse-contents-outer s-BfIc3EpAoT-Y"
-                      style="margin-left: calc(2 * var(--jse-indent-size))"
                     >
                       <div
                         class="jse-contents s-BfIc3EpAoT-Y"
@@ -2138,7 +2136,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                  
                 <div
                   class="jse-footer-outer s-BfIc3EpAoT-Y"
-                  style="margin-left: calc(1 * var(--jse-indent-size))"
                 >
                   <div
                     class="jse-footer s-BfIc3EpAoT-Y"
@@ -2167,7 +2164,6 @@ exports[`JSONEditor > render tree mode 1`] = `
              
             <div
               class="jse-footer-outer s-BfIc3EpAoT-Y"
-              style="margin-left: calc(0 * var(--jse-indent-size))"
             >
               <div
                 class="jse-footer s-BfIc3EpAoT-Y"

@@ -120,12 +120,6 @@
 
   $: root = path.length === 0
 
-  function getIndentationStyle(level) {
-    return `margin-left: calc(${level} * var(--jse-indent-size))`
-  }
-
-  $: indentationStyle = getIndentationStyle(path.length)
-
   // TODO: extract getProps into a separate function
   function getProps(
     path: JSONPath,
@@ -614,6 +608,7 @@
   )}
   data-path={encodeDataPath(path)}
   aria-selected={isNodeSelected}
+  style:--level={path.length}
   class:jse-root={root}
   class:jse-selected={isNodeSelected && isMultiSelection(selection)}
   class:jse-selected-key={isNodeSelected && isKeySelection(selection)}
@@ -628,7 +623,7 @@
   on:blur={undefined}
 >
   {#if Array.isArray(value)}
-    <div class="jse-header-outer" style={indentationStyle}>
+    <div class="jse-header-outer">
       <div class="jse-header">
         <button
           type="button"
@@ -698,7 +693,7 @@
             class:jse-hovered={hover === HOVER_INSERT_INSIDE}
             class:jse-selected={isNodeSelected && isInsideSelection(selection)}
             data-type="insert-selection-area-inside"
-            style={getIndentationStyle(path.length + 1)}
+            style:--level={path.length + 1}
             title={INSERT_EXPLANATION}
           >
             <ContextMenuPointer
@@ -739,7 +734,7 @@
           {/if}
         {/each}
       </div>
-      <div class="jse-footer-outer" style={indentationStyle}>
+      <div class="jse-footer-outer">
         <div data-type="selectable-value" class="jse-footer">
           <span class="jse-bracket">]</span>
         </div>
@@ -754,7 +749,7 @@
       </div>
     {/if}
   {:else if isObject(value)}
-    <div class="jse-header-outer" style={indentationStyle}>
+    <div class="jse-header-outer">
       <div class="jse-header">
         <button
           type="button"
@@ -819,7 +814,7 @@
             class:jse-hovered={hover === HOVER_INSERT_INSIDE}
             class:jse-selected={isNodeSelected && isInsideSelection(selection)}
             data-type="insert-selection-area-inside"
-            style={getIndentationStyle(path.length + 1)}
+            style:--level={path.length + 1}
             title={INSERT_EXPLANATION}
           >
             <ContextMenuPointer
@@ -854,7 +849,7 @@
           </svelte:self>
         {/each}
       </div>
-      <div class="jse-footer-outer" style={indentationStyle}>
+      <div class="jse-footer-outer">
         <div data-type="selectable-value" class="jse-footer">
           <div class="jse-bracket">&rbrace;</div>
         </div>
@@ -869,7 +864,7 @@
       </div>
     {/if}
   {:else}
-    <div class="jse-contents-outer" style={indentationStyle}>
+    <div class="jse-contents-outer">
       <div class="jse-contents">
         <slot name="identifier" />
         {#if !root}
@@ -908,7 +903,6 @@
       class:jse-hovered={hover === HOVER_INSERT_AFTER}
       class:jse-selected={isNodeSelected && isAfterSelection(selection)}
       data-type="insert-selection-area-after"
-      style={indentationStyle}
       title={INSERT_EXPLANATION}
     >
       <ContextMenuPointer

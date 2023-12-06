@@ -1,3 +1,5 @@
+@import 'themes/defaults.scss';
+
 $pressed-button-margin: 2px;
 $input-padding: 5px;
 $search-box-offset: 10px;
@@ -5,9 +7,8 @@ $navigation-bar-height: 27px; // TODO: having this hardcoded is ugly
 $search-box-offset-navigation-bar: $search-box-offset + $navigation-bar-height;
 $border-radius: 3px;
 
-$padding: var(--jse-padding);
-$padding-half: calc(0.5 * var(--jse-padding));
-$padding-double: calc(2 * var(--jse-padding));
+$padding-half: calc(0.5 * $padding);
+$padding-double: calc(2 * $padding);
 $menu-padding: 5px;
 $bottom-height: 5px;
 $contents-padding: 2px;
@@ -19,8 +20,8 @@ $errors-overview-max-height: 25%;
   background: transparent;
   color: inherit;
   cursor: pointer;
-  font-family: var(--jse-font-family);
-  font-size: var(--jse-font-size);
+  font-family: $font-family;
+  font-size: $font-size;
   padding: $menu-padding;
   margin: 0;
 }
@@ -34,16 +35,16 @@ $errors-overview-max-height: 25%;
   color: inherit;
 
   &:hover {
-    background: var(--jse-context-menu-background-highlight);
+    background: $context-menu-background-highlight;
   }
 
   &:focus {
-    background: var(--jse-context-menu-background-highlight);
+    background: $context-menu-background-highlight;
     z-index: 1;
   }
 
   &:disabled {
-    color: var(--jse-context-menu-color-disabled);
+    color: $context-menu-color-disabled;
     background: unset;
   }
 
@@ -59,53 +60,53 @@ $errors-overview-max-height: 25%;
 @mixin jsoneditor-button-primary {
   @include jsoneditor-button;
 
-  background: var(--jse-button-primary-background);
-  color: var(--jse-button-primary-color);
+  background: $button-primary-background;
+  color: $button-primary-color;
   padding: $padding $padding-double;
   border-radius: $border-radius;
 
   &:hover {
-    background: var(--jse-button-primary-background-highlight);
+    background: $button-primary-background-highlight;
   }
 
   &:disabled {
-    background: var(--jse-button-primary-background-disabled);
+    background: $button-primary-background-disabled;
   }
 }
 
 @mixin jsoneditor-button-secondary {
   @include jsoneditor-button;
 
-  background: var(--jse-button-secondary-background);
-  color: var(--jse-button-secondary-color);
+  background: $button-secondary-background;
+  color: $button-secondary-color;
   padding: $padding $padding-double;
   border-radius: $border-radius;
 
   &:hover {
-    background: var(--jse-button-secondary-background-highlight);
+    background: $button-secondary-background-highlight;
   }
 
   &:disabled {
-    background: var(--jse-button-secondary-background-disabled);
+    background: $button-secondary-background-disabled;
   }
 }
 
 @mixin modal-input-mixin {
-  border: var(--jse-input-border);
+  border: $input-border;
   outline: none;
   box-sizing: border-box;
   padding: $padding-half;
-  font-family: var(--jse-font-family-mono);
-  font-size: var(--jse-font-size-mono);
+  font-family: $font-family-mono;
+  font-size: $font-size-mono;
   color: inherit;
-  background: var(--jse-input-background);
+  background: $input-background;
 
   &:focus {
-    border: var(--jse-input-border-focus);
+    border: $input-border-focus;
   }
 
   &:read-only {
-    background: var(--jse-input-background-readonly);
+    background: $input-background-readonly;
   }
 }
 
@@ -117,11 +118,11 @@ $errors-overview-max-height: 25%;
   color: inherit;
   display: flex;
   gap: $padding;
-  padding: $padding-half var(--jse-padding) $padding-half $padding-half;
+  padding: $padding-half $padding $padding-half $padding-half;
   width: 100%;
 
   &:hover {
-    background: var(--jse-table-header-background-highlight);
+    background: $table-header-background-highlight;
   }
 
   &:not(&.jse-readonly) {
@@ -136,9 +137,9 @@ $errors-overview-max-height: 25%;
   min-width: 0;
   min-height: 0;
 
-  font-family: var(--jse-font-family);
-  font-size: var(--jse-font-size);
+  font-family: $font-family;
+  font-size: $font-size;
   line-height: normal;
-  background: var(--jse-modal-background);
-  color: var(--jse-text-color);
+  background: $modal-background;
+  color: $text-color;
 }

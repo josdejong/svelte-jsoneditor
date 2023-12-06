@@ -1,9 +1,9 @@
 @import '../../../../styles';
 
 .jse-inline-value {
-  font-family: var(--jse-font-family-mono);
-  font-size: var(--jse-font-size-mono);
-  line-height: var(--jse-line-height);
+  font-family: $font-family-mono;
+  font-size: $font-size-mono;
+  line-height: $line-height;
   border: none;
   padding: 0 $padding-half;
   background: transparent;
@@ -11,10 +11,10 @@
   cursor: pointer;
 
   &:hover {
-    background: var(--jse-hover-background-color);
+    background: $hover-background-color;
   }
 
   &.jse-selected {
-    background: var(--jse-selection-background-color);
+    background: $selection-background-color;
   }
 }

@@ -2,7 +2,7 @@
 @import '../../../components/controls/EditableDivShared';
 
 .jse-enum-value {
-  background: var(--jse-hover-background-color);
+  background: $hover-background-color;
   border: none;
   padding: 0;
 
@@ -13,13 +13,13 @@
   outline: none;
 
   &.jse-selected {
-    background: var(--jse-selection-background-color);
+    background: $selection-background-color;
     color: inherit;
   }
 
   &.jse-value:focus {
     // override the color to black when editing
-    color: var(--jse-text-color);
+    color: $text-color;
   }
 }
 

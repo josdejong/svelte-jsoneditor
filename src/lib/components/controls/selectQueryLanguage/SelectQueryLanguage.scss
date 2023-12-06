@@ -10,7 +10,7 @@
     right: 0;
     display: flex;
     flex-direction: column;
-    box-shadow: var(--jse-controls-box-shadow);
+    box-shadow: $controls-box-shadow;
 
     .jse-query-language {
       @include jsoneditor-button;
@@ -18,11 +18,11 @@
       text-align: left;
       padding: $padding $padding-double;
       white-space: nowrap;
-      color: var(--jse-context-menu-color);
-      background: var(--jse-context-menu-background);
+      color: $context-menu-color;
+      background: $context-menu-background;
 
       &:hover {
-        background: var(--jse-context-menu-background-highlight);
+        background: $context-menu-background-highlight;
       }
     }
   }
