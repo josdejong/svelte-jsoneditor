@@ -2,7 +2,7 @@
 
 .jse-json-node {
   position: relative;
-  color: var(--jse-text-color);
+  color: $text-color;
 
   &.jse-root {
     min-height: 100%;
@@ -12,7 +12,7 @@
     > .jse-header-outer :global(.jse-context-menu-pointer),
     > .jse-contents-outer > .jse-contents :global(.jse-context-menu-pointer) {
       top: 0;
-      right: calc(-2px - var(--jse-context-menu-pointer-size));
+      right: calc(-2px - $context-menu-pointer-size);
     }
 
     > .jse-contents-outer > .jse-contents {
@@ -30,6 +30,7 @@
   .jse-header-outer,
   .jse-footer-outer {
     display: flex;
+    margin-left: calc(var(--level) * $indent-size);
   }
 
   .jse-header {
@@ -45,6 +46,7 @@
 
   .jse-contents-outer {
     display: flex;
+    margin-left: calc(var(--level) * $indent-size);
   }
 
   .jse-header,
@@ -55,18 +57,18 @@
   }
 
   .jse-contents {
-    padding-left: var(--jse-indent-size);
+    padding-left: $indent-size;
   }
 
   .jse-footer {
     display: inline-flex;
-    padding-left: calc(var(--jse-indent-size) + $input-padding);
+    padding-left: calc($indent-size + $input-padding);
   }
 
   .jse-header,
   .jse-contents,
   .jse-footer {
-    background: var(--jse-contents-background-color);
+    background: $contents-background-color;
   }
 
   .jse-insert-selection-area {
@@ -96,6 +98,7 @@
     display: flex;
     position: relative;
     z-index: 1; // prevent the next line half-overlapping the pointer
+    margin-left: calc(var(--level) * $indent-size);
 
     max-width: 250px;
     min-width: 100px;
@@ -105,11 +108,11 @@
 
     :global(.jse-context-menu-pointer) {
       right: -$height-half;
-      background: var(--jse-context-menu-pointer-hover-background);
+      background: $context-menu-pointer-hover-background;
     }
 
     &.jse-hovered {
-      outline-color: var(--jse-context-menu-pointer-hover-background);
+      outline-color: $context-menu-pointer-hover-background;
     }
   }
 
@@ -126,7 +129,7 @@
     .jse-props .jse-contents,
     .jse-items .jse-contents,
     .jse-footer {
-      background: var(--jse-hover-background-color);
+      background: $hover-background-color;
     }
   }
 
@@ -144,12 +147,12 @@
     .jse-footer,
     :global(.jse-key),
     :global(.jse-value) {
-      background: var(--jse-selection-background-color);
-      cursor: var(--jse-contents-selected-cursor);
+      background: $selection-background-color;
+      cursor: $contents-selected-cursor;
     }
 
     .jse-expand {
-      background: var(--jse-selection-background-color);
+      background: $selection-background-color;
     }
   }
 
@@ -157,22 +160,22 @@
   &.jse-selected-key {
     > .jse-contents-outer > .jse-contents > :global(.jse-identifier) > :global(.jse-key),
     > .jse-header-outer > .jse-header > :global(.jse-identifier) > :global(.jse-key) {
-      background: var(--jse-selection-background-color);
-      cursor: var(--jse-contents-selected-cursor);
+      background: $selection-background-color;
+      cursor: $contents-selected-cursor;
     }
   }
 
   // value selected (part 1)
   &.jse-selected-value > .jse-contents-outer > .jse-contents > :global(.jse-value) {
-    background: var(--jse-selection-background-color);
-    cursor: var(--jse-contents-selected-cursor);
+    background: $selection-background-color;
+    cursor: $contents-selected-cursor;
   }
 
   :global(.jse-collapsed-items.jse-selected),
   &.jse-selected :global(.jse-collapsed-items),
   &.jse-selected-value :global(.jse-collapsed-items) {
-    background-color: var(--jse-selection-background-color);
-    --jse-collapsed-items-background-color: var(--jse-collapsed-items-selected-background-color);
+    background-color: $selection-background-color;
+    --jse-collapsed-items-background-color: #{$collapsed-items-selected-background-color};
   }
 
   // value selected (part 2)
@@ -188,12 +191,12 @@
     .jse-items .jse-header,
     .jse-items .jse-footer,
     .jse-items .jse-expand {
-      background: var(--jse-selection-background-color);
+      background: $selection-background-color;
 
       :global(.jse-key),
       :global(.jse-value) {
-        background: var(--jse-selection-background-color);
-        cursor: var(--jse-contents-selected-cursor);
+        background: $selection-background-color;
+        cursor: $contents-selected-cursor;
       }
     }
   }
@@ -204,17 +207,17 @@
 
   .jse-insert-area {
     &.jse-selected {
-      outline-color: var(--jse-context-menu-pointer-background);
+      outline-color: $context-menu-pointer-background;
     }
   }
 
   .jse-insert-area {
     &.jse-selected {
       :global(.jse-context-menu-pointer) {
-        background: var(--jse-context-menu-pointer-background);
+        background: $context-menu-pointer-background;
 
         &:hover {
-          background: var(--jse-context-menu-pointer-background-highlight);
+          background: $context-menu-pointer-background-highlight;
         }
       }
     }
@@ -224,21 +227,21 @@
 // lighter selection color when the editor doesn't have focus
 :global(.jse-main:not(.jse-focus)) {
   .jse-json-node {
-    --jse-selection-background-color: var(--jse-selection-background-inactive-color);
-    --jse-context-menu-pointer-background: var(--jse-context-menu-pointer-hover-background);
+    --jse-selection-background-color: #{$selection-background-inactive-color};
+    --jse-context-menu-pointer-background: #{$context-menu-pointer-hover-background};
   }
 }
 
 .jse-expand {
-  width: var(--jse-indent-size);
+  width: $indent-size;
   padding: 0;
   margin: 0;
   border: none;
   cursor: pointer;
   background: transparent;
-  color: var(--jse-delimiter-color);
-  font-size: var(--jse-font-size-mono);
-  height: var(--jse-line-height);
+  color: $delimiter-color;
+  font-size: $font-size-mono;
+  height: $line-height;
 
   &:hover {
     opacity: 0.8;
@@ -250,7 +253,7 @@
 .jse-index,
 .jse-bracket {
   vertical-align: top;
-  color: var(--jse-delimiter-color);
+  color: $delimiter-color;
 }
 
 .jse-index {
@@ -268,9 +271,9 @@
 .jse-tag {
   border: none;
   font-size: 80%;
-  font-family: var(--jse-font-family);
-  color: var(--jse-tag-color);
-  background: var(--jse-tag-background);
+  font-family: $font-family;
+  color: $tag-color;
+  background: $tag-background;
   border-radius: 2px;
   cursor: pointer;
   //position: relative;

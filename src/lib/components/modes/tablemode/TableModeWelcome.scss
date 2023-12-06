@@ -7,11 +7,11 @@
   overflow: auto;
   align-items: center;
 
-  border-left: var(--jse-main-border);
-  border-right: var(--jse-main-border);
+  border-left: $main-border;
+  border-right: $main-border;
 
   &:last-child {
-    border-bottom: var(--jse-main-border);
+    border-bottom: $main-border;
   }
 
   .jse-space.jse-before {
@@ -25,14 +25,14 @@
     max-width: 300px;
     margin: 2em $padding;
 
-    font-family: var(--jse-font-family);
-    font-size: var(--jse-font-size);
+    font-family: $font-family;
+    font-size: $font-size;
 
     .jse-nested-arrays-title {
     }
 
     .jse-nested-arrays-info {
-      color: var(--jse-panel-color-readonly);
+      color: $panel-color-readonly;
     }
 
     button.jse-nested-array-action {

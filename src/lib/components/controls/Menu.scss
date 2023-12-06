@@ -1,10 +1,10 @@
 @import '../../styles';
 
 .jse-menu {
-  background: var(--jse-theme-color);
-  font-family: var(--jse-font-family);
-  font-size: var(--jse-font-size-main-menu);
-  color: var(--jse-menu-color);
+  background: $theme-color;
+  font-family: $font-family;
+  font-size: $font-size-main-menu;
+  color: $menu-color;
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
@@ -20,8 +20,8 @@
     color: inherit;
     cursor: pointer;
 
-    width: var(--jse-menu-button-size);
-    height: var(--jse-menu-button-size);
+    width: $menu-button-size;
+    height: $menu-button-size;
     padding: $padding-half;
     margin: 0;
     border-radius: 0;
@@ -33,21 +33,21 @@
 
     &:hover,
     &:focus {
-      background: var(--jse-theme-color-highlight);
+      background: $theme-color-highlight;
     }
 
     &:disabled {
-      color: var(--jse-menu-color);
+      color: $menu-color;
       opacity: 0.5;
 
       background: transparent;
     }
 
     &.jse-group-button {
-      $group-button-color: var(--jse-menu-color);
+      $group-button-color: $menu-color;
 
       width: auto;
-      height: calc(var(--jse-menu-button-size) - $padding);
+      height: calc($menu-button-size - $padding);
       margin: $padding-half 0;
       padding: 0 $padding-half 1px; // 1px bottom padding for better center alignment (text baseline)
       border: 1px solid $group-button-color;
@@ -66,12 +66,12 @@
 
       &:hover,
       &:focus {
-        background: var(--jse-theme-color-highlight);
+        background: $theme-color-highlight;
       }
 
       &.jse-selected {
         background: $group-button-color;
-        color: var(--jse-theme-color);
+        color: $theme-color;
       }
     }
   }
@@ -83,7 +83,7 @@
   .jse-separator {
     $margin: 3px;
 
-    background: var(--jse-menu-color);
+    background: $menu-color;
     opacity: 0.3;
     width: 1px;
     margin: $margin;

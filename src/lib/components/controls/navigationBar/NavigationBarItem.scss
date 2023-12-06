@@ -18,16 +18,16 @@
 
     &:focus,
     &:hover {
-      background: var(--jse-panel-button-background-highlight);
-      color: var(--jse-panel-button-color-highlight);
+      background: $panel-button-background-highlight;
+      color: $panel-button-color-highlight;
     }
 
     &.jse-navigation-bar-arrow {
       padding: 2px $padding 0;
 
       &.jse-open {
-        background: var(--jse-navigation-bar-background);
-        color: var(--jse-navigation-bar-dropdown-color);
+        background: $navigation-bar-background;
+        color: $navigation-bar-dropdown-color;
       }
     }
   }

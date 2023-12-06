@@ -1,11 +1,11 @@
 @import '../../../../styles';
 
 .jse-highlight {
-  background-color: var(--jse-search-match-color);
-  outline: var(--jse-search-match-outline);
+  background-color: $search-match-color;
+  outline: $search-match-outline;
 
   &.jse-active {
-    background-color: var(--jse-search-match-active-color);
-    outline: var(--jse-search-match-active-outline);
+    background-color: $search-match-active-color;
+    outline: $search-match-active-outline;
   }
 }

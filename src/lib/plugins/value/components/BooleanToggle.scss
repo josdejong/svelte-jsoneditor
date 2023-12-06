@@ -6,7 +6,7 @@
   vertical-align: top;
   display: inline-flex;
 
-  color: var(--jse-value-color-boolean);
+  color: $value-color-boolean;
 }
 
 .jse-boolean-toggle:not(.jse-readonly) {
