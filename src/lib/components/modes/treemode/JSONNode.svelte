@@ -238,7 +238,7 @@
 
     // It is possible that the applied key differs from newKey,
     // to prevent duplicate keys. Here we figure out the actually applied key
-    return last(parseJSONPointer(operations[0].path)) || newKey
+    return last(parseJSONPointer(operations[0].path)) as string
   }
 
   function handleMouseDown(event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
