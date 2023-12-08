@@ -158,11 +158,11 @@ export interface MenuSpace {
 
 export type MenuItem = MenuButton | MenuSeparator | MenuSpace
 
-export type ContextMenuColumn = {
+export interface ContextMenuColumn {
   type: 'column'
   items: Array<MenuButton | MenuDropDownButton | MenuLabel | MenuSeparator>
 }
-export type ContextMenuRow = {
+export interface ContextMenuRow {
   type: 'row'
   items: Array<MenuButton | MenuDropDownButton | ContextMenuColumn>
 }
@@ -288,7 +288,12 @@ export type RenderMenuContext = {
   modal: boolean
 }
 export type OnRenderMenu = (items: MenuItem[], context: RenderMenuContext) => MenuItem[] | undefined
-export type OnRenderMenuWithoutContext = (items: MenuItem[]) => MenuItem[] | undefined
+export type OnRenderMenuInternal = (items: MenuItem[]) => MenuItem[]
+export type OnRenderContextMenu = (
+  items: ContextMenuItem[],
+  context: RenderMenuContext
+) => ContextMenuItem[] | undefined
+export type OnRenderContextMenuInternal = (items: ContextMenuItem[]) => ContextMenuItem[]
 export type OnError = (error: Error) => void
 export type OnFocus = () => void
 export type OnBlur = () => void

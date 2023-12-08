@@ -10,7 +10,7 @@
   } from '@fortawesome/free-solid-svg-icons'
   import { faJSONEditorCompact, faJSONEditorFormat } from '$lib/img/customFontawesomeIcons.js'
   import Menu from '../../../controls/Menu.svelte'
-  import type { MenuItem, OnRenderMenuWithoutContext } from '$lib/types'
+  import type { MenuItem, OnRenderMenuInternal } from '$lib/types'
 
   export let readOnly = false
   export let onFormat: () => boolean
@@ -26,7 +26,7 @@
   export let canCompact: boolean
   export let canSort: boolean
   export let canTransform: boolean
-  export let onRenderMenu: OnRenderMenuWithoutContext
+  export let onRenderMenu: OnRenderMenuInternal
 
   const searchItem: MenuItem = {
     type: 'button',

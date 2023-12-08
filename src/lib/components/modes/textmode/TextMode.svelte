@@ -96,7 +96,7 @@
     OnChangeMode,
     OnError,
     OnFocus,
-    OnRenderMenuWithoutContext,
+    OnRenderMenuInternal,
     OnSelect,
     OnSortModal,
     OnTransformModal,
@@ -134,7 +134,7 @@
   export let onError: OnError
   export let onFocus: OnFocus
   export let onBlur: OnBlur
-  export let onRenderMenu: OnRenderMenuWithoutContext
+  export let onRenderMenu: OnRenderMenuInternal
   export let onSortModal: OnSortModal
   export let onTransformModal: OnTransformModal
 

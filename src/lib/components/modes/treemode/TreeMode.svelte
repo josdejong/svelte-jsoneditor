@@ -130,7 +130,8 @@
     OnExpand,
     OnFocus,
     OnJSONEditorModal,
-    OnRenderMenuWithoutContext,
+    OnRenderContextMenuInternal,
+    OnRenderMenuInternal,
     OnRenderValue,
     OnSelect,
     OnSortModal,
@@ -195,7 +196,8 @@
   export let onChangeMode: OnChangeMode
   export let onSelect: OnSelect
   export let onRenderValue: OnRenderValue
-  export let onRenderMenu: OnRenderMenuWithoutContext
+  export let onRenderMenu: OnRenderMenuInternal
+  export let onRenderContextMenu: OnRenderContextMenuInternal
   export let onClassName: OnClassName | undefined
   export let onFocus: OnFocus
   export let onBlur: OnBlur
@@ -1834,6 +1836,7 @@
       onSort: handleSortSelection,
       onTransform: handleTransformSelection,
 
+      onRenderContextMenu,
       onCloseContextMenu: function () {
         closeAbsolutePopup(popupId)
         focus()

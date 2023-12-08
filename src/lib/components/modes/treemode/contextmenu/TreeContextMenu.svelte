@@ -29,7 +29,13 @@
   } from '$lib/logic/selection.js'
   import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
   import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
-  import type { ContextMenuItem, DocumentState, InsertType, JSONParser } from '$lib/types'
+  import type {
+    ContextMenuItem,
+    DocumentState,
+    InsertType,
+    JSONParser,
+    OnRenderContextMenuInternal
+  } from '$lib/types'
   import { getEnforceString } from '$lib/logic/documentState.js'
   import ContextMenu from '../../../../components/controls/contextmenu/ContextMenu.svelte'
 
@@ -40,6 +46,7 @@
   export let showTip: boolean
 
   export let onCloseContextMenu: () => void
+  export let onRenderContextMenu: OnRenderContextMenuInternal
   export let onEditKey: () => void
   export let onEditValue: () => void
   export let onToggleEnforceString: () => void
@@ -198,8 +205,8 @@
     onInsertAfter()
   }
 
-  let items: ContextMenuItem[]
-  $: items = [
+  let defaultItems: ContextMenuItem[]
+  $: defaultItems = [
     {
       type: 'row',
       items: [
@@ -431,6 +438,8 @@
       ]
     }
   ]
+
+  $: items = onRenderContextMenu(defaultItems)
 </script>
 
 <ContextMenu

@@ -58,6 +58,7 @@
   import type { Callbacks, Component } from 'svelte-simple-modal/types/Modal.svelte'
   import ModalRef from '../components/modals/ModalRef.svelte'
   import type { Open } from 'svelte-simple-modal/types/Modal.svelte.js'
+  import type { OnRenderContextMenu } from '$lib'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:JSONEditor')
@@ -93,6 +94,7 @@
   export let onRenderValue: OnRenderValue = renderValue
   export let onClassName: OnClassName = () => undefined
   export let onRenderMenu: OnRenderMenu = noop
+  export let onRenderContextMenu: OnRenderContextMenu = noop
   export let onChangeMode: OnChangeMode = noop
   export let onError: OnError = (err) => {
     console.error(err)
@@ -407,6 +409,7 @@
         onRenderValue,
         onClassName,
         onRenderMenu,
+        onRenderContextMenu,
         onSortModal,
         onTransformModal
       }),
@@ -475,6 +478,7 @@
             onFocus={handleFocus}
             onBlur={handleBlur}
             {onRenderMenu}
+            {onRenderContextMenu}
             {onSortModal}
             {onTransformModal}
             {onJSONEditorModal}

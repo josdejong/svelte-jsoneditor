@@ -14,6 +14,7 @@
     JSONPathParser,
     OnClassName,
     OnPatch,
+    OnRenderContextMenu,
     OnRenderMenu,
     OnRenderValue,
     OnSortModal,
@@ -57,6 +58,7 @@
   export let onRenderValue: OnRenderValue
   export let onClassName: OnClassName
   export let onRenderMenu: OnRenderMenu
+  export let onRenderContextMenu: OnRenderContextMenu
 
   export let onSortModal: OnSortModal
   export let onTransformModal: OnTransformModal
@@ -260,6 +262,7 @@
         onFocus={noop}
         onBlur={noop}
         {onRenderMenu}
+        {onRenderContextMenu}
         {onSortModal}
         {onTransformModal}
         onJSONEditorModal={handleJSONEditorModal}

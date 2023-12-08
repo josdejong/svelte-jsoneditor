@@ -277,58 +277,118 @@ const editor = new JSONEditor({
 
   To adjust the text color of keys or values, the color of the classes `.jse-key` and `.jse-value` can be overwritten.
 
-- `onRenderValue(props: RenderValueProps) : RenderValueComponentDescription[]`
+  - `onRenderValue(props: RenderValueProps) : RenderValueComponentDescription[]`
 
-  _EXPERIMENTAL! This API will most likely change in future versions._
+    _EXPERIMENTAL! This API will most likely change in future versions._
 
-  Customize rendering of the values. By default, `renderValue` is used, which renders a value as an editable div and depending on the value can also render a boolean toggle, a color picker, and a timestamp tag. Multiple components can be rendered alongside each other, like the boolean toggle and color picker being rendered left from the editable div. Built in value renderer components: `EditableValue`, `ReadonlyValue`, `BooleanToggle`, `ColorPicker`, `TimestampTag`, `EnumValue`.
+    Customize rendering of the values. By default, `renderValue` is used, which renders a value as an editable div and depending on the value can also render a boolean toggle, a color picker, and a timestamp tag. Multiple components can be rendered alongside each other, like the boolean toggle and color picker being rendered left from the editable div. Built in value renderer components: `EditableValue`, `ReadonlyValue`, `BooleanToggle`, `ColorPicker`, `TimestampTag`, `EnumValue`.
 
-  For JSON Schema enums, there is a value renderer `renderJSONSchemaEnum` which renders enums using the `EnumValue` component. This can be used like:
+    For JSON Schema enums, there is a value renderer `renderJSONSchemaEnum` which renders enums using the `EnumValue` component. This can be used like:
 
-  ```js
-  import { renderJSONSchemaEnum, renderValue } from 'svelte-jsoneditor'
+    ```js
+    import { renderJSONSchemaEnum, renderValue } from 'svelte-jsoneditor'
 
-  function onRenderValue(props) {
-    // use the enum renderer, and fallback on the default renderer
-    return renderJSONSchemaEnum(props, schema, schemaDefinitions) || renderValue(props)
-  }
-  ```
-
-- `onRenderMenu(items: MenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean }) : MenuItem[] | undefined`.
-  Callback which can be used to make changes to the menu items. New items can
-  be added, or existing items can be removed or reorganized. When the function
-  returns `undefined`, the original `items` will be applied. Using the context values `mode` and `modal`, different actions can be taken depending on the mode of the editor and whether the editor is rendered inside a modal or not.
-
-  A menu item `MenuItem` can be one of the following types:
-
-  - Button:
-
-    ```ts
-    interface MenuButtonItem {
-      onClick: () => void
-      icon?: IconDefinition
-      text?: string
-      title?: string
-      className?: string
-      disabled?: boolean
+    function onRenderValue(props) {
+      // use the enum renderer, and fallback on the default renderer
+      return renderJSONSchemaEnum(props, schema, schemaDefinitions) || renderValue(props)
     }
     ```
 
-  - Separator (gray vertical line between a group of items):
+  - `onRenderMenu(items: MenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean }) : MenuItem[] | undefined`.
+    Callback which can be used to make changes to the menu items. New items can
+    be added, or existing items can be removed or reorganized. When the function
+    returns `undefined`, the original `items` will be applied. Using the context values `mode` and `modal`, different actions can be taken depending on the mode of the editor and whether the editor is rendered inside a modal or not.
 
-    ```ts
-    interface MenuSeparatorItem {
-      separator: true
-    }
-    ```
+    A menu item `MenuItem` can be one of the following types:
 
-  - Space (fills up empty space):
+    - Button:
 
-    ```ts
-    interface MenuSpaceItem {
-      space: true
-    }
-    ```
+      ```ts
+      interface MenuButton {
+        type: 'button'
+        onClick: () => void
+        icon?: IconDefinition
+        text?: string
+        title?: string
+        className?: string
+        disabled?: boolean
+      }
+      ```
+
+    - Separator (gray vertical line between a group of items):
+
+      ```ts
+      interface MenuSeparator {
+        type: 'separator'
+      }
+      ```
+
+    - Space (fills up empty space):
+
+      ```ts
+      interface MenuSpace {
+        type: 'space'
+      }
+      ```
+
+  - `onRenderContextMenu(items: ContextMenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean }) : ContextMenuItem[] | undefined`.
+    Callback which can be used to make changes to the context menu items. New items can
+    be added, or existing items can be removed or reorganized. When the function
+    returns `undefined`, the original `items` will be applied. Using the context values `mode` and `modal`, different actions can be taken depending on the mode of the editor and whether the editor is rendered inside a modal or not.
+
+    A menu item `ContextMenuItem` can be one of the following types:
+
+    - Button:
+
+      ```ts
+      interface MenuButton {
+        type: 'button'
+        onClick: () => void
+        icon?: IconDefinition
+        text?: string
+        title?: string
+        className?: string
+        disabled?: boolean
+      }
+      ```
+
+    - Dropdown button:
+
+      ```ts
+      interface MenuDropDownButton {
+        type: 'dropdown-button'
+        main: MenuButton
+        width?: string
+        items: MenuButton[]
+      }
+      ```
+
+    - Separator (gray line between a group of items):
+
+      ```ts
+      interface MenuSeparator {
+        type: 'separator'
+      }
+      ```
+
+    - Menu row and column:
+
+      ```ts
+      interface MenuLabel {
+        type: 'label'
+        text: string
+      }
+
+      interface ContextMenuColumn {
+        type: 'column'
+        items: Array<MenuButton | MenuDropDownButton | MenuLabel | MenuSeparator>
+      }
+
+      interface ContextMenuRow {
+        type: 'row'
+        items: Array<MenuButton | MenuDropDownButton | ContextMenuColumn>
+      }
+      ```
 
 - `onSelect: (selection: JSONEditorSelection | null) => void`
 
