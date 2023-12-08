@@ -3,26 +3,23 @@ $theme: var(--jse-theme, light);
 /* over all fonts, sizes, and colors */
 $font-family: var(
   --jse-font-family,
-  -apple-system,
-  BlinkMacSystemFont,
-  'Segoe UI',
-  Roboto,
-  Oxygen-Sans,
-  Ubuntu,
-  Cantarell,
-  'Helvetica Neue',
-  sans-serif
+  (
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen-Sans,
+    Ubuntu,
+    Cantarell,
+    'Helvetica Neue',
+    sans-serif
+  )
 );
 /* "consolas" for Windows, "menlo" for Mac with fallback to "monaco", 'Ubuntu Mono' for Ubuntu */
 /* (at Mac this font looks too large at 14px, but 13px is too small for the font on Windows) */
 $font-family-mono: var(
   --jse-font-family-mono,
-  consolas,
-  menlo,
-  monaco,
-  'Ubuntu Mono',
-  'source-code-pro',
-  monospace
+  (consolas, menlo, monaco, 'Ubuntu Mono', 'source-code-pro', monospace)
 );
 
 $font-size-mono: var(--jse-font-size-mono, 14px);
@@ -47,7 +44,7 @@ $error-color: var(--jse-error-color, #ee5341);
 $warning-color: var(--jse-warning-color, #fdc539);
 
 /* main, menu, modal */
-$main-border: var(--jse-main-border, 1px solid #d7d7d7);
+$main-border: var(--jse-main-border, (1px solid #d7d7d7));
 $menu-color: var(--jse-menu-color, $text-color-inverse);
 $menu-button-size: var(--jse-menu-button-size, 32px);
 $modal-background: var(--jse-modal-background, #f5f5f5);
@@ -118,7 +115,7 @@ $value-color-null: var(--jse-value-color-null, #004ed0);
 $value-color-string: var(--jse-value-color-string, #008000);
 $value-color-url: var(--jse-value-color-url, #008000);
 $delimiter-color: var(--jse-delimiter-color, rgba(0, 0, 0, 0.38));
-$edit-outline: var(--jse-edit-outline, 2px solid #656565);
+$edit-outline: var(--jse-edit-outline, (2px solid #656565));
 
 /* contents: selected or hovered */
 $contents-background-color: var(--jse-contents-background-color, transparent);
@@ -141,9 +138,9 @@ $collapsed-items-link-color-highlight: var(--jse-collapsed-items-link-color-high
 
 /* contents: highlighting of search matches */
 $search-match-color: var(--jse-search-match-color, #ffe665);
-$search-match-outline: var(--jse-search-match-outline, 1px solid #ffd700);
+$search-match-outline: var(--jse-search-match-outline, (1px solid #ffd700));
 $search-match-active-color: var(--jse-search-match-active-color, #ffd700);
-$search-match-active-outline: var(--jse-search-match-active-outline, 1px solid #e1be00);
+$search-match-active-outline: var(--jse-search-match-active-outline, (1px solid #e1be00));
 
 /* contents: inline tags inside the JSON document */
 $tag-background: var(--jse-tag-background, rgba(0, 0, 0, 0.2));
@@ -155,11 +152,11 @@ $table-header-background-highlight: var(--jse-table-header-background-highlight,
 $table-row-odd-background: var(--jse-table-row-odd-background, rgba(0, 0, 0, 0.05));
 
 /* controls in modals: inputs, buttons, and `a` */
-$controls-box-shadow: var(--jse-controls-box-shadow, 0 2px 6px 0 rgba(0, 0, 0, 0.24));
+$controls-box-shadow: var(--jse-controls-box-shadow, (0 2px 6px 0 rgba(0, 0, 0, 0.24)));
 $input-background: var(--jse-input-background, $background-color);
 $input-background-readonly: var(--jse-input-background-readonly, transparent);
 $input-color: var(--jse-input-color, $text-color);
-$input-border: var(--jse-input-border, 1px solid #d8dbdf);
+$input-border: var(--jse-input-border, (1px solid #d8dbdf));
 $input-border-focus: var(
   --jse-input-border-focus,
   1px solid var(--jse-input-border-focus, $theme-color)
@@ -199,13 +196,13 @@ $message-action-background-highlight: var(
 
 /* svelte-select */
 $svelte-select-item-is-active-bg: var(--jse-item-is-active-bg, #3883fa);
-$svelte-select-border: var(--jse-svelte-select-border, 1px solid #d8dbdf);
+$svelte-select-border: var(--jse-svelte-select-border, (1px solid #d8dbdf));
 $svelte-select-border-radius: var(--jse-svelte-select-border-radius, 3px);
 $svelte-select-background: var(--jse-svelte-select-background, $white);
-$svelte-select-padding: var(--jse-svelte-select-padding, 0 10px);
+$svelte-select-padding: var(--jse-svelte-select-padding, (0 10px));
 $svelte-select-font-size: var(--jse-svelte-select-font-size, $font-size);
-$svelte-select-multi-select-padding: var(--jse-svelte-select-multi-select-padding, 0 10px);
+$svelte-select-multi-select-padding: var(--jse-svelte-select-multi-select-padding, (0 10px));
 
 /* color picker */
 $color-picker-background: var(--jse-color-picker-background, $panel-background);
-$color-picker-border-box-shadow: var(--jse-color-picker-border-box-shadow, #cbcbcb 0 0 0 1px);
+$color-picker-border-box-shadow: var(--jse-color-picker-border-box-shadow, (#cbcbcb 0 0 0 1px));
