@@ -6,7 +6,7 @@
  *     classnames('primary-button', { selected: true }, 'left')
  *
  */
-export function classnames(...args: Array<string | Record<string, boolean>>): string {
+export function classnames(...args: Array<string | Record<string, boolean> | undefined>): string {
   const classes = []
 
   for (const arg of args) {

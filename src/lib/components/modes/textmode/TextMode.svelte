@@ -283,7 +283,7 @@
 
       return true
     } catch (err) {
-      onError(err)
+      onError(err as Error)
     }
 
     return false
@@ -305,7 +305,7 @@
 
       return true
     } catch (err) {
-      onError(err)
+      onError(err as Error)
     }
 
     return false
@@ -325,7 +325,7 @@
       jsonStatus = JSON_STATUS_VALID
       jsonParseError = null
     } catch (err) {
-      onError(err)
+      onError(err as Error)
     }
   }
 
@@ -353,7 +353,7 @@
         }
       })
     } catch (err) {
-      onError(err)
+      onError(err as Error)
     }
   }
 
@@ -396,7 +396,7 @@
         }
       })
     } catch (err) {
-      onError(err)
+      onError(err as Error)
     }
   }
 
@@ -460,12 +460,15 @@
   function handleSelectValidationError(validationError: ValidationError) {
     debug('select validation error', validationError)
 
-    const richValidationError = toRichValidationError(validationError)
+    const { from, to } = toRichValidationError(validationError)
+    if (from === null || to === null) {
+      return
+    }
 
     // we take "to" as head, not as anchor, because the scrollIntoView will
     // move to the head, and when a large whole object is selected as a whole,
     // we want to scroll to the start of the object and not the end
-    setSelection(richValidationError.from, richValidationError.to)
+    setSelection(from, to)
 
     focus()
   }

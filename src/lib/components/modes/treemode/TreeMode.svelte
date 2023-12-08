@@ -1423,13 +1423,13 @@
     // json and text defined, or having none defined
     if (text !== undefined) {
       const content = { text, json: undefined }
-      onChange(content, previousContent, {
+      onChange?.(content, previousContent, {
         contentErrors: validate(),
         patchResult
       })
     } else if (json !== undefined) {
       const content = { text: undefined, json }
-      onChange(content, previousContent, {
+      onChange?.(content, previousContent, {
         contentErrors: validate(),
         patchResult
       })
@@ -1439,9 +1439,9 @@
   function handlePatch(
     operations: JSONPatchDocument,
     afterPatch?: AfterPatchCallback
-  ): JSONPatchResult {
+  ): JSONPatchResult | null {
     if (readOnly) {
-      return
+      return null
     }
 
     debug('handlePatch', operations, afterPatch)
@@ -1858,7 +1858,7 @@
     })
   }
 
-  function handleContextMenu(event) {
+  function handleContextMenu(event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
     if (readOnly || isEditingSelection(documentState.selection)) {
       return
     }
@@ -1913,7 +1913,7 @@
     }
 
     openContextMenu({
-      anchor: findParentWithNodeName(event.target, 'BUTTON'),
+      anchor: findParentWithNodeName(event.currentTarget, 'BUTTON'),
       offsetTop: 0,
       width: CONTEXT_MENU_WIDTH,
       height: CONTEXT_MENU_HEIGHT,
@@ -1983,8 +1983,11 @@
     }
   }
 
-  function handleWindowMouseDown(event) {
-    const outsideEditor = !isChildOf(event.target, (element) => element === refJsonEditor)
+  function handleWindowMouseDown(event: MouseEvent & { currentTarget: EventTarget & Window }) {
+    const outsideEditor = !isChildOf(
+      event.currentTarget as Element,
+      (element) => element === refJsonEditor
+    )
     if (outsideEditor) {
       if (isEditingSelection(documentState.selection)) {
         debug('click outside the editor, stop edit mode')

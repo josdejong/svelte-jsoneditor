@@ -689,7 +689,7 @@
   }
 
   function findNextInside(path: JSONPath): JSONSelection {
-    const index = parseInt(path[0])
+    const index = parseInt(path[0], 10)
     const nextPath = [String(index + 1), ...path.slice(1)]
 
     return existsIn(json, nextPath)

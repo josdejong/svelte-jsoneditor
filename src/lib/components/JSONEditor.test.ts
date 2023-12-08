@@ -2,9 +2,10 @@ import { beforeEach, afterEach, test, describe, expect, vi } from 'vitest'
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/svelte'
 import JSONEditor from './JSONEditor.svelte'
+import { type Content, Mode } from '$lib/types.js'
 
 describe('JSONEditor', () => {
-  const content = {
+  const content: Content = {
     json: [{ id: 1 }, { id: 2, name: 'Joe' }, { id: 3 }]
   }
 
@@ -27,7 +28,7 @@ describe('JSONEditor', () => {
   test('render tree mode', () => {
     const { container } = render(JSONEditor, {
       props: {
-        mode: 'tree',
+        mode: Mode.tree,
         content
       }
     })
@@ -41,7 +42,7 @@ describe('JSONEditor', () => {
   test('render text mode', () => {
     const { container } = render(JSONEditor, {
       props: {
-        mode: 'text',
+        mode: Mode.text,
         content
       }
     })
@@ -55,7 +56,7 @@ describe('JSONEditor', () => {
   test('render table mode', () => {
     const { container } = render(JSONEditor, {
       props: {
-        mode: 'table',
+        mode: Mode.table,
         content
       }
     })

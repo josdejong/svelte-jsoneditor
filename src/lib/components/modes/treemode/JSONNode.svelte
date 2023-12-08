@@ -58,6 +58,7 @@
   import { onMoveSelection } from '$lib/logic/dragging.js'
   import { forEachIndex, moveItems } from '$lib/utils/arrayUtils.js'
   import type {
+    AbsolutePopupOptions,
     CaretPosition,
     DraggingState,
     ExtendedSearchResultItem,
@@ -68,7 +69,6 @@
     NestedValidationError,
     RenderedItem,
     TreeModeContext,
-    ValidationError,
     VisibleSection
   } from '$lib/types'
   import { SelectionType } from '$lib/types.js'
@@ -88,7 +88,9 @@
   export let searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
   export let selection: JSONSelection | null
   export let context: TreeModeContext
-  export let onDragSelectionStart: MouseEvent
+  export let onDragSelectionStart: (
+    event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }
+  ) => void
 
   const debug = createDebug('jsoneditor:JSONNode')
 
@@ -112,7 +114,7 @@
   let visibleSections: VisibleSection[] | undefined
   $: visibleSections = visibleSectionsMap ? visibleSectionsMap[pointer] : undefined
 
-  let validationError: ValidationError | undefined
+  let validationError: NestedValidationError | undefined
   $: validationError = validationErrorsMap ? validationErrorsMap[pointer] : undefined
 
   let isNodeSelected: boolean
@@ -217,35 +219,34 @@
     return items
   }
 
-  function toggleExpand(event) {
+  function toggleExpand(event: MouseEvent) {
     event.stopPropagation()
 
     const recursive = event.ctrlKey
     context.onExpand(path, !expanded, recursive)
   }
 
-  function handleExpand(event) {
+  function handleExpand(event: MouseEvent) {
     event.stopPropagation()
 
     context.onExpand(path, true)
   }
 
-  function handleUpdateKey(oldKey, newKey) {
-    const operations = rename(path, Object.keys(value), oldKey, newKey)
+  function handleUpdateKey(oldKey: string, newKey: string): string {
+    const operations = rename(path, Object.keys(value as JSONObject), oldKey, newKey)
     context.onPatch(operations)
 
     // It is possible that the applied key differs from newKey,
     // to prevent duplicate keys. Here we figure out the actually applied key
-    const newKeyUnique = last(parseJSONPointer(operations[0].path))
-
-    return newKeyUnique
+    return last(parseJSONPointer(operations[0].path)) || newKey
   }
 
-  function handleMouseDown(event) {
+  function handleMouseDown(event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
     // check if the mouse down is not happening in the key or value input fields or on a button
     if (
-      isContentEditableDiv(event.target) ||
-      (event.which === 1 && isChildOfNodeName(event.target, 'BUTTON')) // left mouse on a button
+      event.target &&
+      (isContentEditableDiv(event.currentTarget) ||
+        (event.which === 1 && isChildOfNodeName(event.currentTarget, 'BUTTON'))) // left mouse on a button
     ) {
       return
     }
@@ -262,7 +263,7 @@
     document.addEventListener('mousemove', handleMouseMoveGlobal, true)
     document.addEventListener('mouseup', handleMouseUpGlobal)
 
-    const anchorType = getSelectionTypeFromTarget(event.target)
+    const anchorType = getSelectionTypeFromTarget(event.currentTarget)
     const json = context.getJson()
     const documentState = context.getDocumentState()
 
@@ -296,7 +297,7 @@
       }
     } else {
       if (anchorType === SelectionType.multi) {
-        if (root && event.target.hasAttribute('data-path')) {
+        if (root && event.currentTarget.hasAttribute('data-path')) {
           const lastCaretPosition = last(
             getVisibleCaretPositions(value, documentState)
           ) as CaretPosition
@@ -304,13 +305,13 @@
         } else {
           context.onSelect(createMultiSelection(path, path))
         }
-      } else {
+      } else if (json !== undefined) {
         context.onSelect(fromSelectionType(json, anchorType, path))
       }
     }
   }
 
-  function handleMouseMove(event) {
+  function handleMouseMove(event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
     if (singleton.selecting) {
       event.preventDefault()
       event.stopPropagation()
@@ -325,7 +326,7 @@
         }
       }
 
-      const selectionType = getSelectionTypeFromTarget(event.target)
+      const selectionType = getSelectionTypeFromTarget(event.currentTarget)
 
       if (
         !isEqual(path, singleton.selectionFocus) ||
@@ -344,11 +345,11 @@
     }
   }
 
-  function handleMouseMoveGlobal(event) {
+  function handleMouseMoveGlobal(event: Event) {
     context.onDrag(event)
   }
 
-  function handleMouseUpGlobal(event) {
+  function handleMouseUpGlobal(event: Event) {
     if (singleton.selecting) {
       singleton.selecting = false
 
@@ -376,7 +377,9 @@
     return clientOffset - contentOffset
   }
 
-  function handleDragSelectionStart(event: MouseEvent) {
+  function handleDragSelectionStart(
+    event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }
+  ) {
     if (context.readOnly || !selection) {
       return
     }
@@ -402,6 +405,9 @@
     }
 
     const json = context.getJson()
+    if (json === undefined) {
+      return
+    }
     const initialPath = getStartPath(json, selection)
     const selectionStartIndex = items.findIndex((item) => isEqual(item.path, initialPath))
     const documentState = context.getDocumentState()
@@ -413,7 +419,7 @@
     })
 
     dragging = {
-      initialTarget: event.target,
+      initialTarget: event.currentTarget,
       initialClientY: event.clientY,
       initialContentTop: findContentTop(),
       selectionStartIndex,
@@ -431,6 +437,9 @@
   function handleDragSelection(event: MouseEvent) {
     if (dragging) {
       const json = context.getJson()
+      if (json === undefined) {
+        return
+      }
       const documentState = context.getDocumentState()
 
       const deltaY = calculateDeltaY(dragging, event)
@@ -453,9 +462,12 @@
     }
   }
 
-  function handleDragSelectionEnd(event) {
+  function handleDragSelectionEnd(event: MouseEvent) {
     if (dragging) {
       const json = context.getJson()
+      if (json === undefined) {
+        return
+      }
       const documentState = context.getDocumentState()
       const deltaY = calculateDeltaY(dragging, event)
       const { operations, updatedSelection } = onMoveSelection({
@@ -475,9 +487,9 @@
       } else {
         // the user did click inside the selection and no contents have been dragged,
         // select the clicked item
-        if (event.target === dragging.initialTarget && !dragging.didMoveItems) {
-          const selectionType = getSelectionTypeFromTarget(event.target)
-          const path = getDataPathFromTarget(event.target)
+        if (event.currentTarget === dragging.initialTarget && !dragging.didMoveItems) {
+          const selectionType = getSelectionTypeFromTarget(event.currentTarget as Element)
+          const path = getDataPathFromTarget(event.currentTarget as Element)
           if (path) {
             context.onSelect(fromSelectionType(json, selectionType, path))
           }
@@ -515,10 +527,16 @@
     }
 
     if (Array.isArray(value)) {
-      const startPath = getStartPath(context.getJson(), selection)
-      const endPath = getEndPath(context.getJson(), selection)
-      const startIndex = last(startPath)
-      const endIndex = last(endPath)
+      const json = context.getJson()
+      if (json === undefined) {
+        return null
+      }
+      const startPath = getStartPath(json, selection)
+      const endPath = getEndPath(json, selection)
+      const startIndex = parseInt(last(startPath) as string, 10)
+      const endIndex = parseInt(last(endPath) as string, 10)
+
+      console.log('TEST', { startPath, endPath, startIndex, endIndex })
 
       // find the section where the selection is
       // if the selection is spread over multiple visible sections,
@@ -536,37 +554,41 @@
       forEachIndex(start, Math.min(value.length, end), (index) => addHeight(String(index)))
     } else {
       // value is Object
-      Object.keys(value).forEach(addHeight)
+      Object.keys(value as JSONObject).forEach(addHeight)
     }
 
     return items
   }
 
-  function handleMouseOver(event: MouseEvent) {
+  function handleMouseOver(event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
     if (singleton.selecting || singleton.dragging) {
       return
     }
 
     event.stopPropagation()
 
-    if (isChildOfAttribute(event.target, 'data-type', 'selectable-value')) {
+    if (isChildOfAttribute(event.currentTarget, 'data-type', 'selectable-value')) {
       hover = HOVER_COLLECTION
-    } else if (isChildOfAttribute(event.target, 'data-type', 'insert-selection-area-inside')) {
+    } else if (
+      isChildOfAttribute(event.currentTarget, 'data-type', 'insert-selection-area-inside')
+    ) {
       hover = HOVER_INSERT_INSIDE
-    } else if (isChildOfAttribute(event.target, 'data-type', 'insert-selection-area-after')) {
+    } else if (
+      isChildOfAttribute(event.currentTarget, 'data-type', 'insert-selection-area-after')
+    ) {
       hover = HOVER_INSERT_AFTER
     }
 
     clearTimeout(hoverTimer)
   }
 
-  function handleMouseOut(event: MouseEvent) {
+  function handleMouseOut(event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
     event.stopPropagation()
 
     // to prevent "flickering" in the hovering state when hovering on the edge
     // of the insert area context menu button: it's visibility toggles when
     // `hover` toggles, which will alternating mouseout and mouseover events
-    hoverTimer = setTimeout(() => (hover = undefined))
+    hoverTimer = window.setTimeout(() => (hover = undefined))
   }
 
   function handleInsertInside(event: MouseEvent) {
@@ -587,14 +609,14 @@
     }
   }
 
-  function handleInsertInsideOpenContextMenu(props) {
+  function handleInsertInsideOpenContextMenu(contextMenuProps: AbsolutePopupOptions) {
     context.onSelect(createInsideSelection(path))
-    context.onContextMenu(props)
+    context.onContextMenu(contextMenuProps)
   }
 
-  function handleInsertAfterOpenContextMenu(props) {
+  function handleInsertAfterOpenContextMenu(contextMenuProps: AbsolutePopupOptions) {
     context.onSelect(createAfterSelection(path))
-    context.onContextMenu(props)
+    context.onContextMenu(contextMenuProps)
   }
 </script>
 
@@ -660,7 +682,7 @@
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(getFocusPath(selection), path)}
+        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !isEditingSelection(selection) && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
             <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -781,7 +803,7 @@
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(getFocusPath(selection), path)}
+        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !isEditingSelection(selection) && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
             <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -873,7 +895,7 @@
         <JSONValue
           {path}
           {value}
-          {enforceString}
+          enforceString={enforceString || false}
           selection={isNodeSelected ? selection : null}
           searchResultItems={filterValueSearchResults(searchResultItemsMap, pointer)}
           {context}

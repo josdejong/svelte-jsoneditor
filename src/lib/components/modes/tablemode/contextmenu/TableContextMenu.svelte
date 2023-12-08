@@ -58,7 +58,7 @@
   $: canEnforceString = canEditValue && !isObjectOrArray(focusValue)
 
   $: enforceString =
-    selection != null
+    selection != null && focusValue !== undefined
       ? getEnforceString(
           focusValue,
           documentState.enforceStringMap,

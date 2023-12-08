@@ -40,19 +40,19 @@
     ArrowRight: 'Right'
   }
 
-  function handleKeyDown(event) {
+  function handleKeyDown(event: KeyboardEvent & { currentTarget: EventTarget & HTMLDivElement }) {
     const combo = keyComboFromEvent(event)
     const direction: 'Up' | 'Down' | 'Left' | 'Right' | undefined = directionByCombo[combo]
 
-    if (direction && event.target) {
+    if (direction && event.currentTarget) {
       event.preventDefault()
 
       const buttons: HTMLButtonElement[] = Array.from(
         refContextMenu.querySelectorAll('button:not([disabled])')
       )
-      const nearest = findNearestElement({
+      const nearest = findNearestElement<HTMLButtonElement>({
         allElements: buttons,
-        currentElement: event.target,
+        currentElement: event.currentTarget as unknown as HTMLButtonElement,
         direction,
         hasPrio: (element: HTMLButtonElement) => {
           return element.getAttribute('data-type') !== 'jse-open-dropdown'
@@ -75,7 +75,7 @@
   tabindex="-1"
   class="jse-contextmenu"
   bind:this={refContextMenu}
-  on:keydown={handleKeyDown}
+  on:keydown={(event) => handleKeyDown(event)}
 >
   {#each items as item}
     {#if isMenuButton(item)}

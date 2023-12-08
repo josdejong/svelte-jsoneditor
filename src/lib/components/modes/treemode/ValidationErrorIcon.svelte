@@ -3,12 +3,12 @@
   import Icon from 'svelte-awesome'
   import { getContext } from 'svelte'
   import { tooltip } from '../../controls/tooltip/tooltip.js'
-  import type { AbsolutePopupContext, ValidationError } from '$lib/types.js'
+  import type { AbsolutePopupContext, NestedValidationError } from '$lib/types.js'
 
   const absolutePopupContext = getContext<AbsolutePopupContext>('absolute-popup')
 
-  export let validationError: ValidationError
-  export let onExpand: (event: Event) => void
+  export let validationError: NestedValidationError
+  export let onExpand: (event: MouseEvent) => void
 
   $: text = validationError.isChildError ? 'Contains invalid data' : validationError.message
 </script>
