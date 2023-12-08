@@ -44,7 +44,7 @@
     const combo = keyComboFromEvent(event)
     const direction: 'Up' | 'Down' | 'Left' | 'Right' | undefined = directionByCombo[combo]
 
-    if (direction && event.currentTarget) {
+    if (direction && event.target) {
       event.preventDefault()
 
       const buttons: HTMLButtonElement[] = Array.from(
@@ -52,7 +52,7 @@
       )
       const nearest = findNearestElement<HTMLButtonElement>({
         allElements: buttons,
-        currentElement: event.currentTarget as unknown as HTMLButtonElement,
+        currentElement: event.target as unknown as HTMLButtonElement,
         direction,
         hasPrio: (element: HTMLButtonElement) => {
           return element.getAttribute('data-type') !== 'jse-open-dropdown'

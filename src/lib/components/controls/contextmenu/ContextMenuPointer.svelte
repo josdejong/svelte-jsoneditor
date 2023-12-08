@@ -14,7 +14,7 @@
   export let onContextMenu: OnContextMenu
 
   function handleClick(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
-    let buttonElem: Element | null = event.currentTarget
+    let buttonElem: Element | null = event.target as HTMLButtonElement
     while (buttonElem && buttonElem.nodeName !== 'BUTTON') {
       buttonElem = buttonElem.parentNode as Element
     }
@@ -39,7 +39,7 @@
   class="jse-context-menu-pointer"
   class:jse-selected={selected}
   title={CONTEXT_MENU_EXPLANATION}
-  on:click={(event) => handleClick(event)}
+  on:click={handleClick}
 >
   <Icon data={faCaretDown} />
 </button>

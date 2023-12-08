@@ -244,9 +244,8 @@
   function handleMouseDown(event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
     // check if the mouse down is not happening in the key or value input fields or on a button
     if (
-      event.target &&
-      (isContentEditableDiv(event.currentTarget) ||
-        (event.which === 1 && isChildOfNodeName(event.currentTarget, 'BUTTON'))) // left mouse on a button
+      (isContentEditableDiv(event.target as HTMLElement) ||
+        (event.which === 1 && isChildOfNodeName(event.target as Element, 'BUTTON'))) // left mouse on a button
     ) {
       return
     }
@@ -263,7 +262,7 @@
     document.addEventListener('mousemove', handleMouseMoveGlobal, true)
     document.addEventListener('mouseup', handleMouseUpGlobal)
 
-    const anchorType = getSelectionTypeFromTarget(event.currentTarget)
+    const anchorType = getSelectionTypeFromTarget(event.target as Element)
     const json = context.getJson()
     const documentState = context.getDocumentState()
 
@@ -297,7 +296,7 @@
       }
     } else {
       if (anchorType === SelectionType.multi) {
-        if (root && event.currentTarget.hasAttribute('data-path')) {
+        if (root && (event.target as Element).hasAttribute('data-path')) {
           const lastCaretPosition = last(
             getVisibleCaretPositions(value, documentState)
           ) as CaretPosition
@@ -326,7 +325,7 @@
         }
       }
 
-      const selectionType = getSelectionTypeFromTarget(event.currentTarget)
+      const selectionType = getSelectionTypeFromTarget(event.target as Element)
 
       if (
         !isEqual(path, singleton.selectionFocus) ||
@@ -419,7 +418,7 @@
     })
 
     dragging = {
-      initialTarget: event.currentTarget,
+      initialTarget: event.target as Element,
       initialClientY: event.clientY,
       initialContentTop: findContentTop(),
       selectionStartIndex,
@@ -487,9 +486,9 @@
       } else {
         // the user did click inside the selection and no contents have been dragged,
         // select the clicked item
-        if (event.currentTarget === dragging.initialTarget && !dragging.didMoveItems) {
-          const selectionType = getSelectionTypeFromTarget(event.currentTarget as Element)
-          const path = getDataPathFromTarget(event.currentTarget as Element)
+        if (event.target === dragging.initialTarget && !dragging.didMoveItems) {
+          const selectionType = getSelectionTypeFromTarget(event.target as Element)
+          const path = getDataPathFromTarget(event.target as Element)
           if (path) {
             context.onSelect(fromSelectionType(json, selectionType, path))
           }
@@ -536,8 +535,6 @@
       const startIndex = parseInt(last(startPath) as string, 10)
       const endIndex = parseInt(last(endPath) as string, 10)
 
-      console.log('TEST', { startPath, endPath, startIndex, endIndex })
-
       // find the section where the selection is
       // if the selection is spread over multiple visible sections,
       // we will not return any items, so dragging will not work there.
@@ -567,14 +564,14 @@
 
     event.stopPropagation()
 
-    if (isChildOfAttribute(event.currentTarget, 'data-type', 'selectable-value')) {
+    if (isChildOfAttribute(event.target as Element, 'data-type', 'selectable-value')) {
       hover = HOVER_COLLECTION
     } else if (
-      isChildOfAttribute(event.currentTarget, 'data-type', 'insert-selection-area-inside')
+      isChildOfAttribute(event.target as Element, 'data-type', 'insert-selection-area-inside')
     ) {
       hover = HOVER_INSERT_INSIDE
     } else if (
-      isChildOfAttribute(event.currentTarget, 'data-type', 'insert-selection-area-after')
+      isChildOfAttribute(event.target as Element, 'data-type', 'insert-selection-area-after')
     ) {
       hover = HOVER_INSERT_AFTER
     }

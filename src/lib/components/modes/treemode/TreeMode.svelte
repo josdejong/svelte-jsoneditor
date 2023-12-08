@@ -1916,7 +1916,7 @@
     }
 
     openContextMenu({
-      anchor: findParentWithNodeName(event.currentTarget, 'BUTTON'),
+      anchor: findParentWithNodeName(event.target, 'BUTTON'),
       offsetTop: 0,
       width: CONTEXT_MENU_WIDTH,
       height: CONTEXT_MENU_HEIGHT,
@@ -1988,7 +1988,7 @@
 
   function handleWindowMouseDown(event: MouseEvent & { currentTarget: EventTarget & Window }) {
     const outsideEditor = !isChildOf(
-      event.currentTarget as Element,
+      event.target as Element,
       (element) => element === refJsonEditor
     )
     if (outsideEditor) {
