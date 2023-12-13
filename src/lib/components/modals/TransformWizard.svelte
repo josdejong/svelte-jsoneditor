@@ -8,7 +8,7 @@
   import { isEqual } from 'lodash-es'
   import type { JSONPath } from 'immutable-json-patch'
   import { setIn } from 'immutable-json-patch'
-  import type { QueryLanguageOptions } from '$lib/types.js'
+  import type { PathOption, QueryLanguageOptions } from '$lib/types.js'
 
   const debug = createDebug('jsoneditor:TransformWizard')
 
@@ -48,10 +48,10 @@
     queryOptions?.projection?.paths && projectionOptions
       ? queryOptions.projection.paths
           .map((path) => projectionOptions.find((option) => isEqual(option.value, path)))
-          .filter((option) => !!option)
+          .filter((option) => !!option) as PathOption[]
       : null
 
-  function changeFilterPath(path: JSONPath) {
+  function changeFilterPath(path: JSONPath | undefined) {
     if (!isEqual(queryOptions?.filter?.path, path)) {
       debug('changeFilterPath', path)
       queryOptions = setIn(queryOptions, ['filter', 'path'], path, true)
@@ -59,7 +59,7 @@
     }
   }
 
-  function changeFilterRelation(relation) {
+  function changeFilterRelation(relation: string | undefined) {
     if (!isEqual(queryOptions?.filter?.relation, relation)) {
       debug('changeFilterRelation', relation)
       queryOptions = setIn(queryOptions, ['filter', 'relation'], relation, true)
@@ -67,7 +67,7 @@
     }
   }
 
-  function changeFilterValue(value) {
+  function changeFilterValue(value: string | undefined) {
     if (!isEqual(queryOptions?.filter?.value, value)) {
       debug('changeFilterValue', value)
       queryOptions = setIn(queryOptions, ['filter', 'value'], value, true)
@@ -75,7 +75,7 @@
     }
   }
 
-  function changeSortPath(path) {
+  function changeSortPath(path: JSONPath | undefined) {
     if (!isEqual(queryOptions?.sort?.path, path)) {
       debug('changeSortPath', path)
       queryOptions = setIn(queryOptions, ['sort', 'path'], path, true)
@@ -83,7 +83,7 @@
     }
   }
 
-  function changeSortDirection(direction) {
+  function changeSortDirection(direction: string | undefined) {
     if (!isEqual(queryOptions?.sort?.direction, direction)) {
       debug('changeSortDirection', direction)
       queryOptions = setIn(queryOptions, ['sort', 'direction'], direction, true)
@@ -91,7 +91,7 @@
     }
   }
 
-  function changeProjectionPaths(paths) {
+  function changeProjectionPaths(paths: JSONPath[] | unknown) {
     if (!isEqual(queryOptions?.projection?.paths, paths)) {
       debug('changeProjectionPaths', paths)
       queryOptions = setIn(queryOptions, ['projection', 'paths'], paths, true)
@@ -99,12 +99,12 @@
     }
   }
 
-  $: changeFilterPath(filterPath?.value || null)
-  $: changeFilterRelation(filterRelation?.value || null)
-  $: changeFilterValue(filterValue || null)
-  $: changeSortPath(sortPath?.value || null)
-  $: changeSortDirection(sortDirection?.value || null)
-  $: changeProjectionPaths(projectionPaths ? projectionPaths.map((item) => item.value) : null)
+  $: changeFilterPath(filterPath?.value)
+  $: changeFilterRelation(filterRelation?.value )
+  $: changeFilterValue(filterValue)
+  $: changeSortPath(sortPath?.value )
+  $: changeSortDirection(sortDirection?.value)
+  $: changeProjectionPaths(projectionPaths ? projectionPaths.map((item) => item.value) : undefined)
 </script>
 
 <table class="jse-transform-wizard">

@@ -244,16 +244,16 @@ export interface QueryLanguage {
 
 export interface QueryLanguageOptions {
   filter?: {
-    path?: string[]
+    path?: JSONPath
     relation?: '==' | '!=' | '<' | '<=' | '>' | '>='
     value?: string
   }
   sort?: {
-    path?: string[]
+    path?: JSONPath
     direction?: 'asc' | 'desc'
   }
   projection?: {
-    paths?: string[][]
+    paths?: JSONPath[]
   }
 }
 
