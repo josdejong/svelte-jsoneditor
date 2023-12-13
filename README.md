@@ -524,7 +524,6 @@ The editor can be styled using the available CSS variables. A full list with all
 
 https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/themes/defaults.scss
 
-
 ### Custom theme color
 
 For example, to change the default blue theme color to anthracite:
