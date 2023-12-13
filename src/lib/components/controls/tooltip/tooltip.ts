@@ -5,7 +5,7 @@ import type { AbsolutePopupOptions } from '$lib/types'
 export interface TooltipOptions {
   text: string
   openAbsolutePopup: (
-    component: typeof SvelteComponent,
+    component: typeof SvelteComponent<Record<string, unknown>>,
     props: Record<string, unknown>,
     options: AbsolutePopupOptions
   ) => number

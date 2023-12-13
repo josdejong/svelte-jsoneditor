@@ -1441,9 +1441,14 @@
   function handlePatch(
     operations: JSONPatchDocument,
     afterPatch?: AfterPatchCallback
-  ): JSONPatchResult | null {
+  ): JSONPatchResult {
     if (readOnly) {
-      return null
+      return {
+        json,
+        previousJson: json,
+        undo: [],
+        redo: []
+      }
     }
 
     debug('handlePatch', operations, afterPatch)

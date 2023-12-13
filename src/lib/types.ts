@@ -267,7 +267,10 @@ export type OnChange =
   | null
 export type OnJSONSelect = (selection: JSONSelection) => void
 export type OnSelect = (selection: JSONEditorSelection | null) => void
-export type OnPatch = (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
+export type OnPatch = (
+  operations: JSONPatchDocument,
+  afterPatch?: AfterPatchCallback
+) => JSONPatchResult
 export type OnChangeText = (updatedText: string, afterPatch?: AfterPatchCallback) => void
 export type OnSort = (params: {
   operations: JSONPatchDocument
@@ -443,7 +446,7 @@ export interface JSONEditorContext {
   findElement: (path: JSONPath) => Element | null
   findNextInside: FindNextInside
   focus: () => void
-  onPatch: (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => JSONPatchResult
+  onPatch: OnPatch
   onSelect: OnJSONSelect
   onFind: OnFind
   onPasteJson: (newPastedJson: PastedJson) => void
@@ -473,7 +476,7 @@ export interface RenderValueProps {
   isEditing: boolean
   parser: JSONParser
   normalization: ValueNormalization
-  onPatch: TreeModeContext['onPatch']
+  onPatch: OnPatch
   onPasteJson: OnPasteJson
   onSelect: OnJSONSelect
   onFind: OnFind
