@@ -1,9 +1,14 @@
 import type Ajv from 'ajv'
 import type { Options, Schema, ErrorObject } from 'ajv'
 import AjvDist from 'ajv'
-import type { JSONValue } from 'immutable-json-patch'
 import { parsePath } from 'immutable-json-patch'
-import type { JSONSchema, JSONSchemaDefinitions, ValidationError, Validator } from '$lib/types'
+import type {
+  JSONSchema,
+  JSONSchemaDefinitions,
+  JSONValue,
+  ValidationError,
+  Validator
+} from '$lib/types'
 import { ValidationSeverity } from '$lib/types.js'
 
 export interface AjvValidatorOptions {

@@ -3,7 +3,7 @@ import assert from 'assert'
 import { javascriptQueryLanguage } from './javascriptQueryLanguage.js'
 import { cloneDeep } from 'lodash-es'
 import { LosslessNumber } from 'lossless-json'
-import type { JSONValue } from 'immutable-json-patch'
+import type { JSONValue } from '$lib/types.js'
 
 const { createQuery, executeQuery } = javascriptQueryLanguage
 

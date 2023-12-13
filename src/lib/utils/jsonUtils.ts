@@ -1,4 +1,4 @@
-import type { JSONObject, JSONPath, JSONValue } from 'immutable-json-patch'
+import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer } from 'immutable-json-patch'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -9,7 +9,9 @@ import { arrayToObject, objectToArray } from './arrayUtils.js'
 import type {
   Content,
   JSONContent,
+  JSONObject,
   JSONParser,
+  JSONValue,
   ParseError,
   TextContent,
   TextLocation

@@ -9,10 +9,11 @@
   import type {
     ExtendedSearchResultItem,
     JSONParser,
+    JSONValue,
     OnJSONSelect,
     ValueNormalization
   } from '$lib/types.js'
-  import type { JSONPath, JSONValue } from 'immutable-json-patch'
+  import type { JSONPath } from 'immutable-json-patch'
 
   export let path: JSONPath
   export let value: JSONValue

@@ -10,7 +10,6 @@
     faPlus,
     faTrashCan
   } from '@fortawesome/free-solid-svg-icons'
-  import type { JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import {
     getFocusPath,
@@ -25,6 +24,7 @@
     ContextMenuItem,
     DocumentState,
     JSONParser,
+    JSONValue,
     OnRenderContextMenuInternal
   } from '$lib/types'
   import { getEnforceString } from '$lib/logic/documentState.js'

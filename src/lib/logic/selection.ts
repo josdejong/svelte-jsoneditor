@@ -7,7 +7,6 @@ import {
   type JSONPatchDocument,
   type JSONPatchOperation,
   type JSONPath,
-  type JSONValue,
   parsePath
 } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
@@ -27,6 +26,7 @@ import type {
   JSONEditorSelection,
   JSONParser,
   JSONSelection,
+  JSONValue,
   KeySelection,
   MultiSelection,
   TextSelection,
@@ -352,7 +352,7 @@ export function getSelectionNextInside(
   const parentPath = initial(path)
   const childPath = [last(path) as string]
 
-  const parent = getIn(json, parentPath)
+  const parent: JSONValue | undefined = getIn(json, parentPath)
   const nextPathInside = parent ? getNextVisiblePath(parent, documentState, childPath) : undefined
 
   if (nextPathInside) {

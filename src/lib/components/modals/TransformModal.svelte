@@ -7,7 +7,7 @@
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
   import { DEBOUNCE_DELAY } from '../../constants.js'
-  import type { JSONPath, JSONValue } from 'immutable-json-patch'
+  import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
   import { transformModalStates, transformModalStateShared } from './transformModalStates.js'
@@ -20,6 +20,7 @@
     Content,
     JSONParser,
     JSONPathParser,
+    JSONValue,
     OnChangeQueryLanguage,
     OnClassName,
     OnPatch,

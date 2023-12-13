@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONPath, JSONValue } from 'immutable-json-patch'
+  import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils.js'
   import { createValueSelection, getFocusPath } from '$lib/logic/selection.js'
@@ -10,6 +10,7 @@
   import type {
     FindNextInside,
     JSONParser,
+    JSONValue,
     OnFind,
     OnJSONSelect,
     OnPasteJson,

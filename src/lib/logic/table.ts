@@ -1,4 +1,4 @@
-import type { JSONArray, JSONPatchOperation, JSONPath, JSONValue } from 'immutable-json-patch'
+import type { JSONPatchOperation, JSONPath } from 'immutable-json-patch'
 import {
   compileJSONPointer,
   isJSONArray,
@@ -8,7 +8,9 @@ import {
 import { groupBy, isEmpty, isEqual, mapValues, partition } from 'lodash-es'
 import type {
   DocumentState,
+  JSONArray,
   JSONSelection,
+  JSONValue,
   SortedColumn,
   TableCellIndex,
   ValidationError

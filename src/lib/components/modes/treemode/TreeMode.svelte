@@ -4,7 +4,7 @@
   import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler.js'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '$lib/utils/debug.js'
-  import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
+  import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, existsIn, getIn, immutableJSONPatch } from 'immutable-json-patch'
   import { jsonrepair } from 'jsonrepair'
   import { initial, isEmpty, isEqual, noop, throttle, uniqueId } from 'lodash-es'
@@ -121,6 +121,7 @@
     JSONPathParser,
     JSONPointerMap,
     JSONSelection,
+    JSONValue,
     NestedValidationError,
     OnBlur,
     OnChange,

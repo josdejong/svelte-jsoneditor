@@ -1,11 +1,5 @@
 import diffSequence from '../generated/diffSequence.js'
-import type {
-  JSONArray,
-  JSONPatchDocument,
-  JSONPatchOperation,
-  JSONPath,
-  JSONValue
-} from 'immutable-json-patch'
+import type { JSONPatchDocument, JSONPatchOperation, JSONPath } from 'immutable-json-patch'
 import {
   compileJSONPointer,
   getIn,
@@ -20,6 +14,7 @@ import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import naturalCompare from 'natural-compare-lite'
 import { int } from '../utils/numberUtils.js'
 import { isObject } from '../utils/typeUtils.js'
+import type { JSONArray, JSONValue } from '$lib/types.js'
 
 export function caseInsensitiveNaturalCompare(a: unknown, b: unknown) {
   const aLower = typeof a === 'string' ? a.toLowerCase() : a

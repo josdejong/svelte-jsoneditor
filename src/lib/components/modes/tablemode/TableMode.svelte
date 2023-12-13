@@ -15,6 +15,7 @@
     JSONParser,
     JSONPatchResult,
     JSONSelection,
+    JSONValue,
     OnBlur,
     OnChange,
     OnChangeMode,
@@ -36,7 +37,7 @@
   } from '$lib/types'
   import { Mode, SortDirection, ValidationSeverity } from '$lib/types.js'
   import TableMenu from './menu/TableMenu.svelte'
-  import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
+  import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import {
     compileJSONPointer,
     existsIn,

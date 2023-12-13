@@ -24,8 +24,10 @@ import type {
   AfterPatchCallback,
   DocumentState,
   InsertType,
+  JSONArray,
   JSONParser,
   JSONSelection,
+  JSONValue,
   OnChange,
   OnChangeText,
   OnJSONSelect,
@@ -37,9 +39,7 @@ import {
   isJSONObject,
   isJSONPatchAdd,
   isJSONPatchReplace,
-  type JSONArray,
   type JSONPath,
-  type JSONValue,
   parsePath
 } from 'immutable-json-patch'
 import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'

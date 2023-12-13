@@ -3,8 +3,7 @@ import { describe, test } from 'vitest'
 import { jmespathQueryLanguage } from './jmespathQueryLanguage.js'
 import { cloneDeep } from 'lodash-es'
 import { LosslessNumber, parse, stringify } from 'lossless-json'
-import type { JSONValue } from 'immutable-json-patch'
-import type { JSONParser } from '$lib/types'
+import type { JSONParser, JSONValue } from '$lib/types'
 
 const { createQuery, executeQuery } = jmespathQueryLanguage
 

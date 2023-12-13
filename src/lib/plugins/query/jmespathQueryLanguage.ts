@@ -1,8 +1,8 @@
 import jmespath from 'jmespath'
-import type { JSONPath, JSONValue } from 'immutable-json-patch'
+import type { JSONPath } from 'immutable-json-patch'
 import { getIn } from 'immutable-json-patch'
 import { parseString } from '$lib/utils/stringUtils.js'
-import type { JSONParser, QueryLanguage, QueryLanguageOptions } from '$lib/types'
+import type { JSONParser, JSONValue, QueryLanguage, QueryLanguageOptions } from '$lib/types'
 import { isEqualParser } from '$lib/utils/jsonUtils.js'
 
 const description = `

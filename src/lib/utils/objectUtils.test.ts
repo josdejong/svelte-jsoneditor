@@ -2,7 +2,8 @@ import { describe, test } from 'vitest'
 import { deepStrictEqual, strictEqual } from 'assert'
 import { traverse } from './objectUtils.js'
 import { isEqual } from 'lodash-es'
-import type { JSONPath, JSONValue } from 'immutable-json-patch'
+import type { JSONPath } from 'immutable-json-patch'
+import type { JSONValue } from '$lib/types.js'
 
 describe('objectUtils', () => {
   const json = {

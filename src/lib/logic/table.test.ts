@@ -17,9 +17,9 @@ import {
   toTableCellPosition
 } from './table.js'
 import { deepStrictEqual } from 'assert'
-import type { JSONArray, JSONPath, JSONValue } from 'immutable-json-patch'
+import type { JSONPath } from 'immutable-json-patch'
 import { createValueSelection } from './selection.js'
-import type { SortedColumn, ValidationError } from '$lib/types.js'
+import type { JSONArray, JSONValue, SortedColumn, ValidationError } from '$lib/types.js'
 import { SortDirection, ValidationSeverity } from '$lib/types.js'
 
 describe('table', () => {

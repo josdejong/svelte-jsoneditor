@@ -1,5 +1,6 @@
-import type { JSONValue, JSONPath } from 'immutable-json-patch'
+import type { JSONPath } from 'immutable-json-patch'
 import { isObject } from './typeUtils.js'
+import type { JSONValue } from '$lib/types.js'
 
 export function traverse(
   json: JSONValue,

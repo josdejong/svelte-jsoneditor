@@ -1,7 +1,8 @@
 import { isObject } from './typeUtils.js'
-import type { JSONArray, JSONObject, JSONPath, JSONValue } from 'immutable-json-patch'
+import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 import { isEqual } from 'lodash-es'
+import type { JSONArray, JSONObject, JSONValue } from '$lib/types.js'
 
 const MAX_ITEM_PATHS_COLLECTION = 10000
 const ROOT_PATH: JSONPath = []

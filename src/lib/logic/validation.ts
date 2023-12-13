@@ -3,12 +3,13 @@ import type {
   ContentErrors,
   JSONParser,
   JSONPointerMap,
+  JSONValue,
   NestedValidationError,
   ValidationError,
   Validator
 } from '$lib/types.js'
 import { ValidationSeverity } from '$lib/types.js'
-import { compileJSONPointer, type JSONPointer, type JSONValue } from 'immutable-json-patch'
+import { compileJSONPointer, type JSONPointer } from 'immutable-json-patch'
 import { MAX_AUTO_REPAIRABLE_SIZE, MAX_VALIDATABLE_SIZE } from '../constants.js'
 import { measure } from '../utils/timeUtils.js'
 import { normalizeJsonParseError } from '../utils/jsonUtils.js'

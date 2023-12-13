@@ -1,10 +1,8 @@
 import type {
-  JSONObject,
   JSONPatchDocument,
   JSONPatchOperation,
   JSONPath,
-  JSONPointer,
-  JSONValue
+  JSONPointer
 } from 'immutable-json-patch'
 import { compileJSONPointer, getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
 import { forEachRight, groupBy, initial, isEqual, last } from 'lodash-es'
@@ -15,9 +13,11 @@ import { stringConvert } from '../utils/typeUtils.js'
 import type {
   DocumentState,
   ExtendedSearchResultItem,
+  JSONObject,
   JSONParser,
   JSONPointerMap,
   JSONSelection,
+  JSONValue,
   SearchResult,
   SearchResultItem
 } from '$lib/types'
@@ -261,7 +261,7 @@ export function createSearchAndReplaceOperations(
     }
   } else if (field === SearchField.value) {
     // replace a value
-    const currentValue = getIn(json, path)
+    const currentValue: JSONValue | undefined = getIn(json, path)
     if (currentValue === undefined) {
       throw new Error(`Cannot replace: path not found ${compileJSONPointer(path)}`)
     }
@@ -367,7 +367,7 @@ export function createSearchAndReplaceAllOperations(
       lastNewSelection = createSelectionFromOperations(json, operations)
     } else if (field === SearchField.value) {
       // replace a value
-      const currentValue = getIn(json, path)
+      const currentValue: JSONValue | undefined = getIn(json, path)
       if (currentValue === undefined) {
         throw new Error(`Cannot replace: path not found ${compileJSONPointer(path)}`)
       }

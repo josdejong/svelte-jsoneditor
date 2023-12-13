@@ -2,8 +2,7 @@ import * as _ from 'lodash-es'
 import { last } from 'lodash-es'
 import { createLodashPropertySelector, createPropertySelector } from '../../utils/pathUtils.js'
 import { parseString } from '../../utils/stringUtils.js'
-import type { QueryLanguage, QueryLanguageOptions } from '../../types.js'
-import type { JSONValue } from 'immutable-json-patch'
+import type { JSONValue, QueryLanguage, QueryLanguageOptions } from '../../types.js'
 import { isInteger } from '../../utils/typeUtils.js'
 
 const description = `

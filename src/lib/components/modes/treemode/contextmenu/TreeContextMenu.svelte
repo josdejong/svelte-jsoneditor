@@ -16,7 +16,6 @@
     faSortAmountDownAlt,
     faTrashCan
   } from '@fortawesome/free-solid-svg-icons'
-  import type { JSONValue } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { initial, isEmpty } from 'lodash-es'
   import {
@@ -34,6 +33,7 @@
     DocumentState,
     InsertType,
     JSONParser,
+    JSONValue,
     OnRenderContextMenuInternal
   } from '$lib/types'
   import { getEnforceString } from '$lib/logic/documentState.js'

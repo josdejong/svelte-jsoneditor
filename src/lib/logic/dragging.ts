@@ -1,6 +1,6 @@
 import { createMultiSelection, getEndPath, getStartPath } from './selection.js'
 import { initial, isEqual } from 'lodash-es'
-import type { JSONValue, JSONPatchDocument } from 'immutable-json-patch'
+import type { JSONPatchDocument } from 'immutable-json-patch'
 import { getIn } from 'immutable-json-patch'
 import { moveInsideParent } from './operations.js'
 import type {
@@ -8,6 +8,7 @@ import type {
   DragInsideAction,
   DragInsideProps,
   JSONSelection,
+  JSONValue,
   MultiSelection,
   RenderedItem
 } from '$lib/types'

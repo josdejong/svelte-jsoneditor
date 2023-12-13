@@ -14,8 +14,7 @@
   import { faJSONEditorCollapse, faJSONEditorExpand } from '$lib/img/customFontawesomeIcons.js'
   import { isObjectOrArray } from '$lib/utils/typeUtils.js'
   import Menu from '../../../controls/Menu.svelte'
-  import type { JSONSelection, MenuItem, OnRenderMenuInternal } from '$lib/types'
-  import type { JSONValue } from 'immutable-json-patch'
+  import type { JSONSelection, JSONValue, MenuItem, OnRenderMenuInternal } from '$lib/types'
   import { isKeySelection, isMultiSelection, isValueSelection } from '$lib/logic/selection.js'
   import type { HistoryState } from '$lib/logic/history.js'
 

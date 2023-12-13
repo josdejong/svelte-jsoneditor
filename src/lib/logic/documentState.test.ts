@@ -22,10 +22,13 @@ import {
 import {
   CaretType,
   type DocumentState,
+  type JSONArray,
+  type JSONObject,
   type JSONPointerMap,
+  type JSONValue,
   type VisibleSection
-} from '../types.js'
-import type { JSONArray, JSONObject, JSONPatchDocument, JSONValue } from 'immutable-json-patch'
+} from '$lib/types.js'
+import type { JSONPatchDocument } from 'immutable-json-patch'
 import { compileJSONPointer, deleteIn, setIn } from 'immutable-json-patch'
 
 describe('documentState', () => {

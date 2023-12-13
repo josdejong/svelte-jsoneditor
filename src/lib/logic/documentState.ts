@@ -10,7 +10,6 @@ import {
   isJSONPatchMove,
   isJSONPatchRemove,
   isJSONPatchReplace,
-  type JSONArray,
   type JSONPatchAdd,
   type JSONPatchCopy,
   type JSONPatchDocument,
@@ -19,7 +18,6 @@ import {
   type JSONPatchReplace,
   type JSONPath,
   type JSONPointer,
-  type JSONValue,
   parseJSONPointer,
   parsePath,
   startsWithJSONPointer
@@ -37,9 +35,11 @@ import {
 import type {
   CaretPosition,
   DocumentState,
+  JSONArray,
   JSONParser,
   JSONPointerMap,
   JSONSelection,
+  JSONValue,
   OnExpand,
   Section,
   VisibleSection
@@ -159,7 +159,7 @@ export function expandWithCallback(
 ): DocumentState {
   const expandedMap = { ...documentState.expandedMap }
 
-  function recurse(value: JSONValue) {
+  function recurse(value: unknown) {
     const pathIndex = currentPath.length
 
     if (Array.isArray(value)) {
@@ -304,7 +304,7 @@ export function documentStatePatch(
   documentState: DocumentState,
   operations: JSONPatchDocument
 ): { json: JSONValue; documentState: DocumentState } {
-  const updatedJson = immutableJSONPatch(json, operations)
+  const updatedJson: JSONValue = immutableJSONPatch(json, operations)
 
   const updatedDocumentState = operations.reduce((updatingState, operation) => {
     if (isJSONPatchAdd(operation)) {
@@ -843,7 +843,7 @@ export function expandRecursive(
   documentState: DocumentState,
   path: JSONPath
 ): DocumentState {
-  const expandContents = getIn(json, path)
+  const expandContents: JSONValue | undefined = getIn(json, path)
   if (expandContents === undefined) {
     return documentState
   }

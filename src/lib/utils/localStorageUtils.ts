@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store'
-import type { JSONValue } from 'immutable-json-patch'
+import type { JSONValue } from '$lib/types.js'
 
 export function useLocalStorage(key: string, defaultValue: JSONValue) {
   const initialValue = loadFromLocalStorage(key, defaultValue)

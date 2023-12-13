@@ -1,14 +1,20 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONPath, JSONValue } from 'immutable-json-patch'
+  import type { JSONPath } from 'immutable-json-patch'
   import { existsIn, getIn } from 'immutable-json-patch'
   import { range } from 'lodash-es'
   import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
   import { createMultiSelection, getFocusPath } from '$lib/logic/selection.js'
   import { createDebug } from '$lib/utils/debug.js'
   import { caseInsensitiveNaturalCompare } from '$lib/logic/sort.js'
-  import type { JSONPathParser, JSONSelection, OnError, OnJSONSelect } from '$lib/types.js'
+  import type {
+    JSONPathParser,
+    JSONSelection,
+    JSONValue,
+    OnError,
+    OnJSONSelect
+  } from '$lib/types.js'
   import Icon from 'svelte-awesome'
   import { faClose, faEdit } from '@fortawesome/free-solid-svg-icons'
   import NavigationBarItem from './NavigationBarItem.svelte'

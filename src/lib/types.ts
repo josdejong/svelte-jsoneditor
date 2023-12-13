@@ -1,6 +1,19 @@
-import type { JSONPatchDocument, JSONPath, JSONValue, JSONPointer } from 'immutable-json-patch'
+import type { JSONPatchDocument, JSONPath, JSONPointer } from 'immutable-json-patch'
 import type { SvelteComponent } from 'svelte'
 import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
+
+// TODO: replace all usage of JSONValue with unknown since that is a more accurate type
+export type JSONPrimitive = string | number | boolean | null
+export type JSONValue =
+  | {
+      [key: string]: JSONValue
+    }
+  | JSONValue[]
+  | JSONPrimitive
+export type JSONObject = {
+  [key: string]: JSONValue
+}
+export type JSONArray = JSONValue[]
 
 export type TextContent = { text: string } | { json: undefined; text: string }
 

@@ -20,8 +20,12 @@ import {
   pathInSelection
 } from './selection.js'
 import { createDocumentState } from './documentState.js'
-import { type DocumentState, type JSONSelection, SelectionType } from '../types.js'
-import type { JSONValue } from 'immutable-json-patch'
+import {
+  type DocumentState,
+  type JSONSelection,
+  type JSONValue,
+  SelectionType
+} from '$lib/types.js'
 
 describe('selection', () => {
   const json = {

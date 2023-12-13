@@ -9,10 +9,10 @@
   import { pathToOption, stringifyJSONPath } from '../../utils/pathUtils.js'
   import { sortJson } from '$lib/logic/sort.js'
   import { sortModalStates } from './sortModalStates'
-  import type { JSONPath, JSONValue } from 'immutable-json-patch'
+  import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { createDebug } from '$lib/utils/debug.js'
-  import type { OnSort } from '$lib/types.js'
+  import type { JSONValue, OnSort } from '$lib/types.js'
   import { onEscape } from '$lib/actions/onEscape.js'
   import type { Context } from 'svelte-simple-modal'
 

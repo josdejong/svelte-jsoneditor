@@ -1,9 +1,9 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONPath, JSONValue } from 'immutable-json-patch'
+  import type { JSONPath } from 'immutable-json-patch'
   import { getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
-  import type { JSONParser, OnChangeMode } from '$lib/types.js'
+  import type { JSONParser, JSONValue, OnChangeMode } from '$lib/types.js'
   import { Mode } from '$lib/types.js'
   import { valueType } from '$lib/utils/typeUtils.js'
   import { findNestedArrays } from '$lib/logic/table.js'

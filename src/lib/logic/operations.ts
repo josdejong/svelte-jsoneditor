@@ -8,13 +8,11 @@ import {
   isJSONPatchMove,
   isJSONPatchRemove,
   isJSONPatchReplace,
-  type JSONObject,
   type JSONPatchAdd,
   type JSONPatchCopy,
   type JSONPatchDocument,
   type JSONPatchOperation,
   type JSONPath,
-  type JSONValue,
   parseJSONPointer,
   revertJSONPatch
 } from 'immutable-json-patch'
@@ -39,7 +37,14 @@ import {
   isValueSelection,
   pathStartsWith
 } from './selection.js'
-import type { ClipboardValues, DragInsideAction, JSONParser, JSONSelection } from '$lib/types'
+import type {
+  ClipboardValues,
+  DragInsideAction,
+  JSONObject,
+  JSONParser,
+  JSONSelection,
+  JSONValue
+} from '$lib/types'
 import { int } from '../utils/numberUtils.js'
 
 /**
@@ -323,7 +328,7 @@ export function extract(json: JSONValue, selection: JSONSelection): JSONPatchDoc
       const value: JSONObject = {}
       getSelectionPaths(json, selection).forEach((path) => {
         const key = String(last(path))
-        value[key] = parent[key]
+        value[key] = parent[key] as JSONValue
       })
 
       return [
@@ -734,18 +739,24 @@ export function revertJSONPatchWithMoveOperations(
       if (isJSONPatchRemove(operation)) {
         const path = parseJSONPointer(operation.path)
         return {
-          revertOperations: [...revertOperations, ...createRevertMoveOperations(json, path)]
+          revertOperations: [
+            ...revertOperations,
+            ...createRevertMoveOperations(json as JSONValue, path)
+          ]
         }
       }
 
       if (isJSONPatchMove(operation)) {
         const from = parseJSONPointer(operation.from)
         return {
-          revertOperations: [...revertOperations, ...createRevertMoveOperations(json, from)]
+          revertOperations: [
+            ...revertOperations,
+            ...createRevertMoveOperations(json as JSONValue, from)
+          ]
         }
       }
 
-      return { revertOperations }
+      return { document: json }
     }
   })
 }

@@ -6,9 +6,9 @@
   import { pathToOption } from '$lib/utils/pathUtils.js'
   import { createDebug } from '$lib/utils/debug.js'
   import { isEqual } from 'lodash-es'
-  import type { JSONPath, JSONValue } from 'immutable-json-patch'
+  import type { JSONPath } from 'immutable-json-patch'
   import { setIn } from 'immutable-json-patch'
-  import type { QueryLanguageOptions } from '$lib/types.js'
+  import type { JSONValue, QueryLanguageOptions } from '$lib/types.js'
 
   const debug = createDebug('jsoneditor:TransformWizard')
 
