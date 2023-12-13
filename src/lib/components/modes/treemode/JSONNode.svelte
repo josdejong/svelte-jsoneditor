@@ -2,13 +2,7 @@
 
 <script lang="ts">
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
-  import type {
-    JSONArray,
-    JSONObject,
-    JSONPath,
-    JSONPointer,
-    JSONValue as JSONValueType
-  } from 'immutable-json-patch'
+  import type { JSONPath, JSONPointer } from 'immutable-json-patch'
   import { appendToJSONPointer, compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
   import { initial, isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
@@ -79,7 +73,7 @@
   import { isObject } from '$lib/utils/typeUtils.js'
   import { classnames } from '$lib/utils/cssUtils.js'
 
-  export let value: JSONValueType
+  export let value: unknown
   export let path: JSONPath
   export let expandedMap: JSONPointerMap<boolean> | undefined
   export let enforceStringMap: JSONPointerMap<boolean> | undefined
@@ -125,7 +119,7 @@
   // TODO: extract getProps into a separate function
   function getProps(
     path: JSONPath,
-    object: JSONObject,
+    object: Record<string, unknown>,
     expandedMap: JSONPointerMap<boolean> | undefined,
     enforceStringMap: JSONPointerMap<boolean> | undefined,
     visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined,
@@ -167,7 +161,7 @@
   // TODO: extract getItems into a separate function
   function getItems(
     path: JSONPath,
-    array: JSONArray,
+    array: Array<unknown>,
     visibleSection: VisibleSection,
     expandedMap: JSONPointerMap<boolean> | undefined,
     enforceStringMap: JSONPointerMap<boolean> | undefined,
@@ -233,7 +227,7 @@
   }
 
   function handleUpdateKey(oldKey: string, newKey: string): string {
-    const operations = rename(path, Object.keys(value as JSONObject), oldKey, newKey)
+    const operations = rename(path, Object.keys(value as Record<string, unknown>), oldKey, newKey)
     context.onPatch(operations)
 
     // It is possible that the applied key differs from newKey,
@@ -551,7 +545,7 @@
       forEachIndex(start, Math.min(value.length, end), (index) => addHeight(String(index)))
     } else {
       // value is Object
-      Object.keys(value as JSONObject).forEach(addHeight)
+      Object.keys(value as Record<string, unknown>).forEach(addHeight)
     }
 
     return items

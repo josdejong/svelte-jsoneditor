@@ -1,7 +1,7 @@
 // TODO: unit test typeUtils.js
 
 import { isNumber } from './numberUtils.js'
-import type { JSONParser, JSONValue } from '../types.js'
+import type { JSONParser } from '../types.js'
 
 /**
  * Test whether a value is an Object (and not an Array or Class)
@@ -151,7 +151,7 @@ export function isUrl(text: unknown): boolean {
  * Convert contents of a string to the correct JSON type. This can be a string,
  * a number, a boolean, etc
  */
-export function stringConvert(str: string, parser: JSONParser): JSONValue {
+export function stringConvert(str: string, parser: JSONParser): unknown {
   if (str === '') {
     return ''
   }

@@ -5,10 +5,10 @@
   import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import Icon from 'svelte-awesome'
-  import type { JSONValue, OnPatch } from '$lib/types.js'
+  import type { OnPatch } from '$lib/types.js'
 
   export let path: JSONPath
-  export let value: JSONValue
+  export let value: unknown
   export let readOnly: boolean
   export let onPatch: OnPatch
   export let focus: () => void

@@ -1,14 +1,13 @@
 import type { JSONPath } from 'immutable-json-patch'
 import { isObject } from './typeUtils.js'
-import type { JSONValue } from '$lib/types.js'
 
 export function traverse(
-  json: JSONValue,
-  callback: (value: JSONValue, path: JSONPath, json: JSONValue) => boolean | void
+  json: unknown,
+  callback: (value: unknown, path: JSONPath, json: unknown) => boolean | void
 ) {
   const currentPath: JSONPath = []
 
-  function recurse(value: JSONValue) {
+  function recurse(value: unknown) {
     const res = callback(value, currentPath, json)
     if (res === false) {
       return

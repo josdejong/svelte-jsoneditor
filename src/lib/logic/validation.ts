@@ -3,7 +3,6 @@ import type {
   ContentErrors,
   JSONParser,
   JSONPointerMap,
-  JSONValue,
   NestedValidationError,
   ValidationError,
   Validator
@@ -57,7 +56,7 @@ export function mapValidationErrors(
 }
 
 export function validateJSON(
-  json: JSONValue,
+  json: unknown,
   validator: Validator | null,
   parser: JSONParser,
   validationParser: JSONParser

@@ -8,9 +8,7 @@ import {
 import { groupBy, isEmpty, isEqual, mapValues, partition } from 'lodash-es'
 import type {
   DocumentState,
-  JSONArray,
   JSONSelection,
-  JSONValue,
   SortedColumn,
   TableCellIndex,
   ValidationError
@@ -30,7 +28,7 @@ type NestedObject = Record<string, NestedObject>
 const endOfPath = Symbol('path')
 
 export function getColumns(
-  array: JSONArray,
+  array: Array<unknown>,
   flatten: boolean,
   maxSampleCount = Infinity
 ): JSONPath[] {
@@ -121,14 +119,14 @@ export function maintainColumnOrder(
   return [...orderedColumns].map(parseJSONPointer)
 }
 
-export function getShallowKeys(value: JSONValue): JSONPath[] {
+export function getShallowKeys(value: unknown): JSONPath[] {
   return isJSONObject(value) ? Object.keys(value).map((key) => [key]) : [[]]
 }
 
-export function getRecursiveKeys(value: JSONValue): JSONPath[] {
+export function getRecursiveKeys(value: unknown): JSONPath[] {
   const paths: JSONPath[] = []
 
-  function recurse(value: JSONValue, path: JSONPath) {
+  function recurse(value: unknown, path: JSONPath) {
     if (isJSONObject(value)) {
       Object.keys(value).forEach((key) => {
         recurse(value[key], path.concat(key))
@@ -151,14 +149,14 @@ export interface VisibleSection {
   visibleHeight: number
   endHeight: number
   averageItemHeight: number
-  visibleItems: JSONArray
+  visibleItems: Array<unknown>
 }
 
 // TODO: write unit tests
 export function calculateVisibleSection(
   scrollTop: number,
   viewPortHeight: number,
-  json: JSONValue | undefined,
+  json: unknown | undefined,
   itemHeights: Record<number, number>,
   defaultItemHeight: number,
   margin = 80
@@ -212,7 +210,7 @@ export function calculateVisibleSection(
 export function calculateVisibleSectionApprox(
   scrollTop: number,
   viewPortHeight: number,
-  json: JSONValue | undefined,
+  json: unknown | undefined,
   defaultItemHeight: number
 ): VisibleSection {
   const itemCount = isJSONArray(json) ? json.length : 0
@@ -283,13 +281,13 @@ export function selectPreviousRow(columns: JSONPath[], selection: JSONSelection)
 }
 
 export function selectNextRow(
-  json: JSONValue,
+  json: unknown,
   columns: JSONPath[],
   selection: JSONSelection
 ): JSONSelection {
   const { rowIndex, columnIndex } = toTableCellPosition(getFocusPath(selection), columns)
 
-  if (rowIndex < (json as JSONArray).length - 1) {
+  if (rowIndex < (json as Array<unknown>).length - 1) {
     const nextPosition = { rowIndex: rowIndex + 1, columnIndex }
     const nextPath = fromTableCellPosition(nextPosition, columns)
     return createValueSelection(nextPath, false)
@@ -486,10 +484,10 @@ export function operationAffectsSortedColumn(
 /**
  * Find nested arrays inside a JSON object
  */
-export function findNestedArrays(json: JSONValue, maxLevel = 2): JSONPath[] {
+export function findNestedArrays(json: unknown, maxLevel = 2): JSONPath[] {
   const props: JSONPath[] = []
 
-  function recurse(value: JSONValue, path: JSONPath) {
+  function recurse(value: unknown, path: JSONPath) {
     if (isJSONObject(value) && path.length < maxLevel) {
       Object.keys(value).forEach((key) => {
         recurse(value[key], path.concat(key))

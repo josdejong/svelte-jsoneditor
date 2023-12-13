@@ -5,7 +5,6 @@
     AfterPatchCallback,
     JSONEditorContext,
     JSONSelection,
-    JSONValue,
     SearchResultItem
   } from '$lib/types'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
@@ -13,7 +12,7 @@
   import { createNestedValueOperations } from '$lib/logic/operations.js'
 
   export let path: JSONPath
-  export let value: JSONValue
+  export let value: unknown
   export let context: JSONEditorContext
   export let enforceString: boolean
   export let selection: JSONSelection | null

@@ -3,7 +3,6 @@ import assert from 'assert'
 import { javascriptQueryLanguage } from './javascriptQueryLanguage.js'
 import { cloneDeep } from 'lodash-es'
 import { LosslessNumber } from 'lossless-json'
-import type { JSONValue } from '$lib/types.js'
 
 const { createQuery, executeQuery } = javascriptQueryLanguage
 
@@ -303,14 +302,14 @@ describe('javascriptQueryLanguage', () => {
 
     test('should work with alternative parsers and non-native JSON data types', () => {
       const data = [new LosslessNumber('4'), new LosslessNumber('7'), new LosslessNumber('5')]
-      const query = createQuery(data as unknown as JSONValue, {
+      const query = createQuery(data, {
         sort: {
           path: [],
           direction: 'asc'
         }
       })
 
-      const result = executeQuery(data as unknown as JSONValue, query, JSON)
+      const result = executeQuery(data, query, JSON)
       assert.deepStrictEqual(result, [
         new LosslessNumber('4'),
         new LosslessNumber('5'),

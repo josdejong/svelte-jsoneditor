@@ -14,11 +14,11 @@
   import { faJSONEditorCollapse, faJSONEditorExpand } from '$lib/img/customFontawesomeIcons.js'
   import { isObjectOrArray } from '$lib/utils/typeUtils.js'
   import Menu from '../../../controls/Menu.svelte'
-  import type { JSONSelection, JSONValue, MenuItem, OnRenderMenuInternal } from '$lib/types'
+  import type { JSONSelection, MenuItem, OnRenderMenuInternal } from '$lib/types'
   import { isKeySelection, isMultiSelection, isValueSelection } from '$lib/logic/selection.js'
   import type { HistoryState } from '$lib/logic/history.js'
 
-  export let json: JSONValue
+  export let json: unknown
   export let selection: JSONSelection | null
 
   export let readOnly: boolean

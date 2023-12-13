@@ -121,7 +121,6 @@
     JSONPathParser,
     JSONPointerMap,
     JSONSelection,
-    JSONValue,
     NestedValidationError,
     OnBlur,
     OnChange,
@@ -229,7 +228,7 @@
     }
   })
 
-  let json: JSONValue | undefined
+  let json: unknown | undefined
   let text: string | undefined
   let parseError: ParseError | undefined = undefined
 
@@ -360,7 +359,7 @@
 
   // we pass searchText and json as argument to trigger search when these variables change,
   // via $: applySearchThrottled(searchText, json)
-  function applySearch(searchText: string, json: JSONValue) {
+  function applySearch(searchText: string, json: unknown) {
     if (searchText === '') {
       debug('clearing search result')
 
@@ -435,7 +434,7 @@
   const memoizedValidate = memoizeOne(validateJSON)
 
   function updateValidationErrors(
-    json: JSONValue,
+    json: unknown,
     validator: Validator | null,
     parser: JSONParser,
     validationParser: JSONParser
@@ -498,7 +497,7 @@
     }
   }
 
-  function applyExternalJson(updatedJson: JSONValue | undefined) {
+  function applyExternalJson(updatedJson: unknown | undefined) {
     if (updatedJson === undefined) {
       return
     }
@@ -618,14 +617,14 @@
     }
   }
 
-  function expandWhenNotInitialized(json: JSONValue) {
+  function expandWhenNotInitialized(json: unknown) {
     if (!documentStateInitialized) {
       documentStateInitialized = true
       documentState = expandWithCallback(json, documentState, [], getDefaultExpand(json))
     }
   }
 
-  function clearSelectionWhenNotExisting(json: JSONValue) {
+  function clearSelectionWhenNotExisting(json: unknown) {
     if (!documentState.selection) {
       return
     }
@@ -650,7 +649,7 @@
     previousText,
     previousTextIsRepaired
   }: {
-    previousJson: JSONValue | undefined
+    previousJson: unknown | undefined
     previousText: string | undefined
     previousState: DocumentState
     previousTextIsRepaired: boolean
@@ -851,7 +850,7 @@
         {
           op: 'replace',
           path: pointer,
-          value: updatedValue as JSONValue
+          value: updatedValue
         }
       ],
       (patchedJson, patchedState) => {
@@ -1051,7 +1050,7 @@
 
     try {
       const path = getAnchorPath(documentState.selection)
-      const currentValue: JSONValue = getIn(json, path)
+      const currentValue: unknown = getIn(json, path)
       const convertedValue = convertValue(currentValue, type, parser)
       if (convertedValue === currentValue) {
         // no change, do nothing
@@ -1271,8 +1270,8 @@
         if (onTransform) {
           onTransform({
             operations,
-            json: json as JSONValue,
-            transformedJson: immutableJSONPatch(json as JSONValue, operations)
+            json,
+            transformedJson: immutableJSONPatch(json, operations)
           })
         } else {
           debug('onTransform', rootPath, operations)
@@ -1313,7 +1312,7 @@
     })
   }
 
-  function openJSONEditorModal(path: JSONPath, value: JSONValue) {
+  function openJSONEditorModal(path: JSONPath, value: unknown) {
     debug('openJSONEditorModal', { path, value })
 
     modalOpen = true
@@ -1452,7 +1451,7 @@
     return patch(operations, afterPatch)
   }
 
-  function handleReplaceJson(updatedJson: JSONValue, afterPatch?: AfterPatchCallback) {
+  function handleReplaceJson(updatedJson: unknown, afterPatch?: AfterPatchCallback) {
     const previousState = documentState
     const previousJson = json
     const previousText = text

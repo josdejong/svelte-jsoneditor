@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONValue, MenuItem, OnRenderMenuInternal } from '$lib/types'
+  import type { MenuItem, OnRenderMenuInternal } from '$lib/types'
   import Menu from '../../../controls/Menu.svelte'
   import {
     faEllipsisV,
@@ -13,7 +13,7 @@
   import type { HistoryState } from '$lib/logic/history'
   import { CONTEXT_MENU_EXPLANATION } from '$lib/constants.js'
 
-  export let json: JSONValue | undefined
+  export let json: unknown | undefined
   export let readOnly: boolean
   export let historyState: HistoryState
   export let onSort: () => void

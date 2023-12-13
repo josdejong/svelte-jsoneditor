@@ -8,13 +8,7 @@
   import { createMultiSelection, getFocusPath } from '$lib/logic/selection.js'
   import { createDebug } from '$lib/utils/debug.js'
   import { caseInsensitiveNaturalCompare } from '$lib/logic/sort.js'
-  import type {
-    JSONPathParser,
-    JSONSelection,
-    JSONValue,
-    OnError,
-    OnJSONSelect
-  } from '$lib/types.js'
+  import type { JSONPathParser, JSONSelection, OnError, OnJSONSelect } from '$lib/types.js'
   import Icon from 'svelte-awesome'
   import { faClose, faEdit } from '@fortawesome/free-solid-svg-icons'
   import NavigationBarItem from './NavigationBarItem.svelte'
@@ -22,7 +16,7 @@
 
   const debug = createDebug('jsoneditor:NavigationBar')
 
-  export let json: JSONValue
+  export let json: unknown
   export let selection: JSONSelection | null
   export let onSelect: OnJSONSelect
   export let onError: OnError

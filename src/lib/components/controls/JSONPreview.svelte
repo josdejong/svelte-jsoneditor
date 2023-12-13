@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { JSONParser, JSONValue } from '$lib/types'
+  import type { JSONParser } from '$lib/types'
   import { truncate } from '$lib/utils/stringUtils.js'
   import { getText } from '$lib/utils/jsonUtils.js'
   import { MAX_CHARACTERS_TEXT_PREVIEW } from '$lib/constants.js'
 
   export let text: string | undefined
-  export let json: JSONValue | undefined
+  export let json: unknown | undefined
   export let indentation: number | string
   export let parser: JSONParser
 

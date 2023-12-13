@@ -3,7 +3,7 @@ import { describe, test } from 'vitest'
 import { jmespathQueryLanguage } from './jmespathQueryLanguage.js'
 import { cloneDeep } from 'lodash-es'
 import { LosslessNumber, parse, stringify } from 'lossless-json'
-import type { JSONParser, JSONValue } from '$lib/types'
+import type { JSONParser } from '$lib/types'
 
 const { createQuery, executeQuery } = jmespathQueryLanguage
 
@@ -241,7 +241,7 @@ describe('jmespathQueryLanguage', () => {
     const LosslessJSONParser = { parse, stringify } as JSONParser
 
     const data = [new LosslessNumber('4'), new LosslessNumber('7'), new LosslessNumber('5')]
-    const query = createQuery(data as unknown as JSONValue, {
+    const query = createQuery(data, {
       sort: {
         path: [],
         direction: 'asc'
@@ -249,7 +249,7 @@ describe('jmespathQueryLanguage', () => {
     })
 
     // JMESPath does not support LosslessNumber, and executeQuery will convert into numbers first
-    const result = executeQuery(data as unknown as JSONValue, query, LosslessJSONParser)
+    const result = executeQuery(data, query, LosslessJSONParser)
     assert.deepStrictEqual(result, [4, 5, 7])
   })
 })

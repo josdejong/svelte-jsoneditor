@@ -9,9 +9,7 @@ import { arrayToObject, objectToArray } from './arrayUtils.js'
 import type {
   Content,
   JSONContent,
-  JSONObject,
   JSONParser,
-  JSONValue,
   ParseError,
   TextContent,
   TextLocation
@@ -229,10 +227,10 @@ export function findTextLocation(text: string, path: JSONPath): TextLocation | n
  * If it cannot be converted, an error is thrown
  */
 export function convertValue(
-  value: JSONValue,
+  value: unknown,
   type: 'value' | 'object' | 'array',
   parser: JSONParser
-): JSONValue {
+): unknown {
   // FIXME: improve the TypeScript here, there are a couple of conversions
   if (type === 'array') {
     if (Array.isArray(value)) {
@@ -282,7 +280,7 @@ export function convertValue(
         const parsedValue = parser.parse(value)
 
         if (isObject(parsedValue)) {
-          return parsedValue as JSONObject
+          return parsedValue
         }
 
         if (Array.isArray(parsedValue)) {
@@ -418,7 +416,7 @@ export function estimateSerializedSize(content: Content, maxSize = Infinity): nu
 
   let estimatedSize = 0
 
-  function recurse(json: JSONValue) {
+  function recurse(json: unknown) {
     if (Array.isArray(json)) {
       // open and close bracket, commas between items
       estimatedSize += 2 + (json.length - 1)

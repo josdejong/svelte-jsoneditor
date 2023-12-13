@@ -8,13 +8,12 @@ import type {
   DragInsideAction,
   DragInsideProps,
   JSONSelection,
-  JSONValue,
   MultiSelection,
   RenderedItem
 } from '$lib/types'
 
 export interface MoveSelectionProps {
-  json: JSONValue
+  json: unknown
   documentState: DocumentState
   deltaY: number
   items: RenderedItem[]
@@ -137,7 +136,7 @@ function findSwapPathDown({
 
 interface UpdatedArraySelectionProps {
   items: RenderedItem[]
-  json: JSONValue
+  json: unknown
   selection: JSONSelection
   offset: number
 }

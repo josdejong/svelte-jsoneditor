@@ -14,7 +14,6 @@ import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import naturalCompare from 'natural-compare-lite'
 import { int } from '../utils/numberUtils.js'
 import { isObject } from '../utils/typeUtils.js'
-import type { JSONArray, JSONValue } from '$lib/types.js'
 
 export function caseInsensitiveNaturalCompare(a: unknown, b: unknown) {
   const aLower = typeof a === 'string' ? a.toLowerCase() : a
@@ -34,7 +33,7 @@ export function caseInsensitiveNaturalCompare(a: unknown, b: unknown) {
  *                       to get the array sorted.
  */
 export function sortJson(
-  json: JSONValue,
+  json: unknown,
   rootPath: JSONPath = [],
   itemPath: JSONPath = [],
   direction: 1 | -1 = 1
@@ -64,12 +63,12 @@ export function sortJson(
  *                       to get the array sorted.
  */
 export function sortObjectKeys(
-  json: JSONValue,
+  json: unknown,
   rootPath: JSONPath = [],
   direction: 1 | -1 = 1
 ): JSONPatchDocument {
   const object = getIn(json, rootPath)
-  const keys = Object.keys(object as unknown as Record<string, JSONValue>)
+  const keys = Object.keys(object as unknown as Record<string, unknown>)
   const sortedKeys = keys.slice()
 
   sortedKeys.sort((keyA, keyB) => {
@@ -102,7 +101,7 @@ export function sortObjectKeys(
  *                           to get the array sorted.
  */
 export function sortArray(
-  json: JSONValue,
+  json: unknown,
   rootPath: JSONPath = [],
   propertyPath: JSONPath = [],
   direction: 1 | -1 = 1
@@ -110,7 +109,7 @@ export function sortArray(
   const comparator = createObjectComparator(propertyPath, direction)
 
   // TODO: make the mechanism to sort configurable? Like use sortOperationsMove and sortOperationsMoveAdvanced
-  const array: JSONArray = getIn(json, rootPath) as JSONArray
+  const array = getIn(json, rootPath) as Array<unknown>
   return [
     {
       op: 'replace',
@@ -124,7 +123,7 @@ export function sortArray(
  * Create a comparator function to compare nested properties in an array
  */
 function createObjectComparator(propertyPath: JSONPath, direction: 1 | -1) {
-  return function comparator(a: JSONValue, b: JSONValue) {
+  return function comparator(a: unknown, b: unknown) {
     const valueA = getIn(a, propertyPath)
     const valueB = getIn(b, propertyPath)
 
@@ -262,7 +261,7 @@ export function sortOperationsMoveAdvanced<T>(
  * array.
  */
 // TODO: write unit tests
-export function fastPatchSort(json: JSONValue, operations: JSONPatchDocument): JSONValue {
+export function fastPatchSort(json: unknown, operations: JSONPatchDocument): unknown {
   if (isEmpty(operations)) {
     // nothing to do :)
     return json

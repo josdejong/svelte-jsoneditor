@@ -8,11 +8,11 @@
   import { isEqual } from 'lodash-es'
   import type { JSONPath } from 'immutable-json-patch'
   import { setIn } from 'immutable-json-patch'
-  import type { JSONValue, QueryLanguageOptions } from '$lib/types.js'
+  import type { QueryLanguageOptions } from '$lib/types.js'
 
   const debug = createDebug('jsoneditor:TransformWizard')
 
-  export let json: JSONValue
+  export let json: unknown
   export let queryOptions: QueryLanguageOptions = {}
   export let onChange: (queryOptions: QueryLanguageOptions) => void
 

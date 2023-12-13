@@ -258,7 +258,7 @@ describe('jsonUtils', () => {
         // @ts-ignore
         { json: [new LosslessNumber('1'), new LosslessNumber('2'), new LosslessNumber('3')] },
         2,
-        LosslessJSONParser
+        LosslessJSONParser as JSONParser
       ),
       { text: '[\n  1,\n  2,\n  3\n]' }
     )

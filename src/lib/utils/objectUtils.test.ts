@@ -3,7 +3,6 @@ import { deepStrictEqual, strictEqual } from 'assert'
 import { traverse } from './objectUtils.js'
 import { isEqual } from 'lodash-es'
 import type { JSONPath } from 'immutable-json-patch'
-import type { JSONValue } from '$lib/types.js'
 
 describe('objectUtils', () => {
   const json = {
@@ -16,7 +15,7 @@ describe('objectUtils', () => {
   }
 
   test('traverse', () => {
-    const logs: Array<{ value: JSONValue; path: JSONPath }> = []
+    const logs: Array<{ value: unknown; path: JSONPath }> = []
 
     traverse(json, (value, path, context) => {
       strictEqual(context, json)
@@ -44,7 +43,7 @@ describe('objectUtils', () => {
       },
       e: 5
     }
-    const logs: Array<{ value: JSONValue; path: JSONPath }> = []
+    const logs: Array<{ value: unknown; path: JSONPath }> = []
 
     traverse(json, (value, path, context) => {
       strictEqual(context, json)
