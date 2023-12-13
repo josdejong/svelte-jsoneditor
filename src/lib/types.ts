@@ -463,25 +463,7 @@ export interface TreeModeContext extends JSONEditorContext {
   onDragEnd: () => void
 }
 
-export interface RenderValuePropsOptional {
-  path?: JSONPath
-  value?: unknown
-  readOnly?: boolean
-  enforceString?: boolean
-  selection?: JSONSelection | null
-  searchResultItems?: SearchResultItem[]
-  isEditing?: boolean
-  parser?: JSONParser
-  normalization?: ValueNormalization
-  onPatch?: TreeModeContext['onPatch']
-  onPasteJson?: OnPasteJson
-  onSelect?: OnJSONSelect
-  onFind?: OnFind
-  findNextInside?: FindNextInside
-  focus?: () => void
-}
-
-export interface RenderValueProps extends RenderValuePropsOptional {
+export interface RenderValueProps {
   path: JSONPath
   value: unknown
   readOnly: boolean
@@ -498,6 +480,8 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   findNextInside: FindNextInside
   focus: () => void
 }
+
+export type RenderValuePropsOptional = Partial<RenderValueProps>
 
 export interface JSONNodeProp {
   key: string
