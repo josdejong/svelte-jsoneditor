@@ -522,7 +522,7 @@ https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/types.ts
 
 The editor can be styled using the available CSS variables. A full list with all variables can be found here:
 
-https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/themes/defaults.css
+https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/themes/defaults.scss
 
 
 ### Custom theme color
