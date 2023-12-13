@@ -90,7 +90,7 @@ Or one-way binding:
   }
 
   function handleChange(updatedContent, previousContent, { contentErrors, patchResult }) {
-    // content is an object { json: JSONValue } | { text: string }
+    // content is an object { json: unknown } | { text: string }
     console.log('onChange: ', { updatedContent, previousContent, contentErrors, patchResult })
     content = updatedContent
   }
@@ -151,7 +151,7 @@ Browser example loading the standalone ES module:
         props: {
           content,
           onChange: (updatedContent, previousContent, { contentErrors, patchResult }) => {
-            // content is an object { json: JSONValue } | { text: string }
+            // content is an object { json: unknown } | { text: string }
             console.log('onChange', { updatedContent, previousContent, contentErrors, patchResult })
             content = updatedContent
           }
@@ -203,7 +203,7 @@ const editor = new JSONEditor({
   props: {
     content,
     onChange: (updatedContent, previousContent, { contentErrors, patchResult }) => {
-      // content is an object { json: JSONValue } | { text: string }
+      // content is an object { json: unknown } | { text: string }
       console.log('onChange', { updatedContent, previousContent, contentErrors, patchResult })
     }
   }
@@ -225,7 +225,7 @@ const editor = new JSONEditor({
 - `escapeControlCharacters: boolean`. False by default. When `true`, control characters like newline and tab are rendered as escaped characters `\n` and `\t`. Only applicable for `'tree'` mode, in `'text'` mode control characters are always escaped.
 - `escapeUnicodeCharacters: boolean`. False by default. When `true`, unicode characters like ☎ and 😀 are rendered escaped like `\u260e` and `\ud83d\ude00`.
 - `flattenColumns: boolean`. True by default. Only applicable to `'table'` mode. When `true`, nested object properties will be displayed each in their own column, with the nested path as column name. When `false`, nested objects will be rendered inline, and double-clicking them will open them in a popup.
-- `validator: function (json: JSONValue): ValidationError[]`. Validate the JSON document.
+- `validator: function (json: unknown): ValidationError[]`. Validate the JSON document.
   For example use the built-in JSON Schema validator powered by Ajv:
 
   ```js
@@ -438,7 +438,7 @@ Note that most methods are asynchronous and will resolve after the editor is re-
   - `editor.expand(path => true)` expand all
   - `editor.expand(path => false)` collapse all
   - `editor.expand(path => path.length < 2)` expand all paths up to 2 levels deep
-- `transform({ id?: string, rootPath?: [], onTransform: ({ operations: JSONPatchDocument, json: JSONValue, transformedJson: JSONValue }) => void, onClose: () => void })` programmatically trigger clicking of the transform button in the main menu, opening the transform model. If a callback `onTransform` is provided, it will replace the build-in logic to apply a transform, allowing you to process the transform operations in an alternative way. If provided, `onClose` callback will trigger when the transform modal closes, both after the user clicked apply or cancel. If an `id` is provided, the transform modal will load the previous status of this `id` instead of the status of the editors transform modal.
+- `transform({ id?: string, rootPath?: [], onTransform: ({ operations: JSONPatchDocument, json: unknown, transformedJson: unknown }) => void, onClose: () => void })` programmatically trigger clicking of the transform button in the main menu, opening the transform model. If a callback `onTransform` is provided, it will replace the build-in logic to apply a transform, allowing you to process the transform operations in an alternative way. If provided, `onClose` callback will trigger when the transform modal closes, both after the user clicked apply or cancel. If an `id` is provided, the transform modal will load the previous status of this `id` instead of the status of the editors transform modal.
 - `scrollTo(path: Path): Promise<void>` Scroll the editor vertically such that the specified path comes into view. Only applicable to modes `tree` and `table`. The path will be expanded when needed. The returned Promise is resolved after scrolling is finished.
 - `findElement(path: Path)` Find the DOM element of a given path. Returns `null` when not found.
 - `acceptAutoRepair(): Promise<Content>` In tree mode, invalid JSON is automatically repaired when loaded. When the repair was successful, the repaired contents are rendered but not yet applied to the document itself until the user clicks "Ok" or starts editing the data. Instead of accepting the repair, the user can also click "Repair manually instead". Invoking `.acceptAutoRepair()` will programmatically accept the repair. This will trigger an update, and the method itself also returns the updated contents. In case of `text` mode or when the editor is not in an "accept auto repair" status, nothing will happen, and the contents will be returned as is.
