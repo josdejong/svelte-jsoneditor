@@ -2,13 +2,30 @@ import type { JSONPatchDocument, JSONPath, JSONPointer } from 'immutable-json-pa
 import type { SvelteComponent } from 'svelte'
 import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 
-export type TextContent = { text: string } | { json: undefined; text: string }
+export type TextContent = { text: string }
 
-export type JSONContent = { json: unknown } | { json: unknown; text: undefined }
+export type JSONContent = { json: unknown }
 
 export type Content = JSONContent | TextContent
 
-export type JSONParser = JSON
+// The `JSONParser` interface is compatible with `JSON`,
+// except that JSON.stringify is wrongly defined to return a string whilst it can return a string or undefined
+// see: https://stackoverflow.com/questions/74461780/is-the-official-type-definition-for-json-stringify-wrong
+export interface JSONParser {
+  parse(
+    text: string,
+    reviver?: ((this: unknown, key: string, value: unknown) => unknown) | null
+  ): unknown
+
+  stringify(
+    value: unknown,
+    replacer?:
+      | ((this: unknown, key: string, value: unknown) => unknown)
+      | Array<number | string>
+      | null,
+    space?: string | number
+  ): string | undefined
+}
 
 export interface JSONPathParser {
   parse: (pathStr: string) => JSONPath

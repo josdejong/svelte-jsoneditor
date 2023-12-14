@@ -1,12 +1,12 @@
 import { test, describe } from 'vitest'
 import { deepStrictEqual } from 'assert'
 import { mapValidationErrors, validateJSON, validateText } from './validation.js'
-import type { JSONParser, ValidationError } from '$lib/types'
+import type { ValidationError } from '$lib/types'
 import { ValidationSeverity } from '$lib/types.js'
 import { stringify, parse, isLosslessNumber } from 'lossless-json'
 import { LosslessNumber } from 'lossless-json'
 
-const LosslessJSONParser = { parse, stringify } as JSONParser
+const LosslessJSONParser = { parse, stringify }
 
 describe('validation', () => {
   test('should create a map from a list with validation errors', () => {

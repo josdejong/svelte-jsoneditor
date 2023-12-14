@@ -159,6 +159,7 @@
   } from '$lib/logic/actions.js'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import type { Context } from 'svelte-simple-modal'
+  import { isJSONContent, isTextContent } from '$lib/utils/jsonUtils.js'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -488,11 +489,9 @@
   }
 
   function applyExternalContent(updatedContent: Content) {
-    if (updatedContent.json !== undefined) {
+    if (isJSONContent(updatedContent)) {
       applyExternalJson(updatedContent.json)
-    }
-
-    if (updatedContent.text !== undefined) {
+    } else if (isTextContent(updatedContent)) {
       applyExternalText(updatedContent.text)
     }
   }
@@ -542,7 +541,7 @@
   }
 
   function applyExternalText(updatedText: string | undefined) {
-    if (updatedText === undefined || externalContent['json'] !== undefined) {
+    if (updatedText === undefined || isJSONContent(externalContent)) {
       return
     }
 
@@ -896,7 +895,10 @@
   function handlePaste(event: ClipboardEvent) {
     event.preventDefault()
 
-    const clipboardText = event.clipboardData.getData('text/plain')
+    const clipboardText = event.clipboardData?.getData('text/plain')
+    if (clipboardText == null) {
+      return
+    }
 
     onPaste({
       clipboardText,
@@ -1096,7 +1098,7 @@
 
     debug('insert before', { selection: documentState.selection, selectionBefore, parentPath })
 
-    tick().then(handleContextMenu)
+    tick().then(() => handleContextMenu())
   }
 
   function handleInsertAfter() {
@@ -1110,7 +1112,7 @@
 
     updateSelection(createAfterSelection(path))
 
-    tick().then(handleContextMenu)
+    tick().then(() => handleContextMenu())
   }
 
   async function handleInsertCharacter(char: string) {
@@ -1792,10 +1794,12 @@
     }
   }
 
-  function handleMouseDown(event: MouseEvent & { target: HTMLDivElement }) {
+  function handleMouseDown(event: Event) {
     debug('handleMouseDown', event)
 
-    if (!isChildOfNodeName(event.target, 'BUTTON') && !event.target.isContentEditable) {
+    const target = event.target as HTMLElement
+
+    if (!isChildOfNodeName(target, 'BUTTON') && !target.isContentEditable) {
       // for example when clicking on the empty area in the main menu
       focus()
 
@@ -1866,7 +1870,7 @@
     })
   }
 
-  function handleContextMenu(event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
+  function handleContextMenu(event?: Event) {
     if (readOnly || isEditingSelection(documentState.selection)) {
       return
     }
@@ -1915,13 +1919,13 @@
     return false
   }
 
-  function handleContextMenuFromTreeMenu(event) {
+  function handleContextMenuFromTreeMenu(event: Event) {
     if (readOnly) {
       return
     }
 
     openContextMenu({
-      anchor: findParentWithNodeName(event.target, 'BUTTON'),
+      anchor: findParentWithNodeName(event.target as HTMLElement, 'BUTTON'),
       offsetTop: 0,
       width: CONTEXT_MENU_WIDTH,
       height: CONTEXT_MENU_HEIGHT,

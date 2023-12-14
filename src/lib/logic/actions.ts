@@ -511,7 +511,7 @@ export function onInsert({
   const newValue = createNewValue(json, selection, insertType)
 
   if (json !== undefined) {
-    const data = parser.stringify(newValue)
+    const data = parser.stringify(newValue) as string
     const operations = insert(json, selection, data, parser)
     debug('onInsert', { insertType, operations, newValue, data })
 

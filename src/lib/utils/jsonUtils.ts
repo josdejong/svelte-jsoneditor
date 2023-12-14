@@ -355,10 +355,10 @@ export function isTextContent(content: unknown): content is TextContent {
 }
 
 /**
- * Check whether content contains text (and not JSON)
+ * Check whether content contains json
  */
 export function isJSONContent(content: unknown): content is JSONContent {
-  return isObject(content) && typeof content.json !== 'undefined' && !isTextContent(content)
+  return isObject(content) && typeof content.json !== 'undefined'
 }
 
 /**
@@ -371,7 +371,7 @@ export function toTextContent(
 ): TextContent {
   return isTextContent(content)
     ? content
-    : { text: parser.stringify(content.json, null, indentation) }
+    : { text: parser.stringify(content.json, null, indentation) as string }
 }
 
 /**

@@ -46,9 +46,9 @@
 
   $: projectionPaths =
     queryOptions?.projection?.paths && projectionOptions
-      ? queryOptions.projection.paths
+      ? (queryOptions.projection.paths
           .map((path) => projectionOptions.find((option) => isEqual(option.value, path)))
-          .filter((option) => !!option) as PathOption[]
+          .filter((option) => !!option) as PathOption[])
       : null
 
   function changeFilterPath(path: JSONPath | undefined) {
@@ -100,9 +100,9 @@
   }
 
   $: changeFilterPath(filterPath?.value)
-  $: changeFilterRelation(filterRelation?.value )
+  $: changeFilterRelation(filterRelation?.value)
   $: changeFilterValue(filterValue)
-  $: changeSortPath(sortPath?.value )
+  $: changeSortPath(sortPath?.value)
   $: changeSortDirection(sortDirection?.value)
   $: changeProjectionPaths(projectionPaths ? projectionPaths.map((item) => item.value) : undefined)
 </script>

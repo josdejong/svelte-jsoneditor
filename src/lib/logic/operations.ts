@@ -531,7 +531,7 @@ export function createNewValue(
   json: unknown | undefined,
   selection: JSONSelection | null,
   valueType: 'object' | 'array' | 'structure' | 'value'
-) {
+): unknown {
   if (valueType === 'object') {
     return {}
   }

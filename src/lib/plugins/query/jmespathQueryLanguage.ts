@@ -100,7 +100,13 @@ function createQuery(json: unknown, queryOptions: QueryLanguageOptions): string 
  */
 function executeQuery(json: unknown, query: string, parser: JSONParser): unknown {
   // JMESPath cannot handle non-native JSON data types like LosslessNumber
-  const preprocessedJson = isEqualParser(parser, JSON) ? json : JSON.parse(parser.stringify(json))
+
+  function stringifyAndParse(json: unknown) {
+    const text = parser.stringify(json)
+    return text !== undefined ? JSON.parse(text) : undefined
+  }
+
+  const preprocessedJson = isEqualParser(parser, JSON) ? json : stringifyAndParse(json)
 
   return jmespath.search(preprocessedJson, query)
 }

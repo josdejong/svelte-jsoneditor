@@ -29,19 +29,15 @@
   import {
     compileJSONPointer,
     isJSONObject,
-    type JSONArray,
-    type JSONObject,
     parseJSONPointer
   } from 'immutable-json-patch'
   import { toJSONContent } from '$lib/utils/jsonUtils.js'
   import { isJSONContent, isTextContent } from '$lib'
-  import type { ChangeEventHandler } from 'svelte/elements.js'
 
-  // const LosslessJSON: JSONParser = { ... } // FIXME: make the types work
   const LosslessJSON = {
     parse,
     stringify
-  } as JSONParser
+  }
 
   let content: Content = {
     text: `{
@@ -412,7 +408,7 @@
     }
   }
 
-  function generateLongArray(): JSONArray {
+  function generateLongArray() {
     return [...new Array(1000)].map((value, index) => {
       const random = Math.round(Math.random() * 1000)
       const item: Record<string, unknown> = {
@@ -447,11 +443,11 @@
         item.unknownProp = 'other'
       }
 
-      return item as JSONObject
+      return item
     })
   }
 
-  const handleOpenFile: ChangeEventHandler<HTMLInputElement> = (event) => {
+  function handleOpenFile (event: Event) {
     const target = event.target as HTMLInputElement
 
     console.log('loadFile', target.files)
@@ -800,7 +796,7 @@
           <pre>
             <code>
             {isJSONContent(content)
-                ? truncate(selectedParser.stringify(content.json, null, 2), 1e5)
+                ? truncate(selectedParser.stringify(content.json, null, 2) ?? '', 1e5)
                 : 'undefined'}
             </code>
           </pre>

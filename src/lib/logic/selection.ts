@@ -658,13 +658,13 @@ export function selectionToPartialJson(
 
   if (isValueSelection(selection)) {
     const value = getIn(json, selection.path)
-    return typeof value === 'string' ? value : parser.stringify(value, null, indentation) // TODO: customizable indentation?
+    return typeof value === 'string' ? value : parser.stringify(value, null, indentation) ?? null // TODO: customizable indentation?
   }
 
   if (isMultiSelection(selection)) {
     if (isEmpty(selection.focusPath)) {
       // root object -> does not have a parent key/index
-      return parser.stringify(json, null, indentation)
+      return parser.stringify(json, null, indentation) ?? null
     }
 
     const parentPath = getParentPath(selection)
@@ -673,7 +673,7 @@ export function selectionToPartialJson(
       if (isMultiSelectionWithOneItem(selection)) {
         // do not suffix a single selected array item with a comma
         const item = getIn(json, selection.focusPath)
-        return parser.stringify(item, null, indentation)
+        return parser.stringify(item, null, indentation) ?? null
       } else {
         return getSelectionPaths(json, selection)
           .map((path) => {

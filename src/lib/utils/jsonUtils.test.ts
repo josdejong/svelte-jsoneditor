@@ -227,7 +227,7 @@ describe('jsonUtils', () => {
   test('isJSONContent', () => {
     strictEqual(isJSONContent({ text: '' }), false)
     strictEqual(isJSONContent({ json: [] }), true)
-    strictEqual(isJSONContent({ text: '', json: [] }), false) // text has precedence over json
+    strictEqual(isJSONContent({ text: '', json: [] }), true)
     strictEqual(isJSONContent(1), false)
     strictEqual(isJSONContent({}), false)
 
@@ -258,7 +258,7 @@ describe('jsonUtils', () => {
         // @ts-ignore
         { json: [new LosslessNumber('1'), new LosslessNumber('2'), new LosslessNumber('3')] },
         2,
-        LosslessJSONParser as JSONParser
+        LosslessJSONParser
       ),
       { text: '[\n  1,\n  2,\n  3\n]' }
     )
@@ -270,7 +270,7 @@ describe('jsonUtils', () => {
     deepStrictEqual(toJSONContent({ text: '[1,2,3]' }), jsonContent)
     strictEqual(toJSONContent(jsonContent), jsonContent)
 
-    deepStrictEqual(toJSONContent({ text: '[1,2,3]' }, LosslessJSONParser as JSONParser), {
+    deepStrictEqual(toJSONContent({ text: '[1,2,3]' }, LosslessJSONParser), {
       json: [new LosslessNumber('1'), new LosslessNumber('2'), new LosslessNumber('3')]
     })
 
@@ -279,7 +279,7 @@ describe('jsonUtils', () => {
     }, /(SyntaxError: Unexpected end of JSON input)|(SyntaxError: Expected ',' or ']' after array element in JSON at position 6)/)
 
     throws(() => {
-      toJSONContent({ text: '[1,2,3' }, LosslessJSONParser as JSONParser)
+      toJSONContent({ text: '[1,2,3' }, LosslessJSONParser)
     }, /SyntaxError: Array item or end of array ']' expected but reached end of input at position 6/)
   })
 
@@ -387,9 +387,8 @@ describe('jsonUtils', () => {
     })
 
     test('should test whether two parsers are equal', () => {
-      // FIXME: should not be needed to cast to JSONParser
-      const LosslessJSON = { parse, stringify } as JSONParser
-      const LosslessJSON2 = { parse, stringify } as JSONParser
+      const LosslessJSON = { parse, stringify }
+      const LosslessJSON2 = { parse, stringify }
 
       strictEqual(isEqualParser(JSON, JSON), true)
       strictEqual(isEqualParser(LosslessJSON, LosslessJSON), true)

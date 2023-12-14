@@ -3,7 +3,6 @@ import assert from 'assert'
 import { lodashQueryLanguage } from './lodashQueryLanguage.js'
 import { cloneDeep } from 'lodash-es'
 import { LosslessNumber, parse, stringify } from 'lossless-json'
-import type { JSONParser } from '$lib/types'
 
 const { createQuery, executeQuery } = lodashQueryLanguage
 
@@ -361,7 +360,7 @@ describe('lodashQueryLanguage', () => {
     })
 
     test('should work with alternative parsers and non-native JSON data types', () => {
-      const LosslessJSONParser = { parse, stringify } as JSONParser
+      const LosslessJSONParser = { parse, stringify }
 
       const data = [new LosslessNumber('4'), new LosslessNumber('7'), new LosslessNumber('5')]
       const query = createQuery(data, {

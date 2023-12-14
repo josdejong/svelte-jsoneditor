@@ -70,7 +70,8 @@ export function validateJSON(
   if (parser !== validationParser) {
     // if needed, convert for example Lossless JSON to native JSON
     // (like replace bigint or LosslessNumber into regular numbers)
-    const convertedJSON = validationParser.parse(parser.stringify(json))
+    const text = parser.stringify(json)
+    const convertedJSON = text !== undefined ? validationParser.parse(text) : undefined
     return validator(convertedJSON)
   } else {
     return validator(json)
