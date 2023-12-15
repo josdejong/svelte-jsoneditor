@@ -895,8 +895,8 @@
   function handlePaste(event: ClipboardEvent) {
     event.preventDefault()
 
-    const clipboardText = event.clipboardData?.getData('text/plain')
-    if (clipboardText == null) {
+    const clipboardText = event.clipboardData?.getData('text/plain') as string | undefined
+    if (clipboardText === undefined) {
       return
     }
 

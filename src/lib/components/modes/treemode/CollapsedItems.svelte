@@ -23,7 +23,7 @@
 
   $: expandItemsSections = getExpandItemsSections(startIndex, endIndex)
 
-  function handleMouseMove(event) {
+  function handleMouseMove(event: MouseEvent) {
     // prevent the whole array from being selected whilst dragging over
     // a section with collapsed items
     event.stopPropagation()

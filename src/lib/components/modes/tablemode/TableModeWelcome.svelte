@@ -37,6 +37,10 @@
         : isJSONArray(json)
           ? 'An empty array' // note: can also be an array with objects but without properties
           : `A ${valueType(json, parser)}`
+
+  function countItems(nestedArrayPath: JSONPath): number {
+    return (getIn(json, nestedArrayPath) as JSONPath).length
+  }
 </script>
 
 <div class="jse-table-mode-welcome">
@@ -58,7 +62,7 @@
       {/if}
     </div>
     {#each nestedArrayPaths as nestedArrayPath}
-      {@const count = getIn(json, nestedArrayPath).length}
+      {@const count = countItems(nestedArrayPath)}
 
       <button
         type="button"

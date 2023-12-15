@@ -23,9 +23,9 @@
     const props = {
       queryLanguages,
       queryLanguageId,
-      onChangeQueryLanguage: (selectedQueryLanguage: QueryLanguage) => {
+      onChangeQueryLanguage: (queryLanguageId: string) => {
         closeAbsolutePopup(popupId)
-        onChangeQueryLanguage(selectedQueryLanguage)
+        onChangeQueryLanguage(queryLanguageId)
       }
     }
 

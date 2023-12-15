@@ -391,10 +391,9 @@
         } catch (repairError) {
           // no valid JSON, will show empty document or invalid json
           json = undefined
-          text = externalContent.text
+          text = content.text
           textIsRepaired = false
-          parseError =
-            text !== undefined && text !== ''
+          parseError = text !== ''
               ? normalizeJsonParseError(text, (err as Error).message || String(err))
               : undefined
         }
@@ -968,7 +967,7 @@
     })
   }
 
-  function handleContextMenu(event: MouseEvent) {
+  function handleContextMenu(event: Event) {
     if (readOnly || isEditingSelection(documentState.selection)) {
       return
     }
@@ -1206,7 +1205,7 @@
     })
   }
 
-  function handleKeyDown(event) {
+  function handleKeyDown(event: KeyboardEvent) {
     const combo = keyComboFromEvent(event)
     debug('keydown', { combo, key: event.key })
 
@@ -1372,7 +1371,10 @@
   function handlePaste(event: ClipboardEvent) {
     event.preventDefault()
 
-    const clipboardText = event.clipboardData.getData('text/plain')
+    const clipboardText = event.clipboardData?.getData('text/plain') as string | undefined
+    if (clipboardText === undefined) {
+      return
+    }
 
     onPaste({
       clipboardText,

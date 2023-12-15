@@ -31,7 +31,7 @@
   import { faCaretLeft } from '@fortawesome/free-solid-svg-icons'
   import memoizeOne from 'memoize-one'
   import { onEscape } from '$lib/actions/onEscape.js'
-  import { getFocusPath } from '$lib/logic/selection.js'
+  import { getFocusPath, isJSONSelection } from '$lib/logic/selection.js'
   import type { Context } from 'svelte-simple-modal'
 
   const debug = createDebug('jsoneditor:JSONEditorModal')
@@ -97,7 +97,7 @@
 
   function scrollToSelection() {
     const selection: JSONEditorSelection | null = last(stack)?.selection || null
-    if (selection) {
+    if (isJSONSelection(selection)) {
       refEditor.scrollTo(getFocusPath(selection))
     }
   }

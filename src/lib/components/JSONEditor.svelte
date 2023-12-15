@@ -350,6 +350,8 @@
         queryLanguageId,
         onChangeQueryLanguage: handleChangeQueryLanguage,
         onRenderValue,
+        onRenderMenu,
+        onRenderContextMenu,
         onClassName,
         onTransform
       },

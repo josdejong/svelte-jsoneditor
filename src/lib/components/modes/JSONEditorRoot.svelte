@@ -239,7 +239,7 @@
   }
 </script>
 
-{#if mode === Mode.text || mode === 'code'}
+{#if mode === Mode.text || String(mode) === 'code'}
   <TextMode
     bind:this={refTextMode}
     externalContent={content}
