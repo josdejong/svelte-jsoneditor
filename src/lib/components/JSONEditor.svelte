@@ -55,10 +55,9 @@
   import JSONEditorRoot from './modes/JSONEditorRoot.svelte'
   import JSONEditorModal from './modals/JSONEditorModal.svelte'
   import memoizeOne from 'memoize-one'
-  import type { Callbacks, Component } from 'svelte-simple-modal/types/Modal.svelte'
   import ModalRef from '../components/modals/ModalRef.svelte'
-  import type { Open } from 'svelte-simple-modal/types/Modal.svelte.js'
-  import type { OnRenderContextMenu } from '$lib'
+  import type { Open, Callbacks, Component } from 'svelte-simple-modal'
+  import type { OnRenderContextMenu } from '$lib/types.js'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:JSONEditor')
