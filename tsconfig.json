@@ -5,31 +5,16 @@
     "module": "es2020",
     "lib": ["es2020", "dom"],
     "target": "es2020",
-    /**
-			svelte-preprocess cannot figure out whether you have a value or a type, so tell TypeScript
-			to enforce using \`import type\` instead of \`import\` for Types.
-			*/
-    "importsNotUsedAsValues": "error",
     "isolatedModules": true,
     "resolveJsonModule": true,
-    /**
-			To have warnings/errors of the Svelte compiler at the correct position,
-			enable source maps by default.
-			*/
-    "sourceMap": true,
+    "sourceMap": true, // To have warnings/errors of the Svelte compiler at the correct position, enable source maps
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
     "strict": true,
     "noImplicitAny": true,
-    "allowJs": false, // turned off (temporarily?) because else Mocha tests fail to run in WebStorm, see https://youtrack.jetbrains.com/issue/WEB-50130
-    "checkJs": false,
-    "paths": {
-      "$lib": ["src/lib"],
-      "$lib/*": ["src/lib/*"],
-      "svelte-jsoneditor": ["src/lib"]
-    }
+    "allowJs": false,
+    "checkJs": false
   },
   "include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte"]
 }

@@ -109,10 +109,10 @@
     "@rollup/plugin-node-resolve": "15.2.3",
     "@rollup/plugin-terser": "0.4.4",
     "@rollup/plugin-typescript": "11.1.5",
-    "@sveltejs/adapter-auto": "2.1.1",
-    "@sveltejs/kit": "1.27.7",
+    "@sveltejs/adapter-auto": "3.0.0",
+    "@sveltejs/kit": "2.0.0",
     "@sveltejs/package": "2.2.3",
-    "@sveltejs/vite-plugin-svelte": "2.5.3",
+    "@sveltejs/vite-plugin-svelte": "3.0.1",
     "@testing-library/jest-dom": "6.1.5",
     "@testing-library/svelte": "4.0.5",
     "@types/cookie": "0.6.0",
@@ -121,7 +121,7 @@
     "@types/lodash-es": "4.17.12",
     "@typescript-eslint/eslint-plugin": "6.13.2",
     "@typescript-eslint/parser": "6.13.2",
-    "@vitest/coverage-c8": "0.33.0",
+    "@vitest/coverage-v8": "1.0.4",
     "cpy-cli": "5.0.0",
     "del-cli": "5.1.0",
     "eslint": "8.55.0",
@@ -139,10 +139,9 @@
     "rollup-plugin-svelte": "7.1.6",
     "standard-version": "9.5.0",
     "svelte-check": "3.6.2",
-    "svelte-preprocess": "5.1.1",
-    "svelte2tsx": "0.6.27",
+    "svelte-preprocess": "5.1.2",
     "typescript": "5.3.2",
-    "vite": "4.5.1",
-    "vitest": "0.34.6"
+    "vite": "5.0.9",
+    "vitest": "1.0.4"
   }
 }
