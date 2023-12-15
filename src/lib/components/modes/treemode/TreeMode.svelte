@@ -1445,6 +1445,7 @@
     afterPatch?: AfterPatchCallback
   ): JSONPatchResult {
     if (readOnly) {
+      // this should never happen in practice
       return {
         json,
         previousJson: json,
@@ -1883,8 +1884,8 @@
     if (event && event.type === 'contextmenu' && event.target !== refHiddenInput) {
       // right mouse click to open context menu
       openContextMenu({
-        left: event.clientX,
-        top: event.clientY,
+        left: (event as MouseEvent).clientX,
+        top: (event as MouseEvent).clientY,
         width: CONTEXT_MENU_WIDTH,
         height: CONTEXT_MENU_HEIGHT,
         showTip: false
@@ -1919,7 +1920,7 @@
     return false
   }
 
-  function handleContextMenuFromTreeMenu(event: Event) {
+  function handleContextMenuFromTreeMenu(event: MouseEvent) {
     if (readOnly) {
       return
     }

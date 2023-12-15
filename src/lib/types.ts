@@ -145,7 +145,7 @@ export type ClipboardValues = Array<{ key: string; value: unknown }>
 
 export interface MenuButton {
   type: 'button'
-  onClick: () => void
+  onClick: (event: MouseEvent) => void
   icon?: IconDefinition
   text?: string
   title?: string
@@ -415,7 +415,7 @@ export interface AbsolutePopupOptions {
 
 export interface AbsolutePopupContext {
   openAbsolutePopup: (
-    component: typeof SvelteComponent,
+    component: typeof SvelteComponent<Record<string, unknown>>,
     props: Record<string, unknown>,
     options: AbsolutePopupOptions
   ) => number

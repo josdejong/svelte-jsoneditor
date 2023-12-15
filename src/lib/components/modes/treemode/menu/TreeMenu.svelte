@@ -31,7 +31,7 @@
   export let onRedo: () => void
   export let onSort: () => void
   export let onTransform: () => void
-  export let onContextMenu: () => void
+  export let onContextMenu: (event: MouseEvent) => void
   export let onCopy: () => void
   export let onRenderMenu: OnRenderMenuInternal
 

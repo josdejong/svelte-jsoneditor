@@ -644,7 +644,13 @@
     afterPatch?: AfterPatchCallback
   ): JSONPatchResult {
     if (readOnly) {
-      return
+      // this should never happen in practice
+      return {
+        json,
+        previousJson: json,
+        redo: [],
+        undo: []
+      }
     }
 
     return patch(operations, afterPatch)
@@ -710,11 +716,12 @@
   }
 
   function handleScroll(event: Event) {
-    scrollTop = event.target['scrollTop']
+    scrollTop = (event.target as HTMLElement)['scrollTop']
   }
 
-  function handleMouseDown(event: MouseEvent & { target: HTMLDivElement }) {
-    const path = event?.target ? getDataPathFromTarget(event.target as HTMLElement) : undefined
+  function handleMouseDown(event: MouseEvent) {
+    const target = event.target as HTMLElement
+    const path = getDataPathFromTarget(target)
     if (path) {
       // when clicking inside the current selection, editing a value, do nothing
       if (
@@ -730,7 +737,7 @@
     }
 
     // for example when clicking on the empty area in the main menu
-    if (!isChildOfNodeName(event.target, 'BUTTON') && !event.target.isContentEditable) {
+    if (!isChildOfNodeName(target, 'BUTTON') && !target.isContentEditable) {
       focus()
     }
   }
@@ -980,8 +987,8 @@
     if (event && event.type === 'contextmenu' && event.target !== refHiddenInput) {
       // right mouse click to open context menu
       openContextMenu({
-        left: event.clientX,
-        top: event.clientY,
+        left: (event as MouseEvent).clientX,
+        top: (event as MouseEvent).clientY,
         width: CONTEXT_MENU_WIDTH,
         height: CONTEXT_MENU_HEIGHT,
         showTip: false
@@ -1016,13 +1023,13 @@
     return false
   }
 
-  function handleContextMenuFromTableMenu(event: Event & { target: HTMLDivElement }) {
+  function handleContextMenuFromTableMenu(event: MouseEvent) {
     if (readOnly) {
       return
     }
 
     openContextMenu({
-      anchor: findParentWithNodeName(event.target, 'BUTTON'),
+      anchor: findParentWithNodeName(event.target as HTMLElement, 'BUTTON'),
       offsetTop: 0,
       width: CONTEXT_MENU_WIDTH,
       height: CONTEXT_MENU_HEIGHT,

@@ -256,7 +256,7 @@
     const updatedJson = immutableJSONPatch(previousJson, operations)
     const undo = revertJSONPatch(previousJson, operations)
     setCodeMirrorContent({
-      text: parser.stringify(updatedJson, null, indentation)
+      text: parser.stringify(updatedJson, null, indentation) as string
     })
 
     return {
@@ -277,7 +277,7 @@
     try {
       const json = parser.parse(text)
       setCodeMirrorContent({
-        text: parser.stringify(json, null, indentation)
+        text: parser.stringify(json, null, indentation) as string
       })
       askToFormat = true
 
@@ -299,7 +299,7 @@
     try {
       const json = parser.parse(text)
       setCodeMirrorContent({
-        text: parser.stringify(json)
+        text: parser.stringify(json) as string
       })
       askToFormat = false
 

@@ -200,7 +200,7 @@ export function countCharacterOccurrences(
  * Find the text location of a JSON path
  */
 // TODO: write unit tests
-export function findTextLocation(text: string, path: JSONPath): TextLocation | null {
+export function findTextLocation(text: string, path: JSONPath): TextLocation {
   try {
     const jsmap = jsonSourceMap.parse(text)
 
@@ -208,7 +208,7 @@ export function findTextLocation(text: string, path: JSONPath): TextLocation | n
     const pointer = jsmap.pointers[pointerName]
     if (pointer) {
       return {
-        path: path,
+        path,
         line: pointer.key ? pointer.key.line : pointer.value ? pointer.value.line : 0,
         column: pointer.key ? pointer.key.column : pointer.value ? pointer.value.column : 0,
         from: pointer.key ? pointer.key.pos : pointer.value ? pointer.value.pos : 0,
@@ -219,7 +219,13 @@ export function findTextLocation(text: string, path: JSONPath): TextLocation | n
     console.error(err)
   }
 
-  return null
+  return {
+    path,
+    line: 0,
+    column: 0,
+    from: 0,
+    to: 0
+  }
 }
 
 /**
