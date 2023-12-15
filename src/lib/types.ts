@@ -394,7 +394,7 @@ export type InsertType = 'value' | 'object' | 'array' | 'structure'
 
 export interface PopupEntry {
   id: number
-  component: typeof SvelteComponent
+  component: typeof SvelteComponent<Record<string, unknown>>
   props: Record<string, unknown>
   options: AbsolutePopupOptions
 }

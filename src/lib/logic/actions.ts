@@ -128,7 +128,7 @@ interface OnPasteAction {
   parser: JSONParser
   onPatch: OnPatch
   onChangeText: OnChangeText
-  openRepairModal: (clipboardText: string, callback: RepairModalCallback) => void
+  openRepairModal: RepairModalCallback
 }
 
 // TODO: write unit tests
