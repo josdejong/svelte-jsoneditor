@@ -65,11 +65,11 @@
     isAfterSelection,
     isEditingSelection,
     isInsideSelection,
+    isJSONSelection,
     isKeySelection,
     isMultiSelection,
     isMultiSelectionWithOneItem,
     isSelectionInsidePath,
-    isTextSelection,
     isValueSelection,
     removeEditModeFromSelection,
     selectAll,
@@ -88,6 +88,8 @@
   } from '$lib/utils/domUtils.js'
   import {
     convertValue,
+    isJSONContent,
+    isTextContent,
     normalizeJsonParseError,
     parseAndRepair,
     parsePartialJson,
@@ -149,17 +151,9 @@
   import { Mode, ValidationSeverity } from '$lib/types.js'
   import memoizeOne from 'memoize-one'
   import { measure } from '$lib/utils/timeUtils.js'
-  import {
-    onCopy,
-    onCut,
-    onInsert,
-    onInsertCharacter,
-    onPaste,
-    onRemove
-  } from '$lib/logic/actions.js'
+  import { onCopy, onCut, onInsert, onInsertCharacter, onPaste, onRemove } from '$lib/logic/actions.js'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import type { Context } from 'svelte-simple-modal'
-  import { isJSONContent, isTextContent } from '$lib/utils/jsonUtils.js'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -608,11 +602,9 @@
     if (!isEqual(documentState.selection, externalSelection)) {
       debug('applyExternalSelection', externalSelection)
 
-      if (isTextSelection(externalSelection)) {
-        return
+      if (isJSONSelection(externalSelection)) {
+        updateSelection(externalSelection)
       }
-
-      updateSelection(externalSelection)
     }
   }
 
