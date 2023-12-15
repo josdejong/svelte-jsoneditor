@@ -13,7 +13,7 @@
   $: lineNumber = line ? line.number : undefined
 
   let columnNumber: number | undefined
-  $: columnNumber = line !==undefined && pos !== undefined ? pos - line.from + 1 : undefined
+  $: columnNumber = line !== undefined && pos !== undefined ? pos - line.from + 1 : undefined
 
   let charCount: number | undefined
   $: charCount = editorState?.selection?.ranges?.reduce((count, range) => {

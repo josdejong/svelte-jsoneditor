@@ -26,11 +26,7 @@
   import { parse, stringify } from 'lossless-json'
   import { truncate } from '$lib/utils/stringUtils.js'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils.js'
-  import {
-    compileJSONPointer,
-    isJSONObject,
-    parseJSONPointer
-  } from 'immutable-json-patch'
+  import { compileJSONPointer, isJSONObject, parseJSONPointer } from 'immutable-json-patch'
   import { toJSONContent } from '$lib/utils/jsonUtils.js'
   import { isJSONContent, isTextContent } from '$lib'
 
@@ -447,7 +443,7 @@
     })
   }
 
-  function handleOpenFile (event: Event) {
+  function handleOpenFile(event: Event) {
     const target = event.target as HTMLInputElement
 
     console.log('loadFile', target.files)
