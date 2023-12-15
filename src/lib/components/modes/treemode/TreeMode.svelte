@@ -121,7 +121,6 @@
     JSONPathParser,
     JSONPointerMap,
     JSONSelection,
-    JSONValue,
     NestedValidationError,
     OnBlur,
     OnChange,
@@ -160,6 +159,7 @@
   } from '$lib/logic/actions.js'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import type { Context } from 'svelte-simple-modal'
+  import { isJSONContent, isTextContent } from '$lib/utils/jsonUtils.js'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -229,7 +229,7 @@
     }
   })
 
-  let json: JSONValue | undefined
+  let json: unknown | undefined
   let text: string | undefined
   let parseError: ParseError | undefined = undefined
 
@@ -360,7 +360,7 @@
 
   // we pass searchText and json as argument to trigger search when these variables change,
   // via $: applySearchThrottled(searchText, json)
-  function applySearch(searchText: string, json: JSONValue) {
+  function applySearch(searchText: string, json: unknown) {
     if (searchText === '') {
       debug('clearing search result')
 
@@ -435,7 +435,7 @@
   const memoizedValidate = memoizeOne(validateJSON)
 
   function updateValidationErrors(
-    json: JSONValue,
+    json: unknown,
     validator: Validator | null,
     parser: JSONParser,
     validationParser: JSONParser
@@ -489,16 +489,14 @@
   }
 
   function applyExternalContent(updatedContent: Content) {
-    if (updatedContent.json !== undefined) {
+    if (isJSONContent(updatedContent)) {
       applyExternalJson(updatedContent.json)
-    }
-
-    if (updatedContent.text !== undefined) {
+    } else if (isTextContent(updatedContent)) {
       applyExternalText(updatedContent.text)
     }
   }
 
-  function applyExternalJson(updatedJson: JSONValue | undefined) {
+  function applyExternalJson(updatedJson: unknown | undefined) {
     if (updatedJson === undefined) {
       return
     }
@@ -543,7 +541,7 @@
   }
 
   function applyExternalText(updatedText: string | undefined) {
-    if (updatedText === undefined || externalContent['json'] !== undefined) {
+    if (updatedText === undefined || isJSONContent(externalContent)) {
       return
     }
 
@@ -618,14 +616,14 @@
     }
   }
 
-  function expandWhenNotInitialized(json: JSONValue) {
+  function expandWhenNotInitialized(json: unknown) {
     if (!documentStateInitialized) {
       documentStateInitialized = true
       documentState = expandWithCallback(json, documentState, [], getDefaultExpand(json))
     }
   }
 
-  function clearSelectionWhenNotExisting(json: JSONValue) {
+  function clearSelectionWhenNotExisting(json: unknown) {
     if (!documentState.selection) {
       return
     }
@@ -650,7 +648,7 @@
     previousText,
     previousTextIsRepaired
   }: {
-    previousJson: JSONValue | undefined
+    previousJson: unknown | undefined
     previousText: string | undefined
     previousState: DocumentState
     previousTextIsRepaired: boolean
@@ -851,7 +849,7 @@
         {
           op: 'replace',
           path: pointer,
-          value: updatedValue as JSONValue
+          value: updatedValue
         }
       ],
       (patchedJson, patchedState) => {
@@ -897,7 +895,10 @@
   function handlePaste(event: ClipboardEvent) {
     event.preventDefault()
 
-    const clipboardText = event.clipboardData.getData('text/plain')
+    const clipboardText = event.clipboardData?.getData('text/plain')
+    if (clipboardText == null) {
+      return
+    }
 
     onPaste({
       clipboardText,
@@ -1051,7 +1052,7 @@
 
     try {
       const path = getAnchorPath(documentState.selection)
-      const currentValue: JSONValue = getIn(json, path)
+      const currentValue: unknown = getIn(json, path)
       const convertedValue = convertValue(currentValue, type, parser)
       if (convertedValue === currentValue) {
         // no change, do nothing
@@ -1097,7 +1098,7 @@
 
     debug('insert before', { selection: documentState.selection, selectionBefore, parentPath })
 
-    tick().then(handleContextMenu)
+    tick().then(() => handleContextMenu())
   }
 
   function handleInsertAfter() {
@@ -1111,7 +1112,7 @@
 
     updateSelection(createAfterSelection(path))
 
-    tick().then(handleContextMenu)
+    tick().then(() => handleContextMenu())
   }
 
   async function handleInsertCharacter(char: string) {
@@ -1271,8 +1272,8 @@
         if (onTransform) {
           onTransform({
             operations,
-            json: json as JSONValue,
-            transformedJson: immutableJSONPatch(json as JSONValue, operations)
+            json,
+            transformedJson: immutableJSONPatch(json, operations)
           })
         } else {
           debug('onTransform', rootPath, operations)
@@ -1313,7 +1314,7 @@
     })
   }
 
-  function openJSONEditorModal(path: JSONPath, value: JSONValue) {
+  function openJSONEditorModal(path: JSONPath, value: unknown) {
     debug('openJSONEditorModal', { path, value })
 
     modalOpen = true
@@ -1442,9 +1443,14 @@
   function handlePatch(
     operations: JSONPatchDocument,
     afterPatch?: AfterPatchCallback
-  ): JSONPatchResult | null {
+  ): JSONPatchResult {
     if (readOnly) {
-      return null
+      return {
+        json,
+        previousJson: json,
+        undo: [],
+        redo: []
+      }
     }
 
     debug('handlePatch', operations, afterPatch)
@@ -1452,7 +1458,7 @@
     return patch(operations, afterPatch)
   }
 
-  function handleReplaceJson(updatedJson: JSONValue, afterPatch?: AfterPatchCallback) {
+  function handleReplaceJson(updatedJson: unknown, afterPatch?: AfterPatchCallback) {
     const previousState = documentState
     const previousJson = json
     const previousText = text
@@ -1788,10 +1794,12 @@
     }
   }
 
-  function handleMouseDown(event: MouseEvent & { target: HTMLDivElement }) {
+  function handleMouseDown(event: Event) {
     debug('handleMouseDown', event)
 
-    if (!isChildOfNodeName(event.target, 'BUTTON') && !event.target.isContentEditable) {
+    const target = event.target as HTMLElement
+
+    if (!isChildOfNodeName(target, 'BUTTON') && !target.isContentEditable) {
       // for example when clicking on the empty area in the main menu
       focus()
 
@@ -1862,7 +1870,7 @@
     })
   }
 
-  function handleContextMenu(event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
+  function handleContextMenu(event?: Event) {
     if (readOnly || isEditingSelection(documentState.selection)) {
       return
     }
@@ -1911,13 +1919,13 @@
     return false
   }
 
-  function handleContextMenuFromTreeMenu(event) {
+  function handleContextMenuFromTreeMenu(event: Event) {
     if (readOnly) {
       return
     }
 
     openContextMenu({
-      anchor: findParentWithNodeName(event.target, 'BUTTON'),
+      anchor: findParentWithNodeName(event.target as HTMLElement, 'BUTTON'),
       offsetTop: 0,
       width: CONTEXT_MENU_WIDTH,
       height: CONTEXT_MENU_HEIGHT,

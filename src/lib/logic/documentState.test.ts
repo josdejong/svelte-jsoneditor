@@ -22,10 +22,7 @@ import {
 import {
   CaretType,
   type DocumentState,
-  type JSONArray,
-  type JSONObject,
   type JSONPointerMap,
-  type JSONValue,
   type VisibleSection
 } from '$lib/types.js'
 import type { JSONPatchDocument } from 'immutable-json-patch'
@@ -372,7 +369,7 @@ describe('documentState', () => {
   })
 
   describe('documentStatePatch', () => {
-    function createJsonAndState(): { json: JSONValue; documentState: DocumentState } {
+    function createJsonAndState(): { json: unknown; documentState: DocumentState } {
       const json = {
         members: [
           { id: 1, name: 'Joe' },
@@ -447,7 +444,7 @@ describe('documentState', () => {
         { op: 'add', path: '/members/1', value: { id: 42, name: 'Julia' } }
       ])
 
-      assert.deepStrictEqual((res.json as JSONObject)?.['members'], [
+      assert.deepStrictEqual((res.json as Record<string, unknown>)?.['members'], [
         { id: 1, name: 'Joe' },
         { id: 42, name: 'Julia' },
         { id: 2, name: 'Sarah' },
@@ -478,7 +475,7 @@ describe('documentState', () => {
         { op: 'add', path: '/members/-', value: { id: 4, name: 'John' } }
       ])
 
-      assert.deepStrictEqual((res.json as JSONObject)['members'], [
+      assert.deepStrictEqual((res.json as Record<string, unknown>)['members'], [
         { id: 1, name: 'Joe' },
         { id: 2, name: 'Sarah' },
         { id: 3, name: 'Mark' },
@@ -671,7 +668,7 @@ describe('documentState', () => {
       const res = documentStatePatch(json, documentState, operations)
 
       // check order of keys
-      assert.deepStrictEqual(Object.keys(res.json as JSONObject), ['a', 'b', 'd'])
+      assert.deepStrictEqual(Object.keys(res.json as Record<string, unknown>), ['a', 'b', 'd'])
 
       // keep expanded state of existing keys
       assert.strictEqual(res.documentState.expandedMap[compileJSONPointer([])], true)
@@ -690,7 +687,11 @@ describe('documentState', () => {
 
       assert.deepStrictEqual(
         res.json,
-        setIn(json, ['group', 'user'], ((json as JSONObject)['members'] as JSONArray)[1])
+        setIn(
+          json,
+          ['group', 'user'],
+          ((json as Record<string, unknown>)['members'] as Array<unknown>)[1]
+        )
       )
       assert.deepStrictEqual(res.documentState, {
         ...documentState,
@@ -709,12 +710,12 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, {
-        group: (json as JSONObject)['group'],
+        group: (json as Record<string, unknown>)['group'],
         members: [
-          ((json as JSONObject)['members'] as JSONArray)[0],
-          ((json as JSONObject)['group'] as JSONObject)['details'],
-          ((json as JSONObject)['members'] as JSONArray)[1],
-          ((json as JSONObject)['members'] as JSONArray)[2]
+          ((json as Record<string, unknown>)['members'] as Array<unknown>)[0],
+          ((json as Record<string, unknown>)['group'] as Record<string, unknown>)['details'],
+          ((json as Record<string, unknown>)['members'] as Array<unknown>)[1],
+          ((json as Record<string, unknown>)['members'] as Array<unknown>)[2]
         ]
       })
 
@@ -738,7 +739,7 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, {
-        members: (json as JSONObject)['members'],
+        members: (json as Record<string, unknown>)['members'],
         group: {
           name: 'Group 1',
           location: 'Block C'
@@ -783,11 +784,11 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, {
-        group: (json as JSONObject)['group'],
+        group: (json as Record<string, unknown>)['group'],
         members: [
-          ((json as JSONObject)['members'] as JSONArray)[1],
-          ((json as JSONObject)['members'] as JSONArray)[0],
-          ((json as JSONObject)['members'] as JSONArray)[2]
+          ((json as Record<string, unknown>)['members'] as Array<unknown>)[1],
+          ((json as Record<string, unknown>)['members'] as Array<unknown>)[0],
+          ((json as Record<string, unknown>)['members'] as Array<unknown>)[2]
         ]
       })
 
@@ -816,11 +817,11 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, {
-        group: (json as JSONObject)['group'],
+        group: (json as Record<string, unknown>)['group'],
         members: [
-          ((json as JSONObject)['members'] as JSONArray)[1],
-          ((json as JSONObject)['members'] as JSONArray)[0],
-          ((json as JSONObject)['members'] as JSONArray)[2]
+          ((json as Record<string, unknown>)['members'] as Array<unknown>)[1],
+          ((json as Record<string, unknown>)['members'] as Array<unknown>)[0],
+          ((json as Record<string, unknown>)['members'] as Array<unknown>)[2]
         ]
       })
 
@@ -853,12 +854,12 @@ describe('documentState', () => {
           location: 'Block C'
         },
         members: [
-          ((json as JSONObject)['members'] as JSONArray)[0],
+          ((json as Record<string, unknown>)['members'] as Array<unknown>)[0],
           {
             description: 'The first group'
           },
-          ((json as JSONObject)['members'] as JSONArray)[1],
-          ((json as JSONObject)['members'] as JSONArray)[2]
+          ((json as Record<string, unknown>)['members'] as Array<unknown>)[1],
+          ((json as Record<string, unknown>)['members'] as Array<unknown>)[2]
         ]
       })
 
@@ -888,12 +889,12 @@ describe('documentState', () => {
 
       assert.deepStrictEqual(res.json, {
         group: {
-          ...((json as JSONObject)['group'] as JSONObject),
-          user: ((json as JSONObject)['members'] as JSONArray)[1]
+          ...((json as Record<string, unknown>)['group'] as Record<string, unknown>),
+          user: ((json as Record<string, unknown>)['members'] as Array<unknown>)[1]
         },
         members: [
-          ((json as JSONObject)['members'] as JSONArray)[0],
-          ((json as JSONObject)['members'] as JSONArray)[2]
+          ((json as Record<string, unknown>)['members'] as Array<unknown>)[0],
+          ((json as Record<string, unknown>)['members'] as Array<unknown>)[2]
         ]
       })
 
@@ -1177,7 +1178,7 @@ describe('documentState', () => {
 /**
  * Helper function to get the visible indices of an Array state
  */
-function getVisibleIndices(json: JSONValue, visibleSections: VisibleSection[]): number[] {
+function getVisibleIndices(json: unknown, visibleSections: VisibleSection[]): number[] {
   const visibleIndices: number[] = []
 
   if (Array.isArray(json)) {

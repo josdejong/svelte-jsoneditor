@@ -2,7 +2,6 @@ import { isObject } from './typeUtils.js'
 import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 import { isEqual } from 'lodash-es'
-import type { JSONArray, JSONObject, JSONValue } from '$lib/types.js'
 
 const MAX_ITEM_PATHS_COLLECTION = 10000
 const ROOT_PATH: JSONPath = []
@@ -65,14 +64,14 @@ export function compareArrays<T>(a: Array<T>, b: Array<T>): number {
  * @param array
  * @param includeObjects If true, object and array paths are returned as well
  */
-export function getNestedPaths(array: JSONValue, includeObjects = false): JSONPath[] {
+export function getNestedPaths(array: unknown, includeObjects = false): JSONPath[] {
   const pointersMap: Record<string, boolean> = {}
 
   if (!Array.isArray(array)) {
     throw new TypeError('Array expected')
   }
 
-  function recurseNestedPaths(obj: JSONValue, path: JSONPath) {
+  function recurseNestedPaths(obj: unknown, path: JSONPath) {
     const isValue = !Array.isArray(obj) && !isObject(obj)
 
     if (isValue || (includeObjects && path.length > 0)) {
@@ -125,17 +124,17 @@ export function limit<T>(array: Array<T>, max: number): Array<T> {
 /**
  * Convert an array into an object having the array indices as keys
  */
-export function arrayToObject(array: JSONArray): JSONObject {
+export function arrayToObject<T>(array: Array<T>): Record<number, T> {
   return {
     ...array
-  } as unknown as JSONObject
+  }
 }
 
 /**
  * Get the values of an object as an array
  */
-export function objectToArray(object: JSONObject): JSONArray {
-  return Object.values(object) as unknown as JSONArray
+export function objectToArray<T>(object: Record<string, T>): Array<T> {
+  return Object.values(object)
 }
 
 /**

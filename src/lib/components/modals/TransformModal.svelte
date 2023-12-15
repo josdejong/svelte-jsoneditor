@@ -20,7 +20,6 @@
     Content,
     JSONParser,
     JSONPathParser,
-    JSONValue,
     OnChangeQueryLanguage,
     OnClassName,
     OnPatch,
@@ -34,7 +33,7 @@
   const debug = createDebug('jsoneditor:TransformModal')
 
   export let id = 'transform-modal-' + uniqueId()
-  export let json: JSONValue
+  export let json: unknown
   export let rootPath: JSONPath = []
 
   export let indentation: number | string
@@ -54,7 +53,7 @@
 
   export let onTransform: OnPatch
 
-  let selectedJson: JSONValue | undefined
+  let selectedJson: unknown | undefined
   $: selectedJson = getIn(json, rootPath)
   let selectedContent: Content
   $: selectedContent = selectedJson ? { json: selectedJson } : { text: '' }
@@ -97,7 +96,7 @@
     debug('handleChangeQuery', { query, isManual })
   }
 
-  function previewTransform(json: JSONValue | undefined, query: string) {
+  function previewTransform(json: unknown | undefined, query: string) {
     if (json === undefined) {
       previewContent = { text: '' }
       previewError = 'Error: No JSON'

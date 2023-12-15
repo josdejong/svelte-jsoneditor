@@ -24,13 +24,12 @@
     ContextMenuItem,
     DocumentState,
     JSONParser,
-    JSONValue,
     OnRenderContextMenuInternal
   } from '$lib/types'
   import { getEnforceString } from '$lib/logic/documentState.js'
   import ContextMenu from '../../../../components/controls/contextmenu/ContextMenu.svelte'
 
-  export let json: JSONValue | undefined
+  export let json: unknown | undefined
   export let documentState: DocumentState
   export let parser: JSONParser
 

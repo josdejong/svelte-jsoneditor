@@ -13,11 +13,9 @@ import { stringConvert } from '../utils/typeUtils.js'
 import type {
   DocumentState,
   ExtendedSearchResultItem,
-  JSONObject,
   JSONParser,
   JSONPointerMap,
   JSONSelection,
-  JSONValue,
   SearchResult,
   SearchResultItem
 } from '$lib/types'
@@ -26,7 +24,7 @@ import { SearchField } from '$lib/types.js'
 // TODO: comment
 // TODO: unit test
 export function updateSearchResult(
-  json: JSONValue,
+  json: unknown,
   newResultItems: SearchResultItem[],
   previousResult: SearchResult | undefined
 ): SearchResult {
@@ -109,7 +107,7 @@ export function searchPrevious(searchResult: SearchResult): SearchResult {
 // TODO: comment
 export function search(
   searchText: string,
-  json: JSONValue,
+  json: unknown,
   maxResults = Infinity
 ): SearchResultItem[] {
   const results: SearchResultItem[] = []
@@ -121,7 +119,7 @@ export function search(
     }
   }
 
-  function searchRecursive(searchTextLowerCase: string, value: JSONValue) {
+  function searchRecursive(searchTextLowerCase: string, value: unknown) {
     if (isJSONArray(value)) {
       const level = path.length
       path.push('0')
@@ -236,7 +234,7 @@ export function replaceAllText(
 }
 
 export function createSearchAndReplaceOperations(
-  json: JSONValue,
+  json: unknown,
   documentState: DocumentState,
   replacementText: string,
   searchResultItem: SearchResultItem,
@@ -249,7 +247,7 @@ export function createSearchAndReplaceOperations(
     const parentPath = initial(path)
     const parent = getIn(json, parentPath)
     const oldKey = last(path) as string
-    const keys = Object.keys(parent as JSONObject)
+    const keys = Object.keys(parent as Record<string, unknown>)
     const newKey = replaceText(oldKey, replacementText, start, end)
 
     const operations = rename(parentPath, keys, oldKey, newKey)
@@ -261,7 +259,7 @@ export function createSearchAndReplaceOperations(
     }
   } else if (field === SearchField.value) {
     // replace a value
-    const currentValue: JSONValue | undefined = getIn(json, path)
+    const currentValue: unknown | undefined = getIn(json, path)
     if (currentValue === undefined) {
       throw new Error(`Cannot replace: path not found ${compileJSONPointer(path)}`)
     }
@@ -281,7 +279,7 @@ export function createSearchAndReplaceOperations(
       {
         op: 'replace',
         path: compileJSONPointer(path),
-        value: enforceString ? value : (stringConvert(value, parser) as JSONValue)
+        value: enforceString ? value : stringConvert(value, parser)
       }
     ]
 
@@ -297,7 +295,7 @@ export function createSearchAndReplaceOperations(
 }
 
 export function createSearchAndReplaceAllOperations(
-  json: JSONValue,
+  json: unknown,
   documentState: DocumentState,
   searchText: string,
   replacementText: string,
@@ -358,7 +356,7 @@ export function createSearchAndReplaceAllOperations(
       const parentPath = initial(path)
       const parent = getIn(json, parentPath)
       const oldKey = last(path) as string
-      const keys = Object.keys(parent as JSONObject)
+      const keys = Object.keys(parent as Record<string, unknown>)
       const newKey = replaceAllText(oldKey, replacementText, items)
 
       const operations = rename(parentPath, keys, oldKey, newKey)
@@ -367,7 +365,7 @@ export function createSearchAndReplaceAllOperations(
       lastNewSelection = createSelectionFromOperations(json, operations)
     } else if (field === SearchField.value) {
       // replace a value
-      const currentValue: JSONValue | undefined = getIn(json, path)
+      const currentValue: unknown | undefined = getIn(json, path)
       if (currentValue === undefined) {
         throw new Error(`Cannot replace: path not found ${compileJSONPointer(path)}`)
       }
@@ -388,7 +386,7 @@ export function createSearchAndReplaceAllOperations(
         {
           op: 'replace',
           path: compileJSONPointer(path),
-          value: enforceString ? value : (stringConvert(value, parser) as JSONValue)
+          value: enforceString ? value : stringConvert(value, parser)
         }
       ]
       allOperations = allOperations.concat(operations)

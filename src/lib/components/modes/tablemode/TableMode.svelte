@@ -15,7 +15,6 @@
     JSONParser,
     JSONPatchResult,
     JSONSelection,
-    JSONValue,
     OnBlur,
     OnChange,
     OnChangeMode,
@@ -207,7 +206,7 @@
     }
   })
 
-  let json: JSONValue | undefined
+  let json: unknown | undefined
   let text: string | undefined
   let parseError: ParseError | undefined = undefined
 
@@ -248,7 +247,7 @@
   $: refreshScrollTop(json)
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  function refreshScrollTop(_json: JSONValue | undefined) {
+  function refreshScrollTop(_json: unknown | undefined) {
     // When the contents go from lots of items and scrollable contents to only a few items and
     // no vertical scroll, the actual scrollTop changes to 0 but there is no on:scroll event
     // triggered, so the internal scrollTop variable is not up-to-date.
@@ -291,7 +290,7 @@
     }
   }
 
-  function clearSelectionWhenNotExisting(json: JSONValue | undefined) {
+  function clearSelectionWhenNotExisting(json: unknown | undefined) {
     if (!documentState.selection || json === undefined) {
       return
     }
@@ -443,7 +442,7 @@
     previousText,
     previousTextIsRepaired
   }: {
-    previousJson: JSONValue | undefined
+    previousJson: unknown | undefined
     previousText: string | undefined
     previousState: DocumentState
     previousTextIsRepaired: boolean
@@ -523,7 +522,7 @@
   const memoizedValidate = memoizeOne(validateJSON)
 
   function updateValidationErrors(
-    json: JSONValue,
+    json: unknown,
     validator: Validator | null,
     parser: JSONParser,
     validationParser: JSONParser
@@ -1074,7 +1073,7 @@
         {
           op: 'replace',
           path: pointer,
-          value: updatedValue as JSONValue
+          value: updatedValue
         }
       ],
       (patchedJson, patchedState) => {
@@ -1388,7 +1387,7 @@
   }
 
   // TODO: this function is duplicated from TreeMode. See if we can reuse the code instead
-  function handleReplaceJson(updatedJson: JSONValue, afterPatch?: AfterPatchCallback) {
+  function handleReplaceJson(updatedJson: unknown, afterPatch?: AfterPatchCallback) {
     const previousState = documentState
     const previousJson = json
     const previousText = text
@@ -1545,8 +1544,8 @@
         if (onTransform) {
           onTransform({
             operations,
-            json: json as JSONValue,
-            transformedJson: immutableJSONPatch(json as JSONValue, operations)
+            json: json,
+            transformedJson: immutableJSONPatch(json, operations)
           })
         } else {
           debug('onTransform', rootPath, operations)
@@ -1572,7 +1571,7 @@
     // open a popup where you can edit the nested object/array
     onJSONEditorModal({
       content: {
-        json: getIn(json as JSONValue, path) as JSONValue
+        json: getIn(json, path)
       },
       path,
       onPatch: context.onPatch,

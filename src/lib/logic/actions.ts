@@ -24,10 +24,8 @@ import type {
   AfterPatchCallback,
   DocumentState,
   InsertType,
-  JSONArray,
   JSONParser,
   JSONSelection,
-  JSONValue,
   OnChange,
   OnChangeText,
   OnJSONSelect,
@@ -56,7 +54,7 @@ import { fromTableCellPosition, toTableCellPosition } from '$lib/logic/table.js'
 const debug = createDebug('jsoneditor:actions')
 
 export interface OnCutAction {
-  json: JSONValue | undefined
+  json: unknown | undefined
   documentState: DocumentState
   indentation: string | number | undefined
   readOnly: boolean
@@ -102,7 +100,7 @@ export async function onCut({
 }
 
 export interface OnCopyAction {
-  json: JSONValue
+  json: unknown
   documentState: DocumentState
   indentation: string | number | undefined
   parser: JSONParser
@@ -124,7 +122,7 @@ type RepairModalCallback = (text: string, onApply: (repairedText: string) => voi
 
 interface OnPasteAction {
   clipboardText: string
-  json: JSONValue | undefined
+  json: unknown | undefined
   selection: JSONSelection | null
   readOnly: boolean
   parser: JSONParser
@@ -201,7 +199,7 @@ export function onPaste({
 }
 
 export interface OnRemoveAction {
-  json: JSONValue | undefined
+  json: unknown | undefined
   text: string | undefined
   documentState: DocumentState
   keepSelection: boolean
@@ -264,7 +262,7 @@ export function onRemove({
 }
 
 export interface OnDuplicateRowAction {
-  json: JSONValue | undefined
+  json: unknown | undefined
   documentState: DocumentState
   columns: JSONPath[]
   readOnly: boolean
@@ -303,7 +301,7 @@ export function onDuplicateRow({
   const operations = duplicate(json, [rowPath])
 
   onPatch(operations, (patchedJson, patchedState) => {
-    const newRowIndex = rowIndex < (json as JSONArray).length ? rowIndex + 1 : rowIndex
+    const newRowIndex = rowIndex < (json as Array<unknown>).length ? rowIndex + 1 : rowIndex
     const newPath = fromTableCellPosition({ rowIndex: newRowIndex, columnIndex }, columns)
     const newSelection = createValueSelection(newPath, false)
 
@@ -317,7 +315,7 @@ export function onDuplicateRow({
 }
 
 export interface OnInsertBeforeRowAction {
-  json: JSONValue | undefined
+  json: unknown | undefined
   documentState: DocumentState
   columns: JSONPath[]
   readOnly: boolean
@@ -350,7 +348,7 @@ export function onInsertBeforeRow({
   debug('insert before row', { rowIndex })
 
   const rowPath = [String(rowIndex)]
-  const newValue = isJSONObject((json as JSONArray)[0]) ? {} : ''
+  const newValue = isJSONObject((json as Array<unknown>)[0]) ? {} : ''
   const values = [{ key: '', value: newValue }]
   const operations = insertBefore(json, rowPath, values)
 
@@ -358,7 +356,7 @@ export function onInsertBeforeRow({
 }
 
 export interface OnInsertAfterRowAction {
-  json: JSONValue | undefined
+  json: unknown | undefined
   documentState: DocumentState
   columns: JSONPath[]
   readOnly: boolean
@@ -395,11 +393,11 @@ export function onInsertAfterRow({
 
   const nextRowIndex = rowIndex + 1
   const nextRowPath = [String(nextRowIndex)]
-  const newValue = isJSONObject((json as JSONArray)[0]) ? {} : ''
+  const newValue = isJSONObject((json as Array<unknown>)[0]) ? {} : ''
   const values = [{ key: '', value: newValue }]
 
   const operations =
-    nextRowIndex < (json as JSONArray).length
+    nextRowIndex < (json as Array<unknown>).length
       ? insertBefore(json, nextRowPath, values)
       : append(json, [], values)
 
@@ -417,7 +415,7 @@ export function onInsertAfterRow({
 }
 
 export interface OnRemoveRowAction {
-  json: JSONValue | undefined
+  json: unknown | undefined
   documentState: DocumentState
   columns: JSONPath[]
   readOnly: boolean
@@ -457,7 +455,7 @@ export function onRemoveRow({
 
   onPatch(operations, (patchedJson, patchedState) => {
     const newRowIndex =
-      rowIndex < (patchedJson as JSONArray).length
+      rowIndex < (patchedJson as Array<unknown>).length
         ? rowIndex
         : rowIndex > 0
           ? rowIndex - 1
@@ -486,12 +484,12 @@ export interface OnInsert {
   insertType: InsertType
   selectInside: boolean
   refJsonEditor: HTMLElement
-  json: JSONValue | undefined
+  json: unknown | undefined
   selection: JSONSelection | null
   readOnly: boolean
   parser: JSONParser
   onPatch: OnPatch
-  onReplaceJson: (updatedJson: JSONValue, afterPatch: AfterPatchCallback) => void
+  onReplaceJson: (updatedJson: unknown, afterPatch: AfterPatchCallback) => void
 }
 
 // TODO: write unit tests
@@ -513,7 +511,7 @@ export function onInsert({
   const newValue = createNewValue(json, selection, insertType)
 
   if (json !== undefined) {
-    const data = parser.stringify(newValue)
+    const data = parser.stringify(newValue) as string
     const operations = insert(json, selection, data, parser)
     debug('onInsert', { insertType, operations, newValue, data })
 
@@ -586,12 +584,12 @@ export interface OnInsertCharacter {
   char: string
   selectInside: boolean
   refJsonEditor: HTMLElement
-  json: JSONValue | undefined
+  json: unknown | undefined
   selection: JSONSelection | null
   readOnly: boolean
   parser: JSONParser
   onPatch: OnPatch
-  onReplaceJson: (updatedJson: JSONValue, afterPatch: AfterPatchCallback) => void
+  onReplaceJson: (updatedJson: unknown, afterPatch: AfterPatchCallback) => void
   onSelect: OnJSONSelect
 }
 
@@ -688,12 +686,12 @@ export async function onInsertCharacter({
 interface OnInsertValueWithCharacter {
   char: string
   refJsonEditor: HTMLElement
-  json: JSONValue | undefined
+  json: unknown | undefined
   selection: JSONSelection | null
   readOnly: boolean
   parser: JSONParser
   onPatch: OnPatch
-  onReplaceJson: (updatedJson: JSONValue, afterPatch: AfterPatchCallback) => void
+  onReplaceJson: (updatedJson: unknown, afterPatch: AfterPatchCallback) => void
 }
 
 async function onInsertValueWithCharacter({

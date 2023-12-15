@@ -2,13 +2,7 @@ import type Ajv from 'ajv'
 import type { Options, Schema, ErrorObject } from 'ajv'
 import AjvDist from 'ajv'
 import { parsePath } from 'immutable-json-patch'
-import type {
-  JSONSchema,
-  JSONSchemaDefinitions,
-  JSONValue,
-  ValidationError,
-  Validator
-} from '$lib/types'
+import type { JSONSchema, JSONSchemaDefinitions, ValidationError, Validator } from '$lib/types'
 import { ValidationSeverity } from '$lib/types.js'
 
 export interface AjvValidatorOptions {
@@ -63,7 +57,7 @@ export function createAjvValidator(options: AjvValidatorOptions): Validator {
     throw validateAjv.errors[0]
   }
 
-  return function validate(json: JSONValue): ValidationError[] {
+  return function validate(json: unknown): ValidationError[] {
     validateAjv(json)
     const ajvErrors = validateAjv.errors || []
 
@@ -90,7 +84,7 @@ function createAjvInstance(options: AjvValidatorOptions): Ajv {
   return ajv
 }
 
-function normalizeAjvError(json: JSONValue, ajvError: ErrorObject): ValidationError {
+function normalizeAjvError(json: unknown, ajvError: ErrorObject): ValidationError {
   return {
     path: parsePath(json, ajvError.instancePath),
     message: ajvError.message || 'Unknown error',

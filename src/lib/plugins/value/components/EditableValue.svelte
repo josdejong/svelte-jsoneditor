@@ -10,7 +10,6 @@
   import type {
     FindNextInside,
     JSONParser,
-    JSONValue,
     OnFind,
     OnJSONSelect,
     OnPasteJson,
@@ -21,7 +20,7 @@
   import { isEqual } from 'lodash-es'
 
   export let path: JSONPath
-  export let value: JSONValue
+  export let value: unknown
   export let parser: JSONParser
   export let normalization: ValueNormalization
   export let enforceString: boolean
@@ -32,7 +31,7 @@
   export let focus: () => void
   export let findNextInside: FindNextInside
 
-  function convert(value: string): JSONValue {
+  function convert(value: string): unknown {
     return enforceString ? value : stringConvert(value, parser)
   }
 
@@ -81,7 +80,7 @@
       if (isObjectOrArray(pastedJson)) {
         onPasteJson({
           path,
-          contents: pastedJson as JSONValue
+          contents: pastedJson
         })
       }
     } catch (err) {

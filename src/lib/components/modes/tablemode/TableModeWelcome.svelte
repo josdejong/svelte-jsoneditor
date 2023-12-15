@@ -3,7 +3,7 @@
 <script lang="ts">
   import type { JSONPath } from 'immutable-json-patch'
   import { getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
-  import type { JSONParser, JSONValue, OnChangeMode } from '$lib/types.js'
+  import type { JSONParser, OnChangeMode } from '$lib/types.js'
   import { Mode } from '$lib/types.js'
   import { valueType } from '$lib/utils/typeUtils.js'
   import { findNestedArrays } from '$lib/logic/table.js'
@@ -11,7 +11,7 @@
   import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
 
   export let text: string | undefined
-  export let json: JSONValue | undefined
+  export let json: unknown | undefined
   export let readOnly: boolean
   export let parser: JSONParser
   export let openJSONEditorModal: (path: JSONPath) => void

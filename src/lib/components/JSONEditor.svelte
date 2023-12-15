@@ -132,8 +132,9 @@
       debug('parser changed, recreate editor')
 
       if (isJSONContent(content)) {
+        const text = previousParser.stringify(content.json)
         content = {
-          json: parser.parse(previousParser.stringify(content.json))
+          json: text !== undefined ? parser.parse(text) : undefined
         }
       }
 

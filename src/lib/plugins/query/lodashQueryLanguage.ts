@@ -2,7 +2,7 @@ import * as _ from 'lodash-es'
 import { last } from 'lodash-es'
 import { createLodashPropertySelector, createPropertySelector } from '../../utils/pathUtils.js'
 import { parseString } from '../../utils/stringUtils.js'
-import type { JSONValue, QueryLanguage, QueryLanguageOptions } from '../../types.js'
+import type { QueryLanguage, QueryLanguageOptions } from '../../types.js'
 import { isInteger } from '../../utils/typeUtils.js'
 
 const description = `
@@ -23,7 +23,7 @@ export const lodashQueryLanguage: QueryLanguage = {
   executeQuery
 }
 
-function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): string {
+function createQuery(json: unknown, queryOptions: QueryLanguageOptions): string {
   const { filter, sort, projection } = queryOptions
   const queryParts = ['  return _.chain(data)\n']
 
@@ -70,7 +70,7 @@ function createQuery(json: JSONValue, queryOptions: QueryLanguageOptions): strin
   return `function query (data) {\n${queryParts.join('')}}`
 }
 
-function executeQuery(json: JSONValue, query: string): JSONValue {
+function executeQuery(json: unknown, query: string): unknown {
   validate(query)
 
   // FIXME: replace unsafe new Function with a JS based query language
