@@ -3,6 +3,10 @@
 //     Svelte: Cannot find module svelte-simple-modal or its corresponding type declarations.
 //
 // Version: svelte-simple-modal@1.6.1, date: 2023-12-15
+//
+// Additionally: the type `Component` is extended with the following to fix some issues:
+//
+//     | typeof import('svelte').SvelteComponent<Record<string, unknown>>
 
 declare module 'svelte-simple-modal' {
   import type { SvelteComponent } from 'svelte'
@@ -15,6 +19,7 @@ declare module 'svelte-simple-modal' {
   export type Component =
     | typeof import('svelte').SvelteComponent
     | typeof import('svelte').SvelteComponent<unknown>
+    | typeof import('svelte').SvelteComponent<Record<string, unknown>>
 
   export type BlurParams = import('svelte/types/runtime/transition').BlurParams
 
