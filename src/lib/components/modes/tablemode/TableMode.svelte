@@ -37,7 +37,13 @@
   import { Mode, SortDirection, ValidationSeverity } from '$lib/types.js'
   import TableMenu from './menu/TableMenu.svelte'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-  import { compileJSONPointer, existsIn, getIn, immutableJSONPatch, isJSONArray } from 'immutable-json-patch'
+  import {
+    compileJSONPointer,
+    existsIn,
+    getIn,
+    immutableJSONPatch,
+    isJSONArray
+  } from 'immutable-json-patch'
   import {
     isTextContent,
     normalizeJsonParseError,
@@ -107,7 +113,12 @@
   import memoizeOne from 'memoize-one'
   import { validateJSON } from '$lib/logic/validation.js'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
-  import { CONTEXT_MENU_HEIGHT, CONTEXT_MENU_WIDTH, SCROLL_DURATION, SIMPLE_MODAL_OPTIONS } from '$lib/constants.js'
+  import {
+    CONTEXT_MENU_HEIGHT,
+    CONTEXT_MENU_WIDTH,
+    SCROLL_DURATION,
+    SIMPLE_MODAL_OPTIONS
+  } from '$lib/constants.js'
   import { noop } from '$lib/utils/noop.js'
   import { createJump } from '$lib/assets/jump.js/src/jump.js'
   import ValidationErrorIcon from '../treemode/ValidationErrorIcon.svelte'
@@ -1761,7 +1772,10 @@
             <tr class="jse-table-row jse-table-row-header">
               <th class="jse-table-cell jse-table-cell-header">
                 {#if !isEmpty(groupedValidationErrors?.root)}
-                  {@const validationError = mergeValidationErrors([], groupedValidationErrors?.root)}
+                  {@const validationError = mergeValidationErrors(
+                    [],
+                    groupedValidationErrors?.root
+                  )}
                   {#if validationError}
                     <div class="jse-table-root-error">
                       <ValidationErrorIcon {validationError} onExpand={noop} />
@@ -1795,7 +1809,10 @@
             {#each visibleSection.visibleItems as item, visibleIndex}
               {@const rowIndex = visibleSection.startIndex + visibleIndex}
               {@const validationErrorsByRow = groupedValidationErrors.rows[rowIndex]}
-              {@const validationError = mergeValidationErrors([String(rowIndex)], validationErrorsByRow?.row)}
+              {@const validationError = mergeValidationErrors(
+                [String(rowIndex)],
+                validationErrorsByRow?.row
+              )}
               <tr class="jse-table-row">
                 {#key rowIndex}
                   <th

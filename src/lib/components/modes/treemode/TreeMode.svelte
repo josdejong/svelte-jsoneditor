@@ -151,7 +151,14 @@
   import { Mode, ValidationSeverity } from '$lib/types.js'
   import memoizeOne from 'memoize-one'
   import { measure } from '$lib/utils/timeUtils.js'
-  import { onCopy, onCut, onInsert, onInsertCharacter, onPaste, onRemove } from '$lib/logic/actions.js'
+  import {
+    onCopy,
+    onCut,
+    onInsert,
+    onInsertCharacter,
+    onPaste,
+    onRemove
+  } from '$lib/logic/actions.js'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import type { Context } from 'svelte-simple-modal'
 
