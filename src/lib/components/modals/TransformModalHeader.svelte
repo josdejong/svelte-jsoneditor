@@ -30,7 +30,6 @@
     }
 
     popupId = openAbsolutePopup(SelectQueryLanguage, props, {
-      position: 'bottom',
       offsetTop: -2,
       offsetLeft: 0,
       anchor: refConfigButton,

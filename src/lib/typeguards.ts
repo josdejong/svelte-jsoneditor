@@ -8,6 +8,7 @@ import type {
   MenuLabel,
   MenuSeparator,
   MenuSpace,
+  ValidationError,
   NestedValidationError
 } from './types.js'
 import { isObject } from '$lib/utils/typeUtils.js'
@@ -85,5 +86,5 @@ export function isValidationError(value: unknown): value is ValidationError {
 }
 
 export function isNestedValidationError(value: unknown): value is NestedValidationError {
-  return isValidationError(value) && typeof value.isChildError === 'boolean'
+  return isObject(value) && isValidationError(value) && typeof value.isChildError === 'boolean'
 }

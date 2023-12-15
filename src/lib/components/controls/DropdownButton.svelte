@@ -66,7 +66,7 @@
         <li>
           <button
             type="button"
-            on:click={() => item.onClick()}
+            on:click={(event) => item.onClick(event)}
             title={item.title}
             disabled={item.disabled}
             class={item.className}

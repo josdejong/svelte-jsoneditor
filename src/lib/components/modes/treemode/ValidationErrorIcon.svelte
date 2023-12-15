@@ -11,7 +11,10 @@
   export let validationError: NestedValidationError | ValidationError
   export let onExpand: (event: MouseEvent) => void
 
-  $: text = isNestedValidationError(validationError) && validationError.isChildError ? 'Contains invalid data' : validationError.message
+  $: text =
+    isNestedValidationError(validationError) && validationError.isChildError
+      ? 'Contains invalid data'
+      : validationError.message
 </script>
 
 <button

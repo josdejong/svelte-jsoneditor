@@ -1154,12 +1154,15 @@
 
     debug('undo', { item, json, documentState })
 
-    const patchResult = {
-      json,
-      previousJson: previousContent.json,
-      redo: item.undo.patch,
-      undo: item.redo.patch
-    }
+    const patchResult =
+      item.undo.patch && item.redo.patch
+        ? {
+            json,
+            previousJson: previousContent.json,
+            redo: item.undo.patch,
+            undo: item.redo.patch
+          }
+        : null
 
     emitOnChange(previousContent, patchResult)
 
@@ -1193,12 +1196,15 @@
 
     debug('redo', { item, json, documentState })
 
-    const patchResult = {
-      json,
-      previousJson: previousContent.json,
-      redo: item.redo.patch,
-      undo: item.undo.patch
-    }
+    const patchResult =
+      item.undo.patch && item.redo.patch
+        ? {
+            json,
+            previousJson: previousContent.json,
+            redo: item.redo.patch,
+            undo: item.undo.patch
+          }
+        : null
 
     emitOnChange(previousContent, patchResult)
 
