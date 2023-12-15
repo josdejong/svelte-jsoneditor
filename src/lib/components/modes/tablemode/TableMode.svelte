@@ -94,6 +94,7 @@
     getAnchorPath,
     getFocusPath,
     isEditingSelection,
+    isJSONSelection,
     isValueSelection,
     pathInSelection,
     pathStartsWith,
@@ -391,10 +392,10 @@
         } catch (repairError) {
           // no valid JSON, will show empty document or invalid json
           json = undefined
-          text = externalContent.text
+          text = content.text
           textIsRepaired = false
           parseError =
-            text !== undefined && text !== ''
+            text !== ''
               ? normalizeJsonParseError(text, (err as Error).message || String(err))
               : undefined
         }
@@ -431,7 +432,9 @@
     if (!isEqual(documentState.selection, externalSelection)) {
       debug('applyExternalSelection', externalSelection)
 
-      updateSelection(externalSelection)
+      if (isJSONSelection(externalSelection)) {
+        updateSelection(externalSelection)
+      }
     }
   }
 
@@ -645,7 +648,13 @@
     afterPatch?: AfterPatchCallback
   ): JSONPatchResult {
     if (readOnly) {
-      return
+      // this should never happen in practice
+      return {
+        json,
+        previousJson: json,
+        redo: [],
+        undo: []
+      }
     }
 
     return patch(operations, afterPatch)
@@ -711,11 +720,12 @@
   }
 
   function handleScroll(event: Event) {
-    scrollTop = event.target['scrollTop']
+    scrollTop = (event.target as HTMLElement)['scrollTop']
   }
 
-  function handleMouseDown(event: MouseEvent & { target: HTMLDivElement }) {
-    const path = event?.target ? getDataPathFromTarget(event.target as HTMLElement) : undefined
+  function handleMouseDown(event: MouseEvent) {
+    const target = event.target as HTMLElement
+    const path = getDataPathFromTarget(target)
     if (path) {
       // when clicking inside the current selection, editing a value, do nothing
       if (
@@ -731,7 +741,7 @@
     }
 
     // for example when clicking on the empty area in the main menu
-    if (!isChildOfNodeName(event.target, 'BUTTON') && !event.target.isContentEditable) {
+    if (!isChildOfNodeName(target, 'BUTTON') && !target.isContentEditable) {
       focus()
     }
   }
@@ -968,7 +978,7 @@
     })
   }
 
-  function handleContextMenu(event: MouseEvent) {
+  function handleContextMenu(event: Event) {
     if (readOnly || isEditingSelection(documentState.selection)) {
       return
     }
@@ -981,8 +991,8 @@
     if (event && event.type === 'contextmenu' && event.target !== refHiddenInput) {
       // right mouse click to open context menu
       openContextMenu({
-        left: event.clientX,
-        top: event.clientY,
+        left: (event as MouseEvent).clientX,
+        top: (event as MouseEvent).clientY,
         width: CONTEXT_MENU_WIDTH,
         height: CONTEXT_MENU_HEIGHT,
         showTip: false
@@ -1017,13 +1027,13 @@
     return false
   }
 
-  function handleContextMenuFromTableMenu(event: Event & { target: HTMLDivElement }) {
+  function handleContextMenuFromTableMenu(event: MouseEvent) {
     if (readOnly) {
       return
     }
 
     openContextMenu({
-      anchor: findParentWithNodeName(event.target, 'BUTTON'),
+      anchor: findParentWithNodeName(event.target as HTMLElement, 'BUTTON'),
       offsetTop: 0,
       width: CONTEXT_MENU_WIDTH,
       height: CONTEXT_MENU_HEIGHT,
@@ -1206,7 +1216,7 @@
     })
   }
 
-  function handleKeyDown(event) {
+  function handleKeyDown(event: KeyboardEvent) {
     const combo = keyComboFromEvent(event)
     debug('keydown', { combo, key: event.key })
 
@@ -1372,7 +1382,10 @@
   function handlePaste(event: ClipboardEvent) {
     event.preventDefault()
 
-    const clipboardText = event.clipboardData.getData('text/plain')
+    const clipboardText = event.clipboardData?.getData('text/plain') as string | undefined
+    if (clipboardText === undefined) {
+      return
+    }
 
     onPaste({
       clipboardText,
@@ -1643,12 +1656,15 @@
 
     debug('undo', { item, json })
 
-    const patchResult = {
-      json,
-      previousJson: previousContent.json,
-      redo: item.undo.patch,
-      undo: item.redo.patch
-    }
+    const patchResult =
+      item.undo.patch && item.redo.patch
+        ? {
+            json,
+            previousJson: previousContent.json,
+            redo: item.undo.patch,
+            undo: item.redo.patch
+          }
+        : null
 
     emitOnChange(previousContent, patchResult)
 
@@ -1682,12 +1698,15 @@
 
     debug('redo', { item, json })
 
-    const patchResult = {
-      json,
-      previousJson: previousContent.json,
-      redo: item.redo.patch,
-      undo: item.undo.patch
-    }
+    const patchResult =
+      item.undo.patch && item.redo.patch
+        ? {
+            json,
+            previousJson: previousContent.json,
+            redo: item.redo.patch,
+            undo: item.undo.patch
+          }
+        : null
 
     emitOnChange(previousContent, patchResult)
 
@@ -1748,17 +1767,20 @@
         use:resizeObserver={handleResizeContents}
         on:scroll={handleScroll}
       >
-        <table class="jse-table-main" cellpadding="0" cellspacing="0">
+        <table class="jse-table-main">
           <tbody>
             <tr class="jse-table-row jse-table-row-header">
               <th class="jse-table-cell jse-table-cell-header">
                 {#if !isEmpty(groupedValidationErrors?.root)}
-                  <div class="jse-table-root-error">
-                    <ValidationErrorIcon
-                      validationError={mergeValidationErrors([], groupedValidationErrors?.root)}
-                      onExpand={noop}
-                    />
-                  </div>
+                  {@const validationError = mergeValidationErrors(
+                    [],
+                    groupedValidationErrors?.root
+                  )}
+                  {#if validationError}
+                    <div class="jse-table-root-error">
+                      <ValidationErrorIcon {validationError} onExpand={noop} />
+                    </div>
+                  {/if}
                 {/if}
               </th>
               {#each columns as column}
@@ -1787,6 +1809,10 @@
             {#each visibleSection.visibleItems as item, visibleIndex}
               {@const rowIndex = visibleSection.startIndex + visibleIndex}
               {@const validationErrorsByRow = groupedValidationErrors.rows[rowIndex]}
+              {@const validationError = mergeValidationErrors(
+                [String(rowIndex)],
+                validationErrorsByRow?.row
+              )}
               <tr class="jse-table-row">
                 {#key rowIndex}
                   <th
@@ -1794,14 +1820,8 @@
                     use:resizeObserver={(element) => handleResizeRow(element, rowIndex)}
                   >
                     {rowIndex}
-                    {#if !isEmpty(validationErrorsByRow?.row)}
-                      <ValidationErrorIcon
-                        validationError={mergeValidationErrors(
-                          [String(rowIndex)],
-                          validationErrorsByRow.row
-                        )}
-                        onExpand={noop}
-                      />
+                    {#if validationError}
+                      <ValidationErrorIcon {validationError} onExpand={noop} />
                     {/if}
                   </th>
                 {/key}
@@ -1812,6 +1832,7 @@
                     isValueSelection(documentState.selection) &&
                     pathStartsWith(documentState.selection.path, path)}
                   {@const validationErrorsByColumn = validationErrorsByRow?.columns[columnIndex]}
+                  {@const validationError = mergeValidationErrors(path, validationErrorsByColumn)}
                   <td
                     class="jse-table-cell"
                     data-path={encodeDataPath(path)}
@@ -1841,11 +1862,8 @@
                       <div class="jse-context-menu-anchor">
                         <ContextMenuPointer selected={true} onContextMenu={openContextMenu} />
                       </div>
-                    {/if}{#if !isEmpty(validationErrorsByColumn)}
-                      <ValidationErrorIcon
-                        validationError={mergeValidationErrors(path, validationErrorsByColumn)}
-                        onExpand={noop}
-                      />
+                    {/if}{#if validationError}
+                      <ValidationErrorIcon {validationError} onExpand={noop} />
                     {/if}
                   </td>
                 {/each}

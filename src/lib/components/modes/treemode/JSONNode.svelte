@@ -338,7 +338,7 @@
     }
   }
 
-  function handleMouseMoveGlobal(event: Event) {
+  function handleMouseMoveGlobal(event: MouseEvent) {
     context.onDrag(event)
   }
 

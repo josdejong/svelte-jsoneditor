@@ -23,14 +23,13 @@
     const props = {
       queryLanguages,
       queryLanguageId,
-      onChangeQueryLanguage: (selectedQueryLanguage: QueryLanguage) => {
+      onChangeQueryLanguage: (queryLanguageId: string) => {
         closeAbsolutePopup(popupId)
-        onChangeQueryLanguage(selectedQueryLanguage)
+        onChangeQueryLanguage(queryLanguageId)
       }
     }
 
     popupId = openAbsolutePopup(SelectQueryLanguage, props, {
-      position: 'bottom',
       offsetTop: -2,
       offsetLeft: 0,
       anchor: refConfigButton,

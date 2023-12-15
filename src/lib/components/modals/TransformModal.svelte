@@ -23,6 +23,8 @@
     OnChangeQueryLanguage,
     OnClassName,
     OnPatch,
+    OnRenderContextMenuInternal,
+    OnRenderMenuInternal,
     OnRenderValue,
     QueryLanguage,
     QueryLanguageOptions
@@ -49,6 +51,8 @@
   export let onChangeQueryLanguage: OnChangeQueryLanguage
 
   export let onRenderValue: OnRenderValue
+  export let onRenderMenu: OnRenderMenuInternal
+  export let onRenderContextMenu: OnRenderContextMenuInternal
   export let onClassName: OnClassName
 
   export let onTransform: OnPatch
@@ -278,7 +282,8 @@
                 {parser}
                 {parseMemoizeOne}
                 {onRenderValue}
-                onRenderMenu={() => undefined}
+                {onRenderMenu}
+                {onRenderContextMenu}
                 onError={console.error}
                 onChange={noop}
                 onChangeMode={noop}
@@ -312,7 +317,8 @@
                 {parser}
                 {parseMemoizeOne}
                 {onRenderValue}
-                onRenderMenu={() => undefined}
+                {onRenderMenu}
+                {onRenderContextMenu}
                 onError={console.error}
                 onChange={noop}
                 onChangeMode={noop}

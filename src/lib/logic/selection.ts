@@ -68,6 +68,16 @@ export function isMultiSelectionWithOneItem(
   return isMultiSelection(selection) && isEqual(selection.focusPath, selection.anchorPath)
 }
 
+export function isJSONSelection(selection: JSONEditorSelection | null): selection is JSONSelection {
+  return (
+    isMultiSelection(selection) ||
+    isAfterSelection(selection) ||
+    isInsideSelection(selection) ||
+    isKeySelection(selection) ||
+    isValueSelection(selection)
+  )
+}
+
 export function isTextSelection(selection: JSONEditorSelection | null): selection is TextSelection {
   return (selection && selection.type === SelectionType.text) || false
 }

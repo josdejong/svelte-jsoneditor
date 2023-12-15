@@ -18,7 +18,7 @@
   export let historyState: HistoryState
   export let onSort: () => void
   export let onTransform: () => void
-  export let onContextMenu: () => void
+  export let onContextMenu: (event: MouseEvent) => void
   export let onUndo: () => void
   export let onRedo: () => void
   export let onRenderMenu: OnRenderMenuInternal

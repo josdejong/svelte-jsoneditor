@@ -4,6 +4,8 @@
     createAjvValidator,
     createValueSelection,
     EditableValue,
+    isJSONContent,
+    isTextContent,
     javascriptQueryLanguage,
     jmespathQueryLanguage,
     JSONEditor,
@@ -18,7 +20,8 @@
     renderValue,
     type RenderValueComponentDescription,
     type RenderValuePropsOptional,
-    SelectionType
+    SelectionType,
+    toJSONContent
   } from 'svelte-jsoneditor'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
@@ -27,8 +30,6 @@
   import { truncate } from '$lib/utils/stringUtils.js'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils.js'
   import { compileJSONPointer, isJSONObject, parseJSONPointer } from 'immutable-json-patch'
-  import { toJSONContent } from '$lib/utils/jsonUtils.js'
-  import { isJSONContent, isTextContent } from '$lib'
 
   const LosslessJSON = {
     parse,

@@ -65,11 +65,11 @@
     isAfterSelection,
     isEditingSelection,
     isInsideSelection,
+    isJSONSelection,
     isKeySelection,
     isMultiSelection,
     isMultiSelectionWithOneItem,
     isSelectionInsidePath,
-    isTextSelection,
     isValueSelection,
     removeEditModeFromSelection,
     selectAll,
@@ -88,6 +88,8 @@
   } from '$lib/utils/domUtils.js'
   import {
     convertValue,
+    isJSONContent,
+    isTextContent,
     normalizeJsonParseError,
     parseAndRepair,
     parsePartialJson,
@@ -159,7 +161,6 @@
   } from '$lib/logic/actions.js'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import type { Context } from 'svelte-simple-modal'
-  import { isJSONContent, isTextContent } from '$lib/utils/jsonUtils.js'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -608,11 +609,9 @@
     if (!isEqual(documentState.selection, externalSelection)) {
       debug('applyExternalSelection', externalSelection)
 
-      if (isTextSelection(externalSelection)) {
-        return
+      if (isJSONSelection(externalSelection)) {
+        updateSelection(externalSelection)
       }
-
-      updateSelection(externalSelection)
     }
   }
 
@@ -895,8 +894,8 @@
   function handlePaste(event: ClipboardEvent) {
     event.preventDefault()
 
-    const clipboardText = event.clipboardData?.getData('text/plain')
-    if (clipboardText == null) {
+    const clipboardText = event.clipboardData?.getData('text/plain') as string | undefined
+    if (clipboardText === undefined) {
       return
     }
 
@@ -1154,12 +1153,15 @@
 
     debug('undo', { item, json, documentState })
 
-    const patchResult = {
-      json,
-      previousJson: previousContent.json,
-      redo: item.undo.patch,
-      undo: item.redo.patch
-    }
+    const patchResult =
+      item.undo.patch && item.redo.patch
+        ? {
+            json,
+            previousJson: previousContent.json,
+            redo: item.undo.patch,
+            undo: item.redo.patch
+          }
+        : null
 
     emitOnChange(previousContent, patchResult)
 
@@ -1193,12 +1195,15 @@
 
     debug('redo', { item, json, documentState })
 
-    const patchResult = {
-      json,
-      previousJson: previousContent.json,
-      redo: item.redo.patch,
-      undo: item.undo.patch
-    }
+    const patchResult =
+      item.undo.patch && item.redo.patch
+        ? {
+            json,
+            previousJson: previousContent.json,
+            redo: item.redo.patch,
+            undo: item.undo.patch
+          }
+        : null
 
     emitOnChange(previousContent, patchResult)
 
@@ -1445,6 +1450,7 @@
     afterPatch?: AfterPatchCallback
   ): JSONPatchResult {
     if (readOnly) {
+      // this should never happen in practice
       return {
         json,
         previousJson: json,
@@ -1883,8 +1889,8 @@
     if (event && event.type === 'contextmenu' && event.target !== refHiddenInput) {
       // right mouse click to open context menu
       openContextMenu({
-        left: event.clientX,
-        top: event.clientY,
+        left: (event as MouseEvent).clientX,
+        top: (event as MouseEvent).clientY,
         width: CONTEXT_MENU_WIDTH,
         height: CONTEXT_MENU_HEIGHT,
         showTip: false
@@ -1919,7 +1925,7 @@
     return false
   }
 
-  function handleContextMenuFromTreeMenu(event: Event) {
+  function handleContextMenuFromTreeMenu(event: MouseEvent) {
     if (readOnly) {
       return
     }
@@ -2032,7 +2038,7 @@
 
   $: autoScrollHandler = refContents ? createAutoScrollHandler(refContents) : undefined
 
-  function handleDrag(event: DragEvent) {
+  function handleDrag(event: MouseEvent) {
     if (autoScrollHandler) {
       autoScrollHandler.onDrag(event)
     }

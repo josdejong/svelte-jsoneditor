@@ -39,7 +39,7 @@
     </div>
 
     <div class="jse-actions">
-      <button type="button" class="jse-primary" on:click={close}> Close </button>
+      <button type="button" class="jse-primary" on:click={() => close()}> Close </button>
     </div>
   </div>
 </div>

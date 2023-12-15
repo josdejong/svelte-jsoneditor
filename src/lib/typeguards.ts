@@ -7,7 +7,9 @@ import type {
   MenuDropDownButton,
   MenuLabel,
   MenuSeparator,
-  MenuSpace
+  MenuSpace,
+  ValidationError,
+  NestedValidationError
 } from './types.js'
 import { isObject } from '$lib/utils/typeUtils.js'
 
@@ -72,4 +74,17 @@ export function isContentValidationErrors(
   contentErrors: unknown
 ): contentErrors is ContentValidationErrors {
   return isObject(contentErrors) && Array.isArray(contentErrors['validationErrors'])
+}
+
+export function isValidationError(value: unknown): value is ValidationError {
+  return (
+    isObject(value) &&
+    Array.isArray(value.path) &&
+    typeof value.message === 'string' &&
+    'severity' in value
+  )
+}
+
+export function isNestedValidationError(value: unknown): value is NestedValidationError {
+  return isObject(value) && isValidationError(value) && typeof value.isChildError === 'boolean'
 }

@@ -145,7 +145,7 @@ export type ClipboardValues = Array<{ key: string; value: unknown }>
 
 export interface MenuButton {
   type: 'button'
-  onClick: () => void
+  onClick: (event: MouseEvent) => void
   icon?: IconDefinition
   text?: string
   title?: string
@@ -394,7 +394,7 @@ export type InsertType = 'value' | 'object' | 'array' | 'structure'
 
 export interface PopupEntry {
   id: number
-  component: typeof SvelteComponent
+  component: typeof SvelteComponent<Record<string, unknown>>
   props: Record<string, unknown>
   options: AbsolutePopupOptions
 }
@@ -415,7 +415,7 @@ export interface AbsolutePopupOptions {
 
 export interface AbsolutePopupContext {
   openAbsolutePopup: (
-    component: typeof SvelteComponent,
+    component: typeof SvelteComponent<Record<string, unknown>>,
     props: Record<string, unknown>,
     options: AbsolutePopupOptions
   ) => number
@@ -479,7 +479,7 @@ export interface TreeModeContext extends JSONEditorContext {
   onExpandSection: (path: JSONPath, section: Section) => void
   onContextMenu: OnContextMenu
   onClassName: OnClassName
-  onDrag: (event: Event) => void
+  onDrag: (event: MouseEvent) => void
   onDragEnd: () => void
 }
 

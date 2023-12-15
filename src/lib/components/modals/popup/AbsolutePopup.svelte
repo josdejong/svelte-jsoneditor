@@ -12,13 +12,13 @@
   let popups: PopupEntry[] = []
 
   function openAbsolutePopup(
-    component: typeof SvelteComponent,
+    component: typeof SvelteComponent<Record<string, unknown>>,
     props: Record<string, unknown>,
     options: AbsolutePopupOptions
   ): number {
     debug('open...', props, options)
 
-    const popup = {
+    const popup: PopupEntry = {
       id: uniqueId(),
       component: component,
       props: props || {},
