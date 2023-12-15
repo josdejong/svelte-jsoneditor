@@ -2031,7 +2031,7 @@
 
   $: autoScrollHandler = refContents ? createAutoScrollHandler(refContents) : undefined
 
-  function handleDrag(event: DragEvent) {
+  function handleDrag(event: MouseEvent) {
     if (autoScrollHandler) {
       autoScrollHandler.onDrag(event)
     }

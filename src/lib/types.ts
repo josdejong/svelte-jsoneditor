@@ -479,7 +479,7 @@ export interface TreeModeContext extends JSONEditorContext {
   onExpandSection: (path: JSONPath, section: Section) => void
   onContextMenu: OnContextMenu
   onClassName: OnClassName
-  onDrag: (event: Event) => void
+  onDrag: (event: MouseEvent) => void
   onDragEnd: () => void
 }
 

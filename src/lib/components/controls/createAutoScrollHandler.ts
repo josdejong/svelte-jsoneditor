@@ -51,7 +51,7 @@ export function createAutoScrollHandler(scrollableElement: Element) {
     }
   }
 
-  function onDrag(event: DragEvent) {
+  function onDrag(event: MouseEvent) {
     if (scrollableElement) {
       const y = event.clientY
       const { top, bottom } = scrollableElement.getBoundingClientRect()
