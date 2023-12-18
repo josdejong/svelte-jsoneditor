@@ -8,7 +8,10 @@ const config = {
   preprocess: sveltePreprocess(),
 
   kit: {
-    adapter: adapter()
+    adapter: adapter(),
+    alias: {
+      'svelte-jsoneditor': 'src/lib'
+    }
   }
 }
 
