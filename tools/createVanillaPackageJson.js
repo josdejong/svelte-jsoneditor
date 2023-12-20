@@ -27,6 +27,7 @@ const vanillaPackage = {
   browser: './standalone.js',
   exports: {
     ...pkg.exports,
+    '.': './index.js', // we don't create an object here, see https://github.com/josdejong/svelte-jsoneditor/issues/334
     './index.js.map': './index.js.map',
     './standalone.js': './standalone.js',
     './standalone.js.map': './standalone.js.map'

@@ -42,7 +42,6 @@ import type {
   Section,
   VisibleSection
 } from '$lib/types'
-import { SelectionType } from '$lib/types.js'
 import { CaretType } from '$lib/types.js'
 import { int } from '../utils/numberUtils.js'
 import { isLargeContent } from '$lib/utils/jsonUtils.js'
@@ -60,11 +59,7 @@ export function createDocumentState(props?: CreateDocumentStateProps): DocumentS
     expandedMap: {},
     enforceStringMap: {},
     visibleSectionsMap: {},
-    selection: {
-      type: SelectionType.value,
-      path: [],
-      edit: false
-    },
+    selection: null,
     sortedColumn: null
   }
 
