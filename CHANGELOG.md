@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.21.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.20.0...v0.21.0) (2023-12-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* The type `Content` is changed from `{ json: JSONValue} | { text: string }` into 
+`{ json: unknown } | { text: string }`, and all other types having `JSONValue` changed 
+to `unknown`. The return type of `JSONParser.stringify` changed from `string` to 
+`string | undefined`.
+
+### Features
+
+* change the type of `json` from `JSONValue` to `unknown` ([#371](https://github.com/josdejong/svelte-jsoneditor/issues/371)) ([dc4671a](https://github.com/josdejong/svelte-jsoneditor/commit/dc4671abaad7b2e8171caeffdbd83df157bf0196))
+* implement `onRenderContextMenu` (fix [#82](https://github.com/josdejong/svelte-jsoneditor/issues/82)) ([e53a620](https://github.com/josdejong/svelte-jsoneditor/commit/e53a620b6babf5f0cc58a432d4ac89861e6b267f))
+* upgrade to upgrade `@sveltejs/kit@2`, `vite-plugin-svelte@3`, `vite@5`, and `vitest@1` ([#374](https://github.com/josdejong/svelte-jsoneditor/issues/374)) ([b83e321](https://github.com/josdejong/svelte-jsoneditor/commit/b83e3214f8b4873f28247e0ee58a1f0c118d29f3))
+
 ## [0.20.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.19.0...v0.20.0) (2023-12-06)
 
 
