@@ -60,11 +60,7 @@ export function createDocumentState(props?: CreateDocumentStateProps): DocumentS
     expandedMap: {},
     enforceStringMap: {},
     visibleSectionsMap: {},
-    selection: {
-      type: SelectionType.value,
-      path: [],
-      edit: false
-    },
+    selection: null,
     sortedColumn: null
   }
 

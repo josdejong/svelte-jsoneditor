@@ -432,7 +432,7 @@
     if (!isEqual(documentState.selection, externalSelection)) {
       debug('applyExternalSelection', externalSelection)
 
-      if (isJSONSelection(externalSelection)) {
+      if (isJSONSelection(externalSelection) || externalSelection === null) {
         updateSelection(externalSelection)
       }
     }
