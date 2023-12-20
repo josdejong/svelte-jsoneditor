@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.21.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.21.0...v0.21.1) (2023-12-20)
+
+
+### Bug Fixes
+
+* add a module export again to the `svelte-jsoneditor` package ([0c695a4](https://github.com/josdejong/svelte-jsoneditor/commit/0c695a444a35b03b37c3a1981ba58c53e3be0159))
+
 ## [0.21.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.20.0...v0.21.0) (2023-12-20)
 
 
