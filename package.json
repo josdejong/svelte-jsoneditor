@@ -15,7 +15,10 @@
   "sideEffects": false,
   "license": "ISC",
   "exports": {
-    ".": "./index.js",
+    ".": {
+      "svelte": "./index.js",
+      "types": "./index.d.ts"
+    },
     "./index.d.ts": "./index.d.ts",
     "./index.js": "./index.js",
     "./themes/jse-theme-dark.css": "./themes/jse-theme-dark.css",
