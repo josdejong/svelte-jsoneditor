@@ -17,6 +17,7 @@
   "exports": {
     ".": {
       "svelte": "./index.js",
+      "module": "./index.js",
       "types": "./index.d.ts"
     },
     "./index.d.ts": "./index.d.ts",
