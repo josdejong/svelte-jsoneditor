@@ -117,7 +117,7 @@
 
   let handleRenderContextMenu: OnRenderContextMenuInternal
   $: handleRenderContextMenu = (items: ContextMenuItem[]) => {
-    return onRenderContextMenu(items, { mode, modal: insideModal }) || items
+    return onRenderContextMenu(items, { mode, modal: insideModal, selection }) || items
   }
 
   export function patch(operations: JSONPatchDocument): JSONPatchResult {

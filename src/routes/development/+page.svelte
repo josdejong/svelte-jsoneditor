@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     type Content,
+    type ContextMenuItem,
     createAjvValidator,
     createValueSelection,
     EditableValue,
@@ -376,6 +377,10 @@
   function onChangeQueryLanguage(newQueryLanguageId: string) {
     console.log('onChangeQueryLanguage', newQueryLanguageId)
     queryLanguageId = newQueryLanguageId
+  }
+  function onRenderContextMenu(item:ContextMenuItem[], content:RenderMenuContext)  {
+    console.log('onRenderContextMenu',item, content)
+    return item
   }
 
   function openInWindow() {
@@ -773,6 +778,7 @@
             onChange={onChangeTree}
             onSelect={onSelectTree}
             onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
+            onRenderContextMenu={onRenderContextMenu}
             {onChangeMode}
             onFocus={() => console.log('onFocus tree')}
             onBlur={() => console.log('onBlur tree', { content: refTreeEditor?.get() })}
