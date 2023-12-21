@@ -331,10 +331,10 @@ const editor = new JSONEditor({
       }
       ```
 
-  - `onRenderContextMenu(items: ContextMenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean }) : ContextMenuItem[] | undefined`.
+  - `onRenderContextMenu(items: ContextMenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean, selection?: JSONEditorSelection | null }) : ContextMenuItem[] | undefined`.
     Callback which can be used to make changes to the context menu items. New items can
     be added, or existing items can be removed or reorganized. When the function
-    returns `undefined`, the original `items` will be applied. Using the context values `mode` and `modal`, different actions can be taken depending on the mode of the editor and whether the editor is rendered inside a modal or not.
+    returns `undefined`, the original `items` will be applied. Using the context values `mode`, `modal` and `selection`, different actions can be taken depending on the mode of the editor and whether the editor is rendered inside a modal or not.
 
     A menu item `ContextMenuItem` can be one of the following types:
 
