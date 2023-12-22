@@ -6,6 +6,7 @@
 
   export let item: MenuDropDownButton
   export let className: string | undefined = undefined
+  export let onCloseContextMenu: () => void
 </script>
 
 <DropdownButton width={item.width} items={item.items}>
@@ -14,7 +15,10 @@
     type="button"
     slot="defaultItem"
     title={item.main.title}
-    on:click={item.main.onClick}
+    on:click={(event) => {
+      onCloseContextMenu()
+      item.main.onClick(event)
+    }}
     disabled={item.main.disabled || false}
   >
     {#if item.main.icon}

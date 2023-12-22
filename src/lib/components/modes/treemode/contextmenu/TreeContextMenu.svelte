@@ -119,89 +119,12 @@
         )
       : false
 
-  function handleEditKey() {
-    onCloseContextMenu()
-    onEditKey()
-  }
-
-  function handleEditValue() {
-    onCloseContextMenu()
-    onEditValue()
-  }
-
-  function handleToggleEnforceString() {
-    onCloseContextMenu()
-    onToggleEnforceString()
-  }
-
-  function handleCut() {
-    onCloseContextMenu()
-    onCut(true)
-  }
-
-  function handleCutCompact() {
-    onCloseContextMenu()
-    onCut(false)
-  }
-
-  function handleCopy() {
-    onCloseContextMenu()
-    onCopy(true)
-  }
-
-  function handleCopyCompact() {
-    onCloseContextMenu()
-    onCopy(false)
-  }
-
-  function handlePaste() {
-    onCloseContextMenu()
-    onPaste()
-  }
-
-  function handleRemove() {
-    onCloseContextMenu()
-    onRemove()
-  }
-
-  function handleDuplicate() {
-    onCloseContextMenu()
-    onDuplicate()
-  }
-
-  function handleExtract() {
-    onCloseContextMenu()
-    onExtract()
-  }
-
   function handleInsertOrConvert(type: InsertType) {
-    onCloseContextMenu()
-
     if (hasSelectionContents) {
       onConvert(type)
     } else {
       onInsert(type)
     }
-  }
-
-  function handleSort() {
-    onCloseContextMenu()
-    onSort()
-  }
-
-  function handleTransform() {
-    onCloseContextMenu()
-    onTransform()
-  }
-
-  function handleInsertBefore() {
-    onCloseContextMenu()
-    onInsertBefore()
-  }
-
-  function handleInsertAfter() {
-    onCloseContextMenu()
-    onInsertAfter()
   }
 
   let defaultItems: ContextMenuItem[]
@@ -211,7 +134,7 @@
       items: [
         {
           type: 'button',
-          onClick: handleEditKey,
+          onClick: () => onEditKey(),
           icon: faPen,
           text: 'Edit key',
           title: 'Edit the key (Double-click on the key)',
@@ -221,7 +144,7 @@
           type: 'dropdown-button',
           main: {
             type: 'button',
-            onClick: handleEditValue,
+            onClick: () => onEditValue(),
             icon: faPen,
             text: editValueText,
             title: 'Edit the value (Double-click on the value)',
@@ -234,7 +157,7 @@
               icon: faPen,
               text: editValueText,
               title: 'Edit the value (Double-click on the value)',
-              onClick: handleEditValue,
+              onClick: () => onEditValue(),
               disabled: !canEditValue
             },
             {
@@ -242,7 +165,7 @@
               icon: enforceString ? faCheckSquare : faSquare,
               text: 'Enforce string',
               title: 'Enforce keeping the value as string when it contains a numeric value',
-              onClick: handleToggleEnforceString,
+              onClick: () => onToggleEnforceString(),
               disabled: !canEnforceString
             }
           ]
@@ -257,7 +180,7 @@
           type: 'dropdown-button',
           main: {
             type: 'button',
-            onClick: handleCut,
+            onClick: () => onCut(true),
             icon: faCut,
             text: 'Cut',
             title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
@@ -270,7 +193,7 @@
               icon: faCut,
               text: 'Cut formatted',
               title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
-              onClick: handleCut,
+              onClick: () => onCut(true),
               disabled: !hasSelectionContents
             },
             {
@@ -278,7 +201,7 @@
               icon: faCut,
               text: 'Cut compacted',
               title: 'Cut selected contents, without indentation (Ctrl+Shift+X)',
-              onClick: handleCutCompact,
+              onClick: () => onCut(false),
               disabled: !hasSelectionContents
             }
           ]
@@ -287,7 +210,7 @@
           type: 'dropdown-button',
           main: {
             type: 'button',
-            onClick: handleCopy,
+            onClick: () => onCopy(true),
             icon: faCopy,
             text: 'Copy',
             title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
@@ -300,7 +223,7 @@
               icon: faCopy,
               text: 'Copy formatted',
               title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
-              onClick: handleCopy,
+              onClick: () => onCopy(true),
               disabled: !hasSelectionContents
             },
             {
@@ -308,14 +231,14 @@
               icon: faCopy,
               text: 'Copy compacted',
               title: 'Copy selected contents, without indentation (Ctrl+Shift+C)',
-              onClick: handleCopyCompact,
+              onClick: () => onCopy(false),
               disabled: !hasSelectionContents
             }
           ]
         },
         {
           type: 'button',
-          onClick: handlePaste,
+          onClick: () => onPaste(),
           icon: faPaste,
           text: 'Paste',
           title: 'Paste clipboard contents (Ctrl+V)',
@@ -332,7 +255,7 @@
           items: [
             {
               type: 'button',
-              onClick: handleDuplicate,
+              onClick: () => onDuplicate(),
               icon: faClone,
               text: 'Duplicate',
               title: 'Duplicate selected contents (Ctrl+D)',
@@ -340,7 +263,7 @@
             },
             {
               type: 'button',
-              onClick: handleExtract,
+              onClick: () => onExtract(),
               icon: faCropAlt,
               text: 'Extract',
               title: 'Extract selected contents',
@@ -348,7 +271,7 @@
             },
             {
               type: 'button',
-              onClick: handleSort,
+              onClick: () => onSort(),
               icon: faSortAmountDownAlt,
               text: 'Sort',
               title: 'Sort array or object contents',
@@ -356,7 +279,7 @@
             },
             {
               type: 'button',
-              onClick: handleTransform,
+              onClick: () => onTransform(),
               icon: faFilter,
               text: 'Transform',
               title: 'Transform array or object contents (filter, sort, project)',
@@ -364,7 +287,7 @@
             },
             {
               type: 'button',
-              onClick: handleRemove,
+              onClick: () => onRemove(),
               icon: faTrashCan,
               text: 'Remove',
               title: 'Remove selected contents (Delete)',
@@ -420,7 +343,7 @@
       items: [
         {
           type: 'button',
-          onClick: handleInsertBefore,
+          onClick: () => onInsertBefore(),
           icon: faCaretSquareUp,
           text: 'Insert before',
           title: 'Select area before current entry to insert or paste contents',
@@ -428,7 +351,7 @@
         },
         {
           type: 'button',
-          onClick: handleInsertAfter,
+          onClick: () => onInsertAfter(),
           icon: faCaretSquareDown,
           text: 'Insert after',
           title: 'Select area after current entry to insert or paste contents',
@@ -443,5 +366,6 @@
 
 <ContextMenu
   {items}
+  {onCloseContextMenu}
   tip={showTip ? 'Tip: you can open this context menu via right-click or with Ctrl+Q' : undefined}
 />
