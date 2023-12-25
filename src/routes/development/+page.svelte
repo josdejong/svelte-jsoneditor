@@ -378,8 +378,8 @@
     console.log('onChangeQueryLanguage', newQueryLanguageId)
     queryLanguageId = newQueryLanguageId
   }
-  function onRenderContextMenu(item:ContextMenuItem[], content:RenderMenuContext)  {
-    console.log('onRenderContextMenu',item, content)
+  function onRenderContextMenu(item: ContextMenuItem[], content: RenderMenuContext) {
+    console.log('onRenderContextMenu', item, content)
     return item
   }
 
@@ -778,7 +778,7 @@
             onChange={onChangeTree}
             onSelect={onSelectTree}
             onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
-            onRenderContextMenu={onRenderContextMenu}
+            {onRenderContextMenu}
             {onChangeMode}
             onFocus={() => console.log('onFocus tree')}
             onBlur={() => console.log('onBlur tree', { content: refTreeEditor?.get() })}
