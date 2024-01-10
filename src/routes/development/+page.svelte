@@ -378,9 +378,9 @@
     console.log('onChangeQueryLanguage', newQueryLanguageId)
     queryLanguageId = newQueryLanguageId
   }
-  function onRenderContextMenu(item: ContextMenuItem[], content: RenderMenuContext) {
-    console.log('onRenderContextMenu', item, content)
-    return item
+  function onRenderContextMenu(items: ContextMenuItem[], content: RenderMenuContext) {
+    console.log('onRenderContextMenu', items, content)
+    return items
   }
 
   function openInWindow() {
