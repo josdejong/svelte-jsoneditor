@@ -92,7 +92,8 @@ export function getColorCSS(color: string): string | null {
  * Returns true if a valid color, false otherwise
  */
 export function isColor(value: unknown): boolean {
-  return typeof value === 'string' && !!getColorCSS(value)
+  const maxColorLength = 99
+  return typeof value === 'string' && value.length < maxColorLength && !!getColorCSS(value)
 }
 
 /**
