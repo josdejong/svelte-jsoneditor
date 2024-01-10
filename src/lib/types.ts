@@ -306,6 +306,7 @@ export type OnContextMenu = (contextMenuProps: AbsolutePopupOptions) => void
 export type RenderMenuContext = {
   mode: 'tree' | 'text' | 'table'
   modal: boolean
+  selection: JSONEditorSelection | null
 }
 export type OnRenderMenu = (items: MenuItem[], context: RenderMenuContext) => MenuItem[] | undefined
 export type OnRenderMenuInternal = (items: MenuItem[]) => MenuItem[]
