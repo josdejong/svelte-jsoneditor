@@ -38,7 +38,8 @@ export default {
     }),
 
     resolve({
-      browser: true
+      browser: true,
+      exportConditions: ['svelte']
     }),
     commonjs(),
     json(),
