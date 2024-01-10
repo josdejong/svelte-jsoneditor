@@ -306,13 +306,13 @@ export type OnContextMenu = (contextMenuProps: AbsolutePopupOptions) => void
 export type RenderMenuContext = {
   mode: 'tree' | 'text' | 'table'
   modal: boolean
-  selection: JSONEditorSelection | null
 }
 export type OnRenderMenu = (items: MenuItem[], context: RenderMenuContext) => MenuItem[] | undefined
 export type OnRenderMenuInternal = (items: MenuItem[]) => MenuItem[]
+export type RenderContextMenuContext = RenderMenuContext & { selection: JSONEditorSelection | null }
 export type OnRenderContextMenu = (
   items: ContextMenuItem[],
-  context: RenderMenuContext
+  context: RenderContextMenuContext
 ) => ContextMenuItem[] | undefined
 export type OnRenderContextMenuInternal = (items: ContextMenuItem[]) => ContextMenuItem[]
 export type OnError = (error: Error) => void
