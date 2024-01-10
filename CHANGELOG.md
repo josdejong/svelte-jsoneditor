@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.21.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.21.1...v0.21.2) (2024-01-10)
+
+
+### Features
+
+* provide the current `selection` in `onRenderContextMenu` ([#376](https://github.com/josdejong/svelte-jsoneditor/issues/376)) ([2068823](https://github.com/josdejong/svelte-jsoneditor/commit/2068823bc302b7be47bfdc6e977cbe65b92e2794))
+* update deps `codemirror`, `jsonrepair`, `sass`, `svelte-awesome`, `svelte-select`, and more ([63ac195](https://github.com/josdejong/svelte-jsoneditor/commit/63ac1950db57523d57446d43daecac69cb84d5a2))
+
+
+### Bug Fixes
+
+* [#379](https://github.com/josdejong/svelte-jsoneditor/issues/379) ContextMenu not closing after using a custom button via onRenderContextMenu ([2a83137](https://github.com/josdejong/svelte-jsoneditor/commit/2a8313759a9c6125369697bbe8cf335214399df5))
+* [#386](https://github.com/josdejong/svelte-jsoneditor/issues/386) add a `standalone.d.ts` file to the `vanilla-jsoneditor` package ([4f8fa55](https://github.com/josdejong/svelte-jsoneditor/commit/4f8fa55fb4ed09ef112ddee3aab03429bf0a5ca9))
+* improve performance of `isColor` detection (see [#378](https://github.com/josdejong/svelte-jsoneditor/issues/378)) ([514f6ca](https://github.com/josdejong/svelte-jsoneditor/commit/514f6cafdf4937d495670395028e0f326a585a9a))
+* improve performance of `isColor` detection for long text values (See [#378](https://github.com/josdejong/svelte-jsoneditor/issues/378)) ([b1a04fc](https://github.com/josdejong/svelte-jsoneditor/commit/b1a04fce772a0fca4c14f1e3758a8ba5c7c77ad5))
+* update dependency `jsonrepair` ([ec23521](https://github.com/josdejong/svelte-jsoneditor/commit/ec235216a1aee30fd880938dc82233a4731c2f0d))
+
 ### [0.21.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.21.0...v0.21.1) (2023-12-20)
 
 
