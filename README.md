@@ -172,6 +172,8 @@ To make it easier to use the library in your framework of choice, you can use a 
 - Vue:
   - [json-editor-vue](https://github.com/cloydlau/json-editor-vue)
   - [vue3-ts-jsoneditor](https://github.com/bestkolobok/vue3-jsoneditor)
+- Django:
+  - [django-svelte-jsoneditor](https://github.com/octue/django-svelte-jsoneditor)
 
 ## API
 
