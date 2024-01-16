@@ -653,68 +653,27 @@ const config = {
 
 ## Develop
 
-Clone the git repository
+To get started: clone the git repository, run `npm install`, and then `npm run dev`. 
 
-Install dependencies (once):
-
-```
-npm install
-```
-
-Start the demo project (at http://localhost:5173):
+All available scripts:
 
 ```
-npm run dev
-```
+npm install             # Install dependencies (once)
 
-Build the library:
+npm run dev             # Start the demo project (at http://localhost:5173)
+npm run build           # Build the library (output in ./package and ./package-vanilla)
 
-```
-npm run build
-```
+npm run test            # Run unit tests in watch mode
+npm run test-ci         # Run unit tests once
+npm run coverage        # Run unit test coverage (output in ./coverage)
 
-Run unit tests (in watch mode):
+npm run lint            # Run linter
+npm run format          # Automatically fix linting issues
 
-```
-npm test
-```
-
-Run unit tests and exit:
-
-```
-npm run test-ci
-```
-
-Run linter:
-
-```
-npm run lint
-```
-
-Run coverage (coverage results will be generated in the folder `./coverage`):
-
-```
-npm run coverage
-```
-
-Automatically fix linting issues:
-
-```
-npm run format
-```
-
-Publish to npm (will increase version number and publish to npm):
-
-```
-npm run release
-```
-
-Note that it will publish two npm packages: `svelte-jsoneditor` and `vanilla-jsoneditor`. You'll need to enter a one-time password for npm.
-
-To try a build and see the change list, run:
-
-```
-npm run release-dry-run
+npm run release-dry-run # To run the build and see the change list without actually publishing
+npm run release         # Publish to npm. Will increase version number, update changelog, etc.
+                        # Note that it will publish two npm packages: `svelte-jsoneditor` and 
+                        # `vanilla-jsoneditor`. You'll need to enter a one-time password for npm.
 ```
 
 ## License
