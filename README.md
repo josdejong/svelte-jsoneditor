@@ -671,9 +671,9 @@ npm run lint            # Run linter
 npm run format          # Automatically fix linting issues
 
 npm run release-dry-run # To run the build and see the change list without actually publishing
-npm run release         # Publish to npm. Will increase version number, update changelog, etc.
-                        # Note that it will publish two npm packages: `svelte-jsoneditor` and 
-                        # `vanilla-jsoneditor`. You'll need to enter a one-time password for npm.
+npm run release         # Publish to npm (requires login). It will increase version number, 
+                        # update changelog, etc. Note that it will publish two npm packages: 
+                        # `svelte-jsoneditor` and `vanilla-jsoneditor`. 
 ```
 
 ## License
