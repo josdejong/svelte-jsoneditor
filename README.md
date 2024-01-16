@@ -653,7 +653,7 @@ const config = {
 
 ## Develop
 
-To get started: clone the git repository, run `npm install`, and then `npm run dev`. 
+To get started: clone the git repository, run `npm install`, and then `npm run dev`.
 
 All available scripts:
 
@@ -671,9 +671,9 @@ npm run lint            # Run linter
 npm run format          # Automatically fix linting issues
 
 npm run release-dry-run # To run the build and see the change list without actually publishing
-npm run release         # Publish to npm (requires login). It will increase the version number, 
-                        # update changelog, etc. Note that it will publish two npm packages: 
-                        # `svelte-jsoneditor` and `vanilla-jsoneditor`. 
+npm run release         # Publish to npm (requires login). It will increase the version number,
+                        # update changelog, etc. Note that it will publish two npm packages:
+                        # `svelte-jsoneditor` and `vanilla-jsoneditor`.
 ```
 
 ## License
