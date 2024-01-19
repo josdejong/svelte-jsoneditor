@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.21.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.21.2...v0.21.3) (2024-01-19)
+
+
+### Bug Fixes
+
+* [#381](https://github.com/josdejong/svelte-jsoneditor/issues/381) method `set()` sometimes throwing an error in `text` mode ([2dc62f0](https://github.com/josdejong/svelte-jsoneditor/commit/2dc62f04056ec352fe548323dda5819e423a25d5))
+* [#391](https://github.com/josdejong/svelte-jsoneditor/issues/391) editor not supporting `Object.create(null)` as object ([918a126](https://github.com/josdejong/svelte-jsoneditor/commit/918a126789c61b8846505072642023a179418e90))
+* update dependencies and devDependencies ([0d49b66](https://github.com/josdejong/svelte-jsoneditor/commit/0d49b66810fa76c4b2fe82021e9dc7b760150407))
+
 ### [0.21.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.21.1...v0.21.2) (2024-01-10)
 
 
