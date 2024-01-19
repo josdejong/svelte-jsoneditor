@@ -9,7 +9,11 @@ import type { JSONParser } from '../types.js'
 export function isObject(value: unknown): value is Record<string, unknown> {
   // note that we check constructor.name, not constructor === Object,
   // so we can use objects created in a different JS realm like an iframe.
-  return typeof value === 'object' && value !== null && value.constructor.name === 'Object'
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    (value.constructor === undefined || value.constructor.name === 'Object')
+  )
 }
 
 /**
@@ -22,7 +26,9 @@ export function isObjectOrArray(value: unknown): value is Object | Array<unknown
   return (
     typeof value === 'object' &&
     value !== null &&
-    (value.constructor.name === 'Object' || value.constructor.name === 'Array')
+    (value.constructor === undefined ||
+      value.constructor.name === 'Object' ||
+      value.constructor.name === 'Array')
   )
 }
 
