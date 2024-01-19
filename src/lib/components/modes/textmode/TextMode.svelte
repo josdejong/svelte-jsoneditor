@@ -675,14 +675,15 @@
     const newText = getText(newContent, indentation, parser)
     const isChanged = !isEqual(newContent, content)
     const previousContent = content
-    content = newContent
-    text = newText
 
     debug('setCodeMirrorContent', { isChanged, forceUpdate })
 
     if (!codeMirrorView || (!isChanged && !forceUpdate)) {
       return
     }
+
+    content = newContent
+    text = newText
 
     if (!disableTextEditor(text, acceptTooLarge)) {
       // keep state

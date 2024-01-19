@@ -159,8 +159,6 @@
     // new editor id -> will re-create the editor
     instanceId = uniqueId()
 
-    await tick() // await re-render (creating the new editor)
-
     // update content *after* re-render, so that the new editor will trigger an onChange event
     content = newContent
   }
