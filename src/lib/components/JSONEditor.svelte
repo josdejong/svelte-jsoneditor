@@ -86,7 +86,7 @@
 
   export let queryLanguages: QueryLanguage[] = [javascriptQueryLanguage]
   export let queryLanguageId: string = queryLanguages[0].id
-
+  export let query = ''
   export let onChangeQueryLanguage: OnChangeQueryLanguage = noop
   export let onChange: OnChange = null
   export let onSelect: OnSelect = noop
@@ -346,6 +346,7 @@
         pathParser,
         queryLanguages,
         queryLanguageId,
+        query,
         onChangeQueryLanguage: handleChangeQueryLanguage,
         onRenderValue,
         onRenderMenu,

@@ -1553,12 +1553,13 @@
       id: id || transformModalId,
       json,
       rootPath: rootPath || [],
-      onTransform: (operations) => {
+      onTransform: (operations, query) => {
         if (onTransform) {
           onTransform({
             operations,
             json: json,
-            transformedJson: immutableJSONPatch(json, operations)
+            transformedJson: immutableJSONPatch(json, operations),
+            query
           })
         } else {
           debug('onTransform', rootPath, operations)

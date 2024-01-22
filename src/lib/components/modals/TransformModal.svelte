@@ -73,10 +73,13 @@
   let showOriginal = transformModalStateShared.showOriginal !== false
 
   let queryOptions = state.queryOptions || {}
-  let query =
-    queryLanguageId === state.queryLanguageId && state.query
-      ? state.query
-      : getSelectedQueryLanguage(queryLanguageId).createQuery(json, state.queryOptions || {})
+  export let query: string
+  if (!query) {
+    query =
+      queryLanguageId === state.queryLanguageId && state.query
+        ? state.query
+        : getSelectedQueryLanguage(queryLanguageId).createQuery(json, state.queryOptions || {})
+  }
   let isManual = state.isManual || false
 
   let previewError: string | undefined = undefined
@@ -160,13 +163,16 @@
         parser
       )
 
-      onTransform([
-        {
-          op: 'replace',
-          path: compileJSONPointer(rootPath),
-          value: jsonTransformed
-        }
-      ])
+      onTransform(
+        [
+          {
+            op: 'replace',
+            path: compileJSONPointer(rootPath),
+            value: jsonTransformed
+          }
+        ],
+        query
+      )
 
       close()
     } catch (err) {

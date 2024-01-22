@@ -286,7 +286,8 @@ export type OnJSONSelect = (selection: JSONSelection) => void
 export type OnSelect = (selection: JSONEditorSelection | null) => void
 export type OnPatch = (
   operations: JSONPatchDocument,
-  afterPatch?: AfterPatchCallback
+  afterPatch?: AfterPatchCallback,
+  query?: string
 ) => JSONPatchResult
 export type OnChangeText = (updatedText: string, afterPatch?: AfterPatchCallback) => void
 export type OnSort = (params: {
@@ -548,9 +549,11 @@ export interface RenderValueComponentDescription {
 export interface TransformModalOptions {
   id?: string
   rootPath?: JSONPath
+  json?: string
   onTransform?: (state: {
     operations: JSONPatchDocument
     json: unknown
+    query: string
     transformedJson: unknown
   }) => void
   onClose?: () => void
@@ -560,7 +563,7 @@ export interface TransformModalCallback {
   id: string
   rootPath: JSONPath
   json: unknown
-  onTransform: (operations: JSONPatchDocument) => void
+  onTransform: (operations: JSONPatchDocument, query: string) => void
   onClose: () => void
 }
 
