@@ -235,6 +235,7 @@
   const validate = useLocalStorage('svelte-jsoneditor-demo-validate', false)
   const validateArray = useLocalStorage('svelte-jsoneditor-demo-validate-array', false)
   const readOnly = useLocalStorage('svelte-jsoneditor-demo-readOnly', false)
+  const forceContextMenu = useLocalStorage('svelte-jsoneditor-demo-forceContextMenu', false)
   const mainMenuBar = useLocalStorage('svelte-jsoneditor-demo-mainMenuBar', true)
   const navigationBar = useLocalStorage('svelte-jsoneditor-demo-navigationBar', true)
   const statusBar = useLocalStorage('svelte-jsoneditor-demo-statusBar', true)
@@ -541,6 +542,9 @@
       <input type="checkbox" bind:checked={$readOnly} /> readOnly
     </label>
     <label>
+      <input type="checkbox" bind:checked={$forceContextMenu} /> forceContextMenu
+    </label>
+    <label>
       <input type="checkbox" bind:checked={$useCustomValueRenderer} /> Custom onRenderValue
     </label>
   </p>
@@ -767,6 +771,7 @@
             escapeUnicodeCharacters={$escapeUnicodeCharacters}
             flattenColumns={$flattenColumns}
             readOnly={$readOnly}
+            forceContextMenu={$forceContextMenu}
             indentation={$selectedIndentation}
             tabSize={$tabSize}
             parser={selectedParser}

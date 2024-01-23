@@ -155,6 +155,8 @@
   debug('isSSR:', isSSR)
 
   export let readOnly: boolean
+  export let forceContextMenu: boolean
+
   export let externalContent: Content
   export let externalSelection: JSONEditorSelection | null
   export let mainMenuBar: boolean
@@ -979,7 +981,7 @@
   }
 
   function handleContextMenu(event: Event) {
-    if (readOnly || isEditingSelection(documentState.selection)) {
+    if ((readOnly && !forceContextMenu) || isEditingSelection(documentState.selection)) {
       return
     }
 
@@ -1028,7 +1030,7 @@
   }
 
   function handleContextMenuFromTableMenu(event: MouseEvent) {
-    if (readOnly) {
+    if (readOnly && !forceContextMenu) {
       return
     }
 

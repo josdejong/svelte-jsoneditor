@@ -75,6 +75,7 @@
   export let askToFormat = true
   export let escapeControlCharacters = false
   export let escapeUnicodeCharacters = false
+  export let forceContextMenu = false
   export let flattenColumns = true
   export let parser: JSONParser = JSON
   export let validator: Validator | null = null
@@ -393,6 +394,7 @@
         onPatch,
 
         readOnly,
+        forceContextMenu,
         indentation,
         tabSize,
         mainMenuBar,
@@ -462,6 +464,7 @@
             {navigationBar}
             {escapeControlCharacters}
             {escapeUnicodeCharacters}
+            {forceContextMenu}
             {flattenColumns}
             {parser}
             {parseMemoizeOne}

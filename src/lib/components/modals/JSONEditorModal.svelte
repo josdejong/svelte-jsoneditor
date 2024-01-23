@@ -41,6 +41,7 @@
   export let onPatch: OnPatch
 
   export let readOnly: boolean
+  export let forceContextMenu: boolean
   export let indentation: number | string
   export let tabSize: number
   export let mainMenuBar: boolean
@@ -244,6 +245,7 @@
         {askToFormat}
         {mainMenuBar}
         {navigationBar}
+        {forceContextMenu}
         {escapeControlCharacters}
         {escapeUnicodeCharacters}
         {flattenColumns}

@@ -41,6 +41,7 @@
   export let indentation: number | string
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
+  export let forceContextMenu: boolean
   export let parser: JSONParser
   export let parseMemoizeOne: JSONParser['parse']
   export let validationParser: JSONParser
@@ -279,6 +280,7 @@
                 {indentation}
                 {escapeControlCharacters}
                 {escapeUnicodeCharacters}
+                {forceContextMenu}
                 {parser}
                 {parseMemoizeOne}
                 {onRenderValue}

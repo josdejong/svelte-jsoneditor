@@ -436,6 +436,7 @@ export interface JSONEditorPropsOptional {
   escapeControlCharacters?: boolean
   escapeUnicodeCharacters?: boolean
   flattenColumns?: true
+  forceContextMenu?: boolean
   parser?: JSONParser
   validator?: Validator | null
   validationParser?: JSONParser

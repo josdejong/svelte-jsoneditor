@@ -49,6 +49,7 @@
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
   export let flattenColumns: boolean
+  export let forceContextMenu: boolean
   export let parser: JSONParser
   export let parseMemoizeOne: JSONParser['parse']
   export let validator: Validator | null
@@ -271,6 +272,7 @@
     externalSelection={selection}
     {readOnly}
     {mainMenuBar}
+    {forceContextMenu}
     {escapeControlCharacters}
     {escapeUnicodeCharacters}
     {flattenColumns}
@@ -301,6 +303,7 @@
     {indentation}
     {mainMenuBar}
     {navigationBar}
+    {forceContextMenu}
     {escapeControlCharacters}
     {escapeUnicodeCharacters}
     {parser}
