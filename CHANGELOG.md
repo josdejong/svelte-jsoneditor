@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.21.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.21.3...v0.21.4) (2024-01-24)
+
+
+### Bug Fixes
+
+* [#381](https://github.com/josdejong/svelte-jsoneditor/issues/381) method `.update()` throwing an exception when calling directly after creating the editor ([75c3b5e](https://github.com/josdejong/svelte-jsoneditor/commit/75c3b5e1c19347e98d86c367bebe5e688c4f3ea1))
+* update `@codemirror/view` and dev dependencies ([3f2afef](https://github.com/josdejong/svelte-jsoneditor/commit/3f2afef38bb420bc4f21629ff5cb16e494b6d025))
+
 ### [0.21.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.21.2...v0.21.3) (2024-01-19)
 
 
