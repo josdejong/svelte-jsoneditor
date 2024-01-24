@@ -2,6 +2,7 @@
 
 <script lang="ts">
   import type { JSONEditorContext, JSONSelection, SearchResultItem } from '$lib/types.js'
+  import { isSvelteActionRenderer } from '$lib/typeguards.js'
   import type { JSONPath } from 'immutable-json-patch'
   import { isEditingSelection, isValueSelection } from '$lib/logic/selection.js'
 
@@ -34,7 +35,20 @@
 </script>
 
 {#each renderers as renderer}
-  {#key renderer.component}
-    <svelte:component this={renderer.component} {...renderer.props} />
-  {/key}
+  {#if isSvelteActionRenderer(renderer)}
+    {@const action = renderer.action}
+    {#key renderer.action}
+      <div
+        role="button"
+        tabindex="-1"
+        class="jse-value jse-readonly-password"
+        data-type="selectable-value"
+        use:action={renderer.props}
+      />
+    {/key}
+  {:else}
+    {#key renderer.component}
+      <svelte:component this={renderer.component} {...renderer.props} />
+    {/key}
+  {/if}
 {/each}

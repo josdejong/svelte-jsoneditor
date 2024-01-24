@@ -1,13 +1,15 @@
 <script>
   import { EnumValue, JSONEditor, renderValue } from 'svelte-jsoneditor'
   import ReadonlyPassword from '../../components/ReadonlyPassword.svelte'
+  import { Evaluator } from '../../components/Evaluator.ts'
 
   let content = {
     text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       username: 'John',
       password: 'secret...',
-      gender: 'male'
+      gender: 'male',
+      evaluate: '2 + 3'
     }
   }
 
@@ -53,6 +55,20 @@
       ]
     }
 
+    if (key === 'evaluate' && !isEditing) {
+      return [
+        {
+          action: Evaluator,
+          props: {
+            value,
+            path,
+            readOnly,
+            onSelect
+          }
+        }
+      ]
+    }
+
     // fallback on the default render components
     return renderValue(props)
   }
@@ -66,7 +82,9 @@
 
 <p>
   Provide a custom <code>onRenderValue</code> method, which hides the value of all fields with the name
-  "password", and creates an enum for the fields with name "gender".
+  "password", and creates an enum for the fields with name "gender". The field named "evaluate" is rendered
+  using a vanilla JS component (action) which evaluates the value as an expression containing an addition
+  of two or more values.
 </p>
 <p>
   <i>EXPERIMENTAL! This API will most likely change in future versions.</i>

@@ -1,6 +1,7 @@
 import type { JSONPatchDocument, JSONPath, JSONPointer } from 'immutable-json-patch'
 import type { SvelteComponent } from 'svelte'
 import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
+import type { Action } from 'svelte/action'
 
 export type TextContent = { text: string }
 
@@ -541,8 +542,15 @@ export interface DraggingState {
   didMoveItems: boolean
 }
 
-export interface RenderValueComponentDescription {
+export type RenderValueComponentDescription = SvelteComponentRenderer | SvelteActionRenderer
+
+export interface SvelteComponentRenderer {
   component: typeof SvelteComponent<RenderValuePropsOptional>
+  props: Record<string, unknown>
+}
+
+export interface SvelteActionRenderer {
+  action: Action
   props: Record<string, unknown>
 }
 
