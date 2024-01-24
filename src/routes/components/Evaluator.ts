@@ -20,10 +20,6 @@ export const Evaluator: Action<HTMLDivElement, EvaluatorProps> = (node, props) =
   }
 
   function handleValueDoubleClick(event: MouseEvent) {
-    if (!props) {
-      return
-    }
-
     if (!props.readOnly) {
       event.preventDefault()
       event.stopPropagation()
