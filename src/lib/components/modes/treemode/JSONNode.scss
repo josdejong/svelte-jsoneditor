@@ -53,7 +53,7 @@
   .jse-contents {
     display: flex;
     flex-direction: row;
-    align-items: start; // important for the alignment of the context menu button and key in case of a multi line value
+    align-items: flex-start; // important for the alignment of the context menu button and key in case of a multi line value
   }
 
   .jse-contents {
