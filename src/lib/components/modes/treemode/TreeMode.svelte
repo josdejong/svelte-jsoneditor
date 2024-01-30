@@ -1879,7 +1879,7 @@
   }
 
   function handleContextMenu(event?: Event) {
-    if (readOnly || isEditingSelection(documentState.selection)) {
+    if (!onRenderContextMenu([]) || isEditingSelection(documentState.selection)) {
       return
     }
 
@@ -1928,7 +1928,7 @@
   }
 
   function handleContextMenuFromTreeMenu(event: MouseEvent) {
-    if (readOnly) {
+    if (!onRenderContextMenu([])) {
       return
     }
 
