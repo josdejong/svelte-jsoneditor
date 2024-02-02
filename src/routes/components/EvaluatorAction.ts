@@ -1,22 +1,22 @@
-import { createValueSelection, type OnSelect } from 'svelte-jsoneditor'
+import { createValueSelection, type OnJSONSelect } from 'svelte-jsoneditor'
 import type { Action } from 'svelte/action'
-import type { JSONPath } from 'immutable-json-patch'
+import { type JSONPath } from 'immutable-json-patch'
 
-export interface EvaluatorProps {
+export interface EvaluatorActionProps {
   value: unknown
   path: JSONPath
   readOnly: boolean
-  onSelect: OnSelect
+  onSelect: OnJSONSelect
 }
 
-export const EvaluatorAction: Action<HTMLDivElement, EvaluatorProps> = (node, props) => {
-  function evaluate(expr: string) {
-    const result = expr
-      .split('+')
-      .map((value) => parseFloat(value.trim()))
-      .reduce((a, b) => a + b)
+export const EvaluatorAction: Action<HTMLDivElement, Record<string, unknown>> = (
+  node,
+  initialProps
+) => {
+  let props = toEvaluatorProps(initialProps)
 
-    return `The result of "${expr}" is "${result}" (double-click to edit)`
+  function updateResult() {
+    node.innerText = evaluate(String(props.value))
   }
 
   function handleValueDoubleClick(event: MouseEvent) {
@@ -30,14 +30,29 @@ export const EvaluatorAction: Action<HTMLDivElement, EvaluatorProps> = (node, pr
   }
 
   node.addEventListener('dblclick', handleValueDoubleClick)
-  node.innerText = evaluate(String(props.value))
+  updateResult()
 
   return {
-    update: (props) => {
-      node.innerText = evaluate(String(props.value))
+    update: (updatedProps) => {
+      props = toEvaluatorProps(updatedProps)
+      updateResult()
     },
     destroy: () => {
       node.removeEventListener('dblclick', handleValueDoubleClick)
     }
   }
+}
+
+function evaluate(expr: string) {
+  const result = expr
+    .split('+')
+    .map((value) => parseFloat(value.trim()))
+    .reduce((a, b) => a + b)
+
+  return `The result of "${expr}" is "${result}" (double-click to edit)`
+}
+
+function toEvaluatorProps(props: Record<string, unknown>): EvaluatorActionProps {
+  // you can add validations and typeguards here if needed
+  return props as unknown as EvaluatorActionProps
 }

@@ -1,7 +1,13 @@
-<script>
-  import { EnumValue, JSONEditor, renderValue } from 'svelte-jsoneditor'
+<script lang="ts">
+  import {
+    EnumValue,
+    JSONEditor,
+    renderValue,
+    type RenderValueComponentDescription,
+    type RenderValueProps
+  } from 'svelte-jsoneditor'
   import ReadonlyPassword from '../../components/ReadonlyPassword.svelte'
-  import { EvaluatorAction } from '../../components/EvaluatorAction.ts'
+  import { EvaluatorAction } from '../../components/EvaluatorAction'
 
   let content = {
     text: undefined, // can be used to pass a stringified JSON document instead
@@ -20,7 +26,7 @@
     { value: 'other', text: 'Other' }
   ]
 
-  function onRenderValue(props) {
+  function onRenderValue(props: RenderValueProps): RenderValueComponentDescription[] {
     const { path, value, readOnly, parser, isEditing, selection, onSelect, onPatch } = props
 
     const key = props.path[props.path.length - 1]

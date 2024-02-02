@@ -2,9 +2,9 @@
 
 <script lang="ts">
   import type { JSONEditorContext, JSONSelection, SearchResultItem } from '$lib/types.js'
-  import { isSvelteActionRenderer } from '$lib/typeguards.js'
   import type { JSONPath } from 'immutable-json-patch'
   import { isEditingSelection, isValueSelection } from '$lib/logic/selection.js'
+  import { isSvelteActionRenderer } from '$lib/typeguards.js'
 
   export let path: JSONPath
   export let value: unknown

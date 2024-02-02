@@ -550,7 +550,7 @@ export interface SvelteComponentRenderer {
 }
 
 export interface SvelteActionRenderer {
-  action: Action
+  action: Action<HTMLElement, Record<string, unknown>>
   props: Record<string, unknown>
 }
 
