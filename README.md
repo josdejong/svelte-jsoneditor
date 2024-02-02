@@ -293,7 +293,7 @@ const editor = new JSONEditor({
     return renderJSONSchemaEnum(props, schema, schemaDefinitions) || renderValue(props)
   }
   ```
-  
+
   The callback `onRenderValue` must return an array with one or multiple renderers. Each renderer can be either a Svelte component or a Svelte action:
 
   ```ts
@@ -301,15 +301,15 @@ const editor = new JSONEditor({
     component: typeof SvelteComponent<RenderValuePropsOptional>
     props: Record<string, unknown>
   }
-    
+
   interface SvelteActionRenderer {
     action: Action // Svelte Action
     props: Record<string, unknown>
   }
   ```
-  
+
   The `SvelteComponentRenderer` interface can be used to provide Svelte components like the `EnumValue` component mentioned above. The `SvelteActionRenderer` expects a [Svelte Action](https://svelte.dev/docs/svelte-action) as `action` property. Since this interface is a plain JavaScript interface, this allows to create custom components in a vanilla JS environment. Basically it is a function that gets a DOM node passed, and needs to return an object with `update` and `destroy` functions:
-        
+
   ```js
   const myRendererAction = {
     action: (node) => {

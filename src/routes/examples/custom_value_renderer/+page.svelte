@@ -84,11 +84,20 @@
   Provide a custom <code>onRenderValue</code> method, which demonstrates three things:
 </p>
 <ol>
-  <li>It hides the value of all fields with the name "password" using a Svelte password component <code>ReadonlyPassword</code></li>
-  <li>It creates an enum component for the fields with name "gender" using a Svelte component <code>EnumValue</code>.</li>
-  <li>The creates a custom component for the field named "evaluate" using a Svelte Action,
-    which evaluates the value as an expression containing an addition of two or more values.
-    This solution can be used when using svelte-jsoneditor in a Vanilla JS environment.
+  <li>
+    It hides the value of all fields with the name "password" using a Svelte password component <code
+      >ReadonlyPassword</code
+    >
+  </li>
+  <li>
+    It creates an enum component for the fields with name "gender" using a Svelte component <code
+      >EnumValue</code
+    >.
+  </li>
+  <li>
+    The creates a custom component for the field named "evaluate" using a Svelte Action, which
+    evaluates the value as an expression containing an addition of two or more values. This solution
+    can be used when using svelte-jsoneditor in a Vanilla JS environment.
   </li>
 </ol>
 
