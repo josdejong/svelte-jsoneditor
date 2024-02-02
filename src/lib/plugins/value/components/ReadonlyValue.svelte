@@ -12,10 +12,10 @@
     OnJSONSelect,
     ValueNormalization
   } from '$lib/types.js'
-  import type { JSONPath, JSONValue } from 'immutable-json-patch'
+  import type { JSONPath } from 'immutable-json-patch'
 
   export let path: JSONPath
-  export let value: JSONValue
+  export let value: unknown
   export let readOnly: boolean
   export let normalization: ValueNormalization
   export let parser: JSONParser

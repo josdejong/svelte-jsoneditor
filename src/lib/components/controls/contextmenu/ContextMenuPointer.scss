@@ -2,10 +2,10 @@
 
 .jse-context-menu-pointer {
   position: absolute;
-  top: calc(-0.5 * var(--jse-context-menu-pointer-size));
-  right: calc(-0.5 * var(--jse-context-menu-pointer-size));
-  width: var(--jse-context-menu-pointer-size);
-  height: var(--jse-context-menu-pointer-size);
+  top: calc(-0.5 * $context-menu-pointer-size);
+  right: calc(-0.5 * $context-menu-pointer-size);
+  width: $context-menu-pointer-size;
+  height: $context-menu-pointer-size;
   padding: 0;
   margin: 0;
 
@@ -13,12 +13,12 @@
   background: transparent;
 
   border-radius: 2px;
-  background: var(--jse-context-menu-pointer-background);
-  color: var(--jse-context-menu-pointer-color);
+  background: $context-menu-pointer-background;
+  color: $context-menu-pointer-color;
   border: none;
-  box-shadow: var(--jse-controls-box-shadow);
+  box-shadow: $controls-box-shadow;
 
   &:hover {
-    background: var(--jse-context-menu-pointer-background-highlight);
+    background: $context-menu-pointer-background-highlight;
   }
 }

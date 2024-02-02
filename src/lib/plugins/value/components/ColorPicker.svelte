@@ -45,8 +45,9 @@
     // when there is not enough space below, and there is enough space above
     const height = 300
 
-    const top = event.target.getBoundingClientRect().top
-    const windowHeight = getWindow(event.target).innerHeight
+    const target = event.target as Element
+    const top = target.getBoundingClientRect().top
+    const windowHeight = getWindow(target)?.innerHeight ?? 0
     const showOnTop = windowHeight - top < height && top > height
 
     const props = {
@@ -56,7 +57,7 @@
     }
 
     openAbsolutePopup(ColorPickerPopup, props, {
-      anchor: event.target,
+      anchor: target,
       closeOnOuterClick: true,
       onClose,
       offsetTop: 18,

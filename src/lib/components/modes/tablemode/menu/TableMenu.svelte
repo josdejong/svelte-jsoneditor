@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { MenuItem, OnRenderMenuWithoutContext } from '$lib/types'
+  import type { MenuItem, OnRenderMenuInternal } from '$lib/types'
   import Menu from '../../../controls/Menu.svelte'
   import {
     faEllipsisV,
@@ -10,19 +10,18 @@
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
-  import type { JSONValue } from 'immutable-json-patch'
   import type { HistoryState } from '$lib/logic/history'
   import { CONTEXT_MENU_EXPLANATION } from '$lib/constants.js'
 
-  export let json: JSONValue | undefined
+  export let json: unknown | undefined
   export let readOnly: boolean
   export let historyState: HistoryState
   export let onSort: () => void
   export let onTransform: () => void
-  export let onContextMenu: () => void
+  export let onContextMenu: (event: MouseEvent) => void
   export let onUndo: () => void
   export let onRedo: () => void
-  export let onRenderMenu: OnRenderMenuWithoutContext
+  export let onRenderMenu: OnRenderMenuInternal
 
   let defaultItems: MenuItem[]
   $: defaultItems = !readOnly
@@ -80,7 +79,7 @@
       ]
 
   let items: MenuItem[]
-  $: items = onRenderMenu(defaultItems) || defaultItems
+  $: items = onRenderMenu(defaultItems)
 </script>
 
 <Menu {items} />

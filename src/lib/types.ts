@@ -1,14 +1,32 @@
-import type { JSONPatchDocument, JSONPath, JSONValue, JSONPointer } from 'immutable-json-patch'
+import type { JSONPatchDocument, JSONPath, JSONPointer } from 'immutable-json-patch'
 import type { SvelteComponent } from 'svelte'
 import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
+import type { Action } from 'svelte/action'
 
-export type TextContent = { text: string } | { json: undefined; text: string }
+export type TextContent = { text: string }
 
-export type JSONContent = { json: JSONValue } | { json: JSONValue; text: undefined }
+export type JSONContent = { json: unknown }
 
 export type Content = JSONContent | TextContent
 
-export type JSONParser = JSON
+// The `JSONParser` interface is compatible with `JSON`,
+// except that JSON.stringify is wrongly defined to return a string whilst it can return a string or undefined
+// see: https://stackoverflow.com/questions/74461780/is-the-official-type-definition-for-json-stringify-wrong
+export interface JSONParser {
+  parse(
+    text: string,
+    reviver?: ((this: unknown, key: string, value: unknown) => unknown) | null
+  ): unknown
+
+  stringify(
+    value: unknown,
+    replacer?:
+      | ((this: unknown, key: string, value: unknown) => unknown)
+      | Array<number | string>
+      | null,
+    space?: string | number
+  ): string | undefined
+}
 
 export interface JSONPathParser {
   parse: (pathStr: string) => JSONPath
@@ -66,16 +84,16 @@ export interface DocumentState {
 }
 
 export interface JSONPatchResult {
-  json: JSONValue
-  previousJson: JSONValue
+  json: unknown
+  previousJson: unknown
   undo: JSONPatchDocument
   redo: JSONPatchDocument
 }
 
 export type AfterPatchCallback = (
-  patchedJson: JSONValue,
+  patchedJson: unknown,
   patchedState: DocumentState
-) => { json?: JSONValue; state?: DocumentState } | undefined
+) => { json?: unknown; state?: DocumentState } | undefined
 
 export interface MultiSelection {
   type: SelectionType.multi
@@ -124,11 +142,11 @@ export type JSONEditorSelection = JSONSelection | TextSelection
 
 export type JSONPointerMap<T> = Record<JSONPointer, T>
 
-export type ClipboardValues = Array<{ key: string; value: JSONValue }>
+export type ClipboardValues = Array<{ key: string; value: unknown }>
 
 export interface MenuButton {
   type: 'button'
-  onClick: () => void
+  onClick: (event: MouseEvent) => void
   icon?: IconDefinition
   text?: string
   title?: string
@@ -158,11 +176,11 @@ export interface MenuSpace {
 
 export type MenuItem = MenuButton | MenuSeparator | MenuSpace
 
-export type ContextMenuColumn = {
+export interface ContextMenuColumn {
   type: 'column'
   items: Array<MenuButton | MenuDropDownButton | MenuLabel | MenuSeparator>
 }
-export type ContextMenuRow = {
+export interface ContextMenuRow {
   type: 'row'
   items: Array<MenuButton | MenuDropDownButton | ContextMenuColumn>
 }
@@ -193,7 +211,7 @@ export interface NestedValidationError extends ValidationError {
   isChildError?: boolean
 }
 
-export type Validator = (json: JSONValue) => ValidationError[]
+export type Validator = (json: unknown) => ValidationError[]
 
 export interface ParseError {
   position: number | null
@@ -238,22 +256,22 @@ export interface QueryLanguage {
   id: string
   name: string
   description: string
-  createQuery: (json: JSONValue, queryOptions: QueryLanguageOptions) => string
-  executeQuery: (json: JSONValue, query: string, parser: JSONParser) => JSONValue
+  createQuery: (json: unknown, queryOptions: QueryLanguageOptions) => string
+  executeQuery: (json: unknown, query: string, parser: JSONParser) => unknown
 }
 
 export interface QueryLanguageOptions {
   filter?: {
-    path?: string[]
+    path?: JSONPath
     relation?: '==' | '!=' | '<' | '<=' | '>' | '>='
     value?: string
   }
   sort?: {
-    path?: string[]
+    path?: JSONPath
     direction?: 'asc' | 'desc'
   }
   projection?: {
-    paths?: string[][]
+    paths?: JSONPath[]
   }
 }
 
@@ -267,7 +285,10 @@ export type OnChange =
   | null
 export type OnJSONSelect = (selection: JSONSelection) => void
 export type OnSelect = (selection: JSONEditorSelection | null) => void
-export type OnPatch = (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => void
+export type OnPatch = (
+  operations: JSONPatchDocument,
+  afterPatch?: AfterPatchCallback
+) => JSONPatchResult
 export type OnChangeText = (updatedText: string, afterPatch?: AfterPatchCallback) => void
 export type OnSort = (params: {
   operations: JSONPatchDocument
@@ -277,10 +298,10 @@ export type OnSort = (params: {
 }) => void
 export type OnFind = (findAndReplace: boolean) => void
 export type OnPaste = (pastedText: string) => void
-export type OnPasteJson = (pastedJson: { path: JSONPath; contents: JSONValue }) => void
+export type OnPasteJson = (pastedJson: { path: JSONPath; contents: unknown }) => void
 export type OnExpand = (path: JSONPath) => boolean
 export type OnRenderValue = (props: RenderValueProps) => RenderValueComponentDescription[]
-export type OnClassName = (path: JSONPath, value: JSONValue) => string | undefined
+export type OnClassName = (path: JSONPath, value: unknown) => string | undefined
 export type OnChangeMode = (mode: Mode) => void
 export type OnContextMenu = (contextMenuProps: AbsolutePopupOptions) => void
 export type RenderMenuContext = {
@@ -288,7 +309,13 @@ export type RenderMenuContext = {
   modal: boolean
 }
 export type OnRenderMenu = (items: MenuItem[], context: RenderMenuContext) => MenuItem[] | undefined
-export type OnRenderMenuWithoutContext = (items: MenuItem[]) => MenuItem[] | undefined
+export type OnRenderMenuInternal = (items: MenuItem[]) => MenuItem[]
+export type RenderContextMenuContext = RenderMenuContext & { selection: JSONEditorSelection | null }
+export type OnRenderContextMenu = (
+  items: ContextMenuItem[],
+  context: RenderContextMenuContext
+) => ContextMenuItem[] | undefined
+export type OnRenderContextMenuInternal = (items: ContextMenuItem[]) => ContextMenuItem[]
 export type OnError = (error: Error) => void
 export type OnFocus = () => void
 export type OnBlur = () => void
@@ -330,10 +357,10 @@ export interface ValueNormalization {
   unescapeValue: UnescapeValue
 }
 
-export type PastedJson = { contents: JSONValue; path: JSONPath } | undefined
+export type PastedJson = { contents: unknown; path: JSONPath } | undefined
 
 export interface DragInsideProps {
-  json: JSONValue
+  json: unknown
   selection: JSONSelection
   deltaY: number
   items: Array<{ path: JSONPath; height: number }>
@@ -351,14 +378,14 @@ export interface RenderedItem {
 export interface HistoryItem {
   undo: {
     patch: JSONPatchDocument | undefined
-    json: JSONValue | undefined
+    json: unknown | undefined
     text: string | undefined
     state: DocumentState
     textIsRepaired: boolean
   }
   redo: {
     patch: JSONPatchDocument | undefined
-    json: JSONValue | undefined
+    json: unknown | undefined
     text: string | undefined
     state: DocumentState
     textIsRepaired: boolean
@@ -369,7 +396,7 @@ export type InsertType = 'value' | 'object' | 'array' | 'structure'
 
 export interface PopupEntry {
   id: number
-  component: typeof SvelteComponent
+  component: typeof SvelteComponent<Record<string, unknown>>
   props: Record<string, unknown>
   options: AbsolutePopupOptions
 }
@@ -390,7 +417,7 @@ export interface AbsolutePopupOptions {
 
 export interface AbsolutePopupContext {
   openAbsolutePopup: (
-    component: typeof SvelteComponent,
+    component: typeof SvelteComponent<Record<string, unknown>>,
     props: Record<string, unknown>,
     options: AbsolutePopupOptions
   ) => number
@@ -424,6 +451,7 @@ export interface JSONEditorPropsOptional {
   onRenderValue?: OnRenderValue
   onClassName?: OnClassName
   onRenderMenu?: OnRenderMenu
+  onRenderContextMenu?: OnRenderContextMenu
   onChangeMode?: OnChangeMode
   onError?: OnError
   onFocus?: OnFocus
@@ -434,12 +462,12 @@ export interface JSONEditorContext {
   readOnly: boolean
   parser: JSONParser
   normalization: ValueNormalization
-  getJson: () => JSONValue | undefined
+  getJson: () => unknown | undefined
   getDocumentState: () => DocumentState
   findElement: (path: JSONPath) => Element | null
   findNextInside: FindNextInside
   focus: () => void
-  onPatch: (operations: JSONPatchDocument, afterPatch?: AfterPatchCallback) => JSONPatchResult
+  onPatch: OnPatch
   onSelect: OnJSONSelect
   onFind: OnFind
   onPasteJson: (newPastedJson: PastedJson) => void
@@ -447,7 +475,7 @@ export interface JSONEditorContext {
 }
 
 export interface TreeModeContext extends JSONEditorContext {
-  getJson: () => JSONValue | undefined
+  getJson: () => unknown | undefined
   getDocumentState: () => DocumentState
   findElement: (path: JSONPath) => Element | null
   onInsert: (type: InsertType) => void
@@ -455,31 +483,13 @@ export interface TreeModeContext extends JSONEditorContext {
   onExpandSection: (path: JSONPath, section: Section) => void
   onContextMenu: OnContextMenu
   onClassName: OnClassName
-  onDrag: (event: Event) => void
+  onDrag: (event: MouseEvent) => void
   onDragEnd: () => void
 }
 
-export interface RenderValuePropsOptional {
-  path?: JSONPath
-  value?: JSONValue
-  readOnly?: boolean
-  enforceString?: boolean
-  selection?: JSONSelection | null
-  searchResultItems?: SearchResultItem[]
-  isEditing?: boolean
-  parser?: JSONParser
-  normalization?: ValueNormalization
-  onPatch?: TreeModeContext['onPatch']
-  onPasteJson?: OnPasteJson
-  onSelect?: OnJSONSelect
-  onFind?: OnFind
-  findNextInside?: FindNextInside
-  focus?: () => void
-}
-
-export interface RenderValueProps extends RenderValuePropsOptional {
+export interface RenderValueProps {
   path: JSONPath
-  value: JSONValue
+  value: unknown
   readOnly: boolean
   enforceString: boolean
   selection: JSONSelection | null
@@ -487,7 +497,7 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   isEditing: boolean
   parser: JSONParser
   normalization: ValueNormalization
-  onPatch: TreeModeContext['onPatch']
+  onPatch: OnPatch
   onPasteJson: OnPasteJson
   onSelect: OnJSONSelect
   onFind: OnFind
@@ -495,9 +505,11 @@ export interface RenderValueProps extends RenderValuePropsOptional {
   focus: () => void
 }
 
+export type RenderValuePropsOptional = Partial<RenderValueProps>
+
 export interface JSONNodeProp {
   key: string
-  value: JSONValue
+  value: unknown
   path: JSONPath
   expandedMap: JSONPointerMap<boolean> | undefined
   enforceStringMap: JSONPointerMap<boolean> | undefined
@@ -510,7 +522,7 @@ export interface JSONNodeProp {
 
 export interface JSONNodeItem {
   index: number
-  value: JSONValue
+  value: unknown
   path: JSONPath
   expandedMap: JSONPointerMap<boolean> | undefined
   enforceStringMap: JSONPointerMap<boolean> | undefined
@@ -531,8 +543,15 @@ export interface DraggingState {
   didMoveItems: boolean
 }
 
-export interface RenderValueComponentDescription {
+export type RenderValueComponentDescription = SvelteComponentRenderer | SvelteActionRenderer
+
+export interface SvelteComponentRenderer {
   component: typeof SvelteComponent<RenderValuePropsOptional>
+  props: Record<string, unknown>
+}
+
+export interface SvelteActionRenderer {
+  action: Action<HTMLElement, Record<string, unknown>>
   props: Record<string, unknown>
 }
 
@@ -541,8 +560,8 @@ export interface TransformModalOptions {
   rootPath?: JSONPath
   onTransform?: (state: {
     operations: JSONPatchDocument
-    json: JSONValue
-    transformedJson: JSONValue
+    json: unknown
+    transformedJson: unknown
   }) => void
   onClose?: () => void
 }
@@ -550,14 +569,14 @@ export interface TransformModalOptions {
 export interface TransformModalCallback {
   id: string
   rootPath: JSONPath
-  json: JSONValue
+  json: unknown
   onTransform: (operations: JSONPatchDocument) => void
   onClose: () => void
 }
 
 export interface SortModalCallback {
   id: string
-  json: JSONValue
+  json: unknown
   rootPath: JSONPath
   onSort: OnSort
   onClose: () => void

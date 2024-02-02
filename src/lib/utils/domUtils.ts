@@ -243,7 +243,6 @@ export function insertActiveElementContents(
 
   if (activeElement && activeElement.isContentEditable) {
     activeElement.textContent = replaceContents ? text : activeElement.textContent + text
-    console.log('UPDATED TEXT', replaceContents ? text : activeElement.textContent + text)
     setCursorToEnd(activeElement)
     if (onActiveElement) {
       onActiveElement(activeElement)
@@ -274,11 +273,7 @@ export function findParentWithNodeName(element: Element, nodeName: string): Elem
   return findParent(element, (e) => e.nodeName === nodeName)
 }
 
-/**
- * @param {HTMLElement} target
- * @returns {string | null}
- */
-export function getSelectionTypeFromTarget(target: HTMLElement): SelectionType {
+export function getSelectionTypeFromTarget(target: Element): SelectionType {
   if (isChildOfAttribute(target, 'data-type', 'selectable-key')) {
     return SelectionType.key
   }
@@ -315,7 +310,7 @@ export function decodeDataPath(pathStr: string): JSONPath {
 /**
  * Find the data path of the given element. Traverses the parent nodes until find
  */
-export function getDataPathFromTarget(target: HTMLElement): JSONPath | null {
+export function getDataPathFromTarget(target: Element): JSONPath | null {
   const parent = findParent(target, (element) => {
     return element?.hasAttribute ? element.hasAttribute('data-path') : false
   })

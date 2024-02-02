@@ -7,41 +7,41 @@
   export let popup: PopupEntry
   export let closeAbsolutePopup: (popupId: number) => void
 
-  let refRootPopup
-  let refHiddenInput
+  let refRootPopup: HTMLDivElement
+  let refHiddenInput: HTMLInputElement
 
   onMount(focus)
 
-  function closeWhenOutside(event) {
+  function closeWhenOutside(event: Event) {
     if (
       popup.options &&
       popup.options.closeOnOuterClick &&
-      !isChildOf(event.target, (e) => e === refRootPopup)
+      !isChildOf(event.target as HTMLElement, (e) => e === refRootPopup)
     ) {
       closeAbsolutePopup(popup.id)
     }
   }
 
-  function handleWindowMouseDown(event) {
+  function handleWindowMouseDown(event: Event) {
     closeWhenOutside(event)
   }
 
-  function handleMouseDownInside(event) {
+  function handleMouseDownInside(event: Event) {
     event.stopPropagation()
   }
 
-  function handleKeyDown(event) {
+  function handleKeyDown(event: KeyboardEvent) {
     const combo = keyComboFromEvent(event)
     if (combo === 'Escape') {
       closeAbsolutePopup(popup.id)
     }
   }
 
-  function handleScrollWheel(event) {
+  function handleScrollWheel(event: Event) {
     closeWhenOutside(event)
   }
 
-  function calculateStyle(refRootPopup, options: AbsolutePopupOptions) {
+  function calculateStyle(refRootPopup: HTMLDivElement, options: AbsolutePopupOptions) {
     function calculatePosition() {
       if (options.anchor) {
         const { anchor, width = 0, height = 0, offsetTop = 0, offsetLeft = 0, position } = options

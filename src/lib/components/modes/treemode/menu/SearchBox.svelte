@@ -53,7 +53,7 @@
     showReplace = !showReplace && !readOnly
   }
 
-  function handleSubmit(event) {
+  function handleSubmit(event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement }) {
     event.preventDefault()
 
     const pendingChanges = text !== previousText
@@ -66,7 +66,7 @@
     }
   }
 
-  function handleKeyDown(event) {
+  function handleKeyDown(event: KeyboardEvent) {
     // key events must not be handled by the generic keydown handler of the
     // whole JSONEditor.
     event.stopPropagation()
@@ -121,7 +121,7 @@
     onReplaceAll(text, replaceText)
   }
 
-  function initSearchInput(element) {
+  function initSearchInput(element: HTMLInputElement) {
     element.select()
   }
 </script>

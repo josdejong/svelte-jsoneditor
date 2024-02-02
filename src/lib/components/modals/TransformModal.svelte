@@ -7,7 +7,7 @@
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
   import { DEBOUNCE_DELAY } from '../../constants.js'
-  import type { JSONPath, JSONValue } from 'immutable-json-patch'
+  import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
   import { transformModalStates, transformModalStateShared } from './transformModalStates.js'
@@ -23,6 +23,8 @@
     OnChangeQueryLanguage,
     OnClassName,
     OnPatch,
+    OnRenderContextMenuInternal,
+    OnRenderMenuInternal,
     OnRenderValue,
     QueryLanguage,
     QueryLanguageOptions
@@ -33,7 +35,7 @@
   const debug = createDebug('jsoneditor:TransformModal')
 
   export let id = 'transform-modal-' + uniqueId()
-  export let json: JSONValue
+  export let json: unknown
   export let rootPath: JSONPath = []
 
   export let indentation: number | string
@@ -49,11 +51,13 @@
   export let onChangeQueryLanguage: OnChangeQueryLanguage
 
   export let onRenderValue: OnRenderValue
+  export let onRenderMenu: OnRenderMenuInternal
+  export let onRenderContextMenu: OnRenderContextMenuInternal
   export let onClassName: OnClassName
 
   export let onTransform: OnPatch
 
-  let selectedJson: JSONValue | undefined
+  let selectedJson: unknown | undefined
   $: selectedJson = getIn(json, rootPath)
   let selectedContent: Content
   $: selectedContent = selectedJson ? { json: selectedJson } : { text: '' }
@@ -96,7 +100,7 @@
     debug('handleChangeQuery', { query, isManual })
   }
 
-  function previewTransform(json: JSONValue | undefined, query: string) {
+  function previewTransform(json: unknown | undefined, query: string) {
     if (json === undefined) {
       previewContent = { text: '' }
       previewError = 'Error: No JSON'
@@ -278,7 +282,8 @@
                 {parser}
                 {parseMemoizeOne}
                 {onRenderValue}
-                onRenderMenu={() => undefined}
+                {onRenderMenu}
+                {onRenderContextMenu}
                 onError={console.error}
                 onChange={noop}
                 onChangeMode={noop}
@@ -312,7 +317,8 @@
                 {parser}
                 {parseMemoizeOne}
                 {onRenderValue}
-                onRenderMenu={() => undefined}
+                {onRenderMenu}
+                {onRenderContextMenu}
                 onError={console.error}
                 onChange={noop}
                 onChangeMode={noop}

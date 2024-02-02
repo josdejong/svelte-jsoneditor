@@ -29,6 +29,7 @@ describe('typeUtils', () => {
 
   test('isObject', () => {
     strictEqual(isObject({}), true)
+    strictEqual(isObject(Object.create(null)), true)
 
     strictEqual(isObject(null), false)
     strictEqual(isObject(undefined), false)
@@ -39,6 +40,7 @@ describe('typeUtils', () => {
 
   test('isObjectOrArray', () => {
     strictEqual(isObjectOrArray({}), true)
+    strictEqual(isObjectOrArray(Object.create(null)), true)
     strictEqual(isObjectOrArray([]), true)
 
     strictEqual(isObjectOrArray(null), false)

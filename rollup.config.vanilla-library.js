@@ -7,6 +7,7 @@ import path from 'path'
 import svelte from 'rollup-plugin-svelte'
 import terser from '@rollup/plugin-terser'
 import sveltePreprocess from 'svelte-preprocess'
+import { getVanillaDependencies } from './tools/getExternalDependencies.js'
 
 const production = !process.env.ROLLUP_WATCH
 const packageFolder = 'package-vanilla'
@@ -14,6 +15,7 @@ const file = path.join(packageFolder, 'index.js')
 
 export default {
   input: 'src/lib/index.ts',
+  external: getVanillaDependencies(),
   output: [
     {
       file,
@@ -36,7 +38,8 @@ export default {
     }),
 
     resolve({
-      browser: true
+      browser: true,
+      exportConditions: ['svelte']
     }),
     commonjs(),
     json(),

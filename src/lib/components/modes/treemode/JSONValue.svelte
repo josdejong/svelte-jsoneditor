@@ -2,17 +2,18 @@
 
 <script lang="ts">
   import type { JSONEditorContext, JSONSelection, SearchResultItem } from '$lib/types.js'
-  import type { JSONValue, JSONPath } from 'immutable-json-patch'
+  import type { JSONPath } from 'immutable-json-patch'
   import { isEditingSelection, isValueSelection } from '$lib/logic/selection.js'
+  import { isSvelteActionRenderer } from '$lib/typeguards.js'
 
   export let path: JSONPath
-  export let value: JSONValue
+  export let value: unknown
   export let context: JSONEditorContext
   export let enforceString: boolean
   export let selection: JSONSelection | null
   export let searchResultItems: SearchResultItem[] | undefined
 
-  $: isEditing = !context.readOnly && isValueSelection(selection) && isEditingSelection(selection)
+  $: isEditing = isValueSelection(selection) && isEditingSelection(selection)
 
   $: renderers = context.onRenderValue({
     path,
@@ -34,7 +35,20 @@
 </script>
 
 {#each renderers as renderer}
-  {#key renderer.component}
-    <svelte:component this={renderer.component} {...renderer.props} />
-  {/key}
+  {#if isSvelteActionRenderer(renderer)}
+    {@const action = renderer.action}
+    {#key renderer.action}
+      <div
+        role="button"
+        tabindex="-1"
+        class="jse-value jse-readonly-password"
+        data-type="selectable-value"
+        use:action={renderer.props}
+      />
+    {/key}
+  {:else}
+    {#key renderer.component}
+      <svelte:component this={renderer.component} {...renderer.props} />
+    {/key}
+  {/if}
 {/each}

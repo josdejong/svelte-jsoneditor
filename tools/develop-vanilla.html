@@ -107,7 +107,7 @@
         JSONEditor,
         lodashQueryLanguage,
         jmespathQueryLanguage
-      } from '../package-vanilla/index.js'
+      } from '../package-vanilla/standalone.js'
 
       const json = {
         array: [
@@ -384,8 +384,7 @@
           updated: ':)'
         }
         const str = JSON.stringify(updatedJson, null, 2)
-        const index = str.lastIndexOf('}')
-        const invalidStr = str.slice(0, index) + ']' + str.slice(index + 1)
+        const invalidStr = str + '['
         testEditor.update({ text: invalidStr })
       }
 

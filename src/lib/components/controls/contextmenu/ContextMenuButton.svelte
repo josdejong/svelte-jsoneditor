@@ -5,12 +5,16 @@
 
   export let item: MenuButton
   export let className: string | undefined = undefined
+  export let onCloseContextMenu: () => void
 </script>
 
 <button
   type="button"
   class={classnames('jse-context-menu-button', className, item.className)}
-  on:click={item.onClick}
+  on:click={(event) => {
+    onCloseContextMenu()
+    item.onClick(event)
+  }}
   title={item.title}
   disabled={item.disabled || false}
 >

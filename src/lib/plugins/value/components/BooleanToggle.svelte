@@ -2,13 +2,13 @@
 
 <script lang="ts">
   import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
-  import type { JSONValue, JSONPath } from 'immutable-json-patch'
+  import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import Icon from 'svelte-awesome'
   import type { OnPatch } from '$lib/types.js'
 
   export let path: JSONPath
-  export let value: JSONValue
+  export let value: unknown
   export let readOnly: boolean
   export let onPatch: OnPatch
   export let focus: () => void

@@ -18,8 +18,8 @@ export function createAutoScrollHandler(scrollableElement: Element) {
     return diff < 20
       ? AUTO_SCROLL_SPEED_SLOW
       : diff < 50
-      ? AUTO_SCROLL_SPEED_NORMAL
-      : AUTO_SCROLL_SPEED_FAST
+        ? AUTO_SCROLL_SPEED_NORMAL
+        : AUTO_SCROLL_SPEED_FAST
   }
 
   function autoScrollCallback() {
@@ -51,7 +51,7 @@ export function createAutoScrollHandler(scrollableElement: Element) {
     }
   }
 
-  function onDrag(event: DragEvent) {
+  function onDrag(event: MouseEvent) {
     if (scrollableElement) {
       const y = event.clientY
       const { top, bottom } = scrollableElement.getBoundingClientRect()

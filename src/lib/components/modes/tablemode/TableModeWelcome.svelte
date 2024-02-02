@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONPath, JSONValue } from 'immutable-json-patch'
+  import type { JSONPath } from 'immutable-json-patch'
   import { getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
   import type { JSONParser, OnChangeMode } from '$lib/types.js'
   import { Mode } from '$lib/types.js'
@@ -11,7 +11,7 @@
   import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
 
   export let text: string | undefined
-  export let json: JSONValue | undefined
+  export let json: unknown | undefined
   export let readOnly: boolean
   export let parser: JSONParser
   export let openJSONEditorModal: (path: JSONPath) => void
@@ -31,12 +31,16 @@
   $: documentType = hasNestedArrays
     ? 'Object with nested arrays'
     : isEmptyDocument
-    ? 'An empty document'
-    : isJSONObject(json)
-    ? 'An object'
-    : isJSONArray(json)
-    ? 'An empty array' // note: can also be an array with objects but without properties
-    : `A ${valueType(json, parser)}`
+      ? 'An empty document'
+      : isJSONObject(json)
+        ? 'An object'
+        : isJSONArray(json)
+          ? 'An empty array' // note: can also be an array with objects but without properties
+          : `A ${valueType(json, parser)}`
+
+  function countItems(nestedArrayPath: JSONPath): number {
+    return (getIn(json, nestedArrayPath) as JSONPath).length
+  }
 </script>
 
 <div class="jse-table-mode-welcome">
@@ -58,7 +62,7 @@
       {/if}
     </div>
     {#each nestedArrayPaths as nestedArrayPath}
-      {@const count = getIn(json, nestedArrayPath).length}
+      {@const count = countItems(nestedArrayPath)}
 
       <button
         type="button"

@@ -1,17 +1,17 @@
 @import '../../../styles';
 
 .jse-color-picker-button {
-  font-size: var(--jse-font-size-mono);
+  font-size: $font-size-mono;
 
-  width: var(--jse-color-picker-button-size);
-  height: var(--jse-color-picker-button-size);
+  width: $color-picker-button-size;
+  height: $color-picker-button-size;
   box-sizing: border-box;
   padding: 0;
   margin: 2px 0 0;
   display: inline-flex;
   vertical-align: top;
 
-  border: 1px solid var(--jse-text-color);
+  border: 1px solid $text-color;
   border-radius: 2px;
   background: inherit;
   outline: none;

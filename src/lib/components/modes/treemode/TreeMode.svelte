@@ -4,7 +4,7 @@
   import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler.js'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '$lib/utils/debug.js'
-  import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
+  import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, existsIn, getIn, immutableJSONPatch } from 'immutable-json-patch'
   import { jsonrepair } from 'jsonrepair'
   import { initial, isEmpty, isEqual, noop, throttle, uniqueId } from 'lodash-es'
@@ -65,11 +65,11 @@
     isAfterSelection,
     isEditingSelection,
     isInsideSelection,
+    isJSONSelection,
     isKeySelection,
     isMultiSelection,
     isMultiSelectionWithOneItem,
     isSelectionInsidePath,
-    isTextSelection,
     isValueSelection,
     removeEditModeFromSelection,
     selectAll,
@@ -88,6 +88,8 @@
   } from '$lib/utils/domUtils.js'
   import {
     convertValue,
+    isJSONContent,
+    isTextContent,
     normalizeJsonParseError,
     parseAndRepair,
     parsePartialJson,
@@ -130,7 +132,8 @@
     OnExpand,
     OnFocus,
     OnJSONEditorModal,
-    OnRenderMenuWithoutContext,
+    OnRenderContextMenuInternal,
+    OnRenderMenuInternal,
     OnRenderValue,
     OnSelect,
     OnSortModal,
@@ -195,7 +198,8 @@
   export let onChangeMode: OnChangeMode
   export let onSelect: OnSelect
   export let onRenderValue: OnRenderValue
-  export let onRenderMenu: OnRenderMenuWithoutContext
+  export let onRenderMenu: OnRenderMenuInternal
+  export let onRenderContextMenu: OnRenderContextMenuInternal
   export let onClassName: OnClassName | undefined
   export let onFocus: OnFocus
   export let onBlur: OnBlur
@@ -226,7 +230,7 @@
     }
   })
 
-  let json: JSONValue | undefined
+  let json: unknown | undefined
   let text: string | undefined
   let parseError: ParseError | undefined = undefined
 
@@ -260,6 +264,8 @@
     escapeControlCharacters,
     escapeUnicodeCharacters
   })
+
+  $: debug('selection', documentState.selection)
 
   let pastedJson: PastedJson
 
@@ -357,7 +363,7 @@
 
   // we pass searchText and json as argument to trigger search when these variables change,
   // via $: applySearchThrottled(searchText, json)
-  function applySearch(searchText: string, json: JSONValue) {
+  function applySearch(searchText: string, json: unknown) {
     if (searchText === '') {
       debug('clearing search result')
 
@@ -432,7 +438,7 @@
   const memoizedValidate = memoizeOne(validateJSON)
 
   function updateValidationErrors(
-    json: JSONValue,
+    json: unknown,
     validator: Validator | null,
     parser: JSONParser,
     validationParser: JSONParser
@@ -486,16 +492,14 @@
   }
 
   function applyExternalContent(updatedContent: Content) {
-    if (updatedContent.json !== undefined) {
+    if (isJSONContent(updatedContent)) {
       applyExternalJson(updatedContent.json)
-    }
-
-    if (updatedContent.text !== undefined) {
+    } else if (isTextContent(updatedContent)) {
       applyExternalText(updatedContent.text)
     }
   }
 
-  function applyExternalJson(updatedJson: JSONValue | undefined) {
+  function applyExternalJson(updatedJson: unknown | undefined) {
     if (updatedJson === undefined) {
       return
     }
@@ -539,7 +543,7 @@
   }
 
   function applyExternalText(updatedText: string | undefined) {
-    if (updatedText === undefined || externalContent['json'] !== undefined) {
+    if (updatedText === undefined || isJSONContent(externalContent)) {
       return
     }
 
@@ -606,22 +610,20 @@
     if (!isEqual(documentState.selection, externalSelection)) {
       debug('applyExternalSelection', externalSelection)
 
-      if (isTextSelection(externalSelection)) {
-        return
+      if (isJSONSelection(externalSelection) || externalSelection === null) {
+        updateSelection(externalSelection)
       }
-
-      updateSelection(externalSelection)
     }
   }
 
-  function expandWhenNotInitialized(json: JSONValue) {
+  function expandWhenNotInitialized(json: unknown) {
     if (!documentStateInitialized) {
       documentStateInitialized = true
       documentState = expandWithCallback(json, documentState, [], getDefaultExpand(json))
     }
   }
 
-  function clearSelectionWhenNotExisting(json: JSONValue) {
+  function clearSelectionWhenNotExisting(json: unknown) {
     if (!documentState.selection) {
       return
     }
@@ -646,7 +648,7 @@
     previousText,
     previousTextIsRepaired
   }: {
-    previousJson: JSONValue | undefined
+    previousJson: unknown | undefined
     previousText: string | undefined
     previousState: DocumentState
     previousTextIsRepaired: boolean
@@ -847,7 +849,7 @@
         {
           op: 'replace',
           path: pointer,
-          value: updatedValue as JSONValue
+          value: updatedValue
         }
       ],
       (patchedJson, patchedState) => {
@@ -893,7 +895,10 @@
   function handlePaste(event: ClipboardEvent) {
     event.preventDefault()
 
-    const clipboardText = event.clipboardData.getData('text/plain')
+    const clipboardText = event.clipboardData?.getData('text/plain') as string | undefined
+    if (clipboardText === undefined) {
+      return
+    }
 
     onPaste({
       clipboardText,
@@ -1047,7 +1052,7 @@
 
     try {
       const path = getAnchorPath(documentState.selection)
-      const currentValue: JSONValue = getIn(json, path)
+      const currentValue: unknown = getIn(json, path)
       const convertedValue = convertValue(currentValue, type, parser)
       if (convertedValue === currentValue) {
         // no change, do nothing
@@ -1093,7 +1098,7 @@
 
     debug('insert before', { selection: documentState.selection, selectionBefore, parentPath })
 
-    tick().then(handleContextMenu)
+    tick().then(() => handleContextMenu())
   }
 
   function handleInsertAfter() {
@@ -1107,7 +1112,7 @@
 
     updateSelection(createAfterSelection(path))
 
-    tick().then(handleContextMenu)
+    tick().then(() => handleContextMenu())
   }
 
   async function handleInsertCharacter(char: string) {
@@ -1149,12 +1154,15 @@
 
     debug('undo', { item, json, documentState })
 
-    const patchResult = {
-      json,
-      previousJson: previousContent.json,
-      redo: item.undo.patch,
-      undo: item.redo.patch
-    }
+    const patchResult =
+      item.undo.patch && item.redo.patch
+        ? {
+            json,
+            previousJson: previousContent.json,
+            redo: item.undo.patch,
+            undo: item.redo.patch
+          }
+        : null
 
     emitOnChange(previousContent, patchResult)
 
@@ -1188,12 +1196,15 @@
 
     debug('redo', { item, json, documentState })
 
-    const patchResult = {
-      json,
-      previousJson: previousContent.json,
-      redo: item.redo.patch,
-      undo: item.undo.patch
-    }
+    const patchResult =
+      item.undo.patch && item.redo.patch
+        ? {
+            json,
+            previousJson: previousContent.json,
+            redo: item.redo.patch,
+            undo: item.undo.patch
+          }
+        : null
 
     emitOnChange(previousContent, patchResult)
 
@@ -1267,8 +1278,8 @@
         if (onTransform) {
           onTransform({
             operations,
-            json: json as JSONValue,
-            transformedJson: immutableJSONPatch(json as JSONValue, operations)
+            json,
+            transformedJson: immutableJSONPatch(json, operations)
           })
         } else {
           debug('onTransform', rootPath, operations)
@@ -1309,7 +1320,7 @@
     })
   }
 
-  function openJSONEditorModal(path: JSONPath, value: JSONValue) {
+  function openJSONEditorModal(path: JSONPath, value: unknown) {
     debug('openJSONEditorModal', { path, value })
 
     modalOpen = true
@@ -1422,13 +1433,13 @@
     // json and text defined, or having none defined
     if (text !== undefined) {
       const content = { text, json: undefined }
-      onChange(content, previousContent, {
+      onChange?.(content, previousContent, {
         contentErrors: validate(),
         patchResult
       })
     } else if (json !== undefined) {
       const content = { text: undefined, json }
-      onChange(content, previousContent, {
+      onChange?.(content, previousContent, {
         contentErrors: validate(),
         patchResult
       })
@@ -1440,7 +1451,13 @@
     afterPatch?: AfterPatchCallback
   ): JSONPatchResult {
     if (readOnly) {
-      return
+      // this should never happen in practice
+      return {
+        json,
+        previousJson: json,
+        undo: [],
+        redo: []
+      }
     }
 
     debug('handlePatch', operations, afterPatch)
@@ -1448,7 +1465,7 @@
     return patch(operations, afterPatch)
   }
 
-  function handleReplaceJson(updatedJson: JSONValue, afterPatch?: AfterPatchCallback) {
+  function handleReplaceJson(updatedJson: unknown, afterPatch?: AfterPatchCallback) {
     const previousState = documentState
     const previousJson = json
     const previousText = text
@@ -1701,7 +1718,7 @@
 
     if (combo === 'Enter' && documentState.selection) {
       // when the selection consists of a single Array item, change selection to editing its value
-      if (!readOnly && isMultiSelectionWithOneItem(documentState.selection)) {
+      if (isMultiSelectionWithOneItem(documentState.selection)) {
         const path = documentState.selection.focusPath
         const parent = getIn(json, initial(path))
         if (Array.isArray(parent)) {
@@ -1710,7 +1727,7 @@
         }
       }
 
-      if (!readOnly && isKeySelection(documentState.selection)) {
+      if (isKeySelection(documentState.selection)) {
         // go to key edit mode
         event.preventDefault()
         updateSelection({ ...documentState.selection, edit: true })
@@ -1724,10 +1741,8 @@
           // expand object/array
           handleExpand(documentState.selection.path, true)
         } else {
-          if (!readOnly) {
-            // go to value edit mode
-            updateSelection({ ...documentState.selection, edit: true })
-          }
+          // go to value edit mode
+          updateSelection({ ...documentState.selection, edit: true })
         }
       }
     }
@@ -1786,10 +1801,12 @@
     }
   }
 
-  function handleMouseDown(event: MouseEvent & { target: HTMLDivElement }) {
+  function handleMouseDown(event: Event) {
     debug('handleMouseDown', event)
 
-    if (!isChildOfNodeName(event.target, 'BUTTON') && !event.target.isContentEditable) {
+    const target = event.target as HTMLElement
+
+    if (!isChildOfNodeName(target, 'BUTTON') && !target.isContentEditable) {
       // for example when clicking on the empty area in the main menu
       focus()
 
@@ -1835,6 +1852,7 @@
       onSort: handleSortSelection,
       onTransform: handleTransformSelection,
 
+      onRenderContextMenu,
       onCloseContextMenu: function () {
         closeAbsolutePopup(popupId)
         focus()
@@ -1859,7 +1877,7 @@
     })
   }
 
-  function handleContextMenu(event) {
+  function handleContextMenu(event?: Event) {
     if (readOnly || isEditingSelection(documentState.selection)) {
       return
     }
@@ -1872,8 +1890,8 @@
     if (event && event.type === 'contextmenu' && event.target !== refHiddenInput) {
       // right mouse click to open context menu
       openContextMenu({
-        left: event.clientX,
-        top: event.clientY,
+        left: (event as MouseEvent).clientX,
+        top: (event as MouseEvent).clientY,
         width: CONTEXT_MENU_WIDTH,
         height: CONTEXT_MENU_HEIGHT,
         showTip: false
@@ -1908,13 +1926,13 @@
     return false
   }
 
-  function handleContextMenuFromTreeMenu(event) {
+  function handleContextMenuFromTreeMenu(event: MouseEvent) {
     if (readOnly) {
       return
     }
 
     openContextMenu({
-      anchor: findParentWithNodeName(event.target, 'BUTTON'),
+      anchor: findParentWithNodeName(event.target as HTMLElement, 'BUTTON'),
       offsetTop: 0,
       width: CONTEXT_MENU_WIDTH,
       height: CONTEXT_MENU_HEIGHT,
@@ -1984,8 +2002,11 @@
     }
   }
 
-  function handleWindowMouseDown(event) {
-    const outsideEditor = !isChildOf(event.target, (element) => element === refJsonEditor)
+  function handleWindowMouseDown(event: MouseEvent & { currentTarget: EventTarget & Window }) {
+    const outsideEditor = !isChildOf(
+      event.target as Element,
+      (element) => element === refJsonEditor
+    )
     if (outsideEditor) {
       if (isEditingSelection(documentState.selection)) {
         debug('click outside the editor, stop edit mode')
@@ -2018,7 +2039,7 @@
 
   $: autoScrollHandler = refContents ? createAutoScrollHandler(refContents) : undefined
 
-  function handleDrag(event: DragEvent) {
+  function handleDrag(event: MouseEvent) {
     if (autoScrollHandler) {
       autoScrollHandler.onDrag(event)
     }

@@ -14,6 +14,7 @@
     JSONPathParser,
     OnClassName,
     OnPatch,
+    OnRenderContextMenu,
     OnRenderMenu,
     OnRenderValue,
     OnSortModal,
@@ -30,7 +31,7 @@
   import { faCaretLeft } from '@fortawesome/free-solid-svg-icons'
   import memoizeOne from 'memoize-one'
   import { onEscape } from '$lib/actions/onEscape.js'
-  import { getFocusPath } from '$lib/logic/selection.js'
+  import { getFocusPath, isJSONSelection } from '$lib/logic/selection.js'
   import type { Context } from 'svelte-simple-modal'
 
   const debug = createDebug('jsoneditor:JSONEditorModal')
@@ -57,6 +58,7 @@
   export let onRenderValue: OnRenderValue
   export let onClassName: OnClassName
   export let onRenderMenu: OnRenderMenu
+  export let onRenderContextMenu: OnRenderContextMenu
 
   export let onSortModal: OnSortModal
   export let onTransformModal: OnTransformModal
@@ -94,8 +96,8 @@
   }
 
   function scrollToSelection() {
-    const selection: JSONPath | null = last(stack)?.selection || null
-    if (selection) {
+    const selection: JSONEditorSelection | null = last(stack)?.selection || null
+    if (isJSONSelection(selection)) {
       refEditor.scrollTo(getFocusPath(selection))
     }
   }
@@ -260,6 +262,7 @@
         onFocus={noop}
         onBlur={noop}
         {onRenderMenu}
+        {onRenderContextMenu}
         {onSortModal}
         {onTransformModal}
         onJSONEditorModal={handleJSONEditorModal}

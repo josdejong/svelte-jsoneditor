@@ -90,7 +90,7 @@ Or one-way binding:
   }
 
   function handleChange(updatedContent, previousContent, { contentErrors, patchResult }) {
-    // content is an object { json: JSONValue } | { text: string }
+    // content is an object { json: unknown } | { text: string }
     console.log('onChange: ', { updatedContent, previousContent, contentErrors, patchResult })
     content = updatedContent
   }
@@ -101,13 +101,27 @@ Or one-way binding:
 </div>
 ```
 
-### Standalone bundle (use in React, Vue, Angular, plain JavaScript, ...)
+### Vanilla bundle (use in React, Vue, Angular, plain JavaScript, ...)
 
-The library provides a standalone bundle of the editor via the npm library `vanilla-jsoneditor` (instead of `svelte-jsoneditor`) which can be used in any browser environment and framework. In a framework like React, Vue, or Angular, you'll need to write some wrapper code around the class interface.
+The library provides a vanilla bundle of the editor via the npm library `vanilla-jsoneditor` (instead of `svelte-jsoneditor`) which can be used in any browser environment and framework. In a framework like React, Vue, or Angular, you'll need to write some wrapper code around the class interface.
 
-Note that the `vanilla-jsoneditor` package contains all dependencies. These are purely needed for the TypeScript types that they export.
+If you have a setup for your project with a bundler (like Vite, Rollup, or Webpack), it is best to use the default ES import:
 
-Browser example loading the ES module:
+```ts
+// for use in a React, Vue, or Angular project
+import { JSONEditor } from 'vanilla-jsoneditor'
+```
+
+If you want to use the library straight in the browser, use the provided standalone ES bundle:
+
+```ts
+// for use directly in the browser
+import { JSONEditor } from 'vanilla-jsoneditor/standalone.js'
+```
+
+The standalone bundle contains all dependencies of `vanilla-jsoneditor`, for example `lodash-es` and `Ajv`. If you use some of these dependencies in your project too, it means that they will be bundled twice in your web application, leading to a needlessly large application size. In general, it is preferable to use the default `import { JSONEditor } from 'vanilla-jsoneditor'` so dependencies can be reused.
+
+Browser example loading the standalone ES module:
 
 ```html
 <!doctype html>
@@ -119,11 +133,11 @@ Browser example loading the ES module:
     <div id="jsoneditor"></div>
 
     <script type="module">
-      import { JSONEditor } from 'vanilla-jsoneditor'
+      import { JSONEditor } from 'vanilla-jsoneditor/standalone.js'
 
       // Or use it through a CDN (not recommended for use in production):
-      // import { JSONEditor } from 'https://unpkg.com/vanilla-jsoneditor/index.js'
-      // import { JSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor/index.js'
+      // import { JSONEditor } from 'https://unpkg.com/vanilla-jsoneditor/standalone.js'
+      // import { JSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor/standalone.js'
 
       let content = {
         text: undefined,
@@ -137,7 +151,7 @@ Browser example loading the ES module:
         props: {
           content,
           onChange: (updatedContent, previousContent, { contentErrors, patchResult }) => {
-            // content is an object { json: JSONValue } | { text: string }
+            // content is an object { json: unknown } | { text: string }
             console.log('onChange', { updatedContent, previousContent, contentErrors, patchResult })
             content = updatedContent
           }
@@ -158,6 +172,8 @@ To make it easier to use the library in your framework of choice, you can use a 
 - Vue:
   - [json-editor-vue](https://github.com/cloydlau/json-editor-vue)
   - [vue3-ts-jsoneditor](https://github.com/bestkolobok/vue3-jsoneditor)
+- Django:
+  - [django-svelte-jsoneditor](https://github.com/octue/django-svelte-jsoneditor)
 
 ## API
 
@@ -180,7 +196,7 @@ Svelte component:
 JavasScript class:
 
 ```js
-import { JSONEditor } from 'vanilla-jsoneditor'
+import { JSONEditor } from 'vanilla-jsoneditor' // or 'vanilla-jsoneditor/standalone.js'
 
 const content = { text: '[1,2,3]' }
 
@@ -189,7 +205,7 @@ const editor = new JSONEditor({
   props: {
     content,
     onChange: (updatedContent, previousContent, { contentErrors, patchResult }) => {
-      // content is an object { json: JSONValue } | { text: string }
+      // content is an object { json: unknown } | { text: string }
       console.log('onChange', { updatedContent, previousContent, contentErrors, patchResult })
     }
   }
@@ -211,7 +227,7 @@ const editor = new JSONEditor({
 - `escapeControlCharacters: boolean`. False by default. When `true`, control characters like newline and tab are rendered as escaped characters `\n` and `\t`. Only applicable for `'tree'` mode, in `'text'` mode control characters are always escaped.
 - `escapeUnicodeCharacters: boolean`. False by default. When `true`, unicode characters like ☎ and 😀 are rendered escaped like `\u260e` and `\ud83d\ude00`.
 - `flattenColumns: boolean`. True by default. Only applicable to `'table'` mode. When `true`, nested object properties will be displayed each in their own column, with the nested path as column name. When `false`, nested objects will be rendered inline, and double-clicking them will open them in a popup.
-- `validator: function (json: JSONValue): ValidationError[]`. Validate the JSON document.
+- `validator: function (json: unknown): ValidationError[]`. Validate the JSON document.
   For example use the built-in JSON Schema validator powered by Ajv:
 
   ```js
@@ -265,11 +281,9 @@ const editor = new JSONEditor({
 
 - `onRenderValue(props: RenderValueProps) : RenderValueComponentDescription[]`
 
-  _EXPERIMENTAL! This API will most likely change in future versions._
-
   Customize rendering of the values. By default, `renderValue` is used, which renders a value as an editable div and depending on the value can also render a boolean toggle, a color picker, and a timestamp tag. Multiple components can be rendered alongside each other, like the boolean toggle and color picker being rendered left from the editable div. Built in value renderer components: `EditableValue`, `ReadonlyValue`, `BooleanToggle`, `ColorPicker`, `TimestampTag`, `EnumValue`.
 
-  For JSON Schema enums, there is a value renderer `renderJSONSchemaEnum` which renders enums using the `EnumValue` component. This can be used like:
+  For JSON Schema enums, there is a ready-made value renderer `renderJSONSchemaEnum` which renders enums using the `EnumValue` component. This can be used like:
 
   ```js
   import { renderJSONSchemaEnum, renderValue } from 'svelte-jsoneditor'
@@ -277,6 +291,38 @@ const editor = new JSONEditor({
   function onRenderValue(props) {
     // use the enum renderer, and fallback on the default renderer
     return renderJSONSchemaEnum(props, schema, schemaDefinitions) || renderValue(props)
+  }
+  ```
+
+  The callback `onRenderValue` must return an array with one or multiple renderers. Each renderer can be either a Svelte component or a Svelte action:
+
+  ```ts
+  interface SvelteComponentRenderer {
+    component: typeof SvelteComponent<RenderValuePropsOptional>
+    props: Record<string, unknown>
+  }
+
+  interface SvelteActionRenderer {
+    action: Action // Svelte Action
+    props: Record<string, unknown>
+  }
+  ```
+
+  The `SvelteComponentRenderer` interface can be used to provide Svelte components like the `EnumValue` component mentioned above. The `SvelteActionRenderer` expects a [Svelte Action](https://svelte.dev/docs/svelte-action) as `action` property. Since this interface is a plain JavaScript interface, this allows to create custom components in a vanilla JS environment. Basically it is a function that gets a DOM node passed, and needs to return an object with `update` and `destroy` functions:
+
+  ```js
+  const myRendererAction = {
+    action: (node) => {
+      // attach something to the HTML DOM node
+      return {
+        update: (node) => {
+          // update the DOM
+        },
+        destroy: () => {
+          // cleanup the DOM
+        }
+      }
+    }
   }
   ```
 
@@ -290,7 +336,8 @@ const editor = new JSONEditor({
   - Button:
 
     ```ts
-    interface MenuButtonItem {
+    interface MenuButton {
+      type: 'button'
       onClick: () => void
       icon?: IconDefinition
       text?: string
@@ -303,16 +350,75 @@ const editor = new JSONEditor({
   - Separator (gray vertical line between a group of items):
 
     ```ts
-    interface MenuSeparatorItem {
-      separator: true
+    interface MenuSeparator {
+      type: 'separator'
     }
     ```
 
   - Space (fills up empty space):
 
     ```ts
-    interface MenuSpaceItem {
-      space: true
+    interface MenuSpace {
+      type: 'space'
+    }
+    ```
+
+- `onRenderContextMenu(items: ContextMenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean, selection: JSONEditorSelection | null }) : ContextMenuItem[] | undefined`.
+  Callback which can be used to make changes to the context menu items. New items can
+  be added, or existing items can be removed or reorganized. When the function
+  returns `undefined`, the original `items` will be applied. Using the context values `mode`, `modal` and `selection`, different actions can be taken depending on the mode of the editor, whether the editor is rendered inside a modal or not and the path of selection.
+
+  A menu item `ContextMenuItem` can be one of the following types:
+
+  - Button:
+
+    ```ts
+    interface MenuButton {
+      type: 'button'
+      onClick: () => void
+      icon?: IconDefinition
+      text?: string
+      title?: string
+      className?: string
+      disabled?: boolean
+    }
+    ```
+
+  - Dropdown button:
+
+    ```ts
+    interface MenuDropDownButton {
+      type: 'dropdown-button'
+      main: MenuButton
+      width?: string
+      items: MenuButton[]
+    }
+    ```
+
+  - Separator (gray line between a group of items):
+
+    ```ts
+    interface MenuSeparator {
+      type: 'separator'
+    }
+    ```
+
+  - Menu row and column:
+
+    ```ts
+    interface MenuLabel {
+      type: 'label'
+      text: string
+    }
+
+    interface ContextMenuColumn {
+      type: 'column'
+      items: Array<MenuButton | MenuDropDownButton | MenuLabel | MenuSeparator>
+    }
+
+    interface ContextMenuRow {
+      type: 'row'
+      items: Array<MenuButton | MenuDropDownButton | ContextMenuColumn>
     }
     ```
 
@@ -364,7 +470,7 @@ Note that most methods are asynchronous and will resolve after the editor is re-
   - `editor.expand(path => true)` expand all
   - `editor.expand(path => false)` collapse all
   - `editor.expand(path => path.length < 2)` expand all paths up to 2 levels deep
-- `transform({ id?: string, rootPath?: [], onTransform: ({ operations: JSONPatchDocument, json: JSONValue, transformedJson: JSONValue }) => void, onClose: () => void })` programmatically trigger clicking of the transform button in the main menu, opening the transform model. If a callback `onTransform` is provided, it will replace the build-in logic to apply a transform, allowing you to process the transform operations in an alternative way. If provided, `onClose` callback will trigger when the transform modal closes, both after the user clicked apply or cancel. If an `id` is provided, the transform modal will load the previous status of this `id` instead of the status of the editors transform modal.
+- `transform({ id?: string, rootPath?: [], onTransform: ({ operations: JSONPatchDocument, json: unknown, transformedJson: unknown }) => void, onClose: () => void })` programmatically trigger clicking of the transform button in the main menu, opening the transform model. If a callback `onTransform` is provided, it will replace the build-in logic to apply a transform, allowing you to process the transform operations in an alternative way. If provided, `onClose` callback will trigger when the transform modal closes, both after the user clicked apply or cancel. If an `id` is provided, the transform modal will load the previous status of this `id` instead of the status of the editors transform modal.
 - `scrollTo(path: Path): Promise<void>` Scroll the editor vertically such that the specified path comes into view. Only applicable to modes `tree` and `table`. The path will be expanded when needed. The returned Promise is resolved after scrolling is finished.
 - `findElement(path: Path)` Find the DOM element of a given path. Returns `null` when not found.
 - `acceptAutoRepair(): Promise<Content>` In tree mode, invalid JSON is automatically repaired when loaded. When the repair was successful, the repaired contents are rendered but not yet applied to the document itself until the user clicks "Ok" or starts editing the data. Instead of accepting the repair, the user can also click "Repair manually instead". Invoking `.acceptAutoRepair()` will programmatically accept the repair. This will trigger an update, and the method itself also returns the updated contents. In case of `text` mode or when the editor is not in an "accept auto repair" status, nothing will happen, and the contents will be returned as is.
@@ -448,7 +554,7 @@ https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/types.ts
 
 The editor can be styled using the available CSS variables. A full list with all variables can be found here:
 
-https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/themes/jse-theme-default.css
+https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/themes/defaults.scss
 
 ### Custom theme color
 
@@ -577,68 +683,29 @@ const config = {
 
 ## Develop
 
-Clone the git repository
+To get started: clone the git repository, run `npm install`, and then `npm run dev`.
 
-Install dependencies (once):
-
-```
-npm install
-```
-
-Start the demo project (at http://localhost:5173):
+All available scripts:
 
 ```
-npm run dev
-```
+npm install             # Install dependencies (once)
 
-Build the library:
+npm run dev             # Start the demo project (at http://localhost:5173)
+npm run build           # Build the library (output in ./package and ./package-vanilla)
 
-```
-npm run build
-```
+npm run test            # Run unit tests in watch mode
+npm run test-ci         # Run unit tests once
+npm run coverage        # Run unit test coverage (output in ./coverage)
 
-Run unit tests (in watch mode):
+npm run check           # Run Svelte checks
+npm run lint            # Run linter
+npm run format          # Automatically fix linting issues
 
-```
-npm test
-```
-
-Run unit tests and exit:
-
-```
-npm run test-ci
-```
-
-Run linter:
-
-```
-npm run lint
-```
-
-Run coverage (coverage results will be generated in the folder `./coverage`):
-
-```
-npm run coverage
-```
-
-Automatically fix linting issues:
-
-```
-npm run format
-```
-
-Publish to npm (will increase version number and publish to npm):
-
-```
-npm run release
-```
-
-Note that it will publish two npm packages: `svelte-jsoneditor` and `vanilla-jsoneditor`. You'll need to enter a one-time password for npm.
-
-To try a build and see the change list, run:
-
-```
-npm run release-dry-run
+npm run release-dry-run # To run the build and see the change list without actually publishing
+npm run release         # Publish to npm (requires login). This will test, check, lint, build,
+                        # increase the version number, update the changelog, and publish to npm.
+                        # Note that it will publish two npm packages: `svelte-jsoneditor`
+                        # and `vanilla-jsoneditor`.
 ```
 
 ## License

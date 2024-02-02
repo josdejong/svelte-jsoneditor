@@ -13,10 +13,10 @@
   export let selected: boolean
   export let onContextMenu: OnContextMenu
 
-  function handleClick(event) {
-    let buttonElem = event.target
+  function handleClick(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
+    let buttonElem: Element | null = event.target as HTMLButtonElement
     while (buttonElem && buttonElem.nodeName !== 'BUTTON') {
-      buttonElem = buttonElem.parentNode
+      buttonElem = buttonElem.parentNode as Element
     }
 
     if (buttonElem) {

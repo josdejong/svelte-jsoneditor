@@ -2,8 +2,8 @@
 
 .jse-header {
   display: flex;
-  background: var(--jse-theme-color);
-  color: var(--jse-menu-color);
+  background: $theme-color;
+  color: $menu-color;
 
   .jse-title {
     flex: 1;

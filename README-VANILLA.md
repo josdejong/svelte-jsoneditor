@@ -30,7 +30,25 @@ Install using npm:
 npm install vanilla-jsoneditor
 ```
 
-Remark: for usage in a Svelte project, install `svelte-jsoneditor` instead.
+Remark: for usage in a Svelte project, install and use `svelte-jsoneditor` instead of `vanilla-jsoneditor`.
+
+## Use
+
+If you have a setup for your project with a bundler (like Vite, Rollup, or Webpack), it is best to use the default ES import:
+
+```ts
+// for use in a React, Vue, or Angular project
+import { JSONEditor } from 'vanilla-jsoneditor'
+```
+
+If you want to use the library straight in the browser, use the provided standalone ES bundle:
+
+```ts
+// for use directly in the browser
+import { JSONEditor } from 'vanilla-jsoneditor/standalone.js'
+```
+
+The standalone bundle contains all dependencies of `vanilla-jsoneditor`, for example `lodash-es` and `Ajv`. If you use some of these dependencies in your project too, it means that they will be bundled twice in your web application, leading to a needlessly large application size. In general, it is preferable to use the default `import { JSONEditor } from 'vanilla-jsoneditor'` so dependencies can be reused.
 
 ## Use (Browser example loading the ES module):
 
@@ -44,7 +62,7 @@ Remark: for usage in a Svelte project, install `svelte-jsoneditor` instead.
     <div id="jsoneditor"></div>
 
     <script type="module">
-      import { JSONEditor } from 'vanilla-jsoneditor'
+      import { JSONEditor } from 'vanilla-jsoneditor/standalone.js'
 
       // Or use it through a CDN (not recommended for use in production):
       // import { JSONEditor } from 'https://unpkg.com/vanilla-jsoneditor/index.js'
@@ -84,7 +102,7 @@ Depending on whether you are using JavaScript of TypeScript, create either a JSX
 
 ### TypeScript:
 
-```typescript
+```tsx
 //
 // JSONEditorReact.tsx
 //
@@ -126,7 +144,7 @@ export default JSONEditorReact
 
 ### JavaScript
 
-```javascript
+```jsx
 //
 // JSONEditorReact.jsx
 //
@@ -172,7 +190,7 @@ If you are using NextJS, you will need to use a dynamic import to only render th
 
 If you are using React in an conventional non-NextJS browser app, you can import the component using a standard import statement like `import JSONEditorReact from '../JSONEditorReact'`
 
-```typescript
+```tsx
 //
 // demo.tsx for use with NextJS
 //
@@ -228,7 +246,7 @@ export default function Demo() {
 }
 ```
 
-```typescript
+```tsx
 //
 // TextContent.tsx
 //

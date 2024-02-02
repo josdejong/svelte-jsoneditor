@@ -8,29 +8,29 @@
   outline: none;
   border-radius: 1px;
   vertical-align: top;
-  color: var(--jse-key-color);
-  cursor: var(--jse-contents-cursor);
+  color: $key-color;
+  cursor: $contents-cursor;
 
   word-break: normal;
   overflow-wrap: normal; // not anywhere as for JSONValue
   white-space: pre-wrap; // important for rendering multiple consecutive spaces
 
   &:hover {
-    background: var(--jse-hover-background-color);
+    background: $hover-background-color;
   }
 
   &:hover {
-    background: var(--jse-hover-background-color);
+    background: $hover-background-color;
   }
 
   &.jse-empty {
     min-width: 3em;
-    outline: 1px dotted var(--jse-tag-background);
+    outline: 1px dotted $tag-background;
     -moz-outline-radius: 2px;
 
     &::after {
       pointer-events: none;
-      color: var(--jse-tag-background);
+      color: $tag-background;
       content: 'key';
     }
   }

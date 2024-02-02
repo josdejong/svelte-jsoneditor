@@ -1,9 +1,12 @@
 <script lang="ts">
   import {
     type Content,
+    type ContextMenuItem,
     createAjvValidator,
     createValueSelection,
     EditableValue,
+    isJSONContent,
+    isTextContent,
     javascriptQueryLanguage,
     jmespathQueryLanguage,
     JSONEditor,
@@ -18,7 +21,8 @@
     renderValue,
     type RenderValueComponentDescription,
     type RenderValuePropsOptional,
-    SelectionType
+    SelectionType,
+    toJSONContent
   } from 'svelte-jsoneditor'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
@@ -26,22 +30,12 @@
   import { parse, stringify } from 'lossless-json'
   import { truncate } from '$lib/utils/stringUtils.js'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils.js'
-  import {
-    compileJSONPointer,
-    isJSONObject,
-    type JSONArray,
-    type JSONObject,
-    parseJSONPointer
-  } from 'immutable-json-patch'
-  import { toJSONContent } from '$lib/utils/jsonUtils.js'
-  import { isJSONContent, isTextContent } from '$lib'
-  import type { ChangeEventHandler } from 'svelte/elements.js'
+  import { compileJSONPointer, isJSONObject, parseJSONPointer } from 'immutable-json-patch'
 
-  // const LosslessJSON: JSONParser = { ... } // FIXME: make the types work
   const LosslessJSON = {
     parse,
     stringify
-  } as JSONParser
+  }
 
   let content: Content = {
     text: `{
@@ -385,6 +379,10 @@
     console.log('onChangeQueryLanguage', newQueryLanguageId)
     queryLanguageId = newQueryLanguageId
   }
+  function onRenderContextMenu(items: ContextMenuItem[], content: RenderMenuContext) {
+    console.log('onRenderContextMenu', items, content)
+    return items
+  }
 
   function openInWindow() {
     const popupWindow = window.open(
@@ -413,7 +411,7 @@
     }
   }
 
-  function generateLongArray(): JSONArray {
+  function generateLongArray() {
     return [...new Array(1000)].map((value, index) => {
       const random = Math.round(Math.random() * 1000)
       const item: Record<string, unknown> = {
@@ -448,11 +446,11 @@
         item.unknownProp = 'other'
       }
 
-      return item as JSONObject
+      return item
     })
   }
 
-  const handleOpenFile: ChangeEventHandler<HTMLInputElement> = (event) => {
+  function handleOpenFile(event: Event) {
     const target = event.target as HTMLInputElement
 
     console.log('loadFile', target.files)
@@ -797,6 +795,7 @@
             onChange={onChangeTree}
             onSelect={onSelectTree}
             onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
+            {onRenderContextMenu}
             {onChangeMode}
             onFocus={() => console.log('onFocus tree')}
             onBlur={() => console.log('onBlur tree', { content: refTreeEditor?.get() })}
@@ -817,7 +816,7 @@
           <pre>
             <code>
             {isJSONContent(content)
-                ? truncate(selectedParser.stringify(content.json, null, 2), 1e5)
+                ? truncate(selectedParser.stringify(content.json, null, 2) ?? '', 1e5)
                 : 'undefined'}
             </code>
           </pre>
@@ -932,7 +931,7 @@ See https://github.com/sveltejs/kit/issues/981
         )};
       --jse-context-menu-pointer-background: #{desaturate(darken($background-color, 40%), 40%)};
 
-      --jse-collapsed-items-background-color: var(--jse-selection-background-inactive-color);
+      --jse-collapsed-items-background-color: #{desaturate(darken($background-color, 5%), 10%)};
       --jse-collapsed-items-selected-background-color: #{desaturate(
           darken($background-color, 20%),
           20%

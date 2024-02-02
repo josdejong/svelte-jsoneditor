@@ -10,7 +10,6 @@ import {
   isJSONPatchMove,
   isJSONPatchRemove,
   isJSONPatchReplace,
-  type JSONArray,
   type JSONPatchAdd,
   type JSONPatchCopy,
   type JSONPatchDocument,
@@ -19,7 +18,6 @@ import {
   type JSONPatchReplace,
   type JSONPath,
   type JSONPointer,
-  type JSONValue,
   parseJSONPointer,
   parsePath,
   startsWithJSONPointer
@@ -44,15 +42,14 @@ import type {
   Section,
   VisibleSection
 } from '$lib/types'
-import { SelectionType } from '$lib/types.js'
 import { CaretType } from '$lib/types.js'
 import { int } from '../utils/numberUtils.js'
 import { isLargeContent } from '$lib/utils/jsonUtils.js'
 
-type OnCreateSelection = (json: JSONValue, documentState: DocumentState) => JSONSelection
+type OnCreateSelection = (json: unknown, documentState: DocumentState) => JSONSelection
 
 export type CreateDocumentStateProps = {
-  json: JSONValue | undefined
+  json: unknown | undefined
   expand?: OnExpand
   select?: OnCreateSelection
 }
@@ -62,11 +59,7 @@ export function createDocumentState(props?: CreateDocumentStateProps): DocumentS
     expandedMap: {},
     enforceStringMap: {},
     visibleSectionsMap: {},
-    selection: {
-      type: SelectionType.value,
-      path: [],
-      edit: false
-    },
+    selection: null,
     sortedColumn: null
   }
 
@@ -95,7 +88,7 @@ export function getVisibleSections(
  * Invoke a callback function for every visible item in the array
  */
 export function forEachVisibleIndex(
-  jsonArray: JSONArray,
+  jsonArray: Array<unknown>,
   visibleSections: VisibleSection[],
   callback: (index: number) => void
 ) {
@@ -109,7 +102,7 @@ export function forEachVisibleIndex(
  * The end of the path itself is not expanded
  */
 export function expandPath(
-  json: JSONValue,
+  json: unknown,
   documentState: DocumentState,
   path: JSONPath
 ): DocumentState {
@@ -152,14 +145,14 @@ export function expandPath(
  * Nodes that are already expanded will be left untouched
  */
 export function expandWithCallback(
-  json: JSONValue | undefined,
+  json: unknown | undefined,
   documentState: DocumentState,
   path: JSONPath,
   expandedCallback: OnExpand
 ): DocumentState {
   const expandedMap = { ...documentState.expandedMap }
 
-  function recurse(value: JSONValue) {
+  function recurse(value: unknown) {
     const pathIndex = currentPath.length
 
     if (Array.isArray(value)) {
@@ -266,7 +259,7 @@ export function setEnforceString(
  * Expand a section of items in an array
  */
 export function expandSection(
-  json: JSONValue,
+  json: unknown,
   documentState: DocumentState,
   pointer: JSONPointer,
   section: Section
@@ -300,11 +293,11 @@ export function syncKeys(actualKeys: string[], prevKeys?: string[]): string[] {
  * Apply patch operations to both json and state
  */
 export function documentStatePatch(
-  json: JSONValue,
+  json: unknown,
   documentState: DocumentState,
   operations: JSONPatchDocument
-): { json: JSONValue; documentState: DocumentState } {
-  const updatedJson = immutableJSONPatch(json, operations)
+): { json: unknown; documentState: DocumentState } {
+  const updatedJson: unknown = immutableJSONPatch(json, operations)
 
   const updatedDocumentState = operations.reduce((updatingState, operation) => {
     if (isJSONPatchAdd(operation)) {
@@ -333,7 +326,7 @@ export function documentStatePatch(
 }
 
 export function documentStateAdd(
-  json: JSONValue,
+  json: unknown,
   documentState: DocumentState,
   operation: JSONPatchAdd
 ): DocumentState {
@@ -368,7 +361,7 @@ export function documentStateAdd(
 }
 
 export function documentStateRemove(
-  updatedJson: JSONValue,
+  updatedJson: unknown,
   documentState: DocumentState,
   operation: JSONPatchRemove
 ): DocumentState {
@@ -407,7 +400,7 @@ export function documentStateRemove(
 }
 
 export function documentStateReplace(
-  updatedJson: JSONValue,
+  updatedJson: unknown,
   documentState: DocumentState,
   operation: JSONPatchReplace
 ): DocumentState {
@@ -438,7 +431,7 @@ export function documentStateReplace(
 }
 
 export function documentStateMoveOrCopy(
-  updatedJson: JSONValue,
+  updatedJson: unknown,
   documentState: DocumentState,
   operation: JSONPatchCopy | JSONPatchMove
 ): DocumentState {
@@ -593,7 +586,7 @@ export function shiftPath<T>(
 
 // TODO: unit test
 export function cleanupNonExistingPaths<T>(
-  json: JSONValue,
+  json: unknown,
   map: JSONPointerMap<T>
 ): JSONPointerMap<T> {
   const updatedMap: JSONPointerMap<T> = {}
@@ -678,7 +671,7 @@ function mergeAdjacentSections(visibleSections: VisibleSection[]): VisibleSectio
 }
 
 export function getEnforceString(
-  value: JSONValue,
+  value: unknown,
   enforceStringMap: JSONPointerMap<boolean> | undefined,
   pointer: JSONPointer,
   parser: JSONParser
@@ -706,10 +699,10 @@ export function getNextKeys(keys: string[], key: string, includeKey = false): st
  * Get all paths which are visible and rendered
  */
 // TODO: create memoized version of getVisiblePaths which remembers just the previous result if json and state are the same
-export function getVisiblePaths(json: JSONValue, documentState: DocumentState): JSONPath[] {
+export function getVisiblePaths(json: unknown, documentState: DocumentState): JSONPath[] {
   const paths: JSONPath[] = []
 
-  function _recurse(value: JSONValue, path: JSONPath) {
+  function _recurse(value: unknown, path: JSONPath) {
     paths.push(path)
     const pointer = compileJSONPointer(path)
 
@@ -740,13 +733,13 @@ export function getVisiblePaths(json: JSONValue, documentState: DocumentState): 
  */
 // TODO: create memoized version of getVisibleCaretPositions which remembers just the previous result if json and state are the same
 export function getVisibleCaretPositions(
-  json: JSONValue,
+  json: unknown,
   documentState: DocumentState,
   includeInside = true
 ): CaretPosition[] {
   const paths: CaretPosition[] = []
 
-  function _recurse(value: JSONValue, path: JSONPath) {
+  function _recurse(value: unknown, path: JSONPath) {
     paths.push({ path, type: CaretType.value })
 
     const pointer = compileJSONPointer(path)
@@ -796,7 +789,7 @@ export function getVisibleCaretPositions(
  */
 // TODO: write tests for getPreviousVisiblePath
 export function getPreviousVisiblePath(
-  json: JSONValue,
+  json: unknown,
   documentState: DocumentState,
   path: JSONPath
 ): JSONPath | null {
@@ -818,7 +811,7 @@ export function getPreviousVisiblePath(
  */
 // TODO: write tests for getNextVisiblePath
 export function getNextVisiblePath(
-  json: JSONValue,
+  json: unknown,
   documentState: DocumentState,
   path: JSONPath
 ): JSONPath | null {
@@ -839,11 +832,11 @@ export function getNextVisiblePath(
  */
 // TODO: write unit test
 export function expandRecursive(
-  json: JSONValue,
+  json: unknown,
   documentState: DocumentState,
   path: JSONPath
 ): DocumentState {
-  const expandContents = getIn(json, path)
+  const expandContents: unknown | undefined = getIn(json, path)
   if (expandContents === undefined) {
     return documentState
   }
@@ -865,6 +858,6 @@ export function expandAll(): boolean {
 }
 
 // TODO: write unit test
-export function getDefaultExpand(json: JSONValue): OnExpand {
+export function getDefaultExpand(json: unknown): OnExpand {
   return isLargeContent({ json }, MAX_DOCUMENT_SIZE_EXPAND_ALL) ? expandMinimal : expandAll
 }

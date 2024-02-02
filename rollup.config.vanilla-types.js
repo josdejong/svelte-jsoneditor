@@ -6,6 +6,10 @@ export default {
     {
       file: 'package-vanilla/index.d.ts',
       format: 'es'
+    },
+    {
+      file: 'package-vanilla/standalone.d.ts',
+      format: 'es'
     }
   ],
   plugins: [dts()]

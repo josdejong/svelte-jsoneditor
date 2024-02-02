@@ -57,7 +57,7 @@ exports[`JSONEditor > render table mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="14.222222222222221"
               role="presentation"
               style=""
@@ -68,10 +68,8 @@ exports[`JSONEditor > render table mode 1`] = `
               <path
                 d="M151.6 469.6C145.5 476.2 137 480 128 480s-17.5-3.8-23.6-10.4l-88-96c-11.9-13-11.1-33.3 2-45.2s33.3-11.1 45.2 2L96 365.7V64c0-17.7 14.3-32 32-32s32 14.3 32 32V365.7l32.4-35.4c11.9-13 32.2-13.9 45.2-2s13.9 32.2 2 45.2l-88 96zM320 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H320c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H320c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H320c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128H544c17.7 0 32 14.3 32 32s-14.3 32-32 32H320c-17.7 0-32-14.3-32-32s14.3-32 32-32z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -86,7 +84,7 @@ exports[`JSONEditor > render table mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -97,10 +95,8 @@ exports[`JSONEditor > render table mode 1`] = `
               <path
                 d="M3.9 54.9C10.5 40.9 24.5 32 40 32H472c15.5 0 29.5 8.9 36.1 22.9s4.6 30.5-5.2 42.5L320 320.9V448c0 12.1-6.8 23.2-17.7 28.6s-23.8 4.3-33.5-3l-64-48c-8.1-6-12.8-15.5-12.8-25.6V320.9L9 97.3C-.7 85.4-2.8 68.8 3.9 54.9z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -115,7 +111,7 @@ exports[`JSONEditor > render table mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -126,10 +122,8 @@ exports[`JSONEditor > render table mode 1`] = `
               <path
                 d="M64 360a56 56 0 1 0 0 112 56 56 0 1 0 0-112zm0-160a56 56 0 1 0 0 112 56 56 0 1 0 0-112zM120 96A56 56 0 1 0 8 96a56 56 0 1 0 112 0z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -149,7 +143,7 @@ exports[`JSONEditor > render table mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -160,10 +154,8 @@ exports[`JSONEditor > render table mode 1`] = `
               <path
                 d="M125.7 160H176c17.7 0 32 14.3 32 32s-14.3 32-32 32H48c-17.7 0-32-14.3-32-32V64c0-17.7 14.3-32 32-32s32 14.3 32 32v51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -179,7 +171,7 @@ exports[`JSONEditor > render table mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -190,10 +182,8 @@ exports[`JSONEditor > render table mode 1`] = `
               <path
                 d="M386.3 160H336c-17.7 0-32 14.3-32 32s14.3 32 32 32H464c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32s-32 14.3-32 32v51.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0s-87.5 229.3 0 316.8s229.3 87.5 316.8 0c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0c-62.5 62.5-163.8 62.5-226.3 0s-62.5-163.8 0-226.3s163.8-62.5 226.3 0L386.3 160z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -225,8 +215,6 @@ exports[`JSONEditor > render table mode 1`] = `
           class="jse-contents s-kw5t6hk3mCrZ"
         >
           <table
-            cellpadding="0"
-            cellspacing="0"
             class="jse-table-main s-kw5t6hk3mCrZ"
           >
             <tbody
@@ -312,6 +300,7 @@ exports[`JSONEditor > render table mode 1`] = `
                   
                   
                   
+                  
                   <!--&lt;JSONValue&gt;-->
                   
                   
@@ -329,6 +318,7 @@ exports[`JSONEditor > render table mode 1`] = `
                     
                   </div>
                   <!--&lt;ReadonlyValue&gt;-->
+                  
                   
                   
                   
@@ -364,6 +354,7 @@ exports[`JSONEditor > render table mode 1`] = `
                   
                   
                   
+                  
                   <!--&lt;JSONValue&gt;-->
                   
                   
@@ -381,6 +372,7 @@ exports[`JSONEditor > render table mode 1`] = `
                     Joe
                   </div>
                   <!--&lt;ReadonlyValue&gt;-->
+                  
                   
                   
                   
@@ -416,6 +408,7 @@ exports[`JSONEditor > render table mode 1`] = `
                   
                   
                   
+                  
                   <!--&lt;JSONValue&gt;-->
                   
                   
@@ -433,6 +426,7 @@ exports[`JSONEditor > render table mode 1`] = `
                     
                   </div>
                   <!--&lt;ReadonlyValue&gt;-->
+                  
                   
                   
                   
@@ -530,7 +524,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -541,10 +535,8 @@ exports[`JSONEditor > render text mode 1`] = `
               <path
                 d="M 0,32 v 64 h 416 v -64 z M 160,160 v 64 h 352 v -64 z M 160,288 v 64 h 288 v -64 z M 0,416 v 64 h 320 v -64 z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -559,7 +551,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -570,10 +562,8 @@ exports[`JSONEditor > render text mode 1`] = `
               <path
                 d="M 0,32 v 64 h 512 v -64 z M 0,160 v 64 h 512 v -64 z M 0,288 v 64 h 352 v -64 z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -592,7 +582,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="14.222222222222221"
               role="presentation"
               style=""
@@ -603,10 +593,8 @@ exports[`JSONEditor > render text mode 1`] = `
               <path
                 d="M151.6 469.6C145.5 476.2 137 480 128 480s-17.5-3.8-23.6-10.4l-88-96c-11.9-13-11.1-33.3 2-45.2s33.3-11.1 45.2 2L96 365.7V64c0-17.7 14.3-32 32-32s32 14.3 32 32V365.7l32.4-35.4c11.9-13 32.2-13.9 45.2-2s13.9 32.2 2 45.2l-88 96zM320 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H320c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H320c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H320c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128H544c17.7 0 32 14.3 32 32s-14.3 32-32 32H320c-17.7 0-32-14.3-32-32s14.3-32 32-32z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -621,7 +609,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -632,10 +620,8 @@ exports[`JSONEditor > render text mode 1`] = `
               <path
                 d="M3.9 54.9C10.5 40.9 24.5 32 40 32H472c15.5 0 29.5 8.9 36.1 22.9s4.6 30.5-5.2 42.5L320 320.9V448c0 12.1-6.8 23.2-17.7 28.6s-23.8 4.3-33.5-3l-64-48c-8.1-6-12.8-15.5-12.8-25.6V320.9L9 97.3C-.7 85.4-2.8 68.8 3.9 54.9z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -650,7 +636,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -661,10 +647,8 @@ exports[`JSONEditor > render text mode 1`] = `
               <path
                 d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -684,7 +668,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -695,10 +679,8 @@ exports[`JSONEditor > render text mode 1`] = `
               <path
                 d="M125.7 160H176c17.7 0 32 14.3 32 32s-14.3 32-32 32H48c-17.7 0-32-14.3-32-32V64c0-17.7 14.3-32 32-32s32 14.3 32 32v51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -714,7 +696,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -725,10 +707,8 @@ exports[`JSONEditor > render text mode 1`] = `
               <path
                 d="M386.3 160H336c-17.7 0-32 14.3-32 32s14.3 32 32 32H464c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32s-32 14.3-32 32v51.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0s-87.5 229.3 0 316.8s229.3 87.5 316.8 0c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0c-62.5 62.5-163.8 62.5-226.3 0s-62.5-163.8 0-226.3s163.8-62.5 226.3 0L386.3 160z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -753,7 +733,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <div
               aria-live="polite"
-              style="position: fixed; top: -10000px;"
+              class="cm-announced"
             />
             <div
               class="cm-scroller"
@@ -1137,7 +1117,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -1148,10 +1128,8 @@ exports[`JSONEditor > render tree mode 1`] = `
               <path
                 d="M 0,448 V 512 h 512 v -64 z M 0,0 V 64 H 512 V 0 Z M 256,96 128,224 h 256 z M 256,416 384,288 H 128 Z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -1166,7 +1144,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -1177,10 +1155,8 @@ exports[`JSONEditor > render tree mode 1`] = `
               <path
                 d="m 0,224 v 64 h 512 v -64 z M 256,192 384,64 H 128 Z M 256,320 128,448 h 256 z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -1199,7 +1175,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="14.222222222222221"
               role="presentation"
               style=""
@@ -1210,10 +1186,8 @@ exports[`JSONEditor > render tree mode 1`] = `
               <path
                 d="M151.6 469.6C145.5 476.2 137 480 128 480s-17.5-3.8-23.6-10.4l-88-96c-11.9-13-11.1-33.3 2-45.2s33.3-11.1 45.2 2L96 365.7V64c0-17.7 14.3-32 32-32s32 14.3 32 32V365.7l32.4-35.4c11.9-13 32.2-13.9 45.2-2s13.9 32.2 2 45.2l-88 96zM320 32h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H320c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H320c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128H480c17.7 0 32 14.3 32 32s-14.3 32-32 32H320c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128H544c17.7 0 32 14.3 32 32s-14.3 32-32 32H320c-17.7 0-32-14.3-32-32s14.3-32 32-32z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -1228,7 +1202,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -1239,10 +1213,8 @@ exports[`JSONEditor > render tree mode 1`] = `
               <path
                 d="M3.9 54.9C10.5 40.9 24.5 32 40 32H472c15.5 0 29.5 8.9 36.1 22.9s4.6 30.5-5.2 42.5L320 320.9V448c0 12.1-6.8 23.2-17.7 28.6s-23.8 4.3-33.5-3l-64-48c-8.1-6-12.8-15.5-12.8-25.6V320.9L9 97.3C-.7 85.4-2.8 68.8 3.9 54.9z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -1257,7 +1229,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -1268,10 +1240,8 @@ exports[`JSONEditor > render tree mode 1`] = `
               <path
                 d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -1286,7 +1256,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -1297,10 +1267,8 @@ exports[`JSONEditor > render tree mode 1`] = `
               <path
                 d="M64 360a56 56 0 1 0 0 112 56 56 0 1 0 0-112zm0-160a56 56 0 1 0 0 112 56 56 0 1 0 0-112zM120 96A56 56 0 1 0 8 96a56 56 0 1 0 112 0z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -1320,7 +1288,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -1331,10 +1299,8 @@ exports[`JSONEditor > render tree mode 1`] = `
               <path
                 d="M125.7 160H176c17.7 0 32 14.3 32 32s-14.3 32-32 32H48c-17.7 0-32-14.3-32-32V64c0-17.7 14.3-32 32-32s32 14.3 32 32v51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -1350,7 +1316,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           >
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -1361,10 +1327,8 @@ exports[`JSONEditor > render tree mode 1`] = `
               <path
                 d="M386.3 160H336c-17.7 0-32 14.3-32 32s14.3 32 32 32H464c17.7 0 32-14.3 32-32V64c0-17.7-14.3-32-32-32s-32 14.3-32 32v51.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0s-87.5 229.3 0 316.8s229.3 87.5 316.8 0c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0c-62.5 62.5-163.8 62.5-226.3 0s-62.5-163.8 0-226.3s163.8-62.5 226.3 0L386.3 160z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -1394,7 +1358,7 @@ exports[`JSONEditor > render tree mode 1`] = `
             >
               <svg
                 aria-label=""
-                class="fa-icon s-0fuyeY-3QfUe"
+                class="fa-icon s-T5YyQewRBd7n"
                 height="16"
                 role="presentation"
                 style=""
@@ -1405,10 +1369,8 @@ exports[`JSONEditor > render tree mode 1`] = `
                 <path
                   d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"
                 />
-                
                  
                  
-                
                 
               </svg>
               <!--&lt;Svg&gt;-->
@@ -1432,7 +1394,7 @@ exports[`JSONEditor > render tree mode 1`] = `
              
             <svg
               aria-label=""
-              class="fa-icon s-0fuyeY-3QfUe"
+              class="fa-icon s-T5YyQewRBd7n"
               height="16"
               role="presentation"
               style=""
@@ -1443,10 +1405,8 @@ exports[`JSONEditor > render tree mode 1`] = `
               <path
                 d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160V416c0 53 43 96 96 96H352c53 0 96-43 96-96V320c0-17.7-14.3-32-32-32s-32 14.3-32 32v96c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V160c0-17.7 14.3-32 32-32h96c17.7 0 32-14.3 32-32s-14.3-32-32-32H96z"
               />
-              
                
                
-              
               
             </svg>
             <!--&lt;Svg&gt;-->
@@ -1482,11 +1442,11 @@ exports[`JSONEditor > render tree mode 1`] = `
             class="jse-json-node jse-expanded s-BfIc3EpAoT-Y jse-root"
             data-path=""
             role="treeitem"
+            style="--level: 0;"
             tabindex="-1"
           >
             <div
               class="jse-header-outer s-BfIc3EpAoT-Y"
-              style="margin-left: calc(0 * var(--jse-indent-size))"
             >
               <div
                 class="jse-header s-BfIc3EpAoT-Y"
@@ -1498,7 +1458,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                 >
                   <svg
                     aria-label=""
-                    class="fa-icon s-0fuyeY-3QfUe"
+                    class="fa-icon s-T5YyQewRBd7n"
                     height="16"
                     role="presentation"
                     style=""
@@ -1509,10 +1469,8 @@ exports[`JSONEditor > render tree mode 1`] = `
                     <path
                       d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"
                     />
-                    
                      
                      
-                    
                     
                   </svg>
                   <!--&lt;Svg&gt;-->
@@ -1567,11 +1525,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                 class="jse-json-node jse-expanded s-BfIc3EpAoT-Y"
                 data-path="%2F0"
                 role="treeitem"
+                style="--level: 1;"
                 tabindex="-1"
               >
                 <div
                   class="jse-header-outer s-BfIc3EpAoT-Y"
-                  style="margin-left: calc(1 * var(--jse-indent-size))"
                 >
                   <div
                     class="jse-header s-BfIc3EpAoT-Y"
@@ -1583,7 +1541,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                     >
                       <svg
                         aria-label=""
-                        class="fa-icon s-0fuyeY-3QfUe"
+                        class="fa-icon s-T5YyQewRBd7n"
                         height="16"
                         role="presentation"
                         style=""
@@ -1594,10 +1552,8 @@ exports[`JSONEditor > render tree mode 1`] = `
                         <path
                           d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"
                         />
-                        
                          
                          
-                        
                         
                       </svg>
                       <!--&lt;Svg&gt;-->
@@ -1655,11 +1611,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                     class="jse-json-node s-BfIc3EpAoT-Y"
                     data-path="%2F0%2Fid"
                     role="treeitem"
+                    style="--level: 2;"
                     tabindex="-1"
                   >
                     <div
                       class="jse-contents-outer s-BfIc3EpAoT-Y"
-                      style="margin-left: calc(2 * var(--jse-indent-size))"
                     >
                       <div
                         class="jse-contents s-BfIc3EpAoT-Y"
@@ -1699,6 +1655,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                         
                         
                         
+                        
                         <!--&lt;JSONValue&gt;-->
                          
                       </div>
@@ -1717,7 +1674,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                  
                 <div
                   class="jse-footer-outer s-BfIc3EpAoT-Y"
-                  style="margin-left: calc(1 * var(--jse-indent-size))"
                 >
                   <div
                     class="jse-footer s-BfIc3EpAoT-Y"
@@ -1746,11 +1702,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                 class="jse-json-node jse-expanded s-BfIc3EpAoT-Y"
                 data-path="%2F1"
                 role="treeitem"
+                style="--level: 1;"
                 tabindex="-1"
               >
                 <div
                   class="jse-header-outer s-BfIc3EpAoT-Y"
-                  style="margin-left: calc(1 * var(--jse-indent-size))"
                 >
                   <div
                     class="jse-header s-BfIc3EpAoT-Y"
@@ -1762,7 +1718,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                     >
                       <svg
                         aria-label=""
-                        class="fa-icon s-0fuyeY-3QfUe"
+                        class="fa-icon s-T5YyQewRBd7n"
                         height="16"
                         role="presentation"
                         style=""
@@ -1773,10 +1729,8 @@ exports[`JSONEditor > render tree mode 1`] = `
                         <path
                           d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"
                         />
-                        
                          
                          
-                        
                         
                       </svg>
                       <!--&lt;Svg&gt;-->
@@ -1834,11 +1788,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                     class="jse-json-node s-BfIc3EpAoT-Y"
                     data-path="%2F1%2Fid"
                     role="treeitem"
+                    style="--level: 2;"
                     tabindex="-1"
                   >
                     <div
                       class="jse-contents-outer s-BfIc3EpAoT-Y"
-                      style="margin-left: calc(2 * var(--jse-indent-size))"
                     >
                       <div
                         class="jse-contents s-BfIc3EpAoT-Y"
@@ -1878,6 +1832,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                         
                         
                         
+                        
                         <!--&lt;JSONValue&gt;-->
                          
                       </div>
@@ -1897,11 +1852,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                     class="jse-json-node s-BfIc3EpAoT-Y"
                     data-path="%2F1%2Fname"
                     role="treeitem"
+                    style="--level: 2;"
                     tabindex="-1"
                   >
                     <div
                       class="jse-contents-outer s-BfIc3EpAoT-Y"
-                      style="margin-left: calc(2 * var(--jse-indent-size))"
                     >
                       <div
                         class="jse-contents s-BfIc3EpAoT-Y"
@@ -1941,6 +1896,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                         
                         
                         
+                        
                         <!--&lt;JSONValue&gt;-->
                          
                       </div>
@@ -1959,7 +1915,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                  
                 <div
                   class="jse-footer-outer s-BfIc3EpAoT-Y"
-                  style="margin-left: calc(1 * var(--jse-indent-size))"
                 >
                   <div
                     class="jse-footer s-BfIc3EpAoT-Y"
@@ -1988,11 +1943,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                 class="jse-json-node jse-expanded s-BfIc3EpAoT-Y"
                 data-path="%2F2"
                 role="treeitem"
+                style="--level: 1;"
                 tabindex="-1"
               >
                 <div
                   class="jse-header-outer s-BfIc3EpAoT-Y"
-                  style="margin-left: calc(1 * var(--jse-indent-size))"
                 >
                   <div
                     class="jse-header s-BfIc3EpAoT-Y"
@@ -2004,7 +1959,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                     >
                       <svg
                         aria-label=""
-                        class="fa-icon s-0fuyeY-3QfUe"
+                        class="fa-icon s-T5YyQewRBd7n"
                         height="16"
                         role="presentation"
                         style=""
@@ -2015,10 +1970,8 @@ exports[`JSONEditor > render tree mode 1`] = `
                         <path
                           d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"
                         />
-                        
                          
                          
-                        
                         
                       </svg>
                       <!--&lt;Svg&gt;-->
@@ -2076,11 +2029,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                     class="jse-json-node s-BfIc3EpAoT-Y"
                     data-path="%2F2%2Fid"
                     role="treeitem"
+                    style="--level: 2;"
                     tabindex="-1"
                   >
                     <div
                       class="jse-contents-outer s-BfIc3EpAoT-Y"
-                      style="margin-left: calc(2 * var(--jse-indent-size))"
                     >
                       <div
                         class="jse-contents s-BfIc3EpAoT-Y"
@@ -2120,6 +2073,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                         
                         
                         
+                        
                         <!--&lt;JSONValue&gt;-->
                          
                       </div>
@@ -2138,7 +2092,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                  
                 <div
                   class="jse-footer-outer s-BfIc3EpAoT-Y"
-                  style="margin-left: calc(1 * var(--jse-indent-size))"
                 >
                   <div
                     class="jse-footer s-BfIc3EpAoT-Y"
@@ -2167,7 +2120,6 @@ exports[`JSONEditor > render tree mode 1`] = `
              
             <div
               class="jse-footer-outer s-BfIc3EpAoT-Y"
-              style="margin-left: calc(0 * var(--jse-indent-size))"
             >
               <div
                 class="jse-footer s-BfIc3EpAoT-Y"

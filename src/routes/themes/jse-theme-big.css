@@ -11,7 +11,7 @@
 
   --jse-button-primary-background: var(--jse-theme-color);
   --jse-button-primary-background-highlight: #e74c1c;
-  --itemIsActiveBG: #fd5e2d;
+  --jse-item-is-active-bg: #fd5e2d;
 
   /* messages */
   --jse-message-error-background: #f6c5c0;

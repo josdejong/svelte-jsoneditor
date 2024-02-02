@@ -4,7 +4,7 @@
   import type { JSONPath } from 'immutable-json-patch'
   import type { SortedColumn } from '$lib/types.js'
   import { SortDirection } from '$lib/types.js'
-  import { stringifyJSONPath } from '../../../utils/pathUtils.js'
+  import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
   import Icon from 'svelte-awesome'
   import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons'
   import { isEmpty, isEqual } from 'lodash-es'

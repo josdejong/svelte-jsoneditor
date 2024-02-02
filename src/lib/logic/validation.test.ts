@@ -1,12 +1,12 @@
 import { test, describe } from 'vitest'
 import { deepStrictEqual } from 'assert'
 import { mapValidationErrors, validateJSON, validateText } from './validation.js'
-import type { JSONParser, ValidationError } from '$lib/types'
+import type { ValidationError } from '$lib/types'
 import { ValidationSeverity } from '$lib/types.js'
-import { stringify, type JSONValue, parse, isLosslessNumber } from 'lossless-json'
+import { stringify, parse, isLosslessNumber } from 'lossless-json'
 import { LosslessNumber } from 'lossless-json'
 
-const LosslessJSONParser = { parse, stringify } as JSONParser
+const LosslessJSONParser = { parse, stringify }
 
 describe('validation', () => {
   test('should create a map from a list with validation errors', () => {
@@ -64,7 +64,7 @@ describe('validation', () => {
       severity: ValidationSeverity.warning
     }
 
-    function myValidator(json: JSONValue): ValidationError[] {
+    function myValidator(json: unknown): ValidationError[] {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       if (!json || typeof json.count !== 'number' || json.count <= 0) {
@@ -74,7 +74,7 @@ describe('validation', () => {
       return []
     }
 
-    function myLosslessValidator(json: JSONValue): ValidationError[] {
+    function myLosslessValidator(json: unknown): ValidationError[] {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       if (!json || !isLosslessNumber(json.count) || json.count <= 0) {
@@ -84,10 +84,10 @@ describe('validation', () => {
       return []
     }
 
-    const validJson = { count: 42 } as JSONValue
-    const invalidJson = { foo: 42 } as JSONValue
-    const validLosslessJson = { count: new LosslessNumber('42') } as unknown as JSONValue
-    const invalidLosslessJson = { foo: new LosslessNumber('42') } as unknown as JSONValue
+    const validJson = { count: 42 }
+    const invalidJson = { foo: 42 }
+    const validLosslessJson = { count: new LosslessNumber('42') }
+    const invalidLosslessJson = { foo: new LosslessNumber('42') }
 
     test('should validateJSON with native parser and valid JSON', () => {
       deepStrictEqual(validateJSON(validJson, myValidator, JSON, JSON), [])
@@ -117,7 +117,7 @@ describe('validation', () => {
     test('should validateJSON with two lossless parsers and valid lossless JSON', () => {
       deepStrictEqual(
         validateJSON(
-          validLosslessJson as unknown as JSONValue,
+          validLosslessJson,
           myLosslessValidator,
           LosslessJSONParser,
           LosslessJSONParser
@@ -140,7 +140,7 @@ describe('validation', () => {
       severity: ValidationSeverity.warning
     }
 
-    function myValidator(json: JSONValue): ValidationError[] {
+    function myValidator(json: unknown): ValidationError[] {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       if (!json || typeof json.count !== 'number' || json.count <= 0) {
@@ -150,7 +150,7 @@ describe('validation', () => {
       return []
     }
 
-    function myLosslessValidator(json: JSONValue): ValidationError[] {
+    function myLosslessValidator(json: unknown): ValidationError[] {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       if (!json || !isLosslessNumber(json.count) || json.count <= 0) {
@@ -200,15 +200,15 @@ describe('validation', () => {
     })
 
     test('should validateText with a non-repairable parse error', () => {
-      const invalidText = '{\n  "name": "Joe" ]'
+      const invalidText = '{\n  "name": "Joe" }[]'
 
       deepStrictEqual(validateText(invalidText, null, LosslessJSONParser, JSON), {
         isRepairable: false,
         parseError: {
-          column: 16,
+          column: 17,
           line: 1,
-          message: "Comma ',' expected after value but got ']' at line 2 column 17",
-          position: 18
+          message: "Expected end of input but got '[' at line 2 column 18",
+          position: 19
         }
       })
     })

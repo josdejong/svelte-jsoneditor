@@ -9,24 +9,24 @@
   outline: none;
   border-radius: 1px;
   vertical-align: top;
-  cursor: var(--jse-contents-cursor);
+  cursor: $contents-cursor;
 
   word-break: normal;
   overflow-wrap: anywhere;
   white-space: pre-wrap; // important for rendering multiple consecutive spaces
 
   &:hover {
-    background: var(--jse-hover-background-color);
+    background: $hover-background-color;
   }
 
   &.jse-empty {
     min-width: 4em;
-    outline: 1px dotted var(--jse-tag-background);
+    outline: 1px dotted $tag-background;
     -moz-outline-radius: 2px;
 
     &::after {
       pointer-events: none;
-      color: var(--jse-tag-background);
+      color: $tag-background;
       content: 'value';
     }
   }

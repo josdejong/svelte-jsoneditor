@@ -2,13 +2,7 @@
 
 <script lang="ts">
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
-  import type {
-    JSONArray,
-    JSONObject,
-    JSONPath,
-    JSONPointer,
-    JSONValue as JSONValueType
-  } from 'immutable-json-patch'
+  import type { JSONPath, JSONPointer } from 'immutable-json-patch'
   import { appendToJSONPointer, compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
   import { initial, isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
@@ -58,6 +52,7 @@
   import { onMoveSelection } from '$lib/logic/dragging.js'
   import { forEachIndex, moveItems } from '$lib/utils/arrayUtils.js'
   import type {
+    AbsolutePopupOptions,
     CaretPosition,
     DraggingState,
     ExtendedSearchResultItem,
@@ -68,7 +63,6 @@
     NestedValidationError,
     RenderedItem,
     TreeModeContext,
-    ValidationError,
     VisibleSection
   } from '$lib/types'
   import { SelectionType } from '$lib/types.js'
@@ -79,7 +73,7 @@
   import { isObject } from '$lib/utils/typeUtils.js'
   import { classnames } from '$lib/utils/cssUtils.js'
 
-  export let value: JSONValueType
+  export let value: unknown
   export let path: JSONPath
   export let expandedMap: JSONPointerMap<boolean> | undefined
   export let enforceStringMap: JSONPointerMap<boolean> | undefined
@@ -88,7 +82,9 @@
   export let searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
   export let selection: JSONSelection | null
   export let context: TreeModeContext
-  export let onDragSelectionStart: MouseEvent
+  export let onDragSelectionStart: (
+    event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }
+  ) => void
 
   const debug = createDebug('jsoneditor:JSONNode')
 
@@ -112,7 +108,7 @@
   let visibleSections: VisibleSection[] | undefined
   $: visibleSections = visibleSectionsMap ? visibleSectionsMap[pointer] : undefined
 
-  let validationError: ValidationError | undefined
+  let validationError: NestedValidationError | undefined
   $: validationError = validationErrorsMap ? validationErrorsMap[pointer] : undefined
 
   let isNodeSelected: boolean
@@ -120,16 +116,10 @@
 
   $: root = path.length === 0
 
-  function getIndentationStyle(level) {
-    return `margin-left: calc(${level} * var(--jse-indent-size))`
-  }
-
-  $: indentationStyle = getIndentationStyle(path.length)
-
   // TODO: extract getProps into a separate function
   function getProps(
     path: JSONPath,
-    object: JSONObject,
+    object: Record<string, unknown>,
     expandedMap: JSONPointerMap<boolean> | undefined,
     enforceStringMap: JSONPointerMap<boolean> | undefined,
     visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined,
@@ -171,7 +161,7 @@
   // TODO: extract getItems into a separate function
   function getItems(
     path: JSONPath,
-    array: JSONArray,
+    array: Array<unknown>,
     visibleSection: VisibleSection,
     expandedMap: JSONPointerMap<boolean> | undefined,
     enforceStringMap: JSONPointerMap<boolean> | undefined,
@@ -223,35 +213,33 @@
     return items
   }
 
-  function toggleExpand(event) {
+  function toggleExpand(event: MouseEvent) {
     event.stopPropagation()
 
     const recursive = event.ctrlKey
     context.onExpand(path, !expanded, recursive)
   }
 
-  function handleExpand(event) {
+  function handleExpand(event: MouseEvent) {
     event.stopPropagation()
 
     context.onExpand(path, true)
   }
 
-  function handleUpdateKey(oldKey, newKey) {
-    const operations = rename(path, Object.keys(value), oldKey, newKey)
+  function handleUpdateKey(oldKey: string, newKey: string): string {
+    const operations = rename(path, Object.keys(value as Record<string, unknown>), oldKey, newKey)
     context.onPatch(operations)
 
     // It is possible that the applied key differs from newKey,
     // to prevent duplicate keys. Here we figure out the actually applied key
-    const newKeyUnique = last(parseJSONPointer(operations[0].path))
-
-    return newKeyUnique
+    return last(parseJSONPointer(operations[0].path)) as string
   }
 
-  function handleMouseDown(event) {
+  function handleMouseDown(event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
     // check if the mouse down is not happening in the key or value input fields or on a button
     if (
-      isContentEditableDiv(event.target) ||
-      (event.which === 1 && isChildOfNodeName(event.target, 'BUTTON')) // left mouse on a button
+      isContentEditableDiv(event.target as HTMLElement) ||
+      (event.which === 1 && isChildOfNodeName(event.target as Element, 'BUTTON')) // left mouse on a button
     ) {
       return
     }
@@ -268,7 +256,7 @@
     document.addEventListener('mousemove', handleMouseMoveGlobal, true)
     document.addEventListener('mouseup', handleMouseUpGlobal)
 
-    const anchorType = getSelectionTypeFromTarget(event.target)
+    const anchorType = getSelectionTypeFromTarget(event.target as Element)
     const json = context.getJson()
     const documentState = context.getDocumentState()
 
@@ -302,7 +290,7 @@
       }
     } else {
       if (anchorType === SelectionType.multi) {
-        if (root && event.target.hasAttribute('data-path')) {
+        if (root && (event.target as Element).hasAttribute('data-path')) {
           const lastCaretPosition = last(
             getVisibleCaretPositions(value, documentState)
           ) as CaretPosition
@@ -310,13 +298,13 @@
         } else {
           context.onSelect(createMultiSelection(path, path))
         }
-      } else {
+      } else if (json !== undefined) {
         context.onSelect(fromSelectionType(json, anchorType, path))
       }
     }
   }
 
-  function handleMouseMove(event) {
+  function handleMouseMove(event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
     if (singleton.selecting) {
       event.preventDefault()
       event.stopPropagation()
@@ -331,7 +319,7 @@
         }
       }
 
-      const selectionType = getSelectionTypeFromTarget(event.target)
+      const selectionType = getSelectionTypeFromTarget(event.target as Element)
 
       if (
         !isEqual(path, singleton.selectionFocus) ||
@@ -350,11 +338,11 @@
     }
   }
 
-  function handleMouseMoveGlobal(event) {
+  function handleMouseMoveGlobal(event: MouseEvent) {
     context.onDrag(event)
   }
 
-  function handleMouseUpGlobal(event) {
+  function handleMouseUpGlobal(event: Event) {
     if (singleton.selecting) {
       singleton.selecting = false
 
@@ -382,7 +370,9 @@
     return clientOffset - contentOffset
   }
 
-  function handleDragSelectionStart(event: MouseEvent) {
+  function handleDragSelectionStart(
+    event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }
+  ) {
     if (context.readOnly || !selection) {
       return
     }
@@ -408,6 +398,9 @@
     }
 
     const json = context.getJson()
+    if (json === undefined) {
+      return
+    }
     const initialPath = getStartPath(json, selection)
     const selectionStartIndex = items.findIndex((item) => isEqual(item.path, initialPath))
     const documentState = context.getDocumentState()
@@ -419,7 +412,7 @@
     })
 
     dragging = {
-      initialTarget: event.target,
+      initialTarget: event.target as Element,
       initialClientY: event.clientY,
       initialContentTop: findContentTop(),
       selectionStartIndex,
@@ -437,6 +430,9 @@
   function handleDragSelection(event: MouseEvent) {
     if (dragging) {
       const json = context.getJson()
+      if (json === undefined) {
+        return
+      }
       const documentState = context.getDocumentState()
 
       const deltaY = calculateDeltaY(dragging, event)
@@ -459,9 +455,12 @@
     }
   }
 
-  function handleDragSelectionEnd(event) {
+  function handleDragSelectionEnd(event: MouseEvent) {
     if (dragging) {
       const json = context.getJson()
+      if (json === undefined) {
+        return
+      }
       const documentState = context.getDocumentState()
       const deltaY = calculateDeltaY(dragging, event)
       const { operations, updatedSelection } = onMoveSelection({
@@ -482,8 +481,8 @@
         // the user did click inside the selection and no contents have been dragged,
         // select the clicked item
         if (event.target === dragging.initialTarget && !dragging.didMoveItems) {
-          const selectionType = getSelectionTypeFromTarget(event.target)
-          const path = getDataPathFromTarget(event.target)
+          const selectionType = getSelectionTypeFromTarget(event.target as Element)
+          const path = getDataPathFromTarget(event.target as Element)
           if (path) {
             context.onSelect(fromSelectionType(json, selectionType, path))
           }
@@ -521,10 +520,14 @@
     }
 
     if (Array.isArray(value)) {
-      const startPath = getStartPath(context.getJson(), selection)
-      const endPath = getEndPath(context.getJson(), selection)
-      const startIndex = last(startPath)
-      const endIndex = last(endPath)
+      const json = context.getJson()
+      if (json === undefined) {
+        return null
+      }
+      const startPath = getStartPath(json, selection)
+      const endPath = getEndPath(json, selection)
+      const startIndex = parseInt(last(startPath) as string, 10)
+      const endIndex = parseInt(last(endPath) as string, 10)
 
       // find the section where the selection is
       // if the selection is spread over multiple visible sections,
@@ -542,37 +545,41 @@
       forEachIndex(start, Math.min(value.length, end), (index) => addHeight(String(index)))
     } else {
       // value is Object
-      Object.keys(value).forEach(addHeight)
+      Object.keys(value as Record<string, unknown>).forEach(addHeight)
     }
 
     return items
   }
 
-  function handleMouseOver(event: MouseEvent) {
+  function handleMouseOver(event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
     if (singleton.selecting || singleton.dragging) {
       return
     }
 
     event.stopPropagation()
 
-    if (isChildOfAttribute(event.target, 'data-type', 'selectable-value')) {
+    if (isChildOfAttribute(event.target as Element, 'data-type', 'selectable-value')) {
       hover = HOVER_COLLECTION
-    } else if (isChildOfAttribute(event.target, 'data-type', 'insert-selection-area-inside')) {
+    } else if (
+      isChildOfAttribute(event.target as Element, 'data-type', 'insert-selection-area-inside')
+    ) {
       hover = HOVER_INSERT_INSIDE
-    } else if (isChildOfAttribute(event.target, 'data-type', 'insert-selection-area-after')) {
+    } else if (
+      isChildOfAttribute(event.target as Element, 'data-type', 'insert-selection-area-after')
+    ) {
       hover = HOVER_INSERT_AFTER
     }
 
     clearTimeout(hoverTimer)
   }
 
-  function handleMouseOut(event: MouseEvent) {
+  function handleMouseOut(event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
     event.stopPropagation()
 
     // to prevent "flickering" in the hovering state when hovering on the edge
     // of the insert area context menu button: it's visibility toggles when
     // `hover` toggles, which will alternating mouseout and mouseover events
-    hoverTimer = setTimeout(() => (hover = undefined))
+    hoverTimer = window.setTimeout(() => (hover = undefined))
   }
 
   function handleInsertInside(event: MouseEvent) {
@@ -593,14 +600,14 @@
     }
   }
 
-  function handleInsertInsideOpenContextMenu(props) {
+  function handleInsertInsideOpenContextMenu(contextMenuProps: AbsolutePopupOptions) {
     context.onSelect(createInsideSelection(path))
-    context.onContextMenu(props)
+    context.onContextMenu(contextMenuProps)
   }
 
-  function handleInsertAfterOpenContextMenu(props) {
+  function handleInsertAfterOpenContextMenu(contextMenuProps: AbsolutePopupOptions) {
     context.onSelect(createAfterSelection(path))
-    context.onContextMenu(props)
+    context.onContextMenu(contextMenuProps)
   }
 </script>
 
@@ -614,6 +621,7 @@
   )}
   data-path={encodeDataPath(path)}
   aria-selected={isNodeSelected}
+  style:--level={path.length}
   class:jse-root={root}
   class:jse-selected={isNodeSelected && isMultiSelection(selection)}
   class:jse-selected-key={isNodeSelected && isKeySelection(selection)}
@@ -628,7 +636,7 @@
   on:blur={undefined}
 >
   {#if Array.isArray(value)}
-    <div class="jse-header-outer" style={indentationStyle}>
+    <div class="jse-header-outer">
       <div class="jse-header">
         <button
           type="button"
@@ -665,7 +673,7 @@
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(getFocusPath(selection), path)}
+        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !isEditingSelection(selection) && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
             <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -698,7 +706,7 @@
             class:jse-hovered={hover === HOVER_INSERT_INSIDE}
             class:jse-selected={isNodeSelected && isInsideSelection(selection)}
             data-type="insert-selection-area-inside"
-            style={getIndentationStyle(path.length + 1)}
+            style:--level={path.length + 1}
             title={INSERT_EXPLANATION}
           >
             <ContextMenuPointer
@@ -739,7 +747,7 @@
           {/if}
         {/each}
       </div>
-      <div class="jse-footer-outer" style={indentationStyle}>
+      <div class="jse-footer-outer">
         <div data-type="selectable-value" class="jse-footer">
           <span class="jse-bracket">]</span>
         </div>
@@ -754,7 +762,7 @@
       </div>
     {/if}
   {:else if isObject(value)}
-    <div class="jse-header-outer" style={indentationStyle}>
+    <div class="jse-header-outer">
       <div class="jse-header">
         <button
           type="button"
@@ -786,7 +794,7 @@
             {/if}
           </div>
         </div>
-        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !selection.edit && isEqual(getFocusPath(selection), path)}
+        {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !isEditingSelection(selection) && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
             <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
           </div>
@@ -819,7 +827,7 @@
             class:jse-hovered={hover === HOVER_INSERT_INSIDE}
             class:jse-selected={isNodeSelected && isInsideSelection(selection)}
             data-type="insert-selection-area-inside"
-            style={getIndentationStyle(path.length + 1)}
+            style:--level={path.length + 1}
             title={INSERT_EXPLANATION}
           >
             <ContextMenuPointer
@@ -854,7 +862,7 @@
           </svelte:self>
         {/each}
       </div>
-      <div class="jse-footer-outer" style={indentationStyle}>
+      <div class="jse-footer-outer">
         <div data-type="selectable-value" class="jse-footer">
           <div class="jse-bracket">&rbrace;</div>
         </div>
@@ -869,7 +877,7 @@
       </div>
     {/if}
   {:else}
-    <div class="jse-contents-outer" style={indentationStyle}>
+    <div class="jse-contents-outer">
       <div class="jse-contents">
         <slot name="identifier" />
         {#if !root}
@@ -878,7 +886,7 @@
         <JSONValue
           {path}
           {value}
-          {enforceString}
+          enforceString={enforceString || false}
           selection={isNodeSelected ? selection : null}
           searchResultItems={filterValueSearchResults(searchResultItemsMap, pointer)}
           {context}
@@ -908,7 +916,6 @@
       class:jse-hovered={hover === HOVER_INSERT_AFTER}
       class:jse-selected={isNodeSelected && isAfterSelection(selection)}
       data-type="insert-selection-area-after"
-      style={indentationStyle}
       title={INSERT_EXPLANATION}
     >
       <ContextMenuPointer

@@ -3,8 +3,6 @@ import assert from 'assert'
 import { lodashQueryLanguage } from './lodashQueryLanguage.js'
 import { cloneDeep } from 'lodash-es'
 import { LosslessNumber, parse, stringify } from 'lossless-json'
-import type { JSONValue } from 'immutable-json-patch'
-import type { JSONParser } from '$lib/types'
 
 const { createQuery, executeQuery } = lodashQueryLanguage
 
@@ -337,42 +335,42 @@ describe('lodashQueryLanguage', () => {
 
     test('should sort a list with numbers', () => {
       const data = [4, 7, 5]
-      const query = createQuery(data as unknown as JSONValue, {
+      const query = createQuery(data, {
         sort: {
           path: [],
           direction: 'asc'
         }
       })
 
-      const result = executeQuery(data as unknown as JSONValue, query, JSON)
+      const result = executeQuery(data, query, JSON)
       assert.deepStrictEqual(result, [4, 5, 7])
     })
 
     test('should sort empty keys by value', () => {
       const data = [{ '': 4 }, { '': 7 }, { '': 5 }]
-      const query = createQuery(data as unknown as JSONValue, {
+      const query = createQuery(data, {
         sort: {
           path: [''],
           direction: 'asc'
         }
       })
 
-      const result = executeQuery(data as unknown as JSONValue, query, JSON)
+      const result = executeQuery(data, query, JSON)
       assert.deepStrictEqual(result, [{ '': 4 }, { '': 5 }, { '': 7 }])
     })
 
     test('should work with alternative parsers and non-native JSON data types', () => {
-      const LosslessJSONParser = { parse, stringify } as JSONParser
+      const LosslessJSONParser = { parse, stringify }
 
       const data = [new LosslessNumber('4'), new LosslessNumber('7'), new LosslessNumber('5')]
-      const query = createQuery(data as unknown as JSONValue, {
+      const query = createQuery(data, {
         sort: {
           path: [],
           direction: 'asc'
         }
       })
 
-      const result = executeQuery(data as unknown as JSONValue, query, LosslessJSONParser)
+      const result = executeQuery(data, query, LosslessJSONParser)
       assert.deepStrictEqual(result, [
         new LosslessNumber('4'),
         new LosslessNumber('5'),

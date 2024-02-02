@@ -1,14 +1,14 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONPath, JSONValue } from 'immutable-json-patch'
+  import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass.js'
   import type { JSONParser, JSONSelection, OnPatch } from '$lib/types.js'
   import { isValueSelection } from '$lib/logic/selection.js'
 
   export let path: JSONPath
-  export let value: JSONValue
+  export let value: unknown
   export let parser: JSONParser
   export let readOnly: boolean
   export let selection: JSONSelection | null
@@ -18,7 +18,7 @@
 
   let refSelect: HTMLSelectElement | undefined
 
-  let bindValue: JSONValue = value
+  let bindValue: unknown = value
   $: bindValue = value
 
   function applyFocus(selection: JSONSelection | null) {
@@ -31,7 +31,7 @@
 
   $: applyFocus(selection)
 
-  function handleSelect(event) {
+  function handleSelect(event: Event) {
     event.stopPropagation()
 
     if (readOnly) {
@@ -47,7 +47,7 @@
     ])
   }
 
-  function handleMouseDown(event) {
+  function handleMouseDown(event: MouseEvent) {
     // stop propagation to prevent selecting the whole line
     event.stopPropagation()
   }

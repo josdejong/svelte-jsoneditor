@@ -2,7 +2,6 @@
 
 import { isNumber } from './numberUtils.js'
 import type { JSONParser } from '../types.js'
-import type { JSONValue } from 'immutable-json-patch'
 
 /**
  * Test whether a value is an Object (and not an Array or Class)
@@ -10,7 +9,11 @@ import type { JSONValue } from 'immutable-json-patch'
 export function isObject(value: unknown): value is Record<string, unknown> {
   // note that we check constructor.name, not constructor === Object,
   // so we can use objects created in a different JS realm like an iframe.
-  return typeof value === 'object' && value !== null && value.constructor.name === 'Object'
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    (value.constructor === undefined || value.constructor.name === 'Object')
+  )
 }
 
 /**
@@ -23,7 +26,9 @@ export function isObjectOrArray(value: unknown): value is Object | Array<unknown
   return (
     typeof value === 'object' &&
     value !== null &&
-    (value.constructor.name === 'Object' || value.constructor.name === 'Array')
+    (value.constructor === undefined ||
+      value.constructor.name === 'Object' ||
+      value.constructor.name === 'Array')
   )
 }
 
@@ -80,20 +85,23 @@ export function isTimestamp(value: unknown): boolean {
  * Source: https://stackoverflow.com/questions/6386090/validating-css-color-names/33184805
  */
 export function getColorCSS(color: string): string | null {
-  const div = window.document.createElement('div')
+  colorTestDiv = colorTestDiv || window.document.createElement('div')
 
-  div.style.color = color
+  colorTestDiv.style.color = ''
+  colorTestDiv.style.color = color
 
-  const applied = div.style.color
+  const applied = colorTestDiv.style.color
   return applied !== '' ? applied.replace(/\s+/g, '').toLowerCase() : null
 }
+let colorTestDiv: HTMLDivElement | null = null
 
 /**
  * Test if a string contains a valid color name or code.
  * Returns true if a valid color, false otherwise
  */
 export function isColor(value: unknown): boolean {
-  return typeof value === 'string' && !!getColorCSS(value)
+  const maxColorLength = 99
+  return typeof value === 'string' && value.length < maxColorLength && !!getColorCSS(value)
 }
 
 /**
@@ -152,7 +160,7 @@ export function isUrl(text: unknown): boolean {
  * Convert contents of a string to the correct JSON type. This can be a string,
  * a number, a boolean, etc
  */
-export function stringConvert(str: string, parser: JSONParser): JSONValue {
+export function stringConvert(str: string, parser: JSONParser): unknown {
   if (str === '') {
     return ''
   }

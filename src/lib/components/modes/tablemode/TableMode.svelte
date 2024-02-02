@@ -20,7 +20,8 @@
     OnChangeMode,
     OnFocus,
     OnJSONEditorModal,
-    OnRenderMenuWithoutContext,
+    OnRenderContextMenuInternal,
+    OnRenderMenuInternal,
     OnRenderValue,
     OnSelect,
     OnSortModal,
@@ -35,7 +36,7 @@
   } from '$lib/types'
   import { Mode, SortDirection, ValidationSeverity } from '$lib/types.js'
   import TableMenu from './menu/TableMenu.svelte'
-  import type { JSONPatchDocument, JSONPath, JSONValue } from 'immutable-json-patch'
+  import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import {
     compileJSONPointer,
     existsIn,
@@ -93,6 +94,7 @@
     getAnchorPath,
     getFocusPath,
     isEditingSelection,
+    isJSONSelection,
     isValueSelection,
     pathInSelection,
     pathStartsWith,
@@ -168,7 +170,8 @@
   export let onChangeMode: OnChangeMode
   export let onSelect: OnSelect
   export let onRenderValue: OnRenderValue
-  export let onRenderMenu: OnRenderMenuWithoutContext
+  export let onRenderMenu: OnRenderMenuInternal
+  export let onRenderContextMenu: OnRenderContextMenuInternal
   export let onFocus: OnFocus
   export let onBlur: OnBlur
   export let onSortModal: OnSortModal
@@ -204,7 +207,7 @@
     }
   })
 
-  let json: JSONValue | undefined
+  let json: unknown | undefined
   let text: string | undefined
   let parseError: ParseError | undefined = undefined
 
@@ -245,7 +248,7 @@
   $: refreshScrollTop(json)
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  function refreshScrollTop(_json: JSONValue | undefined) {
+  function refreshScrollTop(_json: unknown | undefined) {
     // When the contents go from lots of items and scrollable contents to only a few items and
     // no vertical scroll, the actual scrollTop changes to 0 but there is no on:scroll event
     // triggered, so the internal scrollTop variable is not up-to-date.
@@ -288,7 +291,7 @@
     }
   }
 
-  function clearSelectionWhenNotExisting(json: JSONValue | undefined) {
+  function clearSelectionWhenNotExisting(json: unknown | undefined) {
     if (!documentState.selection || json === undefined) {
       return
     }
@@ -389,10 +392,10 @@
         } catch (repairError) {
           // no valid JSON, will show empty document or invalid json
           json = undefined
-          text = externalContent.text
+          text = content.text
           textIsRepaired = false
           parseError =
-            text !== undefined && text !== ''
+            text !== ''
               ? normalizeJsonParseError(text, (err as Error).message || String(err))
               : undefined
         }
@@ -429,7 +432,9 @@
     if (!isEqual(documentState.selection, externalSelection)) {
       debug('applyExternalSelection', externalSelection)
 
-      updateSelection(externalSelection)
+      if (isJSONSelection(externalSelection) || externalSelection === null) {
+        updateSelection(externalSelection)
+      }
     }
   }
 
@@ -440,7 +445,7 @@
     previousText,
     previousTextIsRepaired
   }: {
-    previousJson: JSONValue | undefined
+    previousJson: unknown | undefined
     previousText: string | undefined
     previousState: DocumentState
     previousTextIsRepaired: boolean
@@ -520,7 +525,7 @@
   const memoizedValidate = memoizeOne(validateJSON)
 
   function updateValidationErrors(
-    json: JSONValue,
+    json: unknown,
     validator: Validator | null,
     parser: JSONParser,
     validationParser: JSONParser
@@ -643,7 +648,13 @@
     afterPatch?: AfterPatchCallback
   ): JSONPatchResult {
     if (readOnly) {
-      return
+      // this should never happen in practice
+      return {
+        json,
+        previousJson: json,
+        redo: [],
+        undo: []
+      }
     }
 
     return patch(operations, afterPatch)
@@ -689,7 +700,7 @@
   }
 
   function findNextInside(path: JSONPath): JSONSelection {
-    const index = parseInt(path[0])
+    const index = parseInt(path[0], 10)
     const nextPath = [String(index + 1), ...path.slice(1)]
 
     return existsIn(json, nextPath)
@@ -709,11 +720,12 @@
   }
 
   function handleScroll(event: Event) {
-    scrollTop = event.target['scrollTop']
+    scrollTop = (event.target as HTMLElement)['scrollTop']
   }
 
-  function handleMouseDown(event: MouseEvent & { target: HTMLDivElement }) {
-    const path = event?.target ? getDataPathFromTarget(event.target as HTMLElement) : undefined
+  function handleMouseDown(event: MouseEvent) {
+    const target = event.target as HTMLElement
+    const path = getDataPathFromTarget(target)
     if (path) {
       // when clicking inside the current selection, editing a value, do nothing
       if (
@@ -729,7 +741,7 @@
     }
 
     // for example when clicking on the empty area in the main menu
-    if (!isChildOfNodeName(event.target, 'BUTTON') && !event.target.isContentEditable) {
+    if (!isChildOfNodeName(target, 'BUTTON') && !target.isContentEditable) {
       focus()
     }
   }
@@ -941,6 +953,7 @@
       onInsertAfterRow: handleInsertAfterRow,
       onRemoveRow: handleRemoveRow,
 
+      onRenderContextMenu,
       onCloseContextMenu: function () {
         closeAbsolutePopup(popupId)
         focus()
@@ -965,7 +978,7 @@
     })
   }
 
-  function handleContextMenu(event: MouseEvent) {
+  function handleContextMenu(event: Event) {
     if (readOnly || isEditingSelection(documentState.selection)) {
       return
     }
@@ -978,8 +991,8 @@
     if (event && event.type === 'contextmenu' && event.target !== refHiddenInput) {
       // right mouse click to open context menu
       openContextMenu({
-        left: event.clientX,
-        top: event.clientY,
+        left: (event as MouseEvent).clientX,
+        top: (event as MouseEvent).clientY,
         width: CONTEXT_MENU_WIDTH,
         height: CONTEXT_MENU_HEIGHT,
         showTip: false
@@ -1014,13 +1027,13 @@
     return false
   }
 
-  function handleContextMenuFromTableMenu(event: Event & { target: HTMLDivElement }) {
+  function handleContextMenuFromTableMenu(event: MouseEvent) {
     if (readOnly) {
       return
     }
 
     openContextMenu({
-      anchor: findParentWithNodeName(event.target, 'BUTTON'),
+      anchor: findParentWithNodeName(event.target as HTMLElement, 'BUTTON'),
       offsetTop: 0,
       width: CONTEXT_MENU_WIDTH,
       height: CONTEXT_MENU_HEIGHT,
@@ -1070,7 +1083,7 @@
         {
           op: 'replace',
           path: pointer,
-          value: updatedValue as JSONValue
+          value: updatedValue
         }
       ],
       (patchedJson, patchedState) => {
@@ -1203,7 +1216,7 @@
     })
   }
 
-  function handleKeyDown(event) {
+  function handleKeyDown(event: KeyboardEvent) {
     const combo = keyComboFromEvent(event)
     debug('keydown', { combo, key: event.key })
 
@@ -1369,7 +1382,10 @@
   function handlePaste(event: ClipboardEvent) {
     event.preventDefault()
 
-    const clipboardText = event.clipboardData.getData('text/plain')
+    const clipboardText = event.clipboardData?.getData('text/plain') as string | undefined
+    if (clipboardText === undefined) {
+      return
+    }
 
     onPaste({
       clipboardText,
@@ -1384,7 +1400,7 @@
   }
 
   // TODO: this function is duplicated from TreeMode. See if we can reuse the code instead
-  function handleReplaceJson(updatedJson: JSONValue, afterPatch?: AfterPatchCallback) {
+  function handleReplaceJson(updatedJson: unknown, afterPatch?: AfterPatchCallback) {
     const previousState = documentState
     const previousJson = json
     const previousText = text
@@ -1541,8 +1557,8 @@
         if (onTransform) {
           onTransform({
             operations,
-            json: json as JSONValue,
-            transformedJson: immutableJSONPatch(json as JSONValue, operations)
+            json: json,
+            transformedJson: immutableJSONPatch(json, operations)
           })
         } else {
           debug('onTransform', rootPath, operations)
@@ -1568,7 +1584,7 @@
     // open a popup where you can edit the nested object/array
     onJSONEditorModal({
       content: {
-        json: getIn(json as JSONValue, path) as JSONValue
+        json: getIn(json, path)
       },
       path,
       onPatch: context.onPatch,
@@ -1640,12 +1656,15 @@
 
     debug('undo', { item, json })
 
-    const patchResult = {
-      json,
-      previousJson: previousContent.json,
-      redo: item.undo.patch,
-      undo: item.redo.patch
-    }
+    const patchResult =
+      item.undo.patch && item.redo.patch
+        ? {
+            json,
+            previousJson: previousContent.json,
+            redo: item.undo.patch,
+            undo: item.redo.patch
+          }
+        : null
 
     emitOnChange(previousContent, patchResult)
 
@@ -1679,12 +1698,15 @@
 
     debug('redo', { item, json })
 
-    const patchResult = {
-      json,
-      previousJson: previousContent.json,
-      redo: item.redo.patch,
-      undo: item.undo.patch
-    }
+    const patchResult =
+      item.undo.patch && item.redo.patch
+        ? {
+            json,
+            previousJson: previousContent.json,
+            redo: item.redo.patch,
+            undo: item.undo.patch
+          }
+        : null
 
     emitOnChange(previousContent, patchResult)
 
@@ -1745,17 +1767,20 @@
         use:resizeObserver={handleResizeContents}
         on:scroll={handleScroll}
       >
-        <table class="jse-table-main" cellpadding="0" cellspacing="0">
+        <table class="jse-table-main">
           <tbody>
             <tr class="jse-table-row jse-table-row-header">
               <th class="jse-table-cell jse-table-cell-header">
                 {#if !isEmpty(groupedValidationErrors?.root)}
-                  <div class="jse-table-root-error">
-                    <ValidationErrorIcon
-                      validationError={mergeValidationErrors([], groupedValidationErrors?.root)}
-                      onExpand={noop}
-                    />
-                  </div>
+                  {@const validationError = mergeValidationErrors(
+                    [],
+                    groupedValidationErrors?.root
+                  )}
+                  {#if validationError}
+                    <div class="jse-table-root-error">
+                      <ValidationErrorIcon {validationError} onExpand={noop} />
+                    </div>
+                  {/if}
                 {/if}
               </th>
               {#each columns as column}
@@ -1784,6 +1809,10 @@
             {#each visibleSection.visibleItems as item, visibleIndex}
               {@const rowIndex = visibleSection.startIndex + visibleIndex}
               {@const validationErrorsByRow = groupedValidationErrors.rows[rowIndex]}
+              {@const validationError = mergeValidationErrors(
+                [String(rowIndex)],
+                validationErrorsByRow?.row
+              )}
               <tr class="jse-table-row">
                 {#key rowIndex}
                   <th
@@ -1791,14 +1820,8 @@
                     use:resizeObserver={(element) => handleResizeRow(element, rowIndex)}
                   >
                     {rowIndex}
-                    {#if !isEmpty(validationErrorsByRow?.row)}
-                      <ValidationErrorIcon
-                        validationError={mergeValidationErrors(
-                          [String(rowIndex)],
-                          validationErrorsByRow.row
-                        )}
-                        onExpand={noop}
-                      />
+                    {#if validationError}
+                      <ValidationErrorIcon {validationError} onExpand={noop} />
                     {/if}
                   </th>
                 {/key}
@@ -1809,6 +1832,7 @@
                     isValueSelection(documentState.selection) &&
                     pathStartsWith(documentState.selection.path, path)}
                   {@const validationErrorsByColumn = validationErrorsByRow?.columns[columnIndex]}
+                  {@const validationError = mergeValidationErrors(path, validationErrorsByColumn)}
                   <td
                     class="jse-table-cell"
                     data-path={encodeDataPath(path)}
@@ -1838,11 +1862,8 @@
                       <div class="jse-context-menu-anchor">
                         <ContextMenuPointer selected={true} onContextMenu={openContextMenu} />
                       </div>
-                    {/if}{#if !isEmpty(validationErrorsByColumn)}
-                      <ValidationErrorIcon
-                        validationError={mergeValidationErrors(path, validationErrorsByColumn)}
-                        onExpand={noop}
-                      />
+                    {/if}{#if validationError}
+                      <ValidationErrorIcon {validationError} onExpand={noop} />
                     {/if}
                   </td>
                 {/each}

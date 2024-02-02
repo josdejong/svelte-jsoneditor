@@ -43,8 +43,7 @@
     highlightSpecialChars,
     keymap,
     lineNumbers,
-    rectangularSelection,
-    ViewUpdate
+    rectangularSelection
   } from '@codemirror/view'
   import {
     defaultKeymap,
@@ -97,7 +96,7 @@
     OnChangeMode,
     OnError,
     OnFocus,
-    OnRenderMenuWithoutContext,
+    OnRenderMenuInternal,
     OnSelect,
     OnSortModal,
     OnTransformModal,
@@ -135,7 +134,7 @@
   export let onError: OnError
   export let onFocus: OnFocus
   export let onBlur: OnBlur
-  export let onRenderMenu: OnRenderMenuWithoutContext
+  export let onRenderMenu: OnRenderMenuInternal
   export let onSortModal: OnSortModal
   export let onTransformModal: OnTransformModal
 
@@ -257,7 +256,7 @@
     const updatedJson = immutableJSONPatch(previousJson, operations)
     const undo = revertJSONPatch(previousJson, operations)
     setCodeMirrorContent({
-      text: parser.stringify(updatedJson, null, indentation)
+      text: parser.stringify(updatedJson, null, indentation) as string
     })
 
     return {
@@ -278,13 +277,13 @@
     try {
       const json = parser.parse(text)
       setCodeMirrorContent({
-        text: parser.stringify(json, null, indentation)
+        text: parser.stringify(json, null, indentation) as string
       })
       askToFormat = true
 
       return true
     } catch (err) {
-      onError(err)
+      onError(err as Error)
     }
 
     return false
@@ -300,13 +299,13 @@
     try {
       const json = parser.parse(text)
       setCodeMirrorContent({
-        text: parser.stringify(json)
+        text: parser.stringify(json) as string
       })
       askToFormat = false
 
       return true
     } catch (err) {
-      onError(err)
+      onError(err as Error)
     }
 
     return false
@@ -326,7 +325,7 @@
       jsonStatus = JSON_STATUS_VALID
       jsonParseError = null
     } catch (err) {
-      onError(err)
+      onError(err as Error)
     }
   }
 
@@ -354,7 +353,7 @@
         }
       })
     } catch (err) {
-      onError(err)
+      onError(err as Error)
     }
   }
 
@@ -397,7 +396,7 @@
         }
       })
     } catch (err) {
-      onError(err)
+      onError(err as Error)
     }
   }
 
@@ -461,12 +460,15 @@
   function handleSelectValidationError(validationError: ValidationError) {
     debug('select validation error', validationError)
 
-    const richValidationError = toRichValidationError(validationError)
+    const { from, to } = toRichValidationError(validationError)
+    if (from === null || to === null) {
+      return
+    }
 
     // we take "to" as head, not as anchor, because the scrollIntoView will
     // move to the head, and when a large whole object is selected as a whole,
     // we want to scroll to the start of the object and not the end
-    setSelection(richValidationError.from, richValidationError.to)
+    setSelection(from, to)
 
     focus()
   }
@@ -578,7 +580,7 @@
         EditorView.domEventHandlers({
           dblclick: handleDoubleClick
         }),
-        EditorView.updateListener.of((update: ViewUpdate) => {
+        EditorView.updateListener.of((update) => {
           editorState = update.state
 
           if (update.docChanged) {
@@ -673,14 +675,15 @@
     const newText = getText(newContent, indentation, parser)
     const isChanged = newText !== getText(content, indentation, parser)
     const previousContent = content
-    content = newContent
-    text = newText
 
     debug('setCodeMirrorContent', { isChanged, forceUpdate })
 
     if (!codeMirrorView || (!isChanged && !forceUpdate)) {
       return
     }
+
+    content = newContent
+    text = newText
 
     if (!disableTextEditor(text, acceptTooLarge)) {
       // keep state
@@ -765,7 +768,13 @@
 
     updateCanUndoRedo()
     emitOnChange(content, previousContent)
-    emitOnSelect()
+
+    // We emit OnSelect on the next tick to cater for the case where
+    // the user changes the content directly inside the OnChange callback.
+    // This change will be dispatched by Svelte on the next tick. Before
+    // that tick, emitOnSelect would be fired based on the "old" contents,
+    // which may be out of range when the replacement by the user is shorter.
+    tick().then(emitOnSelect)
   }
 
   function updateLinter(validator: Validator | null) {

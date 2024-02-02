@@ -17,13 +17,13 @@ import {
   toTableCellPosition
 } from './table.js'
 import { deepStrictEqual } from 'assert'
-import type { JSONArray, JSONPath, JSONValue } from 'immutable-json-patch'
+import type { JSONPath } from 'immutable-json-patch'
 import { createValueSelection } from './selection.js'
 import type { SortedColumn, ValidationError } from '$lib/types.js'
 import { SortDirection, ValidationSeverity } from '$lib/types.js'
 
 describe('table', () => {
-  const json: JSONValue = [
+  const json: unknown[] = [
     { name: 'Joe', address: { city: 'New York', street: 'Main street' }, scores: [1, 2, 3] },
     {
       name: 'Sarah',
@@ -58,13 +58,13 @@ describe('table', () => {
   })
 
   test('should extract table columns from non-homogeneous data', () => {
-    const data: JSONArray = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5, name: 'Sarah' }]
+    const data = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5, name: 'Sarah' }]
 
     expect(getColumns(data, true, 2)).toEqual([['id'], ['name']])
   })
 
   test('should extract table columns from conflicting data structures', () => {
-    const data: JSONArray = [{ item: 1 }, { item: { id: 1, name: 'Sarah' } }]
+    const data = [{ item: 1 }, { item: { id: 1, name: 'Sarah' } }]
 
     expect(getColumns(data, true)).toEqual([['item'], ['item', 'id'], ['item', 'name']])
   })
@@ -82,7 +82,7 @@ describe('table', () => {
   })
 
   test('should return an empty array on non-array input', () => {
-    deepStrictEqual(getColumns({} as JSONArray, false), [])
+    deepStrictEqual(getColumns({} as unknown[], false), [])
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore

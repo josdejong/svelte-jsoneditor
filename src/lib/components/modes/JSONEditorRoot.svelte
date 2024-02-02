@@ -2,6 +2,7 @@
   import type {
     Content,
     ContentErrors,
+    ContextMenuItem,
     JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
@@ -16,8 +17,10 @@
     OnExpand,
     OnFocus,
     OnJSONEditorModal,
+    OnRenderContextMenu,
+    OnRenderContextMenuInternal,
     OnRenderMenu,
-    OnRenderMenuWithoutContext,
+    OnRenderMenuInternal,
     OnRenderValue,
     OnSelect,
     OnSortModal,
@@ -59,6 +62,7 @@
   export let onRenderValue: OnRenderValue
   export let onClassName: OnClassName
   export let onRenderMenu: OnRenderMenu
+  export let onRenderContextMenu: OnRenderContextMenu
   export let onError: OnError
   export let onFocus: OnFocus
   export let onBlur: OnBlur
@@ -102,13 +106,18 @@
     type: 'separator'
   }
 
-  let handleRenderMenu: OnRenderMenuWithoutContext
+  let handleRenderMenu: OnRenderMenuInternal
   $: handleRenderMenu = (items: MenuItem[]) => {
     const updatedItems = isMenuSpace(items[0])
       ? modeMenuItems.concat(items) // menu is empty, readOnly mode
       : modeMenuItems.concat(separatorMenuItem, items)
 
     return onRenderMenu(updatedItems, { mode, modal: insideModal }) || updatedItems
+  }
+
+  let handleRenderContextMenu: OnRenderContextMenuInternal
+  $: handleRenderContextMenu = (items: ContextMenuItem[]) => {
+    return onRenderContextMenu(items, { mode, modal: insideModal, selection }) || items
   }
 
   export function patch(operations: JSONPatchDocument): JSONPatchResult {
@@ -230,7 +239,7 @@
   }
 </script>
 
-{#if mode === Mode.text || mode === 'code'}
+{#if mode === Mode.text || String(mode) === 'code'}
   <TextMode
     bind:this={refTextMode}
     externalContent={content}
@@ -277,6 +286,7 @@
     {onFocus}
     {onBlur}
     onRenderMenu={handleRenderMenu}
+    onRenderContextMenu={handleRenderContextMenu}
     {onSortModal}
     {onTransformModal}
     {onJSONEditorModal}
@@ -307,6 +317,7 @@
     {onFocus}
     {onBlur}
     onRenderMenu={handleRenderMenu}
+    onRenderContextMenu={handleRenderContextMenu}
     {onSortModal}
     {onTransformModal}
     {onJSONEditorModal}

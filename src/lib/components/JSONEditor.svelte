@@ -55,9 +55,9 @@
   import JSONEditorRoot from './modes/JSONEditorRoot.svelte'
   import JSONEditorModal from './modals/JSONEditorModal.svelte'
   import memoizeOne from 'memoize-one'
-  import type { Callbacks, Component } from 'svelte-simple-modal/types/Modal.svelte'
   import ModalRef from '../components/modals/ModalRef.svelte'
-  import type { Open } from 'svelte-simple-modal/types/Modal.svelte.js'
+  import type { Open, Callbacks, Component } from 'svelte-simple-modal'
+  import type { OnRenderContextMenu } from '$lib/types.js'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:JSONEditor')
@@ -94,6 +94,7 @@
   export let onRenderValue: OnRenderValue = renderValue
   export let onClassName: OnClassName = () => undefined
   export let onRenderMenu: OnRenderMenu = noop
+  export let onRenderContextMenu: OnRenderContextMenu = noop
   export let onChangeMode: OnChangeMode = noop
   export let onError: OnError = (err) => {
     console.error(err)
@@ -135,8 +136,9 @@
       debug('parser changed, recreate editor')
 
       if (isJSONContent(content)) {
+        const text = previousParser.stringify(content.json)
         content = {
-          json: parser.parse(previousParser.stringify(content.json))
+          json: text !== undefined ? parser.parse(text) : undefined
         }
       }
 
@@ -174,8 +176,6 @@
     instanceId = uniqueId()
 
     content = cloneWhenMutable(newContent)
-
-    await tick() // await rerender
   }
 
   export async function update(updatedContent: Content): Promise<void> {
@@ -363,6 +363,8 @@
         queryLanguageId,
         onChangeQueryLanguage: handleChangeQueryLanguage,
         onRenderValue,
+        onRenderMenu,
+        onRenderContextMenu,
         onClassName,
         onTransform
       },
@@ -422,6 +424,7 @@
         onRenderValue,
         onClassName,
         onRenderMenu,
+        onRenderContextMenu,
         onSortModal,
         onTransformModal
       }),
@@ -438,6 +441,8 @@
 
   $: {
     debug('mode changed to', mode)
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     if (mode === 'code') {
       // check for 'code' is here for backward compatibility (deprecated since v0.4.0)
       console.warn(
@@ -488,6 +493,7 @@
             onFocus={handleFocus}
             onBlur={handleBlur}
             {onRenderMenu}
+            {onRenderContextMenu}
             {onSortModal}
             {onTransformModal}
             {onJSONEditorModal}

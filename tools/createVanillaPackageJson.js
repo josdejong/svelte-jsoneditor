@@ -1,39 +1,16 @@
 // create package.json and copy files like LICENSE.md to package-vanilla
 
 import path from 'path'
-import assert from 'assert'
 import { readFileSync, writeFileSync } from 'fs'
 import { getAbsolutePath } from './utils/getAbsolutePath.mjs'
-import { generateExports } from './utils/generateExports.mjs'
+import { getVanillaDependencies } from './getExternalDependencies.js'
 
 const vanillaPackageFolder = getAbsolutePath(import.meta.url, '..', 'package-vanilla')
 
-const exports = generateExports(vanillaPackageFolder)
-
 const pkg = JSON.parse(String(readFileSync(getAbsolutePath(import.meta.url, '..', 'package.json'))))
-const typesPath = getAbsolutePath(import.meta.url, '..', 'package-vanilla', 'index.d.ts')
-const types = String(readFileSync(typesPath))
 
-// scan the index.d.ts bundle file for all occurrences of "import { ...} from '...'" and extract the name
-const usedDependencyNames = uniq(
-  Array.from(types.matchAll(/(import|export) .+ from '(.+)'/g))
-    .map((match) => match[2])
-    .sort()
-)
-const expectedDependencyNames = [
-  '@fortawesome/free-solid-svg-icons',
-  'ajv',
-  'immutable-json-patch',
-  'svelte'
-]
-
-// We do not want to get surprises
-assert.deepStrictEqual(
-  usedDependencyNames,
-  expectedDependencyNames,
-  `Used dependencies found in "${typesPath}" does not equal the expected dependencies. ` +
-    'Please update the list in createVanillaPackageJson.js manually.'
-)
+// We add svelte here: this is needed to export the TypeScript types
+const usedDependencyNames = [...getVanillaDependencies(), 'svelte']
 
 const usedDependencies = usedDependencyNames.reduce((deps, name) => {
   deps[name] = pkg.dependencies[name]
@@ -47,12 +24,14 @@ const vanillaPackage = {
   dependencies: usedDependencies, // needed for the TypeScript types
   devDependencies: {},
   svelte: undefined,
+  browser: './standalone.js',
   exports: {
-    ...exports,
-    '.': {
-      types: './index.d.ts',
-      module: './index.js'
-    }
+    ...pkg.exports,
+    '.': './index.js', // we don't create an object here, see https://github.com/josdejong/svelte-jsoneditor/issues/334
+    './index.js.map': './index.js.map',
+    './standalone.js': './standalone.js',
+    './standalone.js.map': './standalone.js.map',
+    './standalone.d.ts': './standalone.d.ts'
   }
 }
 
@@ -60,7 +39,3 @@ writeFileSync(
   path.join(vanillaPackageFolder, 'package.json'),
   JSON.stringify(vanillaPackage, null, 2)
 )
-
-function uniq(array) {
-  return [...new Set(array)]
-}

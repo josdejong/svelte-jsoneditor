@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONPath, JSONValue } from 'immutable-json-patch'
+  import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils.js'
   import { createValueSelection, getFocusPath } from '$lib/logic/selection.js'
@@ -20,7 +20,7 @@
   import { isEqual } from 'lodash-es'
 
   export let path: JSONPath
-  export let value: JSONValue
+  export let value: unknown
   export let parser: JSONParser
   export let normalization: ValueNormalization
   export let enforceString: boolean
@@ -31,7 +31,7 @@
   export let focus: () => void
   export let findNextInside: FindNextInside
 
-  function convert(value: string): JSONValue {
+  function convert(value: string): unknown {
     return enforceString ? value : stringConvert(value, parser)
   }
 
@@ -80,7 +80,7 @@
       if (isObjectOrArray(pastedJson)) {
         onPasteJson({
           path,
-          contents: pastedJson as JSONValue
+          contents: pastedJson
         })
       }
     } catch (err) {

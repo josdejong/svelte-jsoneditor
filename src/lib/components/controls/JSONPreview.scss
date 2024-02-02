@@ -2,13 +2,15 @@
 
 .jse-json-preview {
   flex: 1;
-  color: var(--jse-panel-color-readonly);
+  font-family: $font-family-mono;
+  font-size: $font-size-mono;
+  color: $panel-color-readonly;
   overflow: auto;
   white-space: pre-wrap;
   padding: 2px;
 
   // TODO: JSONPreview shouldn't add borders I think
-  border-left: var(--jse-main-border);
-  border-right: var(--jse-main-border);
-  border-bottom: var(--jse-main-border);
+  border-left: $main-border;
+  border-right: $main-border;
+  border-bottom: $main-border;
 }

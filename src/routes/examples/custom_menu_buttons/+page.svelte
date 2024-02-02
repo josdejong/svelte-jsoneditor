@@ -1,7 +1,14 @@
-<script>
-  import { JSONEditor } from 'svelte-jsoneditor'
+<script lang="ts">
+  import {
+    JSONEditor,
+    type MenuButton,
+    type MenuItem,
+    type MenuSeparator,
+    type MenuSpace,
+    type RenderMenuContext
+  } from 'svelte-jsoneditor'
   import { faCopy } from '@fortawesome/free-regular-svg-icons'
-  import copyToClipboard from '$lib/utils/copyToClipboard.ts'
+  import copyToClipboard from '$lib/utils/copyToClipboard.js'
 
   let content = {
     text: undefined, // can be used to pass a stringified JSON document instead
@@ -25,22 +32,23 @@
     await copyToClipboard(contents)
   }
 
-  function handleRenderMenu(items, context) {
+  function handleRenderMenu(items: MenuItem[], context: RenderMenuContext): MenuItem[] | undefined {
     console.log('handleRenderMenu', { items, context })
 
-    const separator = {
-      separator: true
+    const separator: MenuSeparator = {
+      type: 'separator'
     }
 
-    const customCopyButton = {
+    const customCopyButton: MenuButton = {
+      type: 'button',
       onClick: handleCopy,
       icon: faCopy,
       title: 'Copy document to clipboard',
       className: 'custom-copy-button'
     }
 
-    const space = {
-      space: true
+    const space: MenuSpace = {
+      type: 'space'
     }
 
     const itemsWithoutSpace = items.slice(0, items.length - 2)

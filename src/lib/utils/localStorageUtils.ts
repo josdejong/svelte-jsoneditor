@@ -1,14 +1,13 @@
 import { writable } from 'svelte/store'
-import type { JSONValue } from 'immutable-json-patch'
 
-export function useLocalStorage(key: string, defaultValue: JSONValue) {
+export function useLocalStorage(key: string, defaultValue: unknown) {
   const initialValue = loadFromLocalStorage(key, defaultValue)
   const store = writable(initialValue)
   store.subscribe((value) => saveToLocalStorage(key, value))
   return store
 }
 
-function loadFromLocalStorage(key: string, defaultValue: JSONValue) {
+function loadFromLocalStorage(key: string, defaultValue: unknown) {
   if (typeof localStorage === 'undefined') {
     return defaultValue
   }
@@ -22,7 +21,7 @@ function loadFromLocalStorage(key: string, defaultValue: JSONValue) {
   }
 }
 
-function saveToLocalStorage(key: string, value: JSONValue) {
+function saveToLocalStorage(key: string, value: unknown) {
   if (typeof localStorage === 'undefined') {
     return
   }

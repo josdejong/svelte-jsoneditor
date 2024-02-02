@@ -3,12 +3,21 @@
 .jse-modal {
   // styling for the select box, svelte-select
   // see docs: https://github.com/rob-balfre/svelte-select#css-custom-properties-variables
-  --height: 36px;
-  --multi-item-height: 28px;
-  --multi-item-margin: 2px;
-  --multi-item-padding: 2px 8px;
-  --multi-item-border-radius: 6px;
-  --indicator-top: 8px;
+  :global(.svelte-select) {
+    --border: #{$svelte-select-border};
+    --item-is-active-bg: #{$svelte-select-item-is-active-bg};
+    --border-radius: #{$svelte-select-border-radius};
+    --background: #{$svelte-select-background};
+    --padding: #{$svelte-select-padding};
+    --multi-select-padding: #{$svelte-select-multi-select-padding};
+    --font-size: #{$svelte-select-font-size};
+    --height: 36px;
+    --multi-item-height: 28px;
+    --multi-item-margin: 2px;
+    --multi-item-padding: 2px 8px;
+    --multi-item-border-radius: 6px;
+    --indicator-top: 8px;
+  }
 
   @include jse-modal-style;
 
@@ -43,7 +52,7 @@
   height: 100%;
   top: 0;
   left: 0;
-  background: var(--jse-modal-overlay-background);
+  background: $modal-overlay-background;
 }
 
 :global(.bg.jse-modal-bg .jse-modal-window-wrap) {

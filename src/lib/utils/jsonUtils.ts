@@ -1,4 +1,4 @@
-import type { JSONObject, JSONPath, JSONValue } from 'immutable-json-patch'
+import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer } from 'immutable-json-patch'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -15,13 +15,12 @@ import type {
   TextLocation
 } from '../types'
 import { int } from './numberUtils.js'
-import type { JavaScriptValue } from 'lossless-json'
 
 /**
  * Parse the JSON. if this fails, try to repair and parse.
  * Throws an exception when the JSON is invalid and could not be parsed.
  */
-export function parseAndRepair(jsonText: string, parser: JSONParser): JavaScriptValue {
+export function parseAndRepair(jsonText: string, parser: JSONParser): unknown {
   try {
     return parser.parse(jsonText)
   } catch (err) {
@@ -37,7 +36,7 @@ export function parseAndRepair(jsonText: string, parser: JSONParser): JavaScript
 export function parseAndRepairOrUndefined(
   partialJson: string,
   parser: JSONParser
-): JavaScriptValue | undefined {
+): unknown | undefined {
   try {
     return parseAndRepair(partialJson, parser)
   } catch (err) {
@@ -46,10 +45,7 @@ export function parseAndRepairOrUndefined(
 }
 
 // TODO: deduplicate the logic in repairPartialJson and parseAndRepairPartialJson ?
-export function parsePartialJson(
-  partialJson: string,
-  parse: (text: string) => JavaScriptValue
-): JavaScriptValue {
+export function parsePartialJson(partialJson: string, parse: (text: string) => unknown): unknown {
   // for now: dumb brute force approach: simply try out a few things...
 
   // remove trailing comma
@@ -204,7 +200,7 @@ export function countCharacterOccurrences(
  * Find the text location of a JSON path
  */
 // TODO: write unit tests
-export function findTextLocation(text: string, path: JSONPath): TextLocation | null {
+export function findTextLocation(text: string, path: JSONPath): TextLocation {
   try {
     const jsmap = jsonSourceMap.parse(text)
 
@@ -212,7 +208,7 @@ export function findTextLocation(text: string, path: JSONPath): TextLocation | n
     const pointer = jsmap.pointers[pointerName]
     if (pointer) {
       return {
-        path: path,
+        path,
         line: pointer.key ? pointer.key.line : pointer.value ? pointer.value.line : 0,
         column: pointer.key ? pointer.key.column : pointer.value ? pointer.value.column : 0,
         from: pointer.key ? pointer.key.pos : pointer.value ? pointer.value.pos : 0,
@@ -223,7 +219,13 @@ export function findTextLocation(text: string, path: JSONPath): TextLocation | n
     console.error(err)
   }
 
-  return null
+  return {
+    path,
+    line: 0,
+    column: 0,
+    from: 0,
+    to: 0
+  }
 }
 
 /**
@@ -231,10 +233,10 @@ export function findTextLocation(text: string, path: JSONPath): TextLocation | n
  * If it cannot be converted, an error is thrown
  */
 export function convertValue(
-  value: JSONValue,
+  value: unknown,
   type: 'value' | 'object' | 'array',
   parser: JSONParser
-): JSONValue {
+): unknown {
   // FIXME: improve the TypeScript here, there are a couple of conversions
   if (type === 'array') {
     if (Array.isArray(value)) {
@@ -284,7 +286,7 @@ export function convertValue(
         const parsedValue = parser.parse(value)
 
         if (isObject(parsedValue)) {
-          return parsedValue as JSONObject
+          return parsedValue
         }
 
         if (Array.isArray(parsedValue)) {
@@ -359,10 +361,10 @@ export function isTextContent(content: unknown): content is TextContent {
 }
 
 /**
- * Check whether content contains text (and not JSON)
+ * Check whether content contains json
  */
 export function isJSONContent(content: unknown): content is JSONContent {
-  return isObject(content) && typeof content.json !== 'undefined' && !isTextContent(content)
+  return isObject(content) && typeof content.json !== 'undefined'
 }
 
 /**
@@ -375,7 +377,7 @@ export function toTextContent(
 ): TextContent {
   return isTextContent(content)
     ? content
-    : { text: parser.stringify(content.json, null, indentation) }
+    : { text: parser.stringify(content.json, null, indentation) as string }
 }
 
 /**
@@ -420,7 +422,7 @@ export function estimateSerializedSize(content: Content, maxSize = Infinity): nu
 
   let estimatedSize = 0
 
-  function recurse(json: JSONValue) {
+  function recurse(json: unknown) {
     if (Array.isArray(json)) {
       // open and close bracket, commas between items
       estimatedSize += 2 + (json.length - 1)

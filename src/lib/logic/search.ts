@@ -1,10 +1,8 @@
 import type {
-  JSONObject,
   JSONPatchDocument,
   JSONPatchOperation,
   JSONPath,
-  JSONPointer,
-  JSONValue
+  JSONPointer
 } from 'immutable-json-patch'
 import { compileJSONPointer, getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
 import { forEachRight, groupBy, initial, isEqual, last } from 'lodash-es'
@@ -26,7 +24,7 @@ import { SearchField } from '$lib/types.js'
 // TODO: comment
 // TODO: unit test
 export function updateSearchResult(
-  json: JSONValue,
+  json: unknown,
   newResultItems: SearchResultItem[],
   previousResult: SearchResult | undefined
 ): SearchResult {
@@ -42,11 +40,11 @@ export function updateSearchResult(
     matchingActiveIndex !== -1
       ? matchingActiveIndex
       : previousResult?.activeIndex !== undefined &&
-        previousResult?.activeIndex < newResultItems.length
-      ? previousResult?.activeIndex
-      : newResultItems.length > 0
-      ? 0
-      : -1
+          previousResult?.activeIndex < newResultItems.length
+        ? previousResult?.activeIndex
+        : newResultItems.length > 0
+          ? 0
+          : -1
 
   const items: ExtendedSearchResultItem[] = newResultItems.map((item, index) => {
     return { ...item, active: index === activeIndex }
@@ -68,8 +66,8 @@ export function searchNext(searchResult: SearchResult): SearchResult {
     searchResult.activeIndex < searchResult.items.length - 1
       ? searchResult.activeIndex + 1
       : searchResult.items.length > 0
-      ? 0
-      : -1
+        ? 0
+        : -1
 
   const nextActiveItem = searchResult.items[nextActiveIndex]
 
@@ -109,7 +107,7 @@ export function searchPrevious(searchResult: SearchResult): SearchResult {
 // TODO: comment
 export function search(
   searchText: string,
-  json: JSONValue,
+  json: unknown,
   maxResults = Infinity
 ): SearchResultItem[] {
   const results: SearchResultItem[] = []
@@ -121,7 +119,7 @@ export function search(
     }
   }
 
-  function searchRecursive(searchTextLowerCase: string, value: JSONValue) {
+  function searchRecursive(searchTextLowerCase: string, value: unknown) {
     if (isJSONArray(value)) {
       const level = path.length
       path.push('0')
@@ -236,7 +234,7 @@ export function replaceAllText(
 }
 
 export function createSearchAndReplaceOperations(
-  json: JSONValue,
+  json: unknown,
   documentState: DocumentState,
   replacementText: string,
   searchResultItem: SearchResultItem,
@@ -249,7 +247,7 @@ export function createSearchAndReplaceOperations(
     const parentPath = initial(path)
     const parent = getIn(json, parentPath)
     const oldKey = last(path) as string
-    const keys = Object.keys(parent as JSONObject)
+    const keys = Object.keys(parent as Record<string, unknown>)
     const newKey = replaceText(oldKey, replacementText, start, end)
 
     const operations = rename(parentPath, keys, oldKey, newKey)
@@ -261,7 +259,7 @@ export function createSearchAndReplaceOperations(
     }
   } else if (field === SearchField.value) {
     // replace a value
-    const currentValue = getIn(json, path)
+    const currentValue: unknown | undefined = getIn(json, path)
     if (currentValue === undefined) {
       throw new Error(`Cannot replace: path not found ${compileJSONPointer(path)}`)
     }
@@ -281,7 +279,7 @@ export function createSearchAndReplaceOperations(
       {
         op: 'replace',
         path: compileJSONPointer(path),
-        value: enforceString ? value : (stringConvert(value, parser) as JSONValue)
+        value: enforceString ? value : stringConvert(value, parser)
       }
     ]
 
@@ -297,7 +295,7 @@ export function createSearchAndReplaceOperations(
 }
 
 export function createSearchAndReplaceAllOperations(
-  json: JSONValue,
+  json: unknown,
   documentState: DocumentState,
   searchText: string,
   replacementText: string,
@@ -358,7 +356,7 @@ export function createSearchAndReplaceAllOperations(
       const parentPath = initial(path)
       const parent = getIn(json, parentPath)
       const oldKey = last(path) as string
-      const keys = Object.keys(parent as JSONObject)
+      const keys = Object.keys(parent as Record<string, unknown>)
       const newKey = replaceAllText(oldKey, replacementText, items)
 
       const operations = rename(parentPath, keys, oldKey, newKey)
@@ -367,7 +365,7 @@ export function createSearchAndReplaceAllOperations(
       lastNewSelection = createSelectionFromOperations(json, operations)
     } else if (field === SearchField.value) {
       // replace a value
-      const currentValue = getIn(json, path)
+      const currentValue: unknown | undefined = getIn(json, path)
       if (currentValue === undefined) {
         throw new Error(`Cannot replace: path not found ${compileJSONPointer(path)}`)
       }
@@ -388,7 +386,7 @@ export function createSearchAndReplaceAllOperations(
         {
           op: 'replace',
           path: compileJSONPointer(path),
-          value: enforceString ? value : (stringConvert(value, parser) as JSONValue)
+          value: enforceString ? value : stringConvert(value, parser)
         }
       ]
       allOperations = allOperations.concat(operations)

@@ -53,7 +53,7 @@
     } catch (error) {
       return {
         path: undefined,
-        error
+        error: error as Error
       }
     }
   }
@@ -64,7 +64,7 @@
     }
   }
 
-  function handleInput(event) {
+  function handleInput(event: Event & { currentTarget: EventTarget & HTMLInputElement }) {
     inputPath = event.currentTarget.value
   }
 
@@ -81,7 +81,7 @@
       if (result.path !== undefined) {
         onChange(result.path)
       } else {
-        onError(result.error)
+        onError(result.error as Error)
       }
     }
   }
@@ -89,7 +89,7 @@
   function handleCopy() {
     copyToClipBoard(inputPath)
     copied = true
-    copiedTimer = setTimeout(() => (copied = false), copiedDelay)
+    copiedTimer = window.setTimeout(() => (copied = false), copiedDelay)
     focus()
   }
 </script>
@@ -108,7 +108,7 @@
       type="button"
       class="jse-navigation-bar-validation-error"
       use:tooltip={{
-        text: inputValidationError,
+        text: String(inputValidationError || ''),
         ...absolutePopupContext
       }}
     >

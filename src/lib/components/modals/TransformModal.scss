@@ -35,9 +35,9 @@
           }
 
           :global(code) {
-            background: var(--jse-modal-code-background);
-            font-family: var(--jse-font-family-mono);
-            font-size: var(--jse-font-size-mono);
+            background: $modal-code-background;
+            font-family: $font-family-mono;
+            font-size: $font-size-mono;
           }
         }
 
@@ -128,11 +128,11 @@
 
   :global(.jse-tree-mode) {
     flex: 1;
-    background: var(--jse-input-background-readonly);
+    background: $input-background-readonly;
     box-shadow: none;
     box-sizing: border-box;
 
-    --jse-main-border: var(--jse-input-border);
+    --jse-main-border: #{$input-border};
   }
 
   input,
@@ -142,17 +142,17 @@
 
   .jse-preview.jse-error {
     flex: 1;
-    background: var(--jse-input-background-readonly);
-    border: var(--jse-input-border);
-    color: var(--jse-error-color);
+    background: $input-background-readonly;
+    border: $input-border;
+    color: $error-color;
     padding: $padding-half;
   }
 
   :global(a) {
-    color: var(--jse-a-color);
+    color: $a-color;
   }
 
   :global(a:hover) {
-    color: var(--jse-a-color-highlight);
+    color: $a-color-highlight;
   }
 }

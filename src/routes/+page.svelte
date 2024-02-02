@@ -24,13 +24,16 @@
       <a href="examples/custom_menu_buttons">Custom menu buttons</a>
     </li>
     <li>
+      <a href="examples/custom_context_menu_buttons">Custom menu context buttons</a>
+    </li>
+    <li>
       <a href="examples/custom_validation">Custom validation</a>
     </li>
     <li>
       <a href="examples/custom_json_parser">Custom JSON Parser (Lossless JSON)</a>
     </li>
     <li>
-      <a href="examples/custom_value_renderer">Custom value renderer (password, enum)</a>
+      <a href="examples/custom_value_renderer">Custom value renderer (password, enum, action)</a>
     </li>
     <li>
       <a href="examples/json_schema_validation">JSON Schema validation</a>
