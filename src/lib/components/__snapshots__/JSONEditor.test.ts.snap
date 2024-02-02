@@ -137,7 +137,6 @@ exports[`JSONEditor > render table mode 1`] = `
           
           <button
             class="jse-button jse-undo s-kJert7_5e4tU"
-            disabled=""
             title="Undo (Ctrl+Z)"
             type="button"
           >
@@ -1282,7 +1281,6 @@ exports[`JSONEditor > render tree mode 1`] = `
           
           <button
             class="jse-button jse-undo s-kJert7_5e4tU"
-            disabled=""
             title="Undo (Ctrl+Z)"
             type="button"
           >

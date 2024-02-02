@@ -253,7 +253,7 @@
     // no vertical scroll, the actual scrollTop changes to 0 but there is no on:scroll event
     // triggered, so the internal scrollTop variable is not up-to-date.
     // This is a workaround to update the scrollTop by triggering an on:scroll event
-    if (refContents) {
+    if (refContents?.scrollTo) {
       refContents.scrollTo({
         top: refContents.scrollTop,
         left: refContents.scrollLeft
