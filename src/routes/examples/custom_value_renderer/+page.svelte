@@ -1,13 +1,21 @@
-<script>
-  import { EnumValue, JSONEditor, renderValue } from 'svelte-jsoneditor'
+<script lang="ts">
+  import {
+    EnumValue,
+    JSONEditor,
+    renderValue,
+    type RenderValueComponentDescription,
+    type RenderValueProps
+  } from 'svelte-jsoneditor'
   import ReadonlyPassword from '../../components/ReadonlyPassword.svelte'
+  import { EvaluatorAction } from '../../components/EvaluatorAction'
 
   let content = {
     text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       username: 'John',
       password: 'secret...',
-      gender: 'male'
+      gender: 'male',
+      evaluate: '2 + 3'
     }
   }
 
@@ -18,7 +26,7 @@
     { value: 'other', text: 'Other' }
   ]
 
-  function onRenderValue(props) {
+  function onRenderValue(props: RenderValueProps): RenderValueComponentDescription[] {
     const { path, value, readOnly, parser, isEditing, selection, onSelect, onPatch } = props
 
     const key = props.path[props.path.length - 1]
@@ -53,24 +61,51 @@
       ]
     }
 
+    if (key === 'evaluate' && !isEditing) {
+      return [
+        {
+          action: EvaluatorAction,
+          props: {
+            value,
+            path,
+            readOnly,
+            onSelect
+          }
+        }
+      ]
+    }
+
     // fallback on the default render components
     return renderValue(props)
   }
 </script>
 
 <svelte:head>
-  <title>Custom value renderer (password, enum) | svelte-jsoneditor</title>
+  <title>Custom value renderer (password, enum, action) | svelte-jsoneditor</title>
 </svelte:head>
 
-<h1>Custom value renderer (password, enum)</h1>
+<h1>Custom value renderer (password, enum, action)</h1>
 
 <p>
-  Provide a custom <code>onRenderValue</code> method, which hides the value of all fields with the name
-  "password", and creates an enum for the fields with name "gender".
+  Provide a custom <code>onRenderValue</code> method, which demonstrates three things:
 </p>
-<p>
-  <i>EXPERIMENTAL! This API will most likely change in future versions.</i>
-</p>
+<ol>
+  <li>
+    It hides the value of all fields with the name "password" using a Svelte password component <code
+      >ReadonlyPassword</code
+    >
+  </li>
+  <li>
+    It creates an enum component for the fields with name "gender" using a Svelte component <code
+      >EnumValue</code
+    >.
+  </li>
+  <li>
+    The creates a custom component for the field named "evaluate" using a Svelte Action, which
+    evaluates the value as an expression containing an addition of two or more values. This solution
+    can be used when using svelte-jsoneditor in a Vanilla JS environment.
+  </li>
+</ol>
 
 <div class="editor">
   <JSONEditor bind:content {onRenderValue} />

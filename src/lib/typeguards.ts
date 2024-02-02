@@ -9,7 +9,9 @@ import type {
   MenuSeparator,
   MenuSpace,
   ValidationError,
-  NestedValidationError
+  NestedValidationError,
+  SvelteActionRenderer,
+  SvelteComponentRenderer
 } from './types.js'
 import { isObject } from '$lib/utils/typeUtils.js'
 
@@ -87,4 +89,12 @@ export function isValidationError(value: unknown): value is ValidationError {
 
 export function isNestedValidationError(value: unknown): value is NestedValidationError {
   return isObject(value) && isValidationError(value) && typeof value.isChildError === 'boolean'
+}
+
+export function isSvelteComponentRenderer(value: unknown): value is SvelteComponentRenderer {
+  return isObject(value) && 'component' in value && isObject(value.props)
+}
+
+export function isSvelteActionRenderer(value: unknown): value is SvelteActionRenderer {
+  return isObject(value) && typeof value.action === 'function' && isObject(value.props)
 }
