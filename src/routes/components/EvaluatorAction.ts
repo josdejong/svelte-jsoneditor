@@ -9,7 +9,7 @@ export interface EvaluatorProps {
   onSelect: OnSelect
 }
 
-export const Evaluator: Action<HTMLDivElement, EvaluatorProps> = (node, props) => {
+export const EvaluatorAction: Action<HTMLDivElement, EvaluatorProps> = (node, props) => {
   function evaluate(expr: string) {
     const result = expr
       .split('+')

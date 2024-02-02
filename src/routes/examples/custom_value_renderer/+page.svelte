@@ -1,7 +1,7 @@
 <script>
   import { EnumValue, JSONEditor, renderValue } from 'svelte-jsoneditor'
   import ReadonlyPassword from '../../components/ReadonlyPassword.svelte'
-  import { Evaluator } from '../../components/Evaluator.ts'
+  import { EvaluatorAction } from '../../components/EvaluatorAction.ts'
 
   let content = {
     text: undefined, // can be used to pass a stringified JSON document instead
@@ -58,7 +58,7 @@
     if (key === 'evaluate' && !isEditing) {
       return [
         {
-          action: Evaluator,
+          action: EvaluatorAction,
           props: {
             value,
             path,
@@ -75,20 +75,22 @@
 </script>
 
 <svelte:head>
-  <title>Custom value renderer (password, enum) | svelte-jsoneditor</title>
+  <title>Custom value renderer (password, enum, action) | svelte-jsoneditor</title>
 </svelte:head>
 
-<h1>Custom value renderer (password, enum)</h1>
+<h1>Custom value renderer (password, enum, action)</h1>
 
 <p>
-  Provide a custom <code>onRenderValue</code> method, which hides the value of all fields with the name
-  "password", and creates an enum for the fields with name "gender". The field named "evaluate" is rendered
-  using a vanilla JS component (action) which evaluates the value as an expression containing an addition
-  of two or more values.
+  Provide a custom <code>onRenderValue</code> method, which demonstrates three things:
 </p>
-<p>
-  <i>EXPERIMENTAL! This API will most likely change in future versions.</i>
-</p>
+<ol>
+  <li>It hides the value of all fields with the name "password" using a Svelte password component <code>ReadonlyPassword</code></li>
+  <li>It creates an enum component for the fields with name "gender" using a Svelte component <code>EnumValue</code>.</li>
+  <li>The creates a custom component for the field named "evaluate" using a Svelte Action,
+    which evaluates the value as an expression containing an addition of two or more values.
+    This solution can be used when using svelte-jsoneditor in a Vanilla JS environment.
+  </li>
+</ol>
 
 <div class="editor">
   <JSONEditor bind:content {onRenderValue} />
