@@ -31,6 +31,7 @@
   } from '$lib/types.js'
   import { onEscape } from '$lib/actions/onEscape.js'
   import type { Context } from 'svelte-simple-modal'
+  import { readonlyProxy } from '$lib/utils/readonlyProxy.js'
 
   const debug = createDebug('jsoneditor:TransformModal')
 
@@ -58,7 +59,7 @@
   export let onTransform: OnPatch
 
   let selectedJson: unknown | undefined
-  $: selectedJson = getIn(json, rootPath)
+  $: selectedJson = readonlyProxy(getIn(json, rootPath))
   let selectedContent: Content
   $: selectedContent = selectedJson ? { json: selectedJson } : { text: '' }
 
@@ -76,7 +77,10 @@
   let query =
     queryLanguageId === state.queryLanguageId && state.query
       ? state.query
-      : getSelectedQueryLanguage(queryLanguageId).createQuery(selectedJson, state.queryOptions || {})
+      : getSelectedQueryLanguage(queryLanguageId).createQuery(
+          selectedJson,
+          state.queryOptions || {}
+        )
   let isManual = state.isManual || false
 
   let previewError: string | undefined = undefined
