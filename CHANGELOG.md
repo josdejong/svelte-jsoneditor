@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.21.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.21.4...v0.21.5) (2024-02-05)
+
+
+### Features
+
+* implement support for vanilla JS components in `onRenderValue` using Svelte Action ([#398](https://github.com/josdejong/svelte-jsoneditor/issues/398)) ([db482ea](https://github.com/josdejong/svelte-jsoneditor/commit/db482eae3cfe3d902ee66ae1f094ae30d12f1e5b))
+
+
+### Bug Fixes
+
+* [#392](https://github.com/josdejong/svelte-jsoneditor/issues/392) property `onRenderContextMenu` missing in `JSONEditorPropsOptional` ([ee9b4c9](https://github.com/josdejong/svelte-jsoneditor/commit/ee9b4c9199c11f535b94eab145ccac4d83312afa))
+* [#401](https://github.com/josdejong/svelte-jsoneditor/issues/401) original data can be mutated by the TransformModal previews ([337f812](https://github.com/josdejong/svelte-jsoneditor/commit/337f81234b1f72bbd2ab5c89338689ddacdb825a))
+* consistently use selectedJson in the TransformModal ([ac31a79](https://github.com/josdejong/svelte-jsoneditor/commit/ac31a7980d77eae3c5ff3eef0d932f4b3362bdca))
+* use `flex-start` instead of `start` for `align-items` ([#395](https://github.com/josdejong/svelte-jsoneditor/issues/395)) ([b8be1a5](https://github.com/josdejong/svelte-jsoneditor/commit/b8be1a57f3a6e35673033e1fbb879997f5533e7c))
+
 ### [0.21.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.21.3...v0.21.4) (2024-01-24)
 
 
