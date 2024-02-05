@@ -76,7 +76,7 @@
   let query =
     queryLanguageId === state.queryLanguageId && state.query
       ? state.query
-      : getSelectedQueryLanguage(queryLanguageId).createQuery(json, state.queryOptions || {})
+      : getSelectedQueryLanguage(queryLanguageId).createQuery(selectedJson, state.queryOptions || {})
   let isManual = state.isManual || false
 
   let previewError: string | undefined = undefined
@@ -88,7 +88,7 @@
 
   function updateQueryByWizard(newQueryOptions: QueryLanguageOptions) {
     queryOptions = newQueryOptions
-    query = getSelectedQueryLanguage(queryLanguageId).createQuery(json, newQueryOptions)
+    query = getSelectedQueryLanguage(queryLanguageId).createQuery(selectedJson, newQueryOptions)
     isManual = false
 
     debug('updateQueryByWizard', { queryOptions, query, isManual })
@@ -100,8 +100,8 @@
     debug('handleChangeQuery', { query, isManual })
   }
 
-  function previewTransform(json: unknown | undefined, query: string) {
-    if (json === undefined) {
+  function previewTransform(previewJson: unknown | undefined, query: string) {
+    if (previewJson === undefined) {
       previewContent = { text: '' }
       previewError = 'Error: No JSON'
       return
@@ -113,7 +113,7 @@
       })
 
       const jsonTransformed = getSelectedQueryLanguage(queryLanguageId).executeQuery(
-        json,
+        previewJson,
         query,
         parser
       )
@@ -202,7 +202,7 @@
     onChangeQueryLanguage(newQueryLanguageId)
 
     const newSelectedQueryLanguage = getSelectedQueryLanguage(queryLanguageId)
-    query = newSelectedQueryLanguage.createQuery(json, queryOptions)
+    query = newSelectedQueryLanguage.createQuery(selectedJson, queryOptions)
     isManual = false
   }
 </script>
