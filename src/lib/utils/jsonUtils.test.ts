@@ -420,6 +420,11 @@ describe('jsonUtils', () => {
       expect(needsFormatting('{\n  "a": "some:message"\n}')).toBe(false)
       expect(needsFormatting('{\n  "a": "some,message"\n}')).toBe(false)
 
+      expect(needsFormatting('\n[1,2,3]')).toBe(true)
+      expect(needsFormatting('[1,2,3]\n')).toBe(true)
+      expect(needsFormatting('[1,2,3]\n  ')).toBe(true)
+      expect(needsFormatting('  \n[1,2,3]')).toBe(true)
+
       // a colon or comma inside a string gives a false positive (when the text doesn't contain a return character)
       expect(needsFormatting('{"a": "some:message"}')).toBe(true)
       expect(needsFormatting('{"a": "some,message"}')).toBe(true)

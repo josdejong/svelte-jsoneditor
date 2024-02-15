@@ -485,7 +485,7 @@ export function isEqualParser(a: JSONParser, b: JSONParser): boolean {
  */
 export function needsFormatting(jsonText: string): boolean {
   const maxLength = 999
-  const head = jsonText.substring(0, maxLength)
+  const head = jsonText.substring(0, maxLength).trim()
   return !head.includes('\n') && DELIMITER_WITHOUT_SPACING_REGEX.test(head)
 }
 
