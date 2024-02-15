@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.21.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.21.5...v0.21.6) (2024-02-15)
+
+
+### Features
+
+* upgrade `codemirror`, `jsonrepair`, `svelte`, `svelte-simple-modal`, and dev dependencies ([3255741](https://github.com/josdejong/svelte-jsoneditor/commit/32557411017739e9f92a1550d2b7a75113ca9692))
+
+
+### Bug Fixes
+
+* improve the logic to determine whether a JSON document needs formatting ([0ca8a49](https://github.com/josdejong/svelte-jsoneditor/commit/0ca8a493e42a3dbaa2d9560ba772dc12c9ef50ab))
+* type definition of `JSONEditorPropsOptional.flattenColumns` ([3a28757](https://github.com/josdejong/svelte-jsoneditor/commit/3a28757a08abc4b1805c1c22e3245fce696ef31c))
+* type definition of RenderMenuContext.mode ([51a7133](https://github.com/josdejong/svelte-jsoneditor/commit/51a7133778f542a5d634165cf7772fee17332647))
+
 ### [0.21.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.21.4...v0.21.5) (2024-02-05)
 
 
