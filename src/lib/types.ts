@@ -305,7 +305,7 @@ export type OnClassName = (path: JSONPath, value: unknown) => string | undefined
 export type OnChangeMode = (mode: Mode) => void
 export type OnContextMenu = (contextMenuProps: AbsolutePopupOptions) => void
 export type RenderMenuContext = {
-  mode: 'tree' | 'text' | 'table'
+  mode: Mode
   modal: boolean
 }
 export type OnRenderMenu = (items: MenuItem[], context: RenderMenuContext) => MenuItem[] | undefined
