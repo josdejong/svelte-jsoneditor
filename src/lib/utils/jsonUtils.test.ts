@@ -406,8 +406,7 @@ describe('jsonUtils', () => {
 
       expect(needsFormatting('')).toBe(false)
       expect(needsFormatting('[\n1,\n  2,\n  3\n]')).toBe(false)
-      expect(needsFormatting('{\n  "a":true,\n  "b":false\n}')).toBe(false)
-      expect(needsFormatting('\n[1,2,3]')).toBe(false)
+      expect(needsFormatting('{\n  "a": true,\n  "b": false\n}')).toBe(false)
 
       expect(needsFormatting('1234')).toBe(false)
       expect(needsFormatting('"abc"')).toBe(false)
@@ -415,9 +414,15 @@ describe('jsonUtils', () => {
       expect(needsFormatting('false')).toBe(false)
       expect(needsFormatting('null')).toBe(false)
 
-      // cannot detect partially formatted content
-      expect(needsFormatting('[1, 2, 3]')).toBe(true)
+      expect(needsFormatting('[1, 2, 3]')).toBe(false)
+      expect(needsFormatting('{"a": 1, "b": 2}')).toBe(false)
       expect(needsFormatting('{"a":1, "b":2}')).toBe(true)
+      expect(needsFormatting('{\n  "a": "some:message"\n}')).toBe(false)
+      expect(needsFormatting('{\n  "a": "some,message"\n}')).toBe(false)
+
+      // a colon or comma inside a string gives a false positive (when the text doesn't contain a return character)
+      expect(needsFormatting('{"a": "some:message"}')).toBe(true)
+      expect(needsFormatting('{"a": "some,message"}')).toBe(true)
     })
   })
 
