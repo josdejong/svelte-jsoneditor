@@ -452,6 +452,7 @@ export interface JSONEditorPropsOptional {
   onRenderMenu?: OnRenderMenu
   onRenderContextMenu?: OnRenderContextMenu
   onChangeMode?: OnChangeMode
+  onSelect?: OnSelect
   onError?: OnError
   onFocus?: OnFocus
   onBlur?: OnBlur

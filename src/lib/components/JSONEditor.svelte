@@ -58,6 +58,7 @@
   import ModalRef from '../components/modals/ModalRef.svelte'
   import type { Open, Callbacks, Component } from 'svelte-simple-modal'
   import type { OnRenderContextMenu } from '$lib/types.js'
+  import { cloneDeep } from 'lodash-es'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:JSONEditor')
@@ -89,7 +90,7 @@
 
   export let onChangeQueryLanguage: OnChangeQueryLanguage = noop
   export let onChange: OnChange = null
-  export let onSelect: OnSelect = noop
+  export let onSelect: OnSelect | null = null
   export let onRenderValue: OnRenderValue = renderValue
   export let onClassName: OnClassName = () => undefined
   export let onRenderMenu: OnRenderMenu = noop
@@ -288,7 +289,9 @@
   function handleSelect(updatedSelection: JSONEditorSelection | null) {
     selection = updatedSelection
 
-    onSelect(updatedSelection)
+    if (onSelect) {
+      onSelect(cloneDeep(updatedSelection))
+    }
   }
 
   function handleFocus() {
