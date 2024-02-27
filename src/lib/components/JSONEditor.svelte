@@ -66,7 +66,7 @@
   export let content: Content = { text: '' }
   export let selection: JSONEditorSelection | null = null
 
-  export let immutable = false
+  export let immutable = true
   export let readOnly = false
   export let indentation: number | string = 2
   export let tabSize = 4
