@@ -4,7 +4,6 @@
     type MenuButton,
     type MenuItem,
     type MenuSeparator,
-    type MenuSpace,
     type RenderMenuContext
   } from 'svelte-jsoneditor'
   import { faCopy } from '@fortawesome/free-regular-svg-icons'

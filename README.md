@@ -221,6 +221,7 @@ Properties such as `content` and `mode` are either passed as attributes to the S
 ```ts
 content: Content
 ```
+
 Pass the JSON contents to be rendered in the JSONEditor. `Content` is an object containing a property `json` (a parsed JSON document) or `text` (a stringified JSON document). Only one of the two properties must be defined. You can pass both content types to the editor independent of in what mode it is. You can use two-way binding via `bind:content`.
 
 #### selection
@@ -243,7 +244,7 @@ Open the editor in `'tree'` mode (default), `'table'` mode, or `'text'` mode (fo
 
 ```ts
 mainMenuBar: boolean
-``` 
+```
 
 Show the main menu bar. Default value is `true`.
 
@@ -251,7 +252,7 @@ Show the main menu bar. Default value is `true`.
 
 ```ts
 navigationBar: boolean
-``` 
+```
 
 Show the navigation bar with, where you can see the selected path and navigate through your document from there. Default value is `true`.
 
@@ -259,7 +260,7 @@ Show the navigation bar with, where you can see the selected path and navigate t
 
 ```ts
 statusBar: boolean
-``` 
+```
 
 Show a status bar at the bottom of the `'text'` editor, showing information about the cursor location and selected contents. Default value is `true`.
 
@@ -267,7 +268,7 @@ Show a status bar at the bottom of the `'text'` editor, showing information abou
 
 ```ts
 askToFormat: boolean
-``` 
+```
 
 When `true` (default), the user will be asked whether he/she wants to format the JSON document when a compact document is loaded or pasted in `'text'` mode. Only applicable to `'text'` mode.
 
@@ -275,7 +276,7 @@ When `true` (default), the user will be asked whether he/she wants to format the
 
 ```ts
 readOnly: boolean
-``` 
+```
 
 Open the editor in read-only mode: no changes can be made, non-relevant buttons are hidden from the menu, and the context menu is not enabled. Default value is `false`.
 
@@ -283,7 +284,7 @@ Open the editor in read-only mode: no changes can be made, non-relevant buttons 
 
 ```ts
 indentation: number | string
-``` 
+```
 
 Number of spaces use for indentation when stringifying JSON, or a string to be used as indentation like `'\t'` to use a tab as indentation, or `' '` to use 4 spaces (which is equivalent to configuring `indentation: 4`). See also property `tabSize`.
 
@@ -291,7 +292,7 @@ Number of spaces use for indentation when stringifying JSON, or a string to be u
 
 ```ts
 tabSize: number
-``` 
+```
 
 When indentation is configured as a tab character (`indentation: '\t'`), `tabSize` configures how large a tab character is rendered. Default value is `4`. Only applicable to `text` mode.
 
@@ -477,7 +478,7 @@ const myRendererAction = {
 onRenderMenu(items: MenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean }) : MenuItem[] | undefined
 ```
 
-Callback which can be used to make changes to the menu items. New items can  be added, or existing items can be removed or reorganized. When the function returns `undefined`, the original `items` will be applied. Using the context values `mode` and `modal`, different actions can be taken depending on the mode of the editor and whether the editor is rendered inside a modal or not.
+Callback which can be used to make changes to the menu items. New items can be added, or existing items can be removed or reorganized. When the function returns `undefined`, the original `items` will be applied. Using the context values `mode` and `modal`, different actions can be taken depending on the mode of the editor and whether the editor is rendered inside a modal or not.
 
 A menu item `MenuItem` can be one of the following types:
 
@@ -511,7 +512,7 @@ A menu item `MenuItem` can be one of the following types:
   }
   ```
 
-#### onRenderContextMenu  
+#### onRenderContextMenu
 
 ```ts
 onRenderContextMenu(items: ContextMenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean, selection: JSONEditorSelection | null }) : ContextMenuItem[] | undefined
@@ -585,7 +586,7 @@ Callback invoked when the selection is changed. When the selection is removed, t
 
 ```ts
 queryLanguages: QueryLanguage[]
-```  
+```
 
 Configure one or multiple query language that can be used in the Transform modal. The library comes with three languages:
 
@@ -624,7 +625,7 @@ Callback function invoked when the user changes the selected query language in t
 
 Methods can be called on a JSONEditor instance. In Svelte, you can create a reference and call a method like:
 
-````html
+```svelte
 <script>
   let editor
 
@@ -654,7 +655,7 @@ Note that most methods are asynchronous and will resolve after the editor is re-
 
 ```ts
 JSONEditor.prototype.get(): Content
-``` 
+```
 
 Get the current JSON document.
 
@@ -662,7 +663,7 @@ Get the current JSON document.
 
 ```ts
 JSONEditor.prototype.set(content: Content): Promise<void>
-``` 
+```
 
 Replace the current content. Will reset the state of the editor. See also method `update(content)`.
 
@@ -701,7 +702,9 @@ editor.updateProps({
 ```ts
 JSONEditor.prototype.expand([callback: (path: Path) => boolean]): Promise<void>
 ```
+
 Expand or collapse paths in the editor. The `callback` determines which paths will be expanded. If no `callback` is provided, all paths will be expanded. It is only possible to expand a path when all of its parent paths are expanded too. Examples:
+
 - `editor.expand(path => true)` expand all
 - `editor.expand(path => false)` collapse all
 - `editor.expand(path => path.length < 2)` expand all paths up to 2 levels deep
@@ -734,7 +737,7 @@ Find the DOM element of a given path. Returns `null` when not found.
 
 ```ts
 JSONEditor.prototype.acceptAutoRepair(): Promise<Content>
-``` 
+```
 
 In tree mode, invalid JSON is automatically repaired when loaded. When the repair was successful, the repaired contents are rendered but not yet applied to the document itself until the user clicks "Ok" or starts editing the data. Instead of accepting the repair, the user can also click "Repair manually instead". Invoking `.acceptAutoRepair()` will programmatically accept the repair. This will trigger an update, and the method itself also returns the updated contents. In case of `text` mode or when the editor is not in an "accept auto repair" status, nothing will happen, and the contents will be returned as is.
 
@@ -767,6 +770,7 @@ Change the current selection. See also option `selection`.
 ```ts
 JSONEditor.prototype.focus(): Promise<void>
 ```
+
 Give the editor focus.
 
 #### destroy
@@ -776,7 +780,6 @@ JSONEditor.prototype.destroy(): Promise<void>
 ```
 
 Destroy the editor, remove it from the DOM.
-
 
 ### Utility functions
 
