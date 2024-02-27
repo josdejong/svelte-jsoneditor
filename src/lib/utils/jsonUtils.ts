@@ -484,9 +484,10 @@ export function isEqualParser(a: JSONParser, b: JSONParser): boolean {
  * Apply a fast and cheap heuristic to determine whether the content needs formatting (i.e. is compact).
  */
 export function needsFormatting(jsonText: string): boolean {
-  // the check for the length>2 is because an empty array or object does not need formatting
-  return NEEDS_FORMATTING_REGEX.test(jsonText) && jsonText.length > 2
+  const maxLength = 999
+  const head = jsonText.substring(0, maxLength).trim()
+  return !head.includes('\n') && DELIMITER_WITHOUT_SPACING_REGEX.test(head)
 }
 
-// regex that matches the start of an object or array, followed by a non-whitespace character
-const NEEDS_FORMATTING_REGEX = /^[[{]\S/
+// This regex matches cases of a comma or colon NOT followed by a whitespace
+const DELIMITER_WITHOUT_SPACING_REGEX = /[,:]\S/

@@ -214,273 +214,576 @@ const editor = new JSONEditor({
 
 ### properties
 
-- `content: Content` Pass the JSON contents to be rendered in the JSONEditor. `Content` is an object containing a property `json` (a parsed JSON document) or `text` (a stringified JSON document). Only one of the two properties must be defined. You can pass both content types to the editor independent of in what mode it is. You can use two-way binding via `bind:content`.
-- `selection: JSONEditorSelection | null` The current selected contents. You can use two-way binding using `bind:selection`. The `tree` mode supports `MultiSelection`, `KeySelection`, `ValueSelection`, `InsideSelection`, or `AfterSelection`. The `table` mode supports `ValueSelection`, and `text` mode supports `TextSelection.`.
-- `mode: 'tree' | 'text' | 'table'`. Open the editor in `'tree'` mode (default), `'table'` mode, or `'text'` mode (formerly: `code` mode).
-- `mainMenuBar: boolean` Show the main menu bar. Default value is `true`.
-- `navigationBar: boolean` Show the navigation bar with, where you can see the selected path and navigate through your document from there. Default value is `true`.
-- `statusBar: boolean` Show a status bar at the bottom of the `'text'` editor, showing information about the cursor location and selected contents. Default value is `true`.
-- `askToFormat: boolean` When `true` (default), the user will be asked whether he/she wants to format the JSON document when a compact document is loaded or pasted in `'text'` mode. Only applicable to `'text'` mode.
-- `readOnly: boolean` Open the editor in read-only mode: no changes can be made, non-relevant buttons are hidden from the menu, and the context menu is not enabled. Default value is `false`.
-- `indentation: number | string` Number of spaces use for indentation when stringifying JSON, or a string to be used as indentation like `'\t'` to use a tab as indentation, or `' '` to use 4 spaces (which is equivalent to configuring `indentation: 4`). See also property `tabSize`.
-- `tabSize: number` When indentation is configured as a tab character (`indentation: '\t'`), `tabSize` configures how large a tab character is rendered. Default value is `4`. Only applicable to `text` mode.
-- `escapeControlCharacters: boolean`. False by default. When `true`, control characters like newline and tab are rendered as escaped characters `\n` and `\t`. Only applicable for `'tree'` mode, in `'text'` mode control characters are always escaped.
-- `escapeUnicodeCharacters: boolean`. False by default. When `true`, unicode characters like ☎ and 😀 are rendered escaped like `\u260e` and `\ud83d\ude00`.
-- `flattenColumns: boolean`. True by default. Only applicable to `'table'` mode. When `true`, nested object properties will be displayed each in their own column, with the nested path as column name. When `false`, nested objects will be rendered inline, and double-clicking them will open them in a popup.
-- `validator: function (json: unknown): ValidationError[]`. Validate the JSON document.
-  For example use the built-in JSON Schema validator powered by Ajv:
+Properties such as `content` and `mode` are either passed as attributes to the Svelte component, like `<JSONEditor {content} {mode} />`, or via the `props` in case of the vanilla JS constructor: `new JSONEditor({ target, props: { content, mode }`.
 
-  ```js
-  import { createAjvValidator } from 'svelte-jsoneditor'
+#### content
 
-  const validator = createAjvValidator({ schema, schemaDefinitions })
-  ```
+```ts
+content: Content
+```
 
-- `parser: JSON = JSON`. Configure a custom JSON parser, like [`lossless-json`](https://github.com/josdejong/lossless-json). By default, the native `JSON` parser of JavaScript is used. The `JSON` interface is an object with a `parse` and `stringify` function. For example:
+Pass the JSON contents to be rendered in the JSONEditor. `Content` is an object containing a property `json` (a parsed JSON document) or `text` (a stringified JSON document). Only one of the two properties must be defined. You can pass both content types to the editor independent of in what mode it is. You can use two-way binding via `bind:content`.
 
-  ```html
-  <script>
-    import { JSONEditor } from 'svelte-jsoneditor'
-    import { parse, stringify } from 'lossless-json'
+#### selection
 
-    const LosslessJSONParser = { parse, stringify }
+```ts
+selection: JSONEditorSelection | null
+```
 
-    let content = { text: '[1,2,3]' }
-  </script>
+The current selected contents. You can use two-way binding using `bind:selection`. The `tree` mode supports `MultiSelection`, `KeySelection`, `ValueSelection`, `InsideSelection`, or `AfterSelection`. The `table` mode supports `ValueSelection`, and `text` mode supports `TextSelection.`.
 
-  <div>
-    <JSONEditor {content} parser="{LosslessJSONParser}" />
-  </div>
-  ```
+#### mode
 
-- `validationParser: JSONParser = JSON`. Only applicable when a `validator` is provided. This is the same as `parser`, except that this parser is used to parse the data before sending it to the validator. Configure a custom JSON parser that is used to parse JSON before passing it to the `validator`. By default, the built-in `JSON` parser is used. When passing a custom `validationParser`, make sure the output of the parser is supported by the configured `validator`. So, when the `validationParser` can output `bigint` numbers or other numeric types, the `validator` must also support that. In tree mode, when `parser` is not equal to `validationParser`, the JSON document will be converted before it is passed to the `validator` via `validationParser.parse(parser.stringify(json))`.
+```ts
+mode: 'tree' | 'text' | 'table'
+```
 
-- `pathParser: JSONPathParser`. An optional object with a parse and stringify method to parse and stringify a `JSONPath`, which is an array with property names. The `pathParser` is used in the path editor in the navigation bar, which is opened by clicking the edit button on the right side of the navigation bar. The `pathParser.parse` function is allowed to throw an Error when the input is invalid. By default, a JSON Path notation is used, which looks like `$.data[2].nested.property`. Alternatively, it is possible to use for example a JSON Pointer notation like `/data/2/nested/property` or something custom-made. Related helper functions: `parseJSONPath` and `stringifyJSONPath`, `parseJSONPointer` and `compileJSONPointer`.
+Open the editor in `'tree'` mode (default), `'table'` mode, or `'text'` mode (formerly: `code` mode).
 
-- `onError(err: Error)`.
-  Callback fired when an error occurs. Default implementation is to log an error in the console and show a simple alert message to the user.
-- `onChange(content: Content, previousContent: Content, changeStatus: { contentErrors: ContentErrors | null, patchResult: JSONPatchResult | null })`. The callback which is invoked on every change of the contents, both changes made by a user and programmatic changes made via methods like `.set()`, `.update()`, or `.patch()`.
-  The returned `content` is sometimes of type `{ json }`, and sometimes of type `{ text }`. Which of the two is returned depends on the mode of the editor, the change that is applied, and the state of the document (valid, invalid, empty). Please be aware that `{ text }` can contain invalid JSON: whilst typing in `text` mode, a JSON document will be temporarily invalid, like when the user is typing a new string. The parameter `patchResult` is only returned on changes that can be represented as a JSON Patch document, and for example not when freely typing in `text` mode.
-- `onChangeMode(mode: 'tree' | 'text' | 'table')`. Invoked when the mode is changed.
-- `onClassName(path: Path, value: any): string | undefined`.
-  Add a custom class name to specific nodes, based on their path and/or value. Note that in the custom class, you can override CSS variables like `--jse-contents-background-color` to change the styling of a node, like the background color. Relevant variables are:
+#### mainMenuBar
 
-  ```css
-  --jse-contents-background-color
-  --jse-selection-background-color
-  --jse-selection-background-inactive-color
-  --jse-hover-background-color
-  --jse-context-menu-pointer-hover-background
-  --jse-context-menu-pointer-background
-  --jse-context-menu-pointer-background-highlight
-  --jse-collapsed-items-background-color
-  --jse-collapsed-items-selected-background-color
-  ```
+```ts
+mainMenuBar: boolean
+```
 
-  To adjust the text color of keys or values, the color of the classes `.jse-key` and `.jse-value` can be overwritten.
+Show the main menu bar. Default value is `true`.
 
-- `onRenderValue(props: RenderValueProps) : RenderValueComponentDescription[]`
+#### navigationBar
 
-  Customize rendering of the values. By default, `renderValue` is used, which renders a value as an editable div and depending on the value can also render a boolean toggle, a color picker, and a timestamp tag. Multiple components can be rendered alongside each other, like the boolean toggle and color picker being rendered left from the editable div. Built in value renderer components: `EditableValue`, `ReadonlyValue`, `BooleanToggle`, `ColorPicker`, `TimestampTag`, `EnumValue`.
+```ts
+navigationBar: boolean
+```
 
-  For JSON Schema enums, there is a ready-made value renderer `renderJSONSchemaEnum` which renders enums using the `EnumValue` component. This can be used like:
+Show the navigation bar with, where you can see the selected path and navigate through your document from there. Default value is `true`.
 
-  ```js
-  import { renderJSONSchemaEnum, renderValue } from 'svelte-jsoneditor'
+#### statusBar
 
-  function onRenderValue(props) {
-    // use the enum renderer, and fallback on the default renderer
-    return renderJSONSchemaEnum(props, schema, schemaDefinitions) || renderValue(props)
-  }
-  ```
+```ts
+statusBar: boolean
+```
 
-  The callback `onRenderValue` must return an array with one or multiple renderers. Each renderer can be either a Svelte component or a Svelte action:
+Show a status bar at the bottom of the `'text'` editor, showing information about the cursor location and selected contents. Default value is `true`.
 
-  ```ts
-  interface SvelteComponentRenderer {
-    component: typeof SvelteComponent<RenderValuePropsOptional>
-    props: Record<string, unknown>
-  }
+#### askToFormat
 
-  interface SvelteActionRenderer {
-    action: Action // Svelte Action
-    props: Record<string, unknown>
-  }
-  ```
+```ts
+askToFormat: boolean
+```
 
-  The `SvelteComponentRenderer` interface can be used to provide Svelte components like the `EnumValue` component mentioned above. The `SvelteActionRenderer` expects a [Svelte Action](https://svelte.dev/docs/svelte-action) as `action` property. Since this interface is a plain JavaScript interface, this allows to create custom components in a vanilla JS environment. Basically it is a function that gets a DOM node passed, and needs to return an object with `update` and `destroy` functions:
+When `true` (default), the user will be asked whether he/she wants to format the JSON document when a compact document is loaded or pasted in `'text'` mode. Only applicable to `'text'` mode.
 
-  ```js
-  const myRendererAction = {
-    action: (node) => {
-      // attach something to the HTML DOM node
-      return {
-        update: (node) => {
-          // update the DOM
-        },
-        destroy: () => {
-          // cleanup the DOM
-        }
+#### readOnly
+
+```ts
+readOnly: boolean
+```
+
+Open the editor in read-only mode: no changes can be made, non-relevant buttons are hidden from the menu, and the context menu is not enabled. Default value is `false`.
+
+#### indentation
+
+```ts
+indentation: number | string
+```
+
+Number of spaces use for indentation when stringifying JSON, or a string to be used as indentation like `'\t'` to use a tab as indentation, or `' '` to use 4 spaces (which is equivalent to configuring `indentation: 4`). See also property `tabSize`.
+
+#### tabSize
+
+```ts
+tabSize: number
+```
+
+When indentation is configured as a tab character (`indentation: '\t'`), `tabSize` configures how large a tab character is rendered. Default value is `4`. Only applicable to `text` mode.
+
+#### escapeControlCharacters
+
+```ts
+escapeControlCharacters: boolean
+```
+
+False by default. When `true`, control characters like newline and tab are rendered as escaped characters `\n` and `\t`. Only applicable for `'tree'` mode, in `'text'` mode control characters are always escaped.
+
+#### escapeUnicodeCharacters
+
+```ts
+escapeUnicodeCharacters: boolean
+```
+
+False by default. When `true`, unicode characters like ☎ and 😀 are rendered escaped like `\u260e` and `\ud83d\ude00`.
+
+#### flattenColumns
+
+```ts
+flattenColumns: boolean
+```
+
+True by default. Only applicable to `'table'` mode. When `true`, nested object properties will be displayed each in their own column, with the nested path as column name. When `false`, nested objects will be rendered inline, and double-clicking them will open them in a popup.
+
+#### validator
+
+```ts
+validator: function (json: unknown): ValidationError[]
+```
+
+Validate the JSON document. For example use the built-in JSON Schema validator powered by Ajv:
+
+```js
+import { createAjvValidator } from 'svelte-jsoneditor'
+
+const validator = createAjvValidator({ schema, schemaDefinitions })
+```
+
+#### parser
+
+```ts
+parser: JSON = JSON
+```
+
+Configure a custom JSON parser, like [`lossless-json`](https://github.com/josdejong/lossless-json). By default, the native `JSON` parser of JavaScript is used. The `JSON` interface is an object with a `parse` and `stringify` function. For example:
+
+```html
+<script>
+  import { JSONEditor } from 'svelte-jsoneditor'
+  import { parse, stringify } from 'lossless-json'
+
+  const LosslessJSONParser = { parse, stringify }
+
+  let content = { text: '[1,2,3]' }
+</script>
+
+<div>
+  <JSONEditor {content} parser="{LosslessJSONParser}" />
+</div>
+```
+
+#### validationParser
+
+```ts
+validationParser: JSONParser = JSON
+```
+
+Only applicable when a `validator` is provided. This is the same as `parser`, except that this parser is used to parse the data before sending it to the validator. Configure a custom JSON parser that is used to parse JSON before passing it to the `validator`. By default, the built-in `JSON` parser is used. When passing a custom `validationParser`, make sure the output of the parser is supported by the configured `validator`. So, when the `validationParser` can output `bigint` numbers or other numeric types, the `validator` must also support that. In tree mode, when `parser` is not equal to `validationParser`, the JSON document will be converted before it is passed to the `validator` via `validationParser.parse(parser.stringify(json))`.
+
+#### pathParser
+
+```ts
+pathParser: JSONPathParser
+```
+
+An optional object with a parse and stringify method to parse and stringify a `JSONPath`, which is an array with property names. The `pathParser` is used in the path editor in the navigation bar, which is opened by clicking the edit button on the right side of the navigation bar. The `pathParser.parse` function is allowed to throw an Error when the input is invalid. By default, a JSON Path notation is used, which looks like `$.data[2].nested.property`. Alternatively, it is possible to use for example a JSON Pointer notation like `/data/2/nested/property` or something custom-made. Related helper functions: `parseJSONPath` and `stringifyJSONPath`, `parseJSONPointer` and `compileJSONPointer`.
+
+#### onError
+
+```ts
+onError(err: Error)
+```
+
+Callback fired when an error occurs. Default implementation is to log an error in the console and show a simple alert message to the user.
+
+#### onChange
+
+```ts
+onChange(content: Content, previousContent: Content, changeStatus: { contentErrors: ContentErrors | null, patchResult: JSONPatchResult | null })
+```
+
+The callback which is invoked on every change of the contents, both changes made by a user and programmatic changes made via methods like `.set()`, `.update()`, or `.patch()`.
+
+The returned `content` is sometimes of type `{ json }`, and sometimes of type `{ text }`. Which of the two is returned depends on the mode of the editor, the change that is applied, and the state of the document (valid, invalid, empty). Please be aware that `{ text }` can contain invalid JSON: whilst typing in `text` mode, a JSON document will be temporarily invalid, like when the user is typing a new string. The parameter `patchResult` is only returned on changes that can be represented as a JSON Patch document, and for example not when freely typing in `text` mode.
+
+#### onChangeMode
+
+```ts
+onChangeMode(mode: 'tree' | 'text' | 'table')
+```
+
+Invoked when the mode is changed.
+
+#### onClassName
+
+```ts
+onClassName(path: Path, value: any): string | undefined
+```
+
+Add a custom class name to specific nodes, based on their path and/or value. Note that in the custom class, you can override CSS variables like `--jse-contents-background-color` to change the styling of a node, like the background color. Relevant variables are:
+
+```css
+--jse-contents-background-color
+--jse-selection-background-color
+--jse-selection-background-inactive-color
+--jse-hover-background-color
+--jse-context-menu-pointer-hover-background
+--jse-context-menu-pointer-background
+--jse-context-menu-pointer-background-highlight
+--jse-collapsed-items-background-color
+--jse-collapsed-items-selected-background-color
+```
+
+To adjust the text color of keys or values, the color of the classes `.jse-key` and `.jse-value` can be overwritten.
+
+#### onRenderValue
+
+```ts
+onRenderValue(props: RenderValueProps) : RenderValueComponentDescription[]
+```
+
+Customize rendering of the values. By default, `renderValue` is used, which renders a value as an editable div and depending on the value can also render a boolean toggle, a color picker, and a timestamp tag. Multiple components can be rendered alongside each other, like the boolean toggle and color picker being rendered left from the editable div. Built in value renderer components: `EditableValue`, `ReadonlyValue`, `BooleanToggle`, `ColorPicker`, `TimestampTag`, `EnumValue`.
+
+For JSON Schema enums, there is a ready-made value renderer `renderJSONSchemaEnum` which renders enums using the `EnumValue` component. This can be used like:
+
+```js
+import { renderJSONSchemaEnum, renderValue } from 'svelte-jsoneditor'
+
+function onRenderValue(props) {
+  // use the enum renderer, and fallback on the default renderer
+  return renderJSONSchemaEnum(props, schema, schemaDefinitions) || renderValue(props)
+}
+```
+
+The callback `onRenderValue` must return an array with one or multiple renderers. Each renderer can be either a Svelte component or a Svelte action:
+
+```ts
+interface SvelteComponentRenderer {
+  component: typeof SvelteComponent<RenderValuePropsOptional>
+  props: Record<string, unknown>
+}
+
+interface SvelteActionRenderer {
+  action: Action // Svelte Action
+  props: Record<string, unknown>
+}
+```
+
+The `SvelteComponentRenderer` interface can be used to provide Svelte components like the `EnumValue` component mentioned above. The `SvelteActionRenderer` expects a [Svelte Action](https://svelte.dev/docs/svelte-action) as `action` property. Since this interface is a plain JavaScript interface, this allows to create custom components in a vanilla JS environment. Basically it is a function that gets a DOM node passed, and needs to return an object with `update` and `destroy` functions:
+
+```js
+const myRendererAction = {
+  action: (node) => {
+    // attach something to the HTML DOM node
+    return {
+      update: (node) => {
+        // update the DOM
+      },
+      destroy: () => {
+        // cleanup the DOM
       }
     }
   }
-  ```
+}
+```
 
-- `onRenderMenu(items: MenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean }) : MenuItem[] | undefined`.
-  Callback which can be used to make changes to the menu items. New items can
-  be added, or existing items can be removed or reorganized. When the function
-  returns `undefined`, the original `items` will be applied. Using the context values `mode` and `modal`, different actions can be taken depending on the mode of the editor and whether the editor is rendered inside a modal or not.
+#### onRenderMenu
 
-  A menu item `MenuItem` can be one of the following types:
+```ts
+onRenderMenu(items: MenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean }) : MenuItem[] | undefined
+```
 
-  - Button:
+Callback which can be used to make changes to the menu items. New items can be added, or existing items can be removed or reorganized. When the function returns `undefined`, the original `items` will be applied. Using the context values `mode` and `modal`, different actions can be taken depending on the mode of the editor and whether the editor is rendered inside a modal or not.
 
-    ```ts
-    interface MenuButton {
-      type: 'button'
-      onClick: () => void
-      icon?: IconDefinition
-      text?: string
-      title?: string
-      className?: string
-      disabled?: boolean
-    }
-    ```
+A menu item `MenuItem` can be one of the following types:
 
-  - Separator (gray vertical line between a group of items):
-
-    ```ts
-    interface MenuSeparator {
-      type: 'separator'
-    }
-    ```
-
-  - Space (fills up empty space):
-
-    ```ts
-    interface MenuSpace {
-      type: 'space'
-    }
-    ```
-
-- `onRenderContextMenu(items: ContextMenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean, selection: JSONEditorSelection | null }) : ContextMenuItem[] | undefined`.
-  Callback which can be used to make changes to the context menu items. New items can
-  be added, or existing items can be removed or reorganized. When the function
-  returns `undefined`, the original `items` will be applied. Using the context values `mode`, `modal` and `selection`, different actions can be taken depending on the mode of the editor, whether the editor is rendered inside a modal or not and the path of selection.
-
-  A menu item `ContextMenuItem` can be one of the following types:
-
-  - Button:
-
-    ```ts
-    interface MenuButton {
-      type: 'button'
-      onClick: () => void
-      icon?: IconDefinition
-      text?: string
-      title?: string
-      className?: string
-      disabled?: boolean
-    }
-    ```
-
-  - Dropdown button:
-
-    ```ts
-    interface MenuDropDownButton {
-      type: 'dropdown-button'
-      main: MenuButton
-      width?: string
-      items: MenuButton[]
-    }
-    ```
-
-  - Separator (gray line between a group of items):
-
-    ```ts
-    interface MenuSeparator {
-      type: 'separator'
-    }
-    ```
-
-  - Menu row and column:
-
-    ```ts
-    interface MenuLabel {
-      type: 'label'
-      text: string
-    }
-
-    interface ContextMenuColumn {
-      type: 'column'
-      items: Array<MenuButton | MenuDropDownButton | MenuLabel | MenuSeparator>
-    }
-
-    interface ContextMenuRow {
-      type: 'row'
-      items: Array<MenuButton | MenuDropDownButton | ContextMenuColumn>
-    }
-    ```
-
-- `onSelect: (selection: JSONEditorSelection | null) => void`
-
-  Callback invoked when the selection is changed. When the selection is removed, the callback is invoked with `undefined` as argument. In `text` mode, a `TextSelection` will be fired. In `tree` and `table` mode, a `JSONSelection` will be fired (which can be `MultiSelection`, `KeySelection`, `ValueSelection`, `InsideSelection`, or `AfterSelection`). Use typeguards like `isTextSelection` and `isValueSelection` to check what type the selection has.
-
-- `queryLanguages: QueryLanguage[]`.  
-   Configure one or multiple query language that can be used in the Transform modal. The library comes with three languages:
+- Button:
 
   ```ts
-  import {
-    jmespathQueryLanguage,
-    lodashQueryLanguage,
-    javascriptQueryLanguage
-  } from 'svelte-jsoneditor'
-
-  const allQueryLanguages = [jmespathQueryLanguage, lodashQueryLanguage, javascriptQueryLanguage]
+  interface MenuButton {
+    type: 'button'
+    onClick: () => void
+    icon?: IconDefinition
+    text?: string
+    title?: string
+    className?: string
+    disabled?: boolean
+  }
   ```
 
-  By default, only `javascriptQueryLanguage` is loaded.
+- Separator (gray vertical line between a group of items):
 
-- `queryLanguageId`.
-  The `id` of the currently selected query language.
+  ```ts
+  interface MenuSeparator {
+    type: 'separator'
+  }
+  ```
 
-- `onChangeQueryLanguage: (queryLanguageId: string) => void`.
-  Callback function invoked when the user changes the selected query language in the TransformModal via the configuration button top right.
+- Space (fills up empty space):
+
+  ```ts
+  interface MenuSpace {
+    type: 'space'
+  }
+  ```
+
+#### onRenderContextMenu
+
+```ts
+onRenderContextMenu(items: ContextMenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean, selection: JSONEditorSelection | null }) : ContextMenuItem[] | undefined
+```
+
+Callback which can be used to make changes to the context menu items. New items can be added, or existing items can be removed or reorganized. When the function returns `undefined`, the original `items` will be applied. Using the context values `mode`, `modal` and `selection`, different actions can be taken depending on the mode of the editor, whether the editor is rendered inside a modal or not and the path of selection.
+
+A menu item `ContextMenuItem` can be one of the following types:
+
+- Button:
+
+  ```ts
+  interface MenuButton {
+    type: 'button'
+    onClick: () => void
+    icon?: IconDefinition
+    text?: string
+    title?: string
+    className?: string
+    disabled?: boolean
+  }
+  ```
+
+- Dropdown button:
+
+  ```ts
+  interface MenuDropDownButton {
+    type: 'dropdown-button'
+    main: MenuButton
+    width?: string
+    items: MenuButton[]
+  }
+  ```
+
+- Separator (gray line between a group of items):
+
+  ```ts
+  interface MenuSeparator {
+    type: 'separator'
+  }
+  ```
+
+- Menu row and column:
+
+  ```ts
+  interface MenuLabel {
+    type: 'label'
+    text: string
+  }
+
+  interface ContextMenuColumn {
+    type: 'column'
+    items: Array<MenuButton | MenuDropDownButton | MenuLabel | MenuSeparator>
+  }
+
+  interface ContextMenuRow {
+    type: 'row'
+    items: Array<MenuButton | MenuDropDownButton | ContextMenuColumn>
+  }
+  ```
+
+#### onSelect
+
+```ts
+onSelect: (selection: JSONEditorSelection | null) => void
+```
+
+Callback invoked when the selection is changed. When the selection is removed, the callback is invoked with `undefined` as argument. In `text` mode, a `TextSelection` will be fired. In `tree` and `table` mode, a `JSONSelection` will be fired (which can be `MultiSelection`, `KeySelection`, `ValueSelection`, `InsideSelection`, or `AfterSelection`). Use typeguards like `isTextSelection` and `isValueSelection` to check what type the selection has.
+
+#### queryLanguages
+
+```ts
+queryLanguages: QueryLanguage[]
+```
+
+Configure one or multiple query language that can be used in the Transform modal. The library comes with three languages:
+
+```ts
+import {
+  jmespathQueryLanguage,
+  lodashQueryLanguage,
+  javascriptQueryLanguage
+} from 'svelte-jsoneditor'
+
+const allQueryLanguages = [jmespathQueryLanguage, lodashQueryLanguage, javascriptQueryLanguage]
+```
+
+By default, only `javascriptQueryLanguage` is loaded.
+
+#### queryLanguageId
+
+```ts
+queryLanguageId: string
+```
+
+The `id` of the currently selected query language.
+
+#### onChangeQueryLanguage
+
+```ts
+onChangeQueryLanguage: (queryLanguageId: string) => void
+```
+
+Callback function invoked when the user changes the selected query language in the TransformModal via the configuration button top right.
 
 - `onFocus()` callback fired when the editor got focus.
 - `onBlur()` callback fired when the editor lost focus.
 
 ### methods
 
+Methods can be called on a JSONEditor instance. In Svelte, you can create a reference and call a method like:
+
+```svelte
+<script>
+  let editor
+
+  function logContents() {
+    const content = editor.get() // using a method
+    console.log(content)
+  }
+</script>
+
+<JSONEditor bind:this={editor} />
+```
+
+In the vanilla editor, the constructor returns an instance:
+
+```js
+const editor = new JSONEditor({ ... })
+
+function logContents() {
+  const content = editor.get() // using a method
+  console.log(content)
+}
+```
+
 Note that most methods are asynchronous and will resolve after the editor is re-rendered (on the next `tick`).
 
-- `get(): Content` Get the current JSON document.
-- `set(content: Content): Promise<void>` Replace the current content. Will reset the state of the editor. See also method `update(content)`.
-- `update(content: Content): Promise<void>` Update the loaded content, keeping the state of the editor (like expanded objects). You can also call `editor.updateProps({ content })`. See also method `set(content)`.
-- `patch(operations: JSONPatchDocument) : Promise<JSONPatchResult>` Apply a JSON patch document to update the contents of the JSON document. A JSON patch document is a list with JSON Patch operations.
-- `updateProps(props: Object): Promise<void>` update some or all of the properties. Updated `content` can be passed too; this is equivalent to calling `update(content)`. Example:
+#### get
 
-  ```js
-  editor.updateProps({
-    readOnly: true
-  })
-  ```
+```ts
+JSONEditor.prototype.get(): Content
+```
 
-- `expand([callback: (path: Path) => boolean]): Promise<void>` Expand or collapse paths in the editor. The `callback` determines which paths will be expanded. If no `callback` is provided, all paths will be expanded. It is only possible to expand a path when all of its parent paths are expanded too. Examples:
-  - `editor.expand(path => true)` expand all
-  - `editor.expand(path => false)` collapse all
-  - `editor.expand(path => path.length < 2)` expand all paths up to 2 levels deep
-- `transform({ id?: string, rootPath?: [], onTransform: ({ operations: JSONPatchDocument, json: unknown, transformedJson: unknown }) => void, onClose: () => void })` programmatically trigger clicking of the transform button in the main menu, opening the transform model. If a callback `onTransform` is provided, it will replace the build-in logic to apply a transform, allowing you to process the transform operations in an alternative way. If provided, `onClose` callback will trigger when the transform modal closes, both after the user clicked apply or cancel. If an `id` is provided, the transform modal will load the previous status of this `id` instead of the status of the editors transform modal.
-- `scrollTo(path: Path): Promise<void>` Scroll the editor vertically such that the specified path comes into view. Only applicable to modes `tree` and `table`. The path will be expanded when needed. The returned Promise is resolved after scrolling is finished.
-- `findElement(path: Path)` Find the DOM element of a given path. Returns `null` when not found.
-- `acceptAutoRepair(): Promise<Content>` In tree mode, invalid JSON is automatically repaired when loaded. When the repair was successful, the repaired contents are rendered but not yet applied to the document itself until the user clicks "Ok" or starts editing the data. Instead of accepting the repair, the user can also click "Repair manually instead". Invoking `.acceptAutoRepair()` will programmatically accept the repair. This will trigger an update, and the method itself also returns the updated contents. In case of `text` mode or when the editor is not in an "accept auto repair" status, nothing will happen, and the contents will be returned as is.
-- `refresh(): Promise<void>`. Refresh rendering of the contents, for example after changing the font size. This is only available in `text` mode.
-- `validate() : ContentErrors | null`. Get all current parse errors and validation errors.
-- `select(newSelection: JSONEditorSelection | null)` change the current selection. See also option `selection`.
-- `focus(): Promise<void>`. Give the editor focus.
-- `destroy(): Promise<void>`. Destroy the editor, remove it from the DOM.
+Get the current JSON document.
+
+#### set
+
+```ts
+JSONEditor.prototype.set(content: Content): Promise<void>
+```
+
+Replace the current content. Will reset the state of the editor. See also method `update(content)`.
+
+#### update
+
+```ts
+JSONEditor.prototype.update(content: Content): Promise<void>
+```
+
+Update the loaded content, keeping the state of the editor (like expanded objects). You can also call `editor.updateProps({ content })`. See also method `set(content)`.
+
+#### patch
+
+```ts
+JSONEditor.prototype.patch(operations: JSONPatchDocument) : Promise<JSONPatchResult>
+```
+
+Apply a JSON patch document to update the contents of the JSON document. A JSON patch document is a list with JSON Patch operations.
+
+#### updateProps
+
+```ts
+JSONEditor.prototype.updateProps(props: Object): Promise<void>
+```
+
+Tpdate some or all of the properties. Updated `content` can be passed too; this is equivalent to calling `update(content)`. Example:
+
+```js
+editor.updateProps({
+  readOnly: true
+})
+```
+
+#### expand
+
+```ts
+JSONEditor.prototype.expand([callback: (path: Path) => boolean]): Promise<void>
+```
+
+Expand or collapse paths in the editor. The `callback` determines which paths will be expanded. If no `callback` is provided, all paths will be expanded. It is only possible to expand a path when all of its parent paths are expanded too. Examples:
+
+- `editor.expand(path => true)` expand all
+- `editor.expand(path => false)` collapse all
+- `editor.expand(path => path.length < 2)` expand all paths up to 2 levels deep
+
+#### transform
+
+```ts
+JSONEditor.prototype.transform({ id?: string, rootPath?: [], onTransform: ({ operations: JSONPatchDocument, json: unknown, transformedJson: unknown }) => void, onClose: () => void })
+```
+
+Programmatically trigger clicking of the transform button in the main menu, opening the transform model. If a callback `onTransform` is provided, it will replace the build-in logic to apply a transform, allowing you to process the transform operations in an alternative way. If provided, `onClose` callback will trigger when the transform modal closes, both after the user clicked apply or cancel. If an `id` is provided, the transform modal will load the previous status of this `id` instead of the status of the editors transform modal.
+
+#### scrollTo
+
+```ts
+JSONEditor.prototype.scrollTo(path: Path): Promise<void>
+```
+
+Scroll the editor vertically such that the specified path comes into view. Only applicable to modes `tree` and `table`. The path will be expanded when needed. The returned Promise is resolved after scrolling is finished.
+
+#### findElement
+
+```ts
+JSONEditor.prototype.findElement(path: Path)
+```
+
+Find the DOM element of a given path. Returns `null` when not found.
+
+#### acceptAutoRepair
+
+```ts
+JSONEditor.prototype.acceptAutoRepair(): Promise<Content>
+```
+
+In tree mode, invalid JSON is automatically repaired when loaded. When the repair was successful, the repaired contents are rendered but not yet applied to the document itself until the user clicks "Ok" or starts editing the data. Instead of accepting the repair, the user can also click "Repair manually instead". Invoking `.acceptAutoRepair()` will programmatically accept the repair. This will trigger an update, and the method itself also returns the updated contents. In case of `text` mode or when the editor is not in an "accept auto repair" status, nothing will happen, and the contents will be returned as is.
+
+#### refresh
+
+```ts
+JSONEditor.prototype.refresh(): Promise<void>
+```
+
+Refresh rendering of the contents, for example after changing the font size. This is only available in `text` mode.
+
+#### validate
+
+```ts
+JSONEditor.prototype.validate() : ContentErrors | null
+```
+
+Get all current parse errors and validation errors.
+
+#### select
+
+```ts
+JSONEditor.prototype.select(newSelection: JSONEditorSelection | null)
+```
+
+Change the current selection. See also option `selection`.
+
+#### focus
+
+```ts
+JSONEditor.prototype.focus(): Promise<void>
+```
+
+Give the editor focus.
+
+#### destroy
+
+```ts
+JSONEditor.prototype.destroy(): Promise<void>
+```
+
+Destroy the editor, remove it from the DOM.
 
 ### Utility functions
+
+The library exports a set of utility functions. The exact definitions of those functions can be found in the TypeScript d
 
 - Rendering of values:
   - `renderValue`
