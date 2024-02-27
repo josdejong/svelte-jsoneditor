@@ -624,7 +624,7 @@ Callback function invoked when the user changes the selected query language in t
 
 Methods can be called on a JSONEditor instance. In Svelte, you can create a reference and call a method like:
 
-```svelte
+````html
 <script>
   let editor
 
@@ -780,7 +780,7 @@ Destroy the editor, remove it from the DOM.
 
 ### Utility functions
 
-The library exports a set of utility functions. The exact definitions of those functions can be found in the TypeScript definitions.
+The library exports a set of utility functions. The exact definitions of those functions can be found in the TypeScript d
 
 - Rendering of values:
   - `renderValue`
