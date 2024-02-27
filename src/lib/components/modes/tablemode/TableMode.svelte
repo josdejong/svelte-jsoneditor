@@ -154,6 +154,7 @@
   const isSSR = typeof window === 'undefined'
   debug('isSSR:', isSSR)
 
+  export let immutable: boolean
   export let readOnly: boolean
   export let externalContent: Content
   export let externalSelection: JSONEditorSelection | null
@@ -362,7 +363,9 @@
     const currentContent = { json }
     const isChanged = isTextContent(content)
       ? content.text !== text
-      : currentContent.json !== content.json
+      : immutable
+        ? currentContent.json !== content.json
+        : !isEqual(currentContent.json, content.json)
 
     debug('update external content', { isChanged })
 
@@ -401,7 +404,7 @@
         }
       }
     } else {
-      json = content.json
+      json = cloneJsonWhenMutable(content.json)
       text = undefined
       textIsRepaired = false
       parseError = undefined
@@ -436,6 +439,25 @@
         updateSelection(externalSelection)
       }
     }
+  }
+
+  function cloneWhenMutable(content: Content): Content {
+    if (isTextContent(content)) {
+      return content
+    }
+
+    return {
+      json: cloneJsonWhenMutable(content.json)
+    }
+  }
+
+  function cloneJsonWhenMutable(json: unknown): unknown {
+    if (immutable) {
+      return json
+    }
+
+    debug('cloning content')
+    return parser.parse(parser.stringify(json) || '')
   }
 
   // TODO: addHistoryItem is a duplicate of addHistoryItem in TreeMode.svelte. Can we extract and reuse this logic?
@@ -668,22 +690,24 @@
       return
     }
 
+    if (!onChange) {
+      return
+    }
+
     // make sure we cannot send an invalid contents like having both
     // json and text defined, or having none defined
-    if (onChange) {
-      if (text !== undefined) {
-        const content = { text, json: undefined }
-        onChange(content, previousContent, {
-          contentErrors: validate(),
-          patchResult
-        })
-      } else if (json !== undefined) {
-        const content = { text: undefined, json }
-        onChange(content, previousContent, {
-          contentErrors: validate(),
-          patchResult
-        })
-      }
+    if (text !== undefined) {
+      const content = { text, json: undefined }
+      onChange(cloneWhenMutable(content), cloneWhenMutable(previousContent), {
+        contentErrors: validate(),
+        patchResult
+      })
+    } else if (json !== undefined) {
+      const content = { text: undefined, json }
+      onChange(cloneWhenMutable(content), cloneWhenMutable(previousContent), {
+        contentErrors: validate(),
+        patchResult
+      })
     }
   }
 

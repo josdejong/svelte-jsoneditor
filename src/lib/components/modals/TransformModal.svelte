@@ -277,6 +277,7 @@
               <TreeMode
                 externalContent={selectedContent}
                 externalSelection={null}
+                immutable={true}
                 readOnly={true}
                 mainMenuBar={false}
                 navigationBar={false}
@@ -312,6 +313,7 @@
               <TreeMode
                 externalContent={previewContent}
                 externalSelection={null}
+                immutable={true}
                 readOnly={true}
                 mainMenuBar={false}
                 navigationBar={false}

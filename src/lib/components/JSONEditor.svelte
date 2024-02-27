@@ -18,7 +18,7 @@
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import { javascriptQueryLanguage } from '$lib/plugins/query/javascriptQueryLanguage.js'
   import { renderValue } from '$lib/plugins/value/renderValue.js'
-  import { onMount, tick } from 'svelte'
+  import { tick } from 'svelte'
   import TransformModal from './modals/TransformModal.svelte'
   import SortModal from './modals/SortModal.svelte'
   import type {
@@ -113,10 +113,6 @@
     callbacks: Partial<Callbacks>
   } | null = null
 
-  onMount(() => {
-    content = cloneWhenMutable(content)
-  })
-
   $: {
     const contentError = validateContentType(content)
     if (contentError) {
@@ -150,19 +146,8 @@
     }
   }
 
-  function cloneWhenMutable(content: Content): Content {
-    if (immutable || isTextContent(content)) {
-      return content
-    }
-
-    debug('cloning content')
-    return {
-      json: parser.parse(parser.stringify(content.json) || '')
-    }
-  }
-
   export function get(): Content {
-    return cloneWhenMutable(content)
+    return content
   }
 
   export async function set(newContent: Content): Promise<void> {
@@ -176,7 +161,7 @@
     // new editor id -> will re-create the editor
     instanceId = uniqueId()
 
-    content = cloneWhenMutable(newContent)
+    content = newContent
   }
 
   export async function update(updatedContent: Content): Promise<void> {
@@ -187,7 +172,7 @@
       throw new Error(contentError)
     }
 
-    content = cloneWhenMutable(updatedContent)
+    content = updatedContent
 
     await tick() // await rerender
   }
@@ -295,7 +280,7 @@
     content = updatedContent
 
     if (onChange) {
-      onChange(cloneWhenMutable(updatedContent), previousContent, status)
+      onChange(updatedContent, previousContent, status)
     }
   }
 
@@ -408,6 +393,7 @@
         path,
         onPatch,
 
+        immutable,
         readOnly,
         indentation,
         tabSize,
@@ -469,6 +455,7 @@
             {mode}
             {content}
             {selection}
+            {immutable}
             {readOnly}
             {indentation}
             {tabSize}

@@ -673,7 +673,7 @@
 
   function setCodeMirrorContent(newContent: Content, forceUpdate = false) {
     const newText = getText(newContent, indentation, parser)
-    const isChanged = newText !== getText(content, indentation, parser)
+    const isChanged = newText !== text
     const previousContent = content
 
     debug('setCodeMirrorContent', { isChanged, forceUpdate })

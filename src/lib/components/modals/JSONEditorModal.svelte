@@ -40,6 +40,7 @@
   export let path: JSONPath
   export let onPatch: OnPatch
 
+  export let immutable: boolean
   export let readOnly: boolean
   export let indentation: number | string
   export let tabSize: number
@@ -237,6 +238,7 @@
         mode={currentState.mode}
         content={currentState.content}
         selection={currentState.selection}
+        {immutable}
         {readOnly}
         {indentation}
         {tabSize}

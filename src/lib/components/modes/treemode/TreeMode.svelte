@@ -180,6 +180,7 @@
   let hasFocus = false
   const jump = createJump()
 
+  export let immutable: boolean
   export let readOnly: boolean
   export let externalContent: Content
   export let externalSelection: JSONEditorSelection | null
@@ -504,7 +505,7 @@
       return
     }
 
-    const isChanged = json !== updatedJson
+    const isChanged = immutable ? json !== updatedJson : !isEqual(json, updatedJson)
 
     debug('update external json', { isChanged, currentlyText: json === undefined })
 
@@ -519,7 +520,7 @@
     const previousText = text
     const previousTextIsRepaired = textIsRepaired
 
-    json = updatedJson
+    json = cloneJsonWhenMutable(updatedJson)
     expandWhenNotInitialized(json)
     text = undefined
     textIsRepaired = false
@@ -614,6 +615,25 @@
         updateSelection(externalSelection)
       }
     }
+  }
+
+  function cloneWhenMutable(content: Content): Content {
+    if (isTextContent(content)) {
+      return content
+    }
+
+    return {
+      json: cloneJsonWhenMutable(content.json)
+    }
+  }
+
+  function cloneJsonWhenMutable(json: unknown): unknown {
+    if (immutable) {
+      return json
+    }
+
+    debug('cloning content')
+    return parser.parse(parser.stringify(json) || '')
   }
 
   function expandWhenNotInitialized(json: unknown) {
@@ -1429,17 +1449,21 @@
       return
     }
 
+    if (!onChange) {
+      return
+    }
+
     // make sure we cannot send an invalid contents like having both
     // json and text defined, or having none defined
     if (text !== undefined) {
       const content = { text, json: undefined }
-      onChange?.(content, previousContent, {
+      onChange(cloneWhenMutable(content), cloneWhenMutable(previousContent), {
         contentErrors: validate(),
         patchResult
       })
     } else if (json !== undefined) {
       const content = { text: undefined, json }
-      onChange?.(content, previousContent, {
+      onChange(cloneWhenMutable(content), cloneWhenMutable(previousContent), {
         contentErrors: validate(),
         patchResult
       })

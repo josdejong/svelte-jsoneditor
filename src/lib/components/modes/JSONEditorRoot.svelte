@@ -39,6 +39,7 @@
   export let content: Content
   export let selection: JSONEditorSelection | null
 
+  export let immutable: boolean
   export let readOnly: boolean
   export let indentation: number | string
   export let tabSize: number
@@ -274,6 +275,7 @@
     bind:this={refTableMode}
     externalContent={content}
     externalSelection={selection}
+    {immutable}
     {readOnly}
     {mainMenuBar}
     {escapeControlCharacters}
@@ -302,6 +304,7 @@
     bind:this={refTreeMode}
     externalContent={content}
     externalSelection={selection}
+    {immutable}
     {readOnly}
     {indentation}
     {mainMenuBar}

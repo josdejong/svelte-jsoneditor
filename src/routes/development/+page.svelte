@@ -38,7 +38,8 @@
   }
 
   let content: Content = {
-    text: `{
+    text: undefined,
+    json: JSON.parse(`{
   "boolean": true,
   "color": "#82b92c",
   "html_code": "&quot;",
@@ -89,8 +90,7 @@
     }
   ],
   "long line": "longwordlongword longword2longword2longword2 longlinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelongline"
-}`,
-    json: undefined
+}`)
   }
 
   let selectionTree: JSONEditorSelection | null = null
@@ -665,7 +665,12 @@
         }
         // @ts-expect-error content.json is an unstructured, nested object
         content.json.object.a = 'b (Mutated!)'
-        refTreeEditor?.update(content)
+        // @ts-expect-error content.json is an unstructured, nested object
+        delete content.json.object.c
+        // @ts-expect-error content.json is an unstructured, nested object
+        content.json.object.f = 'f (Mutated!)'
+
+        content = { json: content.json } // trigger svelte update
       }}
     >
       Mutate ['object', 'a']
