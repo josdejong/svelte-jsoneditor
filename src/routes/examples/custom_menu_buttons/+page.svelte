@@ -47,13 +47,10 @@
       className: 'custom-copy-button'
     }
 
-    const space: MenuSpace = {
-      type: 'space'
-    }
+    const head = items.slice(0, items.length - 1)
+    const tail = items.slice(items.length - 1) // the tail contains space
 
-    const itemsWithoutSpace = items.slice(0, items.length - 2)
-
-    return itemsWithoutSpace.concat([separator, customCopyButton, space])
+    return head.concat(separator, customCopyButton, tail)
   }
 </script>
 

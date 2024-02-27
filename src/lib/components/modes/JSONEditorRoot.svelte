@@ -34,6 +34,7 @@
   import TreeMode from './treemode/TreeMode.svelte'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { isMenuSpace } from '$lib/typeguards.js'
+  import { cloneDeep } from 'lodash-es'
 
   export let content: Content
   export let selection: JSONEditorSelection | null
@@ -112,12 +113,16 @@
       ? modeMenuItems.concat(items) // menu is empty, readOnly mode
       : modeMenuItems.concat(separatorMenuItem, items)
 
-    return onRenderMenu(updatedItems, { mode, modal: insideModal }) || updatedItems
+    const updatedItemsOriginal = cloneDeep(updatedItems) // the user may change updatedItems in the callback
+
+    return onRenderMenu(updatedItems, { mode, modal: insideModal }) || updatedItemsOriginal
   }
 
   let handleRenderContextMenu: OnRenderContextMenuInternal
   $: handleRenderContextMenu = (items: ContextMenuItem[]) => {
-    return onRenderContextMenu(items, { mode, modal: insideModal, selection }) || items
+    const itemsOriginal = cloneDeep(items) // the user may change items in the callback
+
+    return onRenderContextMenu(items, { mode, modal: insideModal, selection }) || itemsOriginal
   }
 
   export function patch(operations: JSONPatchDocument): JSONPatchResult {
