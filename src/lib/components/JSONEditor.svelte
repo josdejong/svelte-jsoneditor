@@ -157,7 +157,7 @@
 
     debug('cloning content')
     return {
-      json: parser.parse(parser.stringify(content.json))
+      json: parser.parse(parser.stringify(content.json) || '')
     }
   }
 
@@ -278,16 +278,14 @@
   }
 
   export async function updateProps(props: JSONEditorPropsOptional): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    // @ts-expect-error TS doesn't understand the .$set() method
     this.$set(props)
 
     await tick() // await rerender
   }
 
   export async function destroy() {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    // @ts-expect-error TS doesn't understand the .$destroy() method
     this.$destroy()
 
     await tick() // await destroying
