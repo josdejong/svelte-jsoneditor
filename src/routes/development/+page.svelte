@@ -659,12 +659,13 @@
     </button>
     <button
       on:click={() => {
-        if (!content.json) {
+        if (!isJSONContent(content)) {
           alert('Cannot do this, first change the content to be JSON instead of text')
           return
         }
+        // @ts-expect-error content.json is an unstructured, nested object
         content.json.object.a = 'b (Mutated!)'
-        refTreeEditor.update(content)
+        refTreeEditor?.update(content)
       }}
     >
       Mutate ['object', 'a']
