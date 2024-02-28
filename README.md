@@ -240,6 +240,28 @@ mode: 'tree' | 'text' | 'table'
 
 Open the editor in `'tree'` mode (default), `'table'` mode, or `'text'` mode (formerly: `code` mode).
 
+#### immutable
+
+```ts
+immutable: boolean
+```
+
+The option `immutable` is `false` by default. It is higly recommended to configure the editor with `immmutable: true` and only make changes to the editor's contents in an immutable way. This gives _much_ better performane, and is a necessity when working with large JSON documents.
+
+How to use the library in an immutable way, and why, is explained in detail in the section [Immutability](#immutability).
+
+#### immutableWarningDisabled
+
+```ts
+immutableWarningDisabled: boolean
+```
+
+The option `immutableWarningDisabled` is `false` by default. When `svelte-jsoneditor` is configured with `{immutable: false}`, it will log the following console warning:
+
+> JSONEditor is configured with {immutable:false}, which is bad for performance. Consider configuring {immutable:true}, or disable this warning by configuring {immutableWarningDisabled:true}.
+
+If you really need support for mutable changes, you can suppress this warning by configuring `{immutableWarningDisabled: true}`.
+
 #### mainMenuBar
 
 ```ts
@@ -936,6 +958,75 @@ When updating CSS variables dynamically, it is necessary to refresh the via `edi
 </script>
 <JSONEditor bind:this="{editorRef}" ... />
 ```
+
+## Immutability
+
+> TL;DR configure `svelte-jsoneditor` with `{immutable: true}` and only make immutable changes to you document contents for best performance. If you _do_ need support for mutable changes, you can disable the console warning by configuring `{immutableWarningDisabled: true}`.
+
+The editor can support both _immutable_ and _mutable_ changes made to the contents of the editor. This can be configured with the option [`immutable`](#immutable). It is strongly recommended to configure the editor with `{immmutable: true}` and only make changes to the editor's contents in an _immutable_ way. This gives much better performance, and is a necessity when working with large JSON documents.
+
+If you're making mutable changes, the editor has to make a full copy of the JSON document on every change to enable history (undo/redo) and to provide the `onChange` callback with both a current and previous version of the document. The editor also has to do a full rerender of the UI on every change, since it cannot know which part of the document has been changed.
+
+When using immutable changes on the other hand, the editor knows exactly which part of the document is changed using a cheap strict equal check against the previous version of the data. There is no need to make a deep copy of the document on changes, and also, the change detection can be used to only rerender the parts of the UI that actually changed.
+
+Here is an example of a mutable change:
+
+```js
+// mutable change (NOT RECOMMENDED)
+function updateDate() {
+  const lastEdited = new Date().toISOString()
+  const content = toJsonContent(myJsonEditor.get())
+  content.json.lastEdited = lastEdited // <- this is a mutable change
+  myJsonEditor.update(content)
+}
+```
+
+Instead, you can apply the same change in an immutable way. There are various options for that:
+
+```js
+// immutable change (RECOMMENDED)
+
+// immutable change using a libary like "mutative" or "immer" (efficient and easy to work with)
+import { create } from 'mutative'
+function updateDate1() {
+  const content = toJsonContent(myJsonEditor.get())
+  const updatedContent = create(content, (draft) => {
+    draft.json.lastEdited = new Date().toISOString()
+  })
+  myJsonEditor.update(updatedContent)
+}
+
+// immutable change using "immutable-json-patch"
+import { setIn } from 'immutable-json-patch'
+function updateDate2() {
+  const content = toJsonContent(myJsonEditor.get())
+  const updatedContent = setIn(content, ['json', 'lastEdited'], new Date().toISOString())
+  myJsonEditor.update(updatedContent)
+}
+
+// immutable change using the spread operator (not handy for updates in nested data)
+function updateDate3() {
+  const content = toJsonContent(myJsonEditor.get())
+  const updatedContent = {
+    json: {
+      ...content.json,
+      lastEdited: new Date().toISOString()
+    }
+  }
+  myJsonEditor.update(updatedContent)
+}
+
+// immutable change by creating a deep clone (simple but inefficient)
+import { cloneDeep } from 'lodash-es'
+function updateDate4() {
+  const content = toJsonContent(myJsonEditor.get())
+  const updatedContent = cloneDeep(content)
+  updatedContent.json.lastEdited = new Date().toISOString()
+  myJsonEditor.update(updatedContent)
+}
+```
+
+Besides performance benefits, another advantage of an immutable way of working is that it makes the data that you work with much more predictive and less error-prone. You can learn more about immutability by searching for articles or videos about the subject, such as [this video](https://youtu.be/Wo0qiGPSV-s) or [this article](https://www.freecodecamp.org/news/immutability-in-javascript-with-examples/). Immutability is not always the best choice, but in the case of this JSON Editor we're dealing with large and deeply nested data structures, in which we typically make only small changes like updating a single nested value. An immutable approach really shines here, enabling `svelte-jsoneditor` to smoothly render and edit JSON documents up to 512 MB.
 
 ## Differences between `josdejong/svelte-jsoneditor` and `josdejong/jsoneditor`
 

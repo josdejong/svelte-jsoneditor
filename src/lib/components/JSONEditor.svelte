@@ -67,6 +67,7 @@
   export let selection: JSONEditorSelection | null = null
 
   export let immutable = false
+  export let immutableWarningDisabled = false
   export let readOnly = false
   export let indentation: number | string = 2
   export let tabSize = 4
@@ -112,6 +113,17 @@
     component: Component
     callbacks: Partial<Callbacks>
   } | null = null
+
+  $: {
+    if (!immutable && !immutableWarningDisabled) {
+      console.warn(
+        'JSONEditor is configured with {immutable:false}, which is bad for performance. ' +
+          'Consider configuring {immutable:true}, ' +
+          'or disable this warning by configuring {immutableWarningDisabled:true}. ' +
+          'Read more: https://github.com/josdejong/svelte-jsoneditor/?tab=readme-ov-file#immutability'
+      )
+    }
+  }
 
   $: {
     const contentError = validateContentType(content)
@@ -161,7 +173,7 @@
     // new editor id -> will re-create the editor
     instanceId = uniqueId()
 
-    content = immutable ? newContent : {...newContent}
+    content = immutable ? newContent : { ...newContent }
   }
 
   export async function update(updatedContent: Content): Promise<void> {
@@ -172,7 +184,7 @@
       throw new Error(contentError)
     }
 
-    content = immutable ? updatedContent : {...updatedContent}
+    content = immutable ? updatedContent : { ...updatedContent }
 
     await tick() // await rerender
   }
