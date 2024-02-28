@@ -161,7 +161,7 @@
     // new editor id -> will re-create the editor
     instanceId = uniqueId()
 
-    content = newContent
+    content = immutable ? newContent : {...newContent}
   }
 
   export async function update(updatedContent: Content): Promise<void> {
@@ -172,7 +172,7 @@
       throw new Error(contentError)
     }
 
-    content = updatedContent
+    content = immutable ? updatedContent : {...updatedContent}
 
     await tick() // await rerender
   }
