@@ -196,5 +196,39 @@ describe('createAjvValidator', () => {
     }, /the signature of createAjvValidator is changed/)
   })
 
-  // TODO: test support for draft04, draft-06, draft-07
+  test('should support draft-07', () => {
+    const schemaDraft07 = {
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      title: 'My test schema',
+      type: 'object',
+      properties: {
+        userId: {
+          type: 'number'
+        },
+        name: {
+          type: 'string'
+        }
+      },
+      required: ['userId', 'name']
+    }
+
+    const validate = createAjvValidator({ schema: schemaDraft07 })
+
+    const validJson = {
+      userId: 1,
+      name: 'Luke Skywalker'
+    }
+
+    const invalidJson = {
+      userId: '1'
+    }
+
+    assert.deepStrictEqual(validate(validJson), [])
+    assert.deepStrictEqual(validate(invalidJson), [
+      { path: [], message: "must have required property 'name'", severity: 'warning' },
+      { path: ['userId'], message: 'must be number', severity: 'warning' }
+    ])
+  })
+
+  // TODO: test support for draft04, draft-06
 })
