@@ -514,7 +514,6 @@
       return
     }
 
-    const previousContent: Content = { json, text }
     const previousState = documentState
     const previousJson = json
     const previousText = text
@@ -549,7 +548,6 @@
       return
     }
 
-    const previousContent: Content = { json, text }
     const previousJson = json
     const previousState = documentState
     const previousText = text

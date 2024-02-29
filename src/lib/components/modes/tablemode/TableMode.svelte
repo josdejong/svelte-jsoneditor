@@ -371,7 +371,6 @@
       return
     }
 
-    const previousContent = { json, text }
     const previousJson = json
     const previousState = documentState
     const previousText = text
