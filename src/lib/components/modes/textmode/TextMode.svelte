@@ -173,7 +173,7 @@
     escapeUnicodeCharacters
   })
 
-  $: setCodeMirrorContent(externalContent)
+  $: setCodeMirrorContent(externalContent, false, false)
   $: applyExternalSelection(externalSelection)
   $: updateLinter(validator)
   $: updateIndentation(indentation)
@@ -250,14 +250,20 @@
   })
 
   export function patch(operations: JSONPatchDocument): JSONPatchResult {
-    debug('patch', operations)
+    return handlePatch(operations, false)
+  }
+
+  export function handlePatch(operations: JSONPatchDocument, emitChange: boolean): JSONPatchResult {
+    debug('handlePatch', operations, emitChange)
 
     const previousJson = parser.parse(text)
     const updatedJson = immutableJSONPatch(previousJson, operations)
     const undo = revertJSONPatch(previousJson, operations)
-    setCodeMirrorContent({
+    const updatedContent = {
       text: parser.stringify(updatedJson, null, indentation) as string
-    })
+    }
+
+    setCodeMirrorContent(updatedContent, emitChange, false)
 
     return {
       json: updatedJson,
@@ -275,11 +281,12 @@
     }
 
     try {
-      const json = parser.parse(text)
-      setCodeMirrorContent({
-        text: parser.stringify(json, null, indentation) as string
-      })
-      askToFormat = true
+      const updatedJson = parser.parse(text)
+      const updatedContent = {
+        text: parser.stringify(updatedJson, null, indentation) as string
+      }
+
+      setCodeMirrorContent(updatedContent, true, false)
 
       return true
     } catch (err) {
@@ -297,11 +304,12 @@
     }
 
     try {
-      const json = parser.parse(text)
-      setCodeMirrorContent({
-        text: parser.stringify(json) as string
-      })
-      askToFormat = false
+      const updatedJson = parser.parse(text)
+      const updatedContent = {
+        text: parser.stringify(updatedJson) as string
+      }
+
+      setCodeMirrorContent(updatedContent, true, false)
 
       return true
     } catch (err) {
@@ -319,9 +327,12 @@
     }
 
     try {
-      setCodeMirrorContent({
+      const updatedContent = {
         text: jsonrepair(text)
-      })
+      }
+
+      setCodeMirrorContent(updatedContent, true, false)
+
       jsonStatus = JSON_STATUS_VALID
       jsonParseError = null
     } catch (err) {
@@ -345,7 +356,7 @@
         rootPath: [],
         onSort: async ({ operations }) => {
           debug('onSort', operations)
-          patch(operations)
+          handlePatch(operations, true)
         },
         onClose: () => {
           modalOpen = false
@@ -384,7 +395,7 @@
             })
           } else {
             debug('onTransform', operations)
-            patch(operations)
+            handlePatch(operations, true)
           }
         },
         onClose: () => {
@@ -445,7 +456,7 @@
 
   function handleAcceptTooLarge() {
     acceptTooLarge = true
-    setCodeMirrorContent(externalContent, true)
+    setCodeMirrorContent(externalContent, true, true)
   }
 
   function handleSwitchToTreeMode() {
@@ -671,12 +682,12 @@
     }
   }
 
-  function setCodeMirrorContent(newContent: Content, forceUpdate = false) {
+  function setCodeMirrorContent(newContent: Content, emitChange: boolean, forceUpdate: boolean) {
     const newText = getText(newContent, indentation, parser)
     const isChanged = !isEqual(newContent, content)
     const previousContent = content
 
-    debug('setCodeMirrorContent', { isChanged, forceUpdate })
+    debug('setCodeMirrorContent', { isChanged, emitChange, forceUpdate })
 
     if (!codeMirrorView || (!isChanged && !forceUpdate)) {
       return
@@ -698,7 +709,8 @@
     }
 
     updateCanUndoRedo()
-    if (isChanged) {
+
+    if (isChanged && emitChange) {
       emitOnChange(content, previousContent)
     }
   }

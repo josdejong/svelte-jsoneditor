@@ -533,14 +533,6 @@
       previousText,
       previousTextIsRepaired
     })
-
-    // we could work out a patchResult, or use patch(), but only when the previous and new
-    // contents are both json and not text. We go for simplicity and consistency here and
-    // let the functions applyExternalJson and applyExternalText _not_ return
-    // a patchResult ever.
-    const patchResult = null
-
-    emitOnChange(previousContent, patchResult)
   }
 
   function applyExternalText(updatedText: string | undefined) {
@@ -597,14 +589,6 @@
       previousText,
       previousTextIsRepaired
     })
-
-    // we could work out a patchResult, or use patch(), but only when the previous and new
-    // contents are both json and not text. We go for simplicity and consistency here and
-    // let the functions applyExternalJson and applyExternalText _not_ return
-    // a patchResult ever.
-    const patchResult = null
-
-    emitOnChange(previousContent, patchResult)
   }
 
   function applyExternalSelection(externalSelection: JSONEditorSelection | null) {
@@ -739,7 +723,6 @@
       throw new Error('Cannot apply patch: no JSON')
     }
 
-    const previousContent = { json, text }
     const previousJson = json
     const previousState = documentState
     const previousText = text
@@ -799,8 +782,6 @@
       undo,
       redo: operations
     }
-
-    emitOnChange(previousContent, patchResult)
 
     return patchResult
   }
@@ -1451,19 +1432,14 @@
     operations: JSONPatchDocument,
     afterPatch?: AfterPatchCallback
   ): JSONPatchResult {
-    if (readOnly) {
-      // this should never happen in practice
-      return {
-        json,
-        previousJson: json,
-        undo: [],
-        redo: []
-      }
-    }
-
     debug('handlePatch', operations, afterPatch)
 
-    return patch(operations, afterPatch)
+    const previousContent = { json, text }
+    const patchResult = patch(operations, afterPatch)
+
+    emitOnChange(previousContent, patchResult)
+
+    return patchResult
   }
 
   function handleReplaceJson(updatedJson: unknown, afterPatch?: AfterPatchCallback) {
