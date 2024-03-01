@@ -224,6 +224,8 @@ content: Content
 
 Pass the JSON contents to be rendered in the JSONEditor. `Content` is an object containing a property `json` (a parsed JSON document) or `text` (a stringified JSON document). Only one of the two properties must be defined. You can pass both content types to the editor independent of in what mode it is. You can use two-way binding via `bind:content`.
 
+> IMPORTANT: only make immutable changes to `content`. Mutable changes will mess up history and rendered contents. See section [Immutability](#immutability).
+
 #### selection
 
 ```ts
@@ -659,6 +661,8 @@ JSONEditor.prototype.get(): Content
 
 Get the current JSON document.
 
+> IMPORTANT: do not mutate the received `content`, that will mess up history and rendered contents. See section [Immutability](#immutability).
+
 #### set
 
 ```ts
@@ -675,6 +679,8 @@ JSONEditor.prototype.update(content: Content): Promise<void>
 
 Update the loaded content, keeping the state of the editor (like expanded objects). You can also call `editor.updateProps({ content })`. See also method `set(content)`.
 
+> IMPORTANT: only apply immutable changes to `content`. Mutable changes will mess up history and rendered contents. See section [Immutability](#immutability).
+
 #### patch
 
 ```ts
@@ -682,6 +688,8 @@ JSONEditor.prototype.patch(operations: JSONPatchDocument) : Promise<JSONPatchRes
 ```
 
 Apply a JSON patch document to update the contents of the JSON document. A JSON patch document is a list with JSON Patch operations.
+
+> IMPORTANT: only apply immutable changes to the contents. Mutable changes will mess up history and rendered contents. See section [Immutability](#immutability).
 
 #### updateProps
 
@@ -935,6 +943,75 @@ When updating CSS variables dynamically, it is necessary to refresh the via `edi
   }
 </script>
 <JSONEditor bind:this="{editorRef}" ... />
+```
+
+## Immutability
+
+It is important that the `content` of the editor is only updated in an immutable way. Mutating the `content` will break the history (undo/redo), and will not always immediately update the user interface according to the changes.
+
+The reasons for requiring immutable changes are:
+
+1. It is necessary in order to support history (undo/redo).
+2. It allows efficiently re-rendering only changed sections of the user interface.
+
+Other advantages of an immutable way of working are that it makes the data that you work with much more predictive and less error-prone. You can learn more about immutability by searching for articles or videos about the subject, such as [this video](https://youtu.be/Wo0qiGPSV-s) or [this article](https://www.freecodecamp.org/news/immutability-in-javascript-with-examples/). Immutability is not _always_ the best choice, but in the case of this JSON Editor we're dealing with large and deeply nested data structures, in which we typically make only small changes like updating a single nested value. An immutable approach really shines here, enabling `svelte-jsoneditor` to smoothly render and edit JSON documents up to 512 MB.
+
+Here is an example of a mutable change:
+
+```js
+// mutable change (NOT SUPPORTED!)
+function updateDate() {
+  const lastEdited = new Date().toISOString()
+  const content = toJsonContent(myJsonEditor.get())
+  content.json.lastEdited = lastEdited // <- this is a mutable change
+  myJsonEditor.update(content)
+  // ERROR: The UI will not update immediately but only update after changing something
+  // inside the editor like the selection. And most importantly, history is broken now,
+  // because the original document is mutated. You cannot undo this action.
+}
+```
+
+Instead, you can apply the same change in an immutable way. There are various options for that:
+
+```js
+// immutable change using a libary like "mutative" or "immer" (efficient and easy to work with)
+import { create } from 'mutative'
+function updateDate1() {
+  const content = toJsonContent(myJsonEditor.get())
+  const updatedContent = create(content, (draft) => {
+    draft.json.lastEdited = new Date().toISOString()
+  })
+  myJsonEditor.update(updatedContent)
+}
+
+// immutable change using "immutable-json-patch"
+import { setIn } from 'immutable-json-patch'
+function updateDate2() {
+  const content = toJsonContent(myJsonEditor.get())
+  const updatedContent = setIn(content, ['json', 'lastEdited'], new Date().toISOString())
+  myJsonEditor.update(updatedContent)
+}
+
+// immutable change using the spread operator (not handy for updates in nested data)
+function updateDate3() {
+  const content = toJsonContent(myJsonEditor.get())
+  const updatedContent = {
+    json: {
+      ...content.json,
+      lastEdited: new Date().toISOString()
+    }
+  }
+  myJsonEditor.update(updatedContent)
+}
+
+// immutable change by creating a deep clone (simple though inefficient)
+import { cloneDeep } from 'lodash-es'
+function updateDate4() {
+  const content = toJsonContent(myJsonEditor.get())
+  const updatedContent = cloneDeep(content)
+  updatedContent.json.lastEdited = new Date().toISOString()
+  myJsonEditor.update(updatedContent)
+}
 ```
 
 ## Differences between `josdejong/svelte-jsoneditor` and `josdejong/jsoneditor`
