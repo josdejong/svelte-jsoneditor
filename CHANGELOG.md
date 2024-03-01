@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.22.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.21.6...v0.22.0) (2024-03-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* The `onChange` callback is no longer triggered on programmatic changes via a
+two-way binded `content` or via methods `.update()`, `.set()`, and `.patch()`.
+
+### Features
+
+* do not trigger onChange on programmatic changes ([#410](https://github.com/josdejong/svelte-jsoneditor/issues/410)) ([201f602](https://github.com/josdejong/svelte-jsoneditor/commit/201f6020c4022001b41b7c459e2d809808828543))
+* document the requirement for immutable changes in `content` (see [#318](https://github.com/josdejong/svelte-jsoneditor/issues/318)) ([0545e64](https://github.com/josdejong/svelte-jsoneditor/commit/0545e647b9c0e68edecbaf7c8f65d51d64de99a4))
+* update dependencies (a.o. fixing an issue with wrapping tab indented lines) ([1bd92e7](https://github.com/josdejong/svelte-jsoneditor/commit/1bd92e73fb95bb2cd0ded15d1fa0fd02b5959303))
+
+
+### Bug Fixes
+
+* add missing property `onSelect` to interface `JSONEditorPropsOptional` ([4087e3f](https://github.com/josdejong/svelte-jsoneditor/commit/4087e3fa9e2f9243c95e8ff6fb7c46c4c67fb61f))
+* improve the logic to determine whether a JSON document needs formatting ([bb15bd1](https://github.com/josdejong/svelte-jsoneditor/commit/bb15bd1d30998d7490a53cf58a03cfc7b95f8935))
+* onCreateMenu and onCreateContextMenu possibly applying mutated changes without returning ([da8fd60](https://github.com/josdejong/svelte-jsoneditor/commit/da8fd6093de81daff47847cb1c50992b3f23fdbd))
+
 ### [0.21.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.21.5...v0.21.6) (2024-02-15)
 
 
