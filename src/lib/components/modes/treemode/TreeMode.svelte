@@ -2,7 +2,26 @@
 
 <script lang="ts">
   import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler.js'
-  import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
+  import {
+    faArrowRightArrowLeft,
+    faCaretSquareDown,
+    faCaretSquareUp,
+    faCheck,
+    faClone,
+    faCode,
+    faCopy,
+    faCropAlt,
+    faCut,
+    faFilter,
+    faPaste,
+    faPen,
+    faPlus,
+    faSortAmountDownAlt,
+    faTrashCan,
+    faWrench,
+    faCheckSquare,
+    faSquare
+  } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '$lib/utils/debug.js'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, existsIn, getIn, immutableJSONPatch } from 'immutable-json-patch'
@@ -61,7 +80,6 @@
     getSelectionPaths,
     getSelectionRight,
     getSelectionUp,
-    hasSelectionContents,
     isAfterSelection,
     isEditingSelection,
     isInsideSelection,
@@ -73,6 +91,8 @@
     isValueSelection,
     removeEditModeFromSelection,
     selectAll,
+    singleItemSelected,
+    hasSelectionContents,
     updateSelectionInDocumentState
   } from '$lib/logic/selection.js'
   import { mapValidationErrors, validateJSON } from '$lib/logic/validation.js'
@@ -96,7 +116,7 @@
     repairPartialJson
   } from '$lib/utils/jsonUtils.js'
   import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
-  import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils.js'
+  import { isObject, isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
@@ -161,6 +181,7 @@
   } from '$lib/logic/actions.js'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import type { Context } from 'svelte-simple-modal'
+  import type { ContextMenuItem } from '$lib/types'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -210,6 +231,67 @@
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
   let modalOpen = false
+
+  $: selection = documentState.selection
+
+  $: hasJson = json !== undefined
+  $: hasSelection = !!selection
+  $: rootSelected = selection ? isEmpty(getFocusPath(selection)) : false
+  $: focusValue = selection ? getIn(json, getFocusPath(selection)) : undefined
+  $: editValueText = Array.isArray(focusValue)
+    ? 'Edit array'
+    : isObject(focusValue)
+      ? 'Edit object'
+      : 'Edit value'
+
+  $: canDuplicate = hasJson && hasSelectionContents(documentState.selection) && !rootSelected // must not be root
+
+  $: canExtract =
+    hasJson &&
+    selection != null &&
+    (isMultiSelection(selection) || isValueSelection(selection)) &&
+    !rootSelected // must not be root
+
+  $: canEditKey =
+    hasJson &&
+    selection != null &&
+    singleItemSelected(selection) &&
+    !rootSelected &&
+    !Array.isArray(getIn(json, initial(getFocusPath(selection))))
+
+  $: canEditValue = hasJson && selection != null && singleItemSelected(selection)
+  $: canEnforceString = canEditValue && !isObjectOrArray(focusValue)
+
+  $: convertMode = hasSelectionContents(documentState.selection)
+  $: insertOrConvertText = convertMode ? 'Convert to:' : 'Insert:'
+  $: canInsertOrConvertStructure = convertMode ? false : hasSelection
+  $: canInsertOrConvertObject = convertMode
+    ? canConvert(selection) && !isObject(focusValue)
+    : hasSelection
+  $: canInsertOrConvertArray = convertMode
+    ? canConvert(selection) && !Array.isArray(focusValue)
+    : hasSelection
+  $: canInsertOrConvertValue = convertMode
+    ? canConvert(selection) && isObjectOrArray(focusValue)
+    : hasSelection
+
+  $: enforceString =
+    selection != null && focusValue
+      ? getEnforceString(
+          focusValue,
+          documentState.enforceStringMap,
+          compileJSONPointer(getFocusPath(selection)),
+          parser
+        )
+      : false
+
+  function handleInsertOrConvert(type: InsertType) {
+    if (convertMode) {
+      handleConvert(type)
+    } else {
+      handleInsertFromContextMenu(type)
+    }
+  }
 
   createFocusTracker({
     onMount,
@@ -951,7 +1033,7 @@
       readOnly ||
       json === undefined ||
       !documentState.selection ||
-      !hasSelectionContents(documentState.selection) ||
+      !hasSelectionContents ||
       isEmpty(getFocusPath(documentState.selection)) // root selected, cannot duplicate
     ) {
       return
@@ -1007,7 +1089,7 @@
     })
   }
 
-  function handleInsertFromContextMenu(type: 'value' | 'object' | 'array' | 'structure') {
+  function handleInsertFromContextMenu(type: InsertType) {
     if (isKeySelection(documentState.selection)) {
       // in this case, we do not want to rename the key, but replace the property
       updateSelection(createValueSelection(documentState.selection.path, false))
@@ -1020,7 +1102,7 @@
     handleInsert(type)
   }
 
-  function handleConvert(type: 'value' | 'object' | 'array') {
+  function handleConvert(type: InsertType) {
     if (readOnly || !documentState.selection) {
       return
     }
@@ -1033,7 +1115,11 @@
     try {
       const path = getAnchorPath(documentState.selection)
       const currentValue: unknown = getIn(json, path)
-      const convertedValue = convertValue(currentValue, type, parser)
+      const convertedValue = convertValue(
+        currentValue,
+        type as 'value' | 'object' | 'array',
+        parser
+      )
       if (convertedValue === currentValue) {
         // no change, do nothing
         return
@@ -1801,33 +1887,246 @@
     offsetLeft,
     showTip
   }: AbsolutePopupOptions) {
+    const defaultItems: ContextMenuItem[] = [
+      {
+        type: 'row',
+        items: [
+          {
+            type: 'button',
+            onClick: () => handleEditKey(),
+            icon: faPen,
+            text: 'Edit key',
+            title: 'Edit the key (Double-click on the key)',
+            disabled: !canEditKey
+          },
+          {
+            type: 'dropdown-button',
+            main: {
+              type: 'button',
+              onClick: () => handleEditValue(),
+              icon: faPen,
+              text: editValueText,
+              title: 'Edit the value (Double-click on the value)',
+              disabled: !canEditValue
+            },
+            width: '11em',
+            items: [
+              {
+                type: 'button',
+                icon: faPen,
+                text: editValueText,
+                title: 'Edit the value (Double-click on the value)',
+                onClick: () => handleEditValue(),
+                disabled: !canEditValue
+              },
+              {
+                type: 'button',
+                icon: enforceString ? faCheckSquare : faSquare,
+                text: 'Enforce string',
+                title: 'Enforce keeping the value as string when it contains a numeric value',
+                onClick: () => handleToggleEnforceString(),
+                disabled: !canEnforceString
+              }
+            ]
+          }
+        ]
+      },
+      { type: 'separator' },
+      {
+        type: 'row',
+        items: [
+          {
+            type: 'dropdown-button',
+            main: {
+              type: 'button',
+              onClick: () => handleCut(true),
+              icon: faCut,
+              text: 'Cut',
+              title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
+              disabled: !hasSelectionContents
+            },
+            width: '10em',
+            items: [
+              {
+                type: 'button',
+                icon: faCut,
+                text: 'Cut formatted',
+                title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
+                onClick: () => handleCut(true),
+                disabled: !hasSelectionContents
+              },
+              {
+                type: 'button',
+                icon: faCut,
+                text: 'Cut compacted',
+                title: 'Cut selected contents, without indentation (Ctrl+Shift+X)',
+                onClick: () => handleCut(false),
+                disabled: !hasSelectionContents
+              }
+            ]
+          },
+          {
+            type: 'dropdown-button',
+            main: {
+              type: 'button',
+              onClick: () => handleCopy(true),
+              icon: faCopy,
+              text: 'Copy',
+              title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
+              disabled: !hasSelectionContents
+            },
+            width: '12em',
+            items: [
+              {
+                type: 'button',
+                icon: faCopy,
+                text: 'Copy formatted',
+                title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
+                onClick: () => handleCopy(true),
+                disabled: !hasSelectionContents
+              },
+              {
+                type: 'button',
+                icon: faCopy,
+                text: 'Copy compacted',
+                title: 'Copy selected contents, without indentation (Ctrl+Shift+C)',
+                onClick: () => handleCopy(false),
+                disabled: !hasSelectionContents
+              }
+            ]
+          },
+          {
+            type: 'button',
+            onClick: () => handlePasteFromMenu(),
+            icon: faPaste,
+            text: 'Paste',
+            title: 'Paste clipboard contents (Ctrl+V)',
+            disabled: !hasSelection
+          }
+        ]
+      },
+      { type: 'separator' },
+      {
+        type: 'row',
+        items: [
+          {
+            type: 'column',
+            items: [
+              {
+                type: 'button',
+                onClick: () => handleDuplicate(),
+                icon: faClone,
+                text: 'Duplicate',
+                title: 'Duplicate selected contents (Ctrl+D)',
+                disabled: !canDuplicate
+              },
+              {
+                type: 'button',
+                onClick: () => handleExtract(),
+                icon: faCropAlt,
+                text: 'Extract',
+                title: 'Extract selected contents',
+                disabled: !canExtract
+              },
+              {
+                type: 'button',
+                onClick: () => handleSortSelection(),
+                icon: faSortAmountDownAlt,
+                text: 'Sort',
+                title: 'Sort array or object contents',
+                disabled: !hasSelectionContents
+              },
+              {
+                type: 'button',
+                onClick: () => handleTransformSelection(),
+                icon: faFilter,
+                text: 'Transform',
+                title: 'Transform array or object contents (filter, sort, project)',
+                disabled: !hasSelectionContents
+              },
+              {
+                type: 'button',
+                onClick: () => handleRemove(),
+                icon: faTrashCan,
+                text: 'Remove',
+                title: 'Remove selected contents (Delete)',
+                disabled: !hasSelectionContents
+              }
+            ]
+          },
+          {
+            type: 'column',
+            items: [
+              { type: 'label', text: insertOrConvertText },
+              {
+                type: 'button',
+                onClick: () => handleInsertOrConvert('structure'),
+                icon: convertMode ? faArrowRightArrowLeft : faPlus,
+                text: 'Structure',
+                title: insertOrConvertText + ' structure',
+                disabled: !canInsertOrConvertStructure
+              },
+              {
+                type: 'button',
+                onClick: () => handleInsertOrConvert('object'),
+                icon: convertMode ? faArrowRightArrowLeft : faPlus,
+                text: 'Object',
+                title: insertOrConvertText + ' structure',
+                disabled: !canInsertOrConvertObject
+              },
+              {
+                type: 'button',
+                onClick: () => handleInsertOrConvert('array'),
+                icon: convertMode ? faArrowRightArrowLeft : faPlus,
+                text: 'Array',
+                title: insertOrConvertText + ' array',
+                disabled: !canInsertOrConvertArray
+              },
+              {
+                type: 'button',
+                onClick: () => handleInsertOrConvert('value'),
+                icon: convertMode ? faArrowRightArrowLeft : faPlus,
+                text: 'Value',
+                title: insertOrConvertText + ' value',
+                disabled: !canInsertOrConvertValue
+              }
+            ]
+          }
+        ]
+      },
+      {
+        type: 'separator'
+      },
+      {
+        type: 'row',
+        items: [
+          {
+            type: 'button',
+            onClick: () => handleInsertBefore(),
+            icon: faCaretSquareUp,
+            text: 'Insert before',
+            title: 'Select area before current entry to insert or paste contents',
+            disabled: !hasSelectionContents || rootSelected
+          },
+          {
+            type: 'button',
+            onClick: () => handleInsertAfter(),
+            icon: faCaretSquareDown,
+            text: 'Insert after',
+            title: 'Select area after current entry to insert or paste contents',
+            disabled: !hasSelectionContents || rootSelected
+          }
+        ]
+      }
+    ]
+
+    const items = onRenderContextMenu(defaultItems)
+
+    if (items === false) return
+
     const props = {
-      json,
-      documentState: documentState,
-      parser,
       showTip,
-
-      onEditKey: handleEditKey,
-      onEditValue: handleEditValue,
-      onToggleEnforceString: handleToggleEnforceString,
-
-      onCut: handleCut,
-      onCopy: handleCopy,
-      onPaste: handlePasteFromMenu,
-
-      onRemove: handleRemove,
-      onDuplicate: handleDuplicate,
-      onExtract: handleExtract,
-
-      onInsertBefore: handleInsertBefore,
-      onInsert: handleInsertFromContextMenu,
-      onConvert: handleConvert,
-      onInsertAfter: handleInsertAfter,
-
-      onSort: handleSortSelection,
-      onTransform: handleTransformSelection,
-
-      onRenderContextMenu,
+      items,
       onCloseContextMenu: function () {
         closeAbsolutePopup(popupId)
         focus()
@@ -1853,7 +2152,7 @@
   }
 
   function handleContextMenu(event?: Event) {
-    if (readOnly || isEditingSelection(documentState.selection)) {
+    if (isEditingSelection(documentState.selection)) {
       return
     }
 
@@ -1902,10 +2201,6 @@
   }
 
   function handleContextMenuFromTreeMenu(event: MouseEvent) {
-    if (readOnly) {
-      return
-    }
-
     openContextMenu({
       anchor: findParentWithNodeName(event.target as HTMLElement, 'BUTTON'),
       offsetTop: 0,
