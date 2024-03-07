@@ -646,7 +646,7 @@
     <button
       on:click={() => {
         content = {
-          text: '[1, 2, 3 }',
+          text: '[1, 2, 3] [',
           json: undefined
         }
       }}

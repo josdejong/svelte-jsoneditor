@@ -27,6 +27,10 @@
     }
   }
 
+  &.no-main-menu {
+    border-top: $main-border;
+  }
+
   .jse-search-box-container {
     position: relative;
     height: 0;
@@ -35,10 +39,6 @@
     margin-left: $padding;
     text-align: right;
     z-index: 3; // must be above the ContextMenuButton
-  }
-
-  &.no-main-menu {
-    border-top: $main-border;
   }
 
   .jse-contents {

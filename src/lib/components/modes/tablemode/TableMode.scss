@@ -17,6 +17,16 @@
     border-top: $main-border;
   }
 
+  .jse-search-box-container {
+    position: relative;
+    height: 0;
+    top: $padding;
+    margin-right: calc($padding + 20px);
+    margin-left: $padding;
+    text-align: right;
+    z-index: 3; // must be above the ContextMenuButton
+  }
+
   .jse-hidden-input-label {
     position: fixed;
     right: 0;

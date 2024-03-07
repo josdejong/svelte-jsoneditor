@@ -8,7 +8,6 @@
     Content,
     ContentErrors,
     DocumentState,
-    ExtendedSearchResultItem,
     HistoryItem,
     JSONEditorContext,
     JSONEditorSelection,
@@ -28,6 +27,7 @@
     OnTransformModal,
     ParseError,
     PastedJson,
+    SearchResult,
     SortedColumn,
     TransformModalOptions,
     ValidationError,
@@ -138,10 +138,13 @@
   import TableContextMenu from '../../../components/modes/tablemode/contextmenu/TableContextMenu.svelte'
   import CopyPasteModal from '../../../components/modals/CopyPasteModal.svelte'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
+  import SearchBox from '../../controls/SearchBox.svelte'
   import TableModeWelcome from './TableModeWelcome.svelte'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import RefreshColumnHeader from './RefreshColumnHeader.svelte'
   import type { Context } from 'svelte-simple-modal'
+  import { filterValueSearchResults } from '$lib/logic/search.js'
+  import { filterPointerOrUndefined } from 'svelte-jsoneditor/utils/jsonPointer'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext<Context>('simple-modal')
@@ -213,6 +216,28 @@
 
   let pastedJson: PastedJson
 
+  let searchResult: SearchResult | undefined
+  let showSearch = false
+  let showReplace = false
+
+  function handleSearch(result: SearchResult | undefined) {
+    searchResult = result
+  }
+
+  async function handleFocusSearch(path: JSONPath) {
+    documentState = {
+      ...documentState,
+      selection: null // navigation path of current selection would be confusing
+    }
+    await scrollTo(path)
+  }
+
+  function handleCloseSearch() {
+    showSearch = false
+    showReplace = false
+    focus()
+  }
+
   $: applyExternalContent(externalContent)
   $: applyExternalSelection(externalSelection)
 
@@ -222,7 +247,8 @@
     ? maintainColumnOrder(getColumns(json, flattenColumns, maxSampleCount), columns)
     : []
 
-  $: containsValidArray = json && !isEmpty(columns)
+  let containsValidArray: boolean
+  $: containsValidArray = json && !isEmpty(columns) ? true : false
   $: showRefreshButton = Array.isArray(json) && json.length > maxSampleCount
 
   // modalOpen is true when one of the modals is open.
@@ -312,7 +338,6 @@
 
   let documentState = createDocumentState()
   let textIsRepaired = false
-  const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // TODO: implement support for search and replace
 
   function onSortByHeader(newSortedColumn: SortedColumn) {
     if (readOnly) {
@@ -1342,14 +1367,12 @@
 
     if (combo === 'Ctrl+F') {
       event.preventDefault()
-      // openFind(false)
-      // TODO: implement find
+      openFind(false)
     }
 
     if (combo === 'Ctrl+H') {
       event.preventDefault()
-      // openFind(true)
-      // TODO: implement find and replace
+      openFind(true)
     }
 
     if (combo === 'Ctrl+Z') {
@@ -1618,6 +1641,19 @@
     })
   }
 
+  function openFind(findAndReplace: boolean): void {
+    debug('openFind', { findAndReplace })
+
+    showSearch = false
+    showReplace = false
+
+    tick().then(() => {
+      // trick to make sure the focus goes to the search box
+      showSearch = true
+      showReplace = findAndReplace
+    })
+  }
+
   function handleUndo() {
     if (readOnly) {
       return
@@ -1723,8 +1759,9 @@
 >
   {#if mainMenuBar}
     <TableMenu
-      {json}
+      {containsValidArray}
       {readOnly}
+      bind:showSearch
       {historyState}
       onSort={handleSortAll}
       onTransform={handleTransformAll}
@@ -1747,6 +1784,20 @@
       />
     </label>
     {#if containsValidArray}
+      <div class="jse-search-box-container">
+        <SearchBox
+          {json}
+          {documentState}
+          {parser}
+          {showSearch}
+          {showReplace}
+          {readOnly}
+          onSearch={handleSearch}
+          onFocus={handleFocusSearch}
+          onPatch={handlePatch}
+          onClose={handleCloseSearch}
+        />
+      </div>
       <div
         class="jse-contents"
         bind:this={refContents}
@@ -1825,13 +1876,28 @@
                     class:jse-selected-value={isSelected}
                   >
                     {#if isObjectOrArray(value)}
+                      {@const searchResultItems = searchResult?.itemsMap
+                        ? filterPointerOrUndefined(searchResult?.itemsMap, compileJSONPointer(path))
+                        : undefined}
+                      {@const containsActiveSearchResult = searchResultItems
+                        ? Object.values(searchResultItems).some((items) =>
+                            items.some((item) => item.active)
+                          )
+                        : false}
+
                       <InlineValue
                         {path}
                         {value}
                         {parser}
                         {isSelected}
+                        containsSearchResult={!isEmpty(searchResultItems)}
+                        {containsActiveSearchResult}
                         onEdit={openJSONEditorModal}
                       />{:else}
+                      {@const searchResultItems = searchResult?.itemsMap
+                        ? filterValueSearchResults(searchResult?.itemsMap, compileJSONPointer(path))
+                        : undefined}
+
                       <JSONValueComponent
                         {path}
                         value={value !== undefined ? value : ''}
