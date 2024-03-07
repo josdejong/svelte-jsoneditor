@@ -97,7 +97,7 @@
   import TreeMenu from './menu/TreeMenu.svelte'
   import Welcome from './Welcome.svelte'
   import NavigationBar from '../../controls/navigationBar/NavigationBar.svelte'
-  import SearchBox from './menu/SearchBox.svelte'
+  import SearchBox from '../../controls/SearchBox.svelte'
   import type {
     AbsolutePopupContext,
     AbsolutePopupOptions,

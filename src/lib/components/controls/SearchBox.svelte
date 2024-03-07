@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { debounce, throttle } from 'lodash-es'
+  import { debounce } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
     faCaretDown,
