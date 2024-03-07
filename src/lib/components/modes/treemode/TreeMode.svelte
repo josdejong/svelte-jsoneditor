@@ -7,15 +7,13 @@
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, existsIn, getIn, immutableJSONPatch } from 'immutable-json-patch'
   import { jsonrepair } from 'jsonrepair'
-  import { initial, isEmpty, isEqual, noop, throttle, uniqueId } from 'lodash-es'
+  import { initial, isEmpty, isEqual, noop, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
   import { createJump } from '$lib/assets/jump.js/src/jump.js'
   import {
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
-    MAX_SEARCH_RESULTS,
     SCROLL_DURATION,
-    SEARCH_UPDATE_THROTTLE,
     SIMPLE_MODAL_OPTIONS
   } from '$lib/constants.js'
   import {
@@ -35,14 +33,6 @@
   } from '$lib/logic/documentState.js'
   import { createHistory } from '$lib/logic/history.js'
   import { duplicate, extract, revertJSONPatchWithMoveOperations } from '$lib/logic/operations.js'
-  import {
-    createSearchAndReplaceAllOperations,
-    createSearchAndReplaceOperations,
-    search,
-    searchNext,
-    searchPrevious,
-    updateSearchResult
-  } from '$lib/logic/search.js'
   import {
     canConvert,
     createAfterSelection,
@@ -257,7 +247,6 @@
 
   let documentStateInitialized = false
   let documentState = createDocumentState()
-  let searchResult: SearchResult | undefined
 
   let normalization: ValueNormalization
   $: normalization = createNormalizationFunctions({
@@ -269,124 +258,26 @@
 
   let pastedJson: PastedJson
 
+  let searchResult: SearchResult | undefined
   let showSearch = false
   let showReplace = false
-  let searching = false
-  let searchText = ''
 
-  async function handleSearchText(text: string) {
-    debug('search text updated', text)
-    searchText = text
-    await tick() // await for the search results to be updated
-    await focusActiveSearchResult()
+  function handleSearch(result: SearchResult | undefined) {
+    searchResult = result
   }
 
-  async function handleNextSearchResult() {
-    searchResult = searchResult ? searchNext(searchResult) : undefined
-
-    await focusActiveSearchResult()
-  }
-
-  async function handlePreviousSearchResult() {
-    searchResult = searchResult ? searchPrevious(searchResult) : undefined
-
-    await focusActiveSearchResult()
-  }
-
-  async function handleReplace(text: string, replacementText: string) {
-    const activeItem = searchResult?.activeItem
-    debug('handleReplace', { replacementText, activeItem })
-
-    if (!activeItem || json === undefined) {
-      return
+  async function handleFocusSearch(path: JSONPath) {
+    documentState = {
+      ...expandPath(json, documentState, path),
+      selection: null // navigation path of current selection would be confusing
     }
-
-    const { operations, newSelection } = createSearchAndReplaceOperations(
-      json,
-      documentState,
-      replacementText,
-      activeItem,
-      parser
-    )
-
-    handlePatch(operations, (patchedJson, patchedState) => ({
-      state: { ...patchedState, selection: newSelection }
-    }))
-
-    await tick()
-
-    await focusActiveSearchResult()
+    await scrollTo(path)
   }
 
-  async function handleReplaceAll(text: string, replacementText: string) {
-    debug('handleReplaceAll', { text, replacementText })
-
-    const { operations, newSelection } = createSearchAndReplaceAllOperations(
-      json,
-      documentState,
-      text,
-      replacementText,
-      parser
-    )
-
-    handlePatch(operations, (patchedJson, patchedState) => ({
-      state: { ...patchedState, selection: newSelection }
-    }))
-
-    await tick()
-
-    await focusActiveSearchResult()
-  }
-
-  function clearSearchResult() {
+  function handleCloseSearch() {
     showSearch = false
     showReplace = false
-    handleSearchText('')
     focus()
-  }
-
-  async function focusActiveSearchResult() {
-    const activeItem = searchResult?.activeItem
-
-    debug('focusActiveSearchResult', searchResult)
-
-    if (activeItem && json !== undefined) {
-      const path = activeItem.path
-      documentState = {
-        ...expandPath(json, documentState, path),
-        selection: null // navigation path of current selection would be confusing
-      }
-      await tick()
-      await scrollTo(path)
-    }
-  }
-
-  // we pass searchText and json as argument to trigger search when these variables change,
-  // via $: applySearchThrottled(searchText, json)
-  function applySearch(searchText: string, json: unknown) {
-    if (searchText === '') {
-      debug('clearing search result')
-
-      if (searchResult !== undefined) {
-        searchResult = undefined
-      }
-
-      return
-    }
-
-    searching = true
-
-    // setTimeout is to wait until the search icon has been rendered
-    setTimeout(() => {
-      debug('searching...', searchText)
-
-      // console.time('search') // TODO: cleanup
-      const newResultItems = search(searchText, json, MAX_SEARCH_RESULTS)
-      searchResult = updateSearchResult(json, newResultItems, searchResult)
-      // console.timeEnd('search') // TODO: cleanup
-
-      searching = false
-    })
   }
 
   function handleSelectValidationError(error: ValidationError) {
@@ -421,9 +312,6 @@
   $: applyExternalContent(externalContent)
 
   $: applyExternalSelection(externalSelection)
-
-  const applySearchThrottled = throttle(applySearch, SEARCH_UPDATE_THROTTLE)
-  $: applySearchThrottled(searchText, json)
 
   let textIsRepaired = false
 
@@ -2146,18 +2034,16 @@
     {:else}
       <div class="jse-search-box-container">
         <SearchBox
-          show={showSearch}
-          resultCount={searchResult?.items?.length || 0}
-          activeIndex={searchResult?.activeIndex || 0}
+          {json}
+          {documentState}
+          {parser}
+          {showSearch}
           {showReplace}
-          {searching}
           {readOnly}
-          onChange={handleSearchText}
-          onNext={handleNextSearchResult}
-          onPrevious={handlePreviousSearchResult}
-          onReplace={handleReplace}
-          onReplaceAll={handleReplaceAll}
-          onClose={clearSearchResult}
+          onSearch={handleSearch}
+          onFocus={handleFocusSearch}
+          onPatch={handlePatch}
+          onClose={handleCloseSearch}
         />
       </div>
       <div class="jse-contents" data-jsoneditor-scrollable-contents={true} bind:this={refContents}>

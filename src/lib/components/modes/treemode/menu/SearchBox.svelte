@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { debounce, noop } from 'lodash-es'
+  import { debounce, throttle } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
     faCaretDown,
@@ -14,40 +14,47 @@
   } from '@fortawesome/free-solid-svg-icons'
   import { DEBOUNCE_DELAY, MAX_SEARCH_RESULTS } from '$lib/constants.js'
   import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
+  import { createDebug } from '$lib/utils/debug.js'
+  import type { DocumentState, JSONParser, OnPatch, SearchResult } from '$lib/types.js'
+  import {
+    createSearchAndReplaceOperations,
+    createSearchAndReplaceAllOperations,
+    searchNext,
+    searchPrevious,
+    search,
+    updateSearchResult
+  } from '$lib/logic/search.js'
+  import type { JSONPath } from 'immutable-json-patch'
+  import { tick } from 'svelte'
 
-  export let show = false
-  export let searching: boolean
-  export let resultCount = 0
-  export let activeIndex = 0
+  const debug = createDebug('jsoneditor:SearchBox')
+
+  export let json: unknown
+  export let documentState: DocumentState
+  export let parser: JSONParser
+  export let showSearch = false
   export let showReplace = false
   export let readOnly = false
-  export let onChange: (search: string) => void = noop
-  export let onPrevious: () => void = noop
-  export let onNext: () => void = noop
-  export let onReplace: (text: string, replaceText: string) => void = noop
-  export let onReplaceAll: (text: string, replaceText: string) => void = noop
-  export let onClose: () => void = noop
+  export let onSearch: (result: SearchResult | undefined) => void
+  export let onFocus: (path: JSONPath) => Promise<void>
+  export let onPatch: OnPatch
+  export let onClose: () => void
 
   let text = ''
   let previousText = ''
   let replaceText = ''
+  let searching = false
+  let searchResult: SearchResult | undefined
 
+  $: resultCount = searchResult?.items?.length || 0
+  $: activeIndex = searchResult?.activeIndex || 0
   $: formattedResultCount =
     resultCount >= MAX_SEARCH_RESULTS ? `${MAX_SEARCH_RESULTS - 1}+` : String(resultCount)
 
-  $: onChangeDebounced = debounce(onChange, DEBOUNCE_DELAY)
+  $: onSearch(searchResult)
 
-  $: onChangeDebounced(text)
-
-  $: if (show) {
-    initShow()
-  }
-
-  function initShow() {
-    if (text !== '') {
-      onChange(text)
-    }
-  }
+  const applySearchDebounced = debounce(applySearch, DEBOUNCE_DELAY)
+  $: applySearchDebounced(text, json)
 
   function toggleShowReplace() {
     showReplace = !showReplace && !readOnly
@@ -59,10 +66,10 @@
     const pendingChanges = text !== previousText
     if (pendingChanges) {
       previousText = text
-      onChangeDebounced.cancel()
-      onChange(text)
+      applySearchDebounced.flush()
+      handleFocus()
     } else {
-      onNext()
+      handleNext()
     }
   }
 
@@ -74,12 +81,12 @@
 
     if (combo === 'Enter') {
       event.preventDefault()
-      onNext()
+      handleNext()
     }
 
     if (combo === 'Shift+Enter') {
       event.preventDefault()
-      onPrevious()
+      handlePrevious()
     }
 
     if (combo === 'Ctrl+Enter') {
@@ -88,8 +95,8 @@
       if (showReplace) {
         handleReplace()
       } else {
-        onNext()
-        // TODO: move focus to the active element
+        handleNext()
+        // TODO: move focus to the active element so you can start editing?
       }
     }
 
@@ -101,32 +108,125 @@
     if (combo === 'Escape') {
       event.preventDefault()
 
-      onClose()
+      handleClose()
     }
   }
 
-  function handleReplace() {
+  async function handlePaste() {
+    await tick()
+    setTimeout(() => applySearchDebounced.flush())
+  }
+
+  async function handleReplace() {
     if (readOnly) {
       return
     }
 
-    onReplace(text, replaceText)
+    const activeItem = searchResult?.activeItem
+    debug('handleReplace', { replaceText, activeItem })
+
+    if (!activeItem || json === undefined) {
+      return
+    }
+
+    const { operations, newSelection } = createSearchAndReplaceOperations(
+      json,
+      documentState,
+      replaceText,
+      activeItem,
+      parser
+    )
+
+    onPatch(operations, (_, patchedState) => ({
+      state: { ...patchedState, selection: newSelection }
+    }))
+
+    await handleFocus()
   }
 
-  function handleReplaceAll() {
+  async function handleReplaceAll() {
     if (readOnly) {
       return
     }
 
-    onReplaceAll(text, replaceText)
+    debug('handleReplaceAll', { text, replaceText })
+
+    const { operations, newSelection } = createSearchAndReplaceAllOperations(
+      json,
+      documentState,
+      text,
+      replaceText,
+      parser
+    )
+
+    onPatch(operations, (_, patchedState) => ({
+      state: { ...patchedState, selection: newSelection }
+    }))
+
+    await handleFocus()
   }
 
   function initSearchInput(element: HTMLInputElement) {
     element.select()
   }
+
+  async function handleNext() {
+    searchResult = searchResult ? searchNext(searchResult) : undefined
+
+    await handleFocus()
+  }
+
+  async function handlePrevious() {
+    searchResult = searchResult ? searchPrevious(searchResult) : undefined
+
+    await handleFocus()
+  }
+
+  async function handleFocus() {
+    debug('handleFocus', searchResult)
+
+    const activeItem = searchResult?.activeItem
+    if (activeItem && json !== undefined) {
+      await onFocus(activeItem.path)
+    }
+  }
+
+  // we pass searchText and json as argument to trigger search when these variables change,
+  // via $: applySearchThrottled(searchText, json)
+  function applySearch(searchText: string, json: unknown) {
+    if (searchText === '') {
+      debug('clearing search result')
+
+      if (searchResult !== undefined) {
+        searchResult = undefined
+      }
+
+      return
+    }
+
+    searching = true
+
+    // setTimeout is to wait until the search icon has been rendered
+    setTimeout(() => {
+      debug('searching...', searchText)
+
+      const newResultItems = search(searchText, json, MAX_SEARCH_RESULTS)
+      searchResult = updateSearchResult(json, newResultItems, searchResult)
+
+      searching = false
+
+      handleFocus()
+    })
+  }
+
+  function handleClose() {
+    applySearchDebounced.cancel()
+    onSearch(undefined)
+    onClose()
+  }
 </script>
 
-{#if show}
+{#if showSearch}
   <div class="jse-search-box">
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
     <form class="jse-search-form" on:submit={handleSubmit} on:keydown={handleKeyDown}>
@@ -157,16 +257,19 @@
               placeholder="Find"
               bind:value={text}
               use:initSearchInput
+              on:paste={handlePaste}
             />
           </label>
           <div class="jse-search-count" class:jse-visible={text !== ''}>
-            {activeIndex !== -1 ? `${activeIndex + 1}/` : ''}{formattedResultCount}
+            {activeIndex !== -1 && activeIndex < resultCount
+              ? `${activeIndex + 1}/`
+              : ''}{formattedResultCount}
           </div>
           <button
             type="button"
             class="jse-search-next"
             title="Go to next search result (Enter)"
-            on:click={() => onNext()}
+            on:click={handleNext}
           >
             <Icon data={faChevronDown} />
           </button>
@@ -174,7 +277,7 @@
             type="button"
             class="jse-search-previous"
             title="Go to previous search result (Shift+Enter)"
-            on:click={() => onPrevious()}
+            on:click={handlePrevious}
           >
             <Icon data={faChevronUp} />
           </button>
@@ -182,7 +285,7 @@
             type="button"
             class="jse-search-clear"
             title="Close search box (Esc)"
-            on:click={() => onClose()}
+            on:click={handleClose}
           >
             <Icon data={faTimes} />
           </button>
