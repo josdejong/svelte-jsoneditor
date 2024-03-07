@@ -56,10 +56,6 @@
   const applySearchDebounced = debounce(applySearch, DEBOUNCE_DELAY)
   $: applySearchDebounced(showSearch, text, json)
 
-  $: if (showSearch) {
-    applySearchDebounced.flush()
-  }
-
   function toggleShowReplace() {
     showReplace = !showReplace && !readOnly
   }
@@ -199,6 +195,10 @@
   // via $: applySearchThrottled(searchText, json)
   async function applySearch(showSearch: boolean, searchText: string, json: unknown) {
     if (!showSearch) {
+      if (searchResult) {
+        searchResult = undefined
+      }
+
       return
     }
 
@@ -229,8 +229,6 @@
 
   function handleClose() {
     debug('handleClose')
-    applySearchDebounced.cancel()
-    onSearch(undefined)
     onClose()
   }
 </script>
