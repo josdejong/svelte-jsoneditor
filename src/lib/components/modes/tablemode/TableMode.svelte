@@ -942,7 +942,10 @@
     })
 
     const items = onRenderContextMenu(defaultItems)
-    if (items === false) return
+
+    if (items === false) {
+      return
+    }
 
     const props = {
       tip: showTip
