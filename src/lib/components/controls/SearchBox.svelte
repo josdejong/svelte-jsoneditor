@@ -54,7 +54,11 @@
   $: onSearch(searchResult)
 
   const applySearchDebounced = debounce(applySearch, DEBOUNCE_DELAY)
-  $: applySearchDebounced(text, json)
+  $: applySearchDebounced(showSearch, text, json)
+
+  $: if (showSearch) {
+    applySearchDebounced.flush()
+  }
 
   function toggleShowReplace() {
     showReplace = !showReplace && !readOnly
@@ -193,7 +197,11 @@
 
   // we pass searchText and json as argument to trigger search when these variables change,
   // via $: applySearchThrottled(searchText, json)
-  function applySearch(searchText: string, json: unknown) {
+  async function applySearch(showSearch: boolean, searchText: string, json: unknown) {
+    if (!showSearch) {
+      return
+    }
+
     if (searchText === '') {
       debug('clearing search result')
 
@@ -206,20 +214,21 @@
 
     searching = true
 
-    // setTimeout is to wait until the search icon has been rendered
-    setTimeout(() => {
-      debug('searching...', searchText)
+    // wait until the search icon has been rendered
+    await tick()
 
-      const newResultItems = search(searchText, json, MAX_SEARCH_RESULTS)
-      searchResult = updateSearchResult(json, newResultItems, searchResult)
+    debug('searching...', searchText)
 
-      searching = false
+    const newResultItems = search(searchText, json, MAX_SEARCH_RESULTS)
+    searchResult = updateSearchResult(json, newResultItems, searchResult)
 
-      handleFocus()
-    })
+    searching = false
+
+    handleFocus()
   }
 
   function handleClose() {
+    debug('handleClose')
     applySearchDebounced.cancel()
     onSearch(undefined)
     onClose()
