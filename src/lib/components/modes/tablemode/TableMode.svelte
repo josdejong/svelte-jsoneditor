@@ -95,13 +95,10 @@
     getFocusPath,
     isEditingSelection,
     isJSONSelection,
-    isKeySelection,
-    isMultiSelection,
     isValueSelection,
     pathInSelection,
     pathStartsWith,
-    removeEditModeFromSelection,
-    singleItemSelected
+    removeEditModeFromSelection
   } from '$lib/logic/selection.js'
   import { createHistory } from '$lib/logic/history.js'
   import ColumnHeader from './ColumnHeader.svelte'
@@ -111,18 +108,7 @@
   import { getContext, onDestroy, onMount, tick } from 'svelte'
   import { jsonrepair } from 'jsonrepair'
   import Message from '../../controls/Message.svelte'
-  import {
-    faCheck,
-    faClone,
-    faCode,
-    faCopy,
-    faCut,
-    faPaste,
-    faPen,
-    faPlus,
-    faTrashCan,
-    faWrench
-  } from '@fortawesome/free-solid-svg-icons'
+  import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { measure } from '$lib/utils/timeUtils.js'
   import memoizeOne from 'memoize-one'
   import { validateJSON } from '$lib/logic/validation.js'
@@ -149,7 +135,6 @@
   } from '$lib/logic/actions.js'
   import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
   import { resizeObserver } from '$lib/actions/resizeObserver.js'
-  import TableContextMenu from '../../../components/modes/tablemode/contextmenu/TableContextMenu.svelte'
   import CopyPasteModal from '../../../components/modals/CopyPasteModal.svelte'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
   import TableModeWelcome from './TableModeWelcome.svelte'
@@ -157,7 +142,8 @@
   import RefreshColumnHeader from './RefreshColumnHeader.svelte'
   import type { Context } from 'svelte-simple-modal'
   import type { ContextMenuItem } from '$lib/types'
-  import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
+  import createTableContextMenuItems from './contextmenu/createTableContextMenuItems'
+  import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext<Context>('simple-modal')
@@ -199,29 +185,6 @@
     escapeControlCharacters,
     escapeUnicodeCharacters
   })
-
-  $: selection = documentState.selection
-
-  $: hasJson = json !== undefined
-  $: hasSelection = !!selection
-  $: focusValue = json !== undefined && selection ? getIn(json, getFocusPath(selection)) : undefined
-
-  $: hasSelectionContents =
-    hasJson &&
-    (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))
-
-  $: canEditValue = hasJson && selection != null && singleItemSelected(selection)
-  $: canEnforceString = canEditValue && !isObjectOrArray(focusValue)
-
-  $: enforceString =
-    selection != null && focusValue !== undefined
-      ? getEnforceString(
-          focusValue,
-          documentState.enforceStringMap,
-          compileJSONPointer(getFocusPath(selection)),
-          parser
-        )
-      : false
 
   let refJsonEditor: HTMLDivElement
   let refContents: HTMLDivElement | undefined
@@ -960,178 +923,31 @@
     offsetLeft,
     showTip
   }: AbsolutePopupOptions) {
-    let defaultItems: ContextMenuItem[] = [
-      { type: 'separator' },
-      {
-        type: 'row',
-        items: [
-          {
-            type: 'column',
-            items: [
-              { type: 'label', text: 'Table cell:' },
-              {
-                type: 'dropdown-button',
-                main: {
-                  type: 'button',
-                  onClick: () => handleEditValue(),
-                  icon: faPen,
-                  text: 'Edit',
-                  title: 'Edit the value (Double-click on the value)',
-                  disabled: !canEditValue
-                },
-                width: '11em',
-                items: [
-                  {
-                    type: 'button',
-                    icon: faPen,
-                    text: 'Edit',
-                    title: 'Edit the value (Double-click on the value)',
-                    onClick: () => handleEditValue(),
-                    disabled: !canEditValue
-                  },
-                  {
-                    type: 'button',
-                    icon: enforceString ? faCheckSquare : faSquare,
-                    text: 'Enforce string',
-                    title: 'Enforce keeping the value as string when it contains a numeric value',
-                    onClick: () => handleToggleEnforceString(),
-                    disabled: !canEnforceString
-                  }
-                ]
-              },
-              {
-                type: 'dropdown-button',
-                main: {
-                  type: 'button',
-                  onClick: () => handleCut(true),
-                  icon: faCut,
-                  text: 'Cut',
-                  title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
-                  disabled: !hasSelectionContents
-                },
-                width: '10em',
-                items: [
-                  {
-                    type: 'button',
-                    icon: faCut,
-                    text: 'Cut formatted',
-                    title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
-                    onClick: () => handleCut(true),
-                    disabled: !hasSelectionContents
-                  },
-                  {
-                    type: 'button',
-                    icon: faCut,
-                    text: 'Cut compacted',
-                    title: 'Cut selected contents, without indentation (Ctrl+Shift+X)',
-                    onClick: () => handleCut(false),
-                    disabled: !hasSelectionContents
-                  }
-                ]
-              },
-              {
-                type: 'dropdown-button',
-                main: {
-                  type: 'button',
-                  onClick: () => handleCopy(true),
-                  icon: faCopy,
-                  text: 'Copy',
-                  title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
-                  disabled: !hasSelectionContents
-                },
-                width: '12em',
-                items: [
-                  {
-                    type: 'button',
-                    icon: faCopy,
-                    text: 'Copy formatted',
-                    title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
-                    onClick: () => handleCopy(false),
-                    disabled: !hasSelectionContents
-                  },
-                  {
-                    type: 'button',
-                    icon: faCopy,
-                    text: 'Copy compacted',
-                    title: 'Copy selected contents, without indentation (Ctrl+Shift+C)',
-                    onClick: () => handleCopy(false),
-                    disabled: !hasSelectionContents
-                  }
-                ]
-              },
-              {
-                type: 'button',
-                onClick: () => handlePasteFromMenu(),
-                icon: faPaste,
-                text: 'Paste',
-                title: 'Paste clipboard contents (Ctrl+V)',
-                disabled: !hasSelection
-              },
-              {
-                type: 'button',
-                onClick: () => handleRemove(),
-                icon: faTrashCan,
-                text: 'Remove',
-                title: 'Remove selected contents (Delete)',
-                disabled: !hasSelectionContents
-              }
-            ]
-          },
-          {
-            type: 'column',
-            items: [
-              { type: 'label', text: 'Table row:' },
-              {
-                type: 'button',
-                onClick: () => handleEditRow(),
-                icon: faPen,
-                text: 'Edit row',
-                title: 'Edit the current row',
-                disabled: !hasSelectionContents
-              },
-              {
-                type: 'button',
-                onClick: () => handleDuplicateRow(),
-                icon: faClone,
-                text: 'Duplicate row',
-                title: 'Duplicate the current row',
-                disabled: !hasSelection
-              },
-              {
-                type: 'button',
-                onClick: () => handleInsertBeforeRow(),
-                icon: faPlus,
-                text: 'Insert before',
-                title: 'Insert a row before the current row',
-                disabled: !hasSelection
-              },
-              {
-                type: 'button',
-                onClick: () => handleInsertAfterRow(),
-                icon: faPlus,
-                text: 'Insert after',
-                title: 'Insert a row after the current row',
-                disabled: !hasSelection
-              },
-              {
-                type: 'button',
-                onClick: () => handleRemoveRow(),
-                icon: faTrashCan,
-                text: 'Remove row',
-                title: 'Remove current row',
-                disabled: !hasSelection
-              }
-            ]
-          }
-        ]
-      }
-    ]
+    let defaultItems: ContextMenuItem[] = createTableContextMenuItems({
+      json,
+      documentState,
+      parser,
+
+      onEditValue: handleEditValue,
+      onEditRow: handleEditRow,
+      onToggleEnforceString: handleToggleEnforceString,
+      onCut: handleCut,
+      onCopy: handleCopy,
+      onPaste: handlePasteFromMenu,
+      onRemove: handleRemove,
+      onDuplicateRow: handleDuplicateRow,
+      onInsertBeforeRow: handleInsertBeforeRow,
+      onInsertAfterRow: handleInsertAfterRow,
+      onRemoveRow: handleRemoveRow
+    })
 
     const items = onRenderContextMenu(defaultItems)
     if (items === false) return
 
     const props = {
-      showTip,
+      tip: showTip
+        ? 'Tip: you can open this context menu via right-click or with Ctrl+Q'
+        : undefined,
       items,
       onCloseContextMenu: function () {
         closeAbsolutePopup(popupId)
@@ -1141,7 +957,7 @@
 
     modalOpen = true
 
-    const popupId = openAbsolutePopup(TableContextMenu, props, {
+    const popupId = openAbsolutePopup(ContextMenu, props, {
       left,
       top,
       offsetTop,

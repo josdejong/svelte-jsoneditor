@@ -380,7 +380,7 @@
   }
   function onRenderContextMenu(items: ContextMenuItem[], content: RenderMenuContext) {
     console.log('onRenderContextMenu', items, content)
-    return items
+    return $readOnly ? false : items // This return is equivalent to onRenderContextMenu is undefined
   }
 
   function openInWindow() {
