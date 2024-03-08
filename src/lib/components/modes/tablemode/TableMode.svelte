@@ -923,7 +923,7 @@
     offsetLeft,
     showTip
   }: AbsolutePopupOptions) {
-    let defaultItems: ContextMenuItem[] = createTableContextMenuItems({
+    const defaultItems: ContextMenuItem[] = createTableContextMenuItems({
       json,
       documentState,
       parser,
