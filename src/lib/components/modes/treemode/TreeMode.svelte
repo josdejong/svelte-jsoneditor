@@ -113,6 +113,7 @@
     AfterPatchCallback,
     Content,
     ContentErrors,
+    ConvertType,
     DocumentState,
     HistoryItem,
     InsertType,
@@ -1022,7 +1023,7 @@
     handleInsert(type)
   }
 
-  function handleConvert(type: InsertType) {
+  function handleConvert(type: ConvertType) {
     if (readOnly || !documentState.selection) {
       return
     }

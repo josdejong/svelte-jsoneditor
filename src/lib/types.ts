@@ -392,7 +392,8 @@ export interface HistoryItem {
   }
 }
 
-export type InsertType = 'value' | 'object' | 'array' | 'structure'
+export type ConvertType = 'value' | 'object' | 'array'
+export type InsertType = ConvertType | 'structure'
 
 export interface PopupEntry {
   id: number
