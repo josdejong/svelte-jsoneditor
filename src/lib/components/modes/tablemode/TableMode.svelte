@@ -135,13 +135,15 @@
   } from '$lib/logic/actions.js'
   import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
   import { resizeObserver } from '$lib/actions/resizeObserver.js'
-  import TableContextMenu from '../../../components/modes/tablemode/contextmenu/TableContextMenu.svelte'
   import CopyPasteModal from '../../../components/modals/CopyPasteModal.svelte'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
   import TableModeWelcome from './TableModeWelcome.svelte'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import RefreshColumnHeader from './RefreshColumnHeader.svelte'
   import type { Context } from 'svelte-simple-modal'
+  import type { ContextMenuItem } from '$lib/types'
+  import createTableContextMenuItems from './contextmenu/createTableContextMenuItems'
+  import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext<Context>('simple-modal')
@@ -921,11 +923,10 @@
     offsetLeft,
     showTip
   }: AbsolutePopupOptions) {
-    const props = {
+    const defaultItems: ContextMenuItem[] = createTableContextMenuItems({
       json,
-      documentState: documentState,
+      documentState,
       parser,
-      showTip,
 
       onEditValue: handleEditValue,
       onEditRow: handleEditRow,
@@ -937,9 +938,20 @@
       onDuplicateRow: handleDuplicateRow,
       onInsertBeforeRow: handleInsertBeforeRow,
       onInsertAfterRow: handleInsertAfterRow,
-      onRemoveRow: handleRemoveRow,
+      onRemoveRow: handleRemoveRow
+    })
 
-      onRenderContextMenu,
+    const items = onRenderContextMenu(defaultItems)
+
+    if (items === false) {
+      return
+    }
+
+    const props = {
+      tip: showTip
+        ? 'Tip: you can open this context menu via right-click or with Ctrl+Q'
+        : undefined,
+      items,
       onCloseContextMenu: function () {
         closeAbsolutePopup(popupId)
         focus()
@@ -948,7 +960,7 @@
 
     modalOpen = true
 
-    const popupId = openAbsolutePopup(TableContextMenu, props, {
+    const popupId = openAbsolutePopup(ContextMenu, props, {
       left,
       top,
       offsetTop,
@@ -965,7 +977,7 @@
   }
 
   function handleContextMenu(event: Event) {
-    if (readOnly || isEditingSelection(documentState.selection)) {
+    if (isEditingSelection(documentState.selection)) {
       return
     }
 
@@ -1014,10 +1026,6 @@
   }
 
   function handleContextMenuFromTableMenu(event: MouseEvent) {
-    if (readOnly) {
-      return
-    }
-
     openContextMenu({
       anchor: findParentWithNodeName(event.target as HTMLElement, 'BUTTON'),
       offsetTop: 0,

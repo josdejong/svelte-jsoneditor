@@ -314,8 +314,8 @@ export type RenderContextMenuContext = RenderMenuContext & { selection: JSONEdit
 export type OnRenderContextMenu = (
   items: ContextMenuItem[],
   context: RenderContextMenuContext
-) => ContextMenuItem[] | undefined
-export type OnRenderContextMenuInternal = (items: ContextMenuItem[]) => ContextMenuItem[]
+) => ContextMenuItem[] | false | undefined
+export type OnRenderContextMenuInternal = (items: ContextMenuItem[]) => ContextMenuItem[] | false
 export type OnError = (error: Error) => void
 export type OnFocus = () => void
 export type OnBlur = () => void
@@ -392,7 +392,8 @@ export interface HistoryItem {
   }
 }
 
-export type InsertType = 'value' | 'object' | 'array' | 'structure'
+export type ConvertType = 'value' | 'object' | 'array'
+export type InsertType = ConvertType | 'structure'
 
 export interface PopupEntry {
   id: number

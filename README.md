@@ -517,10 +517,10 @@ A menu item `MenuItem` can be one of the following types:
 #### onRenderContextMenu
 
 ```ts
-onRenderContextMenu(items: ContextMenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean, selection: JSONEditorSelection | null }) : ContextMenuItem[] | undefined
+onRenderContextMenu(items: ContextMenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean, selection: JSONEditorSelection | null }) : ContextMenuItem[] | false | undefined
 ```
 
-Callback which can be used to make changes to the context menu items. New items can be added, or existing items can be removed or reorganized. When the function returns `undefined`, the original `items` will be applied. Using the context values `mode`, `modal` and `selection`, different actions can be taken depending on the mode of the editor, whether the editor is rendered inside a modal or not and the path of selection.
+Callback which can be used to make changes to the context menu items. New items can be added, or existing items can be removed or reorganized. When the function returns `undefined`, the original `items` will be applied and the context menu will be displayed when `readOnly` is `false`. When the function returns `false`, the context menu will never be displayed. Using the context values `mode`, `modal` and `selection`, different actions can be taken depending on the mode of the editor, whether the editor is rendered inside a modal or not and the path of selection.
 
 A menu item `ContextMenuItem` can be one of the following types:
 

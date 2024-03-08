@@ -122,7 +122,10 @@
   $: handleRenderContextMenu = (items: ContextMenuItem[]) => {
     const itemsOriginal = cloneDeep(items) // the user may change items in the callback
 
-    return onRenderContextMenu(items, { mode, modal: insideModal, selection }) || itemsOriginal
+    return (
+      onRenderContextMenu(items, { mode, modal: insideModal, selection }) ??
+      (readOnly ? false : itemsOriginal)
+    )
   }
 
   export function patch(operations: JSONPatchDocument): JSONPatchResult {
