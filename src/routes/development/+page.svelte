@@ -381,7 +381,7 @@
 
   function onRenderContextMenu(items: ContextMenuItem[], context: RenderMenuContext) {
     console.log('onRenderContextMenu', items, context)
-    return items // This return is equivalent to onRenderContextMenu is undefined
+    return items
   }
 
   function openInWindow() {

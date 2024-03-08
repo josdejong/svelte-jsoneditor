@@ -7,9 +7,17 @@
   export let item: MenuDropDownButton
   export let className: string | undefined = undefined
   export let onCloseContextMenu: () => void
+
+  $: items = item.items.map(item => ({
+    ...item,
+    onClick: (event: MouseEvent) => {
+      onCloseContextMenu()
+      item.onClick(event)
+    }
+  }))
 </script>
 
-<DropdownButton width={item.width} items={item.items}>
+<DropdownButton width={item.width} items={items}>
   <button
     class={classnames('jse-context-menu-button', className, item.main.className)}
     type="button"
