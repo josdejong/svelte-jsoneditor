@@ -926,14 +926,17 @@
     const defaultItems: ContextMenuItem[] = createTableContextMenuItems({
       json,
       documentState,
+      readOnly,
       parser,
 
       onEditValue: handleEditValue,
       onEditRow: handleEditRow,
       onToggleEnforceString: handleToggleEnforceString,
+
       onCut: handleCut,
       onCopy: handleCopy,
       onPaste: handlePasteFromMenu,
+
       onRemove: handleRemove,
       onDuplicateRow: handleDuplicateRow,
       onInsertBeforeRow: handleInsertBeforeRow,

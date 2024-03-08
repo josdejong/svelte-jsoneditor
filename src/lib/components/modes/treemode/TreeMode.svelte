@@ -1811,6 +1811,7 @@
     const defaultItems: ContextMenuItem[] = createTreeContextMenuItems({
       json,
       documentState,
+      readOnly,
       parser,
 
       onEditKey: handleEditKey,

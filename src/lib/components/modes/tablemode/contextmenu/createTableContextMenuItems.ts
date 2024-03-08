@@ -19,6 +19,7 @@ import { getEnforceString } from '$lib/logic/documentState'
 export default function ({
   json,
   documentState,
+  readOnly,
   parser,
   onEditValue,
   onEditRow,
@@ -34,6 +35,7 @@ export default function ({
 }: {
   json: unknown | undefined
   documentState: DocumentState
+  readOnly: boolean
   parser: JSONParser
   onEditValue: () => void
   onEditRow: () => void
@@ -58,8 +60,10 @@ export default function ({
     hasJson &&
     (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))
 
-  const canEditValue = hasJson && selection != null && singleItemSelected(selection)
+  const canEditValue = !readOnly && hasJson && selection != null && singleItemSelected(selection)
   const canEnforceString = canEditValue && !isObjectOrArray(focusValue)
+
+  const canCut = !readOnly && hasSelectionContents
 
   const enforceString =
     selection != null && focusValue !== undefined
@@ -118,7 +122,7 @@ export default function ({
                 icon: faCut,
                 text: 'Cut',
                 title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
-                disabled: !hasSelectionContents
+                disabled: !canCut
               },
               width: '10em',
               items: [
@@ -128,7 +132,7 @@ export default function ({
                   text: 'Cut formatted',
                   title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
                   onClick: () => onCut(true),
-                  disabled: !hasSelectionContents
+                  disabled: readOnly || !hasSelectionContents
                 },
                 {
                   type: 'button',
@@ -136,7 +140,7 @@ export default function ({
                   text: 'Cut compacted',
                   title: 'Cut selected contents, without indentation (Ctrl+Shift+X)',
                   onClick: () => onCut(false),
-                  disabled: !hasSelectionContents
+                  disabled: readOnly || !hasSelectionContents
                 }
               ]
             },
@@ -176,7 +180,7 @@ export default function ({
               icon: faPaste,
               text: 'Paste',
               title: 'Paste clipboard contents (Ctrl+V)',
-              disabled: !hasSelection
+              disabled: readOnly || !hasSelection
             },
             {
               type: 'button',
@@ -184,7 +188,7 @@ export default function ({
               icon: faTrashCan,
               text: 'Remove',
               title: 'Remove selected contents (Delete)',
-              disabled: !hasSelectionContents
+              disabled: readOnly || !hasSelectionContents
             }
           ]
         },
@@ -198,7 +202,7 @@ export default function ({
               icon: faPen,
               text: 'Edit row',
               title: 'Edit the current row',
-              disabled: !hasSelectionContents
+              disabled: readOnly || !hasSelectionContents
             },
             {
               type: 'button',
@@ -206,7 +210,7 @@ export default function ({
               icon: faClone,
               text: 'Duplicate row',
               title: 'Duplicate the current row',
-              disabled: !hasSelection
+              disabled: readOnly || !hasSelection
             },
             {
               type: 'button',
@@ -214,7 +218,7 @@ export default function ({
               icon: faPlus,
               text: 'Insert before',
               title: 'Insert a row before the current row',
-              disabled: !hasSelection
+              disabled: readOnly || !hasSelection
             },
             {
               type: 'button',
@@ -222,7 +226,7 @@ export default function ({
               icon: faPlus,
               text: 'Insert after',
               title: 'Insert a row after the current row',
-              disabled: !hasSelection
+              disabled: readOnly || !hasSelection
             },
             {
               type: 'button',
@@ -230,7 +234,7 @@ export default function ({
               icon: faTrashCan,
               text: 'Remove row',
               title: 'Remove current row',
-              disabled: !hasSelection
+              disabled: readOnly || !hasSelection
             }
           ]
         }
