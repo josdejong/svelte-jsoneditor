@@ -24,9 +24,9 @@ import {
   singleItemSelected
 } from '$lib/logic/selection'
 import type { DocumentState, InsertType, JSONParser } from 'svelte-jsoneditor'
-import { initial, isEmpty, isObject } from 'lodash-es'
+import { initial, isEmpty } from 'lodash-es'
 import { compileJSONPointer, getIn } from 'immutable-json-patch'
-import { isObjectOrArray } from '$lib/utils/typeUtils'
+import { isObjectOrArray, isObject } from '$lib/utils/typeUtils'
 import { getEnforceString } from '$lib/logic/documentState'
 import type { ContextMenuItem } from 'svelte-jsoneditor'
 
