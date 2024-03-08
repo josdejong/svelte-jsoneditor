@@ -307,6 +307,7 @@ export type OnContextMenu = (contextMenuProps: AbsolutePopupOptions) => void
 export type RenderMenuContext = {
   mode: Mode
   modal: boolean
+  readOnly: boolean
 }
 export type OnRenderMenu = (items: MenuItem[], context: RenderMenuContext) => MenuItem[] | undefined
 export type OnRenderMenuInternal = (items: MenuItem[]) => MenuItem[]

@@ -378,9 +378,10 @@
     console.log('onChangeQueryLanguage', newQueryLanguageId)
     queryLanguageId = newQueryLanguageId
   }
-  function onRenderContextMenu(items: ContextMenuItem[], content: RenderMenuContext) {
-    console.log('onRenderContextMenu', items, content)
-    return $readOnly ? false : items // This return is equivalent to onRenderContextMenu is undefined
+
+  function onRenderContextMenu(items: ContextMenuItem[], context: RenderMenuContext) {
+    console.log('onRenderContextMenu', items, context)
+    return context.readOnly ? false : items // This return is equivalent to onRenderContextMenu is undefined
   }
 
   function openInWindow() {

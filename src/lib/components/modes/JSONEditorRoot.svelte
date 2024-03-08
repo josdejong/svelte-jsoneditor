@@ -115,7 +115,9 @@
 
     const updatedItemsOriginal = cloneDeep(updatedItems) // the user may change updatedItems in the callback
 
-    return onRenderMenu(updatedItems, { mode, modal: insideModal }) || updatedItemsOriginal
+    return (
+      onRenderMenu(updatedItems, { mode, modal: insideModal, readOnly }) || updatedItemsOriginal
+    )
   }
 
   let handleRenderContextMenu: OnRenderContextMenuInternal
@@ -123,7 +125,7 @@
     const itemsOriginal = cloneDeep(items) // the user may change items in the callback
 
     return (
-      onRenderContextMenu(items, { mode, modal: insideModal, selection }) ??
+      onRenderContextMenu(items, { mode, modal: insideModal, readOnly, selection }) ??
       (readOnly ? false : itemsOriginal)
     )
   }
