@@ -1,68 +1,71 @@
-<svelte:options immutable={true} />
+import type { ContextMenuItem, DocumentState, JSONParser } from 'svelte-jsoneditor'
+import {
+  faCheckSquare,
+  faClone,
+  faCopy,
+  faCut,
+  faPaste,
+  faPen,
+  faPlus,
+  faSquare,
+  faTrashCan
+} from '@fortawesome/free-solid-svg-icons'
+import { isKeySelection, isMultiSelection, isValueSelection } from 'svelte-jsoneditor'
+import { compileJSONPointer, getIn } from 'immutable-json-patch'
+import { getFocusPath, singleItemSelected } from '$lib/logic/selection'
+import { isObjectOrArray } from '$lib/utils/typeUtils'
+import { getEnforceString } from '$lib/logic/documentState'
 
-<script lang="ts">
-  import {
-    faClone,
-    faCopy,
-    faCut,
-    faPaste,
-    faPen,
-    faPlus,
-    faTrashCan
-  } from '@fortawesome/free-solid-svg-icons'
-  import { compileJSONPointer, getIn } from 'immutable-json-patch'
-  import {
-    getFocusPath,
-    isKeySelection,
-    isMultiSelection,
-    isValueSelection,
-    singleItemSelected
-  } from '$lib/logic/selection.js'
-  import { isObjectOrArray } from '$lib/utils/typeUtils.js'
-  import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
-  import type {
-    ContextMenuItem,
-    DocumentState,
-    JSONParser,
-    OnRenderContextMenuInternal
-  } from '$lib/types'
-  import { getEnforceString } from '$lib/logic/documentState.js'
-  import ContextMenu from '../../../../components/controls/contextmenu/ContextMenu.svelte'
+export default function ({
+  json,
+  documentState,
+  readOnly,
+  parser,
+  onEditValue,
+  onEditRow,
+  onToggleEnforceString,
+  onCut,
+  onCopy,
+  onPaste,
+  onRemove,
+  onDuplicateRow,
+  onInsertBeforeRow,
+  onInsertAfterRow,
+  onRemoveRow
+}: {
+  json: unknown | undefined
+  documentState: DocumentState
+  readOnly: boolean
+  parser: JSONParser
+  onEditValue: () => void
+  onEditRow: () => void
+  onToggleEnforceString: () => void
+  onCut: (indent: boolean) => void
+  onCopy: (indent: boolean) => void
+  onPaste: () => void
+  onRemove: () => void
+  onDuplicateRow: () => void
+  onInsertBeforeRow: () => void
+  onInsertAfterRow: () => void
+  onRemoveRow: () => void
+}): ContextMenuItem[] {
+  const selection = documentState.selection
 
-  export let json: unknown | undefined
-  export let documentState: DocumentState
-  export let parser: JSONParser
+  const hasJson = json !== undefined
+  const hasSelection = !!selection
+  const focusValue =
+    json !== undefined && selection ? getIn(json, getFocusPath(selection)) : undefined
 
-  export let showTip: boolean
-
-  export let onCloseContextMenu: () => void
-  export let onRenderContextMenu: OnRenderContextMenuInternal
-  export let onEditValue: () => void
-  export let onEditRow: () => void
-  export let onToggleEnforceString: () => void
-  export let onCut: (indent: boolean) => void
-  export let onCopy: (indent: boolean) => void
-  export let onPaste: () => void
-  export let onRemove: () => void
-  export let onDuplicateRow: () => void
-  export let onInsertBeforeRow: () => void
-  export let onInsertAfterRow: () => void
-  export let onRemoveRow: () => void
-
-  $: selection = documentState.selection
-
-  $: hasJson = json !== undefined
-  $: hasSelection = !!selection
-  $: focusValue = json !== undefined && selection ? getIn(json, getFocusPath(selection)) : undefined
-
-  $: hasSelectionContents =
+  const hasSelectionContents =
     hasJson &&
     (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))
 
-  $: canEditValue = hasJson && selection != null && singleItemSelected(selection)
-  $: canEnforceString = canEditValue && !isObjectOrArray(focusValue)
+  const canEditValue = !readOnly && hasJson && selection != null && singleItemSelected(selection)
+  const canEnforceString = canEditValue && !isObjectOrArray(focusValue)
 
-  $: enforceString =
+  const canCut = !readOnly && hasSelectionContents
+
+  const enforceString =
     selection != null && focusValue !== undefined
       ? getEnforceString(
           focusValue,
@@ -72,8 +75,7 @@
         )
       : false
 
-  let defaultItems: ContextMenuItem[]
-  $: defaultItems = [
+  return [
     { type: 'separator' },
     {
       type: 'row',
@@ -120,7 +122,7 @@
                 icon: faCut,
                 text: 'Cut',
                 title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
-                disabled: !hasSelectionContents
+                disabled: !canCut
               },
               width: '10em',
               items: [
@@ -130,7 +132,7 @@
                   text: 'Cut formatted',
                   title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
                   onClick: () => onCut(true),
-                  disabled: !hasSelectionContents
+                  disabled: readOnly || !hasSelectionContents
                 },
                 {
                   type: 'button',
@@ -138,7 +140,7 @@
                   text: 'Cut compacted',
                   title: 'Cut selected contents, without indentation (Ctrl+Shift+X)',
                   onClick: () => onCut(false),
-                  disabled: !hasSelectionContents
+                  disabled: readOnly || !hasSelectionContents
                 }
               ]
             },
@@ -178,7 +180,7 @@
               icon: faPaste,
               text: 'Paste',
               title: 'Paste clipboard contents (Ctrl+V)',
-              disabled: !hasSelection
+              disabled: readOnly || !hasSelection
             },
             {
               type: 'button',
@@ -186,7 +188,7 @@
               icon: faTrashCan,
               text: 'Remove',
               title: 'Remove selected contents (Delete)',
-              disabled: !hasSelectionContents
+              disabled: readOnly || !hasSelectionContents
             }
           ]
         },
@@ -200,7 +202,7 @@
               icon: faPen,
               text: 'Edit row',
               title: 'Edit the current row',
-              disabled: !hasSelectionContents
+              disabled: readOnly || !hasSelectionContents
             },
             {
               type: 'button',
@@ -208,7 +210,7 @@
               icon: faClone,
               text: 'Duplicate row',
               title: 'Duplicate the current row',
-              disabled: !hasSelection
+              disabled: readOnly || !hasSelection
             },
             {
               type: 'button',
@@ -216,7 +218,7 @@
               icon: faPlus,
               text: 'Insert before',
               title: 'Insert a row before the current row',
-              disabled: !hasSelection
+              disabled: readOnly || !hasSelection
             },
             {
               type: 'button',
@@ -224,7 +226,7 @@
               icon: faPlus,
               text: 'Insert after',
               title: 'Insert a row after the current row',
-              disabled: !hasSelection
+              disabled: readOnly || !hasSelection
             },
             {
               type: 'button',
@@ -232,19 +234,11 @@
               icon: faTrashCan,
               text: 'Remove row',
               title: 'Remove current row',
-              disabled: !hasSelection
+              disabled: readOnly || !hasSelection
             }
           ]
         }
       ]
     }
   ]
-
-  $: items = onRenderContextMenu(defaultItems)
-</script>
-
-<ContextMenu
-  {items}
-  {onCloseContextMenu}
-  tip={showTip ? 'Tip: you can open this context menu via right-click or with Ctrl+Q' : undefined}
-/>
+}

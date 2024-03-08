@@ -6,17 +6,25 @@
 
   export let item: MenuDropDownButton
   export let className: string | undefined = undefined
-  export let onCloseContextMenu: () => void
+  export let onRequestClose: () => void
+
+  $: items = item.items.map((item) => ({
+    ...item,
+    onClick: (event: MouseEvent) => {
+      onRequestClose()
+      item.onClick(event)
+    }
+  }))
 </script>
 
-<DropdownButton width={item.width} items={item.items}>
+<DropdownButton width={item.width} {items}>
   <button
     class={classnames('jse-context-menu-button', className, item.main.className)}
     type="button"
     slot="defaultItem"
     title={item.main.title}
     on:click={(event) => {
-      onCloseContextMenu()
+      onRequestClose()
       item.main.onClick(event)
     }}
     disabled={item.main.disabled || false}

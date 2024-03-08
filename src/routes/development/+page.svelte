@@ -378,8 +378,9 @@
     console.log('onChangeQueryLanguage', newQueryLanguageId)
     queryLanguageId = newQueryLanguageId
   }
-  function onRenderContextMenu(items: ContextMenuItem[], content: RenderMenuContext) {
-    console.log('onRenderContextMenu', items, content)
+
+  function onRenderContextMenu(items: ContextMenuItem[], context: RenderMenuContext) {
+    console.log('onRenderContextMenu', items, context)
     return items
   }
 

@@ -477,10 +477,12 @@ const myRendererAction = {
 #### onRenderMenu
 
 ```ts
-onRenderMenu(items: MenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean }) : MenuItem[] | undefined
+onRenderMenu(items: MenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean, readOnly: boolean }) : MenuItem[] | undefined
 ```
 
-Callback which can be used to make changes to the menu items. New items can be added, or existing items can be removed or reorganized. When the function returns `undefined`, the original `items` will be applied. Using the context values `mode` and `modal`, different actions can be taken depending on the mode of the editor and whether the editor is rendered inside a modal or not.
+Callback which can be used to make changes to the menu items. New items can be added, or existing items can be removed or reorganized. When the function returns `undefined`, the original `items` will be applied.
+
+Using the context values `mode`, `modal`, and `readOnly`, different actions can be taken depending on the mode of the editor and whether the editor is rendered inside a modal or not, or depending on whether it is read-only.
 
 A menu item `MenuItem` can be one of the following types:
 
@@ -517,10 +519,12 @@ A menu item `MenuItem` can be one of the following types:
 #### onRenderContextMenu
 
 ```ts
-onRenderContextMenu(items: ContextMenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean, selection: JSONEditorSelection | null }) : ContextMenuItem[] | undefined
+onRenderContextMenu(items: ContextMenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean, readOnly: boolean, selection: JSONEditorSelection | null }) : ContextMenuItem[] | false | undefined
 ```
 
-Callback which can be used to make changes to the context menu items. New items can be added, or existing items can be removed or reorganized. When the function returns `undefined`, the original `items` will be applied. Using the context values `mode`, `modal` and `selection`, different actions can be taken depending on the mode of the editor, whether the editor is rendered inside a modal or not and the path of selection.
+Callback which can be used to make changes to the context menu items. New items can be added, or existing items can be removed or reorganized. When the function returns `undefined`, the original `items` will be applied and the context menu will be displayed when `readOnly` is `false`. When the function returns `false`, the context menu will never be displayed. The callback is triggered too when the editor is `readOnly`, and in most cases you want to return `false` then.
+
+Using the context values `mode`, `modal`, `readOnly` and `selection`, different actions can be taken depending on the mode of the editor, whether the editor is rendered inside a modal or not, whether the editor is read-only or not, and depending on the path of selection.
 
 A menu item `ContextMenuItem` can be one of the following types:
 

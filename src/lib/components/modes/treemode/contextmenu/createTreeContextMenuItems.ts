@@ -1,115 +1,126 @@
-<svelte:options immutable={true} />
+import {
+  faArrowRightArrowLeft,
+  faCaretSquareDown,
+  faCaretSquareUp,
+  faCheckSquare,
+  faClone,
+  faCopy,
+  faCropAlt,
+  faCut,
+  faFilter,
+  faPaste,
+  faPen,
+  faPlus,
+  faSortAmountDownAlt,
+  faSquare,
+  faTrashCan
+} from '@fortawesome/free-solid-svg-icons'
+import {
+  canConvert,
+  getFocusPath,
+  isKeySelection,
+  isMultiSelection,
+  isValueSelection,
+  singleItemSelected
+} from '$lib/logic/selection'
+import type { ConvertType, DocumentState, InsertType, JSONParser } from '$lib/types'
+import { initial, isEmpty } from 'lodash-es'
+import { compileJSONPointer, getIn } from 'immutable-json-patch'
+import { isObjectOrArray, isObject } from '$lib/utils/typeUtils'
+import { getEnforceString } from '$lib/logic/documentState'
+import type { ContextMenuItem } from 'svelte-jsoneditor'
 
-<script lang="ts">
-  import {
-    faArrowRightArrowLeft,
-    faCaretSquareDown,
-    faCaretSquareUp,
-    faClone,
-    faCopy,
-    faCropAlt,
-    faCut,
-    faFilter,
-    faPaste,
-    faPen,
-    faPlus,
-    faSortAmountDownAlt,
-    faTrashCan
-  } from '@fortawesome/free-solid-svg-icons'
-  import { compileJSONPointer, getIn } from 'immutable-json-patch'
-  import { initial, isEmpty } from 'lodash-es'
-  import {
-    canConvert,
-    getFocusPath,
-    isKeySelection,
-    isMultiSelection,
-    isValueSelection,
-    singleItemSelected
-  } from '$lib/logic/selection.js'
-  import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
-  import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
-  import type {
-    ContextMenuItem,
-    DocumentState,
-    InsertType,
-    JSONParser,
-    OnRenderContextMenuInternal
-  } from '$lib/types'
-  import { getEnforceString } from '$lib/logic/documentState.js'
-  import ContextMenu from '../../../../components/controls/contextmenu/ContextMenu.svelte'
+export default function ({
+  json,
+  documentState,
+  readOnly,
+  parser,
+  onEditKey,
+  onEditValue,
+  onToggleEnforceString,
+  onCut,
+  onCopy,
+  onPaste,
+  onRemove,
+  onDuplicate,
+  onExtract,
+  onInsertBefore,
+  onInsert,
+  onConvert,
+  onInsertAfter,
+  onSort,
+  onTransform
+}: {
+  json: unknown
+  documentState: DocumentState
+  readOnly: boolean
+  parser: JSONParser
+  onEditKey: () => void
+  onEditValue: () => void
+  onToggleEnforceString: () => void
+  onCut: (indent: boolean) => void
+  onCopy: (indent: boolean) => void
+  onPaste: () => void
+  onRemove: () => void
+  onDuplicate: () => void
+  onExtract: () => void
+  onInsertBefore: () => void
+  onInsert: (type: InsertType) => void
+  onConvert: (type: ConvertType) => void
+  onInsertAfter: () => void
+  onSort: () => void
+  onTransform: () => void
+}): ContextMenuItem[] {
+  const selection = documentState.selection
 
-  export let json: unknown
-  export let documentState: DocumentState
-  export let parser: JSONParser
-
-  export let showTip: boolean
-
-  export let onCloseContextMenu: () => void
-  export let onRenderContextMenu: OnRenderContextMenuInternal
-  export let onEditKey: () => void
-  export let onEditValue: () => void
-  export let onToggleEnforceString: () => void
-  export let onCut: (indent: boolean) => void
-  export let onCopy: (indent: boolean) => void
-  export let onPaste: () => void
-  export let onRemove: () => void
-  export let onDuplicate: () => void
-  export let onExtract: () => void
-  export let onInsertBefore: () => void
-  export let onInsert: (type: InsertType) => void
-  export let onConvert: (type: InsertType) => void
-  export let onInsertAfter: () => void
-  export let onSort: () => void
-  export let onTransform: () => void
-
-  $: selection = documentState.selection
-
-  $: hasJson = json !== undefined
-  $: hasSelection = !!selection
-  $: rootSelected = selection ? isEmpty(getFocusPath(selection)) : false
-  $: focusValue = selection ? getIn(json, getFocusPath(selection)) : undefined
-  $: editValueText = Array.isArray(focusValue)
+  const hasJson = json !== undefined
+  const hasSelection = !!selection
+  const rootSelected = selection ? isEmpty(getFocusPath(selection)) : false
+  const focusValue = selection ? getIn(json, getFocusPath(selection)) : undefined
+  const editValueText = Array.isArray(focusValue)
     ? 'Edit array'
     : isObject(focusValue)
       ? 'Edit object'
       : 'Edit value'
 
-  $: hasSelectionContents =
+  const hasSelectionContents =
     hasJson &&
     (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))
 
-  $: canDuplicate = hasJson && hasSelectionContents && !rootSelected // must not be root
-
-  $: canExtract =
-    hasJson &&
-    selection != null &&
-    (isMultiSelection(selection) || isValueSelection(selection)) &&
-    !rootSelected // must not be root
-
-  $: canEditKey =
+  const canEditKey =
+    !readOnly &&
     hasJson &&
     selection != null &&
     singleItemSelected(selection) &&
     !rootSelected &&
     !Array.isArray(getIn(json, initial(getFocusPath(selection))))
 
-  $: canEditValue = hasJson && selection != null && singleItemSelected(selection)
-  $: canEnforceString = canEditValue && !isObjectOrArray(focusValue)
+  const canEditValue = !readOnly && hasJson && selection != null && singleItemSelected(selection)
+  const canEnforceString = canEditValue && !isObjectOrArray(focusValue)
 
-  $: convertMode = hasSelectionContents
-  $: insertOrConvertText = convertMode ? 'Convert to:' : 'Insert:'
-  $: canInsertOrConvertStructure = convertMode ? false : hasSelection
-  $: canInsertOrConvertObject = convertMode
-    ? canConvert(selection) && !isObject(focusValue)
-    : hasSelection
-  $: canInsertOrConvertArray = convertMode
-    ? canConvert(selection) && !Array.isArray(focusValue)
-    : hasSelection
-  $: canInsertOrConvertValue = convertMode
-    ? canConvert(selection) && isObjectOrArray(focusValue)
-    : hasSelection
+  const canCut = !readOnly && hasSelectionContents
+  const canCopy = hasSelectionContents
+  const canPaste = !readOnly && hasSelection
+  const canDuplicate = !readOnly && hasJson && hasSelectionContents && !rootSelected // must not be root
+  const canExtract =
+    !readOnly &&
+    hasJson &&
+    selection != null &&
+    (isMultiSelection(selection) || isValueSelection(selection)) &&
+    !rootSelected // must not be root
 
-  $: enforceString =
+  const convertMode = hasSelectionContents
+  const insertOrConvertText = convertMode ? 'Convert to:' : 'Insert:'
+
+  const canInsertOrConvertStructure = readOnly || convertMode ? false : hasSelection
+  const canInsertOrConvertObject =
+    !readOnly && (convertMode ? canConvert(selection) && !isObject(focusValue) : hasSelection)
+  const canInsertOrConvertArray =
+    !readOnly && (convertMode ? canConvert(selection) && !Array.isArray(focusValue) : hasSelection)
+  const canInsertOrConvertValue =
+    !readOnly && (convertMode ? canConvert(selection) && isObjectOrArray(focusValue) : hasSelection)
+
+  const enforceString =
     selection != null && focusValue
       ? getEnforceString(
           focusValue,
@@ -121,14 +132,15 @@
 
   function handleInsertOrConvert(type: InsertType) {
     if (hasSelectionContents) {
-      onConvert(type)
+      if (type !== 'structure') {
+        onConvert(type)
+      }
     } else {
       onInsert(type)
     }
   }
 
-  let defaultItems: ContextMenuItem[]
-  $: defaultItems = [
+  return [
     {
       type: 'row',
       items: [
@@ -184,7 +196,7 @@
             icon: faCut,
             text: 'Cut',
             title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
-            disabled: !hasSelectionContents
+            disabled: !canCut
           },
           width: '10em',
           items: [
@@ -194,7 +206,7 @@
               text: 'Cut formatted',
               title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
               onClick: () => onCut(true),
-              disabled: !hasSelectionContents
+              disabled: !canCut
             },
             {
               type: 'button',
@@ -202,7 +214,7 @@
               text: 'Cut compacted',
               title: 'Cut selected contents, without indentation (Ctrl+Shift+X)',
               onClick: () => onCut(false),
-              disabled: !hasSelectionContents
+              disabled: !canCut
             }
           ]
         },
@@ -214,7 +226,7 @@
             icon: faCopy,
             text: 'Copy',
             title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
-            disabled: !hasSelectionContents
+            disabled: !canCopy
           },
           width: '12em',
           items: [
@@ -224,7 +236,7 @@
               text: 'Copy formatted',
               title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
               onClick: () => onCopy(true),
-              disabled: !hasSelectionContents
+              disabled: !canCopy
             },
             {
               type: 'button',
@@ -232,7 +244,7 @@
               text: 'Copy compacted',
               title: 'Copy selected contents, without indentation (Ctrl+Shift+C)',
               onClick: () => onCopy(false),
-              disabled: !hasSelectionContents
+              disabled: !canCopy
             }
           ]
         },
@@ -242,7 +254,7 @@
           icon: faPaste,
           text: 'Paste',
           title: 'Paste clipboard contents (Ctrl+V)',
-          disabled: !hasSelection
+          disabled: !canPaste
         }
       ]
     },
@@ -275,7 +287,7 @@
               icon: faSortAmountDownAlt,
               text: 'Sort',
               title: 'Sort array or object contents',
-              disabled: !hasSelectionContents
+              disabled: readOnly || !hasSelectionContents
             },
             {
               type: 'button',
@@ -283,7 +295,7 @@
               icon: faFilter,
               text: 'Transform',
               title: 'Transform array or object contents (filter, sort, project)',
-              disabled: !hasSelectionContents
+              disabled: readOnly || !hasSelectionContents
             },
             {
               type: 'button',
@@ -291,7 +303,7 @@
               icon: faTrashCan,
               text: 'Remove',
               title: 'Remove selected contents (Delete)',
-              disabled: !hasSelectionContents
+              disabled: readOnly || !hasSelectionContents
             }
           ]
         },
@@ -347,7 +359,7 @@
           icon: faCaretSquareUp,
           text: 'Insert before',
           title: 'Select area before current entry to insert or paste contents',
-          disabled: !hasSelectionContents || rootSelected
+          disabled: readOnly || !hasSelectionContents || rootSelected
         },
         {
           type: 'button',
@@ -355,17 +367,9 @@
           icon: faCaretSquareDown,
           text: 'Insert after',
           title: 'Select area after current entry to insert or paste contents',
-          disabled: !hasSelectionContents || rootSelected
+          disabled: readOnly || !hasSelectionContents || rootSelected
         }
       ]
     }
   ]
-
-  $: items = onRenderContextMenu(defaultItems)
-</script>
-
-<ContextMenu
-  {items}
-  {onCloseContextMenu}
-  tip={showTip ? 'Tip: you can open this context menu via right-click or with Ctrl+Q' : undefined}
-/>
+}

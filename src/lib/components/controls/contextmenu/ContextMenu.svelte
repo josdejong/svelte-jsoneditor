@@ -19,7 +19,7 @@
   import ContextMenuDropDownButton from './ContextMenuDropDownButton.svelte'
 
   export let items: ContextMenuItem[]
-  export let onCloseContextMenu: () => void
+  export let onRequestClose: () => void
   export let tip: string | undefined
 
   let refContextMenu: HTMLDivElement
@@ -80,27 +80,23 @@
 >
   {#each items as item}
     {#if isMenuButton(item)}
-      <ContextMenuButton {item} {onCloseContextMenu} />
+      <ContextMenuButton {item} {onRequestClose} />
     {:else if isMenuDropDownButton(item)}
-      <ContextMenuDropDownButton {item} {onCloseContextMenu} />
+      <ContextMenuDropDownButton {item} {onRequestClose} />
     {:else if isContextMenuRow(item)}
       <div class="jse-row">
         {#each item.items as rowItem}
           {#if isMenuButton(rowItem)}
-            <ContextMenuButton item={rowItem} {onCloseContextMenu} />
+            <ContextMenuButton item={rowItem} {onRequestClose} />
           {:else if isMenuDropDownButton(rowItem)}
-            <ContextMenuDropDownButton item={rowItem} {onCloseContextMenu} />
+            <ContextMenuDropDownButton item={rowItem} {onRequestClose} />
           {:else if isContextMenuColumn(rowItem)}
             <div class="jse-column">
               {#each rowItem.items as columnItem}
                 {#if isMenuButton(columnItem)}
-                  <ContextMenuButton className="left" item={columnItem} {onCloseContextMenu} />
+                  <ContextMenuButton className="left" item={columnItem} {onRequestClose} />
                 {:else if isMenuDropDownButton(columnItem)}
-                  <ContextMenuDropDownButton
-                    className="left"
-                    item={columnItem}
-                    {onCloseContextMenu}
-                  />
+                  <ContextMenuDropDownButton className="left" item={columnItem} {onRequestClose} />
                 {:else if isMenuSeparator(columnItem)}
                   <div class="jse-separator" />
                 {:else if isMenuLabel(columnItem)}

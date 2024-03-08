@@ -51,7 +51,6 @@
     getSelectionPaths,
     getSelectionRight,
     getSelectionUp,
-    hasSelectionContents,
     isAfterSelection,
     isEditingSelection,
     isInsideSelection,
@@ -63,6 +62,7 @@
     isValueSelection,
     removeEditModeFromSelection,
     selectAll,
+    hasSelectionContents,
     updateSelectionInDocumentState
   } from '$lib/logic/selection.js'
   import { mapValidationErrors, validateJSON } from '$lib/logic/validation.js'
@@ -92,7 +92,6 @@
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import CopyPasteModal from '../../modals/CopyPasteModal.svelte'
   import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
-  import TreeContextMenu from './contextmenu/TreeContextMenu.svelte'
   import JSONNode from './JSONNode.svelte'
   import TreeMenu from './menu/TreeMenu.svelte'
   import Welcome from './Welcome.svelte'
@@ -104,6 +103,7 @@
     AfterPatchCallback,
     Content,
     ContentErrors,
+    ConvertType,
     DocumentState,
     HistoryItem,
     InsertType,
@@ -151,6 +151,9 @@
   } from '$lib/logic/actions.js'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import type { Context } from 'svelte-simple-modal'
+  import type { ContextMenuItem } from '$lib/types'
+  import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
+  import createTreeContextMenuItems from './contextmenu/createTreeContextMenuItems'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -839,7 +842,7 @@
       readOnly ||
       json === undefined ||
       !documentState.selection ||
-      !hasSelectionContents(documentState.selection) ||
+      !hasSelectionContents ||
       isEmpty(getFocusPath(documentState.selection)) // root selected, cannot duplicate
     ) {
       return
@@ -895,7 +898,7 @@
     })
   }
 
-  function handleInsertFromContextMenu(type: 'value' | 'object' | 'array' | 'structure') {
+  function handleInsertFromContextMenu(type: InsertType) {
     if (isKeySelection(documentState.selection)) {
       // in this case, we do not want to rename the key, but replace the property
       updateSelection(createValueSelection(documentState.selection.path, false))
@@ -908,7 +911,7 @@
     handleInsert(type)
   }
 
-  function handleConvert(type: 'value' | 'object' | 'array') {
+  function handleConvert(type: ConvertType) {
     if (readOnly || !documentState.selection) {
       return
     }
@@ -921,7 +924,11 @@
     try {
       const path = getAnchorPath(documentState.selection)
       const currentValue: unknown = getIn(json, path)
-      const convertedValue = convertValue(currentValue, type, parser)
+      const convertedValue = convertValue(
+        currentValue,
+        type as 'value' | 'object' | 'array',
+        parser
+      )
       if (convertedValue === currentValue) {
         // no change, do nothing
         return
@@ -1689,11 +1696,11 @@
     offsetLeft,
     showTip
   }: AbsolutePopupOptions) {
-    const props = {
+    const defaultItems: ContextMenuItem[] = createTreeContextMenuItems({
       json,
-      documentState: documentState,
+      documentState,
+      readOnly,
       parser,
-      showTip,
 
       onEditKey: handleEditKey,
       onEditValue: handleEditValue,
@@ -1709,22 +1716,28 @@
 
       onInsertBefore: handleInsertBefore,
       onInsert: handleInsertFromContextMenu,
-      onConvert: handleConvert,
       onInsertAfter: handleInsertAfter,
+      onConvert: handleConvert,
 
       onSort: handleSortSelection,
-      onTransform: handleTransformSelection,
+      onTransform: handleTransformSelection
+    })
 
-      onRenderContextMenu,
-      onCloseContextMenu: function () {
-        closeAbsolutePopup(popupId)
-        focus()
-      }
+    const items = onRenderContextMenu(defaultItems)
+
+    if (items === false) {
+      return
     }
 
-    modalOpen = true
+    const props = {
+      tip: showTip
+        ? 'Tip: you can open this context menu via right-click or with Ctrl+Q'
+        : undefined,
+      items,
+      onRequestClose: () => closeAbsolutePopup(popupId)
+    }
 
-    const popupId = openAbsolutePopup(TreeContextMenu, props, {
+    const options = {
       left,
       top,
       offsetTop,
@@ -1737,11 +1750,15 @@
         modalOpen = false
         focus()
       }
-    })
+    }
+
+    modalOpen = true
+
+    const popupId = openAbsolutePopup(ContextMenu, props, options)
   }
 
   function handleContextMenu(event?: Event) {
-    if (readOnly || isEditingSelection(documentState.selection)) {
+    if (isEditingSelection(documentState.selection)) {
       return
     }
 
@@ -1790,10 +1807,6 @@
   }
 
   function handleContextMenuFromTreeMenu(event: MouseEvent) {
-    if (readOnly) {
-      return
-    }
-
     openContextMenu({
       anchor: findParentWithNodeName(event.target as HTMLElement, 'BUTTON'),
       offsetTop: 0,
