@@ -8,7 +8,7 @@
   export let className: string | undefined = undefined
   export let onRequestClose: () => void
 
-  $: items = item.items.map(item => ({
+  $: items = item.items.map((item) => ({
     ...item,
     onClick: (event: MouseEvent) => {
       onRequestClose()
@@ -17,7 +17,7 @@
   }))
 </script>
 
-<DropdownButton width={item.width} items={items}>
+<DropdownButton width={item.width} {items}>
   <button
     class={classnames('jse-context-menu-button', className, item.main.className)}
     type="button"
