@@ -1846,15 +1846,10 @@
         ? 'Tip: you can open this context menu via right-click or with Ctrl+Q'
         : undefined,
       items,
-      onCloseContextMenu: function () {
-        closeAbsolutePopup(popupId)
-        focus()
-      }
+      onRequestClose: () => closeAbsolutePopup(popupId)
     }
 
-    modalOpen = true
-
-    const popupId = openAbsolutePopup(ContextMenu, props, {
+    const options = {
       left,
       top,
       offsetTop,
@@ -1867,7 +1862,11 @@
         modalOpen = false
         focus()
       }
-    })
+    }
+
+    modalOpen = true
+
+    const popupId = openAbsolutePopup(ContextMenu, props, options)
   }
 
   function handleContextMenu(event?: Event) {

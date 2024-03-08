@@ -6,12 +6,12 @@
 
   export let item: MenuDropDownButton
   export let className: string | undefined = undefined
-  export let onCloseContextMenu: () => void
+  export let onRequestClose: () => void
 
   $: items = item.items.map(item => ({
     ...item,
     onClick: (event: MouseEvent) => {
-      onCloseContextMenu()
+      onRequestClose()
       item.onClick(event)
     }
   }))
@@ -24,7 +24,7 @@
     slot="defaultItem"
     title={item.main.title}
     on:click={(event) => {
-      onCloseContextMenu()
+      onRequestClose()
       item.main.onClick(event)
     }}
     disabled={item.main.disabled || false}
