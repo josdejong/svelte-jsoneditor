@@ -42,19 +42,18 @@
   }
 
   .jse-contents {
-    border-left: $main-border;
-    border-right: $main-border;
-
-    &:last-child {
-      border-bottom: $main-border;
-    }
-
     flex: 1;
     overflow: auto;
     position: relative;
     padding: $contents-padding;
     display: flex;
     flex-direction: column;
+    border-left: $main-border;
+    border-right: $main-border;
+
+    &:last-child {
+      border-bottom: $main-border;
+    }
 
     .jse-loading-space {
       flex: 1;
