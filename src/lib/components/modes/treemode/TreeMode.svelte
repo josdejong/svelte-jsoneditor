@@ -14,6 +14,7 @@
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
     SCROLL_DURATION,
+    SEARCH_BOX_HEIGHT,
     SIMPLE_MODAL_OPTIONS
   } from '$lib/constants.js'
   import {
@@ -51,6 +52,7 @@
     getSelectionPaths,
     getSelectionRight,
     getSelectionUp,
+    hasSelectionContents,
     isAfterSelection,
     isEditingSelection,
     isInsideSelection,
@@ -62,7 +64,6 @@
     isValueSelection,
     removeEditModeFromSelection,
     selectAll,
-    hasSelectionContents,
     updateSelectionInDocumentState
   } from '$lib/logic/selection.js'
   import { mapValidationErrors, validateJSON } from '$lib/logic/validation.js'
@@ -103,6 +104,7 @@
     AfterPatchCallback,
     Content,
     ContentErrors,
+    ContextMenuItem,
     ConvertType,
     DocumentState,
     HistoryItem,
@@ -141,17 +143,9 @@
   import { Mode, ValidationSeverity } from '$lib/types.js'
   import memoizeOne from 'memoize-one'
   import { measure } from '$lib/utils/timeUtils.js'
-  import {
-    onCopy,
-    onCut,
-    onInsert,
-    onInsertCharacter,
-    onPaste,
-    onRemove
-  } from '$lib/logic/actions.js'
+  import { onCopy, onCut, onInsert, onInsertCharacter, onPaste, onRemove } from '$lib/logic/actions.js'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import type { Context } from 'svelte-simple-modal'
-  import type { ContextMenuItem } from '$lib/types'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
   import createTreeContextMenuItems from './contextmenu/createTreeContextMenuItems'
 
@@ -264,6 +258,27 @@
   let searchResult: SearchResult | undefined
   let showSearch = false
   let showReplace = false
+
+  $: applySearchBoxSpacing(showSearch)
+
+  function applySearchBoxSpacing(showSearch: boolean) {
+    if (!refContents) {
+      return
+    }
+
+    if (showSearch) {
+      const padding = parseInt(getComputedStyle(refContents).padding) ?? 0
+      refContents.style.overflowAnchor = 'none'
+      refContents.style.paddingTop = (padding + SEARCH_BOX_HEIGHT) + 'px'
+      refContents.scrollTop += SEARCH_BOX_HEIGHT
+      refContents.style.overflowAnchor = ''
+    } else {
+      refContents.style.overflowAnchor = 'none'
+      refContents.style.paddingTop = ''
+      refContents.scrollTop -= SEARCH_BOX_HEIGHT
+      refContents.style.overflowAnchor = ''
+    }
+  }
 
   function handleSearch(result: SearchResult | undefined) {
     searchResult = result

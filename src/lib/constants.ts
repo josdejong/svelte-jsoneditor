@@ -66,6 +66,7 @@ export const JSON_STATUS_INVALID = 'invalid'
 // TODO: can we dynamically calculate the size?
 export const CONTEXT_MENU_HEIGHT = (40 + 2) * 8 // px
 export const CONTEXT_MENU_WIDTH = 260 // px
+export const SEARCH_BOX_HEIGHT = 100 // px for search and replace
 
 export const SORT_DIRECTION_NAMES = {
   [SortDirection.asc]: 'ascending',
