@@ -224,7 +224,7 @@
 
     searching = false
 
-    handleFocus()
+    await handleFocus()
   }
 
   function handleClose() {

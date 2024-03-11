@@ -4,7 +4,6 @@ import { SortDirection } from './types.js'
 export const SCROLL_DURATION = 300 // ms
 export const DEBOUNCE_DELAY = 300 // ms
 export const TEXT_MODE_ONCHANGE_DELAY = 300 // ms
-export const SEARCH_UPDATE_THROTTLE = 300 // ms
 export const AUTO_SCROLL_INTERVAL = 50 // ms
 export const AUTO_SCROLL_SPEED_SLOW = 200 // pixels per second
 export const AUTO_SCROLL_SPEED_NORMAL = 400 // pixels per second

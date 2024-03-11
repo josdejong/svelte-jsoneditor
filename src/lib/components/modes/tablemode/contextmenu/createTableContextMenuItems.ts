@@ -68,11 +68,11 @@ export default function ({
   const enforceString =
     selection != null && focusValue !== undefined
       ? getEnforceString(
-        focusValue,
-        documentState.enforceStringMap,
-        compileJSONPointer(getFocusPath(selection)),
-        parser
-      )
+          focusValue,
+          documentState.enforceStringMap,
+          compileJSONPointer(getFocusPath(selection)),
+          parser
+        )
       : false
 
   return [
