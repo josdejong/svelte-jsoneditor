@@ -159,6 +159,7 @@ export function calculateVisibleSection(
   json: unknown | undefined,
   itemHeights: Record<number, number>,
   defaultItemHeight: number,
+  searchBoxOffset: number,
   margin = 80
 ): VisibleSection {
   const itemCount = isJSONArray(json) ? json.length : 0
@@ -169,7 +170,7 @@ export function calculateVisibleSection(
   const getItemHeight = (index: number) => itemHeights[index] || defaultItemHeight
 
   let startIndex = 0
-  let startHeight = 0
+  let startHeight = searchBoxOffset
   while (startHeight < viewPortTop && startIndex < itemCount) {
     startHeight += getItemHeight(startIndex)
     startIndex++

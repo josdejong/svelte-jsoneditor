@@ -7,6 +7,7 @@
     AfterPatchCallback,
     Content,
     ContentErrors,
+    ContextMenuItem,
     DocumentState,
     HistoryItem,
     JSONEditorContext,
@@ -36,13 +37,15 @@
   } from '$lib/types'
   import { Mode, SortDirection, ValidationSeverity } from '$lib/types.js'
   import TableMenu from './menu/TableMenu.svelte'
-  import { compileJSONPointerProp, type JSONPatchDocument, type JSONPath } from 'immutable-json-patch'
   import {
     compileJSONPointer,
+    compileJSONPointerProp,
     existsIn,
     getIn,
     immutableJSONPatch,
-    isJSONArray
+    isJSONArray,
+    type JSONPatchDocument,
+    type JSONPath
   } from 'immutable-json-patch'
   import {
     isTextContent,
@@ -117,6 +120,7 @@
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
     SCROLL_DURATION,
+    SEARCH_BOX_HEIGHT,
     SIMPLE_MODAL_OPTIONS
   } from '$lib/constants.js'
   import { noop } from '$lib/utils/noop.js'
@@ -142,7 +146,6 @@
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import RefreshColumnHeader from './RefreshColumnHeader.svelte'
   import type { Context } from 'svelte-simple-modal'
-  import type { ContextMenuItem } from '$lib/types'
   import createTableContextMenuItems from './contextmenu/createTableContextMenuItems'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
   import { filterValueSearchResults } from '$lib/logic/search.js'
@@ -222,6 +225,20 @@
   let showSearch = false
   let showReplace = false
 
+  $: applySearchBoxSpacing(showSearch)
+
+  function applySearchBoxSpacing(showSearch: boolean) {
+    if (!refContents) {
+      return
+    }
+
+    const offset = showSearch ? SEARCH_BOX_HEIGHT : -SEARCH_BOX_HEIGHT
+    refContents.scrollTo({
+      top: refContents.scrollTop += offset,
+      left: refContents.scrollLeft
+    })
+  }
+
   function handleSearch(result: SearchResult | undefined) {
     searchResult = result
   }
@@ -270,7 +287,8 @@
     viewPortHeight,
     json,
     itemHeightsCache, // warning: itemHeightsCache is mutated and is not responsive itself
-    defaultItemHeight
+    defaultItemHeight,
+    showSearch ? SEARCH_BOX_HEIGHT : 0
   )
 
   $: refreshScrollTop(json)
