@@ -36,7 +36,7 @@
   } from '$lib/types'
   import { Mode, SortDirection, ValidationSeverity } from '$lib/types.js'
   import TableMenu from './menu/TableMenu.svelte'
-  import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
+  import { compileJSONPointerProp, type JSONPatchDocument, type JSONPath } from 'immutable-json-patch'
   import {
     compileJSONPointer,
     existsIn,
@@ -1863,6 +1863,9 @@
                 [String(rowIndex)],
                 validationErrorsByRow?.row
               )}
+              {@const searchResultItemsByRow = searchResult?.itemsMap
+                ? filterPointerOrUndefined(searchResult?.itemsMap, compileJSONPointerProp(rowIndex))
+                : undefined}
               <tr class="jse-table-row">
                 {#key rowIndex}
                   <th
@@ -1877,6 +1880,7 @@
                 {/key}
                 {#each columns as column, columnIndex}
                   {@const path = [String(rowIndex)].concat(column)}
+                  {@const pointer = compileJSONPointer(path)}
                   {@const value = getIn(item, column)}
                   {@const isSelected =
                     isValueSelection(documentState.selection) &&
@@ -1889,11 +1893,11 @@
                     class:jse-selected-value={isSelected}
                   >
                     {#if isObjectOrArray(value)}
-                      {@const searchResultItems = searchResult?.itemsMap
-                        ? filterPointerOrUndefined(searchResult?.itemsMap, compileJSONPointer(path))
+                      {@const searchResultItemsByCell = searchResultItemsByRow
+                        ? filterPointerOrUndefined(searchResultItemsByRow, pointer)
                         : undefined}
-                      {@const containsActiveSearchResult = searchResultItems
-                        ? Object.values(searchResultItems).some((items) =>
+                      {@const containsActiveSearchResult = searchResultItemsByCell
+                        ? Object.values(searchResultItemsByCell).some((items) =>
                             items.some((item) => item.active)
                           )
                         : false}
@@ -1903,25 +1907,20 @@
                         {value}
                         {parser}
                         {isSelected}
-                        containsSearchResult={!isEmpty(searchResultItems)}
+                        containsSearchResult={!isEmpty(searchResultItemsByCell)}
                         {containsActiveSearchResult}
                         onEdit={openJSONEditorModal}
                       />{:else}
-                      {@const searchResultItems = searchResult?.itemsMap
-                        ? filterValueSearchResults(searchResult?.itemsMap, compileJSONPointer(path))
+                      {@const searchResultItemsByCell = searchResult?.itemsMap
+                        ? filterValueSearchResults(searchResult?.itemsMap, pointer)
                         : undefined}
 
                       <JSONValueComponent
                         {path}
                         value={value !== undefined ? value : ''}
-                        enforceString={getEnforceString(
-                          value,
-                          documentState.enforceStringMap,
-                          compileJSONPointer(path),
-                          context.parser
-                        )}
+                        enforceString={getEnforceString(value, documentState.enforceStringMap, pointer, context.parser)}
                         selection={isSelected ? documentState.selection : null}
-                        {searchResultItems}
+                        searchResultItems={searchResultItemsByCell}
                         {context}
                       />{/if}{#if !readOnly && isSelected && !isEditingSelection(documentState.selection)}
                       <div class="jse-context-menu-anchor">
