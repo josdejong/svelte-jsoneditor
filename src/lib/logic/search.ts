@@ -184,9 +184,11 @@ export function search(
 
       const item = json[i]
 
-      for (const column of columns) {
-        for (let c = 0; c < column.length; c++) {
-          path[c + 1] = column[c]
+      for (let c = 0; c < columns.length; c++) {
+        const column = columns[c]
+
+        for (let p = 0; p < column.length; p++) {
+          path[p + 1] = column[p]
         }
         while (path.length > column.length + 1) {
           path.pop()
