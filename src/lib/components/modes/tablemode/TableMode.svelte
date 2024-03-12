@@ -273,6 +273,8 @@
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
   let modalOpen = false
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  let hasFocus = false
 
   let itemHeightsCache: Record<number, number> = {}
 

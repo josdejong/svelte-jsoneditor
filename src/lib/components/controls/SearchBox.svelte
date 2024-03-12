@@ -54,24 +54,16 @@
 
   $: onSearch(searchResult)
 
-  const applySearchDebounced = debounce(applySearch, DEBOUNCE_DELAY)
-  $: applySearchDebounced(showSearch, text, json)
+  $: applyChangedShowSearch(showSearch)
+
+  const applyChangedSearchTextDebounced = debounce(applyChangedSearchText, DEBOUNCE_DELAY)
+  $: applyChangedSearchTextDebounced(text)
+
+  const applyChangedJsonDebounced = debounce(applyChangedJson, DEBOUNCE_DELAY)
+  $: applyChangedJsonDebounced(json)
 
   function toggleShowReplace() {
     showReplace = !showReplace && !readOnly
-  }
-
-  function handleSubmit(event: SubmitEvent & { currentTarget: EventTarget & HTMLFormElement }) {
-    event.preventDefault()
-
-    const pendingChanges = text !== previousText
-    if (pendingChanges) {
-      previousText = text
-      applySearchDebounced.flush()
-      handleFocus()
-    } else {
-      handleNext()
-    }
   }
 
   function handleKeyDown(event: KeyboardEvent) {
@@ -82,7 +74,14 @@
 
     if (combo === 'Enter') {
       event.preventDefault()
-      handleNext()
+
+      const pendingChanges = text !== previousText
+      if (pendingChanges) {
+        applyChangedSearchTextDebounced.flush()
+        previousText = text
+      } else {
+        handleNext()
+      }
     }
 
     if (combo === 'Shift+Enter') {
@@ -115,7 +114,7 @@
 
   async function handlePaste() {
     await tick()
-    setTimeout(() => applySearchDebounced.flush())
+    setTimeout(() => applyChangedSearchTextDebounced.flush())
   }
 
   async function handleReplace() {
@@ -192,9 +191,23 @@
     }
   }
 
+  async function applyChangedShowSearch(showSearch: boolean) {
+    await applySearch(showSearch, text, json)
+  }
+
+  async function applyChangedSearchText(text: string) {
+    await applySearch(showSearch, text, json)
+    await handleFocus()
+  }
+
+  async function applyChangedJson(json: unknown) {
+    await applySearch(showSearch, text, json)
+  }
+
   // we pass searchText and json as argument to trigger search when these variables change,
-  // via $: applySearchThrottled(searchText, json)
-  async function applySearch(showSearch: boolean, searchText: string, json: unknown) {
+  // via various listeners like applyChangedSearchText
+  async function applySearch(showSearch: boolean, text: string, json: unknown) {
+    debug('applySearch', { showSearch, text })
     if (!showSearch) {
       if (searchResult) {
         searchResult = undefined
@@ -203,7 +216,7 @@
       return
     }
 
-    if (searchText === '') {
+    if (text === '') {
       debug('clearing search result')
 
       if (searchResult !== undefined) {
@@ -214,21 +227,24 @@
     }
 
     searching = true
-    debug('searching...', searchText)
 
-    setTimeout(() => {
-      // wait until the search icon has been rendered
-      const newResultItems = search(searchText, json, { maxResults: MAX_SEARCH_RESULTS, columns })
-      searchResult = updateSearchResult(json, newResultItems, searchResult)
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        // wait until the search icon has been rendered
+        const newResultItems = search(text, json, { maxResults: MAX_SEARCH_RESULTS, columns })
+        searchResult = updateSearchResult(json, newResultItems, searchResult)
 
-      searching = false
-
-      handleFocus()
+        searching = false
+        resolve()
+      })
     })
   }
 
   function handleClose() {
     debug('handleClose')
+    applyChangedSearchTextDebounced.cancel()
+    applyChangedJsonDebounced.cancel()
+    applySearch(false, text, json) // will clear the search results
     onClose()
   }
 </script>
@@ -236,7 +252,7 @@
 {#if showSearch}
   <div class="jse-search-box">
     <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-    <form class="jse-search-form" on:submit={handleSubmit} on:keydown={handleKeyDown}>
+    <form class="jse-search-form" on:keydown={handleKeyDown}>
       {#if !readOnly}
         <button
           type="button"
