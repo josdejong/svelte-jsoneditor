@@ -187,8 +187,12 @@ export function search(
       for (let c = 0; c < columns.length; c++) {
         const column = columns[c]
 
-        for (let p = 0; p < column.length; p++) {
-          path[p + 1] = column[p]
+        if (column.length === 1) {
+          path[1] = column[0]
+        } else {
+          for (let p = 0; p < column.length; p++) {
+            path[p + 1] = column[p]
+          }
         }
         while (path.length > column.length + 1) {
           path.pop()
