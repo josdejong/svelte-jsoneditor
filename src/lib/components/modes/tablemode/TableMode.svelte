@@ -267,14 +267,12 @@
     : []
 
   let containsValidArray: boolean
-  $: containsValidArray = json && !isEmpty(columns) ? true : false
+  $: containsValidArray = !!(json && !isEmpty(columns))
   $: showRefreshButton = Array.isArray(json) && json.length > maxSampleCount
 
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
   let modalOpen = false
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  let hasFocus = false
 
   let itemHeightsCache: Record<number, number> = {}
 
@@ -369,7 +367,7 @@
     const rootPath: JSONPath = []
     const direction = newSortedColumn.sortDirection === SortDirection.desc ? -1 : 1
     const operations = sortJson(json, rootPath, newSortedColumn.path, direction)
-    handlePatch(operations, (patchedJson, patchedState) => {
+    handlePatch(operations, (_, patchedState) => {
       return {
         state: {
           ...patchedState,
@@ -667,14 +665,12 @@
       }
     })
 
-    const patchResult = {
+    return {
       json,
       previousJson,
       undo,
       redo: operations
     }
-
-    return patchResult
   }
 
   function handlePatch(
@@ -831,8 +827,9 @@
    * Expand the path when needed.
    */
   export function scrollTo(path: JSONPath, scrollToWhenVisible = true): Promise<void> {
+    const searchBoxHeight = showSearch ? SEARCH_BOX_HEIGHT : 0
     const top = calculateAbsolutePosition(path, columns, itemHeightsCache, defaultItemHeight)
-    const roughDistance = top - scrollTop
+    const roughDistance = top - scrollTop + searchBoxHeight + defaultItemHeight
     const elem = findElement(path)
 
     debug('scrollTo', { path, top, scrollTop, elem })
@@ -850,10 +847,7 @@
       }
     }
 
-    const offset = -(viewPortRect.height / 4)
-
-    // FIXME: scroll horizontally when needed
-    // FIXME: scroll to the exact element (rough distance can be inexact)
+    const offset = -Math.max(searchBoxHeight + 2 * defaultItemHeight, viewPortRect.height / 4)
 
     if (elem) {
       return new Promise((resolve) => {
@@ -875,22 +869,11 @@
           offset,
           duration: SCROLL_DURATION,
           callback: async () => {
+            // ensure the element is rendered now that it is scrolled into view
             await tick()
 
-            const newTop = calculateAbsolutePosition(
-              path,
-              columns,
-              itemHeightsCache,
-              defaultItemHeight
-            )
-
-            if (newTop !== top) {
-              await scrollTo(path, scrollToWhenVisible)
-            } else {
-              // TODO: improve horizontal scrolling: animate and integrate with the vertical scrolling (jump)
-              scrollToHorizontal(path)
-            }
-
+            // TODO: improve horizontal scrolling: animate and integrate with the vertical scrolling (jump)
+            scrollToHorizontal(path)
             resolve()
           }
         })
@@ -953,7 +936,13 @@
    * Note that the path can only be found when the node is expanded.
    */
   export function findElement(path: JSONPath): Element | null {
-    return refContents ? refContents.querySelector(`td[data-path="${encodeDataPath(path)}"]`) : null
+    const column = columns.find((c) => pathStartsWith(path.slice(1), c))
+
+    const resolvedPath = column ? path.slice(0, 1).concat(column) : path
+
+    return refContents
+      ? refContents.querySelector(`td[data-path="${encodeDataPath(resolvedPath)}"]`)
+      : null
   }
 
   function openContextMenu({
@@ -1128,7 +1117,7 @@
           value: updatedValue
         }
       ],
-      (patchedJson, patchedState) => {
+      (_, patchedState) => {
         return {
           state: setEnforceString(patchedState, pointer, enforceString)
         }
@@ -1557,7 +1546,7 @@
       onSort: ({ operations, itemPath, direction }) => {
         debug('onSort', operations, rootPath, itemPath, direction)
 
-        handlePatch(operations, (patchedJson, patchedState) => {
+        handlePatch(operations, (_, patchedState) => {
           return {
             state: {
               ...patchedState,
