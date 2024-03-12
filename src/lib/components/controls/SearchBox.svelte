@@ -218,9 +218,7 @@
 
     setTimeout(() => {
       // wait until the search icon has been rendered
-      // console.time('search') // TODO: cleanup
       const newResultItems = search(searchText, json, { maxResults: MAX_SEARCH_RESULTS, columns })
-      // console.timeEnd('search') // TODO: cleanup
       searchResult = updateSearchResult(json, newResultItems, searchResult)
 
       searching = false
