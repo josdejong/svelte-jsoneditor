@@ -118,10 +118,6 @@
             background: $selection-background-color;
           }
 
-          :global(div) {
-            display: inline-flex;
-          }
-
           // FIXME: this is ugly. give JSONValue an extra class instead?
           :global(div.jse-value) {
             overflow-wrap: normal;
@@ -131,6 +127,7 @@
           }
 
           .jse-context-menu-anchor {
+            display: inline-flex;
             position: relative;
             vertical-align: top;
           }
