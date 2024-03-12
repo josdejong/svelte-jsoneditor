@@ -16,6 +16,7 @@ import type {
   JSONParser,
   JSONPointerMap,
   JSONSelection,
+  SearchOptions,
   SearchResult,
   SearchResultItem
 } from '$lib/types'
@@ -108,15 +109,20 @@ export function searchPrevious(searchResult: SearchResult): SearchResult {
 export function search(
   searchText: string,
   json: unknown,
-  maxResults = Infinity
+  options: SearchOptions = {}
 ): SearchResultItem[] {
+  const searchTextLowerCase = searchText.toLowerCase()
+  const maxResults = options?.maxResults ?? Infinity
+  const columns = options?.columns
   const results: SearchResultItem[] = []
   const path: JSONPath = [] // we reuse the same Array recursively, this is *much* faster than creating a new path every time
 
   function onMatch(match: SearchResultItem) {
-    if (results.length < maxResults) {
-      results.push(match)
+    if (results.length >= maxResults) {
+      return
     }
+
+    results.push(match)
   }
 
   function searchRecursive(searchTextLowerCase: string, value: unknown) {
@@ -166,12 +172,43 @@ export function search(
     }
   }
 
-  if (typeof searchText === 'string' && searchText !== '') {
-    const searchTextLowerCase = searchText.toLowerCase()
-    searchRecursive(searchTextLowerCase, json)
-  }
+  if (searchText === '') {
+    return []
+  } else if (columns) {
+    if (!Array.isArray(json)) {
+      throw new Error('json must be an Array when option columns is defined')
+    }
 
-  return results
+    for (let i = 0; i < json.length; i++) {
+      path[0] = String(i)
+
+      const item = json[i]
+
+      for (const column of columns) {
+        // TODO: optimize this loop: updating path, getting value, cleaning up path
+        for (const pathPart of column) {
+          path.push(pathPart)
+        }
+
+        const value = getIn(item, column)
+
+        searchRecursive(searchTextLowerCase, value)
+
+        while (path.length > 1) {
+          path.pop()
+        }
+      }
+
+      if (results.length >= maxResults) {
+        break
+      }
+    }
+
+    return results
+  } else {
+    searchRecursive(searchTextLowerCase, json)
+    return results
+  }
 }
 
 /**
@@ -302,7 +339,7 @@ export function createSearchAndReplaceAllOperations(
   parser: JSONParser
 ): { newSelection: JSONSelection | null; operations: JSONPatchDocument } {
   // TODO: to improve performance, we could reuse existing search results (except when hitting a maxResult limit)
-  const searchResultItems = search(searchText, json, Infinity /* maxResults */)
+  const searchResultItems = search(searchText, json, { maxResults: Infinity })
 
   interface Match {
     path: JSONPath

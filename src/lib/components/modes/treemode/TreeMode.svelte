@@ -143,7 +143,14 @@
   import { Mode, ValidationSeverity } from '$lib/types.js'
   import memoizeOne from 'memoize-one'
   import { measure } from '$lib/utils/timeUtils.js'
-  import { onCopy, onCut, onInsert, onInsertCharacter, onPaste, onRemove } from '$lib/logic/actions.js'
+  import {
+    onCopy,
+    onCut,
+    onInsert,
+    onInsertCharacter,
+    onPaste,
+    onRemove
+  } from '$lib/logic/actions.js'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import type { Context } from 'svelte-simple-modal'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
@@ -269,7 +276,7 @@
     if (showSearch) {
       const padding = parseInt(getComputedStyle(refContents).padding) ?? 0
       refContents.style.overflowAnchor = 'none'
-      refContents.style.paddingTop = (padding + SEARCH_BOX_HEIGHT) + 'px'
+      refContents.style.paddingTop = padding + SEARCH_BOX_HEIGHT + 'px'
       refContents.scrollTop += SEARCH_BOX_HEIGHT
       refContents.style.overflowAnchor = ''
     } else {
@@ -2068,6 +2075,7 @@
           {showSearch}
           {showReplace}
           {readOnly}
+          columns={undefined}
           onSearch={handleSearch}
           onFocus={handleFocusSearch}
           onPatch={handlePatch}

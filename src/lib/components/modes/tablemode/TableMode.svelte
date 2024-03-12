@@ -234,7 +234,7 @@
 
     const offset = showSearch ? SEARCH_BOX_HEIGHT : -SEARCH_BOX_HEIGHT
     refContents.scrollTo({
-      top: refContents.scrollTop += offset,
+      top: (refContents.scrollTop += offset),
       left: refContents.scrollLeft
     })
   }
@@ -1823,6 +1823,7 @@
           {showSearch}
           {showReplace}
           {readOnly}
+          {columns}
           onSearch={handleSearch}
           onFocus={handleFocusSearch}
           onPatch={handlePatch}
@@ -1936,7 +1937,12 @@
                       <JSONValueComponent
                         {path}
                         value={value !== undefined ? value : ''}
-                        enforceString={getEnforceString(value, documentState.enforceStringMap, pointer, context.parser)}
+                        enforceString={getEnforceString(
+                          value,
+                          documentState.enforceStringMap,
+                          pointer,
+                          context.parser
+                        )}
                         selection={isSelected ? documentState.selection : null}
                         searchResultItems={searchResultItemsByCell}
                         {context}

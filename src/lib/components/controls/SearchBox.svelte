@@ -32,9 +32,10 @@
   export let json: unknown
   export let documentState: DocumentState
   export let parser: JSONParser
-  export let showSearch = false
-  export let showReplace = false
-  export let readOnly = false
+  export let showSearch: boolean
+  export let showReplace: boolean
+  export let readOnly: boolean
+  export let columns: JSONPath[] | undefined
   export let onSearch: (result: SearchResult | undefined) => void
   export let onFocus: (path: JSONPath) => Promise<void>
   export let onPatch: OnPatch
@@ -219,7 +220,9 @@
 
     debug('searching...', searchText)
 
-    const newResultItems = search(searchText, json, MAX_SEARCH_RESULTS)
+    // console.time('search') // TODO: cleanup
+    const newResultItems = search(searchText, json, { maxResults: MAX_SEARCH_RESULTS, columns })
+    // console.timeEnd('search') // TODO: cleanup
     searchResult = updateSearchResult(json, newResultItems, searchResult)
 
     searching = false
