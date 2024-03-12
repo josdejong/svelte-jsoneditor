@@ -769,8 +769,8 @@
       event.preventDefault()
     }
 
-    // for example when clicking on the empty area in the main menu
-    if (!isChildOfNodeName(target, 'BUTTON') && !target.isContentEditable) {
+    // for example when clicking on the empty area in the main menu or on an InlineValue
+    if (!target.isContentEditable) {
       focus()
     }
   }
