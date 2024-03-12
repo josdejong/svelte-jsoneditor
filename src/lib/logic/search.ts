@@ -185,18 +185,16 @@ export function search(
       const item = json[i]
 
       for (const column of columns) {
-        // TODO: optimize this loop: updating path, getting value, cleaning up path
-        for (const pathPart of column) {
-          path.push(pathPart)
+        for (let c = 0; c < column.length; c++) {
+          path[c + 1] = column[c]
+        }
+        while (path.length > column.length + 1) {
+          path.pop()
         }
 
         const value = getIn(item, column)
 
         searchRecursive(searchTextLowerCase, value)
-
-        while (path.length > 1) {
-          path.pop()
-        }
       }
 
       if (results.length >= maxResults) {
