@@ -161,7 +161,7 @@
   let validationErrors: ValidationError[] = []
   const linterCompartment = new Compartment()
   const readOnlyCompartment = new Compartment()
-  const indentUnitCompartment = new Compartment()
+  const indentCompartment = new Compartment()
   const tabSizeCompartment = new Compartment()
   const themeCompartment = new Compartment()
 
@@ -606,12 +606,11 @@
         search({
           top: true
         }),
+        EditorView.lineWrapping,
         readOnlyCompartment.of(EditorState.readOnly.of(readOnly)),
         tabSizeCompartment.of(EditorState.tabSize.of(tabSize)),
-        indentUnitCompartment.of(createIndentUnit(indentation)),
-        themeCompartment.of(EditorView.theme({}, { dark: hasDarkTheme() })),
-        EditorView.lineWrapping,
-        wrappedLineIndent
+        indentCompartment.of(createIndent(indentation)),
+        themeCompartment.of(EditorView.theme({}, { dark: hasDarkTheme() }))
       ]
     })
 
@@ -806,7 +805,7 @@
       debug('updateIndentation', indentation)
 
       codeMirrorView.dispatch({
-        effects: indentUnitCompartment.reconfigure(createIndentUnit(indentation))
+        effects: indentCompartment.reconfigure(createIndent(indentation))
       })
     }
   }
@@ -846,8 +845,14 @@
     }
   }
 
-  function createIndentUnit(indentation: number | string): Extension {
-    return indentUnit.of(typeof indentation === 'number' ? ' '.repeat(indentation) : indentation)
+  function createIndent(indentation: number | string): Extension[] {
+    const indent = indentUnit.of(
+      typeof indentation === 'number' ? ' '.repeat(indentation) : indentation
+    )
+
+    // We disable wrappedLineIndent in case of tabs to work around a bug:
+    // https://github.com/fauzi9331/codemirror-wrapped-line-indent/issues/2
+    return indentation === '\t' ? [indent] : [indent, wrappedLineIndent]
   }
 
   function updateCanUndoRedo() {
