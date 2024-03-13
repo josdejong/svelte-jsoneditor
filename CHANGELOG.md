@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.23.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.22.0...v0.23.0) (2024-03-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* The `onRenderContextMenu` callback now also triggers when the editor is `readOnly`,
+so you now have to handle that case in the callback.
+
+### Features
+
+* [#399](https://github.com/josdejong/svelte-jsoneditor/issues/399) enable onRenderContextMenu when the editor is readOnly ([#411](https://github.com/josdejong/svelte-jsoneditor/issues/411)) ([db3fb57](https://github.com/josdejong/svelte-jsoneditor/commit/db3fb57dc62210b906628cfba1287808bf5bd304))
+* extend the contexts of `onRenderMenu` and `onRenderContextMenu` with a prop `readOnly` ([#411](https://github.com/josdejong/svelte-jsoneditor/issues/411)) ([4df5548](https://github.com/josdejong/svelte-jsoneditor/commit/4df55481a17c22211538df1cd289faec3af25177))
+* search and replace in table mode ([#415](https://github.com/josdejong/svelte-jsoneditor/issues/415)) ([0860f3e](https://github.com/josdejong/svelte-jsoneditor/commit/0860f3ea422a09eb21e84a345a9bccada7866c6b))
+
+
+### Bug Fixes
+
+* cannot convert an Array into an Object ([4b3af48](https://github.com/josdejong/svelte-jsoneditor/commit/4b3af488faa29704f3e74d451b8af9d0434f1273))
+* context menu not closing when clicking a button in a dropdown menu ([e2c419a](https://github.com/josdejong/svelte-jsoneditor/commit/e2c419acb31d23257e37911117d50ae0d26697d2))
+* disable all relevant context menu buttons when readOnly (see [#411](https://github.com/josdejong/svelte-jsoneditor/issues/411)) ([c66ee09](https://github.com/josdejong/svelte-jsoneditor/commit/c66ee09165587800c3c734af6af683026ac2f8c1))
+* disable wrapped line indent when using tabs because that doesn't work well ([2a067e1](https://github.com/josdejong/svelte-jsoneditor/commit/2a067e1551d2881b2977726a1dcfb6ed6d045504))
+* editor not getting focus when clicking inside the welcome screen of table mode ([919a31e](https://github.com/josdejong/svelte-jsoneditor/commit/919a31ecd5912a43eb964197c23f0811d7c202ea))
+* insert an object or array in tree mode in an empty document not working ([5382e1c](https://github.com/josdejong/svelte-jsoneditor/commit/5382e1ce75b46b5b84fd8fc76764a7a5e9b03a62))
+* status bar not visible when caret is at the start of the document ([dca87f0](https://github.com/josdejong/svelte-jsoneditor/commit/dca87f02800f2b16c311a013581d2ba4db31518f))
+* table row actions not disabled in the table mode context menu when having an empty document ([7123249](https://github.com/josdejong/svelte-jsoneditor/commit/7123249d28eecae4e9a6875760d63fb47fabbcdd))
+
 ## [0.22.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.21.6...v0.22.0) (2024-03-01)
 
 
