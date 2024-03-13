@@ -2026,7 +2026,19 @@
       />
       <JSONPreview {text} {json} {indentation} {parser} />
     {:else}
-      <TableModeWelcome {text} {json} {readOnly} {parser} {openJSONEditorModal} {onChangeMode} />
+      <TableModeWelcome
+        {text}
+        {json}
+        {readOnly}
+        {parser}
+        {openJSONEditorModal}
+        {onChangeMode}
+        onClick={() => {
+          // FIXME: this is a workaround for the editor not putting the focus on refHiddenInput
+          //  when clicking in the welcome screen so you cannot paste a document from clipboard.
+          focus()
+        }}
+      />
     {/if}
   {:else}
     <div class="jse-contents jse-contents-loading">

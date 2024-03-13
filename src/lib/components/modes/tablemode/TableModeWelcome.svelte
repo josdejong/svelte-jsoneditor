@@ -16,6 +16,7 @@
   export let parser: JSONParser
   export let openJSONEditorModal: (path: JSONPath) => void
   export let onChangeMode: OnChangeMode
+  export let onClick: () => void
 
   $: action = readOnly ? 'View' : 'Edit'
 
@@ -43,7 +44,7 @@
   }
 </script>
 
-<div class="jse-table-mode-welcome">
+<div class="jse-table-mode-welcome" on:click={() => onClick()} role="none">
   <div class="jse-space jse-before" />
 
   <div class="jse-nested-arrays">

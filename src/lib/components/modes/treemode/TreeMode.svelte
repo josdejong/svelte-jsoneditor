@@ -2040,8 +2040,7 @@
           }}
           onClick={() => {
             // FIXME: this is a workaround for the editor not putting the focus on refHiddenInput
-            //  when clicking in the welcome screen (only occurs in 'tree' mode,
-            //  so you cannot paste a document from clipboard.
+            //  when clicking in the welcome screen so you cannot paste a document from clipboard.
             focus()
           }}
         />

@@ -229,7 +229,6 @@
   // we pass searchText and json as argument to trigger search when these variables change,
   // via various listeners like applyChangedSearchText
   async function applySearch(showSearch: boolean, text: string, json: unknown) {
-    debug('applySearch', { showSearch, text })
     if (!showSearch) {
       if (searchResult) {
         searchResult = undefined
@@ -237,6 +236,8 @@
 
       return
     }
+
+    debug('applySearch', { showSearch, text })
 
     if (text === '') {
       debug('clearing search result')
