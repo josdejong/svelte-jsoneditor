@@ -903,10 +903,6 @@
   }
 
   function handleInsert(insertType: InsertType): void {
-    if (json === undefined) {
-      return
-    }
-
     onInsert({
       insertType,
       selectInside: true,
