@@ -112,6 +112,17 @@
     }
   }
 
+  function handleReplaceKeyDown(event: KeyboardEvent) {
+    const combo = keyComboFromEvent(event)
+
+    if (combo === 'Enter') {
+      event.preventDefault()
+      event.stopPropagation()
+
+      handleReplace()
+    }
+  }
+
   async function handlePaste() {
     await tick()
     setTimeout(() => applyChangedSearchTextDebounced.flush())
@@ -125,12 +136,15 @@
     const activeItem = searchResult?.activeItem
     debug('handleReplace', { replaceText, activeItem })
 
-    if (!activeItem || json === undefined) {
+    if (!searchResult || !activeItem || json === undefined) {
       return
     }
 
     // move to the next search result *before* applying the replacement
-    const promise = handleNext()
+    searchResult = {
+      ...searchNext(searchResult),
+      activeIndex // trick to prevent shortly flickering of index from 1 to 2 and then to 1 again after the next search
+    }
 
     const { operations, newSelection } = createSearchAndReplaceOperations(
       json,
@@ -144,7 +158,12 @@
       state: { ...patchedState, selection: newSelection }
     }))
 
-    return promise
+    // immediately trigger updating the search results
+    await tick()
+    await applyChangedJsonDebounced.flush()
+
+    // focus to the next search result
+    await handleFocus()
   }
 
   async function handleReplaceAll() {
@@ -324,6 +343,7 @@
               type="text"
               placeholder="Replace"
               bind:value={replaceText}
+              on:keydown={handleReplaceKeyDown}
             />
             <button
               type="button"
