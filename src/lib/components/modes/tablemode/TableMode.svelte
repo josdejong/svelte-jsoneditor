@@ -77,7 +77,6 @@
     findParentWithNodeName,
     getDataPathFromTarget,
     getWindow,
-    isChildOfNodeName,
     isEditableDivRef
   } from '$lib/utils/domUtils.js'
   import { createDebug } from '$lib/utils/debug.js'
