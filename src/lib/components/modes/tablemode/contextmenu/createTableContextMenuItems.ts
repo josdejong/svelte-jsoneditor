@@ -202,7 +202,7 @@ export default function ({
               icon: faPen,
               text: 'Edit row',
               title: 'Edit the current row',
-              disabled: readOnly || !hasSelectionContents
+              disabled: readOnly || !hasSelection || !hasJson
             },
             {
               type: 'button',
@@ -210,7 +210,7 @@ export default function ({
               icon: faClone,
               text: 'Duplicate row',
               title: 'Duplicate the current row',
-              disabled: readOnly || !hasSelection
+              disabled: readOnly || !hasSelection || !hasJson
             },
             {
               type: 'button',
@@ -218,7 +218,7 @@ export default function ({
               icon: faPlus,
               text: 'Insert before',
               title: 'Insert a row before the current row',
-              disabled: readOnly || !hasSelection
+              disabled: readOnly || !hasSelection || !hasJson
             },
             {
               type: 'button',
@@ -226,7 +226,7 @@ export default function ({
               icon: faPlus,
               text: 'Insert after',
               title: 'Insert a row after the current row',
-              disabled: readOnly || !hasSelection
+              disabled: readOnly || !hasSelection || !hasJson
             },
             {
               type: 'button',
@@ -234,7 +234,7 @@ export default function ({
               icon: faTrashCan,
               text: 'Remove row',
               title: 'Remove current row',
-              disabled: readOnly || !hasSelection
+              disabled: readOnly || !hasSelection || !hasJson
             }
           ]
         }
