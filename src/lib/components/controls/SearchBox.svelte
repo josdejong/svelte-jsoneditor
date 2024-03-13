@@ -129,6 +129,9 @@
       return
     }
 
+    // move to the next search result *before* applying the replacement
+    const promise = handleNext()
+
     const { operations, newSelection } = createSearchAndReplaceOperations(
       json,
       documentState,
@@ -141,7 +144,7 @@
       state: { ...patchedState, selection: newSelection }
     }))
 
-    await handleFocus()
+    return promise
   }
 
   async function handleReplaceAll() {
