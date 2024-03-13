@@ -337,6 +337,11 @@ export enum SearchField {
   value = 'value'
 }
 
+export interface SearchOptions {
+  maxResults?: number
+  columns?: JSONPath[]
+}
+
 export interface SearchResultItem {
   path: JSONPath
   field: SearchField

@@ -17,6 +17,16 @@
     border-top: $main-border;
   }
 
+  .jse-search-box-container {
+    position: relative;
+    height: 0;
+    top: calc($line-height + 2 * $padding);
+    margin-right: calc($padding + 20px);
+    margin-left: $padding;
+    text-align: right;
+    z-index: 3; // must be above the ContextMenuButton
+  }
+
   .jse-hidden-input-label {
     position: fixed;
     right: 0;
@@ -40,6 +50,7 @@
     display: flex;
     overflow: auto;
     overflow-anchor: none; // important to prevent Chrome from adjusting the scrollTop based on changing contents (causing an infinite loop)
+    scrollbar-gutter: stable;
 
     border-left: $main-border;
     border-right: $main-border;
@@ -107,10 +118,6 @@
             background: $selection-background-color;
           }
 
-          :global(div) {
-            display: inline-flex;
-          }
-
           // FIXME: this is ugly. give JSONValue an extra class instead?
           :global(div.jse-value) {
             overflow-wrap: normal;
@@ -120,6 +127,7 @@
           }
 
           .jse-context-menu-anchor {
+            display: inline-flex;
             position: relative;
             vertical-align: top;
           }

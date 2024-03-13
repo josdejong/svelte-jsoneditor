@@ -105,6 +105,33 @@ exports[`JSONEditor > render table mode 1`] = `
           </button>
           
           <button
+            class="jse-button jse-search s-kJert7_5e4tU"
+            title="Search (Ctrl+F)"
+            type="button"
+          >
+            <svg
+              aria-label=""
+              class="fa-icon s-T5YyQewRBd7n"
+              height="16"
+              role="presentation"
+              style=""
+              version="1.1"
+              viewBox="0 0 512 512"
+              width="16"
+            >
+              <path
+                d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
+              />
+               
+               
+              
+            </svg>
+            <!--&lt;Svg&gt;-->
+            <!--&lt;Icon&gt;-->
+             
+          </button>
+          
+          <button
             class="jse-button jse-contextmenu s-kJert7_5e4tU"
             title="Open context menu (Click here, right click on the selection, or use the context menu button or Ctrl+Q)"
             type="button"
@@ -210,6 +237,13 @@ exports[`JSONEditor > render table mode 1`] = `
             type="text"
           />
         </label>
+         
+        <div
+          class="jse-search-box-container s-kw5t6hk3mCrZ"
+        >
+          
+          <!--&lt;SearchBox&gt;-->
+        </div>
          
         <div
           class="jse-contents s-kw5t6hk3mCrZ"

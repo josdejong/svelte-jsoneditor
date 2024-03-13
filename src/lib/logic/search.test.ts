@@ -11,7 +11,7 @@ import {
   search,
   splitValue
 } from './search.js'
-import type { ExtendedSearchResultItem, SearchResultItem } from '$lib/types.js'
+import type { ExtendedSearchResultItem, SearchOptions, SearchResultItem } from '$lib/types.js'
 import { SearchField } from '$lib/types.js'
 import { createKeySelection, createValueSelection } from './selection.js'
 
@@ -137,20 +137,86 @@ describe('search', () => {
     assert.deepStrictEqual(resultsAll.length, count)
 
     const maxResults = 4
-    const results = search('42', json, maxResults)
+    const results = search('42', json, { maxResults })
     assert.deepStrictEqual(results.length, maxResults)
+  })
+
+  describe('search using columns', () => {
+    const json = [
+      { id: 1, name: 'John', address: { city: 'Rotterdam' } },
+      { id: 2, name: 'Sarah', address: { city: 'Amsterdam' } }
+    ]
+
+    const json2 = ['John', 'Sarah']
+
+    function searchPaths(searchText: string, json: unknown, options?: SearchOptions): JSONPath[] {
+      return search(searchText, json, options).map((result) => result.path)
+    }
+
+    test('should search in column names when not using columns', () => {
+      assert.deepStrictEqual(searchPaths('name', json), [
+        ['0', 'name'],
+        ['1', 'name']
+      ])
+      assert.deepStrictEqual(searchPaths('address', json), [
+        ['0', 'address'],
+        ['1', 'address']
+      ])
+      assert.deepStrictEqual(searchPaths('city', json), [
+        ['0', 'address', 'city'],
+        ['1', 'address', 'city']
+      ])
+      assert.deepStrictEqual(searchPaths('john', json), [['0', 'name']])
+      assert.deepStrictEqual(searchPaths('rotterdam', json), [['0', 'address', 'city']])
+    })
+
+    test('should not search in column names when using nested columns', () => {
+      const columns = [['id'], ['name'], ['address']]
+      assert.deepStrictEqual(searchPaths('name', json, { columns }), [])
+      assert.deepStrictEqual(searchPaths('address', json, { columns }), [])
+      assert.deepStrictEqual(searchPaths('city', json, { columns }), [
+        ['0', 'address', 'city'],
+        ['1', 'address', 'city']
+      ])
+      assert.deepStrictEqual(searchPaths('john', json, { columns }), [['0', 'name']])
+      assert.deepStrictEqual(searchPaths('rotterdam', json, { columns }), [
+        ['0', 'address', 'city']
+      ])
+    })
+
+    test('should not search in column names when using flattened columns', () => {
+      const columns = [['id'], ['name'], ['address', 'city']]
+      assert.deepStrictEqual(searchPaths('name', json, { columns }), [])
+      assert.deepStrictEqual(searchPaths('address', json, { columns }), [])
+      assert.deepStrictEqual(searchPaths('city', json, { columns }), [])
+      assert.deepStrictEqual(searchPaths('john', json, { columns }), [['0', 'name']])
+      assert.deepStrictEqual(searchPaths('rotterdam', json, { columns }), [
+        ['0', 'address', 'city']
+      ])
+    })
+
+    test('should search in a flat array without columns', () => {
+      assert.deepStrictEqual(searchPaths('foo', json2), [])
+      assert.deepStrictEqual(searchPaths('john', json2), [['0']])
+    })
+
+    test('should search in a flat array with columns', () => {
+      const columns = [[]]
+      assert.deepStrictEqual(searchPaths('foo', json2, { columns }), [])
+      assert.deepStrictEqual(searchPaths('john', json2, { columns }), [['0']])
+    })
   })
 
   test('should limit search results to the provided max in case of multiple matches in a single field', () => {
     const maxResults = 4
 
     assert.deepStrictEqual(
-      search('ha', { greeting: 'ha ha ha ha ha ha' }, maxResults).length,
+      search('ha', { greeting: 'ha ha ha ha ha ha' }, { maxResults }).length,
       maxResults
     )
 
     assert.deepStrictEqual(
-      search('ha', { 'ha ha ha ha ha ha': 'ha ha ha ha ha ha' }, maxResults).length,
+      search('ha', { 'ha ha ha ha ha ha': 'ha ha ha ha ha ha' }, { maxResults }).length,
       maxResults
     )
   })

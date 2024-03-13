@@ -7,8 +7,8 @@
     AfterPatchCallback,
     Content,
     ContentErrors,
+    ContextMenuItem,
     DocumentState,
-    ExtendedSearchResultItem,
     HistoryItem,
     JSONEditorContext,
     JSONEditorSelection,
@@ -28,6 +28,7 @@
     OnTransformModal,
     ParseError,
     PastedJson,
+    SearchResult,
     SortedColumn,
     TransformModalOptions,
     ValidationError,
@@ -36,13 +37,15 @@
   } from '$lib/types'
   import { Mode, SortDirection, ValidationSeverity } from '$lib/types.js'
   import TableMenu from './menu/TableMenu.svelte'
-  import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import {
     compileJSONPointer,
+    compileJSONPointerProp,
     existsIn,
     getIn,
     immutableJSONPatch,
-    isJSONArray
+    isJSONArray,
+    type JSONPatchDocument,
+    type JSONPath
   } from 'immutable-json-patch'
   import {
     isTextContent,
@@ -74,7 +77,6 @@
     findParentWithNodeName,
     getDataPathFromTarget,
     getWindow,
-    isChildOfNodeName,
     isEditableDivRef
   } from '$lib/utils/domUtils.js'
   import { createDebug } from '$lib/utils/debug.js'
@@ -117,6 +119,7 @@
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
     SCROLL_DURATION,
+    SEARCH_BOX_HEIGHT,
     SIMPLE_MODAL_OPTIONS
   } from '$lib/constants.js'
   import { noop } from '$lib/utils/noop.js'
@@ -137,13 +140,15 @@
   import { resizeObserver } from '$lib/actions/resizeObserver.js'
   import CopyPasteModal from '../../../components/modals/CopyPasteModal.svelte'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
+  import SearchBox from '../../controls/SearchBox.svelte'
   import TableModeWelcome from './TableModeWelcome.svelte'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import RefreshColumnHeader from './RefreshColumnHeader.svelte'
   import type { Context } from 'svelte-simple-modal'
-  import type { ContextMenuItem } from '$lib/types'
   import createTableContextMenuItems from './contextmenu/createTableContextMenuItems'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
+  import { filterValueSearchResults } from '$lib/logic/search.js'
+  import { filterPointerOrUndefined } from 'svelte-jsoneditor/utils/jsonPointer'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext<Context>('simple-modal')
@@ -215,6 +220,42 @@
 
   let pastedJson: PastedJson
 
+  let searchResult: SearchResult | undefined
+  let showSearch = false
+  let showReplace = false
+
+  $: applySearchBoxSpacing(showSearch)
+
+  function applySearchBoxSpacing(showSearch: boolean) {
+    if (!refContents) {
+      return
+    }
+
+    const offset = showSearch ? SEARCH_BOX_HEIGHT : -SEARCH_BOX_HEIGHT
+    refContents.scrollTo({
+      top: (refContents.scrollTop += offset),
+      left: refContents.scrollLeft
+    })
+  }
+
+  function handleSearch(result: SearchResult | undefined) {
+    searchResult = result
+  }
+
+  async function handleFocusSearch(path: JSONPath) {
+    documentState = {
+      ...documentState,
+      selection: null // navigation path of current selection would be confusing
+    }
+    await scrollTo(path)
+  }
+
+  function handleCloseSearch() {
+    showSearch = false
+    showReplace = false
+    focus()
+  }
+
   $: applyExternalContent(externalContent)
   $: applyExternalSelection(externalSelection)
 
@@ -224,7 +265,8 @@
     ? maintainColumnOrder(getColumns(json, flattenColumns, maxSampleCount), columns)
     : []
 
-  $: containsValidArray = json && !isEmpty(columns)
+  let containsValidArray: boolean
+  $: containsValidArray = !!(json && !isEmpty(columns))
   $: showRefreshButton = Array.isArray(json) && json.length > maxSampleCount
 
   // modalOpen is true when one of the modals is open.
@@ -244,7 +286,8 @@
     viewPortHeight,
     json,
     itemHeightsCache, // warning: itemHeightsCache is mutated and is not responsive itself
-    defaultItemHeight
+    defaultItemHeight,
+    showSearch ? SEARCH_BOX_HEIGHT : 0
   )
 
   $: refreshScrollTop(json)
@@ -314,7 +357,6 @@
 
   let documentState = createDocumentState()
   let textIsRepaired = false
-  const searchResultItems: ExtendedSearchResultItem[] | undefined = undefined // TODO: implement support for search and replace
 
   function onSortByHeader(newSortedColumn: SortedColumn) {
     if (readOnly) {
@@ -326,7 +368,7 @@
     const rootPath: JSONPath = []
     const direction = newSortedColumn.sortDirection === SortDirection.desc ? -1 : 1
     const operations = sortJson(json, rootPath, newSortedColumn.path, direction)
-    handlePatch(operations, (patchedJson, patchedState) => {
+    handlePatch(operations, (_, patchedState) => {
       return {
         state: {
           ...patchedState,
@@ -624,14 +666,12 @@
       }
     })
 
-    const patchResult = {
+    return {
       json,
       previousJson,
       undo,
       redo: operations
     }
-
-    return patchResult
   }
 
   function handlePatch(
@@ -728,8 +768,8 @@
       event.preventDefault()
     }
 
-    // for example when clicking on the empty area in the main menu
-    if (!isChildOfNodeName(target, 'BUTTON') && !target.isContentEditable) {
+    // for example when clicking on the empty area in the main menu or on an InlineValue
+    if (!target.isContentEditable) {
       focus()
     }
   }
@@ -788,8 +828,9 @@
    * Expand the path when needed.
    */
   export function scrollTo(path: JSONPath, scrollToWhenVisible = true): Promise<void> {
+    const searchBoxHeight = showSearch ? SEARCH_BOX_HEIGHT : 0
     const top = calculateAbsolutePosition(path, columns, itemHeightsCache, defaultItemHeight)
-    const roughDistance = top - scrollTop
+    const roughDistance = top - scrollTop + searchBoxHeight + defaultItemHeight
     const elem = findElement(path)
 
     debug('scrollTo', { path, top, scrollTop, elem })
@@ -807,10 +848,7 @@
       }
     }
 
-    const offset = -(viewPortRect.height / 4)
-
-    // FIXME: scroll horizontally when needed
-    // FIXME: scroll to the exact element (rough distance can be inexact)
+    const offset = -Math.max(searchBoxHeight + 2 * defaultItemHeight, viewPortRect.height / 4)
 
     if (elem) {
       return new Promise((resolve) => {
@@ -832,22 +870,11 @@
           offset,
           duration: SCROLL_DURATION,
           callback: async () => {
+            // ensure the element is rendered now that it is scrolled into view
             await tick()
 
-            const newTop = calculateAbsolutePosition(
-              path,
-              columns,
-              itemHeightsCache,
-              defaultItemHeight
-            )
-
-            if (newTop !== top) {
-              await scrollTo(path, scrollToWhenVisible)
-            } else {
-              // TODO: improve horizontal scrolling: animate and integrate with the vertical scrolling (jump)
-              scrollToHorizontal(path)
-            }
-
+            // TODO: improve horizontal scrolling: animate and integrate with the vertical scrolling (jump)
+            scrollToHorizontal(path)
             resolve()
           }
         })
@@ -910,7 +937,13 @@
    * Note that the path can only be found when the node is expanded.
    */
   export function findElement(path: JSONPath): Element | null {
-    return refContents ? refContents.querySelector(`td[data-path="${encodeDataPath(path)}"]`) : null
+    const column = columns.find((c) => pathStartsWith(path.slice(1), c))
+
+    const resolvedPath = column ? path.slice(0, 1).concat(column) : path
+
+    return refContents
+      ? refContents.querySelector(`td[data-path="${encodeDataPath(resolvedPath)}"]`)
+      : null
   }
 
   function openContextMenu({
@@ -1085,7 +1118,7 @@
           value: updatedValue
         }
       ],
-      (patchedJson, patchedState) => {
+      (_, patchedState) => {
         return {
           state: setEnforceString(patchedState, pointer, enforceString)
         }
@@ -1355,14 +1388,12 @@
 
     if (combo === 'Ctrl+F') {
       event.preventDefault()
-      // openFind(false)
-      // TODO: implement find
+      openFind(false)
     }
 
     if (combo === 'Ctrl+H') {
       event.preventDefault()
-      // openFind(true)
-      // TODO: implement find and replace
+      openFind(true)
     }
 
     if (combo === 'Ctrl+Z') {
@@ -1516,7 +1547,7 @@
       onSort: ({ operations, itemPath, direction }) => {
         debug('onSort', operations, rootPath, itemPath, direction)
 
-        handlePatch(operations, (patchedJson, patchedState) => {
+        handlePatch(operations, (_, patchedState) => {
           return {
             state: {
               ...patchedState,
@@ -1631,6 +1662,19 @@
     })
   }
 
+  function openFind(findAndReplace: boolean): void {
+    debug('openFind', { findAndReplace })
+
+    showSearch = false
+    showReplace = false
+
+    tick().then(() => {
+      // trick to make sure the focus goes to the search box
+      showSearch = true
+      showReplace = findAndReplace
+    })
+  }
+
   function handleUndo() {
     if (readOnly) {
       return
@@ -1736,8 +1780,9 @@
 >
   {#if mainMenuBar}
     <TableMenu
-      {json}
+      {containsValidArray}
       {readOnly}
+      bind:showSearch
       {historyState}
       onSort={handleSortAll}
       onTransform={handleTransformAll}
@@ -1760,6 +1805,21 @@
       />
     </label>
     {#if containsValidArray}
+      <div class="jse-search-box-container">
+        <SearchBox
+          {json}
+          {documentState}
+          {parser}
+          {showSearch}
+          {showReplace}
+          {readOnly}
+          {columns}
+          onSearch={handleSearch}
+          onFocus={handleFocusSearch}
+          onPatch={handlePatch}
+          onClose={handleCloseSearch}
+        />
+      </div>
       <div
         class="jse-contents"
         bind:this={refContents}
@@ -1812,6 +1872,9 @@
                 [String(rowIndex)],
                 validationErrorsByRow?.row
               )}
+              {@const searchResultItemsByRow = searchResult?.itemsMap
+                ? filterPointerOrUndefined(searchResult?.itemsMap, compileJSONPointerProp(rowIndex))
+                : undefined}
               <tr class="jse-table-row">
                 {#key rowIndex}
                   <th
@@ -1826,6 +1889,7 @@
                 {/key}
                 {#each columns as column, columnIndex}
                   {@const path = [String(rowIndex)].concat(column)}
+                  {@const pointer = compileJSONPointer(path)}
                   {@const value = getIn(item, column)}
                   {@const isSelected =
                     isValueSelection(documentState.selection) &&
@@ -1838,24 +1902,39 @@
                     class:jse-selected-value={isSelected}
                   >
                     {#if isObjectOrArray(value)}
+                      {@const searchResultItemsByCell = searchResultItemsByRow
+                        ? filterPointerOrUndefined(searchResultItemsByRow, pointer)
+                        : undefined}
+                      {@const containsActiveSearchResult = searchResultItemsByCell
+                        ? Object.values(searchResultItemsByCell).some((items) =>
+                            items.some((item) => item.active)
+                          )
+                        : false}
+
                       <InlineValue
                         {path}
                         {value}
                         {parser}
                         {isSelected}
+                        containsSearchResult={!isEmpty(searchResultItemsByCell)}
+                        {containsActiveSearchResult}
                         onEdit={openJSONEditorModal}
                       />{:else}
+                      {@const searchResultItemsByCell = searchResult?.itemsMap
+                        ? filterValueSearchResults(searchResult?.itemsMap, pointer)
+                        : undefined}
+
                       <JSONValueComponent
                         {path}
                         value={value !== undefined ? value : ''}
                         enforceString={getEnforceString(
                           value,
                           documentState.enforceStringMap,
-                          compileJSONPointer(path),
+                          pointer,
                           context.parser
                         )}
                         selection={isSelected ? documentState.selection : null}
-                        {searchResultItems}
+                        searchResultItems={searchResultItemsByCell}
                         {context}
                       />{/if}{#if !readOnly && isSelected && !isEditingSelection(documentState.selection)}
                       <div class="jse-context-menu-anchor">

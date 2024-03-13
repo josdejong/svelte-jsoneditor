@@ -10,7 +10,7 @@ import {
   faSquare,
   faTrashCan
 } from '@fortawesome/free-solid-svg-icons'
-import { isKeySelection, isMultiSelection, isValueSelection } from 'svelte-jsoneditor'
+import { isKeySelection, isMultiSelection, isValueSelection } from '$lib/logic/selection'
 import { compileJSONPointer, getIn } from 'immutable-json-patch'
 import { getFocusPath, singleItemSelected } from '$lib/logic/selection'
 import { isObjectOrArray } from '$lib/utils/typeUtils'

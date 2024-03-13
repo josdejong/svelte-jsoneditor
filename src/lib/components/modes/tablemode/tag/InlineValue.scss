@@ -17,4 +17,14 @@
   &.jse-selected {
     background: $selection-background-color;
   }
+
+  &.jse-highlight {
+    background-color: $search-match-color;
+    outline: $search-match-outline;
+
+    &.jse-active {
+      background-color: $search-match-active-color;
+      outline: $search-match-active-outline;
+    }
+  }
 }

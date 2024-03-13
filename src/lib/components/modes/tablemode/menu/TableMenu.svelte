@@ -7,14 +7,16 @@
     faEllipsisV,
     faFilter,
     faRedo,
+    faSearch,
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
   import type { HistoryState } from '$lib/logic/history'
   import { CONTEXT_MENU_EXPLANATION } from '$lib/constants.js'
 
-  export let json: unknown | undefined
+  export let containsValidArray: boolean
   export let readOnly: boolean
+  export let showSearch = false
   export let historyState: HistoryState
   export let onSort: () => void
   export let onTransform: () => void
@@ -22,6 +24,10 @@
   export let onUndo: () => void
   export let onRedo: () => void
   export let onRenderMenu: OnRenderMenuInternal
+
+  function handleToggleSearch() {
+    showSearch = !showSearch
+  }
 
   let defaultItems: MenuItem[]
   $: defaultItems = !readOnly
@@ -32,7 +38,7 @@
           title: 'Sort',
           className: 'jse-sort',
           onClick: onSort,
-          disabled: readOnly || json === undefined
+          disabled: readOnly || !containsValidArray
         },
         {
           type: 'button',
@@ -40,7 +46,15 @@
           title: 'Transform contents (filter, sort, project)',
           className: 'jse-transform',
           onClick: onTransform,
-          disabled: readOnly || json === undefined
+          disabled: readOnly || !containsValidArray
+        },
+        {
+          type: 'button',
+          icon: faSearch,
+          title: 'Search (Ctrl+F)',
+          className: 'jse-search',
+          onClick: handleToggleSearch,
+          disabled: !containsValidArray
         },
         {
           type: 'button',

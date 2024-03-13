@@ -1,4 +1,4 @@
-@import '../../../../styles';
+@import '../../styles';
 
 $search-size: 28px;
 $button-width: 20px;
@@ -78,15 +78,13 @@ $input-min-width: 50px;
         display: flex;
         align-items: center;
         position: relative;
-        padding-left: $padding-section-left;
 
         .jse-search-icon {
           color: inherit;
           cursor: inherit;
           background: inherit;
-          position: absolute;
-          top: $padding-half;
-          left: $padding-half;
+          width: $padding-section-left;
+          text-align: center;
         }
 
         label.jse-search-input-label {
