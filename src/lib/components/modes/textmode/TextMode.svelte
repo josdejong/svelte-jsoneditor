@@ -643,7 +643,7 @@
       from,
       to,
       message,
-      severity: ValidationSeverity.warning,
+      severity: validationError.severity,
       actions: []
     }
   }

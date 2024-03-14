@@ -19,7 +19,7 @@
 
 <button
   type="button"
-  class="jse-validation-error"
+  class="jse-validation-{validationError.severity}"
   on:click={onExpand}
   use:tooltip={{ text, ...absolutePopupContext }}
 >

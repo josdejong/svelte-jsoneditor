@@ -36,7 +36,7 @@
         <tbody>
           {#each limit(validationErrors, MAX_VALIDATION_ERRORS) as validationError, index}
             <tr
-              class="jse-validation-error"
+            class="jse-validation-error {validationError.severity}"
               on:click={() => {
                 // trigger on the next tick to prevent the editor not getting focus
                 setTimeout(() => selectError(validationError))
@@ -77,7 +77,7 @@
         </tbody>
       </table>
     {:else}
-      <table class="jse-validation-errors-overview-collapsed">
+      <table class="jse-validation-errors-overview-collapsed {validationErrors[0].severity}">
         <tbody>
           <tr class="jse-validation-error" on:click={expand}>
             <td class="jse-validation-error-icon">
