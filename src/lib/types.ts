@@ -83,6 +83,54 @@ export interface DocumentState {
   sortedColumn: SortedColumn | null
 }
 
+// TODO: keep search results in DocumentState2?
+// TODO: put selection in DocumentState2?
+export type DocumentState2 =
+  | {
+      type: 'object'
+      expanded: boolean
+      properties: Record<string, DocumentState2>
+    }
+  | {
+      type: 'array'
+      expanded: boolean
+      visibleSections: VisibleSection[] | null
+      items: Array<DocumentState2 | undefined>
+    }
+  | {
+      type: 'value'
+      enforceString?: boolean
+    }
+
+// // FIXME: is this type RecursiveStatePath helpful or not? If not, remove it
+export type RecursiveStatePath = [] | ['items' | 'properties', string, ...RecursiveStatePath[]]
+
+// FIXME: cleanup
+// export type RecursiveState<ObjectState, ArrayState, ValueState> =
+//   | ({
+//       type: 'object'
+//       properties: Record<string, RecursiveState<ObjectState, ArrayState, ValueState>>
+//     } & ObjectState)
+//   | ({
+//       type: 'array'
+//       items: Array<RecursiveState<ObjectState, ArrayState, ValueState> | undefined>
+//     } & ArrayState)
+//   | ({
+//       type: 'value'
+//     } & ValueState)
+//
+// export type ExpandedState = RecursiveState<
+//   { expanded: boolean },
+//   { expanded: boolean },
+//   { type: 'value' }
+// >
+// export type SelectionState = RecursiveState<
+//   { selected: boolean; selectedKeys: Record<string, JSONSelection> },
+//   { selected: boolean },
+//   { selected: boolean }
+// >
+// export type EnforcedStringState = RecursiveState<void, void, { enforceString?: boolean }>
+
 export interface JSONPatchResult {
   json: unknown
   previousJson: unknown
