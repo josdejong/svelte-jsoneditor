@@ -1,5 +1,6 @@
 import {
   compileJSONPointer,
+  deleteIn,
   existsIn,
   getIn,
   immutableJSONPatch,
@@ -20,7 +21,9 @@ import {
   type JSONPointer,
   parseJSONPointer,
   parsePath,
-  startsWithJSONPointer
+  setIn,
+  startsWithJSONPointer,
+  updateIn
 } from 'immutable-json-patch'
 import { initial, isEqual, last } from 'lodash-es'
 import { DEFAULT_VISIBLE_SECTIONS, MAX_DOCUMENT_SIZE_EXPAND_ALL } from '../constants.js'
@@ -35,6 +38,7 @@ import {
 import type {
   CaretPosition,
   DocumentState,
+  DocumentState2,
   JSONParser,
   JSONPointerMap,
   JSONSelection,
@@ -77,11 +81,44 @@ export function createDocumentState(props?: CreateDocumentStateProps): DocumentS
   return documentState
 }
 
+export function createDocumentState2({
+  json,
+  select,
+  expand
+}: CreateDocumentStateProps): DocumentState2 {
+  let documentState: DocumentState2 = Array.isArray(json)
+    ? { type: 'array', expanded: false, visibleSections: null, items: [] }
+    : isObject(json)
+      ? { type: 'object', expanded: false, properties: {} }
+      : { type: 'value' }
+
+  if (select && json !== undefined) {
+    // FIXME: handle initial selection
+  }
+
+  if (expand) {
+    documentState = expandWithCallback2(json, documentState, [], expand)
+  }
+
+  return documentState
+}
+
 export function getVisibleSections(
   documentState: DocumentState,
   pointer: JSONPointer
 ): VisibleSection[] {
   return documentState.visibleSectionsMap[pointer] || DEFAULT_VISIBLE_SECTIONS
+}
+
+export function getVisibleSections2(
+  json: unknown,
+  documentState: DocumentState2,
+  path: JSONPath
+): VisibleSection[] {
+  return (
+    getIn(documentState, toRecursiveStatePath(json, path).concat('visibleSections')) ||
+    DEFAULT_VISIBLE_SECTIONS
+  )
 }
 
 /**
@@ -144,6 +181,7 @@ export function expandPath(
  * Expand a node, end expand its children according to the provided callback
  * Nodes that are already expanded will be left untouched
  */
+// FIXME: remove expandWithCallback
 export function expandWithCallback(
   json: unknown | undefined,
   documentState: DocumentState,
@@ -200,6 +238,122 @@ export function expandWithCallback(
   }
 }
 
+export function toRecursiveStatePath(json: unknown, path: JSONPath): JSONPath {
+  let value = json
+  const recursiveStatePath: JSONPath = []
+
+  let i = 0
+  while (i < path.length) {
+    if (Array.isArray(value)) {
+      const index = path[i]
+      recursiveStatePath.push('items', index)
+      value = value[parseInt(index)]
+    } else if (isObject(value)) {
+      const key = path[i]
+      recursiveStatePath.push('properties', key)
+      value = (value as Record<string, unknown>)[key]
+    } else {
+      throw new Error(`Cannot convert path: Object or Array expected at index ${i}`)
+    }
+
+    i++
+  }
+
+  return recursiveStatePath
+}
+
+/**
+ * Expand a node, end expand its children according to the provided callback
+ * Nodes that are already expanded will be left untouched
+ */
+// FIXME: rename expandWithCallback2 to expandWithCallback
+export function expandWithCallback2(
+  json: unknown | undefined,
+  documentState: DocumentState2,
+  path: JSONPath,
+  expandedCallback: OnExpand
+): DocumentState2 {
+  let updatedState = documentState
+
+  // FIXME: should (recursively) create new state when it is missing
+
+  function recurse(value: unknown) {
+    const pathIndex = currentPath.length
+    const pathStateIndex = currentStatePath.length + 1
+
+    if (Array.isArray(value)) {
+      if (expandedCallback(currentPath)) {
+        updatedState = updateIn(
+          updatedState,
+          currentStatePath,
+          (value: DocumentState2 | undefined) => {
+            return value
+              ? { ...value, expanded: true }
+              : { type: 'array', expanded: true, visibleSections: null, items: [] }
+          }
+        )
+
+        if (value.length > 0) {
+          currentStatePath.push('items')
+
+          const visibleSections = getVisibleSections2(json, documentState, path)
+
+          forEachVisibleIndex(value, visibleSections, (index) => {
+            const indexStr = String(index)
+            currentPath[pathIndex] = indexStr
+            currentStatePath[pathStateIndex] = indexStr
+
+            recurse(value[index])
+          })
+
+          currentPath.pop()
+          currentPath.pop()
+          currentStatePath.pop()
+          currentStatePath.pop()
+        }
+      }
+    } else if (isObject(value)) {
+      if (expandedCallback(currentPath)) {
+        updatedState = updateIn(
+          updatedState,
+          currentStatePath,
+          (value: DocumentState2 | undefined) => {
+            return value
+              ? { ...value, expanded: true }
+              : { type: 'object', expanded: true, properties: {} }
+          }
+        )
+
+        const keys = Object.keys(value)
+        if (keys.length > 0) {
+          currentStatePath.push('properties')
+
+          for (const key of keys) {
+            currentPath[pathIndex] = key
+            currentStatePath[pathStateIndex] = key
+
+            recurse(value[key])
+          }
+
+          currentPath.pop()
+          currentPath.pop()
+          currentStatePath.pop()
+          currentStatePath.pop()
+        }
+      }
+    }
+  }
+
+  const currentPath = path.slice()
+  const currentStatePath = toRecursiveStatePath(json, currentPath)
+  const value = json !== undefined ? getIn(json, path) : json
+  if (value !== undefined) {
+    recurse(value)
+  }
+
+  return updatedState
+}
+
 // TODO: write unit tests
 export function expandSingleItem(documentState: DocumentState, path: JSONPath): DocumentState {
   return {
@@ -209,6 +363,24 @@ export function expandSingleItem(documentState: DocumentState, path: JSONPath): 
       [compileJSONPointer(path)]: true
     }
   }
+}
+
+// TODO: write unit tests
+export function expandSingleItem2(
+  json: unknown,
+  documentState: DocumentState2,
+  path: JSONPath
+): DocumentState2 {
+  return updateIn(
+    documentState,
+    toRecursiveStatePath(json, path),
+    (state: DocumentState2 | undefined) => {
+      console.log('update in', state, path)
+      return state?.type === 'object' || state?.type === 'array'
+        ? { ...state, expanded: true }
+        : state
+    }
+  )
 }
 
 // TODO: write unit tests
@@ -224,6 +396,36 @@ export function collapsePath(documentState: DocumentState, path: JSONPath): Docu
     enforceStringMap,
     visibleSectionsMap
   }
+}
+
+// TODO: write unit tests
+export function collapsePath2(
+  json: unknown,
+  documentState: DocumentState2,
+  path: JSONPath
+): DocumentState2 {
+  return updateIn(
+    documentState,
+    toRecursiveStatePath(json, path),
+    (state: DocumentState2 | undefined) => {
+      if (state?.type === 'object') {
+        return {
+          ...state,
+          expanded: false,
+          properties: {} // clear the state of nested objects
+        }
+      } else if (state?.type === 'array') {
+        return {
+          ...state,
+          expanded: false,
+          visibleSections: null,
+          items: []
+        }
+      } else {
+        return state
+      }
+    }
+  )
 }
 
 // TODO: write unit tests
@@ -292,6 +494,208 @@ export function syncKeys(actualKeys: string[], prevKeys?: string[]): string[] {
 /**
  * Apply patch operations to both json and state
  */
+export function documentStatePatch2(
+  json: unknown,
+  documentState: DocumentState2,
+  operations: JSONPatchDocument
+): { json: unknown; documentState: DocumentState2 } {
+  const updatedJson: unknown = immutableJSONPatch(json, operations)
+
+  const updatedDocumentState = operations.reduce((updatingState, operation) => {
+    if (isJSONPatchAdd(operation)) {
+      return documentStateAdd2(updatedJson, updatingState, operation, undefined)
+    }
+
+    if (isJSONPatchRemove(operation)) {
+      return documentStateRemove2(updatedJson, updatingState, operation)
+    }
+
+    if (isJSONPatchReplace(operation)) {
+      return documentStateReplace2(updatedJson, updatingState, operation)
+    }
+
+    if (isJSONPatchCopy(operation) || isJSONPatchMove(operation)) {
+      return documentStateMoveOrCopy2(updatedJson, updatingState, operation)
+    }
+
+    return updatingState
+  }, documentState)
+
+  return {
+    json: updatedJson,
+    documentState: updatedDocumentState
+  }
+}
+
+function updateInDocumentState(
+  json: unknown,
+  documentState: DocumentState2,
+  path: JSONPath,
+  transform: (value: DocumentState2 | undefined) => DocumentState2 | undefined
+) {
+  return updateIn(documentState, toRecursiveStatePath(json, path), transform)
+}
+
+export function documentStateAdd2(
+  updatedJson: unknown,
+  documentState: DocumentState2,
+  operation: JSONPatchAdd,
+  stateValue: DocumentState2 | undefined
+): DocumentState2 {
+  const path = parsePath(updatedJson, operation.path)
+  const parentPath = initial(path)
+  const parent = getIn(updatedJson, parentPath)
+
+  let updatedState = documentState
+
+  if (Array.isArray(parent)) {
+    updatedState = updateInDocumentState(
+      updatedJson,
+      updatedState,
+      parentPath,
+      (arrayState: DocumentState2 | undefined) => {
+        if (arrayState?.type !== 'array') {
+          return arrayState
+        }
+
+        const index = int(last(path) as string)
+        const { items, visibleSections } = arrayState
+        return {
+          ...arrayState,
+          items:
+            index < items.length
+              ? items
+                  .slice(0, index)
+                  // eslint-disable-next-line no-sparse-arrays
+                  .concat(stateValue !== undefined ? [stateValue] : [,])
+                  .concat(items.slice(index))
+              : items,
+          visibleSections: visibleSections ? shiftVisibleSections(visibleSections, index, 1) : null
+        }
+      }
+    )
+  }
+
+  // object property added, nothing to do
+  return setIn(updatedState, toRecursiveStatePath(updatedJson, path), stateValue)
+}
+
+export function documentStateRemove2(
+  updatedJson: unknown,
+  documentState: DocumentState2,
+  operation: JSONPatchRemove
+): DocumentState2 {
+  const path = parsePath(updatedJson, operation.path)
+  const parentPath = initial(path)
+  const parent = getIn(updatedJson, parentPath)
+
+  if (Array.isArray(parent)) {
+    return updateInDocumentState(
+      updatedJson,
+      documentState,
+      parentPath,
+      (arrayState: DocumentState2 | undefined) => {
+        if (arrayState?.type !== 'array') {
+          return arrayState
+        }
+
+        const index = int(last(path) as string)
+        const { items, visibleSections } = arrayState
+
+        return {
+          ...arrayState,
+          items: items.slice(0, index).concat(items.slice(index + 1)),
+          visibleSections: visibleSections ? shiftVisibleSections(visibleSections, index, -1) : null
+        }
+      }
+    )
+  }
+
+  return deleteIn(documentState, toRecursiveStatePath(updatedJson, path))
+}
+
+export function documentStateReplace2(
+  updatedJson: unknown,
+  documentState: DocumentState2,
+  operation: JSONPatchReplace
+): DocumentState2 {
+  const path = parsePath(updatedJson, operation.path)
+
+  return updateInDocumentState(updatedJson, documentState, path, (state) => {
+    if (state) {
+      if (Array.isArray(operation.value)) {
+        if (state.type !== 'array') {
+          return {
+            type: 'array',
+            expanded: state.type === 'object' ? state.expanded : false,
+            visibleSections: null,
+            items: [] as DocumentState2[]
+          }
+        }
+      } else if (isObject(operation.value)) {
+        if (state.type !== 'object') {
+          return {
+            type: 'object',
+            expanded: state.type === 'array' ? state.expanded : false,
+            properties: {}
+          }
+        }
+      } else {
+        // FIXME: convert to value state if possible instead of creating a new state
+        if (state.type !== 'value') {
+          return { type: 'value' }
+        }
+      }
+    }
+
+    return state
+  })
+}
+
+export function documentStateMoveOrCopy2(
+  updatedJson: unknown,
+  documentState: DocumentState2,
+  operation: JSONPatchCopy | JSONPatchMove
+): DocumentState2 {
+  if (isJSONPatchMove(operation) && operation.from === operation.path) {
+    // nothing to do
+    return documentState
+  }
+
+  let updatedState = documentState
+
+  // get the state that we will move or copy
+  const from = parsePath(updatedJson, operation.from)
+  const stateValue = getIn<DocumentState2 | undefined>(
+    updatedState,
+    toRecursiveStatePath(updatedJson, from)
+  )
+
+  if (isJSONPatchMove(operation)) {
+    updatedState = documentStateRemove2(updatedJson, updatedState, {
+      op: 'remove',
+      path: operation.from
+    })
+  }
+
+  updatedState = documentStateAdd2(
+    updatedJson,
+    updatedState,
+    {
+      op: 'add',
+      path: operation.path,
+      value: null // note that the value is not actually used, so we just use null instead of getting the actual value from the json
+    },
+    stateValue
+  )
+
+  return updatedState
+}
+
+/**
+ * Apply patch operations to both json and state
+ */
+// FIXME: remove the original documentStatePatch
 export function documentStatePatch(
   json: unknown,
   documentState: DocumentState,
