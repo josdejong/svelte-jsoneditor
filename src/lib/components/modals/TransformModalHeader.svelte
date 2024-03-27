@@ -43,8 +43,7 @@
 <Header
   title="Transform"
   fullScreenButton={true}
-  {fullscreen}
-  onToggleFullscreen={() => (fullscreen = !fullscreen)}
+  bind:fullscreen
   onClose={close}
 >
   <button

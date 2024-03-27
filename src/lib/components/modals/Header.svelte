@@ -13,7 +13,6 @@
   export let title = 'Modal'
   export let fullScreenButton: boolean = false
   export let fullscreen: boolean = false
-  export let onToggleFullscreen: (() => void) | undefined = undefined
   export let onClose: (() => void) | undefined = undefined
 
   const { close } = getContext<Context>('simple-modal')
@@ -29,7 +28,7 @@
       type="button"
       class="jse-fullscreen"
       title="Toggle fullscreen"
-      on:click={() => onToggleFullscreen?.()}
+      on:click={() => fullscreen = !fullscreen}
     >
       <Icon data={fullscreen ? faDownLeftAndUpRightToCenter : faUpRightAndDownLeftFromCenter} />
     </button>

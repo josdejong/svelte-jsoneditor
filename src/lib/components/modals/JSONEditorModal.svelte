@@ -228,8 +228,7 @@
   <Header
     title="Edit nested content {stack.length > 1 ? ` (${stack.length})` : ''}"
     fullScreenButton={true}
-    {fullscreen}
-    onToggleFullscreen={() => (fullscreen = !fullscreen)}
+    bind:fullscreen
     onClose={handleClose}
   />
 
