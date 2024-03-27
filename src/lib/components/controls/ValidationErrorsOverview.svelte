@@ -29,14 +29,14 @@
   }
 
   function getValidationClass(errors: ValidationError[]): string {
-    if (errors.some(e => e.severity === ValidationSeverity.error)) {
-      return 'error';
-    } else if (errors.some(e => e.severity === ValidationSeverity.warning)) {
-      return 'warning';
-    } else if (errors.some(e => e.severity === ValidationSeverity.info)) {
-      return 'info';
+    if (errors.some((e) => e.severity === ValidationSeverity.error)) {
+      return 'error'
+    } else if (errors.some((e) => e.severity === ValidationSeverity.warning)) {
+      return 'warning'
+    } else if (errors.some((e) => e.severity === ValidationSeverity.info)) {
+      return 'info'
     }
-    return '';
+    return ''
   }
 </script>
 
@@ -47,7 +47,7 @@
         <tbody>
           {#each limit(validationErrors, MAX_VALIDATION_ERRORS) as validationError, index}
             <tr
-            class="jse-validation-{validationError.severity}"
+              class="jse-validation-{validationError.severity}"
               on:click={() => {
                 // trigger on the next tick to prevent the editor not getting focus
                 setTimeout(() => selectError(validationError))
