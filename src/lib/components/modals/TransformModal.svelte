@@ -65,8 +65,9 @@
 
   const { close } = getContext<Context>('simple-modal')
 
-  const stateId = `${id}:${compileJSONPointer(rootPath)}`
+  let fullscreen = false
 
+  const stateId = `${id}:${compileJSONPointer(rootPath)}`
   const state = transformModalStates[stateId] || {}
 
   // showWizard is not stored inside a stateId
@@ -209,14 +210,23 @@
     query = newSelectedQueryLanguage.createQuery(selectedJson, queryOptions)
     isManual = false
   }
+
+  function handleEscape() {
+    if (fullscreen) {
+      fullscreen = !fullscreen
+    } else {
+      close()
+    }
+  }
 </script>
 
-<div class="jse-modal jse-transform" use:onEscape={close}>
+<div class="jse-modal jse-transform" class:fullscreen use:onEscape={handleEscape}>
   <AbsolutePopup>
     <TransformModalHeader
       {queryLanguages}
       {queryLanguageId}
       onChangeQueryLanguage={handleChangeQueryLanguage}
+      bind:fullscreen
     />
     <div class="jse-modal-contents">
       <div class="jse-main-contents">
