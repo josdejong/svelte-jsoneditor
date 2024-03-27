@@ -35,7 +35,7 @@
       ValidationSeverity.info
     ]
 
-    return severities.find(severity => errors.some((error) => error.severity === severity))
+    return severities.find((severity) => errors.some((error) => error.severity === severity))
   }
 </script>
 
