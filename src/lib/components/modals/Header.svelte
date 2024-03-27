@@ -16,6 +16,7 @@
   <div class="jse-title">
     {title}
   </div>
+  <slot name="actions" />
   <button
     type="button"
     class="jse-close"

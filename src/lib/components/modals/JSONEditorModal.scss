@@ -2,6 +2,10 @@
 @import 'Modal';
 
 .jse-modal.jse-jsoneditor-modal {
+  button.jse-fullscreen {
+    @include jse-modal-menu-button;
+  }
+
   .jse-modal-contents {
     padding-top: 0;
 

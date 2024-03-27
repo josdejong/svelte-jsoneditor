@@ -3,7 +3,12 @@
 <script lang="ts">
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
-  import { faCog, faTimes } from '@fortawesome/free-solid-svg-icons'
+  import {
+    faCog,
+    faDownLeftAndUpRightToCenter,
+    faTimes,
+    faUpRightAndDownLeftFromCenter
+  } from '@fortawesome/free-solid-svg-icons'
   import SelectQueryLanguage from '../controls/selectQueryLanguage/SelectQueryLanguage.svelte'
   import type { AbsolutePopupContext, OnChangeQueryLanguage, QueryLanguage } from '$lib/types.js'
   import type { Context } from 'svelte-simple-modal'
@@ -11,6 +16,7 @@
   export let queryLanguages: QueryLanguage[]
   export let queryLanguageId: string
   export let onChangeQueryLanguage: OnChangeQueryLanguage
+  export let fullscreen: boolean
 
   let refConfigButton: HTMLButtonElement | undefined
   let popupId: number | undefined
@@ -51,6 +57,14 @@
       <Icon data={faCog} />
     </button>
   {/if}
+  <button
+    type="button"
+    class="jse-fullscreen"
+    title="Toggle fullscreen"
+    on:click={() => (fullscreen = !fullscreen)}
+  >
+    <Icon data={fullscreen ? faDownLeftAndUpRightToCenter : faUpRightAndDownLeftFromCenter} />
+  </button>
   <button type="button" class="jse-close" on:click={() => close()}>
     <Icon data={faTimes} />
   </button>
