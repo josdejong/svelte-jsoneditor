@@ -28,16 +28,14 @@
     expanded = true
   }
 
-  function getMaxSeverity(errors: ValidationError[]): ValidationSeverity | null {
-    if (errors.some((e) => e.severity === ValidationSeverity.error)) {
-      return ValidationSeverity.error
-    } else if (errors.some((e) => e.severity === ValidationSeverity.warning)) {
-      return ValidationSeverity.warning
-    } else if (errors.some((e) => e.severity === ValidationSeverity.info)) {
-      return ValidationSeverity.info
-    }
+  function getMaxSeverity(errors: ValidationError[]): ValidationSeverity | undefined {
+    const severities = [
+      ValidationSeverity.error,
+      ValidationSeverity.warning,
+      ValidationSeverity.info
+    ]
 
-    return null
+    return severities.find(severity => errors.some((error) => error.severity === severity))
   }
 </script>
 
