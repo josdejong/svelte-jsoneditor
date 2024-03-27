@@ -13,6 +13,24 @@
     tr {
       cursor: pointer;
 
+      &.jse-validation-error {
+        background: $message-error-background;
+        color: $message-error-color;
+      }
+
+      &.jse-validation-warning {
+        background: $message-warning-background;
+        color: $message-warning-color;
+        &:hover {
+          filter: brightness(105%);
+        }
+      }
+
+      &.jse-validation-info {
+        background: $message-info-background;
+        color: $message-info-color;
+      }
+
       &:hover {
         filter: brightness(110%);
       }
@@ -53,19 +71,4 @@
       }
     }
   }
-}
-
-.error {
-  background: $message-error-background;
-  color: $message-error-color;
-}
-
-.warning {
-  background: $message-warning-background;
-  color: $message-warning-color;
-}
-
-.info {
-  background: $message-info-background;
-  color: $message-info-color;
 }

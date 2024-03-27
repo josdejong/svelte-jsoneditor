@@ -9,7 +9,7 @@
   import { isEmpty } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
-  import type { ValidationError } from '$lib/types.js'
+  import { ValidationSeverity, type ValidationError } from '$lib/types.js'
   import { MAX_VALIDATION_ERRORS } from '$lib/constants.js'
   import { limit } from '$lib/utils/arrayUtils.js'
 
@@ -27,6 +27,17 @@
   function expand() {
     expanded = true
   }
+
+  function getValidationClass(errors: ValidationError[]): string {
+    if (errors.some(e => e.severity === ValidationSeverity.error)) {
+      return 'error';
+    } else if (errors.some(e => e.severity === ValidationSeverity.warning)) {
+      return 'warning';
+    } else if (errors.some(e => e.severity === ValidationSeverity.info)) {
+      return 'info';
+    }
+    return '';
+  }
 </script>
 
 {#if !isEmpty(validationErrors)}
@@ -36,7 +47,7 @@
         <tbody>
           {#each limit(validationErrors, MAX_VALIDATION_ERRORS) as validationError, index}
             <tr
-            class="jse-validation-error {validationError.severity}"
+            class="jse-validation-{validationError.severity}"
               on:click={() => {
                 // trigger on the next tick to prevent the editor not getting focus
                 setTimeout(() => selectError(validationError))
@@ -77,9 +88,9 @@
         </tbody>
       </table>
     {:else}
-      <table class="jse-validation-errors-overview-collapsed {validationErrors[0].severity}">
+      <table class="jse-validation-errors-overview-collapsed">
         <tbody>
-          <tr class="jse-validation-error" on:click={expand}>
+          <tr class="jse-validation-{getValidationClass(validationErrors)}" on:click={expand}>
             <td class="jse-validation-error-icon">
               <Icon data={faExclamationTriangle} />
             </td>

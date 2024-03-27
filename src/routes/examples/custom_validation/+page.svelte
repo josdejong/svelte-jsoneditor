@@ -56,7 +56,7 @@
 
       // check whether the team consists of exactly four members
       if (json.team.length !== 4) {
-        errors.push({ path: ['team'], message: 'A team must have 4 members', severity: 'warning' })
+        errors.push({ path: ['team'], message: 'A team must have 4 members', severity: 'error' })
       }
 
       // check whether there is at least one adult member in the team
@@ -67,7 +67,7 @@
         errors.push({
           path: ['team'],
           message: 'A team must have at least one adult person (age >= 18)',
-          severity: 'warning'
+          severity: 'info'
         })
       }
     } else {
