@@ -1,17 +1,13 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { getContext } from 'svelte'
+  import {getContext} from 'svelte'
   import Icon from 'svelte-awesome'
-  import {
-    faCog,
-    faDownLeftAndUpRightToCenter,
-    faTimes,
-    faUpRightAndDownLeftFromCenter
-  } from '@fortawesome/free-solid-svg-icons'
+  import {faCog} from '@fortawesome/free-solid-svg-icons'
   import SelectQueryLanguage from '../controls/selectQueryLanguage/SelectQueryLanguage.svelte'
-  import type { AbsolutePopupContext, OnChangeQueryLanguage, QueryLanguage } from '$lib/types.js'
-  import type { Context } from 'svelte-simple-modal'
+  import type {AbsolutePopupContext, OnChangeQueryLanguage, QueryLanguage} from '$lib/types.js'
+  import type {Context} from 'svelte-simple-modal'
+  import Header from './Header.svelte'
 
   export let queryLanguages: QueryLanguage[]
   export let queryLanguageId: string
@@ -44,30 +40,24 @@
   }
 </script>
 
-<div class="jse-header">
-  <div class="jse-title">Transform</div>
-  {#if queryLanguages.length > 1}
-    <button
-      type="button"
-      bind:this={refConfigButton}
-      class="jse-config"
-      on:click={openConfig}
-      title="Select a query language"
-    >
-      <Icon data={faCog} />
-    </button>
-  {/if}
+<Header
+  title="Transform"
+  fullScreenButton={true}
+  {fullscreen}
+  onToggleFullscreen={() => (fullscreen = !fullscreen)}
+  onClose={close}
+>
   <button
+    slot="actions"
     type="button"
-    class="jse-fullscreen"
-    title="Toggle fullscreen"
-    on:click={() => (fullscreen = !fullscreen)}
+    bind:this={refConfigButton}
+    class="jse-config"
+    class:hide={queryLanguages.length <= 1}
+    on:click={openConfig}
+    title="Select a query language"
   >
-    <Icon data={fullscreen ? faDownLeftAndUpRightToCenter : faUpRightAndDownLeftFromCenter} />
+    <Icon data={faCog} />
   </button>
-  <button type="button" class="jse-close" on:click={() => close()}>
-    <Icon data={faTimes} />
-  </button>
-</div>
+</Header>
 
-<style src="./Header.scss"></style>
+<style src="./TransformModalHeader.scss"></style>

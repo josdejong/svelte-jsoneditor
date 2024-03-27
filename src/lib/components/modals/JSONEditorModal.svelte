@@ -28,11 +28,7 @@
   import { initial, isEmpty, last } from 'lodash-es'
   import { isJSONContent, toJSONContent } from '$lib/utils/jsonUtils.js'
   import Icon from 'svelte-awesome'
-  import {
-    faCaretLeft,
-    faDownLeftAndUpRightToCenter,
-    faUpRightAndDownLeftFromCenter
-  } from '@fortawesome/free-solid-svg-icons'
+  import { faCaretLeft } from '@fortawesome/free-solid-svg-icons'
   import memoizeOne from 'memoize-one'
   import { onEscape } from '$lib/actions/onEscape.js'
   import { getFocusPath, isJSONSelection } from '$lib/logic/selection.js'
@@ -231,18 +227,11 @@
 <div class="jse-modal jse-jsoneditor-modal" class:fullscreen use:onEscape={handleEscape}>
   <Header
     title="Edit nested content {stack.length > 1 ? ` (${stack.length})` : ''}"
+    fullScreenButton={true}
+    {fullscreen}
+    onToggleFullscreen={() => (fullscreen = !fullscreen)}
     onClose={handleClose}
-  >
-    <button
-      slot="actions"
-      type="button"
-      class="jse-fullscreen"
-      title="Toggle fullscreen"
-      on:click={() => (fullscreen = !fullscreen)}
-    >
-      <Icon data={fullscreen ? faDownLeftAndUpRightToCenter : faUpRightAndDownLeftFromCenter} />
-    </button>
-  </Header>
+  />
 
   <div class="jse-modal-contents">
     <div class="jse-label">

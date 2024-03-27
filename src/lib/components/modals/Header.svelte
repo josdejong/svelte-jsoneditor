@@ -3,10 +3,17 @@
 <script lang="ts">
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
-  import { faTimes } from '@fortawesome/free-solid-svg-icons'
+  import {
+    faDownLeftAndUpRightToCenter,
+    faTimes,
+    faUpRightAndDownLeftFromCenter
+  } from '@fortawesome/free-solid-svg-icons'
   import type { Context } from 'svelte-simple-modal'
 
   export let title = 'Modal'
+  export let fullScreenButton: boolean = false
+  export let fullscreen: boolean = false
+  export let onToggleFullscreen: (() => void) | undefined = undefined
   export let onClose: (() => void) | undefined = undefined
 
   const { close } = getContext<Context>('simple-modal')
@@ -17,6 +24,16 @@
     {title}
   </div>
   <slot name="actions" />
+  {#if fullScreenButton}
+    <button
+      type="button"
+      class="jse-fullscreen"
+      title="Toggle fullscreen"
+      on:click={() => onToggleFullscreen?.()}
+    >
+      <Icon data={fullscreen ? faDownLeftAndUpRightToCenter : faUpRightAndDownLeftFromCenter} />
+    </button>
+  {/if}
   <button
     type="button"
     class="jse-close"
