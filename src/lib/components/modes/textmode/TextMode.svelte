@@ -633,7 +633,7 @@
   }
 
   function toRichValidationError(validationError: ValidationError): RichValidationError {
-    const { path, message } = validationError
+    const { path, message, severity } = validationError
     const { line, column, from, to } = findTextLocation(normalization.escapeValue(text), path)
 
     return {
@@ -643,7 +643,7 @@
       from,
       to,
       message,
-      severity: ValidationSeverity.warning,
+      severity,
       actions: []
     }
   }

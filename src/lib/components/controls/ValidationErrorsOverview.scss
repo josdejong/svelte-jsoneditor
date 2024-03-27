@@ -3,8 +3,6 @@
 .jse-validation-errors-overview {
   font-family: $font-family-mono;
   font-size: $font-size-mono;
-  background: $message-warning-background;
-  color: $message-warning-color;
   overflow: auto;
   max-height: $errors-overview-max-height;
 
@@ -15,8 +13,26 @@
     tr {
       cursor: pointer;
 
+      &.jse-validation-error {
+        background: $message-error-background;
+        color: $message-error-color;
+      }
+
+      &.jse-validation-warning {
+        background: $message-warning-background;
+        color: $message-warning-color;
+        &:hover {
+          filter: brightness(105%);
+        }
+      }
+
+      &.jse-validation-info {
+        background: $message-info-background;
+        color: $message-info-color;
+      }
+
       &:hover {
-        background-color: rgba(255, 255, 255, 0.1);
+        filter: brightness(110%);
       }
 
       td {
