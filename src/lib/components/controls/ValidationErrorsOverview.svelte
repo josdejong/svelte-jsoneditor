@@ -28,15 +28,16 @@
     expanded = true
   }
 
-  function getValidationClass(errors: ValidationError[]): string {
+  function getMaxSeverity(errors: ValidationError[]): ValidationSeverity | null {
     if (errors.some((e) => e.severity === ValidationSeverity.error)) {
-      return 'error'
+      return ValidationSeverity.error
     } else if (errors.some((e) => e.severity === ValidationSeverity.warning)) {
-      return 'warning'
+      return ValidationSeverity.warning
     } else if (errors.some((e) => e.severity === ValidationSeverity.info)) {
-      return 'info'
+      return ValidationSeverity.info
     }
-    return ''
+
+    return null
   }
 </script>
 
@@ -90,7 +91,7 @@
     {:else}
       <table class="jse-validation-errors-overview-collapsed">
         <tbody>
-          <tr class="jse-validation-{getValidationClass(validationErrors)}" on:click={expand}>
+          <tr class="jse-validation-{getMaxSeverity(validationErrors)}" on:click={expand}>
             <td class="jse-validation-error-icon">
               <Icon data={faExclamationTriangle} />
             </td>
