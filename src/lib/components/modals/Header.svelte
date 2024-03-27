@@ -28,7 +28,7 @@
       type="button"
       class="jse-fullscreen"
       title="Toggle fullscreen"
-      on:click={() => fullscreen = !fullscreen}
+      on:click={() => (fullscreen = !fullscreen)}
     >
       <Icon data={fullscreen ? faDownLeftAndUpRightToCenter : faUpRightAndDownLeftFromCenter} />
     </button>

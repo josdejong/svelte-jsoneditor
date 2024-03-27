@@ -1,12 +1,12 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import {getContext} from 'svelte'
+  import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
-  import {faCog} from '@fortawesome/free-solid-svg-icons'
+  import { faCog } from '@fortawesome/free-solid-svg-icons'
   import SelectQueryLanguage from '../controls/selectQueryLanguage/SelectQueryLanguage.svelte'
-  import type {AbsolutePopupContext, OnChangeQueryLanguage, QueryLanguage} from '$lib/types.js'
-  import type {Context} from 'svelte-simple-modal'
+  import type { AbsolutePopupContext, OnChangeQueryLanguage, QueryLanguage } from '$lib/types.js'
+  import type { Context } from 'svelte-simple-modal'
   import Header from './Header.svelte'
 
   export let queryLanguages: QueryLanguage[]
@@ -40,12 +40,7 @@
   }
 </script>
 
-<Header
-  title="Transform"
-  fullScreenButton={true}
-  bind:fullscreen
-  onClose={close}
->
+<Header title="Transform" fullScreenButton={true} bind:fullscreen onClose={close}>
   <button
     slot="actions"
     type="button"
