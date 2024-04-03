@@ -770,7 +770,7 @@
 
     // for example when clicking on the empty area in the main menu or on an InlineValue
     if (!target.isContentEditable) {
-      focus()
+      setTimeout(focus)
     }
   }
 
