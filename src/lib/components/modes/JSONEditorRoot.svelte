@@ -91,7 +91,7 @@
       type: 'button',
       text: 'tree',
       title: `Switch to tree mode (current mode: ${mode})`,
-      className: 'jse-group-button ' + ((mode === Mode.tree || !mode) ? ' jse-selected' : ''),
+      className: 'jse-group-button ' + (mode === Mode.tree || !mode ? ' jse-selected' : ''),
       onClick: () => onChangeMode(Mode.tree)
     },
     {
