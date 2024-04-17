@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.23.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.1...v0.23.2) (2024-04-17)
+
+
+### Bug Fixes
+
+* [#423](https://github.com/josdejong/svelte-jsoneditor/issues/423) error about an invalid selection in text mode when clearing the contents ([5ed8a86](https://github.com/josdejong/svelte-jsoneditor/commit/5ed8a86a6166064d8bd27af6299db18cdf762885))
+* change text "fullscreen" to "full screen" ([a56415f](https://github.com/josdejong/svelte-jsoneditor/commit/a56415f5ed79890ec2a3ee885ac2df40cf7cef40))
+* editor not getting focus when clicking in an empty area in table mode ([0e74043](https://github.com/josdejong/svelte-jsoneditor/commit/0e740432d55faf32929cac572be7a59465466ab5))
+
 ### [0.23.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.0...v0.23.1) (2024-03-28)
 
 
