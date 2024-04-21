@@ -99,7 +99,8 @@
       type: 'button',
       text: 'table',
       title: `Switch to table mode (current mode: ${mode})`,
-      className: 'jse-group-button jse-last' + ((mode || defaultMode) === Mode.table ? ' jse-selected' : ''),
+      className:
+        'jse-group-button jse-last' + ((mode || defaultMode) === Mode.table ? ' jse-selected' : ''),
       onClick: () => onChangeMode(Mode.table)
     }
   ]

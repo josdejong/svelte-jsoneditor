@@ -747,7 +747,7 @@
           <input type="checkbox" bind:checked={$showTreeEditor} /> Show tree editor
         </label>
         <select class="mode-toggle" bind:value={leftEditorMode}>
-          <option value="{undefined}">undefined</option>
+          <option value={undefined}>undefined</option>
           <option value="tree">tree</option>
           <option value="text">text</option>
           <option value="table">table</option>
