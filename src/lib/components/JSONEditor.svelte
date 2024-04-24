@@ -63,45 +63,70 @@
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:JSONEditor')
 
-  export let content: Content = { text: '' }
-  export let selection: JSONEditorSelection | null = null
-
-  export let readOnly = false
-  export let indentation: number | string = 2
-  export let tabSize = 4
-  export let mode: Mode = Mode.tree
-  export let mainMenuBar = true
-  export let navigationBar = true
-  export let statusBar = true
-  export let askToFormat = true
-  export let escapeControlCharacters = false
-  export let escapeUnicodeCharacters = false
-  export let flattenColumns = true
-  export let parser: JSONParser = JSON
-  export let validator: Validator | null = null
-  export let validationParser: JSONParser = JSON
-  export let pathParser: JSONPathParser = {
-    parse: parseJSONPath,
-    stringify: stringifyJSONPath
-  }
-
-  export let queryLanguages: QueryLanguage[] = [javascriptQueryLanguage]
-  export let queryLanguageId: string = queryLanguages[0].id
-
-  export let onChangeQueryLanguage: OnChangeQueryLanguage = noop
-  export let onChange: OnChange = null
-  export let onSelect: OnSelect | null = null
-  export let onRenderValue: OnRenderValue = renderValue
-  export let onClassName: OnClassName = () => undefined
-  export let onRenderMenu: OnRenderMenu = noop
-  export let onRenderContextMenu: OnRenderContextMenu = noop
-  export let onChangeMode: OnChangeMode = noop
-  export let onError: OnError = (err) => {
+  const contentDefault = { text: '' }
+  const selectionDefault = null
+  const readOnlyDefault = false
+  const indentationDefault = 2
+  const tabSizeDefault = 4
+  const modeDefault = Mode.tree
+  const mainMenuBarDefault = true
+  const navigationBarDefault = true
+  const statusBarDefault = true
+  const askToFormatDefault = true
+  const escapeControlCharactersDefault = false
+  const escapeUnicodeCharactersDefault = false
+  const flattenColumnsDefault = true
+  const parserDefault = JSON
+  const validatorDefault = null
+  const validationParserDefault = JSON
+  const pathParserDefault = { parse: parseJSONPath, stringify: stringifyJSONPath }
+  const queryLanguagesDefault = [javascriptQueryLanguage]
+  const queryLanguageIdDefault = javascriptQueryLanguage.id
+  const onChangeQueryLanguageDefault = noop
+  const onChangeDefault = undefined
+  const onSelectDefault = undefined
+  const onRenderValueDefault = renderValue
+  const onClassNameDefault = () => undefined
+  const onRenderMenuDefault = noop
+  const onRenderContextMenuDefault = noop
+  const onChangeModeDefault = noop
+  const onErrorDefault: OnError = (err) => {
     console.error(err)
     alert(err.toString()) // TODO: create a nice alert modal
   }
-  export let onFocus: OnFocus = noop
-  export let onBlur: OnBlur = noop
+  const onFocusDefault = noop
+  const onBlurDefault = noop
+
+  export let content: Content | undefined = contentDefault
+  export let selection: JSONEditorSelection | null | undefined = selectionDefault
+  export let readOnly: boolean | undefined = readOnlyDefault
+  export let indentation: number | string | undefined = indentationDefault
+  export let tabSize: number | undefined = tabSizeDefault
+  export let mode: Mode | undefined = modeDefault
+  export let mainMenuBar: boolean | undefined = mainMenuBarDefault
+  export let navigationBar: boolean | undefined = navigationBarDefault
+  export let statusBar: boolean | undefined = statusBarDefault
+  export let askToFormat: boolean | undefined = askToFormatDefault
+  export let escapeControlCharacters: boolean | undefined = escapeControlCharactersDefault
+  export let escapeUnicodeCharacters: boolean | undefined = escapeUnicodeCharactersDefault
+  export let flattenColumns: boolean | undefined = flattenColumnsDefault
+  export let parser: JSONParser | undefined = parserDefault
+  export let validator: Validator | null | undefined = validatorDefault
+  export let validationParser: JSONParser | undefined = validationParserDefault
+  export let pathParser: JSONPathParser | undefined = pathParserDefault
+  export let queryLanguages: QueryLanguage[] | undefined = queryLanguagesDefault
+  export let queryLanguageId: string | undefined = queryLanguageIdDefault
+  export let onChangeQueryLanguage: OnChangeQueryLanguage | undefined = onChangeQueryLanguageDefault
+  export let onChange: OnChange | undefined = onChangeDefault
+  export let onSelect: OnSelect | null | undefined = onSelectDefault
+  export let onRenderValue: OnRenderValue | undefined = onRenderValueDefault
+  export let onClassName: OnClassName | undefined = onClassNameDefault
+  export let onRenderMenu: OnRenderMenu | undefined = onRenderMenuDefault
+  export let onRenderContextMenu: OnRenderContextMenu | undefined = onRenderContextMenuDefault
+  export let onChangeMode: OnChangeMode | undefined = onChangeModeDefault
+  export let onError: OnError | undefined = onErrorDefault
+  export let onFocus: OnFocus | undefined = onFocusDefault
+  export let onBlur: OnBlur | undefined = onBlurDefault
 
   let instanceId = uniqueId()
   let hasFocus = false
@@ -122,23 +147,25 @@
   // We memoize the last parse result for the case when the content is text and very large.
   // In that case parsing takes a few seconds. When the user switches between tree and table mode,
   // without having made a change, we do not want to parse the text again.
-  $: parseMemoizeOne = memoizeOne(parser.parse)
+  $: parseMemoizeOne = memoizeOne((parser ?? parserDefault).parse)
 
   // rerender the full editor when the parser changes. This is needed because
   // numeric state is hold at many places in the editor.
-  let previousParser = parser
+  let previousParser: JSONParser = parser ?? parserDefault
   $: {
-    if (!isEqualParser(parser, previousParser)) {
+    const parserOrDefault = parser ?? parserDefault
+
+    if (!isEqualParser(parserOrDefault, previousParser)) {
       debug('parser changed, recreate editor')
 
       if (isJSONContent(content)) {
         const text = previousParser.stringify(content.json)
         content = {
-          json: text !== undefined ? parser.parse(text) : undefined
+          json: text !== undefined ? parserOrDefault.parse(text) : undefined
         }
       }
 
-      previousParser = parser
+      previousParser = parserOrDefault
 
       // new editor id -> will re-create the editor
       instanceId = uniqueId()
@@ -146,7 +173,7 @@
   }
 
   export function get(): Content {
-    return content
+    return content ?? contentDefault
   }
 
   export async function set(newContent: Content): Promise<void> {
@@ -179,9 +206,11 @@
 
   export async function patch(operations: JSONPatchDocument): Promise<JSONPatchResult> {
     if (isTextContent(content)) {
+      const parserOrDefault = parser ?? parserDefault
+
       try {
         content = {
-          json: parser.parse(content.text),
+          json: parserOrDefault.parse(content.text),
           text: undefined
         }
       } catch (err) {
@@ -290,7 +319,7 @@
     selection = updatedSelection
 
     if (onSelect) {
-      onSelect(cloneDeep(updatedSelection))
+      onSelect(cloneDeep(updatedSelection) ?? null)
     }
   }
 
@@ -318,13 +347,16 @@
     await tick()
     await focus()
 
-    onChangeMode(newMode)
+    const callback = onChangeMode ?? onChangeModeDefault
+    callback(newMode)
   }
 
   function handleChangeQueryLanguage(newQueryLanguageId: string) {
     debug('handleChangeQueryLanguage', newQueryLanguageId)
     queryLanguageId = newQueryLanguageId
-    onChangeQueryLanguage(newQueryLanguageId)
+
+    const callback = onChangeQueryLanguage ?? onChangeQueryLanguageDefault
+    callback(newQueryLanguageId)
   }
 
   // The onTransformModal method is located in JSONEditor to prevent circular references:
@@ -453,35 +485,35 @@
         {#key instanceId}
           <JSONEditorRoot
             bind:this={refJSONEditorRoot}
-            {mode}
-            {content}
-            {selection}
-            {readOnly}
-            {indentation}
-            {tabSize}
-            {statusBar}
-            {askToFormat}
-            {mainMenuBar}
-            {navigationBar}
-            {escapeControlCharacters}
-            {escapeUnicodeCharacters}
-            {flattenColumns}
-            {parser}
+            mode={mode ?? modeDefault}
+            content={content ?? contentDefault}
+            selection={selection ?? selectionDefault}
+            readOnly={readOnly ?? readOnlyDefault}
+            indentation={indentation ?? indentationDefault}
+            tabSize={tabSize ?? tabSizeDefault}
+            statusBar={statusBar ?? statusBarDefault}
+            askToFormat={askToFormat ?? askToFormatDefault}
+            mainMenuBar={mainMenuBar ?? mainMenuBarDefault}
+            navigationBar={navigationBar ?? navigationBarDefault}
+            escapeControlCharacters={escapeControlCharacters ?? escapeControlCharactersDefault}
+            escapeUnicodeCharacters={escapeUnicodeCharacters ?? escapeUnicodeCharactersDefault}
+            flattenColumns={flattenColumns ?? flattenColumnsDefault}
+            parser={parser ?? parserDefault}
             {parseMemoizeOne}
-            {validator}
-            {validationParser}
-            {pathParser}
+            validator={validator ?? validatorDefault}
+            validationParser={validationParser ?? validationParserDefault}
+            pathParser={pathParser ?? pathParserDefault}
             insideModal={false}
-            {onError}
+            onError={onError ?? onErrorDefault}
             onChange={handleChange}
             onChangeMode={toggleMode}
             onSelect={handleSelect}
-            {onRenderValue}
-            {onClassName}
+            onRenderValue={onRenderValue ?? onRenderValueDefault}
+            onClassName={onClassName ?? onClassNameDefault}
             onFocus={handleFocus}
             onBlur={handleBlur}
-            {onRenderMenu}
-            {onRenderContextMenu}
+            onRenderMenu={onRenderMenu ?? onRenderMenuDefault}
+            onRenderContextMenu={onRenderContextMenu ?? onRenderContextMenuDefault}
             {onSortModal}
             {onTransformModal}
             {onJSONEditorModal}

@@ -750,6 +750,7 @@
           <option value="tree">tree</option>
           <option value="text">text</option>
           <option value="table">table</option>
+          <option value={undefined}>undefined</option>
           <option value="code">code (deprecated)</option>
         </select>
       </p>
