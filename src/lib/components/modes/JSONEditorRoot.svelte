@@ -28,6 +28,7 @@
     TransformModalOptions,
     Validator
   } from '$lib/types'
+  import DEFAULT_PROPERTIES from '../../utils/DEFAULT_PROPERTIES'
   import { Mode } from '$lib/types.js'
   import TextMode from './textmode/TextMode.svelte'
   import TableMode from './tablemode/TableMode.svelte'
@@ -42,8 +43,7 @@
   export let readOnly: boolean
   export let indentation: number | string
   export let tabSize: number
-  export let defaultMode = Mode.tree
-  export let mode: Mode | undefined = defaultMode
+  export let mode: Mode | undefined
   export let mainMenuBar: boolean
   export let navigationBar: boolean
   export let statusBar: boolean
@@ -85,14 +85,18 @@
       // check for 'code' mode is here for backward compatibility (deprecated since v0.4.0)
       className:
         'jse-group-button jse-first' +
-        ((mode || defaultMode) === Mode.text || (mode as string) === 'code' ? ' jse-selected' : ''),
+        ((mode || DEFAULT_PROPERTIES.mode) === Mode.text || (mode as string) === 'code'
+          ? ' jse-selected'
+          : ''),
       onClick: () => onChangeMode(Mode.text)
     },
     {
       type: 'button',
       text: 'tree',
       title: `Switch to tree mode (current mode: ${mode})`,
-      className: 'jse-group-button ' + ((mode || defaultMode) === Mode.tree ? ' jse-selected' : ''),
+      className:
+        'jse-group-button ' +
+        ((mode || DEFAULT_PROPERTIES.mode) === Mode.tree ? ' jse-selected' : ''),
       onClick: () => onChangeMode(Mode.tree)
     },
     {
@@ -100,7 +104,8 @@
       text: 'table',
       title: `Switch to table mode (current mode: ${mode})`,
       className:
-        'jse-group-button jse-last' + ((mode || defaultMode) === Mode.table ? ' jse-selected' : ''),
+        'jse-group-button jse-last' +
+        ((mode || DEFAULT_PROPERTIES.mode) === Mode.table ? ' jse-selected' : ''),
       onClick: () => onChangeMode(Mode.table)
     }
   ]
