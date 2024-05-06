@@ -5,7 +5,7 @@
   "homepage": "https://github.com/josdejong/svelte-jsoneditor",
   "repository": {
     "type": "git",
-    "url": "https://github.com/josdejong/svelte-jsoneditor.git"
+    "url": "git+https://github.com/josdejong/svelte-jsoneditor.git"
   },
   "type": "module",
   "svelte": "./index.js",
