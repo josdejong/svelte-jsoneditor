@@ -108,49 +108,51 @@
 </script>
 
 <table class="jse-transform-wizard">
-  <tr>
-    <th>Filter</th>
-    <td>
-      <div class="jse-horizontal">
-        <Select class="jse-filter-path" showChevron items={fieldOptions} bind:value={filterPath} />
-        <Select
-          class="jse-filter-relation"
-          showChevron
-          items={filterRelationOptions}
-          bind:value={filterRelation}
-        />
-        <input class="jse-filter-value" bind:value={filterValue} />
-      </div>
-    </td>
-  </tr>
-  <tr>
-    <th>Sort</th>
-    <td>
-      <div class="jse-horizontal">
-        <Select class="jse-sort-path" showChevron items={fieldOptions} bind:value={sortPath} />
-        <Select
-          class="jse-sort-direction"
-          showChevron
-          items={sortDirectionOptions}
-          bind:value={sortDirection}
-        />
-      </div>
-    </td>
-  </tr>
-  <tr>
-    <th>Pick</th>
-    <td>
-      <div class="jse-horizontal">
-        <Select
-          class="jse-projection-paths"
-          multiple
-          showChevron
-          items={projectionOptions}
-          bind:value={projectionPaths}
-        />
-      </div>
-    </td>
-  </tr>
+  <tbody>
+    <tr>
+      <th>Filter</th>
+      <td>
+        <div class="jse-horizontal">
+          <Select class="jse-filter-path" showChevron items={fieldOptions} bind:value={filterPath} />
+          <Select
+            class="jse-filter-relation"
+            showChevron
+            items={filterRelationOptions}
+            bind:value={filterRelation}
+          />
+          <input class="jse-filter-value" bind:value={filterValue} />
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <th>Sort</th>
+      <td>
+        <div class="jse-horizontal">
+          <Select class="jse-sort-path" showChevron items={fieldOptions} bind:value={sortPath} />
+          <Select
+            class="jse-sort-direction"
+            showChevron
+            items={sortDirectionOptions}
+            bind:value={sortDirection}
+          />
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <th>Pick</th>
+      <td>
+        <div class="jse-horizontal">
+          <Select
+            class="jse-projection-paths"
+            multiple
+            showChevron
+            items={projectionOptions}
+            bind:value={projectionPaths}
+          />
+        </div>
+      </td>
+    </tr>
+  </tbody>
 </table>
 
 <style src="./TransformWizard.scss"></style>
