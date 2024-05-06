@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.23.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.2...v0.23.3) (2024-05-06)
+
+
+### Features
+
+* update `codemirror`, `ajv`, `fontawesome`, `jsonrepair`, and dev dependencies ([7bd08e7](https://github.com/josdejong/svelte-jsoneditor/commit/7bd08e7021b2a8c5067ab346859f613457edcd44))
+
+
+### Bug Fixes
+
+* text mode loads partially scrolled down ([56e18ee](https://github.com/josdejong/svelte-jsoneditor/commit/56e18ee0573e4af7731a725133e93dc179e2857e))
+
 ### [0.23.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.1...v0.23.2) (2024-04-17)
 
 
