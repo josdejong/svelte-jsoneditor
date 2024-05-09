@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.23.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.3...v0.23.4) (2024-05-09)
+
+
+### Bug Fixes
+
+* cannot use middle mouse button to scroll ([d0e7f4c](https://github.com/josdejong/svelte-jsoneditor/commit/d0e7f4cce8046c1c0101127556378aa6da770122))
+* update `jsonrepair` and other dependencies ([7b9063f](https://github.com/josdejong/svelte-jsoneditor/commit/7b9063fb65c8703e654cf6489e09f4d6d6898f4e))
+
 ### [0.23.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.2...v0.23.3) (2024-05-06)
 
 
