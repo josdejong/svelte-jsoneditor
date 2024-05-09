@@ -752,6 +752,11 @@
   }
 
   function handleMouseDown(event: MouseEvent) {
+    // only handle when the left or right mouse button is pressed, not the middle mouse button (scroll wheel)
+    if (event.buttons !== 1 && event.buttons !== 2) {
+      return
+    }
+
     const target = event.target as HTMLElement
     const path = getDataPathFromTarget(target)
     if (path) {
