@@ -32,9 +32,9 @@
     documentStatePatch2,
     expandAll,
     expandMinimal,
-    expandPath,
+    expandPath2,
     expandRecursive,
-    expandSection, expandSection2,
+    expandSection2,
     expandSingleItem2,
     expandWithCallback,
     expandWithCallback2,
@@ -53,8 +53,7 @@
     findRootPath,
     getAnchorPath,
     getEndPath,
-    getFocusPath,
-    getInitialSelection,
+    getFocusPath, getInitialSelection,
     getSelectionDown,
     getSelectionLeft,
     getSelectionNextInside,
@@ -239,30 +238,27 @@
   let text: string | undefined
   let parseError: ParseError | undefined = undefined
 
+  let documentStateInitialized = false
+  let documentState = createDocumentState()
+  let documentState2: DocumentState2 = createDocumentState2({ json })
+  let selection: JSONSelection | null
+
   function updateSelection(
-    selection:
+    updatedSelection:
       | JSONSelection
       | null
       | ((selection: JSONSelection | null) => JSONSelection | null | undefined | void)
   ) {
-    debug('updateSelection', selection)
+    debug('updateSelection', updatedSelection)
 
-    const updatedSelection =
-      typeof selection === 'function' ? selection(documentState.selection) || null : selection
+    const appliedSelection = typeof updatedSelection === 'function' ? updatedSelection(selection) || null : updatedSelection
 
-    if (!isEqual(updatedSelection, documentState.selection)) {
-      documentState = {
-        ...documentState,
-        selection: updatedSelection
-      }
+    if (!isEqual(appliedSelection, selection)) {
+      selection = appliedSelection
 
-      onSelect(updatedSelection)
+      onSelect(appliedSelection)
     }
   }
-
-  let documentStateInitialized = false
-  let documentState = createDocumentState()
-  let documentState2: DocumentState2 = createDocumentState2({ json })
 
   let normalization: ValueNormalization
   $: normalization = createNormalizationFunctions({
@@ -270,7 +266,7 @@
     escapeUnicodeCharacters
   })
 
-  $: debug('selection', documentState.selection)
+  $: debug('selection', selection)
 
   let pastedJson: PastedJson
 
@@ -304,10 +300,8 @@
   }
 
   async function handleFocusSearch(path: JSONPath) {
-    documentState = {
-      ...expandPath(json, documentState, path),
-      selection: null // navigation path of current selection would be confusing
-    }
+    documentState2 = expandPath2(json, documentState2, path)
+    null // navigation path of current selection would be confusing
     await scrollTo(path)
   }
 
@@ -408,6 +402,10 @@
 
   function getDocumentState(): DocumentState {
     return documentState
+  }
+
+  function getSelection(): JSONSelection | null {
+    return selection
   }
 
   function applyExternalContent(updatedContent: Content) {
@@ -511,45 +509,38 @@
   }
 
   function applyExternalSelection(externalSelection: JSONEditorSelection | null) {
-    if (!isEqual(documentState.selection, externalSelection)) {
-      debug('applyExternalSelection', externalSelection)
+    if (isEqual(selection, externalSelection)) {
+      return
+    }
 
-      if (isJSONSelection(externalSelection) || externalSelection === null) {
-        updateSelection(externalSelection)
-      }
+    debug('applyExternalSelection', externalSelection)
+
+    if (isJSONSelection(externalSelection) || externalSelection === null) {
+      updateSelection(externalSelection)
     }
   }
 
   function expandWhenNotInitialized(json: unknown) {
     if (!documentStateInitialized) {
       documentStateInitialized = true
-      documentState = expandWithCallback(json, documentState, [], getDefaultExpand(json))
-      try {
-        documentState2 = createDocumentState2({ json, expand: getDefaultExpand(json) })
-        debug('documentState2', { documentState2 })
-      } catch (err) {
-        console.error(err)
-      }
+      documentState2 = createDocumentState2({ json, expand: getDefaultExpand(json) })
     }
   }
 
   function clearSelectionWhenNotExisting(json: unknown) {
-    if (!documentState.selection) {
+    if (!selection) {
       return
     }
 
     if (
-      existsIn(json, getAnchorPath(documentState.selection)) &&
-      existsIn(json, getFocusPath(documentState.selection))
+      existsIn(json, getAnchorPath(selection)) &&
+      existsIn(json, getFocusPath(selection))
     ) {
       return
     }
 
-    debug('clearing selection: path does not exist anymore', documentState.selection)
-    documentState = {
-      ...documentState,
-      selection: getInitialSelection(json, documentState)
-    }
+    debug('clearing selection: path does not exist anymore', selection)
+    selection = getInitialSelection(json, documentState2)
   }
 
   function addHistoryItem({
@@ -574,14 +565,20 @@
         history.add({
           undo: {
             patch: [{ op: 'replace', path: '', value: previousJson }],
-            state: removeEditModeFromSelection(previousState),
+            state: {
+              ...previousState,
+              selection: removeEditModeFromSelection(selection)
+            },
             json: undefined,
             text: previousText,
             textIsRepaired: previousTextIsRepaired
           },
           redo: {
             patch: [{ op: 'replace', path: '', value: json }],
-            state: removeEditModeFromSelection(documentState),
+            state: {
+              ...documentState,
+              selection: removeEditModeFromSelection(selection)
+            },
             json: undefined,
             text,
             textIsRepaired
@@ -593,13 +590,19 @@
             patch: undefined,
             json: undefined,
             text: previousText,
-            state: removeEditModeFromSelection(previousState),
+            state: {
+              ...previousState,
+              selection: removeEditModeFromSelection(selection)
+            },
             textIsRepaired: previousTextIsRepaired
           },
           redo: {
             patch: undefined,
             json,
-            state: removeEditModeFromSelection(documentState),
+            state: {
+              ...documentState,
+              selection: removeEditModeFromSelection(selection)
+            },
             text,
             textIsRepaired
           }
@@ -611,7 +614,10 @@
           undo: {
             patch: undefined,
             json: previousJson,
-            state: removeEditModeFromSelection(previousState),
+            state: {
+              ...previousState,
+              selection: removeEditModeFromSelection(selection)
+            },
             text: previousText,
             textIsRepaired: previousTextIsRepaired
           },
@@ -620,7 +626,10 @@
             json: undefined,
             text,
             textIsRepaired,
-            state: removeEditModeFromSelection(documentState)
+            state: {
+              ...documentState,
+              selection: removeEditModeFromSelection(selection)
+            }
           }
         })
       } else {
@@ -632,10 +641,7 @@
   function createDefaultSelection() {
     debug('createDefaultSelection')
 
-    documentState = {
-      ...documentState,
-      selection: createValueSelection([], false)
-    }
+    selection = createValueSelection([], false)
   }
 
   export function patch(
@@ -695,13 +701,19 @@
         patch: undo,
         json: undefined,
         text: previousText,
-        state: removeEditModeFromSelection(previousState),
+        state: {
+          ...previousState,
+          selection: removeEditModeFromSelection(selection)
+        },
         textIsRepaired: previousTextIsRepaired
       },
       redo: {
         patch: operations,
         json: undefined,
-        state: removeEditModeFromSelection(newState),
+        state: {
+          ...newState,
+          selection: removeEditModeFromSelection(selection)
+        },
         text,
         textIsRepaired
       }
@@ -723,19 +735,19 @@
   // $: debug('selection', selection)
 
   function handleEditKey() {
-    if (readOnly || !documentState.selection) {
+    if (readOnly || !selection) {
       return
     }
 
-    updateSelection(createKeySelection(getFocusPath(documentState.selection), true))
+    updateSelection(createKeySelection(getFocusPath(selection), true))
   }
 
   function handleEditValue() {
-    if (readOnly || !documentState.selection) {
+    if (readOnly || !selection) {
       return
     }
 
-    const path = getFocusPath(documentState.selection)
+    const path = getFocusPath(selection)
     const value = getIn(json, path)
     if (isObjectOrArray(value)) {
       openJSONEditorModal(path, value)
@@ -745,11 +757,11 @@
   }
 
   function handleToggleEnforceString() {
-    if (readOnly || !isValueSelection(documentState.selection)) {
+    if (readOnly || !isValueSelection(selection)) {
       return
     }
 
-    const path = getFocusPath(documentState.selection)
+    const path = getFocusPath(selection)
     const statePath = toRecursiveStatePath(json, path)
     const pointer = compileJSONPointer(path)
     const value = getIn(json, path)
@@ -788,7 +800,7 @@
   async function handleCut(indent = true) {
     await onCut({
       json,
-      documentState,
+      selection,
       indentation: indent ? indentation : undefined,
       readOnly,
       parser,
@@ -803,7 +815,7 @@
 
     await onCopy({
       json,
-      documentState,
+      selection,
       indentation: indent ? indentation : undefined,
       parser
     })
@@ -820,7 +832,7 @@
     onPaste({
       clipboardText,
       json,
-      selection: documentState.selection,
+      selection,
       readOnly,
       parser,
       onPatch: handlePatch,
@@ -875,7 +887,7 @@
     onRemove({
       json,
       text,
-      documentState,
+      selection,
       keepSelection: false,
       readOnly,
       onChange,
@@ -887,16 +899,16 @@
     if (
       readOnly ||
       json === undefined ||
-      !documentState.selection ||
+      !selection ||
       !hasSelectionContents ||
-      isEmpty(getFocusPath(documentState.selection)) // root selected, cannot duplicate
+      isEmpty(getFocusPath(selection)) // root selected, cannot duplicate
     ) {
       return
     }
 
-    debug('duplicate', { selection: documentState.selection })
+    debug('duplicate', { selection })
 
-    const operations = duplicate(json, getSelectionPaths(json, documentState.selection))
+    const operations = duplicate(json, getSelectionPaths(json, selection))
 
     handlePatch(operations)
   }
@@ -904,16 +916,16 @@
   function handleExtract() {
     if (
       readOnly ||
-      !documentState.selection ||
-      (!isMultiSelection(documentState.selection) && !isValueSelection(documentState.selection)) ||
-      isEmpty(getFocusPath(documentState.selection)) // root selected, cannot extract
+      !selection ||
+      (!isMultiSelection(selection) && !isValueSelection(selection)) ||
+      isEmpty(getFocusPath(selection)) // root selected, cannot extract
     ) {
       return
     }
 
-    debug('extract', { selection: documentState.selection })
+    debug('extract', { selection })
 
-    const operations = extract(json, documentState.selection)
+    const operations = extract(json, selection)
 
     handlePatch(operations, (patchedJson, patchedState) => {
       if (isObjectOrArray(patchedJson)) {
@@ -932,7 +944,7 @@
       selectInside: true,
       refJsonEditor,
       json,
-      selection: documentState.selection,
+      selection,
       readOnly,
       parser,
       onPatch: handlePatch,
@@ -941,30 +953,30 @@
   }
 
   function handleInsertFromContextMenu(type: InsertType) {
-    if (isKeySelection(documentState.selection)) {
+    if (isKeySelection(selection)) {
       // in this case, we do not want to rename the key, but replace the property
-      updateSelection(createValueSelection(documentState.selection.path, false))
+      updateSelection(createValueSelection(selection.path, false))
     }
 
-    if (!documentState.selection) {
-      updateSelection(getInitialSelection(json, documentState))
+    if (!selection) {
+      updateSelection(getInitialSelection(json, documentState2))
     }
 
     handleInsert(type)
   }
 
   function handleConvert(type: ConvertType) {
-    if (readOnly || !documentState.selection) {
+    if (readOnly || !selection) {
       return
     }
 
-    if (!canConvert(documentState.selection)) {
+    if (!canConvert(selection)) {
       onError(new Error(`Cannot convert current selection to ${type}`))
       return
     }
 
     try {
-      const path = getAnchorPath(documentState.selection)
+      const path = getAnchorPath(selection)
       const currentValue: unknown = getIn(json, path)
       const convertedValue = convertValue(
         currentValue,
@@ -980,13 +992,13 @@
         { op: 'replace', path: compileJSONPointer(path), value: convertedValue }
       ]
 
-      debug('handleConvert', { selection: documentState.selection, path, type, operations })
+      debug('handleConvert', { selection, path, type, operations })
 
       handlePatch(operations, (patchedJson, patchedState) => {
         // expand converted object/array
         return {
-          state: documentState.selection
-            ? expandRecursive(patchedJson, patchedState, getFocusPath(documentState.selection))
+          state: selection
+            ? expandRecursive(patchedJson, patchedState, getFocusPath(selection))
             : documentState
         }
       })
@@ -996,12 +1008,12 @@
   }
 
   function handleInsertBefore() {
-    if (!documentState.selection) {
+    if (!selection) {
       return
     }
 
-    const selectionBefore = getSelectionUp(json, documentState, false)
-    const parentPath = initial(getFocusPath(documentState.selection))
+    const selectionBefore = getSelectionUp(json, documentState2, selection, false)
+    const parentPath = initial(getFocusPath(selection))
 
     if (
       selectionBefore &&
@@ -1013,17 +1025,17 @@
       updateSelection(createInsideSelection(parentPath))
     }
 
-    debug('insert before', { selection: documentState.selection, selectionBefore, parentPath })
+    debug('insert before', { selection, selectionBefore, parentPath })
 
     tick().then(() => handleContextMenu())
   }
 
   function handleInsertAfter() {
-    if (!documentState.selection) {
+    if (!selection) {
       return
     }
 
-    const path = getEndPath(json, documentState.selection)
+    const path = getEndPath(json, selection)
 
     debug('insert after', path)
 
@@ -1038,7 +1050,7 @@
       selectInside: true,
       refJsonEditor,
       json,
-      selection: documentState.selection,
+      selection,
       readOnly,
       parser,
       onPatch: handlePatch,
@@ -1084,8 +1096,8 @@
     emitOnChange(previousContent, patchResult)
 
     focus()
-    if (documentState.selection) {
-      scrollTo(getFocusPath(documentState.selection), false)
+    if (selection) {
+      scrollTo(getFocusPath(selection), false)
     }
   }
 
@@ -1126,8 +1138,8 @@
     emitOnChange(previousContent, patchResult)
 
     focus()
-    if (documentState.selection) {
-      scrollTo(getFocusPath(documentState.selection), false)
+    if (selection) {
+      scrollTo(getFocusPath(selection), false)
     }
   }
 
@@ -1161,11 +1173,11 @@
   }
 
   function handleSortSelection() {
-    if (!documentState.selection) {
+    if (!selection) {
       return
     }
 
-    const rootPath = findRootPath(json, documentState.selection)
+    const rootPath = findRootPath(json, selection)
     openSortModal(rootPath)
   }
 
@@ -1221,11 +1233,11 @@
   }
 
   function handleTransformSelection() {
-    if (!documentState.selection) {
+    if (!selection) {
       return
     }
 
-    const rootPath = findRootPath(json, documentState.selection)
+    const rootPath = findRootPath(json, selection)
     openTransformModal({
       rootPath
     })
@@ -1261,7 +1273,7 @@
    * Expand the path when needed.
    */
   export async function scrollTo(path: JSONPath, scrollToWhenVisible = true): Promise<void> {
-    documentState = expandPath(json, documentState, path)
+    documentState2 = expandPath2(json, documentState2, path)
     await tick() // await rerender (else the element we want to scroll to does not yet exist)
 
     const elem = findElement(path)
@@ -1430,21 +1442,21 @@
 
     try {
       json = parseMemoizeOne(updatedText)
-      documentState = expandWithCallback(json, documentState, [], expandMinimal)
+      documentState2 = expandWithCallback2(json, documentState2, [], expandMinimal)
       text = undefined
       textIsRepaired = false
       parseError = undefined
     } catch (err) {
       try {
         json = parseMemoizeOne(jsonrepair(updatedText))
-        documentState = expandWithCallback(json, documentState, [], expandMinimal)
+        documentState2 = expandWithCallback2(json, documentState2, [], expandMinimal)
         text = updatedText
         textIsRepaired = true
         parseError = undefined
       } catch (repairError) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
-        documentState = createDocumentState({ json, expand: expandMinimal })
+        documentState2 = createDocumentState2({ json, expand: expandMinimal })
         text = updatedText
         textIsRepaired = false
         parseError =
@@ -1459,6 +1471,7 @@
 
       json = callback?.json !== undefined ? callback.json : json
       documentState = callback?.state !== undefined ? callback.state : documentState
+      documentState2 = callback?.state2 !== undefined ? callback.state2 : documentState2
     }
 
     // ensure the selection is valid
@@ -1495,9 +1508,9 @@
     } else {
       documentState2 = collapsePath2(json, documentState2, path)
 
-      if (documentState.selection) {
+      if (selection) {
         // check whether the selection is still visible and not collapsed
-        if (isSelectionInsidePath(documentState.selection, path)) {
+        if (isSelectionInsidePath(selection, path)) {
           // remove selection when not visible anymore
           updateSelection(null)
         }
@@ -1592,9 +1605,9 @@
     if (combo === 'ArrowUp' || combo === 'Shift+ArrowUp') {
       event.preventDefault()
 
-      const newSelection = documentState.selection
-        ? getSelectionUp(json, documentState, keepAnchorPath) || documentState.selection
-        : getInitialSelection(json, documentState)
+      const newSelection = selection
+        ? getSelectionUp(json, documentState2, selection, keepAnchorPath) || selection
+        : getInitialSelection(json, documentState2)
 
       updateSelection(newSelection)
       scrollIntoView(getFocusPath(newSelection))
@@ -1602,9 +1615,9 @@
     if (combo === 'ArrowDown' || combo === 'Shift+ArrowDown') {
       event.preventDefault()
 
-      const newSelection = documentState.selection
-        ? getSelectionDown(json, documentState, keepAnchorPath) || documentState.selection
-        : getInitialSelection(json, documentState)
+      const newSelection = selection
+        ? getSelectionDown(json, documentState2, selection, keepAnchorPath) || selection
+        : getInitialSelection(json, documentState2)
 
       updateSelection(newSelection)
       scrollIntoView(getFocusPath(newSelection))
@@ -1612,10 +1625,10 @@
     if (combo === 'ArrowLeft' || combo === 'Shift+ArrowLeft') {
       event.preventDefault()
 
-      const newSelection = documentState.selection
-        ? getSelectionLeft(json, documentState, keepAnchorPath, !readOnly) ||
-          documentState.selection
-        : getInitialSelection(json, documentState)
+      const newSelection = selection
+        ? getSelectionLeft(json, documentState, selection, keepAnchorPath, !readOnly) ||
+          selection
+        : getInitialSelection(json, documentState2)
 
       updateSelection(newSelection)
       scrollIntoView(getFocusPath(newSelection))
@@ -1624,19 +1637,19 @@
       event.preventDefault()
 
       const newSelection =
-        documentState.selection && json !== undefined
-          ? getSelectionRight(json, documentState, keepAnchorPath, !readOnly) ||
-            documentState.selection
-          : getInitialSelection(json, documentState)
+        selection && json !== undefined
+          ? getSelectionRight(json, documentState, selection, keepAnchorPath, !readOnly) ||
+            selection
+          : getInitialSelection(json, documentState2)
 
       updateSelection(newSelection)
       scrollIntoView(getFocusPath(newSelection))
     }
 
-    if (combo === 'Enter' && documentState.selection) {
+    if (combo === 'Enter' && selection) {
       // when the selection consists of a single Array item, change selection to editing its value
-      if (isMultiSelectionWithOneItem(documentState.selection)) {
-        const path = documentState.selection.focusPath
+      if (isMultiSelectionWithOneItem(selection)) {
+        const path = selection.focusPath
         const parent = getIn(json, initial(path))
         if (Array.isArray(parent)) {
           // change into selection of the value
@@ -1644,28 +1657,28 @@
         }
       }
 
-      if (isKeySelection(documentState.selection)) {
+      if (isKeySelection(selection)) {
         // go to key edit mode
         event.preventDefault()
-        updateSelection({ ...documentState.selection, edit: true })
+        updateSelection({ ...selection, edit: true })
       }
 
-      if (isValueSelection(documentState.selection)) {
+      if (isValueSelection(selection)) {
         event.preventDefault()
 
-        const value = getIn(json, documentState.selection.path)
+        const value = getIn(json, selection.path)
         if (isObjectOrArray(value)) {
           // expand object/array
-          handleExpand(documentState.selection.path, true)
+          handleExpand(selection.path, true)
         } else {
           // go to value edit mode
-          updateSelection({ ...documentState.selection, edit: true })
+          updateSelection({ ...selection, edit: true })
         }
       }
     }
 
     const normalizedCombo = combo.replace(/^Shift\+/, '') // replace 'Shift+A' with 'A'
-    if (normalizedCombo.length === 1 && documentState.selection) {
+    if (normalizedCombo.length === 1 && selection) {
       // a regular key like a, A, _, etc is entered.
       // Replace selected contents with a new value having this first character as text
       event.preventDefault()
@@ -1675,7 +1688,7 @@
 
     if (
       combo === 'Enter' &&
-      (isAfterSelection(documentState.selection) || isInsideSelection(documentState.selection))
+      (isAfterSelection(selection) || isInsideSelection(selection))
     ) {
       // Enter on an insert area -> open the area in edit mode
       event.preventDefault()
@@ -1683,8 +1696,8 @@
       return
     }
 
-    if (combo === 'Ctrl+Enter' && isValueSelection(documentState.selection)) {
-      const value = getIn(json, documentState.selection.path)
+    if (combo === 'Ctrl+Enter' && isValueSelection(selection)) {
+      const value = getIn(json, selection.path)
 
       if (isUrl(value)) {
         // open url in new page
@@ -1692,7 +1705,7 @@
       }
     }
 
-    if (combo === 'Escape' && documentState.selection) {
+    if (combo === 'Escape' && selection) {
       event.preventDefault()
       updateSelection(null)
     }
@@ -1727,7 +1740,7 @@
       // for example when clicking on the empty area in the main menu
       focus()
 
-      if (!documentState.selection && json === undefined && (text === '' || text === undefined)) {
+      if (!selection && json === undefined && (text === '' || text === undefined)) {
         createDefaultSelection()
       }
     }
@@ -1745,9 +1758,9 @@
   }: AbsolutePopupOptions) {
     const defaultItems: ContextMenuItem[] = createTreeContextMenuItems({
       json,
-      documentState,
+      documentState2,
+      selection,
       readOnly,
-      parser,
 
       onEditKey: handleEditKey,
       onEditValue: handleEditValue,
@@ -1805,7 +1818,7 @@
   }
 
   function handleContextMenu(event?: Event) {
-    if (isEditingSelection(documentState.selection)) {
+    if (isEditingSelection(selection)) {
       return
     }
 
@@ -1931,7 +1944,7 @@
       (element) => element === refJsonEditor
     )
     if (outsideEditor) {
-      if (isEditingSelection(documentState.selection)) {
+      if (isEditingSelection(selection)) {
         debug('click outside the editor, stop edit mode')
         updateSelection((selection) => {
           if (isKeySelection(selection)) {
@@ -1957,7 +1970,7 @@
   }
 
   function findNextInside(path: JSONPath): JSONSelection | null {
-    return getSelectionNextInside(json, documentState, path)
+    return getSelectionNextInside(json, documentState2, selection, path)
   }
 
   $: autoScrollHandler = refContents ? createAutoScrollHandler(refContents) : undefined
@@ -1983,6 +1996,7 @@
     normalization,
     getJson,
     getDocumentState,
+    getSelection,
     findElement,
     findNextInside,
     focus,
@@ -2018,7 +2032,7 @@
   {#if mainMenuBar}
     <TreeMenu
       {json}
-      selection={documentState.selection}
+      {selection}
       {readOnly}
       {historyState}
       bind:showSearch
@@ -2037,7 +2051,7 @@
   {#if navigationBar}
     <NavigationBar
       {json}
-      selection={documentState.selection}
+      {selection}
       onSelect={handleNavigationBarSelect}
       {onError}
       {pathParser}
@@ -2113,7 +2127,7 @@
           state={documentState2}
           {validationErrorsMap}
           searchResultItemsMap={searchResult?.itemsMap}
-          selection={documentState.selection}
+          {selection}
           {context}
           onDragSelectionStart={noop}
         />

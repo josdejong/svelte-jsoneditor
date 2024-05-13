@@ -506,7 +506,8 @@ export interface JSONEditorContext {
 
 export interface TreeModeContext extends JSONEditorContext {
   getJson: () => unknown | undefined
-  getDocumentState: () => DocumentState
+  getDocumentState: () => DocumentState // FIXME: remove getDocumentState
+  getSelection: () => JSONSelection | null
   findElement: (path: JSONPath) => Element | null
   onInsert: (type: InsertType) => void
   onExpand: (path: JSONPath, expanded: boolean, recursive?: boolean) => void

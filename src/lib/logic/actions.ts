@@ -55,7 +55,7 @@ const debug = createDebug('jsoneditor:actions')
 
 export interface OnCutAction {
   json: unknown | undefined
-  documentState: DocumentState
+  selection: JSONSelection | null
   indentation: string | number | undefined
   readOnly: boolean
   parser: JSONParser
@@ -65,31 +65,26 @@ export interface OnCutAction {
 // TODO: write unit tests
 export async function onCut({
   json,
-  documentState,
+  selection,
   indentation,
   readOnly,
   parser,
   onPatch
 }: OnCutAction) {
-  if (
-    readOnly ||
-    json === undefined ||
-    !documentState.selection ||
-    !hasSelectionContents(documentState.selection)
-  ) {
+  if (readOnly || json === undefined || !selection || !hasSelectionContents(selection)) {
     return
   }
 
-  const clipboard = selectionToPartialJson(json, documentState.selection, indentation, parser)
+  const clipboard = selectionToPartialJson(json, selection, indentation, parser)
   if (clipboard == null) {
     return
   }
 
-  debug('cut', { selection: documentState.selection, clipboard, indentation })
+  debug('cut', { selection, clipboard, indentation })
 
   await copyToClipboard(clipboard)
 
-  const { operations, newSelection } = createRemoveOperations(json, documentState.selection)
+  const { operations, newSelection } = createRemoveOperations(json, selection)
 
   onPatch(operations, (patchedJson, patchedState) => ({
     state: {
@@ -101,14 +96,14 @@ export async function onCut({
 
 export interface OnCopyAction {
   json: unknown
-  documentState: DocumentState
+  selection: JSONSelection | null
   indentation: string | number | undefined
   parser: JSONParser
 }
 
 // TODO: write unit tests
-export async function onCopy({ json, documentState, indentation, parser }: OnCopyAction) {
-  const clipboard = selectionToPartialJson(json, documentState.selection, indentation, parser)
+export async function onCopy({ json, selection, indentation, parser }: OnCopyAction) {
+  const clipboard = selectionToPartialJson(json, selection, indentation, parser)
   if (clipboard == null) {
     return
   }
@@ -201,7 +196,7 @@ export function onPaste({
 export interface OnRemoveAction {
   json: unknown | undefined
   text: string | undefined
-  documentState: DocumentState
+  selection: JSONSelection | null
   keepSelection: boolean
   readOnly: boolean
   onChange: OnChange
@@ -212,27 +207,26 @@ export interface OnRemoveAction {
 export function onRemove({
   json,
   text,
-  documentState,
+  selection,
   keepSelection,
   readOnly,
   onChange,
   onPatch
 }: OnRemoveAction) {
-  if (readOnly || !documentState.selection) {
+  if (readOnly || !selection) {
     return
   }
 
   // in case of a selected key or value, we change the selection to the whole
   // entry to remove this, we do not want to clear a key or value only.
   const removeSelection =
-    json !== undefined &&
-    (isKeySelection(documentState.selection) || isValueSelection(documentState.selection))
-      ? createMultiSelection(documentState.selection.path, documentState.selection.path)
-      : documentState.selection
+    json !== undefined && (isKeySelection(selection) || isValueSelection(selection))
+      ? createMultiSelection(selection.path, selection.path)
+      : selection
 
-  if (isEmpty(getFocusPath(documentState.selection))) {
+  if (isEmpty(getFocusPath(selection))) {
     // root selected -> clear complete document
-    debug('remove root', { selection: documentState.selection })
+    debug('remove root', { selection })
 
     if (onChange) {
       onChange(
@@ -249,12 +243,12 @@ export function onRemove({
     if (json !== undefined) {
       const { operations, newSelection } = createRemoveOperations(json, removeSelection)
 
-      debug('remove', { operations, selection: documentState.selection, newSelection })
+      debug('remove', { operations, selection, newSelection })
 
       onPatch(operations, (patchedJson, patchedState) => ({
         state: {
           ...patchedState,
-          selection: keepSelection ? documentState.selection : newSelection
+          selection: keepSelection ? selection : newSelection
         }
       }))
     }

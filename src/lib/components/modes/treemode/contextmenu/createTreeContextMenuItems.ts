@@ -23,18 +23,18 @@ import {
   isValueSelection,
   singleItemSelected
 } from '$lib/logic/selection'
-import type { ConvertType, DocumentState, InsertType, JSONParser } from '$lib/types'
+import type { ConvertType, DocumentState2, InsertType, JSONSelection } from '$lib/types'
 import { initial, isEmpty } from 'lodash-es'
-import { compileJSONPointer, getIn } from 'immutable-json-patch'
-import { isObjectOrArray, isObject } from '$lib/utils/typeUtils'
-import { getEnforceString } from '$lib/logic/documentState'
-import type { ContextMenuItem } from 'svelte-jsoneditor'
+import { getIn } from 'immutable-json-patch'
+import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
+import { toRecursiveStatePath } from '$lib/logic/documentState'
+import { type ContextMenuItem, isValueDocumentState2 } from 'svelte-jsoneditor'
 
 export default function ({
   json,
-  documentState,
+  documentState2,
+  selection,
   readOnly,
-  parser,
   onEditKey,
   onEditValue,
   onToggleEnforceString,
@@ -52,9 +52,9 @@ export default function ({
   onTransform
 }: {
   json: unknown
-  documentState: DocumentState
+  documentState2: DocumentState2
+  selection: JSONSelection | null
   readOnly: boolean
-  parser: JSONParser
   onEditKey: () => void
   onEditValue: () => void
   onToggleEnforceString: () => void
@@ -71,8 +71,6 @@ export default function ({
   onSort: () => void
   onTransform: () => void
 }): ContextMenuItem[] {
-  const selection = documentState.selection
-
   const hasJson = json !== undefined
   const hasSelection = !!selection
   const rootSelected = selection ? isEmpty(getFocusPath(selection)) : false
@@ -120,15 +118,15 @@ export default function ({
   const canInsertOrConvertValue =
     !readOnly && (convertMode ? canConvert(selection) && isObjectOrArray(focusValue) : hasSelection)
 
-  const enforceString =
-    selection != null && focusValue
-      ? getEnforceString(
-          focusValue,
-          documentState.enforceStringMap,
-          compileJSONPointer(getFocusPath(selection)),
-          parser
+  const state =
+    selection != null
+      ? getIn<DocumentState2 | undefined>(
+          documentState2,
+          toRecursiveStatePath(json, getFocusPath(selection))
         )
-      : false
+      : undefined
+
+  const enforceString = isValueDocumentState2(state) && focusValue ? state.enforceString : false
 
   function handleInsertOrConvert(type: InsertType) {
     if (hasSelectionContents) {

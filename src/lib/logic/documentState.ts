@@ -49,7 +49,7 @@ import type {
 import { CaretType } from '$lib/types.js'
 import { int } from '../utils/numberUtils.js'
 import { isLargeContent } from '$lib/utils/jsonUtils.js'
-import { isArrayDocumentState2 } from 'svelte-jsoneditor'
+import { isArrayDocumentState2, isObjectDocumentState2 } from '$lib/typeguards.js'
 
 type OnCreateSelection = (json: unknown, documentState: DocumentState) => JSONSelection
 
@@ -82,20 +82,17 @@ export function createDocumentState(props?: CreateDocumentStateProps): DocumentS
   return documentState
 }
 
-export function createDocumentState2({
-  json,
-  select,
-  expand
-}: CreateDocumentStateProps): DocumentState2 {
+export type CreateDocumentStateProps2 = {
+  json: unknown | undefined
+  expand?: OnExpand
+}
+
+export function createDocumentState2({ json, expand }: CreateDocumentStateProps2): DocumentState2 {
   let documentState: DocumentState2 = Array.isArray(json)
     ? { type: 'array', expanded: false, visibleSections: DEFAULT_VISIBLE_SECTIONS, items: [] }
     : isObject(json)
       ? { type: 'object', expanded: false, properties: {} }
       : { type: 'value' }
-
-  if (select && json !== undefined) {
-    // FIXME: handle initial selection
-  }
 
   if (expand) {
     documentState = expandWithCallback2(json, documentState, [], expand)
@@ -176,6 +173,74 @@ export function expandPath(
     expandedMap,
     visibleSectionsMap
   }
+}
+
+/**
+ * Expand all nodes on given path
+ * The end of the path itself is not expanded
+ */
+export function expandPath2(
+  json: unknown,
+  documentState: DocumentState2,
+  path: JSONPath
+): DocumentState2 {
+  // FIXME: refactor an simplify this function. Create some handy util functions? The updateIn is hard to reason about
+  let updatedState = documentState
+
+  for (let i = 0; i < path.length; i++) {
+    const partialPath = path.slice(0, i)
+    const recursivePartialPath = toRecursiveStatePath(json, partialPath)
+    const value = getIn(json, partialPath)
+
+    if (Array.isArray(value)) {
+      updatedState = updateIn(
+        updatedState,
+        recursivePartialPath,
+        (state: DocumentState2 | undefined) => {
+          const arrayState = isArrayDocumentState2(state)
+            ? { ...state, expanded: true }
+            : {
+                type: 'array',
+                expanded: true,
+                visibleSections: DEFAULT_VISIBLE_SECTIONS,
+                items: []
+              }
+
+          // if needed, enlarge the expanded sections such that the search result becomes visible in the array
+          if (i < path.length) {
+            const index = int(path[i])
+
+            if (!inVisibleSection(arrayState.visibleSections, index)) {
+              const start = currentRoundNumber(index)
+              const end = nextRoundNumber(start)
+              const newSection = { start, end }
+
+              return {
+                ...arrayState,
+                visibleSections: mergeSections(arrayState.visibleSections.concat(newSection))
+              }
+            }
+          }
+
+          return arrayState
+        }
+      )
+    }
+
+    if (isObject(value)) {
+      updatedState = updateIn(
+        updatedState,
+        recursivePartialPath,
+        (state: DocumentState2 | undefined) => {
+          return isObjectDocumentState2(state)
+            ? { ...state, expanded: true }
+            : { type: 'object', expanded: true, properties: {} }
+        }
+      )
+    }
+  }
+
+  return updatedState
 }
 
 /**
@@ -1128,30 +1193,26 @@ export function getNextKeys(keys: string[], key: string, includeKey = false): st
  * Get all paths which are visible and rendered
  */
 // TODO: create memoized version of getVisiblePaths which remembers just the previous result if json and state are the same
-export function getVisiblePaths(json: unknown, documentState: DocumentState): JSONPath[] {
+export function getVisiblePaths(json: unknown, documentState: DocumentState2): JSONPath[] {
   const paths: JSONPath[] = []
 
-  function _recurse(value: unknown, path: JSONPath) {
+  function _recurse(value: unknown, state: DocumentState2 | undefined, path: JSONPath) {
     paths.push(path)
-    const pointer = compileJSONPointer(path)
 
-    if (value && documentState.expandedMap[pointer]) {
-      if (isJSONArray(value)) {
-        const visibleSections = getVisibleSections(documentState, pointer)
-        forEachVisibleIndex(value, visibleSections, (index) => {
-          _recurse(value[index], path.concat(String(index)))
-        })
-      }
+    if (isJSONArray(value) && isArrayDocumentState2(state) && state.expanded) {
+      forEachVisibleIndex(value, state.visibleSections, (index) => {
+        _recurse(value[index], state.items[index], path.concat(String(index)))
+      })
+    }
 
-      if (isJSONObject(value)) {
-        Object.keys(value).forEach((key) => {
-          _recurse(value[key], path.concat(key))
-        })
-      }
+    if (isJSONObject(value) && isObjectDocumentState2(state) && state.expanded) {
+      Object.keys(value).forEach((key) => {
+        _recurse(value[key], state.properties[key], path.concat(key))
+      })
     }
   }
 
-  _recurse(json, [])
+  _recurse(json, documentState, [])
 
   return paths
 }
@@ -1219,7 +1280,7 @@ export function getVisibleCaretPositions(
 // TODO: write tests for getPreviousVisiblePath
 export function getPreviousVisiblePath(
   json: unknown,
-  documentState: DocumentState,
+  documentState: DocumentState2,
   path: JSONPath
 ): JSONPath | null {
   const visiblePaths = getVisiblePaths(json, documentState)
@@ -1241,7 +1302,7 @@ export function getPreviousVisiblePath(
 // TODO: write tests for getNextVisiblePath
 export function getNextVisiblePath(
   json: unknown,
-  documentState: DocumentState,
+  documentState: DocumentState2,
   path: JSONPath
 ): JSONPath | null {
   const visiblePaths = getVisiblePaths(json, documentState)

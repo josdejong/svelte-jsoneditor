@@ -282,7 +282,7 @@
 
     if (event.shiftKey) {
       // Shift+Click will select multiple entries
-      const fullSelection = context.getDocumentState().selection
+      const fullSelection = context.getSelection()
       if (fullSelection) {
         context.onSelect(createMultiSelection(getAnchorPath(fullSelection), path))
       }
@@ -401,10 +401,9 @@
     }
     const initialPath = getStartPath(json, selection)
     const selectionStartIndex = items.findIndex((item) => isEqual(item.path, initialPath))
-    const documentState = context.getDocumentState()
     const { offset } = onMoveSelection({
       json,
-      documentState,
+      selection: context.getSelection(),
       deltaY: 0,
       items
     })
@@ -431,12 +430,11 @@
       if (json === undefined) {
         return
       }
-      const documentState = context.getDocumentState()
 
       const deltaY = calculateDeltaY(dragging, event)
       const { offset } = onMoveSelection({
         json,
-        documentState,
+        selection: context.getSelection(),
         deltaY,
         items: dragging.items
       })
@@ -459,11 +457,10 @@
       if (json === undefined) {
         return
       }
-      const documentState = context.getDocumentState()
       const deltaY = calculateDeltaY(dragging, event)
       const { operations, updatedSelection } = onMoveSelection({
         json,
-        documentState,
+        selection: context.getSelection(),
         deltaY,
         items: dragging.items
       })

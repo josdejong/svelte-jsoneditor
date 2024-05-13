@@ -12,7 +12,7 @@ import {
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import { isObjectOrArray } from '$lib/utils/typeUtils.js'
 import {
-  collapsePath,
+  collapsePath2,
   getNextVisiblePath,
   getPreviousVisiblePath,
   getVisibleCaretPositions,
@@ -22,6 +22,7 @@ import type {
   AfterSelection,
   CaretPosition,
   DocumentState,
+  DocumentState2,
   InsideSelection,
   JSONEditorSelection,
   JSONParser,
@@ -215,10 +216,10 @@ export function isSelectionInsidePath(selection: JSONSelection, path: JSONPath):
 
 export function getSelectionUp(
   json: unknown,
-  documentState: DocumentState,
+  documentState: DocumentState2,
+  selection: JSONSelection | null,
   keepAnchorPath = false
 ): JSONSelection | null {
-  const selection = documentState.selection
   if (!selection) {
     return null
   }
@@ -276,10 +277,10 @@ export function getSelectionUp(
 
 export function getSelectionDown(
   json: unknown,
-  documentState: DocumentState,
+  documentState: DocumentState2,
+  selection: JSONSelection | null,
   keepAnchorPath = false
 ): JSONSelection | null {
-  const selection = documentState.selection
   if (!selection) {
     return null
   }
@@ -288,7 +289,7 @@ export function getSelectionDown(
   // if the focusPath is an Array or object, we must not step into it but
   // over it, we pass state with this array/object collapsed
   const collapsedState = isObjectOrArray(getIn(json, focusPath))
-    ? collapsePath(documentState, focusPath)
+    ? collapsePath2(json, documentState, focusPath)
     : documentState
 
   const nextPath = getNextVisiblePath(json, documentState, focusPath)
@@ -354,7 +355,8 @@ export function getSelectionDown(
  */
 export function getSelectionNextInside(
   json: unknown,
-  documentState: DocumentState,
+  documentState: DocumentState2,
+  selection: JSONSelection | null,
   path: JSONPath
 ): JSONSelection | null {
   // TODO: write unit tests for getSelectionNextInside
@@ -406,11 +408,11 @@ export function findCaretAndSiblings(
 
 export function getSelectionLeft(
   json: unknown,
-  documentState: DocumentState,
+  documentState: DocumentState, // FIXME: must become DocumentState2
+  selection: JSONSelection | null,
   keepAnchorPath = false,
   includeInside = true
 ): JSONSelection | null {
-  const selection = documentState.selection
   if (!selection) {
     return null
   }
@@ -445,11 +447,11 @@ export function getSelectionLeft(
 
 export function getSelectionRight(
   json: unknown,
-  documentState: DocumentState,
+  documentState: DocumentState, // FIXME: must become documentState2
+  selection: JSONSelection | null,
   keepAnchorPath = false,
   includeInside = true
 ): JSONSelection | null {
-  const selection = documentState.selection
   if (!selection) {
     return null
   }
@@ -478,7 +480,7 @@ export function getSelectionRight(
 /**
  * Get a proper initial selection based on what is visible
  */
-export function getInitialSelection(json: unknown, documentState: DocumentState): JSONSelection {
+export function getInitialSelection(json: unknown, documentState: DocumentState2): JSONSelection {
   const visiblePaths = getVisiblePaths(json, documentState)
 
   // find the first, deepest nested entry (normally a value, not an Object/Array)
@@ -594,20 +596,12 @@ export function pathStartsWith(path: JSONPath, parentPath: JSONPath): boolean {
 }
 
 // TODO: write unit tests
-export function removeEditModeFromSelection(documentState: DocumentState): DocumentState {
-  const selection = documentState.selection
-
+export function removeEditModeFromSelection(selection: JSONSelection | null): JSONSelection | null {
   if ((isKeySelection(selection) || isValueSelection(selection)) && selection.edit) {
-    return {
-      ...documentState,
-      selection: {
-        ...selection,
-        edit: false
-      }
-    }
+    return { ...selection, edit: false }
   }
 
-  return documentState
+  return selection
 }
 
 export function createKeySelection(path: JSONPath, edit: boolean): KeySelection {
