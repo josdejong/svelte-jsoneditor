@@ -371,14 +371,24 @@ export function expandSingleItem2(
   documentState: DocumentState2,
   path: JSONPath
 ): DocumentState2 {
+  const value = getIn(json, path)
+
   return updateIn(
     documentState,
     toRecursiveStatePath(json, path),
     (state: DocumentState2 | undefined) => {
       console.log('update in', state, path)
-      return state?.type === 'object' || state?.type === 'array'
-        ? { ...state, expanded: true }
-        : state
+      if (isObject(value)) {
+        return state?.type === 'object'
+          ? { ...state, expanded: true }
+          : { type: 'object', expanded: true, properties: {} }
+      } else if (Array.isArray(value)) {
+        return state?.type === 'array'
+          ? { ...state, expanded: true }
+          : { type: 'array', expanded: true, items: [], visibleSections: [] }
+      } else {
+        return state?.type === 'value' ? state : { type: 'value' }
+      }
     }
   )
 }
@@ -409,18 +419,11 @@ export function collapsePath2(
     toRecursiveStatePath(json, path),
     (state: DocumentState2 | undefined) => {
       if (state?.type === 'object') {
-        return {
-          ...state,
-          expanded: false,
-          properties: {} // clear the state of nested objects
-        }
+        // clear the state of nested objects/arrays
+        return { type: 'object', expanded: false, properties: {} }
       } else if (state?.type === 'array') {
-        return {
-          ...state,
-          expanded: false,
-          visibleSections: null,
-          items: []
-        }
+        // clear the state of nested objects/arrays
+        return { type: 'array', expanded: false, visibleSections: null, items: [] }
       } else {
         return state
       }
@@ -1264,4 +1267,7 @@ export function expandAll(): boolean {
 // TODO: write unit test
 export function getDefaultExpand(json: unknown): OnExpand {
   return isLargeContent({ json }, MAX_DOCUMENT_SIZE_EXPAND_ALL) ? expandMinimal : expandAll
+}
+function isArrayOrObject(json: unknown): any {
+  throw new Error('Function not implemented.')
 }

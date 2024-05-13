@@ -18,16 +18,19 @@
     SIMPLE_MODAL_OPTIONS
   } from '$lib/constants.js'
   import {
-    collapsePath,
+    collapsePath2,
     createDocumentState,
+    createDocumentState2,
     documentStatePatch,
+    documentStatePatch2,
     expandAll,
     expandMinimal,
     expandPath,
     expandRecursive,
     expandSection,
-    expandSingleItem,
+    expandSingleItem2,
     expandWithCallback,
+    expandWithCallback2,
     getDefaultExpand,
     getEnforceString,
     setEnforceString
@@ -107,6 +110,7 @@
     ContextMenuItem,
     ConvertType,
     DocumentState,
+    DocumentState2,
     HistoryItem,
     InsertType,
     JSONEditorSelection,
@@ -251,6 +255,7 @@
 
   let documentStateInitialized = false
   let documentState = createDocumentState()
+  let documentState2: DocumentState2 = createDocumentState2({ json })
 
   let normalization: ValueNormalization
   $: normalization = createNormalizationFunctions({
@@ -322,14 +327,8 @@
   export function expand(callback: OnExpand = expandAll) {
     debug('expand')
 
-    // clear the expanded state and visible sections (else you can't collapse anything)
-    const cleanDocumentState = {
-      ...documentState,
-      expandedMap: {},
-      visibleSectionsMap: {}
-    }
-
-    documentState = expandWithCallback(json, cleanDocumentState, [], callback)
+    // FIXME: clear the expanded state and visible sections (else you can't collapse anything using the callback)
+    documentState2 = expandWithCallback2(json, documentState2, [], callback)
   }
 
   // two-way binding of externalContent and internal json and text (
@@ -405,6 +404,8 @@
   }
 
   function applyExternalContent(updatedContent: Content) {
+    debug('applyExternalContent', { updatedContent })
+
     if (isJSONContent(updatedContent)) {
       applyExternalJson(updatedContent.json)
     } else if (isTextContent(updatedContent)) {
@@ -516,6 +517,12 @@
     if (!documentStateInitialized) {
       documentStateInitialized = true
       documentState = expandWithCallback(json, documentState, [], getDefaultExpand(json))
+      try {
+        documentState2 = createDocumentState2({ json, expand: getDefaultExpand(json) })
+        debug('documentState2', { documentState2 })
+      } catch (err) {
+        console.error(err)
+      }
     }
   }
 
@@ -645,6 +652,7 @@
       operations
     ) as JSONPatchDocument
     const patched = documentStatePatch(json, documentState, operations)
+    const patched2 = documentStatePatch2(json, documentState2, operations)
 
     // update the selection based on the operations
     const updatedSelection = createSelectionFromOperations(json, operations)
@@ -653,15 +661,19 @@
       updatedSelection,
       false
     )
+    // FIXME: update selection based on patched2
     debug('patch updatedSelection', updatedSelection)
 
     const callback =
-      typeof afterPatch === 'function' ? afterPatch(patched.json, patchedDocumentState) : undefined
+      typeof afterPatch === 'function'
+        ? afterPatch(patched.json, patched.documentState, patched2.documentState)
+        : undefined
 
-    json = callback && callback.json !== undefined ? callback.json : patched.json
-    const newState =
-      callback && callback.state !== undefined ? callback.state : patchedDocumentState
+    json = callback?.json !== undefined ? callback.json : patched.json
+    const newState = callback?.state !== undefined ? callback.state : patchedDocumentState
+    const newState2 = callback?.state2 !== undefined ? callback.state2 : patched2.documentState
     documentState = newState
+    documentState2 = newState2
     text = undefined
     textIsRepaired = false
     pastedJson = undefined
@@ -1361,12 +1373,14 @@
     const previousTextIsRepaired = textIsRepaired
 
     const updatedState = expandWithCallback(json, documentState, [], expandMinimal)
+    const updatedState2 = expandWithCallback2(json, documentState2, [], expandMinimal)
 
     const callback =
-      typeof afterPatch === 'function' ? afterPatch(updatedJson, updatedState) : undefined
+      typeof afterPatch === 'function' ? afterPatch(updatedJson, updatedState, updatedState2) : undefined
 
-    json = callback && callback.json !== undefined ? callback.json : updatedJson
-    documentState = callback && callback.state !== undefined ? callback.state : updatedState
+    json = callback?.json !== undefined ? callback.json : updatedJson
+    documentState = callback?.state !== undefined ? callback.state : updatedState
+    documentState2 = callback?.state2 !== undefined ? callback.state2 : updatedState2
     text = undefined
     textIsRepaired = false
     parseError = undefined
@@ -1425,10 +1439,10 @@
     }
 
     if (typeof afterPatch === 'function') {
-      const callback = afterPatch(json, documentState)
+      const callback = afterPatch(json, documentState, documentState2)
 
-      json = callback && callback.json ? callback.json : json
-      documentState = callback && callback.state ? callback.state : documentState
+      json = callback?.json !== undefined ? callback.json : json
+      documentState = callback?.state !== undefined ? callback.state : documentState
     }
 
     // ensure the selection is valid
@@ -1454,23 +1468,23 @@
    * @param [recursive=false]  Only applicable when expanding
    */
   function handleExpand(path: JSONPath, expanded: boolean, recursive = false): void {
-    debug('expand', { path, expanded, recursive })
+    debug('handleExpand', { path, expanded, recursive })
 
     if (expanded) {
       if (recursive) {
-        documentState = expandWithCallback(json, documentState, path, expandAll)
+        documentState2 = expandWithCallback2(json, documentState2, path, expandAll)
       } else {
-        documentState = expandSingleItem(documentState, path)
+        documentState2 = expandSingleItem2(json, documentState2, path)
       }
     } else {
-      documentState = collapsePath(documentState, path)
-    }
+      documentState2 = collapsePath2(json, documentState2, path)
 
-    if (documentState.selection && !expanded) {
-      // check whether the selection is still visible and not collapsed
-      if (isSelectionInsidePath(documentState.selection, path)) {
-        // remove selection when not visible anymore
-        updateSelection(null)
+      if (documentState.selection) {
+        // check whether the selection is still visible and not collapsed
+        if (isSelectionInsidePath(documentState.selection, path)) {
+          // remove selection when not visible anymore
+          updateSelection(null)
+        }
       }
     }
 
@@ -2081,7 +2095,7 @@
         <JSONNode
           value={json}
           path={[]}
-          expandedMap={documentState.expandedMap}
+          state={documentState2}
           enforceStringMap={documentState.enforceStringMap}
           visibleSectionsMap={documentState.visibleSectionsMap}
           {validationErrorsMap}

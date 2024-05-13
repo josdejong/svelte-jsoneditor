@@ -11,7 +11,10 @@ import type {
   ValidationError,
   NestedValidationError,
   SvelteActionRenderer,
-  SvelteComponentRenderer
+  SvelteComponentRenderer,
+  ObjectDocumentState2,
+  ArrayDocumentState2,
+  DocumentState2
 } from './types.js'
 import { isObject } from '$lib/utils/typeUtils.js'
 
@@ -97,4 +100,22 @@ export function isSvelteComponentRenderer(value: unknown): value is SvelteCompon
 
 export function isSvelteActionRenderer(value: unknown): value is SvelteActionRenderer {
   return isObject(value) && typeof value.action === 'function' && isObject(value.props)
+}
+
+export function isObjectDocumentState2(
+  state: DocumentState2 | undefined
+): state is ObjectDocumentState2 {
+  return isObject(state) && state.type === 'object'
+}
+
+export function isArrayDocumentState2(
+  state: DocumentState2 | undefined
+): state is ArrayDocumentState2 {
+  return isObject(state) && state.type === 'array'
+}
+
+export function isExpandableState(
+  state: DocumentState2 | undefined
+): state is ObjectDocumentState2 | ArrayDocumentState2 {
+  return isObjectDocumentState2(state) || isArrayDocumentState2(state)
 }

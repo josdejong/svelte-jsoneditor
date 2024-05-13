@@ -54,6 +54,7 @@
   import type {
     AbsolutePopupOptions,
     CaretPosition,
+    DocumentState2,
     DraggingState,
     ExtendedSearchResultItem,
     JSONNodeItem,
@@ -72,10 +73,15 @@
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
   import { isObject } from '$lib/utils/typeUtils.js'
   import { classnames } from '$lib/utils/cssUtils.js'
+  import {
+    isArrayDocumentState2,
+    isExpandableState,
+    isObjectDocumentState2
+  } from 'svelte-jsoneditor'
 
   export let value: unknown
   export let path: JSONPath
-  export let expandedMap: JSONPointerMap<boolean> | undefined
+  export let state: DocumentState2 | undefined
   export let enforceStringMap: JSONPointerMap<boolean> | undefined
   export let visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
   export let validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
@@ -100,7 +106,7 @@
   $: pointer = compileJSONPointer(path)
 
   let expanded: boolean
-  $: expanded = expandedMap ? expandedMap[pointer] === true : false
+  $: expanded = isExpandableState(state) ? state.expanded : false
 
   let enforceString: boolean | undefined
   $: enforceString = getEnforceString(value, enforceStringMap, pointer, context.parser)
@@ -120,7 +126,6 @@
   function getProps(
     path: JSONPath,
     object: Record<string, unknown>,
-    expandedMap: JSONPointerMap<boolean> | undefined,
     enforceStringMap: JSONPointerMap<boolean> | undefined,
     visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined,
     validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined,
@@ -135,7 +140,6 @@
         key,
         value: object[key],
         path: keyPath,
-        expandedMap: filterPointerOrUndefined(expandedMap, keyPointer),
         enforceStringMap: filterPointerOrUndefined(enforceStringMap, keyPointer),
         visibleSectionsMap: filterPointerOrUndefined(visibleSectionsMap, keyPointer),
         validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, keyPointer),
@@ -163,7 +167,6 @@
     path: JSONPath,
     array: Array<unknown>,
     visibleSection: VisibleSection,
-    expandedMap: JSONPointerMap<boolean> | undefined,
     enforceStringMap: JSONPointerMap<boolean> | undefined,
     visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined,
     validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined,
@@ -183,7 +186,6 @@
         index,
         value: array[index],
         path: itemPath,
-        expandedMap: filterPointerOrUndefined(expandedMap, itemPointer),
         enforceStringMap: filterPointerOrUndefined(enforceStringMap, itemPointer),
         visibleSectionsMap: filterPointerOrUndefined(visibleSectionsMap, itemPointer),
         validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, itemPointer),
@@ -721,11 +723,11 @@
           </div>
         {/if}
         {#each visibleSections || DEFAULT_VISIBLE_SECTIONS as visibleSection, sectionIndex (sectionIndex)}
-          {#each getItems(path, value, visibleSection, expandedMap, enforceStringMap, visibleSectionsMap, validationErrorsMap, searchResultItemsMap, selection, dragging) as item (item.index)}
+          {#each getItems(path, value, visibleSection, enforceStringMap, visibleSectionsMap, validationErrorsMap, searchResultItemsMap, selection, dragging) as item (item.index)}
             <svelte:self
               value={item.value}
               path={item.path}
-              expandedMap={item.expandedMap}
+              state={isArrayDocumentState2(state) ? state.items[item.index] : undefined}
               enforceStringMap={item.enforceStringMap}
               visibleSectionsMap={item.visibleSectionsMap}
               validationErrorsMap={item.validationErrorsMap}
@@ -841,11 +843,11 @@
             />
           </div>
         {/if}
-        {#each getProps(path, value, expandedMap, enforceStringMap, visibleSectionsMap, validationErrorsMap, searchResultItemsMap, selection, dragging) as prop}
+        {#each getProps(path, value, enforceStringMap, visibleSectionsMap, validationErrorsMap, searchResultItemsMap, selection, dragging) as prop}
           <svelte:self
             value={prop.value}
             path={prop.path}
-            expandedMap={prop.expandedMap}
+            state={isObjectDocumentState2(state) ? state.properties[prop.key] : undefined}
             enforceStringMap={prop.enforceStringMap}
             visibleSectionsMap={prop.visibleSectionsMap}
             validationErrorsMap={prop.validationErrorsMap}

@@ -83,53 +83,27 @@ export interface DocumentState {
   sortedColumn: SortedColumn | null
 }
 
+export interface ObjectDocumentState2 {
+  type: 'object'
+  expanded: boolean
+  properties: Record<string, DocumentState2 | undefined>
+}
+
+export interface ArrayDocumentState2 {
+  type: 'array'
+  expanded: boolean
+  visibleSections: VisibleSection[] | null
+  items: Array<DocumentState2 | undefined>
+}
+
+export interface ValueDocumentState2 {
+  type: 'value'
+  enforceString?: boolean
+}
+
 // TODO: keep search results in DocumentState2?
 // TODO: put selection in DocumentState2?
-export type DocumentState2 =
-  | {
-      type: 'object'
-      expanded: boolean
-      properties: Record<string, DocumentState2>
-    }
-  | {
-      type: 'array'
-      expanded: boolean
-      visibleSections: VisibleSection[] | null
-      items: Array<DocumentState2 | undefined>
-    }
-  | {
-      type: 'value'
-      enforceString?: boolean
-    }
-
-// // FIXME: is this type RecursiveStatePath helpful or not? If not, remove it
-export type RecursiveStatePath = [] | ['items' | 'properties', string, ...RecursiveStatePath[]]
-
-// FIXME: cleanup
-// export type RecursiveState<ObjectState, ArrayState, ValueState> =
-//   | ({
-//       type: 'object'
-//       properties: Record<string, RecursiveState<ObjectState, ArrayState, ValueState>>
-//     } & ObjectState)
-//   | ({
-//       type: 'array'
-//       items: Array<RecursiveState<ObjectState, ArrayState, ValueState> | undefined>
-//     } & ArrayState)
-//   | ({
-//       type: 'value'
-//     } & ValueState)
-//
-// export type ExpandedState = RecursiveState<
-//   { expanded: boolean },
-//   { expanded: boolean },
-//   { type: 'value' }
-// >
-// export type SelectionState = RecursiveState<
-//   { selected: boolean; selectedKeys: Record<string, JSONSelection> },
-//   { selected: boolean },
-//   { selected: boolean }
-// >
-// export type EnforcedStringState = RecursiveState<void, void, { enforceString?: boolean }>
+export type DocumentState2 = ObjectDocumentState2 | ArrayDocumentState2 | ValueDocumentState2
 
 export interface JSONPatchResult {
   json: unknown
@@ -140,8 +114,9 @@ export interface JSONPatchResult {
 
 export type AfterPatchCallback = (
   patchedJson: unknown,
-  patchedState: DocumentState
-) => { json?: unknown; state?: DocumentState } | undefined
+  patchedState: DocumentState,
+  patchedState2: DocumentState2
+) => { json?: unknown; state?: DocumentState; state2?: DocumentState2 } | undefined
 
 export interface MultiSelection {
   type: SelectionType.multi
