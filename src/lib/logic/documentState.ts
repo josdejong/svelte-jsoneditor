@@ -355,17 +355,6 @@ export function expandWithCallback2(
 }
 
 // TODO: write unit tests
-export function expandSingleItem(documentState: DocumentState, path: JSONPath): DocumentState {
-  return {
-    ...documentState,
-    expandedMap: {
-      ...documentState.expandedMap,
-      [compileJSONPointer(path)]: true
-    }
-  }
-}
-
-// TODO: write unit tests
 export function expandSingleItem2(
   json: unknown,
   documentState: DocumentState2,
@@ -1113,7 +1102,7 @@ export function getVisiblePaths(json: unknown, documentState: DocumentState): JS
     paths.push(path)
     const pointer = compileJSONPointer(path)
 
-    if (value && documentState.expandedMap[pointer] === true) {
+    if (value && documentState.expandedMap[pointer]) {
       if (isJSONArray(value)) {
         const visibleSections = getVisibleSections(documentState, pointer)
         forEachVisibleIndex(value, visibleSections, (index) => {
@@ -1150,7 +1139,7 @@ export function getVisibleCaretPositions(
     paths.push({ path, type: CaretType.value })
 
     const pointer = compileJSONPointer(path)
-    if (value && documentState.expandedMap[pointer] === true) {
+    if (value && documentState.expandedMap[pointer]) {
       if (includeInside) {
         paths.push({ path, type: CaretType.inside })
       }
@@ -1267,7 +1256,4 @@ export function expandAll(): boolean {
 // TODO: write unit test
 export function getDefaultExpand(json: unknown): OnExpand {
   return isLargeContent({ json }, MAX_DOCUMENT_SIZE_EXPAND_ALL) ? expandMinimal : expandAll
-}
-function isArrayOrObject(json: unknown): any {
-  throw new Error('Function not implemented.')
 }

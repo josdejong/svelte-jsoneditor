@@ -541,8 +541,6 @@ export interface JSONNodeProp {
   key: string
   value: unknown
   path: JSONPath
-  expandedMap: JSONPointerMap<boolean> | undefined
-  enforceStringMap: JSONPointerMap<boolean> | undefined
   visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
   validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   keySearchResultItemsMap: ExtendedSearchResultItem[] | undefined
@@ -554,8 +552,6 @@ export interface JSONNodeItem {
   index: number
   value: unknown
   path: JSONPath
-  expandedMap: JSONPointerMap<boolean> | undefined
-  enforceStringMap: JSONPointerMap<boolean> | undefined
   visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
   validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined

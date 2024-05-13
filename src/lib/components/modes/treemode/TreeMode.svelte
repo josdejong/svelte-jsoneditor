@@ -4,8 +4,15 @@
   import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler.js'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
   import { createDebug } from '$lib/utils/debug.js'
-  import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-  import { compileJSONPointer, existsIn, getIn, immutableJSONPatch } from 'immutable-json-patch'
+  import {
+    compileJSONPointer,
+    existsIn,
+    getIn,
+    immutableJSONPatch,
+    type JSONPatchDocument,
+    type JSONPath,
+    setIn
+  } from 'immutable-json-patch'
   import { jsonrepair } from 'jsonrepair'
   import { initial, isEmpty, isEqual, noop, uniqueId } from 'lodash-es'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
@@ -32,8 +39,7 @@
     expandWithCallback,
     expandWithCallback2,
     getDefaultExpand,
-    getEnforceString,
-    setEnforceString
+    toRecursiveStatePath
   } from '$lib/logic/documentState.js'
   import { createHistory } from '$lib/logic/history.js'
   import { duplicate, extract, revertJSONPatchWithMoveOperations } from '$lib/logic/operations.js'
@@ -145,6 +151,7 @@
     ValueNormalization
   } from '$lib/types'
   import { Mode, ValidationSeverity } from '$lib/types.js'
+  import { isValueDocumentState2} from '$lib/typeguards.js'
   import memoizeOne from 'memoize-one'
   import { measure } from '$lib/utils/timeUtils.js'
   import {
@@ -662,7 +669,6 @@
       false
     )
     // FIXME: update selection based on patched2
-    debug('patch updatedSelection', updatedSelection)
 
     const callback =
       typeof afterPatch === 'function'
@@ -678,6 +684,8 @@
     textIsRepaired = false
     pastedJson = undefined
     parseError = undefined
+
+    debug('patch', { updatedSelection, documentState, documentState2 })
 
     // ensure the selection is valid
     clearSelectionWhenNotExisting(json)
@@ -742,9 +750,13 @@
     }
 
     const path = getFocusPath(documentState.selection)
+    const statePath = toRecursiveStatePath(json, path)
     const pointer = compileJSONPointer(path)
     const value = getIn(json, path)
-    const enforceString = !getEnforceString(value, documentState.enforceStringMap, pointer, parser)
+    const valueState = getIn<DocumentState2 | undefined>(documentState2, statePath)
+    const enforceString = !(isValueDocumentState2(valueState)
+      ? valueState.enforceString ?? false
+      : false)
     const updatedValue = enforceString ? String(value) : stringConvert(String(value), parser)
 
     debug('handleToggleEnforceString', { enforceString, value, updatedValue })
@@ -757,9 +769,9 @@
           value: updatedValue
         }
       ],
-      (patchedJson, patchedState) => {
+      (patchedJson, patchedState, patchedState2) => {
         return {
-          state: setEnforceString(patchedState, pointer, enforceString)
+          state2: setIn(patchedState2, statePath, { type: 'value', enforceString })
         }
       }
     )
@@ -1376,7 +1388,9 @@
     const updatedState2 = expandWithCallback2(json, documentState2, [], expandMinimal)
 
     const callback =
-      typeof afterPatch === 'function' ? afterPatch(updatedJson, updatedState, updatedState2) : undefined
+      typeof afterPatch === 'function'
+        ? afterPatch(updatedJson, updatedState, updatedState2)
+        : undefined
 
     json = callback?.json !== undefined ? callback.json : updatedJson
     documentState = callback?.state !== undefined ? callback.state : updatedState
@@ -1384,6 +1398,8 @@
     text = undefined
     textIsRepaired = false
     parseError = undefined
+
+    debug('TEST', { documentState2 })
 
     // make sure the selection is valid
     clearSelectionWhenNotExisting(json)
@@ -2096,7 +2112,6 @@
           value={json}
           path={[]}
           state={documentState2}
-          enforceStringMap={documentState.enforceStringMap}
           visibleSectionsMap={documentState.visibleSectionsMap}
           {validationErrorsMap}
           searchResultItemsMap={searchResult?.itemsMap}

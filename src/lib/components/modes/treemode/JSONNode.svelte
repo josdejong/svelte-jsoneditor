@@ -13,7 +13,7 @@
     HOVER_INSERT_INSIDE,
     INSERT_EXPLANATION
   } from '$lib/constants.js'
-  import { getEnforceString, getVisibleCaretPositions } from '$lib/logic/documentState.js'
+  import { getVisibleCaretPositions } from '$lib/logic/documentState.js'
   import { rename } from '$lib/logic/operations.js'
   import {
     createAfterSelection,
@@ -27,12 +27,12 @@
     getSelectionPaths,
     getStartPath,
     isAfterSelection,
+    isEditingSelection,
     isInsideSelection,
     isKeySelection,
     isMultiSelection,
     isValueSelection,
     pathInSelection,
-    isEditingSelection,
     selectionIfOverlapping
   } from '$lib/logic/selection.js'
   import {
@@ -76,13 +76,13 @@
   import {
     isArrayDocumentState2,
     isExpandableState,
-    isObjectDocumentState2
+    isObjectDocumentState2,
+    isValueDocumentState2
   } from 'svelte-jsoneditor'
 
   export let value: unknown
   export let path: JSONPath
   export let state: DocumentState2 | undefined
-  export let enforceStringMap: JSONPointerMap<boolean> | undefined
   export let visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
   export let validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   export let searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
@@ -108,8 +108,8 @@
   let expanded: boolean
   $: expanded = isExpandableState(state) ? state.expanded : false
 
-  let enforceString: boolean | undefined
-  $: enforceString = getEnforceString(value, enforceStringMap, pointer, context.parser)
+  let enforceString: boolean
+  $: enforceString = isValueDocumentState2(state) ? state.enforceString ?? false : false
 
   let visibleSections: VisibleSection[] | undefined
   $: visibleSections = visibleSectionsMap ? visibleSectionsMap[pointer] : undefined
@@ -126,7 +126,6 @@
   function getProps(
     path: JSONPath,
     object: Record<string, unknown>,
-    enforceStringMap: JSONPointerMap<boolean> | undefined,
     visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined,
     validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined,
     searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
@@ -140,7 +139,6 @@
         key,
         value: object[key],
         path: keyPath,
-        enforceStringMap: filterPointerOrUndefined(enforceStringMap, keyPointer),
         visibleSectionsMap: filterPointerOrUndefined(visibleSectionsMap, keyPointer),
         validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, keyPointer),
         keySearchResultItemsMap: filterKeySearchResults(searchResultItemsMap, keyPointer),
@@ -167,7 +165,6 @@
     path: JSONPath,
     array: Array<unknown>,
     visibleSection: VisibleSection,
-    enforceStringMap: JSONPointerMap<boolean> | undefined,
     visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined,
     validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined,
     searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
@@ -186,7 +183,6 @@
         index,
         value: array[index],
         path: itemPath,
-        enforceStringMap: filterPointerOrUndefined(enforceStringMap, itemPointer),
         visibleSectionsMap: filterPointerOrUndefined(visibleSectionsMap, itemPointer),
         validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, itemPointer),
         searchResultItemsMap: filterPointerOrUndefined(searchResultItemsMap, itemPointer),
@@ -723,12 +719,11 @@
           </div>
         {/if}
         {#each visibleSections || DEFAULT_VISIBLE_SECTIONS as visibleSection, sectionIndex (sectionIndex)}
-          {#each getItems(path, value, visibleSection, enforceStringMap, visibleSectionsMap, validationErrorsMap, searchResultItemsMap, selection, dragging) as item (item.index)}
+          {#each getItems(path, value, visibleSection, visibleSectionsMap, validationErrorsMap, searchResultItemsMap, selection, dragging) as item (item.index)}
             <svelte:self
               value={item.value}
               path={item.path}
               state={isArrayDocumentState2(state) ? state.items[item.index] : undefined}
-              enforceStringMap={item.enforceStringMap}
               visibleSectionsMap={item.visibleSectionsMap}
               validationErrorsMap={item.validationErrorsMap}
               searchResultItemsMap={item.searchResultItemsMap}
@@ -843,12 +838,11 @@
             />
           </div>
         {/if}
-        {#each getProps(path, value, enforceStringMap, visibleSectionsMap, validationErrorsMap, searchResultItemsMap, selection, dragging) as prop}
+        {#each getProps(path, value, visibleSectionsMap, validationErrorsMap, searchResultItemsMap, selection, dragging) as prop}
           <svelte:self
             value={prop.value}
             path={prop.path}
             state={isObjectDocumentState2(state) ? state.properties[prop.key] : undefined}
-            enforceStringMap={prop.enforceStringMap}
             visibleSectionsMap={prop.visibleSectionsMap}
             validationErrorsMap={prop.validationErrorsMap}
             searchResultItemsMap={prop.valueSearchResultItemsMap}
@@ -893,7 +887,7 @@
         <JSONValue
           {path}
           {value}
-          enforceString={enforceString || false}
+          {enforceString}
           selection={isNodeSelected ? selection : null}
           searchResultItems={filterValueSearchResults(searchResultItemsMap, pointer)}
           {context}

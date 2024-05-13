@@ -14,7 +14,8 @@ import type {
   SvelteComponentRenderer,
   ObjectDocumentState2,
   ArrayDocumentState2,
-  DocumentState2
+  DocumentState2,
+  ValueDocumentState2
 } from './types.js'
 import { isObject } from '$lib/utils/typeUtils.js'
 
@@ -112,6 +113,12 @@ export function isArrayDocumentState2(
   state: DocumentState2 | undefined
 ): state is ArrayDocumentState2 {
   return isObject(state) && state.type === 'array'
+}
+
+export function isValueDocumentState2(
+  state: DocumentState2 | undefined
+): state is ValueDocumentState2 {
+  return isObject(state) && state.type === 'value'
 }
 
 export function isExpandableState(
