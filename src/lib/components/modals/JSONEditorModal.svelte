@@ -73,6 +73,7 @@
   }
 
   let refEditor: JSONEditorRoot
+  let fullscreen: boolean
 
   const rootState: ModalState = {
     mode: determineMode(content),
@@ -160,6 +161,14 @@
     }
   }
 
+  function handleEscape() {
+    if (fullscreen) {
+      fullscreen = false
+    } else {
+      handleClose()
+    }
+  }
+
   function handleChange(updatedContent: Content) {
     debug('handleChange', updatedContent)
 
@@ -215,9 +224,11 @@
   }
 </script>
 
-<div class="jse-modal jse-jsoneditor-modal" use:onEscape={handleClose}>
+<div class="jse-modal jse-jsoneditor-modal" class:fullscreen use:onEscape={handleEscape}>
   <Header
     title="Edit nested content {stack.length > 1 ? ` (${stack.length})` : ''}"
+    fullScreenButton={true}
+    bind:fullscreen
     onClose={handleClose}
   />
 

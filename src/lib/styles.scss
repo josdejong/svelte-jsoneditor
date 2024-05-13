@@ -110,6 +110,18 @@ $errors-overview-max-height: 25%;
   }
 }
 
+@mixin jse-modal-menu-button {
+  border: none;
+  background: transparent;
+  min-width: 32px;
+  color: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
 @mixin jse-column-header-mixin {
   background: none;
   border: none;

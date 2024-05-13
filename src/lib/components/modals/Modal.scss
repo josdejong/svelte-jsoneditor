@@ -57,6 +57,7 @@
 
 :global(.bg.jse-modal-bg .jse-modal-window-wrap) {
   margin: 0;
+  overflow: auto;
 }
 
 :global(.bg.jse-modal-bg .jse-modal-window) {
@@ -78,10 +79,17 @@
 
 :global(.bg.jse-modal-bg .jse-modal-window.jse-modal-window-jsoneditor) {
   width: 800px;
-  height: auto;
-  min-height: 500px;
-  max-height: calc(100vh - 6rem);
+  max-height: 500px;
   display: flex;
+}
+
+:global(.bg.jse-modal-bg .jse-modal-window:has(div.fullscreen)) {
+  margin: $padding;
+  padding: 0;
+  width: calc(100vw - 2 * $padding);
+  height: calc(100vh - 2 * $padding);
+  max-width: none;
+  max-height: none;
 }
 
 :global(.bg.jse-modal-bg .jse-modal-container) {
@@ -89,4 +97,5 @@
   display: flex;
   flex-direction: column;
   padding: 0;
+  max-height: none;
 }

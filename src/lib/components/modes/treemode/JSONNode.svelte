@@ -236,10 +236,15 @@
   }
 
   function handleMouseDown(event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
+    // only handle when the left or right mouse button is pressed, not the middle mouse button (scroll wheel)
+    if (event.buttons !== 1 && event.buttons !== 2) {
+      return
+    }
+
     // check if the mouse down is not happening in the key or value input fields or on a button
     if (
       isContentEditableDiv(event.target as HTMLElement) ||
-      (event.which === 1 && isChildOfNodeName(event.target as Element, 'BUTTON')) // left mouse on a button
+      (event.buttons === 1 && isChildOfNodeName(event.target as Element, 'BUTTON')) // left mouse on a button
     ) {
       return
     }

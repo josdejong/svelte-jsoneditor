@@ -2,6 +2,50 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.23.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.3...v0.23.4) (2024-05-09)
+
+
+### Bug Fixes
+
+* cannot use middle mouse button to scroll ([d0e7f4c](https://github.com/josdejong/svelte-jsoneditor/commit/d0e7f4cce8046c1c0101127556378aa6da770122))
+* update `jsonrepair` and other dependencies ([7b9063f](https://github.com/josdejong/svelte-jsoneditor/commit/7b9063fb65c8703e654cf6489e09f4d6d6898f4e))
+
+### [0.23.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.2...v0.23.3) (2024-05-06)
+
+
+### Features
+
+* update `codemirror`, `ajv`, `fontawesome`, `jsonrepair`, and dev dependencies ([7bd08e7](https://github.com/josdejong/svelte-jsoneditor/commit/7bd08e7021b2a8c5067ab346859f613457edcd44))
+
+
+### Bug Fixes
+
+* text mode loads partially scrolled down ([56e18ee](https://github.com/josdejong/svelte-jsoneditor/commit/56e18ee0573e4af7731a725133e93dc179e2857e))
+
+### [0.23.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.1...v0.23.2) (2024-04-17)
+
+
+### Bug Fixes
+
+* [#423](https://github.com/josdejong/svelte-jsoneditor/issues/423) error about an invalid selection in text mode when clearing the contents ([5ed8a86](https://github.com/josdejong/svelte-jsoneditor/commit/5ed8a86a6166064d8bd27af6299db18cdf762885))
+* change text "fullscreen" to "full screen" ([a56415f](https://github.com/josdejong/svelte-jsoneditor/commit/a56415f5ed79890ec2a3ee885ac2df40cf7cef40))
+* editor not getting focus when clicking in an empty area in table mode ([0e74043](https://github.com/josdejong/svelte-jsoneditor/commit/0e740432d55faf32929cac572be7a59465466ab5))
+
+### [0.23.1](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.0...v0.23.1) (2024-03-28)
+
+
+### Features
+
+* fullscreen support for modals ([#420](https://github.com/josdejong/svelte-jsoneditor/issues/420)) ([160a739](https://github.com/josdejong/svelte-jsoneditor/commit/160a739f7deecc0544cd630e9a0a582b0403eb76))
+* pass validation severity into UI ([#416](https://github.com/josdejong/svelte-jsoneditor/issues/416)) ([6cd6af9](https://github.com/josdejong/svelte-jsoneditor/commit/6cd6af9bedbbf564f0463dbbb383a9cd2f8b84c4)), closes [#369](https://github.com/josdejong/svelte-jsoneditor/issues/369) [#148](https://github.com/josdejong/svelte-jsoneditor/issues/148) [#150](https://github.com/josdejong/svelte-jsoneditor/issues/150)
+* update dependencies (`codemirror`, `sass`, and dev dependencies) ([abf0468](https://github.com/josdejong/svelte-jsoneditor/commit/abf0468991bb7cfcbe9f81b68605e8b842ed64c6))
+
+
+### Bug Fixes
+
+* support pressing Esc to close the CopyPasteModal ([fb77efe](https://github.com/josdejong/svelte-jsoneditor/commit/fb77efef5f4a36ae4ff28694e836521fd8170101))
+* update dependency `vanilla-picker` and update devDependencies ([b0ba13f](https://github.com/josdejong/svelte-jsoneditor/commit/b0ba13fb866aa2565a4bfd135dc8305ef51cf43d))
+
 ## [0.23.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.22.0...v0.23.0) (2024-03-13)
 
 

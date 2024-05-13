@@ -3,14 +3,16 @@
 <script lang="ts">
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
-  import { faCog, faTimes } from '@fortawesome/free-solid-svg-icons'
+  import { faCog } from '@fortawesome/free-solid-svg-icons'
   import SelectQueryLanguage from '../controls/selectQueryLanguage/SelectQueryLanguage.svelte'
   import type { AbsolutePopupContext, OnChangeQueryLanguage, QueryLanguage } from '$lib/types.js'
   import type { Context } from 'svelte-simple-modal'
+  import Header from './Header.svelte'
 
   export let queryLanguages: QueryLanguage[]
   export let queryLanguageId: string
   export let onChangeQueryLanguage: OnChangeQueryLanguage
+  export let fullscreen: boolean
 
   let refConfigButton: HTMLButtonElement | undefined
   let popupId: number | undefined
@@ -38,22 +40,18 @@
   }
 </script>
 
-<div class="jse-header">
-  <div class="jse-title">Transform</div>
-  {#if queryLanguages.length > 1}
-    <button
-      type="button"
-      bind:this={refConfigButton}
-      class="jse-config"
-      on:click={openConfig}
-      title="Select a query language"
-    >
-      <Icon data={faCog} />
-    </button>
-  {/if}
-  <button type="button" class="jse-close" on:click={() => close()}>
-    <Icon data={faTimes} />
+<Header title="Transform" fullScreenButton={true} bind:fullscreen onClose={close}>
+  <button
+    slot="actions"
+    type="button"
+    bind:this={refConfigButton}
+    class="jse-config"
+    class:hide={queryLanguages.length <= 1}
+    on:click={openConfig}
+    title="Select a query language"
+  >
+    <Icon data={faCog} />
   </button>
-</div>
+</Header>
 
-<style src="./Header.scss"></style>
+<style src="./TransformModalHeader.scss"></style>

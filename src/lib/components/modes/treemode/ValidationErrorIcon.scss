@@ -9,5 +9,27 @@ button.jse-validation-error {
   vertical-align: top;
   display: inline-flex;
 
+  color: $error-color;
+}
+
+button.jse-validation-info {
+  @include jsoneditor-button;
+
+  padding: 0;
+  margin: 0;
+  vertical-align: top;
+  display: inline-flex;
+
+  color: $info-color;
+}
+
+button.jse-validation-warning {
+  @include jsoneditor-button;
+
+  padding: 0;
+  margin: 0;
+  vertical-align: top;
+  display: inline-flex;
+
   color: $warning-color;
 }
