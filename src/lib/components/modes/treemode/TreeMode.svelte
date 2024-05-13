@@ -34,7 +34,7 @@
     expandMinimal,
     expandPath,
     expandRecursive,
-    expandSection,
+    expandSection, expandSection2,
     expandSingleItem2,
     expandWithCallback,
     expandWithCallback2,
@@ -1532,8 +1532,7 @@
   function handleExpandSection(path: JSONPath, section: Section) {
     debug('handleExpandSection', path, section)
 
-    const pointer = compileJSONPointer(path)
-    documentState = expandSection(json, documentState, pointer, section)
+    documentState2 = expandSection2(documentState2, path, section)
   }
 
   function handlePasteJson(newPastedJson: PastedJson) {
@@ -2112,7 +2111,6 @@
           value={json}
           path={[]}
           state={documentState2}
-          visibleSectionsMap={documentState.visibleSectionsMap}
           {validationErrorsMap}
           searchResultItemsMap={searchResult?.itemsMap}
           selection={documentState.selection}

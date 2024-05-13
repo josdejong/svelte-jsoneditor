@@ -83,7 +83,6 @@
   export let value: unknown
   export let path: JSONPath
   export let state: DocumentState2 | undefined
-  export let visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
   export let validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   export let searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
   export let selection: JSONSelection | null
@@ -112,7 +111,7 @@
   $: enforceString = isValueDocumentState2(state) ? state.enforceString ?? false : false
 
   let visibleSections: VisibleSection[] | undefined
-  $: visibleSections = visibleSectionsMap ? visibleSectionsMap[pointer] : undefined
+  $: visibleSections = isArrayDocumentState2(state) ? state.visibleSections : undefined
 
   let validationError: NestedValidationError | undefined
   $: validationError = validationErrorsMap ? validationErrorsMap[pointer] : undefined
@@ -126,7 +125,6 @@
   function getProps(
     path: JSONPath,
     object: Record<string, unknown>,
-    visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined,
     validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined,
     searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
     selection: JSONSelection | null,
@@ -139,7 +137,6 @@
         key,
         value: object[key],
         path: keyPath,
-        visibleSectionsMap: filterPointerOrUndefined(visibleSectionsMap, keyPointer),
         validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, keyPointer),
         keySearchResultItemsMap: filterKeySearchResults(searchResultItemsMap, keyPointer),
         valueSearchResultItemsMap: filterPointerOrUndefined(searchResultItemsMap, keyPointer),
@@ -165,7 +162,6 @@
     path: JSONPath,
     array: Array<unknown>,
     visibleSection: VisibleSection,
-    visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined,
     validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined,
     searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
     selection: JSONSelection | null,
@@ -183,7 +179,6 @@
         index,
         value: array[index],
         path: itemPath,
-        visibleSectionsMap: filterPointerOrUndefined(visibleSectionsMap, itemPointer),
         validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, itemPointer),
         searchResultItemsMap: filterPointerOrUndefined(searchResultItemsMap, itemPointer),
         selection: selectionIfOverlapping(context.getJson(), selection, itemPath)
@@ -718,13 +713,12 @@
             />
           </div>
         {/if}
-        {#each visibleSections || DEFAULT_VISIBLE_SECTIONS as visibleSection, sectionIndex (sectionIndex)}
-          {#each getItems(path, value, visibleSection, visibleSectionsMap, validationErrorsMap, searchResultItemsMap, selection, dragging) as item (item.index)}
+        {#each (visibleSections || DEFAULT_VISIBLE_SECTIONS) as visibleSection, sectionIndex (sectionIndex)}
+          {#each getItems(path, value, visibleSection, validationErrorsMap, searchResultItemsMap, selection, dragging) as item (item.index)}
             <svelte:self
               value={item.value}
               path={item.path}
               state={isArrayDocumentState2(state) ? state.items[item.index] : undefined}
-              visibleSectionsMap={item.visibleSectionsMap}
               validationErrorsMap={item.validationErrorsMap}
               searchResultItemsMap={item.searchResultItemsMap}
               selection={item.selection}
@@ -838,12 +832,11 @@
             />
           </div>
         {/if}
-        {#each getProps(path, value, visibleSectionsMap, validationErrorsMap, searchResultItemsMap, selection, dragging) as prop}
+        {#each getProps(path, value, validationErrorsMap, searchResultItemsMap, selection, dragging) as prop}
           <svelte:self
             value={prop.value}
             path={prop.path}
             state={isObjectDocumentState2(state) ? state.properties[prop.key] : undefined}
-            visibleSectionsMap={prop.visibleSectionsMap}
             validationErrorsMap={prop.validationErrorsMap}
             searchResultItemsMap={prop.valueSearchResultItemsMap}
             selection={prop.selection}

@@ -92,7 +92,7 @@ export interface ObjectDocumentState2 {
 export interface ArrayDocumentState2 {
   type: 'array'
   expanded: boolean
-  visibleSections: VisibleSection[] | null
+  visibleSections: VisibleSection[]
   items: Array<DocumentState2 | undefined>
 }
 
@@ -541,7 +541,6 @@ export interface JSONNodeProp {
   key: string
   value: unknown
   path: JSONPath
-  visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
   validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   keySearchResultItemsMap: ExtendedSearchResultItem[] | undefined
   valueSearchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
@@ -552,7 +551,6 @@ export interface JSONNodeItem {
   index: number
   value: unknown
   path: JSONPath
-  visibleSectionsMap: JSONPointerMap<VisibleSection[]> | undefined
   validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
   selection: JSONSelection | null

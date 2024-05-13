@@ -49,6 +49,7 @@ import type {
 import { CaretType } from '$lib/types.js'
 import { int } from '../utils/numberUtils.js'
 import { isLargeContent } from '$lib/utils/jsonUtils.js'
+import { isArrayDocumentState2 } from 'svelte-jsoneditor'
 
 type OnCreateSelection = (json: unknown, documentState: DocumentState) => JSONSelection
 
@@ -87,7 +88,7 @@ export function createDocumentState2({
   expand
 }: CreateDocumentStateProps): DocumentState2 {
   let documentState: DocumentState2 = Array.isArray(json)
-    ? { type: 'array', expanded: false, visibleSections: null, items: [] }
+    ? { type: 'array', expanded: false, visibleSections: DEFAULT_VISIBLE_SECTIONS, items: [] }
     : isObject(json)
       ? { type: 'object', expanded: false, properties: {} }
       : { type: 'value' }
@@ -289,7 +290,12 @@ export function expandWithCallback2(
           (value: DocumentState2 | undefined) => {
             return value
               ? { ...value, expanded: true }
-              : { type: 'array', expanded: true, visibleSections: null, items: [] }
+              : {
+                  type: 'array',
+                  expanded: true,
+                  visibleSections: DEFAULT_VISIBLE_SECTIONS,
+                  items: []
+                }
           }
         )
 
@@ -374,7 +380,7 @@ export function expandSingleItem2(
       } else if (Array.isArray(value)) {
         return state?.type === 'array'
           ? { ...state, expanded: true }
-          : { type: 'array', expanded: true, items: [], visibleSections: [] }
+          : { type: 'array', expanded: true, visibleSections: DEFAULT_VISIBLE_SECTIONS, items: [] }
       } else {
         return state?.type === 'value' ? state : { type: 'value' }
       }
@@ -412,7 +418,12 @@ export function collapsePath2(
         return { type: 'object', expanded: false, properties: {} }
       } else if (state?.type === 'array') {
         // clear the state of nested objects/arrays
-        return { type: 'array', expanded: false, visibleSections: null, items: [] }
+        return {
+          type: 'array',
+          expanded: false,
+          visibleSections: DEFAULT_VISIBLE_SECTIONS,
+          items: []
+        }
       } else {
         return state
       }
@@ -465,6 +476,28 @@ export function expandSection(
       [pointer]: mergeSections(getVisibleSections(documentState, pointer).concat(section))
     }
   }
+}
+
+/**
+ * Expand a section of items in an array
+ */
+export function expandSection2(
+  documentState: DocumentState2,
+  path: JSONPath,
+  section: Section
+): DocumentState2 {
+  return updateIn(documentState, path, (state: DocumentState2) => {
+    if (!isArrayDocumentState2(state)) {
+      return
+    }
+
+    const visibleSections = mergeSections([
+      ...(state.visibleSections ?? DEFAULT_VISIBLE_SECTIONS),
+      section
+    ])
+
+    return { ...state, visibleSections }
+  })
 }
 
 export function syncKeys(actualKeys: string[], prevKeys?: string[]): string[] {
@@ -562,7 +595,7 @@ export function documentStateAdd2(
                   .concat(stateValue !== undefined ? [stateValue] : [,])
                   .concat(items.slice(index))
               : items,
-          visibleSections: visibleSections ? shiftVisibleSections(visibleSections, index, 1) : null
+          visibleSections: shiftVisibleSections(visibleSections, index, 1)
         }
       }
     )
@@ -597,7 +630,7 @@ export function documentStateRemove2(
         return {
           ...arrayState,
           items: items.slice(0, index).concat(items.slice(index + 1)),
-          visibleSections: visibleSections ? shiftVisibleSections(visibleSections, index, -1) : null
+          visibleSections: shiftVisibleSections(visibleSections, index, -1)
         }
       }
     )
@@ -620,7 +653,7 @@ export function documentStateReplace2(
           return {
             type: 'array',
             expanded: state.type === 'object' ? state.expanded : false,
-            visibleSections: null,
+            visibleSections: DEFAULT_VISIBLE_SECTIONS,
             items: [] as DocumentState2[]
           }
         }
