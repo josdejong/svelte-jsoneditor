@@ -11,7 +11,7 @@ import { createSelectionFromOperations } from './selection.js'
 import { rename } from './operations.js'
 import { stringConvert } from '../utils/typeUtils.js'
 import type {
-  DocumentState,
+  DocumentState2,
   ExtendedSearchResultItem,
   JSONParser,
   JSONPointerMap,
@@ -25,7 +25,6 @@ import { SearchField } from '$lib/types.js'
 // TODO: comment
 // TODO: unit test
 export function updateSearchResult(
-  json: unknown,
   newResultItems: SearchResultItem[],
   previousResult: SearchResult | undefined
 ): SearchResult {
@@ -276,7 +275,7 @@ export function replaceAllText(
 
 export function createSearchAndReplaceOperations(
   json: unknown,
-  documentState: DocumentState,
+  documentState: DocumentState2,
   replacementText: string,
   searchResultItem: SearchResultItem,
   parser: JSONParser
@@ -306,14 +305,7 @@ export function createSearchAndReplaceOperations(
     }
     const currentValueText = typeof currentValue === 'string' ? currentValue : String(currentValue)
 
-    const pointer = compileJSONPointer(path)
-    const enforceString = getEnforceString(
-      currentValue,
-      documentState.enforceStringMap,
-      pointer,
-      parser
-    )
-
+    const enforceString = getEnforceString(json, documentState, path, parser)
     const value = replaceText(currentValueText, replacementText, start, end)
 
     const operations: JSONPatchOperation[] = [
@@ -337,7 +329,7 @@ export function createSearchAndReplaceOperations(
 
 export function createSearchAndReplaceAllOperations(
   json: unknown,
-  documentState: DocumentState,
+  documentState: DocumentState2,
   searchText: string,
   replacementText: string,
   parser: JSONParser
@@ -412,15 +404,7 @@ export function createSearchAndReplaceAllOperations(
       }
       const currentValueText =
         typeof currentValue === 'string' ? currentValue : String(currentValue)
-
-      const pointer = compileJSONPointer(path)
-      const enforceString = getEnforceString(
-        currentValue,
-        documentState.enforceStringMap,
-        pointer,
-        parser
-      )
-
+      const enforceString = getEnforceString(json, documentState, path, parser)
       const value = replaceAllText(currentValueText, replacementText, items)
 
       const operations: JSONPatchOperation[] = [

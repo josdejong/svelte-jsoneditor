@@ -15,13 +15,13 @@
   import { DEBOUNCE_DELAY, MAX_SEARCH_RESULTS } from '$lib/constants.js'
   import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
   import { createDebug } from '$lib/utils/debug.js'
-  import type { DocumentState, JSONParser, OnPatch, SearchResult } from '$lib/types.js'
+  import type { DocumentState2, JSONParser, OnPatch, SearchResult } from '$lib/types.js'
   import {
-    createSearchAndReplaceOperations,
     createSearchAndReplaceAllOperations,
+    createSearchAndReplaceOperations,
+    search,
     searchNext,
     searchPrevious,
-    search,
     updateSearchResult
   } from '$lib/logic/search.js'
   import type { JSONPath } from 'immutable-json-patch'
@@ -30,7 +30,7 @@
   const debug = createDebug('jsoneditor:SearchBox')
 
   export let json: unknown
-  export let documentState: DocumentState
+  export let documentState: DocumentState2
   export let parser: JSONParser
   export let showSearch: boolean
   export let showReplace: boolean
@@ -255,7 +255,7 @@
       setTimeout(() => {
         // wait until the search icon has been rendered
         const newResultItems = search(text, json, { maxResults: MAX_SEARCH_RESULTS, columns })
-        searchResult = updateSearchResult(json, newResultItems, searchResult)
+        searchResult = updateSearchResult(newResultItems, searchResult)
 
         searching = false
         resolve()

@@ -23,18 +23,25 @@ import {
   isValueSelection,
   singleItemSelected
 } from '$lib/logic/selection'
-import type { ConvertType, DocumentState2, InsertType, JSONSelection } from '$lib/types'
+import type {
+  ConvertType,
+  DocumentState2,
+  InsertType,
+  JSONParser,
+  JSONSelection,
+  ContextMenuItem
+} from '$lib/types'
 import { initial, isEmpty } from 'lodash-es'
 import { getIn } from 'immutable-json-patch'
 import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
-import { toRecursiveStatePath } from '$lib/logic/documentState'
-import { type ContextMenuItem, isValueDocumentState2 } from 'svelte-jsoneditor'
+import { getEnforceString } from '$lib/logic/documentState'
 
 export default function ({
   json,
-  documentState2,
+  documentState,
   selection,
   readOnly,
+  parser,
   onEditKey,
   onEditValue,
   onToggleEnforceString,
@@ -52,9 +59,10 @@ export default function ({
   onTransform
 }: {
   json: unknown
-  documentState2: DocumentState2
+  documentState: DocumentState2
   selection: JSONSelection | null
   readOnly: boolean
+  parser: JSONParser
   onEditKey: () => void
   onEditValue: () => void
   onToggleEnforceString: () => void
@@ -118,15 +126,10 @@ export default function ({
   const canInsertOrConvertValue =
     !readOnly && (convertMode ? canConvert(selection) && isObjectOrArray(focusValue) : hasSelection)
 
-  const state =
+  const enforceString =
     selection != null
-      ? getIn<DocumentState2 | undefined>(
-          documentState2,
-          toRecursiveStatePath(json, getFocusPath(selection))
-        )
-      : undefined
-
-  const enforceString = isValueDocumentState2(state) && focusValue ? state.enforceString : false
+      ? getEnforceString(json, documentState, getFocusPath(selection), parser)
+      : false
 
   function handleInsertOrConvert(type: InsertType) {
     if (hasSelectionContents) {

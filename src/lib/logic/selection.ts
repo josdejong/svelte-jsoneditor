@@ -12,7 +12,7 @@ import {
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import { isObjectOrArray } from '$lib/utils/typeUtils.js'
 import {
-  collapsePath2,
+  collapsePath,
   getNextVisiblePath,
   getPreviousVisiblePath,
   getVisibleCaretPositions,
@@ -21,7 +21,6 @@ import {
 import type {
   AfterSelection,
   CaretPosition,
-  DocumentState,
   DocumentState2,
   InsideSelection,
   JSONEditorSelection,
@@ -289,7 +288,7 @@ export function getSelectionDown(
   // if the focusPath is an Array or object, we must not step into it but
   // over it, we pass state with this array/object collapsed
   const collapsedState = isObjectOrArray(getIn(json, focusPath))
-    ? collapsePath2(json, documentState, focusPath)
+    ? collapsePath(json, documentState, focusPath)
     : documentState
 
   const nextPath = getNextVisiblePath(json, documentState, focusPath)
@@ -379,10 +378,10 @@ export function getSelectionNextInside(
 // TODO: unit test
 export function findCaretAndSiblings(
   json: unknown,
-  documentState: DocumentState,
+  documentState: DocumentState2,
+  selection: JSONSelection | null,
   includeInside: boolean
 ): { next: CaretPosition | null; caret: CaretPosition | null; previous: CaretPosition | null } {
-  const selection = documentState.selection
   if (!selection) {
     return { caret: null, previous: null, next: null }
   }
@@ -408,7 +407,7 @@ export function findCaretAndSiblings(
 
 export function getSelectionLeft(
   json: unknown,
-  documentState: DocumentState, // FIXME: must become DocumentState2
+  documentState: DocumentState2,
   selection: JSONSelection | null,
   keepAnchorPath = false,
   includeInside = true
@@ -417,7 +416,7 @@ export function getSelectionLeft(
     return null
   }
 
-  const { caret, previous } = findCaretAndSiblings(json, documentState, includeInside)
+  const { caret, previous } = findCaretAndSiblings(json, documentState, selection, includeInside)
 
   if (keepAnchorPath) {
     if (!isMultiSelection(selection)) {
@@ -447,7 +446,7 @@ export function getSelectionLeft(
 
 export function getSelectionRight(
   json: unknown,
-  documentState: DocumentState, // FIXME: must become documentState2
+  documentState: DocumentState2,
   selection: JSONSelection | null,
   keepAnchorPath = false,
   includeInside = true
@@ -456,7 +455,7 @@ export function getSelectionRight(
     return null
   }
 
-  const { caret, next } = findCaretAndSiblings(json, documentState, includeInside)
+  const { caret, next } = findCaretAndSiblings(json, documentState, selection, includeInside)
 
   if (keepAnchorPath) {
     if (!isMultiSelection(selection)) {
@@ -703,21 +702,6 @@ export function selectionToPartialJson(
 
 export function isEditingSelection(selection: JSONSelection | null): boolean {
   return (isKeySelection(selection) || isValueSelection(selection)) && selection.edit === true
-}
-
-export function updateSelectionInDocumentState(
-  documentState: DocumentState,
-  selection: JSONSelection | null,
-  replaceIfUndefined = true
-): DocumentState {
-  if (!selection && !replaceIfUndefined) {
-    return documentState
-  }
-
-  return {
-    ...documentState,
-    selection
-  }
 }
 
 /**

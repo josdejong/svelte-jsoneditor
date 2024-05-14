@@ -1,4 +1,4 @@
-import { test, describe } from 'vitest'
+import { describe, test } from 'vitest'
 import assert from 'assert'
 import type { JSONPath } from 'immutable-json-patch'
 import { immutableJSONPatch } from 'immutable-json-patch'

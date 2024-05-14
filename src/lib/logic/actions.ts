@@ -22,7 +22,6 @@ import {
 } from '$lib/logic/operations.js'
 import type {
   AfterPatchCallback,
-  DocumentState,
   InsertType,
   JSONParser,
   JSONSelection,
@@ -176,7 +175,7 @@ export function onPaste({
         if (patchedJson) {
           const path: JSONPath = []
           return {
-            state: expandRecursive(patchedJson, patchedState, path) as DocumentState
+            state: expandRecursive(patchedJson, patchedState, path)
           }
         }
       })
@@ -257,7 +256,7 @@ export function onRemove({
 
 export interface OnDuplicateRowAction {
   json: unknown | undefined
-  documentState: DocumentState
+  selection: JSONSelection | null
   columns: JSONPath[]
   readOnly: boolean
   onPatch: OnPatch
@@ -270,24 +269,16 @@ export interface OnDuplicateRowAction {
 // TODO: write unit tests
 export function onDuplicateRow({
   json,
-  documentState,
+  selection,
   columns,
   readOnly,
   onPatch
 }: OnDuplicateRowAction) {
-  if (
-    readOnly ||
-    json === undefined ||
-    !documentState.selection ||
-    !hasSelectionContents(documentState.selection)
-  ) {
+  if (readOnly || json === undefined || !selection || !hasSelectionContents(selection)) {
     return
   }
 
-  const { rowIndex, columnIndex } = toTableCellPosition(
-    getFocusPath(documentState.selection),
-    columns
-  )
+  const { rowIndex, columnIndex } = toTableCellPosition(getFocusPath(selection), columns)
 
   debug('duplicate row', { rowIndex })
 
@@ -310,7 +301,7 @@ export function onDuplicateRow({
 
 export interface OnInsertBeforeRowAction {
   json: unknown | undefined
-  documentState: DocumentState
+  selection: JSONSelection | null
   columns: JSONPath[]
   readOnly: boolean
   onPatch: OnPatch
@@ -323,21 +314,16 @@ export interface OnInsertBeforeRowAction {
 // TODO: write unit tests
 export function onInsertBeforeRow({
   json,
-  documentState,
+  selection,
   columns,
   readOnly,
   onPatch
 }: OnInsertBeforeRowAction) {
-  if (
-    readOnly ||
-    json === undefined ||
-    !documentState.selection ||
-    !hasSelectionContents(documentState.selection)
-  ) {
+  if (readOnly || json === undefined || !selection || !hasSelectionContents(selection)) {
     return
   }
 
-  const { rowIndex } = toTableCellPosition(getFocusPath(documentState.selection), columns)
+  const { rowIndex } = toTableCellPosition(getFocusPath(selection), columns)
 
   debug('insert before row', { rowIndex })
 
@@ -351,7 +337,7 @@ export function onInsertBeforeRow({
 
 export interface OnInsertAfterRowAction {
   json: unknown | undefined
-  documentState: DocumentState
+  selection: JSONSelection | null
   columns: JSONPath[]
   readOnly: boolean
   onPatch: OnPatch
@@ -364,24 +350,16 @@ export interface OnInsertAfterRowAction {
 // TODO: write unit tests
 export function onInsertAfterRow({
   json,
-  documentState,
+  selection,
   columns,
   readOnly,
   onPatch
 }: OnInsertAfterRowAction) {
-  if (
-    readOnly ||
-    json === undefined ||
-    !documentState.selection ||
-    !hasSelectionContents(documentState.selection)
-  ) {
+  if (readOnly || json === undefined || !selection || !hasSelectionContents(selection)) {
     return
   }
 
-  const { rowIndex, columnIndex } = toTableCellPosition(
-    getFocusPath(documentState.selection),
-    columns
-  )
+  const { rowIndex, columnIndex } = toTableCellPosition(getFocusPath(selection), columns)
 
   debug('insert after row', { rowIndex })
 
@@ -410,7 +388,7 @@ export function onInsertAfterRow({
 
 export interface OnRemoveRowAction {
   json: unknown | undefined
-  documentState: DocumentState
+  selection: JSONSelection | null
   columns: JSONPath[]
   readOnly: boolean
   onPatch: OnPatch
@@ -421,26 +399,12 @@ export interface OnRemoveRowAction {
  * it cannot duplicate something in some nested array
  */
 // TODO: write unit tests
-export function onRemoveRow({
-  json,
-  documentState,
-  columns,
-  readOnly,
-  onPatch
-}: OnRemoveRowAction) {
-  if (
-    readOnly ||
-    json === undefined ||
-    !documentState.selection ||
-    !hasSelectionContents(documentState.selection)
-  ) {
+export function onRemoveRow({ json, selection, columns, readOnly, onPatch }: OnRemoveRowAction) {
+  if (readOnly || json === undefined || !selection || !hasSelectionContents(selection)) {
     return
   }
 
-  const { rowIndex, columnIndex } = toTableCellPosition(
-    getFocusPath(documentState.selection),
-    columns
-  )
+  const { rowIndex, columnIndex } = toTableCellPosition(getFocusPath(selection), columns)
 
   debug('remove row', { rowIndex })
 
@@ -513,17 +477,15 @@ export function onInsert({
       operations.filter((operation) => operation.op === 'add' || operation.op === 'replace')
     )
 
-    onPatch(operations, (patchedJson, patchedState) => {
+    onPatch(operations, (patchedJson, patchedState, patchedSelection) => {
       // TODO: extract determining the newSelection in a separate function
       if (operation) {
         const path = parsePath(patchedJson, operation.path)
 
         if (isObjectOrArray(newValue)) {
           return {
-            state: {
-              ...expandWithCallback(patchedJson, patchedState, path, expandAll),
-              selection: selectInside ? createInsideSelection(path) : patchedState.selection
-            }
+            state: expandWithCallback(patchedJson, patchedState, path, expandAll),
+            selection: selectInside ? createInsideSelection(path) : patchedSelection
           }
         }
 
@@ -533,16 +495,10 @@ export function onInsert({
 
           return {
             // expandPath is invoked to make sure that visibleSections is extended when needed
-            state: expandPath(
-              patchedJson,
-              {
-                ...patchedState,
-                selection: isObject(parent)
-                  ? createKeySelection(path, true)
-                  : createValueSelection(path, true)
-              },
-              path
-            )
+            state: expandPath(patchedJson, patchedState, path),
+            selection: isObject(parent)
+              ? createKeySelection(path, true)
+              : createValueSelection(path, true)
           }
         }
 

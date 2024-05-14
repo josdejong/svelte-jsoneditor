@@ -103,26 +103,26 @@ export function isSvelteActionRenderer(value: unknown): value is SvelteActionRen
   return isObject(value) && typeof value.action === 'function' && isObject(value.props)
 }
 
-export function isObjectDocumentState2(
+export function isObjectDocumentState(
   state: DocumentState2 | undefined
 ): state is ObjectDocumentState2 {
-  return isObject(state) && state.type === 'object'
+  return state !== undefined && state.type === 'object'
 }
 
-export function isArrayDocumentState2(
+export function isArrayDocumentState(
   state: DocumentState2 | undefined
 ): state is ArrayDocumentState2 {
-  return isObject(state) && state.type === 'array'
+  return state !== undefined && state.type === 'array'
 }
 
-export function isValueDocumentState2(
+export function isValueDocumentState(
   state: DocumentState2 | undefined
 ): state is ValueDocumentState2 {
-  return isObject(state) && state.type === 'value'
+  return state !== undefined && state.type === 'value'
 }
 
 export function isExpandableState(
   state: DocumentState2 | undefined
 ): state is ObjectDocumentState2 | ArrayDocumentState2 {
-  return isObjectDocumentState2(state) || isArrayDocumentState2(state)
+  return isObjectDocumentState(state) || isArrayDocumentState(state)
 }

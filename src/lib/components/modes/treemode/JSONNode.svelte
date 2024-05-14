@@ -13,7 +13,7 @@
     HOVER_INSERT_INSIDE,
     INSERT_EXPLANATION
   } from '$lib/constants.js'
-  import { getVisibleCaretPositions } from '$lib/logic/documentState.js'
+  import { getEnforceString, getVisibleCaretPositions } from '$lib/logic/documentState.js'
   import { rename } from '$lib/logic/operations.js'
   import {
     createAfterSelection,
@@ -67,18 +67,17 @@
     VisibleSection
   } from '$lib/types'
   import { SelectionType } from '$lib/types.js'
+  import {
+    isArrayDocumentState,
+    isExpandableState,
+    isObjectDocumentState
+  } from '$lib/typeguards.js'
   import { filterPointerOrUndefined } from '$lib/utils/jsonPointer.js'
   import { filterKeySearchResults, filterValueSearchResults } from '$lib/logic/search.js'
   import { createMemoizePath } from '$lib/utils/pathUtils.js'
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
   import { isObject } from '$lib/utils/typeUtils.js'
   import { classnames } from '$lib/utils/cssUtils.js'
-  import {
-    isArrayDocumentState2,
-    isExpandableState,
-    isObjectDocumentState2,
-    isValueDocumentState2
-  } from 'svelte-jsoneditor'
 
   export let value: unknown
   export let path: JSONPath
@@ -108,10 +107,10 @@
   $: expanded = isExpandableState(state) ? state.expanded : false
 
   let enforceString: boolean
-  $: enforceString = isValueDocumentState2(state) ? state.enforceString ?? false : false
+  $: enforceString = getEnforceString(value, state, [], context.parser)
 
   let visibleSections: VisibleSection[] | undefined
-  $: visibleSections = isArrayDocumentState2(state) ? state.visibleSections : undefined
+  $: visibleSections = isArrayDocumentState(state) ? state.visibleSections : undefined
 
   let validationError: NestedValidationError | undefined
   $: validationError = validationErrorsMap ? validationErrorsMap[pointer] : undefined
@@ -710,12 +709,12 @@
             />
           </div>
         {/if}
-        {#each (visibleSections || DEFAULT_VISIBLE_SECTIONS) as visibleSection, sectionIndex (sectionIndex)}
+        {#each visibleSections || DEFAULT_VISIBLE_SECTIONS as visibleSection, sectionIndex (sectionIndex)}
           {#each getItems(path, value, visibleSection, validationErrorsMap, searchResultItemsMap, selection, dragging) as item (item.index)}
             <svelte:self
               value={item.value}
               path={item.path}
-              state={isArrayDocumentState2(state) ? state.items[item.index] : undefined}
+              state={isArrayDocumentState(state) ? state.items[item.index] : undefined}
               validationErrorsMap={item.validationErrorsMap}
               searchResultItemsMap={item.searchResultItemsMap}
               selection={item.selection}
@@ -833,7 +832,7 @@
           <svelte:self
             value={prop.value}
             path={prop.path}
-            state={isObjectDocumentState2(state) ? state.properties[prop.key] : undefined}
+            state={isObjectDocumentState(state) ? state.properties[prop.key] : undefined}
             validationErrorsMap={prop.validationErrorsMap}
             searchResultItemsMap={prop.valueSearchResultItemsMap}
             selection={prop.selection}

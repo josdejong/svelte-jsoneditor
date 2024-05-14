@@ -75,14 +75,6 @@ export interface CaretPosition {
   type: CaretType // TODO: refactor this to use SelectionType here, then we can simplify the util functions to turn this into a selection
 }
 
-export interface DocumentState {
-  expandedMap: JSONPointerMap<boolean>
-  enforceStringMap: JSONPointerMap<boolean>
-  visibleSectionsMap: JSONPointerMap<VisibleSection[]>
-  selection: JSONSelection | null
-  sortedColumn: SortedColumn | null
-}
-
 export interface ObjectDocumentState2 {
   type: 'object'
   expanded: boolean
@@ -114,9 +106,9 @@ export interface JSONPatchResult {
 
 export type AfterPatchCallback = (
   patchedJson: unknown,
-  patchedState: DocumentState,
-  patchedState2: DocumentState2
-) => { json?: unknown; state?: DocumentState; state2?: DocumentState2 } | undefined
+  patchedState: DocumentState2,
+  patchedSelection: JSONSelection | null
+) => { json?: unknown; state?: DocumentState2; selection?: JSONSelection | null } | undefined
 
 export interface MultiSelection {
   type: SelectionType.multi
@@ -409,14 +401,18 @@ export interface HistoryItem {
     patch: JSONPatchDocument | undefined
     json: unknown | undefined
     text: string | undefined
-    state: DocumentState
+    state: DocumentState2
+    selection: JSONSelection | null
+    sortedColumn: SortedColumn | null
     textIsRepaired: boolean
   }
   redo: {
     patch: JSONPatchDocument | undefined
     json: unknown | undefined
     text: string | undefined
-    state: DocumentState
+    state: DocumentState2
+    selection: JSONSelection | null
+    sortedColumn: SortedColumn | null
     textIsRepaired: boolean
   }
 }
@@ -493,7 +489,7 @@ export interface JSONEditorContext {
   parser: JSONParser
   normalization: ValueNormalization
   getJson: () => unknown | undefined
-  getDocumentState: () => DocumentState
+  getDocumentState: () => DocumentState2
   findElement: (path: JSONPath) => Element | null
   findNextInside: FindNextInside
   focus: () => void
@@ -506,7 +502,7 @@ export interface JSONEditorContext {
 
 export interface TreeModeContext extends JSONEditorContext {
   getJson: () => unknown | undefined
-  getDocumentState: () => DocumentState // FIXME: remove getDocumentState
+  getDocumentState: () => DocumentState2
   getSelection: () => JSONSelection | null
   findElement: (path: JSONPath) => Element | null
   onInsert: (type: InsertType) => void

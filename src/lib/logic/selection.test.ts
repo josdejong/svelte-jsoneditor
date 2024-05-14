@@ -7,20 +7,20 @@ import {
   createMultiSelection,
   createSelectionFromOperations,
   createValueSelection,
-  getSelectionPaths,
   findRootPath,
   getInitialSelection,
   getParentPath,
   getSelectionDown,
   getSelectionLeft,
+  getSelectionPaths,
   getSelectionRight,
   getSelectionUp,
+  pathInSelection,
   selectionIfOverlapping,
-  selectionToPartialJson,
-  pathInSelection
+  selectionToPartialJson
 } from './selection.js'
 import { createDocumentState } from './documentState.js'
-import { type DocumentState, type JSONSelection, SelectionType } from '$lib/types.js'
+import { SelectionType } from '$lib/types.js'
 
 describe('selection', () => {
   const json = {
@@ -159,45 +159,29 @@ describe('selection', () => {
       expand: () => true
     })
 
-    function withSelection(documentState: DocumentState, selection: JSONSelection): DocumentState {
-      return {
-        ...documentState,
-        selection
-      }
-    }
-
     test('getSelectionLeft', () => {
       assert.deepStrictEqual(
-        getSelectionLeft(json2, {
-          ...documentState2,
-          selection: createValueSelection(['path'], false)
-        }),
+        getSelectionLeft(json2, documentState2, createValueSelection(['path'], false)),
         createKeySelection(['path'], false)
       )
 
       assert.deepStrictEqual(
-        getSelectionLeft(
-          json2,
-          withSelection(documentState2, createKeySelection(['path1'], false))
-        ),
+        getSelectionLeft(json2, documentState2, createKeySelection(['path1'], false)),
         createAfterSelection(['path'])
       )
 
       assert.deepStrictEqual(
-        getSelectionLeft(json2, withSelection(documentState2, createAfterSelection(['path']))),
+        getSelectionLeft(json2, documentState2, createAfterSelection(['path'])),
         createValueSelection(['path'], false)
       )
 
       assert.deepStrictEqual(
-        getSelectionLeft(json2, withSelection(documentState2, createInsideSelection([]))),
+        getSelectionLeft(json2, documentState2, createInsideSelection([])),
         createValueSelection([], false)
       )
 
       assert.deepStrictEqual(
-        getSelectionLeft(
-          json2,
-          withSelection(documentState2, createMultiSelection(['path1'], ['path2']))
-        ),
+        getSelectionLeft(json2, documentState2, createMultiSelection(['path1'], ['path2'])),
         createKeySelection(['path2'], false)
       )
     })
@@ -206,12 +190,12 @@ describe('selection', () => {
       const json2 = [1, 2, 3]
       const documentState2 = createDocumentState({
         json: json2,
-        expand: () => false,
-        select: () => createValueSelection(['1'], false)
+        expand: () => false
       })
+      const selection = createValueSelection(['1'], false)
 
       assert.deepStrictEqual(
-        getSelectionLeft(json2, documentState2),
+        getSelectionLeft(json2, documentState2, selection),
         createMultiSelection(['1'], ['1'])
       )
     })
@@ -221,7 +205,8 @@ describe('selection', () => {
       assert.deepStrictEqual(
         getSelectionLeft(
           json2,
-          withSelection(documentState2, createValueSelection(['path'], false)),
+          documentState2,
+          createValueSelection(['path'], false),
           keepAnchorPath
         ),
         {
@@ -234,41 +219,32 @@ describe('selection', () => {
 
     test('getSelectionRight', () => {
       assert.deepStrictEqual(
-        getSelectionRight(
-          json2,
-          withSelection(documentState2, createKeySelection(['path'], false))
-        ),
+        getSelectionRight(json2, documentState2, createKeySelection(['path'], false)),
         createValueSelection(['path'], false)
       )
 
       assert.deepStrictEqual(
-        getSelectionRight(json2, withSelection(documentState2, createValueSelection([], false))),
+        getSelectionRight(json2, documentState2, createValueSelection([], false)),
         createInsideSelection([])
       )
 
       assert.deepStrictEqual(
-        getSelectionRight(
-          json2,
-          withSelection(documentState2, createValueSelection(['path'], false))
-        ),
+        getSelectionRight(json2, documentState2, createValueSelection(['path'], false)),
         createAfterSelection(['path'])
       )
 
       assert.deepStrictEqual(
-        getSelectionRight(json2, withSelection(documentState2, createAfterSelection(['path']))),
+        getSelectionRight(json2, documentState2, createAfterSelection(['path'])),
         createKeySelection(['path1'], false)
       )
 
       assert.deepStrictEqual(
-        getSelectionRight(json2, withSelection(documentState2, createInsideSelection(['path']))),
+        getSelectionRight(json2, documentState2, createInsideSelection(['path'])),
         null
       )
 
       assert.deepStrictEqual(
-        getSelectionRight(
-          json2,
-          withSelection(documentState2, createMultiSelection(['path1'], ['path2']))
-        ),
+        getSelectionRight(json2, documentState2, createMultiSelection(['path1'], ['path2'])),
         createValueSelection(['path2'], false)
       )
     })
@@ -278,7 +254,8 @@ describe('selection', () => {
       assert.deepStrictEqual(
         getSelectionRight(
           json2,
-          withSelection(documentState2, createKeySelection(['path'], false)),
+          documentState2,
+          createKeySelection(['path'], false),
           keepAnchorPath
         ),
         {
@@ -302,136 +279,102 @@ describe('selection', () => {
 
       test('should get selection up from KEY selection', () => {
         assert.deepStrictEqual(
-          getSelectionUp(json2, withSelection(documentState2, createKeySelection(['obj'], false))),
+          getSelectionUp(json2, documentState2, createKeySelection(['obj'], false)),
           createKeySelection(['a'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionUp(
-            json2,
-            withSelection(documentState2, createKeySelection(['obj', 'c'], false))
-          ),
+          getSelectionUp(json2, documentState2, createKeySelection(['obj', 'c'], false)),
           createKeySelection(['obj'], false)
         )
 
         // jump from key to array value
         assert.deepStrictEqual(
-          getSelectionUp(json2, withSelection(documentState2, createKeySelection(['d'], false))),
+          getSelectionUp(json2, documentState2, createKeySelection(['d'], false)),
           createValueSelection(['arr', '1'], false)
         )
       })
 
       test('should get selection up from VALUE selection', () => {
         assert.deepStrictEqual(
-          getSelectionUp(
-            json2,
-            withSelection(documentState2, createValueSelection(['obj'], false))
-          ),
+          getSelectionUp(json2, documentState2, createValueSelection(['obj'], false)),
           createValueSelection(['a'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionUp(
-            json2,
-            withSelection(documentState2, createValueSelection(['obj', 'c'], false))
-          ),
+          getSelectionUp(json2, documentState2, createValueSelection(['obj', 'c'], false)),
           createValueSelection(['obj'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionUp(json2, withSelection(documentState2, createValueSelection(['d'], false))),
+          getSelectionUp(json2, documentState2, createValueSelection(['d'], false)),
           createValueSelection(['arr', '1'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionUp(
-            json2,
-            withSelection(documentState2, createValueSelection(['arr', '1'], false))
-          ),
+          getSelectionUp(json2, documentState2, createValueSelection(['arr', '1'], false)),
           createValueSelection(['arr', '0'], false)
         )
       })
 
       test('should get selection up from AFTER selection', () => {
         assert.deepStrictEqual(
-          getSelectionUp(json2, withSelection(documentState2, createAfterSelection(['arr', '1']))),
+          getSelectionUp(json2, documentState2, createAfterSelection(['arr', '1'])),
           createValueSelection(['arr', '1'], false)
         )
 
         // FIXME: this should return a value selection of /obj/c instead of /obj
         assert.deepStrictEqual(
-          getSelectionUp(json2, withSelection(documentState2, createAfterSelection(['obj']))),
+          getSelectionUp(json2, documentState2, createAfterSelection(['obj'])),
           createValueSelection(['obj'], false)
         )
       })
 
       test('should get selection up from INSIDE selection', () => {
         assert.deepStrictEqual(
-          getSelectionUp(json2, withSelection(documentState2, createInsideSelection(['arr']))),
+          getSelectionUp(json2, documentState2, createInsideSelection(['arr'])),
           createValueSelection(['arr'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionUp(json2, withSelection(documentState2, createInsideSelection(['obj']))),
+          getSelectionUp(json2, documentState2, createInsideSelection(['obj'])),
           createValueSelection(['obj'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionUp(json2, withSelection(documentState2, createInsideSelection([]))),
+          getSelectionUp(json2, documentState2, createInsideSelection([])),
           createValueSelection([], false)
         )
       })
 
       test('should get selection up from MULTI selection', () => {
         assert.deepStrictEqual(
-          getSelectionUp(
-            json2,
-            withSelection(documentState2, createMultiSelection(['d'], ['obj']))
-          ),
+          getSelectionUp(json2, documentState2, createMultiSelection(['d'], ['obj'])),
           createValueSelection(['a'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionUp(
-            json2,
-            withSelection(documentState2, createMultiSelection(['d'], ['obj'])),
-            true
-          ),
+          getSelectionUp(json2, documentState2, createMultiSelection(['d'], ['obj']), true),
           createMultiSelection(['d'], ['a'])
         )
 
         assert.deepStrictEqual(
-          getSelectionUp(
-            json2,
-            withSelection(documentState2, createMultiSelection(['obj'], ['d']))
-          ),
+          getSelectionUp(json2, documentState2, createMultiSelection(['obj'], ['d'])),
           createValueSelection(['a'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionUp(
-            json2,
-            withSelection(documentState2, createMultiSelection(['obj'], ['d'])),
-            false
-          ),
+          getSelectionUp(json2, documentState2, createMultiSelection(['obj'], ['d']), false),
           createValueSelection(['a'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionUp(
-            json2,
-            withSelection(documentState2, createMultiSelection(['obj'], ['d'])),
-            true
-          ),
+          getSelectionUp(json2, documentState2, createMultiSelection(['obj'], ['d']), true),
           createMultiSelection(['obj'], ['arr'])
         )
 
         assert.deepStrictEqual(
-          getSelectionUp(
-            json2,
-            withSelection(documentState2, createMultiSelection(['a'], ['a'])),
-            false
-          ),
+          getSelectionUp(json2, documentState2, createMultiSelection(['a'], ['a']), false),
           createValueSelection([], false)
         )
       })
@@ -450,160 +393,106 @@ describe('selection', () => {
 
       test('should get selection down from KEY selection', () => {
         assert.deepStrictEqual(
-          getSelectionDown(
-            json2,
-            withSelection(documentState2, createKeySelection(['obj'], false))
-          ),
+          getSelectionDown(json2, documentState2, createKeySelection(['obj'], false)),
           createKeySelection(['obj', 'c'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionDown(
-            json2,
-            withSelection(documentState2, createKeySelection(['obj', 'c'], false))
-          ),
+          getSelectionDown(json2, documentState2, createKeySelection(['obj', 'c'], false)),
           createKeySelection(['arr'], false)
         )
 
         // jump from key to array value
         assert.deepStrictEqual(
-          getSelectionDown(
-            json2,
-            withSelection(documentState2, createKeySelection(['arr'], false))
-          ),
+          getSelectionDown(json2, documentState2, createKeySelection(['arr'], false)),
           createValueSelection(['arr', '0'], false)
         )
       })
 
       test('should get selection down from VALUE selection', () => {
         assert.deepStrictEqual(
-          getSelectionDown(
-            json2,
-            withSelection(documentState2, createValueSelection(['obj'], false))
-          ),
+          getSelectionDown(json2, documentState2, createValueSelection(['obj'], false)),
           createValueSelection(['obj', 'c'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionDown(
-            json2,
-            withSelection(documentState2, createValueSelection(['obj', 'c'], false))
-          ),
+          getSelectionDown(json2, documentState2, createValueSelection(['obj', 'c'], false)),
           createValueSelection(['arr'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionDown(
-            json2,
-            withSelection(documentState2, createValueSelection(['arr', '1'], false))
-          ),
+          getSelectionDown(json2, documentState2, createValueSelection(['arr', '1'], false)),
           createValueSelection(['d'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionDown(
-            json2,
-            withSelection(documentState2, createValueSelection(['arr', '0'], false))
-          ),
+          getSelectionDown(json2, documentState2, createValueSelection(['arr', '0'], false)),
           createValueSelection(['arr', '1'], false)
         )
       })
 
       test('should get selection down from AFTER selection', () => {
         assert.deepStrictEqual(
-          getSelectionDown(
-            json2,
-            withSelection(documentState2, createAfterSelection(['arr', '0']))
-          ),
+          getSelectionDown(json2, documentState2, createAfterSelection(['arr', '0'])),
           createValueSelection(['arr', '1'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionDown(
-            json2,
-            withSelection(documentState2, createAfterSelection(['arr', '1']))
-          ),
+          getSelectionDown(json2, documentState2, createAfterSelection(['arr', '1'])),
           createValueSelection(['d'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionDown(json2, withSelection(documentState2, createAfterSelection(['obj']))),
+          getSelectionDown(json2, documentState2, createAfterSelection(['obj'])),
           createValueSelection(['arr'], false)
         )
       })
 
       test('should get selection down from INSIDE selection', () => {
         assert.deepStrictEqual(
-          getSelectionDown(json2, withSelection(documentState2, createInsideSelection(['arr']))),
+          getSelectionDown(json2, documentState2, createInsideSelection(['arr'])),
           createValueSelection(['arr', '0'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionDown(json2, withSelection(documentState2, createInsideSelection(['obj']))),
+          getSelectionDown(json2, documentState2, createInsideSelection(['obj'])),
           createValueSelection(['obj', 'c'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionDown(
-            json2,
-            withSelection(documentState2, createInsideSelection(['arr'])),
-            true
-          ),
+          getSelectionDown(json2, documentState2, createInsideSelection(['arr']), true),
           createMultiSelection(['arr', '0'], ['arr', '0'])
         )
       })
 
       test('should get selection down from MULTI selection', () => {
         assert.deepStrictEqual(
-          getSelectionDown(
-            json2,
-            withSelection(documentState2, createMultiSelection(['arr'], ['a']))
-          ),
+          getSelectionDown(json2, documentState2, createMultiSelection(['arr'], ['a'])),
           createValueSelection(['d'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionDown(
-            json2,
-            withSelection(documentState2, createMultiSelection(['arr'], ['a'])),
-            false
-          ),
+          getSelectionDown(json2, documentState2, createMultiSelection(['arr'], ['a']), false),
           createValueSelection(['d'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionDown(
-            json2,
-            withSelection(documentState2, createMultiSelection(['arr'], ['a'])),
-            true
-          ),
+          getSelectionDown(json2, documentState2, createMultiSelection(['arr'], ['a']), true),
           createMultiSelection(['arr'], ['obj'])
         )
 
         assert.deepStrictEqual(
-          getSelectionDown(
-            json2,
-            withSelection(documentState2, createMultiSelection(['a'], ['arr'])),
-            false
-          ),
+          getSelectionDown(json2, documentState2, createMultiSelection(['a'], ['arr']), false),
           createValueSelection(['d'], false)
         )
 
         assert.deepStrictEqual(
-          getSelectionDown(
-            json2,
-            withSelection(documentState2, createMultiSelection(['a'], ['arr'])),
-            true
-          ),
+          getSelectionDown(json2, documentState2, createMultiSelection(['a'], ['arr']), true),
           createMultiSelection(['a'], ['d'])
         )
 
         assert.deepStrictEqual(
-          getSelectionDown(
-            json2,
-            withSelection(documentState2, createMultiSelection(['arr'], ['arr'])),
-            false
-          ),
+          getSelectionDown(json2, documentState2, createMultiSelection(['arr'], ['arr']), false),
           createValueSelection(['d'], false)
         )
       })
@@ -619,11 +508,7 @@ describe('selection', () => {
         const documentState3 = createDocumentState({ json: json3, expand: () => true })
 
         assert.deepStrictEqual(
-          getSelectionDown(
-            json3,
-            withSelection(documentState3, createAfterSelection(['arr'])),
-            false
-          ),
+          getSelectionDown(json3, documentState3, createAfterSelection(['arr']), false),
           null
         )
       })
