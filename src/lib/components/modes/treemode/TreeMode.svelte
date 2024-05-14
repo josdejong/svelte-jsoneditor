@@ -568,6 +568,7 @@
             patch: [{ op: 'replace', path: '', value: previousJson }],
             state: previousState,
             selection: removeEditModeFromSelection(previousSelection),
+            sortedColumn: null,
             json: undefined,
             text: previousText,
             textIsRepaired: previousTextIsRepaired
@@ -576,6 +577,7 @@
             patch: [{ op: 'replace', path: '', value: json }],
             state: documentState,
             selection: removeEditModeFromSelection(selection),
+            sortedColumn: null,
             json: undefined,
             text,
             textIsRepaired
@@ -589,6 +591,7 @@
             text: previousText,
             state: previousState,
             selection: removeEditModeFromSelection(previousSelection),
+            sortedColumn: null,
             textIsRepaired: previousTextIsRepaired
           },
           redo: {
@@ -596,6 +599,7 @@
             json,
             state: documentState,
             selection: removeEditModeFromSelection(selection),
+            sortedColumn: null,
             text,
             textIsRepaired
           }
@@ -609,6 +613,7 @@
             json: previousJson,
             state: previousState,
             selection: removeEditModeFromSelection(previousSelection),
+            sortedColumn: null,
             text: previousText,
             textIsRepaired: previousTextIsRepaired
           },
@@ -618,7 +623,8 @@
             text,
             textIsRepaired,
             state: documentState,
-            selection: removeEditModeFromSelection(selection)
+            selection: removeEditModeFromSelection(selection),
+            sortedColumn: null
           }
         })
       } else {
@@ -683,6 +689,7 @@
         text: previousText,
         state: previousState,
         selection: removeEditModeFromSelection(selection),
+        sortedColumn: null,
         textIsRepaired: previousTextIsRepaired
       },
       redo: {
@@ -690,6 +697,7 @@
         json: undefined,
         state: documentState,
         selection: removeEditModeFromSelection(selection),
+        sortedColumn: null,
         text,
         textIsRepaired
       }

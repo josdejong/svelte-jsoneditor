@@ -3,7 +3,10 @@ import { describe, expect, test } from 'vitest'
 import { flatMap, isEqual, range, times } from 'lodash-es'
 import { ARRAY_SECTION_SIZE, DEFAULT_VISIBLE_SECTIONS } from '../constants.js'
 import {
+  createArrayDocumentState,
   createDocumentState,
+  createObjectDocumentState,
+  createValueDocumentState,
   documentStatePatch,
   expandPath,
   expandSection,
@@ -13,11 +16,14 @@ import {
   getVisibleCaretPositions,
   getVisiblePaths,
   shiftVisibleSections,
+  syncDocumentState,
   syncKeys,
-  toRecursiveStatePath
+  toRecursiveStatePath,
+  updateInDocumentState
 } from './documentState.js'
 import { CaretType, type DocumentState, type VisibleSection } from '$lib/types.js'
 import { deleteIn, getIn, type JSONPatchDocument, setIn, updateIn } from 'immutable-json-patch'
+import { isArrayDocumentState } from 'svelte-jsoneditor'
 
 describe('documentState', () => {
   test('syncKeys should append new keys and remove old keys', () => {
@@ -26,6 +32,119 @@ describe('documentState', () => {
 
   test('syncKeys should keep the previous order of the keys ', () => {
     assert.deepStrictEqual(syncKeys(['a', 'b'], ['b', 'a']), ['b', 'a'])
+  })
+
+  describe('syncDocumentState', () => {
+    test('should maintain array documentState when no change is needed', () => {
+      const state: DocumentState = {
+        type: 'array',
+        expanded: true,
+        items: [{ type: 'value', enforceString: false }],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+      assert.deepStrictEqual(syncDocumentState([1, 2, 3], state), state)
+    })
+
+    test('should maintain object documentState when no change is needed', () => {
+      const state: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {
+          c: { type: 'value', enforceString: false }
+        }
+      }
+      assert.deepStrictEqual(syncDocumentState({ a: 1, b: 2, c: 3 }, state), state)
+    })
+
+    test('should switch array, object, and value state', () => {
+      const arrayState = createArrayDocumentState()
+      const objectState = createObjectDocumentState()
+      const valueState = createValueDocumentState()
+
+      assert.deepStrictEqual(syncDocumentState(undefined, arrayState), undefined)
+      assert.deepStrictEqual(syncDocumentState(undefined, objectState), undefined)
+      assert.deepStrictEqual(syncDocumentState(undefined, valueState), undefined)
+      assert.deepStrictEqual(syncDocumentState(undefined, undefined), undefined)
+
+      assert.deepStrictEqual(syncDocumentState([], arrayState), arrayState)
+      assert.deepStrictEqual(syncDocumentState([], objectState), arrayState)
+      assert.deepStrictEqual(syncDocumentState([], valueState), arrayState)
+      assert.deepStrictEqual(syncDocumentState([], undefined), undefined)
+
+      assert.deepStrictEqual(syncDocumentState({}, arrayState), objectState)
+      assert.deepStrictEqual(syncDocumentState({}, objectState), objectState)
+      assert.deepStrictEqual(syncDocumentState({}, valueState), objectState)
+      assert.deepStrictEqual(syncDocumentState({}, undefined), undefined)
+
+      assert.deepStrictEqual(syncDocumentState(42, arrayState), undefined)
+      assert.deepStrictEqual(syncDocumentState(42, objectState), undefined)
+      assert.deepStrictEqual(syncDocumentState(42, valueState), valueState)
+      assert.deepStrictEqual(syncDocumentState(42, undefined), undefined)
+    })
+
+    test('should maintain expanded state when switching between array and object', () => {
+      const arrayState = createArrayDocumentState({ expanded: false })
+      const objectState = createObjectDocumentState({ expanded: false })
+      const arrayStateExpanded = createArrayDocumentState({ expanded: true })
+      const objectStateExpanded = createObjectDocumentState({ expanded: true })
+
+      assert.deepStrictEqual(syncDocumentState({}, arrayState), objectState)
+      assert.deepStrictEqual(syncDocumentState([], objectState), arrayState)
+
+      assert.deepStrictEqual(syncDocumentState({}, arrayStateExpanded), objectStateExpanded)
+      assert.deepStrictEqual(syncDocumentState([], objectStateExpanded), arrayStateExpanded)
+    })
+
+    test('should remove deleted properties', () => {
+      const state: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {
+          a: { type: 'value', enforceString: false },
+          b: { type: 'value', enforceString: false },
+          c: { type: 'value', enforceString: false }
+        }
+      }
+
+      const expected: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {
+          a: { type: 'value', enforceString: false },
+          c: { type: 'value', enforceString: false }
+        }
+      }
+
+      assert.deepStrictEqual(syncDocumentState({ a: 1, c: 3, d: 4 }, state), expected)
+    })
+
+    test('should remove deleted items', () => {
+      const state: DocumentState = {
+        type: 'array',
+        expanded: true,
+        // eslint-disable-next-line no-sparse-arrays
+        items: [, { type: 'value' }, { type: 'value' }],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      const expected: DocumentState = {
+        type: 'array',
+        expanded: true,
+        // eslint-disable-next-line no-sparse-arrays
+        items: [, { type: 'value' }],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      assert.deepStrictEqual(syncDocumentState([1, 2], state), expected)
+    })
+
+    test('should work on nested objects', () => {
+      // FIXME
+    })
+
+    test('should work on arrays objects', () => {
+      // FIXME
+    })
   })
 
   test('toRecursiveStatePath', () => {
@@ -411,11 +530,12 @@ describe('documentState', () => {
       }
 
       let documentState: DocumentState = createDocumentState({ json, expand: () => true })
-      documentState = setIn(
-        documentState,
-        ['properties', 'members', 'visibleSections'],
-        [{ start: 0, end: 3 }]
-      )
+
+      documentState = updateInDocumentState(json, documentState, ['members'], (state) => {
+        return isArrayDocumentState(state)
+          ? { ...state, visibleSections: [{ start: 0, end: 3 }] }
+          : state
+      })
 
       return { json, documentState }
     }
@@ -613,7 +733,23 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, setIn(json, ['group'], { groupId: '1234' }))
-      assert.deepStrictEqual(res.state, documentState)
+      assert.deepStrictEqual(res.state, {
+        type: 'object',
+        expanded: true,
+        properties: {
+          group: { expanded: true, properties: {}, type: 'object' },
+          members: {
+            type: 'array',
+            expanded: true,
+            items: [
+              { expanded: true, properties: {}, type: 'object' },
+              { expanded: true, properties: {}, type: 'object' },
+              { expanded: true, properties: {}, type: 'object' }
+            ],
+            visibleSections: [{ end: 3, start: 0 }]
+          }
+        }
+      })
     })
 
     test('replace: should replace a value in an array', () => {
@@ -668,9 +804,7 @@ describe('documentState', () => {
       assert.deepStrictEqual(res.state, {
         type: 'object',
         expanded: true,
-        properties: {
-          b: { type: 'object', expanded: true, properties: {} }
-        }
+        properties: {}
       })
     })
 

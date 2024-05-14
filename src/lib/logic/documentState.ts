@@ -83,6 +83,55 @@ export function createValueDocumentState(): ValueDocumentState {
   return { type: 'value' }
 }
 
+export function syncDocumentState(
+  json: unknown,
+  documentState: DocumentState | undefined
+): DocumentState | undefined {
+  if (json === undefined || documentState === undefined) {
+    return undefined
+  }
+
+  if (Array.isArray(json)) {
+    if (!isArrayDocumentState(documentState)) {
+      const expanded = isExpandableState(documentState) ? documentState.expanded : false
+      return createArrayDocumentState({ expanded })
+    }
+
+    const items = documentState.items
+      .slice(0, json.length)
+      .map((state, index) => syncDocumentState(json[index], state))
+
+    return { ...documentState, items }
+  }
+
+  if (isObject(json)) {
+    if (!isObjectDocumentState(documentState)) {
+      const expanded = isExpandableState(documentState) ? documentState.expanded : false
+      return createObjectDocumentState({ expanded })
+    }
+
+    const properties: ObjectDocumentState['properties'] = {}
+    Object.keys(documentState.properties).forEach((key) => {
+      const value = json[key]
+      if (value !== undefined) {
+        const state = syncDocumentState(value, documentState.properties[key])
+        if (state !== undefined) {
+          properties[key] = state
+        }
+      }
+    })
+
+    return { ...documentState, properties }
+  }
+
+  // value
+  if (!isValueDocumentState(documentState)) {
+    return undefined
+  }
+
+  return documentState
+}
+
 export function getVisibleSections(
   json: unknown,
   documentState: DocumentState,
@@ -400,11 +449,11 @@ export function documentStatePatch(
 
   return {
     json: updatedJson,
-    state: updatedDocumentState
+    state: syncDocumentState(updatedJson, updatedDocumentState) as DocumentState
   }
 }
 
-function getInDocumentState(
+export function getInDocumentState(
   json: unknown,
   documentState: DocumentState | undefined,
   path: JSONPath
@@ -412,7 +461,7 @@ function getInDocumentState(
   return getIn(documentState, toRecursiveStatePath(json, path))
 }
 
-function setInDocumentState(
+export function setInDocumentState(
   json: unknown,
   documentState: DocumentState,
   path: JSONPath,
@@ -421,7 +470,7 @@ function setInDocumentState(
   return setIn(documentState, toRecursiveStatePath(json, path), value)
 }
 
-function updateInDocumentState(
+export function updateInDocumentState(
   json: unknown,
   documentState: DocumentState,
   path: JSONPath,
@@ -430,7 +479,7 @@ function updateInDocumentState(
   return updateIn(documentState, toRecursiveStatePath(json, path), transform)
 }
 
-function deleteInDocumentState(
+export function deleteInDocumentState(
   json: unknown,
   documentState: DocumentState,
   path: JSONPath
