@@ -25,7 +25,7 @@ import {
 } from '$lib/logic/selection'
 import type {
   ConvertType,
-  DocumentState2,
+  DocumentState,
   InsertType,
   JSONParser,
   JSONSelection,
@@ -59,7 +59,7 @@ export default function ({
   onTransform
 }: {
   json: unknown
-  documentState: DocumentState2
+  documentState: DocumentState
   selection: JSONSelection | null
   readOnly: boolean
   parser: JSONParser

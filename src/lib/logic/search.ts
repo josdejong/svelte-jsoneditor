@@ -11,7 +11,7 @@ import { createSelectionFromOperations } from './selection.js'
 import { rename } from './operations.js'
 import { stringConvert } from '../utils/typeUtils.js'
 import type {
-  DocumentState2,
+  DocumentState,
   ExtendedSearchResultItem,
   JSONParser,
   JSONPointerMap,
@@ -275,7 +275,7 @@ export function replaceAllText(
 
 export function createSearchAndReplaceOperations(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   replacementText: string,
   searchResultItem: SearchResultItem,
   parser: JSONParser
@@ -329,7 +329,7 @@ export function createSearchAndReplaceOperations(
 
 export function createSearchAndReplaceAllOperations(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   searchText: string,
   replacementText: string,
   parser: JSONParser

@@ -8,7 +8,7 @@
     Content,
     ContentErrors,
     ContextMenuItem,
-    DocumentState2,
+    DocumentState,
     HistoryItem,
     JSONEditorContext,
     JSONEditorSelection,
@@ -478,7 +478,7 @@
   }: {
     previousJson: unknown | undefined
     previousText: string | undefined
-    previousState: DocumentState2
+    previousState: DocumentState
     previousSelection: JSONSelection | null
     previousSortedColumn: SortedColumn | null
     previousTextIsRepaired: boolean

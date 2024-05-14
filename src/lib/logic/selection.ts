@@ -21,7 +21,7 @@ import {
 import type {
   AfterSelection,
   CaretPosition,
-  DocumentState2,
+  DocumentState,
   InsideSelection,
   JSONEditorSelection,
   JSONParser,
@@ -215,7 +215,7 @@ export function isSelectionInsidePath(selection: JSONSelection, path: JSONPath):
 
 export function getSelectionUp(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   selection: JSONSelection | null,
   keepAnchorPath = false
 ): JSONSelection | null {
@@ -276,7 +276,7 @@ export function getSelectionUp(
 
 export function getSelectionDown(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   selection: JSONSelection | null,
   keepAnchorPath = false
 ): JSONSelection | null {
@@ -354,7 +354,7 @@ export function getSelectionDown(
  */
 export function getSelectionNextInside(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   selection: JSONSelection | null,
   path: JSONPath
 ): JSONSelection | null {
@@ -378,7 +378,7 @@ export function getSelectionNextInside(
 // TODO: unit test
 export function findCaretAndSiblings(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   selection: JSONSelection | null,
   includeInside: boolean
 ): { next: CaretPosition | null; caret: CaretPosition | null; previous: CaretPosition | null } {
@@ -407,7 +407,7 @@ export function findCaretAndSiblings(
 
 export function getSelectionLeft(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   selection: JSONSelection | null,
   keepAnchorPath = false,
   includeInside = true
@@ -446,7 +446,7 @@ export function getSelectionLeft(
 
 export function getSelectionRight(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   selection: JSONSelection | null,
   keepAnchorPath = false,
   includeInside = true
@@ -479,7 +479,7 @@ export function getSelectionRight(
 /**
  * Get a proper initial selection based on what is visible
  */
-export function getInitialSelection(json: unknown, documentState: DocumentState2): JSONSelection {
+export function getInitialSelection(json: unknown, documentState: DocumentState): JSONSelection {
   const visiblePaths = getVisiblePaths(json, documentState)
 
   // find the first, deepest nested entry (normally a value, not an Object/Array)

@@ -15,7 +15,7 @@
   import { DEBOUNCE_DELAY, MAX_SEARCH_RESULTS } from '$lib/constants.js'
   import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
   import { createDebug } from '$lib/utils/debug.js'
-  import type { DocumentState2, JSONParser, OnPatch, SearchResult } from '$lib/types.js'
+  import type { DocumentState, JSONParser, OnPatch, SearchResult } from '$lib/types.js'
   import {
     createSearchAndReplaceAllOperations,
     createSearchAndReplaceOperations,
@@ -30,7 +30,7 @@
   const debug = createDebug('jsoneditor:SearchBox')
 
   export let json: unknown
-  export let documentState: DocumentState2
+  export let documentState: DocumentState
   export let parser: JSONParser
   export let showSearch: boolean
   export let showReplace: boolean

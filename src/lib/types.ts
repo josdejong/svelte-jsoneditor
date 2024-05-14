@@ -75,27 +75,25 @@ export interface CaretPosition {
   type: CaretType // TODO: refactor this to use SelectionType here, then we can simplify the util functions to turn this into a selection
 }
 
-export interface ObjectDocumentState2 {
+export interface ObjectDocumentState {
   type: 'object'
   expanded: boolean
-  properties: Record<string, DocumentState2 | undefined>
+  properties: Record<string, DocumentState | undefined>
 }
 
-export interface ArrayDocumentState2 {
+export interface ArrayDocumentState {
   type: 'array'
   expanded: boolean
   visibleSections: VisibleSection[]
-  items: Array<DocumentState2 | undefined>
+  items: Array<DocumentState | undefined>
 }
 
-export interface ValueDocumentState2 {
+export interface ValueDocumentState {
   type: 'value'
   enforceString?: boolean
 }
 
-// TODO: keep search results in DocumentState2?
-// TODO: put selection in DocumentState2?
-export type DocumentState2 = ObjectDocumentState2 | ArrayDocumentState2 | ValueDocumentState2
+export type DocumentState = ObjectDocumentState | ArrayDocumentState | ValueDocumentState
 
 export interface JSONPatchResult {
   json: unknown
@@ -106,9 +104,9 @@ export interface JSONPatchResult {
 
 export type AfterPatchCallback = (
   patchedJson: unknown,
-  patchedState: DocumentState2,
+  patchedState: DocumentState,
   patchedSelection: JSONSelection | null
-) => { json?: unknown; state?: DocumentState2; selection?: JSONSelection | null } | undefined
+) => { json?: unknown; state?: DocumentState; selection?: JSONSelection | null } | undefined
 
 export interface MultiSelection {
   type: SelectionType.multi
@@ -401,7 +399,7 @@ export interface HistoryItem {
     patch: JSONPatchDocument | undefined
     json: unknown | undefined
     text: string | undefined
-    state: DocumentState2
+    state: DocumentState
     selection: JSONSelection | null
     sortedColumn: SortedColumn | null
     textIsRepaired: boolean
@@ -410,7 +408,7 @@ export interface HistoryItem {
     patch: JSONPatchDocument | undefined
     json: unknown | undefined
     text: string | undefined
-    state: DocumentState2
+    state: DocumentState
     selection: JSONSelection | null
     sortedColumn: SortedColumn | null
     textIsRepaired: boolean
@@ -489,7 +487,7 @@ export interface JSONEditorContext {
   parser: JSONParser
   normalization: ValueNormalization
   getJson: () => unknown | undefined
-  getDocumentState: () => DocumentState2
+  getDocumentState: () => DocumentState
   findElement: (path: JSONPath) => Element | null
   findNextInside: FindNextInside
   focus: () => void
@@ -502,7 +500,7 @@ export interface JSONEditorContext {
 
 export interface TreeModeContext extends JSONEditorContext {
   getJson: () => unknown | undefined
-  getDocumentState: () => DocumentState2
+  getDocumentState: () => DocumentState
   getSelection: () => JSONSelection | null
   findElement: (path: JSONPath) => Element | null
   onInsert: (type: InsertType) => void

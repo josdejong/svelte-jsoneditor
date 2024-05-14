@@ -54,7 +54,7 @@
   import type {
     AbsolutePopupOptions,
     CaretPosition,
-    DocumentState2,
+    DocumentState,
     DraggingState,
     ExtendedSearchResultItem,
     JSONNodeItem,
@@ -81,7 +81,7 @@
 
   export let value: unknown
   export let path: JSONPath
-  export let state: DocumentState2 | undefined
+  export let state: DocumentState | undefined
   export let validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   export let searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
   export let selection: JSONSelection | null

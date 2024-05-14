@@ -112,7 +112,7 @@
     ContentErrors,
     ContextMenuItem,
     ConvertType,
-    DocumentState2,
+    DocumentState,
     HistoryItem,
     InsertType,
     JSONEditorSelection,
@@ -235,7 +235,7 @@
   let parseError: ParseError | undefined = undefined
 
   let documentStateInitialized = false
-  let documentState: DocumentState2 = createDocumentState({ json })
+  let documentState: DocumentState = createDocumentState({ json })
   let selection: JSONSelection | null
 
   function updateSelection(
@@ -398,7 +398,7 @@
     return json
   }
 
-  function getDocumentState(): DocumentState2 {
+  function getDocumentState(): DocumentState {
     return documentState
   }
 
@@ -551,7 +551,7 @@
   }: {
     previousJson: unknown | undefined
     previousText: string | undefined
-    previousState: DocumentState2
+    previousState: DocumentState
     previousSelection: JSONSelection | null
     previousTextIsRepaired: boolean
   }) {

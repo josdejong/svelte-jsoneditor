@@ -1,4 +1,4 @@
-import type { ContextMenuItem, DocumentState2, JSONParser, JSONSelection } from 'svelte-jsoneditor'
+import type { ContextMenuItem, DocumentState, JSONParser, JSONSelection } from 'svelte-jsoneditor'
 import {
   faCheckSquare,
   faClone,
@@ -35,7 +35,7 @@ export default function ({
   onRemoveRow
 }: {
   json: unknown | undefined
-  documentState: DocumentState2
+  documentState: DocumentState
   selection: JSONSelection | null
   readOnly: boolean
   parser: JSONParser

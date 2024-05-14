@@ -16,7 +16,7 @@ import {
   syncKeys,
   toRecursiveStatePath
 } from './documentState.js'
-import { CaretType, type DocumentState2, type VisibleSection } from '$lib/types.js'
+import { CaretType, type DocumentState, type VisibleSection } from '$lib/types.js'
 import { deleteIn, getIn, type JSONPatchDocument, setIn, updateIn } from 'immutable-json-patch'
 
 describe('documentState', () => {
@@ -394,7 +394,7 @@ describe('documentState', () => {
   })
 
   describe('documentStatePatch', () => {
-    function createJsonAndState(): { json: unknown; documentState: DocumentState2 } {
+    function createJsonAndState(): { json: unknown; documentState: DocumentState } {
       const json = {
         members: [
           { id: 1, name: 'Joe' },
@@ -410,7 +410,7 @@ describe('documentState', () => {
         }
       }
 
-      let documentState: DocumentState2 = createDocumentState({ json, expand: () => true })
+      let documentState: DocumentState = createDocumentState({ json, expand: () => true })
       documentState = setIn(
         documentState,
         ['properties', 'members', 'visibleSections'],
@@ -432,7 +432,7 @@ describe('documentState', () => {
 
     test('add: should add a value to an object (expanded)', () => {
       const json = { a: 2, b: 3 }
-      const documentState: DocumentState2 = createDocumentState({ json, expand: () => true })
+      const documentState: DocumentState = createDocumentState({ json, expand: () => true })
 
       const res = documentStatePatch(json, documentState, [{ op: 'add', path: '/c', value: 42 }])
 
@@ -442,7 +442,7 @@ describe('documentState', () => {
 
     test('add: should override a value in an object', () => {
       const json = { a: 2, b: 3 }
-      const documentState: DocumentState2 = createDocumentState({ json, expand: () => true })
+      const documentState: DocumentState = createDocumentState({ json, expand: () => true })
 
       const res = documentStatePatch(json, documentState, [{ op: 'add', path: '/a', value: 42 }])
 
@@ -511,7 +511,7 @@ describe('documentState', () => {
 
     test('add: extend the visibleSection when appending a value to an array', () => {
       const json = [0, 1, 2, 3]
-      const documentState: DocumentState2 = {
+      const documentState: DocumentState = {
         type: 'array',
         expanded: true,
         items: [],
@@ -530,7 +530,7 @@ describe('documentState', () => {
 
     test('replace: should keep enforceString state', () => {
       const json = '42'
-      const documentState: DocumentState2 = {
+      const documentState: DocumentState = {
         type: 'value',
         enforceString: true
       }
@@ -561,7 +561,7 @@ describe('documentState', () => {
       assert.deepStrictEqual(res.json, deleteIn(json, ['members', '1']))
       assert.deepStrictEqual(
         res.state,
-        updateIn(documentState, ['properties', 'members'], (state: DocumentState2) => ({
+        updateIn(documentState, ['properties', 'members'], (state: DocumentState) => ({
           ...state,
           items: state.type === 'array' ? state.items.slice(0, 2) : null,
           visibleSections: [{ start: 0, end: 2 }]
@@ -572,7 +572,7 @@ describe('documentState', () => {
     test('remove: should remove a value from an array (2)', () => {
       // verify that the maps indices are shifted
       const { json, documentState } = createJsonAndState()
-      const documentState2 = setIn<DocumentState2>(
+      const documentState2 = setIn<DocumentState>(
         documentState,
         ['properties', 'members', 'items', '1', 'expanded'],
         false
@@ -583,7 +583,7 @@ describe('documentState', () => {
       assert.deepStrictEqual(res.json, deleteIn(json, ['members', '1']))
       assert.deepStrictEqual(
         res.state,
-        updateIn(documentState, ['properties', 'members'], (state: DocumentState2) => ({
+        updateIn(documentState, ['properties', 'members'], (state: DocumentState) => ({
           ...state,
           items: state.type === 'array' ? [state.items[0], state.items[2]] : null,
           visibleSections: [{ start: 0, end: 2 }]
@@ -697,7 +697,7 @@ describe('documentState', () => {
 
     test('copy: should copy a value into an array', () => {
       const { json, documentState } = createJsonAndState()
-      const documentState2 = setIn<DocumentState2>(
+      const documentState2 = setIn<DocumentState>(
         documentState,
         ['properties', 'group', 'properties', 'details', 'expanded'],
         false
@@ -719,7 +719,7 @@ describe('documentState', () => {
 
       assert.deepStrictEqual(
         res.state,
-        updateIn(documentState2, ['properties', 'members'], (state: DocumentState2) => ({
+        updateIn(documentState2, ['properties', 'members'], (state: DocumentState) => ({
           ...state,
           items:
             state.type === 'array'
@@ -777,7 +777,7 @@ describe('documentState', () => {
       // we collapse the member we're going to move, so we can see whether the state is correctly switched
       const jsonAndState = createJsonAndState()
       const json = jsonAndState.json
-      const documentState = setIn<DocumentState2>(
+      const documentState = setIn<DocumentState>(
         jsonAndState.documentState,
         ['properties', 'members', 'items', '1', 'expanded'],
         false
@@ -799,7 +799,7 @@ describe('documentState', () => {
       // we have collapsed members[1], and after that moved it from index 1 to 0, so now members[0] should be collapsed
       assert.deepStrictEqual(
         res.state,
-        updateIn(documentState, ['properties', 'members'], (state: DocumentState2 | undefined) => {
+        updateIn(documentState, ['properties', 'members'], (state: DocumentState | undefined) => {
           return {
             ...state,
             items: state?.type === 'array' ? [state.items[1], state.items[0], state.items[2]] : null
@@ -812,7 +812,7 @@ describe('documentState', () => {
       // we collapse the member we're going to move, so we can see whether the state is correctly switched
       const jsonAndState = createJsonAndState()
       const json = jsonAndState.json
-      const documentState = setIn<DocumentState2>(
+      const documentState = setIn<DocumentState>(
         jsonAndState.documentState,
         ['properties', 'members', 'items', '0', 'expanded'],
         false
@@ -834,7 +834,7 @@ describe('documentState', () => {
       // we have collapsed members[0], and after that moved it from index 0 to 1, so now members[1] should be collapsed
       assert.deepStrictEqual(
         res.state,
-        updateIn(documentState, ['properties', 'members'], (state: DocumentState2 | undefined) => {
+        updateIn(documentState, ['properties', 'members'], (state: DocumentState | undefined) => {
           return {
             ...state,
             items: state?.type === 'array' ? [state.items[1], state.items[0], state.items[2]] : null
@@ -846,7 +846,7 @@ describe('documentState', () => {
     test('move: should move a value from object to array', () => {
       const jsonAndState = createJsonAndState()
       const json = jsonAndState.json
-      const documentState = setIn<DocumentState2>(
+      const documentState = setIn<DocumentState>(
         jsonAndState.documentState,
         ['properties', 'members', 'items', '1', 'expanded'],
         false
@@ -874,7 +874,7 @@ describe('documentState', () => {
       expectedDocumentState = updateIn(
         expectedDocumentState,
         ['properties', 'members'],
-        (state: DocumentState2) => ({
+        (state: DocumentState) => ({
           ...state,
           items:
             state.type === 'array'
@@ -915,7 +915,7 @@ describe('documentState', () => {
       expectedDocumentState = updateIn(
         expectedDocumentState,
         ['properties', 'members'],
-        (state: DocumentState2) => ({
+        (state: DocumentState) => ({
           ...state,
           items: state.type === 'array' ? [state.items[0], state.items[2]] : null,
           visibleSections: [{ start: 0, end: 2 }]

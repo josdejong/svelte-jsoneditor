@@ -34,7 +34,7 @@ import {
 } from './expandItemsSections.js'
 import type {
   CaretPosition,
-  DocumentState2,
+  DocumentState,
   JSONParser,
   OnExpand,
   Section,
@@ -55,8 +55,8 @@ export type CreateDocumentStateProps = {
   expand?: OnExpand
 }
 
-export function createDocumentState({ json, expand }: CreateDocumentStateProps): DocumentState2 {
-  let documentState: DocumentState2 = Array.isArray(json)
+export function createDocumentState({ json, expand }: CreateDocumentStateProps): DocumentState {
+  let documentState: DocumentState = Array.isArray(json)
     ? { type: 'array', expanded: false, visibleSections: DEFAULT_VISIBLE_SECTIONS, items: [] }
     : isObject(json)
       ? { type: 'object', expanded: false, properties: {} }
@@ -71,7 +71,7 @@ export function createDocumentState({ json, expand }: CreateDocumentStateProps):
 
 export function getVisibleSections(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   path: JSONPath
 ): VisibleSection[] {
   return (
@@ -99,9 +99,9 @@ export function forEachVisibleIndex(
  */
 export function expandPath(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   path: JSONPath
-): DocumentState2 {
+): DocumentState {
   // FIXME: refactor an simplify this function. Create some handy util functions? The updateIn is hard to reason about
   let updatedState = documentState
 
@@ -114,7 +114,7 @@ export function expandPath(
       updatedState = updateIn(
         updatedState,
         recursivePartialPath,
-        (state: DocumentState2 | undefined) => {
+        (state: DocumentState | undefined) => {
           const arrayState = isArrayDocumentState(state)
             ? { ...state, expanded: true }
             : {
@@ -149,7 +149,7 @@ export function expandPath(
       updatedState = updateIn(
         updatedState,
         recursivePartialPath,
-        (state: DocumentState2 | undefined) => {
+        (state: DocumentState | undefined) => {
           return isObjectDocumentState(state)
             ? { ...state, expanded: true }
             : { type: 'object', expanded: true, properties: {} }
@@ -191,10 +191,10 @@ export function toRecursiveStatePath(json: unknown, path: JSONPath): JSONPath {
  */
 export function expandWithCallback(
   json: unknown | undefined,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   path: JSONPath,
   expandedCallback: OnExpand
-): DocumentState2 {
+): DocumentState {
   let updatedState = documentState
 
   // FIXME: should (recursively) create new state when it is missing
@@ -208,7 +208,7 @@ export function expandWithCallback(
         updatedState = updateIn(
           updatedState,
           currentStatePath,
-          (value: DocumentState2 | undefined) => {
+          (value: DocumentState | undefined) => {
             return value
               ? { ...value, expanded: true }
               : {
@@ -244,7 +244,7 @@ export function expandWithCallback(
         updatedState = updateIn(
           updatedState,
           currentStatePath,
-          (value: DocumentState2 | undefined) => {
+          (value: DocumentState | undefined) => {
             return value
               ? { ...value, expanded: true }
               : { type: 'object', expanded: true, properties: {} }
@@ -284,15 +284,15 @@ export function expandWithCallback(
 // TODO: write unit tests
 export function expandSingleItem(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   path: JSONPath
-): DocumentState2 {
+): DocumentState {
   const value = getIn(json, path)
 
   return updateIn(
     documentState,
     toRecursiveStatePath(json, path),
-    (state: DocumentState2 | undefined) => {
+    (state: DocumentState | undefined) => {
       console.log('update in', state, path)
       if (isObject(value)) {
         return state?.type === 'object'
@@ -312,13 +312,13 @@ export function expandSingleItem(
 // TODO: write unit tests
 export function collapsePath(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   path: JSONPath
-): DocumentState2 {
+): DocumentState {
   return updateIn(
     documentState,
     toRecursiveStatePath(json, path),
-    (state: DocumentState2 | undefined) => {
+    (state: DocumentState | undefined) => {
       if (state?.type === 'object') {
         // clear the state of nested objects/arrays
         return { type: 'object', expanded: false, properties: {} }
@@ -342,11 +342,11 @@ export function collapsePath(
  */
 export function expandSection(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   path: JSONPath,
   section: Section
-): DocumentState2 {
-  return updateIn(documentState, toRecursiveStatePath(json, path), (state: DocumentState2) => {
+): DocumentState {
+  return updateIn(documentState, toRecursiveStatePath(json, path), (state: DocumentState) => {
     if (!isArrayDocumentState(state)) {
       return state
     }
@@ -381,9 +381,9 @@ export function syncKeys(actualKeys: string[], prevKeys?: string[]): string[] {
  */
 export function documentStatePatch(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   operations: JSONPatchDocument
-): { json: unknown; state: DocumentState2 } {
+): { json: unknown; state: DocumentState } {
   const updatedJson: unknown = immutableJSONPatch(json, operations)
 
   const updatedDocumentState = operations.reduce((updatingState, operation) => {
@@ -414,19 +414,19 @@ export function documentStatePatch(
 
 function updateInDocumentState(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   path: JSONPath,
-  transform: (value: DocumentState2 | undefined) => DocumentState2 | undefined
+  transform: (value: DocumentState | undefined) => DocumentState | undefined
 ) {
   return updateIn(documentState, toRecursiveStatePath(json, path), transform)
 }
 
 export function documentStateAdd(
   updatedJson: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   operation: JSONPatchAdd,
-  stateValue: DocumentState2 | undefined
-): DocumentState2 {
+  stateValue: DocumentState | undefined
+): DocumentState {
   const path = parsePath(updatedJson, operation.path)
   const parentPath = initial(path)
   const parent = getIn(updatedJson, parentPath)
@@ -438,7 +438,7 @@ export function documentStateAdd(
       updatedJson,
       updatedState,
       parentPath,
-      (arrayState: DocumentState2 | undefined) => {
+      (arrayState: DocumentState | undefined) => {
         if (arrayState?.type !== 'array') {
           return arrayState
         }
@@ -467,9 +467,9 @@ export function documentStateAdd(
 
 export function documentStateRemove(
   updatedJson: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   operation: JSONPatchRemove
-): DocumentState2 {
+): DocumentState {
   const path = parsePath(updatedJson, operation.path)
   const parentPath = initial(path)
   const parent = getIn(updatedJson, parentPath)
@@ -479,7 +479,7 @@ export function documentStateRemove(
       updatedJson,
       documentState,
       parentPath,
-      (arrayState: DocumentState2 | undefined) => {
+      (arrayState: DocumentState | undefined) => {
         if (arrayState?.type !== 'array') {
           return arrayState
         }
@@ -501,9 +501,9 @@ export function documentStateRemove(
 
 export function documentStateReplace(
   updatedJson: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   operation: JSONPatchReplace
-): DocumentState2 {
+): DocumentState {
   const path = parsePath(updatedJson, operation.path)
 
   return updateInDocumentState(updatedJson, documentState, path, (state) => {
@@ -514,7 +514,7 @@ export function documentStateReplace(
             type: 'array',
             expanded: state.type === 'object' ? state.expanded : false,
             visibleSections: DEFAULT_VISIBLE_SECTIONS,
-            items: [] as DocumentState2[]
+            items: [] as DocumentState[]
           }
         }
       } else if (isObject(operation.value)) {
@@ -539,9 +539,9 @@ export function documentStateReplace(
 
 export function documentStateMoveOrCopy(
   updatedJson: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   operation: JSONPatchCopy | JSONPatchMove
-): DocumentState2 {
+): DocumentState {
   if (isJSONPatchMove(operation) && operation.from === operation.path) {
     // nothing to do
     return documentState
@@ -551,7 +551,7 @@ export function documentStateMoveOrCopy(
 
   // get the state that we will move or copy
   const from = parsePath(updatedJson, operation.from)
-  const stateValue = getIn<DocumentState2 | undefined>(
+  const stateValue = getIn<DocumentState | undefined>(
     updatedState,
     toRecursiveStatePath(updatedJson, from)
   )
@@ -616,12 +616,12 @@ function mergeAdjacentSections(visibleSections: VisibleSection[]): VisibleSectio
 
 export function getEnforceString(
   json: unknown,
-  documentState: DocumentState2 | undefined,
+  documentState: DocumentState | undefined,
   path: JSONPath,
   parser: JSONParser
 ): boolean {
   const value = getIn(json, path)
-  const nestedState = getIn<DocumentState2 | undefined>(
+  const nestedState = getIn<DocumentState | undefined>(
     documentState,
     toRecursiveStatePath(json, path)
   )
@@ -648,10 +648,10 @@ export function getNextKeys(keys: string[], key: string, includeKey = false): st
  * Get all paths which are visible and rendered
  */
 // TODO: create memoized version of getVisiblePaths which remembers just the previous result if json and state are the same
-export function getVisiblePaths(json: unknown, documentState: DocumentState2): JSONPath[] {
+export function getVisiblePaths(json: unknown, documentState: DocumentState): JSONPath[] {
   const paths: JSONPath[] = []
 
-  function _recurse(value: unknown, state: DocumentState2 | undefined, path: JSONPath) {
+  function _recurse(value: unknown, state: DocumentState | undefined, path: JSONPath) {
     paths.push(path)
 
     if (isJSONArray(value) && isArrayDocumentState(state) && state.expanded) {
@@ -679,7 +679,7 @@ export function getVisiblePaths(json: unknown, documentState: DocumentState2): J
 // TODO: create memoized version of getVisibleCaretPositions which remembers just the previous result if json and state are the same
 export function getVisibleCaretPositions(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   includeInside = true
 ): CaretPosition[] {
   const paths: CaretPosition[] = []
@@ -687,7 +687,7 @@ export function getVisibleCaretPositions(
   function _recurse(value: unknown, path: JSONPath) {
     paths.push({ path, type: CaretType.value })
 
-    const valueState = getIn<DocumentState2 | undefined>(
+    const valueState = getIn<DocumentState | undefined>(
       documentState,
       toRecursiveStatePath(json, path)
     )
@@ -740,7 +740,7 @@ export function getVisibleCaretPositions(
 // TODO: write tests for getPreviousVisiblePath
 export function getPreviousVisiblePath(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   path: JSONPath
 ): JSONPath | null {
   const visiblePaths = getVisiblePaths(json, documentState)
@@ -762,7 +762,7 @@ export function getPreviousVisiblePath(
 // TODO: write tests for getNextVisiblePath
 export function getNextVisiblePath(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   path: JSONPath
 ): JSONPath | null {
   const visiblePaths = getVisiblePaths(json, documentState)
@@ -783,9 +783,9 @@ export function getNextVisiblePath(
 // TODO: write unit test
 export function expandRecursive(
   json: unknown,
-  documentState: DocumentState2,
+  documentState: DocumentState,
   path: JSONPath
-): DocumentState2 {
+): DocumentState {
   const expandContents: unknown | undefined = getIn(json, path)
   if (expandContents === undefined) {
     return documentState
