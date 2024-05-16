@@ -86,7 +86,7 @@
     documentStatePatch,
     expandMinimal,
     expandWithCallback,
-    getEnforceString,
+    getEnforceString, syncDocumentState,
     toRecursiveStatePath
   } from '$lib/logic/documentState.js'
   import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils.js'
@@ -414,18 +414,21 @@
     if (isTextContent(content)) {
       try {
         json = parseMemoizeOne(content.text)
+        documentState = syncDocumentState(json, documentState)
         text = content.text
         textIsRepaired = false
         parseError = undefined
       } catch (err) {
         try {
           json = parseMemoizeOne(jsonrepair(content.text))
+          documentState = syncDocumentState(json, documentState)
           text = content.text
           textIsRepaired = true
           parseError = undefined
         } catch (repairError) {
           // no valid JSON, will show empty document or invalid json
           json = undefined
+          documentState = undefined
           text = content.text
           textIsRepaired = false
           parseError =
@@ -436,6 +439,7 @@
       }
     } else {
       json = content.json
+      documentState = syncDocumentState(json, documentState)
       text = undefined
       textIsRepaired = false
       parseError = undefined
@@ -1462,7 +1466,7 @@
     const previousContent = { json, text }
     const previousTextIsRepaired = textIsRepaired
 
-    const updatedState = expandWithCallback(json, documentState, [], expandMinimal)
+    const updatedState = expandWithCallback(json, syncDocumentState(updatedJson, documentState), [], expandMinimal)
 
     const callback =
       typeof afterPatch === 'function'
@@ -1511,21 +1515,21 @@
 
     try {
       json = parseMemoizeOne(updatedText)
-      documentState = expandWithCallback(json, documentState, [], expandMinimal)
+      documentState = expandWithCallback(json, syncDocumentState(json, documentState), [], expandMinimal)
       text = undefined
       textIsRepaired = false
       parseError = undefined
     } catch (err) {
       try {
         json = parseMemoizeOne(jsonrepair(updatedText))
-        documentState = expandWithCallback(json, documentState, [], expandMinimal)
+        documentState = expandWithCallback(json, syncDocumentState(json, documentState), [], expandMinimal)
         text = updatedText
         textIsRepaired = true
         parseError = undefined
       } catch (repairError) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
-        documentState = createDocumentState({ json, expand: expandMinimal })
+        documentState = undefined
         text = updatedText
         textIsRepaired = false
         parseError =

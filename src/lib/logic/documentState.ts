@@ -97,9 +97,13 @@ export function syncDocumentState(
       return createArrayDocumentState({ expanded })
     }
 
-    const items = documentState.items
-      .slice(0, json.length)
-      .map((state, index) => syncDocumentState(json[index], state))
+    const items: DocumentState[] = []
+    for (let i = 0; i < Math.min(documentState.items.length, json.length); i++) {
+      const state = syncDocumentState(json[i], documentState.items[i])
+      if (state !== undefined) {
+        items[i] = state
+      }
+    }
 
     return { ...documentState, items }
   }

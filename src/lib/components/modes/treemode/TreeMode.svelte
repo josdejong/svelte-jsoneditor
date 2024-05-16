@@ -36,7 +36,7 @@
     expandSingleItem,
     expandWithCallback,
     getDefaultExpand,
-    getEnforceString,
+    getEnforceString, syncDocumentState,
     toRecursiveStatePath
   } from '$lib/logic/documentState.js'
   import { createHistory } from '$lib/logic/history.js'
@@ -438,6 +438,7 @@
     const previousTextIsRepaired = textIsRepaired
 
     json = updatedJson
+    documentState = syncDocumentState(updatedJson, documentState)
     expandWhenNotInitialized(json)
     text = undefined
     textIsRepaired = false
@@ -475,6 +476,7 @@
 
     try {
       json = parseMemoizeOne(updatedText)
+      documentState = syncDocumentState(json, documentState)
       expandWhenNotInitialized(json)
       text = updatedText
       textIsRepaired = false
@@ -482,6 +484,7 @@
     } catch (err) {
       try {
         json = parseMemoizeOne(jsonrepair(updatedText))
+        documentState = syncDocumentState(json, documentState)
         expandWhenNotInitialized(json)
         text = updatedText
         textIsRepaired = true
@@ -490,6 +493,7 @@
       } catch (repairError) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
+        documentState = undefined
         text = externalContent['text']
         textIsRepaired = false
         parseError =
@@ -1380,15 +1384,15 @@
     const previousContent = { json, text }
     const previousTextIsRepaired = textIsRepaired
 
-    const updatedState2 = expandWithCallback(json, documentState, [], expandMinimal)
+    const updatedState = expandWithCallback(json, syncDocumentState(updatedJson, documentState), [], expandMinimal)
 
     const callback =
       typeof afterPatch === 'function'
-        ? afterPatch(updatedJson, updatedState2, selection)
+        ? afterPatch(updatedJson, updatedState, selection)
         : undefined
 
     json = callback?.json !== undefined ? callback.json : updatedJson
-    documentState = callback?.state !== undefined ? callback.state : updatedState2
+    documentState = callback?.state !== undefined ? callback.state : updatedState
     selection = callback?.selection !== undefined ? callback.selection : selection
     text = undefined
     textIsRepaired = false
@@ -1425,14 +1429,14 @@
 
     try {
       json = parseMemoizeOne(updatedText)
-      documentState = expandWithCallback(json, documentState, [], expandMinimal)
+      documentState = expandWithCallback(json, syncDocumentState(json, documentState), [], expandMinimal)
       text = undefined
       textIsRepaired = false
       parseError = undefined
     } catch (err) {
       try {
         json = parseMemoizeOne(jsonrepair(updatedText))
-        documentState = expandWithCallback(json, documentState, [], expandMinimal)
+        documentState = expandWithCallback(json, syncDocumentState(json, documentState), [], expandMinimal)
         text = updatedText
         textIsRepaired = true
         parseError = undefined

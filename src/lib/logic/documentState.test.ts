@@ -139,11 +139,88 @@ describe('documentState', () => {
     })
 
     test('should work on nested objects', () => {
-      // FIXME
+      const state: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {
+          nested: {
+            type: 'object',
+            expanded: true,
+            properties: {
+              c: { type: 'value', enforceString: false },
+              d: { type: 'value', enforceString: false }
+            }
+          }
+        }
+      }
+
+      const expected: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {
+          nested: {
+            type: 'object',
+            expanded: true,
+            properties: {
+              c: { type: 'value', enforceString: false }
+            }
+          }
+        }
+      }
+
+      assert.deepStrictEqual(syncDocumentState({ nested: { a: 1, b: 2, c: 3 } }, state), expected)
+
+      const expected2: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {}
+      }
+
+      assert.deepStrictEqual(syncDocumentState({ nested: 42 }, state), expected2)
     })
 
-    test('should work on arrays objects', () => {
-      // FIXME
+    test('should work on nested arrays', () => {
+      const state: DocumentState = {
+        type: 'array',
+        expanded: true,
+        items: [
+          {
+            type: 'array',
+            expanded: true,
+            visibleSections: DEFAULT_VISIBLE_SECTIONS,
+            // eslint-disable-next-line no-sparse-arrays
+            items: [{ type: 'value' }, { type: 'value' }, { type: 'value' }, { type: 'value' }]
+          }
+        ],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      const expected: DocumentState = {
+        type: 'array',
+        expanded: true,
+        items: [
+          {
+            type: 'array',
+            expanded: true,
+            visibleSections: DEFAULT_VISIBLE_SECTIONS,
+            // eslint-disable-next-line no-sparse-arrays
+            items: [{ type: 'value' }, { type: 'value' }, { type: 'value' }]
+          }
+        ],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      assert.deepStrictEqual(syncDocumentState([[1, 2, 3]], state), expected)
+
+      const expected2: DocumentState = {
+        type: 'array',
+        expanded: true,
+        // eslint-disable-next-line no-sparse-arrays
+        items: [],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      assert.deepStrictEqual(syncDocumentState([42], state), expected2)
     })
   })
 
@@ -784,7 +861,7 @@ describe('documentState', () => {
       const json = {
         c: { cc: 4 },
         b: { bb: 3 },
-        a: 2
+        a: { aa: 222 }
       }
       const documentState = createDocumentState({ json, expand: () => true })
 
@@ -792,7 +869,7 @@ describe('documentState', () => {
         {
           op: 'replace',
           path: '',
-          value: { a: 22, b: 33, d: 55 }
+          value: { a: { aa: 22 }, b: 33, d: 55 }
         }
       ]
       const res = documentStatePatch(json, documentState, operations)
@@ -804,7 +881,9 @@ describe('documentState', () => {
       assert.deepStrictEqual(res.state, {
         type: 'object',
         expanded: true,
-        properties: {}
+        properties: {
+          a: { type: 'object', expanded: true, properties: {} }
+        }
       })
     })
 
