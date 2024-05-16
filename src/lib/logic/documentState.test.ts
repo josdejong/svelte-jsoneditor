@@ -702,7 +702,7 @@ describe('documentState', () => {
 
       let documentState = createDocumentState({ json, expand: () => true })
 
-      documentState = updateInDocumentState(json, documentState, ['members'], (state) => {
+      documentState = updateInDocumentState(json, documentState, ['members'], (_value, state) => {
         return isArrayDocumentState(state)
           ? { ...state, visibleSections: [{ start: 0, end: 3 }] }
           : state
@@ -890,10 +890,7 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, setIn(json, ['group'], 42))
-      assert.deepStrictEqual(
-        res.state,
-        setIn(documentState, ['properties', 'group'], { type: 'value' })
-      )
+      assert.deepStrictEqual(res.state, deleteIn(documentState, ['properties', 'group']))
     })
 
     test('replace: should replace a an object with a new object', () => {
@@ -930,10 +927,12 @@ describe('documentState', () => {
         { op: 'replace', path: '/members/1', value: 42 }
       ])
 
+      const items = getIn(documentState, ['properties', 'members', 'items']) as DocumentState[]
       assert.deepStrictEqual(res.json, setIn(json, ['members', '1'], 42))
       assert.deepStrictEqual(
         res.state,
-        setIn(documentState, ['properties', 'members', 'items', '1'], { type: 'value' })
+        // eslint-disable-next-line no-sparse-arrays
+        setIn(documentState, ['properties', 'members', 'items'], [items[0], , items[2]])
       )
     })
 
@@ -945,10 +944,7 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, setIn(json, ['members'], 42))
-      assert.deepStrictEqual(
-        res.state,
-        setIn(documentState, ['properties', 'members'], { type: 'value' })
-      )
+      assert.deepStrictEqual(res.state, deleteIn(documentState, ['properties', 'members']))
     })
 
     test('replace: should replace the root document itself', () => {

@@ -15,7 +15,6 @@ import {
   type JSONPatchDocument,
   type JSONPatchMove,
   type JSONPatchRemove,
-  type JSONPatchReplace,
   type JSONPath,
   parsePath,
   setIn,
@@ -104,7 +103,7 @@ export function ensureNestedDocumentState(
         return arrayState
       }
 
-      const index = parseInt(path[0], 10)
+      const index = int(path[0])
       const itemState = recurse(value[index], arrayState.items[index], path.slice(1))
       return setIn(arrayState, ['items', path[0]], itemState)
     }
@@ -211,53 +210,35 @@ export function expandPath(
   documentState: DocumentState | undefined,
   path: JSONPath
 ): DocumentState | undefined {
-  // FIXME: refactor an simplify this function. Create some handy util functions? The updateIn is hard to reason about
   let updatedState = documentState
 
   for (let i = 0; i < path.length; i++) {
     const partialPath = path.slice(0, i)
-    const value = getIn(json, partialPath)
+    updatedState = expandSingleItem(json, updatedState, partialPath)
 
-    if (Array.isArray(value)) {
+    if (i < path.length) {
       updatedState = updateInDocumentState(
         json,
         updatedState,
         partialPath,
-        (state: DocumentState | undefined) => {
-          const arrayState = isArrayDocumentState(state)
-            ? { ...state, expanded: true }
-            : createArrayDocumentState({ expanded: true })
-
-          // if needed, enlarge the expanded sections such that the search result becomes visible in the array
-          if (i < path.length) {
-            const index = int(path[i])
-
-            if (!inVisibleSection(arrayState.visibleSections, index)) {
-              const start = currentRoundNumber(index)
-              const end = nextRoundNumber(start)
-              const newSection = { start, end }
-
-              return {
-                ...arrayState,
-                visibleSections: mergeSections(arrayState.visibleSections.concat(newSection))
-              }
-            }
+        (_value, nestedState) => {
+          if (!isArrayDocumentState(nestedState)) {
+            return nestedState
           }
 
-          return arrayState
-        }
-      )
-    }
+          const index = int(path[i])
+          if (inVisibleSection(nestedState.visibleSections, index)) {
+            return nestedState
+          }
 
-    if (isObject(value)) {
-      updatedState = updateInDocumentState(
-        json,
-        updatedState,
-        partialPath,
-        (state: DocumentState | undefined) => {
-          return isObjectDocumentState(state)
-            ? { ...state, expanded: true }
-            : createObjectDocumentState({ expanded: true })
+          const start = currentRoundNumber(index)
+          const end = nextRoundNumber(start)
+          const newVisibleSection = { start, end }
+
+          return {
+            ...nestedState,
+            visibleSections: mergeSections(nestedState.visibleSections.concat(newVisibleSection))
+          }
         }
       )
     }
@@ -275,7 +256,7 @@ export function toRecursiveStatePath(json: unknown, path: JSONPath): JSONPath {
     if (Array.isArray(value)) {
       const index = path[i]
       recursiveStatePath.push('items', index)
-      value = value[parseInt(index)]
+      value = value[int(index)]
     } else if (isObject(value)) {
       const key = path[i]
       recursiveStatePath.push('properties', key)
@@ -387,22 +368,8 @@ export function expandSingleItem(
   documentState: DocumentState | undefined,
   path: JSONPath
 ): DocumentState | undefined {
-  const value = getIn(json, path)
-
-  return updateInDocumentState(json, documentState, path, (state: DocumentState | undefined) => {
-    if (isObject(value)) {
-      return isObjectDocumentState(state)
-        ? { ...state, expanded: true }
-        : createObjectDocumentState({ expanded: true })
-    }
-
-    if (Array.isArray(value)) {
-      return isArrayDocumentState(state)
-        ? { ...state, expanded: true }
-        : createArrayDocumentState({ expanded: true })
-    }
-
-    return isValueDocumentState(state) ? state : createValueDocumentState()
+  return updateInDocumentState(json, documentState, path, (_value, state) => {
+    return isExpandableState(state) ? { ...state, expanded: true } : state
   })
 }
 
@@ -412,16 +379,13 @@ export function collapsePath(
   documentState: DocumentState | undefined,
   path: JSONPath
 ): DocumentState | undefined {
-  return updateInDocumentState(json, documentState, path, (state: DocumentState | undefined) => {
-    if (state?.type === 'object') {
-      // clear the state of nested objects/arrays
-      return createObjectDocumentState({ expanded: false })
-    } else if (state?.type === 'array') {
-      // clear the state of nested objects/arrays
-      return createArrayDocumentState({ expanded: false })
-    } else {
-      return state
-    }
+  return updateInDocumentState(json, documentState, path, (_value, state) => {
+    // clear the state of nested objects/arrays
+    return isObjectDocumentState(state)
+      ? createObjectDocumentState({ expanded: false })
+      : isArrayDocumentState(state)
+        ? createArrayDocumentState({ expanded: false })
+        : state
   })
 }
 
@@ -434,7 +398,7 @@ export function expandSection(
   path: JSONPath,
   section: Section
 ): DocumentState | undefined {
-  return updateInDocumentState(json, documentState, path, (state) => {
+  return updateInDocumentState(json, documentState, path, (_value, state) => {
     if (!isArrayDocumentState(state)) {
       return state
     }
@@ -484,7 +448,8 @@ export function documentStatePatch(
     }
 
     if (isJSONPatchReplace(operation)) {
-      return documentStateReplace(updatedJson, updatingState, operation)
+      // nothing special to do
+      return updatingState
     }
 
     if (isJSONPatchCopy(operation) || isJSONPatchMove(operation)) {
@@ -522,10 +487,13 @@ export function updateInDocumentState(
   json: unknown,
   documentState: DocumentState | undefined,
   path: JSONPath,
-  transform: (value: DocumentState | undefined) => DocumentState | undefined
+  transform: (value: unknown, state: DocumentState) => DocumentState
 ) {
   const ensuredState = ensureNestedDocumentState(json, documentState, path)
-  return updateIn(ensuredState, toRecursiveStatePath(json, path), transform)
+  return updateIn(ensuredState, toRecursiveStatePath(json, path), (nestedState: DocumentState) => {
+    const value = getIn(json, path)
+    return transform(value, nestedState)
+  })
 }
 
 export function deleteInDocumentState(
@@ -544,37 +512,34 @@ export function documentStateAdd(
 ): DocumentState | undefined {
   const path = parsePath(updatedJson, operation.path)
   const parentPath = initial(path)
-  const parent = getIn(updatedJson, parentPath)
 
   let updatedState = documentState
 
-  if (Array.isArray(parent)) {
-    updatedState = updateInDocumentState(
-      updatedJson,
-      updatedState,
-      parentPath,
-      (arrayState: DocumentState | undefined) => {
-        if (arrayState?.type !== 'array') {
-          return arrayState
-        }
-
-        const index = int(last(path) as string)
-        const { items, visibleSections } = arrayState
-        return {
-          ...arrayState,
-          items:
-            index < items.length
-              ? items
-                  .slice(0, index)
-                  // eslint-disable-next-line no-sparse-arrays
-                  .concat(stateValue !== undefined ? [stateValue] : [,])
-                  .concat(items.slice(index))
-              : items,
-          visibleSections: shiftVisibleSections(visibleSections, index, 1)
-        }
+  updatedState = updateInDocumentState(
+    updatedJson,
+    updatedState,
+    parentPath,
+    (_parent, arrayState) => {
+      if (!isArrayDocumentState(arrayState)) {
+        return arrayState
       }
-    )
-  }
+
+      const index = int(last(path) as string)
+      const { items, visibleSections } = arrayState
+      return {
+        ...arrayState,
+        items:
+          index < items.length
+            ? items
+                .slice(0, index)
+                // eslint-disable-next-line no-sparse-arrays
+                .concat(stateValue !== undefined ? [stateValue] : [,])
+                .concat(items.slice(index))
+            : items,
+        visibleSections: shiftVisibleSections(visibleSections, index, 1)
+      }
+    }
+  )
 
   // object property added, nothing to do
   return setInDocumentState(updatedJson, updatedState, path, stateValue)
@@ -590,60 +555,23 @@ export function documentStateRemove(
   const parent = getIn(updatedJson, parentPath)
 
   if (Array.isArray(parent)) {
-    return updateInDocumentState(
-      updatedJson,
-      documentState,
-      parentPath,
-      (arrayState: DocumentState | undefined) => {
-        if (arrayState?.type !== 'array') {
-          return arrayState
-        }
-
-        const index = int(last(path) as string)
-        const { items, visibleSections } = arrayState
-
-        return {
-          ...arrayState,
-          items: items.slice(0, index).concat(items.slice(index + 1)),
-          visibleSections: shiftVisibleSections(visibleSections, index, -1)
-        }
+    return updateInDocumentState(updatedJson, documentState, parentPath, (_parent, arrayState) => {
+      if (!isArrayDocumentState(arrayState)) {
+        return arrayState
       }
-    )
+
+      const index = int(last(path) as string)
+      const { items, visibleSections } = arrayState
+
+      return {
+        ...arrayState,
+        items: items.slice(0, index).concat(items.slice(index + 1)),
+        visibleSections: shiftVisibleSections(visibleSections, index, -1)
+      }
+    })
   }
 
   return deleteInDocumentState(updatedJson, documentState, path)
-}
-
-export function documentStateReplace(
-  updatedJson: unknown,
-  documentState: DocumentState | undefined,
-  operation: JSONPatchReplace
-): DocumentState | undefined {
-  const path = parsePath(updatedJson, operation.path)
-
-  return updateInDocumentState(updatedJson, documentState, path, (state) => {
-    if (state) {
-      if (Array.isArray(operation.value)) {
-        if (!isArrayDocumentState(state)) {
-          return createArrayDocumentState({
-            expanded: isObjectDocumentState(state) ? state.expanded : false
-          })
-        }
-      } else if (isObject(operation.value)) {
-        if (!isObjectDocumentState(state)) {
-          return createObjectDocumentState({
-            expanded: isArrayDocumentState(state) ? state.expanded : false
-          })
-        }
-      } else {
-        if (!isValueDocumentState(state)) {
-          return createValueDocumentState()
-        }
-      }
-    }
-
-    return state
-  })
 }
 
 export function documentStateMoveOrCopy(
