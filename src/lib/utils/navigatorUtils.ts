@@ -1,2 +1,3 @@
-export const IS_MAC =
-  typeof navigator !== 'undefined' ? navigator.platform.toUpperCase().indexOf('MAC') >= 0 : false
+export const IS_MAC = navigator?.platform?.toUpperCase().includes('MAC')
+  ?? navigator?.userAgentData?.platform?.toUpperCase().includes('MAC')
+  ?? false;
