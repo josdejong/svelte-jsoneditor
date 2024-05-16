@@ -59,7 +59,7 @@ export default function ({
   onTransform
 }: {
   json: unknown
-  documentState: DocumentState
+  documentState: DocumentState | undefined
   selection: JSONSelection | null
   readOnly: boolean
   parser: JSONParser

@@ -35,7 +35,7 @@ export default function ({
   onRemoveRow
 }: {
   json: unknown | undefined
-  documentState: DocumentState
+  documentState: DocumentState | undefined
   selection: JSONSelection | null
   readOnly: boolean
   parser: JSONParser

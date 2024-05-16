@@ -275,7 +275,7 @@ export function replaceAllText(
 
 export function createSearchAndReplaceOperations(
   json: unknown,
-  documentState: DocumentState,
+  documentState: DocumentState | undefined,
   replacementText: string,
   searchResultItem: SearchResultItem,
   parser: JSONParser
@@ -329,7 +329,7 @@ export function createSearchAndReplaceOperations(
 
 export function createSearchAndReplaceAllOperations(
   json: unknown,
-  documentState: DocumentState,
+  documentState: DocumentState | undefined,
   searchText: string,
   replacementText: string,
   parser: JSONParser

@@ -86,7 +86,8 @@
     documentStatePatch,
     expandMinimal,
     expandWithCallback,
-    getEnforceString, syncDocumentState,
+    getEnforceString,
+    syncDocumentState,
     toRecursiveStatePath
   } from '$lib/logic/documentState.js'
   import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils.js'
@@ -323,7 +324,7 @@
         ? updatedSelection(selection) || null
         : updatedSelection
 
-    if (!isEqual(appliedSelection, appliedSelection)) {
+    if (!isEqual(appliedSelection, selection)) {
       selection = appliedSelection
       onSelect(appliedSelection)
     }
@@ -342,7 +343,8 @@
     selection = null // TODO: try find the closest cell that still exists (similar to getInitialSelection)
   }
 
-  let documentState = createDocumentState({ json })
+  let documentState: DocumentState | undefined =
+    json !== undefined ? createDocumentState({ json }) : undefined
   let selection: JSONSelection | null = null
   let sortedColumn: SortedColumn | null = null
   let textIsRepaired = false
@@ -359,10 +361,8 @@
     const operations = sortJson(json, rootPath, newSortedColumn.path, direction)
     handlePatch(operations, (_, patchedState) => {
       return {
-        state: {
-          ...patchedState,
-          sortedColumn: newSortedColumn
-        }
+        state: patchedState,
+        sortedColumn: newSortedColumn
       }
     })
   }
@@ -482,7 +482,7 @@
   }: {
     previousJson: unknown | undefined
     previousText: string | undefined
-    previousState: DocumentState
+    previousState: DocumentState | undefined
     previousSelection: JSONSelection | null
     previousSortedColumn: SortedColumn | null
     previousTextIsRepaired: boolean
@@ -1466,7 +1466,12 @@
     const previousContent = { json, text }
     const previousTextIsRepaired = textIsRepaired
 
-    const updatedState = expandWithCallback(json, syncDocumentState(updatedJson, documentState), [], expandMinimal)
+    const updatedState = expandWithCallback(
+      json,
+      syncDocumentState(updatedJson, documentState),
+      [],
+      expandMinimal
+    )
 
     const callback =
       typeof afterPatch === 'function'
@@ -1515,14 +1520,24 @@
 
     try {
       json = parseMemoizeOne(updatedText)
-      documentState = expandWithCallback(json, syncDocumentState(json, documentState), [], expandMinimal)
+      documentState = expandWithCallback(
+        json,
+        syncDocumentState(json, documentState),
+        [],
+        expandMinimal
+      )
       text = undefined
       textIsRepaired = false
       parseError = undefined
     } catch (err) {
       try {
         json = parseMemoizeOne(jsonrepair(updatedText))
-        documentState = expandWithCallback(json, syncDocumentState(json, documentState), [], expandMinimal)
+        documentState = expandWithCallback(
+          json,
+          syncDocumentState(json, documentState),
+          [],
+          expandMinimal
+        )
         text = updatedText
         textIsRepaired = true
         parseError = undefined
@@ -1589,12 +1604,10 @@
 
         handlePatch(operations, (_, patchedState) => {
           return {
-            state: {
-              ...patchedState,
-              sortedColumn: {
-                path: itemPath,
-                sortDirection: direction === -1 ? SortDirection.desc : SortDirection.asc
-              }
+            state: patchedState,
+            sortedColumn: {
+              path: itemPath,
+              sortDirection: direction === -1 ? SortDirection.desc : SortDirection.asc
             }
           }
         })

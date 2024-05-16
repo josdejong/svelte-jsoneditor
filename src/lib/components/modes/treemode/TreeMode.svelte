@@ -36,7 +36,8 @@
     expandSingleItem,
     expandWithCallback,
     getDefaultExpand,
-    getEnforceString, syncDocumentState,
+    getEnforceString,
+    syncDocumentState,
     toRecursiveStatePath
   } from '$lib/logic/documentState.js'
   import { createHistory } from '$lib/logic/history.js'
@@ -235,7 +236,7 @@
   let parseError: ParseError | undefined = undefined
 
   let documentStateInitialized = false
-  let documentState: DocumentState = createDocumentState({ json })
+  let documentState: DocumentState | undefined = createDocumentState({ json })
   let selection: JSONSelection | null
 
   function updateSelection(
@@ -398,7 +399,7 @@
     return json
   }
 
-  function getDocumentState(): DocumentState {
+  function getDocumentState(): DocumentState | undefined {
     return documentState
   }
 
@@ -555,7 +556,7 @@
   }: {
     previousJson: unknown | undefined
     previousText: string | undefined
-    previousState: DocumentState
+    previousState: DocumentState | undefined
     previousSelection: JSONSelection | null
     previousTextIsRepaired: boolean
   }) {
@@ -1146,10 +1147,8 @@
 
         handlePatch(operations, (patchedJson, patchedState) => ({
           // expand the newly replaced array and select it
-          state: {
-            ...expandRecursive(patchedJson, patchedState, rootPath),
-            selection: createValueSelection(rootPath, false)
-          }
+          state: expandRecursive(patchedJson, patchedState, rootPath),
+          selection: createValueSelection(rootPath, false)
         }))
       },
       onClose: () => {
@@ -1202,10 +1201,8 @@
 
           handlePatch(operations, (patchedJson, patchedState) => ({
             // expand the newly replaced array and select it
-            state: {
-              ...expandRecursive(patchedJson, patchedState, rootPath),
-              selection: createValueSelection(rootPath, false)
-            }
+            state: expandRecursive(patchedJson, patchedState, rootPath),
+            selection: createValueSelection(rootPath, false)
           }))
         }
       },
@@ -1384,7 +1381,12 @@
     const previousContent = { json, text }
     const previousTextIsRepaired = textIsRepaired
 
-    const updatedState = expandWithCallback(json, syncDocumentState(updatedJson, documentState), [], expandMinimal)
+    const updatedState = expandWithCallback(
+      json,
+      syncDocumentState(updatedJson, documentState),
+      [],
+      expandMinimal
+    )
 
     const callback =
       typeof afterPatch === 'function'
@@ -1429,14 +1431,24 @@
 
     try {
       json = parseMemoizeOne(updatedText)
-      documentState = expandWithCallback(json, syncDocumentState(json, documentState), [], expandMinimal)
+      documentState = expandWithCallback(
+        json,
+        syncDocumentState(json, documentState),
+        [],
+        expandMinimal
+      )
       text = undefined
       textIsRepaired = false
       parseError = undefined
     } catch (err) {
       try {
         json = parseMemoizeOne(jsonrepair(updatedText))
-        documentState = expandWithCallback(json, syncDocumentState(json, documentState), [], expandMinimal)
+        documentState = expandWithCallback(
+          json,
+          syncDocumentState(json, documentState),
+          [],
+          expandMinimal
+        )
         text = updatedText
         textIsRepaired = true
         parseError = undefined
@@ -1742,7 +1754,7 @@
   }: AbsolutePopupOptions) {
     const defaultItems: ContextMenuItem[] = createTreeContextMenuItems({
       json,
-      documentState: documentState,
+      documentState,
       selection,
       readOnly,
       parser,

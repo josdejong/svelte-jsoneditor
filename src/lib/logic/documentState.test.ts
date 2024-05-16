@@ -8,6 +8,7 @@ import {
   createObjectDocumentState,
   createValueDocumentState,
   documentStatePatch,
+  ensureNestedDocumentState,
   expandPath,
   expandSection,
   expandWithCallback,
@@ -32,6 +33,99 @@ describe('documentState', () => {
 
   test('syncKeys should keep the previous order of the keys ', () => {
     assert.deepStrictEqual(syncKeys(['a', 'b'], ['b', 'a']), ['b', 'a'])
+  })
+
+  describe('ensureNestedDocumentState', () => {
+    test('should create nested state in an array', () => {
+      const expected: DocumentState = {
+        type: 'array',
+        expanded: false,
+        // eslint-disable-next-line no-sparse-arrays
+        items: [, { type: 'value' }],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      assert.deepStrictEqual(ensureNestedDocumentState([1, 2, 3], undefined, ['1']), expected)
+    })
+
+    test('should maintain state when creating nested state in an array', () => {
+      const state: DocumentState = {
+        type: 'array',
+        expanded: true,
+        items: [],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      const expected: DocumentState = {
+        type: 'array',
+        expanded: true,
+        // eslint-disable-next-line no-sparse-arrays
+        items: [, { type: 'value' }],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      assert.deepStrictEqual(ensureNestedDocumentState([1, 2, 3], state, ['1']), expected)
+    })
+
+    test('should create nested state in an object', () => {
+      const expected: DocumentState = {
+        type: 'object',
+        expanded: false,
+        properties: {
+          a: { type: 'value' }
+        }
+      }
+
+      assert.deepStrictEqual(ensureNestedDocumentState({ a: 2, b: 3 }, undefined, ['a']), expected)
+    })
+
+    test('should maintain state when creating nested state in an object', () => {
+      const state: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {}
+      }
+
+      const expected: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {
+          a: { type: 'value' }
+        }
+      }
+
+      assert.deepStrictEqual(ensureNestedDocumentState({ a: 2, b: 3 }, state, ['a']), expected)
+    })
+
+    test('should create nested state in an object and array', () => {
+      const expected: DocumentState = {
+        type: 'object',
+        expanded: false,
+        properties: {
+          array: {
+            type: 'array',
+            expanded: false,
+            // eslint-disable-next-line no-sparse-arrays
+            items: [, { type: 'value' }],
+            visibleSections: DEFAULT_VISIBLE_SECTIONS
+          }
+        }
+      }
+
+      assert.deepStrictEqual(
+        ensureNestedDocumentState({ array: [1, 2, 3] }, undefined, ['array', '1']),
+        expected
+      )
+    })
+
+    test('should maintain value state', () => {
+      const state: DocumentState = {
+        type: 'value',
+        enforceString: true
+      }
+
+      assert.deepStrictEqual(ensureNestedDocumentState(42, state, []), state)
+    })
   })
 
   describe('syncDocumentState', () => {
@@ -590,7 +684,7 @@ describe('documentState', () => {
   })
 
   describe('documentStatePatch', () => {
-    function createJsonAndState(): { json: unknown; documentState: DocumentState } {
+    function createJsonAndState(): { json: unknown; documentState: DocumentState | undefined } {
       const json = {
         members: [
           { id: 1, name: 'Joe' },
@@ -606,7 +700,7 @@ describe('documentState', () => {
         }
       }
 
-      let documentState: DocumentState = createDocumentState({ json, expand: () => true })
+      let documentState = createDocumentState({ json, expand: () => true })
 
       documentState = updateInDocumentState(json, documentState, ['members'], (state) => {
         return isArrayDocumentState(state)
@@ -629,7 +723,7 @@ describe('documentState', () => {
 
     test('add: should add a value to an object (expanded)', () => {
       const json = { a: 2, b: 3 }
-      const documentState: DocumentState = createDocumentState({ json, expand: () => true })
+      const documentState = createDocumentState({ json, expand: () => true })
 
       const res = documentStatePatch(json, documentState, [{ op: 'add', path: '/c', value: 42 }])
 
@@ -639,7 +733,7 @@ describe('documentState', () => {
 
     test('add: should override a value in an object', () => {
       const json = { a: 2, b: 3 }
-      const documentState: DocumentState = createDocumentState({ json, expand: () => true })
+      const documentState = createDocumentState({ json, expand: () => true })
 
       const res = documentStatePatch(json, documentState, [{ op: 'add', path: '/a', value: 42 }])
 

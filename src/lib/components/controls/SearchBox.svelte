@@ -30,7 +30,7 @@
   const debug = createDebug('jsoneditor:SearchBox')
 
   export let json: unknown
-  export let documentState: DocumentState
+  export let documentState: DocumentState | undefined
   export let parser: JSONParser
   export let showSearch: boolean
   export let showReplace: boolean
@@ -155,7 +155,8 @@
     )
 
     onPatch(operations, (_, patchedState) => ({
-      state: { ...patchedState, selection: newSelection }
+      state: patchedState,
+      selection: newSelection
     }))
 
     // immediately trigger updating the search results
@@ -182,7 +183,8 @@
     )
 
     onPatch(operations, (_, patchedState) => ({
-      state: { ...patchedState, selection: newSelection }
+      state: patchedState,
+      selection: newSelection
     }))
 
     await handleFocus()

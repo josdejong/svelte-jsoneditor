@@ -85,11 +85,9 @@ export async function onCut({
 
   const { operations, newSelection } = createRemoveOperations(json, selection)
 
-  onPatch(operations, (patchedJson, patchedState) => ({
-    state: {
-      ...patchedState,
-      selection: newSelection
-    }
+  onPatch(operations, (_, patchedState) => ({
+    state: patchedState,
+    selection: newSelection
   }))
 }
 
@@ -244,11 +242,9 @@ export function onRemove({
 
       debug('remove', { operations, selection, newSelection })
 
-      onPatch(operations, (patchedJson, patchedState) => ({
-        state: {
-          ...patchedState,
-          selection: keepSelection ? selection : newSelection
-        }
+      onPatch(operations, (_, patchedState) => ({
+        state: patchedState,
+        selection: keepSelection ? selection : newSelection
       }))
     }
   }
@@ -285,16 +281,14 @@ export function onDuplicateRow({
   const rowPath = [String(rowIndex)]
   const operations = duplicate(json, [rowPath])
 
-  onPatch(operations, (patchedJson, patchedState) => {
+  onPatch(operations, (_, patchedState) => {
     const newRowIndex = rowIndex < (json as Array<unknown>).length ? rowIndex + 1 : rowIndex
     const newPath = fromTableCellPosition({ rowIndex: newRowIndex, columnIndex }, columns)
     const newSelection = createValueSelection(newPath, false)
 
     return {
-      state: {
-        ...patchedState,
-        selection: newSelection
-      }
+      state: patchedState,
+      selection: newSelection
     }
   })
 }
@@ -373,15 +367,13 @@ export function onInsertAfterRow({
       ? insertBefore(json, nextRowPath, values)
       : append(json, [], values)
 
-  onPatch(operations, (patchedJson, patchedState) => {
+  onPatch(operations, (_, patchedState) => {
     const nextPath = fromTableCellPosition({ rowIndex: nextRowIndex, columnIndex }, columns)
     const newSelection = createValueSelection(nextPath, false)
 
     return {
-      state: {
-        ...patchedState,
-        selection: newSelection
-      }
+      state: patchedState,
+      selection: newSelection
     }
   })
 }
@@ -430,10 +422,8 @@ export function onRemoveRow({ json, selection, columns, readOnly, onPatch }: OnR
     debug('remove row new selection', { rowIndex, newRowIndex, newSelection })
 
     return {
-      state: {
-        ...patchedState,
-        selection: newSelection
-      }
+      state: patchedState,
+      selection: newSelection
     }
   })
 }
@@ -520,12 +510,10 @@ export function onInsert({
 
     const path: JSONPath = []
     onReplaceJson(newValue, (patchedJson, patchedState) => ({
-      state: {
-        ...expandRecursive(patchedJson, patchedState, path),
-        selection: isObjectOrArray(newValue)
-          ? createInsideSelection(path)
-          : createValueSelection(path, true)
-      }
+      state: expandRecursive(patchedJson, patchedState, path),
+      selection: isObjectOrArray(newValue)
+        ? createInsideSelection(path)
+        : createValueSelection(path, true)
     }))
   }
 }
@@ -556,7 +544,7 @@ export async function onInsertCharacter({
   onReplaceJson,
   onSelect
 }: OnInsertCharacter) {
-  // a regular key like a, A, _, etc is entered.
+  // a regular key like a, A, _, etc. is entered.
   // Replace selected contents with a new value having this first character as text
   if (readOnly) {
     return

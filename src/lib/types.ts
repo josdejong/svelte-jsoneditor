@@ -104,9 +104,11 @@ export interface JSONPatchResult {
 
 export type AfterPatchCallback = (
   patchedJson: unknown,
-  patchedState: DocumentState,
+  patchedState: DocumentState | undefined,
   patchedSelection: JSONSelection | null
-) => { json?: unknown; state?: DocumentState; selection?: JSONSelection | null } | undefined
+) =>
+  | { json?: unknown; state?: DocumentState | undefined; selection?: JSONSelection | null }
+  | undefined
 
 export interface MultiSelection {
   type: SelectionType.multi
@@ -399,7 +401,7 @@ export interface HistoryItem {
     patch: JSONPatchDocument | undefined
     json: unknown | undefined
     text: string | undefined
-    state: DocumentState
+    state: DocumentState | undefined
     selection: JSONSelection | null
     sortedColumn: SortedColumn | null
     textIsRepaired: boolean
@@ -408,7 +410,7 @@ export interface HistoryItem {
     patch: JSONPatchDocument | undefined
     json: unknown | undefined
     text: string | undefined
-    state: DocumentState
+    state: DocumentState | undefined
     selection: JSONSelection | null
     sortedColumn: SortedColumn | null
     textIsRepaired: boolean
@@ -487,7 +489,7 @@ export interface JSONEditorContext {
   parser: JSONParser
   normalization: ValueNormalization
   getJson: () => unknown | undefined
-  getDocumentState: () => DocumentState
+  getDocumentState: () => DocumentState | undefined
   findElement: (path: JSONPath) => Element | null
   findNextInside: FindNextInside
   focus: () => void
@@ -500,7 +502,7 @@ export interface JSONEditorContext {
 
 export interface TreeModeContext extends JSONEditorContext {
   getJson: () => unknown | undefined
-  getDocumentState: () => DocumentState
+  getDocumentState: () => DocumentState | undefined
   getSelection: () => JSONSelection | null
   findElement: (path: JSONPath) => Element | null
   onInsert: (type: InsertType) => void
