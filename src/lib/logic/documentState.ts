@@ -403,10 +403,7 @@ export function expandSection(
       return state
     }
 
-    const visibleSections = mergeSections([
-      ...(state.visibleSections ?? DEFAULT_VISIBLE_SECTIONS),
-      section
-    ])
+    const visibleSections = mergeSections(state.visibleSections.concat(section))
 
     return { ...state, visibleSections }
   })
@@ -448,7 +445,7 @@ export function documentStatePatch(
     }
 
     if (isJSONPatchReplace(operation)) {
-      // nothing special to do
+      // nothing special to do (all is handled by syncDocumentState)
       return updatingState
     }
 
@@ -461,7 +458,7 @@ export function documentStatePatch(
 
   return {
     json: updatedJson,
-    state: syncDocumentState(updatedJson, updatedDocumentState) as DocumentState
+    state: syncDocumentState(updatedJson, updatedDocumentState)
   }
 }
 
