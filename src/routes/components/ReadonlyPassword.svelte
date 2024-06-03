@@ -10,7 +10,7 @@
   export let readOnly
   export let onSelect
 
-  $: hiddenValue = '*'.repeat(String(value).length)
+  $: hiddenValue = '*'.repeat(Math.max(String(value).length, 3))
 
   function handleValueDoubleClick(event) {
     if (!readOnly) {

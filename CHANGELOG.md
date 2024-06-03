@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.23.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.4...v0.23.5) (2024-05-30)
+
+
+### Features
+
+* upgrade dependencies `codemirror`, `ajv`, `jsonrepair`, and update dev dependencies ([999acfc](https://github.com/josdejong/svelte-jsoneditor/commit/999acfc28b4c3bbb3475052373925bd3432ffc52))
+
+
+### Bug Fixes
+
+* cleanup wrong classname `jse-readonly-password` attached to all values ([eabbeb2](https://github.com/josdejong/svelte-jsoneditor/commit/eabbeb299c82513c8fec141db64dc61b55083359))
+* make platform detection more robust and future proof ([#435](https://github.com/josdejong/svelte-jsoneditor/issues/435)) ([776ff70](https://github.com/josdejong/svelte-jsoneditor/commit/776ff709c3588b6705795062bcc4933fe02360e3))
+
 ### [0.23.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.3...v0.23.4) (2024-05-09)
 
 
