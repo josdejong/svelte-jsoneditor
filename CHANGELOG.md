@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.23.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.5...v0.23.6) (2024-06-05)
+
+
+### Features
+
+* update dependencies `codemirror`, `codemirror-indentation-markers`, `ajv`, `sass` ([1eb5c0b](https://github.com/josdejong/svelte-jsoneditor/commit/1eb5c0bc582b2bad4a233e90e5c75d2304009a6a))
+
+
+### Bug Fixes
+
+* [#436](https://github.com/josdejong/svelte-jsoneditor/issues/436) Ctrl+Click (Cmd+Click) not working on Mac ([7142783](https://github.com/josdejong/svelte-jsoneditor/commit/714278381fde46ac5abc828c744316291babbab5))
+
 ### [0.23.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.4...v0.23.5) (2024-05-30)
 
 
