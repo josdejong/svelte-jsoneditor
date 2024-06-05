@@ -23,6 +23,7 @@ export function keyComboFromEvent(event: KeyComboEvent, separator = '+', isMac =
   const combi = []
 
   if (isCtrlKeyDown(event, isMac)) {
+    // on Mac this is called Command or Cmd
     combi.push('Ctrl')
   }
   if (event.altKey) {
