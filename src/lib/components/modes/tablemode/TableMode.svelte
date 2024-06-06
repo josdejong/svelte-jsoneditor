@@ -45,8 +45,7 @@
     immutableJSONPatch,
     isJSONArray,
     type JSONPatchDocument,
-    type JSONPath,
-    setIn
+    type JSONPath
   } from 'immutable-json-patch'
   import {
     isTextContent,
@@ -87,8 +86,8 @@
     expandMinimal,
     expandWithCallback,
     getEnforceString,
-    syncDocumentState,
-    toRecursiveStatePath
+    setInDocumentState,
+    syncDocumentState
   } from '$lib/logic/documentState.js'
   import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils.js'
   import InlineValue from './tag/InlineValue.svelte'
@@ -1129,10 +1128,9 @@
     }
 
     const path = selection.path
-    const statePath = toRecursiveStatePath(json, path)
     const pointer = compileJSONPointer(path)
     const value = getIn(json, path)
-    const enforceString = !getEnforceString(value, documentState, path, parser)
+    const enforceString = !getEnforceString(json, documentState, path, parser)
     const updatedValue = enforceString ? String(value) : stringConvert(String(value), parser)
 
     debug('handleToggleEnforceString', { enforceString, value, updatedValue })
@@ -1147,7 +1145,7 @@
       ],
       (_, patchedState) => {
         return {
-          state: setIn(patchedState, statePath, { type: 'value', enforceString })
+          state: setInDocumentState(json, patchedState, path, { type: 'value', enforceString })
         }
       }
     )
