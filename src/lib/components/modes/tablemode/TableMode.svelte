@@ -1746,6 +1746,7 @@
 
     json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
     documentState = item.undo.state
+    selection = item.undo.selection
     text = item.undo.text
     textIsRepaired = item.undo.textIsRepaired
     parseError = undefined
@@ -1788,6 +1789,7 @@
 
     json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
     documentState = item.redo.state
+    selection = item.redo.selection
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired
     parseError = undefined
