@@ -304,12 +304,6 @@
     }
   }
 
-  function clearSortedColumn() {
-    if (sortedColumn) {
-      sortedColumn = null
-    }
-  }
-
   function updateSelection(
     updatedSelection:
       | JSONSelection
@@ -448,7 +442,7 @@
     clearSelectionWhenNotExisting(json)
 
     // reset the sorting order (we don't know...)
-    clearSortedColumn()
+    sortedColumn = null
 
     addHistoryItem({
       previousJson,
@@ -1747,6 +1741,7 @@
     json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
     documentState = item.undo.state
     selection = item.undo.selection
+    sortedColumn = item.undo.sortedColumn
     text = item.undo.text
     textIsRepaired = item.undo.textIsRepaired
     parseError = undefined
@@ -1790,6 +1785,7 @@
     json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
     documentState = item.redo.state
     selection = item.redo.selection
+    sortedColumn = item.redo.sortedColumn
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired
     parseError = undefined
