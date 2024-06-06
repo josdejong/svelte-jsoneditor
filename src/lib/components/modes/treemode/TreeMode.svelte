@@ -10,8 +10,7 @@
     getIn,
     immutableJSONPatch,
     type JSONPatchDocument,
-    type JSONPath,
-    setIn
+    type JSONPath
   } from 'immutable-json-patch'
   import { jsonrepair } from 'jsonrepair'
   import { initial, isEmpty, isEqual, noop, uniqueId } from 'lodash-es'
@@ -37,6 +36,7 @@
     expandWithCallback,
     getDefaultExpand,
     getEnforceString,
+    setInDocumentState,
     syncDocumentState,
     toRecursiveStatePath
   } from '$lib/logic/documentState.js'
@@ -752,7 +752,6 @@
     }
 
     const path = getFocusPath(selection)
-    const statePath = toRecursiveStatePath(json, path)
     const pointer = compileJSONPointer(path)
     const value = getIn(json, path)
     const enforceString = !getEnforceString(json, documentState, path, parser)
@@ -770,7 +769,7 @@
       ],
       (_, patchedState) => {
         return {
-          state: setIn(patchedState, statePath, { type: 'value', enforceString })
+          state: setInDocumentState(json, patchedState, path, { type: 'value', enforceString })
         }
       }
     )
