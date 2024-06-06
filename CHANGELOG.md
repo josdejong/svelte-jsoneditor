@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.23.7](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.6...v0.23.7) (2024-06-06)
+
+
+### Bug Fixes
+
+* search and replace in table mode not working ([3f8a398](https://github.com/josdejong/svelte-jsoneditor/commit/3f8a3989108a6629cd46810e02da919c9bd1dfc5))
+
 ### [0.23.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.5...v0.23.6) (2024-06-05)
 
 
