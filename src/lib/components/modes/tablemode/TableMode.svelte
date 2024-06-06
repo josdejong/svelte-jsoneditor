@@ -658,6 +658,8 @@
     json = callback?.json !== undefined ? callback.json : patched.json
     documentState = callback?.state !== undefined ? callback.state : patched.state
     selection = callback?.selection !== undefined ? callback.selection : selection
+    sortedColumn =
+      callback?.sortedColumn !== undefined ? callback.sortedColumn : patchedSortedColumn
     text = undefined
     textIsRepaired = false
     pastedJson = undefined
@@ -678,7 +680,7 @@
         json: undefined,
         state: documentState,
         selection: removeEditModeFromSelection(selection),
-        sortedColumn: patchedSortedColumn,
+        sortedColumn,
         text: undefined,
         textIsRepaired
       }
@@ -1479,7 +1481,7 @@
     json = callback?.json !== undefined ? callback.json : updatedJson
     documentState = callback?.state !== undefined ? callback.state : updatedState
     selection = callback?.selection !== undefined ? callback.selection : selection
-    // sortedColumn = clearSortedColumnWhenAffectedByOperations() // FIXME
+    sortedColumn = null // we can't know whether the new json is still sorted or not
     text = undefined
     textIsRepaired = false
     parseError = undefined

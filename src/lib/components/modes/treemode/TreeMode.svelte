@@ -37,8 +37,7 @@
     getDefaultExpand,
     getEnforceString,
     setInDocumentState,
-    syncDocumentState,
-    toRecursiveStatePath
+    syncDocumentState
   } from '$lib/logic/documentState.js'
   import { createHistory } from '$lib/logic/history.js'
   import { duplicate, extract, revertJSONPatchWithMoveOperations } from '$lib/logic/operations.js'
