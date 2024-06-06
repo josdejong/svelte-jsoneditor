@@ -467,10 +467,8 @@
 
       if (operations) {
         context.onPatch(operations, (_, patchedState) => ({
-          state: {
-            ...patchedState,
-            selection: updatedSelection || selection
-          }
+          state: patchedState,
+          selection: updatedSelection ?? selection
         }))
       } else {
         // the user did click inside the selection and no contents have been dragged,
