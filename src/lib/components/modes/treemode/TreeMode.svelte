@@ -656,6 +656,7 @@
 
     const previousJson = json
     const previousState = documentState
+    const previousSelection = selection
     const previousText = text
     const previousTextIsRepaired = textIsRepaired
 
@@ -693,7 +694,7 @@
         json: undefined,
         text: previousText,
         state: previousState,
-        selection: removeEditModeFromSelection(selection),
+        selection: removeEditModeFromSelection(previousSelection),
         sortedColumn: null,
         textIsRepaired: previousTextIsRepaired
       },
