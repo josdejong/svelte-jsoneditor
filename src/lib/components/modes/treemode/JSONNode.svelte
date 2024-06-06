@@ -78,6 +78,7 @@
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
   import { isObject } from '$lib/utils/typeUtils.js'
   import { classnames } from '$lib/utils/cssUtils.js'
+  import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
 
   export let value: unknown
   export let path: JSONPath
@@ -208,7 +209,7 @@
   function toggleExpand(event: MouseEvent) {
     event.stopPropagation()
 
-    const recursive = event.ctrlKey
+    const recursive = isCtrlKeyDown(event)
     context.onExpand(path, !expanded, recursive)
   }
 

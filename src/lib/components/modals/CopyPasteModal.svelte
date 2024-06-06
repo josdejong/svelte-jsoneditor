@@ -2,14 +2,14 @@
 
 <script lang="ts">
   import { getContext } from 'svelte'
-  import { IS_MAC } from '$lib/utils/navigatorUtils.js'
+  import { isMac } from '$lib/utils/navigatorUtils.js'
   import { onEscape } from '$lib/actions/onEscape.js'
   import Header from './Header.svelte'
   import type { Context } from 'svelte-simple-modal'
 
   const { close } = getContext<Context>('simple-modal')
 
-  const ctrl = IS_MAC ? '⌘' : 'Ctrl'
+  const ctrl = isMac() ? '⌘' : 'Ctrl'
 </script>
 
 <div class="jse-modal jse-copy-paste" use:onEscape={() => close()}>

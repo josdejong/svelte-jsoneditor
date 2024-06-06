@@ -1,11 +1,13 @@
 // inspiration: https://github.com/andrepolischuk/keycomb
 
+import { isMac as _isMac } from './navigatorUtils.js'
+
 // KeyComboEvent is a subset of KeyboardEvent
 export interface KeyComboEvent {
-  ctrlKey?: boolean
-  metaKey?: boolean
-  altKey?: boolean
-  shiftKey?: boolean
+  ctrlKey: boolean
+  metaKey: boolean
+  altKey: boolean
+  shiftKey: boolean
   key: string
 }
 
@@ -17,15 +19,11 @@ export interface KeyComboEvent {
  * meta keys "Ctrl" ("Command" on Mac), and "Alt" ("Alt" or "Option" on Mac)
  * So pressing "Command" and "A"on Mac will return "Ctrl+A"
  */
-export function keyComboFromEvent(event: KeyComboEvent, separator = '+'): string {
+export function keyComboFromEvent(event: KeyComboEvent, separator = '+', isMac = _isMac): string {
   const combi = []
 
-  if (event.ctrlKey) {
-    // Control on Windows
-    combi.push('Ctrl')
-  }
-  if (event.metaKey) {
-    // Command on Mac
+  if (isCtrlKeyDown(event, isMac)) {
+    // on Mac this is called Command or Cmd
     combi.push('Ctrl')
   }
   if (event.altKey) {
@@ -43,6 +41,17 @@ export function keyComboFromEvent(event: KeyComboEvent, separator = '+'): string
   }
 
   return combi.join(separator)
+}
+
+/**
+ * Test whether the Ctrl key (windows, linux) or Command key (mac) is down
+ */
+export function isCtrlKeyDown(
+  event: { ctrlKey: boolean; metaKey: boolean },
+  isMac = _isMac
+): boolean {
+  // metaKey is the Command key ⌘ on a Mac (but the Windows Key ⊞ on Windows)
+  return event.ctrlKey || (event.metaKey && isMac())
 }
 
 const metaKeys = {
