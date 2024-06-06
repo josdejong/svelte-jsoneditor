@@ -281,7 +281,7 @@ export function expandWithCallback(
   path: JSONPath,
   expandedCallback: OnExpand
 ): DocumentState | undefined {
-  let updatedState = documentState
+  let updatedState = ensureNestedDocumentState(json, documentState, path)
 
   // FIXME: simplify this function
 
