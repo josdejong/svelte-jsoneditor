@@ -86,7 +86,7 @@
     expandMinimal,
     expandWithCallback,
     getEnforceString,
-    setInDocumentState,
+    setInRecursiveState,
     syncDocumentState
   } from '$lib/logic/documentState.js'
   import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils.js'
@@ -1141,7 +1141,7 @@
       ],
       (_, patchedState) => {
         return {
-          state: setInDocumentState(json, patchedState, path, { type: 'value', enforceString })
+          state: setInRecursiveState(json, patchedState, path, { type: 'value', enforceString })
         }
       }
     )

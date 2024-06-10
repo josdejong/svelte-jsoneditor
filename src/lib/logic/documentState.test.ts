@@ -7,8 +7,9 @@ import {
   createDocumentState,
   createObjectDocumentState,
   createValueDocumentState,
+  documentStateFactory,
   documentStatePatch,
-  ensureNestedDocumentState,
+  ensureRecursiveState,
   expandPath,
   expandSection,
   expandWithCallback,
@@ -20,11 +21,11 @@ import {
   syncDocumentState,
   syncKeys,
   toRecursiveStatePath,
-  updateInDocumentState
+  updateInRecursiveState
 } from './documentState.js'
 import { CaretType, type DocumentState, type VisibleSection } from '$lib/types.js'
 import { deleteIn, getIn, type JSONPatchDocument, setIn, updateIn } from 'immutable-json-patch'
-import { isArrayDocumentState } from 'svelte-jsoneditor'
+import { isArrayRecursiveState } from 'svelte-jsoneditor'
 
 describe('documentState', () => {
   test('syncKeys should append new keys and remove old keys', () => {
@@ -45,7 +46,10 @@ describe('documentState', () => {
         visibleSections: DEFAULT_VISIBLE_SECTIONS
       }
 
-      assert.deepStrictEqual(ensureNestedDocumentState([1, 2, 3], undefined, ['1']), expected)
+      assert.deepStrictEqual(
+        ensureRecursiveState([1, 2, 3], undefined, ['1'], documentStateFactory),
+        expected
+      )
     })
 
     test('should maintain state when creating nested state in an array', () => {
@@ -64,7 +68,10 @@ describe('documentState', () => {
         visibleSections: DEFAULT_VISIBLE_SECTIONS
       }
 
-      assert.deepStrictEqual(ensureNestedDocumentState([1, 2, 3], state, ['1']), expected)
+      assert.deepStrictEqual(
+        ensureRecursiveState([1, 2, 3], state, ['1'], documentStateFactory),
+        expected
+      )
     })
 
     test('should create nested state in an object', () => {
@@ -76,7 +83,10 @@ describe('documentState', () => {
         }
       }
 
-      assert.deepStrictEqual(ensureNestedDocumentState({ a: 2, b: 3 }, undefined, ['a']), expected)
+      assert.deepStrictEqual(
+        ensureRecursiveState({ a: 2, b: 3 }, undefined, ['a'], documentStateFactory),
+        expected
+      )
     })
 
     test('should maintain state when creating nested state in an object', () => {
@@ -94,7 +104,10 @@ describe('documentState', () => {
         }
       }
 
-      assert.deepStrictEqual(ensureNestedDocumentState({ a: 2, b: 3 }, state, ['a']), expected)
+      assert.deepStrictEqual(
+        ensureRecursiveState({ a: 2, b: 3 }, state, ['a'], documentStateFactory),
+        expected
+      )
     })
 
     test('should create nested state in an object and array', () => {
@@ -113,7 +126,7 @@ describe('documentState', () => {
       }
 
       assert.deepStrictEqual(
-        ensureNestedDocumentState({ array: [1, 2, 3] }, undefined, ['array', '1']),
+        ensureRecursiveState({ array: [1, 2, 3] }, undefined, ['array', '1'], documentStateFactory),
         expected
       )
     })
@@ -124,7 +137,7 @@ describe('documentState', () => {
         enforceString: true
       }
 
-      assert.deepStrictEqual(ensureNestedDocumentState(42, state, []), state)
+      assert.deepStrictEqual(ensureRecursiveState(42, state, [], documentStateFactory), state)
     })
   })
 
@@ -365,6 +378,24 @@ describe('documentState', () => {
     test('should expand a nested item of a json document', () => {
       assert.deepStrictEqual(
         expandWithCallback(json, expandedState, ['array'], (path) => isEqual(path, ['array'])),
+        {
+          expanded: false,
+          properties: {
+            array: {
+              type: 'array',
+              expanded: true,
+              visibleSections: DEFAULT_VISIBLE_SECTIONS,
+              items: []
+            }
+          },
+          type: 'object'
+        }
+      )
+    })
+
+    test('should expand a nested item of a json document starting without state', () => {
+      assert.deepStrictEqual(
+        expandWithCallback(json, undefined, ['array'], (path) => isEqual(path, ['array'])),
         {
           expanded: false,
           properties: {
@@ -702,8 +733,8 @@ describe('documentState', () => {
 
       let documentState = createDocumentState({ json, expand: () => true })
 
-      documentState = updateInDocumentState(json, documentState, ['members'], (_value, state) => {
-        return isArrayDocumentState(state)
+      documentState = updateInRecursiveState(json, documentState, ['members'], (_value, state) => {
+        return isArrayRecursiveState(state)
           ? { ...state, visibleSections: [{ start: 0, end: 3 }] }
           : state
       })

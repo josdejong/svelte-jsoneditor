@@ -68,9 +68,9 @@
   } from '$lib/types'
   import { SelectionType } from '$lib/types.js'
   import {
-    isArrayDocumentState,
+    isArrayRecursiveState,
     isExpandableState,
-    isObjectDocumentState
+    isObjectRecursiveState
   } from '$lib/typeguards.js'
   import { filterPointerOrUndefined } from '$lib/utils/jsonPointer.js'
   import { filterKeySearchResults, filterValueSearchResults } from '$lib/logic/search.js'
@@ -111,7 +111,7 @@
   $: enforceString = getEnforceString(value, state, [], context.parser)
 
   let visibleSections: VisibleSection[] | undefined
-  $: visibleSections = isArrayDocumentState(state) ? state.visibleSections : undefined
+  $: visibleSections = isArrayRecursiveState(state) ? state.visibleSections : undefined
 
   let validationError: NestedValidationError | undefined
   $: validationError = validationErrorsMap ? validationErrorsMap[pointer] : undefined
@@ -713,7 +713,7 @@
             <svelte:self
               value={item.value}
               path={item.path}
-              state={isArrayDocumentState(state) ? state.items[item.index] : undefined}
+              state={isArrayRecursiveState(state) ? state.items[item.index] : undefined}
               validationErrorsMap={item.validationErrorsMap}
               searchResultItemsMap={item.searchResultItemsMap}
               selection={item.selection}
@@ -831,7 +831,7 @@
           <svelte:self
             value={prop.value}
             path={prop.path}
-            state={isObjectDocumentState(state) ? state.properties[prop.key] : undefined}
+            state={isObjectRecursiveState(state) ? state.properties[prop.key] : undefined}
             validationErrorsMap={prop.validationErrorsMap}
             searchResultItemsMap={prop.valueSearchResultItemsMap}
             selection={prop.selection}

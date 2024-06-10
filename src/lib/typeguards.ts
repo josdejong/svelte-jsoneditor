@@ -12,10 +12,10 @@ import type {
   NestedValidationError,
   SvelteActionRenderer,
   SvelteComponentRenderer,
-  ObjectDocumentState,
-  ArrayDocumentState,
-  DocumentState,
-  ValueDocumentState
+  RecursiveState,
+  ArrayRecursiveState,
+  ObjectRecursiveState,
+  ValueRecursiveState
 } from './types.js'
 import { isObject } from '$lib/utils/typeUtils.js'
 
@@ -103,26 +103,26 @@ export function isSvelteActionRenderer(value: unknown): value is SvelteActionRen
   return isObject(value) && typeof value.action === 'function' && isObject(value.props)
 }
 
-export function isObjectDocumentState(
-  state: DocumentState | undefined
-): state is ObjectDocumentState {
+export function isObjectRecursiveState(
+  state: RecursiveState | undefined
+): state is ObjectRecursiveState {
   return state !== undefined && state.type === 'object'
 }
 
-export function isArrayDocumentState(
-  state: DocumentState | undefined
-): state is ArrayDocumentState {
+export function isArrayRecursiveState(
+  state: RecursiveState | undefined
+): state is ArrayRecursiveState {
   return state !== undefined && state.type === 'array'
 }
 
-export function isValueDocumentState(
-  state: DocumentState | undefined
-): state is ValueDocumentState {
+export function isValueRecursiveState(
+  state: RecursiveState | undefined
+): state is ValueRecursiveState {
   return state !== undefined && state.type === 'value'
 }
 
 export function isExpandableState(
-  state: DocumentState | undefined
-): state is ObjectDocumentState | ArrayDocumentState {
-  return isObjectDocumentState(state) || isArrayDocumentState(state)
+  state: RecursiveState | undefined
+): state is ObjectRecursiveState | ArrayRecursiveState {
+  return isObjectRecursiveState(state) || isArrayRecursiveState(state)
 }

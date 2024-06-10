@@ -36,7 +36,7 @@
     expandWithCallback,
     getDefaultExpand,
     getEnforceString,
-    setInDocumentState,
+    setInRecursiveState,
     syncDocumentState
   } from '$lib/logic/documentState.js'
   import { createHistory } from '$lib/logic/history.js'
@@ -768,7 +768,7 @@
       ],
       (_, patchedState) => {
         return {
-          state: setInDocumentState(json, patchedState, path, { type: 'value', enforceString })
+          state: setInRecursiveState(json, patchedState, path, { type: 'value', enforceString })
         }
       }
     )

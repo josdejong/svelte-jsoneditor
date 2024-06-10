@@ -75,20 +75,42 @@ export interface CaretPosition {
   type: CaretType // TODO: refactor this to use SelectionType here, then we can simplify the util functions to turn this into a selection
 }
 
-export interface ObjectDocumentState {
+export interface ObjectRecursiveState {
   type: 'object'
-  expanded: boolean
-  properties: Record<string, DocumentState | undefined>
+  properties: Record<string, RecursiveState | undefined>
 }
 
-export interface ArrayDocumentState {
+export interface ArrayRecursiveState {
   type: 'array'
+  items: Array<RecursiveState | undefined>
+}
+
+export interface ValueRecursiveState {
+  type: 'value'
+}
+
+export type RecursiveState = ObjectRecursiveState | ArrayRecursiveState | ValueRecursiveState
+
+export interface RecursiveStateFactory {
+  createObjectDocumentState: () => ObjectRecursiveState
+  createArrayDocumentState: () => ArrayRecursiveState
+  createValueDocumentState: () => ValueRecursiveState
+}
+
+export interface ObjectDocumentState extends ObjectRecursiveState {
+  type: 'object'
+  properties: Record<string, DocumentState | undefined>
+  expanded: boolean
+}
+
+export interface ArrayDocumentState extends ArrayRecursiveState {
+  type: 'array'
+  items: Array<DocumentState | undefined>
   expanded: boolean
   visibleSections: VisibleSection[]
-  items: Array<DocumentState | undefined>
 }
 
-export interface ValueDocumentState {
+export interface ValueDocumentState extends ValueRecursiveState {
   type: 'value'
   enforceString?: boolean
 }
