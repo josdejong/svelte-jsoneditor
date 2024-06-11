@@ -2,8 +2,8 @@
 
 <script lang="ts">
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
-  import type { JSONPath, JSONPointer } from 'immutable-json-patch'
-  import { appendToJSONPointer, compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
+  import type { JSONPath } from 'immutable-json-patch'
+  import { parseJSONPointer } from 'immutable-json-patch'
   import { initial, isEqual, last } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
