@@ -26,6 +26,7 @@
   import {
     collapsePath,
     createDocumentState,
+    documentStateFactory,
     documentStatePatch,
     expandAll,
     expandMinimal,
@@ -138,6 +139,7 @@
     OnTransformModal,
     ParseError,
     PastedJson,
+    RecursiveSearchResult,
     SearchResult,
     Section,
     TransformModalOptions,
@@ -161,6 +163,7 @@
   import type { Context } from 'svelte-simple-modal'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
   import createTreeContextMenuItems from './contextmenu/createTreeContextMenuItems'
+  import { toRecursiveSearchResult as toRecursiveSearchResult } from 'svelte-jsoneditor/logic/search.js'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -269,6 +272,7 @@
   let pastedJson: PastedJson
 
   let searchResult: SearchResult | undefined
+  let recursiveSearchResult: RecursiveSearchResult | undefined
   let showSearch = false
   let showReplace = false
 
@@ -295,6 +299,9 @@
 
   function handleSearch(result: SearchResult | undefined) {
     searchResult = result
+    recursiveSearchResult = searchResult
+      ? toRecursiveSearchResult(json, searchResult.items)
+      : undefined
   }
 
   async function handleFocusSearch(path: JSONPath) {
@@ -768,7 +775,13 @@
       ],
       (_, patchedState) => {
         return {
-          state: setInRecursiveState(json, patchedState, path, { type: 'value', enforceString })
+          state: setInRecursiveState(
+            json,
+            patchedState,
+            path,
+            { type: 'value', enforceString },
+            documentStateFactory
+          )
         }
       }
     )
@@ -2116,7 +2129,7 @@
           path={[]}
           state={documentState}
           {validationErrorsMap}
-          searchResultItemsMap={searchResult?.itemsMap}
+          {recursiveSearchResult}
           {selection}
           {context}
           onDragSelectionStart={noop}

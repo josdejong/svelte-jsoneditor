@@ -56,12 +56,12 @@
     CaretPosition,
     DocumentState,
     DraggingState,
-    ExtendedSearchResultItem,
     JSONNodeItem,
     JSONNodeProp,
     JSONPointerMap,
     JSONSelection,
     NestedValidationError,
+    RecursiveSearchResult,
     RenderedItem,
     TreeModeContext,
     VisibleSection
@@ -84,7 +84,7 @@
   export let path: JSONPath
   export let state: DocumentState | undefined
   export let validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
-  export let searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
+  export let recursiveSearchResult: RecursiveSearchResult | undefined
   export let selection: JSONSelection | null
   export let context: TreeModeContext
   export let onDragSelectionStart: (
@@ -126,7 +126,6 @@
     path: JSONPath,
     object: Record<string, unknown>,
     validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined,
-    searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
     selection: JSONSelection | null,
     dragging: DraggingState | undefined
   ): JSONNodeProp[] {
@@ -138,8 +137,6 @@
         value: object[key],
         path: keyPath,
         validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, keyPointer),
-        keySearchResultItemsMap: filterKeySearchResults(searchResultItemsMap, keyPointer),
-        valueSearchResultItemsMap: filterPointerOrUndefined(searchResultItemsMap, keyPointer),
         selection: selectionIfOverlapping(context.getJson(), selection, keyPath)
       }
     })
@@ -163,7 +160,6 @@
     array: Array<unknown>,
     visibleSection: VisibleSection,
     validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined,
-    searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
     selection: JSONSelection | null,
     dragging: DraggingState | undefined
   ): JSONNodeItem[] {
@@ -180,7 +176,6 @@
         value: array[index],
         path: itemPath,
         validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, itemPointer),
-        searchResultItemsMap: filterPointerOrUndefined(searchResultItemsMap, itemPointer),
         selection: selectionIfOverlapping(context.getJson(), selection, itemPath)
       })
     }
@@ -709,13 +704,15 @@
           </div>
         {/if}
         {#each visibleSections || DEFAULT_VISIBLE_SECTIONS as visibleSection, sectionIndex (sectionIndex)}
-          {#each getItems(path, value, visibleSection, validationErrorsMap, searchResultItemsMap, selection, dragging) as item (item.index)}
+          {#each getItems(path, value, visibleSection, validationErrorsMap, selection, dragging) as item (item.index)}
             <svelte:self
               value={item.value}
               path={item.path}
               state={isArrayRecursiveState(state) ? state.items[item.index] : undefined}
               validationErrorsMap={item.validationErrorsMap}
-              searchResultItemsMap={item.searchResultItemsMap}
+              recursiveSearchResult={isArrayRecursiveState(recursiveSearchResult)
+                ? recursiveSearchResult.items[item.index]
+                : undefined}
               selection={item.selection}
               {context}
               onDragSelectionStart={handleDragSelectionStart}
@@ -827,13 +824,17 @@
             />
           </div>
         {/if}
-        {#each getProps(path, value, validationErrorsMap, searchResultItemsMap, selection, dragging) as prop}
+        {#each getProps(path, value, validationErrorsMap, selection, dragging) as prop}
+          {@const nestedSearchResult = isObjectRecursiveState(recursiveSearchResult)
+            ? recursiveSearchResult.properties[prop.key]
+            : undefined}
+
           <svelte:self
             value={prop.value}
             path={prop.path}
             state={isObjectRecursiveState(state) ? state.properties[prop.key] : undefined}
             validationErrorsMap={prop.validationErrorsMap}
-            searchResultItemsMap={prop.valueSearchResultItemsMap}
+            recursiveSearchResult={nestedSearchResult}
             selection={prop.selection}
             {context}
             onDragSelectionStart={handleDragSelectionStart}
@@ -843,7 +844,7 @@
                 path={prop.path}
                 key={prop.key}
                 selection={prop.selection}
-                searchResultItems={prop.keySearchResultItemsMap}
+                searchResultItems={filterKeySearchResults(nestedSearchResult)}
                 {context}
                 onUpdateKey={handleUpdateKey}
               />
@@ -877,7 +878,7 @@
           {value}
           {enforceString}
           selection={isNodeSelected ? selection : null}
-          searchResultItems={filterValueSearchResults(searchResultItemsMap, pointer)}
+          searchResultItems={filterValueSearchResults(recursiveSearchResult)}
           {context}
         />
         {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !isEditingSelection(selection) && isEqual(getFocusPath(selection), path)}

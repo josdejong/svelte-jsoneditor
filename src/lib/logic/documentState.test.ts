@@ -733,11 +733,17 @@ describe('documentState', () => {
 
       let documentState = createDocumentState({ json, expand: () => true })
 
-      documentState = updateInRecursiveState(json, documentState, ['members'], (_value, state) => {
-        return isArrayRecursiveState(state)
-          ? { ...state, visibleSections: [{ start: 0, end: 3 }] }
-          : state
-      })
+      documentState = updateInRecursiveState(
+        json,
+        documentState,
+        ['members'],
+        (_value, state) => {
+          return isArrayRecursiveState(state)
+            ? { ...state, visibleSections: [{ start: 0, end: 3 }] }
+            : state
+        },
+        documentStateFactory
+      )
 
       return { json, documentState }
     }

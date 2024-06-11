@@ -54,6 +54,24 @@ import {
   isValueRecursiveState
 } from '$lib/typeguards.js'
 
+export type CreateRecursiveStateProps = {
+  json: unknown | undefined
+  factory: RecursiveStateFactory
+}
+
+export function createRecursiveState({
+  json,
+  factory
+}: CreateRecursiveStateProps): RecursiveState | undefined {
+  return Array.isArray(json)
+    ? factory.createArrayDocumentState()
+    : isObject(json)
+      ? factory.createObjectDocumentState()
+      : json !== undefined
+        ? factory.createValueDocumentState()
+        : undefined
+}
+
 export type CreateDocumentStateProps = {
   json: unknown | undefined
   expand?: OnExpand
@@ -63,13 +81,7 @@ export function createDocumentState({
   json,
   expand
 }: CreateDocumentStateProps): DocumentState | undefined {
-  let documentState: DocumentState | undefined = Array.isArray(json)
-    ? createArrayDocumentState()
-    : isObject(json)
-      ? createObjectDocumentState()
-      : json !== undefined
-        ? createValueDocumentState()
-        : undefined
+  let documentState = createRecursiveState({ json, factory: documentStateFactory }) as DocumentState
 
   if (expand && documentState) {
     documentState = expandWithCallback(json, documentState, [], expand)
@@ -251,7 +263,8 @@ export function expandPath(
             ...nestedState,
             visibleSections: mergeSections(nestedState.visibleSections.concat(newVisibleSection))
           }
-        }
+        },
+        documentStateFactory
       )
     }
   }
@@ -292,7 +305,7 @@ export function expandWithCallback(
   documentState: DocumentState | undefined,
   path: JSONPath,
   expandedCallback: OnExpand
-): DocumentState | undefined {
+): DocumentState {
   // FIXME: updateInDocumentState and ensureNestedDocumentState here
   let updatedState = ensureRecursiveState(json, documentState, path, documentStateFactory)
 
@@ -381,9 +394,15 @@ export function expandSingleItem(
   documentState: DocumentState | undefined,
   path: JSONPath
 ): DocumentState | undefined {
-  return updateInRecursiveState(json, documentState, path, (_value, state) => {
-    return isExpandableState(state) ? { ...state, expanded: true } : state
-  })
+  return updateInRecursiveState(
+    json,
+    documentState,
+    path,
+    (_value, state) => {
+      return isExpandableState(state) ? { ...state, expanded: true } : state
+    },
+    documentStateFactory
+  )
 }
 
 // TODO: write unit tests
@@ -392,14 +411,20 @@ export function collapsePath(
   documentState: DocumentState | undefined,
   path: JSONPath
 ): DocumentState | undefined {
-  return updateInRecursiveState(json, documentState, path, (_value, state) => {
-    // clear the state of nested objects/arrays
-    return isObjectRecursiveState(state)
-      ? createObjectDocumentState({ expanded: false })
-      : isArrayRecursiveState(state)
-        ? createArrayDocumentState({ expanded: false })
-        : state
-  })
+  return updateInRecursiveState(
+    json,
+    documentState,
+    path,
+    (_value, state) => {
+      // clear the state of nested objects/arrays
+      return isObjectRecursiveState(state)
+        ? createObjectDocumentState({ expanded: false })
+        : isArrayRecursiveState(state)
+          ? createArrayDocumentState({ expanded: false })
+          : state
+    },
+    documentStateFactory
+  )
 }
 
 /**
@@ -411,15 +436,21 @@ export function expandSection(
   path: JSONPath,
   section: Section
 ): DocumentState | undefined {
-  return updateInRecursiveState(json, documentState, path, (_value, state) => {
-    if (!isArrayRecursiveState(state)) {
-      return state
-    }
+  return updateInRecursiveState(
+    json,
+    documentState,
+    path,
+    (_value, state) => {
+      if (!isArrayRecursiveState(state)) {
+        return state
+      }
 
-    const visibleSections = mergeSections(state.visibleSections.concat(section))
+      const visibleSections = mergeSections(state.visibleSections.concat(section))
 
-    return { ...state, visibleSections }
-  })
+      return { ...state, visibleSections }
+    },
+    documentStateFactory
+  )
 }
 
 export function syncKeys(actualKeys: string[], prevKeys?: string[]): string[] {
@@ -487,9 +518,10 @@ export function setInRecursiveState(
   json: unknown,
   documentState: DocumentState | undefined,
   path: JSONPath,
-  value: unknown
+  value: unknown,
+  factory: RecursiveStateFactory
 ): DocumentState | undefined {
-  const ensuredState = ensureRecursiveState(json, documentState, path, documentStateFactory)
+  const ensuredState = ensureRecursiveState(json, documentState, path, factory)
   return setIn(ensuredState, toRecursiveStatePath(json, path), value)
 }
 
@@ -497,9 +529,10 @@ export function updateInRecursiveState<T extends RecursiveState>(
   json: unknown,
   documentState: T | undefined,
   path: JSONPath,
-  transform: (value: unknown, state: T) => T
+  transform: (value: unknown, state: T) => T,
+  factory: RecursiveStateFactory
 ): T {
-  const ensuredState: T = ensureRecursiveState(json, documentState, path, documentStateFactory)
+  const ensuredState: T = ensureRecursiveState(json, documentState, path, factory)
   return updateIn(ensuredState, toRecursiveStatePath(json, path), (nestedState: T) => {
     const value = getIn(json, path)
     return transform(value, nestedState)
@@ -548,11 +581,12 @@ export function documentStateAdd(
             : items,
         visibleSections: shiftVisibleSections(visibleSections, index, 1)
       }
-    }
+    },
+    documentStateFactory
   )
 
   // object property added, nothing to do
-  return setInRecursiveState(updatedJson, updatedState, path, stateValue)
+  return setInRecursiveState(updatedJson, updatedState, path, stateValue, documentStateFactory)
 }
 
 export function documentStateRemove(
@@ -565,20 +599,26 @@ export function documentStateRemove(
   const parent = getIn(updatedJson, parentPath)
 
   if (Array.isArray(parent)) {
-    return updateInRecursiveState(updatedJson, documentState, parentPath, (_parent, arrayState) => {
-      if (!isArrayRecursiveState(arrayState)) {
-        return arrayState
-      }
+    return updateInRecursiveState(
+      updatedJson,
+      documentState,
+      parentPath,
+      (_parent, arrayState) => {
+        if (!isArrayRecursiveState(arrayState)) {
+          return arrayState
+        }
 
-      const index = int(last(path) as string)
-      const { items, visibleSections } = arrayState
+        const index = int(last(path) as string)
+        const { items, visibleSections } = arrayState
 
-      return {
-        ...arrayState,
-        items: items.slice(0, index).concat(items.slice(index + 1)),
-        visibleSections: shiftVisibleSections(visibleSections, index, -1)
-      }
-    })
+        return {
+          ...arrayState,
+          items: items.slice(0, index).concat(items.slice(index + 1)),
+          visibleSections: shiftVisibleSections(visibleSections, index, -1)
+        }
+      },
+      documentStateFactory
+    )
   }
 
   return deleteInDocumentState(updatedJson, documentState, path)

@@ -28,6 +28,7 @@
     OnTransformModal,
     ParseError,
     PastedJson,
+    RecursiveSearchResult,
     SearchResult,
     SortedColumn,
     TransformModalOptions,
@@ -39,7 +40,6 @@
   import TableMenu from './menu/TableMenu.svelte'
   import {
     compileJSONPointer,
-    compileJSONPointerProp,
     existsIn,
     getIn,
     immutableJSONPatch,
@@ -82,10 +82,12 @@
   import { createDebug } from '$lib/utils/debug.js'
   import {
     createDocumentState,
+    documentStateFactory,
     documentStatePatch,
     expandMinimal,
     expandWithCallback,
     getEnforceString,
+    getInRecursiveState,
     setInRecursiveState,
     syncDocumentState
   } from '$lib/logic/documentState.js'
@@ -148,8 +150,7 @@
   import type { Context } from 'svelte-simple-modal'
   import createTableContextMenuItems from './contextmenu/createTableContextMenuItems'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
-  import { filterValueSearchResults } from '$lib/logic/search.js'
-  import { filterPointerOrUndefined } from 'svelte-jsoneditor/utils/jsonPointer'
+  import { flattenRecursiveSearchResult, toRecursiveSearchResult } from '$lib/logic/search.js'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext<Context>('simple-modal')
@@ -222,6 +223,7 @@
   let pastedJson: PastedJson
 
   let searchResult: SearchResult | undefined
+  let recursiveSearchResult: RecursiveSearchResult | undefined
   let showSearch = false
   let showReplace = false
 
@@ -241,6 +243,9 @@
 
   function handleSearch(result: SearchResult | undefined) {
     searchResult = result
+    recursiveSearchResult = searchResult
+      ? toRecursiveSearchResult(json, searchResult.items)
+      : undefined
   }
 
   async function handleFocusSearch(path: JSONPath) {
@@ -1141,7 +1146,13 @@
       ],
       (_, patchedState) => {
         return {
-          state: setInRecursiveState(json, patchedState, path, { type: 'value', enforceString })
+          state: setInRecursiveState(
+            json,
+            patchedState,
+            path,
+            { type: 'value', enforceString },
+            documentStateFactory
+          )
         }
       }
     )
@@ -1918,9 +1929,9 @@
                 [String(rowIndex)],
                 validationErrorsByRow?.row
               )}
-              {@const searchResultItemsByRow = searchResult?.itemsMap
-                ? filterPointerOrUndefined(searchResult?.itemsMap, compileJSONPointerProp(rowIndex))
-                : undefined}
+              {@const searchResultItemsByRow = getInRecursiveState(json, recursiveSearchResult, [
+                String(rowIndex)
+              ])}
               <tr class="jse-table-row">
                 {#key rowIndex}
                   <th
@@ -1935,7 +1946,6 @@
                 {/key}
                 {#each columns as column, columnIndex}
                   {@const path = [String(rowIndex)].concat(column)}
-                  {@const pointer = compileJSONPointer(path)}
                   {@const value = getIn(item, column)}
                   {@const isSelected =
                     isValueSelection(selection) && pathStartsWith(selection.path, path)}
@@ -1947,13 +1957,11 @@
                     class:jse-selected-value={isSelected}
                   >
                     {#if isObjectOrArray(value)}
-                      {@const searchResultItemsByCell = searchResultItemsByRow
-                        ? filterPointerOrUndefined(searchResultItemsByRow, pointer)
-                        : undefined}
+                      {@const searchResultItemsByCell = flattenRecursiveSearchResult(
+                        getInRecursiveState(json, recursiveSearchResult, path)
+                      )}
                       {@const containsActiveSearchResult = searchResultItemsByCell
-                        ? Object.values(searchResultItemsByCell).some((items) =>
-                            items.some((item) => item.active)
-                          )
+                        ? searchResultItemsByCell.some((item) => item.active)
                         : false}
 
                       <InlineValue
@@ -1965,9 +1973,11 @@
                         {containsActiveSearchResult}
                         onEdit={openJSONEditorModal}
                       />{:else}
-                      {@const searchResultItemsByCell = searchResult?.itemsMap
-                        ? filterValueSearchResults(searchResult?.itemsMap, pointer)
-                        : undefined}
+                      {@const searchResultItemsByCell = getInRecursiveState(
+                        json,
+                        recursiveSearchResult,
+                        path
+                      )?.searchResults}
 
                       <JSONValueComponent
                         {path}

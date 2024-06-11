@@ -117,6 +117,32 @@ export interface ValueDocumentState extends ValueRecursiveState {
 
 export type DocumentState = ObjectDocumentState | ArrayDocumentState | ValueDocumentState
 
+export interface ObjectRecursiveSearchResult extends ObjectRecursiveState {
+  type: 'object'
+  properties: Record<string, RecursiveSearchResult | undefined>
+  searchResults?: ExtendedSearchResultItem[]
+}
+
+export interface ArrayRecursiveSearchResult extends ArrayRecursiveState {
+  type: 'array'
+  items: Array<RecursiveSearchResult | undefined>
+  searchResults?: ExtendedSearchResultItem[]
+}
+
+export interface ValueRecursiveSearchResult extends ValueRecursiveState {
+  type: 'value'
+  searchResults?: ExtendedSearchResultItem[]
+}
+
+export type RecursiveSearchResult =
+  | ObjectRecursiveSearchResult
+  | ArrayRecursiveSearchResult
+  | ValueRecursiveSearchResult
+
+export type WithSearchResults = RecursiveSearchResult & {
+  searchResults: ExtendedSearchResultItem[]
+}
+
 export interface JSONPatchResult {
   json: unknown
   previousJson: unknown
@@ -369,7 +395,6 @@ export type FindNextInside = (path: JSONPath) => JSONSelection | null
 
 export interface SearchResult {
   items: ExtendedSearchResultItem[]
-  itemsMap: JSONPointerMap<ExtendedSearchResultItem[]>
   activeItem: ExtendedSearchResultItem | undefined
   activeIndex: number | -1
 }
@@ -566,8 +591,6 @@ export interface JSONNodeProp {
   value: unknown
   path: JSONPath
   validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
-  keySearchResultItemsMap: ExtendedSearchResultItem[] | undefined
-  valueSearchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
   selection: JSONSelection | null
 }
 
@@ -576,7 +599,6 @@ export interface JSONNodeItem {
   value: unknown
   path: JSONPath
   validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
-  searchResultItemsMap: JSONPointerMap<ExtendedSearchResultItem[]> | undefined
   selection: JSONSelection | null
 }
 

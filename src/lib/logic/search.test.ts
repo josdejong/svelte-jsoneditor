@@ -7,11 +7,18 @@ import {
   createSearchAndReplaceAllOperations,
   createSearchAndReplaceOperations,
   findCaseInsensitiveMatches,
+  flattenRecursiveSearchResult,
   replaceText,
   search,
-  splitValue
+  splitValue,
+  toRecursiveSearchResult
 } from './search.js'
-import type { ExtendedSearchResultItem, SearchOptions, SearchResultItem } from '$lib/types.js'
+import type {
+  ExtendedSearchResultItem,
+  RecursiveSearchResult,
+  SearchOptions,
+  SearchResultItem
+} from '$lib/types.js'
 import { SearchField } from '$lib/types.js'
 import { createKeySelection, createValueSelection } from './selection.js'
 
@@ -589,6 +596,155 @@ describe('search', () => {
     const updatedJson = immutableJSONPatch(json, operations)
     assert.deepStrictEqual(updatedJson, {
       value: 4
+    })
+  })
+
+  describe('toRecursiveSearchResult', () => {
+    const json = {
+      b: { c: 'a' },
+      a: [{ a: 'b', c: 'a' }, 'e', 'a']
+    }
+
+    const expectedSearchResults: ExtendedSearchResultItem[] = [
+      {
+        path: ['b', 'c'],
+        field: SearchField.value,
+        fieldIndex: 0,
+        start: 0,
+        end: 1,
+        active: false
+      },
+      {
+        path: ['a'],
+        field: SearchField.key,
+        fieldIndex: 0,
+        start: 0,
+        end: 1,
+        active: true
+      },
+      {
+        path: ['a', '0', 'a'],
+        field: SearchField.key,
+        fieldIndex: 0,
+        start: 0,
+        end: 1,
+        active: false
+      },
+      {
+        path: ['a', '0', 'c'],
+        field: SearchField.value,
+        fieldIndex: 0,
+        start: 0,
+        end: 1,
+        active: false
+      },
+      {
+        path: ['a', '2'],
+        field: SearchField.value,
+        fieldIndex: 0,
+        start: 0,
+        end: 1,
+        active: false
+      }
+    ]
+
+    const expectedRecursiveSearchResult: RecursiveSearchResult = {
+      type: 'object',
+      properties: {
+        b: {
+          type: 'object',
+          properties: {
+            c: { type: 'value', searchResults: [expectedSearchResults[0]] }
+          }
+        },
+        a: {
+          type: 'array',
+          searchResults: [expectedSearchResults[1]],
+          items: [
+            {
+              type: 'object',
+              properties: {
+                a: { type: 'value', searchResults: [expectedSearchResults[2]] },
+                c: { type: 'value', searchResults: [expectedSearchResults[3]] }
+              }
+            },
+            ,
+            { type: 'value', searchResults: [expectedSearchResults[4]] }
+          ]
+        }
+      }
+    }
+
+    test('should create recursive search result', () => {
+      const activeIndex = 1
+      const results = search('a', json).map((item, index) => ({
+        ...item,
+        active: index === activeIndex
+      }))
+
+      assert.deepStrictEqual(results, expectedSearchResults)
+
+      const recursiveResults = toRecursiveSearchResult(json, results)
+
+      assert.deepStrictEqual(recursiveResults, expectedRecursiveSearchResult)
+    })
+
+    test('should flatten recursive search result', () => {
+      const flatResults = flattenRecursiveSearchResult(expectedRecursiveSearchResult)
+
+      assert.deepStrictEqual(flatResults, expectedSearchResults)
+    })
+
+    test('should merge recursive search results in a single object', () => {
+      const json = {
+        a: 'aha'
+      }
+
+      const activeIndex = 1
+      const results = search('a', json).map((item, index) => ({
+        ...item,
+        active: index === activeIndex
+      }))
+
+      const expected = [
+        {
+          path: ['a'],
+          field: SearchField.key,
+          fieldIndex: 0,
+          start: 0,
+          end: 1,
+          active: false
+        },
+        {
+          path: ['a'],
+          field: SearchField.value,
+          fieldIndex: 0,
+          start: 0,
+          end: 1,
+          active: true
+        },
+        {
+          path: ['a'],
+          field: SearchField.value,
+          fieldIndex: 1,
+          start: 2,
+          end: 3,
+          active: false
+        }
+      ]
+
+      assert.deepStrictEqual(results, expected)
+
+      const recursiveResults = toRecursiveSearchResult(json, results)
+      assert.deepStrictEqual(recursiveResults, {
+        type: 'object',
+        properties: {
+          a: {
+            type: 'value',
+            searchResults: [expected[0], expected[1], expected[2]]
+          }
+        }
+      })
     })
   })
 })

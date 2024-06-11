@@ -1,12 +1,7 @@
-import type {
-  JSONPatchDocument,
-  JSONPatchOperation,
-  JSONPath,
-  JSONPointer
-} from 'immutable-json-patch'
+import type { JSONPatchDocument, JSONPatchOperation, JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
-import { forEachRight, groupBy, initial, isEqual, last } from 'lodash-es'
-import { getEnforceString } from './documentState.js'
+import { forEachRight, initial, isEqual, last } from 'lodash-es'
+import { createRecursiveState, getEnforceString, updateInRecursiveState } from './documentState.js'
 import { createSelectionFromOperations } from './selection.js'
 import { rename } from './operations.js'
 import { stringConvert } from '../utils/typeUtils.js'
@@ -14,13 +9,19 @@ import type {
   DocumentState,
   ExtendedSearchResultItem,
   JSONParser,
-  JSONPointerMap,
   JSONSelection,
   SearchOptions,
   SearchResult,
-  SearchResultItem
+  SearchResultItem,
+  RecursiveSearchResult,
+  RecursiveStateFactory
 } from '$lib/types'
 import { SearchField } from '$lib/types.js'
+import {
+  hasSearchResults,
+  isArrayRecursiveState,
+  isObjectRecursiveState
+} from 'svelte-jsoneditor/typeguards.js'
 
 // TODO: comment
 // TODO: unit test
@@ -54,7 +55,6 @@ export function updateSearchResult(
 
   return {
     items,
-    itemsMap: groupBy(items, (item) => compileJSONPointer(item.path)),
     activeItem,
     activeIndex
   }
@@ -78,7 +78,6 @@ export function searchNext(searchResult: SearchResult): SearchResult {
   return {
     ...searchResult,
     items,
-    itemsMap: groupBy(items, (item) => compileJSONPointer(item.path)),
     activeItem: nextActiveItem,
     activeIndex: nextActiveIndex
   }
@@ -98,7 +97,6 @@ export function searchPrevious(searchResult: SearchResult): SearchResult {
   return {
     ...searchResult,
     items,
-    itemsMap: groupBy(items, (item) => compileJSONPointer(item.path)),
     activeItem: previousActiveItem,
     activeIndex: previousActiveIndex
   }
@@ -484,28 +482,72 @@ function getSearchResultPath(searchResultItem: SearchResultItem): JSONPath {
 
 // TODO: write unit tests
 export function filterKeySearchResults(
-  map: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
-  pointer: JSONPointer
+  searchResult: RecursiveSearchResult | undefined
 ): ExtendedSearchResultItem[] | undefined {
-  const items = map?.[pointer]?.filter((item: SearchResultItem) => item.field === SearchField.key)
-
-  if (!items || items.length === 0) {
-    return undefined
-  }
-
-  return items
+  return hasSearchResults(searchResult)
+    ? searchResult.searchResults.filter((result) => result.field === SearchField.key)
+    : undefined
 }
 
 // TODO: write unit tests
 export function filterValueSearchResults(
-  map: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
-  pointer: JSONPointer
+  searchResult: RecursiveSearchResult | undefined
 ): ExtendedSearchResultItem[] | undefined {
-  const items = map?.[pointer]?.filter((item: SearchResultItem) => item.field === SearchField.value)
+  return hasSearchResults(searchResult)
+    ? searchResult.searchResults.filter((result) => result.field === SearchField.value)
+    : undefined
+}
 
-  if (!items || items.length === 0) {
-    return undefined
-  }
+export function createSearchResultsState({
+  json
+}: {
+  json: unknown
+}): RecursiveSearchResult | undefined {
+  return createRecursiveState({
+    json,
+    factory: recursiveSearchResultsFactory
+  }) as RecursiveSearchResult
+}
 
-  return items
+export const recursiveSearchResultsFactory: RecursiveStateFactory = {
+  createObjectDocumentState: () => ({ type: 'object', properties: {} }),
+  createArrayDocumentState: () => ({ type: 'array', items: [] }),
+  createValueDocumentState: () => ({ type: 'value' })
+}
+
+export function toRecursiveSearchResult(
+  json: unknown,
+  searchResults: ExtendedSearchResultItem[]
+): RecursiveSearchResult | undefined {
+  return searchResults.reduce(
+    (recursiveState, searchResult) => {
+      return updateInRecursiveState(
+        json,
+        recursiveState,
+        searchResult.path,
+        (_, nestedState) => ({
+          ...nestedState,
+          searchResults: nestedState.searchResults
+            ? nestedState.searchResults.concat(searchResult)
+            : [searchResult]
+        }),
+        recursiveSearchResultsFactory
+      )
+    },
+    undefined as RecursiveSearchResult | undefined
+  )
+}
+
+export function flattenRecursiveSearchResult(
+  node: RecursiveSearchResult | undefined
+): ExtendedSearchResultItem[] {
+  const self = node?.searchResults ?? []
+
+  const nested = isObjectRecursiveState(node)
+    ? Object.values(node.properties).flatMap(flattenRecursiveSearchResult)
+    : isArrayRecursiveState(node)
+      ? node.items.flatMap(flattenRecursiveSearchResult)
+      : []
+
+  return self.concat(nested)
 }
