@@ -574,7 +574,7 @@ export function documentStateAdd(
         items:
           index < items.length
             ? // eslint-disable-next-line no-sparse-arrays
-            insertItemsAt(items, index, stateValue !== undefined ? [stateValue] : [,])
+              insertItemsAt(items, index, stateValue !== undefined ? [stateValue] : [,])
             : items,
         visibleSections: shiftVisibleSections(visibleSections, index, 1)
       }
