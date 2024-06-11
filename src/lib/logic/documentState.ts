@@ -22,7 +22,7 @@ import {
 } from 'immutable-json-patch'
 import { initial, last } from 'lodash-es'
 import { DEFAULT_VISIBLE_SECTIONS, MAX_DOCUMENT_SIZE_EXPAND_ALL } from '../constants.js'
-import { forEachIndex, insertItemsAt } from '../utils/arrayUtils.js'
+import { forEachIndex, insertItemsAt, strictShallowEqual } from '../utils/arrayUtils.js'
 import { isObject, isStringContainingPrimitiveValue } from '../utils/typeUtils.js'
 import {
   currentRoundNumber,
@@ -171,7 +171,9 @@ export function syncDocumentState(
       }
     }
 
-    return { ...documentState, items }
+    const changed = !strictShallowEqual(items, documentState.items)
+
+    return changed ? { ...documentState, items } : documentState
   }
 
   if (isObject(json)) {
@@ -191,7 +193,12 @@ export function syncDocumentState(
       }
     })
 
-    return { ...documentState, properties }
+    const changed = !strictShallowEqual(
+      Object.values(properties),
+      Object.values(documentState.properties)
+    )
+
+    return changed ? { ...documentState, properties } : documentState
   }
 
   // json is of type value

@@ -23,7 +23,12 @@ import {
   toRecursiveStatePath,
   updateInRecursiveState
 } from './documentState.js'
-import { CaretType, type DocumentState, type VisibleSection } from '$lib/types.js'
+import {
+  CaretType,
+  type ArrayDocumentState,
+  type DocumentState,
+  type VisibleSection
+} from '$lib/types.js'
 import { deleteIn, getIn, type JSONPatchDocument, setIn, updateIn } from 'immutable-json-patch'
 import { isArrayRecursiveState } from 'svelte-jsoneditor'
 
@@ -328,6 +333,73 @@ describe('documentState', () => {
       }
 
       assert.deepStrictEqual(syncDocumentState([42], state), expected2)
+    })
+
+    test('objects should be handled in an immutable way', () => {
+      const json = {
+        nested: {
+          c: 2,
+          d: 3
+        }
+      }
+
+      const state: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {
+          nested: {
+            type: 'object',
+            expanded: true,
+            properties: {
+              c: { type: 'value' },
+              d: { type: 'value' }
+            }
+          }
+        }
+      }
+
+      const syncedState = syncDocumentState(json, state)
+      assert.deepStrictEqual(syncedState, state)
+      assert.strictEqual(syncedState, state)
+    })
+
+    test('arrays should be handled in an immutable way', () => {
+      const json = [1, 2, 3]
+      const state: DocumentState = {
+        type: 'array',
+        expanded: true,
+        items: [{ type: 'value' }, { type: 'value' }, { type: 'value' }],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      const syncedState = syncDocumentState(json, state)
+      assert.deepStrictEqual(syncedState, state)
+      assert.strictEqual(syncedState, state)
+    })
+
+    test('should handle a change in an immutable way', () => {
+      const items: DocumentState[] = [{ type: 'value' }, { type: 'value' }, { type: 'value' }]
+      const state: ArrayDocumentState = {
+        type: 'array',
+        expanded: true,
+        items,
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      const updatedJson = [1, 2]
+
+      const syncedState = syncDocumentState(updatedJson, state) as ArrayDocumentState
+
+      const expected: DocumentState = {
+        type: 'array',
+        expanded: true,
+        items: items.slice(0, 2),
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      assert.deepStrictEqual(syncedState, expected)
+      assert.strictEqual(syncedState.items[0], expected.items[0])
+      assert.strictEqual(syncedState.items[1], expected.items[1])
     })
   })
 
@@ -809,7 +881,7 @@ describe('documentState', () => {
             // eslint-disable-next-line no-sparse-arrays
             items: [
               { expanded: true, properties: {}, type: 'object' },
-              ,
+              undefined, // ideally, this should be an empty item, not undefined
               { expanded: true, properties: {}, type: 'object' },
               { expanded: true, properties: {}, type: 'object' }
             ],
