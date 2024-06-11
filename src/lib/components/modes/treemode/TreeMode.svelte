@@ -73,7 +73,7 @@
     removeEditModeFromSelection,
     selectAll
   } from '$lib/logic/selection.js'
-  import { mapValidationErrors, validateJSON } from '$lib/logic/validation.js'
+  import { toRecursiveValidationErrors, validateJSON } from '$lib/logic/validation.js'
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
@@ -120,9 +120,7 @@
     JSONParser,
     JSONPatchResult,
     JSONPathParser,
-    JSONPointerMap,
     JSONSelection,
-    NestedValidationError,
     OnBlur,
     OnChange,
     OnChangeMode,
@@ -140,6 +138,7 @@
     ParseError,
     PastedJson,
     RecursiveSearchResult,
+    RecursiveValidationErrors,
     SearchResult,
     Section,
     TransformModalOptions,
@@ -346,10 +345,9 @@
   let textIsRepaired = false
 
   let validationErrors: ValidationError[] = []
-  $: updateValidationErrors(json, validator, parser, validationParser)
+  let recursiveValidationErrors: RecursiveValidationErrors | undefined
 
-  let validationErrorsMap: JSONPointerMap<NestedValidationError>
-  $: validationErrorsMap = mapValidationErrors(validationErrors)
+  $: updateValidationErrors(json, validator, parser, validationParser)
 
   // because onChange returns the validation errors and there is also a separate listener,
   // we would execute validation twice. Memoizing the last result solves this.
@@ -379,6 +377,7 @@
         if (!isEqual(newValidationErrors, validationErrors)) {
           debug('validationErrors changed:', newValidationErrors)
           validationErrors = newValidationErrors
+          recursiveValidationErrors = toRecursiveValidationErrors(json, validationErrors)
         }
       },
       (duration) => debug(`validationErrors updated in ${duration} ms`)
@@ -2128,7 +2127,7 @@
           value={json}
           path={[]}
           state={documentState}
-          {validationErrorsMap}
+          {recursiveValidationErrors}
           {recursiveSearchResult}
           {selection}
           {context}

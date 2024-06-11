@@ -502,7 +502,7 @@ export function documentStatePatch(
 
   return {
     json: updatedJson,
-    state: syncDocumentState(updatedJson, updatedDocumentState)
+    state: syncDocumentState(updatedJson, updatedDocumentState) // sync to cleanup leftover state
   }
 }
 

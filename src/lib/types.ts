@@ -143,6 +143,28 @@ export type WithSearchResults = RecursiveSearchResult & {
   searchResults: ExtendedSearchResultItem[]
 }
 
+export interface ObjectRecursiveValidationErrors extends ObjectRecursiveState {
+  type: 'object'
+  properties: Record<string, RecursiveValidationErrors | undefined>
+  validationError?: NestedValidationError
+}
+
+export interface ArrayRecursiveValidationErrors extends ArrayRecursiveState {
+  type: 'array'
+  items: Array<RecursiveValidationErrors | undefined>
+  validationError?: NestedValidationError
+}
+
+export interface ValueRecursiveValidationErrors extends ValueRecursiveState {
+  type: 'value'
+  validationError?: NestedValidationError
+}
+
+export type RecursiveValidationErrors =
+  | ObjectRecursiveValidationErrors
+  | ArrayRecursiveValidationErrors
+  | ValueRecursiveValidationErrors
+
 export interface JSONPatchResult {
   json: unknown
   previousJson: unknown
@@ -156,11 +178,11 @@ export type AfterPatchCallback = (
   patchedSelection: JSONSelection | null
 ) =>
   | {
-      json?: unknown
-      state?: DocumentState | undefined
-      selection?: JSONSelection | null
-      sortedColumn?: SortedColumn | null
-    }
+    json?: unknown
+    state?: DocumentState | undefined
+    selection?: JSONSelection | null
+    sortedColumn?: SortedColumn | null
+  }
   | undefined
 
 export interface MultiSelection {
@@ -207,8 +229,6 @@ export interface TextSelection {
 }
 
 export type JSONEditorSelection = JSONSelection | TextSelection
-
-export type JSONPointerMap<T> = Record<JSONPointer, T>
 
 export type ClipboardValues = Array<{ key: string; value: unknown }>
 
@@ -590,7 +610,6 @@ export interface JSONNodeProp {
   key: string
   value: unknown
   path: JSONPath
-  validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   selection: JSONSelection | null
 }
 
@@ -598,7 +617,6 @@ export interface JSONNodeItem {
   index: number
   value: unknown
   path: JSONPath
-  validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
   selection: JSONSelection | null
 }
 

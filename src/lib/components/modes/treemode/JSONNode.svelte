@@ -58,10 +58,10 @@
     DraggingState,
     JSONNodeItem,
     JSONNodeProp,
-    JSONPointerMap,
     JSONSelection,
     NestedValidationError,
     RecursiveSearchResult,
+    RecursiveValidationErrors,
     RenderedItem,
     TreeModeContext,
     VisibleSection
@@ -72,7 +72,6 @@
     isExpandableState,
     isObjectRecursiveState
   } from '$lib/typeguards.js'
-  import { filterPointerOrUndefined } from '$lib/utils/jsonPointer.js'
   import { filterKeySearchResults, filterValueSearchResults } from '$lib/logic/search.js'
   import { createMemoizePath } from '$lib/utils/pathUtils.js'
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
@@ -83,7 +82,7 @@
   export let value: unknown
   export let path: JSONPath
   export let state: DocumentState | undefined
-  export let validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined
+  export let recursiveValidationErrors: RecursiveValidationErrors | undefined
   export let recursiveSearchResult: RecursiveSearchResult | undefined
   export let selection: JSONSelection | null
   export let context: TreeModeContext
@@ -114,7 +113,7 @@
   $: visibleSections = isArrayRecursiveState(state) ? state.visibleSections : undefined
 
   let validationError: NestedValidationError | undefined
-  $: validationError = validationErrorsMap ? validationErrorsMap[pointer] : undefined
+  $: validationError = recursiveValidationErrors?.validationError
 
   let isNodeSelected: boolean
   $: isNodeSelected = pathInSelection(context.getJson(), selection, path)
@@ -125,7 +124,6 @@
   function getProps(
     path: JSONPath,
     object: Record<string, unknown>,
-    validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined,
     selection: JSONSelection | null,
     dragging: DraggingState | undefined
   ): JSONNodeProp[] {
@@ -136,7 +134,6 @@
         key,
         value: object[key],
         path: keyPath,
-        validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, keyPointer),
         selection: selectionIfOverlapping(context.getJson(), selection, keyPath)
       }
     })
@@ -159,7 +156,6 @@
     path: JSONPath,
     array: Array<unknown>,
     visibleSection: VisibleSection,
-    validationErrorsMap: JSONPointerMap<NestedValidationError> | undefined,
     selection: JSONSelection | null,
     dragging: DraggingState | undefined
   ): JSONNodeItem[] {
@@ -175,7 +171,6 @@
         index,
         value: array[index],
         path: itemPath,
-        validationErrorsMap: filterPointerOrUndefined(validationErrorsMap, itemPointer),
         selection: selectionIfOverlapping(context.getJson(), selection, itemPath)
       })
     }
@@ -704,12 +699,16 @@
           </div>
         {/if}
         {#each visibleSections || DEFAULT_VISIBLE_SECTIONS as visibleSection, sectionIndex (sectionIndex)}
-          {#each getItems(path, value, visibleSection, validationErrorsMap, selection, dragging) as item (item.index)}
+          {#each getItems(path, value, visibleSection, selection, dragging) as item (item.index)}
+            {@const nestedValidationErrors = isArrayRecursiveState(recursiveValidationErrors)
+              ? recursiveValidationErrors.items[item.index]
+              : undefined}
+
             <svelte:self
               value={item.value}
               path={item.path}
               state={isArrayRecursiveState(state) ? state.items[item.index] : undefined}
-              validationErrorsMap={item.validationErrorsMap}
+              recursiveValidationErrors={nestedValidationErrors}
               recursiveSearchResult={isArrayRecursiveState(recursiveSearchResult)
                 ? recursiveSearchResult.items[item.index]
                 : undefined}
@@ -824,16 +823,20 @@
             />
           </div>
         {/if}
-        {#each getProps(path, value, validationErrorsMap, selection, dragging) as prop}
+        {#each getProps(path, value, selection, dragging) as prop}
           {@const nestedSearchResult = isObjectRecursiveState(recursiveSearchResult)
             ? recursiveSearchResult.properties[prop.key]
+            : undefined}
+
+          {@const nestedValidationErrors = isObjectRecursiveState(recursiveValidationErrors)
+            ? recursiveValidationErrors.properties[prop.key]
             : undefined}
 
           <svelte:self
             value={prop.value}
             path={prop.path}
             state={isObjectRecursiveState(state) ? state.properties[prop.key] : undefined}
-            validationErrorsMap={prop.validationErrorsMap}
+            recursiveValidationErrors={nestedValidationErrors}
             recursiveSearchResult={nestedSearchResult}
             selection={prop.selection}
             {context}

@@ -1,6 +1,6 @@
 import { test, describe } from 'vitest'
 import { deepStrictEqual } from 'assert'
-import { mapValidationErrors, validateJSON, validateText } from './validation.js'
+import { toRecursiveValidationErrors, validateJSON, validateText } from './validation.js'
 import type { ValidationError } from '$lib/types'
 import { ValidationSeverity } from '$lib/types.js'
 import { stringify, parse, isLosslessNumber } from 'lossless-json'
@@ -10,44 +10,52 @@ const LosslessJSONParser = { parse, stringify }
 
 describe('validation', () => {
   test('should create a map from a list with validation errors', () => {
+    const json = {
+      year: 2084,
+      pupils: [{ age: 23 }, { age: 26 }, { age: '42' }]
+    }
+
+    const severity = ValidationSeverity.warning
     const message1 = 'Number expected'
     const message2 = 'Year in the past expected'
     const message3 = 'Contains invalid data'
 
-    const error1: ValidationError = {
-      path: ['pupils', '2', 'age'],
-      message: message1,
-      severity: ValidationSeverity.warning
-    }
-    const error2: ValidationError = {
-      path: ['year'],
-      message: message2,
-      severity: ValidationSeverity.warning
-    }
+    const error1: ValidationError = { path: ['pupils', '2', 'age'], message: message1, severity }
+    const error2: ValidationError = { path: ['year'], message: message2, severity }
+
+    const childErrorA = { isChildError: true, path: [], message: message3, severity }
+    const childErrorB = { isChildError: true, path: ['pupils'], message: message3, severity }
+    const childErrorC = { isChildError: true, path: ['pupils', '2'], message: message3, severity }
 
     const validationErrors = [error1, error2]
 
-    deepStrictEqual(mapValidationErrors(validationErrors), {
-      '': {
-        isChildError: true,
-        path: [],
-        message: message3,
-        severity: ValidationSeverity.warning
-      },
-      '/pupils': {
-        isChildError: true,
-        path: ['pupils'],
-        message: message3,
-        severity: ValidationSeverity.warning
-      },
-      '/pupils/2': {
-        isChildError: true,
-        path: ['pupils', '2'],
-        message: message3,
-        severity: ValidationSeverity.warning
-      },
-      '/pupils/2/age': error1,
-      '/year': error2
+    deepStrictEqual(toRecursiveValidationErrors(json, validationErrors), {
+      type: 'object',
+      validationError: childErrorA,
+      properties: {
+        year: {
+          type: 'value',
+          validationError: error2
+        },
+        pupils: {
+          type: 'array',
+          validationError: childErrorB,
+          items: [
+            ,
+            ,
+            {
+              type: 'object',
+              validationError: childErrorC,
+              properties: {
+                age: {
+                  type: 'value',
+                  validationError: error1
+                }
+              }
+            }
+          ]
+        }
+      }
     })
   })
 
