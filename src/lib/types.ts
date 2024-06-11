@@ -610,14 +610,12 @@ export interface JSONNodeProp {
   key: string
   value: unknown
   path: JSONPath
-  selection: JSONSelection | null
 }
 
 export interface JSONNodeItem {
   index: number
   value: unknown
   path: JSONPath
-  selection: JSONSelection | null
 }
 
 export interface DraggingState {

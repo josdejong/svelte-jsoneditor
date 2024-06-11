@@ -185,3 +185,7 @@ export function forEachSample<T>(
     }
   }
 }
+
+export function insertItemsAt<T>(array: T[], index: number, items: T[]): T[] {
+  return array.slice(0, index).concat(items).concat(array.slice(index))
+}

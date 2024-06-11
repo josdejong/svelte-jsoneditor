@@ -22,7 +22,7 @@ import {
 } from 'immutable-json-patch'
 import { initial, last } from 'lodash-es'
 import { DEFAULT_VISIBLE_SECTIONS, MAX_DOCUMENT_SIZE_EXPAND_ALL } from '../constants.js'
-import { forEachIndex } from '../utils/arrayUtils.js'
+import { forEachIndex, insertItemsAt } from '../utils/arrayUtils.js'
 import { isObject, isStringContainingPrimitiveValue } from '../utils/typeUtils.js'
 import {
   currentRoundNumber,
@@ -573,11 +573,8 @@ export function documentStateAdd(
         ...arrayState,
         items:
           index < items.length
-            ? items
-                .slice(0, index)
-                // eslint-disable-next-line no-sparse-arrays
-                .concat(stateValue !== undefined ? [stateValue] : [,])
-                .concat(items.slice(index))
+            ? // eslint-disable-next-line no-sparse-arrays
+            insertItemsAt(items, index, stateValue !== undefined ? [stateValue] : [,])
             : items,
         visibleSections: shiftVisibleSections(visibleSections, index, 1)
       }
