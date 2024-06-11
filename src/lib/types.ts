@@ -178,11 +178,11 @@ export type AfterPatchCallback = (
   patchedSelection: JSONSelection | null
 ) =>
   | {
-    json?: unknown
-    state?: DocumentState | undefined
-    selection?: JSONSelection | null
-    sortedColumn?: SortedColumn | null
-  }
+      json?: unknown
+      state?: DocumentState | undefined
+      selection?: JSONSelection | null
+      sortedColumn?: SortedColumn | null
+    }
   | undefined
 
 export interface MultiSelection {
