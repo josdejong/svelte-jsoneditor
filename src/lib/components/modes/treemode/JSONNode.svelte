@@ -100,9 +100,6 @@
   // that would force all children to re-render
   const memoizePath = createMemoizePath()
 
-  let pointer: JSONPointer
-  $: pointer = compileJSONPointer(path)
-
   let expanded: boolean
   $: expanded = isExpandableState(state) ? state.expanded : false
 
@@ -120,21 +117,17 @@
 
   $: root = path.length === 0
 
-  // TODO: extract getProps into a separate function
   function getProps(
     path: JSONPath,
     object: Record<string, unknown>,
-    selection: JSONSelection | null,
     dragging: DraggingState | undefined
   ): JSONNodeProp[] {
     let props = Object.keys(object).map((key) => {
       const keyPath = memoizePath(path.concat(key))
-      const keyPointer = appendToJSONPointer(pointer, key)
       return {
         key,
         value: object[key],
-        path: keyPath,
-        selection: selectionIfOverlapping(context.getJson(), selection, keyPath)
+        path: keyPath
       }
     })
 
@@ -151,12 +144,10 @@
     return props
   }
 
-  // TODO: extract getItems into a separate function
   function getItems(
     path: JSONPath,
     array: Array<unknown>,
     visibleSection: VisibleSection,
-    selection: JSONSelection | null,
     dragging: DraggingState | undefined
   ): JSONNodeItem[] {
     const start = visibleSection.start
@@ -165,13 +156,11 @@
 
     for (let index = start; index < end; index++) {
       const itemPath = memoizePath(path.concat(String(index)))
-      const itemPointer = appendToJSONPointer(pointer, index)
 
       items.push({
         index,
         value: array[index],
-        path: itemPath,
-        selection: selectionIfOverlapping(context.getJson(), selection, itemPath)
+        path: itemPath
       })
     }
 
@@ -699,10 +688,16 @@
           </div>
         {/if}
         {#each visibleSections || DEFAULT_VISIBLE_SECTIONS as visibleSection, sectionIndex (sectionIndex)}
-          {#each getItems(path, value, visibleSection, selection, dragging) as item (item.index)}
+          {#each getItems(path, value, visibleSection, dragging) as item (item.index)}
             {@const nestedValidationErrors = isArrayRecursiveState(recursiveValidationErrors)
               ? recursiveValidationErrors.items[item.index]
               : undefined}
+
+            {@const nestedSelection = selectionIfOverlapping(
+              context.getJson(),
+              selection,
+              item.path
+            )}
 
             <svelte:self
               value={item.value}
@@ -712,7 +707,7 @@
               recursiveSearchResult={isArrayRecursiveState(recursiveSearchResult)
                 ? recursiveSearchResult.items[item.index]
                 : undefined}
-              selection={item.selection}
+              selection={nestedSelection}
               {context}
               onDragSelectionStart={handleDragSelectionStart}
             >
@@ -823,7 +818,7 @@
             />
           </div>
         {/if}
-        {#each getProps(path, value, selection, dragging) as prop}
+        {#each getProps(path, value, dragging) as prop}
           {@const nestedSearchResult = isObjectRecursiveState(recursiveSearchResult)
             ? recursiveSearchResult.properties[prop.key]
             : undefined}
@@ -832,13 +827,15 @@
             ? recursiveValidationErrors.properties[prop.key]
             : undefined}
 
+          {@const nestedSelection = selectionIfOverlapping(context.getJson(), selection, prop.path)}
+
           <svelte:self
             value={prop.value}
             path={prop.path}
             state={isObjectRecursiveState(state) ? state.properties[prop.key] : undefined}
             recursiveValidationErrors={nestedValidationErrors}
             recursiveSearchResult={nestedSearchResult}
-            selection={prop.selection}
+            selection={nestedSelection}
             {context}
             onDragSelectionStart={handleDragSelectionStart}
           >
@@ -846,7 +843,7 @@
               <JSONKey
                 path={prop.path}
                 key={prop.key}
-                selection={prop.selection}
+                selection={nestedSelection}
                 searchResultItems={filterKeySearchResults(nestedSearchResult)}
                 {context}
                 onUpdateKey={handleUpdateKey}
