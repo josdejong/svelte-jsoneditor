@@ -2,8 +2,8 @@
 
 <script lang="ts">
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
-  import type { JSONPath } from 'immutable-json-patch'
-  import { parseJSONPointer } from 'immutable-json-patch'
+  import type { JSONPath, JSONPointer } from 'immutable-json-patch'
+  import { appendToJSONPointer, parseJSONPointer } from 'immutable-json-patch'
   import { initial, isEqual, last, range } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
@@ -71,14 +71,15 @@
     isObjectRecursiveState
   } from '$lib/typeguards.js'
   import { filterKeySearchResults, filterValueSearchResults } from '$lib/logic/search.js'
-  import { createMemoizePath } from '$lib/utils/pathUtils.js'
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
   import { isObject } from '$lib/utils/typeUtils.js'
   import { classnames } from '$lib/utils/cssUtils.js'
   import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
 
+  // we pass `pointer` instead of `path` because pointer, a string, is immutable
+  // without it, *all* nodes would re-render on every change because the path changes every time by re-creating it
+  export let pointer: JSONPointer
   export let value: unknown
-  export let path: JSONPath
   export let state: DocumentState | undefined
   export let recursiveValidationErrors: RecursiveValidationErrors | undefined
   export let recursiveSearchResult: RecursiveSearchResult | undefined
@@ -94,9 +95,8 @@
   let hoverTimer: number | undefined = undefined
   let dragging: DraggingState | undefined = undefined
 
-  // important to prevent creating a new path for all children with every re-render,
-  // that would force all children to re-render
-  const memoizePath = createMemoizePath()
+  let path: JSONPath
+  $: path = parseJSONPointer(pointer)
 
   let expanded: boolean
   $: expanded = isExpandableState(state) ? state.expanded : false
@@ -665,8 +665,6 @@
         {/if}
         {#each visibleSections || DEFAULT_VISIBLE_SECTIONS as visibleSection, sectionIndex (sectionIndex)}
           {#each getItems(value, visibleSection, dragging) as item (item.index)}
-            {@const itemPath = memoizePath(path.concat(String(item.index)))}
-
             {@const nestedValidationErrors = isArrayRecursiveState(recursiveValidationErrors)
               ? recursiveValidationErrors.items[item.index]
               : undefined}
@@ -674,12 +672,12 @@
             {@const nestedSelection = selectionIfOverlapping(
               context.getJson(),
               selection,
-              itemPath
+              path.concat(String(item.index))
             )}
 
             <svelte:self
               value={value[item.index]}
-              path={itemPath}
+              pointer={appendToJSONPointer(pointer, item.index)}
               state={isArrayRecursiveState(state) ? state.items[item.index] : undefined}
               recursiveValidationErrors={nestedValidationErrors}
               recursiveSearchResult={isArrayRecursiveState(recursiveSearchResult)
@@ -797,7 +795,7 @@
           </div>
         {/if}
         {#each getKeys(value, dragging) as key}
-          {@const propPath = memoizePath(path.concat(key))}
+          {@const propPointer = appendToJSONPointer(pointer, key)}
 
           {@const nestedSearchResult = isObjectRecursiveState(recursiveSearchResult)
             ? recursiveSearchResult.properties[key]
@@ -807,11 +805,15 @@
             ? recursiveValidationErrors.properties[key]
             : undefined}
 
-          {@const nestedSelection = selectionIfOverlapping(context.getJson(), selection, propPath)}
+          {@const nestedSelection = selectionIfOverlapping(
+            context.getJson(),
+            selection,
+            path.concat(key)
+          )}
 
           <svelte:self
             value={value[key]}
-            path={propPath}
+            pointer={propPointer}
             state={isObjectRecursiveState(state) ? state.properties[key] : undefined}
             recursiveValidationErrors={nestedValidationErrors}
             recursiveSearchResult={nestedSearchResult}
@@ -821,7 +823,7 @@
           >
             <div slot="identifier" class="jse-identifier">
               <JSONKey
-                path={propPath}
+                pointer={propPointer}
                 {key}
                 selection={nestedSelection}
                 searchResultItems={filterKeySearchResults(nestedSearchResult)}

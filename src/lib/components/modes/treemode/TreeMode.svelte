@@ -2125,7 +2125,7 @@
       <div class="jse-contents" data-jsoneditor-scrollable-contents={true} bind:this={refContents}>
         <JSONNode
           value={json}
-          path={[]}
+          pointer={''}
           state={documentState}
           {recursiveValidationErrors}
           {recursiveSearchResult}

@@ -13,17 +13,20 @@
   import { addNewLineSuffix } from '$lib/utils/domUtils.js'
   import type { ExtendedSearchResultItem, JSONSelection, TreeModeContext } from '$lib/types.js'
   import { UpdateSelectionAfterChange } from '$lib/types.js'
-  import type { JSONPath } from 'immutable-json-patch'
+  import { parseJSONPointer, type JSONPath, type JSONPointer } from 'immutable-json-patch'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
   import { classnames } from '$lib/utils/cssUtils.js'
 
-  export let path: JSONPath
+  export let pointer: JSONPointer
   export let key: string
   export let selection: JSONSelection | null
   export let searchResultItems: ExtendedSearchResultItem[] | undefined
   export let onUpdateKey: (oldKey: string, newKey: string) => string
 
   export let context: TreeModeContext
+
+  let path: JSONPath
+  $: path = parseJSONPointer(pointer)
 
   $: isKeySelected = selection ? isKeySelection(selection) && isEqual(selection.path, path) : false
   $: isEditingKey = isKeySelected && isEditingSelection(selection)
