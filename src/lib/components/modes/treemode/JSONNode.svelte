@@ -76,8 +76,9 @@
   import { classnames } from '$lib/utils/cssUtils.js'
   import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
 
-  // we pass `pointer` instead of `path` because pointer, a string, is immutable
-  // without it, *all* nodes would re-render on every change because the path changes every time by re-creating it
+  // We pass `pointer` instead of `path` because pointer (a string) is immutable.
+  // Without it, *all* nodes would re-render on *every* change in JSON or DocumentState,
+  // because the path changes every time by re-creating it.
   export let pointer: JSONPointer
   export let value: unknown
   export let state: DocumentState | undefined
