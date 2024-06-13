@@ -515,13 +515,28 @@ export const recursiveSearchResultsFactory: RecursiveStateFactory = {
   createValueDocumentState: () => ({ type: 'value' })
 }
 
+export function updateInRecursiveSearchResult(
+  json: unknown,
+  recursiveSearchResult: RecursiveSearchResult | undefined,
+  path: JSONPath,
+  transform: (value: unknown, state: RecursiveSearchResult) => RecursiveSearchResult
+): RecursiveSearchResult {
+  return updateInRecursiveState(
+    json,
+    recursiveSearchResult,
+    path,
+    transform,
+    recursiveSearchResultsFactory
+  )
+}
+
 export function toRecursiveSearchResult(
   json: unknown,
   searchResults: ExtendedSearchResultItem[]
 ): RecursiveSearchResult | undefined {
   return searchResults.reduce(
     (recursiveState, searchResult) => {
-      return updateInRecursiveState(
+      return updateInRecursiveSearchResult(
         json,
         recursiveState,
         searchResult.path,
@@ -530,8 +545,7 @@ export function toRecursiveSearchResult(
           searchResults: nestedState.searchResults
             ? nestedState.searchResults.concat(searchResult)
             : [searchResult]
-        }),
-        recursiveSearchResultsFactory
+        })
       )
     },
     undefined as RecursiveSearchResult | undefined

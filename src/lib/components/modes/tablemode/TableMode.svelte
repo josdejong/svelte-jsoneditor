@@ -82,13 +82,12 @@
   import { createDebug } from '$lib/utils/debug.js'
   import {
     createDocumentState,
-    documentStateFactory,
     documentStatePatch,
     expandMinimal,
     expandWithCallback,
     getEnforceString,
     getInRecursiveState,
-    setInRecursiveState,
+    setInDocumentState,
     syncDocumentState
   } from '$lib/logic/documentState.js'
   import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils.js'
@@ -1146,13 +1145,7 @@
       ],
       (_, patchedState) => {
         return {
-          state: setInRecursiveState(
-            json,
-            patchedState,
-            path,
-            { type: 'value', enforceString },
-            documentStateFactory
-          )
+          state: setInDocumentState(json, patchedState, path, { type: 'value', enforceString })
         }
       }
     )

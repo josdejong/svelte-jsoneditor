@@ -21,7 +21,7 @@ import {
   syncDocumentState,
   syncKeys,
   toRecursiveStatePath,
-  updateInRecursiveState
+  updateInDocumentState
 } from './documentState.js'
 import {
   CaretType,
@@ -805,17 +805,11 @@ describe('documentState', () => {
 
       let documentState = createDocumentState({ json, expand: () => true })
 
-      documentState = updateInRecursiveState(
-        json,
-        documentState,
-        ['members'],
-        (_value, state) => {
-          return isArrayRecursiveState(state)
-            ? { ...state, visibleSections: [{ start: 0, end: 3 }] }
-            : state
-        },
-        documentStateFactory
-      )
+      documentState = updateInDocumentState(json, documentState, ['members'], (_value, state) => {
+        return isArrayRecursiveState(state)
+          ? { ...state, visibleSections: [{ start: 0, end: 3 }] }
+          : state
+      })
 
       return { json, documentState }
     }

@@ -14,6 +14,7 @@ import { normalizeJsonParseError } from '../utils/jsonUtils.js'
 import { createDebug } from '../utils/debug.js'
 import { jsonrepair } from 'jsonrepair'
 import { updateInRecursiveState } from './documentState.js'
+import type { JSONPath } from 'immutable-json-patch'
 
 const debug = createDebug('validation')
 
@@ -21,6 +22,15 @@ export const recursiveValidationErrorsFactory: RecursiveStateFactory = {
   createObjectDocumentState: () => ({ type: 'object', properties: {} }),
   createArrayDocumentState: () => ({ type: 'array', items: [] }),
   createValueDocumentState: () => ({ type: 'value' })
+}
+
+export function updateInRecursiveValidationErrors(
+  json: unknown,
+  errors: RecursiveValidationErrors | undefined,
+  path: JSONPath,
+  transform: (value: unknown, state: RecursiveValidationErrors) => RecursiveValidationErrors
+): RecursiveValidationErrors {
+  return updateInRecursiveState(json, errors, path, transform, recursiveValidationErrorsFactory)
 }
 
 /**
@@ -37,13 +47,10 @@ export function toRecursiveValidationErrors(
 
   // first generate the errors themselves
   validationErrors.forEach((validationError) => {
-    output = updateInRecursiveState(
-      json,
-      output,
-      validationError.path,
-      (_, state) => ({ ...state, validationError }),
-      recursiveValidationErrorsFactory
-    )
+    output = updateInRecursiveValidationErrors(json, output, validationError.path, (_, state) => ({
+      ...state,
+      validationError
+    }))
   })
 
   // create error entries for all parent nodes (displayed when the node is collapsed)
@@ -53,25 +60,19 @@ export function toRecursiveValidationErrors(
     while (parentPath.length > 0) {
       parentPath = initial(parentPath)
 
-      output = updateInRecursiveState(
-        json,
-        output,
-        parentPath,
-        (_, state) => {
-          return state.validationError
-            ? state
-            : {
-                ...state,
-                validationError: {
-                  isChildError: true,
-                  path: parentPath,
-                  message: 'Contains invalid data',
-                  severity: ValidationSeverity.warning
-                }
+      output = updateInRecursiveValidationErrors(json, output, parentPath, (_, state) => {
+        return state.validationError
+          ? state
+          : {
+              ...state,
+              validationError: {
+                isChildError: true,
+                path: parentPath,
+                message: 'Contains invalid data',
+                severity: ValidationSeverity.warning
               }
-        },
-        recursiveValidationErrorsFactory
-      )
+            }
+      })
     }
   })
 

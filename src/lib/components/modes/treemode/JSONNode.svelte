@@ -36,7 +36,6 @@
     selectionIfOverlapping
   } from '$lib/logic/selection.js'
   import {
-    encodeDataPath,
     getDataPathFromTarget,
     getSelectionTypeFromTarget,
     isChildOfAttribute,
