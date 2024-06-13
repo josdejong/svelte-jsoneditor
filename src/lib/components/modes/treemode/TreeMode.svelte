@@ -687,8 +687,6 @@
     pastedJson = undefined
     parseError = undefined
 
-    debug('patch', { updatedSelection, documentState2: documentState })
-
     // ensure the selection is valid
     clearSelectionWhenNotExisting(json)
 
@@ -1072,7 +1070,7 @@
     textIsRepaired = item.undo.textIsRepaired
     parseError = undefined
 
-    debug('undo', { item, json, documentState2: documentState, selection })
+    debug('undo', { item, json, documentState, selection })
 
     const patchResult =
       item.undo.patch && item.redo.patch
@@ -1115,7 +1113,7 @@
     textIsRepaired = item.redo.textIsRepaired
     parseError = undefined
 
-    debug('redo', { item, json, documentState2: documentState, selection })
+    debug('redo', { item, json, documentState, selection })
 
     const patchResult =
       item.undo.patch && item.redo.patch
