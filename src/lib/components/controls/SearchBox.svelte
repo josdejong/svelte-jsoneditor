@@ -42,7 +42,7 @@
   export let onClose: () => void
 
   let text = ''
-  let previousText = ''
+  let appliedText = ''
   let replaceText = ''
   let searching = false
   let searchResult: SearchResultDetails | undefined
@@ -75,10 +75,9 @@
     if (combo === 'Enter') {
       event.preventDefault()
 
-      const pendingChanges = text !== previousText
+      const pendingChanges = text !== appliedText
       if (pendingChanges) {
         applyChangedSearchTextDebounced.flush()
-        previousText = text
       } else {
         handleNext()
       }
@@ -251,6 +250,7 @@
       return
     }
 
+    appliedText = text
     searching = true
 
     return new Promise<void>((resolve) => {
