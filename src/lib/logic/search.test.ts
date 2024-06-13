@@ -660,6 +660,7 @@ describe('search', () => {
         a: {
           type: 'array',
           searchResults: [expectedSearchResults[1]],
+          // eslint-disable-next-line no-sparse-arrays
           items: [
             {
               type: 'object',

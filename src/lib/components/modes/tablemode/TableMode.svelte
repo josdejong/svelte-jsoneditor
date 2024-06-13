@@ -1929,7 +1929,7 @@
                 [String(rowIndex)],
                 validationErrorsByRow?.row
               )}
-              {@const searchResultItemsByRow = getInRecursiveState(json, recursiveSearchResult, [
+              {@const searchResultByRow = getInRecursiveState(json, recursiveSearchResult, [
                 String(rowIndex)
               ])}
               <tr class="jse-table-row">
@@ -1957,11 +1957,12 @@
                     class:jse-selected-value={isSelected}
                   >
                     {#if isObjectOrArray(value)}
-                      {@const searchResultItemsByCell = flattenRecursiveSearchResult(
-                        getInRecursiveState(json, recursiveSearchResult, path)
+                      {@const searchResultsByCell = flattenRecursiveSearchResult(
+                        getInRecursiveState(item, searchResultByRow, column)
                       )}
-                      {@const containsActiveSearchResult = searchResultItemsByCell
-                        ? searchResultItemsByCell.some((item) => item.active)
+
+                      {@const containsActiveSearchResult = searchResultsByCell
+                        ? searchResultsByCell.some((item) => item.active)
                         : false}
 
                       <InlineValue
@@ -1969,7 +1970,7 @@
                         {value}
                         {parser}
                         {isSelected}
-                        containsSearchResult={!isEmpty(searchResultItemsByCell)}
+                        containsSearchResult={!isEmpty(searchResultsByCell)}
                         {containsActiveSearchResult}
                         onEdit={openJSONEditorModal}
                       />{:else}

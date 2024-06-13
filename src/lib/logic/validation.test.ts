@@ -40,6 +40,7 @@ describe('validation', () => {
         pupils: {
           type: 'array',
           validationError: childErrorB,
+          // eslint-disable-next-line no-sparse-arrays
           items: [
             ,
             ,

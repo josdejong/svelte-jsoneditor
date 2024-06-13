@@ -1,4 +1,4 @@
-import type { JSONPatchDocument, JSONPath, JSONPointer } from 'immutable-json-patch'
+import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
 import type { SvelteComponent } from 'svelte'
 import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import type { Action } from 'svelte/action'
