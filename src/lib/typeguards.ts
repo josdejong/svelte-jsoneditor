@@ -16,7 +16,7 @@ import type {
   ArrayRecursiveState,
   ObjectRecursiveState,
   ValueRecursiveState,
-  RecursiveSearchResult,
+  SearchResults,
   WithSearchResults
 } from './types.js'
 import { isObject } from '$lib/utils/typeUtils.js'
@@ -129,9 +129,7 @@ export function isExpandableState(
   return isObjectRecursiveState(state) || isArrayRecursiveState(state)
 }
 
-export function hasSearchResults(
-  state: RecursiveSearchResult | undefined
-): state is WithSearchResults {
+export function hasSearchResults(state: SearchResults | undefined): state is WithSearchResults {
   return (
     state !== undefined &&
     Array.isArray((state as unknown as Record<string, unknown>).searchResults)

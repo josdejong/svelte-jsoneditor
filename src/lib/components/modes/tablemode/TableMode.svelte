@@ -28,8 +28,8 @@
     OnTransformModal,
     ParseError,
     PastedJson,
-    RecursiveSearchResult,
-    SearchResult,
+    SearchResults,
+    SearchResultDetails,
     SortedColumn,
     TransformModalOptions,
     ValidationError,
@@ -149,7 +149,7 @@
   import type { Context } from 'svelte-simple-modal'
   import createTableContextMenuItems from './contextmenu/createTableContextMenuItems'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
-  import { flattenRecursiveSearchResult, toRecursiveSearchResult } from '$lib/logic/search.js'
+  import { flattenSearchResults, toRecursiveSearchResults } from '$lib/logic/search.js'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext<Context>('simple-modal')
@@ -221,8 +221,8 @@
 
   let pastedJson: PastedJson
 
-  let searchResult: SearchResult | undefined
-  let recursiveSearchResult: RecursiveSearchResult | undefined
+  let searchResultDetails: SearchResultDetails | undefined
+  let searchResults: SearchResults | undefined
   let showSearch = false
   let showReplace = false
 
@@ -240,10 +240,10 @@
     })
   }
 
-  function handleSearch(result: SearchResult | undefined) {
-    searchResult = result
-    recursiveSearchResult = searchResult
-      ? toRecursiveSearchResult(json, searchResult.items)
+  function handleSearch(result: SearchResultDetails | undefined) {
+    searchResultDetails = result
+    searchResults = searchResultDetails
+      ? toRecursiveSearchResults(json, searchResultDetails.items)
       : undefined
   }
 
@@ -1922,7 +1922,7 @@
                 [String(rowIndex)],
                 validationErrorsByRow?.row
               )}
-              {@const searchResultByRow = getInRecursiveState(json, recursiveSearchResult, [
+              {@const searchResultByRow = getInRecursiveState(json, searchResults, [
                 String(rowIndex)
               ])}
               <tr class="jse-table-row">
@@ -1950,7 +1950,7 @@
                     class:jse-selected-value={isSelected}
                   >
                     {#if isObjectOrArray(value)}
-                      {@const searchResultsByCell = flattenRecursiveSearchResult(
+                      {@const searchResultsByCell = flattenSearchResults(
                         getInRecursiveState(item, searchResultByRow, column)
                       )}
 
@@ -1969,7 +1969,7 @@
                       />{:else}
                       {@const searchResultItemsByCell = getInRecursiveState(
                         json,
-                        recursiveSearchResult,
+                        searchResults,
                         path
                       )?.searchResults}
 

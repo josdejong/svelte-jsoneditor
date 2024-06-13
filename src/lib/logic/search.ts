@@ -11,9 +11,9 @@ import type {
   JSONParser,
   JSONSelection,
   SearchOptions,
-  SearchResult,
+  SearchResultDetails,
   SearchResultItem,
-  RecursiveSearchResult,
+  SearchResults,
   RecursiveStateFactory
 } from '$lib/types'
 import { SearchField } from '$lib/types.js'
@@ -27,8 +27,8 @@ import {
 // TODO: unit test
 export function updateSearchResult(
   newResultItems: SearchResultItem[],
-  previousResult: SearchResult | undefined
-): SearchResult {
+  previousResult: SearchResultDetails | undefined
+): SearchResultDetails {
   const activePath = previousResult?.activeItem
     ? getSearchResultPath(previousResult.activeItem)
     : undefined
@@ -61,7 +61,7 @@ export function updateSearchResult(
 }
 
 // TODO: unit test
-export function searchNext(searchResult: SearchResult): SearchResult {
+export function searchNext(searchResult: SearchResultDetails): SearchResultDetails {
   const nextActiveIndex =
     searchResult.activeIndex < searchResult.items.length - 1
       ? searchResult.activeIndex + 1
@@ -84,7 +84,7 @@ export function searchNext(searchResult: SearchResult): SearchResult {
 }
 
 // TODO: unit test
-export function searchPrevious(searchResult: SearchResult): SearchResult {
+export function searchPrevious(searchResult: SearchResultDetails): SearchResultDetails {
   const previousActiveIndex =
     searchResult.activeIndex > 0 ? searchResult.activeIndex - 1 : searchResult.items.length - 1
 
@@ -482,7 +482,7 @@ function getSearchResultPath(searchResultItem: SearchResultItem): JSONPath {
 
 // TODO: write unit tests
 export function filterKeySearchResults(
-  searchResult: RecursiveSearchResult | undefined
+  searchResult: SearchResults | undefined
 ): ExtendedSearchResultItem[] | undefined {
   return hasSearchResults(searchResult)
     ? searchResult.searchResults.filter((result) => result.field === SearchField.key)
@@ -491,76 +491,59 @@ export function filterKeySearchResults(
 
 // TODO: write unit tests
 export function filterValueSearchResults(
-  searchResult: RecursiveSearchResult | undefined
+  searchResult: SearchResults | undefined
 ): ExtendedSearchResultItem[] | undefined {
   return hasSearchResults(searchResult)
     ? searchResult.searchResults.filter((result) => result.field === SearchField.value)
     : undefined
 }
 
-export function createSearchResultsState({
-  json
-}: {
-  json: unknown
-}): RecursiveSearchResult | undefined {
+export function createSearchResults({ json }: { json: unknown }): SearchResults | undefined {
   return createRecursiveState({
     json,
-    factory: recursiveSearchResultsFactory
-  }) as RecursiveSearchResult
+    factory: searchResultsFactory
+  }) as SearchResults
 }
 
-export const recursiveSearchResultsFactory: RecursiveStateFactory = {
+export const searchResultsFactory: RecursiveStateFactory = {
   createObjectDocumentState: () => ({ type: 'object', properties: {} }),
   createArrayDocumentState: () => ({ type: 'array', items: [] }),
   createValueDocumentState: () => ({ type: 'value' })
 }
 
-export function updateInRecursiveSearchResult(
+export function updateInSearchResults(
   json: unknown,
-  recursiveSearchResult: RecursiveSearchResult | undefined,
+  searchResults: SearchResults | undefined,
   path: JSONPath,
-  transform: (value: unknown, state: RecursiveSearchResult) => RecursiveSearchResult
-): RecursiveSearchResult {
-  return updateInRecursiveState(
-    json,
-    recursiveSearchResult,
-    path,
-    transform,
-    recursiveSearchResultsFactory
-  )
+  transform: (value: unknown, state: SearchResults) => SearchResults
+): SearchResults {
+  return updateInRecursiveState(json, searchResults, path, transform, searchResultsFactory)
 }
 
-export function toRecursiveSearchResult(
+export function toRecursiveSearchResults(
   json: unknown,
-  searchResults: ExtendedSearchResultItem[]
-): RecursiveSearchResult | undefined {
-  return searchResults.reduce(
+  searchResultItems: ExtendedSearchResultItem[]
+): SearchResults | undefined {
+  return searchResultItems.reduce(
     (recursiveState, searchResult) => {
-      return updateInRecursiveSearchResult(
-        json,
-        recursiveState,
-        searchResult.path,
-        (_, nestedState) => ({
-          ...nestedState,
-          searchResults: nestedState.searchResults
-            ? nestedState.searchResults.concat(searchResult)
-            : [searchResult]
-        })
-      )
+      return updateInSearchResults(json, recursiveState, searchResult.path, (_, nestedState) => ({
+        ...nestedState,
+        searchResults: nestedState.searchResults
+          ? nestedState.searchResults.concat(searchResult)
+          : [searchResult]
+      }))
     },
-    undefined as RecursiveSearchResult | undefined
+    undefined as SearchResults | undefined
   )
 }
 
-export function flattenRecursiveSearchResult(
-  node: RecursiveSearchResult | undefined
-): ExtendedSearchResultItem[] {
+export function flattenSearchResults(node: SearchResults | undefined): ExtendedSearchResultItem[] {
   const self = node?.searchResults ?? []
 
   const nested = isObjectRecursiveState(node)
-    ? Object.values(node.properties).flatMap(flattenRecursiveSearchResult)
+    ? Object.values(node.properties).flatMap(flattenSearchResults)
     : isArrayRecursiveState(node)
-      ? node.items.flatMap(flattenRecursiveSearchResult)
+      ? node.items.flatMap(flattenSearchResults)
       : []
 
   return self.concat(nested)

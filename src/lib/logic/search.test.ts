@@ -7,15 +7,15 @@ import {
   createSearchAndReplaceAllOperations,
   createSearchAndReplaceOperations,
   findCaseInsensitiveMatches,
-  flattenRecursiveSearchResult,
+  flattenSearchResults,
   replaceText,
   search,
   splitValue,
-  toRecursiveSearchResult
+  toRecursiveSearchResults
 } from './search.js'
 import type {
   ExtendedSearchResultItem,
-  RecursiveSearchResult,
+  SearchResults,
   SearchOptions,
   SearchResultItem
 } from '$lib/types.js'
@@ -648,7 +648,7 @@ describe('search', () => {
       }
     ]
 
-    const expectedRecursiveSearchResult: RecursiveSearchResult = {
+    const expectedRecursiveSearchResult: SearchResults = {
       type: 'object',
       properties: {
         b: {
@@ -685,13 +685,13 @@ describe('search', () => {
 
       assert.deepStrictEqual(results, expectedSearchResults)
 
-      const recursiveResults = toRecursiveSearchResult(json, results)
+      const recursiveResults = toRecursiveSearchResults(json, results)
 
       assert.deepStrictEqual(recursiveResults, expectedRecursiveSearchResult)
     })
 
     test('should flatten recursive search result', () => {
-      const flatResults = flattenRecursiveSearchResult(expectedRecursiveSearchResult)
+      const flatResults = flattenSearchResults(expectedRecursiveSearchResult)
 
       assert.deepStrictEqual(flatResults, expectedSearchResults)
     })
@@ -736,7 +736,7 @@ describe('search', () => {
 
       assert.deepStrictEqual(results, expected)
 
-      const recursiveResults = toRecursiveSearchResult(json, results)
+      const recursiveResults = toRecursiveSearchResults(json, results)
       assert.deepStrictEqual(recursiveResults, {
         type: 'object',
         properties: {

@@ -117,29 +117,26 @@ export interface ValueDocumentState extends ValueRecursiveState {
 
 export type DocumentState = ObjectDocumentState | ArrayDocumentState | ValueDocumentState
 
-export interface ObjectRecursiveSearchResult extends ObjectRecursiveState {
+export interface ObjectSearchResults extends ObjectRecursiveState {
   type: 'object'
-  properties: Record<string, RecursiveSearchResult | undefined>
+  properties: Record<string, SearchResults | undefined>
   searchResults?: ExtendedSearchResultItem[]
 }
 
-export interface ArrayRecursiveSearchResult extends ArrayRecursiveState {
+export interface ArraySearchResults extends ArrayRecursiveState {
   type: 'array'
-  items: Array<RecursiveSearchResult | undefined>
+  items: Array<SearchResults | undefined>
   searchResults?: ExtendedSearchResultItem[]
 }
 
-export interface ValueRecursiveSearchResult extends ValueRecursiveState {
+export interface ValueSearchResults extends ValueRecursiveState {
   type: 'value'
   searchResults?: ExtendedSearchResultItem[]
 }
 
-export type RecursiveSearchResult =
-  | ObjectRecursiveSearchResult
-  | ArrayRecursiveSearchResult
-  | ValueRecursiveSearchResult
+export type SearchResults = ObjectSearchResults | ArraySearchResults | ValueSearchResults
 
-export type WithSearchResults = RecursiveSearchResult & {
+export type WithSearchResults = SearchResults & {
   searchResults: ExtendedSearchResultItem[]
 }
 
@@ -413,7 +410,7 @@ export type OnTransformModal = (props: TransformModalCallback) => void
 export type OnJSONEditorModal = (props: JSONEditorModalCallback) => void
 export type FindNextInside = (path: JSONPath) => JSONSelection | null
 
-export interface SearchResult {
+export interface SearchResultDetails {
   items: ExtendedSearchResultItem[]
   activeItem: ExtendedSearchResultItem | undefined
   activeIndex: number | -1

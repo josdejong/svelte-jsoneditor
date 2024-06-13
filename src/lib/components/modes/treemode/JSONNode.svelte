@@ -57,7 +57,7 @@
     DraggingState,
     JSONSelection,
     NestedValidationError,
-    RecursiveSearchResult,
+    SearchResults,
     RecursiveValidationErrors,
     RenderedItem,
     TreeModeContext,
@@ -82,7 +82,7 @@
   export let value: unknown
   export let state: DocumentState | undefined
   export let recursiveValidationErrors: RecursiveValidationErrors | undefined
-  export let recursiveSearchResult: RecursiveSearchResult | undefined
+  export let searchResults: SearchResults | undefined
   export let selection: JSONSelection | null
   export let context: TreeModeContext
   export let onDragSelectionStart: (
@@ -681,8 +681,8 @@
               pointer={appendToJSONPointer(pointer, item.index)}
               state={isArrayRecursiveState(state) ? state.items[item.index] : undefined}
               recursiveValidationErrors={nestedValidationErrors}
-              recursiveSearchResult={isArrayRecursiveState(recursiveSearchResult)
-                ? recursiveSearchResult.items[item.index]
+              searchResults={isArrayRecursiveState(searchResults)
+                ? searchResults.items[item.index]
                 : undefined}
               selection={nestedSelection}
               {context}
@@ -798,8 +798,8 @@
         {#each getKeys(value, dragging) as key}
           {@const propPointer = appendToJSONPointer(pointer, key)}
 
-          {@const nestedSearchResult = isObjectRecursiveState(recursiveSearchResult)
-            ? recursiveSearchResult.properties[key]
+          {@const nestedSearchResults = isObjectRecursiveState(searchResults)
+            ? searchResults.properties[key]
             : undefined}
 
           {@const nestedValidationErrors = isObjectRecursiveState(recursiveValidationErrors)
@@ -817,7 +817,7 @@
             pointer={propPointer}
             state={isObjectRecursiveState(state) ? state.properties[key] : undefined}
             recursiveValidationErrors={nestedValidationErrors}
-            recursiveSearchResult={nestedSearchResult}
+            searchResults={nestedSearchResults}
             selection={nestedSelection}
             {context}
             onDragSelectionStart={handleDragSelectionStart}
@@ -827,7 +827,7 @@
                 pointer={propPointer}
                 {key}
                 selection={nestedSelection}
-                searchResultItems={filterKeySearchResults(nestedSearchResult)}
+                searchResultItems={filterKeySearchResults(nestedSearchResults)}
                 {context}
                 onUpdateKey={handleUpdateKey}
               />
@@ -861,7 +861,7 @@
           {value}
           {enforceString}
           selection={isNodeSelected ? selection : null}
-          searchResultItems={filterValueSearchResults(recursiveSearchResult)}
+          searchResultItems={filterValueSearchResults(searchResults)}
           {context}
         />
         {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !isEditingSelection(selection) && isEqual(getFocusPath(selection), path)}
