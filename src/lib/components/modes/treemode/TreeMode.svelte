@@ -137,7 +137,7 @@
     ParseError,
     PastedJson,
     SearchResults,
-    RecursiveValidationErrors,
+    ValidationErrors,
     SearchResultDetails,
     Section,
     TransformModalOptions,
@@ -343,8 +343,8 @@
 
   let textIsRepaired = false
 
-  let validationErrors: ValidationError[] = []
-  let recursiveValidationErrors: RecursiveValidationErrors | undefined
+  let validationErrorList: ValidationError[] = []
+  let validationErrors: ValidationErrors | undefined
 
   $: updateValidationErrors(json, validator, parser, validationParser)
 
@@ -360,11 +360,11 @@
   ) {
     measure(
       () => {
-        let newValidationErrors: ValidationError[]
+        let newValidationErrorList: ValidationError[]
         try {
-          newValidationErrors = memoizedValidate(json, validator, parser, validationParser)
+          newValidationErrorList = memoizedValidate(json, validator, parser, validationParser)
         } catch (err) {
-          newValidationErrors = [
+          newValidationErrorList = [
             {
               path: [],
               message: 'Failed to validate: ' + (err as Error).message,
@@ -373,10 +373,10 @@
           ]
         }
 
-        if (!isEqual(newValidationErrors, validationErrors)) {
-          debug('validationErrors changed:', newValidationErrors)
-          validationErrors = newValidationErrors
-          recursiveValidationErrors = toRecursiveValidationErrors(json, validationErrors)
+        if (!isEqual(newValidationErrorList, validationErrorList)) {
+          debug('validationErrors changed:', newValidationErrorList)
+          validationErrorList = newValidationErrorList
+          validationErrors = toRecursiveValidationErrors(json, validationErrorList)
         }
       },
       (duration) => debug(`validationErrors updated in ${duration} ms`)
@@ -396,7 +396,7 @@
     // make sure the validation results are up-to-date
     // normally, they are only updated on the next tick after the json is changed
     updateValidationErrors(json, validator, parser, validationParser)
-    return !isEmpty(validationErrors) ? { validationErrors } : null
+    return !isEmpty(validationErrorList) ? { validationErrors: validationErrorList } : null
   }
 
   export function getJson() {
@@ -2120,7 +2120,7 @@
           value={json}
           pointer={''}
           state={documentState}
-          {recursiveValidationErrors}
+          {validationErrors}
           {searchResults}
           {selection}
           {context}
@@ -2178,7 +2178,10 @@
         />
       {/if}
 
-      <ValidationErrorsOverview {validationErrors} selectError={handleSelectValidationError} />
+      <ValidationErrorsOverview
+        validationErrors={validationErrorList}
+        selectError={handleSelectValidationError}
+      />
     {/if}
   {:else}
     <div class="jse-contents">

@@ -58,7 +58,7 @@
     JSONSelection,
     NestedValidationError,
     SearchResults,
-    RecursiveValidationErrors,
+    ValidationErrors,
     RenderedItem,
     TreeModeContext,
     VisibleSection
@@ -81,7 +81,7 @@
   export let pointer: JSONPointer
   export let value: unknown
   export let state: DocumentState | undefined
-  export let recursiveValidationErrors: RecursiveValidationErrors | undefined
+  export let validationErrors: ValidationErrors | undefined
   export let searchResults: SearchResults | undefined
   export let selection: JSONSelection | null
   export let context: TreeModeContext
@@ -109,7 +109,7 @@
   $: visibleSections = isArrayRecursiveState(state) ? state.visibleSections : undefined
 
   let validationError: NestedValidationError | undefined
-  $: validationError = recursiveValidationErrors?.validationError
+  $: validationError = validationErrors?.validationError
 
   let isNodeSelected: boolean
   $: isNodeSelected = pathInSelection(context.getJson(), selection, path)
@@ -666,8 +666,8 @@
         {/if}
         {#each visibleSections || DEFAULT_VISIBLE_SECTIONS as visibleSection, sectionIndex (sectionIndex)}
           {#each getItems(value, visibleSection, dragging) as item (item.index)}
-            {@const nestedValidationErrors = isArrayRecursiveState(recursiveValidationErrors)
-              ? recursiveValidationErrors.items[item.index]
+            {@const nestedValidationErrors = isArrayRecursiveState(validationErrors)
+              ? validationErrors.items[item.index]
               : undefined}
 
             {@const nestedSelection = selectionIfOverlapping(
@@ -680,7 +680,7 @@
               value={value[item.index]}
               pointer={appendToJSONPointer(pointer, item.index)}
               state={isArrayRecursiveState(state) ? state.items[item.index] : undefined}
-              recursiveValidationErrors={nestedValidationErrors}
+              validationErrors={nestedValidationErrors}
               searchResults={isArrayRecursiveState(searchResults)
                 ? searchResults.items[item.index]
                 : undefined}
@@ -802,8 +802,8 @@
             ? searchResults.properties[key]
             : undefined}
 
-          {@const nestedValidationErrors = isObjectRecursiveState(recursiveValidationErrors)
-            ? recursiveValidationErrors.properties[key]
+          {@const nestedValidationErrors = isObjectRecursiveState(validationErrors)
+            ? validationErrors.properties[key]
             : undefined}
 
           {@const nestedSelection = selectionIfOverlapping(
@@ -816,7 +816,7 @@
             value={value[key]}
             pointer={propPointer}
             state={isObjectRecursiveState(state) ? state.properties[key] : undefined}
-            recursiveValidationErrors={nestedValidationErrors}
+            validationErrors={nestedValidationErrors}
             searchResults={nestedSearchResults}
             selection={nestedSelection}
             {context}

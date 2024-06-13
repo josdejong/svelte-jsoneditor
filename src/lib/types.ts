@@ -140,27 +140,27 @@ export type WithSearchResults = SearchResults & {
   searchResults: ExtendedSearchResultItem[]
 }
 
-export interface ObjectRecursiveValidationErrors extends ObjectRecursiveState {
+export interface ObjectValidationErrors extends ObjectRecursiveState {
   type: 'object'
-  properties: Record<string, RecursiveValidationErrors | undefined>
+  properties: Record<string, ValidationErrors | undefined>
   validationError?: NestedValidationError
 }
 
-export interface ArrayRecursiveValidationErrors extends ArrayRecursiveState {
+export interface ArrayValidationErrors extends ArrayRecursiveState {
   type: 'array'
-  items: Array<RecursiveValidationErrors | undefined>
+  items: Array<ValidationErrors | undefined>
   validationError?: NestedValidationError
 }
 
-export interface ValueRecursiveValidationErrors extends ValueRecursiveState {
+export interface ValueValidationErrors extends ValueRecursiveState {
   type: 'value'
   validationError?: NestedValidationError
 }
 
-export type RecursiveValidationErrors =
-  | ObjectRecursiveValidationErrors
-  | ArrayRecursiveValidationErrors
-  | ValueRecursiveValidationErrors
+export type ValidationErrors =
+  | ObjectValidationErrors
+  | ArrayValidationErrors
+  | ValueValidationErrors
 
 export interface JSONPatchResult {
   json: unknown

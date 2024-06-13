@@ -3,7 +3,7 @@ import type {
   ContentErrors,
   JSONParser,
   RecursiveStateFactory,
-  RecursiveValidationErrors,
+  ValidationErrors,
   ValidationError,
   Validator
 } from '$lib/types.js'
@@ -18,19 +18,19 @@ import type { JSONPath } from 'immutable-json-patch'
 
 const debug = createDebug('validation')
 
-export const recursiveValidationErrorsFactory: RecursiveStateFactory = {
+export const validationErrorsFactory: RecursiveStateFactory = {
   createObjectDocumentState: () => ({ type: 'object', properties: {} }),
   createArrayDocumentState: () => ({ type: 'array', items: [] }),
   createValueDocumentState: () => ({ type: 'value' })
 }
 
-export function updateInRecursiveValidationErrors(
+export function updateInValidationErrors(
   json: unknown,
-  errors: RecursiveValidationErrors | undefined,
+  errors: ValidationErrors | undefined,
   path: JSONPath,
-  transform: (value: unknown, state: RecursiveValidationErrors) => RecursiveValidationErrors
-): RecursiveValidationErrors {
-  return updateInRecursiveState(json, errors, path, transform, recursiveValidationErrorsFactory)
+  transform: (value: unknown, state: ValidationErrors) => ValidationErrors
+): ValidationErrors {
+  return updateInRecursiveState(json, errors, path, transform, validationErrorsFactory)
 }
 
 /**
@@ -42,12 +42,12 @@ export function updateInRecursiveValidationErrors(
 export function toRecursiveValidationErrors(
   json: unknown,
   validationErrors: ValidationError[]
-): RecursiveValidationErrors | undefined {
-  let output: RecursiveValidationErrors | undefined
+): ValidationErrors | undefined {
+  let output: ValidationErrors | undefined
 
   // first generate the errors themselves
   validationErrors.forEach((validationError) => {
-    output = updateInRecursiveValidationErrors(json, output, validationError.path, (_, state) => ({
+    output = updateInValidationErrors(json, output, validationError.path, (_, state) => ({
       ...state,
       validationError
     }))
@@ -60,7 +60,7 @@ export function toRecursiveValidationErrors(
     while (parentPath.length > 0) {
       parentPath = initial(parentPath)
 
-      output = updateInRecursiveValidationErrors(json, output, parentPath, (_, state) => {
+      output = updateInValidationErrors(json, output, parentPath, (_, state) => {
         return state.validationError
           ? state
           : {
