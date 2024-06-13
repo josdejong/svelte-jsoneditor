@@ -98,6 +98,7 @@
 
   let path: JSONPath
   $: path = parseJSONPointer(pointer)
+  $: dataPath = encodeURIComponent(pointer) // This is the same as encodeDataPath(path) but faster
 
   let expanded: boolean
   $: expanded = isExpandableState(state) ? state.expanded : false
@@ -568,7 +569,7 @@
     { 'jse-expanded': expanded },
     context.onClassName(path, value)
   )}
-  data-path={encodeDataPath(path)}
+  data-path={dataPath}
   aria-selected={isNodeSelected}
   style:--level={path.length}
   class:jse-root={root}
