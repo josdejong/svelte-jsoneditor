@@ -606,18 +606,6 @@ export interface RenderValueProps {
 
 export type RenderValuePropsOptional = Partial<RenderValueProps>
 
-export interface JSONNodeProp {
-  key: string
-  value: unknown
-  path: JSONPath
-}
-
-export interface JSONNodeItem {
-  index: number
-  value: unknown
-  path: JSONPath
-}
-
 export interface DraggingState {
   initialTarget: Element
   initialClientY: number

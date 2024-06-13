@@ -4,7 +4,7 @@
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import type { JSONPath } from 'immutable-json-patch'
   import { parseJSONPointer } from 'immutable-json-patch'
-  import { initial, isEqual, last } from 'lodash-es'
+  import { initial, isEqual, last, range } from 'lodash-es'
   import Icon from 'svelte-awesome'
   import {
     DEFAULT_VISIBLE_SECTIONS,
@@ -56,8 +56,6 @@
     CaretPosition,
     DocumentState,
     DraggingState,
-    JSONNodeItem,
-    JSONNodeProp,
     JSONSelection,
     NestedValidationError,
     RecursiveSearchResult,
@@ -117,72 +115,50 @@
 
   $: root = path.length === 0
 
-  function getProps(
-    path: JSONPath,
-    object: Record<string, unknown>,
-    dragging: DraggingState | undefined
-  ): JSONNodeProp[] {
-    let props = Object.keys(object).map((key) => {
-      const keyPath = memoizePath(path.concat(key))
-      return {
-        key,
-        value: object[key],
-        path: keyPath
-      }
-    })
+  /**
+   * Get sorted keys, applying dragging order
+   */
+  function getKeys(object: Record<string, unknown>, dragging: DraggingState | undefined): string[] {
+    const keys = Object.keys(object)
 
-    // reorder the props when dragging
+    // reorder the keys whilst dragging
     if (dragging && dragging.offset !== 0) {
-      props = moveItems(
-        props,
+      return moveItems(
+        keys,
         dragging.selectionStartIndex,
         dragging.selectionItemsCount,
         dragging.offset
       )
     }
 
-    return props
+    return keys
+  }
+
+  interface ItemIndex {
+    index: number
+    gutterIndex: number
   }
 
   function getItems(
-    path: JSONPath,
     array: Array<unknown>,
     visibleSection: VisibleSection,
     dragging: DraggingState | undefined
-  ): JSONNodeItem[] {
+  ): ItemIndex[] {
     const start = visibleSection.start
     const end = Math.min(visibleSection.end, array.length)
-    let items: JSONNodeItem[] = []
+    const indices = range(start, end)
 
-    for (let index = start; index < end; index++) {
-      const itemPath = memoizePath(path.concat(String(index)))
-
-      items.push({
-        index,
-        value: array[index],
-        path: itemPath
-      })
-    }
-
-    // reorder the items when dragging
+    // reorder the items whilst dragging
     if (dragging && dragging.offset !== 0) {
-      const originalIndexes = items.map((item) => item.index)
-
-      items = moveItems(
-        items,
+      return moveItems(
+        indices,
         dragging.selectionStartIndex,
         dragging.selectionItemsCount,
         dragging.offset
-      )
-
-      // maintain the original indexes. Indexes must keep the same order,
-      // note that the indexes can be a visible section from 200-300 for example
-      for (let i = 0; i < items.length; i++) {
-        items[i].index = originalIndexes[i]
-      }
+      ).map((index, gutterIndex) => ({ index, gutterIndex }))
     }
 
-    return items
+    return indices.map((index) => ({ index, gutterIndex: index }))
   }
 
   function toggleExpand(event: MouseEvent) {
@@ -688,7 +664,9 @@
           </div>
         {/if}
         {#each visibleSections || DEFAULT_VISIBLE_SECTIONS as visibleSection, sectionIndex (sectionIndex)}
-          {#each getItems(path, value, visibleSection, dragging) as item (item.index)}
+          {#each getItems(value, visibleSection, dragging) as item (item.index)}
+            {@const itemPath = memoizePath(path.concat(String(item.index)))}
+
             {@const nestedValidationErrors = isArrayRecursiveState(recursiveValidationErrors)
               ? recursiveValidationErrors.items[item.index]
               : undefined}
@@ -696,12 +674,12 @@
             {@const nestedSelection = selectionIfOverlapping(
               context.getJson(),
               selection,
-              item.path
+              itemPath
             )}
 
             <svelte:self
-              value={item.value}
-              path={item.path}
+              value={value[item.index]}
+              path={itemPath}
               state={isArrayRecursiveState(state) ? state.items[item.index] : undefined}
               recursiveValidationErrors={nestedValidationErrors}
               recursiveSearchResult={isArrayRecursiveState(recursiveSearchResult)
@@ -712,7 +690,7 @@
               onDragSelectionStart={handleDragSelectionStart}
             >
               <div slot="identifier" class="jse-identifier">
-                <div class="jse-index">{item.index}</div>
+                <div class="jse-index">{item.gutterIndex}</div>
               </div>
             </svelte:self>
           {/each}
@@ -818,21 +796,23 @@
             />
           </div>
         {/if}
-        {#each getProps(path, value, dragging) as prop}
+        {#each getKeys(value, dragging) as key}
+          {@const propPath = memoizePath(path.concat(key))}
+
           {@const nestedSearchResult = isObjectRecursiveState(recursiveSearchResult)
-            ? recursiveSearchResult.properties[prop.key]
+            ? recursiveSearchResult.properties[key]
             : undefined}
 
           {@const nestedValidationErrors = isObjectRecursiveState(recursiveValidationErrors)
-            ? recursiveValidationErrors.properties[prop.key]
+            ? recursiveValidationErrors.properties[key]
             : undefined}
 
-          {@const nestedSelection = selectionIfOverlapping(context.getJson(), selection, prop.path)}
+          {@const nestedSelection = selectionIfOverlapping(context.getJson(), selection, propPath)}
 
           <svelte:self
-            value={prop.value}
-            path={prop.path}
-            state={isObjectRecursiveState(state) ? state.properties[prop.key] : undefined}
+            value={value[key]}
+            path={propPath}
+            state={isObjectRecursiveState(state) ? state.properties[key] : undefined}
             recursiveValidationErrors={nestedValidationErrors}
             recursiveSearchResult={nestedSearchResult}
             selection={nestedSelection}
@@ -841,8 +821,8 @@
           >
             <div slot="identifier" class="jse-identifier">
               <JSONKey
-                path={prop.path}
-                key={prop.key}
+                path={propPath}
+                {key}
                 selection={nestedSelection}
                 searchResultItems={filterKeySearchResults(nestedSearchResult)}
                 {context}
