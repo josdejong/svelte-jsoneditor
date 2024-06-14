@@ -1848,9 +1848,7 @@
       if (isEditingSelection(selection)) {
         debug('click outside the editor, stop edit mode')
         updateSelection((selection) => {
-          if (isKeySelection(selection)) {
-            return { ...selection, edit: false }
-          } else if (isValueSelection(selection)) {
+          if (isKeySelection(selection) || isValueSelection(selection)) {
             return { ...selection, edit: false }
           } else {
             return selection
