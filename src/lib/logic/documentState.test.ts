@@ -1,32 +1,36 @@
-import assert, { deepStrictEqual } from 'assert'
-import { describe, test } from 'vitest'
+import assert from 'assert'
+import { describe, expect, test } from 'vitest'
 import { flatMap, isEqual, range, times } from 'lodash-es'
-import { ARRAY_SECTION_SIZE } from '../constants.js'
+import { ARRAY_SECTION_SIZE, DEFAULT_VISIBLE_SECTIONS } from '../constants.js'
 import {
-  collapsePath,
+  createArrayDocumentState,
   createDocumentState,
-  deletePath,
+  createObjectDocumentState,
+  createValueDocumentState,
+  documentStateFactory,
   documentStatePatch,
+  ensureRecursiveState,
   expandPath,
   expandSection,
   expandWithCallback,
-  filterPath,
   forEachVisibleIndex,
   getEnforceString,
   getVisibleCaretPositions,
   getVisiblePaths,
-  shiftPath,
   shiftVisibleSections,
-  syncKeys
+  syncDocumentState,
+  syncKeys,
+  toRecursiveStatePath,
+  updateInDocumentState
 } from './documentState.js'
 import {
   CaretType,
+  type ArrayDocumentState,
   type DocumentState,
-  type JSONPointerMap,
   type VisibleSection
 } from '$lib/types.js'
-import type { JSONPatchDocument } from 'immutable-json-patch'
-import { compileJSONPointer, deleteIn, setIn } from 'immutable-json-patch'
+import { deleteIn, getIn, type JSONPatchDocument, setIn, updateIn } from 'immutable-json-patch'
+import { isArrayRecursiveState } from 'svelte-jsoneditor'
 
 describe('documentState', () => {
   test('syncKeys should append new keys and remove old keys', () => {
@@ -37,79 +41,505 @@ describe('documentState', () => {
     assert.deepStrictEqual(syncKeys(['a', 'b'], ['b', 'a']), ['b', 'a'])
   })
 
+  describe('ensureNestedDocumentState', () => {
+    test('should create nested state in an array', () => {
+      const expected: DocumentState = {
+        type: 'array',
+        expanded: false,
+        // eslint-disable-next-line no-sparse-arrays
+        items: [, { type: 'value' }],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      assert.deepStrictEqual(
+        ensureRecursiveState([1, 2, 3], undefined, ['1'], documentStateFactory),
+        expected
+      )
+    })
+
+    test('should maintain state when creating nested state in an array', () => {
+      const state: DocumentState = {
+        type: 'array',
+        expanded: true,
+        items: [],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      const expected: DocumentState = {
+        type: 'array',
+        expanded: true,
+        // eslint-disable-next-line no-sparse-arrays
+        items: [, { type: 'value' }],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      assert.deepStrictEqual(
+        ensureRecursiveState([1, 2, 3], state, ['1'], documentStateFactory),
+        expected
+      )
+    })
+
+    test('should create nested state in an object', () => {
+      const expected: DocumentState = {
+        type: 'object',
+        expanded: false,
+        properties: {
+          a: { type: 'value' }
+        }
+      }
+
+      assert.deepStrictEqual(
+        ensureRecursiveState({ a: 2, b: 3 }, undefined, ['a'], documentStateFactory),
+        expected
+      )
+    })
+
+    test('should maintain state when creating nested state in an object', () => {
+      const state: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {}
+      }
+
+      const expected: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {
+          a: { type: 'value' }
+        }
+      }
+
+      assert.deepStrictEqual(
+        ensureRecursiveState({ a: 2, b: 3 }, state, ['a'], documentStateFactory),
+        expected
+      )
+    })
+
+    test('should create nested state in an object and array', () => {
+      const expected: DocumentState = {
+        type: 'object',
+        expanded: false,
+        properties: {
+          array: {
+            type: 'array',
+            expanded: false,
+            // eslint-disable-next-line no-sparse-arrays
+            items: [, { type: 'value' }],
+            visibleSections: DEFAULT_VISIBLE_SECTIONS
+          }
+        }
+      }
+
+      assert.deepStrictEqual(
+        ensureRecursiveState({ array: [1, 2, 3] }, undefined, ['array', '1'], documentStateFactory),
+        expected
+      )
+    })
+
+    test('should maintain value state', () => {
+      const state: DocumentState = {
+        type: 'value',
+        enforceString: true
+      }
+
+      assert.deepStrictEqual(ensureRecursiveState(42, state, [], documentStateFactory), state)
+    })
+  })
+
+  describe('syncDocumentState', () => {
+    test('should maintain array documentState when no change is needed', () => {
+      const state: DocumentState = {
+        type: 'array',
+        expanded: true,
+        items: [{ type: 'value', enforceString: false }],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+      assert.deepStrictEqual(syncDocumentState([1, 2, 3], state), state)
+    })
+
+    test('should maintain object documentState when no change is needed', () => {
+      const state: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {
+          c: { type: 'value', enforceString: false }
+        }
+      }
+      assert.deepStrictEqual(syncDocumentState({ a: 1, b: 2, c: 3 }, state), state)
+    })
+
+    test('should switch array, object, and value state', () => {
+      const arrayState = createArrayDocumentState()
+      const objectState = createObjectDocumentState()
+      const valueState = createValueDocumentState()
+
+      assert.deepStrictEqual(syncDocumentState(undefined, arrayState), undefined)
+      assert.deepStrictEqual(syncDocumentState(undefined, objectState), undefined)
+      assert.deepStrictEqual(syncDocumentState(undefined, valueState), undefined)
+      assert.deepStrictEqual(syncDocumentState(undefined, undefined), undefined)
+
+      assert.deepStrictEqual(syncDocumentState([], arrayState), arrayState)
+      assert.deepStrictEqual(syncDocumentState([], objectState), arrayState)
+      assert.deepStrictEqual(syncDocumentState([], valueState), arrayState)
+      assert.deepStrictEqual(syncDocumentState([], undefined), undefined)
+
+      assert.deepStrictEqual(syncDocumentState({}, arrayState), objectState)
+      assert.deepStrictEqual(syncDocumentState({}, objectState), objectState)
+      assert.deepStrictEqual(syncDocumentState({}, valueState), objectState)
+      assert.deepStrictEqual(syncDocumentState({}, undefined), undefined)
+
+      assert.deepStrictEqual(syncDocumentState(42, arrayState), undefined)
+      assert.deepStrictEqual(syncDocumentState(42, objectState), undefined)
+      assert.deepStrictEqual(syncDocumentState(42, valueState), valueState)
+      assert.deepStrictEqual(syncDocumentState(42, undefined), undefined)
+    })
+
+    test('should maintain expanded state when switching between array and object', () => {
+      const arrayState = createArrayDocumentState({ expanded: false })
+      const objectState = createObjectDocumentState({ expanded: false })
+      const arrayStateExpanded = createArrayDocumentState({ expanded: true })
+      const objectStateExpanded = createObjectDocumentState({ expanded: true })
+
+      assert.deepStrictEqual(syncDocumentState({}, arrayState), objectState)
+      assert.deepStrictEqual(syncDocumentState([], objectState), arrayState)
+
+      assert.deepStrictEqual(syncDocumentState({}, arrayStateExpanded), objectStateExpanded)
+      assert.deepStrictEqual(syncDocumentState([], objectStateExpanded), arrayStateExpanded)
+    })
+
+    test('should remove deleted properties', () => {
+      const state: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {
+          a: { type: 'value', enforceString: false },
+          b: { type: 'value', enforceString: false },
+          c: { type: 'value', enforceString: false }
+        }
+      }
+
+      const expected: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {
+          a: { type: 'value', enforceString: false },
+          c: { type: 'value', enforceString: false }
+        }
+      }
+
+      assert.deepStrictEqual(syncDocumentState({ a: 1, c: 3, d: 4 }, state), expected)
+    })
+
+    test('should remove deleted items', () => {
+      const state: DocumentState = {
+        type: 'array',
+        expanded: true,
+        // eslint-disable-next-line no-sparse-arrays
+        items: [, { type: 'value' }, { type: 'value' }],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      const expected: DocumentState = {
+        type: 'array',
+        expanded: true,
+        // eslint-disable-next-line no-sparse-arrays
+        items: [, { type: 'value' }],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      assert.deepStrictEqual(syncDocumentState([1, 2], state), expected)
+    })
+
+    test('should work on nested objects', () => {
+      const state: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {
+          nested: {
+            type: 'object',
+            expanded: true,
+            properties: {
+              c: { type: 'value', enforceString: false },
+              d: { type: 'value', enforceString: false }
+            }
+          }
+        }
+      }
+
+      const expected: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {
+          nested: {
+            type: 'object',
+            expanded: true,
+            properties: {
+              c: { type: 'value', enforceString: false }
+            }
+          }
+        }
+      }
+
+      assert.deepStrictEqual(syncDocumentState({ nested: { a: 1, b: 2, c: 3 } }, state), expected)
+
+      const expected2: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {}
+      }
+
+      assert.deepStrictEqual(syncDocumentState({ nested: 42 }, state), expected2)
+    })
+
+    test('should work on nested arrays', () => {
+      const state: DocumentState = {
+        type: 'array',
+        expanded: true,
+        items: [
+          {
+            type: 'array',
+            expanded: true,
+            visibleSections: DEFAULT_VISIBLE_SECTIONS,
+            // eslint-disable-next-line no-sparse-arrays
+            items: [{ type: 'value' }, { type: 'value' }, { type: 'value' }, { type: 'value' }]
+          }
+        ],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      const expected: DocumentState = {
+        type: 'array',
+        expanded: true,
+        items: [
+          {
+            type: 'array',
+            expanded: true,
+            visibleSections: DEFAULT_VISIBLE_SECTIONS,
+            // eslint-disable-next-line no-sparse-arrays
+            items: [{ type: 'value' }, { type: 'value' }, { type: 'value' }]
+          }
+        ],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      assert.deepStrictEqual(syncDocumentState([[1, 2, 3]], state), expected)
+
+      const expected2: DocumentState = {
+        type: 'array',
+        expanded: true,
+        // eslint-disable-next-line no-sparse-arrays
+        items: [],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      assert.deepStrictEqual(syncDocumentState([42], state), expected2)
+    })
+
+    test('objects should be handled in an immutable way', () => {
+      const json = {
+        nested: {
+          c: 2,
+          d: 3
+        }
+      }
+
+      const state: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {
+          nested: {
+            type: 'object',
+            expanded: true,
+            properties: {
+              c: { type: 'value' },
+              d: { type: 'value' }
+            }
+          }
+        }
+      }
+
+      const syncedState = syncDocumentState(json, state)
+      assert.deepStrictEqual(syncedState, state)
+      assert.strictEqual(syncedState, state)
+    })
+
+    test('arrays should be handled in an immutable way', () => {
+      const json = [1, 2, 3]
+      const state: DocumentState = {
+        type: 'array',
+        expanded: true,
+        items: [{ type: 'value' }, { type: 'value' }, { type: 'value' }],
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      const syncedState = syncDocumentState(json, state)
+      assert.deepStrictEqual(syncedState, state)
+      assert.strictEqual(syncedState, state)
+    })
+
+    test('should handle a change in an immutable way', () => {
+      const items: DocumentState[] = [{ type: 'value' }, { type: 'value' }, { type: 'value' }]
+      const state: ArrayDocumentState = {
+        type: 'array',
+        expanded: true,
+        items,
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      const updatedJson = [1, 2]
+
+      const syncedState = syncDocumentState(updatedJson, state) as ArrayDocumentState
+
+      const expected: DocumentState = {
+        type: 'array',
+        expanded: true,
+        items: items.slice(0, 2),
+        visibleSections: DEFAULT_VISIBLE_SECTIONS
+      }
+
+      assert.deepStrictEqual(syncedState, expected)
+      assert.strictEqual(syncedState.items[0], expected.items[0])
+      assert.strictEqual(syncedState.items[1], expected.items[1])
+    })
+  })
+
+  test('toRecursiveStatePath', () => {
+    const json = {
+      foo: { a: 42 },
+      bar: [1, 2, 3]
+    }
+
+    expect(toRecursiveStatePath(json, [])).toEqual([])
+    expect(toRecursiveStatePath(json, ['foo'])).toEqual(['properties', 'foo'])
+    expect(toRecursiveStatePath(json, ['bar'])).toEqual(['properties', 'bar'])
+    expect(toRecursiveStatePath(json, ['bar', '2'])).toEqual(['properties', 'bar', 'items', '2'])
+  })
+
   describe('expandWithCallback', () => {
     const json = {
       array: [1, 2, { c: 6 }],
       object: { a: 4, b: 5 },
       value: 'hello'
     }
-    const state = createDocumentState()
+    const expandedState = createDocumentState({ json })
 
     test('should fully expand a json document', () => {
-      assert.deepStrictEqual(expandWithCallback(json, state, [], () => true).expandedMap, {
-        '': true,
-        '/array': true,
-        '/array/2': true,
-        '/object': true
-      })
+      assert.deepStrictEqual(
+        expandWithCallback(json, expandedState, [], () => true),
+        {
+          type: 'object',
+          expanded: true,
+          properties: {
+            array: {
+              type: 'array',
+              expanded: true,
+              visibleSections: DEFAULT_VISIBLE_SECTIONS,
+              // eslint-disable-next-line no-sparse-arrays
+              items: [, , { type: 'object', expanded: true, properties: {} }]
+            },
+            object: {
+              type: 'object',
+              expanded: true,
+              properties: {}
+            }
+          }
+        }
+      )
     })
 
     test('should expand a nested item of a json document', () => {
       assert.deepStrictEqual(
-        expandWithCallback(json, state, ['array'], (path) => isEqual(path, ['array'])).expandedMap,
+        expandWithCallback(json, expandedState, ['array'], (path) => isEqual(path, ['array'])),
         {
-          '/array': true
+          expanded: false,
+          properties: {
+            array: {
+              type: 'array',
+              expanded: true,
+              visibleSections: DEFAULT_VISIBLE_SECTIONS,
+              items: []
+            }
+          },
+          type: 'object'
+        }
+      )
+    })
+
+    test('should expand a nested item of a json document starting without state', () => {
+      assert.deepStrictEqual(
+        expandWithCallback(json, undefined, ['array'], (path) => isEqual(path, ['array'])),
+        {
+          expanded: false,
+          properties: {
+            array: {
+              type: 'array',
+              expanded: true,
+              visibleSections: DEFAULT_VISIBLE_SECTIONS,
+              items: []
+            }
+          },
+          type: 'object'
         }
       )
     })
 
     test('should expand a part of a json document recursively', () => {
-      assert.deepStrictEqual(expandWithCallback(json, state, ['array'], () => true).expandedMap, {
-        '/array': true,
-        '/array/2': true
-      })
+      assert.deepStrictEqual(
+        expandWithCallback(json, expandedState, ['array'], () => true),
+        {
+          expanded: false,
+          properties: {
+            array: {
+              type: 'array',
+              expanded: true,
+              visibleSections: DEFAULT_VISIBLE_SECTIONS,
+              // eslint-disable-next-line no-sparse-arrays
+              items: [, , { expanded: true, properties: {}, type: 'object' }]
+            }
+          },
+          type: 'object'
+        }
+      )
     })
 
     test('should partially expand a json document', () => {
       assert.deepStrictEqual(
-        expandWithCallback(json, state, [], (path) => path.length <= 1).expandedMap,
+        expandWithCallback(json, expandedState, [], (path) => path.length <= 1),
         {
-          '': true,
-          '/array': true,
-          '/object': true
+          expanded: true,
+          properties: {
+            array: {
+              type: 'array',
+              expanded: true,
+              visibleSections: DEFAULT_VISIBLE_SECTIONS,
+              items: []
+            },
+            object: { type: 'object', expanded: true, properties: {} }
+          },
+          type: 'object'
         }
       )
     })
 
     test('should expand the root of a json document', () => {
       assert.deepStrictEqual(
-        expandWithCallback(json, state, [], (path) => path.length === 0).expandedMap,
+        expandWithCallback(json, expandedState, [], (path) => path.length === 0),
         {
-          '': true
+          expanded: true,
+          properties: {},
+          type: 'object'
         }
       )
     })
 
     test('should not traverse non-expanded nodes', () => {
       assert.deepStrictEqual(
-        expandWithCallback(json, state, [], (path) => path.length > 0).expandedMap,
-        {}
-      )
-    })
-
-    test('should leave already expanded nodes as is', () => {
-      const expandedMap = {
-        '': true,
-        '/array': true
-      }
-      const stateWithExpanded = {
-        ...state,
-        expandedMap
-      }
-
-      assert.deepStrictEqual(
-        expandWithCallback(json, stateWithExpanded, [], () => false).expandedMap,
-        expandedMap
+        expandWithCallback(json, expandedState, [], (path) => path.length > 0),
+        {
+          expanded: false,
+          properties: {},
+          type: 'object'
+        }
       )
     })
   })
@@ -121,7 +551,7 @@ describe('documentState', () => {
       value: 'hello'
     }
 
-    const documentState = createDocumentState()
+    const documentState = createDocumentState({ json })
     assert.deepStrictEqual(getVisiblePaths(json, documentState), [[]])
 
     const documentState0 = createDocumentState({ json, expand: (path) => path.length <= 0 })
@@ -167,7 +597,7 @@ describe('documentState', () => {
     }
 
     // by default, should have a visible section from 0-100 only (so 100-500 is invisible)
-    const documentState1 = createDocumentState({ json, expand: (path) => path.length <= 1 })
+    const documentState1 = createDocumentState({ json, expand: () => true })
     assert.deepStrictEqual(getVisiblePaths(json, documentState1), [
       [],
       ['array'],
@@ -177,10 +607,7 @@ describe('documentState', () => {
     // create a visible section from 200-300 (in addition to the visible section 0-100)
     const start = 2 * ARRAY_SECTION_SIZE
     const end = 3 * ARRAY_SECTION_SIZE
-    const documentState2 = expandSection(json, documentState1, compileJSONPointer(['array']), {
-      start,
-      end
-    })
+    const documentState2 = expandSection(json, documentState1, ['array'], { start, end })
     assert.deepStrictEqual(getVisiblePaths(json, documentState2), [
       [],
       ['array'],
@@ -320,10 +747,7 @@ describe('documentState', () => {
     // create a visible section from 200-300 (in addition to the visible section 0-100)
     const start = 2 * ARRAY_SECTION_SIZE
     const end = 3 * ARRAY_SECTION_SIZE
-    const documentState2 = expandSection(json, documentState1, compileJSONPointer(['array']), {
-      start,
-      end
-    })
+    const documentState2 = expandSection(json, documentState1, ['array'], { start, end })
     assert.deepStrictEqual(
       getVisibleCaretPositions(json, documentState2),
       flatMap([
@@ -354,22 +778,16 @@ describe('documentState', () => {
 
   test('should keep/update enforce string', () => {
     const json1 = 42
-    const documentState1 = createDocumentState()
-    assert.strictEqual(
-      getEnforceString(json1, documentState1.enforceStringMap, compileJSONPointer([]), JSON),
-      false
-    )
+    const documentState1 = createDocumentState({ json: json1 })
+    assert.strictEqual(getEnforceString(json1, documentState1, [], JSON), false)
 
     const json2 = '42'
-    const documentState2 = createDocumentState()
-    assert.strictEqual(
-      getEnforceString(json2, documentState2.enforceStringMap, compileJSONPointer([]), JSON),
-      true
-    )
+    const documentState2 = createDocumentState({ json: json2 })
+    assert.strictEqual(getEnforceString(json2, documentState2, [], JSON), true)
   })
 
   describe('documentStatePatch', () => {
-    function createJsonAndState(): { json: unknown; documentState: DocumentState } {
+    function createJsonAndState(): { json: unknown; documentState: DocumentState | undefined } {
       const json = {
         members: [
           { id: 1, name: 'Joe' },
@@ -385,54 +803,45 @@ describe('documentState', () => {
         }
       }
 
-      const documentState: DocumentState = {
-        ...createDocumentState({ json, expand: () => true }),
-        visibleSectionsMap: {
-          '/members': [{ start: 0, end: 3 }]
-        }
-      }
+      let documentState = createDocumentState({ json, expand: () => true })
+
+      documentState = updateInDocumentState(json, documentState, ['members'], (_value, state) => {
+        return isArrayRecursiveState(state)
+          ? { ...state, visibleSections: [{ start: 0, end: 3 }] }
+          : state
+      })
 
       return { json, documentState }
     }
 
     test('add: should add a value to an object', () => {
       const json = { a: 2, b: 3 }
-      const documentState = createDocumentState()
+      const documentState = createDocumentState({ json })
 
       const res = documentStatePatch(json, documentState, [{ op: 'add', path: '/c', value: 4 }])
 
       assert.deepStrictEqual(res.json, { a: 2, b: 3, c: 4 })
-      assert.deepStrictEqual(res.documentState, documentState)
+      assert.deepStrictEqual(res.state, documentState)
     })
 
     test('add: should add a value to an object (expanded)', () => {
       const json = { a: 2, b: 3 }
-      const documentState: DocumentState = {
-        ...createDocumentState(),
-        expandedMap: {
-          '': true
-        }
-      }
+      const documentState = createDocumentState({ json, expand: () => true })
 
       const res = documentStatePatch(json, documentState, [{ op: 'add', path: '/c', value: 42 }])
 
       assert.deepStrictEqual(res.json, { a: 2, b: 3, c: 42 })
-      assert.deepStrictEqual(res.documentState, documentState)
+      assert.deepStrictEqual(res.state, documentState)
     })
 
     test('add: should override a value in an object', () => {
       const json = { a: 2, b: 3 }
-      const documentState: DocumentState = {
-        ...createDocumentState(),
-        expandedMap: {
-          '': true
-        }
-      }
+      const documentState = createDocumentState({ json, expand: () => true })
 
       const res = documentStatePatch(json, documentState, [{ op: 'add', path: '/a', value: 42 }])
 
       assert.deepStrictEqual(res.json, { a: 42, b: 3 })
-      assert.deepStrictEqual(res.documentState, {
+      assert.deepStrictEqual(res.state, {
         ...documentState
       })
     })
@@ -451,20 +860,30 @@ describe('documentState', () => {
         { id: 3, name: 'Mark' }
       ])
 
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        expandedMap: {
-          '': true,
-          '/group': true,
-          '/group/details': true,
-          '/members': true,
-          '/members/0': true,
-          '/members/2': true,
-          '/members/3': true
+      assert.deepStrictEqual(res.state, {
+        expanded: true,
+        properties: {
+          group: {
+            expanded: true,
+            properties: {
+              details: { expanded: true, properties: {}, type: 'object' }
+            },
+            type: 'object'
+          },
+          members: {
+            expanded: true,
+            // eslint-disable-next-line no-sparse-arrays
+            items: [
+              { expanded: true, properties: {}, type: 'object' },
+              undefined, // ideally, this should be an empty item, not undefined
+              { expanded: true, properties: {}, type: 'object' },
+              { expanded: true, properties: {}, type: 'object' }
+            ],
+            type: 'array',
+            visibleSections: [{ start: 0, end: 4 }]
+          }
         },
-        visibleSectionsMap: {
-          '/members': [{ start: 0, end: 4 }]
-        }
+        type: 'object'
       })
     })
 
@@ -481,51 +900,41 @@ describe('documentState', () => {
         { id: 3, name: 'Mark' },
         { id: 4, name: 'John' }
       ])
-      assert.deepStrictEqual(res.documentState, documentState)
+      assert.deepStrictEqual(res.state, documentState)
     })
 
     test('add: extend the visibleSection when appending a value to an array', () => {
       const json = [0, 1, 2, 3]
-      const documentState = {
-        ...createDocumentState(),
-        expandedMap: {
-          '': true
-        },
-        visibleSectionsMap: {
-          '': [{ start: 0, end: 5 }]
-        }
+      const documentState: DocumentState = {
+        type: 'array',
+        expanded: true,
+        items: [],
+        visibleSections: [{ start: 0, end: 5 }]
       }
 
       const res = documentStatePatch(json, documentState, [{ op: 'add', path: '/4', value: 4 }])
 
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        visibleSectionsMap: {
-          '': [{ start: 0, end: 6 }]
-        }
+      assert.deepStrictEqual(res.state, {
+        type: 'array',
+        expanded: true,
+        items: [],
+        visibleSections: [{ start: 0, end: 6 }]
       })
     })
 
     test('replace: should keep enforceString state', () => {
       const json = '42'
-      const documentState = {
-        ...createDocumentState(),
-        enforceStringMap: {
-          '': true
-        }
+      const documentState: DocumentState = {
+        type: 'value',
+        enforceString: true
       }
-      const pointer = compileJSONPointer([])
-      assert.strictEqual(
-        getEnforceString(json, documentState.enforceStringMap, pointer, JSON),
-        true
-      )
 
       const operations: JSONPatchDocument = [{ op: 'replace', path: '', value: 'forty two' }]
       const res = documentStatePatch(json, documentState, operations)
-      assert.deepStrictEqual(
-        getEnforceString(res.json, res.documentState.enforceStringMap, pointer, JSON),
-        true
-      )
+      assert.deepStrictEqual(res.state, {
+        type: 'value',
+        enforceString: true
+      })
     })
 
     test('remove: should remove a value from an object', () => {
@@ -536,7 +945,7 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, deleteIn(json, ['group', 'location']))
-      assert.deepStrictEqual(res.documentState, documentState)
+      assert.deepStrictEqual(res.state, documentState)
     })
 
     test('remove: should remove a value from an array', () => {
@@ -544,30 +953,36 @@ describe('documentState', () => {
       const res = documentStatePatch(json, documentState, [{ op: 'remove', path: '/members/1' }])
 
       assert.deepStrictEqual(res.json, deleteIn(json, ['members', '1']))
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        expandedMap: deleteIn(documentState.expandedMap, ['/members/2']), // [2] is moved to [1]
-        visibleSectionsMap: {
-          '/members': [{ start: 0, end: 2 }]
-        }
-      })
+      assert.deepStrictEqual(
+        res.state,
+        updateIn(documentState, ['properties', 'members'], (state: DocumentState) => ({
+          ...state,
+          items: state.type === 'array' ? state.items.slice(0, 2) : null,
+          visibleSections: [{ start: 0, end: 2 }]
+        }))
+      )
     })
 
     test('remove: should remove a value from an array (2)', () => {
       // verify that the maps indices are shifted
       const { json, documentState } = createJsonAndState()
-      const documentState2 = collapsePath(documentState, ['members', '1'])
+      const documentState2 = setIn<DocumentState>(
+        documentState,
+        ['properties', 'members', 'items', '1', 'expanded'],
+        false
+      )
 
       const res = documentStatePatch(json, documentState2, [{ op: 'remove', path: '/members/1' }])
 
       assert.deepStrictEqual(res.json, deleteIn(json, ['members', '1']))
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        expandedMap: deleteIn(documentState.expandedMap, ['/members/2']), // [2] is moved to [1]
-        visibleSectionsMap: {
-          '/members': [{ start: 0, end: 2 }]
-        }
-      })
+      assert.deepStrictEqual(
+        res.state,
+        updateIn(documentState, ['properties', 'members'], (state: DocumentState) => ({
+          ...state,
+          items: state.type === 'array' ? [state.items[0], state.items[2]] : null,
+          visibleSections: [{ start: 0, end: 2 }]
+        }))
+      )
     })
 
     test('replace: should replace a an object with a value', () => {
@@ -578,16 +993,7 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, setIn(json, ['group'], 42))
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        expandedMap: {
-          '': true,
-          '/members': true,
-          '/members/0': true,
-          '/members/1': true,
-          '/members/2': true
-        }
-      })
+      assert.deepStrictEqual(res.state, deleteIn(documentState, ['properties', 'group']))
     })
 
     test('replace: should replace a an object with a new object', () => {
@@ -598,15 +1004,21 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, setIn(json, ['group'], { groupId: '1234' }))
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        expandedMap: {
-          '': true,
-          '/group': true,
-          '/members': true,
-          '/members/0': true,
-          '/members/1': true,
-          '/members/2': true
+      assert.deepStrictEqual(res.state, {
+        type: 'object',
+        expanded: true,
+        properties: {
+          group: { expanded: true, properties: {}, type: 'object' },
+          members: {
+            type: 'array',
+            expanded: true,
+            items: [
+              { expanded: true, properties: {}, type: 'object' },
+              { expanded: true, properties: {}, type: 'object' },
+              { expanded: true, properties: {}, type: 'object' }
+            ],
+            visibleSections: [{ end: 3, start: 0 }]
+          }
         }
       })
     })
@@ -618,11 +1030,13 @@ describe('documentState', () => {
         { op: 'replace', path: '/members/1', value: 42 }
       ])
 
+      const items = getIn(documentState, ['properties', 'members', 'items']) as DocumentState[]
       assert.deepStrictEqual(res.json, setIn(json, ['members', '1'], 42))
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        expandedMap: deleteIn(documentState.expandedMap, ['/members/1'])
-      })
+      assert.deepStrictEqual(
+        res.state,
+        // eslint-disable-next-line no-sparse-arrays
+        setIn(documentState, ['properties', 'members', 'items'], [items[0], , items[2]])
+      )
     })
 
     test('replace: should replace an array with a value', () => {
@@ -633,36 +1047,22 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, setIn(json, ['members'], 42))
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        expandedMap: {
-          '': true,
-          '/group': true,
-          '/group/details': true
-        },
-        visibleSectionsMap: {}
-      })
+      assert.deepStrictEqual(res.state, deleteIn(documentState, ['properties', 'members']))
     })
 
     test('replace: should replace the root document itself', () => {
       const json = {
-        c: {
-          cc: 4
-        },
-        b: {
-          bb: 3
-        },
-        a: 2
+        c: { cc: 4 },
+        b: { bb: 3 },
+        a: { aa: 222 }
       }
-      const documentState = {
-        ...createDocumentState({ json, expand: () => true })
-      }
+      const documentState = createDocumentState({ json, expand: () => true })
 
       const operations: JSONPatchDocument = [
         {
           op: 'replace',
           path: '',
-          value: { a: 22, b: 33, d: 55 }
+          value: { a: { aa: 22 }, b: 33, d: 55 }
         }
       ]
       const res = documentStatePatch(json, documentState, operations)
@@ -670,12 +1070,14 @@ describe('documentState', () => {
       // check order of keys
       assert.deepStrictEqual(Object.keys(res.json as Record<string, unknown>), ['a', 'b', 'd'])
 
-      // keep expanded state of existing keys
-      assert.strictEqual(res.documentState.expandedMap[compileJSONPointer([])], true)
-      assert.strictEqual(res.documentState.expandedMap[compileJSONPointer(['b'])], true)
-
-      // remove expanded state of removed keys
-      assert.strictEqual(res.documentState.expandedMap[compileJSONPointer(['c'])], undefined)
+      // keep expanded state of existing keys, and remove expanded state of removed keys
+      assert.deepStrictEqual(res.state, {
+        type: 'object',
+        expanded: true,
+        properties: {
+          a: { type: 'object', expanded: true, properties: {} }
+        }
+      })
     })
 
     test('copy: should copy a value into an object', () => {
@@ -687,48 +1089,56 @@ describe('documentState', () => {
 
       assert.deepStrictEqual(
         res.json,
-        setIn(
-          json,
-          ['group', 'user'],
-          ((json as Record<string, unknown>)['members'] as Array<unknown>)[1]
-        )
+        setIn(json, ['group', 'user'], getIn(json, ['members', '1']))
       )
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        expandedMap: {
-          ...documentState.expandedMap,
-          '/group/user': true
-        }
-      })
+      assert.deepStrictEqual(
+        res.state,
+        setIn(documentState, ['properties', 'group', 'properties', 'user'], {
+          type: 'object',
+          expanded: true,
+          properties: {}
+        })
+      )
     })
 
     test('copy: should copy a value into an array', () => {
       const { json, documentState } = createJsonAndState()
+      const documentState2 = setIn<DocumentState>(
+        documentState,
+        ['properties', 'group', 'properties', 'details', 'expanded'],
+        false
+      )
 
-      const res = documentStatePatch(json, documentState, [
+      const res = documentStatePatch(json, documentState2, [
         { op: 'copy', from: '/group/details', path: '/members/1' }
       ])
 
       assert.deepStrictEqual(res.json, {
-        group: (json as Record<string, unknown>)['group'],
+        group: getIn(json, ['group']),
         members: [
-          ((json as Record<string, unknown>)['members'] as Array<unknown>)[0],
-          ((json as Record<string, unknown>)['group'] as Record<string, unknown>)['details'],
-          ((json as Record<string, unknown>)['members'] as Array<unknown>)[1],
-          ((json as Record<string, unknown>)['members'] as Array<unknown>)[2]
+          getIn(json, ['members', '0']),
+          getIn(json, ['group', 'details']),
+          getIn(json, ['members', '1']),
+          getIn(json, ['members', '2'])
         ]
       })
 
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        expandedMap: {
-          ...documentState.expandedMap,
-          '/members/3': true
-        },
-        visibleSectionsMap: {
-          '/members': [{ start: 0, end: 4 }]
-        }
-      })
+      assert.deepStrictEqual(
+        res.state,
+        updateIn(documentState2, ['properties', 'members'], (state: DocumentState) => ({
+          ...state,
+          items:
+            state.type === 'array'
+              ? [
+                  state.items[0],
+                  getIn(documentState2, ['properties', 'group', 'properties', 'details']),
+                  state.items[1],
+                  state.items[2]
+                ]
+              : null,
+          visibleSections: [{ start: 0, end: 4 }]
+        }))
+      )
     })
 
     test('move: should move a value from object to object', () => {
@@ -748,18 +1158,14 @@ describe('documentState', () => {
           description: 'The first group'
         }
       })
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        expandedMap: {
-          '': true,
-          '/group': true,
-          '/details': true,
-          '/members': true,
-          '/members/0': true,
-          '/members/1': true,
-          '/members/2': true
-        }
-      })
+
+      let expectedDocumentState = documentState
+      const fromPathRecursive = ['properties', 'group', 'properties', 'details']
+      const value = getIn(expectedDocumentState, fromPathRecursive)
+      expectedDocumentState = deleteIn(expectedDocumentState, fromPathRecursive)
+      expectedDocumentState = setIn(expectedDocumentState, ['properties', 'details'], value)
+
+      assert.deepStrictEqual(res.state, expectedDocumentState)
     })
 
     test('move: moving a value inside the object itself should move it to the end of keys', () => {
@@ -770,14 +1176,18 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, json)
-      assert.deepStrictEqual(res.documentState, documentState)
+      assert.deepStrictEqual(res.state, documentState)
     })
 
     test('move: should move a value from array to array (up)', () => {
       // we collapse the member we're going to move, so we can see whether the state is correctly switched
       const jsonAndState = createJsonAndState()
       const json = jsonAndState.json
-      const documentState = collapsePath(jsonAndState.documentState, ['members', '1'])
+      const documentState = setIn<DocumentState>(
+        jsonAndState.documentState,
+        ['properties', 'members', 'items', '1', 'expanded'],
+        false
+      )
 
       const res = documentStatePatch(json, documentState, [
         { op: 'move', from: '/members/1', path: '/members/0' }
@@ -786,31 +1196,33 @@ describe('documentState', () => {
       assert.deepStrictEqual(res.json, {
         group: (json as Record<string, unknown>)['group'],
         members: [
-          ((json as Record<string, unknown>)['members'] as Array<unknown>)[1],
-          ((json as Record<string, unknown>)['members'] as Array<unknown>)[0],
-          ((json as Record<string, unknown>)['members'] as Array<unknown>)[2]
+          getIn(json, ['members', '1']),
+          getIn(json, ['members', '0']),
+          getIn(json, ['members', '2'])
         ]
       })
 
       // we have collapsed members[1], and after that moved it from index 1 to 0, so now members[0] should be collapsed
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        expandedMap: {
-          '': true,
-          '/group': true,
-          '/group/details': true,
-          '/members': true,
-          '/members/1': true,
-          '/members/2': true
-        }
-      })
+      assert.deepStrictEqual(
+        res.state,
+        updateIn(documentState, ['properties', 'members'], (state: DocumentState | undefined) => {
+          return {
+            ...state,
+            items: state?.type === 'array' ? [state.items[1], state.items[0], state.items[2]] : null
+          }
+        })
+      )
     })
 
     test('move: should move a value from array to array (down)', () => {
       // we collapse the member we're going to move, so we can see whether the state is correctly switched
       const jsonAndState = createJsonAndState()
       const json = jsonAndState.json
-      const documentState = collapsePath(jsonAndState.documentState, ['members', '0'])
+      const documentState = setIn<DocumentState>(
+        jsonAndState.documentState,
+        ['properties', 'members', 'items', '0', 'expanded'],
+        false
+      )
 
       const res = documentStatePatch(json, documentState, [
         { op: 'move', from: '/members/0', path: '/members/1' }
@@ -819,30 +1231,32 @@ describe('documentState', () => {
       assert.deepStrictEqual(res.json, {
         group: (json as Record<string, unknown>)['group'],
         members: [
-          ((json as Record<string, unknown>)['members'] as Array<unknown>)[1],
-          ((json as Record<string, unknown>)['members'] as Array<unknown>)[0],
-          ((json as Record<string, unknown>)['members'] as Array<unknown>)[2]
+          getIn(json, ['members', '1']),
+          getIn(json, ['members', '0']),
+          getIn(json, ['members', '2'])
         ]
       })
 
       // we have collapsed members[0], and after that moved it from index 0 to 1, so now members[1] should be collapsed
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        expandedMap: {
-          '': true,
-          '/group': true,
-          '/group/details': true,
-          '/members': true,
-          '/members/0': true,
-          '/members/2': true
-        }
-      })
+      assert.deepStrictEqual(
+        res.state,
+        updateIn(documentState, ['properties', 'members'], (state: DocumentState | undefined) => {
+          return {
+            ...state,
+            items: state?.type === 'array' ? [state.items[1], state.items[0], state.items[2]] : null
+          }
+        })
+      )
     })
 
     test('move: should move a value from object to array', () => {
       const jsonAndState = createJsonAndState()
       const json = jsonAndState.json
-      const documentState = collapsePath(jsonAndState.documentState, ['members', '1'])
+      const documentState = setIn<DocumentState>(
+        jsonAndState.documentState,
+        ['properties', 'members', 'items', '1', 'expanded'],
+        false
+      )
 
       const res = documentStatePatch(json, documentState, [
         { op: 'move', from: '/group/details', path: '/members/1' }
@@ -854,30 +1268,33 @@ describe('documentState', () => {
           location: 'Block C'
         },
         members: [
-          ((json as Record<string, unknown>)['members'] as Array<unknown>)[0],
-          {
-            description: 'The first group'
-          },
-          ((json as Record<string, unknown>)['members'] as Array<unknown>)[1],
-          ((json as Record<string, unknown>)['members'] as Array<unknown>)[2]
+          getIn(json, ['members', '0']),
+          { description: 'The first group' },
+          getIn(json, ['members', '1']),
+          getIn(json, ['members', '2'])
         ]
       })
 
-      // we have collapsed members[0], and after that moved it from index 0 to 1, so now members[1] should be collapsed
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        expandedMap: {
-          '': true,
-          '/group': true,
-          '/members': true,
-          '/members/0': true,
-          '/members/1': true,
-          '/members/3': true
-        },
-        visibleSectionsMap: {
-          '/members': [{ start: 0, end: 4 }]
-        }
-      })
+      const fromPathRecursive = ['properties', 'group', 'properties', 'details']
+      let expectedDocumentState = deleteIn(documentState, fromPathRecursive)
+      expectedDocumentState = updateIn(
+        expectedDocumentState,
+        ['properties', 'members'],
+        (state: DocumentState) => ({
+          ...state,
+          items:
+            state.type === 'array'
+              ? [
+                  state.items[0],
+                  getIn(documentState, fromPathRecursive),
+                  state.items[1],
+                  state.items[2]
+                ]
+              : null,
+          visibleSections: [{ start: 0, end: 4 }]
+        })
+      )
+      assert.deepStrictEqual(res.state, expectedDocumentState)
     })
 
     test('move: should move a value from array to object', () => {
@@ -889,31 +1306,28 @@ describe('documentState', () => {
 
       assert.deepStrictEqual(res.json, {
         group: {
-          ...((json as Record<string, unknown>)['group'] as Record<string, unknown>),
-          user: ((json as Record<string, unknown>)['members'] as Array<unknown>)[1]
+          ...(getIn(json, ['group']) as Record<string, unknown>),
+          user: getIn(json, ['members', '1'])
         },
-        members: [
-          ((json as Record<string, unknown>)['members'] as Array<unknown>)[0],
-          ((json as Record<string, unknown>)['members'] as Array<unknown>)[2]
-        ]
+        members: [getIn(json, ['members', '0']), getIn(json, ['members', '2'])]
       })
 
-      // we have collapsed members[0], and after that moved it from index 0 to 1, so now members[1] should be collapsed
-      assert.deepStrictEqual(res.documentState, {
-        ...documentState,
-        expandedMap: {
-          '': true,
-          '/group': true,
-          '/group/details': true,
-          '/group/user': true,
-          '/members': true,
-          '/members/0': true,
-          '/members/1': true
-        },
-        visibleSectionsMap: {
-          '/members': [{ start: 0, end: 2 }]
-        }
+      const pathRecursive = ['properties', 'group', 'properties', 'user']
+      let expectedDocumentState = setIn(documentState, pathRecursive, {
+        type: 'object',
+        expanded: true,
+        properties: {}
       })
+      expectedDocumentState = updateIn(
+        expectedDocumentState,
+        ['properties', 'members'],
+        (state: DocumentState) => ({
+          ...state,
+          items: state.type === 'array' ? [state.items[0], state.items[2]] : null,
+          visibleSections: [{ start: 0, end: 2 }]
+        })
+      )
+      assert.deepStrictEqual(res.state, expectedDocumentState)
     })
   })
 
@@ -1004,41 +1418,72 @@ describe('documentState', () => {
     }
 
     test('should expand root path', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState(), []).expandedMap, {})
+      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), []), {
+        type: 'object',
+        expanded: false,
+        properties: {}
+      })
     })
 
     test('should expand an array', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState(), ['array']).expandedMap, {
-        '': true
+      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), ['array']), {
+        type: 'object',
+        expanded: true,
+        properties: {}
       })
     })
 
     test('should expand an object inside an array', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState(), ['array', '2']).expandedMap, {
-        '': true,
-        '/array': true
+      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), ['array', '2']), {
+        type: 'object',
+        expanded: true,
+        properties: {
+          array: {
+            type: 'array',
+            expanded: true,
+            items: [],
+            visibleSections: DEFAULT_VISIBLE_SECTIONS
+          }
+        }
       })
     })
 
     test('should not expand a value (only objects and arrays)', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState(), ['array', '0']).expandedMap, {
-        '': true,
-        '/array': true
+      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), ['array', '0']), {
+        type: 'object',
+        expanded: true,
+        properties: {
+          array: {
+            type: 'array',
+            expanded: true,
+            items: [],
+            visibleSections: DEFAULT_VISIBLE_SECTIONS
+          }
+        }
       })
     })
 
     test('should expand an object', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState(), ['object']).expandedMap, {
-        '': true
+      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), ['object']), {
+        type: 'object',
+        expanded: true,
+        properties: {}
       })
     })
 
     test('should expand a nested object', () => {
       assert.deepStrictEqual(
-        expandPath(json, createDocumentState(), ['object', 'nested']).expandedMap,
+        expandPath(json, createDocumentState({ json }), ['object', 'nested']),
         {
-          '': true,
-          '/object': true
+          type: 'object',
+          expanded: true,
+          properties: {
+            object: {
+              type: 'object',
+              expanded: true,
+              properties: {}
+            }
+          }
         }
       )
     })
@@ -1048,129 +1493,21 @@ describe('documentState', () => {
         largeArray: range(0, 500).map((index) => ({ id: index }))
       }
 
-      assert.deepStrictEqual(expandPath(json, createDocumentState(), ['largeArray', '120']), {
-        ...createDocumentState(),
-        expandedMap: {
-          '': true,
-          '/largeArray': true
-        },
-        visibleSectionsMap: {
-          '/largeArray': [{ start: 0, end: 200 }]
+      assert.deepStrictEqual(
+        expandPath(json, createDocumentState({ json }), ['largeArray', '120']),
+        {
+          type: 'object',
+          expanded: true,
+          properties: {
+            largeArray: {
+              type: 'array',
+              expanded: true,
+              items: [],
+              visibleSections: [{ start: 0, end: 200 }]
+            }
+          }
         }
-      })
-    })
-  })
-
-  describe('shiftPath', () => {
-    const expandedPaths: JSONPointerMap<number> = {
-      '/array': 1,
-      '/array/0': 2,
-      '/array/0/name': 3,
-      '/array/2': 4,
-      '/array/2/name': 5,
-      '/array/3': 6,
-      '/array/3/name': 7,
-      '/obj': 8
-    }
-
-    test('should shift entries one up', () => {
-      deepStrictEqual(shiftPath(expandedPaths, ['array'], 2, -1), {
-        '/array': 1,
-        '/array/0': 2,
-        '/array/0/name': 3,
-        '/array/1': 4,
-        '/array/1/name': 5,
-        '/array/2': 6,
-        '/array/2/name': 7,
-        '/obj': 8
-      })
-    })
-
-    test('should shift entries one down', () => {
-      deepStrictEqual(shiftPath(expandedPaths, ['array'], 2, 1), {
-        '/array': 1,
-        '/array/0': 2,
-        '/array/0/name': 3,
-        '/array/3': 4,
-        '/array/3/name': 5,
-        '/array/4': 6,
-        '/array/4/name': 7,
-        '/obj': 8
-      })
-    })
-
-    test('should shift entries an offset 0 (do nothing)', () => {
-      deepStrictEqual(shiftPath(expandedPaths, ['array'], 2, 0), expandedPaths)
-    })
-  })
-
-  describe('deletePath', () => {
-    const myStateMap: JSONPointerMap<number> = {
-      '/array': 1,
-      '/array/0': 2,
-      '/array/1': 3,
-      '/array/2': 4,
-      '/array/2/name': 5,
-      '/obj': 6
-    }
-
-    test('should delete an object path from a PathsMap', () => {
-      deepStrictEqual(deletePath(myStateMap, ['obj']), {
-        '/array': 1,
-        '/array/0': 2,
-        '/array/1': 3,
-        '/array/2': 4,
-        '/array/2/name': 5
-      })
-    })
-
-    test('should delete an array item from a PathsMap', () => {
-      deepStrictEqual(deletePath(myStateMap, ['array', '1']), {
-        '/array': 1,
-        '/array/0': 2,
-        '/array/2': 4,
-        '/array/2/name': 5,
-        '/obj': 6
-      })
-    })
-
-    test('should delete nested paths from a PathsMap', () => {
-      deepStrictEqual(deletePath(myStateMap, ['array']), {
-        '/obj': 6
-      })
-    })
-  })
-
-  describe('filterPath', () => {
-    const expandedPaths: JSONPointerMap<number> = {
-      '/array': 1,
-      '/array/0': 2,
-      '/array/1': 3,
-      '/array/2': 4,
-      '/array/2/name': 5,
-      '/obj': 6
-    }
-
-    test('should filter an object path from a PathsMap', () => {
-      deepStrictEqual(filterPath(expandedPaths, '/obj'), {
-        '/obj': 6
-      })
-    })
-
-    test('should filter an array item from a PathsMap', () => {
-      deepStrictEqual(filterPath(expandedPaths, '/array/1'), {
-        '/array/1': 3
-      })
-    })
-
-    test('should delete nested paths from a PathsMap', () => {
-      deepStrictEqual(filterPath(expandedPaths, '/array'), {
-        '/array': 1,
-        '/array/0': 2,
-        '/array/1': 3,
-        '/array/2': 4,
-        '/array/2/name': 5
-      })
+      )
     })
   })
 })

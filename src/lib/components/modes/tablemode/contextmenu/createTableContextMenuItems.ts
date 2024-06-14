@@ -1,4 +1,4 @@
-import type { ContextMenuItem, DocumentState, JSONParser } from 'svelte-jsoneditor'
+import type { ContextMenuItem, DocumentState, JSONParser, JSONSelection } from 'svelte-jsoneditor'
 import {
   faCheckSquare,
   faClone,
@@ -11,7 +11,7 @@ import {
   faTrashCan
 } from '@fortawesome/free-solid-svg-icons'
 import { isKeySelection, isMultiSelection, isValueSelection } from '$lib/logic/selection'
-import { compileJSONPointer, getIn } from 'immutable-json-patch'
+import { getIn } from 'immutable-json-patch'
 import { getFocusPath, singleItemSelected } from '$lib/logic/selection'
 import { isObjectOrArray } from '$lib/utils/typeUtils'
 import { getEnforceString } from '$lib/logic/documentState'
@@ -19,6 +19,7 @@ import { getEnforceString } from '$lib/logic/documentState'
 export default function ({
   json,
   documentState,
+  selection,
   readOnly,
   parser,
   onEditValue,
@@ -34,7 +35,8 @@ export default function ({
   onRemoveRow
 }: {
   json: unknown | undefined
-  documentState: DocumentState
+  documentState: DocumentState | undefined
+  selection: JSONSelection | null
   readOnly: boolean
   parser: JSONParser
   onEditValue: () => void
@@ -49,8 +51,6 @@ export default function ({
   onInsertAfterRow: () => void
   onRemoveRow: () => void
 }): ContextMenuItem[] {
-  const selection = documentState.selection
-
   const hasJson = json !== undefined
   const hasSelection = !!selection
   const focusValue =
@@ -66,13 +66,8 @@ export default function ({
   const canCut = !readOnly && hasSelectionContents
 
   const enforceString =
-    selection != null && focusValue !== undefined
-      ? getEnforceString(
-          focusValue,
-          documentState.enforceStringMap,
-          compileJSONPointer(getFocusPath(selection)),
-          parser
-        )
+    selection != null
+      ? getEnforceString(json, documentState, getFocusPath(selection), parser)
       : false
 
   return [

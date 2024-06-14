@@ -15,13 +15,13 @@
   import { DEBOUNCE_DELAY, MAX_SEARCH_RESULTS } from '$lib/constants.js'
   import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
   import { createDebug } from '$lib/utils/debug.js'
-  import type { DocumentState, JSONParser, OnPatch, SearchResult } from '$lib/types.js'
+  import type { DocumentState, JSONParser, OnPatch, SearchResultDetails } from '$lib/types.js'
   import {
-    createSearchAndReplaceOperations,
     createSearchAndReplaceAllOperations,
+    createSearchAndReplaceOperations,
+    search,
     searchNext,
     searchPrevious,
-    search,
     updateSearchResult
   } from '$lib/logic/search.js'
   import type { JSONPath } from 'immutable-json-patch'
@@ -30,22 +30,22 @@
   const debug = createDebug('jsoneditor:SearchBox')
 
   export let json: unknown
-  export let documentState: DocumentState
+  export let documentState: DocumentState | undefined
   export let parser: JSONParser
   export let showSearch: boolean
   export let showReplace: boolean
   export let readOnly: boolean
   export let columns: JSONPath[] | undefined
-  export let onSearch: (result: SearchResult | undefined) => void
+  export let onSearch: (result: SearchResultDetails | undefined) => void
   export let onFocus: (path: JSONPath) => Promise<void>
   export let onPatch: OnPatch
   export let onClose: () => void
 
   let text = ''
-  let previousText = ''
+  let appliedText = ''
   let replaceText = ''
   let searching = false
-  let searchResult: SearchResult | undefined
+  let searchResult: SearchResultDetails | undefined
 
   $: resultCount = searchResult?.items?.length || 0
   $: activeIndex = searchResult?.activeIndex || 0
@@ -75,10 +75,9 @@
     if (combo === 'Enter') {
       event.preventDefault()
 
-      const pendingChanges = text !== previousText
+      const pendingChanges = text !== appliedText
       if (pendingChanges) {
         applyChangedSearchTextDebounced.flush()
-        previousText = text
       } else {
         handleNext()
       }
@@ -155,7 +154,8 @@
     )
 
     onPatch(operations, (_, patchedState) => ({
-      state: { ...patchedState, selection: newSelection }
+      state: patchedState,
+      selection: newSelection
     }))
 
     // immediately trigger updating the search results
@@ -182,7 +182,8 @@
     )
 
     onPatch(operations, (_, patchedState) => ({
-      state: { ...patchedState, selection: newSelection }
+      state: patchedState,
+      selection: newSelection
     }))
 
     await handleFocus()
@@ -249,13 +250,14 @@
       return
     }
 
+    appliedText = text
     searching = true
 
     return new Promise<void>((resolve) => {
       setTimeout(() => {
         // wait until the search icon has been rendered
         const newResultItems = search(text, json, { maxResults: MAX_SEARCH_RESULTS, columns })
-        searchResult = updateSearchResult(json, newResultItems, searchResult)
+        searchResult = updateSearchResult(newResultItems, searchResult)
 
         searching = false
         resolve()

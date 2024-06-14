@@ -4,7 +4,6 @@ import type { JSONPatchDocument } from 'immutable-json-patch'
 import { getIn } from 'immutable-json-patch'
 import { moveInsideParent } from './operations.js'
 import type {
-  DocumentState,
   DragInsideAction,
   DragInsideProps,
   JSONSelection,
@@ -14,7 +13,7 @@ import type {
 
 export interface MoveSelectionProps {
   json: unknown
-  documentState: DocumentState
+  selection: JSONSelection | null
   deltaY: number
   items: RenderedItem[]
 }
@@ -27,11 +26,11 @@ export interface MoveSelectionResult {
 
 export function onMoveSelection({
   json,
-  documentState,
+  selection,
   deltaY,
   items
 }: MoveSelectionProps): MoveSelectionResult {
-  if (!documentState.selection) {
+  if (!selection) {
     return {
       operations: undefined,
       updatedSelection: null,
@@ -39,7 +38,6 @@ export function onMoveSelection({
     }
   }
 
-  const selection = documentState.selection
   const dragInsideAction =
     deltaY < 0
       ? findSwapPathUp({ json, selection, deltaY, items })

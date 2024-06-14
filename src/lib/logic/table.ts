@@ -6,13 +6,7 @@ import {
   parseJSONPointer
 } from 'immutable-json-patch'
 import { groupBy, isEmpty, isEqual, mapValues, partition } from 'lodash-es'
-import type {
-  DocumentState,
-  JSONSelection,
-  SortedColumn,
-  TableCellIndex,
-  ValidationError
-} from '$lib/types.js'
+import type { JSONSelection, SortedColumn, TableCellIndex, ValidationError } from '$lib/types.js'
 import { ValidationSeverity } from '$lib/types.js'
 import { createValueSelection, getFocusPath, pathStartsWith } from './selection.js'
 import { isNumber } from '../utils/numberUtils.js'
@@ -438,22 +432,15 @@ function findColumnIndex(error: ValidationError, columns: JSONPath[]): number {
  * Clear the sorted column from the documentState when it is affected by the operations
  */
 export function clearSortedColumnWhenAffectedByOperations(
-  documentState: DocumentState,
+  sortedColumn: SortedColumn | null,
   operations: JSONPatchOperation[],
   columms: JSONPath[]
-): DocumentState {
+): SortedColumn | null {
   const mustBeCleared = operations.some((operation) =>
-    operationAffectsSortedColumn(documentState.sortedColumn, operation, columms)
+    operationAffectsSortedColumn(sortedColumn, operation, columms)
   )
 
-  if (mustBeCleared) {
-    return {
-      ...documentState,
-      sortedColumn: null
-    }
-  }
-
-  return documentState
+  return mustBeCleared ? null : sortedColumn
 }
 
 export function operationAffectsSortedColumn(

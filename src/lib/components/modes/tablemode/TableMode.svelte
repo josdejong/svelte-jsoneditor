@@ -28,7 +28,8 @@
     OnTransformModal,
     ParseError,
     PastedJson,
-    SearchResult,
+    SearchResults,
+    SearchResultDetails,
     SortedColumn,
     TransformModalOptions,
     ValidationError,
@@ -39,7 +40,6 @@
   import TableMenu from './menu/TableMenu.svelte'
   import {
     compileJSONPointer,
-    compileJSONPointerProp,
     existsIn,
     getIn,
     immutableJSONPatch,
@@ -86,7 +86,9 @@
     expandMinimal,
     expandWithCallback,
     getEnforceString,
-    setEnforceString
+    getInRecursiveState,
+    setInDocumentState,
+    syncDocumentState
   } from '$lib/logic/documentState.js'
   import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils.js'
   import InlineValue from './tag/InlineValue.svelte'
@@ -147,8 +149,7 @@
   import type { Context } from 'svelte-simple-modal'
   import createTableContextMenuItems from './contextmenu/createTableContextMenuItems'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
-  import { filterValueSearchResults } from '$lib/logic/search.js'
-  import { filterPointerOrUndefined } from 'svelte-jsoneditor/utils/jsonPointer'
+  import { flattenSearchResults, toRecursiveSearchResults } from '$lib/logic/search.js'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { open } = getContext<Context>('simple-modal')
@@ -220,7 +221,8 @@
 
   let pastedJson: PastedJson
 
-  let searchResult: SearchResult | undefined
+  let searchResultDetails: SearchResultDetails | undefined
+  let searchResults: SearchResults | undefined
   let showSearch = false
   let showReplace = false
 
@@ -238,15 +240,15 @@
     })
   }
 
-  function handleSearch(result: SearchResult | undefined) {
-    searchResult = result
+  function handleSearch(result: SearchResultDetails | undefined) {
+    searchResultDetails = result
+    searchResults = searchResultDetails
+      ? toRecursiveSearchResults(json, searchResultDetails.items)
+      : undefined
   }
 
   async function handleFocusSearch(path: JSONPath) {
-    documentState = {
-      ...documentState,
-      selection: null // navigation path of current selection would be confusing
-    }
+    selection = null // navigation path of current selection would be confusing
     await scrollTo(path)
   }
 
@@ -306,56 +308,42 @@
     }
   }
 
-  function clearSortedColumn() {
-    if (documentState.sortedColumn) {
-      documentState = {
-        ...documentState,
-        sortedColumn: null
-      }
-    }
-  }
-
   function updateSelection(
-    selection:
+    updatedSelection:
       | JSONSelection
       | null
       | ((selection: JSONSelection | null) => JSONSelection | null | void | undefined)
   ) {
-    debug('updateSelection', selection)
+    debug('updateSelection', updatedSelection)
 
-    const updatedSelection =
-      typeof selection === 'function' ? selection(documentState.selection) || null : selection
+    const appliedSelection =
+      typeof updatedSelection === 'function'
+        ? updatedSelection(selection) || null
+        : updatedSelection
 
-    if (!isEqual(updatedSelection, documentState.selection)) {
-      documentState = {
-        ...documentState,
-        selection: updatedSelection
-      }
-
-      onSelect(updatedSelection)
+    if (!isEqual(appliedSelection, selection)) {
+      selection = appliedSelection
+      onSelect(appliedSelection)
     }
   }
 
   function clearSelectionWhenNotExisting(json: unknown | undefined) {
-    if (!documentState.selection || json === undefined) {
+    if (!selection || json === undefined) {
       return
     }
 
-    if (
-      existsIn(json, getAnchorPath(documentState.selection)) &&
-      existsIn(json, getFocusPath(documentState.selection))
-    ) {
+    if (existsIn(json, getAnchorPath(selection)) && existsIn(json, getFocusPath(selection))) {
       return
     }
 
-    debug('clearing selection: path does not exist anymore', documentState.selection)
-    documentState = {
-      ...documentState,
-      selection: null // TODO: try find the closest cell that still exists (similar to getInitialSelection)
-    }
+    debug('clearing selection: path does not exist anymore', selection)
+    selection = null // TODO: try find the closest cell that still exists (similar to getInitialSelection)
   }
 
-  let documentState = createDocumentState()
+  let documentState: DocumentState | undefined =
+    json !== undefined ? createDocumentState({ json }) : undefined
+  let selection: JSONSelection | null = null
+  let sortedColumn: SortedColumn | null = null
   let textIsRepaired = false
 
   function onSortByHeader(newSortedColumn: SortedColumn) {
@@ -370,10 +358,8 @@
     const operations = sortJson(json, rootPath, newSortedColumn.path, direction)
     handlePatch(operations, (_, patchedState) => {
       return {
-        state: {
-          ...patchedState,
-          sortedColumn: newSortedColumn
-        }
+        state: patchedState,
+        sortedColumn: newSortedColumn
       }
     })
   }
@@ -415,26 +401,26 @@
       return
     }
 
-    const previousJson = json
-    const previousState = documentState
-    const previousText = text
-    const previousTextIsRepaired = textIsRepaired
+    const previousState = { json, documentState, selection, sortedColumn, text, textIsRepaired }
 
     if (isTextContent(content)) {
       try {
         json = parseMemoizeOne(content.text)
+        documentState = syncDocumentState(json, documentState)
         text = content.text
         textIsRepaired = false
         parseError = undefined
       } catch (err) {
         try {
           json = parseMemoizeOne(jsonrepair(content.text))
+          documentState = syncDocumentState(json, documentState)
           text = content.text
           textIsRepaired = true
           parseError = undefined
         } catch (repairError) {
           // no valid JSON, will show empty document or invalid json
           json = undefined
+          documentState = undefined
           text = content.text
           textIsRepaired = false
           parseError =
@@ -445,6 +431,7 @@
       }
     } else {
       json = content.json
+      documentState = syncDocumentState(json, documentState)
       text = undefined
       textIsRepaired = false
       parseError = undefined
@@ -454,18 +441,13 @@
     clearSelectionWhenNotExisting(json)
 
     // reset the sorting order (we don't know...)
-    clearSortedColumn()
+    sortedColumn = null
 
-    addHistoryItem({
-      previousJson,
-      previousState,
-      previousText,
-      previousTextIsRepaired
-    })
+    addHistoryItem(previousState)
   }
 
   function applyExternalSelection(externalSelection: JSONEditorSelection | null) {
-    if (!isEqual(documentState.selection, externalSelection)) {
+    if (!isEqual(selection, externalSelection)) {
       debug('applyExternalSelection', externalSelection)
 
       if (isJSONSelection(externalSelection) || externalSelection === null) {
@@ -474,82 +456,43 @@
     }
   }
 
-  // TODO: addHistoryItem is a duplicate of addHistoryItem in TreeMode.svelte. Can we extract and reuse this logic?
-  function addHistoryItem({
-    previousJson,
-    previousState,
-    previousText,
-    previousTextIsRepaired
-  }: {
-    previousJson: unknown | undefined
-    previousText: string | undefined
-    previousState: DocumentState
-    previousTextIsRepaired: boolean
-  }) {
-    if (previousJson === undefined && previousText === undefined) {
+  interface PreviousState {
+    json: unknown | undefined
+    text: string | undefined
+    documentState: DocumentState | undefined
+    selection: JSONSelection | null
+    textIsRepaired: boolean
+    sortedColumn: SortedColumn | null
+  }
+
+  function addHistoryItem(previous: PreviousState) {
+    if (previous.json === undefined && previous.text === undefined) {
       // initialization -> do not create a history item
       return
     }
 
-    if (json !== undefined) {
-      if (previousJson !== undefined) {
-        // regular undo/redo with JSON patch
-        history.add({
-          undo: {
-            patch: [{ op: 'replace', path: '', value: previousJson }],
-            state: removeEditModeFromSelection(previousState),
-            json: undefined,
-            text: previousText,
-            textIsRepaired: previousTextIsRepaired
-          },
-          redo: {
-            patch: [{ op: 'replace', path: '', value: json }],
-            state: removeEditModeFromSelection(documentState),
-            json: undefined,
-            text,
-            textIsRepaired
-          }
-        })
-      } else {
-        history.add({
-          undo: {
-            patch: undefined,
-            json: undefined,
-            text: previousText,
-            state: removeEditModeFromSelection(previousState),
-            textIsRepaired: previousTextIsRepaired
-          },
-          redo: {
-            patch: undefined,
-            json,
-            state: removeEditModeFromSelection(documentState),
-            text,
-            textIsRepaired
-          }
-        })
+    const canPatch = json !== undefined && previous.json !== undefined
+
+    history.add({
+      undo: {
+        patch: canPatch ? [{ op: 'replace', path: '', value: previous.json }] : undefined,
+        json: previous.json,
+        text: previous.text,
+        documentState: previous.documentState,
+        textIsRepaired: previous.textIsRepaired,
+        selection: removeEditModeFromSelection(previous.selection),
+        sortedColumn: previous.sortedColumn
+      },
+      redo: {
+        patch: canPatch ? [{ op: 'replace', path: '', value: json }] : undefined,
+        json,
+        text,
+        documentState,
+        textIsRepaired,
+        selection: removeEditModeFromSelection(selection),
+        sortedColumn
       }
-    } else {
-      if (previousJson !== undefined) {
-        history.add({
-          undo: {
-            patch: undefined,
-            json: previousJson,
-            state: removeEditModeFromSelection(previousState),
-            text: previousText,
-            textIsRepaired: previousTextIsRepaired
-          },
-          redo: {
-            patch: undefined,
-            json: undefined,
-            text,
-            textIsRepaired,
-            state: removeEditModeFromSelection(documentState)
-          }
-        })
-      } else {
-        // this cannot happen. Nothing to do, no change
-      }
-    }
+    })
   }
 
   let validationErrors: ValidationError[] = []
@@ -617,8 +560,14 @@
     }
 
     const previousJson = json
-    const previousState = documentState
-    const previousTextIsRepaired = textIsRepaired
+    const previousState: PreviousState = {
+      json: undefined, // not needed: we use patch to reconstruct the json
+      text,
+      documentState,
+      selection: removeEditModeFromSelection(selection),
+      sortedColumn,
+      textIsRepaired
+    }
 
     // execute the patch operations
     const undo: JSONPatchDocument = revertJSONPatchWithMoveOperations(
@@ -630,20 +579,22 @@
     // Clear the sorted column when needed. We need to do this before `afterPatch`,
     // else we clear any changed made in the callback. It is a bit odd that
     // afterPatch does not receive the actual previousDocumentState. Better ideas?
-    const patchedJson = patched.json
-    const patchedDocumentState = clearSortedColumnWhenAffectedByOperations(
-      documentState,
+    const patchedSortedColumn = clearSortedColumnWhenAffectedByOperations(
+      sortedColumn,
       operations,
       columns
     )
 
     const callback =
-      typeof afterPatch === 'function' ? afterPatch(patchedJson, patchedDocumentState) : undefined
+      typeof afterPatch === 'function'
+        ? afterPatch(patched.json, patched.state, selection)
+        : undefined
 
-    json = callback && callback.json !== undefined ? callback.json : patchedJson
-    const newState =
-      callback && callback.state !== undefined ? callback.state : patchedDocumentState
-    documentState = newState
+    json = callback?.json !== undefined ? callback.json : patched.json
+    documentState = callback?.state !== undefined ? callback.state : patched.state
+    selection = callback?.selection !== undefined ? callback.selection : selection
+    sortedColumn =
+      callback?.sortedColumn !== undefined ? callback.sortedColumn : patchedSortedColumn
     text = undefined
     textIsRepaired = false
     pastedJson = undefined
@@ -652,16 +603,15 @@
     history.add({
       undo: {
         patch: undo,
-        json: undefined,
-        text: undefined,
-        state: removeEditModeFromSelection(previousState),
-        textIsRepaired: previousTextIsRepaired
+        ...previousState
       },
       redo: {
         patch: operations,
-        json: undefined,
-        state: removeEditModeFromSelection(newState),
+        json: undefined, // not needed: we use patch to reconstruct the json
         text: undefined,
+        documentState,
+        selection: removeEditModeFromSelection(selection),
+        sortedColumn,
         textIsRepaired
       }
     })
@@ -761,10 +711,7 @@
     const path = getDataPathFromTarget(target)
     if (path) {
       // when clicking inside the current selection, editing a value, do nothing
-      if (
-        isEditingSelection(documentState.selection) &&
-        pathInSelection(json, documentState.selection, path)
-      ) {
+      if (isEditingSelection(selection) && pathInSelection(json, selection, path)) {
         return
       }
 
@@ -791,18 +738,15 @@
   }
 
   function createDefaultSelectionWhenUndefined() {
-    if (!documentState.selection) {
+    if (!selection) {
       updateSelection(createDefaultSelection())
     }
   }
 
   export function acceptAutoRepair() {
     if (textIsRepaired && json !== undefined) {
-      const previousState = documentState
-      const previousJson = json
-      const previousText = text
       const previousContent = { json, text }
-      const previousTextIsRepaired = textIsRepaired
+      const previousState = { json, documentState, selection, sortedColumn, text, textIsRepaired }
 
       // json stays as is
       text = undefined
@@ -810,12 +754,7 @@
 
       clearSelectionWhenNotExisting(json)
 
-      addHistoryItem({
-        previousJson,
-        previousState,
-        previousText,
-        previousTextIsRepaired
-      })
+      addHistoryItem(previousState)
 
       // we could work out a patchResult, or use patch(), but only when the previous and new
       // contents are both json and not text. We go for simplicity and consistency here and
@@ -964,6 +903,7 @@
     const defaultItems: ContextMenuItem[] = createTableContextMenuItems({
       json,
       documentState,
+      selection,
       readOnly,
       parser,
 
@@ -1020,7 +960,7 @@
   }
 
   function handleContextMenu(event: Event) {
-    if (isEditingSelection(documentState.selection)) {
+    if (isEditingSelection(selection)) {
       return
     }
 
@@ -1079,11 +1019,11 @@
   }
 
   function handleEditValue() {
-    if (readOnly || !documentState.selection) {
+    if (readOnly || !selection) {
       return
     }
 
-    const path = getFocusPath(documentState.selection)
+    const path = getFocusPath(selection)
     const value = getIn(json, path)
     if (isObjectOrArray(value)) {
       openJSONEditorModal(path)
@@ -1093,24 +1033,24 @@
   }
 
   function handleEditRow() {
-    if (readOnly || !documentState.selection) {
+    if (readOnly || !selection) {
       return
     }
 
-    const path = getFocusPath(documentState.selection)
+    const path = getFocusPath(selection)
     const pathRow = path.slice(0, 1)
     openJSONEditorModal(pathRow)
   }
 
   function handleToggleEnforceString() {
-    if (readOnly || !isValueSelection(documentState.selection)) {
+    if (readOnly || !isValueSelection(selection)) {
       return
     }
 
-    const path = documentState.selection.path
+    const path = selection.path
     const pointer = compileJSONPointer(path)
     const value = getIn(json, path)
-    const enforceString = !getEnforceString(value, documentState.enforceStringMap, pointer, parser)
+    const enforceString = !getEnforceString(json, documentState, path, parser)
     const updatedValue = enforceString ? String(value) : stringConvert(String(value), parser)
 
     debug('handleToggleEnforceString', { enforceString, value, updatedValue })
@@ -1125,7 +1065,7 @@
       ],
       (_, patchedState) => {
         return {
-          state: setEnforceString(patchedState, pointer, enforceString)
+          state: setInDocumentState(json, patchedState, path, { type: 'value', enforceString })
         }
       }
     )
@@ -1189,7 +1129,7 @@
   async function handleCut(indent: boolean) {
     await onCut({
       json,
-      documentState,
+      selection,
       indentation: indent ? indentation : undefined,
       readOnly,
       parser,
@@ -1204,7 +1144,7 @@
 
     await onCopy({
       json,
-      documentState,
+      selection,
       indentation: indent ? indentation : undefined,
       parser
     })
@@ -1214,7 +1154,7 @@
     onRemove({
       json,
       text,
-      documentState,
+      selection,
       keepSelection: true,
       readOnly,
       onChange,
@@ -1223,19 +1163,19 @@
   }
 
   function handleDuplicateRow() {
-    onDuplicateRow({ json, documentState, columns, readOnly, onPatch: handlePatch })
+    onDuplicateRow({ json, selection, columns, readOnly, onPatch: handlePatch })
   }
 
   function handleInsertBeforeRow() {
-    onInsertBeforeRow({ json, documentState, columns, readOnly, onPatch: handlePatch })
+    onInsertBeforeRow({ json, selection, columns, readOnly, onPatch: handlePatch })
   }
 
   function handleInsertAfterRow() {
-    onInsertAfterRow({ json, documentState, columns, readOnly, onPatch: handlePatch })
+    onInsertAfterRow({ json, selection, columns, readOnly, onPatch: handlePatch })
   }
 
   function handleRemoveRow() {
-    onRemoveRow({ json, documentState, columns, readOnly, onPatch: handlePatch })
+    onRemoveRow({ json, selection, columns, readOnly, onPatch: handlePatch })
   }
 
   async function handleInsertCharacter(char: string) {
@@ -1244,7 +1184,7 @@
       selectInside: false,
       refJsonEditor,
       json,
-      selection: documentState.selection,
+      selection: selection,
       readOnly,
       parser,
       onPatch: handlePatch,
@@ -1307,8 +1247,8 @@
 
       createDefaultSelectionWhenUndefined()
 
-      if (documentState.selection) {
-        const newSelection = selectPreviousColumn(columns, documentState.selection)
+      if (selection) {
+        const newSelection = selectPreviousColumn(columns, selection)
         updateSelection(newSelection)
         scrollIntoView(getFocusPath(newSelection))
       }
@@ -1319,8 +1259,8 @@
 
       createDefaultSelectionWhenUndefined()
 
-      if (documentState.selection) {
-        const newSelection = selectNextColumn(columns, documentState.selection)
+      if (selection) {
+        const newSelection = selectNextColumn(columns, selection)
         updateSelection(newSelection)
         scrollIntoView(getFocusPath(newSelection))
       }
@@ -1331,8 +1271,8 @@
 
       createDefaultSelectionWhenUndefined()
 
-      if (documentState.selection) {
-        const newSelection = selectPreviousRow(columns, documentState.selection)
+      if (selection) {
+        const newSelection = selectPreviousRow(columns, selection)
         updateSelection(newSelection)
         scrollIntoView(getFocusPath(newSelection))
       }
@@ -1343,18 +1283,18 @@
 
       createDefaultSelectionWhenUndefined()
 
-      if (documentState.selection) {
-        const newSelection = selectNextRow(json, columns, documentState.selection)
+      if (selection) {
+        const newSelection = selectNextRow(json, columns, selection)
         updateSelection(newSelection)
         scrollIntoView(getFocusPath(newSelection))
       }
     }
 
-    if (combo === 'Enter' && documentState.selection) {
-      if (isValueSelection(documentState.selection)) {
+    if (combo === 'Enter' && selection) {
+      if (isValueSelection(selection)) {
         event.preventDefault()
 
-        const path = documentState.selection.path
+        const path = selection.path
         const value = getIn(json, path)
         if (isObjectOrArray(value)) {
           // edit nested object/array
@@ -1362,14 +1302,14 @@
         } else {
           if (!readOnly) {
             // go to value edit mode
-            updateSelection({ ...documentState.selection, edit: true })
+            updateSelection({ ...selection, edit: true })
           }
         }
       }
     }
 
     const normalizedCombo = combo.replace(/^Shift\+/, '') // replace 'Shift+A' with 'A'
-    if (normalizedCombo.length === 1 && documentState.selection) {
+    if (normalizedCombo.length === 1 && selection) {
       // a regular key like a, A, _, etc is entered.
       // Replace selected contents with a new value having this first character as text
       event.preventDefault()
@@ -1377,8 +1317,8 @@
       return
     }
 
-    if (combo === 'Ctrl+Enter' && isValueSelection(documentState.selection)) {
-      const value = getIn(json, documentState.selection.path)
+    if (combo === 'Ctrl+Enter' && isValueSelection(selection)) {
+      const value = getIn(json, selection.path)
 
       if (isUrl(value)) {
         // open url in new page
@@ -1386,7 +1326,7 @@
       }
     }
 
-    if (combo === 'Escape' && documentState.selection) {
+    if (combo === 'Escape' && selection) {
       event.preventDefault()
       updateSelection(null)
     }
@@ -1425,7 +1365,7 @@
     onPaste({
       clipboardText,
       json,
-      selection: documentState.selection,
+      selection: selection,
       readOnly,
       parser,
       onPatch: handlePatch,
@@ -1436,19 +1376,25 @@
 
   // TODO: this function is duplicated from TreeMode. See if we can reuse the code instead
   function handleReplaceJson(updatedJson: unknown, afterPatch?: AfterPatchCallback) {
-    const previousState = documentState
-    const previousJson = json
-    const previousText = text
     const previousContent = { json, text }
-    const previousTextIsRepaired = textIsRepaired
+    const previousState = { json, documentState, selection, sortedColumn, text, textIsRepaired }
 
-    const updatedState = expandWithCallback(json, documentState, [], expandMinimal)
+    const updatedState = expandWithCallback(
+      json,
+      syncDocumentState(updatedJson, documentState),
+      [],
+      expandMinimal
+    )
 
     const callback =
-      typeof afterPatch === 'function' ? afterPatch(updatedJson, updatedState) : undefined
+      typeof afterPatch === 'function'
+        ? afterPatch(updatedJson, updatedState, selection)
+        : undefined
 
-    json = callback && callback.json !== undefined ? callback.json : updatedJson
-    documentState = callback && callback.state !== undefined ? callback.state : updatedState
+    json = callback?.json !== undefined ? callback.json : updatedJson
+    documentState = callback?.state !== undefined ? callback.state : updatedState
+    selection = callback?.selection !== undefined ? callback.selection : selection
+    sortedColumn = null // we can't know whether the new json is still sorted or not
     text = undefined
     textIsRepaired = false
     parseError = undefined
@@ -1456,12 +1402,7 @@
     // make sure the selection is valid
     clearSelectionWhenNotExisting(json)
 
-    addHistoryItem({
-      previousJson,
-      previousState,
-      previousText,
-      previousTextIsRepaired
-    })
+    addHistoryItem(previousState)
 
     // we could work out a patchResult, or use patch(), but only when the previous and new
     // contents are both json and not text. We go for simplicity and consistency here and
@@ -1475,29 +1416,36 @@
   function handleChangeText(updatedText: string, afterPatch?: AfterPatchCallback) {
     debug('handleChangeText')
 
-    const previousState = documentState
-    const previousJson = json
-    const previousText = text
     const previousContent = { json, text }
-    const previousTextIsRepaired = textIsRepaired
+    const previousState = { json, documentState, selection, sortedColumn, text, textIsRepaired }
 
     try {
       json = parseMemoizeOne(updatedText)
-      documentState = expandWithCallback(json, documentState, [], expandMinimal)
+      documentState = expandWithCallback(
+        json,
+        syncDocumentState(json, documentState),
+        [],
+        expandMinimal
+      )
       text = undefined
       textIsRepaired = false
       parseError = undefined
     } catch (err) {
       try {
         json = parseMemoizeOne(jsonrepair(updatedText))
-        documentState = expandWithCallback(json, documentState, [], expandMinimal)
+        documentState = expandWithCallback(
+          json,
+          syncDocumentState(json, documentState),
+          [],
+          expandMinimal
+        )
         text = updatedText
         textIsRepaired = true
         parseError = undefined
       } catch (repairError) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
-        documentState = createDocumentState({ json, expand: expandMinimal })
+        documentState = undefined
         text = updatedText
         textIsRepaired = false
         parseError =
@@ -1508,21 +1456,17 @@
     }
 
     if (typeof afterPatch === 'function') {
-      const callback = afterPatch(json, documentState)
+      const callback = afterPatch(json, documentState, selection)
 
-      json = callback && callback.json ? callback.json : json
-      documentState = callback && callback.state ? callback.state : documentState
+      json = callback?.json !== undefined ? callback.json : json
+      documentState = callback?.state !== undefined ? callback.state : documentState
+      selection = callback?.selection !== undefined ? callback.selection : selection
     }
 
     // ensure the selection is valid
     clearSelectionWhenNotExisting(json)
 
-    addHistoryItem({
-      previousJson,
-      previousState,
-      previousText,
-      previousTextIsRepaired
-    })
+    addHistoryItem(previousState)
 
     // no JSON patch actions available in text mode
     const patchResult = null
@@ -1554,12 +1498,10 @@
 
         handlePatch(operations, (_, patchedState) => {
           return {
-            state: {
-              ...patchedState,
-              sortedColumn: {
-                path: itemPath,
-                sortDirection: direction === -1 ? SortDirection.desc : SortDirection.asc
-              }
+            state: patchedState,
+            sortedColumn: {
+              path: itemPath,
+              sortDirection: direction === -1 ? SortDirection.desc : SortDirection.asc
             }
           }
         })
@@ -1697,7 +1639,9 @@
     const previousContent = { json, text }
 
     json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
-    documentState = item.undo.state
+    documentState = item.undo.documentState
+    selection = item.undo.selection
+    sortedColumn = item.undo.sortedColumn
     text = item.undo.text
     textIsRepaired = item.undo.textIsRepaired
     parseError = undefined
@@ -1717,8 +1661,8 @@
     emitOnChange(previousContent, patchResult)
 
     focus()
-    if (documentState.selection) {
-      scrollTo(getFocusPath(documentState.selection), false)
+    if (selection) {
+      scrollTo(getFocusPath(selection), false)
     }
   }
 
@@ -1739,7 +1683,9 @@
     const previousContent = { json, text }
 
     json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
-    documentState = item.redo.state
+    documentState = item.redo.documentState
+    selection = item.redo.selection
+    sortedColumn = item.redo.sortedColumn
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired
     parseError = undefined
@@ -1759,8 +1705,8 @@
     emitOnChange(previousContent, patchResult)
 
     focus()
-    if (documentState.selection) {
-      scrollTo(getFocusPath(documentState.selection), false)
+    if (selection) {
+      scrollTo(getFocusPath(selection), false)
     }
   }
 
@@ -1849,12 +1795,7 @@
               </th>
               {#each columns as column}
                 <th class="jse-table-cell jse-table-cell-header">
-                  <ColumnHeader
-                    path={column}
-                    sortedColumn={documentState.sortedColumn}
-                    {readOnly}
-                    onSort={onSortByHeader}
-                  />
+                  <ColumnHeader path={column} {sortedColumn} {readOnly} onSort={onSortByHeader} />
                 </th>
               {/each}
               {#if showRefreshButton}
@@ -1877,9 +1818,9 @@
                 [String(rowIndex)],
                 validationErrorsByRow?.row
               )}
-              {@const searchResultItemsByRow = searchResult?.itemsMap
-                ? filterPointerOrUndefined(searchResult?.itemsMap, compileJSONPointerProp(rowIndex))
-                : undefined}
+              {@const searchResultByRow = getInRecursiveState(json, searchResults, [
+                String(rowIndex)
+              ])}
               <tr class="jse-table-row">
                 {#key rowIndex}
                   <th
@@ -1894,11 +1835,9 @@
                 {/key}
                 {#each columns as column, columnIndex}
                   {@const path = [String(rowIndex)].concat(column)}
-                  {@const pointer = compileJSONPointer(path)}
                   {@const value = getIn(item, column)}
                   {@const isSelected =
-                    isValueSelection(documentState.selection) &&
-                    pathStartsWith(documentState.selection.path, path)}
+                    isValueSelection(selection) && pathStartsWith(selection.path, path)}
                   {@const validationErrorsByColumn = validationErrorsByRow?.columns[columnIndex]}
                   {@const validationError = mergeValidationErrors(path, validationErrorsByColumn)}
                   <td
@@ -1907,13 +1846,12 @@
                     class:jse-selected-value={isSelected}
                   >
                     {#if isObjectOrArray(value)}
-                      {@const searchResultItemsByCell = searchResultItemsByRow
-                        ? filterPointerOrUndefined(searchResultItemsByRow, pointer)
-                        : undefined}
-                      {@const containsActiveSearchResult = searchResultItemsByCell
-                        ? Object.values(searchResultItemsByCell).some((items) =>
-                            items.some((item) => item.active)
-                          )
+                      {@const searchResultsByCell = flattenSearchResults(
+                        getInRecursiveState(item, searchResultByRow, column)
+                      )}
+
+                      {@const containsActiveSearchResult = searchResultsByCell
+                        ? searchResultsByCell.some((item) => item.active)
                         : false}
 
                       <InlineValue
@@ -1921,27 +1859,24 @@
                         {value}
                         {parser}
                         {isSelected}
-                        containsSearchResult={!isEmpty(searchResultItemsByCell)}
+                        containsSearchResult={!isEmpty(searchResultsByCell)}
                         {containsActiveSearchResult}
                         onEdit={openJSONEditorModal}
                       />{:else}
-                      {@const searchResultItemsByCell = searchResult?.itemsMap
-                        ? filterValueSearchResults(searchResult?.itemsMap, pointer)
-                        : undefined}
+                      {@const searchResultItemsByCell = getInRecursiveState(
+                        json,
+                        searchResults,
+                        path
+                      )?.searchResults}
 
                       <JSONValueComponent
                         {path}
                         value={value !== undefined ? value : ''}
-                        enforceString={getEnforceString(
-                          value,
-                          documentState.enforceStringMap,
-                          pointer,
-                          context.parser
-                        )}
-                        selection={isSelected ? documentState.selection : null}
+                        enforceString={getEnforceString(json, documentState, path, context.parser)}
+                        selection={isSelected ? selection : null}
                         searchResultItems={searchResultItemsByCell}
                         {context}
-                      />{/if}{#if !readOnly && isSelected && !isEditingSelection(documentState.selection)}
+                      />{/if}{#if !readOnly && isSelected && !isEditingSelection(selection)}
                       <div class="jse-context-menu-anchor">
                         <ContextMenuPointer selected={true} onContextMenu={openContextMenu} />
                       </div>

@@ -139,9 +139,9 @@ $collapsed-items-link-color-highlight: var(--jse-collapsed-items-link-color-high
 
 /* contents: highlighting of search matches */
 $search-match-color: var(--jse-search-match-color, #ffe665);
-$search-match-outline: var(--jse-search-match-outline, (1px solid #ffd700));
-$search-match-active-color: var(--jse-search-match-active-color, #ffd700);
-$search-match-active-outline: var(--jse-search-match-active-outline, (1px solid #e1be00));
+$search-match-outline: var(--jse-search-match-outline, none);
+$search-match-active-color: var(--jse-search-match-active-color, $search-match-color);
+$search-match-active-outline: var(--jse-search-match-outline, (2px solid #e0be00));
 
 /* contents: inline tags inside the JSON document */
 $tag-background: var(--jse-tag-background, rgba(0, 0, 0, 0.2));
