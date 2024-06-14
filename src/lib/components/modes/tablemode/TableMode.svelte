@@ -401,12 +401,7 @@
       return
     }
 
-    const previousJson = json
-    const previousState = documentState
-    const previousSelection = selection
-    const previousSortedColumn = sortedColumn
-    const previousText = text
-    const previousTextIsRepaired = textIsRepaired
+    const previousState = { json, documentState, selection, sortedColumn, text, textIsRepaired }
 
     if (isTextContent(content)) {
       try {
@@ -448,14 +443,7 @@
     // reset the sorting order (we don't know...)
     sortedColumn = null
 
-    addHistoryItem({
-      previousJson,
-      previousState,
-      previousSelection,
-      previousSortedColumn,
-      previousText,
-      previousTextIsRepaired
-    })
+    addHistoryItem(previousState)
   }
 
   function applyExternalSelection(externalSelection: JSONEditorSelection | null) {
@@ -468,98 +456,43 @@
     }
   }
 
-  // TODO: addHistoryItem is a duplicate of addHistoryItem in TreeMode.svelte. Can we extract and reuse this logic?
-  function addHistoryItem({
-    previousJson,
-    previousState,
-    previousSelection,
-    previousSortedColumn,
-    previousText,
-    previousTextIsRepaired
-  }: {
-    previousJson: unknown | undefined
-    previousText: string | undefined
-    previousState: DocumentState | undefined
-    previousSelection: JSONSelection | null
-    previousSortedColumn: SortedColumn | null
-    previousTextIsRepaired: boolean
-  }) {
-    if (previousJson === undefined && previousText === undefined) {
+  interface PreviousState {
+    json: unknown | undefined
+    text: string | undefined
+    documentState: DocumentState | undefined
+    selection: JSONSelection | null
+    textIsRepaired: boolean
+    sortedColumn: SortedColumn | null
+  }
+
+  function addHistoryItem(previous: PreviousState) {
+    if (previous.json === undefined && previous.text === undefined) {
       // initialization -> do not create a history item
       return
     }
 
-    if (json !== undefined) {
-      if (previousJson !== undefined) {
-        // regular undo/redo with JSON patch
-        history.add({
-          undo: {
-            patch: [{ op: 'replace', path: '', value: previousJson }],
-            state: previousState,
-            selection: removeEditModeFromSelection(previousSelection),
-            sortedColumn: previousSortedColumn,
-            json: undefined,
-            text: previousText,
-            textIsRepaired: previousTextIsRepaired
-          },
-          redo: {
-            patch: [{ op: 'replace', path: '', value: json }],
-            state: documentState,
-            selection: removeEditModeFromSelection(selection),
-            sortedColumn,
-            json: undefined,
-            text,
-            textIsRepaired
-          }
-        })
-      } else {
-        history.add({
-          undo: {
-            patch: undefined,
-            json: undefined,
-            text: previousText,
-            state: previousState,
-            selection: removeEditModeFromSelection(previousSelection),
-            sortedColumn: previousSortedColumn,
-            textIsRepaired: previousTextIsRepaired
-          },
-          redo: {
-            patch: undefined,
-            json,
-            state: documentState,
-            selection: removeEditModeFromSelection(selection),
-            sortedColumn,
-            text,
-            textIsRepaired
-          }
-        })
+    const canPatch = json !== undefined && previous.json !== undefined
+
+    history.add({
+      undo: {
+        patch: canPatch ? [{ op: 'replace', path: '', value: previous.json }] : undefined,
+        json: previous.json,
+        text: previous.text,
+        documentState: previous.documentState,
+        textIsRepaired: previous.textIsRepaired,
+        selection: removeEditModeFromSelection(previous.selection),
+        sortedColumn: previous.sortedColumn
+      },
+      redo: {
+        patch: canPatch ? [{ op: 'replace', path: '', value: json }] : undefined,
+        json,
+        text,
+        documentState,
+        textIsRepaired,
+        selection: removeEditModeFromSelection(selection),
+        sortedColumn
       }
-    } else {
-      if (previousJson !== undefined) {
-        history.add({
-          undo: {
-            patch: undefined,
-            json: previousJson,
-            state: previousState,
-            selection: removeEditModeFromSelection(previousSelection),
-            sortedColumn: previousSortedColumn,
-            text: previousText,
-            textIsRepaired: previousTextIsRepaired
-          },
-          redo: {
-            patch: undefined,
-            json: undefined,
-            text,
-            textIsRepaired,
-            state: documentState,
-            selection: removeEditModeFromSelection(selection),
-            sortedColumn
-          }
-        })
-      } else {
-        // this cannot happen. Nothing to do, no change
-      }
-    }
+    })
   }
 
   let validationErrors: ValidationError[] = []
@@ -666,20 +599,20 @@
     history.add({
       undo: {
         patch: undo,
-        json: undefined,
+        json: undefined, // not needed: we use patch to reconstruct the json
         text: undefined,
-        state: previousState,
+        documentState,
         selection: removeEditModeFromSelection(previousSelection),
         sortedColumn: previousSortedColumn,
         textIsRepaired: previousTextIsRepaired
       },
       redo: {
         patch: operations,
-        json: undefined,
-        state: documentState,
+        json: undefined, // not needed: we use patch to reconstruct the json
+        text: undefined,
+        documentState,
         selection: removeEditModeFromSelection(selection),
         sortedColumn,
-        text: undefined,
         textIsRepaired
       }
     })
@@ -813,13 +746,8 @@
 
   export function acceptAutoRepair() {
     if (textIsRepaired && json !== undefined) {
-      const previousState = documentState
-      const previousSelection = selection
-      const previousSortedColumn = sortedColumn
-      const previousJson = json
-      const previousText = text
       const previousContent = { json, text }
-      const previousTextIsRepaired = textIsRepaired
+      const previousState = { json, documentState, selection, sortedColumn, text, textIsRepaired }
 
       // json stays as is
       text = undefined
@@ -827,14 +755,7 @@
 
       clearSelectionWhenNotExisting(json)
 
-      addHistoryItem({
-        previousJson,
-        previousState,
-        previousSelection,
-        previousSortedColumn,
-        previousText,
-        previousTextIsRepaired
-      })
+      addHistoryItem(previousState)
 
       // we could work out a patchResult, or use patch(), but only when the previous and new
       // contents are both json and not text. We go for simplicity and consistency here and
@@ -1456,13 +1377,8 @@
 
   // TODO: this function is duplicated from TreeMode. See if we can reuse the code instead
   function handleReplaceJson(updatedJson: unknown, afterPatch?: AfterPatchCallback) {
-    const previousState = documentState
-    const previousSelection = selection
-    const previousSortedColumn = sortedColumn
-    const previousJson = json
-    const previousText = text
     const previousContent = { json, text }
-    const previousTextIsRepaired = textIsRepaired
+    const previousState = { json, documentState, selection, sortedColumn, text, textIsRepaired }
 
     const updatedState = expandWithCallback(
       json,
@@ -1487,14 +1403,7 @@
     // make sure the selection is valid
     clearSelectionWhenNotExisting(json)
 
-    addHistoryItem({
-      previousJson,
-      previousState,
-      previousSelection,
-      previousSortedColumn,
-      previousText,
-      previousTextIsRepaired
-    })
+    addHistoryItem(previousState)
 
     // we could work out a patchResult, or use patch(), but only when the previous and new
     // contents are both json and not text. We go for simplicity and consistency here and
@@ -1508,13 +1417,8 @@
   function handleChangeText(updatedText: string, afterPatch?: AfterPatchCallback) {
     debug('handleChangeText')
 
-    const previousState = documentState
-    const previousSelection = selection
-    const previousSortedColumn = sortedColumn
-    const previousJson = json
-    const previousText = text
     const previousContent = { json, text }
-    const previousTextIsRepaired = textIsRepaired
+    const previousState = { json, documentState, selection, sortedColumn, text, textIsRepaired }
 
     try {
       json = parseMemoizeOne(updatedText)
@@ -1563,14 +1467,7 @@
     // ensure the selection is valid
     clearSelectionWhenNotExisting(json)
 
-    addHistoryItem({
-      previousJson,
-      previousState,
-      previousSelection,
-      previousSortedColumn,
-      previousText,
-      previousTextIsRepaired
-    })
+    addHistoryItem(previousState)
 
     // no JSON patch actions available in text mode
     const patchResult = null
@@ -1743,7 +1640,7 @@
     const previousContent = { json, text }
 
     json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
-    documentState = item.undo.state
+    documentState = item.undo.documentState
     selection = item.undo.selection
     sortedColumn = item.undo.sortedColumn
     text = item.undo.text
@@ -1787,7 +1684,7 @@
     const previousContent = { json, text }
 
     json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
-    documentState = item.redo.state
+    documentState = item.redo.documentState
     selection = item.redo.selection
     sortedColumn = item.redo.sortedColumn
     text = item.redo.text

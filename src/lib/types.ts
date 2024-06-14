@@ -470,19 +470,19 @@ export interface HistoryItem {
     patch: JSONPatchDocument | undefined
     json: unknown | undefined
     text: string | undefined
-    state: DocumentState | undefined
+    documentState: DocumentState | undefined
     selection: JSONSelection | null
-    sortedColumn: SortedColumn | null
     textIsRepaired: boolean
+    sortedColumn: SortedColumn | null
   }
   redo: {
     patch: JSONPatchDocument | undefined
     json: unknown | undefined
     text: string | undefined
-    state: DocumentState | undefined
+    documentState: DocumentState | undefined
     selection: JSONSelection | null
-    sortedColumn: SortedColumn | null
     textIsRepaired: boolean
+    sortedColumn: SortedColumn | null
   }
 }
 
