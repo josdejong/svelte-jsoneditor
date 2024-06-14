@@ -62,7 +62,7 @@ export default function ({
 }: {
   json: unknown
   documentState: DocumentState | undefined
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   readOnly: boolean
   parser: JSONParser
   onEditKey: () => void

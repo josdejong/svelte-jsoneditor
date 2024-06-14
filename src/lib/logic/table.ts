@@ -432,19 +432,19 @@ function findColumnIndex(error: ValidationError, columns: JSONPath[]): number {
  * Clear the sorted column from the documentState when it is affected by the operations
  */
 export function clearSortedColumnWhenAffectedByOperations(
-  sortedColumn: SortedColumn | null,
+  sortedColumn: SortedColumn | undefined,
   operations: JSONPatchOperation[],
   columms: JSONPath[]
-): SortedColumn | null {
+): SortedColumn | undefined {
   const mustBeCleared = operations.some((operation) =>
     operationAffectsSortedColumn(sortedColumn, operation, columms)
   )
 
-  return mustBeCleared ? null : sortedColumn
+  return mustBeCleared ? undefined : sortedColumn
 }
 
 export function operationAffectsSortedColumn(
-  sortedColumn: SortedColumn | null,
+  sortedColumn: SortedColumn | undefined,
   operation: JSONPatchOperation,
   columns: JSONPath[]
 ): boolean {

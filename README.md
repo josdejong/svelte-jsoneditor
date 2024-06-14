@@ -229,7 +229,7 @@ Pass the JSON contents to be rendered in the JSONEditor. `Content` is an object 
 #### selection
 
 ```ts
-selection: JSONEditorSelection | null
+selection: JSONEditorSelection | undefined
 ```
 
 The current selected contents. You can use two-way binding using `bind:selection`. The `tree` mode supports `MultiSelection`, `KeySelection`, `ValueSelection`, `InsideSelection`, or `AfterSelection`. The `table` mode supports `ValueSelection`, and `text` mode supports `TextSelection.`.
@@ -386,7 +386,7 @@ Callback fired when an error occurs. Default implementation is to log an error i
 #### onChange
 
 ```ts
-onChange(content: Content, previousContent: Content, changeStatus: { contentErrors: ContentErrors | null, patchResult: JSONPatchResult | null })
+onChange(content: Content, previousContent: Content, changeStatus: { contentErrors: ContentErrors | undefined, patchResult: JSONPatchResult | undefined })
 ```
 
 The callback which is invoked on every change of the contents made by the user from within the editor. It will not trigger on changes that are applied programmatically via methods like `.set()`, `.update()`, or `.patch()`.
@@ -519,7 +519,7 @@ A menu item `MenuItem` can be one of the following types:
 #### onRenderContextMenu
 
 ```ts
-onRenderContextMenu(items: ContextMenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean, readOnly: boolean, selection: JSONEditorSelection | null }) : ContextMenuItem[] | false | undefined
+onRenderContextMenu(items: ContextMenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean, readOnly: boolean, selection: JSONEditorSelection | undefined }) : ContextMenuItem[] | false | undefined
 ```
 
 Callback which can be used to make changes to the context menu items. New items can be added, or existing items can be removed or reorganized. When the function returns `undefined`, the original `items` will be applied and the context menu will be displayed when `readOnly` is `false`. When the function returns `false`, the context menu will never be displayed. The callback is triggered too when the editor is `readOnly`, and in most cases you want to return `false` then.
@@ -583,7 +583,7 @@ A menu item `ContextMenuItem` can be one of the following types:
 #### onSelect
 
 ```ts
-onSelect: (selection: JSONEditorSelection | null) => void
+onSelect: (selection: JSONEditorSelection | undefined) => void
 ```
 
 Callback invoked when the selection is changed. When the selection is removed, the callback is invoked with `undefined` as argument. In `text` mode, a `TextSelection` will be fired. In `tree` and `table` mode, a `JSONSelection` will be fired (which can be `MultiSelection`, `KeySelection`, `ValueSelection`, `InsideSelection`, or `AfterSelection`). Use typeguards like `isTextSelection` and `isValueSelection` to check what type the selection has.
@@ -764,7 +764,7 @@ Refresh rendering of the contents, for example after changing the font size. Thi
 #### validate
 
 ```ts
-JSONEditor.prototype.validate() : ContentErrors | null
+JSONEditor.prototype.validate() : ContentErrors | undefined
 ```
 
 Get all current parse errors and validation errors.
@@ -772,7 +772,7 @@ Get all current parse errors and validation errors.
 #### select
 
 ```ts
-JSONEditor.prototype.select(newSelection: JSONEditorSelection | null)
+JSONEditor.prototype.select(newSelection: JSONEditorSelection | undefined)
 ```
 
 Change the current selection. See also option `selection`.

@@ -39,9 +39,9 @@ declare module 'svelte-simple-modal' {
   ) => TransitionConfig
 
   export interface Options {
-    id: string | null
-    ariaLabel: string | null
-    ariaLabelledBy: string | null
+    id: string | undefined
+    ariaLabel: string | undefined
+    ariaLabelledBy: string | undefined
     closeButton: Component | boolean
     closeOnEsc: boolean
     closeOnOuterClick: boolean
@@ -50,11 +50,11 @@ declare module 'svelte-simple-modal' {
     styleWindow: Styles
     styleContent: Styles
     styleCloseButton: Styles
-    classBg: string | null
-    classWindowWrap: string | null
-    classWindow: string | null
-    classContent: string | null
-    classCloseButton: string | null
+    classBg: string | undefined
+    classWindowWrap: string | undefined
+    classWindow: string | undefined
+    classContent: string | undefined
+    classCloseButton: string | undefined
     transitionBg: TransitionFn
     transitionBgProps: BlurParams
     transitionWindow: TransitionFn
@@ -98,13 +98,13 @@ declare module 'svelte-simple-modal' {
      * Svelte component to be shown as the modal
      * @default null
      */
-    show?: Component | null
+    show?: Component | undefined
 
     /**
      * Element ID assigned to the modal's root DOM element
      * @default null
      */
-    id?: string | null
+    id?: string | undefined
 
     /**
      * Svelte context key to reference the simple modal context
@@ -117,14 +117,14 @@ declare module 'svelte-simple-modal' {
      * @see https://www.w3.org/TR/wai-aria-1.1/#aria-label
      * @default null
      */
-    ariaLabel?: string | null
+    ariaLabel?: string | undefined
 
     /**
      * Element ID holding the accessibility label of the modal
      * @see https://www.w3.org/TR/wai-aria-1.1/#aria-labelledby
      * @default null
      */
-    ariaLabelledBy?: string | null
+    ariaLabelledBy?: string | undefined
 
     /**
      * Whether to show a close button or not
@@ -178,31 +178,31 @@ declare module 'svelte-simple-modal' {
      * Class name for the background element
      * @default null
      */
-    classBg?: string | null
+    classBg?: string | undefined
 
     /**
      * Class name for window wrapper element
      * @default null
      */
-    classWindowWrap?: string | null
+    classWindowWrap?: string | undefined
 
     /**
      * Class name for window element
      * @default null
      */
-    classWindow?: string | null
+    classWindow?: string | undefined
 
     /**
      * Class name for content element
      * @default null
      */
-    classContent?: string | null
+    classContent?: string | undefined
 
     /**
      * Class name for close element
      * @default null
      */
-    classCloseButton?: string | null
+    classCloseButton?: string | undefined
 
     /**
      * Do not apply default styles to the modal

@@ -121,12 +121,12 @@
   export let statusBar: boolean
   export let askToFormat: boolean
   export let externalContent: Content
-  export let externalSelection: JSONEditorSelection | null
+  export let externalSelection: JSONEditorSelection | undefined
   export let indentation: number | string
   export let tabSize: number
   export let escapeUnicodeCharacters: boolean
   export let parser: JSONParser
-  export let validator: Validator | null
+  export let validator: Validator | undefined
   export let validationParser: JSONParser
   export let onChange: OnChange
   export let onChangeMode: OnChangeMode
@@ -334,7 +334,7 @@
       setCodeMirrorContent(updatedContent, true, false)
 
       jsonStatus = JSON_STATUS_VALID
-      jsonParseError = null
+      jsonParseError = undefined
     } catch (err) {
       onError(err as Error)
     }
@@ -472,7 +472,7 @@
     debug('select validation error', validationError)
 
     const { from, to } = toRichValidationError(validationError)
-    if (from === null || to === null) {
+    if (from === undefined || to === undefined) {
       return
     }
 
@@ -635,7 +635,7 @@
       : false
   }
 
-  function isValidSelection(selection: JSONEditorSelection | null, text: string): boolean {
+  function isValidSelection(selection: JSONEditorSelection | undefined, text: string): boolean {
     if (!isTextSelection(selection)) {
       return false
     }
@@ -678,7 +678,7 @@
                 apply: () => handleRepair()
               }
             ]
-          : null
+          : undefined
     }
   }
 
@@ -725,7 +725,7 @@
     }
   }
 
-  function applyExternalSelection(externalSelection: JSONEditorSelection | null) {
+  function applyExternalSelection(externalSelection: JSONEditorSelection | undefined) {
     if (!isTextSelection(externalSelection)) {
       return
     }
@@ -740,7 +740,7 @@
   }
 
   function toCodeMirrorSelection(
-    selection: JSONEditorSelection | null
+    selection: JSONEditorSelection | undefined
   ): EditorSelection | undefined {
     return isTextSelection(selection) ? EditorSelection.fromJSON(selection) : undefined
   }
@@ -799,7 +799,7 @@
     tick().then(emitOnSelect)
   }
 
-  function updateLinter(validator: Validator | null) {
+  function updateLinter(validator: Validator | undefined) {
     debug('updateLinter', validator)
 
     if (!codeMirrorView) {
@@ -892,7 +892,7 @@
     if (onChange) {
       onChange(content, previousContent, {
         contentErrors: validate(),
-        patchResult: null
+        patchResult: undefined
       })
     }
   }
@@ -911,7 +911,7 @@
 
   let jsonStatus = JSON_STATUS_VALID
 
-  let jsonParseError: ParseError | null = null
+  let jsonParseError: ParseError | undefined
 
   function linterCallback(): Diagnostic[] {
     if (disableTextEditor(text, acceptTooLarge)) {
@@ -933,7 +933,7 @@
     return []
   }
 
-  export function validate(): ContentErrors | null {
+  export function validate(): ContentErrors | undefined {
     debug('validate:start')
 
     flush()
@@ -951,7 +951,7 @@
       validationErrors = []
     } else {
       jsonStatus = JSON_STATUS_VALID
-      jsonParseError = null
+      jsonParseError = undefined
       validationErrors = contentErrors?.validationErrors || []
     }
 

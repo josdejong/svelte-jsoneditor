@@ -172,13 +172,13 @@ export interface JSONPatchResult {
 export type AfterPatchCallback = (
   patchedJson: unknown,
   patchedState: DocumentState | undefined,
-  patchedSelection: JSONSelection | null
+  patchedSelection: JSONSelection | undefined
 ) =>
   | {
       json?: unknown
       state?: DocumentState | undefined
-      selection?: JSONSelection | null
-      sortedColumn?: SortedColumn | null
+      selection?: JSONSelection | undefined
+      sortedColumn?: SortedColumn | undefined
     }
   | undefined
 
@@ -299,9 +299,9 @@ export interface NestedValidationError extends ValidationError {
 export type Validator = (json: unknown) => ValidationError[]
 
 export interface ParseError {
-  position: number | null
-  line: number | null
-  column: number | null
+  position: number | undefined
+  line: number | undefined
+  column: number | undefined
   message: string
 }
 
@@ -317,11 +317,11 @@ export interface ContentValidationErrors {
 export type ContentErrors = ContentParseError | ContentValidationErrors
 
 export interface RichValidationError extends ValidationError {
-  line: number | null
-  column: number | null
-  from: number | null
-  to: number | null
-  actions: Array<{ name: string; apply: () => void }> | null
+  line: number | undefined
+  column: number | undefined
+  from: number | undefined
+  to: number | undefined
+  actions: Array<{ name: string; apply: () => void }> | undefined
 }
 
 export interface TextLocation {
@@ -362,14 +362,14 @@ export interface QueryLanguageOptions {
 
 export type OnChangeQueryLanguage = (queryLanguageId: string) => void
 export interface OnChangeStatus {
-  contentErrors: ContentErrors | null
-  patchResult: JSONPatchResult | null
+  contentErrors: ContentErrors | undefined
+  patchResult: JSONPatchResult | undefined
 }
 export type OnChange =
   | ((content: Content, previousContent: Content, status: OnChangeStatus) => void)
-  | null
+  | undefined
 export type OnJSONSelect = (selection: JSONSelection) => void
-export type OnSelect = (selection: JSONEditorSelection | null) => void
+export type OnSelect = (selection: JSONEditorSelection | undefined) => void
 export type OnPatch = (
   operations: JSONPatchDocument,
   afterPatch?: AfterPatchCallback
@@ -396,7 +396,9 @@ export type RenderMenuContext = {
 }
 export type OnRenderMenu = (items: MenuItem[], context: RenderMenuContext) => MenuItem[] | undefined
 export type OnRenderMenuInternal = (items: MenuItem[]) => MenuItem[]
-export type RenderContextMenuContext = RenderMenuContext & { selection: JSONEditorSelection | null }
+export type RenderContextMenuContext = RenderMenuContext & {
+  selection: JSONEditorSelection | undefined
+}
 export type OnRenderContextMenu = (
   items: ContextMenuItem[],
   context: RenderContextMenuContext
@@ -408,7 +410,7 @@ export type OnBlur = () => void
 export type OnSortModal = (props: SortModalCallback) => void
 export type OnTransformModal = (props: TransformModalCallback) => void
 export type OnJSONEditorModal = (props: JSONEditorModalCallback) => void
-export type FindNextInside = (path: JSONPath) => JSONSelection | null
+export type FindNextInside = (path: JSONPath) => JSONSelection | undefined
 
 export interface SearchResultDetails {
   items: ExtendedSearchResultItem[]
@@ -471,18 +473,18 @@ export interface HistoryItem {
     json: unknown | undefined
     text: string | undefined
     documentState: DocumentState | undefined
-    selection: JSONSelection | null
+    selection: JSONSelection | undefined
+    sortedColumn: SortedColumn | undefined
     textIsRepaired: boolean
-    sortedColumn: SortedColumn | null
   }
   redo: {
     patch: JSONPatchDocument | undefined
     json: unknown | undefined
     text: string | undefined
     documentState: DocumentState | undefined
-    selection: JSONSelection | null
+    selection: JSONSelection | undefined
+    sortedColumn: SortedColumn | undefined
     textIsRepaired: boolean
-    sortedColumn: SortedColumn | null
   }
 }
 
@@ -533,7 +535,7 @@ export interface JSONEditorPropsOptional {
   escapeUnicodeCharacters?: boolean
   flattenColumns?: boolean
   parser?: JSONParser
-  validator?: Validator | null
+  validator?: Validator | undefined
   validationParser?: JSONParser
   pathParser?: JSONPathParser
 
@@ -559,7 +561,7 @@ export interface JSONEditorContext {
   normalization: ValueNormalization
   getJson: () => unknown | undefined
   getDocumentState: () => DocumentState | undefined
-  findElement: (path: JSONPath) => Element | null
+  findElement: (path: JSONPath) => Element | undefined
   findNextInside: FindNextInside
   focus: () => void
   onPatch: OnPatch
@@ -572,8 +574,8 @@ export interface JSONEditorContext {
 export interface TreeModeContext extends JSONEditorContext {
   getJson: () => unknown | undefined
   getDocumentState: () => DocumentState | undefined
-  getSelection: () => JSONSelection | null
-  findElement: (path: JSONPath) => Element | null
+  getSelection: () => JSONSelection | undefined
+  findElement: (path: JSONPath) => Element | undefined
   onInsert: (type: InsertType) => void
   onExpand: (path: JSONPath, expanded: boolean, recursive?: boolean) => void
   onExpandSection: (path: JSONPath, section: Section) => void
@@ -588,7 +590,7 @@ export interface RenderValueProps {
   value: unknown
   readOnly: boolean
   enforceString: boolean
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   searchResultItems: SearchResultItem[] | undefined
   isEditing: boolean
   parser: JSONParser

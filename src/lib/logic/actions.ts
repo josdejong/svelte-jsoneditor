@@ -54,7 +54,7 @@ const debug = createDebug('jsoneditor:actions')
 
 export interface OnCutAction {
   json: unknown | undefined
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   indentation: string | number | undefined
   readOnly: boolean
   parser: JSONParser
@@ -93,7 +93,7 @@ export async function onCut({
 
 export interface OnCopyAction {
   json: unknown
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   indentation: string | number | undefined
   parser: JSONParser
 }
@@ -115,7 +115,7 @@ type RepairModalCallback = (text: string, onApply: (repairedText: string) => voi
 interface OnPasteAction {
   clipboardText: string
   json: unknown | undefined
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   readOnly: boolean
   parser: JSONParser
   onPatch: OnPatch
@@ -193,7 +193,7 @@ export function onPaste({
 export interface OnRemoveAction {
   json: unknown | undefined
   text: string | undefined
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   keepSelection: boolean
   readOnly: boolean
   onChange: OnChange
@@ -230,8 +230,8 @@ export function onRemove({
         { text: '', json: undefined },
         json !== undefined ? { text: undefined, json } : { text: text || '', json },
         {
-          contentErrors: null,
-          patchResult: null
+          contentErrors: undefined,
+          patchResult: undefined
         }
       )
     }
@@ -252,7 +252,7 @@ export function onRemove({
 
 export interface OnDuplicateRowAction {
   json: unknown | undefined
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   columns: JSONPath[]
   readOnly: boolean
   onPatch: OnPatch
@@ -295,7 +295,7 @@ export function onDuplicateRow({
 
 export interface OnInsertBeforeRowAction {
   json: unknown | undefined
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   columns: JSONPath[]
   readOnly: boolean
   onPatch: OnPatch
@@ -331,7 +331,7 @@ export function onInsertBeforeRow({
 
 export interface OnInsertAfterRowAction {
   json: unknown | undefined
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   columns: JSONPath[]
   readOnly: boolean
   onPatch: OnPatch
@@ -380,7 +380,7 @@ export function onInsertAfterRow({
 
 export interface OnRemoveRowAction {
   json: unknown | undefined
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   columns: JSONPath[]
   readOnly: boolean
   onPatch: OnPatch
@@ -417,7 +417,7 @@ export function onRemoveRow({ json, selection, columns, readOnly, onPatch }: OnR
             fromTableCellPosition({ rowIndex: newRowIndex, columnIndex }, columns),
             false
           )
-        : null
+        : undefined
 
     debug('remove row new selection', { rowIndex, newRowIndex, newSelection })
 
@@ -433,7 +433,7 @@ export interface OnInsert {
   selectInside: boolean
   refJsonEditor: HTMLElement
   json: unknown | undefined
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   readOnly: boolean
   parser: JSONParser
   onPatch: OnPatch
@@ -523,7 +523,7 @@ export interface OnInsertCharacter {
   selectInside: boolean
   refJsonEditor: HTMLElement
   json: unknown | undefined
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   readOnly: boolean
   parser: JSONParser
   onPatch: OnPatch
@@ -625,7 +625,7 @@ interface OnInsertValueWithCharacter {
   char: string
   refJsonEditor: HTMLElement
   json: unknown | undefined
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   readOnly: boolean
   parser: JSONParser
   onPatch: OnPatch

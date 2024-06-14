@@ -83,7 +83,7 @@
   export let state: DocumentState | undefined
   export let validationErrors: ValidationErrors | undefined
   export let searchResults: SearchResults | undefined
-  export let selection: JSONSelection | null
+  export let selection: JSONSelection | undefined
   export let context: TreeModeContext
   export let onDragSelectionStart: (
     event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }
@@ -454,7 +454,7 @@
   function getVisibleItemsWithHeights(
     selection: JSONSelection,
     visibleSections: VisibleSection[]
-  ): RenderedItem[] | null {
+  ): RenderedItem[] | undefined {
     const items: RenderedItem[] = []
 
     function addHeight(prop: string) {
@@ -471,7 +471,7 @@
     if (Array.isArray(value)) {
       const json = context.getJson()
       if (json === undefined) {
-        return null
+        return undefined
       }
       const startPath = getStartPath(json, selection)
       const endPath = getEndPath(json, selection)
@@ -487,7 +487,7 @@
       })
 
       if (!currentSection) {
-        return null
+        return undefined
       }
 
       const { start, end } = currentSection
@@ -860,7 +860,7 @@
           {path}
           {value}
           {enforceString}
-          selection={isNodeSelected ? selection : null}
+          selection={isNodeSelected ? selection : undefined}
           searchResultItems={filterValueSearchResults(searchResults)}
           {context}
         />

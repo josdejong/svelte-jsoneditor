@@ -277,7 +277,7 @@ export function createSearchAndReplaceOperations(
   replacementText: string,
   searchResultItem: SearchResultItem,
   parser: JSONParser
-): { newSelection: JSONSelection | null; operations: JSONPatchDocument } {
+): { newSelection: JSONSelection | undefined; operations: JSONPatchDocument } {
   const { field, path, start, end } = searchResultItem
 
   if (field === SearchField.key) {
@@ -331,7 +331,7 @@ export function createSearchAndReplaceAllOperations(
   searchText: string,
   replacementText: string,
   parser: JSONParser
-): { newSelection: JSONSelection | null; operations: JSONPatchDocument } {
+): { newSelection: JSONSelection | undefined; operations: JSONPatchDocument } {
   // TODO: to improve performance, we could reuse existing search results (except when hitting a maxResult limit)
   const searchResultItems = search(searchText, json, { maxResults: Infinity })
 
@@ -377,7 +377,7 @@ export function createSearchAndReplaceAllOperations(
 
   // step 3: call createSearchAndReplaceOperations for each of the matches
   let allOperations: JSONPatchDocument = []
-  let lastNewSelection: JSONSelection | null = null
+  let lastNewSelection: JSONSelection | undefined
   deduplicatedMatches.forEach((match) => {
     // TODO: there is overlap with the logic of createSearchAndReplaceOperations. Can we extract and reuse this logic?
     const { field, path, items } = match

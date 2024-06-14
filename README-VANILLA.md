@@ -111,7 +111,7 @@ import { JSONEditor, JSONEditorPropsOptional } from 'vanilla-jsoneditor'
 
 const JSONEditorReact: React.FC<JSONEditorPropsOptional> = (props) => {
   const refContainer = useRef<HTMLDivElement>(null)
-  const refEditor = useRef<JSONEditor | null>(null)
+  const refEditor = useRef<JSONEditor | undefined>(null)
 
   useEffect(() => {
     // create editor

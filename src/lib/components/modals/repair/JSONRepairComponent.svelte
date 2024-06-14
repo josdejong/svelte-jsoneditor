@@ -18,7 +18,7 @@
   export let readOnly = false
   export let onParse: (text: string) => void
   export let onRepair: (text: string) => string
-  export let onChange: ((updatedText: string) => void) | null = null
+  export let onChange: ((updatedText: string) => void) | undefined = undefined
   export let onApply: (repairedText: string) => void
   export let onCancel: () => void
 

@@ -819,7 +819,7 @@ export function getPreviousVisiblePath(
   json: unknown,
   documentState: DocumentState | undefined,
   path: JSONPath
-): JSONPath | null {
+): JSONPath | undefined {
   const visiblePaths = getVisiblePaths(json, documentState)
   const visiblePathPointers = visiblePaths.map(compileJSONPointer)
   const pathPointer = compileJSONPointer(path)
@@ -828,8 +828,6 @@ export function getPreviousVisiblePath(
   if (index !== -1 && index > 0) {
     return visiblePaths[index - 1]
   }
-
-  return null
 }
 
 /**
@@ -841,7 +839,7 @@ export function getNextVisiblePath(
   json: unknown,
   documentState: DocumentState | undefined,
   path: JSONPath
-): JSONPath | null {
+): JSONPath | undefined {
   const visiblePaths = getVisiblePaths(json, documentState)
   const visiblePathPointers = visiblePaths.map(compileJSONPointer)
   const index = visiblePathPointers.indexOf(compileJSONPointer(path))
@@ -849,8 +847,6 @@ export function getNextVisiblePath(
   if (index !== -1 && index < visiblePaths.length - 1) {
     return visiblePaths[index + 1]
   }
-
-  return null
 }
 
 /**

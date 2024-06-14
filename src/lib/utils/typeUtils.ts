@@ -84,16 +84,16 @@ export function isTimestamp(value: unknown): boolean {
  *
  * Source: https://stackoverflow.com/questions/6386090/validating-css-color-names/33184805
  */
-export function getColorCSS(color: string): string | null {
+export function getColorCSS(color: string): string | undefined {
   colorTestDiv = colorTestDiv || window.document.createElement('div')
 
   colorTestDiv.style.color = ''
   colorTestDiv.style.color = color
 
   const applied = colorTestDiv.style.color
-  return applied !== '' ? applied.replace(/\s+/g, '').toLowerCase() : null
+  return applied !== '' ? applied.replace(/\s+/g, '').toLowerCase() : undefined
 }
-let colorTestDiv: HTMLDivElement | null = null
+let colorTestDiv: HTMLDivElement | undefined = undefined
 
 /**
  * Test if a string contains a valid color name or code.

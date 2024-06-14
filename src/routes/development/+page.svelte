@@ -93,8 +93,8 @@
     json: undefined
   }
 
-  let selectionTree: JSONEditorSelection | null = null
-  let selectionText: JSONEditorSelection | null = null
+  let selectionTree: JSONEditorSelection | undefined
+  let selectionText: JSONEditorSelection | undefined
 
   const schema = {
     title: 'Employee',
@@ -362,11 +362,11 @@
     })
   }
 
-  function onSelectTree(selection: JSONEditorSelection | null) {
+  function onSelectTree(selection: JSONEditorSelection | undefined) {
     console.log('onSelectTree', selection)
   }
 
-  function onSelectText(selection: JSONEditorSelection | null) {
+  function onSelectText(selection: JSONEditorSelection | undefined) {
     console.log('onSelectText', selection)
   }
 
@@ -695,8 +695,8 @@
     </button>
     <button
       on:click={() => {
-        refTreeEditor?.select(null)
-        refTextEditor?.select(null)
+        refTreeEditor?.select(undefined)
+        refTextEditor?.select(undefined)
       }}
     >
       Select nothing

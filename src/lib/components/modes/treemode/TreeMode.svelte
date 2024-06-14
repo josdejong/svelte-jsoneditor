@@ -183,14 +183,14 @@
 
   export let readOnly: boolean
   export let externalContent: Content
-  export let externalSelection: JSONEditorSelection | null
+  export let externalSelection: JSONEditorSelection | undefined
   export let mainMenuBar: boolean
   export let navigationBar: boolean
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
   export let parser: JSONParser
   export let parseMemoizeOne: JSONParser['parse']
-  export let validator: Validator | null
+  export let validator: Validator | undefined
   export let validationParser: JSONParser
   export let pathParser: JSONPathParser
   export let indentation: number | string
@@ -237,19 +237,19 @@
 
   let documentStateInitialized = false
   let documentState: DocumentState | undefined = createDocumentState({ json })
-  let selection: JSONSelection | null
+  let selection: JSONSelection | undefined
 
   function updateSelection(
     updatedSelection:
       | JSONSelection
-      | null
-      | ((selection: JSONSelection | null) => JSONSelection | null | undefined | void)
+      | undefined
+      | ((selection: JSONSelection | undefined) => JSONSelection | undefined | void)
   ) {
     debug('updateSelection', updatedSelection)
 
     const appliedSelection =
       typeof updatedSelection === 'function'
-        ? updatedSelection(selection) || null
+        ? updatedSelection(selection) || undefined
         : updatedSelection
 
     if (!isEqual(appliedSelection, selection)) {
@@ -354,7 +354,7 @@
 
   function updateValidationErrors(
     json: unknown,
-    validator: Validator | null,
+    validator: Validator | undefined,
     parser: JSONParser,
     validationParser: JSONParser
   ) {
@@ -383,7 +383,7 @@
     )
   }
 
-  export function validate(): ContentErrors | null {
+  export function validate(): ContentErrors | undefined {
     debug('validate')
 
     if (parseError) {
@@ -396,7 +396,7 @@
     // make sure the validation results are up-to-date
     // normally, they are only updated on the next tick after the json is changed
     updateValidationErrors(json, validator, parser, validationParser)
-    return !isEmpty(validationErrorList) ? { validationErrors: validationErrorList } : null
+    return !isEmpty(validationErrorList) ? { validationErrors: validationErrorList } : undefined
   }
 
   export function getJson() {
@@ -407,7 +407,7 @@
     return documentState
   }
 
-  function getSelection(): JSONSelection | null {
+  function getSelection(): JSONSelection | undefined {
     return selection
   }
 
@@ -499,7 +499,7 @@
     addHistoryItem(previousState)
   }
 
-  function applyExternalSelection(externalSelection: JSONEditorSelection | null) {
+  function applyExternalSelection(externalSelection: JSONEditorSelection | undefined) {
     if (isEqual(selection, externalSelection)) {
       return
     }
@@ -535,7 +535,7 @@
     json: unknown | undefined
     text: string | undefined
     documentState: DocumentState | undefined
-    selection: JSONSelection | null
+    selection: JSONSelection | undefined
     textIsRepaired: boolean
   }
 
@@ -555,7 +555,7 @@
         documentState: previous.documentState,
         textIsRepaired: previous.textIsRepaired,
         selection: removeEditModeFromSelection(previous.selection),
-        sortedColumn: null
+        sortedColumn: undefined
       },
       redo: {
         patch: canPatch ? [{ op: 'replace', path: '', value: json }] : undefined,
@@ -564,7 +564,7 @@
         documentState,
         textIsRepaired,
         selection: removeEditModeFromSelection(selection),
-        sortedColumn: null
+        sortedColumn: undefined
       }
     })
   }
@@ -592,7 +592,7 @@
       documentState,
       selection: removeEditModeFromSelection(selection),
       textIsRepaired,
-      sortedColumn: null
+      sortedColumn: undefined
     }
 
     // execute the patch operations
@@ -632,7 +632,7 @@
         text,
         documentState,
         selection: removeEditModeFromSelection(selection),
-        sortedColumn: null,
+        sortedColumn: undefined,
         textIsRepaired
       }
     })
@@ -1006,7 +1006,7 @@
             redo: item.undo.patch,
             undo: item.redo.patch
           }
-        : null
+        : undefined
 
     emitOnChange(previousContent, patchResult)
 
@@ -1049,7 +1049,7 @@
             redo: item.redo.patch,
             undo: item.undo.patch
           }
-        : null
+        : undefined
 
     emitOnChange(previousContent, patchResult)
 
@@ -1221,10 +1221,8 @@
    * Find the DOM element of a given path.
    * Note that the path can only be found when the node is expanded.
    */
-  export function findElement(path: JSONPath): Element | null {
-    return refContents
-      ? refContents.querySelector(`div[data-path="${encodeDataPath(path)}"]`)
-      : null
+  export function findElement(path: JSONPath): Element | undefined {
+    return refContents?.querySelector(`div[data-path="${encodeDataPath(path)}"]`) || undefined
   }
 
   /**
@@ -1262,7 +1260,7 @@
     }
   }
 
-  function emitOnChange(previousContent: Content, patchResult: JSONPatchResult | null) {
+  function emitOnChange(previousContent: Content, patchResult: JSONPatchResult | undefined) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (previousContent.json === undefined && previousContent?.text === undefined) {
@@ -1332,7 +1330,7 @@
     // we could work out a patchResult, or use patch(), but only when the previous and new
     // contents are both json and not text. We go for simplicity and consistency here and
     // do _not_ return a patchResult ever.
-    const patchResult = null
+    const patchResult = undefined
 
     emitOnChange(previousContent, patchResult)
   }
@@ -1393,7 +1391,7 @@
     addHistoryItem(previousState)
 
     // no JSON patch actions available in text mode
-    const patchResult = null
+    const patchResult = undefined
 
     emitOnChange(previousContent, patchResult)
   }
@@ -1420,7 +1418,7 @@
         // check whether the selection is still visible and not collapsed
         if (isSelectionInsidePath(selection, path)) {
           // remove selection when not visible anymore
-          updateSelection(null)
+          updateSelection(undefined)
         }
       }
     }
@@ -1611,7 +1609,7 @@
 
     if (combo === 'Escape' && selection) {
       event.preventDefault()
-      updateSelection(null)
+      updateSelection(undefined)
     }
 
     if (combo === 'Ctrl+F') {
@@ -1791,7 +1789,7 @@
     pastedJson = undefined
 
     // exit edit mode
-    const refEditableDiv = refContents?.querySelector('.jse-editable-div') || null
+    const refEditableDiv = refContents?.querySelector('.jse-editable-div') || undefined
     if (isEditableDivRef(refEditableDiv)) {
       refEditableDiv.cancel()
     }
@@ -1874,8 +1872,8 @@
     }
   }
 
-  function findNextInside(path: JSONPath): JSONSelection | null {
-    return getSelectionNextInside(json, documentState, selection, path)
+  function findNextInside(path: JSONPath): JSONSelection | undefined {
+    return getSelectionNextInside(json, documentState, path)
   }
 
   $: autoScrollHandler = refContents ? createAutoScrollHandler(refContents) : undefined

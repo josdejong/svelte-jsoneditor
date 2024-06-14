@@ -8,10 +8,10 @@ export function getJSONSchemaOptions(
   schema: JSONSchema,
   schemaDefinitions: JSONSchemaDefinitions | undefined,
   path: JSONPath
-): JSONSchemaEnum | null {
+): JSONSchemaEnum | undefined {
   const schemaForPath = findSchema(schema, schemaDefinitions || {}, path)
 
-  return schemaForPath ? findEnum(schemaForPath) : null
+  return schemaForPath ? findEnum(schemaForPath) : undefined
 }
 
 /**
@@ -20,7 +20,7 @@ export function getJSONSchemaOptions(
  *
  * Source: https://github.com/josdejong/jsoneditor/blob/develop/src/js/Node.js
  */
-export function findEnum(schema: JSONSchema): JSONSchemaEnum | null {
+export function findEnum(schema: JSONSchema): JSONSchemaEnum | undefined {
   if (Array.isArray(schema['enum'])) {
     return schema['enum']
   }
@@ -33,7 +33,7 @@ export function findEnum(schema: JSONSchema): JSONSchemaEnum | null {
     }
   }
 
-  return null
+  return undefined
 }
 
 /**
@@ -46,7 +46,7 @@ export function findSchema(
   schemaDefinitions: JSONSchemaDefinitions,
   path: JSONPath,
   currentSchema = topLevelSchema
-): JSONSchema | null {
+): JSONSchema | undefined {
   const nextPath = path.slice(1, path.length)
   const nextKey = path[0]
 
@@ -131,5 +131,5 @@ export function findSchema(
     }
   }
 
-  return null
+  return undefined
 }
