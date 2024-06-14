@@ -176,6 +176,8 @@ export function onPaste({
             state: expandRecursive(patchedJson, patchedState, path)
           }
         }
+
+        return undefined
       })
     }
   }
@@ -491,9 +493,9 @@ export function onInsert({
               : createValueSelection(path, true)
           }
         }
-
-        return undefined
       }
+
+      return undefined
     })
 
     debug('after patch')

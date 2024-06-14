@@ -253,7 +253,7 @@
           context.onSelect(createMultiSelection(path, path))
         }
       } else if (json !== undefined) {
-        context.onSelect(fromSelectionType(json, anchorType, path))
+        context.onSelect(fromSelectionType(anchorType, path))
       }
     }
   }
@@ -433,7 +433,7 @@
           const selectionType = getSelectionTypeFromTarget(event.target as Element)
           const path = getDataPathFromTarget(event.target as Element)
           if (path) {
-            context.onSelect(fromSelectionType(json, selectionType, path))
+            context.onSelect(fromSelectionType(selectionType, path))
           }
         }
       }

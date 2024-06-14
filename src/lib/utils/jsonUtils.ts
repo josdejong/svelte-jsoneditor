@@ -430,7 +430,7 @@ export function estimateSerializedSize(content: Content, maxSize = Infinity): nu
       estimatedSize += 2 + (json.length - 1)
 
       if (estimatedSize > maxSize) {
-        return estimatedSize
+        return
       }
 
       for (let i = 0; i < json.length; i++) {
@@ -439,7 +439,7 @@ export function estimateSerializedSize(content: Content, maxSize = Infinity): nu
         recurse(item)
 
         if (estimatedSize > maxSize) {
-          return estimatedSize
+          return
         }
       }
     } else if (isObject(json)) {

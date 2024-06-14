@@ -243,14 +243,12 @@
     updatedSelection:
       | JSONSelection
       | undefined
-      | ((selection: JSONSelection | undefined) => JSONSelection | undefined | void)
+      | ((selection: JSONSelection | undefined) => JSONSelection | undefined)
   ) {
     debug('updateSelection', updatedSelection)
 
     const appliedSelection =
-      typeof updatedSelection === 'function'
-        ? updatedSelection(selection) || undefined
-        : updatedSelection
+      typeof updatedSelection === 'function' ? updatedSelection(selection) : updatedSelection
 
     if (!isEqual(appliedSelection, selection)) {
       selection = appliedSelection
@@ -849,6 +847,8 @@
           state: expandRecursive(patchedJson, patchedState, path)
         }
       }
+
+      return undefined
     })
   }
 
@@ -1222,7 +1222,7 @@
    * Note that the path can only be found when the node is expanded.
    */
   export function findElement(path: JSONPath): Element | undefined {
-    return refContents?.querySelector(`div[data-path="${encodeDataPath(path)}"]`) || undefined
+    return refContents?.querySelector(`div[data-path="${encodeDataPath(path)}"]`) ?? undefined
   }
 
   /**
@@ -1765,8 +1765,6 @@
         }
       }
     }
-
-    return false
   }
 
   function handleContextMenuFromTreeMenu(event: MouseEvent) {
@@ -1789,7 +1787,7 @@
     pastedJson = undefined
 
     // exit edit mode
-    const refEditableDiv = refContents?.querySelector('.jse-editable-div') || undefined
+    const refEditableDiv = refContents?.querySelector('.jse-editable-div') ?? undefined
     if (isEditableDivRef(refEditableDiv)) {
       refEditableDiv.cancel()
     }

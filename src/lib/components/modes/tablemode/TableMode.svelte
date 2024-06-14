@@ -312,14 +312,12 @@
     updatedSelection:
       | JSONSelection
       | undefined
-      | ((selection: JSONSelection | undefined) => JSONSelection | undefined | void | undefined)
+      | ((selection: JSONSelection | undefined) => JSONSelection | undefined)
   ) {
     debug('updateSelection', updatedSelection)
 
     const appliedSelection =
-      typeof updatedSelection === 'function'
-        ? updatedSelection(selection) || undefined
-        : updatedSelection
+      typeof updatedSelection === 'function' ? updatedSelection(selection) : updatedSelection
 
     if (!isEqual(appliedSelection, selection)) {
       selection = appliedSelection
@@ -1004,8 +1002,6 @@
         }
       }
     }
-
-    return false
   }
 
   function handleContextMenuFromTableMenu(event: MouseEvent) {
@@ -1080,7 +1076,7 @@
     const { path, contents } = pastedJson
 
     // exit edit mode
-    const refEditableDiv = refContents?.querySelector('.jse-editable-div') || undefined
+    const refEditableDiv = refContents?.querySelector('.jse-editable-div') ?? undefined
     if (isEditableDivRef(refEditableDiv)) {
       refEditableDiv.cancel()
     }

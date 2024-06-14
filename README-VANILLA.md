@@ -2,7 +2,7 @@
 
 A web-based tool to view, edit, format, transform, and validate JSON.
 
-Try it out: https://jsoneditoronline.org
+Try it out: <https://jsoneditoronline.org>
 
 This is the vanilla variant of `svelte-jsoneditor`, which can be used in vanilla JavaScript or frameworks like SolidJS, React, Vue, Angular.
 
@@ -50,7 +50,7 @@ import { JSONEditor } from 'vanilla-jsoneditor/standalone.js'
 
 The standalone bundle contains all dependencies of `vanilla-jsoneditor`, for example `lodash-es` and `Ajv`. If you use some of these dependencies in your project too, it means that they will be bundled twice in your web application, leading to a needlessly large application size. In general, it is preferable to use the default `import { JSONEditor } from 'vanilla-jsoneditor'` so dependencies can be reused.
 
-## Use (Browser example loading the ES module):
+## Use (Browser example loading the ES module)
 
 ```html
 <!doctype html>
@@ -100,7 +100,7 @@ The standalone bundle contains all dependencies of `vanilla-jsoneditor`, for exa
 
 Depending on whether you are using JavaScript of TypeScript, create either a JSX or TSX file:
 
-### TypeScript:
+### TypeScript
 
 ```tsx
 //
@@ -111,7 +111,7 @@ import { JSONEditor, JSONEditorPropsOptional } from 'vanilla-jsoneditor'
 
 const JSONEditorReact: React.FC<JSONEditorPropsOptional> = (props) => {
   const refContainer = useRef<HTMLDivElement>(null)
-  const refEditor = useRef<JSONEditor | undefined>(null)
+  const refEditor = useRef<JSONEditor | null>(null)
 
   useEffect(() => {
     // create editor

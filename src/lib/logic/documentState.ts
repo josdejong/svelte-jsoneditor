@@ -828,6 +828,8 @@ export function getPreviousVisiblePath(
   if (index !== -1 && index > 0) {
     return visiblePaths[index - 1]
   }
+
+  return undefined
 }
 
 /**
@@ -847,6 +849,8 @@ export function getNextVisiblePath(
   if (index !== -1 && index < visiblePaths.length - 1) {
     return visiblePaths[index + 1]
   }
+
+  return undefined
 }
 
 /**

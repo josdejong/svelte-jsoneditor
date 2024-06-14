@@ -201,7 +201,7 @@ export function findParent(
     e = e.parentNode as Element
   }
 
-  return e || undefined
+  return e
 }
 
 /**

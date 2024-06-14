@@ -746,6 +746,7 @@ export function canConvert(selection: JSONSelection | undefined): boolean {
 }
 
 // TODO: unit test
+// eslint-disable-next-line consistent-return
 export function fromCaretPosition(caretPosition: CaretPosition): JSONSelection {
   switch (caretPosition.type) {
     case CaretType.key:
@@ -760,11 +761,8 @@ export function fromCaretPosition(caretPosition: CaretPosition): JSONSelection {
 }
 
 // TODO: unit test
-export function fromSelectionType(
-  json: unknown,
-  selectionType: SelectionType,
-  path: JSONPath
-): JSONSelection {
+// eslint-disable-next-line consistent-return
+export function fromSelectionType(selectionType: SelectionType, path: JSONPath): JSONSelection {
   switch (selectionType) {
     case SelectionType.key:
       return createKeySelection(path, false)

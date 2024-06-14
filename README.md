@@ -2,7 +2,7 @@
 
 A web-based tool to view, edit, format, transform, and validate JSON.
 
-Try it out: https://jsoneditoronline.org
+Try it out: <https://jsoneditoronline.org>
 
 The library is written with Svelte, but can be used in plain JavaScript too and in any framework (SolidJS, React, Vue, Angular, etc).
 
@@ -41,13 +41,13 @@ npm install vanilla-jsoneditor
 ### Examples
 
 - Svelte:
-  - Playground: https://www.sveltelab.dev/q1l38ztdys4at87
+  - Playground: <https://www.sveltelab.dev/q1l38ztdys4at87>
   - Examples: [/src/routes/examples](/src/routes/examples)
 - Plain JavaScript examples:
-  - Try it out: https://jsbin.com/gatibux/edit?html,output
+  - Try it out: <https://jsbin.com/gatibux/edit?html,output>
   - Examples: [/examples/browser](/examples/browser)
-- React example: https://codesandbox.io/s/svelte-jsoneditor-react-59wxz
-- Vue example: https://codesandbox.io/s/svelte-jsoneditor-vue-toln3w
+- React example: <https://codesandbox.io/s/svelte-jsoneditor-react-59wxz>
+- Vue example: <https://codesandbox.io/s/svelte-jsoneditor-vue-toln3w>
 
 ### Svelte usage
 
@@ -863,13 +863,13 @@ The library exports a set of utility functions. The exact definitions of those f
 
 The TypeScript types (like `Content`, `JSONSelection`, and `JSONPatchOperation`) are defined in the following source file:
 
-https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/types.ts
+<https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/types.ts>
 
 ## Styling
 
 The editor can be styled using the available CSS variables. A full list with all variables can be found here:
 
-https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/themes/defaults.scss
+<https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/themes/defaults.scss>
 
 ### Custom theme color
 

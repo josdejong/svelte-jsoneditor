@@ -97,7 +97,7 @@
   }
 
   function scrollToSelection() {
-    const selection: JSONEditorSelection | undefined = last(stack)?.selection || undefined
+    const selection: JSONEditorSelection | undefined = last(stack)?.selection
     if (isJSONSelection(selection)) {
       refEditor.scrollTo(getFocusPath(selection))
     }
