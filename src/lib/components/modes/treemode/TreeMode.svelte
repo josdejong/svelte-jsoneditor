@@ -586,10 +586,14 @@
     }
 
     const previousJson = json
-    const previousState = documentState
-    const previousSelection = selection
-    const previousText = text
-    const previousTextIsRepaired = textIsRepaired
+    const previousState = {
+      json: undefined, // not needed: we use patch to reconstruct the json
+      text,
+      documentState,
+      selection: removeEditModeFromSelection(selection),
+      textIsRepaired,
+      sortedColumn: null
+    }
 
     // execute the patch operations
     const undo: JSONPatchDocument = revertJSONPatchWithMoveOperations(
@@ -620,12 +624,7 @@
     history.add({
       undo: {
         patch: undo,
-        json: undefined, // not needed, we use patch to reconstruct
-        text: previousText,
-        documentState: previousState,
-        selection: removeEditModeFromSelection(previousSelection),
-        sortedColumn: null,
-        textIsRepaired: previousTextIsRepaired
+        ...previousState
       },
       redo: {
         patch: operations,
