@@ -248,7 +248,9 @@ export function expandPath(
 
   for (let i = 0; i < path.length; i++) {
     const partialPath = path.slice(0, i)
-    updatedState = expandSingleItem(json, updatedState, partialPath)
+    updatedState = updateInDocumentState(json, updatedState, partialPath, (_value, state) => {
+      return isExpandableState(state) ? { ...state, expanded: true } : state
+    })
 
     if (i < path.length) {
       updatedState = updateInDocumentState(
@@ -329,6 +331,7 @@ export function expandWithCallback(
         if (value.length > 0) {
           const visibleSections = getVisibleSections(json, documentState, path)
 
+          // FIXME: should run for all items, not just the visible items
           forEachVisibleIndex(value, visibleSections, (index) => {
             const indexStr = String(index)
             currentPath[pathIndex] = indexStr
@@ -368,17 +371,6 @@ export function expandWithCallback(
   }
 
   return updatedState
-}
-
-// TODO: write unit tests
-export function expandSingleItem(
-  json: unknown,
-  documentState: DocumentState | undefined,
-  path: JSONPath
-): DocumentState | undefined {
-  return updateInDocumentState(json, documentState, path, (_value, state) => {
-    return isExpandableState(state) ? { ...state, expanded: true } : state
-  })
 }
 
 // TODO: write unit tests
@@ -835,19 +827,16 @@ export function getNextVisiblePath(
  */
 // TODO: write unit test
 export function expandRecursive(
-  json: unknown,
+  json: unknown | undefined,
   documentState: DocumentState | undefined,
   path: JSONPath
 ): DocumentState | undefined {
-  const expandContents: unknown | undefined = getIn(json, path)
-  if (expandContents === undefined) {
-    return documentState
-  }
+  const expandedJson = getIn(json, path)
+  const callback = !isLargeContent({ json: expandedJson }, MAX_DOCUMENT_SIZE_EXPAND_ALL)
+    ? expandAll
+    : expandMinimal
 
-  const expandAllRecursive = !isLargeContent({ json: expandContents }, MAX_DOCUMENT_SIZE_EXPAND_ALL)
-  const expandCallback = expandAllRecursive ? expandAll : expandMinimal
-
-  return expandWithCallback(json, documentState, path, expandCallback)
+  return expandWithCallback(json, documentState, path, callback)
 }
 
 // TODO: write unit test

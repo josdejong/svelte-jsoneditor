@@ -32,7 +32,6 @@
     expandPath,
     expandRecursive,
     expandSection,
-    expandSingleItem,
     expandWithCallback,
     getDefaultExpand,
     getEnforceString,
@@ -1405,11 +1404,8 @@
     debug('handleExpand', { path, expanded, recursive })
 
     if (expanded) {
-      if (recursive) {
-        documentState = expandWithCallback(json, documentState, path, expandAll)
-      } else {
-        documentState = expandSingleItem(json, documentState, path)
-      }
+      const callback: OnExpand = recursive ? expandAll : (p) => p.length === path.length
+      documentState = expandWithCallback(json, documentState, path, callback)
     } else {
       documentState = collapsePath(json, documentState, path)
 
