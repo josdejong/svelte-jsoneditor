@@ -29,18 +29,6 @@ export interface AjvValidatorOptions {
  * @return Returns a validation function
  */
 export function createAjvValidator(options: AjvValidatorOptions): Validator {
-  // Deprecation error for the API of v0.9.2 and older
-  if (options.schema === undefined) {
-    throw new Error(
-      'Deprecation warning: ' +
-        'the signature of createAjvValidator is changed from ' +
-        'createAjvValidator(schema, schemaDefinitions, ajvOptions) ' +
-        'to ' +
-        'createAjvValidator({ schema, schemaDefinitions, ajvOptions }). ' +
-        'Please pass the arguments as an object instead of unnamed arguments.'
-    )
-  }
-
   let ajv = createAjvInstance(options)
   if (options.onCreateAjv !== undefined) {
     ajv = options.onCreateAjv(ajv) || ajv

@@ -81,10 +81,7 @@
       type: 'button',
       text: 'text',
       title: `Switch to text mode (current mode: ${mode})`,
-      // check for 'code' mode is here for backward compatibility (deprecated since v0.4.0)
-      className:
-        'jse-group-button jse-first' +
-        (mode === Mode.text || (mode as string) === 'code' ? ' jse-selected' : ''),
+      className: 'jse-group-button jse-first' + (mode === Mode.text ? ' jse-selected' : ''),
       onClick: () => onChangeMode(Mode.text)
     },
     {

@@ -434,17 +434,7 @@
     jsoneditorModalState = undefined
   }
 
-  $: {
-    debug('mode changed to', mode)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    if (mode === 'code') {
-      // check for 'code' is here for backward compatibility (deprecated since v0.4.0)
-      console.warn(
-        'Deprecation warning: "code" mode is renamed to "text". Please use mode="text" instead.'
-      )
-    }
-  }
+  $: debug('mode changed to', mode)
 </script>
 
 <AbsolutePopup>
