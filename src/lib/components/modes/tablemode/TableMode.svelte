@@ -381,7 +381,7 @@
     focus,
     onPatch: handlePatch,
     onSelect: updateSelection,
-    onFind: handleFind,
+    onFind: openFind,
     onPasteJson: handlePasteJson,
     onRenderValue
   }
@@ -661,12 +661,6 @@
         })
       }
     }
-  }
-
-  function handleFind(findAndReplace: boolean) {
-    debug('handleFind', findAndReplace)
-
-    // TODO: implement handleFind
   }
 
   function handlePasteJson(newPastedJson: PastedJson) {
