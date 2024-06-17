@@ -101,7 +101,8 @@ export default function ({
   const canEditKey =
     !readOnly && hasJson && singleItemSelected(selection) && !rootSelected && !Array.isArray(parent)
 
-  const canEditValue = !readOnly && hasJson && selection != null && singleItemSelected(selection)
+  const canEditValue =
+    !readOnly && hasJson && selection !== undefined && singleItemSelected(selection)
   const canEnforceString = canEditValue && !isObjectOrArray(focusValue)
 
   const canCut = !readOnly && hasSelectionContents
@@ -111,7 +112,7 @@ export default function ({
   const canExtract =
     !readOnly &&
     hasJson &&
-    selection != null &&
+    selection !== undefined &&
     (isMultiSelection(selection) || isValueSelection(selection)) &&
     !rootSelected // must not be root
 
@@ -130,7 +131,7 @@ export default function ({
     !readOnly && (convertMode ? canConvert(selection) && isObjectOrArray(focusValue) : hasSelection)
 
   const enforceString =
-    selection != null
+    selection !== undefined
       ? getEnforceString(json, documentState, getFocusPath(selection), parser)
       : false
 

@@ -75,7 +75,7 @@ export async function onCut({
   }
 
   const clipboard = selectionToPartialJson(json, selection, indentation, parser)
-  if (clipboard == null) {
+  if (clipboard === undefined) {
     return
   }
 
@@ -101,7 +101,7 @@ export interface OnCopyAction {
 // TODO: write unit tests
 export async function onCopy({ json, selection, indentation, parser }: OnCopyAction) {
   const clipboard = selectionToPartialJson(json, selection, indentation, parser)
-  if (clipboard == null) {
+  if (clipboard === undefined) {
     return
   }
 
@@ -140,11 +140,11 @@ export function onPaste({
 
   function doPaste(pastedText: string) {
     if (json !== undefined) {
-      const selectionNonNull = selection || createValueSelection([], false)
+      const ensureSelection = selection || createValueSelection([], false)
 
-      const operations = insert(json, selectionNonNull, pastedText, parser)
+      const operations = insert(json, ensureSelection, pastedText, parser)
 
-      debug('paste', { pastedText, operations, selectionNonNull })
+      debug('paste', { pastedText, operations, ensureSelection })
 
       onPatch(operations, (patchedJson, patchedState) => {
         let updatedState = patchedState
@@ -483,7 +483,7 @@ export function onInsert({
 
         if (newValue === '') {
           // open the newly inserted value in edit mode
-          const parent = !isEmpty(path) ? getIn(patchedJson, initial(path)) : null
+          const parent = !isEmpty(path) ? getIn(patchedJson, initial(path)) : undefined
 
           return {
             // expandPath is invoked to make sure that visibleSections is extended when needed

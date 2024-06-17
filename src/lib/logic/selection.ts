@@ -255,7 +255,7 @@ export function getSelectionUp(
   }
 
   if (isKeySelection(selection)) {
-    if (previousPath == null || previousPath.length === 0) {
+    if (previousPath === undefined || previousPath.length === 0) {
       return undefined
     }
 

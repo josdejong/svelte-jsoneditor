@@ -51,7 +51,7 @@
   class={getValueClass(value, parser)}
   on:click={handleValueClick}
   on:dblclick={handleValueDoubleClick}
-  title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : null}
+  title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : undefined}
 >
   {#if searchResultItems}
     <SearchResultHighlighter text={normalization.escapeValue(value)} {searchResultItems} />

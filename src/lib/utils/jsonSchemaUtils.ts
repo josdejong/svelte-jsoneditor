@@ -101,17 +101,14 @@ export function findSchema(
 
     if (
       typeof currentSchema.properties === 'object' &&
-      currentSchema.properties !== null &&
+      currentSchema.properties &&
       nextKey in currentSchema.properties
     ) {
       currentSchema = (currentSchema.properties as Record<string, JSONSchema>)[nextKey]
       return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
     }
 
-    if (
-      typeof currentSchema.patternProperties === 'object' &&
-      currentSchema.patternProperties !== null
-    ) {
+    if (typeof currentSchema.patternProperties === 'object' && currentSchema.patternProperties) {
       for (const prop in currentSchema.patternProperties) {
         if (nextKey.match(prop)) {
           currentSchema = (currentSchema.patternProperties as Record<string, JSONSchema>)[prop]
@@ -125,7 +122,7 @@ export function findSchema(
       return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
     }
 
-    if (typeof currentSchema.items === 'object' && currentSchema.items !== null) {
+    if (typeof currentSchema.items === 'object' && currentSchema.items) {
       currentSchema = currentSchema.items as JSONSchema
       return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
     }

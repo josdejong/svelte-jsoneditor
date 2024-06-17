@@ -121,6 +121,11 @@
     }
   }
 
+  // backward compatibility warning since v1.0.0
+  $: if (selection === null) {
+    console.warn('selection is invalid: it is null but should be undefined')
+  }
+
   // We memoize the last parse result for the case when the content is text and very large.
   // In that case parsing takes a few seconds. When the user switches between tree and table mode,
   // without having made a change, we do not want to parse the text again.

@@ -263,7 +263,7 @@
       event.preventDefault()
       event.stopPropagation()
 
-      if (singleton.selectionFocus == null) {
+      if (singleton.selectionFocus === undefined) {
         // First move event, no selection yet.
         // Clear the default selection of the browser
         if (window.getSelection) {
@@ -460,7 +460,7 @@
     function addHeight(prop: string) {
       const itemPath = path.concat(prop)
       const element = context.findElement(itemPath)
-      if (element != null) {
+      if (element !== undefined) {
         items.push({
           path: itemPath,
           height: element.clientHeight

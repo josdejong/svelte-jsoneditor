@@ -302,7 +302,6 @@
 
   async function handleFocusSearch(path: JSONPath) {
     documentState = expandPath(json, documentState, path)
-    null // navigation path of current selection would be confusing
     await scrollTo(path)
   }
 
@@ -504,7 +503,7 @@
 
     debug('applyExternalSelection', externalSelection)
 
-    if (isJSONSelection(externalSelection) || externalSelection === null) {
+    if (isJSONSelection(externalSelection) || externalSelection === undefined) {
       updateSelection(externalSelection)
     }
   }

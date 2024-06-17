@@ -60,13 +60,14 @@ export default function ({
     hasJson &&
     (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))
 
-  const canEditValue = !readOnly && hasJson && selection != null && singleItemSelected(selection)
+  const canEditValue =
+    !readOnly && hasJson && selection !== undefined && singleItemSelected(selection)
   const canEnforceString = canEditValue && !isObjectOrArray(focusValue)
 
   const canCut = !readOnly && hasSelectionContents
 
   const enforceString =
-    selection != null
+    selection !== undefined
       ? getEnforceString(json, documentState, getFocusPath(selection), parser)
       : false
 

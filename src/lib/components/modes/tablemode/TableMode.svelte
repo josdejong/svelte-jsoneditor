@@ -448,7 +448,7 @@
     if (!isEqual(selection, externalSelection)) {
       debug('applyExternalSelection', externalSelection)
 
-      if (isJSONSelection(externalSelection) || externalSelection === null) {
+      if (isJSONSelection(externalSelection) || externalSelection === undefined) {
         updateSelection(externalSelection)
       }
     }
