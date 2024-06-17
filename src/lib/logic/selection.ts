@@ -593,7 +593,6 @@ export function findRootPath(json: unknown, selection: JSONSelection): JSONPath 
     : initial(getFocusPath(selection)) // the parent path of the paths
 }
 
-// TODO: unit test
 export function pathStartsWith(path: JSONPath, parentPath: JSONPath): boolean {
   if (path.length < parentPath.length) {
     return false

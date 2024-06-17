@@ -16,6 +16,7 @@ import {
   getSelectionRight,
   getSelectionUp,
   pathInSelection,
+  pathStartsWith,
   selectionIfOverlapping,
   selectionToPartialJson
 } from './selection.js'
@@ -884,6 +885,19 @@ describe('selection', () => {
       assert.strictEqual(pathInSelection(json, selection, ['str']), false)
       assert.strictEqual(pathInSelection(json, selection, ['bool']), false)
       assert.strictEqual(pathInSelection(json, selection, ['obj', 'arr', '1']), true)
+    })
+  })
+
+  describe('pathStartsWith', () => {
+    test('should determine whether a path starts with parent path', () => {
+      assert.strictEqual(pathStartsWith([], []), true)
+      assert.strictEqual(pathStartsWith(['a'], []), true)
+      assert.strictEqual(pathStartsWith(['a'], ['a']), true)
+      assert.strictEqual(pathStartsWith(['a', 'b'], ['a']), true)
+      assert.strictEqual(pathStartsWith(['a', 'b'], ['a', 'b']), true)
+      assert.strictEqual(pathStartsWith(['a'], ['a', 'b']), false)
+      assert.strictEqual(pathStartsWith(['a', 'b'], ['b']), false)
+      assert.strictEqual(pathStartsWith(['a', 'b'], ['a', 'b', 'c']), false)
     })
   })
 })
