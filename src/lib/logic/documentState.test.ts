@@ -957,7 +957,7 @@ describe('documentState', () => {
         res.state,
         updateIn(documentState, ['properties', 'members'], (state: DocumentState) => ({
           ...state,
-          items: state.type === 'array' ? state.items.slice(0, 2) : null,
+          items: state.type === 'array' ? state.items.slice(0, 2) : undefined,
           visibleSections: [{ start: 0, end: 2 }]
         }))
       )
@@ -979,7 +979,7 @@ describe('documentState', () => {
         res.state,
         updateIn(documentState, ['properties', 'members'], (state: DocumentState) => ({
           ...state,
-          items: state.type === 'array' ? [state.items[0], state.items[2]] : null,
+          items: state.type === 'array' ? [state.items[0], state.items[2]] : undefined,
           visibleSections: [{ start: 0, end: 2 }]
         }))
       )
@@ -1135,7 +1135,7 @@ describe('documentState', () => {
                   state.items[1],
                   state.items[2]
                 ]
-              : null,
+              : undefined,
           visibleSections: [{ start: 0, end: 4 }]
         }))
       )
@@ -1208,7 +1208,8 @@ describe('documentState', () => {
         updateIn(documentState, ['properties', 'members'], (state: DocumentState | undefined) => {
           return {
             ...state,
-            items: state?.type === 'array' ? [state.items[1], state.items[0], state.items[2]] : null
+            items:
+              state?.type === 'array' ? [state.items[1], state.items[0], state.items[2]] : undefined
           }
         })
       )
@@ -1243,7 +1244,8 @@ describe('documentState', () => {
         updateIn(documentState, ['properties', 'members'], (state: DocumentState | undefined) => {
           return {
             ...state,
-            items: state?.type === 'array' ? [state.items[1], state.items[0], state.items[2]] : null
+            items:
+              state?.type === 'array' ? [state.items[1], state.items[0], state.items[2]] : undefined
           }
         })
       )
@@ -1290,7 +1292,7 @@ describe('documentState', () => {
                   state.items[1],
                   state.items[2]
                 ]
-              : null,
+              : undefined,
           visibleSections: [{ start: 0, end: 4 }]
         })
       )
@@ -1323,7 +1325,7 @@ describe('documentState', () => {
         ['properties', 'members'],
         (state: DocumentState) => ({
           ...state,
-          items: state.type === 'array' ? [state.items[0], state.items[2]] : null,
+          items: state.type === 'array' ? [state.items[0], state.items[2]] : undefined,
           visibleSections: [{ start: 0, end: 2 }]
         })
       )

@@ -13,14 +13,14 @@ import type {
 
 export interface MoveSelectionProps {
   json: unknown
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   deltaY: number
   items: RenderedItem[]
 }
 
 export interface MoveSelectionResult {
   operations: JSONPatchDocument | undefined
-  updatedSelection: JSONSelection | null
+  updatedSelection: JSONSelection | undefined
   offset: number
 }
 
@@ -33,7 +33,7 @@ export function onMoveSelection({
   if (!selection) {
     return {
       operations: undefined,
-      updatedSelection: null,
+      updatedSelection: undefined,
       offset: 0
     }
   }
@@ -46,7 +46,7 @@ export function onMoveSelection({
   if (!dragInsideAction || dragInsideAction.offset === 0) {
     return {
       operations: undefined,
-      updatedSelection: null,
+      updatedSelection: undefined,
       offset: 0
     }
   }
@@ -72,7 +72,7 @@ export function onMoveSelection({
     // object
     return {
       operations,
-      updatedSelection: null,
+      updatedSelection: undefined,
       offset: dragInsideAction.offset
     }
   }

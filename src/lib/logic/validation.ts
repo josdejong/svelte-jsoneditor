@@ -81,7 +81,7 @@ export function toRecursiveValidationErrors(
 
 export function validateJSON(
   json: unknown,
-  validator: Validator | null,
+  validator: Validator | undefined,
   parser: JSONParser,
   validationParser: JSONParser
 ): ValidationError[] {
@@ -104,10 +104,10 @@ export function validateJSON(
 
 export function validateText(
   text: string,
-  validator: Validator | null,
+  validator: Validator | undefined,
   parser: JSONParser,
   validationParser: JSONParser
-): ContentErrors | null {
+): ContentErrors | undefined {
   debug('validateText')
 
   if (text.length > MAX_VALIDATABLE_SIZE) {
@@ -124,7 +124,7 @@ export function validateText(
 
   if (text.length === 0) {
     // new, empty document, do not try to parse
-    return null
+    return undefined
   }
 
   try {
@@ -136,7 +136,7 @@ export function validateText(
     )
 
     if (!validator) {
-      return null
+      return undefined
     }
 
     // if needed, parse with the validationParser to be able to feed the json to the validator
@@ -154,7 +154,7 @@ export function validateText(
       (duration) => debug(`validate: validated json in ${duration} ms`)
     )
 
-    return !isEmpty(validationErrors) ? { validationErrors } : null
+    return !isEmpty(validationErrors) ? { validationErrors } : undefined
   } catch (err) {
     const isRepairable = measure(
       () => canAutoRepair(text, parser),

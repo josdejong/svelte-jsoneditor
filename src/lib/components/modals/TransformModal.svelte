@@ -286,7 +286,7 @@
             {#if showOriginal}
               <TreeMode
                 externalContent={selectedContent}
-                externalSelection={null}
+                externalSelection={undefined}
                 readOnly={true}
                 mainMenuBar={false}
                 navigationBar={false}
@@ -308,7 +308,7 @@
                 onTransformModal={noop}
                 onJSONEditorModal={noop}
                 {onClassName}
-                validator={null}
+                validator={undefined}
                 {validationParser}
                 {pathParser}
               />
@@ -321,7 +321,7 @@
             {#if !previewError}
               <TreeMode
                 externalContent={previewContent}
-                externalSelection={null}
+                externalSelection={undefined}
                 readOnly={true}
                 mainMenuBar={false}
                 navigationBar={false}
@@ -343,7 +343,7 @@
                 onTransformModal={noop}
                 onJSONEditorModal={noop}
                 {onClassName}
-                validator={null}
+                validator={undefined}
                 {validationParser}
                 {pathParser}
               />

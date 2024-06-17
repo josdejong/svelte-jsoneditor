@@ -173,7 +173,7 @@ describe('validation', () => {
     const invalidText = '{ "foo": 42 }'
 
     test('should validateText with native parser and valid JSON', () => {
-      deepStrictEqual(validateText(validText, myValidator, JSON, JSON), null)
+      deepStrictEqual(validateText(validText, myValidator, JSON, JSON), undefined)
     })
 
     test('should validateText with native parser and invalid JSON', () => {
@@ -183,7 +183,7 @@ describe('validation', () => {
     })
 
     test('should validateText with lossless parser and valid JSON', () => {
-      deepStrictEqual(validateText(validText, myValidator, LosslessJSONParser, JSON), null)
+      deepStrictEqual(validateText(validText, myValidator, LosslessJSONParser, JSON), undefined)
     })
 
     test('should validateText with lossless parser and invalid JSON', () => {
@@ -195,7 +195,7 @@ describe('validation', () => {
     test('should validateText with two lossless parsers and valid JSON', () => {
       deepStrictEqual(
         validateText(validText, myLosslessValidator, LosslessJSONParser, LosslessJSONParser),
-        null
+        undefined
       )
     })
 
@@ -211,7 +211,7 @@ describe('validation', () => {
     test('should validateText with a non-repairable parse error', () => {
       const invalidText = '{\n  "name": "Joe" }[]'
 
-      deepStrictEqual(validateText(invalidText, null, LosslessJSONParser, JSON), {
+      deepStrictEqual(validateText(invalidText, undefined, LosslessJSONParser, JSON), {
         isRepairable: false,
         parseError: {
           column: 17,
@@ -225,7 +225,7 @@ describe('validation', () => {
     test('should validateText with a repairable parse error', () => {
       const invalidText = '{\n  "name": "Joe"'
 
-      deepStrictEqual(validateText(invalidText, null, LosslessJSONParser, JSON), {
+      deepStrictEqual(validateText(invalidText, undefined, LosslessJSONParser, JSON), {
         isRepairable: true,
         parseError: {
           column: 15,
@@ -240,7 +240,7 @@ describe('validation', () => {
     test('should validateText with duplicate keys', () => {
       const duplicateKeysText = '{\n  "name": "Joe",\n  "age": 23,\n  "name": "Sarah"\n}'
 
-      deepStrictEqual(validateText(duplicateKeysText, null, LosslessJSONParser, JSON), {
+      deepStrictEqual(validateText(duplicateKeysText, undefined, LosslessJSONParser, JSON), {
         isRepairable: false,
         parseError: {
           column: 3,

@@ -37,7 +37,7 @@
   import { cloneDeep } from 'lodash-es'
 
   export let content: Content
-  export let selection: JSONEditorSelection | null
+  export let selection: JSONEditorSelection | undefined
 
   export let readOnly: boolean
   export let indentation: number | string
@@ -52,7 +52,7 @@
   export let flattenColumns: boolean
   export let parser: JSONParser
   export let parseMemoizeOne: JSONParser['parse']
-  export let validator: Validator | null
+  export let validator: Validator | undefined
   export let validationParser: JSONParser
   export let pathParser: JSONPathParser
   export let insideModal: boolean
@@ -177,7 +177,7 @@
    * Validate the contents of the editor using the configured validator.
    * Returns a parse error or a list with validation warnings
    */
-  export function validate(): ContentErrors | null {
+  export function validate(): ContentErrors | undefined {
     if (refTextMode) {
       return refTextMode.validate()
     } else if (refTreeMode) {
@@ -219,7 +219,7 @@
     }
   }
 
-  export function findElement(path: JSONPath): Element | null {
+  export function findElement(path: JSONPath): Element | undefined {
     if (refTreeMode) {
       return refTreeMode.findElement(path)
     } else if (refTableMode) {

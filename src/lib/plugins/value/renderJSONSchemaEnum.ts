@@ -16,7 +16,7 @@ export function renderJSONSchemaEnum(
   props: RenderValueProps,
   schema: JSONSchema,
   schemaDefinitions?: JSONSchemaDefinitions
-): RenderValueComponentDescription[] | null {
+): RenderValueComponentDescription[] | undefined {
   const enumValues = getJSONSchemaOptions(schema, schemaDefinitions, props.path)
 
   if (enumValues) {
@@ -49,5 +49,5 @@ export function renderJSONSchemaEnum(
     ]
   }
 
-  return null
+  return undefined
 }

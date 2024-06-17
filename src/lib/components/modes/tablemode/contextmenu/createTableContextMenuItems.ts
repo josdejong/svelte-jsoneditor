@@ -36,7 +36,7 @@ export default function ({
 }: {
   json: unknown | undefined
   documentState: DocumentState | undefined
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   readOnly: boolean
   parser: JSONParser
   onEditValue: () => void
@@ -60,13 +60,14 @@ export default function ({
     hasJson &&
     (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))
 
-  const canEditValue = !readOnly && hasJson && selection != null && singleItemSelected(selection)
+  const canEditValue =
+    !readOnly && hasJson && selection !== undefined && singleItemSelected(selection)
   const canEnforceString = canEditValue && !isObjectOrArray(focusValue)
 
   const canCut = !readOnly && hasSelectionContents
 
   const enforceString =
-    selection != null
+    selection !== undefined
       ? getEnforceString(json, documentState, getFocusPath(selection), parser)
       : false
 

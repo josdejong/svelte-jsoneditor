@@ -64,7 +64,7 @@
   const debug = createDebug('jsoneditor:JSONEditor')
 
   export let content: Content = { text: '' }
-  export let selection: JSONEditorSelection | null = null
+  export let selection: JSONEditorSelection | undefined = undefined
 
   export let readOnly = false
   export let indentation: number | string = 2
@@ -78,7 +78,7 @@
   export let escapeUnicodeCharacters = false
   export let flattenColumns = true
   export let parser: JSONParser = JSON
-  export let validator: Validator | null = null
+  export let validator: Validator | undefined = undefined
   export let validationParser: JSONParser = JSON
   export let pathParser: JSONPathParser = {
     parse: parseJSONPath,
@@ -89,8 +89,8 @@
   export let queryLanguageId: string = queryLanguages[0].id
 
   export let onChangeQueryLanguage: OnChangeQueryLanguage = noop
-  export let onChange: OnChange = null
-  export let onSelect: OnSelect | null = null
+  export let onChange: OnChange | undefined = undefined
+  export let onSelect: OnSelect | undefined = undefined
   export let onRenderValue: OnRenderValue = renderValue
   export let onClassName: OnClassName = () => undefined
   export let onRenderMenu: OnRenderMenu = noop
@@ -107,16 +107,23 @@
   let hasFocus = false
   let refJSONEditorRoot: JSONEditorRoot
   let open: Open // svelte-simple-modal context open(...)
-  let jsoneditorModalState: {
-    component: Component
-    callbacks: Partial<Callbacks>
-  } | null = null
+  let jsoneditorModalState:
+    | {
+        component: Component
+        callbacks: Partial<Callbacks>
+      }
+    | undefined = undefined
 
   $: {
     const contentError = validateContentType(content)
     if (contentError) {
       console.error('Error: ' + contentError)
     }
+  }
+
+  // backward compatibility warning since v1.0.0
+  $: if (selection === null) {
+    console.warn('selection is invalid: it is null but should be undefined')
   }
 
   // We memoize the last parse result for the case when the content is text and very large.
@@ -198,7 +205,7 @@
     return result
   }
 
-  export async function select(newSelection: JSONEditorSelection | null) {
+  export async function select(newSelection: JSONEditorSelection | undefined) {
     selection = newSelection
 
     await tick() // await rerender
@@ -221,7 +228,7 @@
    * Validate the contents of the editor using the configured validator.
    * Returns a parse error or a list with validation warnings
    */
-  export function validate(): ContentErrors | null {
+  export function validate(): ContentErrors | undefined {
     return refJSONEditorRoot.validate()
   }
 
@@ -248,7 +255,7 @@
     await refJSONEditorRoot.scrollTo(path)
   }
 
-  export function findElement(path: JSONPath): Element | null {
+  export function findElement(path: JSONPath): Element | undefined {
     return refJSONEditorRoot.findElement(path)
   }
 
@@ -286,7 +293,7 @@
     }
   }
 
-  function handleSelect(updatedSelection: JSONEditorSelection | null) {
+  function handleSelect(updatedSelection: JSONEditorSelection | undefined) {
     selection = updatedSelection
 
     if (onSelect) {
@@ -424,7 +431,7 @@
 
   function closeJSONEditorModal() {
     jsoneditorModalState?.callbacks?.onClose?.()
-    jsoneditorModalState = null
+    jsoneditorModalState = undefined
   }
 
   $: {

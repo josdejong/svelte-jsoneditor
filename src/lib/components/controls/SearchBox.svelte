@@ -229,13 +229,13 @@
 
   // we pass searchText and json as argument to trigger search when these variables change,
   // via various listeners like applyChangedSearchText
-  async function applySearch(showSearch: boolean, text: string, json: unknown) {
+  async function applySearch(showSearch: boolean, text: string, json: unknown): Promise<void> {
     if (!showSearch) {
       if (searchResult) {
         searchResult = undefined
       }
 
-      return
+      return Promise.resolve()
     }
 
     debug('applySearch', { showSearch, text })
@@ -247,7 +247,7 @@
         searchResult = undefined
       }
 
-      return
+      return Promise.resolve()
     }
 
     appliedText = text

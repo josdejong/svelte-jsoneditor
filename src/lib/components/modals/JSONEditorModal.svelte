@@ -51,7 +51,7 @@
   export let escapeUnicodeCharacters: boolean
   export let flattenColumns: boolean
   export let parser: JSONParser
-  export let validator: Validator | null
+  export let validator: Validator | undefined
   export let validationParser: JSONParser
   export let pathParser: JSONPathParser
 
@@ -68,7 +68,7 @@
   interface ModalState {
     mode: Mode
     content: Content
-    selection: JSONEditorSelection | null
+    selection: JSONEditorSelection | undefined
     relativePath: JSONPath
   }
 
@@ -78,7 +78,7 @@
   const rootState: ModalState = {
     mode: determineMode(content),
     content,
-    selection: null,
+    selection: undefined,
     relativePath: path
   }
   let stack: ModalState[] = [rootState]
@@ -97,7 +97,7 @@
   }
 
   function scrollToSelection() {
-    const selection: JSONEditorSelection | null = last(stack)?.selection || null
+    const selection: JSONEditorSelection | undefined = last(stack)?.selection
     if (isJSONSelection(selection)) {
       refEditor.scrollTo(getFocusPath(selection))
     }
@@ -180,7 +180,7 @@
     stack = [...initial(stack), updatedState]
   }
 
-  function handleChangeSelection(newSelection: JSONEditorSelection | null) {
+  function handleChangeSelection(newSelection: JSONEditorSelection | undefined) {
     debug('handleChangeSelection', newSelection)
 
     const updatedState = {
@@ -213,7 +213,7 @@
     const nestedModalState = {
       mode: determineMode(content),
       content,
-      selection: null,
+      selection: undefined,
       relativePath: path
     }
     stack = [...stack, nestedModalState]

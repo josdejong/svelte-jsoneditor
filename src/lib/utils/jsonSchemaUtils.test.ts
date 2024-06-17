@@ -183,9 +183,9 @@ describe('jsonSchemaUtils', () => {
         }
       }
       let path = ['bar']
-      assert.strictEqual(findSchema(schema, {}, path), null)
+      assert.strictEqual(findSchema(schema, {}, path), undefined)
       path = ['foo', 'bar']
-      assert.strictEqual(findSchema(schema, {}, path), null)
+      assert.strictEqual(findSchema(schema, {}, path), undefined)
     })
 
     test('should find one of required properties', () => {
@@ -607,9 +607,9 @@ describe('jsonSchemaUtils', () => {
           }
         }
         let path = ['not-in-schema']
-        assert.strictEqual(findSchema(schema, {}, path), null)
+        assert.strictEqual(findSchema(schema, {}, path), undefined)
         path = ['levelOne', 'not-in-schema']
-        assert.strictEqual(findSchema(schema, {}, path), null)
+        assert.strictEqual(findSchema(schema, {}, path), undefined)
       })
 
       test('should return additionalProperties schema', () => {

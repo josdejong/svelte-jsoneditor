@@ -83,7 +83,7 @@
   export let state: DocumentState | undefined
   export let validationErrors: ValidationErrors | undefined
   export let searchResults: SearchResults | undefined
-  export let selection: JSONSelection | null
+  export let selection: JSONSelection | undefined
   export let context: TreeModeContext
   export let onDragSelectionStart: (
     event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }
@@ -253,7 +253,7 @@
           context.onSelect(createMultiSelection(path, path))
         }
       } else if (json !== undefined) {
-        context.onSelect(fromSelectionType(json, anchorType, path))
+        context.onSelect(fromSelectionType(anchorType, path))
       }
     }
   }
@@ -263,7 +263,7 @@
       event.preventDefault()
       event.stopPropagation()
 
-      if (singleton.selectionFocus == null) {
+      if (singleton.selectionFocus === undefined) {
         // First move event, no selection yet.
         // Clear the default selection of the browser
         if (window.getSelection) {
@@ -433,7 +433,7 @@
           const selectionType = getSelectionTypeFromTarget(event.target as Element)
           const path = getDataPathFromTarget(event.target as Element)
           if (path) {
-            context.onSelect(fromSelectionType(json, selectionType, path))
+            context.onSelect(fromSelectionType(selectionType, path))
           }
         }
       }
@@ -454,13 +454,13 @@
   function getVisibleItemsWithHeights(
     selection: JSONSelection,
     visibleSections: VisibleSection[]
-  ): RenderedItem[] | null {
+  ): RenderedItem[] | undefined {
     const items: RenderedItem[] = []
 
     function addHeight(prop: string) {
       const itemPath = path.concat(prop)
       const element = context.findElement(itemPath)
-      if (element != null) {
+      if (element !== undefined) {
         items.push({
           path: itemPath,
           height: element.clientHeight
@@ -471,7 +471,7 @@
     if (Array.isArray(value)) {
       const json = context.getJson()
       if (json === undefined) {
-        return null
+        return undefined
       }
       const startPath = getStartPath(json, selection)
       const endPath = getEndPath(json, selection)
@@ -487,7 +487,7 @@
       })
 
       if (!currentSection) {
-        return null
+        return undefined
       }
 
       const { start, end } = currentSection
@@ -860,7 +860,7 @@
           {path}
           {value}
           {enforceString}
-          selection={isNodeSelected ? selection : null}
+          selection={isNodeSelected ? selection : undefined}
           searchResultItems={filterValueSearchResults(searchResults)}
           {context}
         />

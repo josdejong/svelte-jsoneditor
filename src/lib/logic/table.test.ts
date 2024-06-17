@@ -90,6 +90,10 @@ describe('table', () => {
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
+    deepStrictEqual(getColumns(undefined, false), [])
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     deepStrictEqual(getColumns('foo', false), [])
   })
 

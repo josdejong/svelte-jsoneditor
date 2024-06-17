@@ -5,7 +5,7 @@ const debug = createDebug('jsoneditor:FocusTracker')
 export interface FocusTrackerProps {
   onMount: (callback: () => void) => void
   onDestroy: (callback: () => void) => void
-  getWindow: () => Window | null
+  getWindow: () => Window | undefined
   hasFocus: () => boolean
   onFocus: () => void
   onBlur: () => void

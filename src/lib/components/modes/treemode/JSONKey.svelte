@@ -19,7 +19,7 @@
 
   export let pointer: JSONPointer
   export let key: string
-  export let selection: JSONSelection | null
+  export let selection: JSONSelection | undefined
   export let searchResultItems: ExtendedSearchResultItem[] | undefined
   export let onUpdateKey: (oldKey: string, newKey: string) => string
 

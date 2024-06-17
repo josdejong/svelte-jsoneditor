@@ -12,6 +12,14 @@
     "sourceType": "module",
     "ecmaVersion": 2019
   },
+  "rules": {
+    "consistent-return": [
+      "warn",
+      {
+        "treatUndefinedAsUnspecified": false
+      }
+    ]
+  },
   "overrides": [
     {
       "files": ["*.svelte"],
