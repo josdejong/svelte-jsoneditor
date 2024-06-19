@@ -157,6 +157,7 @@
 
   let onChangeDisabled = false
   let acceptTooLarge = false
+  let askToFormatApplied = askToFormat
 
   let validationErrors: ValidationError[] = []
   const linterCompartment = new Compartment()
@@ -288,6 +289,8 @@
 
       setCodeMirrorContent(updatedContent, true, false)
 
+      askToFormatApplied = askToFormat // reset to the original value
+
       return true
     } catch (err) {
       onError(err as Error)
@@ -310,6 +313,8 @@
       }
 
       setCodeMirrorContent(updatedContent, true, false)
+
+      askToFormatApplied = false
 
       return true
     } catch (err) {
@@ -1072,7 +1077,7 @@
         />
       {/if}
 
-      {#if !jsonParseError && askToFormat && needsFormatting(text)}
+      {#if !jsonParseError && askToFormatApplied && needsFormatting(text)}
         <Message
           type="success"
           message="Do you want to format the JSON?"
@@ -1087,7 +1092,7 @@
               icon: faTimes,
               text: 'No thanks',
               title: 'Close this message',
-              onClick: () => (askToFormat = false)
+              onClick: () => (askToFormatApplied = false)
             }
           ]}
           onClose={focus}
