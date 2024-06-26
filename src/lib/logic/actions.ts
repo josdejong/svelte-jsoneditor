@@ -41,8 +41,8 @@ import {
 } from 'immutable-json-patch'
 import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
 import {
-  expandAll,
-  expandPath,
+  expandAllNonHidden,
+  expandParentPath,
   expandRecursive,
   expandWithCallback
 } from '$lib/logic/documentState.js'
@@ -476,7 +476,7 @@ export function onInsert({
 
         if (isObjectOrArray(newValue)) {
           return {
-            state: expandWithCallback(patchedJson, patchedState, path, expandAll),
+            state: expandWithCallback(patchedJson, patchedState, path, expandAllNonHidden),
             selection: selectInside ? createInsideSelection(path) : patchedSelection
           }
         }
@@ -486,8 +486,8 @@ export function onInsert({
           const parent = !isEmpty(path) ? getIn(patchedJson, initial(path)) : undefined
 
           return {
-            // expandPath is invoked to make sure that visibleSections is extended when needed
-            state: expandPath(patchedJson, patchedState, path),
+            // expandParentPath is invoked to make sure that visibleSections is extended when needed
+            state: expandParentPath(patchedJson, patchedState, path),
             selection: isObject(parent)
               ? createKeySelection(path, true)
               : createValueSelection(path, true)

@@ -53,6 +53,7 @@ import {
   isObjectRecursiveState,
   isValueRecursiveState
 } from '$lib/typeguards.js'
+import { pathStartsWith } from './selection.js'
 
 export type CreateRecursiveStateProps = {
   json: unknown | undefined
@@ -239,46 +240,19 @@ export function forEachVisibleIndex(
  * Expand all nodes on given path
  * The end of the path itself is not expanded
  */
-export function expandPath(
+export function expandParentPath(
   json: unknown,
   documentState: DocumentState | undefined,
   path: JSONPath
 ): DocumentState | undefined {
-  let updatedState = documentState
-
-  for (let i = 0; i < path.length; i++) {
-    const partialPath = path.slice(0, i)
-    updatedState = updateInDocumentState(json, updatedState, partialPath, (_value, state) => {
-      return isExpandableState(state) ? { ...state, expanded: true } : state
-    })
-
-    if (i < path.length) {
-      updatedState = updateInDocumentState(
-        json,
-        updatedState,
-        partialPath,
-        (_value, nestedState) => {
-          if (!isArrayRecursiveState(nestedState)) {
-            return nestedState
-          }
-
-          const index = int(path[i])
-          if (inVisibleSection(nestedState.visibleSections, index)) {
-            return nestedState
-          }
-
-          const start = currentRoundNumber(index)
-          const end = nextRoundNumber(start)
-          const newVisibleSection = { start, end }
-
-          return {
-            ...nestedState,
-            visibleSections: mergeSections(nestedState.visibleSections.concat(newVisibleSection))
-          }
-        }
-      )
-    }
+  if (path.length === 0) {
+    return documentState
   }
+
+  const parent = initial(path)
+  const updatedState = expandWithCallback(json, documentState, [], (p) => pathStartsWith(parent, p))
+
+  // FIXME: should adjust the visibleSections when the child of the parent is hidden
 
   return updatedState
 }
@@ -316,58 +290,110 @@ export function expandWithCallback(
   documentState: DocumentState | undefined,
   path: JSONPath,
   expandedCallback: OnExpand
-): DocumentState | undefined {
-  let updatedState = documentState
+): DocumentState {
+  // FIXME: updateInDocumentState and ensureNestedDocumentState here?
+  let updatedState = ensureRecursiveState(json, documentState, path, documentStateFactory)
 
-  function recurse(value: unknown) {
+  // FIXME: simplify this function
+
+  function recurse(value: unknown, hidden: boolean): boolean {
     const pathIndex = currentPath.length
+    const pathStateIndex = currentStatePath.length + 1
 
     if (Array.isArray(value)) {
-      if (expandedCallback(currentPath)) {
-        updatedState = updateInDocumentState(json, updatedState, currentPath, (_value, state) => {
-          return state ? { ...state, expanded: true } : createArrayDocumentState({ expanded: true })
-        })
+      if (expandedCallback(currentPath, hidden)) {
+        updatedState = updateIn(
+          updatedState,
+          currentStatePath,
+          (value: DocumentState | undefined) => {
+            return value
+              ? { ...value, expanded: true }
+              : createArrayDocumentState({ expanded: true })
+          }
+        )
 
         if (value.length > 0) {
-          const visibleSections = getVisibleSections(json, documentState, path)
+          currentStatePath.push('items')
 
-          // FIXME: should run for all items, not just the visible items
-          forEachVisibleIndex(value, visibleSections, (index) => {
+          const visibleSections = getVisibleSections(json, updatedState, path)
+          let updatedVisibleSections = visibleSections
+
+          for (let index = 0; index < value.length; index++) {
             const indexStr = String(index)
             currentPath[pathIndex] = indexStr
+            currentStatePath[pathStateIndex] = indexStr
+            const hidden = !inVisibleSection(updatedVisibleSections, index)
 
-            recurse(value[index])
-          })
-
-          currentPath.pop()
-        }
-      }
-    } else if (isObject(value)) {
-      if (expandedCallback(currentPath)) {
-        updatedState = updateInDocumentState(json, updatedState, currentPath, (_value, state) => {
-          return state
-            ? { ...state, expanded: true }
-            : createObjectDocumentState({ expanded: true })
-        })
-
-        const keys = Object.keys(value)
-        if (keys.length > 0) {
-          for (const key of keys) {
-            currentPath[pathIndex] = key
-
-            recurse(value[key])
+            const expanded = recurse(value[index], hidden)
+            console.log('expanded', { currentPath, expanded, hidden })
+            if (expanded && hidden) {
+              const start = currentRoundNumber(index)
+              const end = nextRoundNumber(start)
+              const newVisibleSection = { start, end }
+              updatedVisibleSections = mergeSections(
+                updatedVisibleSections.concat(newVisibleSection)
+              )
+              console.log('updatedVisibleSections', updatedVisibleSections)
+            }
           }
 
           currentPath.pop()
+          currentStatePath.pop()
+          currentStatePath.pop()
+
+          if (updatedVisibleSections !== visibleSections) {
+            updatedState = updateIn(
+              updatedState,
+              currentStatePath,
+              (value: DocumentState | undefined) => {
+                return { ...value, visibleSections: updatedVisibleSections }
+              }
+            )
+          }
         }
+
+        return true
+      }
+    } else if (isObject(value)) {
+      if (expandedCallback(currentPath, hidden)) {
+        updatedState = updateIn(
+          updatedState,
+          currentStatePath,
+          (value: DocumentState | undefined) => {
+            return value
+              ? { ...value, expanded: true }
+              : createObjectDocumentState({ expanded: true })
+          }
+        )
+
+        const keys = Object.keys(value)
+        if (keys.length > 0) {
+          currentStatePath.push('properties')
+
+          for (const key of keys) {
+            currentPath[pathIndex] = key
+            currentStatePath[pathStateIndex] = key
+
+            recurse(value[key], false)
+          }
+
+          currentPath.pop()
+          currentStatePath.pop()
+          currentStatePath.pop()
+        }
+
+        return true
       }
     }
+
+    return false
   }
 
   const currentPath = path.slice()
+  const currentStatePath = toRecursiveStatePath(json, currentPath)
   const value = json !== undefined ? getIn(json, path) : json
   if (value !== undefined) {
-    recurse(value)
+    recurse(value, false)
   }
 
   return updatedState
@@ -833,23 +859,23 @@ export function expandRecursive(
 ): DocumentState | undefined {
   const expandedJson = getIn(json, path)
   const callback = !isLargeContent({ json: expandedJson }, MAX_DOCUMENT_SIZE_EXPAND_ALL)
-    ? expandAll
+    ? expandAllNonHidden
     : expandMinimal
 
   return expandWithCallback(json, documentState, path, callback)
 }
 
 // TODO: write unit test
-export function expandMinimal(path: JSONPath): boolean {
-  return path.length === 0 ? true : path.length === 1 && path[0] === '0' // first item of an array
+export function expandMinimal(path: JSONPath, hidden: boolean): boolean {
+  return !hidden && (path.length === 0 ? true : path.length === 1 && path[0] === '0') // first item of an array
 }
 
 // TODO: write unit test
-export function expandAll(): boolean {
-  return true
+export function expandAllNonHidden(_path: JSONPath, hidden: boolean): boolean {
+  return !hidden
 }
 
 // TODO: write unit test
 export function getDefaultExpand(json: unknown): OnExpand {
-  return isLargeContent({ json }, MAX_DOCUMENT_SIZE_EXPAND_ALL) ? expandMinimal : expandAll
+  return isLargeContent({ json }, MAX_DOCUMENT_SIZE_EXPAND_ALL) ? expandMinimal : expandAllNonHidden
 }

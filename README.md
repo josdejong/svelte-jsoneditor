@@ -712,10 +712,12 @@ editor.updateProps({
 #### expand
 
 ```ts
-JSONEditor.prototype.expand([callback: (path: Path) => boolean]): Promise<void>
+JSONEditor.prototype.expand([callback: (path: Path, hidden: boolean) => boolean]): Promise<void>
 ```
 
-Expand or collapse paths in the editor. The `callback` determines which paths will be expanded. If no `callback` is provided, all paths will be expanded. It is only possible to expand a path when all of its parent paths are expanded too. Examples:
+Expand or collapse paths in the editor. The `callback` determines which paths will be expanded. If no `callback` is provided, all paths will be expanded. It is only possible to expand a path when all of its parent paths are expanded too. The second argument `hidden` of the callback is true for items in an array that are inside a collapsed part of the array: by default, only the first 100 items of an array are rendered.
+
+Examples:
 
 - `editor.expand(path => true)` expand all
 - `editor.expand(path => false)` collapse all

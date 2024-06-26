@@ -27,9 +27,9 @@
     collapsePath,
     createDocumentState,
     documentStatePatch,
-    expandAll,
+    expandAllNonHidden,
     expandMinimal,
-    expandPath,
+    expandParentPath,
     expandRecursive,
     expandSection,
     expandWithCallback,
@@ -300,7 +300,7 @@
   }
 
   async function handleFocusSearch(path: JSONPath) {
-    documentState = expandPath(json, documentState, path)
+    documentState = expandParentPath(json, documentState, path)
     await scrollTo(path)
   }
 
@@ -324,7 +324,7 @@
   })
   let historyState = history.getState()
 
-  export function expand(callback: OnExpand = expandAll) {
+  export function expand(callback: OnExpand = expandAllNonHidden) {
     debug('expand')
 
     // FIXME: clear the expanded state and visible sections (else you can't collapse anything using the callback)
@@ -1183,7 +1183,7 @@
    * Expand the path when needed.
    */
   export async function scrollTo(path: JSONPath, scrollToWhenVisible = true): Promise<void> {
-    documentState = expandPath(json, documentState, path)
+    documentState = expandParentPath(json, documentState, path)
     await tick() // await rerender (else the element we want to scroll to does not yet exist)
 
     const elem = findElement(path)
@@ -1404,7 +1404,7 @@
     debug('handleExpand', { path, expanded, recursive })
 
     if (expanded) {
-      const callback: OnExpand = recursive ? expandAll : (p) => p.length === path.length
+      const callback: OnExpand = recursive ? expandAllNonHidden : (p) => p.length === path.length
       documentState = expandWithCallback(json, documentState, path, callback)
     } else {
       documentState = collapsePath(json, documentState, path)

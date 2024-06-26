@@ -10,7 +10,7 @@ import {
   documentStateFactory,
   documentStatePatch,
   ensureRecursiveState,
-  expandPath,
+  expandParentPath,
   expandSection,
   expandWithCallback,
   forEachVisibleIndex,
@@ -498,6 +498,71 @@ describe('documentState', () => {
             }
           },
           type: 'object'
+        }
+      )
+    })
+
+    const json2 = {
+      array: times(3 * ARRAY_SECTION_SIZE, (index) => ({ index }))
+    }
+    const state2 = createDocumentState({ json: json2 })
+    const indexA = 5
+    const indexB = ARRAY_SECTION_SIZE + 45
+
+    test('should expand a hidden part of a json array', () => {
+      const expectedItems = []
+      expectedItems[indexA] = { type: 'object', expanded: true, properties: {} }
+      expectedItems[indexB] = { type: 'object', expanded: true, properties: {} }
+
+      assert.deepStrictEqual(
+        expandWithCallback(json2, state2, [], (path) => {
+          return (
+            isEqual(path, []) ||
+            isEqual(path, ['array']) ||
+            isEqual(path, ['array', String(indexA)]) ||
+            isEqual(path, ['array', String(indexB)])
+          )
+        }),
+        {
+          type: 'object',
+          expanded: true,
+          properties: {
+            array: {
+              type: 'array',
+              expanded: true,
+              visibleSections: [{ start: 0, end: 200 }],
+              items: expectedItems
+            }
+          }
+        }
+      )
+    })
+
+    test('should not expand a hidden part of a json array', () => {
+      const expectedItems = []
+      expectedItems[indexA] = { type: 'object', expanded: true, properties: {} }
+
+      assert.deepStrictEqual(
+        expandWithCallback(json2, state2, [], (path, hidden) => {
+          return (
+            !hidden &&
+            (isEqual(path, []) ||
+              isEqual(path, ['array']) ||
+              isEqual(path, ['array', String(indexA)]) ||
+              isEqual(path, ['array', String(indexB)]))
+          )
+        }),
+        {
+          type: 'object',
+          expanded: true,
+          properties: {
+            array: {
+              type: 'array',
+              expanded: true,
+              visibleSections: [{ start: 0, end: 100 }],
+              items: expectedItems
+            }
+          }
         }
       )
     })
@@ -1412,7 +1477,7 @@ describe('documentState', () => {
     })
   })
 
-  describe('expandPath', () => {
+  describe('expandParentPath', () => {
     const json = {
       array: [1, 2, { c: 6 }],
       object: { a: 4, b: 5, nested: { c: 6 } },
@@ -1420,7 +1485,7 @@ describe('documentState', () => {
     }
 
     test('should expand root path', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), []), {
+      assert.deepStrictEqual(expandParentPath(json, createDocumentState({ json }), []), {
         type: 'object',
         expanded: false,
         properties: {}
@@ -1428,7 +1493,7 @@ describe('documentState', () => {
     })
 
     test('should expand an array', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), ['array']), {
+      assert.deepStrictEqual(expandParentPath(json, createDocumentState({ json }), ['array']), {
         type: 'object',
         expanded: true,
         properties: {}
@@ -1436,37 +1501,43 @@ describe('documentState', () => {
     })
 
     test('should expand an object inside an array', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), ['array', '2']), {
-        type: 'object',
-        expanded: true,
-        properties: {
-          array: {
-            type: 'array',
-            expanded: true,
-            items: [],
-            visibleSections: DEFAULT_VISIBLE_SECTIONS
+      assert.deepStrictEqual(
+        expandParentPath(json, createDocumentState({ json }), ['array', '2']),
+        {
+          type: 'object',
+          expanded: true,
+          properties: {
+            array: {
+              type: 'array',
+              expanded: true,
+              items: [],
+              visibleSections: DEFAULT_VISIBLE_SECTIONS
+            }
           }
         }
-      })
+      )
     })
 
     test('should not expand a value (only objects and arrays)', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), ['array', '0']), {
-        type: 'object',
-        expanded: true,
-        properties: {
-          array: {
-            type: 'array',
-            expanded: true,
-            items: [],
-            visibleSections: DEFAULT_VISIBLE_SECTIONS
+      assert.deepStrictEqual(
+        expandParentPath(json, createDocumentState({ json }), ['array', '0']),
+        {
+          type: 'object',
+          expanded: true,
+          properties: {
+            array: {
+              type: 'array',
+              expanded: true,
+              items: [],
+              visibleSections: DEFAULT_VISIBLE_SECTIONS
+            }
           }
         }
-      })
+      )
     })
 
     test('should expand an object', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), ['object']), {
+      assert.deepStrictEqual(expandParentPath(json, createDocumentState({ json }), ['object']), {
         type: 'object',
         expanded: true,
         properties: {}
@@ -1475,7 +1546,7 @@ describe('documentState', () => {
 
     test('should expand a nested object', () => {
       assert.deepStrictEqual(
-        expandPath(json, createDocumentState({ json }), ['object', 'nested']),
+        expandParentPath(json, createDocumentState({ json }), ['object', 'nested']),
         {
           type: 'object',
           expanded: true,
@@ -1492,11 +1563,11 @@ describe('documentState', () => {
 
     test('should expand visible section of an array if needed', () => {
       const json = {
-        largeArray: range(0, 500).map((index) => ({ id: index }))
+        largeArray: range(0, 300).map((index) => ({ id: index }))
       }
 
       assert.deepStrictEqual(
-        expandPath(json, createDocumentState({ json }), ['largeArray', '120']),
+        expandParentPath(json, createDocumentState({ json }), ['largeArray', '120']),
         {
           type: 'object',
           expanded: true,
