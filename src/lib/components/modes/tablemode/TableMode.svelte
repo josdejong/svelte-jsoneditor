@@ -83,8 +83,6 @@
   import {
     createDocumentState,
     documentStatePatch,
-    expandMinimal,
-    expandWithCallback,
     getEnforceString,
     getInRecursiveState,
     setInDocumentState,
@@ -1369,12 +1367,7 @@
     const previousContent = { json, text }
     const previousState = { json, documentState, selection, sortedColumn, text, textIsRepaired }
 
-    const updatedState = expandWithCallback(
-      json,
-      syncDocumentState(updatedJson, documentState),
-      [],
-      expandMinimal
-    )
+    const updatedState = syncDocumentState(updatedJson, documentState)
 
     const callback =
       typeof afterPatch === 'function'
@@ -1411,24 +1404,14 @@
 
     try {
       json = parseMemoizeOne(updatedText)
-      documentState = expandWithCallback(
-        json,
-        syncDocumentState(json, documentState),
-        [],
-        expandMinimal
-      )
+      documentState = syncDocumentState(json, documentState)
       text = undefined
       textIsRepaired = false
       parseError = undefined
     } catch (err) {
       try {
         json = parseMemoizeOne(jsonrepair(updatedText))
-        documentState = expandWithCallback(
-          json,
-          syncDocumentState(json, documentState),
-          [],
-          expandMinimal
-        )
+        documentState = syncDocumentState(json, documentState)
         text = updatedText
         textIsRepaired = true
         parseError = undefined
