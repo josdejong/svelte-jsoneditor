@@ -4,7 +4,6 @@
   import { compileJSONPointer, type JSONPath } from 'immutable-json-patch'
   import {
     createValueSelection,
-    type JSONParser,
     type OnPatch,
     type OnSelect,
     type ValueNormalization
