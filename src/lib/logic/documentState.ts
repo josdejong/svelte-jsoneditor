@@ -235,19 +235,19 @@ export function forEachVisibleIndex(
   })
 }
 
-export function expandVisibleSection(
-  visibleSections: VisibleSection[],
-  index: number
-): VisibleSection[] {
-  if (inVisibleSection(visibleSections, index)) {
-    return visibleSections
+export function expandVisibleSection(state: ArrayDocumentState, index: number): ArrayDocumentState {
+  if (inVisibleSection(state.visibleSections, index)) {
+    return state
   }
 
   const start = currentRoundNumber(index)
   const end = nextRoundNumber(start)
   const newVisibleSection = { start, end }
 
-  return mergeSections(visibleSections.concat(newVisibleSection))
+  return {
+    ...state,
+    visibleSections: mergeSections(state.visibleSections.concat(newVisibleSection))
+  }
 }
 
 export function toRecursiveStatePath(json: unknown, path: JSONPath): JSONPath {
@@ -300,30 +300,11 @@ export function expandPath(
     if (i < path.length) {
       const index = int(path[i])
 
-      updatedState = updateInDocumentState(
-        json,
-        updatedState,
-        partialPath,
-        (_value, nestedState) => {
-          if (!isArrayRecursiveState(nestedState)) {
-            return nestedState
-          }
-
-          if (inVisibleSection(nestedState.visibleSections, index)) {
-            return nestedState
-          }
-
-          // TODO: move this logic into a helper function
-          const start = currentRoundNumber(index)
-          const end = nextRoundNumber(start)
-          const newVisibleSection = { start, end }
-
-          return {
-            ...nestedState,
-            visibleSections: mergeSections(nestedState.visibleSections.concat(newVisibleSection))
-          }
-        }
-      )
+      updatedState = updateInDocumentState(json, updatedState, partialPath, (_, nestedState) => {
+        return isArrayRecursiveState(nestedState)
+          ? expandVisibleSection(nestedState, index)
+          : nestedState
+      })
     }
   }
 
@@ -868,17 +849,14 @@ export function getNextVisiblePath(
  * else expand in a minimalistic way
  */
 // TODO: write unit test
-export function expandRecursive(
+export function expandSmart(
   json: unknown | undefined,
   documentState: DocumentState | undefined,
   path: JSONPath
 ): DocumentState | undefined {
   const expandedJson = getIn(json, path)
-  const callback = !isLargeContent({ json: expandedJson }, MAX_DOCUMENT_SIZE_EXPAND_ALL)
-    ? expandAll
-    : expandMinimal
 
-  return expandPath(json, documentState, path, callback)
+  return expandPath(json, documentState, path, getSmartExpand(expandedJson))
 }
 
 // TODO: write unit test
@@ -893,6 +871,6 @@ export function expandAll(): boolean {
 }
 
 // TODO: write unit test
-export function getDefaultExpand(json: unknown): OnExpand {
+export function getSmartExpand(json: unknown): OnExpand {
   return isLargeContent({ json }, MAX_DOCUMENT_SIZE_EXPAND_ALL) ? expandMinimal : expandAll
 }

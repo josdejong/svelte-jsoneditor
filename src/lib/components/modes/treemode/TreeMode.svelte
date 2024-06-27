@@ -29,10 +29,10 @@
     documentStatePatch,
     expandAll,
     expandMinimal,
-    expandRecursive,
+    expandSmart,
     expandSection,
     expandPath,
-    getDefaultExpand,
+    getSmartExpand,
     getEnforceString,
     setInDocumentState,
     syncDocumentState,
@@ -510,7 +510,7 @@
   function expandWhenNotInitialized(json: unknown) {
     if (!documentStateInitialized) {
       documentStateInitialized = true
-      documentState = createDocumentState({ json, expand: getDefaultExpand(json) })
+      documentState = createDocumentState({ json, expand: getSmartExpand(json) })
     }
   }
 
@@ -842,7 +842,7 @@
         // expand extracted object/array
         const path: JSONPath = []
         return {
-          state: expandRecursive(patchedJson, patchedState, path)
+          state: expandSmart(patchedJson, patchedState, path)
         }
       }
 
@@ -910,7 +910,7 @@
         // expand converted object/array
         return {
           state: selection
-            ? expandRecursive(patchedJson, patchedState, getFocusPath(selection))
+            ? expandSmart(patchedJson, patchedState, getFocusPath(selection))
             : documentState
         }
       })
@@ -1073,7 +1073,7 @@
 
         handlePatch(operations, (patchedJson, patchedState) => ({
           // expand the newly replaced array and select it
-          state: expandRecursive(patchedJson, patchedState, rootPath),
+          state: expandSmart(patchedJson, patchedState, rootPath),
           selection: createValueSelection(rootPath, false)
         }))
       },
@@ -1127,7 +1127,7 @@
 
           handlePatch(operations, (patchedJson, patchedState) => ({
             // expand the newly replaced array and select it
-            state: expandRecursive(patchedJson, patchedState, rootPath),
+            state: expandSmart(patchedJson, patchedState, rootPath),
             selection: createValueSelection(rootPath, false)
           }))
         }
@@ -1395,9 +1395,7 @@
 
     if (expanded) {
       const callback: OnExpand = recursive ? expandAll : (p) => p.length === path.length
-      documentState = updateInDocumentState(json, documentState, path, (value, state) => {
-        return expandPath(value, state, [], callback)
-      })
+      documentState = expandPath(json, documentState, path, callback)
     } else {
       documentState = collapsePath(json, documentState, path)
 
@@ -1790,7 +1788,7 @@
 
     handlePatch(operations, (patchedJson, patchedState) => {
       return {
-        state: expandRecursive(patchedJson, patchedState, path)
+        state: expandSmart(patchedJson, patchedState, path)
       }
     })
 

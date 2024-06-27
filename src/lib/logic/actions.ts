@@ -40,7 +40,7 @@ import {
   parsePath
 } from 'immutable-json-patch'
 import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
-import { expandAll, expandRecursive, expandPath } from '$lib/logic/documentState.js'
+import { expandAll, expandSmart, expandPath } from '$lib/logic/documentState.js'
 import { initial, isEmpty, last } from 'lodash-es'
 import { insertActiveElementContents } from '$lib/utils/domUtils.js'
 import { fromTableCellPosition, toTableCellPosition } from '$lib/logic/table.js'
@@ -153,7 +153,7 @@ export function onPaste({
           )
           .forEach((operation) => {
             const path = parsePath(json, operation.path)
-            updatedState = expandRecursive(patchedJson, updatedState, path)
+            updatedState = expandSmart(patchedJson, updatedState, path)
           })
 
         return {
@@ -168,7 +168,7 @@ export function onPaste({
         if (patchedJson) {
           const path: JSONPath = []
           return {
-            state: expandRecursive(patchedJson, patchedState, path)
+            state: expandSmart(patchedJson, patchedState, path)
           }
         }
 
@@ -506,7 +506,7 @@ export function onInsert({
 
     const path: JSONPath = []
     onReplaceJson(newValue, (patchedJson, patchedState) => ({
-      state: expandRecursive(patchedJson, patchedState, path),
+      state: expandSmart(patchedJson, patchedState, path),
       selection: isObjectOrArray(newValue)
         ? createInsideSelection(path)
         : createValueSelection(path, true)
