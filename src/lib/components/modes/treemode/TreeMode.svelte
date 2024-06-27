@@ -32,11 +32,9 @@
     expandSmart,
     expandSection,
     expandPath,
-    getSmartExpand,
     getEnforceString,
     setInDocumentState,
-    syncDocumentState,
-    updateInDocumentState
+    syncDocumentState
   } from '$lib/logic/documentState.js'
   import { createHistory } from '$lib/logic/history.js'
   import { duplicate, extract, revertJSONPatchWithMoveOperations } from '$lib/logic/operations.js'
@@ -510,7 +508,7 @@
   function expandWhenNotInitialized(json: unknown) {
     if (!documentStateInitialized) {
       documentStateInitialized = true
-      documentState = createDocumentState({ json, expand: getSmartExpand(json) })
+      documentState = expandSmart(json, documentState, [])
     }
   }
 

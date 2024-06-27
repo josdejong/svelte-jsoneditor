@@ -855,8 +855,11 @@ export function expandSmart(
   path: JSONPath
 ): DocumentState | undefined {
   const expandedJson = getIn(json, path)
+  const callback = isLargeContent({ json: expandedJson }, MAX_DOCUMENT_SIZE_EXPAND_ALL)
+    ? expandMinimal
+    : expandAll
 
-  return expandPath(json, documentState, path, getSmartExpand(expandedJson))
+  return expandPath(json, documentState, path, callback)
 }
 
 // TODO: write unit test
@@ -868,9 +871,4 @@ export function expandMinimal(path: JSONPath): boolean {
 // TODO: write unit test
 export function expandAll(): boolean {
   return true
-}
-
-// TODO: write unit test
-export function getSmartExpand(json: unknown): OnExpand {
-  return isLargeContent({ json }, MAX_DOCUMENT_SIZE_EXPAND_ALL) ? expandMinimal : expandAll
 }
