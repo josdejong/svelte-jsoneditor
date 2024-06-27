@@ -300,7 +300,6 @@ describe('documentState', () => {
             type: 'array',
             expanded: true,
             visibleSections: DEFAULT_VISIBLE_SECTIONS,
-            // eslint-disable-next-line no-sparse-arrays
             items: [{ type: 'value' }, { type: 'value' }, { type: 'value' }, { type: 'value' }]
           }
         ],
@@ -315,7 +314,6 @@ describe('documentState', () => {
             type: 'array',
             expanded: true,
             visibleSections: DEFAULT_VISIBLE_SECTIONS,
-            // eslint-disable-next-line no-sparse-arrays
             items: [{ type: 'value' }, { type: 'value' }, { type: 'value' }]
           }
         ],
@@ -327,7 +325,6 @@ describe('documentState', () => {
       const expected2: DocumentState = {
         type: 'array',
         expanded: true,
-        // eslint-disable-next-line no-sparse-arrays
         items: [],
         visibleSections: DEFAULT_VISIBLE_SECTIONS
       }
@@ -937,7 +934,6 @@ describe('documentState', () => {
           },
           members: {
             expanded: true,
-            // eslint-disable-next-line no-sparse-arrays
             items: [
               { expanded: true, properties: {}, type: 'object' },
               undefined, // ideally, this should be an empty item, not undefined

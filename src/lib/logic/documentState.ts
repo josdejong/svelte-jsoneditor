@@ -249,12 +249,38 @@ export function expandParentPath(
     return documentState
   }
 
-  const parent = initial(path)
-  const updatedState = expandWithCallback(json, documentState, [], (p) => pathStartsWith(parent, p))
+  const parentPath = initial(path)
+  const updatedState = expandWithCallback(json, documentState, [], (p) =>
+    pathStartsWith(parentPath, p)
+  )
 
-  // FIXME: should adjust the visibleSections when the child of the parent is hidden
+  // adjust visible section of the parent Array if needed
+  return updateInDocumentState(json, updatedState, parentPath, (_value, state) => {
+    if (!isArrayRecursiveState(state)) {
+      return state
+    }
 
-  return updatedState
+    const index = int(last(path) as string)
+    return {
+      ...state,
+      visibleSections: expandVisibleSection(state.visibleSections, index)
+    }
+  })
+}
+
+export function expandVisibleSection(
+  visibleSections: VisibleSection[],
+  index: number
+): VisibleSection[] {
+  if (inVisibleSection(visibleSections, index)) {
+    return visibleSections
+  }
+
+  const start = currentRoundNumber(index)
+  const end = nextRoundNumber(start)
+  const newVisibleSection = { start, end }
+
+  return mergeSections(visibleSections.concat(newVisibleSection))
 }
 
 export function toRecursiveStatePath(json: unknown, path: JSONPath): JSONPath {
@@ -325,15 +351,8 @@ export function expandWithCallback(
             const hidden = !inVisibleSection(updatedVisibleSections, index)
 
             const expanded = recurse(value[index], hidden)
-            console.log('expanded', { currentPath, expanded, hidden })
             if (expanded && hidden) {
-              const start = currentRoundNumber(index)
-              const end = nextRoundNumber(start)
-              const newVisibleSection = { start, end }
-              updatedVisibleSections = mergeSections(
-                updatedVisibleSections.concat(newVisibleSection)
-              )
-              console.log('updatedVisibleSections', updatedVisibleSections)
+              updatedVisibleSections = expandVisibleSection(updatedVisibleSections, index)
             }
           }
 
@@ -573,8 +592,7 @@ export function documentStateAdd(
         ...arrayState,
         items:
           index < items.length
-            ? // eslint-disable-next-line no-sparse-arrays
-              insertItemsAt(items, index, stateValue !== undefined ? [stateValue] : [,])
+            ? insertItemsAt(items, index, stateValue !== undefined ? [stateValue] : Array(1))
             : items,
         visibleSections: shiftVisibleSections(visibleSections, index, 1)
       }
