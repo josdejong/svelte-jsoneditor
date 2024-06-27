@@ -27,16 +27,16 @@
     collapsePath,
     createDocumentState,
     documentStatePatch,
-    expandAllNonHidden,
+    expandAll,
     expandMinimal,
-    expandParentPath,
     expandRecursive,
     expandSection,
-    expandWithCallback,
+    expandPath,
     getDefaultExpand,
     getEnforceString,
     setInDocumentState,
-    syncDocumentState
+    syncDocumentState,
+    updateInDocumentState
   } from '$lib/logic/documentState.js'
   import { createHistory } from '$lib/logic/history.js'
   import { duplicate, extract, revertJSONPatchWithMoveOperations } from '$lib/logic/operations.js'
@@ -300,7 +300,7 @@
   }
 
   async function handleFocusSearch(path: JSONPath) {
-    documentState = expandParentPath(json, documentState, path)
+    documentState = expandPath(json, documentState, path)
     await scrollTo(path)
   }
 
@@ -324,11 +324,11 @@
   })
   let historyState = history.getState()
 
-  export function expand(callback: OnExpand = expandAllNonHidden) {
+  export function expand(callback: OnExpand = expandAll) {
     debug('expand')
 
     // FIXME: clear the expanded state and visible sections (else you can't collapse anything using the callback)
-    documentState = expandWithCallback(json, documentState, [], callback)
+    documentState = expandPath(json, documentState, [], callback)
   }
 
   // two-way binding of externalContent and internal json and text (
@@ -1183,7 +1183,7 @@
    * Expand the path when needed.
    */
   export async function scrollTo(path: JSONPath, scrollToWhenVisible = true): Promise<void> {
-    documentState = expandParentPath(json, documentState, path)
+    documentState = expandPath(json, documentState, path)
     await tick() // await rerender (else the element we want to scroll to does not yet exist)
 
     const elem = findElement(path)
@@ -1301,7 +1301,7 @@
     const previousContent = { json, text }
     const previousState = { documentState, selection, json, text, textIsRepaired }
 
-    const updatedState = expandWithCallback(
+    const updatedState = expandPath(
       json,
       syncDocumentState(updatedJson, documentState),
       [],
@@ -1341,24 +1341,14 @@
 
     try {
       json = parseMemoizeOne(updatedText)
-      documentState = expandWithCallback(
-        json,
-        syncDocumentState(json, documentState),
-        [],
-        expandMinimal
-      )
+      documentState = expandPath(json, syncDocumentState(json, documentState), [], expandMinimal)
       text = undefined
       textIsRepaired = false
       parseError = undefined
     } catch (err) {
       try {
         json = parseMemoizeOne(jsonrepair(updatedText))
-        documentState = expandWithCallback(
-          json,
-          syncDocumentState(json, documentState),
-          [],
-          expandMinimal
-        )
+        documentState = expandPath(json, syncDocumentState(json, documentState), [], expandMinimal)
         text = updatedText
         textIsRepaired = true
         parseError = undefined
@@ -1404,8 +1394,10 @@
     debug('handleExpand', { path, expanded, recursive })
 
     if (expanded) {
-      const callback: OnExpand = recursive ? expandAllNonHidden : (p) => p.length === path.length
-      documentState = expandWithCallback(json, documentState, path, callback)
+      const callback: OnExpand = recursive ? expandAll : (p) => p.length === path.length
+      documentState = updateInDocumentState(json, documentState, path, (value, state) => {
+        return expandPath(value, state, [], callback)
+      })
     } else {
       documentState = collapsePath(json, documentState, path)
 

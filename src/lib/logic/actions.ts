@@ -40,12 +40,7 @@ import {
   parsePath
 } from 'immutable-json-patch'
 import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
-import {
-  expandAllNonHidden,
-  expandParentPath,
-  expandRecursive,
-  expandWithCallback
-} from '$lib/logic/documentState.js'
+import { expandAll, expandRecursive, expandPath } from '$lib/logic/documentState.js'
 import { initial, isEmpty, last } from 'lodash-es'
 import { insertActiveElementContents } from '$lib/utils/domUtils.js'
 import { fromTableCellPosition, toTableCellPosition } from '$lib/logic/table.js'
@@ -476,7 +471,7 @@ export function onInsert({
 
         if (isObjectOrArray(newValue)) {
           return {
-            state: expandWithCallback(patchedJson, patchedState, path, expandAllNonHidden),
+            state: expandPath(patchedJson, patchedState, path, expandAll),
             selection: selectInside ? createInsideSelection(path) : patchedSelection
           }
         }
@@ -486,8 +481,7 @@ export function onInsert({
           const parent = !isEmpty(path) ? getIn(patchedJson, initial(path)) : undefined
 
           return {
-            // expandParentPath is invoked to make sure that visibleSections is extended when needed
-            state: expandParentPath(patchedJson, patchedState, path),
+            state: expandPath(patchedJson, patchedState, path),
             selection: isObject(parent)
               ? createKeySelection(path, true)
               : createValueSelection(path, true)
