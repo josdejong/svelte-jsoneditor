@@ -26,7 +26,9 @@ import {
   CaretType,
   type ArrayDocumentState,
   type DocumentState,
-  type VisibleSection
+  type VisibleSection,
+  type ObjectDocumentState,
+  type OnExpand
 } from '$lib/types.js'
 import { deleteIn, getIn, type JSONPatchDocument, setIn, updateIn } from 'immutable-json-patch'
 import { isArrayRecursiveState } from 'svelte-jsoneditor'
@@ -515,6 +517,34 @@ describe('documentState', () => {
           type: 'object'
         }
       )
+    })
+
+    test('should leave the documentState untouched (immutable) when there are no changes', () => {
+      const expected: DocumentState = {
+        expanded: true,
+        properties: {
+          array: {
+            type: 'array',
+            expanded: true,
+            visibleSections: DEFAULT_VISIBLE_SECTIONS,
+            items: []
+          },
+          object: { type: 'object', expanded: true, properties: {} }
+        },
+        type: 'object'
+      }
+
+      const callback: OnExpand = (relativePath) => relativePath.length <= 1
+      const actual = expandPath(json, expected, [], callback) as ObjectDocumentState
+      const actualArray = actual.properties.array as ArrayDocumentState
+      const expectedArray = expected.properties.array as ArrayDocumentState
+
+      assert.deepStrictEqual(actual, expected)
+      assert.strictEqual(actual, expected)
+      assert.strictEqual(actual.properties, expected.properties)
+      assert.strictEqual(actualArray, expectedArray)
+      assert.strictEqual(actualArray.items, expectedArray.items)
+      assert.strictEqual(actualArray.visibleSections, expectedArray.visibleSections)
     })
 
     test('should expand the root of a json document', () => {
@@ -1505,6 +1535,36 @@ describe('documentState', () => {
           }
         }
       )
+    })
+
+    test('should leave the documentState untouched (immutable) when already expanded section of an array if needed', () => {
+      const json = {
+        largeArray: range(0, 300).map((index) => ({ id: index }))
+      }
+
+      const expected: DocumentState = {
+        type: 'object',
+        expanded: true,
+        properties: {
+          largeArray: {
+            type: 'array',
+            expanded: true,
+            items: [],
+            visibleSections: [{ start: 0, end: 200 }]
+          }
+        }
+      }
+
+      const actual = expandPath(json, expected, ['largeArray', '120']) as ObjectDocumentState
+      const actualLargeArray = actual.properties.largeArray as ArrayDocumentState
+      const expectedLargeArray = expected.properties.largeArray as ArrayDocumentState
+
+      assert.deepStrictEqual(actual, expected)
+      assert.strictEqual(actual, expected)
+      assert.strictEqual(actual.properties, expected.properties)
+      assert.strictEqual(actualLargeArray, expectedLargeArray)
+      assert.strictEqual(actualLargeArray.items, expectedLargeArray.items)
+      assert.strictEqual(actualLargeArray.visibleSections, expectedLargeArray.visibleSections)
     })
   })
 })

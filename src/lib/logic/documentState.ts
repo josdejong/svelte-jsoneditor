@@ -212,16 +212,6 @@ export function syncDocumentState(
   return undefined
 }
 
-export function getVisibleSections(
-  json: unknown,
-  documentState: DocumentState | undefined,
-  path: JSONPath
-): VisibleSection[] {
-  const valueState = getInRecursiveState(json, documentState, path)
-
-  return isArrayRecursiveState(valueState) ? valueState.visibleSections : DEFAULT_VISIBLE_SECTIONS
-}
-
 /**
  * Invoke a callback function for every visible item in the array
  */
@@ -284,28 +274,25 @@ export function expandPath(
   path: JSONPath,
   expandedCallback?: OnExpand
 ): DocumentState | undefined {
-  // FIXME: simplify this function
-
   let updatedState = documentState
 
   // Step 1: expand all nodes along the path, and update visibleSections if needed
-  // FIXME: rewrite this for loop into a recursive function? (more efficient I think)
   for (let i = 0; i < path.length; i++) {
     const partialPath = path.slice(0, i)
 
-    updatedState = updateInDocumentState(json, updatedState, partialPath, (_, state) => {
-      return isExpandableState(state) ? { ...state, expanded: true } : state
-    })
-
-    if (i < path.length) {
-      const index = int(path[i])
-
-      updatedState = updateInDocumentState(json, updatedState, partialPath, (_, nestedState) => {
-        return isArrayRecursiveState(nestedState)
-          ? expandVisibleSection(nestedState, index)
+    updatedState = updateInDocumentState(json, updatedState, partialPath, (_, nestedState) => {
+      const updatedState =
+        isExpandableState(nestedState) && !nestedState.expanded
+          ? { ...nestedState, expanded: true }
           : nestedState
-      })
-    }
+
+      if (isArrayRecursiveState(updatedState)) {
+        const index = int(path[i])
+        return expandVisibleSection(updatedState, index)
+      }
+
+      return updatedState
+    })
   }
 
   if (!expandedCallback) {
@@ -326,8 +313,10 @@ function _expandRecursively(
   callback: OnExpand
 ): DocumentState | undefined {
   if (Array.isArray(json) && callback(path)) {
-    const updatedState = isArrayRecursiveState(documentState)
-      ? { ...documentState, expanded: true }
+    let updatedState = isArrayRecursiveState(documentState)
+      ? documentState.expanded
+        ? documentState
+        : { ...documentState, expanded: true }
       : createArrayDocumentState({ expanded: true })
 
     if (json.length > 0) {
@@ -335,8 +324,9 @@ function _expandRecursively(
 
       forEachVisibleIndex(json, updatedState.visibleSections, (index) => {
         const itemPath = path.concat(String(index))
-        const item = _expandRecursively(json[index], updatedState.items[index], itemPath, callback)
-        if (item !== undefined) {
+        const itemState = updatedState.items[index]
+        const item = _expandRecursively(json[index], itemState, itemPath, callback)
+        if (item !== itemState) {
           if (items === undefined) {
             items = updatedState.items.slice()
           }
@@ -346,7 +336,7 @@ function _expandRecursively(
       })
 
       if (items) {
-        updatedState.items = items
+        updatedState = { ...updatedState, items }
       }
     }
 
@@ -354,8 +344,10 @@ function _expandRecursively(
   }
 
   if (isObject(json) && callback(path)) {
-    const updatedState = isObjectRecursiveState(documentState)
-      ? { ...documentState, expanded: true }
+    let updatedState = isObjectRecursiveState(documentState)
+      ? documentState.expanded
+        ? documentState
+        : { ...documentState, expanded: true }
       : createObjectDocumentState({ expanded: true })
 
     const keys = Object.keys(json)
@@ -364,18 +356,19 @@ function _expandRecursively(
 
       for (const key of keys) {
         const propPath = path.concat(key)
-        const prop = _expandRecursively(json[key], updatedState.properties[key], propPath, callback)
-        if (prop !== undefined) {
+        const propState = updatedState.properties[key]
+        const updatedPropState = _expandRecursively(json[key], propState, propPath, callback)
+        if (updatedPropState !== propState) {
           if (properties === undefined) {
             properties = { ...updatedState.properties }
           }
 
-          properties[key] = prop
+          properties[key] = updatedPropState
         }
       }
 
       if (properties) {
-        updatedState.properties = properties
+        updatedState = { ...updatedState, properties }
       }
     }
 
@@ -851,9 +844,9 @@ export function expandSmart(
 }
 
 // TODO: write unit test
-export function expandMinimal(path: JSONPath): boolean {
+export function expandMinimal(relativePath: JSONPath): boolean {
   // first item of an array
-  return path.length === 0 ? true : path.length === 1 && path[0] === '0'
+  return relativePath.length === 0 ? true : relativePath.length === 1 && relativePath[0] === '0'
 }
 
 // TODO: write unit test
