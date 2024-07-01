@@ -10,8 +10,11 @@ import {
   documentStateFactory,
   documentStatePatch,
   ensureRecursiveState,
-  expandSection,
+  expandAll,
   expandPath,
+  expandSection,
+  expandSelf,
+  expandSmart,
   forEachVisibleIndex,
   getEnforceString,
   getVisibleCaretPositions,
@@ -23,12 +26,12 @@ import {
   updateInDocumentState
 } from './documentState.js'
 import {
-  CaretType,
   type ArrayDocumentState,
+  CaretType,
   type DocumentState,
-  type VisibleSection,
   type ObjectDocumentState,
-  type OnExpand
+  type OnExpand,
+  type VisibleSection
 } from '$lib/types.js'
 import { deleteIn, getIn, type JSONPatchDocument, setIn, updateIn } from 'immutable-json-patch'
 import { isArrayRecursiveState } from 'svelte-jsoneditor'
@@ -556,6 +559,27 @@ describe('documentState', () => {
           type: 'object'
         }
       )
+    })
+
+    test('should expand a nested object', () => {
+      // Without callback, will not expand the nested object itself
+      assert.deepStrictEqual(expandPath(json, documentState, ['object']), {
+        expanded: true,
+        properties: {},
+        type: 'object'
+      })
+
+      assert.deepStrictEqual(expandPath(json, documentState, ['object'], expandSelf), {
+        type: 'object',
+        expanded: true,
+        properties: {
+          object: {
+            type: 'object',
+            expanded: true,
+            properties: {}
+          }
+        }
+      })
     })
 
     test('should not traverse non-expanded nodes', () => {
@@ -1476,7 +1500,25 @@ describe('documentState', () => {
     })
 
     test('should not expand a value (only objects and arrays)', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), ['array', '0']), {
+      assert.deepStrictEqual(
+        expandPath(json, createDocumentState({ json }), ['array', '0'], expandAll),
+        {
+          type: 'object',
+          expanded: true,
+          properties: {
+            array: {
+              type: 'array',
+              expanded: true,
+              items: [{ type: 'value' }],
+              visibleSections: DEFAULT_VISIBLE_SECTIONS
+            }
+          }
+        }
+      )
+    })
+
+    test('should not expand the end node of the path without callback', () => {
+      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), ['array', '2']), {
         type: 'object',
         expanded: true,
         properties: {
@@ -1565,6 +1607,57 @@ describe('documentState', () => {
       assert.strictEqual(actualLargeArray, expectedLargeArray)
       assert.strictEqual(actualLargeArray.items, expectedLargeArray.items)
       assert.strictEqual(actualLargeArray.visibleSections, expectedLargeArray.visibleSections)
+    })
+  })
+
+  describe('expandSmart', () => {
+    const array = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 }]
+    const object = { a: { id: 1 }, b: { id: 2 }, c: { id: 3 }, d: { id: 4 }, e: { id: 5 } }
+
+    test('should fully expand a small document', () => {
+      assert.deepStrictEqual(expandSmart(array, undefined, [], 100), {
+        expanded: true,
+        items: [
+          { expanded: true, properties: {}, type: 'object' },
+          { expanded: true, properties: {}, type: 'object' },
+          { expanded: true, properties: {}, type: 'object' },
+          { expanded: true, properties: {}, type: 'object' },
+          { expanded: true, properties: {}, type: 'object' }
+        ],
+        type: 'array',
+        visibleSections: [{ end: 100, start: 0 }]
+      })
+    })
+
+    test('should expand only the first array item of a large document', () => {
+      assert.deepStrictEqual(expandSmart(array, undefined, [], 10), {
+        expanded: true,
+        items: [{ expanded: true, properties: {}, type: 'object' }],
+        type: 'array',
+        visibleSections: [{ end: 100, start: 0 }]
+      })
+    })
+
+    test('should expand only the object root of a large document', () => {
+      assert.deepStrictEqual(expandSmart(object, undefined, [], 10), {
+        expanded: true,
+        properties: {},
+        type: 'object'
+      })
+    })
+
+    test('should expand all nested properties of an object when it is a small document', () => {
+      assert.deepStrictEqual(expandSmart(object, undefined, [], 1000), {
+        expanded: true,
+        properties: {
+          a: { expanded: true, properties: {}, type: 'object' },
+          b: { expanded: true, properties: {}, type: 'object' },
+          c: { expanded: true, properties: {}, type: 'object' },
+          d: { expanded: true, properties: {}, type: 'object' },
+          e: { expanded: true, properties: {}, type: 'object' }
+        },
+        type: 'object'
+      })
     })
   })
 })

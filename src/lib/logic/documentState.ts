@@ -829,27 +829,27 @@ export function getNextVisiblePath(
  * Expand recursively when the expanded contents is small enough,
  * else expand in a minimalistic way
  */
-// TODO: write unit test
 export function expandSmart(
   json: unknown | undefined,
   documentState: DocumentState | undefined,
-  path: JSONPath
+  path: JSONPath,
+  maxSize: number = MAX_DOCUMENT_SIZE_EXPAND_ALL
 ): DocumentState | undefined {
-  const expandedJson = getIn(json, path)
-  const callback = isLargeContent({ json: expandedJson }, MAX_DOCUMENT_SIZE_EXPAND_ALL)
-    ? expandMinimal
-    : expandAll
+  const nestedJson = getIn(json, path)
+  const callback = isLargeContent({ json: nestedJson }, maxSize) ? expandMinimal : expandAll
 
   return expandPath(json, documentState, path, callback)
 }
 
-// TODO: write unit test
 export function expandMinimal(relativePath: JSONPath): boolean {
   // first item of an array
   return relativePath.length === 0 ? true : relativePath.length === 1 && relativePath[0] === '0'
 }
 
-// TODO: write unit test
+export function expandSelf(relativePath: JSONPath): boolean {
+  return relativePath.length === 0
+}
+
 export function expandAll(): boolean {
   return true
 }
