@@ -147,11 +147,19 @@
     throw new Error(`Method patch is not available in mode "${mode}"`)
   }
 
-  export function expand(callback?: OnExpand): void {
+  export function expand(path: JSONPath, callback?: OnExpand): void {
     if (refTreeMode) {
-      return refTreeMode.expand(callback)
+      return refTreeMode.expand(path, callback)
     } else {
       throw new Error(`Method expand is not available in mode "${mode}"`)
+    }
+  }
+
+  export function collapse(path: JSONPath): void {
+    if (refTreeMode) {
+      return refTreeMode.expand(path)
+    } else {
+      throw new Error(`Method collapse is not available in mode "${mode}"`)
     }
   }
 

@@ -272,7 +272,7 @@ export function expandPath(
   json: unknown | undefined,
   documentState: DocumentState | undefined,
   path: JSONPath,
-  expandedCallback?: OnExpand
+  callback: OnExpand
 ): DocumentState | undefined {
   let updatedState = documentState
 
@@ -295,14 +295,10 @@ export function expandPath(
     })
   }
 
-  if (!expandedCallback) {
-    return updatedState
-  }
-
   // Step 2: recursively expand child nodes tested with the callback
   return updateInDocumentState(json, updatedState, path, (nestedValue, nestedState) => {
     const relativePath: JSONPath = []
-    return _expandRecursively(nestedValue, nestedState, relativePath, expandedCallback)
+    return _expandRecursively(nestedValue, nestedState, relativePath, callback)
   })
 }
 
@@ -841,15 +837,25 @@ export function expandSmart(
   return expandPath(json, documentState, path, callback)
 }
 
+/**
+ * Expand the root array or object, and in case of an array, expand the first array item
+ */
 export function expandMinimal(relativePath: JSONPath): boolean {
   // first item of an array
   return relativePath.length === 0 ? true : relativePath.length === 1 && relativePath[0] === '0'
 }
 
+/**
+ * Expand the root array or object
+ */
 export function expandSelf(relativePath: JSONPath): boolean {
   return relativePath.length === 0
 }
 
 export function expandAll(): boolean {
   return true
+}
+
+export function expandNone(): boolean {
+  return false
 }

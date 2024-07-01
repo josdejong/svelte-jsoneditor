@@ -11,6 +11,7 @@ import {
   documentStatePatch,
   ensureRecursiveState,
   expandAll,
+  expandNone,
   expandPath,
   expandSection,
   expandSelf,
@@ -50,8 +51,7 @@ describe('documentState', () => {
       const expected: DocumentState = {
         type: 'array',
         expanded: false,
-        // eslint-disable-next-line no-sparse-arrays
-        items: [, { type: 'value' }],
+        items: initArray([1, { type: 'value' }]),
         visibleSections: DEFAULT_VISIBLE_SECTIONS
       }
 
@@ -72,8 +72,7 @@ describe('documentState', () => {
       const expected: DocumentState = {
         type: 'array',
         expanded: true,
-        // eslint-disable-next-line no-sparse-arrays
-        items: [, { type: 'value' }],
+        items: initArray([1, { type: 'value' }]),
         visibleSections: DEFAULT_VISIBLE_SECTIONS
       }
 
@@ -127,8 +126,7 @@ describe('documentState', () => {
           array: {
             type: 'array',
             expanded: false,
-            // eslint-disable-next-line no-sparse-arrays
-            items: [, { type: 'value' }],
+            items: initArray([1, { type: 'value' }]),
             visibleSections: DEFAULT_VISIBLE_SECTIONS
           }
         }
@@ -238,16 +236,14 @@ describe('documentState', () => {
       const state: DocumentState = {
         type: 'array',
         expanded: true,
-        // eslint-disable-next-line no-sparse-arrays
-        items: [, { type: 'value' }, { type: 'value' }],
+        items: initArray([1, { type: 'value' }], [2, { type: 'value' }]),
         visibleSections: DEFAULT_VISIBLE_SECTIONS
       }
 
       const expected: DocumentState = {
         type: 'array',
         expanded: true,
-        // eslint-disable-next-line no-sparse-arrays
-        items: [, { type: 'value' }],
+        items: initArray([1, { type: 'value' }]),
         visibleSections: DEFAULT_VISIBLE_SECTIONS
       }
 
@@ -435,8 +431,7 @@ describe('documentState', () => {
               type: 'array',
               expanded: true,
               visibleSections: DEFAULT_VISIBLE_SECTIONS,
-              // eslint-disable-next-line no-sparse-arrays
-              items: [, , { type: 'object', expanded: true, properties: {} }]
+              items: initArray([2, { type: 'object', expanded: true, properties: {} }])
             },
             object: {
               type: 'object',
@@ -494,8 +489,7 @@ describe('documentState', () => {
               type: 'array',
               expanded: true,
               visibleSections: DEFAULT_VISIBLE_SECTIONS,
-              // eslint-disable-next-line no-sparse-arrays
-              items: [, , { expanded: true, properties: {}, type: 'object' }]
+              items: initArray([2, { expanded: true, properties: {}, type: 'object' }])
             }
           },
           type: 'object'
@@ -563,9 +557,11 @@ describe('documentState', () => {
 
     test('should expand a nested object', () => {
       // Without callback, will not expand the nested object itself
-      assert.deepStrictEqual(expandPath(json, documentState, ['object']), {
+      assert.deepStrictEqual(expandPath(json, documentState, ['object'], expandNone), {
         expanded: true,
-        properties: {},
+        properties: {
+          object: { type: 'object', expanded: false, properties: {} }
+        },
         type: 'object'
       })
 
@@ -573,11 +569,7 @@ describe('documentState', () => {
         type: 'object',
         expanded: true,
         properties: {
-          object: {
-            type: 'object',
-            expanded: true,
-            properties: {}
-          }
+          object: { type: 'object', expanded: true, properties: {} }
         }
       })
     })
@@ -1083,8 +1075,11 @@ describe('documentState', () => {
       assert.deepStrictEqual(res.json, setIn(json, ['members', '1'], 42))
       assert.deepStrictEqual(
         res.state,
-        // eslint-disable-next-line no-sparse-arrays
-        setIn(documentState, ['properties', 'members', 'items'], [items[0], , items[2]])
+        setIn(
+          documentState,
+          ['properties', 'members', 'items'],
+          initArray([0, items[0]], [2, items[2]])
+        )
       )
     })
 
@@ -1469,34 +1464,47 @@ describe('documentState', () => {
     }
 
     test('should expand root path', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), []), {
+      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), [], expandSelf), {
         type: 'object',
-        expanded: false,
+        expanded: true,
         properties: {}
       })
     })
 
     test('should expand an array', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), ['array']), {
-        type: 'object',
-        expanded: true,
-        properties: {}
-      })
+      assert.deepStrictEqual(
+        expandPath(json, createDocumentState({ json }), ['array'], expandNone),
+        {
+          type: 'object',
+          expanded: true,
+          properties: {
+            array: {
+              expanded: false,
+              items: [],
+              type: 'array',
+              visibleSections: DEFAULT_VISIBLE_SECTIONS
+            }
+          }
+        }
+      )
     })
 
     test('should expand an object inside an array', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), ['array', '2']), {
-        type: 'object',
-        expanded: true,
-        properties: {
-          array: {
-            type: 'array',
-            expanded: true,
-            items: [],
-            visibleSections: DEFAULT_VISIBLE_SECTIONS
+      assert.deepStrictEqual(
+        expandPath(json, createDocumentState({ json }), ['array', '2'], expandNone),
+        {
+          type: 'object',
+          expanded: true,
+          properties: {
+            array: {
+              type: 'array',
+              expanded: true,
+              items: initArray([2, { type: 'object', expanded: false, properties: {} }]),
+              visibleSections: DEFAULT_VISIBLE_SECTIONS
+            }
           }
         }
-      })
+      )
     })
 
     test('should not expand a value (only objects and arrays)', () => {
@@ -1518,31 +1526,39 @@ describe('documentState', () => {
     })
 
     test('should not expand the end node of the path without callback', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), ['array', '2']), {
-        type: 'object',
-        expanded: true,
-        properties: {
-          array: {
-            type: 'array',
-            expanded: true,
-            items: [],
-            visibleSections: DEFAULT_VISIBLE_SECTIONS
+      assert.deepStrictEqual(
+        expandPath(json, createDocumentState({ json }), ['array', '2'], expandNone),
+        {
+          type: 'object',
+          expanded: true,
+          properties: {
+            array: {
+              type: 'array',
+              expanded: true,
+              items: initArray([2, { type: 'object', expanded: false, properties: {} }]),
+              visibleSections: DEFAULT_VISIBLE_SECTIONS
+            }
           }
         }
-      })
+      )
     })
 
     test('should expand an object', () => {
-      assert.deepStrictEqual(expandPath(json, createDocumentState({ json }), ['object']), {
-        type: 'object',
-        expanded: true,
-        properties: {}
-      })
+      assert.deepStrictEqual(
+        expandPath(json, createDocumentState({ json }), ['object'], expandSelf),
+        {
+          type: 'object',
+          expanded: true,
+          properties: {
+            object: { expanded: true, properties: {}, type: 'object' }
+          }
+        }
+      )
     })
 
     test('should expand a nested object', () => {
       assert.deepStrictEqual(
-        expandPath(json, createDocumentState({ json }), ['object', 'nested']),
+        expandPath(json, createDocumentState({ json }), ['object', 'nested'], expandNone),
         {
           type: 'object',
           expanded: true,
@@ -1550,7 +1566,9 @@ describe('documentState', () => {
             object: {
               type: 'object',
               expanded: true,
-              properties: {}
+              properties: {
+                nested: { expanded: false, properties: {}, type: 'object' }
+              }
             }
           }
         }
@@ -1563,7 +1581,7 @@ describe('documentState', () => {
       }
 
       assert.deepStrictEqual(
-        expandPath(json, createDocumentState({ json }), ['largeArray', '120']),
+        expandPath(json, createDocumentState({ json }), ['largeArray', '120'], expandNone),
         {
           type: 'object',
           expanded: true,
@@ -1571,7 +1589,7 @@ describe('documentState', () => {
             largeArray: {
               type: 'array',
               expanded: true,
-              items: [],
+              items: initArray([120, { type: 'object', expanded: false, properties: {} }]),
               visibleSections: [{ start: 0, end: 200 }]
             }
           }
@@ -1591,13 +1609,18 @@ describe('documentState', () => {
           largeArray: {
             type: 'array',
             expanded: true,
-            items: [],
+            items: initArray([120, { type: 'object', expanded: false, properties: {} }]),
             visibleSections: [{ start: 0, end: 200 }]
           }
         }
       }
 
-      const actual = expandPath(json, expected, ['largeArray', '120']) as ObjectDocumentState
+      const actual = expandPath(
+        json,
+        expected,
+        ['largeArray', '120'],
+        expandNone
+      ) as ObjectDocumentState
       const actualLargeArray = actual.properties.largeArray as ArrayDocumentState
       const expectedLargeArray = expected.properties.largeArray as ArrayDocumentState
 
@@ -1675,4 +1698,27 @@ function getVisibleIndices(json: unknown, visibleSections: VisibleSection[]): nu
   }
 
   return visibleIndices
+}
+
+/**
+ * Helper function to initialize a sparse array with items at specific indices only
+ *
+ * Example usage (creating an array with items at index 0, 1, 2, and 5 but not at index 3 and 4:
+ *
+ *     initArray(
+ *       [0, "item 0"],
+ *       [1, "item 1"],
+ *       [2, "item 2"],
+ *       [5, "item 5"]
+ *     )
+ *
+ */
+function initArray<T>(...entries: Array<[index: number, item: T]>): T[] {
+  const array: T[] = []
+
+  entries.forEach(([index, item]) => {
+    array[index] = item
+  })
+
+  return array
 }

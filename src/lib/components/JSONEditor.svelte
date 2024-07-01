@@ -211,8 +211,14 @@
     await tick() // await rerender
   }
 
-  export async function expand(callback?: OnExpand): Promise<void> {
-    refJSONEditorRoot.expand(callback)
+  export async function expand(path: JSONPath, callback?: OnExpand): Promise<void> {
+    refJSONEditorRoot.expand(path, callback)
+
+    await tick() // await rerender
+  }
+
+  export async function collapse(path: JSONPath): Promise<void> {
+    refJSONEditorRoot.collapse(path)
 
     await tick() // await rerender
   }

@@ -404,7 +404,7 @@ Invoked when the mode is changed.
 #### onClassName
 
 ```ts
-onClassName(path: Path, value: any): string | undefined
+onClassName(path: JSONPath, value: any): string | undefined
 ```
 
 Add a custom class name to specific nodes, based on their path and/or value. Note that in the custom class, you can override CSS variables like `--jse-contents-background-color` to change the styling of a node, like the background color. Relevant variables are:
@@ -712,16 +712,33 @@ editor.updateProps({
 #### expand
 
 ```ts
-JSONEditor.prototype.expand([callback: (path: Path, hidden: boolean) => boolean]): Promise<void>
+JSONEditor.prototype.expand(path: JSONPath, callback?: (relativePath: JSONPath) => boolean = expandSelf): Promise<void>
 ```
 
-Expand or collapse paths in the editor. The `callback` determines which paths will be expanded. If no `callback` is provided, all paths will be expanded. It is only possible to expand a path when all of its parent paths are expanded too. The second argument `hidden` of the callback is true for items in an array that are inside a collapsed part of the array: by default, only the first 100 items of an array are rendered.
+Expand or collapse paths in the editor. All nodes along the provided `path` will be expanded and become visible (rendered). So for example collapsed sections of an array will be expanded. Using the optional `callback`, the node itself and some or all of its nested child nodes can be expanded too. The `callback` function only iterates over the visible items of arrays and not over any of the collapsed items.
 
 Examples:
 
-- `editor.expand(path => true)` expand all
-- `editor.expand(path => false)` collapse all
-- `editor.expand(path => path.length < 2)` expand all paths up to 2 levels deep
+- `editor.expand([], () => true)` expand all
+- `editor.expand([], relativePath => relativePath.length < 2)` expand all paths up to 2 levels deep
+- `editor.expand(['array', '204'])` expand the root object, the array in this object, and the 204th item in the array.
+- `editor.expand(['array', '204'], () => false)` expand the root object, the array in this object, but not the 204th item itself.
+- `editor.expand(['array', '204'], relativePath => relativePath.length < 2)` expand the root object, the array in this object, and expand the 204th array item and all of its child's up to a depth of max 2 levels.
+
+The library exports a couple of utility functions for commonly used `callback` functions:
+
+- `expandAll`: recursively expand all nested objects and arrays.
+- `expandNone`: expand nothing, also not the root object or array.
+- `expandSelf`: expand the root array or object. This is the default for the `callback` parameter.
+- `expandMinimal`: expand the root array or object, and in case of an array, expand the first array item.
+
+### collapse
+
+```ts
+JSONEditor.prototype.collapse(path: JSONPath): Promise<void>
+```
+
+Collapse a path in the editor. All nested objects and arrays will be collapsed too.
 
 #### transform
 
@@ -734,7 +751,7 @@ Programmatically trigger clicking of the transform button in the main menu, open
 #### scrollTo
 
 ```ts
-JSONEditor.prototype.scrollTo(path: Path): Promise<void>
+JSONEditor.prototype.scrollTo(path: JSONPath): Promise<void>
 ```
 
 Scroll the editor vertically such that the specified path comes into view. Only applicable to modes `tree` and `table`. The path will be expanded when needed. The returned Promise is resolved after scrolling is finished.
@@ -742,7 +759,7 @@ Scroll the editor vertically such that the specified path comes into view. Only 
 #### findElement
 
 ```ts
-JSONEditor.prototype.findElement(path: Path)
+JSONEditor.prototype.findElement(path: JSONPath)
 ```
 
 Find the DOM element of a given path. Returns `null` when not found.
@@ -823,6 +840,11 @@ The library exports a set of utility functions. The exact definitions of those f
   - `toTextContent`
   - `toJSONContent`
   - `estimateSerializedSize`
+- Expand:
+  - `expandAll`
+  - `expandMinimal`
+  - `expandNone`
+  - `expandSelf`
 - Selection:
   - `isValueSelection`
   - `isKeySelection`

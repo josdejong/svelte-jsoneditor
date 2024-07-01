@@ -40,7 +40,7 @@ import {
   parsePath
 } from 'immutable-json-patch'
 import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
-import { expandAll, expandSmart, expandPath } from '$lib/logic/documentState.js'
+import { expandAll, expandSmart, expandPath, expandNone } from '$lib/logic/documentState.js'
 import { initial, isEmpty, last } from 'lodash-es'
 import { insertActiveElementContents } from '$lib/utils/domUtils.js'
 import { fromTableCellPosition, toTableCellPosition } from '$lib/logic/table.js'
@@ -481,7 +481,7 @@ export function onInsert({
           const parent = !isEmpty(path) ? getIn(patchedJson, initial(path)) : undefined
 
           return {
-            state: expandPath(patchedJson, patchedState, path),
+            state: expandPath(patchedJson, patchedState, path, expandNone),
             selection: isObject(parent)
               ? createKeySelection(path, true)
               : createValueSelection(path, true)
