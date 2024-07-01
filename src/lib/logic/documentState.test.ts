@@ -1713,7 +1713,7 @@ describe('documentState', () => {
             type: 'array',
             expanded: false,
             items: initArray([120, { type: 'object', expanded: false, properties: {} }]),
-            visibleSections: [{ start: 0, end: 200 }]
+            visibleSections: [{ start: 0, end: 100 }]
           }
         }
       })
@@ -1743,7 +1743,7 @@ describe('documentState', () => {
             type: 'array',
             expanded: false,
             items: initArray([120, { type: 'object', expanded: false, properties: {} }]),
-            visibleSections: [{ start: 0, end: 200 }]
+            visibleSections: [{ start: 0, end: 100 }]
           }
         }
       })
@@ -1758,7 +1758,7 @@ describe('documentState', () => {
             type: 'array',
             expanded: false,
             items: initArray([120, { type: 'object', expanded: true, properties: {} }]),
-            visibleSections: [{ start: 0, end: 200 }]
+            visibleSections: [{ start: 0, end: 100 }]
           }
         }
       })

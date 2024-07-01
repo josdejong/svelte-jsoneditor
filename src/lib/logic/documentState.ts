@@ -377,24 +377,30 @@ export function collapsePath(
   recursive: boolean
 ): DocumentState | undefined {
   return updateInDocumentState(json, documentState, path, (_value, nestedState) => {
-    if (recursive) {
-      return _collapseRecursively(nestedState)
-    } else {
-      return isExpandableState(nestedState) && nestedState.expanded
-        ? { ...nestedState, expanded: false }
-        : nestedState
-    }
+    return recursive ? _collapseRecursively(nestedState) : _collapse(nestedState)
   })
+}
+
+function _collapse<T extends DocumentState | undefined>(documentState: T): T {
+  if (!isExpandableState(documentState) || !documentState.expanded) {
+    return documentState
+  }
+
+  if (isArrayRecursiveState(documentState)) {
+    return { ...documentState, expanded: false, visibleSections: DEFAULT_VISIBLE_SECTIONS }
+  }
+
+  if (isObjectRecursiveState(documentState)) {
+    return { ...documentState, expanded: false }
+  }
+
+  return documentState
 }
 
 // FIXME: merge and refactor _expandRecursively and _collapseRecursively
 function _collapseRecursively(documentState: DocumentState | undefined): DocumentState | undefined {
   if (isArrayRecursiveState(documentState)) {
-    let updatedState = isArrayRecursiveState(documentState)
-      ? !documentState.expanded
-        ? documentState
-        : { ...documentState, expanded: false }
-      : createArrayDocumentState({ expanded: false })
+    let updatedState = _collapse(documentState)
 
     let items: ArrayDocumentState['items'] | undefined
     updatedState.items.forEach((item, index) => {
