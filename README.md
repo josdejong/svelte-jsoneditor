@@ -735,10 +735,10 @@ The library exports a couple of utility functions for commonly used `callback` f
 ### collapse
 
 ```ts
-JSONEditor.prototype.collapse(path: JSONPath): Promise<void>
+JSONEditor.prototype.collapse(path: JSONPath, recursive?: boolean = false): Promise<void>
 ```
 
-Collapse a path in the editor. All nested objects and arrays will be collapsed too.
+Collapse a path in the editor. When `recursive` is `true`, all nested objects and arrays will be collapsed too. The default value of `recursive` is `false`.
 
 #### transform
 

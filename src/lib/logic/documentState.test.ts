@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest'
 import { flatMap, isEqual, range, times } from 'lodash-es'
 import { ARRAY_SECTION_SIZE, DEFAULT_VISIBLE_SECTIONS } from '../constants.js'
 import {
+  collapsePath,
   createArrayDocumentState,
   createDocumentState,
   createObjectDocumentState,
@@ -1680,6 +1681,86 @@ describe('documentState', () => {
           e: { expanded: true, properties: {}, type: 'object' }
         },
         type: 'object'
+      })
+    })
+  })
+
+  describe('collapsePath', () => {
+    const json = {
+      largeArray: range(0, 300).map((index) => ({ id: index }))
+    }
+
+    const documentState: DocumentState = {
+      type: 'object',
+      expanded: true,
+      properties: {
+        largeArray: {
+          type: 'array',
+          expanded: true,
+          items: initArray([120, { type: 'object', expanded: true, properties: {} }]),
+          visibleSections: [{ start: 0, end: 200 }]
+        }
+      }
+    }
+
+    test('collapse a path (recursive)', () => {
+      // TODO
+      assert.deepStrictEqual(collapsePath(json, documentState, [], true), {
+        type: 'object',
+        expanded: false,
+        properties: {
+          largeArray: {
+            type: 'array',
+            expanded: false,
+            items: initArray([120, { type: 'object', expanded: false, properties: {} }]),
+            visibleSections: [{ start: 0, end: 200 }]
+          }
+        }
+      })
+    })
+
+    test('collapse a path (non-recursive)', () => {
+      assert.deepStrictEqual(collapsePath(json, documentState, [], false), {
+        type: 'object',
+        expanded: false,
+        properties: {
+          largeArray: {
+            type: 'array',
+            expanded: true,
+            items: initArray([120, { type: 'object', expanded: true, properties: {} }]),
+            visibleSections: [{ start: 0, end: 200 }]
+          }
+        }
+      })
+    })
+
+    test('collapse a nested path (recursive)', () => {
+      assert.deepStrictEqual(collapsePath(json, documentState, ['largeArray'], true), {
+        type: 'object',
+        expanded: true,
+        properties: {
+          largeArray: {
+            type: 'array',
+            expanded: false,
+            items: initArray([120, { type: 'object', expanded: false, properties: {} }]),
+            visibleSections: [{ start: 0, end: 200 }]
+          }
+        }
+      })
+    })
+
+    test('collapse a nested path (non-recursive)', () => {
+      assert.deepStrictEqual(collapsePath(json, documentState, ['largeArray'], false), {
+        type: 'object',
+        expanded: true,
+        properties: {
+          largeArray: {
+            type: 'array',
+            expanded: false,
+            items: initArray([120, { type: 'object', expanded: true, properties: {} }]),
+            visibleSections: [{ start: 0, end: 200 }]
+          }
+        }
       })
     })
   })

@@ -217,8 +217,8 @@
     await tick() // await rerender
   }
 
-  export async function collapse(path: JSONPath): Promise<void> {
-    refJSONEditorRoot.collapse(path)
+  export async function collapse(path: JSONPath, recursive = false): Promise<void> {
+    refJSONEditorRoot.collapse(path, recursive)
 
     await tick() // await rerender
   }

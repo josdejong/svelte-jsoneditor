@@ -294,7 +294,7 @@ export function getSelectionDown(
   // if the focusPath is an Array or object, we must not step into it but
   // over it, we pass state with this array/object collapsed
   const collapsedState = isObjectOrArray(getIn(json, focusPath))
-    ? collapsePath(json, documentState, focusPath)
+    ? collapsePath(json, documentState, focusPath, true)
     : documentState
 
   const nextPath = getNextVisiblePath(json, documentState, focusPath)

@@ -155,9 +155,9 @@
     }
   }
 
-  export function collapse(path: JSONPath): void {
+  export function collapse(path: JSONPath, recursive: boolean): void {
     if (refTreeMode) {
-      return refTreeMode.expand(path)
+      return refTreeMode.collapse(path, recursive)
     } else {
       throw new Error(`Method collapse is not available in mode "${mode}"`)
     }

@@ -330,8 +330,8 @@
     documentState = expandPath(json, documentState, path, callback)
   }
 
-  export function collapse(path: JSONPath) {
-    documentState = collapsePath(json, documentState, path)
+  export function collapse(path: JSONPath, recursive: boolean) {
+    documentState = collapsePath(json, documentState, path, recursive)
 
     if (selection) {
       // check whether the selection is still visible and not collapsed
@@ -1398,17 +1398,16 @@
   /**
    * Toggle expanded state of a node
    * @param path The path to be expanded
-   * @param expanded  True to expand, false to collapse
+   * @param expanded  True if currently expanded, false when currently collapsed
    * @param [recursive=false]  Only applicable when expanding
    */
   function handleExpand(path: JSONPath, expanded: boolean, recursive = false): void {
     debug('handleExpand', { path, expanded, recursive })
 
     if (expanded) {
-      const callback: OnExpand = recursive ? expandAll : (p) => p.length === 0
-      expand(path, callback)
+      expand(path, recursive ? expandAll : expandSelf)
     } else {
-      collapse(path)
+      collapse(path, recursive)
     }
 
     // set focus to the hidden input, so we can capture quick keys like Ctrl+X, Ctrl+C, Ctrl+V
