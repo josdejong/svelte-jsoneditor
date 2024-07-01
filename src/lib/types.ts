@@ -384,7 +384,7 @@ export type OnSort = (params: {
 export type OnFind = (findAndReplace: boolean) => void
 export type OnPaste = (pastedText: string) => void
 export type OnPasteJson = (pastedJson: { path: JSONPath; contents: unknown }) => void
-export type OnExpand = (path: JSONPath) => boolean
+export type OnExpand = (relativePath: JSONPath) => boolean
 export type OnRenderValue = (props: RenderValueProps) => RenderValueComponentDescription[]
 export type OnClassName = (path: JSONPath, value: unknown) => string | undefined
 export type OnChangeMode = (mode: Mode) => void

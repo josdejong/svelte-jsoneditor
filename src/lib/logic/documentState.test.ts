@@ -417,11 +417,11 @@ describe('documentState', () => {
       object: { a: 4, b: 5 },
       value: 'hello'
     }
-    const expandedState = createDocumentState({ json })
+    const documentState = createDocumentState({ json })
 
     test('should fully expand a json document', () => {
       assert.deepStrictEqual(
-        expandPath(json, expandedState, [], () => true),
+        expandPath(json, documentState, [], () => true),
         {
           type: 'object',
           expanded: true,
@@ -445,7 +445,7 @@ describe('documentState', () => {
 
     test('should expand a nested item of a json document', () => {
       assert.deepStrictEqual(
-        expandPath(json, expandedState, ['array'], (path) => isEqual(path, ['array'])),
+        expandPath(json, documentState, ['array'], (relativePath) => isEqual(relativePath, [])),
         {
           expanded: true,
           properties: {
@@ -463,7 +463,7 @@ describe('documentState', () => {
 
     test('should expand a nested item of a json document starting without state', () => {
       assert.deepStrictEqual(
-        expandPath(json, undefined, ['array'], (path) => isEqual(path, ['array'])),
+        expandPath(json, undefined, ['array'], (relativePath) => isEqual(relativePath, [])),
         {
           expanded: true,
           properties: {
@@ -481,7 +481,7 @@ describe('documentState', () => {
 
     test('should expand a part of a json document recursively', () => {
       assert.deepStrictEqual(
-        expandPath(json, expandedState, ['array'], () => true),
+        expandPath(json, documentState, ['array'], () => true),
         {
           expanded: true,
           properties: {
@@ -500,7 +500,7 @@ describe('documentState', () => {
 
     test('should partially expand a json document', () => {
       assert.deepStrictEqual(
-        expandPath(json, expandedState, [], (path) => path.length <= 1),
+        expandPath(json, documentState, [], (relativePath) => relativePath.length <= 1),
         {
           expanded: true,
           properties: {
@@ -519,7 +519,7 @@ describe('documentState', () => {
 
     test('should expand the root of a json document', () => {
       assert.deepStrictEqual(
-        expandPath(json, expandedState, [], (path) => path.length === 0),
+        expandPath(json, documentState, [], (relativePath) => relativePath.length === 0),
         {
           expanded: true,
           properties: {},
@@ -530,7 +530,7 @@ describe('documentState', () => {
 
     test('should not traverse non-expanded nodes', () => {
       assert.deepStrictEqual(
-        expandPath(json, expandedState, [], (path) => path.length > 0),
+        expandPath(json, documentState, [], (relativePath) => relativePath.length > 0),
         {
           expanded: false,
           properties: {},

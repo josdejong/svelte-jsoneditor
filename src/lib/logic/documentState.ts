@@ -288,8 +288,8 @@ export function expandPath(
 
   let updatedState = documentState
 
+  // Step 1: expand all nodes along the path, and update visibleSections if needed
   // FIXME: rewrite this for loop into a recursive function? (more efficient I think)
-  // step 1: expand all nodes on the path, and update visibleSections if needed
   for (let i = 0; i < path.length; i++) {
     const partialPath = path.slice(0, i)
 
@@ -312,89 +312,77 @@ export function expandPath(
     return updatedState
   }
 
-  const callback: OnExpand = expandedCallback // TODO: only needed to make TS happy
+  // Step 2: recursively expand child nodes tested with the callback
+  return updateInDocumentState(json, updatedState, path, (nestedValue, nestedState) => {
+    const relativePath: JSONPath = []
+    return _expandRecursively(nestedValue, nestedState, relativePath, expandedCallback)
+  })
+}
 
-  // FIXME: rewrite this to pass both value, nestedState, and path (a bit less efficient, but much simpler code)
-  function recurse(value: unknown): boolean {
-    const pathIndex = currentPath.length
-    const pathStateIndex = currentStatePath.length + 1
+function _expandRecursively(
+  json: unknown,
+  documentState: DocumentState | undefined,
+  path: JSONPath,
+  callback: OnExpand
+): DocumentState | undefined {
+  if (Array.isArray(json) && callback(path)) {
+    const updatedState = isArrayRecursiveState(documentState)
+      ? { ...documentState, expanded: true }
+      : createArrayDocumentState({ expanded: true })
 
-    if (Array.isArray(value)) {
-      if (callback(currentPath)) {
-        updatedState = updateIn(
-          updatedState,
-          currentStatePath,
-          (value: DocumentState | undefined) => {
-            return value
-              ? { ...value, expanded: true }
-              : createArrayDocumentState({ expanded: true })
+    if (json.length > 0) {
+      let items: ArrayDocumentState['items'] | undefined
+
+      forEachVisibleIndex(json, updatedState.visibleSections, (index) => {
+        const itemPath = path.concat(String(index))
+        const item = _expandRecursively(json[index], updatedState.items[index], itemPath, callback)
+        if (item !== undefined) {
+          if (items === undefined) {
+            items = updatedState.items.slice()
           }
-        )
 
-        if (value.length > 0) {
-          currentStatePath.push('items')
-
-          const visibleSections = getVisibleSections(json, documentState, path)
-
-          forEachVisibleIndex(value, visibleSections, (index) => {
-            const indexStr = String(index)
-            currentPath[pathIndex] = indexStr
-            currentStatePath[pathStateIndex] = indexStr
-
-            recurse(value[index])
-          })
-
-          currentPath.pop()
-          currentStatePath.pop()
-          currentStatePath.pop()
+          items[index] = item
         }
+      })
 
-        return true
-      }
-    } else if (isObject(value)) {
-      if (callback(currentPath)) {
-        updatedState = updateIn(
-          updatedState,
-          currentStatePath,
-          (value: DocumentState | undefined) => {
-            return value
-              ? { ...value, expanded: true }
-              : createObjectDocumentState({ expanded: true })
-          }
-        )
-
-        const keys = Object.keys(value)
-        if (keys.length > 0) {
-          currentStatePath.push('properties')
-
-          for (const key of keys) {
-            currentPath[pathIndex] = key
-            currentStatePath[pathStateIndex] = key
-
-            recurse(value[key])
-          }
-
-          currentPath.pop()
-          currentStatePath.pop()
-          currentStatePath.pop()
-        }
-
-        return true
+      if (items) {
+        updatedState.items = items
       }
     }
 
-    return false
+    return updatedState
   }
 
-  // step 2: recursively expand child nodes tested with the callback
-  const currentPath = path.slice()
-  const currentStatePath = toRecursiveStatePath(json, currentPath)
-  const value = json !== undefined ? getIn(json, path) : json
-  if (value !== undefined) {
-    recurse(value)
+  if (isObject(json) && callback(path)) {
+    const updatedState = isObjectRecursiveState(documentState)
+      ? { ...documentState, expanded: true }
+      : createObjectDocumentState({ expanded: true })
+
+    const keys = Object.keys(json)
+    if (keys.length > 0) {
+      let properties: ObjectDocumentState['properties'] | undefined
+
+      for (const key of keys) {
+        const propPath = path.concat(key)
+        const prop = _expandRecursively(json[key], updatedState.properties[key], propPath, callback)
+        if (prop !== undefined) {
+          if (properties === undefined) {
+            properties = { ...updatedState.properties }
+          }
+
+          properties[key] = prop
+        }
+      }
+
+      if (properties) {
+        updatedState.properties = properties
+      }
+    }
+
+    return updatedState
   }
 
-  return updatedState
+  return documentState
 }
 
 // TODO: write unit tests
