@@ -165,7 +165,7 @@ describe('documentState', () => {
         type: 'object',
         expanded: true,
         properties: {
-          c: { type: 'value', enforceString: false }
+          c: { type: 'value', enforceString: true }
         }
       }
       assert.deepStrictEqual(syncDocumentState({ a: 1, b: 2, c: 3 }, state), state)

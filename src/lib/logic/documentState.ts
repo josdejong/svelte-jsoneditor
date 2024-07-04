@@ -156,60 +156,96 @@ export function syncDocumentState(
   json: unknown,
   documentState: DocumentState | undefined
 ): DocumentState | undefined {
-  if (json === undefined || documentState === undefined) {
-    return undefined
-  }
-
-  if (Array.isArray(json)) {
-    if (!isArrayRecursiveState(documentState)) {
-      const expanded = isExpandableState(documentState) ? documentState.expanded : false
-      return createArrayDocumentState({ expanded })
+  return _transformDocumentState(json, documentState, (nestedJson, nestedState) => {
+    if (nestedJson === undefined || nestedState === undefined) {
+      return undefined
     }
 
-    const items: DocumentState[] = []
-    for (let i = 0; i < Math.min(documentState.items.length, json.length); i++) {
-      const itemState = syncDocumentState(json[i], documentState.items[i])
-      if (itemState !== undefined) {
-        items[i] = itemState
+    if (Array.isArray(nestedJson)) {
+      if (isArrayRecursiveState(nestedState)) {
+        return nestedState
       }
+
+      const expanded = isExpandableState(nestedState) ? nestedState.expanded : false
+      return createArrayDocumentState({ expanded })
+    } else if (isObject(nestedJson)) {
+      if (isObjectRecursiveState(nestedState)) {
+        return nestedState
+      }
+
+      const expanded = isExpandableState(nestedState) ? nestedState.expanded : false
+      return createObjectDocumentState({ expanded })
+    } else {
+      // json is of type value
+      if (isValueRecursiveState(nestedState)) {
+        return nestedState
+      }
+
+      // type of state does not match the actual type of the json
+      return undefined
     }
+  })
+}
 
-    const changed = !strictShallowEqual(items, documentState.items)
+function _forEachStateItem(
+  json: Array<unknown>,
+  documentState: ArrayDocumentState,
+  callback: (item: unknown, itemState: DocumentState | undefined, index: number) => void
+) {
+  const count = Math.min(documentState.items.length, json.length)
+  for (let i = 0; i < count; i++) {
+    callback(json[i], documentState.items[i], i)
+  }
+}
 
-    return changed ? { ...documentState, items } : documentState
+function _transformDocumentState(
+  json: unknown,
+  documentState: DocumentState | undefined,
+  callback: (value: unknown, nestedState: DocumentState | undefined) => DocumentState | undefined,
+  forEach: (
+    json: Array<unknown>,
+    documentState: ArrayDocumentState,
+    callback: (item: unknown, itemState: DocumentState | undefined, index: number) => void
+  ) => void = _forEachStateItem
+): DocumentState | undefined {
+  const updatedState = callback(json, documentState)
+
+  if (Array.isArray(json) && isArrayRecursiveState(updatedState)) {
+    const items: (DocumentState | undefined)[] = []
+    forEach(json, updatedState, (item, itemState, index) => {
+      const updatedItem = _transformDocumentState(item, itemState, callback)
+      if (updatedItem !== undefined) {
+        items[index] = updatedItem
+      }
+    })
+
+    const changed = !strictShallowEqual(items, updatedState.items)
+
+    return changed ? { ...updatedState, items } : updatedState
   }
 
-  if (isObject(json)) {
-    if (!isObjectRecursiveState(documentState)) {
-      const expanded = isExpandableState(documentState) ? documentState.expanded : false
-      return createObjectDocumentState({ expanded })
-    }
-
+  if (isObject(json) && isObjectRecursiveState(updatedState)) {
     const properties: ObjectDocumentState['properties'] = {}
-    Object.keys(documentState.properties).forEach((key) => {
+    Object.keys(updatedState.properties).forEach((key) => {
       const value = json[key]
       if (value !== undefined) {
-        const propertyState = syncDocumentState(value, documentState.properties[key])
-        if (propertyState !== undefined) {
-          properties[key] = propertyState
+        const prop = updatedState.properties[key]
+        const updatedProp = _transformDocumentState(value, prop, callback)
+        if (updatedProp !== undefined) {
+          properties[key] = updatedProp
         }
       }
     })
 
     const changed = !strictShallowEqual(
       Object.values(properties),
-      Object.values(documentState.properties)
+      Object.values(updatedState.properties)
     )
 
-    return changed ? { ...documentState, properties } : documentState
+    return changed ? { ...updatedState, properties } : updatedState
   }
 
-  // json is of type value
-  if (isValueRecursiveState(documentState)) {
-    return documentState
-  }
-
-  return undefined
+  return updatedState
 }
 
 /**
@@ -376,21 +412,17 @@ export function collapsePath(
   path: JSONPath,
   recursive: boolean
 ): DocumentState | undefined {
-  return updateInDocumentState(json, documentState, path, (_value, nestedState) => {
-    return recursive ? _collapseRecursively(nestedState) : _collapse(nestedState)
+  return updateInDocumentState(json, documentState, path, (nestedJson, nestedState) => {
+    return recursive ? _collapseRecursively(nestedJson, nestedState) : _collapse(nestedState)
   })
 }
 
 function _collapse<T extends DocumentState | undefined>(documentState: T): T {
-  if (!isExpandableState(documentState) || !documentState.expanded) {
-    return documentState
-  }
-
-  if (isArrayRecursiveState(documentState)) {
+  if (isArrayRecursiveState(documentState) && documentState.expanded) {
     return { ...documentState, expanded: false, visibleSections: DEFAULT_VISIBLE_SECTIONS }
   }
 
-  if (isObjectRecursiveState(documentState)) {
+  if (isObjectRecursiveState(documentState) && documentState.expanded) {
     return { ...documentState, expanded: false }
   }
 
@@ -398,57 +430,11 @@ function _collapse<T extends DocumentState | undefined>(documentState: T): T {
 }
 
 // FIXME: merge and refactor _expandRecursively and _collapseRecursively
-function _collapseRecursively(documentState: DocumentState | undefined): DocumentState | undefined {
-  if (isArrayRecursiveState(documentState)) {
-    let updatedState = _collapse(documentState)
-
-    let items: ArrayDocumentState['items'] | undefined
-    updatedState.items.forEach((item, index) => {
-      const updatedItem = _collapseRecursively(item)
-      if (updatedItem !== item) {
-        if (items === undefined) {
-          items = updatedState.items.slice()
-        }
-
-        items[index] = updatedItem
-      }
-    })
-
-    if (items) {
-      updatedState = { ...updatedState, items }
-    }
-
-    return updatedState
-  }
-
-  if (isObjectRecursiveState(documentState)) {
-    let updatedState = isObjectRecursiveState(documentState)
-      ? !documentState.expanded
-        ? documentState
-        : { ...documentState, expanded: false }
-      : createObjectDocumentState({ expanded: false })
-
-    let properties: ObjectDocumentState['properties'] | undefined
-    Object.keys(documentState.properties).forEach((key) => {
-      const prop = updatedState.properties[key]
-      const updatedProp = _collapseRecursively(prop)
-      if (updatedProp !== prop) {
-        if (properties === undefined) {
-          properties = { ...updatedState.properties }
-        }
-
-        properties[key] = updatedProp
-      }
-    })
-
-    if (properties) {
-      updatedState = { ...updatedState, properties }
-    }
-
-    return updatedState
-  }
-
-  return documentState
+function _collapseRecursively(
+  json: unknown,
+  documentState: DocumentState | undefined
+): DocumentState | undefined {
+  return _transformDocumentState(json, documentState, (_, nestedState) => _collapse(nestedState))
 }
 
 /**
