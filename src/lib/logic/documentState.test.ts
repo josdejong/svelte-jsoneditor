@@ -1763,6 +1763,42 @@ describe('documentState', () => {
         }
       })
     })
+
+    test('collapse should do nothing on a non-existing path (1)', () => {
+      const nonExpandedState: DocumentState = {
+        type: 'object',
+        expanded: false,
+        properties: {}
+      }
+
+      assert.deepStrictEqual(collapsePath(json, nonExpandedState, [], false), {
+        type: 'object',
+        expanded: false,
+        properties: {}
+      })
+    })
+
+    test('collapse should do nothing on a non-existing path (2)', () => {
+      const nonExpandedState: DocumentState = {
+        type: 'object',
+        expanded: false,
+        properties: {}
+      }
+
+      // TODO: it would be more neat if the documentState was left untouched since it is not collapsed anyway
+      assert.deepStrictEqual(collapsePath(json, nonExpandedState, ['largeArray'], false), {
+        type: 'object',
+        expanded: false,
+        properties: {
+          largeArray: {
+            expanded: false,
+            items: [],
+            type: 'array',
+            visibleSections: DEFAULT_VISIBLE_SECTIONS
+          }
+        }
+      })
+    })
   })
 })
 
