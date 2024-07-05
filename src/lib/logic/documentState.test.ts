@@ -1690,6 +1690,7 @@ describe('documentState', () => {
       largeArray: range(0, 300).map((index) => ({ id: index }))
     }
 
+    const idState: DocumentState = { type: 'value', enforceString: true }
     const documentState: DocumentState = {
       type: 'object',
       expanded: true,
@@ -1697,14 +1698,20 @@ describe('documentState', () => {
         largeArray: {
           type: 'array',
           expanded: true,
-          items: initArray([120, { type: 'object', expanded: true, properties: {} }]),
+          items: initArray([
+            120,
+            {
+              type: 'object',
+              expanded: true,
+              properties: { id: idState }
+            }
+          ]),
           visibleSections: [{ start: 0, end: 200 }]
         }
       }
     }
 
     test('collapse a path (recursive)', () => {
-      // TODO
       assert.deepStrictEqual(collapsePath(json, documentState, [], true), {
         type: 'object',
         expanded: false,
@@ -1712,7 +1719,7 @@ describe('documentState', () => {
           largeArray: {
             type: 'array',
             expanded: false,
-            items: initArray([120, { type: 'object', expanded: false, properties: {} }]),
+            items: [],
             visibleSections: [{ start: 0, end: 100 }]
           }
         }
@@ -1727,7 +1734,10 @@ describe('documentState', () => {
           largeArray: {
             type: 'array',
             expanded: true,
-            items: initArray([120, { type: 'object', expanded: true, properties: {} }]),
+            items: initArray([
+              120,
+              { type: 'object', expanded: true, properties: { id: idState } }
+            ]),
             visibleSections: [{ start: 0, end: 200 }]
           }
         }
@@ -1742,7 +1752,7 @@ describe('documentState', () => {
           largeArray: {
             type: 'array',
             expanded: false,
-            items: initArray([120, { type: 'object', expanded: false, properties: {} }]),
+            items: [],
             visibleSections: [{ start: 0, end: 100 }]
           }
         }
@@ -1757,7 +1767,10 @@ describe('documentState', () => {
           largeArray: {
             type: 'array',
             expanded: false,
-            items: initArray([120, { type: 'object', expanded: true, properties: {} }]),
+            items: initArray([
+              120,
+              { type: 'object', expanded: true, properties: { id: idState } }
+            ]),
             visibleSections: [{ start: 0, end: 100 }]
           }
         }
