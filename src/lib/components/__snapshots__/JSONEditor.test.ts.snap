@@ -865,7 +865,6 @@ exports[`JSONEditor > render text mode 1`] = `
               </div>
             </div>
             <div
-              aria-autocomplete="list"
               aria-multiline="true"
               autocapitalize="off"
               autocorrect="off"
