@@ -34,6 +34,9 @@ export {
   estimateSerializedSize
 } from './utils/jsonUtils.js'
 
+// expand
+export { expandAll, expandMinimal, expandNone, expandSelf } from './logic/documentState'
+
 // selection
 export {
   isValueSelection,

@@ -81,10 +81,13 @@ export function createDocumentState({
   json,
   expand
 }: CreateDocumentStateProps): DocumentState | undefined {
-  let documentState = createRecursiveState({ json, factory: documentStateFactory }) as DocumentState
+  let documentState: DocumentState | undefined = createRecursiveState({
+    json,
+    factory: documentStateFactory
+  }) as DocumentState
 
   if (expand && documentState) {
-    documentState = expandWithCallback(json, documentState, [], expand)
+    documentState = expandPath(json, documentState, [], expand)
   }
 
   return documentState
@@ -151,72 +154,100 @@ export function ensureRecursiveState<T extends RecursiveState>(
 
 export function syncDocumentState(
   json: unknown,
-  documentState: DocumentState | undefined
+  documentState: DocumentState | undefined,
+  path: JSONPath = []
 ): DocumentState | undefined {
-  if (json === undefined || documentState === undefined) {
-    return undefined
-  }
-
-  if (Array.isArray(json)) {
-    if (!isArrayRecursiveState(documentState)) {
-      const expanded = isExpandableState(documentState) ? documentState.expanded : false
-      return createArrayDocumentState({ expanded })
-    }
-
-    const items: DocumentState[] = []
-    for (let i = 0; i < Math.min(documentState.items.length, json.length); i++) {
-      const itemState = syncDocumentState(json[i], documentState.items[i])
-      if (itemState !== undefined) {
-        items[i] = itemState
+  return _transformDocumentState(
+    json,
+    documentState,
+    path,
+    (nestedJson, nestedState) => {
+      if (nestedJson === undefined || nestedState === undefined) {
+        return undefined
       }
-    }
 
-    const changed = !strictShallowEqual(items, documentState.items)
+      if (Array.isArray(nestedJson)) {
+        if (isArrayRecursiveState(nestedState)) {
+          return nestedState
+        }
 
-    return changed ? { ...documentState, items } : documentState
+        const expanded = isExpandableState(nestedState) ? nestedState.expanded : false
+        return createArrayDocumentState({ expanded })
+      }
+
+      if (isObject(nestedJson)) {
+        if (isObjectRecursiveState(nestedState)) {
+          return nestedState
+        }
+
+        const expanded = isExpandableState(nestedState) ? nestedState.expanded : false
+        return createObjectDocumentState({ expanded })
+      }
+
+      // json is of type value
+      if (isValueRecursiveState(nestedState)) {
+        return nestedState
+      }
+
+      // type of state does not match the actual type of the json
+      return undefined
+    },
+    () => true
+  )
+}
+
+function _transformDocumentState(
+  json: unknown,
+  documentState: DocumentState | undefined,
+  path: JSONPath,
+  callback: (
+    nestedJson: unknown,
+    nestedState: DocumentState | undefined,
+    path: JSONPath
+  ) => DocumentState | undefined,
+  recurse: (nestedState: DocumentState | undefined) => boolean
+): DocumentState | undefined {
+  const updatedState = callback(json, documentState, path)
+
+  if (Array.isArray(json) && isArrayRecursiveState(updatedState) && recurse(updatedState)) {
+    const items: (DocumentState | undefined)[] = []
+
+    forEachVisibleIndex(json, updatedState.visibleSections, (index) => {
+      const itemPath = path.concat(String(index))
+      const value = json[index]
+      const item = updatedState.items[index]
+      const updatedItem = _transformDocumentState(value, item, itemPath, callback, recurse)
+      if (updatedItem !== undefined) {
+        items[index] = updatedItem
+      }
+    })
+
+    const changed = !strictShallowEqual(items, updatedState.items)
+
+    return changed ? { ...updatedState, items } : updatedState
   }
 
-  if (isObject(json)) {
-    if (!isObjectRecursiveState(documentState)) {
-      const expanded = isExpandableState(documentState) ? documentState.expanded : false
-      return createObjectDocumentState({ expanded })
-    }
-
+  if (isObject(json) && isObjectRecursiveState(updatedState) && recurse(updatedState)) {
     const properties: ObjectDocumentState['properties'] = {}
-    Object.keys(documentState.properties).forEach((key) => {
+    Object.keys(json).forEach((key) => {
+      const propPath = path.concat(key)
       const value = json[key]
-      if (value !== undefined) {
-        const propertyState = syncDocumentState(value, documentState.properties[key])
-        if (propertyState !== undefined) {
-          properties[key] = propertyState
-        }
+      const prop = updatedState.properties[key]
+      const updatedProp = _transformDocumentState(value, prop, propPath, callback, recurse)
+      if (updatedProp !== undefined) {
+        properties[key] = updatedProp
       }
     })
 
     const changed = !strictShallowEqual(
       Object.values(properties),
-      Object.values(documentState.properties)
+      Object.values(updatedState.properties)
     )
 
-    return changed ? { ...documentState, properties } : documentState
+    return changed ? { ...updatedState, properties } : updatedState
   }
 
-  // json is of type value
-  if (isValueRecursiveState(documentState)) {
-    return documentState
-  }
-
-  return undefined
-}
-
-export function getVisibleSections(
-  json: unknown,
-  documentState: DocumentState | undefined,
-  path: JSONPath
-): VisibleSection[] {
-  const valueState = getInRecursiveState(json, documentState, path)
-
-  return isArrayRecursiveState(valueState) ? valueState.visibleSections : DEFAULT_VISIBLE_SECTIONS
+  return updatedState
 }
 
 /**
@@ -232,50 +263,19 @@ export function forEachVisibleIndex(
   })
 }
 
-/**
- * Expand all nodes on given path
- * The end of the path itself is not expanded
- */
-export function expandPath(
-  json: unknown,
-  documentState: DocumentState | undefined,
-  path: JSONPath
-): DocumentState | undefined {
-  let updatedState = documentState
-
-  for (let i = 0; i < path.length; i++) {
-    const partialPath = path.slice(0, i)
-    updatedState = expandSingleItem(json, updatedState, partialPath)
-
-    if (i < path.length) {
-      updatedState = updateInDocumentState(
-        json,
-        updatedState,
-        partialPath,
-        (_value, nestedState) => {
-          if (!isArrayRecursiveState(nestedState)) {
-            return nestedState
-          }
-
-          const index = int(path[i])
-          if (inVisibleSection(nestedState.visibleSections, index)) {
-            return nestedState
-          }
-
-          const start = currentRoundNumber(index)
-          const end = nextRoundNumber(start)
-          const newVisibleSection = { start, end }
-
-          return {
-            ...nestedState,
-            visibleSections: mergeSections(nestedState.visibleSections.concat(newVisibleSection))
-          }
-        }
-      )
-    }
+export function expandVisibleSection(state: ArrayDocumentState, index: number): ArrayDocumentState {
+  if (inVisibleSection(state.visibleSections, index)) {
+    return state
   }
 
-  return updatedState
+  const start = currentRoundNumber(index)
+  const end = nextRoundNumber(start)
+  const newVisibleSection = { start, end }
+
+  return {
+    ...state,
+    visibleSections: mergeSections(state.visibleSections.concat(newVisibleSection))
+  }
 }
 
 export function toRecursiveStatePath(json: unknown, path: JSONPath): JSONPath {
@@ -303,122 +303,111 @@ export function toRecursiveStatePath(json: unknown, path: JSONPath): JSONPath {
 }
 
 /**
- * Expand a node, end expand its children according to the provided callback
- * Nodes that are already expanded will be left untouched
+ * Expand all nodes along the given path, and expand invisible array sections if needed.
+ * Then, optionally expand child nodes according to the provided callback.
  */
-export function expandWithCallback(
+export function expandPath(
   json: unknown | undefined,
   documentState: DocumentState | undefined,
   path: JSONPath,
-  expandedCallback: OnExpand
-): DocumentState {
-  // FIXME: updateInDocumentState and ensureNestedDocumentState here
-  let updatedState = ensureRecursiveState(json, documentState, path, documentStateFactory)
-
-  // FIXME: simplify this function
-
-  function recurse(value: unknown) {
-    const pathIndex = currentPath.length
-    const pathStateIndex = currentStatePath.length + 1
-
-    if (Array.isArray(value)) {
-      if (expandedCallback(currentPath)) {
-        updatedState = updateIn(
-          updatedState,
-          currentStatePath,
-          (value: DocumentState | undefined) => {
-            return value
-              ? { ...value, expanded: true }
-              : createArrayDocumentState({ expanded: true })
-          }
-        )
-
-        if (value.length > 0) {
-          currentStatePath.push('items')
-
-          const visibleSections = getVisibleSections(json, documentState, path)
-
-          forEachVisibleIndex(value, visibleSections, (index) => {
-            const indexStr = String(index)
-            currentPath[pathIndex] = indexStr
-            currentStatePath[pathStateIndex] = indexStr
-
-            recurse(value[index])
-          })
-
-          currentPath.pop()
-          currentPath.pop()
-          currentStatePath.pop()
-          currentStatePath.pop()
-        }
-      }
-    } else if (isObject(value)) {
-      if (expandedCallback(currentPath)) {
-        updatedState = updateIn(
-          updatedState,
-          currentStatePath,
-          (value: DocumentState | undefined) => {
-            return value
-              ? { ...value, expanded: true }
-              : createObjectDocumentState({ expanded: true })
-          }
-        )
-
-        const keys = Object.keys(value)
-        if (keys.length > 0) {
-          currentStatePath.push('properties')
-
-          for (const key of keys) {
-            currentPath[pathIndex] = key
-            currentStatePath[pathStateIndex] = key
-
-            recurse(value[key])
-          }
-
-          currentPath.pop()
-          currentPath.pop()
-          currentStatePath.pop()
-          currentStatePath.pop()
-        }
-      }
-    }
-  }
-
-  const currentPath = path.slice()
-  const currentStatePath = toRecursiveStatePath(json, currentPath)
-  const value = json !== undefined ? getIn(json, path) : json
-  if (value !== undefined) {
-    recurse(value)
-  }
-
-  return updatedState
-}
-
-// TODO: write unit tests
-export function expandSingleItem(
-  json: unknown,
-  documentState: DocumentState | undefined,
-  path: JSONPath
+  callback: OnExpand
 ): DocumentState | undefined {
-  return updateInDocumentState(json, documentState, path, (_value, state) => {
-    return isExpandableState(state) ? { ...state, expanded: true } : state
+  let updatedState = documentState
+
+  // Step 1: expand all nodes along the path, and update visibleSections if needed
+  for (let i = 0; i < path.length; i++) {
+    const partialPath = path.slice(0, i)
+
+    updatedState = updateInDocumentState(json, updatedState, partialPath, (_, nestedState) => {
+      const updatedState =
+        isExpandableState(nestedState) && !nestedState.expanded
+          ? { ...nestedState, expanded: true }
+          : nestedState
+
+      if (isArrayRecursiveState(updatedState)) {
+        const index = int(path[i])
+        return expandVisibleSection(updatedState, index)
+      }
+
+      return updatedState
+    })
+  }
+
+  // Step 2: recursively expand child nodes tested with the callback
+  return updateInDocumentState(json, updatedState, path, (nestedValue, nestedState) => {
+    const relativePath: JSONPath = []
+    return _expandRecursively(nestedValue, nestedState, relativePath, callback)
   })
 }
 
-// TODO: write unit tests
+function _expandRecursively(
+  json: unknown,
+  documentState: DocumentState | undefined,
+  path: JSONPath,
+  callback: OnExpand
+): DocumentState | undefined {
+  return _transformDocumentState(
+    json,
+    documentState,
+    path,
+    (nestedJson, nestedState, nestedPath) => {
+      if (Array.isArray(nestedJson) && callback(nestedPath)) {
+        return isArrayRecursiveState(nestedState)
+          ? nestedState.expanded
+            ? nestedState
+            : { ...nestedState, expanded: true }
+          : createArrayDocumentState({ expanded: true })
+      }
+
+      if (isObject(nestedJson) && callback(nestedPath)) {
+        return isObjectRecursiveState(nestedState)
+          ? nestedState.expanded
+            ? nestedState
+            : { ...nestedState, expanded: true }
+          : createObjectDocumentState({ expanded: true })
+      }
+
+      return nestedState
+    },
+    (nestedState) => isExpandableState(nestedState) && nestedState.expanded
+  )
+}
+
 export function collapsePath(
   json: unknown,
   documentState: DocumentState | undefined,
+  path: JSONPath,
+  recursive: boolean
+): DocumentState | undefined {
+  return updateInDocumentState(json, documentState, path, (nestedJson, nestedState) => {
+    return recursive ? _collapseRecursively(nestedJson, nestedState, path) : _collapse(nestedState)
+  })
+}
+
+function _collapse<T extends DocumentState | undefined>(documentState: T): T {
+  if (isArrayRecursiveState(documentState) && documentState.expanded) {
+    return { ...documentState, expanded: false, visibleSections: DEFAULT_VISIBLE_SECTIONS }
+  }
+
+  if (isObjectRecursiveState(documentState) && documentState.expanded) {
+    return { ...documentState, expanded: false }
+  }
+
+  return documentState
+}
+
+function _collapseRecursively(
+  json: unknown,
+  documentState: DocumentState | undefined,
   path: JSONPath
 ): DocumentState | undefined {
-  return updateInDocumentState(json, documentState, path, (_value, state) => {
-    // clear the state of nested objects/arrays
-    return isObjectRecursiveState(state)
-      ? createObjectDocumentState({ expanded: false })
-      : isArrayRecursiveState(state)
-        ? createArrayDocumentState({ expanded: false })
-        : state
-  })
+  return _transformDocumentState(
+    json,
+    documentState,
+    path,
+    (_, nestedState) => _collapse(nestedState),
+    () => true
+  )
 }
 
 /**
@@ -517,7 +506,7 @@ export function updateInRecursiveState<T extends RecursiveState>(
   json: unknown,
   documentState: T | undefined,
   path: JSONPath,
-  transform: (value: unknown, state: T) => T,
+  transform: (value: unknown, state: T) => T | undefined,
   factory: RecursiveStateFactory
 ): T {
   const ensuredState: T = ensureRecursiveState(json, documentState, path, factory)
@@ -527,26 +516,26 @@ export function updateInRecursiveState<T extends RecursiveState>(
   })
 }
 
-export function setInDocumentState(
-  json: unknown,
-  documentState: DocumentState | undefined,
+export function setInDocumentState<T extends RecursiveState>(
+  json: unknown | undefined,
+  documentState: T | undefined,
   path: JSONPath,
   value: unknown
-): DocumentState | undefined {
+): T | undefined {
   return setInRecursiveState(json, documentState, path, value, documentStateFactory)
 }
 
 export function updateInDocumentState<T extends RecursiveState>(
-  json: unknown,
+  json: unknown | undefined,
   documentState: T | undefined,
   path: JSONPath,
-  transform: (value: unknown, state: T) => T
+  transform: (value: unknown, state: T) => T | undefined
 ): T {
   return updateInRecursiveState(json, documentState, path, transform, documentStateFactory)
 }
 
 export function deleteInDocumentState<T extends RecursiveState>(
-  json: unknown,
+  json: unknown | undefined,
   documentState: T | undefined,
   path: JSONPath
 ): T | undefined {
@@ -579,8 +568,7 @@ export function documentStateAdd(
         ...arrayState,
         items:
           index < items.length
-            ? // eslint-disable-next-line no-sparse-arrays
-              insertItemsAt(items, index, stateValue !== undefined ? [stateValue] : [,])
+            ? insertItemsAt(items, index, stateValue !== undefined ? [stateValue] : Array(1))
             : items,
         visibleSections: shiftVisibleSections(visibleSections, index, 1)
       }
@@ -857,34 +845,37 @@ export function getNextVisiblePath(
  * Expand recursively when the expanded contents is small enough,
  * else expand in a minimalistic way
  */
-// TODO: write unit test
-export function expandRecursive(
-  json: unknown,
+export function expandSmart(
+  json: unknown | undefined,
   documentState: DocumentState | undefined,
-  path: JSONPath
+  path: JSONPath,
+  maxSize: number = MAX_DOCUMENT_SIZE_EXPAND_ALL
 ): DocumentState | undefined {
-  const expandContents: unknown | undefined = getIn(json, path)
-  if (expandContents === undefined) {
-    return documentState
-  }
+  const nestedJson = getIn(json, path)
+  const callback = isLargeContent({ json: nestedJson }, maxSize) ? expandMinimal : expandAll
 
-  const expandAllRecursive = !isLargeContent({ json: expandContents }, MAX_DOCUMENT_SIZE_EXPAND_ALL)
-  const expandCallback = expandAllRecursive ? expandAll : expandMinimal
-
-  return expandWithCallback(json, documentState, path, expandCallback)
+  return expandPath(json, documentState, path, callback)
 }
 
-// TODO: write unit test
-export function expandMinimal(path: JSONPath): boolean {
-  return path.length === 0 ? true : path.length === 1 && path[0] === '0' // first item of an array
+/**
+ * Expand the root array or object, and in case of an array, expand the first array item
+ */
+export function expandMinimal(relativePath: JSONPath): boolean {
+  // first item of an array
+  return relativePath.length === 0 ? true : relativePath.length === 1 && relativePath[0] === '0'
 }
 
-// TODO: write unit test
+/**
+ * Expand the root array or object
+ */
+export function expandSelf(relativePath: JSONPath): boolean {
+  return relativePath.length === 0
+}
+
 export function expandAll(): boolean {
   return true
 }
 
-// TODO: write unit test
-export function getDefaultExpand(json: unknown): OnExpand {
-  return isLargeContent({ json }, MAX_DOCUMENT_SIZE_EXPAND_ALL) ? expandMinimal : expandAll
+export function expandNone(): boolean {
+  return false
 }

@@ -40,12 +40,7 @@ import {
   parsePath
 } from 'immutable-json-patch'
 import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
-import {
-  expandAll,
-  expandPath,
-  expandRecursive,
-  expandWithCallback
-} from '$lib/logic/documentState.js'
+import { expandAll, expandSmart, expandPath, expandNone } from '$lib/logic/documentState.js'
 import { initial, isEmpty, last } from 'lodash-es'
 import { insertActiveElementContents } from '$lib/utils/domUtils.js'
 import { fromTableCellPosition, toTableCellPosition } from '$lib/logic/table.js'
@@ -158,7 +153,7 @@ export function onPaste({
           )
           .forEach((operation) => {
             const path = parsePath(json, operation.path)
-            updatedState = expandRecursive(patchedJson, updatedState, path)
+            updatedState = expandSmart(patchedJson, updatedState, path)
           })
 
         return {
@@ -173,7 +168,7 @@ export function onPaste({
         if (patchedJson) {
           const path: JSONPath = []
           return {
-            state: expandRecursive(patchedJson, patchedState, path)
+            state: expandSmart(patchedJson, patchedState, path)
           }
         }
 
@@ -476,7 +471,7 @@ export function onInsert({
 
         if (isObjectOrArray(newValue)) {
           return {
-            state: expandWithCallback(patchedJson, patchedState, path, expandAll),
+            state: expandPath(patchedJson, patchedState, path, expandAll),
             selection: selectInside ? createInsideSelection(path) : patchedSelection
           }
         }
@@ -486,8 +481,7 @@ export function onInsert({
           const parent = !isEmpty(path) ? getIn(patchedJson, initial(path)) : undefined
 
           return {
-            // expandPath is invoked to make sure that visibleSections is extended when needed
-            state: expandPath(patchedJson, patchedState, path),
+            state: expandPath(patchedJson, patchedState, path, expandNone),
             selection: isObject(parent)
               ? createKeySelection(path, true)
               : createValueSelection(path, true)
@@ -512,7 +506,7 @@ export function onInsert({
 
     const path: JSONPath = []
     onReplaceJson(newValue, (patchedJson, patchedState) => ({
-      state: expandRecursive(patchedJson, patchedState, path),
+      state: expandSmart(patchedJson, patchedState, path),
       selection: isObjectOrArray(newValue)
         ? createInsideSelection(path)
         : createValueSelection(path, true)

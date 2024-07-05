@@ -29,12 +29,11 @@
     documentStatePatch,
     expandAll,
     expandMinimal,
+    expandNone,
     expandPath,
-    expandRecursive,
     expandSection,
-    expandSingleItem,
-    expandWithCallback,
-    getDefaultExpand,
+    expandSelf,
+    expandSmart,
     getEnforceString,
     setInDocumentState,
     syncDocumentState
@@ -136,13 +135,13 @@
     OnTransformModal,
     ParseError,
     PastedJson,
-    SearchResults,
-    ValidationErrors,
     SearchResultDetails,
+    SearchResults,
     Section,
     TransformModalOptions,
     TreeModeContext,
     ValidationError,
+    ValidationErrors,
     Validator,
     ValueNormalization
   } from '$lib/types'
@@ -301,7 +300,7 @@
   }
 
   async function handleFocusSearch(path: JSONPath) {
-    documentState = expandPath(json, documentState, path)
+    documentState = expandPath(json, documentState, path, expandNone)
     await scrollTo(path)
   }
 
@@ -325,11 +324,22 @@
   })
   let historyState = history.getState()
 
-  export function expand(callback: OnExpand = expandAll) {
+  export function expand(path: JSONPath, callback: OnExpand = expandSelf) {
     debug('expand')
 
-    // FIXME: clear the expanded state and visible sections (else you can't collapse anything using the callback)
-    documentState = expandWithCallback(json, documentState, [], callback)
+    documentState = expandPath(json, documentState, path, callback)
+  }
+
+  export function collapse(path: JSONPath, recursive: boolean) {
+    documentState = collapsePath(json, documentState, path, recursive)
+
+    if (selection) {
+      // check whether the selection is still visible and not collapsed
+      if (isSelectionInsidePath(selection, path)) {
+        // remove selection when not visible anymore
+        updateSelection(undefined)
+      }
+    }
   }
 
   // two-way binding of externalContent and internal json and text (
@@ -511,7 +521,7 @@
   function expandWhenNotInitialized(json: unknown) {
     if (!documentStateInitialized) {
       documentStateInitialized = true
-      documentState = createDocumentState({ json, expand: getDefaultExpand(json) })
+      documentState = expandSmart(json, documentState, [])
     }
   }
 
@@ -843,7 +853,7 @@
         // expand extracted object/array
         const path: JSONPath = []
         return {
-          state: expandRecursive(patchedJson, patchedState, path)
+          state: expandSmart(patchedJson, patchedState, path)
         }
       }
 
@@ -911,7 +921,7 @@
         // expand converted object/array
         return {
           state: selection
-            ? expandRecursive(patchedJson, patchedState, getFocusPath(selection))
+            ? expandSmart(patchedJson, patchedState, getFocusPath(selection))
             : documentState
         }
       })
@@ -1074,7 +1084,7 @@
 
         handlePatch(operations, (patchedJson, patchedState) => ({
           // expand the newly replaced array and select it
-          state: expandRecursive(patchedJson, patchedState, rootPath),
+          state: expandSmart(patchedJson, patchedState, rootPath),
           selection: createValueSelection(rootPath, false)
         }))
       },
@@ -1128,7 +1138,7 @@
 
           handlePatch(operations, (patchedJson, patchedState) => ({
             // expand the newly replaced array and select it
-            state: expandRecursive(patchedJson, patchedState, rootPath),
+            state: expandSmart(patchedJson, patchedState, rootPath),
             selection: createValueSelection(rootPath, false)
           }))
         }
@@ -1184,7 +1194,7 @@
    * Expand the path when needed.
    */
   export async function scrollTo(path: JSONPath, scrollToWhenVisible = true): Promise<void> {
-    documentState = expandPath(json, documentState, path)
+    documentState = expandPath(json, documentState, path, expandNone)
     await tick() // await rerender (else the element we want to scroll to does not yet exist)
 
     const elem = findElement(path)
@@ -1302,7 +1312,7 @@
     const previousContent = { json, text }
     const previousState = { documentState, selection, json, text, textIsRepaired }
 
-    const updatedState = expandWithCallback(
+    const updatedState = expandPath(
       json,
       syncDocumentState(updatedJson, documentState),
       [],
@@ -1342,24 +1352,14 @@
 
     try {
       json = parseMemoizeOne(updatedText)
-      documentState = expandWithCallback(
-        json,
-        syncDocumentState(json, documentState),
-        [],
-        expandMinimal
-      )
+      documentState = expandPath(json, syncDocumentState(json, documentState), [], expandMinimal)
       text = undefined
       textIsRepaired = false
       parseError = undefined
     } catch (err) {
       try {
         json = parseMemoizeOne(jsonrepair(updatedText))
-        documentState = expandWithCallback(
-          json,
-          syncDocumentState(json, documentState),
-          [],
-          expandMinimal
-        )
+        documentState = expandPath(json, syncDocumentState(json, documentState), [], expandMinimal)
         text = updatedText
         textIsRepaired = true
         parseError = undefined
@@ -1398,28 +1398,16 @@
   /**
    * Toggle expanded state of a node
    * @param path The path to be expanded
-   * @param expanded  True to expand, false to collapse
+   * @param expanded  True if currently expanded, false when currently collapsed
    * @param [recursive=false]  Only applicable when expanding
    */
   function handleExpand(path: JSONPath, expanded: boolean, recursive = false): void {
     debug('handleExpand', { path, expanded, recursive })
 
     if (expanded) {
-      if (recursive) {
-        documentState = expandWithCallback(json, documentState, path, expandAll)
-      } else {
-        documentState = expandSingleItem(json, documentState, path)
-      }
+      expand(path, recursive ? expandAll : expandSelf)
     } else {
-      documentState = collapsePath(json, documentState, path)
-
-      if (selection) {
-        // check whether the selection is still visible and not collapsed
-        if (isSelectionInsidePath(selection, path)) {
-          // remove selection when not visible anymore
-          updateSelection(undefined)
-        }
-      }
+      collapse(path, recursive)
     }
 
     // set focus to the hidden input, so we can capture quick keys like Ctrl+X, Ctrl+C, Ctrl+V
@@ -1802,7 +1790,7 @@
 
     handlePatch(operations, (patchedJson, patchedState) => {
       return {
-        state: expandRecursive(patchedJson, patchedState, path)
+        state: expandSmart(patchedJson, patchedState, path)
       }
     })
 
