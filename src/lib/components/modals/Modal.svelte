@@ -1,7 +1,7 @@
 <script lang="ts">
   // code based on: https://svelte.dev/examples/modal
   import { onEscape } from '$lib/actions/onEscape.js'
-  import {onDestroy, onMount} from "svelte";
+  import { onDestroy, onMount } from 'svelte'
 
   export let onClose: () => void
 
@@ -30,6 +30,7 @@
     border-radius: $border-radius;
     border: none;
     padding: 0;
+    display: flex;
   }
 
   dialog::backdrop {
@@ -38,6 +39,8 @@
 
   dialog > div {
     padding: 0;
+    flex: 1;
+    display: flex;
   }
 
   dialog[open] {

@@ -4,7 +4,7 @@
   import { createDebug } from '../utils/debug.js'
   import type { Callbacks, Component, Open } from 'svelte-simple-modal'
   import Modal, { bind } from 'svelte-simple-modal'
-  import { JSONEDITOR_MODAL_OPTIONS, TRANSFORM_MODAL_OPTIONS } from '../constants.js'
+  import { JSONEDITOR_MODAL_OPTIONS } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
   import {
     isEqualParser,
@@ -20,12 +20,14 @@
   import type {
     Content,
     ContentErrors,
+    ContextMenuItem,
     JSONEditorModalCallback,
     JSONEditorPropsOptional,
     JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
     JSONPathParser,
+    MenuItem,
     OnBlur,
     OnChange,
     OnChangeMode,
@@ -40,8 +42,9 @@
     OnSelect,
     QueryLanguage,
     SortModalProps,
-    TransformModalProps,
+    TransformModalCallback,
     TransformModalOptions,
+    TransformModalProps,
     Validator
   } from '$lib/types'
   import type { OnRenderContextMenu } from '$lib/types.js'
@@ -341,38 +344,33 @@
 
   // The onTransformModal method is located in JSONEditor to prevent circular references:
   //     TreeMode -> TransformModal -> TreeMode
-  function onTransformModal({ id, json, rootPath, onTransform, onClose }: TransformModalProps) {
+  function onTransformModal({ id, json, rootPath, onTransform, onClose }: TransformModalCallback) {
     if (readOnly) {
       return
     }
 
-    open(
-      TransformModal,
-      {
-        id,
-        json,
-        rootPath,
-        indentation,
-        escapeControlCharacters,
-        escapeUnicodeCharacters,
-        parser,
-        parseMemoizeOne,
-        validationParser,
-        pathParser,
-        queryLanguages,
-        queryLanguageId,
-        onChangeQueryLanguage: handleChangeQueryLanguage,
-        onRenderValue,
-        onRenderMenu,
-        onRenderContextMenu,
-        onClassName,
-        onTransform
-      },
-      TRANSFORM_MODAL_OPTIONS,
-      {
-        onClose
-      }
-    )
+    transformModalProps = {
+      id,
+      json,
+      rootPath,
+      indentation,
+      escapeControlCharacters,
+      escapeUnicodeCharacters,
+      parser,
+      parseMemoizeOne,
+      validationParser,
+      pathParser,
+      queryLanguages,
+      queryLanguageId,
+      onChangeQueryLanguage: handleChangeQueryLanguage,
+      onRenderValue,
+      onRenderMenu: (items: MenuItem[]) => onRenderMenu(items, { mode, modal: true, readOnly }),
+      onRenderContextMenu: (items: ContextMenuItem[]) =>
+        onRenderContextMenu(items, { mode, modal: true, readOnly, selection }),
+      onClassName,
+      onTransform,
+      onClose
+    }
   }
 
   // The onSortModal is positioned here for consistency with TransformModal
@@ -478,12 +476,19 @@
           />
         {/key}
       </div>
+
+      {#if sortModalProps}
+        <SortModal {...sortModalProps} onClose={() => (sortModalProps = undefined)} />
+      {/if}
+
+      {#if transformModalProps}
+        <TransformModal
+          {...transformModalProps}
+          onClose={() => (transformModalProps = undefined)}
+        />
+      {/if}
     </Modal>
   </Modal>
 </AbsolutePopup>
-
-{#if sortModalProps}
-  <SortModal {...sortModalProps} onClose={() => sortModalProps = undefined} />
-{/if}
 
 <style src="./JSONEditor.scss"></style>

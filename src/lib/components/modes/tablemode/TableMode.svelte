@@ -276,6 +276,7 @@
   let modalOpen = false
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let hasFocus = false
+  let copyPasteModalOpen = false
 
   let itemHeightsCache: Record<number, number> = {}
 
@@ -1120,19 +1121,7 @@
   }
 
   function handlePasteFromMenu() {
-    open(
-      CopyPasteModal,
-      {},
-      {
-        ...SIMPLE_MODAL_OPTIONS,
-        styleWindow: {
-          width: '450px'
-        }
-      },
-      {
-        onClose: () => focus()
-      }
-    )
+    copyPasteModalOpen = true
   }
 
   function handleClearPastedJson() {
@@ -1993,5 +1982,9 @@
     </div>
   {/if}
 </div>
+
+{#if copyPasteModalOpen}
+  <CopyPasteModal onClose={() => (copyPasteModalOpen = false)} />
+{/if}
 
 <style src="./TableMode.scss"></style>

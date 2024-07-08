@@ -395,7 +395,7 @@ export type RenderMenuContext = {
   readOnly: boolean
 }
 export type OnRenderMenu = (items: MenuItem[], context: RenderMenuContext) => MenuItem[] | undefined
-export type OnRenderMenuInternal = (items: MenuItem[]) => MenuItem[]
+export type OnRenderMenuInternal = (items: MenuItem[]) => MenuItem[] | undefined
 export type RenderContextMenuContext = RenderMenuContext & {
   selection: JSONEditorSelection | undefined
 }
@@ -403,12 +403,14 @@ export type OnRenderContextMenu = (
   items: ContextMenuItem[],
   context: RenderContextMenuContext
 ) => ContextMenuItem[] | false | undefined
-export type OnRenderContextMenuInternal = (items: ContextMenuItem[]) => ContextMenuItem[] | false
+export type OnRenderContextMenuInternal = (
+  items: ContextMenuItem[]
+) => ContextMenuItem[] | false | undefined
 export type OnError = (error: Error) => void
 export type OnFocus = () => void
 export type OnBlur = () => void
 export type OnSortModal = (props: SortModalProps) => void
-export type OnTransformModal = (props: TransformModalProps) => void
+export type OnTransformModal = (props: TransformModalCallback) => void
 export type OnJSONEditorModal = (props: JSONEditorModalCallback) => void
 export type FindNextInside = (path: JSONPath) => JSONSelection | undefined
 
@@ -639,10 +641,35 @@ export interface TransformModalOptions {
   onClose?: () => void
 }
 
-export interface TransformModalProps {
+export interface TransformModalCallback {
   id: string
-  rootPath: JSONPath
   json: unknown
+  rootPath: JSONPath
+  onTransform: (operations: JSONPatchDocument) => void
+  onClose: () => void
+}
+
+export interface TransformModalProps extends TransformModalCallback {
+  id: string
+  json: unknown
+  rootPath: JSONPath
+  indentation: number | string
+  escapeControlCharacters: boolean
+  escapeUnicodeCharacters: boolean
+  parser: JSONParser
+  parseMemoizeOne: JSONParser['parse']
+  validationParser: JSONParser
+  pathParser: JSONPathParser
+
+  queryLanguages: QueryLanguage[]
+  queryLanguageId: string
+  onChangeQueryLanguage: OnChangeQueryLanguage
+
+  onRenderValue: OnRenderValue
+  onRenderMenu: OnRenderMenuInternal
+  onRenderContextMenu: OnRenderContextMenuInternal
+  onClassName: OnClassName
+
   onTransform: (operations: JSONPatchDocument) => void
   onClose: () => void
 }
