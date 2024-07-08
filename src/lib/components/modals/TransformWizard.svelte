@@ -111,7 +111,12 @@
       <th>Filter</th>
       <td>
         <div class="jse-horizontal">
-          <Select class="jse-filter-path" showChevron items={fieldOptions} bind:value={filterPath} />
+          <Select
+            class="jse-filter-path"
+            showChevron
+            items={fieldOptions}
+            bind:value={filterPath}
+          />
           <Select
             class="jse-filter-relation"
             showChevron
