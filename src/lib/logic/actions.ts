@@ -22,7 +22,6 @@ import {
 } from '$lib/logic/operations.js'
 import type {
   AfterPatchCallback,
-  DocumentState,
   InsertType,
   JSONParser,
   JSONSelection,
@@ -41,12 +40,7 @@ import {
   parsePath
 } from 'immutable-json-patch'
 import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
-import {
-  expandAll,
-  expandPath,
-  expandRecursive,
-  expandWithCallback
-} from '$lib/logic/documentState.js'
+import { expandAll, expandSmart, expandPath, expandNone } from '$lib/logic/documentState.js'
 import { initial, isEmpty, last } from 'lodash-es'
 import { insertActiveElementContents } from '$lib/utils/domUtils.js'
 import { fromTableCellPosition, toTableCellPosition } from '$lib/logic/table.js'
@@ -55,7 +49,7 @@ const debug = createDebug('jsoneditor:actions')
 
 export interface OnCutAction {
   json: unknown | undefined
-  documentState: DocumentState
+  selection: JSONSelection | undefined
   indentation: string | number | undefined
   readOnly: boolean
   parser: JSONParser
@@ -65,51 +59,44 @@ export interface OnCutAction {
 // TODO: write unit tests
 export async function onCut({
   json,
-  documentState,
+  selection,
   indentation,
   readOnly,
   parser,
   onPatch
 }: OnCutAction) {
-  if (
-    readOnly ||
-    json === undefined ||
-    !documentState.selection ||
-    !hasSelectionContents(documentState.selection)
-  ) {
+  if (readOnly || json === undefined || !selection || !hasSelectionContents(selection)) {
     return
   }
 
-  const clipboard = selectionToPartialJson(json, documentState.selection, indentation, parser)
-  if (clipboard == null) {
+  const clipboard = selectionToPartialJson(json, selection, indentation, parser)
+  if (clipboard === undefined) {
     return
   }
 
-  debug('cut', { selection: documentState.selection, clipboard, indentation })
+  debug('cut', { selection, clipboard, indentation })
 
   await copyToClipboard(clipboard)
 
-  const { operations, newSelection } = createRemoveOperations(json, documentState.selection)
+  const { operations, newSelection } = createRemoveOperations(json, selection)
 
-  onPatch(operations, (patchedJson, patchedState) => ({
-    state: {
-      ...patchedState,
-      selection: newSelection
-    }
+  onPatch(operations, (_, patchedState) => ({
+    state: patchedState,
+    selection: newSelection
   }))
 }
 
 export interface OnCopyAction {
   json: unknown
-  documentState: DocumentState
+  selection: JSONSelection | undefined
   indentation: string | number | undefined
   parser: JSONParser
 }
 
 // TODO: write unit tests
-export async function onCopy({ json, documentState, indentation, parser }: OnCopyAction) {
-  const clipboard = selectionToPartialJson(json, documentState.selection, indentation, parser)
-  if (clipboard == null) {
+export async function onCopy({ json, selection, indentation, parser }: OnCopyAction) {
+  const clipboard = selectionToPartialJson(json, selection, indentation, parser)
+  if (clipboard === undefined) {
     return
   }
 
@@ -123,7 +110,7 @@ type RepairModalCallback = (text: string, onApply: (repairedText: string) => voi
 interface OnPasteAction {
   clipboardText: string
   json: unknown | undefined
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   readOnly: boolean
   parser: JSONParser
   onPatch: OnPatch
@@ -148,11 +135,11 @@ export function onPaste({
 
   function doPaste(pastedText: string) {
     if (json !== undefined) {
-      const selectionNonNull = selection || createValueSelection([], false)
+      const ensureSelection = selection || createValueSelection([], false)
 
-      const operations = insert(json, selectionNonNull, pastedText, parser)
+      const operations = insert(json, ensureSelection, pastedText, parser)
 
-      debug('paste', { pastedText, operations, selectionNonNull })
+      debug('paste', { pastedText, operations, ensureSelection })
 
       onPatch(operations, (patchedJson, patchedState) => {
         let updatedState = patchedState
@@ -166,7 +153,7 @@ export function onPaste({
           )
           .forEach((operation) => {
             const path = parsePath(json, operation.path)
-            updatedState = expandRecursive(patchedJson, updatedState, path)
+            updatedState = expandSmart(patchedJson, updatedState, path)
           })
 
         return {
@@ -181,9 +168,11 @@ export function onPaste({
         if (patchedJson) {
           const path: JSONPath = []
           return {
-            state: expandRecursive(patchedJson, patchedState, path) as DocumentState
+            state: expandSmart(patchedJson, patchedState, path)
           }
         }
+
+        return undefined
       })
     }
   }
@@ -201,7 +190,7 @@ export function onPaste({
 export interface OnRemoveAction {
   json: unknown | undefined
   text: string | undefined
-  documentState: DocumentState
+  selection: JSONSelection | undefined
   keepSelection: boolean
   readOnly: boolean
   onChange: OnChange
@@ -212,35 +201,34 @@ export interface OnRemoveAction {
 export function onRemove({
   json,
   text,
-  documentState,
+  selection,
   keepSelection,
   readOnly,
   onChange,
   onPatch
 }: OnRemoveAction) {
-  if (readOnly || !documentState.selection) {
+  if (readOnly || !selection) {
     return
   }
 
   // in case of a selected key or value, we change the selection to the whole
   // entry to remove this, we do not want to clear a key or value only.
   const removeSelection =
-    json !== undefined &&
-    (isKeySelection(documentState.selection) || isValueSelection(documentState.selection))
-      ? createMultiSelection(documentState.selection.path, documentState.selection.path)
-      : documentState.selection
+    json !== undefined && (isKeySelection(selection) || isValueSelection(selection))
+      ? createMultiSelection(selection.path, selection.path)
+      : selection
 
-  if (isEmpty(getFocusPath(documentState.selection))) {
+  if (isEmpty(getFocusPath(selection))) {
     // root selected -> clear complete document
-    debug('remove root', { selection: documentState.selection })
+    debug('remove root', { selection })
 
     if (onChange) {
       onChange(
         { text: '', json: undefined },
         json !== undefined ? { text: undefined, json } : { text: text || '', json },
         {
-          contentErrors: null,
-          patchResult: null
+          contentErrors: undefined,
+          patchResult: undefined
         }
       )
     }
@@ -249,13 +237,11 @@ export function onRemove({
     if (json !== undefined) {
       const { operations, newSelection } = createRemoveOperations(json, removeSelection)
 
-      debug('remove', { operations, selection: documentState.selection, newSelection })
+      debug('remove', { operations, selection, newSelection })
 
-      onPatch(operations, (patchedJson, patchedState) => ({
-        state: {
-          ...patchedState,
-          selection: keepSelection ? documentState.selection : newSelection
-        }
+      onPatch(operations, (_, patchedState) => ({
+        state: patchedState,
+        selection: keepSelection ? selection : newSelection
       }))
     }
   }
@@ -263,7 +249,7 @@ export function onRemove({
 
 export interface OnDuplicateRowAction {
   json: unknown | undefined
-  documentState: DocumentState
+  selection: JSONSelection | undefined
   columns: JSONPath[]
   readOnly: boolean
   onPatch: OnPatch
@@ -276,47 +262,37 @@ export interface OnDuplicateRowAction {
 // TODO: write unit tests
 export function onDuplicateRow({
   json,
-  documentState,
+  selection,
   columns,
   readOnly,
   onPatch
 }: OnDuplicateRowAction) {
-  if (
-    readOnly ||
-    json === undefined ||
-    !documentState.selection ||
-    !hasSelectionContents(documentState.selection)
-  ) {
+  if (readOnly || json === undefined || !selection || !hasSelectionContents(selection)) {
     return
   }
 
-  const { rowIndex, columnIndex } = toTableCellPosition(
-    getFocusPath(documentState.selection),
-    columns
-  )
+  const { rowIndex, columnIndex } = toTableCellPosition(getFocusPath(selection), columns)
 
   debug('duplicate row', { rowIndex })
 
   const rowPath = [String(rowIndex)]
   const operations = duplicate(json, [rowPath])
 
-  onPatch(operations, (patchedJson, patchedState) => {
+  onPatch(operations, (_, patchedState) => {
     const newRowIndex = rowIndex < (json as Array<unknown>).length ? rowIndex + 1 : rowIndex
     const newPath = fromTableCellPosition({ rowIndex: newRowIndex, columnIndex }, columns)
     const newSelection = createValueSelection(newPath, false)
 
     return {
-      state: {
-        ...patchedState,
-        selection: newSelection
-      }
+      state: patchedState,
+      selection: newSelection
     }
   })
 }
 
 export interface OnInsertBeforeRowAction {
   json: unknown | undefined
-  documentState: DocumentState
+  selection: JSONSelection | undefined
   columns: JSONPath[]
   readOnly: boolean
   onPatch: OnPatch
@@ -329,21 +305,16 @@ export interface OnInsertBeforeRowAction {
 // TODO: write unit tests
 export function onInsertBeforeRow({
   json,
-  documentState,
+  selection,
   columns,
   readOnly,
   onPatch
 }: OnInsertBeforeRowAction) {
-  if (
-    readOnly ||
-    json === undefined ||
-    !documentState.selection ||
-    !hasSelectionContents(documentState.selection)
-  ) {
+  if (readOnly || json === undefined || !selection || !hasSelectionContents(selection)) {
     return
   }
 
-  const { rowIndex } = toTableCellPosition(getFocusPath(documentState.selection), columns)
+  const { rowIndex } = toTableCellPosition(getFocusPath(selection), columns)
 
   debug('insert before row', { rowIndex })
 
@@ -357,7 +328,7 @@ export function onInsertBeforeRow({
 
 export interface OnInsertAfterRowAction {
   json: unknown | undefined
-  documentState: DocumentState
+  selection: JSONSelection | undefined
   columns: JSONPath[]
   readOnly: boolean
   onPatch: OnPatch
@@ -370,24 +341,16 @@ export interface OnInsertAfterRowAction {
 // TODO: write unit tests
 export function onInsertAfterRow({
   json,
-  documentState,
+  selection,
   columns,
   readOnly,
   onPatch
 }: OnInsertAfterRowAction) {
-  if (
-    readOnly ||
-    json === undefined ||
-    !documentState.selection ||
-    !hasSelectionContents(documentState.selection)
-  ) {
+  if (readOnly || json === undefined || !selection || !hasSelectionContents(selection)) {
     return
   }
 
-  const { rowIndex, columnIndex } = toTableCellPosition(
-    getFocusPath(documentState.selection),
-    columns
-  )
+  const { rowIndex, columnIndex } = toTableCellPosition(getFocusPath(selection), columns)
 
   debug('insert after row', { rowIndex })
 
@@ -401,22 +364,20 @@ export function onInsertAfterRow({
       ? insertBefore(json, nextRowPath, values)
       : append(json, [], values)
 
-  onPatch(operations, (patchedJson, patchedState) => {
+  onPatch(operations, (_, patchedState) => {
     const nextPath = fromTableCellPosition({ rowIndex: nextRowIndex, columnIndex }, columns)
     const newSelection = createValueSelection(nextPath, false)
 
     return {
-      state: {
-        ...patchedState,
-        selection: newSelection
-      }
+      state: patchedState,
+      selection: newSelection
     }
   })
 }
 
 export interface OnRemoveRowAction {
   json: unknown | undefined
-  documentState: DocumentState
+  selection: JSONSelection | undefined
   columns: JSONPath[]
   readOnly: boolean
   onPatch: OnPatch
@@ -427,26 +388,12 @@ export interface OnRemoveRowAction {
  * it cannot duplicate something in some nested array
  */
 // TODO: write unit tests
-export function onRemoveRow({
-  json,
-  documentState,
-  columns,
-  readOnly,
-  onPatch
-}: OnRemoveRowAction) {
-  if (
-    readOnly ||
-    json === undefined ||
-    !documentState.selection ||
-    !hasSelectionContents(documentState.selection)
-  ) {
+export function onRemoveRow({ json, selection, columns, readOnly, onPatch }: OnRemoveRowAction) {
+  if (readOnly || json === undefined || !selection || !hasSelectionContents(selection)) {
     return
   }
 
-  const { rowIndex, columnIndex } = toTableCellPosition(
-    getFocusPath(documentState.selection),
-    columns
-  )
+  const { rowIndex, columnIndex } = toTableCellPosition(getFocusPath(selection), columns)
 
   debug('remove row', { rowIndex })
 
@@ -467,15 +414,13 @@ export function onRemoveRow({
             fromTableCellPosition({ rowIndex: newRowIndex, columnIndex }, columns),
             false
           )
-        : null
+        : undefined
 
     debug('remove row new selection', { rowIndex, newRowIndex, newSelection })
 
     return {
-      state: {
-        ...patchedState,
-        selection: newSelection
-      }
+      state: patchedState,
+      selection: newSelection
     }
   })
 }
@@ -485,7 +430,7 @@ export interface OnInsert {
   selectInside: boolean
   refJsonEditor: HTMLElement
   json: unknown | undefined
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   readOnly: boolean
   parser: JSONParser
   onPatch: OnPatch
@@ -519,41 +464,32 @@ export function onInsert({
       operations.filter((operation) => operation.op === 'add' || operation.op === 'replace')
     )
 
-    onPatch(operations, (patchedJson, patchedState) => {
+    onPatch(operations, (patchedJson, patchedState, patchedSelection) => {
       // TODO: extract determining the newSelection in a separate function
       if (operation) {
         const path = parsePath(patchedJson, operation.path)
 
         if (isObjectOrArray(newValue)) {
           return {
-            state: {
-              ...expandWithCallback(patchedJson, patchedState, path, expandAll),
-              selection: selectInside ? createInsideSelection(path) : patchedState.selection
-            }
+            state: expandPath(patchedJson, patchedState, path, expandAll),
+            selection: selectInside ? createInsideSelection(path) : patchedSelection
           }
         }
 
         if (newValue === '') {
           // open the newly inserted value in edit mode
-          const parent = !isEmpty(path) ? getIn(patchedJson, initial(path)) : null
+          const parent = !isEmpty(path) ? getIn(patchedJson, initial(path)) : undefined
 
           return {
-            // expandPath is invoked to make sure that visibleSections is extended when needed
-            state: expandPath(
-              patchedJson,
-              {
-                ...patchedState,
-                selection: isObject(parent)
-                  ? createKeySelection(path, true)
-                  : createValueSelection(path, true)
-              },
-              path
-            )
+            state: expandPath(patchedJson, patchedState, path, expandNone),
+            selection: isObject(parent)
+              ? createKeySelection(path, true)
+              : createValueSelection(path, true)
           }
         }
-
-        return undefined
       }
+
+      return undefined
     })
 
     debug('after patch')
@@ -570,12 +506,10 @@ export function onInsert({
 
     const path: JSONPath = []
     onReplaceJson(newValue, (patchedJson, patchedState) => ({
-      state: {
-        ...expandRecursive(patchedJson, patchedState, path),
-        selection: isObjectOrArray(newValue)
-          ? createInsideSelection(path)
-          : createValueSelection(path, true)
-      }
+      state: expandSmart(patchedJson, patchedState, path),
+      selection: isObjectOrArray(newValue)
+        ? createInsideSelection(path)
+        : createValueSelection(path, true)
     }))
   }
 }
@@ -585,7 +519,7 @@ export interface OnInsertCharacter {
   selectInside: boolean
   refJsonEditor: HTMLElement
   json: unknown | undefined
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   readOnly: boolean
   parser: JSONParser
   onPatch: OnPatch
@@ -606,7 +540,7 @@ export async function onInsertCharacter({
   onReplaceJson,
   onSelect
 }: OnInsertCharacter) {
-  // a regular key like a, A, _, etc is entered.
+  // a regular key like a, A, _, etc. is entered.
   // Replace selected contents with a new value having this first character as text
   if (readOnly) {
     return
@@ -687,7 +621,7 @@ interface OnInsertValueWithCharacter {
   char: string
   refJsonEditor: HTMLElement
   json: unknown | undefined
-  selection: JSONSelection | null
+  selection: JSONSelection | undefined
   readOnly: boolean
   parser: JSONParser
   onPatch: OnPatch

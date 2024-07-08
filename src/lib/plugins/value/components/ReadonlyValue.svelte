@@ -13,6 +13,7 @@
     ValueNormalization
   } from '$lib/types.js'
   import type { JSONPath } from 'immutable-json-patch'
+  import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
 
   export let path: JSONPath
   export let value: unknown
@@ -26,7 +27,7 @@
   $: valueIsUrl = isUrl(value)
 
   function handleValueClick(event: MouseEvent) {
-    if (typeof value === 'string' && valueIsUrl && event.ctrlKey) {
+    if (typeof value === 'string' && valueIsUrl && isCtrlKeyDown(event)) {
       event.preventDefault()
       event.stopPropagation()
 
@@ -50,7 +51,7 @@
   class={getValueClass(value, parser)}
   on:click={handleValueClick}
   on:dblclick={handleValueDoubleClick}
-  title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : null}
+  title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : undefined}
 >
   {#if searchResultItems}
     <SearchResultHighlighter text={normalization.escapeValue(value)} {searchResultItems} />

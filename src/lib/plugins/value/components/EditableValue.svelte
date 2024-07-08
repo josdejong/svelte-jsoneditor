@@ -44,11 +44,11 @@
           value: convert(normalization.unescapeValue(newValue))
         }
       ],
-      (patchedJson, patchedState) => {
+      (_, patchedState, patchedSelection) => {
         // Leave the selection as is when it is no longer the path that we were editing here
         // This happens for example when the user clicks or double-clicks on another value
         // whilst editing a value
-        if (patchedState.selection && !isEqual(path, getFocusPath(patchedState.selection))) {
+        if (patchedSelection && !isEqual(path, getFocusPath(patchedSelection))) {
           return undefined
         }
 
@@ -58,10 +58,8 @@
             : createValueSelection(path, false)
 
         return {
-          state: {
-            ...patchedState,
-            selection
-          }
+          state: patchedState,
+          selection
         }
       }
     )

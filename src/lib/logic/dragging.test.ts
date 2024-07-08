@@ -4,7 +4,6 @@ import { onMoveSelection } from './dragging.js'
 import type { MoveSelectionResult } from './dragging.js'
 import { deepStrictEqual, strictEqual } from 'assert'
 import { isEqual } from 'lodash-es'
-import { createDocumentState } from './documentState.js'
 import type { RenderedItem } from '../types'
 import { immutableJSONPatch } from 'immutable-json-patch'
 
@@ -14,11 +13,7 @@ describe('dragging', () => {
     const json = {
       array: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     }
-    let documentState = createDocumentState({ json, expand: () => true })
-    documentState = {
-      ...documentState,
-      selection: createMultiSelection(['array', '3'], ['array', '5'])
-    }
+    const selection = createMultiSelection(['array', '3'], ['array', '5'])
 
     const allItems: RenderedItem[] = json.array.map((item, index) => ({
       path: ['array', String(index)],
@@ -34,7 +29,7 @@ describe('dragging', () => {
     }): MoveSelectionResult {
       return onMoveSelection({
         json,
-        documentState,
+        selection,
         deltaY,
         items
       })
@@ -148,11 +143,7 @@ describe('dragging', () => {
     const json = {
       object: { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6 }
     }
-    const documentState = createDocumentState({
-      json,
-      expand: () => true,
-      select: () => createMultiSelection(['object', 'c'], ['object', 'e'])
-    })
+    const selection = createMultiSelection(['object', 'c'], ['object', 'e'])
     const allItems = Object.keys(json.object).map((key) => ({
       path: ['object', key],
       height: itemHeight
@@ -167,7 +158,7 @@ describe('dragging', () => {
     }) {
       return onMoveSelection({
         json,
-        documentState,
+        selection,
         deltaY,
         items
       })

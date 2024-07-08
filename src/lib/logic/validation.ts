@@ -2,20 +2,36 @@ import { initial, isEmpty } from 'lodash-es'
 import type {
   ContentErrors,
   JSONParser,
-  JSONPointerMap,
-  NestedValidationError,
+  RecursiveStateFactory,
+  ValidationErrors,
   ValidationError,
   Validator
 } from '$lib/types.js'
 import { ValidationSeverity } from '$lib/types.js'
-import { compileJSONPointer, type JSONPointer } from 'immutable-json-patch'
 import { MAX_AUTO_REPAIRABLE_SIZE, MAX_VALIDATABLE_SIZE } from '../constants.js'
 import { measure } from '../utils/timeUtils.js'
 import { normalizeJsonParseError } from '../utils/jsonUtils.js'
 import { createDebug } from '../utils/debug.js'
 import { jsonrepair } from 'jsonrepair'
+import { updateInRecursiveState } from './documentState.js'
+import type { JSONPath } from 'immutable-json-patch'
 
 const debug = createDebug('validation')
+
+export const validationErrorsFactory: RecursiveStateFactory = {
+  createObjectDocumentState: () => ({ type: 'object', properties: {} }),
+  createArrayDocumentState: () => ({ type: 'array', items: [] }),
+  createValueDocumentState: () => ({ type: 'value' })
+}
+
+export function updateInValidationErrors(
+  json: unknown,
+  errors: ValidationErrors | undefined,
+  path: JSONPath,
+  transform: (value: unknown, state: ValidationErrors) => ValidationErrors
+): ValidationErrors {
+  return updateInRecursiveState(json, errors, path, transform, validationErrorsFactory)
+}
 
 /**
  * Create a flat map with validation errors, where the key is the stringified path
@@ -23,14 +39,18 @@ const debug = createDebug('validation')
  *
  * Returns a nested object containing the validation errors
  */
-export function mapValidationErrors(
+export function toRecursiveValidationErrors(
+  json: unknown,
   validationErrors: ValidationError[]
-): JSONPointerMap<NestedValidationError> {
-  const map: Record<JSONPointer, ValidationError | NestedValidationError> = {}
+): ValidationErrors | undefined {
+  let output: ValidationErrors | undefined
 
-  // first generate a map with the errors themselves
+  // first generate the errors themselves
   validationErrors.forEach((validationError) => {
-    map[compileJSONPointer(validationError.path)] = validationError
+    output = updateInValidationErrors(json, output, validationError.path, (_, state) => ({
+      ...state,
+      validationError
+    }))
   })
 
   // create error entries for all parent nodes (displayed when the node is collapsed)
@@ -39,25 +59,29 @@ export function mapValidationErrors(
 
     while (parentPath.length > 0) {
       parentPath = initial(parentPath)
-      const parentPointer: JSONPointer = compileJSONPointer(parentPath)
 
-      if (!(parentPointer in map)) {
-        map[parentPointer] = {
-          isChildError: true,
-          path: parentPath,
-          message: 'Contains invalid data',
-          severity: ValidationSeverity.warning
-        }
-      }
+      output = updateInValidationErrors(json, output, parentPath, (_, state) => {
+        return state.validationError
+          ? state
+          : {
+              ...state,
+              validationError: {
+                isChildError: true,
+                path: parentPath,
+                message: 'Contains invalid data',
+                severity: ValidationSeverity.warning
+              }
+            }
+      })
     }
   })
 
-  return map
+  return output
 }
 
 export function validateJSON(
   json: unknown,
-  validator: Validator | null,
+  validator: Validator | undefined,
   parser: JSONParser,
   validationParser: JSONParser
 ): ValidationError[] {
@@ -80,10 +104,10 @@ export function validateJSON(
 
 export function validateText(
   text: string,
-  validator: Validator | null,
+  validator: Validator | undefined,
   parser: JSONParser,
   validationParser: JSONParser
-): ContentErrors | null {
+): ContentErrors | undefined {
   debug('validateText')
 
   if (text.length > MAX_VALIDATABLE_SIZE) {
@@ -100,7 +124,7 @@ export function validateText(
 
   if (text.length === 0) {
     // new, empty document, do not try to parse
-    return null
+    return undefined
   }
 
   try {
@@ -112,7 +136,7 @@ export function validateText(
     )
 
     if (!validator) {
-      return null
+      return undefined
     }
 
     // if needed, parse with the validationParser to be able to feed the json to the validator
@@ -130,7 +154,7 @@ export function validateText(
       (duration) => debug(`validate: validated json in ${duration} ms`)
     )
 
-    return !isEmpty(validationErrors) ? { validationErrors } : null
+    return !isEmpty(validationErrors) ? { validationErrors } : undefined
   } catch (err) {
     const isRepairable = measure(
       () => canAutoRepair(text, parser),

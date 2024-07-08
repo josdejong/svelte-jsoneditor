@@ -133,10 +133,10 @@ describe('typeUtils', () => {
     expect(getColorCSS('#82b92c')).toBe('rgb(130,185,44)')
     expect(getColorCSS('rgba(255, 0, 0, 0.5)')).toBe('rgba(255,0,0,0.5)')
     expect(getColorCSS('#ff000066')).toBe('rgba(255,0,0,0.4)')
-    expect(getColorCSS('#a')).toBe(null)
-    expect(getColorCSS('foo')).toBe(null)
-    expect(getColorCSS('red  ')).toBe(null)
-    expect(getColorCSS('  ')).toBe(null)
+    expect(getColorCSS('#a')).toBe(undefined)
+    expect(getColorCSS('foo')).toBe(undefined)
+    expect(getColorCSS('red  ')).toBe(undefined)
+    expect(getColorCSS('  ')).toBe(undefined)
   })
 
   test('isColor', () => {

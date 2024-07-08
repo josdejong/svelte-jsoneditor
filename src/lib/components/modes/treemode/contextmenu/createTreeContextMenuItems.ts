@@ -18,21 +18,30 @@ import {
 import {
   canConvert,
   getFocusPath,
+  isAfterSelection,
+  isInsideSelection,
   isKeySelection,
   isMultiSelection,
   isValueSelection,
   singleItemSelected
 } from '$lib/logic/selection'
-import type { ConvertType, DocumentState, InsertType, JSONParser } from '$lib/types'
+import type {
+  ConvertType,
+  DocumentState,
+  InsertType,
+  JSONParser,
+  JSONSelection,
+  ContextMenuItem
+} from '$lib/types'
 import { initial, isEmpty } from 'lodash-es'
-import { compileJSONPointer, getIn } from 'immutable-json-patch'
-import { isObjectOrArray, isObject } from '$lib/utils/typeUtils'
+import { getIn } from 'immutable-json-patch'
+import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
 import { getEnforceString } from '$lib/logic/documentState'
-import type { ContextMenuItem } from 'svelte-jsoneditor'
 
 export default function ({
   json,
   documentState,
+  selection,
   readOnly,
   parser,
   onEditKey,
@@ -52,7 +61,8 @@ export default function ({
   onTransform
 }: {
   json: unknown
-  documentState: DocumentState
+  documentState: DocumentState | undefined
+  selection: JSONSelection | undefined
   readOnly: boolean
   parser: JSONParser
   onEditKey: () => void
@@ -71,8 +81,6 @@ export default function ({
   onSort: () => void
   onTransform: () => void
 }): ContextMenuItem[] {
-  const selection = documentState.selection
-
   const hasJson = json !== undefined
   const hasSelection = !!selection
   const rootSelected = selection ? isEmpty(getFocusPath(selection)) : false
@@ -87,15 +95,14 @@ export default function ({
     hasJson &&
     (isMultiSelection(selection) || isKeySelection(selection) || isValueSelection(selection))
 
-  const canEditKey =
-    !readOnly &&
-    hasJson &&
-    selection != null &&
-    singleItemSelected(selection) &&
-    !rootSelected &&
-    !Array.isArray(getIn(json, initial(getFocusPath(selection))))
+  const parent =
+    selection && !rootSelected ? getIn(json, initial(getFocusPath(selection))) : undefined
 
-  const canEditValue = !readOnly && hasJson && selection != null && singleItemSelected(selection)
+  const canEditKey =
+    !readOnly && hasJson && singleItemSelected(selection) && !rootSelected && !Array.isArray(parent)
+
+  const canEditValue =
+    !readOnly && hasJson && selection !== undefined && singleItemSelected(selection)
   const canEnforceString = canEditValue && !isObjectOrArray(focusValue)
 
   const canCut = !readOnly && hasSelectionContents
@@ -105,14 +112,17 @@ export default function ({
   const canExtract =
     !readOnly &&
     hasJson &&
-    selection != null &&
+    selection !== undefined &&
     (isMultiSelection(selection) || isValueSelection(selection)) &&
     !rootSelected // must not be root
 
   const convertMode = hasSelectionContents
   const insertOrConvertText = convertMode ? 'Convert to:' : 'Insert:'
 
-  const canInsertOrConvertStructure = readOnly || convertMode ? false : hasSelection
+  const canInsertOrConvertStructure =
+    !readOnly &&
+    ((isInsideSelection(selection) && Array.isArray(focusValue)) ||
+      (isAfterSelection(selection) && Array.isArray(parent)))
   const canInsertOrConvertObject =
     !readOnly && (convertMode ? canConvert(selection) && !isObject(focusValue) : hasSelection)
   const canInsertOrConvertArray =
@@ -121,13 +131,8 @@ export default function ({
     !readOnly && (convertMode ? canConvert(selection) && isObjectOrArray(focusValue) : hasSelection)
 
   const enforceString =
-    selection != null && focusValue
-      ? getEnforceString(
-          focusValue,
-          documentState.enforceStringMap,
-          compileJSONPointer(getFocusPath(selection)),
-          parser
-        )
+    selection !== undefined
+      ? getEnforceString(json, documentState, getFocusPath(selection), parser)
       : false
 
   function handleInsertOrConvert(type: InsertType) {
@@ -316,7 +321,7 @@ export default function ({
               onClick: () => handleInsertOrConvert('structure'),
               icon: convertMode ? faArrowRightArrowLeft : faPlus,
               text: 'Structure',
-              title: insertOrConvertText + ' structure',
+              title: insertOrConvertText + ' structure like the first item in the array',
               disabled: !canInsertOrConvertStructure
             },
             {
@@ -324,7 +329,7 @@ export default function ({
               onClick: () => handleInsertOrConvert('object'),
               icon: convertMode ? faArrowRightArrowLeft : faPlus,
               text: 'Object',
-              title: insertOrConvertText + ' structure',
+              title: insertOrConvertText + ' object',
               disabled: !canInsertOrConvertObject
             },
             {

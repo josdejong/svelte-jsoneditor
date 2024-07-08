@@ -195,13 +195,13 @@ export function findParent(
   element: Element,
   predicate: (element: Element) => boolean
 ): Element | undefined {
-  let e: Element | null = element
+  let e: Element | undefined = element
 
   while (e && !predicate(e)) {
     e = e.parentNode as Element
   }
 
-  return e || undefined
+  return e
 }
 
 /**
@@ -237,9 +237,9 @@ export function insertActiveElementContents(
     return
   }
 
-  const activeElement: HTMLElement | null = window.document.activeElement
+  const activeElement: HTMLElement | undefined = window.document.activeElement
     ? (window.document.activeElement as HTMLElement)
-    : null
+    : undefined
 
   if (activeElement && activeElement.isContentEditable) {
     activeElement.textContent = replaceContents ? text : activeElement.textContent + text
@@ -254,8 +254,8 @@ export function insertActiveElementContents(
  * Gets a DOM element's Window.  This is normally just the global `window`
  * variable, but if we opened a child window, it may be different.
  */
-export function getWindow(element: Element): Window | null {
-  return element && element.ownerDocument ? element.ownerDocument.defaultView : null
+export function getWindow(element: Element): Window | undefined {
+  return element?.ownerDocument?.defaultView ?? undefined
 }
 
 export function activeElementIsChildOf(element: Element) {
@@ -310,13 +310,13 @@ export function decodeDataPath(pathStr: string): JSONPath {
 /**
  * Find the data path of the given element. Traverses the parent nodes until find
  */
-export function getDataPathFromTarget(target: Element): JSONPath | null {
+export function getDataPathFromTarget(target: Element): JSONPath | undefined {
   const parent = findParent(target, (element) => {
     return element?.hasAttribute ? element.hasAttribute('data-path') : false
   })
 
-  const dataPath = parent?.getAttribute('data-path')
-  return dataPath ? decodeDataPath(dataPath) : null
+  const dataPath = parent?.getAttribute('data-path') ?? undefined
+  return dataPath ? decodeDataPath(dataPath) : undefined
 }
 
 /**
@@ -411,7 +411,7 @@ export interface EditableDivElement extends HTMLDivElement {
   cancel: () => void
 }
 
-export function isEditableDivRef(element: Element | null): element is EditableDivElement {
+export function isEditableDivRef(element: Element | undefined): element is EditableDivElement {
   return (
     !!element &&
     element.nodeName === 'DIV' &&

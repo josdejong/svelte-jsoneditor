@@ -10,10 +10,10 @@ export interface EvaluatorActionProps {
 }
 
 export const EvaluatorAction: Action<HTMLDivElement, Record<string, unknown>> = (
-  node,
-  initialProps
+  node: HTMLDivElement,
+  initialProps: Record<string, unknown>
 ) => {
-  let props = toEvaluatorProps(initialProps)
+  let props = toEvaluatorProps(initialProps as Record<string, unknown>)
 
   function updateResult() {
     node.innerText = evaluate(String(props.value))

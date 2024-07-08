@@ -10,7 +10,7 @@
   export let value: unknown
   export let context: JSONEditorContext
   export let enforceString: boolean
-  export let selection: JSONSelection | null
+  export let selection: JSONSelection | undefined
   export let searchResultItems: SearchResultItem[] | undefined
 
   $: isEditing = isValueSelection(selection) && isEditingSelection(selection)
@@ -41,7 +41,7 @@
       <div
         role="button"
         tabindex="-1"
-        class="jse-value jse-readonly-password"
+        class="jse-value"
         data-type="selectable-value"
         use:action={renderer.props}
       />

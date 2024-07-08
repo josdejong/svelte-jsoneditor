@@ -14,7 +14,7 @@
   export let onContextMenu: OnContextMenu
 
   function handleClick(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
-    let buttonElem: Element | null = event.target as HTMLButtonElement
+    let buttonElem: Element | undefined = event.target as HTMLButtonElement
     while (buttonElem && buttonElem.nodeName !== 'BUTTON') {
       buttonElem = buttonElem.parentNode as Element
     }

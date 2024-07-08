@@ -2,6 +2,58 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.23.7](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.6...v0.23.7) (2024-06-06)
+
+
+### Bug Fixes
+
+* search and replace in table mode not working ([3f8a398](https://github.com/josdejong/svelte-jsoneditor/commit/3f8a3989108a6629cd46810e02da919c9bd1dfc5))
+
+### [0.23.6](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.5...v0.23.6) (2024-06-05)
+
+
+### Features
+
+* update dependencies `codemirror`, `codemirror-indentation-markers`, `ajv`, `sass` ([1eb5c0b](https://github.com/josdejong/svelte-jsoneditor/commit/1eb5c0bc582b2bad4a233e90e5c75d2304009a6a))
+
+
+### Bug Fixes
+
+* [#436](https://github.com/josdejong/svelte-jsoneditor/issues/436) Ctrl+Click (Cmd+Click) not working on Mac ([7142783](https://github.com/josdejong/svelte-jsoneditor/commit/714278381fde46ac5abc828c744316291babbab5))
+
+### [0.23.5](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.4...v0.23.5) (2024-05-30)
+
+
+### Features
+
+* upgrade dependencies `codemirror`, `ajv`, `jsonrepair`, and update dev dependencies ([999acfc](https://github.com/josdejong/svelte-jsoneditor/commit/999acfc28b4c3bbb3475052373925bd3432ffc52))
+
+
+### Bug Fixes
+
+* cleanup wrong classname `jse-readonly-password` attached to all values ([eabbeb2](https://github.com/josdejong/svelte-jsoneditor/commit/eabbeb299c82513c8fec141db64dc61b55083359))
+* make platform detection more robust and future proof ([#435](https://github.com/josdejong/svelte-jsoneditor/issues/435)) ([776ff70](https://github.com/josdejong/svelte-jsoneditor/commit/776ff709c3588b6705795062bcc4933fe02360e3))
+
+### [0.23.4](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.3...v0.23.4) (2024-05-09)
+
+
+### Bug Fixes
+
+* cannot use middle mouse button to scroll ([d0e7f4c](https://github.com/josdejong/svelte-jsoneditor/commit/d0e7f4cce8046c1c0101127556378aa6da770122))
+* update `jsonrepair` and other dependencies ([7b9063f](https://github.com/josdejong/svelte-jsoneditor/commit/7b9063fb65c8703e654cf6489e09f4d6d6898f4e))
+
+### [0.23.3](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.2...v0.23.3) (2024-05-06)
+
+
+### Features
+
+* update `codemirror`, `ajv`, `fontawesome`, `jsonrepair`, and dev dependencies ([7bd08e7](https://github.com/josdejong/svelte-jsoneditor/commit/7bd08e7021b2a8c5067ab346859f613457edcd44))
+
+
+### Bug Fixes
+
+* text mode loads partially scrolled down ([56e18ee](https://github.com/josdejong/svelte-jsoneditor/commit/56e18ee0573e4af7731a725133e93dc179e2857e))
+
 ### [0.23.2](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.1...v0.23.2) (2024-04-17)
 
 
