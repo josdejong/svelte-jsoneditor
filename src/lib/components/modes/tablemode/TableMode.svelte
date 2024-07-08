@@ -1813,7 +1813,7 @@
               {/if}
             </tr>
             <tr class="jse-table-invisible-start-section">
-              <td style:height={visibleSection.startHeight + 'px'} colspan={columns.length} />
+              <td style:height={visibleSection.startHeight + 'px'} colspan={columns.length}></td>
             </tr>
             {#each visibleSection.visibleItems as item, visibleIndex}
               {@const rowIndex = visibleSection.startIndex + visibleIndex}
@@ -1890,13 +1890,13 @@
                   </td>
                 {/each}
                 {#if showRefreshButton}
-                  <td class="jse-table-cell" />
+                  <td class="jse-table-cell"></td>
                 {/if}
               </tr>
             {/each}
 
             <tr class="jse-table-invisible-end-section">
-              <td style:height={visibleSection.endHeight + 'px'} colspan={columns.length} />
+              <td style:height={visibleSection.endHeight + 'px'} colspan={columns.length}></td>
             </tr>
           </tbody>
         </table>
@@ -1986,7 +1986,7 @@
     {/if}
   {:else}
     <div class="jse-contents jse-contents-loading">
-      <div class="jse-loading-space" />
+      <div class="jse-loading-space"></div>
       <div class="jse-loading">loading...</div>
     </div>
   {/if}

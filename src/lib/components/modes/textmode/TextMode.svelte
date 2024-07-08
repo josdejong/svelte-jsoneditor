@@ -1020,7 +1020,7 @@
   {#if !isSSR}
     {@const editorDisabled = disableTextEditor(text, acceptTooLarge)}
 
-    <div class="jse-contents" class:jse-hidden={editorDisabled} bind:this={codeMirrorRef} />
+    <div class="jse-contents" class:jse-hidden={editorDisabled} bind:this={codeMirrorRef}></div>
 
     {#if editorDisabled}
       <Message
@@ -1101,7 +1101,7 @@
     {/if}
   {:else}
     <div class="jse-contents">
-      <div class="jse-loading-space" />
+      <div class="jse-loading-space"></div>
       <div class="jse-loading">loading...</div>
     </div>
   {/if}

@@ -6,7 +6,7 @@
 </script>
 
 <div class="jse-welcome" on:click={() => onClick()} role="none">
-  <div class="jse-space jse-before" />
+  <div class="jse-space jse-before"></div>
   <div class="jse-contents">
     <div class="jse-welcome-title">Empty document</div>
     {#if !readOnly}
@@ -23,7 +23,7 @@
       >
     {/if}
   </div>
-  <div class="jse-space jse-after" />
+  <div class="jse-space jse-after"></div>
 </div>
 
 <style src="./Welcome.scss"></style>

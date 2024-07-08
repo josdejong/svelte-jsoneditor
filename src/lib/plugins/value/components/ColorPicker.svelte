@@ -72,6 +72,6 @@
   style="background: {color}"
   title={!readOnly ? 'Click to open a color picker' : `Color ${value}`}
   on:click={openColorPicker}
-/>
+></button>
 
 <style src="./ColorPicker.scss"></style>

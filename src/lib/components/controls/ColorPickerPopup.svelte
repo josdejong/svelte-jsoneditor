@@ -39,6 +39,6 @@
   })
 </script>
 
-<div class="jse-color-picker-popup" bind:this={ref} />
+<div class="jse-color-picker-popup" bind:this={ref}></div>
 
 <style src="./ColorPickerPopup.scss"></style>
