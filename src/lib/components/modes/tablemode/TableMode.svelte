@@ -77,6 +77,7 @@
     findParentWithNodeName,
     getDataPathFromTarget,
     getWindow,
+    isChildOf,
     isEditableDivRef
   } from '$lib/utils/domUtils.js'
   import { createDebug } from '$lib/utils/debug.js'
@@ -97,6 +98,7 @@
     getFocusPath,
     isEditingSelection,
     isJSONSelection,
+    isKeySelection,
     isValueSelection,
     pathInSelection,
     pathStartsWith,
@@ -684,6 +686,35 @@
     if (refHiddenInput) {
       refHiddenInput.focus()
       refHiddenInput.select()
+    }
+  }
+
+  function handleWindowMouseDown(event: MouseEvent & { currentTarget: EventTarget & Window }) {
+    const outsideEditor = !isChildOf(
+      event.target as Element,
+      (element) => element === refJsonEditor
+    )
+    if (outsideEditor) {
+      if (isEditingSelection(selection)) {
+        debug('click outside the editor, stop edit mode')
+        updateSelection((selection) => {
+          if (isKeySelection(selection) || isValueSelection(selection)) {
+            return { ...selection, edit: false }
+          } else {
+            return selection
+          }
+        })
+
+        if (hasFocus && refHiddenInput) {
+          refHiddenInput.focus()
+          refHiddenInput.blur()
+        }
+
+        debug('blur (outside editor)')
+        if (refHiddenInput) {
+          refHiddenInput.blur()
+        }
+      }
     }
   }
 
@@ -1691,6 +1722,8 @@
     itemHeightsCache[rowIndex] = element.getBoundingClientRect().height
   }
 </script>
+
+<svelte:window on:mousedown={handleWindowMouseDown} />
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <div
