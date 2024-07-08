@@ -407,8 +407,8 @@ export type OnRenderContextMenuInternal = (items: ContextMenuItem[]) => ContextM
 export type OnError = (error: Error) => void
 export type OnFocus = () => void
 export type OnBlur = () => void
-export type OnSortModal = (props: SortModalCallback) => void
-export type OnTransformModal = (props: TransformModalCallback) => void
+export type OnSortModal = (props: SortModalProps) => void
+export type OnTransformModal = (props: TransformModalProps) => void
 export type OnJSONEditorModal = (props: JSONEditorModalCallback) => void
 export type FindNextInside = (path: JSONPath) => JSONSelection | undefined
 
@@ -639,7 +639,7 @@ export interface TransformModalOptions {
   onClose?: () => void
 }
 
-export interface TransformModalCallback {
+export interface TransformModalProps {
   id: string
   rootPath: JSONPath
   json: unknown
@@ -647,7 +647,7 @@ export interface TransformModalCallback {
   onClose: () => void
 }
 
-export interface SortModalCallback {
+export interface SortModalProps {
   id: string
   json: unknown
   rootPath: JSONPath

@@ -210,6 +210,7 @@
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
   let modalOpen = false
+  let copyPasteModalOpen = false
 
   createFocusTracker({
     onMount,
@@ -763,19 +764,7 @@
   }
 
   function handlePasteFromMenu() {
-    open(
-      CopyPasteModal,
-      {},
-      {
-        ...SIMPLE_MODAL_OPTIONS,
-        styleWindow: {
-          width: '450px'
-        }
-      },
-      {
-        onClose: () => focus()
-      }
-    )
+    copyPasteModalOpen = true
   }
 
   function openRepairModal(text: string, onApply: (repairedText: string) => void) {
@@ -2075,5 +2064,7 @@
     </div>
   {/if}
 </div>
+
+<CopyPasteModal bind:open={copyPasteModalOpen} />
 
 <style src="./TreeMode.scss"></style>

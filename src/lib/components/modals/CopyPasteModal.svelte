@@ -1,48 +1,52 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { getContext } from 'svelte'
   import { isMac } from '$lib/utils/navigatorUtils.js'
-  import { onEscape } from '$lib/actions/onEscape.js'
   import Header from './Header.svelte'
-  import type { Context } from 'svelte-simple-modal'
+  import Modal from './Modal.svelte'
 
-  const { close } = getContext<Context>('simple-modal')
+  export let open: boolean
+
+  function onClose() {
+    open = false
+  }
 
   const ctrl = isMac() ? '⌘' : 'Ctrl'
 </script>
 
-<div class="jse-modal jse-copy-paste" use:onEscape={() => close()}>
-  <Header title="Copying and pasting" />
+<Modal bind:open>
+  <div class="jse-modal jse-copy-paste">
+    <Header title="Copying and pasting" {onClose} />
 
-  <div class="jse-modal-contents">
-    <div>These actions are unavailable via the menu. Please use:</div>
+    <div class="jse-modal-contents">
+      <div>These actions are unavailable via the menu. Please use:</div>
 
-    <div class="jse-shortcuts">
-      <div class="jse-shortcut">
-        <div class="jse-key">
-          {ctrl}+C
+      <div class="jse-shortcuts">
+        <div class="jse-shortcut">
+          <div class="jse-key">
+            {ctrl}+C
+          </div>
+          for copy
         </div>
-        for copy
-      </div>
-      <div class="jse-shortcut">
-        <div class="jse-key">
-          {ctrl}+X
+        <div class="jse-shortcut">
+          <div class="jse-key">
+            {ctrl}+X
+          </div>
+          for cut
         </div>
-        for cut
-      </div>
-      <div class="jse-shortcut">
-        <div class="jse-key">
-          {ctrl}+V
+        <div class="jse-shortcut">
+          <div class="jse-key">
+            {ctrl}+V
+          </div>
+          for paste
         </div>
-        for paste
       </div>
-    </div>
 
-    <div class="jse-actions">
-      <button type="button" class="jse-primary" on:click={() => close()}> Close </button>
+      <div class="jse-actions">
+        <button type="button" class="jse-primary" on:click={onClose}> Close </button>
+      </div>
     </div>
   </div>
-</div>
+</Modal>
 
 <style src="./CopyPasteModal.scss"></style>

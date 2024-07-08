@@ -15,7 +15,7 @@
   export let fullscreen: boolean = false
   export let onClose: (() => void) | undefined = undefined
 
-  const { close } = getContext<Context>('simple-modal')
+  const simpleModalContext = getContext<Context>('simple-modal')
 </script>
 
 <div class="jse-header">
@@ -39,8 +39,8 @@
     on:click={() => {
       if (onClose) {
         onClose()
-      } else {
-        close()
+      } else if (simpleModalContext) {
+        simpleModalContext.close()
       }
     }}
   >

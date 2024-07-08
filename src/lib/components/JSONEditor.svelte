@@ -2,12 +2,9 @@
 
 <script lang="ts">
   import { createDebug } from '../utils/debug.js'
+  import type { Callbacks, Component, Open } from 'svelte-simple-modal'
   import Modal, { bind } from 'svelte-simple-modal'
-  import {
-    JSONEDITOR_MODAL_OPTIONS,
-    SORT_MODAL_OPTIONS,
-    TRANSFORM_MODAL_OPTIONS
-  } from '../constants.js'
+  import { JSONEDITOR_MODAL_OPTIONS, TRANSFORM_MODAL_OPTIONS } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
   import {
     isEqualParser,
@@ -20,7 +17,6 @@
   import { renderValue } from '$lib/plugins/value/renderValue.js'
   import { tick } from 'svelte'
   import TransformModal from './modals/TransformModal.svelte'
-  import SortModal from './modals/SortModal.svelte'
   import type {
     Content,
     ContentErrors,
@@ -43,11 +39,12 @@
     OnRenderValue,
     OnSelect,
     QueryLanguage,
-    SortModalCallback,
-    TransformModalCallback,
+    SortModalProps,
+    TransformModalProps,
     TransformModalOptions,
     Validator
   } from '$lib/types'
+  import type { OnRenderContextMenu } from '$lib/types.js'
   import { Mode } from '$lib/types.js'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { noop } from '../utils/noop.js'
@@ -56,9 +53,8 @@
   import JSONEditorModal from './modals/JSONEditorModal.svelte'
   import memoizeOne from 'memoize-one'
   import ModalRef from '../components/modals/ModalRef.svelte'
-  import type { Open, Callbacks, Component } from 'svelte-simple-modal'
-  import type { OnRenderContextMenu } from '$lib/types.js'
   import { cloneDeep } from 'lodash-es'
+  import SortModal from '$lib/components/modals/SortModal.svelte'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:JSONEditor')
@@ -113,6 +109,9 @@
         callbacks: Partial<Callbacks>
       }
     | undefined = undefined
+
+  let sortModalProps: SortModalProps | undefined
+  let transformModalProps: TransformModalProps | undefined
 
   $: {
     const contentError = validateContentType(content)
@@ -342,7 +341,7 @@
 
   // The onTransformModal method is located in JSONEditor to prevent circular references:
   //     TreeMode -> TransformModal -> TreeMode
-  function onTransformModal({ id, json, rootPath, onTransform, onClose }: TransformModalCallback) {
+  function onTransformModal({ id, json, rootPath, onTransform, onClose }: TransformModalProps) {
     if (readOnly) {
       return
     }
@@ -377,24 +376,12 @@
   }
 
   // The onSortModal is positioned here for consistency with TransformModal
-  function onSortModal({ id, json, rootPath, onSort, onClose }: SortModalCallback) {
+  function onSortModal(props: SortModalProps) {
     if (readOnly) {
       return
     }
 
-    open(
-      SortModal,
-      {
-        id,
-        json,
-        rootPath,
-        onSort
-      },
-      SORT_MODAL_OPTIONS,
-      {
-        onClose
-      }
-    )
+    sortModalProps = props
   }
 
   // The onJSONEditorModal method is located in JSONEditor to prevent circular references:
@@ -494,5 +481,7 @@
     </Modal>
   </Modal>
 </AbsolutePopup>
+
+<SortModal open={sortModalProps !== undefined} {...sortModalProps} />
 
 <style src="./JSONEditor.scss"></style>
