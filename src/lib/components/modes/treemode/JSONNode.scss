@@ -1,5 +1,70 @@
 @import '../../../styles';
 
+.jse-expand {
+  width: $indent-size;
+  padding: 0;
+  margin: 0;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: $delimiter-color;
+  font-size: $font-size-mono;
+  height: $line-height;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.jse-meta,
+.jse-separator,
+.jse-index,
+.jse-bracket {
+  vertical-align: top;
+  color: $delimiter-color;
+}
+
+.jse-index {
+  padding: 0 $padding-half;
+}
+
+.jse-bracket {
+  padding: 0 2px;
+
+  &.jse-expanded {
+    padding-right: $padding;
+  }
+}
+
+.jse-tag {
+  border: none;
+  font-size: 80%;
+  font-family: $font-family;
+  color: $tag-color;
+  background: $tag-background;
+  border-radius: 2px;
+  cursor: pointer;
+  //position: relative;
+  display: inline-block;
+  padding: 0 4px;
+  line-height: normal;
+  margin: 1px 0;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &.jse-expanded {
+    opacity: 0.7;
+    cursor: inherit;
+  }
+}
+
+.jse-identifier {
+  vertical-align: top;
+  position: relative;
+}
+
 .jse-json-node {
   position: relative;
   color: $text-color;
@@ -230,69 +295,4 @@
     --jse-selection-background-color: #{$selection-background-inactive-color};
     --jse-context-menu-pointer-background: #{$context-menu-pointer-hover-background};
   }
-}
-
-.jse-expand {
-  width: $indent-size;
-  padding: 0;
-  margin: 0;
-  border: none;
-  cursor: pointer;
-  background: transparent;
-  color: $delimiter-color;
-  font-size: $font-size-mono;
-  height: $line-height;
-
-  &:hover {
-    opacity: 0.8;
-  }
-}
-
-.jse-meta,
-.jse-separator,
-.jse-index,
-.jse-bracket {
-  vertical-align: top;
-  color: $delimiter-color;
-}
-
-.jse-index {
-  padding: 0 $padding-half;
-}
-
-.jse-bracket {
-  padding: 0 2px;
-
-  &.jse-expanded {
-    padding-right: $padding;
-  }
-}
-
-.jse-tag {
-  border: none;
-  font-size: 80%;
-  font-family: $font-family;
-  color: $tag-color;
-  background: $tag-background;
-  border-radius: 2px;
-  cursor: pointer;
-  //position: relative;
-  display: inline-block;
-  padding: 0 4px;
-  line-height: normal;
-  margin: 1px 0;
-
-  &:hover {
-    opacity: 0.8;
-  }
-
-  &.jse-expanded {
-    opacity: 0.7;
-    cursor: inherit;
-  }
-}
-
-.jse-identifier {
-  vertical-align: top;
-  position: relative;
 }
