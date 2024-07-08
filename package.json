@@ -98,11 +98,13 @@
     "memoize-one": "^6.0.0",
     "natural-compare-lite": "^1.4.0",
     "sass": "^1.77.6",
-    "svelte": "^5.0.0-next.175",
     "svelte-awesome": "^3.3.1",
     "svelte-select": "^5.8.3",
     "svelte-simple-modal": "^1.6.2",
     "vanilla-picker": "^2.12.3"
+  },
+  "peerDependencies": {
+    "svelte": "^4.0.0 || ^5.0.0"
   },
   "devDependencies": {
     "@babel/core": "7.24.7",
@@ -143,6 +145,7 @@
     "rollup-plugin-dts": "6.1.1",
     "rollup-plugin-svelte": "7.2.2",
     "standard-version": "9.5.0",
+    "svelte": "^5.0.0-next.175",
     "svelte-check": "3.8.4",
     "svelte-preprocess": "6.0.1",
     "typescript": "5.5.3",
