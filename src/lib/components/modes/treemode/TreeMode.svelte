@@ -2065,6 +2065,8 @@
   {/if}
 </div>
 
-<CopyPasteModal bind:open={copyPasteModalOpen} />
+{#if copyPasteModalOpen}
+  <CopyPasteModal onClose={() => copyPasteModalOpen = false} />
+{/if}
 
 <style src="./TreeMode.scss"></style>

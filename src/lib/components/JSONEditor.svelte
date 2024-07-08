@@ -482,6 +482,8 @@
   </Modal>
 </AbsolutePopup>
 
-<SortModal open={sortModalProps !== undefined} {...sortModalProps} />
+{#if sortModalProps}
+  <SortModal {...sortModalProps} onClose={() => sortModalProps = undefined} />
+{/if}
 
 <style src="./JSONEditor.scss"></style>

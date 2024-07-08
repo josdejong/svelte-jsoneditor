@@ -16,17 +16,16 @@
 
   const debug = createDebug('jsoneditor:SortModal')
 
-  export let open: boolean
-  export let id: string | undefined = undefined
-  export let json: unknown | undefined = undefined // the whole document
-  export let rootPath: JSONPath | undefined = undefined
-  export let onSort: OnSort | undefined = undefined
+  export let id: string
+  export let json: unknown // the whole document
+  export let rootPath: JSONPath
+  export let onSort: OnSort
+  export let onClose: () => void
 
-  $: stateId =
-    id !== undefined && rootPath !== undefined ? `${id}:${compileJSONPointer(rootPath)}` : ''
-  $: selectedJson = json !== undefined && rootPath !== undefined ? getIn(json, rootPath) : undefined
+  $: stateId = `${id}:${compileJSONPointer(rootPath)}`
+  $: selectedJson = getIn(json, rootPath)
   $: jsonIsArray = Array.isArray(selectedJson)
-  $: paths = jsonIsArray && selectedJson !== undefined ? getNestedPaths(selectedJson) : undefined
+  $: paths = jsonIsArray ? getNestedPaths(selectedJson) : undefined
   $: properties = paths ? paths.map(pathToOption) : undefined
 
   const asc = {
@@ -71,16 +70,12 @@
     }
   }
 
-  function onClose() {
-    open = false
-  }
-
   function focus(element: HTMLElement) {
     element.focus()
   }
 </script>
 
-<Modal bind:open>
+<Modal {onClose}>
   <div class="jse-modal jse-sort">
     <Header title={jsonIsArray ? 'Sort array items' : 'Sort object keys'} {onClose} />
 

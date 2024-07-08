@@ -1,26 +1,18 @@
 <script lang="ts">
   // code based on: https://svelte.dev/examples/modal
   import { onEscape } from '$lib/actions/onEscape.js'
+  import {onDestroy, onMount} from "svelte";
 
-  export let open: boolean
+  export let onClose: () => void
 
   let dialog: HTMLDialogElement
 
-  function toggle(open: boolean) {
-    if (dialog) {
-      if (open) {
-        dialog.showModal()
-      } else {
-        dialog.close()
-      }
-    }
-  }
+  onMount(() => dialog.showModal())
+  onDestroy(() => dialog.close())
 
   function close() {
-    open = false
+    onClose()
   }
-
-  $: toggle(open)
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->

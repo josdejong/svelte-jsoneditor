@@ -5,16 +5,12 @@
   import Header from './Header.svelte'
   import Modal from './Modal.svelte'
 
-  export let open: boolean
-
-  function onClose() {
-    open = false
-  }
+  export let onClose: () => void
 
   const ctrl = isMac() ? '⌘' : 'Ctrl'
 </script>
 
-<Modal bind:open>
+<Modal {onClose}>
   <div class="jse-modal jse-copy-paste">
     <Header title="Copying and pasting" {onClose} />
 
