@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import { getExpandItemsSections } from '$lib/logic/expandItemsSections.js'
   import type { JSONSelection, Section, VisibleSection, JSONEditorContext } from '$lib/types.js'

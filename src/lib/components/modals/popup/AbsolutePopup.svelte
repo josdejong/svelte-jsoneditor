@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import { createDebug } from '$lib/utils/debug.js'
   import { setContext, type SvelteComponent } from 'svelte'

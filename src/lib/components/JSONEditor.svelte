@@ -1,5 +1,3 @@
-<svelte:options accessors={false} immutable={true} />
-
 <script lang="ts">
   import { createDebug } from '../utils/debug.js'
   import Modal, { bind } from 'svelte-simple-modal'

@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import Select from 'svelte-select'
   import { getNestedPaths } from '$lib/utils/arrayUtils.js'

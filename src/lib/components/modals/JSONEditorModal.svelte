@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import { getContext, tick } from 'svelte'
   import Header from './Header.svelte'

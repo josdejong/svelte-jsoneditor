@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   // This component is to get a reference to the simple-modal context
   // containing open and close. Usage:

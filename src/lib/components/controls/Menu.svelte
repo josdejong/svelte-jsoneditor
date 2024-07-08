@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import Icon from 'svelte-awesome'
   import type { MenuItem } from '$lib/types'

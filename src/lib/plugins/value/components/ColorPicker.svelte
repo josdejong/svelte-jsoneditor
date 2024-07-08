@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import { getColorCSS } from '$lib/utils/typeUtils.js'
   import { getWindow } from '$lib/utils/domUtils.js'

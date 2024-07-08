@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   export let readOnly: boolean
   export let onCreateArray: () => void
