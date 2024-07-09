@@ -1,40 +1,26 @@
-import { isEmpty, last } from 'lodash-es'
-
-type Callback = (event: KeyboardEvent) => void
-
-// singleton stack with callbacks
-let callbacks: Callback[] = []
-
-function handleKeyDown(event: KeyboardEvent) {
-  if (event.key === 'Escape') {
-    const callback = last(callbacks)
-    if (callback) {
-      callback(event)
-    }
-  }
-}
+type Callback = () => void
 
 /**
- * The provided callback is invoked when the user presses Escape,
- * but only the callback of the last registered component is invoked.
- *
- * This is useful for example when opening a model on top of another modal:
- * you only want the top modal to close on Escape, and not the second modal.
+ * The provided callback is invoked when the user presses Escape, and then stops propagation of the event.
  */
-export function onEscape(_element: Element | undefined, callback: Callback) {
-  if (isEmpty(callbacks)) {
-    window.addEventListener('keydown', handleKeyDown)
+export function onEscape(element: HTMLElement | undefined, callback: Callback) {
+  if (!element) {
+    return undefined
   }
 
-  callbacks.push(callback)
+  function handleKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      event.stopPropagation()
+      callback()
+    }
+  }
+
+  element.addEventListener('keydown', handleKeyDown)
 
   return {
-    destroy: () => {
-      callbacks = callbacks.filter((c) => c !== callback)
-
-      if (isEmpty(callbacks)) {
-        window.removeEventListener('keydown', handleKeyDown)
-      }
+    destroy() {
+      element.removeEventListener('keydown', handleKeyDown)
     }
   }
 }
