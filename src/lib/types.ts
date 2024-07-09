@@ -682,6 +682,14 @@ export interface SortModalProps {
   onClose: () => void
 }
 
+export interface JSONRepairModalProps {
+  text: string
+  onParse: (text: string) => void
+  onRepair: (text: string) => string
+  onApply: (repairedText: string) => void
+  onClose: () => void
+}
+
 export interface JSONEditorModalCallback {
   content: Content
   path: JSONPath

@@ -2,4 +2,8 @@
 
 .jse-modal.jse-repair {
   @include jse-modal-style;
+
+  display: flex;
+  width: 600px;
+  height: 500px;
 }

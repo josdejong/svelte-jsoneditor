@@ -34,7 +34,8 @@
     TransformModalOptions,
     ValidationError,
     Validator,
-    ValueNormalization
+    ValueNormalization,
+    JSONRepairModalProps
   } from '$lib/types'
   import { Mode, SortDirection, ValidationSeverity } from '$lib/types.js'
   import TableMenu from './menu/TableMenu.svelte'
@@ -121,8 +122,7 @@
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
     SCROLL_DURATION,
-    SEARCH_BOX_HEIGHT,
-    SIMPLE_MODAL_OPTIONS
+    SEARCH_BOX_HEIGHT
   } from '$lib/constants.js'
   import { noop } from '$lib/utils/noop.js'
   import { createJump } from '$lib/assets/jump.js/src/jump.js'
@@ -146,13 +146,11 @@
   import TableModeWelcome from './TableModeWelcome.svelte'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import RefreshColumnHeader from './RefreshColumnHeader.svelte'
-  import type { Context } from 'svelte-simple-modal'
   import createTableContextMenuItems from './contextmenu/createTableContextMenuItems'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
   import { flattenSearchResults, toRecursiveSearchResults } from '$lib/logic/search.js'
 
   const debug = createDebug('jsoneditor:TableMode')
-  const { open } = getContext<Context>('simple-modal')
   const { openAbsolutePopup, closeAbsolutePopup } =
     getContext<AbsolutePopupContext>('absolute-popup')
   const jump = createJump()
@@ -195,6 +193,8 @@
   let refJsonEditor: HTMLDivElement
   let refContents: HTMLDivElement | undefined
   let refHiddenInput: HTMLInputElement
+
+  let jsonRepairModalProps: JSONRepairModalProps | undefined = undefined
 
   createFocusTracker({
     onMount,
@@ -1566,29 +1566,13 @@
   }
 
   function openRepairModal(text: string, onApply: (repairedText: string) => void) {
-    open(
-      JSONRepairModal,
-      {
-        text,
-        onParse: (text: string) => parsePartialJson(text, (t) => parseAndRepair(t, parser)),
-        onRepair: repairPartialJson,
-        onApply
-      },
-      {
-        ...SIMPLE_MODAL_OPTIONS,
-        styleWindow: {
-          width: '600px',
-          height: '500px'
-        },
-        styleContent: {
-          padding: 0,
-          height: '100%'
-        }
-      },
-      {
-        onClose: () => focus()
-      }
-    )
+    jsonRepairModalProps = {
+      text,
+      onParse: (text) => parsePartialJson(text, (t) => parseAndRepair(t, parser)),
+      onRepair: repairPartialJson,
+      onApply,
+      onClose: focus
+    }
   }
 
   function handleSortAll() {
@@ -1985,6 +1969,10 @@
 
 {#if copyPasteModalOpen}
   <CopyPasteModal onClose={() => (copyPasteModalOpen = false)} />
+{/if}
+
+{#if jsonRepairModalProps}
+  <JSONRepairModal {...jsonRepairModalProps} onClose={() => (jsonRepairModalProps = undefined)} />
 {/if}
 
 <style src="./TableMode.scss"></style>

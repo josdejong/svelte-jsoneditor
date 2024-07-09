@@ -20,8 +20,7 @@
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
     SCROLL_DURATION,
-    SEARCH_BOX_HEIGHT,
-    SIMPLE_MODAL_OPTIONS
+    SEARCH_BOX_HEIGHT
   } from '$lib/constants.js'
   import {
     collapsePath,
@@ -118,6 +117,7 @@
     JSONParser,
     JSONPatchResult,
     JSONPathParser,
+    JSONRepairModalProps,
     JSONSelection,
     OnBlur,
     OnChange,
@@ -157,7 +157,6 @@
     onRemove
   } from '$lib/logic/actions.js'
   import JSONPreview from '../../controls/JSONPreview.svelte'
-  import type { Context } from 'svelte-simple-modal'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
   import createTreeContextMenuItems from './contextmenu/createTreeContextMenuItems'
   import { toRecursiveSearchResults as toRecursiveSearchResults } from 'svelte-jsoneditor/logic/search.js'
@@ -167,7 +166,6 @@
   const isSSR = typeof window === 'undefined'
   debug('isSSR:', isSSR)
 
-  const { open } = getContext<Context>('simple-modal')
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
 
@@ -211,6 +209,7 @@
   // This is used to track whether the editor still has focus
   let modalOpen = false
   let copyPasteModalOpen = false
+  let jsonRepairModalProps: JSONRepairModalProps | undefined = undefined
 
   createFocusTracker({
     onMount,
@@ -768,29 +767,13 @@
   }
 
   function openRepairModal(text: string, onApply: (repairedText: string) => void) {
-    open(
-      JSONRepairModal,
-      {
-        text,
-        onParse: (text: string) => parsePartialJson(text, (t) => parseAndRepair(t, parser)),
-        onRepair: repairPartialJson,
-        onApply
-      },
-      {
-        ...SIMPLE_MODAL_OPTIONS,
-        styleWindow: {
-          width: '600px',
-          height: '500px'
-        },
-        styleContent: {
-          padding: 0,
-          height: '100%'
-        }
-      },
-      {
-        onClose: () => focus()
-      }
-    )
+    jsonRepairModalProps = {
+      text,
+      onParse: (text) => parsePartialJson(text, (t) => parseAndRepair(t, parser)),
+      onRepair: repairPartialJson,
+      onApply,
+      onClose: focus
+    }
   }
 
   function handleRemove() {
@@ -2067,6 +2050,10 @@
 
 {#if copyPasteModalOpen}
   <CopyPasteModal onClose={() => (copyPasteModalOpen = false)} />
+{/if}
+
+{#if jsonRepairModalProps}
+  <JSONRepairModal {...jsonRepairModalProps} onClose={() => (jsonRepairModalProps = undefined)} />
 {/if}
 
 <style src="./TreeMode.scss"></style>
