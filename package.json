@@ -62,7 +62,7 @@
     "lint:prettier": "prettier --check --plugin prettier-plugin-svelte .",
     "lint:eslint": "eslint --cache --ignore-path .gitignore .",
     "format": "prettier --write --plugin prettier-plugin-svelte .",
-    "prepare": "husky install && cd tools && node generateDiffSequenceEsm.js && cd ..",
+    "prepare": "husky && cd tools && node generateDiffSequenceEsm.js && cd ..",
     "release": "npm-run-all release:**",
     "release:lint": "npm run lint",
     "release:test": "npm run test-ci",
