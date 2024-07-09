@@ -10,6 +10,10 @@
   onMount(() => dialog.showModal())
   onDestroy(() => dialog.close())
 
+  function handleEscape(event: KeyboardEvent) {
+    event.stopPropagation()
+  }
+
   function close() {
     onClose()
   }
@@ -18,7 +22,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 <dialog bind:this={dialog} on:close={close} on:click|self={close}>
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div on:click|stopPropagation use:onEscape={close}>
+  <div on:click|stopPropagation use:onEscape={handleEscape}>
     <slot />
   </div>
 </dialog>

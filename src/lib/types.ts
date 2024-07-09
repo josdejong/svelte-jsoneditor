@@ -409,7 +409,7 @@ export type OnRenderContextMenuInternal = (
 export type OnError = (error: Error) => void
 export type OnFocus = () => void
 export type OnBlur = () => void
-export type OnSortModal = (props: SortModalProps) => void
+export type OnSortModal = (props: SortModalCallback) => void
 export type OnTransformModal = (props: TransformModalCallback) => void
 export type OnJSONEditorModal = (props: JSONEditorModalCallback) => void
 export type FindNextInside = (path: JSONPath) => JSONSelection | undefined
@@ -557,6 +557,35 @@ export interface JSONEditorPropsOptional {
   onBlur?: OnBlur
 }
 
+export interface JSONEditorModalProps {
+  content: Content
+  path: JSONPath
+  onPatch: OnPatch
+
+  readOnly: boolean
+  indentation: number | string
+  tabSize: number
+  mainMenuBar: boolean
+  navigationBar: boolean
+  statusBar: boolean
+  askToFormat: boolean
+  escapeControlCharacters: boolean
+  escapeUnicodeCharacters: boolean
+  flattenColumns: boolean
+  parser: JSONParser
+  validator: Validator | undefined
+  validationParser: JSONParser
+  pathParser: JSONPathParser
+
+  onRenderValue: OnRenderValue
+  onClassName: OnClassName
+  onRenderMenu: OnRenderMenu
+  onRenderContextMenu: OnRenderContextMenu
+  onSortModal: (props: SortModalCallback) => void
+  onTransformModal: (props: TransformModalCallback) => void
+  onClose: () => void
+}
+
 export interface JSONEditorContext {
   readOnly: boolean
   parser: JSONParser
@@ -674,7 +703,7 @@ export interface TransformModalProps extends TransformModalCallback {
   onClose: () => void
 }
 
-export interface SortModalProps {
+export interface SortModalCallback {
   id: string
   json: unknown
   rootPath: JSONPath

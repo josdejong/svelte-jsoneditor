@@ -100,7 +100,6 @@
     "sass": "^1.77.6",
     "svelte-awesome": "^3.3.1",
     "svelte-select": "^5.8.3",
-    "svelte-simple-modal": "^1.6.2",
     "vanilla-picker": "^2.12.3"
   },
   "peerDependencies": {

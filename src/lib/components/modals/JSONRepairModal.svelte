@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import JSONRepairComponent from './repair/JSONRepairComponent.svelte'
-  import Modal from '$lib/components/modals/Modal.svelte'
+  import Modal from './Modal.svelte'
 
   export let text: string
   export let onParse: (text: string) => void

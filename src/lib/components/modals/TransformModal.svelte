@@ -29,7 +29,7 @@
   } from '$lib/types.js'
   import { onEscape } from '$lib/actions/onEscape.js'
   import { readonlyProxy } from '$lib/utils/readonlyProxy.js'
-  import Modal from '$lib/components/modals/Modal.svelte'
+  import Modal from './Modal.svelte'
 
   const debug = createDebug('jsoneditor:TransformModal')
 
