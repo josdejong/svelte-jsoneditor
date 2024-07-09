@@ -217,8 +217,8 @@
   }
 </script>
 
-<Modal {onClose}>
-  <div class="jse-modal jse-transform" class:fullscreen use:onEscape={handleEscape}>
+<Modal {onClose} className="jse-transform-modal" {fullscreen}>
+  <div class="jse-transform-modal-inner" use:onEscape={handleEscape}>
     <AbsolutePopup>
       <TransformModalHeader
         {queryLanguages}

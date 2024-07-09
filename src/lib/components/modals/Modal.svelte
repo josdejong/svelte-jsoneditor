@@ -3,6 +3,8 @@
   import { onEscape } from '$lib/actions/onEscape.js'
   import { onDestroy, onMount } from 'svelte'
 
+  export let className: string | undefined = undefined
+  export let fullscreen = false
   export let onClose: () => void
 
   let dialog: HTMLDialogElement
@@ -10,8 +12,8 @@
   onMount(() => dialog.showModal())
   onDestroy(() => dialog.close())
 
-  function handleEscape(event: KeyboardEvent) {
-    event.stopPropagation()
+  function handleEscape() {
+    onClose()
   }
 
   function close() {
@@ -20,9 +22,15 @@
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
-<dialog bind:this={dialog} on:close={close} on:click|self={close}>
+<dialog
+  bind:this={dialog}
+  on:close={close}
+  on:click|self={close}
+  class={className}
+  class:jse-fullscreen={fullscreen}
+>
   <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div on:click|stopPropagation use:onEscape={handleEscape}>
+  <div class="jse-modal" on:click|stopPropagation use:onEscape={handleEscape}>
     <slot />
   </div>
 </dialog>
@@ -35,16 +43,39 @@
     border: none;
     padding: 0;
     display: flex;
+    min-width: 0;
+
+    &.jse-sort-modal {
+      width: 400px;
+    }
+
+    &.jse-repair-modal {
+      width: 600px;
+      height: 500px;
+    }
+
+    &.jse-jsoneditor-modal {
+      width: 800px;
+      height: 600px;
+    }
+
+    &.jse-transform-modal {
+      width: 1200px;
+      height: 1200px;
+    }
+
+    &.jse-fullscreen {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   dialog::backdrop {
     background: $modal-overlay-background;
   }
 
-  dialog > div {
-    padding: 0;
-    flex: 1;
-    display: flex;
+  dialog > .jse-modal {
+    @include jse-modal-style;
   }
 
   dialog[open] {
@@ -71,5 +102,23 @@
     to {
       opacity: 1;
     }
+  }
+
+  // styling for the select box, svelte-select
+  // see docs: https://github.com/rob-balfre/svelte-select#css-custom-properties-variables
+  :global(.svelte-select) {
+    --border: #{$svelte-select-border};
+    --item-is-active-bg: #{$svelte-select-item-is-active-bg};
+    --border-radius: #{$svelte-select-border-radius};
+    --background: #{$svelte-select-background};
+    --padding: #{$svelte-select-padding};
+    --multi-select-padding: #{$svelte-select-multi-select-padding};
+    --font-size: #{$svelte-select-font-size};
+    --height: 36px;
+    --multi-item-height: 28px;
+    --multi-item-margin: 2px;
+    --multi-item-padding: 2px 8px;
+    --multi-item-border-radius: 6px;
+    --indicator-top: 8px;
   }
 </style>

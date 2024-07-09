@@ -75,72 +75,70 @@
   }
 </script>
 
-<Modal {onClose}>
-  <div class="jse-modal jse-sort">
-    <Header title={jsonIsArray ? 'Sort array items' : 'Sort object keys'} {onClose} />
+<Modal {onClose} className="jse-sort-modal">
+  <Header title={jsonIsArray ? 'Sort array items' : 'Sort object keys'} {onClose} />
 
-    <div class="jse-modal-contents">
-      <table>
-        <colgroup>
-          <col width="25%" />
-          <col width="75%" />
-        </colgroup>
-        <tbody>
+  <div class="jse-modal-contents">
+    <table>
+      <colgroup>
+        <col width="25%" />
+        <col width="75%" />
+      </colgroup>
+      <tbody>
+        <tr>
+          <th>Path</th>
+          <td>
+            <input
+              class="jse-path"
+              type="text"
+              readonly
+              title="Selected path"
+              value={rootPath && !isEmpty(rootPath)
+                ? stringifyJSONPath(rootPath)
+                : '(document root)'}
+            />
+          </td>
+        </tr>
+        {#if jsonIsArray && ((properties && properties?.length > 1) || selectedProperty === undefined)}
           <tr>
-            <th>Path</th>
+            <th>Property</th>
             <td>
-              <input
-                class="jse-path"
-                type="text"
-                readonly
-                title="Selected path"
-                value={rootPath && !isEmpty(rootPath)
-                  ? stringifyJSONPath(rootPath)
-                  : '(document root)'}
-              />
+              <Select showChevron items={properties} bind:value={selectedProperty} />
             </td>
           </tr>
-          {#if jsonIsArray && ((properties && properties?.length > 1) || selectedProperty === undefined)}
-            <tr>
-              <th>Property</th>
-              <td>
-                <Select showChevron items={properties} bind:value={selectedProperty} />
-              </td>
-            </tr>
-          {/if}
-          <tr>
-            <th>Direction</th>
-            <td>
-              <Select
-                showChevron
-                clearable={false}
-                items={directions}
-                bind:value={selectedDirection}
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div class="jse-space">
-        {#if sortError}
-          <div class="jse-error">
-            {sortError}
-          </div>
         {/if}
-      </div>
+        <tr>
+          <th>Direction</th>
+          <td>
+            <Select
+              showChevron
+              clearable={false}
+              items={directions}
+              bind:value={selectedDirection}
+            />
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
-      <div class="jse-actions">
-        <button
-          type="button"
-          class="jse-primary"
-          on:click={handleSort}
-          use:focus
-          disabled={jsonIsArray && properties && properties?.length > 1 ? !selectedProperty : false}
-        >
-          Sort
-        </button>
-      </div>
+    <div class="jse-space">
+      {#if sortError}
+        <div class="jse-error">
+          {sortError}
+        </div>
+      {/if}
+    </div>
+
+    <div class="jse-actions">
+      <button
+        type="button"
+        class="jse-primary"
+        on:click={handleSort}
+        use:focus
+        disabled={jsonIsArray && properties && properties?.length > 1 ? !selectedProperty : false}
+      >
+        Sort
+      </button>
     </div>
   </div>
 </Modal>

@@ -224,8 +224,8 @@
   }
 </script>
 
-<Modal {onClose}>
-  <div class="jse-modal jse-jsoneditor-modal" class:fullscreen use:onEscape={handleEscape}>
+<Modal {onClose} className="jse-jsoneditor-modal" {fullscreen}>
+  <div class="jse-modal-wrapper" use:onEscape={handleEscape}>
     <Header
       title="Edit nested content {stack.length > 1 ? ` (${stack.length})` : ''}"
       fullScreenButton={true}

@@ -20,16 +20,12 @@
   }
 </script>
 
-<Modal {onClose}>
-  <div class="jse-modal jse-repair">
-    <JSONRepairComponent
-      bind:text
-      {onParse}
-      {onRepair}
-      onApply={handleApply}
-      onCancel={handleCancel}
-    />
-  </div>
+<Modal {onClose} className="jse-repair-modal">
+  <JSONRepairComponent
+    bind:text
+    {onParse}
+    {onRepair}
+    onApply={handleApply}
+    onCancel={handleCancel}
+  />
 </Modal>
-
-<style src="./JSONRepairModal.scss"></style>
