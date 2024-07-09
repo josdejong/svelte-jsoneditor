@@ -644,14 +644,12 @@
       }
     })
 
-    const patchResult = {
+    return {
       json,
       previousJson,
       undo,
       redo: operations
     }
-
-    return patchResult
   }
 
   // TODO: cleanup logging
@@ -1062,7 +1060,7 @@
       },
       onClose: () => {
         modalOpen = false
-        focus()
+        setTimeout(focus)
       }
     })
   }
@@ -1117,7 +1115,7 @@
       },
       onClose: () => {
         modalOpen = false
-        focus()
+        setTimeout(focus)
         if (onClose) {
           onClose()
         }
@@ -1156,7 +1154,7 @@
       onPatch: context.onPatch,
       onClose: () => {
         modalOpen = false
-        focus()
+        setTimeout(focus)
       }
     })
   }
@@ -2053,7 +2051,10 @@
 {/if}
 
 {#if jsonRepairModalProps}
-  <JSONRepairModal {...jsonRepairModalProps} onClose={() => (jsonRepairModalProps = undefined)} />
+  <JSONRepairModal {...jsonRepairModalProps} onClose={() => {
+    jsonRepairModalProps?.onClose()
+    jsonRepairModalProps = undefined
+  }} />
 {/if}
 
 <style src="./TreeMode.scss"></style>
