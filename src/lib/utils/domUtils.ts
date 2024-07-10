@@ -405,17 +405,3 @@ export function findNearestElement<T extends Element>({
 
   return undefined
 }
-
-export interface EditableDivElement extends HTMLDivElement {
-  refresh: () => void
-  cancel: () => void
-}
-
-export function isEditableDivRef(element: Element | undefined): element is EditableDivElement {
-  return (
-    !!element &&
-    element.nodeName === 'DIV' &&
-    typeof (element as unknown as Record<string, unknown>).refresh === 'function' &&
-    typeof (element as unknown as Record<string, unknown>).cancel === 'function'
-  )
-}

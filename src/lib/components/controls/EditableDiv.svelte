@@ -37,12 +37,6 @@
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       domValue.refresh = handleValueInput
-
-      // The cancel method can be used to cancel editing, without firing a change
-      // when the contents did change in the meantime. It is the same as pressing ESC
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      domValue.cancel = handleCancel
     }
   })
 
