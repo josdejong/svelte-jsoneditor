@@ -15,6 +15,10 @@ export { renderValue } from './plugins/value/renderValue.js'
 export { renderJSONSchemaEnum } from './plugins/value/renderJSONSchemaEnum.js'
 export { BooleanToggle, ColorPicker, EditableValue, EnumValue, ReadonlyValue, TimestampTag }
 
+// HTML
+export { getValueClass } from './plugins/value/components/utils/getValueClass'
+export { keyComboFromEvent } from './utils/keyBindings'
+
 // validator plugins
 export * from './plugins/validator/createAjvValidator.js'
 
@@ -49,7 +53,12 @@ export {
   createKeySelection,
   createInsideSelection,
   createAfterSelection,
-  createMultiSelection
+  createMultiSelection,
+  getFocusPath,
+  getAnchorPath,
+  getStartPath,
+  getEndPath,
+  getSelectionPaths
 } from './logic/selection.js'
 
 // parser
@@ -61,6 +70,17 @@ export { parseJSONPath, stringifyJSONPath } from './utils/pathUtils.js'
 // actions
 export { resizeObserver } from './actions/resizeObserver.js'
 export { onEscape } from './actions/onEscape.js'
+
+// type checking
+export {
+  valueType,
+  isObject,
+  isObjectOrArray,
+  isBoolean,
+  isTimestamp,
+  isColor,
+  isUrl
+} from './utils/typeUtils'
 
 // typeguards
 export * from './typeguards.js'
