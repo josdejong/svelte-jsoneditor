@@ -94,6 +94,7 @@
 
 <EditableDiv
   value={normalization.escapeValue(value)}
+  label="Edit value"
   onChange={handleChangeValue}
   onCancel={handleCancelChange}
   onPaste={handlePaste}

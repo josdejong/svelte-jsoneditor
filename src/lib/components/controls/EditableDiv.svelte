@@ -14,6 +14,7 @@
 
   export let value: string
   export let shortText = false
+  export let label: string
   export let onChange: (newValue: string, updateSelection: UpdateSelectionAfterChange) => void
   export let onCancel: () => void
   export let onFind: OnFind
@@ -155,6 +156,7 @@
 
 <div
   role="textbox"
+  aria-label={label}
   tabindex="0"
   class={classnames('jse-editable-div', valueClass, { 'jse-short-text': shortText })}
   contenteditable="true"
