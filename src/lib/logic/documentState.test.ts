@@ -19,6 +19,7 @@ import {
   expandSmart,
   forEachVisibleIndex,
   getEnforceString,
+  getInRecursiveState,
   getVisibleCaretPositions,
   getVisiblePaths,
   shiftVisibleSections,
@@ -411,6 +412,27 @@ describe('documentState', () => {
     expect(toRecursiveStatePath(json, ['foo'])).toEqual(['properties', 'foo'])
     expect(toRecursiveStatePath(json, ['bar'])).toEqual(['properties', 'bar'])
     expect(toRecursiveStatePath(json, ['bar', '2'])).toEqual(['properties', 'bar', 'items', '2'])
+  })
+
+  test('getInRecursiveState', () => {
+    const json = {
+      foo: { a: 42 },
+      bar: [1, 2, 3]
+    }
+    const state = createDocumentState({ json, expand: () => true })
+
+    expect(getInRecursiveState(json, state, [])).toEqual(state)
+    expect(getInRecursiveState(json, state, ['foo'])).toEqual(
+      (state as ObjectDocumentState).properties.foo
+    )
+    expect(getInRecursiveState(json, state, ['bar'])).toEqual(
+      (state as ObjectDocumentState).properties.bar
+    )
+    expect(getInRecursiveState(json, state, ['bar', '2'])).toEqual(
+      ((state as ObjectDocumentState).properties.bar as ArrayDocumentState).items[2]
+    )
+
+    expect(getInRecursiveState(json, state, ['non', 'existing'])).toEqual(undefined)
   })
 
   describe('expandPath with callback', () => {
