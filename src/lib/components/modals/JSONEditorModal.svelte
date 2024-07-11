@@ -30,10 +30,9 @@
   import Icon from 'svelte-awesome'
   import { faCaretLeft } from '@fortawesome/free-solid-svg-icons'
   import memoizeOne from 'memoize-one'
-  import { onEscape } from '$lib/actions/onEscape.js'
   import { getFocusPath, isJSONSelection } from '$lib/logic/selection.js'
   import Modal from './Modal.svelte'
-  import AbsolutePopup from '$lib/components/modals/popup/AbsolutePopup.svelte'
+  import AbsolutePopup from './popup/AbsolutePopup.svelte'
 
   const debug = createDebug('jsoneditor:JSONEditorModal')
 
@@ -74,6 +73,7 @@
   }
 
   let refEditor: JSONEditorRoot
+  let refApply: HTMLButtonElement
   let fullscreen: boolean
 
   const rootState: ModalState = {
@@ -149,7 +149,10 @@
   function handleClose() {
     debug('handleClose')
 
-    if (stack.length > 1) {
+    if (fullscreen) {
+      // exit fullscreen
+      fullscreen = false
+    } else if (stack.length > 1) {
       // remove the last item from the stack
       stack = initial(stack)
       tick().then(scrollToSelection)
@@ -159,14 +162,6 @@
     } else {
       // this is the first modal, the root state, close the modal
       onClose()
-    }
-  }
-
-  function handleEscape() {
-    if (fullscreen) {
-      fullscreen = false
-    } else {
-      handleClose()
     }
   }
 
@@ -218,6 +213,8 @@
       relativePath: path
     }
     stack = [...stack, nestedModalState]
+
+    refApply.focus()
   }
 
   function focus(element: HTMLElement) {
@@ -225,8 +222,8 @@
   }
 </script>
 
-<Modal {onClose} className="jse-jsoneditor-modal" {fullscreen}>
-  <div class="jse-modal-wrapper" use:onEscape={handleEscape}>
+<Modal onClose={handleClose} className="jse-jsoneditor-modal" {fullscreen}>
+  <div class="jse-modal-wrapper">
     <AbsolutePopup>
       <Header
         title="Edit nested content {stack.length > 1 ? ` (${stack.length})` : ''}"
@@ -302,11 +299,11 @@
             </button>
           {/if}
           {#if !readOnly}
-            <button type="button" class="jse-primary" on:click={handleApply} use:focus>
+            <button type="button" class="jse-primary" on:click={handleApply} use:focus bind:this={refApply}>
               Apply
             </button>
           {:else}
-            <button type="button" class="jse-primary" on:click={handleClose} use:focus>
+            <button type="button" class="jse-primary" on:click={handleClose}>
               Close
             </button>
           {/if}

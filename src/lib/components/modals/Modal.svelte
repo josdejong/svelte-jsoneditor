@@ -12,10 +12,6 @@
   onMount(() => dialog.showModal())
   onDestroy(() => dialog.close())
 
-  function handleEscape() {
-    onClose()
-  }
-
   function close() {
     onClose()
   }
@@ -26,11 +22,11 @@
   bind:this={dialog}
   on:close={close}
   on:click|self={close}
+  use:onEscape={close}
   class={className}
   class:jse-fullscreen={fullscreen}
 >
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div class="jse-modal" on:click|stopPropagation use:onEscape={handleEscape}>
+  <div class="jse-modal">
     <slot />
   </div>
 </dialog>
@@ -40,11 +36,13 @@
 
   dialog {
     border-radius: $border-radius;
+    font-size: $padding; // for some reason that I don't understand, the font-size of the dialog is used as margin around the dialog
     border: none;
     padding: 0;
     display: flex;
     min-width: 0;
     overflow: visible;
+    transition: width 0.1s ease-in-out, height 0.1s ease-in-out;
 
     &.jse-sort-modal {
       width: 400px;
@@ -62,7 +60,7 @@
 
     &.jse-transform-modal {
       width: 1200px;
-      height: 1200px;
+      height: 800px;
     }
 
     &.jse-fullscreen {
