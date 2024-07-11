@@ -383,7 +383,7 @@ export type OnSort = (params: {
 }) => void
 export type OnFind = (findAndReplace: boolean) => void
 export type OnPaste = (pastedText: string) => void
-export type OnPasteJson = (pastedJson: { path: JSONPath; contents: unknown }) => void
+export type OnPasteJson = (pastedJson: PastedJson) => void
 export type OnExpand = (relativePath: JSONPath) => boolean
 export type OnRenderValue = (props: RenderValueProps) => RenderValueComponentDescription[]
 export type OnClassName = (path: JSONPath, value: unknown) => string | undefined
@@ -451,7 +451,11 @@ export interface ValueNormalization {
   unescapeValue: UnescapeValue
 }
 
-export type PastedJson = { contents: unknown; path: JSONPath } | undefined
+export type PastedJson = {
+  path: JSONPath
+  contents: unknown
+  onPasteAsJson: () => void
+}
 
 export interface DragInsideProps {
   json: unknown

@@ -826,6 +826,9 @@ The library exports a set of utility functions. The exact definitions of those f
     - `EnumValue`
     - `ReadonlyValue`
     - `TimestampTag`
+  - HTML:
+    - `getValueClass`
+    - `keyComboFromEvent`
 - Validation:
   - `createAjvValidator`
 - Query languages:
@@ -857,6 +860,11 @@ The library exports a set of utility functions. The exact definitions of those f
   - `createInsideSelection`,
   - `createAfterSelection`
   - `createMultiSelection`
+  - `getFocusPath`
+  - `getAnchorPath`
+  - `getStartPath`
+  - `getEndPath`
+  - `getSelectionPaths`
 - Parser:
   - `isEqualParser`
 - Path:
@@ -865,6 +873,15 @@ The library exports a set of utility functions. The exact definitions of those f
 - Actions:
   - `resizeObserver`
   - `onEscape`
+- Type checking:
+  - `valueType`
+  - `stringConvert`
+  - `isObject`
+  - `isObjectOrArray`
+  - `isBoolean`
+  - `isTimestamp`
+  - `isColor`
+  - `isUrl`
 - Typeguards:
   - `isContentParseError`
   - `isContentValidationErrors`

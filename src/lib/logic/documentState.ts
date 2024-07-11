@@ -488,7 +488,11 @@ export function getInRecursiveState<T extends RecursiveState>(
   documentState: T | undefined,
   path: JSONPath
 ): T | undefined {
-  return getIn(documentState, toRecursiveStatePath(json, path))
+  try {
+    return getIn(documentState, toRecursiveStatePath(json, path))
+  } catch (err) {
+    return undefined
+  }
 }
 
 export function setInRecursiveState<T extends RecursiveState>(
