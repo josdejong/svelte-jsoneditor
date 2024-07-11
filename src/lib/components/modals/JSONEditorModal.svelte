@@ -33,6 +33,7 @@
   import { onEscape } from '$lib/actions/onEscape.js'
   import { getFocusPath, isJSONSelection } from '$lib/logic/selection.js'
   import Modal from './Modal.svelte'
+  import AbsolutePopup from '$lib/components/modals/popup/AbsolutePopup.svelte'
 
   const debug = createDebug('jsoneditor:JSONEditorModal')
 
@@ -226,84 +227,92 @@
 
 <Modal {onClose} className="jse-jsoneditor-modal" {fullscreen}>
   <div class="jse-modal-wrapper" use:onEscape={handleEscape}>
-    <Header
-      title="Edit nested content {stack.length > 1 ? ` (${stack.length})` : ''}"
-      fullScreenButton={true}
-      bind:fullscreen
-      onClose={handleClose}
-    />
+    <AbsolutePopup>
+      <Header
+        title="Edit nested content {stack.length > 1 ? ` (${stack.length})` : ''}"
+        fullScreenButton={true}
+        bind:fullscreen
+        onClose={handleClose}
+      />
 
-    <div class="jse-modal-contents">
-      <div class="jse-label">
-        <div class="jse-label-inner">Path</div>
-      </div>
-      <input class="jse-path" type="text" readonly title="Selected path" value={pathDescription} />
-
-      <div class="jse-label">
-        <div class="jse-label-inner">Contents</div>
-      </div>
-
-      <div class="jse-modal-inline-editor">
-        <JSONEditorRoot
-          bind:this={refEditor}
-          mode={currentState.mode}
-          content={currentState.content}
-          selection={currentState.selection}
-          {readOnly}
-          {indentation}
-          {tabSize}
-          {statusBar}
-          {askToFormat}
-          {mainMenuBar}
-          {navigationBar}
-          {escapeControlCharacters}
-          {escapeUnicodeCharacters}
-          {flattenColumns}
-          {parser}
-          {parseMemoizeOne}
-          {validator}
-          {validationParser}
-          {pathParser}
-          insideModal={true}
-          onError={handleError}
-          onChange={handleChange}
-          onChangeMode={handleChangeMode}
-          onSelect={handleChangeSelection}
-          {onRenderValue}
-          {onClassName}
-          onFocus={noop}
-          onBlur={noop}
-          {onRenderMenu}
-          {onRenderContextMenu}
-          {onSortModal}
-          {onTransformModal}
-          onJSONEditorModal={handleJSONEditorModal}
+      <div class="jse-modal-contents">
+        <div class="jse-label">
+          <div class="jse-label-inner">Path</div>
+        </div>
+        <input
+          class="jse-path"
+          type="text"
+          readonly
+          title="Selected path"
+          value={pathDescription}
         />
-      </div>
 
-      <div class="jse-actions">
-        {#if error}
-          <div class="jse-error">
-            {error}
-          </div>
-        {/if}
+        <div class="jse-label">
+          <div class="jse-label-inner">Contents</div>
+        </div>
 
-        {#if stack.length > 1}
-          <button type="button" class="jse-secondary" on:click={handleClose}>
-            <Icon data={faCaretLeft} /> Back
-          </button>
-        {/if}
-        {#if !readOnly}
-          <button type="button" class="jse-primary" on:click={handleApply} use:focus>
-            Apply
-          </button>
-        {:else}
-          <button type="button" class="jse-primary" on:click={handleClose} use:focus>
-            Close
-          </button>
-        {/if}
+        <div class="jse-modal-inline-editor">
+          <JSONEditorRoot
+            bind:this={refEditor}
+            mode={currentState.mode}
+            content={currentState.content}
+            selection={currentState.selection}
+            {readOnly}
+            {indentation}
+            {tabSize}
+            {statusBar}
+            {askToFormat}
+            {mainMenuBar}
+            {navigationBar}
+            {escapeControlCharacters}
+            {escapeUnicodeCharacters}
+            {flattenColumns}
+            {parser}
+            {parseMemoizeOne}
+            {validator}
+            {validationParser}
+            {pathParser}
+            insideModal={true}
+            onError={handleError}
+            onChange={handleChange}
+            onChangeMode={handleChangeMode}
+            onSelect={handleChangeSelection}
+            {onRenderValue}
+            {onClassName}
+            onFocus={noop}
+            onBlur={noop}
+            {onRenderMenu}
+            {onRenderContextMenu}
+            {onSortModal}
+            {onTransformModal}
+            onJSONEditorModal={handleJSONEditorModal}
+          />
+        </div>
+
+        <div class="jse-actions">
+          {#if error}
+            <div class="jse-error">
+              {error}
+            </div>
+          {/if}
+
+          {#if stack.length > 1}
+            <button type="button" class="jse-secondary" on:click={handleClose}>
+              <Icon data={faCaretLeft} /> Back
+            </button>
+          {/if}
+          {#if !readOnly}
+            <button type="button" class="jse-primary" on:click={handleApply} use:focus>
+              Apply
+            </button>
+          {:else}
+            <button type="button" class="jse-primary" on:click={handleClose} use:focus>
+              Close
+            </button>
+          {/if}
+        </div>
       </div>
-    </div>
+    </AbsolutePopup>
   </div>
 </Modal>
 
