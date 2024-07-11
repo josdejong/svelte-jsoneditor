@@ -3,9 +3,6 @@
 exports[`JSONEditor > render table mode 1`] = `
 <div>
    
-   
-   
-   
   <div
     class="jse-main svelte-1wlky2l"
   >
@@ -457,9 +454,11 @@ exports[`JSONEditor > render table mode 1`] = `
       
     </div>
      
+     
     
     
   </div>
+   
    
    
   
@@ -468,9 +467,6 @@ exports[`JSONEditor > render table mode 1`] = `
 
 exports[`JSONEditor > render text mode 1`] = `
 <div>
-   
-   
-   
    
   <div
     class="jse-main svelte-1wlky2l"
@@ -1028,15 +1024,13 @@ exports[`JSONEditor > render text mode 1`] = `
   </div>
    
    
+   
   
 </div>
 `;
 
 exports[`JSONEditor > render tree mode 1`] = `
 <div>
-   
-   
-   
    
   <div
     class="jse-main svelte-1wlky2l"
@@ -2063,9 +2057,11 @@ exports[`JSONEditor > render tree mode 1`] = `
       
     </div>
      
+     
     
     
   </div>
+   
    
    
   
