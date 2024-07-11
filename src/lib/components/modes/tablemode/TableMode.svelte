@@ -1972,10 +1972,13 @@
 {/if}
 
 {#if jsonRepairModalProps}
-  <JSONRepairModal {...jsonRepairModalProps} onClose={() => {
-    jsonRepairModalProps?.onClose()
-    jsonRepairModalProps = undefined
-  }} />
+  <JSONRepairModal
+    {...jsonRepairModalProps}
+    onClose={() => {
+      jsonRepairModalProps?.onClose()
+      jsonRepairModalProps = undefined
+    }}
+  />
 {/if}
 
 <style src="./TableMode.scss"></style>

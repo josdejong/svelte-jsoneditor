@@ -451,24 +451,33 @@
   </div>
 
   {#if sortModalProps}
-    <SortModal {...sortModalProps} onClose={() => {
-      sortModalProps?.onClose()
-      sortModalProps = undefined
-    }} />
+    <SortModal
+      {...sortModalProps}
+      onClose={() => {
+        sortModalProps?.onClose()
+        sortModalProps = undefined
+      }}
+    />
   {/if}
 
   {#if transformModalProps}
-    <TransformModal {...transformModalProps} onClose={() => {
-      transformModalProps?.onClose()
-      transformModalProps = undefined
-    }} />
+    <TransformModal
+      {...transformModalProps}
+      onClose={() => {
+        transformModalProps?.onClose()
+        transformModalProps = undefined
+      }}
+    />
   {/if}
 
   {#if jsonEditorModalProps}
-    <JSONEditorModal {...jsonEditorModalProps} onClose={() => {
-      jsonEditorModalProps?.onClose()
-      jsonEditorModalProps = undefined
-    }} />
+    <JSONEditorModal
+      {...jsonEditorModalProps}
+      onClose={() => {
+        jsonEditorModalProps?.onClose()
+        jsonEditorModalProps = undefined
+      }}
+    />
   {/if}
 </AbsolutePopup>
 
