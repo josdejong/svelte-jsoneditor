@@ -247,7 +247,7 @@
   }
 
   async function handleFocusSearch(path: JSONPath) {
-    selection = undefined // navigation path of current selection would be confusing
+    updateSelection(undefined) // navigation path of current selection would be confusing
     await scrollTo(path)
   }
 
@@ -334,7 +334,7 @@
     }
 
     debug('clearing selection: path does not exist anymore', selection)
-    selection = undefined // TODO: try find the closest cell that still exists (similar to getInitialSelection)
+    updateSelection(undefined) // TODO: try find the closest cell that still exists (similar to getInitialSelection)
   }
 
   let documentState: DocumentState | undefined =
@@ -589,7 +589,7 @@
 
     json = callback?.json !== undefined ? callback.json : patched.json
     documentState = callback?.state !== undefined ? callback.state : patched.state
-    selection = callback?.selection !== undefined ? callback.selection : selection
+    updateSelection(callback?.selection !== undefined ? callback.selection : selection)
     sortedColumn =
       callback?.sortedColumn !== undefined ? callback.sortedColumn : patchedSortedColumn
     text = undefined
@@ -1390,7 +1390,7 @@
 
     json = callback?.json !== undefined ? callback.json : updatedJson
     documentState = callback?.state !== undefined ? callback.state : updatedState
-    selection = callback?.selection !== undefined ? callback.selection : selection
+    updateSelection(callback?.selection !== undefined ? callback.selection : selection)
     sortedColumn = undefined // we can't know whether the new json is still sorted or not
     text = undefined
     textIsRepaired = false
@@ -1447,7 +1447,7 @@
 
       json = callback?.json !== undefined ? callback.json : json
       documentState = callback?.state !== undefined ? callback.state : documentState
-      selection = callback?.selection !== undefined ? callback.selection : selection
+      updateSelection(callback?.selection !== undefined ? callback.selection : selection)
     }
 
     // ensure the selection is valid
@@ -1627,7 +1627,7 @@
 
     json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
     documentState = item.undo.documentState
-    selection = item.undo.selection
+    updateSelection(item.undo.selection)
     sortedColumn = item.undo.sortedColumn
     text = item.undo.text
     textIsRepaired = item.undo.textIsRepaired
@@ -1671,7 +1671,7 @@
 
     json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
     documentState = item.redo.documentState
-    selection = item.redo.selection
+    updateSelection(item.redo.selection)
     sortedColumn = item.redo.sortedColumn
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired

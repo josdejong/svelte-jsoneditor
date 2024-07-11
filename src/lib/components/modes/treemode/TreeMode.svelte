@@ -534,7 +534,7 @@
     }
 
     debug('clearing selection: path does not exist anymore', selection)
-    selection = getInitialSelection(json, documentState)
+    updateSelection(getInitialSelection(json, documentState))
   }
 
   interface PreviousState {
@@ -578,7 +578,7 @@
   function createDefaultSelection() {
     debug('createDefaultSelection')
 
-    selection = createValueSelection([], false)
+    updateSelection(createValueSelection([], false))
   }
 
   export function patch(
@@ -618,7 +618,7 @@
 
     json = callback?.json !== undefined ? callback.json : patched.json
     documentState = callback?.state !== undefined ? callback.state : patched.state
-    selection = callback?.selection !== undefined ? callback.selection : updatedSelection
+    updateSelection(callback?.selection !== undefined ? callback.selection : updatedSelection)
     text = undefined
     textIsRepaired = false
     pastedJson = undefined
@@ -999,7 +999,7 @@
 
     json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
     documentState = item.undo.documentState
-    selection = item.undo.selection
+    updateSelection(item.undo.selection)
     text = item.undo.text
     textIsRepaired = item.undo.textIsRepaired
     parseError = undefined
@@ -1042,7 +1042,7 @@
 
     json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
     documentState = item.redo.documentState
-    selection = item.redo.selection
+    updateSelection(item.redo.selection)
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired
     parseError = undefined
@@ -1325,7 +1325,7 @@
 
     json = callback?.json !== undefined ? callback.json : updatedJson
     documentState = callback?.state !== undefined ? callback.state : updatedState
-    selection = callback?.selection !== undefined ? callback.selection : selection
+    updateSelection(callback?.selection !== undefined ? callback.selection : selection)
     text = undefined
     textIsRepaired = false
     parseError = undefined
@@ -1380,7 +1380,7 @@
 
       json = callback?.json !== undefined ? callback.json : json
       documentState = callback?.state !== undefined ? callback.state : documentState
-      selection = callback?.selection !== undefined ? callback.selection : selection
+      updateSelection(callback?.selection !== undefined ? callback.selection : selection)
     }
 
     // ensure the selection is valid
