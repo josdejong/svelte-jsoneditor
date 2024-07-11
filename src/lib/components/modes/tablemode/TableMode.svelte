@@ -77,8 +77,7 @@
     findParentWithNodeName,
     getDataPathFromTarget,
     getWindow,
-    isChildOf,
-    isEditableDivRef
+    isChildOf
   } from '$lib/utils/domUtils.js'
   import { createDebug } from '$lib/utils/debug.js'
   import {
@@ -219,7 +218,7 @@
   let text: string | undefined
   let parseError: ParseError | undefined = undefined
 
-  let pastedJson: PastedJson
+  let pastedJson: PastedJson | undefined
 
   let searchResultDetails: SearchResultDetails | undefined
   let searchResults: SearchResults | undefined
@@ -1096,24 +1095,8 @@
       return
     }
 
-    const { path, contents } = pastedJson
-
-    // exit edit mode
-    const refEditableDiv = refContents?.querySelector('.jse-editable-div') ?? undefined
-    if (isEditableDivRef(refEditableDiv)) {
-      refEditableDiv.cancel()
-    }
-
-    // replace the value with the JSON object/array
-    const operations: JSONPatchDocument = [
-      {
-        op: 'replace',
-        path: compileJSONPointer(path),
-        value: contents
-      }
-    ]
-
-    handlePatch(operations)
+    const { onPasteAsJson } = pastedJson
+    onPasteAsJson()
 
     // TODO: get rid of the setTimeout here
     setTimeout(focus)

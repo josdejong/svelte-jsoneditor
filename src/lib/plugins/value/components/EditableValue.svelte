@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONPath } from 'immutable-json-patch'
+  import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils.js'
   import { createValueSelection, getFocusPath } from '$lib/logic/selection.js'
@@ -18,6 +18,7 @@
   } from '$lib/types.js'
   import { UpdateSelectionAfterChange } from '$lib/types.js'
   import { isEqual } from 'lodash-es'
+  import { expandSmart } from '$lib/logic/documentState'
 
   export let path: JSONPath
   export let value: unknown
@@ -78,7 +79,24 @@
       if (isObjectOrArray(pastedJson)) {
         onPasteJson({
           path,
-          contents: pastedJson
+          contents: pastedJson,
+          onPasteAsJson: () => {
+            // exit edit mode
+            handleCancelChange()
+
+            // replace the value with the JSON object/array
+            const operations: JSONPatchDocument = [
+              {
+                op: 'replace',
+                path: compileJSONPointer(path),
+                value: pastedJson
+              }
+            ]
+
+            onPatch(operations, (patchedJson, patchedState) => ({
+              state: expandSmart(patchedJson, patchedState, path)
+            }))
+          }
         })
       }
     } catch (err) {
