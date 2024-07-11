@@ -44,6 +44,7 @@
     padding: 0;
     display: flex;
     min-width: 0;
+    overflow: visible;
 
     &.jse-sort-modal {
       width: 400px;
