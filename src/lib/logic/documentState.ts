@@ -454,27 +454,28 @@ export function documentStatePatch(
   documentState: DocumentState | undefined,
   operations: JSONPatchDocument
 ): { json: unknown; state: DocumentState | undefined } {
+  // FIXME: rewrite to apply one operation at a time (both updatedJson and updatedDocumentState
   const updatedJson: unknown = immutableJSONPatch(json, operations)
 
-  const updatedDocumentState = operations.reduce((updatingState, operation) => {
+  const updatedDocumentState = operations.reduce((updatedState, operation) => {
     if (isJSONPatchAdd(operation)) {
-      return documentStateAdd(updatedJson, updatingState, operation, undefined)
+      return documentStateAdd(json, updatedState, operation, undefined)
     }
 
     if (isJSONPatchRemove(operation)) {
-      return documentStateRemove(updatedJson, updatingState, operation)
+      return documentStateRemove(json, updatedState, operation)
     }
 
     if (isJSONPatchReplace(operation)) {
       // nothing special to do (all is handled by syncDocumentState)
-      return updatingState
+      return updatedState
     }
 
     if (isJSONPatchCopy(operation) || isJSONPatchMove(operation)) {
-      return documentStateMoveOrCopy(updatedJson, updatingState, operation)
+      return documentStateMoveOrCopy(json, updatedState, operation)
     }
 
-    return updatingState
+    return updatedState
   }, documentState)
 
   return {
