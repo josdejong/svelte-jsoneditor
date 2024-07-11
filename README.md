@@ -875,6 +875,7 @@ The library exports a set of utility functions. The exact definitions of those f
   - `onEscape`
 - Type checking:
   - `valueType`
+  - `stringConvert`
   - `isObject`
   - `isObjectOrArray`
   - `isBoolean`

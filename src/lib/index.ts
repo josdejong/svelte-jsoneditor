@@ -74,6 +74,7 @@ export { onEscape } from './actions/onEscape.js'
 // type checking
 export {
   valueType,
+  stringConvert,
   isObject,
   isObjectOrArray,
   isBoolean,
