@@ -2,6 +2,7 @@
   // code based on: https://svelte.dev/examples/modal
   import { onEscape } from '$lib/actions/onEscape.js'
   import { onDestroy, onMount } from 'svelte'
+  import { classnames } from '$lib/utils/cssUtils.js'
 
   export let className: string | undefined = undefined
   export let fullscreen = false
@@ -23,10 +24,10 @@
   on:close={close}
   on:click|self={close}
   use:onEscape={close}
-  class={className}
+  class={classnames('jse-modal', className)}
   class:jse-fullscreen={fullscreen}
 >
-  <div class="jse-modal">
+  <div class="jse-modal-inner">
     <slot />
   </div>
 </dialog>
@@ -34,7 +35,7 @@
 <style lang="scss">
   @import '../../styles.scss';
 
-  dialog {
+  dialog.jse-modal {
     border-radius: $border-radius;
     font-size: $padding; // for some reason that I don't understand, the font-size of the dialog is used as margin around the dialog
     border: none;
@@ -42,7 +43,9 @@
     display: flex;
     min-width: 0;
     overflow: visible;
-    transition: width 0.1s ease-in-out, height 0.1s ease-in-out;
+    transition:
+      width 0.1s ease-in-out,
+      height 0.1s ease-in-out;
 
     &.jse-sort-modal {
       width: 400px;
@@ -67,22 +70,22 @@
       width: 100%;
       height: 100%;
     }
-  }
 
-  dialog::backdrop {
-    background: $modal-overlay-background;
-  }
+    &::backdrop {
+      background: $modal-overlay-background;
+    }
 
-  dialog > .jse-modal {
-    @include jse-modal-style;
-  }
+    &[open] {
+      animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
 
-  dialog[open] {
-    animation: zoom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
+    &[open]::backdrop {
+      animation: fade 0.2s ease-out;
+    }
 
-  dialog[open]::backdrop {
-    animation: fade 0.2s ease-out;
+    & .jse-modal-inner {
+      @include jse-modal-style;
+    }
   }
 
   @keyframes zoom {

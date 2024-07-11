@@ -299,13 +299,17 @@
             </button>
           {/if}
           {#if !readOnly}
-            <button type="button" class="jse-primary" on:click={handleApply} use:focus bind:this={refApply}>
+            <button
+              type="button"
+              class="jse-primary"
+              on:click={handleApply}
+              use:focus
+              bind:this={refApply}
+            >
               Apply
             </button>
           {:else}
-            <button type="button" class="jse-primary" on:click={handleClose}>
-              Close
-            </button>
+            <button type="button" class="jse-primary" on:click={handleClose}> Close </button>
           {/if}
         </div>
       </div>
