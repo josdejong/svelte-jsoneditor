@@ -455,7 +455,6 @@ export function documentStatePatch(
   documentState: DocumentState | undefined,
   operations: JSONPatchDocument
 ): { json: unknown; documentState: DocumentState | undefined } {
-  // FIXME: rewrite to apply one operation at a time (both updatedJson and updatedDocumentState
   const initial = { json, documentState }
 
   const result = operations.reduce((current, operation) => {
