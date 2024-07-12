@@ -1457,6 +1457,17 @@ describe('documentState', () => {
     assert.deepStrictEqual(res.documentState, { type: 'object', expanded: true, properties: {} })
   })
 
+  test('move: should extract an array item', () => {
+    const json = [{ id: 0 }, { id: 1 }, { id: 2 }]
+    const documentState = createDocumentState({ json, expand: () => true })
+
+    const res = documentStatePatch(json, documentState, [{ op: 'move', from: '/1', path: '' }])
+
+    assert.deepStrictEqual(res.json, { id: 1 })
+
+    assert.deepStrictEqual(res.state, { type: 'object', expanded: true, properties: {} })
+  })
+
   describe('shiftVisibleSections', () => {
     const json = [1, 2, 3, 4, 5, 6, 7, 8]
     const visibleSections: VisibleSection[] = [
