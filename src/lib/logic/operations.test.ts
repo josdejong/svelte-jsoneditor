@@ -160,7 +160,7 @@ describe('operations', () => {
         { op: 'move', from: '/object/e', path: '/object/e' }
       ])
 
-      const { json: updatedJson, state: updatedDocumentState } = documentStatePatch(
+      const { json: updatedJson, documentState: updatedDocumentState } = documentStatePatch(
         json,
         documentState,
         operations
@@ -185,7 +185,7 @@ describe('operations', () => {
         { op: 'move', from: '/object/e', path: '/object/e' }
       ])
 
-      const { json: updatedJson, state: updatedDocumentState } = documentStatePatch(
+      const { json: updatedJson, documentState: updatedDocumentState } = documentStatePatch(
         json,
         documentState,
         operations

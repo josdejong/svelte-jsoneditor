@@ -613,11 +613,11 @@
 
     const callback =
       typeof afterPatch === 'function'
-        ? afterPatch(patched.json, patched.state, updatedSelection)
+        ? afterPatch(patched.json, patched.documentState, updatedSelection)
         : undefined
 
     json = callback?.json !== undefined ? callback.json : patched.json
-    documentState = callback?.state !== undefined ? callback.state : patched.state
+    documentState = callback?.state !== undefined ? callback.state : patched.documentState
     selection = callback?.selection !== undefined ? callback.selection : updatedSelection
     text = undefined
     textIsRepaired = false

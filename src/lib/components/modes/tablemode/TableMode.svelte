@@ -585,11 +585,11 @@
 
     const callback =
       typeof afterPatch === 'function'
-        ? afterPatch(patched.json, patched.state, selection)
+        ? afterPatch(patched.json, patched.documentState, selection)
         : undefined
 
     json = callback?.json !== undefined ? callback.json : patched.json
-    documentState = callback?.state !== undefined ? callback.state : patched.state
+    documentState = callback?.state !== undefined ? callback.state : patched.documentState
     selection = callback?.selection !== undefined ? callback.selection : selection
     sortedColumn =
       callback?.sortedColumn !== undefined ? callback.sortedColumn : patchedSortedColumn
