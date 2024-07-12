@@ -20,29 +20,6 @@ export const MAX_AUTO_REPAIRABLE_SIZE = 1024 * 1024 // 1 MB
 export const MAX_DOCUMENT_SIZE_TEXT_MODE = 10 * 1024 * 1024 // 10 MB
 export const MAX_DOCUMENT_SIZE_EXPAND_ALL = 10 * 1024 // 10 KB
 
-export const SIMPLE_MODAL_OPTIONS = {
-  closeButton: false,
-  classBg: 'jse-modal-bg',
-  classWindow: 'jse-modal-window',
-  classWindowWrap: 'jse-modal-window-wrap',
-  classContent: 'jse-modal-container'
-}
-
-export const SORT_MODAL_OPTIONS = {
-  ...SIMPLE_MODAL_OPTIONS,
-  classWindow: 'jse-modal-window jse-modal-window-sort'
-}
-
-export const TRANSFORM_MODAL_OPTIONS = {
-  ...SIMPLE_MODAL_OPTIONS,
-  classWindow: 'jse-modal-window jse-modal-window-transform'
-}
-
-export const JSONEDITOR_MODAL_OPTIONS = {
-  ...SIMPLE_MODAL_OPTIONS,
-  classWindow: 'jse-modal-window jse-modal-window-jsoneditor'
-}
-
 export const INSERT_EXPLANATION =
   'Insert or paste contents, ' +
   'enter [ insert a new array, ' +
