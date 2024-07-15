@@ -98,7 +98,6 @@
     getFocusPath,
     isEditingSelection,
     isJSONSelection,
-    isKeySelection,
     isValueSelection,
     pathInSelection,
     pathStartsWith,
@@ -247,7 +246,7 @@
   }
 
   async function handleFocusSearch(path: JSONPath) {
-    updateSelection(undefined) // navigation path of current selection would be confusing
+    selection = undefined // navigation path of current selection would be confusing
     await scrollTo(path)
   }
 
@@ -308,22 +307,18 @@
     }
   }
 
-  function updateSelection(
-    updatedSelection:
-      | JSONSelection
-      | undefined
-      | ((selection: JSONSelection | undefined) => JSONSelection | undefined)
-  ) {
-    debug('updateSelection', updatedSelection)
+  function handleSelect(updatedSelection: JSONSelection | undefined) {
+    selection = updatedSelection
+  }
 
-    const appliedSelection =
-      typeof updatedSelection === 'function' ? updatedSelection(selection) : updatedSelection
-
-    if (!isEqual(appliedSelection, selection)) {
-      selection = appliedSelection
-      onSelect(appliedSelection)
+  function emitOnSelect(updatedSelection: JSONSelection | undefined) {
+    if (!isEqual(updatedSelection, externalSelection)) {
+      debug('onSelect', updatedSelection)
+      onSelect(updatedSelection)
     }
   }
+
+  $: emitOnSelect(selection)
 
   function clearSelectionWhenNotExisting(json: unknown | undefined) {
     if (!selection || json === undefined) {
@@ -335,13 +330,13 @@
     }
 
     debug('clearing selection: path does not exist anymore', selection)
-    updateSelection(undefined) // TODO: try find the closest cell that still exists (similar to getInitialSelection)
+    selection = undefined // TODO: try find the closest cell that still exists (similar to getInitialSelection)
   }
 
   let documentState: DocumentState | undefined =
     json !== undefined ? createDocumentState({ json }) : undefined
-  let selection: JSONSelection | undefined = undefined
-  let sortedColumn: SortedColumn | undefined = undefined
+  let selection: JSONSelection | undefined
+  let sortedColumn: SortedColumn | undefined
   let textIsRepaired = false
 
   function onSortByHeader(newSortedColumn: SortedColumn) {
@@ -380,7 +375,7 @@
     findNextInside,
     focus,
     onPatch: handlePatch,
-    onSelect: updateSelection,
+    onSelect: handleSelect,
     onFind: openFind,
     onPasteJson: handlePasteJson,
     onRenderValue
@@ -445,12 +440,14 @@
   }
 
   function applyExternalSelection(externalSelection: JSONEditorSelection | undefined) {
-    if (!isEqual(selection, externalSelection)) {
-      debug('applyExternalSelection', externalSelection)
+    if (isEqual(selection, externalSelection)) {
+      return
+    }
 
-      if (isJSONSelection(externalSelection) || externalSelection === undefined) {
-        updateSelection(externalSelection)
-      }
+    debug('applyExternalSelection', { selection, externalSelection })
+
+    if (isJSONSelection(externalSelection)) {
+      selection = externalSelection
     }
   }
 
@@ -590,7 +587,7 @@
 
     json = callback?.json !== undefined ? callback.json : patched.json
     documentState = callback?.state !== undefined ? callback.state : patched.documentState
-    updateSelection(callback?.selection !== undefined ? callback.selection : selection)
+    selection = callback?.selection !== undefined ? callback.selection : selection
     sortedColumn =
       callback?.sortedColumn !== undefined ? callback.sortedColumn : patchedSortedColumn
     text = undefined
@@ -694,14 +691,8 @@
     )
     if (outsideEditor) {
       if (isEditingSelection(selection)) {
-        debug('click outside the editor, stop edit mode')
-        updateSelection((selection) => {
-          if (isKeySelection(selection) || isValueSelection(selection)) {
-            return { ...selection, edit: false }
-          } else {
-            return selection
-          }
-        })
+        debug('click outside the editor, exit edit mode')
+        selection = removeEditModeFromSelection(selection)
 
         if (hasFocus && refHiddenInput) {
           refHiddenInput.focus()
@@ -734,7 +725,7 @@
         return
       }
 
-      updateSelection(createValueSelection(path))
+      selection = createValueSelection(path)
 
       event.preventDefault()
     }
@@ -758,7 +749,7 @@
 
   function createDefaultSelectionWhenUndefined() {
     if (!selection) {
-      updateSelection(createDefaultSelection())
+      selection = createDefaultSelection()
     }
   }
 
@@ -1045,7 +1036,7 @@
     if (isObjectOrArray(value)) {
       openJSONEditorModal(path)
     } else {
-      updateSelection(createValueSelection(path))
+      selection = createValueSelection(path)
     }
   }
 
@@ -1177,7 +1168,7 @@
       parser,
       onPatch: handlePatch,
       onReplaceJson: handleReplaceJson,
-      onSelect: updateSelection
+      onSelect: handleSelect
     })
   }
 
@@ -1222,7 +1213,7 @@
     }
     if (combo === 'Ctrl+A') {
       event.preventDefault()
-      // updateSelection(selectAll())
+      // selection = selectAll()
       // TODO: implement select all
     }
 
@@ -1237,7 +1228,7 @@
 
       if (selection) {
         const newSelection = selectPreviousColumn(columns, selection)
-        updateSelection(newSelection)
+        selection = newSelection
         scrollIntoView(getFocusPath(newSelection))
       }
     }
@@ -1249,7 +1240,7 @@
 
       if (selection) {
         const newSelection = selectNextColumn(columns, selection)
-        updateSelection(newSelection)
+        selection = newSelection
         scrollIntoView(getFocusPath(newSelection))
       }
     }
@@ -1261,7 +1252,7 @@
 
       if (selection) {
         const newSelection = selectPreviousRow(columns, selection)
-        updateSelection(newSelection)
+        selection = newSelection
         scrollIntoView(getFocusPath(newSelection))
       }
     }
@@ -1273,7 +1264,7 @@
 
       if (selection) {
         const newSelection = selectNextRow(json, columns, selection)
-        updateSelection(newSelection)
+        selection = newSelection
         scrollIntoView(getFocusPath(newSelection))
       }
     }
@@ -1290,7 +1281,7 @@
         } else {
           if (!readOnly) {
             // go to value edit mode
-            updateSelection({ ...selection, edit: true })
+            selection = { ...selection, edit: true }
           }
         }
       }
@@ -1316,7 +1307,7 @@
 
     if (combo === 'Escape' && selection) {
       event.preventDefault()
-      updateSelection(undefined)
+      selection = undefined
     }
 
     if (combo === 'Ctrl+F') {
@@ -1376,7 +1367,7 @@
 
     json = callback?.json !== undefined ? callback.json : updatedJson
     documentState = callback?.state !== undefined ? callback.state : updatedState
-    updateSelection(callback?.selection !== undefined ? callback.selection : selection)
+    selection = callback?.selection !== undefined ? callback.selection : selection
     sortedColumn = undefined // we can't know whether the new json is still sorted or not
     text = undefined
     textIsRepaired = false
@@ -1433,7 +1424,7 @@
 
       json = callback?.json !== undefined ? callback.json : json
       documentState = callback?.state !== undefined ? callback.state : documentState
-      updateSelection(callback?.selection !== undefined ? callback.selection : selection)
+      selection = callback?.selection !== undefined ? callback.selection : selection
     }
 
     // ensure the selection is valid
@@ -1450,7 +1441,7 @@
   function handleSelectValidationError(error: ValidationError) {
     debug('select validation error', error)
 
-    updateSelection(createValueSelection(error.path))
+    selection = createValueSelection(error.path)
 
     scrollTo(error.path)
   }
@@ -1597,7 +1588,7 @@
 
     json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
     documentState = item.undo.documentState
-    updateSelection(item.undo.selection)
+    selection = item.undo.selection
     sortedColumn = item.undo.sortedColumn
     text = item.undo.text
     textIsRepaired = item.undo.textIsRepaired
@@ -1641,7 +1632,7 @@
 
     json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
     documentState = item.redo.documentState
-    updateSelection(item.redo.selection)
+    selection = item.redo.selection
     sortedColumn = item.redo.sortedColumn
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired
