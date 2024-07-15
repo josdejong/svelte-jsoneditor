@@ -46,7 +46,15 @@ export default {
 
     typescript({ sourceMap: true, inlineSources: true }),
     getBabelOutputPlugin({
-      presets: ['@babel/preset-env']
+      // { modules: false } is to resolve the following console warning:
+      //     Dynamic import can only be transformed when transforming ES modules to AMD, CommonJS or SystemJS.
+      // See: https://stackoverflow.com/questions/63563485/how-can-i-preserve-dynamic-import-statements-with-babel-preset-env
+      presets: [['@babel/preset-env', { modules: false }]],
+
+      // { compact: true } is to resolve the following console warning:
+      //     [BABEL] Note: The code generator has deoptimised the styling of undefined as it exceeds the max of 500KB.
+      // See: https://github.com/babel/babel/discussions/13676
+      compact: true
     }),
 
     // minify
