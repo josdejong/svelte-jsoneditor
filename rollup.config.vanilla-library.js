@@ -6,7 +6,7 @@ import { getBabelOutputPlugin } from '@rollup/plugin-babel'
 import path from 'path'
 import svelte from 'rollup-plugin-svelte'
 import terser from '@rollup/plugin-terser'
-import sveltePreprocess from 'svelte-preprocess'
+import { sveltePreprocess } from 'svelte-preprocess'
 import { getVanillaDependencies } from './tools/getExternalDependencies.js'
 
 const production = !process.env.ROLLUP_WATCH
