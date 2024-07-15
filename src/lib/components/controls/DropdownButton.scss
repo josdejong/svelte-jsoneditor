@@ -29,6 +29,7 @@
     width: 2em;
     background: $context-menu-background;
     color: $context-menu-color;
+    border-radius: 0;
 
     &.jse-visible {
       background: $background;
@@ -46,8 +47,6 @@
       color: $context-menu-color-disabled;
       background: unset;
     }
-
-    border-radius: 0;
   }
 
   .jse-dropdown-items {

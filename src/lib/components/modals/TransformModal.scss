@@ -9,10 +9,9 @@
 }
 
 .jse-modal-contents {
-  @include jse-modal-contents;
-
   color: inherit;
-  padding: 0;
+
+  @include jse-modal-contents($modal-padding: 0);
 
   .jse-main-contents {
     flex: 1;
