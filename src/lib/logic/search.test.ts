@@ -331,7 +331,7 @@ describe('search', () => {
       }
     ])
 
-    assert.deepStrictEqual(newSelection, createValueSelection(['hello world'], false))
+    assert.deepStrictEqual(newSelection, createValueSelection(['hello world']))
 
     const updatedJson = immutableJSONPatch(json, operations)
     assert.deepStrictEqual(updatedJson, {
@@ -364,7 +364,7 @@ describe('search', () => {
       { op: 'move', from: '/after', path: '/after' }
     ])
 
-    assert.deepStrictEqual(newSelection, createKeySelection(['hello *'], false))
+    assert.deepStrictEqual(newSelection, createKeySelection(['hello *']))
 
     const updatedJson = immutableJSONPatch(json, operations)
     assert.deepStrictEqual(updatedJson, {
@@ -527,7 +527,7 @@ describe('search', () => {
       { op: 'move', from: '/after', path: '/after' }
     ])
 
-    assert.deepStrictEqual(newSelection, createKeySelection(['hello *'], false))
+    assert.deepStrictEqual(newSelection, createKeySelection(['hello *']))
 
     const updatedJson = immutableJSONPatch(json, operations)
     assert.deepStrictEqual(updatedJson, {

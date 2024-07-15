@@ -269,7 +269,7 @@ export function selectPreviousRow(columns: JSONPath[], selection: JSONSelection)
   if (rowIndex > 0) {
     const previousPosition = { rowIndex: rowIndex - 1, columnIndex }
     const previousPath = fromTableCellPosition(previousPosition, columns)
-    return createValueSelection(previousPath, false)
+    return createValueSelection(previousPath)
   }
 
   return selection
@@ -285,7 +285,7 @@ export function selectNextRow(
   if (rowIndex < (json as Array<unknown>).length - 1) {
     const nextPosition = { rowIndex: rowIndex + 1, columnIndex }
     const nextPath = fromTableCellPosition(nextPosition, columns)
-    return createValueSelection(nextPath, false)
+    return createValueSelection(nextPath)
   }
 
   return selection
@@ -297,7 +297,7 @@ export function selectPreviousColumn(columns: JSONPath[], selection: JSONSelecti
   if (columnIndex > 0) {
     const previousPosition = { rowIndex, columnIndex: columnIndex - 1 }
     const previousPath = fromTableCellPosition(previousPosition, columns)
-    return createValueSelection(previousPath, false)
+    return createValueSelection(previousPath)
   }
 
   return selection
@@ -309,7 +309,7 @@ export function selectNextColumn(columns: JSONPath[], selection: JSONSelection):
   if (columnIndex < columns.length - 1) {
     const nextPosition = { rowIndex, columnIndex: columnIndex + 1 }
     const nextPath = fromTableCellPosition(nextPosition, columns)
-    return createValueSelection(nextPath, false)
+    return createValueSelection(nextPath)
   }
 
   return selection

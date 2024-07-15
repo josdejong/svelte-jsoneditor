@@ -201,13 +201,25 @@ export interface InsideSelection {
 export interface KeySelection {
   type: SelectionType.key
   path: JSONPath
-  edit?: boolean
 }
 
-export interface ValueSelection {
+export interface EditKeySelection extends KeySelection {
+  type: SelectionType.key
+  path: JSONPath
+  edit: true
+  initialValue?: string
+}
+
+export type ValueSelection = {
   type: SelectionType.value
   path: JSONPath
-  edit?: boolean
+}
+
+export interface EditValueSelection extends ValueSelection {
+  type: SelectionType.value
+  path: JSONPath
+  edit: true
+  initialValue?: string
 }
 
 export type JSONSelection =
@@ -215,7 +227,9 @@ export type JSONSelection =
   | AfterSelection
   | InsideSelection
   | KeySelection
+  | EditKeySelection
   | ValueSelection
+  | EditValueSelection
 
 // TextSelection is the result of EditorSelection.toJSON() from CodeMirror,
 // with an additional `type` property

@@ -3,6 +3,7 @@
 <script lang="ts">
   import { initial, isEqual } from 'lodash-es'
   import {
+    createEditKeySelection,
     createKeySelection,
     createValueSelection,
     isEditingSelection,
@@ -13,7 +14,7 @@
   import { addNewLineSuffix } from '$lib/utils/domUtils.js'
   import type { ExtendedSearchResultItem, JSONSelection, TreeModeContext } from '$lib/types.js'
   import { UpdateSelectionAfterChange } from '$lib/types.js'
-  import { parseJSONPointer, type JSONPath, type JSONPointer } from 'immutable-json-patch'
+  import { type JSONPath, type JSONPointer, parseJSONPointer } from 'immutable-json-patch'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
   import { classnames } from '$lib/utils/cssUtils.js'
 
@@ -28,7 +29,7 @@
   let path: JSONPath
   $: path = parseJSONPointer(pointer)
 
-  $: isKeySelected = selection ? isKeySelection(selection) && isEqual(selection.path, path) : false
+  $: isKeySelected = isKeySelection(selection) && isEqual(selection.path, path)
   $: isEditingKey = isKeySelected && isEditingSelection(selection)
 
   function handleKeyDoubleClick(
@@ -36,7 +37,7 @@
   ) {
     if (!isEditingKey && !context.readOnly) {
       event.preventDefault()
-      context.onSelect(createKeySelection(path, true))
+      context.onSelect(createEditKeySelection(path))
     }
   }
 
@@ -52,8 +53,8 @@
 
     context.onSelect(
       updateSelection === UpdateSelectionAfterChange.nextInside
-        ? createValueSelection(updatedPath, false)
-        : createKeySelection(updatedPath, false)
+        ? createValueSelection(updatedPath)
+        : createKeySelection(updatedPath)
     )
 
     if (updateSelection !== UpdateSelectionAfterChange.self) {
@@ -62,7 +63,7 @@
   }
 
   function handleCancelChange() {
-    context.onSelect(createKeySelection(path, false))
+    context.onSelect(createKeySelection(path))
     context.focus()
   }
 </script>
@@ -70,6 +71,7 @@
 {#if !context.readOnly && isEditingKey}
   <EditableDiv
     value={context.normalization.escapeValue(key)}
+    initialValue={isEditingSelection(selection) ? selection.initialValue : undefined}
     label="Edit key"
     shortText
     onChange={handleChangeValue}

@@ -64,7 +64,7 @@
   }
 
   function cancel() {
-    onSelect(createValueSelection(path, false))
+    onSelect(createValueSelection(path))
 
     focus()
   }

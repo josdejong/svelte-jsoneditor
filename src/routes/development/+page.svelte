@@ -663,7 +663,7 @@
     </button>
     <button
       on:click={() => {
-        selectionTree = createValueSelection(['object', 'a'], false)
+        selectionTree = createValueSelection(['object', 'a'])
         refTreeEditor?.focus()
       }}
     >
@@ -671,7 +671,7 @@
     </button>
     <button
       on:click={() => {
-        refTreeEditor?.select(createValueSelection(['669', 'name'], false))
+        refTreeEditor?.select(createValueSelection(['669', 'name']))
         refTreeEditor?.focus()
       }}
     >
