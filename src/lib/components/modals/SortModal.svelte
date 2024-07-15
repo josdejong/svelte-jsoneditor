@@ -1,18 +1,16 @@
 <script lang="ts">
   import { isEmpty } from 'lodash-es'
-  import { getContext } from 'svelte'
   import Select from 'svelte-select'
   import Header from './Header.svelte'
   import { getNestedPaths } from '$lib/utils/arrayUtils.js'
-  import { pathToOption, stringifyJSONPath } from '../../utils/pathUtils.js'
+  import { pathToOption, stringifyJSONPath } from '$lib/utils/pathUtils.js'
   import { sortJson } from '$lib/logic/sort.js'
   import { sortModalStates } from './sortModalStates'
   import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { createDebug } from '$lib/utils/debug.js'
   import type { OnSort } from '$lib/types.js'
-  import { onEscape } from '$lib/actions/onEscape.js'
-  import type { Context } from 'svelte-simple-modal'
+  import Modal from './Modal.svelte'
 
   const debug = createDebug('jsoneditor:SortModal')
 
@@ -20,13 +18,12 @@
   export let json: unknown // the whole document
   export let rootPath: JSONPath
   export let onSort: OnSort
+  export let onClose: () => void
 
-  const { close } = getContext<Context>('simple-modal')
-
-  const stateId = `${id}:${compileJSONPointer(rootPath)}`
-  const selectedJson = getIn(json, rootPath)
+  $: stateId = `${id}:${compileJSONPointer(rootPath)}`
+  $: selectedJson = getIn(json, rootPath)
   $: jsonIsArray = Array.isArray(selectedJson)
-  $: paths = jsonIsArray && selectedJson !== undefined ? getNestedPaths(selectedJson) : undefined
+  $: paths = jsonIsArray ? getNestedPaths(selectedJson) : undefined
   $: properties = paths ? paths.map(pathToOption) : undefined
 
   const asc = {
@@ -61,9 +58,11 @@
       const itemPath: JSONPath = selectedProperty?.value || properties?.[0]?.value || []
       const direction = selectedDirection?.value
       const operations = sortJson(json, rootPath, itemPath, direction)
-      onSort({ operations, rootPath, itemPath, direction })
+      if (onSort !== undefined && rootPath !== undefined) {
+        onSort({ operations, rootPath, itemPath, direction })
+      }
 
-      close()
+      onClose()
     } catch (err) {
       sortError = String(err)
     }
@@ -74,8 +73,8 @@
   }
 </script>
 
-<div class="jse-modal jse-sort" use:onEscape={close}>
-  <Header title={jsonIsArray ? 'Sort array items' : 'Sort object keys'} />
+<Modal {onClose} className="jse-sort-modal">
+  <Header title={jsonIsArray ? 'Sort array items' : 'Sort object keys'} {onClose} />
 
   <div class="jse-modal-contents">
     <table>
@@ -92,7 +91,9 @@
               type="text"
               readonly
               title="Selected path"
-              value={!isEmpty(rootPath) ? stringifyJSONPath(rootPath) : '(document root)'}
+              value={rootPath && !isEmpty(rootPath)
+                ? stringifyJSONPath(rootPath)
+                : '(document root)'}
             />
           </td>
         </tr>
@@ -138,6 +139,6 @@
       </button>
     </div>
   </div>
-</div>
+</Modal>
 
 <style src="./SortModal.scss"></style>

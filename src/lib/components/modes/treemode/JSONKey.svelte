@@ -68,6 +68,7 @@
 {#if !context.readOnly && isEditingKey}
   <EditableDiv
     value={context.normalization.escapeValue(key)}
+    label="Edit key"
     shortText
     onChange={handleChangeValue}
     onCancel={handleCancelChange}

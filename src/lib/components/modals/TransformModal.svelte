@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { uniqueId } from '../../utils/uniqueId.js'
+  import { uniqueId } from '$lib/utils/uniqueId.js'
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import { debounce, isEmpty, noop } from 'lodash-es'
-  import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
-  import { DEBOUNCE_DELAY } from '../../constants.js'
-  import type { JSONPath } from 'immutable-json-patch'
+  import { DEBOUNCE_DELAY } from '$lib/constants.js'
+  import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
   import { transformModalStates, transformModalStateShared } from './transformModalStates.js'
@@ -20,7 +19,6 @@
     JSONPathParser,
     OnChangeQueryLanguage,
     OnClassName,
-    OnPatch,
     OnRenderContextMenuInternal,
     OnRenderMenuInternal,
     OnRenderValue,
@@ -28,8 +26,8 @@
     QueryLanguageOptions
   } from '$lib/types.js'
   import { onEscape } from '$lib/actions/onEscape.js'
-  import type { Context } from 'svelte-simple-modal'
   import { readonlyProxy } from '$lib/utils/readonlyProxy.js'
+  import Modal from './Modal.svelte'
 
   const debug = createDebug('jsoneditor:TransformModal')
 
@@ -54,14 +52,13 @@
   export let onRenderContextMenu: OnRenderContextMenuInternal
   export let onClassName: OnClassName
 
-  export let onTransform: OnPatch
+  export let onTransform: (operations: JSONPatchDocument) => void
+  export let onClose: () => void
 
   let selectedJson: unknown | undefined
   $: selectedJson = readonlyProxy(getIn(json, rootPath))
   let selectedContent: Content
   $: selectedContent = selectedJson ? { json: selectedJson } : { text: '' }
-
-  const { close } = getContext<Context>('simple-modal')
 
   let fullscreen = false
 
@@ -171,7 +168,7 @@
         }
       ])
 
-      close()
+      onClose()
     } catch (err) {
       // this should never occur since we can only press the Transform
       // button when creating a preview was successful
@@ -213,160 +210,167 @@
     if (fullscreen) {
       fullscreen = !fullscreen
     } else {
-      close()
+      onClose()
     }
   }
 </script>
 
-<div class="jse-modal jse-transform" class:fullscreen use:onEscape={handleEscape}>
-  <AbsolutePopup>
-    <TransformModalHeader
-      {queryLanguages}
-      {queryLanguageId}
-      onChangeQueryLanguage={handleChangeQueryLanguage}
-      bind:fullscreen
-    />
-    <div class="jse-modal-contents">
-      <div class="jse-main-contents">
-        <div class="jse-query-contents">
-          <div class="jse-label">
-            <div class="jse-label-inner">Language</div>
-          </div>
-          <div class="jse-description">
-            <!-- eslint-disable-next-line svelte/no-at-html-tags -->
-            {@html getSelectedQueryLanguage(queryLanguageId).description}
-          </div>
-
-          <div class="jse-label">
-            <div class="jse-label-inner">Path</div>
-          </div>
-          <input
-            class="jse-path"
-            type="text"
-            readonly
-            title="Selected path"
-            value={!isEmpty(rootPath) ? stringifyJSONPath(rootPath) : '(document root)'}
-          />
-
-          <div class="jse-label">
-            <div class="jse-label-inner">
-              <button type="button" on:click={toggleShowWizard}>
-                <Icon data={showWizard ? faCaretDown : faCaretRight} />
-                Wizard
-              </button>
+<Modal {onClose} className="jse-transform-modal" {fullscreen}>
+  <div class="jse-transform-modal-inner" use:onEscape={handleEscape}>
+    <AbsolutePopup>
+      <TransformModalHeader
+        {queryLanguages}
+        {queryLanguageId}
+        onChangeQueryLanguage={handleChangeQueryLanguage}
+        {onClose}
+        bind:fullscreen
+      />
+      <div class="jse-modal-contents">
+        <div class="jse-main-contents">
+          <div class="jse-query-contents">
+            <div class="jse-label">
+              <div class="jse-label-inner">Language</div>
             </div>
-          </div>
-          {#if showWizard}
-            {#if Array.isArray(selectedJson)}
-              <TransformWizard {queryOptions} json={selectedJson} onChange={updateQueryByWizard} />
-            {:else}
-              (Only available for arrays, not for objects)
-            {/if}
-          {/if}
+            <div class="jse-description">
+              <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+              {@html getSelectedQueryLanguage(queryLanguageId).description}
+            </div>
 
-          <div class="jse-label">
-            <div class="jse-label-inner">Query</div>
-          </div>
-          <textarea class="jse-query" spellcheck="false" on:input={handleChangeQuery}
-            >{query}</textarea
-          >
-        </div>
-        <div class="jse-data-contents" class:jse-hide-original-data={!showOriginal}>
-          <div class="jse-original-data" class:jse-hide={!showOriginal}>
+            <div class="jse-label">
+              <div class="jse-label-inner">Path</div>
+            </div>
+            <input
+              class="jse-path"
+              type="text"
+              readonly
+              title="Selected path"
+              value={!isEmpty(rootPath) ? stringifyJSONPath(rootPath) : '(document root)'}
+            />
+
             <div class="jse-label">
               <div class="jse-label-inner">
-                <button type="button" on:click={toggleShowOriginal}>
-                  <Icon data={showOriginal ? faCaretDown : faCaretRight} />
-                  Original
+                <button type="button" on:click={toggleShowWizard}>
+                  <Icon data={showWizard ? faCaretDown : faCaretRight} />
+                  Wizard
                 </button>
               </div>
             </div>
-            {#if showOriginal}
-              <TreeMode
-                externalContent={selectedContent}
-                externalSelection={undefined}
-                readOnly={true}
-                mainMenuBar={false}
-                navigationBar={false}
-                {indentation}
-                {escapeControlCharacters}
-                {escapeUnicodeCharacters}
-                {parser}
-                {parseMemoizeOne}
-                {onRenderValue}
-                {onRenderMenu}
-                {onRenderContextMenu}
-                onError={console.error}
-                onChange={noop}
-                onChangeMode={noop}
-                onSelect={noop}
-                onFocus={noop}
-                onBlur={noop}
-                onSortModal={noop}
-                onTransformModal={noop}
-                onJSONEditorModal={noop}
-                {onClassName}
-                validator={undefined}
-                {validationParser}
-                {pathParser}
-              />
+            {#if showWizard}
+              {#if Array.isArray(selectedJson)}
+                <TransformWizard
+                  {queryOptions}
+                  json={selectedJson}
+                  onChange={updateQueryByWizard}
+                />
+              {:else}
+                (Only available for arrays, not for objects)
+              {/if}
             {/if}
-          </div>
-          <div class="jse-preview-data">
+
             <div class="jse-label">
-              <div class="jse-label-inner">Preview</div>
+              <div class="jse-label-inner">Query</div>
             </div>
-            {#if !previewError}
-              <TreeMode
-                externalContent={previewContent}
-                externalSelection={undefined}
-                readOnly={true}
-                mainMenuBar={false}
-                navigationBar={false}
-                {indentation}
-                {escapeControlCharacters}
-                {escapeUnicodeCharacters}
-                {parser}
-                {parseMemoizeOne}
-                {onRenderValue}
-                {onRenderMenu}
-                {onRenderContextMenu}
-                onError={console.error}
-                onChange={noop}
-                onChangeMode={noop}
-                onSelect={noop}
-                onFocus={noop}
-                onBlur={noop}
-                onSortModal={noop}
-                onTransformModal={noop}
-                onJSONEditorModal={noop}
-                {onClassName}
-                validator={undefined}
-                {validationParser}
-                {pathParser}
-              />
-            {:else}
-              <div class="jse-preview jse-error">
-                {previewError}
+            <textarea class="jse-query" spellcheck="false" on:input={handleChangeQuery}
+              >{query}</textarea
+            >
+          </div>
+          <div class="jse-data-contents" class:jse-hide-original-data={!showOriginal}>
+            <div class="jse-original-data" class:jse-hide={!showOriginal}>
+              <div class="jse-label">
+                <div class="jse-label-inner">
+                  <button type="button" on:click={toggleShowOriginal}>
+                    <Icon data={showOriginal ? faCaretDown : faCaretRight} />
+                    Original
+                  </button>
+                </div>
               </div>
-            {/if}
+              {#if showOriginal}
+                <TreeMode
+                  externalContent={selectedContent}
+                  externalSelection={undefined}
+                  readOnly={true}
+                  mainMenuBar={false}
+                  navigationBar={false}
+                  {indentation}
+                  {escapeControlCharacters}
+                  {escapeUnicodeCharacters}
+                  {parser}
+                  {parseMemoizeOne}
+                  {onRenderValue}
+                  {onRenderMenu}
+                  {onRenderContextMenu}
+                  onError={console.error}
+                  onChange={noop}
+                  onChangeMode={noop}
+                  onSelect={noop}
+                  onFocus={noop}
+                  onBlur={noop}
+                  onSortModal={noop}
+                  onTransformModal={noop}
+                  onJSONEditorModal={noop}
+                  {onClassName}
+                  validator={undefined}
+                  {validationParser}
+                  {pathParser}
+                />
+              {/if}
+            </div>
+            <div class="jse-preview-data">
+              <div class="jse-label">
+                <div class="jse-label-inner">Preview</div>
+              </div>
+              {#if !previewError}
+                <TreeMode
+                  externalContent={previewContent}
+                  externalSelection={undefined}
+                  readOnly={true}
+                  mainMenuBar={false}
+                  navigationBar={false}
+                  {indentation}
+                  {escapeControlCharacters}
+                  {escapeUnicodeCharacters}
+                  {parser}
+                  {parseMemoizeOne}
+                  {onRenderValue}
+                  {onRenderMenu}
+                  {onRenderContextMenu}
+                  onError={console.error}
+                  onChange={noop}
+                  onChangeMode={noop}
+                  onSelect={noop}
+                  onFocus={noop}
+                  onBlur={noop}
+                  onSortModal={noop}
+                  onTransformModal={noop}
+                  onJSONEditorModal={noop}
+                  {onClassName}
+                  validator={undefined}
+                  {validationParser}
+                  {pathParser}
+                />
+              {:else}
+                <div class="jse-preview jse-error">
+                  {previewError}
+                </div>
+              {/if}
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="jse-actions">
-        <button
-          type="button"
-          class="jse-primary"
-          on:click={handleTransform}
-          use:focus
-          disabled={!!previewError}
-        >
-          Transform
-        </button>
+        <div class="jse-actions">
+          <button
+            type="button"
+            class="jse-primary"
+            on:click={handleTransform}
+            use:focus
+            disabled={!!previewError}
+          >
+            Transform
+          </button>
+        </div>
       </div>
-    </div>
-  </AbsolutePopup>
-</div>
+    </AbsolutePopup>
+  </div>
+</Modal>
 
 <style src="./TransformModal.scss"></style>

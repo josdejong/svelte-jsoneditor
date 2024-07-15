@@ -4,7 +4,7 @@ A web-based tool to view, edit, format, transform, and validate JSON.
 
 Try it out: <https://jsoneditoronline.org>
 
-The library is written with Svelte, but can be used in plain JavaScript too and in any framework (SolidJS, React, Vue, Angular, etc).
+The library is written with Svelte, but can be used in plain JavaScript too and in any framework (SolidJS, React, Vue, Angular, etc.). It requires a browser from March 2022 or newer.
 
 ![JSONEditor tree mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_tree_mode_screenshot.png)
 ![JSONEditor text mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_text_mode_screenshot.png)
@@ -826,6 +826,9 @@ The library exports a set of utility functions. The exact definitions of those f
     - `EnumValue`
     - `ReadonlyValue`
     - `TimestampTag`
+  - HTML:
+    - `getValueClass`
+    - `keyComboFromEvent`
 - Validation:
   - `createAjvValidator`
 - Query languages:
@@ -857,6 +860,11 @@ The library exports a set of utility functions. The exact definitions of those f
   - `createInsideSelection`,
   - `createAfterSelection`
   - `createMultiSelection`
+  - `getFocusPath`
+  - `getAnchorPath`
+  - `getStartPath`
+  - `getEndPath`
+  - `getSelectionPaths`
 - Parser:
   - `isEqualParser`
 - Path:
@@ -865,6 +873,15 @@ The library exports a set of utility functions. The exact definitions of those f
 - Actions:
   - `resizeObserver`
   - `onEscape`
+- Type checking:
+  - `valueType`
+  - `stringConvert`
+  - `isObject`
+  - `isObjectOrArray`
+  - `isBoolean`
+  - `isTimestamp`
+  - `isColor`
+  - `isUrl`
 - Typeguards:
   - `isContentParseError`
   - `isContentValidationErrors`

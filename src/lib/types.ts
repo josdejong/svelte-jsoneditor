@@ -383,7 +383,7 @@ export type OnSort = (params: {
 }) => void
 export type OnFind = (findAndReplace: boolean) => void
 export type OnPaste = (pastedText: string) => void
-export type OnPasteJson = (pastedJson: { path: JSONPath; contents: unknown }) => void
+export type OnPasteJson = (pastedJson: PastedJson) => void
 export type OnExpand = (relativePath: JSONPath) => boolean
 export type OnRenderValue = (props: RenderValueProps) => RenderValueComponentDescription[]
 export type OnClassName = (path: JSONPath, value: unknown) => string | undefined
@@ -395,7 +395,7 @@ export type RenderMenuContext = {
   readOnly: boolean
 }
 export type OnRenderMenu = (items: MenuItem[], context: RenderMenuContext) => MenuItem[] | undefined
-export type OnRenderMenuInternal = (items: MenuItem[]) => MenuItem[]
+export type OnRenderMenuInternal = (items: MenuItem[]) => MenuItem[] | undefined
 export type RenderContextMenuContext = RenderMenuContext & {
   selection: JSONEditorSelection | undefined
 }
@@ -403,7 +403,9 @@ export type OnRenderContextMenu = (
   items: ContextMenuItem[],
   context: RenderContextMenuContext
 ) => ContextMenuItem[] | false | undefined
-export type OnRenderContextMenuInternal = (items: ContextMenuItem[]) => ContextMenuItem[] | false
+export type OnRenderContextMenuInternal = (
+  items: ContextMenuItem[]
+) => ContextMenuItem[] | false | undefined
 export type OnError = (error: Error) => void
 export type OnFocus = () => void
 export type OnBlur = () => void
@@ -449,7 +451,11 @@ export interface ValueNormalization {
   unescapeValue: UnescapeValue
 }
 
-export type PastedJson = { contents: unknown; path: JSONPath } | undefined
+export type PastedJson = {
+  path: JSONPath
+  contents: unknown
+  onPasteAsJson: () => void
+}
 
 export interface DragInsideProps {
   json: unknown
@@ -555,6 +561,35 @@ export interface JSONEditorPropsOptional {
   onBlur?: OnBlur
 }
 
+export interface JSONEditorModalProps {
+  content: Content
+  path: JSONPath
+  onPatch: OnPatch
+
+  readOnly: boolean
+  indentation: number | string
+  tabSize: number
+  mainMenuBar: boolean
+  navigationBar: boolean
+  statusBar: boolean
+  askToFormat: boolean
+  escapeControlCharacters: boolean
+  escapeUnicodeCharacters: boolean
+  flattenColumns: boolean
+  parser: JSONParser
+  validator: Validator | undefined
+  validationParser: JSONParser
+  pathParser: JSONPathParser
+
+  onRenderValue: OnRenderValue
+  onClassName: OnClassName
+  onRenderMenu: OnRenderMenu
+  onRenderContextMenu: OnRenderContextMenu
+  onSortModal: (props: SortModalCallback) => void
+  onTransformModal: (props: TransformModalCallback) => void
+  onClose: () => void
+}
+
 export interface JSONEditorContext {
   readOnly: boolean
   parser: JSONParser
@@ -641,8 +676,33 @@ export interface TransformModalOptions {
 
 export interface TransformModalCallback {
   id: string
-  rootPath: JSONPath
   json: unknown
+  rootPath: JSONPath
+  onTransform: (operations: JSONPatchDocument) => void
+  onClose: () => void
+}
+
+export interface TransformModalProps extends TransformModalCallback {
+  id: string
+  json: unknown
+  rootPath: JSONPath
+  indentation: number | string
+  escapeControlCharacters: boolean
+  escapeUnicodeCharacters: boolean
+  parser: JSONParser
+  parseMemoizeOne: JSONParser['parse']
+  validationParser: JSONParser
+  pathParser: JSONPathParser
+
+  queryLanguages: QueryLanguage[]
+  queryLanguageId: string
+  onChangeQueryLanguage: OnChangeQueryLanguage
+
+  onRenderValue: OnRenderValue
+  onRenderMenu: OnRenderMenuInternal
+  onRenderContextMenu: OnRenderContextMenuInternal
+  onClassName: OnClassName
+
   onTransform: (operations: JSONPatchDocument) => void
   onClose: () => void
 }
@@ -652,6 +712,14 @@ export interface SortModalCallback {
   json: unknown
   rootPath: JSONPath
   onSort: OnSort
+  onClose: () => void
+}
+
+export interface JSONRepairModalProps {
+  text: string
+  onParse: (text: string) => void
+  onRepair: (text: string) => string
+  onApply: (repairedText: string) => void
   onClose: () => void
 }
 

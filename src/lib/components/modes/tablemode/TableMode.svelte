@@ -32,7 +32,8 @@
     TransformModalOptions,
     ValidationError,
     Validator,
-    ValueNormalization
+    ValueNormalization,
+    JSONRepairModalProps
   } from '$lib/types'
   import { Mode, SortDirection, ValidationSeverity } from '$lib/types.js'
   import TableMenu from './menu/TableMenu.svelte'
@@ -75,8 +76,7 @@
     findParentWithNodeName,
     getDataPathFromTarget,
     getWindow,
-    isChildOf,
-    isEditableDivRef
+    isChildOf
   } from '$lib/utils/domUtils.js'
   import { createDebug } from '$lib/utils/debug.js'
   import {
@@ -119,8 +119,7 @@
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
     SCROLL_DURATION,
-    SEARCH_BOX_HEIGHT,
-    SIMPLE_MODAL_OPTIONS
+    SEARCH_BOX_HEIGHT
   } from '$lib/constants.js'
   import { noop } from '$lib/utils/noop.js'
   import { createJump } from '$lib/assets/jump.js/src/jump.js'
@@ -144,13 +143,11 @@
   import TableModeWelcome from './TableModeWelcome.svelte'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import RefreshColumnHeader from './RefreshColumnHeader.svelte'
-  import type { Context } from 'svelte-simple-modal'
   import createTableContextMenuItems from './contextmenu/createTableContextMenuItems'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
   import { flattenSearchResults, toRecursiveSearchResults } from '$lib/logic/search.js'
 
   const debug = createDebug('jsoneditor:TableMode')
-  const { open } = getContext<Context>('simple-modal')
   const { openAbsolutePopup, closeAbsolutePopup } =
     getContext<AbsolutePopupContext>('absolute-popup')
   const jump = createJump()
@@ -194,6 +191,8 @@
   let refContents: HTMLDivElement | undefined
   let refHiddenInput: HTMLInputElement
 
+  let jsonRepairModalProps: JSONRepairModalProps | undefined = undefined
+
   createFocusTracker({
     onMount,
     onDestroy,
@@ -217,7 +216,7 @@
   let text: string | undefined
   let parseError: ParseError | undefined = undefined
 
-  let pastedJson: PastedJson
+  let pastedJson: PastedJson | undefined
 
   let searchResultDetails: SearchResultDetails | undefined
   let searchResults: SearchResults | undefined
@@ -246,7 +245,7 @@
   }
 
   async function handleFocusSearch(path: JSONPath) {
-    selection = undefined // navigation path of current selection would be confusing
+    updateSelection(undefined) // navigation path of current selection would be confusing
     await scrollTo(path)
   }
 
@@ -274,6 +273,7 @@
   let modalOpen = false
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let hasFocus = false
+  let copyPasteModalOpen = false
 
   let itemHeightsCache: Record<number, number> = {}
 
@@ -333,7 +333,7 @@
     }
 
     debug('clearing selection: path does not exist anymore', selection)
-    selection = undefined // TODO: try find the closest cell that still exists (similar to getInitialSelection)
+    updateSelection(undefined) // TODO: try find the closest cell that still exists (similar to getInitialSelection)
   }
 
   let documentState: DocumentState | undefined =
@@ -583,12 +583,12 @@
 
     const callback =
       typeof afterPatch === 'function'
-        ? afterPatch(patched.json, patched.state, selection)
+        ? afterPatch(patched.json, patched.documentState, selection)
         : undefined
 
     json = callback?.json !== undefined ? callback.json : patched.json
-    documentState = callback?.state !== undefined ? callback.state : patched.state
-    selection = callback?.selection !== undefined ? callback.selection : selection
+    documentState = callback?.state !== undefined ? callback.state : patched.documentState
+    updateSelection(callback?.selection !== undefined ? callback.selection : selection)
     sortedColumn =
       callback?.sortedColumn !== undefined ? callback.sortedColumn : patchedSortedColumn
     text = undefined
@@ -1094,43 +1094,15 @@
       return
     }
 
-    const { path, contents } = pastedJson
-
-    // exit edit mode
-    const refEditableDiv = refContents?.querySelector('.jse-editable-div') ?? undefined
-    if (isEditableDivRef(refEditableDiv)) {
-      refEditableDiv.cancel()
-    }
-
-    // replace the value with the JSON object/array
-    const operations: JSONPatchDocument = [
-      {
-        op: 'replace',
-        path: compileJSONPointer(path),
-        value: contents
-      }
-    ]
-
-    handlePatch(operations)
+    const { onPasteAsJson } = pastedJson
+    onPasteAsJson()
 
     // TODO: get rid of the setTimeout here
     setTimeout(focus)
   }
 
   function handlePasteFromMenu() {
-    open(
-      CopyPasteModal,
-      {},
-      {
-        ...SIMPLE_MODAL_OPTIONS,
-        styleWindow: {
-          width: '450px'
-        }
-      },
-      {
-        onClose: () => focus()
-      }
-    )
+    copyPasteModalOpen = true
   }
 
   function handleClearPastedJson() {
@@ -1405,7 +1377,7 @@
 
     json = callback?.json !== undefined ? callback.json : updatedJson
     documentState = callback?.state !== undefined ? callback.state : updatedState
-    selection = callback?.selection !== undefined ? callback.selection : selection
+    updateSelection(callback?.selection !== undefined ? callback.selection : selection)
     sortedColumn = undefined // we can't know whether the new json is still sorted or not
     text = undefined
     textIsRepaired = false
@@ -1462,7 +1434,7 @@
 
       json = callback?.json !== undefined ? callback.json : json
       documentState = callback?.state !== undefined ? callback.state : documentState
-      selection = callback?.selection !== undefined ? callback.selection : selection
+      updateSelection(callback?.selection !== undefined ? callback.selection : selection)
     }
 
     // ensure the selection is valid
@@ -1510,7 +1482,7 @@
       },
       onClose: () => {
         modalOpen = false
-        focus()
+        setTimeout(focus)
       }
     })
   }
@@ -1547,7 +1519,7 @@
       },
       onClose: () => {
         modalOpen = false
-        focus()
+        setTimeout(focus)
         if (onClose) {
           onClose()
         }
@@ -1569,35 +1541,19 @@
       onPatch: context.onPatch,
       onClose: () => {
         modalOpen = false
-        focus()
+        setTimeout(focus)
       }
     })
   }
 
   function openRepairModal(text: string, onApply: (repairedText: string) => void) {
-    open(
-      JSONRepairModal,
-      {
-        text,
-        onParse: (text: string) => parsePartialJson(text, (t) => parseAndRepair(t, parser)),
-        onRepair: repairPartialJson,
-        onApply
-      },
-      {
-        ...SIMPLE_MODAL_OPTIONS,
-        styleWindow: {
-          width: '600px',
-          height: '500px'
-        },
-        styleContent: {
-          padding: 0,
-          height: '100%'
-        }
-      },
-      {
-        onClose: () => focus()
-      }
-    )
+    jsonRepairModalProps = {
+      text,
+      onParse: (text) => parsePartialJson(text, (t) => parseAndRepair(t, parser)),
+      onRepair: repairPartialJson,
+      onApply,
+      onClose: focus
+    }
   }
 
   function handleSortAll() {
@@ -1642,7 +1598,7 @@
 
     json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
     documentState = item.undo.documentState
-    selection = item.undo.selection
+    updateSelection(item.undo.selection)
     sortedColumn = item.undo.sortedColumn
     text = item.undo.text
     textIsRepaired = item.undo.textIsRepaired
@@ -1686,7 +1642,7 @@
 
     json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
     documentState = item.redo.documentState
-    selection = item.redo.selection
+    updateSelection(item.redo.selection)
     sortedColumn = item.redo.sortedColumn
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired
@@ -1991,5 +1947,19 @@
     </div>
   {/if}
 </div>
+
+{#if copyPasteModalOpen}
+  <CopyPasteModal onClose={() => (copyPasteModalOpen = false)} />
+{/if}
+
+{#if jsonRepairModalProps}
+  <JSONRepairModal
+    {...jsonRepairModalProps}
+    onClose={() => {
+      jsonRepairModalProps?.onClose()
+      jsonRepairModalProps = undefined
+    }}
+  />
+{/if}
 
 <style src="./TableMode.scss"></style>

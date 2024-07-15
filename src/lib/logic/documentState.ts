@@ -14,6 +14,7 @@ import {
   type JSONPatchCopy,
   type JSONPatchDocument,
   type JSONPatchMove,
+  type JSONPatchOperation,
   type JSONPatchRemove,
   type JSONPath,
   parsePath,
@@ -453,34 +454,45 @@ export function documentStatePatch(
   json: unknown,
   documentState: DocumentState | undefined,
   operations: JSONPatchDocument
-): { json: unknown; state: DocumentState | undefined } {
-  const updatedJson: unknown = immutableJSONPatch(json, operations)
+): { json: unknown; documentState: DocumentState | undefined } {
+  const initial = { json, documentState }
 
-  const updatedDocumentState = operations.reduce((updatingState, operation) => {
-    if (isJSONPatchAdd(operation)) {
-      return documentStateAdd(updatedJson, updatingState, operation, undefined)
+  const result = operations.reduce((current, operation) => {
+    return {
+      json: immutableJSONPatch(current.json, [operation]),
+      documentState: _documentStatePatch(current.json, current.documentState, operation)
     }
-
-    if (isJSONPatchRemove(operation)) {
-      return documentStateRemove(updatedJson, updatingState, operation)
-    }
-
-    if (isJSONPatchReplace(operation)) {
-      // nothing special to do (all is handled by syncDocumentState)
-      return updatingState
-    }
-
-    if (isJSONPatchCopy(operation) || isJSONPatchMove(operation)) {
-      return documentStateMoveOrCopy(updatedJson, updatingState, operation)
-    }
-
-    return updatingState
-  }, documentState)
+  }, initial)
 
   return {
-    json: updatedJson,
-    state: syncDocumentState(updatedJson, updatedDocumentState) // sync to cleanup leftover state
+    json: result.json,
+    documentState: syncDocumentState(result.json, result.documentState) // sync to clean up leftover state
   }
+}
+
+function _documentStatePatch(
+  json: unknown,
+  documentState: DocumentState | undefined,
+  operation: JSONPatchOperation
+): DocumentState | undefined {
+  if (isJSONPatchAdd(operation)) {
+    return documentStateAdd(json, documentState, operation, undefined)
+  }
+
+  if (isJSONPatchRemove(operation)) {
+    return documentStateRemove(json, documentState, operation)
+  }
+
+  if (isJSONPatchReplace(operation)) {
+    // nothing special to do (all is handled by syncDocumentState)
+    return documentState
+  }
+
+  if (isJSONPatchCopy(operation) || isJSONPatchMove(operation)) {
+    return documentStateMoveOrCopy(json, documentState, operation)
+  }
+
+  return documentState
 }
 
 export function getInRecursiveState<T extends RecursiveState>(
@@ -488,7 +500,11 @@ export function getInRecursiveState<T extends RecursiveState>(
   documentState: T | undefined,
   path: JSONPath
 ): T | undefined {
-  return getIn(documentState, toRecursiveStatePath(json, path))
+  try {
+    return getIn(documentState, toRecursiveStatePath(json, path))
+  } catch (err) {
+    return undefined
+  }
 }
 
 export function setInRecursiveState<T extends RecursiveState>(

@@ -18,8 +18,7 @@
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
     SCROLL_DURATION,
-    SEARCH_BOX_HEIGHT,
-    SIMPLE_MODAL_OPTIONS
+    SEARCH_BOX_HEIGHT
   } from '$lib/constants.js'
   import {
     collapsePath,
@@ -77,8 +76,7 @@
     findParentWithNodeName,
     getWindow,
     isChildOf,
-    isChildOfNodeName,
-    isEditableDivRef
+    isChildOfNodeName
   } from '$lib/utils/domUtils.js'
   import {
     convertValue,
@@ -116,6 +114,7 @@
     JSONParser,
     JSONPatchResult,
     JSONPathParser,
+    JSONRepairModalProps,
     JSONSelection,
     OnBlur,
     OnChange,
@@ -155,7 +154,6 @@
     onRemove
   } from '$lib/logic/actions.js'
   import JSONPreview from '../../controls/JSONPreview.svelte'
-  import type { Context } from 'svelte-simple-modal'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
   import createTreeContextMenuItems from './contextmenu/createTreeContextMenuItems'
   import { toRecursiveSearchResults as toRecursiveSearchResults } from 'svelte-jsoneditor/logic/search.js'
@@ -165,7 +163,6 @@
   const isSSR = typeof window === 'undefined'
   debug('isSSR:', isSSR)
 
-  const { open } = getContext<Context>('simple-modal')
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
 
@@ -208,6 +205,8 @@
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
   let modalOpen = false
+  let copyPasteModalOpen = false
+  let jsonRepairModalProps: JSONRepairModalProps | undefined = undefined
 
   createFocusTracker({
     onMount,
@@ -262,7 +261,7 @@
 
   $: debug('selection', selection)
 
-  let pastedJson: PastedJson
+  let pastedJson: PastedJson | undefined
 
   let searchResultDetails: SearchResultDetails | undefined
   let searchResults: SearchResults | undefined
@@ -533,7 +532,7 @@
     }
 
     debug('clearing selection: path does not exist anymore', selection)
-    selection = getInitialSelection(json, documentState)
+    updateSelection(getInitialSelection(json, documentState))
   }
 
   interface PreviousState {
@@ -577,7 +576,7 @@
   function createDefaultSelection() {
     debug('createDefaultSelection')
 
-    selection = createValueSelection([], false)
+    updateSelection(createValueSelection([], false))
   }
 
   export function patch(
@@ -612,12 +611,12 @@
 
     const callback =
       typeof afterPatch === 'function'
-        ? afterPatch(patched.json, patched.state, updatedSelection)
+        ? afterPatch(patched.json, patched.documentState, updatedSelection)
         : undefined
 
     json = callback?.json !== undefined ? callback.json : patched.json
-    documentState = callback?.state !== undefined ? callback.state : patched.state
-    selection = callback?.selection !== undefined ? callback.selection : updatedSelection
+    documentState = callback?.state !== undefined ? callback.state : patched.documentState
+    updateSelection(callback?.selection !== undefined ? callback.selection : updatedSelection)
     text = undefined
     textIsRepaired = false
     pastedJson = undefined
@@ -642,14 +641,12 @@
       }
     })
 
-    const patchResult = {
+    return {
       json,
       previousJson,
       undo,
       redo: operations
     }
-
-    return patchResult
   }
 
   // TODO: cleanup logging
@@ -761,45 +758,17 @@
   }
 
   function handlePasteFromMenu() {
-    open(
-      CopyPasteModal,
-      {},
-      {
-        ...SIMPLE_MODAL_OPTIONS,
-        styleWindow: {
-          width: '450px'
-        }
-      },
-      {
-        onClose: () => focus()
-      }
-    )
+    copyPasteModalOpen = true
   }
 
   function openRepairModal(text: string, onApply: (repairedText: string) => void) {
-    open(
-      JSONRepairModal,
-      {
-        text,
-        onParse: (text: string) => parsePartialJson(text, (t) => parseAndRepair(t, parser)),
-        onRepair: repairPartialJson,
-        onApply
-      },
-      {
-        ...SIMPLE_MODAL_OPTIONS,
-        styleWindow: {
-          width: '600px',
-          height: '500px'
-        },
-        styleContent: {
-          padding: 0,
-          height: '100%'
-        }
-      },
-      {
-        onClose: () => focus()
-      }
-    )
+    jsonRepairModalProps = {
+      text,
+      onParse: (text) => parsePartialJson(text, (t) => parseAndRepair(t, parser)),
+      onRepair: repairPartialJson,
+      onApply,
+      onClose: focus
+    }
   }
 
   function handleRemove() {
@@ -998,7 +967,7 @@
 
     json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
     documentState = item.undo.documentState
-    selection = item.undo.selection
+    updateSelection(item.undo.selection)
     text = item.undo.text
     textIsRepaired = item.undo.textIsRepaired
     parseError = undefined
@@ -1041,7 +1010,7 @@
 
     json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
     documentState = item.redo.documentState
-    selection = item.redo.selection
+    updateSelection(item.redo.selection)
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired
     parseError = undefined
@@ -1088,7 +1057,7 @@
       },
       onClose: () => {
         modalOpen = false
-        focus()
+        setTimeout(focus)
       }
     })
   }
@@ -1143,7 +1112,7 @@
       },
       onClose: () => {
         modalOpen = false
-        focus()
+        setTimeout(focus)
         if (onClose) {
           onClose()
         }
@@ -1182,7 +1151,7 @@
       onPatch: context.onPatch,
       onClose: () => {
         modalOpen = false
-        focus()
+        setTimeout(focus)
       }
     })
   }
@@ -1324,7 +1293,7 @@
 
     json = callback?.json !== undefined ? callback.json : updatedJson
     documentState = callback?.state !== undefined ? callback.state : updatedState
-    selection = callback?.selection !== undefined ? callback.selection : selection
+    updateSelection(callback?.selection !== undefined ? callback.selection : selection)
     text = undefined
     textIsRepaired = false
     parseError = undefined
@@ -1379,7 +1348,7 @@
 
       json = callback?.json !== undefined ? callback.json : json
       documentState = callback?.state !== undefined ? callback.state : documentState
-      selection = callback?.selection !== undefined ? callback.selection : selection
+      updateSelection(callback?.selection !== undefined ? callback.selection : selection)
     }
 
     // ensure the selection is valid
@@ -1768,29 +1737,10 @@
       return
     }
 
-    const { path, contents } = pastedJson
+    const { onPasteAsJson } = pastedJson
     pastedJson = undefined
 
-    // exit edit mode
-    const refEditableDiv = refContents?.querySelector('.jse-editable-div') ?? undefined
-    if (isEditableDivRef(refEditableDiv)) {
-      refEditableDiv.cancel()
-    }
-
-    // replace the value with the JSON object/array
-    const operations: JSONPatchDocument = [
-      {
-        op: 'replace',
-        path: compileJSONPointer(path),
-        value: contents
-      }
-    ]
-
-    handlePatch(operations, (patchedJson, patchedState) => {
-      return {
-        state: expandSmart(patchedJson, patchedState, path)
-      }
-    })
+    onPasteAsJson()
 
     // TODO: get rid of the setTimeout here
     setTimeout(focus)
@@ -2073,5 +2023,19 @@
     </div>
   {/if}
 </div>
+
+{#if copyPasteModalOpen}
+  <CopyPasteModal onClose={() => (copyPasteModalOpen = false)} />
+{/if}
+
+{#if jsonRepairModalProps}
+  <JSONRepairModal
+    {...jsonRepairModalProps}
+    onClose={() => {
+      jsonRepairModalProps?.onClose()
+      jsonRepairModalProps = undefined
+    }}
+  />
+{/if}
 
 <style src="./TreeMode.scss"></style>
