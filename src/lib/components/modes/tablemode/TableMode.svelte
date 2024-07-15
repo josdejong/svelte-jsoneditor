@@ -673,9 +673,7 @@
     const index = parseInt(path[0], 10)
     const nextPath = [String(index + 1), ...path.slice(1)]
 
-    return existsIn(json, nextPath)
-      ? createValueSelection(nextPath, false)
-      : createValueSelection(path, false)
+    return existsIn(json, nextPath) ? createValueSelection(nextPath) : createValueSelection(path)
   }
 
   export function focus() {
@@ -736,7 +734,7 @@
         return
       }
 
-      updateSelection(createValueSelection(path, false))
+      updateSelection(createValueSelection(path))
 
       event.preventDefault()
     }
@@ -752,7 +750,7 @@
       // Select the first row, first column
       const path = ['0', ...columns[0]]
 
-      return createValueSelection(path, false)
+      return createValueSelection(path)
     } else {
       return undefined
     }
@@ -1047,7 +1045,7 @@
     if (isObjectOrArray(value)) {
       openJSONEditorModal(path)
     } else {
-      updateSelection(createValueSelection(path, true))
+      updateSelection(createValueSelection(path))
     }
   }
 
@@ -1173,7 +1171,6 @@
     await onInsertCharacter({
       char,
       selectInside: false,
-      refJsonEditor,
       json,
       selection: selection,
       readOnly,
@@ -1453,7 +1450,7 @@
   function handleSelectValidationError(error: ValidationError) {
     debug('select validation error', error)
 
-    updateSelection(createValueSelection(error.path, false))
+    updateSelection(createValueSelection(error.path))
 
     scrollTo(error.path)
   }

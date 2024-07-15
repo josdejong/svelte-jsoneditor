@@ -42,8 +42,9 @@
   import {
     canConvert,
     createAfterSelection,
+    createEditKeySelection,
+    createEditValueSelection,
     createInsideSelection,
-    createKeySelection,
     createSelectionFromOperations,
     createValueSelection,
     findRootPath,
@@ -312,7 +313,7 @@
   function handleSelectValidationError(error: ValidationError) {
     debug('select validation error', error)
 
-    updateSelection(createValueSelection(error.path, false))
+    updateSelection(createValueSelection(error.path))
     scrollTo(error.path)
   }
 
@@ -578,7 +579,7 @@
   function createDefaultSelection() {
     debug('createDefaultSelection')
 
-    updateSelection(createValueSelection([], false))
+    updateSelection(createValueSelection([]))
   }
 
   export function patch(
@@ -661,7 +662,7 @@
       return
     }
 
-    updateSelection(createKeySelection(getFocusPath(selection), true))
+    updateSelection(createEditKeySelection(getFocusPath(selection)))
   }
 
   function handleEditValue() {
@@ -674,7 +675,7 @@
     if (isObjectOrArray(value)) {
       openJSONEditorModal(path, value)
     } else {
-      updateSelection(createValueSelection(path, true))
+      updateSelection(createEditValueSelection(path))
     }
   }
 
@@ -834,7 +835,7 @@
     onInsert({
       insertType,
       selectInside: true,
-      refJsonEditor,
+      initialValue: undefined,
       json,
       selection,
       readOnly,
@@ -847,7 +848,7 @@
   function handleInsertFromContextMenu(type: InsertType) {
     if (isKeySelection(selection)) {
       // in this case, we do not want to rename the key, but replace the property
-      updateSelection(createValueSelection(selection.path, false))
+      updateSelection(createValueSelection(selection.path))
     }
 
     if (!selection) {
@@ -940,7 +941,6 @@
     await onInsertCharacter({
       char,
       selectInside: true,
-      refJsonEditor,
       json,
       selection,
       readOnly,
@@ -1054,7 +1054,7 @@
         handlePatch(operations, (patchedJson, patchedState) => ({
           // expand the newly replaced array and select it
           state: expandSmart(patchedJson, patchedState, rootPath),
-          selection: createValueSelection(rootPath, false)
+          selection: createValueSelection(rootPath)
         }))
       },
       onClose: () => {
@@ -1108,7 +1108,7 @@
           handlePatch(operations, (patchedJson, patchedState) => ({
             // expand the newly replaced array and select it
             state: expandSmart(patchedJson, patchedState, rootPath),
-            selection: createValueSelection(rootPath, false)
+            selection: createValueSelection(rootPath)
           }))
         }
       },
@@ -1514,7 +1514,7 @@
         const parent = getIn(json, initial(path))
         if (Array.isArray(parent)) {
           // change into selection of the value
-          updateSelection(createValueSelection(path, false))
+          updateSelection(createValueSelection(path))
         }
       }
 

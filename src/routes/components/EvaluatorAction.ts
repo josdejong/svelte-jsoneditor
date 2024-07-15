@@ -1,6 +1,7 @@
-import { createValueSelection, type OnJSONSelect } from 'svelte-jsoneditor'
+import { type OnJSONSelect } from 'svelte-jsoneditor'
 import type { Action } from 'svelte/action'
 import { type JSONPath } from 'immutable-json-patch'
+import { createEditValueSelection } from '$lib/logic/selection'
 
 export interface EvaluatorActionProps {
   value: unknown
@@ -25,7 +26,7 @@ export const EvaluatorAction: Action<HTMLDivElement, Record<string, unknown>> = 
       event.stopPropagation()
 
       // open in edit mode
-      props.onSelect(createValueSelection(props.path, true))
+      props.onSelect(createEditValueSelection(props.path))
     }
   }
 
