@@ -165,34 +165,22 @@
 
   function handleChange(updatedContent: Content) {
     debug('handleChange', updatedContent)
-
-    const updatedState = {
-      ...currentState,
-      content: updatedContent
-    }
-
-    stack = [...initial(stack), updatedState]
+    updateState((state) => ({ ...state, content: updatedContent }))
   }
 
   function handleChangeSelection(newSelection: JSONEditorSelection | undefined) {
     debug('handleChangeSelection', newSelection)
-
-    const updatedState = {
-      ...currentState,
-      selection: newSelection
-    }
-
-    stack = [...initial(stack), updatedState]
+    updateState((state) => ({ ...state, selection: newSelection }))
   }
 
   function handleChangeMode(newMode: Mode) {
     debug('handleChangeMode', newMode)
+    updateState((state) => ({ ...state, mode: newMode }))
+  }
 
-    const updatedState = {
-      ...currentState,
-      mode: newMode
-    }
-
+  function updateState(callback: (state: ModalState) => ModalState) {
+    const state = last(stack) as ModalState
+    const updatedState = callback(state)
     stack = [...initial(stack), updatedState]
   }
 

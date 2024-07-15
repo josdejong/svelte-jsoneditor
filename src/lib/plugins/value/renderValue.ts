@@ -1,15 +1,16 @@
-import { isBoolean, isColor, isTimestamp } from '../../utils/typeUtils.js'
+import { isBoolean, isColor, isTimestamp } from '$lib/utils/typeUtils.js'
+import type { RenderValueComponentDescription, RenderValueProps } from '$lib/types'
 import BooleanToggle from './components/BooleanToggle.svelte'
 import ColorPicker from './components/ColorPicker.svelte'
 import EditableValue from './components/EditableValue.svelte'
 import ReadonlyValue from './components/ReadonlyValue.svelte'
 import TimestampTag from './components/TimestampTag.svelte'
-import type { RenderValueComponentDescription, RenderValueProps } from '../../types'
 
 export function renderValue({
   path,
   value,
   readOnly,
+  selection,
   enforceString,
   searchResultItems,
   isEditing,
@@ -44,6 +45,7 @@ export function renderValue({
       props: {
         path,
         value,
+        selection,
         enforceString,
         parser,
         normalization,

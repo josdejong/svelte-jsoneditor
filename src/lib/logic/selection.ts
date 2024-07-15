@@ -22,6 +22,8 @@ import type {
   AfterSelection,
   CaretPosition,
   DocumentState,
+  EditKeySelection,
+  EditValueSelection,
   InsideSelection,
   JSONEditorSelection,
   JSONParser,
@@ -246,12 +248,12 @@ export function getSelectionUp(
   if (isAfterSelection(selection)) {
     // select the node itself, not the previous node,
     // FIXME: when after an expanded object/array, should go to the last item inside the object/array
-    return createValueSelection(focusPath, false)
+    return createValueSelection(focusPath)
   }
 
   if (isInsideSelection(selection)) {
     // select the node itself, not the previous node,
-    return createValueSelection(focusPath, false)
+    return createValueSelection(focusPath)
   }
 
   if (isKeySelection(selection)) {
@@ -263,18 +265,18 @@ export function getSelectionUp(
     const parent = getIn(json, parentPath)
     if (Array.isArray(parent) || isEmpty(previousPath)) {
       // switch to value selection: array has no keys, and root object also not
-      return createValueSelection(previousPath, false)
+      return createValueSelection(previousPath)
     } else {
-      return createKeySelection(previousPath, false)
+      return createKeySelection(previousPath)
     }
   }
 
   if (isValueSelection(selection)) {
-    return previousPath !== undefined ? createValueSelection(previousPath, false) : undefined
+    return previousPath !== undefined ? createValueSelection(previousPath) : undefined
   }
 
   if (previousPath !== undefined) {
-    return createValueSelection(previousPath, false)
+    return createValueSelection(previousPath)
   }
 
   return undefined
@@ -318,15 +320,15 @@ export function getSelectionDown(
   }
 
   if (isAfterSelection(selection)) {
-    return nextPathAfter !== undefined ? createValueSelection(nextPathAfter, false) : undefined
+    return nextPathAfter !== undefined ? createValueSelection(nextPathAfter) : undefined
   }
 
   if (isInsideSelection(selection)) {
-    return nextPath !== undefined ? createValueSelection(nextPath, false) : undefined
+    return nextPath !== undefined ? createValueSelection(nextPath) : undefined
   }
 
   if (isValueSelection(selection)) {
-    return nextPath !== undefined ? createValueSelection(nextPath, false) : undefined
+    return nextPath !== undefined ? createValueSelection(nextPath) : undefined
   }
 
   if (isKeySelection(selection)) {
@@ -338,17 +340,17 @@ export function getSelectionDown(
     const parent = getIn(json, parentPath)
     if (Array.isArray(parent)) {
       // switch to value selection: array has no keys
-      return createValueSelection(nextPath, false)
+      return createValueSelection(nextPath)
     } else {
-      return createKeySelection(nextPath, false)
+      return createKeySelection(nextPath)
     }
   }
 
   if (isMultiSelection(selection)) {
     return nextPathAfter !== undefined
-      ? createValueSelection(nextPathAfter, false)
+      ? createValueSelection(nextPathAfter)
       : nextPath !== undefined
-        ? createValueSelection(nextPath, false)
+        ? createValueSelection(nextPath)
         : undefined
   }
 
@@ -373,7 +375,7 @@ export function getSelectionNextInside(
   const nextPathInside = parent ? getNextVisiblePath(parent, documentState, childPath) : undefined
 
   if (nextPathInside) {
-    return createValueSelection(parentPath.concat(nextPathInside), false)
+    return createValueSelection(parentPath.concat(nextPathInside))
   } else {
     return createAfterSelection(path)
   }
@@ -449,7 +451,7 @@ export function getSelectionLeft(
   }
 
   if (isMultiSelection(selection) && !Array.isArray(parent)) {
-    return createKeySelection(selection.focusPath, false)
+    return createKeySelection(selection.focusPath)
   }
 
   return undefined
@@ -481,7 +483,7 @@ export function getSelectionRight(
   }
 
   if (isMultiSelection(selection)) {
-    return createValueSelection(selection.focusPath, false)
+    return createValueSelection(selection.focusPath)
   }
 
   return undefined
@@ -507,8 +509,8 @@ export function getInitialSelection(
 
   const path = visiblePaths[index]
   return path === undefined || path.length === 0 || Array.isArray(getIn(json, initial(path)))
-    ? createValueSelection(path, false) // Array items and root object/array do not have a key, so select value in that case
-    : createKeySelection(path, false)
+    ? createValueSelection(path) // Array items and root object/array do not have a key, so select value in that case
+    : createKeySelection(path)
 }
 
 export function createSelectionFromOperations(
@@ -521,7 +523,7 @@ export function createSelectionFromOperations(
       // a replaced value
       const path = parsePath(json, operation.path)
 
-      return createValueSelection(path, false)
+      return createValueSelection(path)
     }
   }
 
@@ -537,7 +539,7 @@ export function createSelectionFromOperations(
       // a renamed key
       const path = parsePath(json, firstOp.path)
 
-      return createKeySelection(path, false)
+      return createKeySelection(path)
     }
   }
 
@@ -611,27 +613,31 @@ export function pathStartsWith(path: JSONPath, parentPath: JSONPath): boolean {
 export function removeEditModeFromSelection(
   selection: JSONSelection | undefined
 ): JSONSelection | undefined {
-  if ((isKeySelection(selection) || isValueSelection(selection)) && selection.edit) {
-    return { ...selection, edit: false }
+  if (isEditingSelection(selection)) {
+    const { type, path } = selection
+    return { type, path } as KeySelection | ValueSelection
   }
 
   return selection
 }
 
-export function createKeySelection(path: JSONPath, edit: boolean): KeySelection {
-  return {
-    type: SelectionType.key,
-    path,
-    edit
-  }
+export function createKeySelection(path: JSONPath): KeySelection {
+  return { type: SelectionType.key, path }
 }
 
-export function createValueSelection(path: JSONPath, edit: boolean): ValueSelection {
-  return {
-    type: SelectionType.value,
-    path,
-    edit
-  }
+export function createEditKeySelection(path: JSONPath, initialValue?: string): EditKeySelection {
+  return { type: SelectionType.key, path, edit: true, initialValue }
+}
+
+export function createValueSelection(path: JSONPath): ValueSelection {
+  return { type: SelectionType.value, path }
+}
+
+export function createEditValueSelection(
+  path: JSONPath,
+  initialValue?: string
+): EditValueSelection {
+  return { type: SelectionType.value, path, edit: true, initialValue }
 }
 
 export function createInsideSelection(path: JSONPath): InsideSelection {
@@ -715,8 +721,13 @@ export function selectionToPartialJson(
   return undefined
 }
 
-export function isEditingSelection(selection: JSONSelection | undefined): boolean {
-  return (isKeySelection(selection) || isValueSelection(selection)) && selection.edit === true
+export function isEditingSelection(
+  selection: JSONSelection | undefined
+): selection is EditKeySelection | EditValueSelection {
+  return (
+    (isKeySelection(selection) || isValueSelection(selection)) &&
+    (selection as Record<string, unknown>).edit === true
+  )
 }
 
 /**
@@ -724,7 +735,7 @@ export function isEditingSelection(selection: JSONSelection | undefined): boolea
  */
 // TODO: write unit tests
 export function selectAll(): JSONSelection {
-  return createValueSelection([], false)
+  return createValueSelection([])
 }
 
 // TODO: write unit tests
@@ -749,9 +760,9 @@ export function canConvert(selection: JSONSelection | undefined): boolean {
 export function fromCaretPosition(caretPosition: CaretPosition): JSONSelection {
   switch (caretPosition.type) {
     case CaretType.key:
-      return createKeySelection(caretPosition.path, false)
+      return createKeySelection(caretPosition.path)
     case CaretType.value:
-      return createValueSelection(caretPosition.path, false)
+      return createValueSelection(caretPosition.path)
     case CaretType.after:
       return createAfterSelection(caretPosition.path)
     case CaretType.inside:
@@ -764,9 +775,9 @@ export function fromCaretPosition(caretPosition: CaretPosition): JSONSelection {
 export function fromSelectionType(selectionType: SelectionType, path: JSONPath): JSONSelection {
   switch (selectionType) {
     case SelectionType.key:
-      return createKeySelection(path, false)
+      return createKeySelection(path)
     case SelectionType.value:
-      return createValueSelection(path, false)
+      return createValueSelection(path)
     case SelectionType.after:
       return createAfterSelection(path)
     case SelectionType.inside:

@@ -224,33 +224,6 @@ export function setCursorToEnd(element: HTMLElement) {
 }
 
 /**
- * Insert (append or replace) the text contents of the current active element
- */
-export function insertActiveElementContents(
-  container: HTMLElement,
-  text: string,
-  replaceContents: boolean,
-  onActiveElement?: (activeElement: HTMLElement) => void
-) {
-  const window = getWindow(container)
-  if (!window) {
-    return
-  }
-
-  const activeElement: HTMLElement | undefined = window.document.activeElement
-    ? (window.document.activeElement as HTMLElement)
-    : undefined
-
-  if (activeElement && activeElement.isContentEditable) {
-    activeElement.textContent = replaceContents ? text : activeElement.textContent + text
-    setCursorToEnd(activeElement)
-    if (onActiveElement) {
-      onActiveElement(activeElement)
-    }
-  }
-}
-
-/**
  * Gets a DOM element's Window.  This is normally just the global `window`
  * variable, but if we opened a child window, it may be different.
  */

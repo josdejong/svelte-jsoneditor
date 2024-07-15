@@ -232,7 +232,7 @@ Pass the JSON contents to be rendered in the JSONEditor. `Content` is an object 
 selection: JSONEditorSelection | undefined
 ```
 
-The current selected contents. You can use two-way binding using `bind:selection`. The `tree` mode supports `MultiSelection`, `KeySelection`, `ValueSelection`, `InsideSelection`, or `AfterSelection`. The `table` mode supports `ValueSelection`, and `text` mode supports `TextSelection.`.
+The current selected contents. You can use two-way binding using `bind:selection`. The `tree` mode supports `MultiSelection`, `KeySelection`, `EditKeySelection`, `ValueSelection`, `EditValueSelection`, `InsideSelection`, or `AfterSelection`. The `table` mode supports `ValueSelection`, and `text` mode supports `TextSelection.`.
 
 #### mode
 
@@ -586,7 +586,7 @@ A menu item `ContextMenuItem` can be one of the following types:
 onSelect: (selection: JSONEditorSelection | undefined) => void
 ```
 
-Callback invoked when the selection is changed. When the selection is removed, the callback is invoked with `undefined` as argument. In `text` mode, a `TextSelection` will be fired. In `tree` and `table` mode, a `JSONSelection` will be fired (which can be `MultiSelection`, `KeySelection`, `ValueSelection`, `InsideSelection`, or `AfterSelection`). Use typeguards like `isTextSelection` and `isValueSelection` to check what type the selection has.
+Callback invoked when the selection is changed. When the selection is removed, the callback is invoked with `undefined` as argument. In `text` mode, a `TextSelection` will be fired. In `tree` and `table` mode, a `JSONSelection` will be fired (which can be `MultiSelection`, `KeySelection`, `EditKeySelection`, `ValueSelection`, `EditValueSelection`, `InsideSelection`, or `AfterSelection`). Use typeguards like `isTextSelection` and `isValueSelection` to check what type the selection has.
 
 #### queryLanguages
 
@@ -856,7 +856,9 @@ The library exports a set of utility functions. The exact definitions of those f
   - `isMultiSelection`,
   - `isEditingSelection`
   - `createValueSelection`
+  - `createEditValueSelection`
   - `createKeySelection`
+  - `createEditKeySelection`
   - `createInsideSelection`,
   - `createAfterSelection`
   - `createMultiSelection`

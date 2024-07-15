@@ -1,11 +1,11 @@
 import {
+  createEditKeySelection,
+  createEditValueSelection,
   createInsideSelection,
-  createKeySelection,
   createMultiSelection,
   createValueSelection,
   getFocusPath,
   hasSelectionContents,
-  isEditingSelection,
   isKeySelection,
   isValueSelection,
   selectionToPartialJson
@@ -40,9 +40,8 @@ import {
   parsePath
 } from 'immutable-json-patch'
 import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
-import { expandAll, expandSmart, expandPath, expandNone } from '$lib/logic/documentState.js'
+import { expandAll, expandNone, expandPath, expandSmart } from '$lib/logic/documentState.js'
 import { initial, isEmpty, last } from 'lodash-es'
-import { insertActiveElementContents } from '$lib/utils/domUtils.js'
 import { fromTableCellPosition, toTableCellPosition } from '$lib/logic/table.js'
 
 const debug = createDebug('jsoneditor:actions')
@@ -135,7 +134,7 @@ export function onPaste({
 
   function doPaste(pastedText: string) {
     if (json !== undefined) {
-      const ensureSelection = selection || createValueSelection([], false)
+      const ensureSelection = selection || createValueSelection([])
 
       const operations = insert(json, ensureSelection, pastedText, parser)
 
@@ -281,7 +280,7 @@ export function onDuplicateRow({
   onPatch(operations, (_, patchedState) => {
     const newRowIndex = rowIndex < (json as Array<unknown>).length ? rowIndex + 1 : rowIndex
     const newPath = fromTableCellPosition({ rowIndex: newRowIndex, columnIndex }, columns)
-    const newSelection = createValueSelection(newPath, false)
+    const newSelection = createValueSelection(newPath)
 
     return {
       state: patchedState,
@@ -366,7 +365,7 @@ export function onInsertAfterRow({
 
   onPatch(operations, (_, patchedState) => {
     const nextPath = fromTableCellPosition({ rowIndex: nextRowIndex, columnIndex }, columns)
-    const newSelection = createValueSelection(nextPath, false)
+    const newSelection = createValueSelection(nextPath)
 
     return {
       state: patchedState,
@@ -411,8 +410,7 @@ export function onRemoveRow({ json, selection, columns, readOnly, onPatch }: OnR
     const newSelection =
       newRowIndex !== undefined
         ? createValueSelection(
-            fromTableCellPosition({ rowIndex: newRowIndex, columnIndex }, columns),
-            false
+            fromTableCellPosition({ rowIndex: newRowIndex, columnIndex }, columns)
           )
         : undefined
 
@@ -428,9 +426,9 @@ export function onRemoveRow({ json, selection, columns, readOnly, onPatch }: OnR
 export interface OnInsert {
   insertType: InsertType
   selectInside: boolean
-  refJsonEditor: HTMLElement
   json: unknown | undefined
   selection: JSONSelection | undefined
+  initialValue: string | undefined
   readOnly: boolean
   parser: JSONParser
   onPatch: OnPatch
@@ -441,7 +439,7 @@ export interface OnInsert {
 export function onInsert({
   insertType,
   selectInside,
-  refJsonEditor,
+  initialValue,
   json,
   selection,
   readOnly,
@@ -483,8 +481,8 @@ export function onInsert({
           return {
             state: expandPath(patchedJson, patchedState, path, expandNone),
             selection: isObject(parent)
-              ? createKeySelection(path, true)
-              : createValueSelection(path, true)
+              ? createEditKeySelection(path, initialValue)
+              : createEditValueSelection(path, initialValue)
           }
         }
       }
@@ -493,13 +491,6 @@ export function onInsert({
     })
 
     debug('after patch')
-
-    if (operation) {
-      if (newValue === '') {
-        // open the newly inserted value in edit mode (can be cancelled via ESC this way)
-        tick2(() => insertActiveElementContents(refJsonEditor, '', true, refreshEditableDiv))
-      }
-    }
   } else {
     // document is empty or invalid (in that case it has text but no json)
     debug('onInsert', { insertType, newValue })
@@ -509,7 +500,7 @@ export function onInsert({
       state: expandSmart(patchedJson, patchedState, path),
       selection: isObjectOrArray(newValue)
         ? createInsideSelection(path)
-        : createValueSelection(path, true)
+        : createEditValueSelection(path)
     }))
   }
 }
@@ -517,7 +508,6 @@ export function onInsert({
 export interface OnInsertCharacter {
   char: string
   selectInside: boolean
-  refJsonEditor: HTMLElement
   json: unknown | undefined
   selection: JSONSelection | undefined
   readOnly: boolean
@@ -531,7 +521,6 @@ export interface OnInsertCharacter {
 export async function onInsertCharacter({
   char,
   selectInside,
-  refJsonEditor,
   json,
   selection,
   readOnly,
@@ -547,15 +536,7 @@ export async function onInsertCharacter({
   }
 
   if (isKeySelection(selection)) {
-    // only replace contents when not yet in edit mode (can happen when entering
-    // multiple characters very quickly after each other due to the async handling)
-    const replaceContents = !selection.edit
-
-    onSelect({ ...selection, edit: true })
-    tick2(() =>
-      // We use this way via insertActiveElementContents, so we can cancel via ESC
-      insertActiveElementContents(refJsonEditor, char, replaceContents, refreshEditableDiv)
-    )
+    onSelect({ ...selection, edit: true, initialValue: char })
     return
   }
 
@@ -563,7 +544,7 @@ export async function onInsertCharacter({
     onInsert({
       insertType: 'object',
       selectInside,
-      refJsonEditor,
+      initialValue: undefined, // not relevant
       json,
       selection,
       readOnly,
@@ -575,7 +556,7 @@ export async function onInsertCharacter({
     onInsert({
       insertType: 'array',
       selectInside,
-      refJsonEditor,
+      initialValue: undefined, // not relevant
       json,
       selection,
       readOnly,
@@ -586,15 +567,7 @@ export async function onInsertCharacter({
   } else {
     if (isValueSelection(selection) && json !== undefined) {
       if (!isObjectOrArray(getIn(json, selection.path))) {
-        // only replace contents when not yet in edit mode (can happen when entering
-        // multiple characters very quickly after each other due to the async handling)
-        const replaceContents = !selection.edit
-
-        onSelect({ ...selection, edit: true })
-        tick2(() =>
-          // We use this way via insertActiveElementContents, so we can cancel via ESC
-          insertActiveElementContents(refJsonEditor, char, replaceContents, refreshEditableDiv)
-        )
+        onSelect({ ...selection, edit: true, initialValue: char })
       } else {
         // TODO: replace the object/array with editing a text in edit mode?
         //  (Ideally this this should not create an entry in history though,
@@ -605,7 +578,6 @@ export async function onInsertCharacter({
       debug('onInsertValueWithCharacter', { char })
       await onInsertValueWithCharacter({
         char,
-        refJsonEditor,
         json,
         selection,
         readOnly,
@@ -619,7 +591,6 @@ export async function onInsertCharacter({
 
 interface OnInsertValueWithCharacter {
   char: string
-  refJsonEditor: HTMLElement
   json: unknown | undefined
   selection: JSONSelection | undefined
   readOnly: boolean
@@ -630,7 +601,6 @@ interface OnInsertValueWithCharacter {
 
 async function onInsertValueWithCharacter({
   char,
-  refJsonEditor,
   json,
   selection,
   readOnly,
@@ -646,7 +616,7 @@ async function onInsertValueWithCharacter({
   onInsert({
     insertType: 'value',
     selectInside: false, // not relevant, we insert a value, not an object or array
-    refJsonEditor,
+    initialValue: char,
     json,
     selection,
     readOnly,
@@ -654,29 +624,4 @@ async function onInsertValueWithCharacter({
     onPatch,
     onReplaceJson
   })
-
-  // only replace contents when not yet in edit mode (can happen when entering
-  // multiple characters very quickly after each other due to the async handling)
-  const replaceContents = !isEditingSelection(selection)
-
-  tick2(() => insertActiveElementContents(refJsonEditor, char, replaceContents, refreshEditableDiv))
-}
-
-/**
- * set two timeouts, two ticks of delay.
- * This allows to perform some action in the DOM *after* Svelte has re-rendered the app for example
- * WARNING: try to avoid using this function, it is tricky to rely on it.
- */
-function tick2(callback: () => void) {
-  setTimeout(() => setTimeout(callback))
-}
-
-function refreshEditableDiv(element: HTMLElement) {
-  // We force a refresh because when changing the text of the editable div programmatically,
-  // the DIV doesn't get a trigger to update it's class
-  // TODO: come up with a better solution
-
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  element?.refresh()
 }

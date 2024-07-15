@@ -11,12 +11,12 @@
   border-left: $main-border;
   border-right: $main-border;
 
+  display: flex;
+  gap: $padding;
+
   &:last-child {
     border-bottom: $main-border;
   }
-
-  display: flex;
-  gap: $padding;
 
   .jse-status-bar-info {
     padding: 2px;

@@ -40,8 +40,9 @@
   import {
     canConvert,
     createAfterSelection,
+    createEditKeySelection,
+    createEditValueSelection,
     createInsideSelection,
-    createKeySelection,
     createSelectionFromOperations,
     createValueSelection,
     findRootPath,
@@ -235,31 +236,24 @@
   let documentState: DocumentState | undefined = createDocumentState({ json })
   let selection: JSONSelection | undefined
 
-  function updateSelection(
-    updatedSelection:
-      | JSONSelection
-      | undefined
-      | ((selection: JSONSelection | undefined) => JSONSelection | undefined)
-  ) {
-    debug('updateSelection', updatedSelection)
+  function handleSelect(updatedSelection: JSONSelection | undefined) {
+    selection = updatedSelection
+  }
 
-    const appliedSelection =
-      typeof updatedSelection === 'function' ? updatedSelection(selection) : updatedSelection
-
-    if (!isEqual(appliedSelection, selection)) {
-      selection = appliedSelection
-
-      onSelect(appliedSelection)
+  function emitOnSelect(updatedSelection: JSONSelection | undefined) {
+    if (!isEqual(updatedSelection, externalSelection)) {
+      debug('onSelect', updatedSelection)
+      onSelect(updatedSelection)
     }
   }
+
+  $: emitOnSelect(selection)
 
   let normalization: ValueNormalization
   $: normalization = createNormalizationFunctions({
     escapeControlCharacters,
     escapeUnicodeCharacters
   })
-
-  $: debug('selection', selection)
 
   let pastedJson: PastedJson | undefined
 
@@ -310,7 +304,7 @@
   function handleSelectValidationError(error: ValidationError) {
     debug('select validation error', error)
 
-    updateSelection(createValueSelection(error.path, false))
+    selection = createValueSelection(error.path)
     scrollTo(error.path)
   }
 
@@ -334,7 +328,7 @@
       // check whether the selection is still visible and not collapsed
       if (isSelectionInsidePath(selection, path)) {
         // remove selection when not visible anymore
-        updateSelection(undefined)
+        selection = undefined
       }
     }
   }
@@ -508,10 +502,10 @@
       return
     }
 
-    debug('applyExternalSelection', externalSelection)
+    debug('applyExternalSelection', { selection, externalSelection })
 
-    if (isJSONSelection(externalSelection) || externalSelection === undefined) {
-      updateSelection(externalSelection)
+    if (isJSONSelection(externalSelection)) {
+      selection = externalSelection
     }
   }
 
@@ -532,7 +526,7 @@
     }
 
     debug('clearing selection: path does not exist anymore', selection)
-    updateSelection(getInitialSelection(json, documentState))
+    selection = getInitialSelection(json, documentState)
   }
 
   interface PreviousState {
@@ -576,7 +570,7 @@
   function createDefaultSelection() {
     debug('createDefaultSelection')
 
-    updateSelection(createValueSelection([], false))
+    selection = createValueSelection([])
   }
 
   export function patch(
@@ -616,7 +610,7 @@
 
     json = callback?.json !== undefined ? callback.json : patched.json
     documentState = callback?.state !== undefined ? callback.state : patched.documentState
-    updateSelection(callback?.selection !== undefined ? callback.selection : updatedSelection)
+    selection = callback?.selection !== undefined ? callback.selection : updatedSelection
     text = undefined
     textIsRepaired = false
     pastedJson = undefined
@@ -659,7 +653,7 @@
       return
     }
 
-    updateSelection(createKeySelection(getFocusPath(selection), true))
+    selection = createEditKeySelection(getFocusPath(selection))
   }
 
   function handleEditValue() {
@@ -672,7 +666,7 @@
     if (isObjectOrArray(value)) {
       openJSONEditorModal(path, value)
     } else {
-      updateSelection(createValueSelection(path, true))
+      selection = createEditValueSelection(path)
     }
   }
 
@@ -832,7 +826,7 @@
     onInsert({
       insertType,
       selectInside: true,
-      refJsonEditor,
+      initialValue: undefined,
       json,
       selection,
       readOnly,
@@ -845,11 +839,11 @@
   function handleInsertFromContextMenu(type: InsertType) {
     if (isKeySelection(selection)) {
       // in this case, we do not want to rename the key, but replace the property
-      updateSelection(createValueSelection(selection.path, false))
+      selection = createValueSelection(selection.path)
     }
 
     if (!selection) {
-      updateSelection(getInitialSelection(json, documentState))
+      selection = getInitialSelection(json, documentState)
     }
 
     handleInsert(type)
@@ -910,9 +904,9 @@
       !isEmpty(getFocusPath(selectionBefore)) &&
       isEqual(parentPath, initial(getFocusPath(selectionBefore)))
     ) {
-      updateSelection(createAfterSelection(getFocusPath(selectionBefore)))
+      selection = createAfterSelection(getFocusPath(selectionBefore))
     } else {
-      updateSelection(createInsideSelection(parentPath))
+      selection = createInsideSelection(parentPath)
     }
 
     debug('insert before', { selection, selectionBefore, parentPath })
@@ -929,7 +923,7 @@
 
     debug('insert after', path)
 
-    updateSelection(createAfterSelection(path))
+    selection = createAfterSelection(path)
 
     tick().then(() => handleContextMenu())
   }
@@ -938,14 +932,13 @@
     await onInsertCharacter({
       char,
       selectInside: true,
-      refJsonEditor,
       json,
       selection,
       readOnly,
       parser,
       onPatch: handlePatch,
       onReplaceJson: handleReplaceJson,
-      onSelect: updateSelection
+      onSelect: handleSelect
     })
   }
 
@@ -967,7 +960,7 @@
 
     json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
     documentState = item.undo.documentState
-    updateSelection(item.undo.selection)
+    selection = item.undo.selection
     text = item.undo.text
     textIsRepaired = item.undo.textIsRepaired
     parseError = undefined
@@ -1010,7 +1003,7 @@
 
     json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
     documentState = item.redo.documentState
-    updateSelection(item.redo.selection)
+    selection = item.redo.selection
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired
     parseError = undefined
@@ -1052,7 +1045,7 @@
         handlePatch(operations, (patchedJson, patchedState) => ({
           // expand the newly replaced array and select it
           state: expandSmart(patchedJson, patchedState, rootPath),
-          selection: createValueSelection(rootPath, false)
+          selection: createValueSelection(rootPath)
         }))
       },
       onClose: () => {
@@ -1106,7 +1099,7 @@
           handlePatch(operations, (patchedJson, patchedState) => ({
             // expand the newly replaced array and select it
             state: expandSmart(patchedJson, patchedState, rootPath),
-            selection: createValueSelection(rootPath, false)
+            selection: createValueSelection(rootPath)
           }))
         }
       },
@@ -1293,7 +1286,7 @@
 
     json = callback?.json !== undefined ? callback.json : updatedJson
     documentState = callback?.state !== undefined ? callback.state : updatedState
-    updateSelection(callback?.selection !== undefined ? callback.selection : selection)
+    selection = callback?.selection !== undefined ? callback.selection : selection
     text = undefined
     textIsRepaired = false
     parseError = undefined
@@ -1348,7 +1341,7 @@
 
       json = callback?.json !== undefined ? callback.json : json
       documentState = callback?.state !== undefined ? callback.state : documentState
-      updateSelection(callback?.selection !== undefined ? callback.selection : selection)
+      selection = callback?.selection !== undefined ? callback.selection : selection
     }
 
     // ensure the selection is valid
@@ -1455,7 +1448,7 @@
     }
     if (combo === 'Ctrl+A') {
       event.preventDefault()
-      updateSelection(selectAll())
+      selection = selectAll()
     }
 
     if (combo === 'Ctrl+Q') {
@@ -1469,7 +1462,7 @@
         ? getSelectionUp(json, documentState, selection, keepAnchorPath) || selection
         : getInitialSelection(json, documentState)
 
-      updateSelection(newSelection)
+      selection = newSelection
       scrollIntoView(getFocusPath(newSelection))
     }
     if (combo === 'ArrowDown' || combo === 'Shift+ArrowDown') {
@@ -1479,7 +1472,7 @@
         ? getSelectionDown(json, documentState, selection, keepAnchorPath) || selection
         : getInitialSelection(json, documentState)
 
-      updateSelection(newSelection)
+      selection = newSelection
       scrollIntoView(getFocusPath(newSelection))
     }
     if (combo === 'ArrowLeft' || combo === 'Shift+ArrowLeft') {
@@ -1489,7 +1482,7 @@
         ? getSelectionLeft(json, documentState, selection, keepAnchorPath, !readOnly) || selection
         : getInitialSelection(json, documentState)
 
-      updateSelection(newSelection)
+      selection = newSelection
       scrollIntoView(getFocusPath(newSelection))
     }
     if (combo === 'ArrowRight' || combo === 'Shift+ArrowRight') {
@@ -1501,7 +1494,7 @@
             selection
           : getInitialSelection(json, documentState)
 
-      updateSelection(newSelection)
+      selection = newSelection
       scrollIntoView(getFocusPath(newSelection))
     }
 
@@ -1512,14 +1505,14 @@
         const parent = getIn(json, initial(path))
         if (Array.isArray(parent)) {
           // change into selection of the value
-          updateSelection(createValueSelection(path, false))
+          selection = createValueSelection(path)
         }
       }
 
       if (isKeySelection(selection)) {
         // go to key edit mode
         event.preventDefault()
-        updateSelection({ ...selection, edit: true })
+        selection = { ...selection, edit: true }
       }
 
       if (isValueSelection(selection)) {
@@ -1531,7 +1524,7 @@
           handleExpand(selection.path, true)
         } else {
           // go to value edit mode
-          updateSelection({ ...selection, edit: true })
+          selection = { ...selection, edit: true }
         }
       }
     }
@@ -1563,7 +1556,7 @@
 
     if (combo === 'Escape' && selection) {
       event.preventDefault()
-      updateSelection(undefined)
+      selection = undefined
     }
 
     if (combo === 'Ctrl+F') {
@@ -1757,7 +1750,7 @@
   }
 
   function handleNavigationBarSelect(newSelection: JSONSelection) {
-    updateSelection(newSelection)
+    selection = newSelection
 
     focus()
     scrollTo(getFocusPath(newSelection))
@@ -1781,14 +1774,8 @@
     )
     if (outsideEditor) {
       if (isEditingSelection(selection)) {
-        debug('click outside the editor, stop edit mode')
-        updateSelection((selection) => {
-          if (isKeySelection(selection) || isValueSelection(selection)) {
-            return { ...selection, edit: false }
-          } else {
-            return selection
-          }
-        })
+        debug('click outside the editor, exit edit mode')
+        selection = removeEditModeFromSelection(selection)
 
         if (hasFocus && refHiddenInput) {
           refHiddenInput.focus()
@@ -1837,7 +1824,7 @@
     onPatch: handlePatch,
     onInsert: handleInsert,
     onExpand: handleExpand,
-    onSelect: updateSelection,
+    onSelect: handleSelect,
     onFind: openFind,
     onExpandSection: handleExpandSection,
     onPasteJson: handlePasteJson,

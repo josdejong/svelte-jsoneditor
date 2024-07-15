@@ -678,7 +678,7 @@ export function createRemoveOperations(
       // there is no parent, this is the root document
       const operations: JSONPatchDocument = [{ op: 'replace', path: '', value: '' }]
 
-      const newSelection = createValueSelection([], false)
+      const newSelection = createValueSelection([])
 
       return { operations, newSelection }
     }

@@ -2,12 +2,13 @@
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils.js'
-  import { createValueSelection, getFocusPath } from '$lib/logic/selection.js'
+  import { createValueSelection, getFocusPath, isEditingSelection } from '$lib/logic/selection.js'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass.js'
   import EditableDiv from '../../../components/controls/EditableDiv.svelte'
   import type {
     FindNextInside,
     JSONParser,
+    JSONSelection,
     OnFind,
     OnJSONSelect,
     OnPasteJson,
@@ -20,6 +21,7 @@
 
   export let path: JSONPath
   export let value: unknown
+  export let selection: JSONSelection | undefined
   export let parser: JSONParser
   export let normalization: ValueNormalization
   export let enforceString: boolean
@@ -54,7 +56,7 @@
         const selection =
           updateSelection === UpdateSelectionAfterChange.nextInside
             ? findNextInside(path)
-            : createValueSelection(path, false)
+            : createValueSelection(path)
 
         return {
           state: patchedState,
@@ -67,7 +69,7 @@
   }
 
   function handleCancelChange() {
-    onSelect(createValueSelection(path, false))
+    onSelect(createValueSelection(path))
     focus()
   }
 
@@ -110,6 +112,7 @@
 
 <EditableDiv
   value={normalization.escapeValue(value)}
+  initialValue={isEditingSelection(selection) ? selection.initialValue : undefined}
   label="Edit value"
   onChange={handleChangeValue}
   onCancel={handleCancelChange}

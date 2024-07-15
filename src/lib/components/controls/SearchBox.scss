@@ -107,14 +107,13 @@ $input-min-width: 50px;
       }
 
       .jse-replace-section {
+        flex: 1;
+        display: flex;
         padding-left: $padding-section-left;
 
         button {
           width: auto;
         }
-
-        flex: 1;
-        display: flex;
       }
     }
   }

@@ -11,6 +11,7 @@
   const debug = createDebug('jsoneditor:EditableDiv')
 
   export let value: string
+  export let initialValue: string | undefined
   export let shortText = false
   export let label: string
   export let onChange: (newValue: string, updateSelection: UpdateSelectionAfterChange) => void
@@ -25,17 +26,12 @@
   let closed = false
 
   onMount(() => {
-    debug('onMount', { value })
-    setDomValue(value)
+    debug('onMount', { value, initialValue })
+    setDomValue(initialValue !== undefined ? initialValue : value)
 
     // focus
     if (domValue) {
       setCursorToEnd(domValue)
-
-      // The refresh method can be used to update the classnames for example
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      domValue.refresh = handleValueInput
     }
   })
 
