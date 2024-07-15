@@ -23,6 +23,7 @@
   bind:this={dialog}
   on:close={close}
   on:click|self={close}
+  on:cancel|preventDefault
   use:onEscape={close}
   class={classnames('jse-modal', className)}
   class:jse-fullscreen={fullscreen}
