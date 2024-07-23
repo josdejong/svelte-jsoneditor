@@ -9,15 +9,10 @@
   outline: none;
   border-radius: 1px;
   vertical-align: top;
-  cursor: $contents-cursor;
 
   word-break: normal;
   overflow-wrap: anywhere;
   white-space: pre-wrap; // important for rendering multiple consecutive spaces
-
-  &:hover {
-    background: $hover-background-color;
-  }
 
   &.jse-empty {
     min-width: 4em;

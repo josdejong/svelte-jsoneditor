@@ -16,7 +16,6 @@
   import { UpdateSelectionAfterChange } from '$lib/types.js'
   import { type JSONPath, type JSONPointer, parseJSONPointer } from 'immutable-json-patch'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
-  import { classnames } from '$lib/utils/cssUtils.js'
 
   export let pointer: JSONPointer
   export let key: string
@@ -39,12 +38,6 @@
       event.preventDefault()
       context.onSelect(createEditKeySelection(path))
     }
-  }
-
-  function getKeyClass(key: string) {
-    return classnames('jse-key', {
-      'jse-empty': key === ''
-    })
   }
 
   function handleChangeValue(newKey: string, updateSelection: UpdateSelectionAfterChange) {
@@ -82,7 +75,8 @@
   <div
     role="none"
     data-type="selectable-key"
-    class={getKeyClass(key)}
+    class="jse-key"
+    class:jse-empty={key === ''}
     on:dblclick={handleKeyDoubleClick}
   >
     {#if searchResultItems}
