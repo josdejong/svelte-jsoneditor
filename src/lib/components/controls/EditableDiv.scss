@@ -21,7 +21,7 @@ div.jse-editable-div {
 
   &[contenteditable='true'] {
     outline: $edit-outline;
-    background: inherit !important;
+    background: $background-color;
     position: relative;
     border-radius: 0;
     z-index: 3; // must be on top of hovering the entry below it
