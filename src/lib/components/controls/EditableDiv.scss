@@ -19,6 +19,11 @@ div.jse-editable-div {
     overflow-wrap: normal;
   }
 
+  &.jse-table-cell {
+    overflow-wrap: normal;
+    white-space: nowrap;
+  }
+
   &[contenteditable='true'] {
     outline: $edit-outline;
     background: $background-color;

@@ -369,6 +369,7 @@
 
   let context: JSONEditorContext
   $: context = {
+    mode: Mode.table,
     readOnly,
     parser,
     normalization,

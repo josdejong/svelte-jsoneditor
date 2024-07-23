@@ -9,6 +9,7 @@ import TimestampTag from './components/TimestampTag.svelte'
 export function renderValue({
   path,
   value,
+  mode,
   readOnly,
   selection,
   enforceString,
@@ -46,6 +47,7 @@ export function renderValue({
         path,
         value,
         selection,
+        mode,
         enforceString,
         parser,
         normalization,
@@ -62,7 +64,7 @@ export function renderValue({
   if (!isEditing) {
     renderers.push({
       component: ReadonlyValue,
-      props: { path, value, readOnly, parser, normalization, searchResultItems, onSelect }
+      props: { path, value, mode, readOnly, parser, normalization, searchResultItems, onSelect }
     })
   }
 

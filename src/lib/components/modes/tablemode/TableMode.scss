@@ -127,14 +127,6 @@
             }
           }
 
-          // FIXME: this is ugly. give JSONValue an extra class instead?
-          :global(div.jse-value) {
-            overflow-wrap: normal;
-            white-space: nowrap;
-            vertical-align: top;
-            display: inline-block;
-          }
-
           .jse-context-menu-anchor {
             display: inline-flex;
             position: relative;

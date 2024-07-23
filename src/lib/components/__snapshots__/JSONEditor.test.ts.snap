@@ -7,7 +7,7 @@ exports[`JSONEditor > render table mode 1`] = `
     class="jse-main svelte-57bmz4"
   >
     <div
-      class="jse-table-mode svelte-18w0uuc"
+      class="jse-table-mode svelte-gl60hz"
       role="table"
     >
       <div
@@ -209,10 +209,10 @@ exports[`JSONEditor > render table mode 1`] = `
       </div>
        
       <label
-        class="jse-hidden-input-label svelte-18w0uuc"
+        class="jse-hidden-input-label svelte-gl60hz"
       >
         <input
-          class="jse-hidden-input svelte-18w0uuc"
+          class="jse-hidden-input svelte-gl60hz"
           readonly=""
           tabindex="-1"
           type="text"
@@ -220,27 +220,27 @@ exports[`JSONEditor > render table mode 1`] = `
       </label>
        
       <div
-        class="jse-search-box-container svelte-18w0uuc"
+        class="jse-search-box-container svelte-gl60hz"
       >
         
       </div>
        
       <div
-        class="jse-contents svelte-18w0uuc"
+        class="jse-contents svelte-gl60hz"
       >
         <table
-          class="jse-table-main svelte-18w0uuc"
+          class="jse-table-main svelte-gl60hz"
         >
           <tbody>
             <tr
-              class="jse-table-row jse-table-row-header svelte-18w0uuc"
+              class="jse-table-row jse-table-row-header svelte-gl60hz"
             >
               <th
-                class="jse-table-cell jse-table-cell-header svelte-18w0uuc"
+                class="jse-table-cell jse-table-cell-header svelte-gl60hz"
               />
                
               <th
-                class="jse-table-cell jse-table-cell-header svelte-18w0uuc"
+                class="jse-table-cell jse-table-cell-header svelte-gl60hz"
               >
                 <button
                   class="jse-column-header svelte-2i3vdx"
@@ -256,7 +256,7 @@ exports[`JSONEditor > render table mode 1`] = `
                 </button>
               </th>
               <th
-                class="jse-table-cell jse-table-cell-header svelte-18w0uuc"
+                class="jse-table-cell jse-table-cell-header svelte-gl60hz"
               >
                 <button
                   class="jse-column-header svelte-2i3vdx"
@@ -278,31 +278,31 @@ exports[`JSONEditor > render table mode 1`] = `
               class="jse-table-invisible-start-section"
             >
               <td
-                class="svelte-18w0uuc"
+                class="svelte-gl60hz"
                 colspan="2"
                 style="height: 0px;"
               />
             </tr>
              
             <tr
-              class="jse-table-row svelte-18w0uuc"
+              class="jse-table-row svelte-gl60hz"
             >
               <th
-                class="jse-table-cell jse-table-cell-gutter svelte-18w0uuc"
+                class="jse-table-cell jse-table-cell-gutter svelte-gl60hz"
               >
                 0
                  
               </th>
                
               <td
-                class="jse-table-cell svelte-18w0uuc"
+                class="jse-table-cell svelte-gl60hz"
                 data-path="%2F0%2Fid"
               >
                 <div
-                  class="jse-value-outer svelte-18w0uuc"
+                  class="jse-value-outer svelte-gl60hz"
                 >
                   <div
-                    class="jse-value jse-number svelte-uybyhn"
+                    class="jse-value jse-number jse-table-cell svelte-9ohlz8"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -318,14 +318,14 @@ exports[`JSONEditor > render table mode 1`] = `
                 </div>
               </td>
               <td
-                class="jse-table-cell svelte-18w0uuc"
+                class="jse-table-cell svelte-gl60hz"
                 data-path="%2F0%2Fname"
               >
                 <div
-                  class="jse-value-outer svelte-18w0uuc"
+                  class="jse-value-outer svelte-gl60hz"
                 >
                   <div
-                    class="jse-value jse-string jse-empty svelte-uybyhn"
+                    class="jse-value jse-string jse-empty jse-table-cell svelte-9ohlz8"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -343,24 +343,24 @@ exports[`JSONEditor > render table mode 1`] = `
                
             </tr>
             <tr
-              class="jse-table-row svelte-18w0uuc"
+              class="jse-table-row svelte-gl60hz"
             >
               <th
-                class="jse-table-cell jse-table-cell-gutter svelte-18w0uuc"
+                class="jse-table-cell jse-table-cell-gutter svelte-gl60hz"
               >
                 1
                  
               </th>
                
               <td
-                class="jse-table-cell svelte-18w0uuc"
+                class="jse-table-cell svelte-gl60hz"
                 data-path="%2F1%2Fid"
               >
                 <div
-                  class="jse-value-outer svelte-18w0uuc"
+                  class="jse-value-outer svelte-gl60hz"
                 >
                   <div
-                    class="jse-value jse-number svelte-uybyhn"
+                    class="jse-value jse-number jse-table-cell svelte-9ohlz8"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -376,14 +376,14 @@ exports[`JSONEditor > render table mode 1`] = `
                 </div>
               </td>
               <td
-                class="jse-table-cell svelte-18w0uuc"
+                class="jse-table-cell svelte-gl60hz"
                 data-path="%2F1%2Fname"
               >
                 <div
-                  class="jse-value-outer svelte-18w0uuc"
+                  class="jse-value-outer svelte-gl60hz"
                 >
                   <div
-                    class="jse-value jse-string svelte-uybyhn"
+                    class="jse-value jse-string jse-table-cell svelte-9ohlz8"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -401,24 +401,24 @@ exports[`JSONEditor > render table mode 1`] = `
                
             </tr>
             <tr
-              class="jse-table-row svelte-18w0uuc"
+              class="jse-table-row svelte-gl60hz"
             >
               <th
-                class="jse-table-cell jse-table-cell-gutter svelte-18w0uuc"
+                class="jse-table-cell jse-table-cell-gutter svelte-gl60hz"
               >
                 2
                  
               </th>
                
               <td
-                class="jse-table-cell svelte-18w0uuc"
+                class="jse-table-cell svelte-gl60hz"
                 data-path="%2F2%2Fid"
               >
                 <div
-                  class="jse-value-outer svelte-18w0uuc"
+                  class="jse-value-outer svelte-gl60hz"
                 >
                   <div
-                    class="jse-value jse-number svelte-uybyhn"
+                    class="jse-value jse-number jse-table-cell svelte-9ohlz8"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -434,14 +434,14 @@ exports[`JSONEditor > render table mode 1`] = `
                 </div>
               </td>
               <td
-                class="jse-table-cell svelte-18w0uuc"
+                class="jse-table-cell svelte-gl60hz"
                 data-path="%2F2%2Fname"
               >
                 <div
-                  class="jse-value-outer svelte-18w0uuc"
+                  class="jse-value-outer svelte-gl60hz"
                 >
                   <div
-                    class="jse-value jse-string jse-empty svelte-uybyhn"
+                    class="jse-value jse-string jse-empty jse-table-cell svelte-9ohlz8"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -463,7 +463,7 @@ exports[`JSONEditor > render table mode 1`] = `
               class="jse-table-invisible-end-section"
             >
               <td
-                class="svelte-18w0uuc"
+                class="svelte-gl60hz"
                 colspan="2"
                 style="height: 0px;"
               />
@@ -1606,7 +1606,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                         class="jse-value-outer svelte-mu13qf"
                       >
                         <div
-                          class="jse-value jse-number svelte-uybyhn"
+                          class="jse-value jse-number svelte-9ohlz8"
                           data-type="selectable-value"
                           role="button"
                           tabindex="-1"
@@ -1780,7 +1780,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                         class="jse-value-outer svelte-mu13qf"
                       >
                         <div
-                          class="jse-value jse-number svelte-uybyhn"
+                          class="jse-value jse-number svelte-9ohlz8"
                           data-type="selectable-value"
                           role="button"
                           tabindex="-1"
@@ -1844,7 +1844,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                         class="jse-value-outer svelte-mu13qf"
                       >
                         <div
-                          class="jse-value jse-string svelte-uybyhn"
+                          class="jse-value jse-string svelte-9ohlz8"
                           data-type="selectable-value"
                           role="button"
                           tabindex="-1"
@@ -2018,7 +2018,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                         class="jse-value-outer svelte-mu13qf"
                       >
                         <div
-                          class="jse-value jse-number svelte-uybyhn"
+                          class="jse-value jse-number svelte-9ohlz8"
                           data-type="selectable-value"
                           role="button"
                           tabindex="-1"

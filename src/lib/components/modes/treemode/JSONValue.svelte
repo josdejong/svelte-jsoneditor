@@ -18,6 +18,7 @@
   $: renderers = context.onRenderValue({
     path,
     value,
+    mode: context.mode,
     readOnly: context.readOnly,
     enforceString,
     isEditing,
