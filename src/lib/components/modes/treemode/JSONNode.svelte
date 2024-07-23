@@ -573,7 +573,6 @@
   style:--level={path.length}
   class:jse-root={root}
   class:jse-selected={isNodeSelected && isMultiSelection(selection)}
-  class:jse-selected-key={isNodeSelected && isKeySelection(selection)}
   class:jse-selected-value={isNodeSelected && isValueSelection(selection)}
   class:jse-readonly={context.readOnly}
   class:jse-hovered={hover === HOVER_COLLECTION}
@@ -624,7 +623,7 @@
         </div>
         {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !isEditingSelection(selection) && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
-            <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
+            <ContextMenuPointer {root} selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
       </div>
@@ -659,6 +658,7 @@
             title={INSERT_EXPLANATION}
           >
             <ContextMenuPointer
+              insert={true}
               selected={isNodeSelected && isInsideSelection(selection)}
               onContextMenu={handleInsertInsideOpenContextMenu}
             />
@@ -755,7 +755,7 @@
         </div>
         {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !isEditingSelection(selection) && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
-            <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
+            <ContextMenuPointer {root} selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
       </div>
@@ -790,6 +790,7 @@
             title={INSERT_EXPLANATION}
           >
             <ContextMenuPointer
+              insert={true}
               selected={isNodeSelected && isInsideSelection(selection)}
               onContextMenu={handleInsertInsideOpenContextMenu}
             />
@@ -806,10 +807,12 @@
             ? validationErrors.properties[key]
             : undefined}
 
+          {@const nestedPath = path.concat(key)}
+
           {@const nestedSelection = selectionIfOverlapping(
             context.getJson(),
             selection,
-            path.concat(key)
+            nestedPath
           )}
 
           <svelte:self
@@ -822,7 +825,12 @@
             {context}
             onDragSelectionStart={handleDragSelectionStart}
           >
-            <div slot="identifier" class="jse-identifier">
+            <div
+              slot="identifier"
+              class="jse-key-outer"
+              class:jse-selected-key={isKeySelection(nestedSelection) &&
+                isEqual(nestedSelection.path, nestedPath)}
+            >
               <JSONKey
                 pointer={propPointer}
                 {key}
@@ -856,17 +864,19 @@
         {#if !root}
           <div class="jse-separator">:</div>
         {/if}
-        <JSONValue
-          {path}
-          {value}
-          {enforceString}
-          selection={isNodeSelected ? selection : undefined}
-          searchResultItems={filterValueSearchResults(searchResults)}
-          {context}
-        />
+        <div class="jse-value-outer">
+          <JSONValue
+            {path}
+            {value}
+            {enforceString}
+            selection={isNodeSelected ? selection : undefined}
+            searchResultItems={filterValueSearchResults(searchResults)}
+            {context}
+          />
+        </div>
         {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !isEditingSelection(selection) && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
-            <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
+            <ContextMenuPointer {root} selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
       </div>
@@ -892,6 +902,7 @@
       title={INSERT_EXPLANATION}
     >
       <ContextMenuPointer
+        insert={true}
         selected={isNodeSelected && isAfterSelection(selection)}
         onContextMenu={handleInsertAfterOpenContextMenu}
       />

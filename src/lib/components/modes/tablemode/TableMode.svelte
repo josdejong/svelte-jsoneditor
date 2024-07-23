@@ -70,7 +70,6 @@
     toTableCellPosition
   } from '$lib/logic/table.js'
   import { isEmpty, isEqual, uniqueId } from 'lodash-es'
-  import JSONValueComponent from './JSONValue.svelte'
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
@@ -91,7 +90,10 @@
   } from '$lib/logic/documentState.js'
   import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils.js'
   import InlineValue from './tag/InlineValue.svelte'
-  import { revertJSONPatchWithMoveOperations } from '$lib/logic/operations.js'
+  import {
+    createNestedValueOperations,
+    revertJSONPatchWithMoveOperations
+  } from '$lib/logic/operations.js'
   import {
     createValueSelection,
     getAnchorPath,
@@ -147,6 +149,7 @@
   import createTableContextMenuItems from './contextmenu/createTableContextMenuItems'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
   import { flattenSearchResults, toRecursiveSearchResults } from '$lib/logic/search.js'
+  import JSONValue from '$lib/components/modes/treemode/JSONValue.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { openAbsolutePopup, closeAbsolutePopup } =
@@ -366,6 +369,7 @@
 
   let context: JSONEditorContext
   $: context = {
+    mode: Mode.table,
     readOnly,
     parser,
     normalization,
@@ -374,7 +378,12 @@
     findElement,
     findNextInside,
     focus,
-    onPatch: handlePatch,
+    onPatch: (operations, afterPatch) => {
+      // When having flattened table columns and having inserted a new row, it is possible that
+      // we edit a nested value of which the parent object is not existing. Therefore, we call
+      // replaceNestedValue to create the parent object(s) first.
+      return handlePatch(createNestedValueOperations(operations, json), afterPatch)
+    },
     onSelect: handleSelect,
     onFind: openFind,
     onPasteJson: handlePasteJson,
@@ -1528,7 +1537,7 @@
         json: getIn(json, path)
       },
       path,
-      onPatch: context.onPatch,
+      onPatch: handlePatch,
       onClose: () => {
         modalOpen = false
         setTimeout(focus)
@@ -1790,49 +1799,47 @@
                     isValueSelection(selection) && pathStartsWith(selection.path, path)}
                   {@const validationErrorsByColumn = validationErrorsByRow?.columns[columnIndex]}
                   {@const validationError = mergeValidationErrors(path, validationErrorsByColumn)}
-                  <td
-                    class="jse-table-cell"
-                    data-path={encodeDataPath(path)}
-                    class:jse-selected-value={isSelected}
-                  >
-                    {#if isObjectOrArray(value)}
-                      {@const searchResultsByCell = flattenSearchResults(
-                        getInRecursiveState(item, searchResultByRow, column)
-                      )}
+                  <td class="jse-table-cell" data-path={encodeDataPath(path)}>
+                    <div class="jse-value-outer" class:jse-selected-value={isSelected}>
+                      {#if isObjectOrArray(value)}
+                        {@const searchResultsByCell = flattenSearchResults(
+                          getInRecursiveState(item, searchResultByRow, column)
+                        )}
 
-                      {@const containsActiveSearchResult = searchResultsByCell
-                        ? searchResultsByCell.some((item) => item.active)
-                        : false}
+                        {@const containsActiveSearchResult = searchResultsByCell
+                          ? searchResultsByCell.some((item) => item.active)
+                          : false}
 
-                      <InlineValue
-                        {path}
-                        {value}
-                        {parser}
-                        {isSelected}
-                        containsSearchResult={!isEmpty(searchResultsByCell)}
-                        {containsActiveSearchResult}
-                        onEdit={openJSONEditorModal}
-                      />{:else}
-                      {@const searchResultItemsByCell = getInRecursiveState(
-                        json,
-                        searchResults,
-                        path
-                      )?.searchResults}
+                        <InlineValue
+                          {path}
+                          {value}
+                          {parser}
+                          {isSelected}
+                          containsSearchResult={!isEmpty(searchResultsByCell)}
+                          {containsActiveSearchResult}
+                          onEdit={openJSONEditorModal}
+                        />{:else}
+                        {@const searchResultItemsByCell = getInRecursiveState(
+                          json,
+                          searchResults,
+                          path
+                        )?.searchResults}
 
-                      <JSONValueComponent
-                        {path}
-                        value={value !== undefined ? value : ''}
-                        enforceString={getEnforceString(json, documentState, path, context.parser)}
-                        selection={isSelected ? selection : undefined}
-                        searchResultItems={searchResultItemsByCell}
-                        {context}
-                      />{/if}{#if !readOnly && isSelected && !isEditingSelection(selection)}
-                      <div class="jse-context-menu-anchor">
-                        <ContextMenuPointer selected={true} onContextMenu={openContextMenu} />
-                      </div>
-                    {/if}{#if validationError}
-                      <ValidationErrorIcon {validationError} onExpand={noop} />
-                    {/if}
+                        <JSONValue
+                          {path}
+                          value={value !== undefined ? value : ''}
+                          enforceString={getEnforceString(json, documentState, path, parser)}
+                          selection={isSelected ? selection : undefined}
+                          searchResultItems={searchResultItemsByCell}
+                          {context}
+                        />{/if}{#if !readOnly && isSelected && !isEditingSelection(selection)}
+                        <div class="jse-context-menu-anchor">
+                          <ContextMenuPointer selected={true} onContextMenu={openContextMenu} />
+                        </div>
+                      {/if}{#if validationError}
+                        <ValidationErrorIcon {validationError} onExpand={noop} />
+                      {/if}
+                    </div>
                   </td>
                 {/each}
                 {#if showRefreshButton}

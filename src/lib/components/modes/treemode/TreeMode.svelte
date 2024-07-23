@@ -1814,6 +1814,7 @@
   // it should only change when a config option like readOnly or onClassName is changed
   let context: TreeModeContext
   $: context = {
+    mode: Mode.tree,
     readOnly,
     parser,
     normalization,

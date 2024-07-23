@@ -13,12 +13,29 @@
   background: transparent;
 
   border-radius: 2px;
-  background: $context-menu-pointer-background;
+  background: $context-menu-pointer-hover-background;
   color: $context-menu-pointer-color;
   border: none;
   box-shadow: $controls-box-shadow;
 
+  &.jse-root {
+    top: 0;
+    right: calc(-2px - $context-menu-pointer-size);
+  }
+
+  &.jse-insert {
+    right: -1px;
+  }
+
   &:hover {
     background: $context-menu-pointer-background-highlight;
+  }
+
+  &.jse-selected {
+    background: $context-menu-pointer-background;
+
+    &:hover {
+      background: $context-menu-pointer-background-highlight;
+    }
   }
 }
