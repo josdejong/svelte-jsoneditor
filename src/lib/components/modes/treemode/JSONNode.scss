@@ -209,24 +209,19 @@
       cursor: $contents-selected-cursor;
     }
 
-    // make the hovering background invisible when hovering over selected keys/values
-    //--jse-hover-background-color: #{$selection-background-color};
-    //--jse-contents-cursor: #{$contents-selected-cursor};
-
-    //.jse-key-outer,
-    //.jse-value-outer,
-    //.jse-meta,
-    //.jse-footer {
-    //  &:hover {
-    //    background: inherit;
-    //    cursor: inherit;
-    //  }
-    //}
+    .jse-key-outer,
+    .jse-value-outer,
+    .jse-meta,
+    .jse-footer {
+      &:hover {
+        background: inherit;
+        cursor: inherit;
+      }
+    }
   }
 
   // key selected
   .jse-key-outer.jse-selected-key {
-    //.jse-key-outer.jse-selected-key:hover {
     background: $selection-background-color;
     cursor: $contents-selected-cursor;
   }
@@ -242,6 +237,13 @@
     .jse-footer {
       background: $selection-background-color;
       cursor: $contents-selected-cursor;
+    }
+
+    .jse-key-outer {
+      &:hover {
+        background: inherit;
+        cursor: inherit;
+      }
     }
   }
 
