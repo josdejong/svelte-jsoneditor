@@ -8,6 +8,7 @@ import {
   createDocumentState,
   createObjectDocumentState,
   createValueDocumentState,
+  deleteInDocumentState,
   documentStateFactory,
   documentStatePatch,
   ensureRecursiveState,
@@ -1890,6 +1891,29 @@ describe('documentState', () => {
           }
         }
       })
+    })
+  })
+
+  describe('deleteInDocumentState', () => {
+    const json = { value: '42' }
+    const documentState: DocumentState = {
+      type: 'object',
+      expanded: true,
+      properties: {
+        value: { type: 'value', enforceString: true }
+      }
+    }
+
+    test('delete existing state', () => {
+      expect(deleteInDocumentState(json, documentState, ['value'])).toEqual({
+        type: 'object',
+        expanded: true,
+        properties: {}
+      })
+    })
+
+    test('delete non-existing state', () => {
+      expect(deleteInDocumentState(json, documentState, ['foo'])).toEqual(documentState)
     })
   })
 })
