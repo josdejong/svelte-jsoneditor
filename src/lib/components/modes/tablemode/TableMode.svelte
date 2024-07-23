@@ -70,7 +70,6 @@
     toTableCellPosition
   } from '$lib/logic/table.js'
   import { isEmpty, isEqual, uniqueId } from 'lodash-es'
-  import JSONValueCell from './JSONValueCell.svelte'
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
@@ -91,7 +90,10 @@
   } from '$lib/logic/documentState.js'
   import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils.js'
   import InlineValue from './tag/InlineValue.svelte'
-  import { revertJSONPatchWithMoveOperations } from '$lib/logic/operations.js'
+  import {
+    createNestedValueOperations,
+    revertJSONPatchWithMoveOperations
+  } from '$lib/logic/operations.js'
   import {
     createValueSelection,
     getAnchorPath,
@@ -147,6 +149,7 @@
   import createTableContextMenuItems from './contextmenu/createTableContextMenuItems'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
   import { flattenSearchResults, toRecursiveSearchResults } from '$lib/logic/search.js'
+  import JSONValue from '$lib/components/modes/treemode/JSONValue.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { openAbsolutePopup, closeAbsolutePopup } =
@@ -374,7 +377,12 @@
     findElement,
     findNextInside,
     focus,
-    onPatch: handlePatch,
+    onPatch: (operations, afterPatch) => {
+      // When having flattened table columns and having inserted a new row, it is possible that
+      // we edit a nested value of which the parent object is not existing. Therefore, we call
+      // replaceNestedValue to create the parent object(s) first.
+      return handlePatch(createNestedValueOperations(operations, json), afterPatch)
+    },
     onSelect: handleSelect,
     onFind: openFind,
     onPasteJson: handlePasteJson,
@@ -1528,7 +1536,7 @@
         json: getIn(json, path)
       },
       path,
-      onPatch: context.onPatch,
+      onPatch: handlePatch,
       onClose: () => {
         modalOpen = false
         setTimeout(focus)
@@ -1816,15 +1824,10 @@
                           path
                         )?.searchResults}
 
-                        <JSONValueCell
+                        <JSONValue
                           {path}
                           value={value !== undefined ? value : ''}
-                          enforceString={getEnforceString(
-                            json,
-                            documentState,
-                            path,
-                            context.parser
-                          )}
+                          enforceString={getEnforceString(json, documentState, path, parser)}
                           selection={isSelected ? selection : undefined}
                           searchResultItems={searchResultItemsByCell}
                           {context}
