@@ -314,8 +314,8 @@ exports[`JSONEditor > render table mode 1`] = `
                   
                   
                   
-                  
                 </div>
+                 
               </td>
               <td
                 class="jse-table-cell svelte-gl60hz"
@@ -337,8 +337,8 @@ exports[`JSONEditor > render table mode 1`] = `
                   
                   
                   
-                  
                 </div>
+                 
               </td>
                
             </tr>
@@ -372,8 +372,8 @@ exports[`JSONEditor > render table mode 1`] = `
                   
                   
                   
-                  
                 </div>
+                 
               </td>
               <td
                 class="jse-table-cell svelte-gl60hz"
@@ -395,8 +395,8 @@ exports[`JSONEditor > render table mode 1`] = `
                   
                   
                   
-                  
                 </div>
+                 
               </td>
                
             </tr>
@@ -430,8 +430,8 @@ exports[`JSONEditor > render table mode 1`] = `
                   
                   
                   
-                  
                 </div>
+                 
               </td>
               <td
                 class="jse-table-cell svelte-gl60hz"
@@ -453,8 +453,8 @@ exports[`JSONEditor > render table mode 1`] = `
                   
                   
                   
-                  
                 </div>
+                 
               </td>
                
             </tr>

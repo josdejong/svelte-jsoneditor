@@ -149,7 +149,7 @@
   import createTableContextMenuItems from './contextmenu/createTableContextMenuItems'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
   import { flattenSearchResults, toRecursiveSearchResults } from '$lib/logic/search.js'
-  import JSONValue from '$lib/components/modes/treemode/JSONValue.svelte'
+  import JSONValue from '../treemode/JSONValue.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { openAbsolutePopup, closeAbsolutePopup } =
