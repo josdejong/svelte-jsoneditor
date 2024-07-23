@@ -1836,10 +1836,11 @@
                         <div class="jse-context-menu-anchor">
                           <ContextMenuPointer selected={true} onContextMenu={openContextMenu} />
                         </div>
-                      {/if}{#if validationError}
-                        <ValidationErrorIcon {validationError} onExpand={noop} />
                       {/if}
                     </div>
+                    {#if validationError}
+                      <ValidationErrorIcon {validationError} onExpand={noop} />
+                    {/if}
                   </td>
                 {/each}
                 {#if showRefreshButton}
