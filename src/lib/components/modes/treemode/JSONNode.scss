@@ -74,13 +74,6 @@
     padding-bottom: $contents-padding;
     box-sizing: border-box;
 
-    // FIXME: move this styling inside .jse-context-menu-pointer
-    > .jse-header-outer :global(.jse-context-menu-pointer),
-    > .jse-contents-outer > .jse-contents :global(.jse-context-menu-pointer) {
-      top: 0;
-      right: calc(-2px - $context-menu-pointer-size);
-    }
-
     > .jse-contents-outer > .jse-contents {
       padding-left: 0;
     }
@@ -175,11 +168,6 @@
     height: 0;
     margin-right: $padding-half;
     outline: $height-half solid; // color depends on hovered/selected/inactive+selected
-
-    // FIXME: pass an extra class or property to the ContextMenuPointer in case of the insert after area
-    :global(.jse-context-menu-pointer) {
-      right: -$height-half;
-    }
 
     &.jse-hovered {
       outline-color: $context-menu-pointer-hover-background;

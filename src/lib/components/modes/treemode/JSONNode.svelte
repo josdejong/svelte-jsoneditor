@@ -623,7 +623,7 @@
         </div>
         {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !isEditingSelection(selection) && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
-            <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
+            <ContextMenuPointer {root} selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
       </div>
@@ -658,6 +658,7 @@
             title={INSERT_EXPLANATION}
           >
             <ContextMenuPointer
+              insert={true}
               selected={isNodeSelected && isInsideSelection(selection)}
               onContextMenu={handleInsertInsideOpenContextMenu}
             />
@@ -754,7 +755,7 @@
         </div>
         {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !isEditingSelection(selection) && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
-            <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
+            <ContextMenuPointer {root} selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
       </div>
@@ -789,6 +790,7 @@
             title={INSERT_EXPLANATION}
           >
             <ContextMenuPointer
+              insert={true}
               selected={isNodeSelected && isInsideSelection(selection)}
               onContextMenu={handleInsertInsideOpenContextMenu}
             />
@@ -874,7 +876,7 @@
         </div>
         {#if !context.readOnly && isNodeSelected && selection && (isValueSelection(selection) || isMultiSelection(selection)) && !isEditingSelection(selection) && isEqual(getFocusPath(selection), path)}
           <div class="jse-context-menu-pointer-anchor">
-            <ContextMenuPointer selected={true} onContextMenu={context.onContextMenu} />
+            <ContextMenuPointer {root} selected={true} onContextMenu={context.onContextMenu} />
           </div>
         {/if}
       </div>
@@ -900,6 +902,7 @@
       title={INSERT_EXPLANATION}
     >
       <ContextMenuPointer
+        insert={true}
         selected={isNodeSelected && isAfterSelection(selection)}
         onContextMenu={handleInsertAfterOpenContextMenu}
       />
