@@ -605,6 +605,7 @@ export interface JSONEditorModalProps {
 }
 
 export interface JSONEditorContext {
+  mode: Mode
   readOnly: boolean
   parser: JSONParser
   normalization: ValueNormalization
@@ -637,6 +638,7 @@ export interface TreeModeContext extends JSONEditorContext {
 export interface RenderValueProps {
   path: JSONPath
   value: unknown
+  mode: Mode
   readOnly: boolean
   enforceString: boolean
   selection: JSONSelection | undefined

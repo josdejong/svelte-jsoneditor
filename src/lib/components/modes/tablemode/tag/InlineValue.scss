@@ -8,15 +8,7 @@
   padding: 0 $padding-half;
   background: transparent;
   color: inherit;
-  cursor: pointer;
-
-  &:hover {
-    background: $hover-background-color;
-  }
-
-  &.jse-selected {
-    background: $selection-background-color;
-  }
+  cursor: inherit;
 
   &.jse-highlight {
     background-color: $search-match-color;

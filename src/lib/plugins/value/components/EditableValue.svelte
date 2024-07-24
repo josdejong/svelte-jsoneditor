@@ -5,23 +5,25 @@
   import { createValueSelection, getFocusPath, isEditingSelection } from '$lib/logic/selection.js'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass.js'
   import EditableDiv from '../../../components/controls/EditableDiv.svelte'
-  import type {
-    FindNextInside,
-    JSONParser,
-    JSONSelection,
-    OnFind,
-    OnJSONSelect,
-    OnPasteJson,
-    OnPatch,
-    ValueNormalization
+  import {
+    type FindNextInside,
+    type JSONParser,
+    type JSONSelection,
+    Mode,
+    type OnFind,
+    type OnJSONSelect,
+    type OnPasteJson,
+    type OnPatch,
+    UpdateSelectionAfterChange,
+    type ValueNormalization
   } from '$lib/types.js'
-  import { UpdateSelectionAfterChange } from '$lib/types.js'
   import { isEqual } from 'lodash-es'
   import { expandSmart } from '$lib/logic/documentState'
 
   export let path: JSONPath
   export let value: unknown
   export let selection: JSONSelection | undefined
+  export let mode: Mode
   export let parser: JSONParser
   export let normalization: ValueNormalization
   export let enforceString: boolean
@@ -106,7 +108,7 @@
   }
 
   function handleOnValueClass(value: string): string {
-    return getValueClass(convert(normalization.unescapeValue(value)), parser)
+    return getValueClass(convert(normalization.unescapeValue(value)), mode, parser)
   }
 </script>
 

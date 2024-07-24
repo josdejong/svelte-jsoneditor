@@ -114,16 +114,17 @@
             // FIXME: border and/or border shadow?
           }
 
-          &.jse-selected-value > :global(.jse-value) {
-            background: $selection-background-color;
-          }
-
-          // FIXME: this is ugly. give JSONValue an extra class instead?
-          :global(div.jse-value) {
-            overflow-wrap: normal;
-            white-space: nowrap;
-            vertical-align: top;
+          .jse-value-outer {
             display: inline-block;
+            cursor: $contents-cursor;
+
+            &:hover {
+              background: $hover-background-color;
+            }
+
+            &.jse-selected-value {
+              background: $selection-background-color;
+            }
           }
 
           .jse-context-menu-anchor {

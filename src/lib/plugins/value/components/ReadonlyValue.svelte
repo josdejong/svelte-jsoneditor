@@ -4,17 +4,19 @@
   import SearchResultHighlighter from '../../../components/modes/treemode/highlight/SearchResultHighlighter.svelte'
   import { getValueClass } from './utils/getValueClass.js'
   import { addNewLineSuffix } from '$lib/utils/domUtils.js'
-  import type {
-    ExtendedSearchResultItem,
-    JSONParser,
-    OnJSONSelect,
-    ValueNormalization
+  import {
+    type ExtendedSearchResultItem,
+    type JSONParser,
+    Mode,
+    type OnJSONSelect,
+    type ValueNormalization
   } from '$lib/types.js'
   import type { JSONPath } from 'immutable-json-patch'
   import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
 
   export let path: JSONPath
   export let value: unknown
+  export let mode: Mode
   export let readOnly: boolean
   export let normalization: ValueNormalization
   export let parser: JSONParser
@@ -46,7 +48,7 @@
   role="button"
   tabindex="-1"
   data-type="selectable-value"
-  class={getValueClass(value, parser)}
+  class={getValueClass(value, mode, parser)}
   on:click={handleValueClick}
   on:dblclick={handleValueDoubleClick}
   title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : undefined}

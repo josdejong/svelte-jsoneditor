@@ -8,6 +8,8 @@
   } from '$lib/constants.js'
   import type { OnContextMenu } from '$lib/types'
 
+  export let root: boolean = false
+  export let insert: boolean = false
   export let selected: boolean
   export let onContextMenu: OnContextMenu
 
@@ -35,6 +37,8 @@
 <button
   type="button"
   class="jse-context-menu-pointer"
+  class:jse-root={root}
+  class:jse-insert={insert}
   class:jse-selected={selected}
   title={CONTEXT_MENU_EXPLANATION}
   on:click={handleClick}

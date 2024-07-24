@@ -22,9 +22,3 @@
     color: $text-color;
   }
 }
-
-:global(.jse-json-node.jse-selected) {
-  .jse-enum-value {
-    background: transparent;
-  }
-}

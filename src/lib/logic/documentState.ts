@@ -1,6 +1,7 @@
 import {
   compileJSONPointer,
   deleteIn,
+  existsIn,
   getIn,
   immutableJSONPatch,
   isJSONArray,
@@ -555,7 +556,11 @@ export function deleteInDocumentState<T extends RecursiveState>(
   documentState: T | undefined,
   path: JSONPath
 ): T | undefined {
-  return deleteIn(documentState, toRecursiveStatePath(json, path))
+  const recursivePath = toRecursiveStatePath(json, path)
+
+  return existsIn(documentState, recursivePath)
+    ? deleteIn(documentState, toRecursiveStatePath(json, path))
+    : documentState
 }
 
 export function documentStateAdd(
