@@ -598,7 +598,7 @@ Configure one or multiple query language that can be used in the Transform modal
 
 - [JSONQuery](https://github.com/josdejong/jsonquery)
 - [JMESPath](https://jmespath.org/)
-- [JSONPath](https://github.com/dchester/jsonpath/)
+- [JSONPath](https://github.com/JSONPath-Plus/JSONPath)
 - JavaScript + [Lodash](https://lodash.com/)
 - JavaScript
 
