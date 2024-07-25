@@ -9,6 +9,8 @@
     isTextContent,
     javascriptQueryLanguage,
     jmespathQueryLanguage,
+    jsonQueryLanguage,
+    jsonpathQueryLanguage,
     JSONEditor,
     type JSONEditorSelection,
     type JSONParser,
@@ -31,7 +33,6 @@
   import { truncate } from '$lib/utils/stringUtils.js'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils.js'
   import { compileJSONPointer, isJSONObject, parseJSONPointer } from 'immutable-json-patch'
-  import { jsonQueryLanguage } from '$lib/plugins/query/jsonQueryLanguage'
 
   const LosslessJSON = {
     parse,
@@ -271,7 +272,13 @@
   let leftEditorMode: Mode = Mode.tree
 
   $: queryLanguages = $multipleQueryLanguages
-    ? [jsonQueryLanguage, javascriptQueryLanguage, lodashQueryLanguage, jmespathQueryLanguage]
+    ? [
+        jsonQueryLanguage,
+        javascriptQueryLanguage,
+        jsonpathQueryLanguage,
+        lodashQueryLanguage,
+        jmespathQueryLanguage
+      ]
     : [jsonQueryLanguage]
   let queryLanguageId = jsonQueryLanguage.id // TODO: store in local storage
 

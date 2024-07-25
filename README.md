@@ -598,6 +598,7 @@ Configure one or multiple query language that can be used in the Transform modal
 
 - [JSONQuery](https://github.com/josdejong/jsonquery)
 - [JMESPath](https://jmespath.org/)
+- [JSONPath](https://github.com/dchester/jsonpath/)
 - JavaScript + [Lodash](https://lodash.com/)
 - JavaScript
 
@@ -607,6 +608,7 @@ The languages can be loaded as follows:
 import {
   jsonQueryLanguage,
   jmespathQueryLanguage,
+  jsonpathQueryLanguage,
   lodashQueryLanguage,
   javascriptQueryLanguage
 } from 'svelte-jsoneditor'
@@ -614,6 +616,7 @@ import {
 const allQueryLanguages = [
   jsonQueryLanguage,
   jmespathQueryLanguage,
+  jsonpathQueryLanguage,
   lodashQueryLanguage,
   javascriptQueryLanguage
 ]
