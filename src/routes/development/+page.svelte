@@ -31,7 +31,7 @@
   import { truncate } from '$lib/utils/stringUtils.js'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils.js'
   import { compileJSONPointer, isJSONObject, parseJSONPointer } from 'immutable-json-patch'
-  import {jsonQueryLanguage} from "$lib/plugins/query/jsonQueryLanguage";
+  import { jsonQueryLanguage } from '$lib/plugins/query/jsonQueryLanguage'
 
   const LosslessJSON = {
     parse,
