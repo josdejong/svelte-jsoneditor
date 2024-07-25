@@ -1635,7 +1635,7 @@
       onTransform: handleTransformSelection
     })
 
-    const items = onRenderContextMenu(defaultItems)
+    const items = onRenderContextMenu(defaultItems) ?? defaultItems
 
     if (items === false) {
       return
