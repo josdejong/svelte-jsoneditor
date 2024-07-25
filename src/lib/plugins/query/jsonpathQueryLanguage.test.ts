@@ -158,12 +158,12 @@ describe('jsonpathQueryLanguage', () => {
       assert.deepStrictEqual(result, ['Stuart', 'Bob'])
     })
 
-    test('should throw an exception the query is no valid jsonpath expression', () => {
+    test('should throw an exception when the query is no valid jsonpath expression', () => {
       assert.throws(() => {
         const data = {}
-        const query = 'hello world'
+        const query = '@bla bla bla'
         executeQuery(data, query, JSON)
-      }, /Error: Lexical error/)
+      }, /TypeError: Unknown value type bla bla b/)
     })
   })
 })

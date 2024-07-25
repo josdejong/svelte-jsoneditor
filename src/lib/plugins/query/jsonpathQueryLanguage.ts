@@ -1,4 +1,4 @@
-import jsonpath from 'jsonpath'
+import { JSONPath as JSONPathPlus } from 'jsonpath-plus'
 import { parseString } from '$lib/utils/stringUtils'
 import type { QueryLanguage, QueryLanguageOptions } from '$lib/types'
 import type { JSONPath } from 'immutable-json-patch'
@@ -48,8 +48,8 @@ function createQuery(_json: unknown, queryOptions: QueryLanguageOptions): string
   return expression
 }
 
-function executeQuery(json: unknown, expression: string): unknown {
-  const output = jsonpath.query(json, expression)
+function executeQuery(json: unknown, path: string): unknown {
+  const output = JSONPathPlus({ json: json as JSON, path })
   return output !== undefined ? output : null
 }
 
