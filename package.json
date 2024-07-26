@@ -82,7 +82,7 @@
     "@codemirror/lint": "^6.8.1",
     "@codemirror/search": "^6.5.6",
     "@codemirror/state": "^6.4.1",
-    "@codemirror/view": "^6.28.4",
+    "@codemirror/view": "^6.29.0",
     "@fortawesome/free-regular-svg-icons": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@josdejong/jsonquery": "^0.0.4",
