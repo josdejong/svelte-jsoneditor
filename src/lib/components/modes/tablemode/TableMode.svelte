@@ -1767,7 +1767,10 @@
                 </th>
               {/if}
             </tr>
-            <tr class="jse-table-invisible-start-section">
+            <tr
+              class="jse-table-invisible-start-section"
+              class:jse-search-box-background={showSearch}
+            >
               <td style:height={visibleSection.startHeight + 'px'} colspan={columns.length} />
             </tr>
             {#each visibleSection.visibleItems as item, visibleIndex}
