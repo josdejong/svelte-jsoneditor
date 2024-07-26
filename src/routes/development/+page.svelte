@@ -145,7 +145,7 @@
         'nested object': {
           type: 'object',
           properties: {
-            value: {type: 'number'}
+            value: { type: 'number' }
           }
         }
       },
