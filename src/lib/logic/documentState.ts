@@ -564,53 +564,48 @@ export function deleteInDocumentState<T extends RecursiveState>(
 }
 
 export function documentStateAdd(
-  updatedJson: unknown,
+  json: unknown,
   documentState: DocumentState | undefined,
   operation: JSONPatchAdd,
   stateValue: DocumentState | undefined
 ): DocumentState | undefined {
-  const path = parsePath(updatedJson, operation.path)
+  const path = parsePath(json, operation.path)
   const parentPath = initial(path)
 
   let updatedState = documentState
 
-  updatedState = updateInDocumentState(
-    updatedJson,
-    updatedState,
-    parentPath,
-    (_parent, arrayState) => {
-      if (!isArrayRecursiveState(arrayState)) {
-        return arrayState
-      }
-
-      const index = int(last(path) as string)
-      const { items, visibleSections } = arrayState
-      return {
-        ...arrayState,
-        items:
-          index < items.length
-            ? insertItemsAt(items, index, stateValue !== undefined ? [stateValue] : Array(1))
-            : items,
-        visibleSections: shiftVisibleSections(visibleSections, index, 1)
-      }
+  updatedState = updateInDocumentState(json, updatedState, parentPath, (_parent, arrayState) => {
+    if (!isArrayRecursiveState(arrayState)) {
+      return arrayState
     }
-  )
+
+    const index = int(last(path) as string)
+    const { items, visibleSections } = arrayState
+    return {
+      ...arrayState,
+      items:
+        index < items.length
+          ? insertItemsAt(items, index, stateValue !== undefined ? [stateValue] : Array(1))
+          : items,
+      visibleSections: shiftVisibleSections(visibleSections, index, 1)
+    }
+  })
 
   // object property added, nothing to do
-  return setInDocumentState(updatedJson, updatedState, path, stateValue)
+  return setInDocumentState(json, updatedState, path, stateValue)
 }
 
 export function documentStateRemove(
-  updatedJson: unknown,
+  json: unknown,
   documentState: DocumentState | undefined,
   operation: JSONPatchRemove
 ): DocumentState | undefined {
-  const path = parsePath(updatedJson, operation.path)
+  const path = parsePath(json, operation.path)
   const parentPath = initial(path)
-  const parent = getIn(updatedJson, parentPath)
+  const parent = getIn(json, parentPath)
 
   if (Array.isArray(parent)) {
-    return updateInDocumentState(updatedJson, documentState, parentPath, (_parent, arrayState) => {
+    return updateInDocumentState(json, documentState, parentPath, (_parent, arrayState) => {
       if (!isArrayRecursiveState(arrayState)) {
         return arrayState
       }
@@ -626,11 +621,11 @@ export function documentStateRemove(
     })
   }
 
-  return deleteInDocumentState(updatedJson, documentState, path)
+  return deleteInDocumentState(json, documentState, path)
 }
 
 export function documentStateMoveOrCopy(
-  updatedJson: unknown,
+  json: unknown,
   documentState: DocumentState | undefined,
   operation: JSONPatchCopy | JSONPatchMove
 ): DocumentState | undefined {
@@ -642,18 +637,18 @@ export function documentStateMoveOrCopy(
   let updatedState = documentState
 
   // get the state that we will move or copy
-  const from = parsePath(updatedJson, operation.from)
-  const stateValue = getInRecursiveState(updatedJson, updatedState, from)
+  const from = parsePath(json, operation.from)
+  const stateValue = getInRecursiveState(json, updatedState, from)
 
   if (isJSONPatchMove(operation)) {
-    updatedState = documentStateRemove(updatedJson, updatedState, {
+    updatedState = documentStateRemove(json, updatedState, {
       op: 'remove',
       path: operation.from
     })
   }
 
   updatedState = documentStateAdd(
-    updatedJson,
+    json,
     updatedState,
     {
       op: 'add',
