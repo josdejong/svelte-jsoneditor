@@ -143,7 +143,10 @@
           type: 'number'
         },
         'nested object': {
-          type: 'object'
+          type: 'object',
+          properties: {
+            value: {type: 'number'}
+          }
         }
       },
       required: ['id', 'name', 'random', 'array'],
