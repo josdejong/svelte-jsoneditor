@@ -120,7 +120,8 @@
           <Select
             class="jse-filter-relation"
             showChevron
-            clearable={false}items={filterRelationOptions}
+            clearable={false}
+            items={filterRelationOptions}
             bind:value={filterRelation}
           />
           <input class="jse-filter-value" bind:value={filterValue} />
@@ -134,7 +135,8 @@
           <Select class="jse-sort-path" showChevron items={fieldOptions} bind:value={sortPath} />
           <Select
             class="jse-sort-direction"
-            showChevronclearable={false}
+            showChevron
+            clearable={false}
             items={sortDirectionOptions}
             bind:value={sortDirection}
           />
