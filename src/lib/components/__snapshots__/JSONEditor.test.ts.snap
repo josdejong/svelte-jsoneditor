@@ -7,7 +7,7 @@ exports[`JSONEditor > render table mode 1`] = `
     class="jse-main svelte-57bmz4"
   >
     <div
-      class="jse-table-mode svelte-gl60hz"
+      class="jse-table-mode svelte-u14cgx"
       role="table"
     >
       <div
@@ -209,10 +209,10 @@ exports[`JSONEditor > render table mode 1`] = `
       </div>
        
       <label
-        class="jse-hidden-input-label svelte-gl60hz"
+        class="jse-hidden-input-label svelte-u14cgx"
       >
         <input
-          class="jse-hidden-input svelte-gl60hz"
+          class="jse-hidden-input svelte-u14cgx"
           readonly=""
           tabindex="-1"
           type="text"
@@ -220,27 +220,27 @@ exports[`JSONEditor > render table mode 1`] = `
       </label>
        
       <div
-        class="jse-search-box-container svelte-gl60hz"
+        class="jse-search-box-container svelte-u14cgx"
       >
         
       </div>
        
       <div
-        class="jse-contents svelte-gl60hz"
+        class="jse-contents svelte-u14cgx"
       >
         <table
-          class="jse-table-main svelte-gl60hz"
+          class="jse-table-main svelte-u14cgx"
         >
           <tbody>
             <tr
-              class="jse-table-row jse-table-row-header svelte-gl60hz"
+              class="jse-table-row jse-table-row-header svelte-u14cgx"
             >
               <th
-                class="jse-table-cell jse-table-cell-header svelte-gl60hz"
+                class="jse-table-cell jse-table-cell-header svelte-u14cgx"
               />
                
               <th
-                class="jse-table-cell jse-table-cell-header svelte-gl60hz"
+                class="jse-table-cell jse-table-cell-header svelte-u14cgx"
               >
                 <button
                   class="jse-column-header svelte-2i3vdx"
@@ -256,7 +256,7 @@ exports[`JSONEditor > render table mode 1`] = `
                 </button>
               </th>
               <th
-                class="jse-table-cell jse-table-cell-header svelte-gl60hz"
+                class="jse-table-cell jse-table-cell-header svelte-u14cgx"
               >
                 <button
                   class="jse-column-header svelte-2i3vdx"
@@ -275,31 +275,31 @@ exports[`JSONEditor > render table mode 1`] = `
             </tr>
              
             <tr
-              class="jse-table-invisible-start-section"
+              class="jse-table-invisible-start-section svelte-u14cgx"
             >
               <td
-                class="svelte-gl60hz"
+                class="svelte-u14cgx"
                 colspan="2"
                 style="height: 0px;"
               />
             </tr>
              
             <tr
-              class="jse-table-row svelte-gl60hz"
+              class="jse-table-row svelte-u14cgx"
             >
               <th
-                class="jse-table-cell jse-table-cell-gutter svelte-gl60hz"
+                class="jse-table-cell jse-table-cell-gutter svelte-u14cgx"
               >
                 0
                  
               </th>
                
               <td
-                class="jse-table-cell svelte-gl60hz"
+                class="jse-table-cell svelte-u14cgx"
                 data-path="%2F0%2Fid"
               >
                 <div
-                  class="jse-value-outer svelte-gl60hz"
+                  class="jse-value-outer svelte-u14cgx"
                 >
                   <div
                     class="jse-value jse-number jse-table-cell svelte-9ohlz8"
@@ -318,11 +318,11 @@ exports[`JSONEditor > render table mode 1`] = `
                  
               </td>
               <td
-                class="jse-table-cell svelte-gl60hz"
+                class="jse-table-cell svelte-u14cgx"
                 data-path="%2F0%2Fname"
               >
                 <div
-                  class="jse-value-outer svelte-gl60hz"
+                  class="jse-value-outer svelte-u14cgx"
                 >
                   <div
                     class="jse-value jse-string jse-empty jse-table-cell svelte-9ohlz8"
@@ -343,21 +343,21 @@ exports[`JSONEditor > render table mode 1`] = `
                
             </tr>
             <tr
-              class="jse-table-row svelte-gl60hz"
+              class="jse-table-row svelte-u14cgx"
             >
               <th
-                class="jse-table-cell jse-table-cell-gutter svelte-gl60hz"
+                class="jse-table-cell jse-table-cell-gutter svelte-u14cgx"
               >
                 1
                  
               </th>
                
               <td
-                class="jse-table-cell svelte-gl60hz"
+                class="jse-table-cell svelte-u14cgx"
                 data-path="%2F1%2Fid"
               >
                 <div
-                  class="jse-value-outer svelte-gl60hz"
+                  class="jse-value-outer svelte-u14cgx"
                 >
                   <div
                     class="jse-value jse-number jse-table-cell svelte-9ohlz8"
@@ -376,11 +376,11 @@ exports[`JSONEditor > render table mode 1`] = `
                  
               </td>
               <td
-                class="jse-table-cell svelte-gl60hz"
+                class="jse-table-cell svelte-u14cgx"
                 data-path="%2F1%2Fname"
               >
                 <div
-                  class="jse-value-outer svelte-gl60hz"
+                  class="jse-value-outer svelte-u14cgx"
                 >
                   <div
                     class="jse-value jse-string jse-table-cell svelte-9ohlz8"
@@ -401,21 +401,21 @@ exports[`JSONEditor > render table mode 1`] = `
                
             </tr>
             <tr
-              class="jse-table-row svelte-gl60hz"
+              class="jse-table-row svelte-u14cgx"
             >
               <th
-                class="jse-table-cell jse-table-cell-gutter svelte-gl60hz"
+                class="jse-table-cell jse-table-cell-gutter svelte-u14cgx"
               >
                 2
                  
               </th>
                
               <td
-                class="jse-table-cell svelte-gl60hz"
+                class="jse-table-cell svelte-u14cgx"
                 data-path="%2F2%2Fid"
               >
                 <div
-                  class="jse-value-outer svelte-gl60hz"
+                  class="jse-value-outer svelte-u14cgx"
                 >
                   <div
                     class="jse-value jse-number jse-table-cell svelte-9ohlz8"
@@ -434,11 +434,11 @@ exports[`JSONEditor > render table mode 1`] = `
                  
               </td>
               <td
-                class="jse-table-cell svelte-gl60hz"
+                class="jse-table-cell svelte-u14cgx"
                 data-path="%2F2%2Fname"
               >
                 <div
-                  class="jse-value-outer svelte-gl60hz"
+                  class="jse-value-outer svelte-u14cgx"
                 >
                   <div
                     class="jse-value jse-string jse-empty jse-table-cell svelte-9ohlz8"
@@ -463,7 +463,7 @@ exports[`JSONEditor > render table mode 1`] = `
               class="jse-table-invisible-end-section"
             >
               <td
-                class="svelte-gl60hz"
+                class="svelte-u14cgx"
                 colspan="2"
                 style="height: 0px;"
               />

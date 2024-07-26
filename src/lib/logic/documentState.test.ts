@@ -35,6 +35,7 @@ import {
   type DocumentState,
   type ObjectDocumentState,
   type OnExpand,
+  type ValueDocumentState,
   type VisibleSection
 } from '$lib/types.js'
 import { deleteIn, getIn, type JSONPatchDocument, setIn, updateIn } from 'immutable-json-patch'
@@ -859,14 +860,36 @@ describe('documentState', () => {
     )
   })
 
-  test('should keep/update enforce string', () => {
+  test('should determine enforce string', () => {
     const json1 = 42
     const documentState1 = createDocumentState({ json: json1 })
-    assert.strictEqual(getEnforceString(json1, documentState1, [], JSON), false)
+    assert.strictEqual(getEnforceString(json1, documentState1, []), false)
 
     const json2 = '42'
     const documentState2 = createDocumentState({ json: json2 })
-    assert.strictEqual(getEnforceString(json2, documentState2, [], JSON), true)
+    assert.strictEqual(getEnforceString(json2, documentState2, []), true)
+
+    const json3 = 'true'
+    const documentState3 = createDocumentState({ json: json3 })
+    assert.strictEqual(getEnforceString(json3, documentState3, []), true)
+
+    const json4 = 'null'
+    const documentState4 = createDocumentState({ json: json4 })
+    assert.strictEqual(getEnforceString(json4, documentState4, []), true)
+  })
+
+  test('should create enforce string state if needed', () => {
+    const json = '42'
+    const documentState = createDocumentState({ json })
+    assert.strictEqual(getEnforceString(json, documentState, []), true)
+    assert.strictEqual((documentState as ValueDocumentState).enforceString, undefined)
+
+    const result = documentStatePatch(json, documentState, [
+      { op: 'replace', path: '', value: 'abc' }
+    ])
+    assert.strictEqual(result.json, 'abc')
+    assert.strictEqual(getEnforceString(result.json, result.documentState, []), true)
+    assert.strictEqual((result.documentState as ValueDocumentState).enforceString, true)
   })
 
   describe('documentStatePatch', () => {

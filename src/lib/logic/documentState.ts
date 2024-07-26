@@ -36,7 +36,6 @@ import type {
   ArrayDocumentState,
   CaretPosition,
   DocumentState,
-  JSONParser,
   ObjectDocumentState,
   OnExpand,
   ArrayRecursiveState,
@@ -485,6 +484,14 @@ function _documentStatePatch(
   }
 
   if (isJSONPatchReplace(operation)) {
+    const path = parsePath(json, operation.path)
+    const enforceString = getEnforceString(json, documentState, path)
+    if (enforceString) {
+      // ensure the enforceString setting is not lost when for example changing "123"
+      // into "abc" and later back to "123", so we now make it explicit.
+      return setInDocumentState(json, documentState, path, { type: 'value', enforceString })
+    }
+
     // nothing special to do (all is handled by syncDocumentState)
     return documentState
   }
@@ -701,8 +708,7 @@ function mergeAdjacentSections(visibleSections: VisibleSection[]): VisibleSectio
 export function getEnforceString(
   json: unknown,
   documentState: DocumentState | undefined,
-  path: JSONPath,
-  parser: JSONParser
+  path: JSONPath
 ): boolean {
   const value = getIn(json, path)
   const nestedState = getInRecursiveState(json, documentState, path)
@@ -712,7 +718,7 @@ export function getEnforceString(
     return enforceString
   }
 
-  return isStringContainingPrimitiveValue(value, parser)
+  return isStringContainingPrimitiveValue(value)
 }
 
 export function getNextKeys(keys: string[], key: string, includeKey = false): string[] {

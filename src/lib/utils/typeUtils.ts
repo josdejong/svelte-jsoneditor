@@ -1,6 +1,6 @@
 // TODO: unit test typeUtils.js
 
-import { isNumber } from './numberUtils.js'
+import { containsNumber } from './numberUtils.js'
 import type { JSONParser } from '../types.js'
 
 /**
@@ -134,7 +134,7 @@ export function valueType(value: unknown, parser: JSONParser): string {
 
   // unknown type (like a LosslessNumber). Try out what stringfying results in
   const valueStr = parser.stringify(value)
-  if (valueStr && isNumber(valueStr)) {
+  if (valueStr && containsNumber(valueStr)) {
     return 'number'
   }
   if (valueStr === 'true' || valueStr === 'false') {
@@ -179,7 +179,7 @@ export function stringConvert(str: string, parser: JSONParser): unknown {
     return false
   }
 
-  if (isNumber(strTrim)) {
+  if (containsNumber(strTrim)) {
     return parser.parse(strTrim)
   }
 
@@ -190,8 +190,10 @@ export function stringConvert(str: string, parser: JSONParser): unknown {
  * Test whether a string contains a numeric, boolean, or null value.
  * Returns true when the string contains a number, boolean, or null.
  */
-export function isStringContainingPrimitiveValue(str: unknown, parser: JSONParser): boolean {
-  return typeof str === 'string' && typeof stringConvert(str, parser) !== 'string'
+export function isStringContainingPrimitiveValue(str: unknown): boolean {
+  // note that we can safely use JSON parser here instead of the configured JSONParser,
+  // since we do not actually use the parsed number, just want to check that it is not a string
+  return typeof str === 'string' && typeof stringConvert(str, JSON) !== 'string'
 }
 
 /**
