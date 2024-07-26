@@ -23,9 +23,11 @@ export { keyComboFromEvent } from './utils/keyBindings'
 export * from './plugins/validator/createAjvValidator.js'
 
 // query plugins
+export { jsonQueryLanguage } from './plugins/query/jsonQueryLanguage.js'
+export { jmespathQueryLanguage } from './plugins/query/jmespathQueryLanguage.js'
+export { jsonpathQueryLanguage } from './plugins/query/jsonpathQueryLanguage.js'
 export { lodashQueryLanguage } from './plugins/query/lodashQueryLanguage.js'
 export { javascriptQueryLanguage } from './plugins/query/javascriptQueryLanguage.js'
-export { jmespathQueryLanguage } from './plugins/query/jmespathQueryLanguage.js'
 
 // content
 export {

@@ -109,6 +109,7 @@
     <script type="module">
       import {
         JSONEditor,
+        jsonQueryLanguage,
         lodashQueryLanguage,
         jmespathQueryLanguage
       } from '../package-vanilla/standalone.js'
@@ -192,7 +193,7 @@
 
           return []
         },
-        queryLanguages: [lodashQueryLanguage, jmespathQueryLanguage]
+        queryLanguages: [jsonQueryLanguage, lodashQueryLanguage, jmespathQueryLanguage]
       }
       const testEditor = new JSONEditor({ target, props })
 

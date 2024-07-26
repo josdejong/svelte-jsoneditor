@@ -33,14 +33,14 @@
 
   // TODO: the binding with the select boxes is very cumbersome. Can we simplify this?
   let filterPath = queryOptions?.filter?.path ? pathToOption(queryOptions.filter.path) : undefined
-  let filterRelation = queryOptions?.filter?.relation
-    ? filterRelationOptions.find((option) => option.value === queryOptions.filter?.relation)
-    : undefined
+  let filterRelation =
+    filterRelationOptions.find((option) => option.value === queryOptions.filter?.relation) ??
+    filterRelationOptions[0]
   let filterValue = queryOptions?.filter?.value || ''
   let sortPath = queryOptions?.sort?.path ? pathToOption(queryOptions.sort.path) : undefined
-  let sortDirection = queryOptions?.sort?.direction
-    ? sortDirectionOptions.find((option) => option.value === queryOptions.sort?.direction)
-    : undefined
+  let sortDirection =
+    sortDirectionOptions.find((option) => option.value === queryOptions.sort?.direction) ??
+    sortDirectionOptions[0]
 
   $: projectionPaths =
     queryOptions?.projection?.paths && projectionOptions
@@ -120,7 +120,7 @@
           <Select
             class="jse-filter-relation"
             showChevron
-            items={filterRelationOptions}
+            clearable={false}items={filterRelationOptions}
             bind:value={filterRelation}
           />
           <input class="jse-filter-value" bind:value={filterValue} />
@@ -134,7 +134,7 @@
           <Select class="jse-sort-path" showChevron items={fieldOptions} bind:value={sortPath} />
           <Select
             class="jse-sort-direction"
-            showChevron
+            showChevronclearable={false}
             items={sortDirectionOptions}
             bind:value={sortDirection}
           />

@@ -9,7 +9,7 @@ import { groupBy, isEmpty, isEqual, mapValues, partition } from 'lodash-es'
 import type { JSONSelection, SortedColumn, TableCellIndex, ValidationError } from '$lib/types.js'
 import { ValidationSeverity } from '$lib/types.js'
 import { createValueSelection, getFocusPath, pathStartsWith } from './selection.js'
-import { isNumber } from '../utils/numberUtils.js'
+import { containsNumber } from '../utils/numberUtils.js'
 import type { Dictionary } from 'lodash'
 import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
 import { forEachSample } from '$lib/utils/arrayUtils.js'
@@ -356,7 +356,7 @@ export function groupValidationErrors(
   columns: JSONPath[]
 ): GroupedValidationErrors {
   const [arrayErrors, rootErrors] = partition(validationErrors, (validationError) =>
-    isNumber(validationError.path[0])
+    containsNumber(validationError.path[0])
   )
 
   const errorsByRow: Dictionary<ValidationError[]> = groupBy(arrayErrors, findRowIndex)

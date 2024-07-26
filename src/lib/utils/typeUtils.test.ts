@@ -108,14 +108,14 @@ describe('typeUtils', () => {
   })
 
   test('isStringContainingPrimitiveValue', () => {
-    strictEqual(isStringContainingPrimitiveValue(22, JSON), false)
-    strictEqual(isStringContainingPrimitiveValue('text', JSON), false)
-    strictEqual(isStringContainingPrimitiveValue('2.4', JSON), true)
-    strictEqual(isStringContainingPrimitiveValue('-2.4', JSON), true)
-    strictEqual(isStringContainingPrimitiveValue('2e3', JSON), true)
-    strictEqual(isStringContainingPrimitiveValue('true', JSON), true)
-    strictEqual(isStringContainingPrimitiveValue('false', JSON), true)
-    strictEqual(isStringContainingPrimitiveValue('null', JSON), true)
+    strictEqual(isStringContainingPrimitiveValue(22), false)
+    strictEqual(isStringContainingPrimitiveValue('text'), false)
+    strictEqual(isStringContainingPrimitiveValue('2.4'), true)
+    strictEqual(isStringContainingPrimitiveValue('-2.4'), true)
+    strictEqual(isStringContainingPrimitiveValue('2e3'), true)
+    strictEqual(isStringContainingPrimitiveValue('true'), true)
+    strictEqual(isStringContainingPrimitiveValue('false'), true)
+    strictEqual(isStringContainingPrimitiveValue('null'), true)
   })
 
   test('isInteger', () => {

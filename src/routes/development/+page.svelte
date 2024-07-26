@@ -9,6 +9,8 @@
     isTextContent,
     javascriptQueryLanguage,
     jmespathQueryLanguage,
+    jsonQueryLanguage,
+    jsonpathQueryLanguage,
     JSONEditor,
     type JSONEditorSelection,
     type JSONParser,
@@ -141,7 +143,10 @@
           type: 'number'
         },
         'nested object': {
-          type: 'object'
+          type: 'object',
+          properties: {
+            value: { type: 'number' }
+          }
         }
       },
       required: ['id', 'name', 'random', 'array'],
@@ -270,9 +275,15 @@
   let leftEditorMode: Mode = Mode.tree
 
   $: queryLanguages = $multipleQueryLanguages
-    ? [javascriptQueryLanguage, lodashQueryLanguage, jmespathQueryLanguage]
-    : [javascriptQueryLanguage]
-  let queryLanguageId = javascriptQueryLanguage.id // TODO: store in local storage
+    ? [
+        jsonQueryLanguage,
+        javascriptQueryLanguage,
+        jsonpathQueryLanguage,
+        lodashQueryLanguage,
+        jmespathQueryLanguage
+      ]
+    : [jsonQueryLanguage]
+  let queryLanguageId = jsonQueryLanguage.id // TODO: store in local storage
 
   let selectedParser: JSONParser
   $: selectedParser =

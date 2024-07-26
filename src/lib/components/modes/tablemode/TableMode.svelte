@@ -939,7 +939,7 @@
       onRemoveRow: handleRemoveRow
     })
 
-    const items = onRenderContextMenu(defaultItems)
+    const items = onRenderContextMenu(defaultItems) ?? defaultItems
 
     if (items === false) {
       return
@@ -1765,7 +1765,10 @@
                 </th>
               {/if}
             </tr>
-            <tr class="jse-table-invisible-start-section">
+            <tr
+              class="jse-table-invisible-start-section"
+              class:jse-search-box-background={showSearch}
+            >
               <td style:height={visibleSection.startHeight + 'px'} colspan={columns.length}></td>
             </tr>
             {#each visibleSection.visibleItems as item, visibleIndex}

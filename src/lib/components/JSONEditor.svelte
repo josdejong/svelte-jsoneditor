@@ -8,7 +8,7 @@
     validateContentType
   } from '../utils/jsonUtils.js'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
-  import { javascriptQueryLanguage } from '$lib/plugins/query/javascriptQueryLanguage.js'
+  import { jsonQueryLanguage } from '$lib/plugins/query/jsonQueryLanguage.js'
   import { renderValue } from '$lib/plugins/value/renderValue.js'
   import { tick } from 'svelte'
   import TransformModal from './modals/TransformModal.svelte'
@@ -79,7 +79,7 @@
     stringify: stringifyJSONPath
   }
 
-  export let queryLanguages: QueryLanguage[] = [javascriptQueryLanguage]
+  export let queryLanguages: QueryLanguage[] = [jsonQueryLanguage]
   export let queryLanguageId: string = queryLanguages[0].id
 
   export let onChangeQueryLanguage: OnChangeQueryLanguage = noop

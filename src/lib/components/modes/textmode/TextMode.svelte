@@ -621,8 +621,7 @@
 
     codeMirrorView = new EditorView({
       state,
-      parent: target,
-      scrollTo: EditorView.scrollIntoView(0) // see https://discuss.codemirror.net/t/editor-starts-partially-scrolled-down/7567
+      parent: target
     })
 
     return codeMirrorView

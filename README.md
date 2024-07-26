@@ -594,19 +594,37 @@ Callback invoked when the selection is changed. When the selection is removed, t
 queryLanguages: QueryLanguage[]
 ```
 
-Configure one or multiple query language that can be used in the Transform modal. The library comes with three languages:
+Configure one or multiple query language that can be used in the Transform modal. The library comes with the following languages included:
+
+- [JSONQuery](https://github.com/josdejong/jsonquery)
+- [JMESPath](https://jmespath.org/)
+- [JSONPath](https://github.com/JSONPath-Plus/JSONPath)
+- JavaScript + [Lodash](https://lodash.com/)
+- JavaScript
+
+The languages can be loaded as follows:
 
 ```ts
 import {
+  jsonQueryLanguage,
   jmespathQueryLanguage,
+  jsonpathQueryLanguage,
   lodashQueryLanguage,
   javascriptQueryLanguage
 } from 'svelte-jsoneditor'
 
-const allQueryLanguages = [jmespathQueryLanguage, lodashQueryLanguage, javascriptQueryLanguage]
+const allQueryLanguages = [
+  jsonQueryLanguage,
+  jmespathQueryLanguage,
+  jsonpathQueryLanguage,
+  lodashQueryLanguage,
+  javascriptQueryLanguage
+]
 ```
 
-By default, only `javascriptQueryLanguage` is loaded.
+By default, only `jsonQueryLanguage` is loaded in the editor.
+
+Note that both `lodashQueryLanguage` and `javascriptQueryLanguage` can execute arbitrary JavaScript code and use `new Function(...)` to execute the code. Therefore, they are not suitable in general to store or share queries because of the security risks. In some environments, trying to use them will result in CSP (Content Security Policy) errors depending on the security policy.
 
 #### queryLanguageId
 
@@ -832,9 +850,10 @@ The library exports a set of utility functions. The exact definitions of those f
 - Validation:
   - `createAjvValidator`
 - Query languages:
+  - `jsonQueryLanguage`
+  - `jmespathQueryLanguage`
   - `lodashQueryLanguage`
   - `javascriptQueryLanguage`
-  - `jmespathQueryLanguage`
 - Content:
   - `isContent`
   - `isTextContent`
