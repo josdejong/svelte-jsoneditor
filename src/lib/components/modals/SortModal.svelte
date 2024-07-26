@@ -22,7 +22,6 @@
   export let onSort: OnSort
   export let onClose: () => void
 
-  $: stateId = `${id}:${compileJSONPointer(rootPath)}`
   $: selectedJson = getIn(json, rootPath)
   $: jsonIsArray = Array.isArray(selectedJson)
   $: paths = jsonIsArray ? getNestedPaths(selectedJson) : undefined
@@ -38,6 +37,7 @@
   }
   const directions = [asc, desc]
 
+  const stateId = `${id}:${compileJSONPointer(rootPath)}`
   let selectedProperty = sortModalStates[stateId]?.selectedProperty
   let selectedDirection = sortModalStates[stateId]?.selectedDirection || asc
   let sortError: string | undefined = undefined

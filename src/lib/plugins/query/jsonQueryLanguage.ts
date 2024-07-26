@@ -1,12 +1,12 @@
 import { jsonquery } from '@josdejong/jsonquery'
-import { parseString } from '../../utils/stringUtils.js'
-import type { QueryLanguage, QueryLanguageOptions } from '../../types.js'
+import { parseString } from '$lib/utils/stringUtils.js'
+import type { QueryLanguage, QueryLanguageOptions } from '$lib/types.js'
 import type { JSONPath } from 'immutable-json-patch'
 
 const description = `
 <p>
   Enter a <a href="https://github.com/josdejong/jsonquery" target="_blank" 
-  rel="noopener noreferrer"><code>jsonquery</code></a> function to filter, sort, or transform the data.
+  rel="noopener noreferrer">jsonquery</a> function to filter, sort, or transform the data.
   You can use functions like <code>get</code>, <code>filter</code>,
   <code>sort</code>, <code>pick</code>, <code>groupBy</code>, <code>uniq</code>, etcetera.
 </p>
