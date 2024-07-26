@@ -72,6 +72,7 @@
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
   import { isObject } from '$lib/utils/typeUtils.js'
   import { classnames } from '$lib/utils/cssUtils.js'
+  import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
 
   export let value: unknown
   export let path: JSONPath
@@ -216,7 +217,7 @@
   function toggleExpand(event: MouseEvent) {
     event.stopPropagation()
 
-    const recursive = event.ctrlKey
+    const recursive = isCtrlKeyDown(event)
     context.onExpand(path, !expanded, recursive)
   }
 
@@ -236,10 +237,15 @@
   }
 
   function handleMouseDown(event: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
+    // only handle when the left or right mouse button is pressed, not the middle mouse button (scroll wheel)
+    if (event.buttons !== 1 && event.buttons !== 2) {
+      return
+    }
+
     // check if the mouse down is not happening in the key or value input fields or on a button
     if (
       isContentEditableDiv(event.target as HTMLElement) ||
-      (event.which === 1 && isChildOfNodeName(event.target as Element, 'BUTTON')) // left mouse on a button
+      (event.buttons === 1 && isChildOfNodeName(event.target as Element, 'BUTTON')) // left mouse on a button
     ) {
       return
     }

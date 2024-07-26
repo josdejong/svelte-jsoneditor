@@ -555,7 +555,9 @@
 
     const state = EditorState.create({
       doc: initialText,
-      selection: toCodeMirrorSelection(externalSelection),
+      selection: isValidSelection(externalSelection, initialText)
+        ? toCodeMirrorSelection(externalSelection)
+        : undefined,
       extensions: [
         keymap.of([indentWithTab, formatCompactKeyBinding]),
         linterCompartment.of(createLinter()),
@@ -616,7 +618,8 @@
 
     codeMirrorView = new EditorView({
       state,
-      parent: target
+      parent: target,
+      scrollTo: EditorView.scrollIntoView(0) // see https://discuss.codemirror.net/t/editor-starts-partially-scrolled-down/7567
     })
 
     return codeMirrorView
@@ -630,6 +633,14 @@
     return codeMirrorRef
       ? getComputedStyle(codeMirrorRef).getPropertyValue('--jse-theme').includes('dark')
       : false
+  }
+
+  function isValidSelection(selection: JSONEditorSelection | null, text: string): boolean {
+    if (!isTextSelection(selection)) {
+      return false
+    }
+
+    return selection.ranges.every((range) => range.anchor < text.length && range.head < text.length)
   }
 
   function toRichValidationError(validationError: ValidationError): RichValidationError {

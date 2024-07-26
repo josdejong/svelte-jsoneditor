@@ -36,6 +36,9 @@
       <a href="examples/custom_value_renderer">Custom value renderer (password, enum, action)</a>
     </li>
     <li>
+      <a href="examples/custom_value_renderer2">Custom value renderer 2 (editable input)</a>
+    </li>
+    <li>
       <a href="examples/json_schema_validation">JSON Schema validation</a>
     </li>
     <li>

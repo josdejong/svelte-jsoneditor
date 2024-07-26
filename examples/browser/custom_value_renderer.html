@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <title>JSONEditor | Custom Value Renderer</title>
+
+    <style>
+      body {
+        font-family: sans-serif;
+        line-height: 1.5em;
+        max-width: 800px;
+      }
+
+      code {
+        background: #f5f5f5;
+        padding: 2px;
+      }
+
+      #jsoneditor {
+        width: 100%;
+        height: 500px;
+      }
+
+      .custom-evaluator-component {
+        background: greenyellow;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Custom value renderer (password, enum, action)</h1>
+
+    <p>Provide a custom <code>onRenderValue</code> method, which demonstrates three things:</p>
+    <ol>
+      <li>
+        It hides the value of all fields with the name "password" using a custom component (action)
+        <code>ReadonlyPasswordAction</code>.
+      </li>
+      <li>
+        It creates an enum component for the fields with name "gender" using a component
+        <code>EnumValue</code> provided by <code>svelte-jsoneditor</code>.
+      </li>
+      <li>
+        The creates a custom component for the field named "evaluate" using a custom component
+        (action) <code>EvaluatorAction</code>, which evaluates the value as an expression containing
+        an addition of two or more values. This solution can be used when using svelte-jsoneditor in
+        a Vanilla JS environment.
+      </li>
+    </ol>
+
+    <div id="jsoneditor"></div>
+
+    <script type="module">
+      import { JSONEditor, renderValue, EnumValue } from '../../package-vanilla/standalone.js'
+      import { ReadonlyPasswordAction } from './components/ReadonlyPasswordAction.js'
+      import { EvaluatorAction } from './components/EvaluatorAction.js'
+
+      const genderOptions = [
+        { value: null, text: '-' },
+        { value: 'male', text: 'Male' },
+        { value: 'female', text: 'Female' },
+        { value: 'other', text: 'Other' }
+      ]
+
+      const content = {
+        text: undefined, // can be used to pass a stringified JSON document instead
+        json: {
+          username: 'John',
+          password: 'secret...',
+          gender: 'male',
+          evaluate: '2 + 3'
+        }
+      }
+
+      // define a custom rendering function for values
+      function onRenderValue(props) {
+        const key = props.path[props.path.length - 1]
+
+        if (key === 'password' && !props.isEditing) {
+          return [
+            {
+              action: ReadonlyPasswordAction,
+              props
+            }
+          ]
+        }
+
+        if (key === 'gender') {
+          return [
+            {
+              component: EnumValue,
+              props: {
+                ...props,
+                options: genderOptions
+              }
+            }
+          ]
+        }
+
+        if (key === 'evaluate' && !props.isEditing) {
+          return [
+            {
+              action: EvaluatorAction,
+              props
+            }
+          ]
+        }
+
+        // fallback on the default render components
+        return renderValue(props)
+      }
+
+      // create the editor
+      const editor = new JSONEditor({
+        target: document.getElementById('jsoneditor'),
+        props: {
+          content,
+          onRenderValue
+        }
+      })
+    </script>
+  </body>
+</html>

@@ -41,7 +41,7 @@
       <div
         role="button"
         tabindex="-1"
-        class="jse-value jse-readonly-password"
+        class="jse-value"
         data-type="selectable-value"
         use:action={renderer.props}
       />
