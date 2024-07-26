@@ -30,6 +30,7 @@
   import { onEscape } from '$lib/actions/onEscape.js'
   import { readonlyProxy } from '$lib/utils/readonlyProxy.js'
   import Modal from './Modal.svelte'
+  import { onMount } from 'svelte'
 
   const debug = createDebug('jsoneditor:TransformModal')
 
@@ -57,6 +58,8 @@
   export let onTransform: (operations: JSONPatchDocument) => void
   export let onClose: () => void
 
+  let refQueryInput: HTMLTextAreaElement
+
   let selectedJson: unknown | undefined
   $: selectedJson = readonlyProxy(getIn(json, rootPath))
   let selectedContent: Content
@@ -83,6 +86,10 @@
 
   let previewError: string | undefined = undefined
   let previewContent: Content = { text: '' }
+
+  onMount(() => {
+    refQueryInput?.focus()
+  })
 
   function getSelectedQueryLanguage(queryLanguageId: string): QueryLanguage {
     return queryLanguages.find((item) => item.id === queryLanguageId) || queryLanguages[0]
@@ -272,8 +279,11 @@
             <div class="jse-label">
               <div class="jse-label-inner">Query</div>
             </div>
-            <textarea class="jse-query" spellcheck="false" on:input={handleChangeQuery}
-              >{query}</textarea
+            <textarea
+              bind:this={refQueryInput}
+              class="jse-query"
+              spellcheck="false"
+              on:input={handleChangeQuery}>{query}</textarea
             >
           </div>
           <div class="jse-data-contents" class:jse-hide-original-data={!showOriginal}>

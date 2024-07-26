@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { tick } from 'svelte'
+  import { onMount, tick } from 'svelte'
   import Header from './Header.svelte'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, immutableJSONPatch, isJSONArray } from 'immutable-json-patch'
@@ -73,7 +73,6 @@
   }
 
   let refEditor: JSONEditorRoot
-  let refApply: HTMLButtonElement
   let fullscreen: boolean
 
   const rootState: ModalState = {
@@ -92,6 +91,10 @@
   $: parseMemoizeOne = memoizeOne(parser.parse)
 
   let error: string | undefined = undefined
+
+  onMount(() => {
+    refEditor?.focus()
+  })
 
   function determineMode(content: Content): Mode {
     return isJSONContent(content) && isJSONArray(content.json) ? Mode.table : Mode.tree
@@ -155,7 +158,10 @@
     } else if (stack.length > 1) {
       // remove the last item from the stack
       stack = initial(stack)
-      tick().then(scrollToSelection)
+      tick().then(() => {
+        refEditor?.focus()
+        scrollToSelection()
+      })
 
       // clear any error from the just closed state
       error = undefined
@@ -202,7 +208,7 @@
     }
     stack = [...stack, nestedModalState]
 
-    refApply.focus()
+    tick().then(() => refEditor?.focus())
   }
 
   function focus(element: HTMLElement) {
@@ -287,13 +293,7 @@
             </button>
           {/if}
           {#if !readOnly}
-            <button
-              type="button"
-              class="jse-primary"
-              on:click={handleApply}
-              use:focus
-              bind:this={refApply}
-            >
+            <button type="button" class="jse-primary" on:click={handleApply} use:focus>
               Apply
             </button>
           {:else}
