@@ -271,17 +271,14 @@
       return
     }
 
-    if (showSearch) {
-      const padding = parseInt(getComputedStyle(refContents).padding) ?? 0
-      refContents.style.overflowAnchor = 'none'
-      refContents.style.paddingTop = padding + SEARCH_BOX_HEIGHT + 'px'
-      refContents.scrollTop += SEARCH_BOX_HEIGHT
-      refContents.style.overflowAnchor = ''
-    } else {
-      refContents.style.overflowAnchor = 'none'
-      refContents.style.paddingTop = ''
-      refContents.scrollTop -= SEARCH_BOX_HEIGHT
-      refContents.style.overflowAnchor = ''
+    if (showSearch && refContents.scrollTop === 0) {
+        refContents.style.overflowAnchor = 'none'
+        refContents.scrollTop += SEARCH_BOX_HEIGHT
+        setTimeout(() => {
+          if (refContents) {
+            refContents.style.overflowAnchor = ''
+          }
+        })
     }
   }
 
@@ -1939,6 +1936,9 @@
         />
       </div>
       <div class="jse-contents" data-jsoneditor-scrollable-contents={true} bind:this={refContents}>
+        {#if showSearch}
+          <div class="jse-search-box-background"></div>
+        {/if}
         <JSONNode
           value={json}
           pointer={''}
