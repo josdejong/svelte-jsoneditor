@@ -119,7 +119,8 @@
           }
 
           .jse-value-outer {
-            display: inline-block;
+            display: inline;
+            padding: 1px 0; // align the height with the inner EditableDiv TODO: find a better solution
             cursor: $contents-cursor;
 
             &:hover {
