@@ -1452,7 +1452,6 @@
     selection = createValueSelection(error.path)
 
     scrollTo(error.path)
-    focus()
   }
 
   function openSortModal(rootPath: JSONPath) {
