@@ -272,13 +272,13 @@
     }
 
     if (showSearch && refContents.scrollTop === 0) {
-        refContents.style.overflowAnchor = 'none'
-        refContents.scrollTop += SEARCH_BOX_HEIGHT
-        setTimeout(() => {
-          if (refContents) {
-            refContents.style.overflowAnchor = ''
-          }
-        })
+      refContents.style.overflowAnchor = 'none'
+      refContents.scrollTop += SEARCH_BOX_HEIGHT
+      setTimeout(() => {
+        if (refContents) {
+          refContents.style.overflowAnchor = ''
+        }
+      })
     }
   }
 
