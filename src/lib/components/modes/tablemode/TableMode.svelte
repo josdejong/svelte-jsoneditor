@@ -727,6 +727,10 @@
     }
 
     const target = event.target as HTMLElement
+    if (!target.isContentEditable) {
+      focus()
+    }
+
     const path = getDataPathFromTarget(target)
     if (path) {
       // when clicking inside the current selection, editing a value, do nothing
@@ -737,11 +741,6 @@
       selection = createValueSelection(path)
 
       event.preventDefault()
-    }
-
-    // for example when clicking on the empty area in the main menu or on an InlineValue
-    if (!target.isContentEditable && !hasFocus) {
-      setTimeout(focus)
     }
   }
 
@@ -1453,6 +1452,7 @@
     selection = createValueSelection(error.path)
 
     scrollTo(error.path)
+    focus()
   }
 
   function openSortModal(rootPath: JSONPath) {
