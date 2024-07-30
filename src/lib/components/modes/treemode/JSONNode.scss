@@ -188,6 +188,26 @@
     }
   }
 
+  &.jse-hovered:not(.jse-selected):not(.jse-selected-value) {
+    .jse-value-outer,
+    .jse-meta,
+    .jse-items .jse-header,
+    .jse-items .jse-contents,
+    .jse-props .jse-header,
+    .jse-props .jse-contents,
+    .jse-footer {
+      background: $hover-background-color;
+      cursor: $contents-cursor;
+
+      .jse-value-outer,
+      .jse-meta {
+        // since the $hover-background-color is half transparent,
+        // we have to prevent it from being applied twice, else it gets a darker color
+        background: none;
+      }
+    }
+  }
+
   // key and value selected
   &.jse-selected {
     .jse-header,
@@ -225,12 +245,12 @@
     .jse-footer {
       background: $selection-background-color;
       cursor: $contents-selected-cursor;
-    }
 
-    .jse-key-outer {
-      &:hover {
-        background: inherit;
-        cursor: inherit;
+      .jse-key-outer {
+        &:hover {
+          background: inherit;
+          cursor: inherit;
+        }
       }
     }
   }
