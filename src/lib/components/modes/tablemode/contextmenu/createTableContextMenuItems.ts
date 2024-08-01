@@ -1,4 +1,4 @@
-import type { ContextMenuItem, DocumentState, JSONParser, JSONSelection } from 'svelte-jsoneditor'
+import type { ContextMenuItem, DocumentState, JSONSelection } from 'svelte-jsoneditor'
 import {
   faCheckSquare,
   faClone,
@@ -21,7 +21,6 @@ export default function ({
   documentState,
   selection,
   readOnly,
-  parser,
   onEditValue,
   onEditRow,
   onToggleEnforceString,
@@ -38,7 +37,6 @@ export default function ({
   documentState: DocumentState | undefined
   selection: JSONSelection | undefined
   readOnly: boolean
-  parser: JSONParser
   onEditValue: () => void
   onEditRow: () => void
   onToggleEnforceString: () => void
@@ -67,9 +65,7 @@ export default function ({
   const canCut = !readOnly && hasSelectionContents
 
   const enforceString =
-    selection !== undefined
-      ? getEnforceString(json, documentState, getFocusPath(selection), parser)
-      : false
+    selection !== undefined ? getEnforceString(json, documentState, getFocusPath(selection)) : false
 
   return [
     { type: 'separator' },

@@ -303,7 +303,7 @@ export function createSearchAndReplaceOperations(
     }
     const currentValueText = typeof currentValue === 'string' ? currentValue : String(currentValue)
 
-    const enforceString = getEnforceString(json, documentState, path, parser)
+    const enforceString = getEnforceString(json, documentState, path)
     const value = replaceText(currentValueText, replacementText, start, end)
 
     const operations: JSONPatchOperation[] = [
@@ -402,7 +402,7 @@ export function createSearchAndReplaceAllOperations(
       }
       const currentValueText =
         typeof currentValue === 'string' ? currentValue : String(currentValue)
-      const enforceString = getEnforceString(json, documentState, path, parser)
+      const enforceString = getEnforceString(json, documentState, path)
       const value = replaceAllText(currentValueText, replacementText, items)
 
       const operations: JSONPatchOperation[] = [

@@ -43,7 +43,6 @@ export default function ({
   documentState,
   selection,
   readOnly,
-  parser,
   onEditKey,
   onEditValue,
   onToggleEnforceString,
@@ -64,7 +63,6 @@ export default function ({
   documentState: DocumentState | undefined
   selection: JSONSelection | undefined
   readOnly: boolean
-  parser: JSONParser
   onEditKey: () => void
   onEditValue: () => void
   onToggleEnforceString: () => void
@@ -131,9 +129,7 @@ export default function ({
     !readOnly && (convertMode ? canConvert(selection) && isObjectOrArray(focusValue) : hasSelection)
 
   const enforceString =
-    selection !== undefined
-      ? getEnforceString(json, documentState, getFocusPath(selection), parser)
-      : false
+    selection !== undefined ? getEnforceString(json, documentState, getFocusPath(selection)) : false
 
   function handleInsertOrConvert(type: InsertType) {
     if (hasSelectionContents) {
