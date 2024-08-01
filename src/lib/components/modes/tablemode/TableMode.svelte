@@ -921,7 +921,6 @@
       documentState,
       selection,
       readOnly,
-      parser,
 
       onEditValue: handleEditValue,
       onEditRow: handleEditRow,
@@ -1064,7 +1063,7 @@
     const path = selection.path
     const pointer = compileJSONPointer(path)
     const value = getIn(json, path)
-    const enforceString = !getEnforceString(json, documentState, path, parser)
+    const enforceString = !getEnforceString(json, documentState, path)
     const updatedValue = enforceString ? String(value) : stringConvert(String(value), parser)
 
     debug('handleToggleEnforceString', { enforceString, value, updatedValue })
@@ -1828,7 +1827,7 @@
                         <JSONValue
                           {path}
                           value={value !== undefined ? value : ''}
-                          enforceString={getEnforceString(json, documentState, path, parser)}
+                          enforceString={getEnforceString(json, documentState, path)}
                           selection={isSelected ? selection : undefined}
                           searchResultItems={searchResultItemsByCell}
                           {context}

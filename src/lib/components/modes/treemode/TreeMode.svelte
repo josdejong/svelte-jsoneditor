@@ -675,7 +675,7 @@
     const path = getFocusPath(selection)
     const pointer = compileJSONPointer(path)
     const value = getIn(json, path)
-    const enforceString = !getEnforceString(json, documentState, path, parser)
+    const enforceString = !getEnforceString(json, documentState, path)
     const updatedValue = enforceString ? String(value) : stringConvert(String(value), parser)
 
     debug('handleToggleEnforceString', { enforceString, value, updatedValue })
@@ -1607,7 +1607,6 @@
       documentState,
       selection,
       readOnly,
-      parser,
 
       onEditKey: handleEditKey,
       onEditValue: handleEditValue,

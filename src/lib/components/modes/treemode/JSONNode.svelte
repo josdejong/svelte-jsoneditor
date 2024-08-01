@@ -101,7 +101,7 @@
   $: expanded = isExpandableState(state) ? state.expanded : false
 
   let enforceString: boolean
-  $: enforceString = getEnforceString(value, state, [], context.parser)
+  $: enforceString = getEnforceString(value, state, [])
 
   let visibleSections: VisibleSection[] | undefined
   $: visibleSections = isArrayRecursiveState(state) ? state.visibleSections : undefined
