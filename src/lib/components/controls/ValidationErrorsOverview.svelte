@@ -45,6 +45,7 @@
           {#each limit(validationErrors, MAX_VALIDATION_ERRORS) as validationError, index}
             <tr
               class="jse-validation-{validationError.severity}"
+              tabindex="0"
               on:click={() => {
                 // trigger on the next tick to prevent the editor not getting focus
                 setTimeout(() => selectError(validationError))

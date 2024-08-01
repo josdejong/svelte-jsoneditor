@@ -507,6 +507,8 @@
 
     if (isChildOfAttribute(event.target as Element, 'data-type', 'selectable-value')) {
       hover = HOVER_COLLECTION
+    } else if (isChildOfAttribute(event.target as Element, 'data-type', 'selectable-key')) {
+      hover = undefined
     } else if (
       isChildOfAttribute(event.target as Element, 'data-type', 'insert-selection-area-inside')
     ) {
