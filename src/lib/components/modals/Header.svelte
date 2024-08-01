@@ -1,21 +1,17 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'
   import {
     faDownLeftAndUpRightToCenter,
     faTimes,
     faUpRightAndDownLeftFromCenter
   } from '@fortawesome/free-solid-svg-icons'
-  import type { Context } from 'svelte-simple-modal'
 
   export let title = 'Modal'
   export let fullScreenButton: boolean = false
   export let fullscreen: boolean = false
   export let onClose: (() => void) | undefined = undefined
-
-  const { close } = getContext<Context>('simple-modal')
 </script>
 
 <div class="jse-header">
@@ -33,17 +29,7 @@
       <Icon data={fullscreen ? faDownLeftAndUpRightToCenter : faUpRightAndDownLeftFromCenter} />
     </button>
   {/if}
-  <button
-    type="button"
-    class="jse-close"
-    on:click={() => {
-      if (onClose) {
-        onClose()
-      } else {
-        close()
-      }
-    }}
-  >
+  <button type="button" class="jse-close" on:click={() => onClose?.()}>
     <Icon data={faTimes} />
   </button>
 </div>

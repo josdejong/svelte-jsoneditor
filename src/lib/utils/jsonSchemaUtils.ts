@@ -8,10 +8,10 @@ export function getJSONSchemaOptions(
   schema: JSONSchema,
   schemaDefinitions: JSONSchemaDefinitions | undefined,
   path: JSONPath
-): JSONSchemaEnum | null {
+): JSONSchemaEnum | undefined {
   const schemaForPath = findSchema(schema, schemaDefinitions || {}, path)
 
-  return schemaForPath ? findEnum(schemaForPath) : null
+  return schemaForPath ? findEnum(schemaForPath) : undefined
 }
 
 /**
@@ -20,7 +20,7 @@ export function getJSONSchemaOptions(
  *
  * Source: https://github.com/josdejong/jsoneditor/blob/develop/src/js/Node.js
  */
-export function findEnum(schema: JSONSchema): JSONSchemaEnum | null {
+export function findEnum(schema: JSONSchema): JSONSchemaEnum | undefined {
   if (Array.isArray(schema['enum'])) {
     return schema['enum']
   }
@@ -33,7 +33,7 @@ export function findEnum(schema: JSONSchema): JSONSchemaEnum | null {
     }
   }
 
-  return null
+  return undefined
 }
 
 /**
@@ -46,7 +46,7 @@ export function findSchema(
   schemaDefinitions: JSONSchemaDefinitions,
   path: JSONPath,
   currentSchema = topLevelSchema
-): JSONSchema | null {
+): JSONSchema | undefined {
   const nextPath = path.slice(1, path.length)
   const nextKey = path[0]
 
@@ -101,17 +101,14 @@ export function findSchema(
 
     if (
       typeof currentSchema.properties === 'object' &&
-      currentSchema.properties !== null &&
+      currentSchema.properties &&
       nextKey in currentSchema.properties
     ) {
       currentSchema = (currentSchema.properties as Record<string, JSONSchema>)[nextKey]
       return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
     }
 
-    if (
-      typeof currentSchema.patternProperties === 'object' &&
-      currentSchema.patternProperties !== null
-    ) {
+    if (typeof currentSchema.patternProperties === 'object' && currentSchema.patternProperties) {
       for (const prop in currentSchema.patternProperties) {
         if (nextKey.match(prop)) {
           currentSchema = (currentSchema.patternProperties as Record<string, JSONSchema>)[prop]
@@ -125,11 +122,11 @@ export function findSchema(
       return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
     }
 
-    if (typeof currentSchema.items === 'object' && currentSchema.items !== null) {
+    if (typeof currentSchema.items === 'object' && currentSchema.items) {
       currentSchema = currentSchema.items as JSONSchema
       return findSchema(topLevelSchema, schemaDefinitions, nextPath, currentSchema)
     }
   }
 
-  return null
+  return undefined
 }

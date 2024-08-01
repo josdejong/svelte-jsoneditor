@@ -12,6 +12,9 @@
   display: flex;
   flex-direction: row;
 
-  &.jse-focus {
+  // lighter selection color when the editor doesn't have focus
+  &:not(.jse-focus) {
+    --jse-selection-background-color: #{$selection-background-inactive-color};
+    --jse-context-menu-pointer-background: #{$context-menu-pointer-hover-background};
   }
 }

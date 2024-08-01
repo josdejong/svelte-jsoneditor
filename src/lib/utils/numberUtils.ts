@@ -9,7 +9,7 @@ export function isDigit(char: string): boolean {
 const DIGIT_REGEX = /^[0-9]$/
 
 // TODO: unit test
-export function isNumber(value: string): boolean {
+export function containsNumber(value: string): boolean {
   return NUMBER_REGEX.test(value)
 }
 

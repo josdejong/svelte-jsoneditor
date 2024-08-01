@@ -36,9 +36,9 @@
     }
 
     button.jse-nested-array-action {
-      @include jsoneditor-button-primary;
-
       text-align: left;
+
+      @include jsoneditor-button-primary;
 
       .jse-nested-array-count {
         opacity: 0.5;

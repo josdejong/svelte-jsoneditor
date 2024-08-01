@@ -9,11 +9,15 @@ const vanillaPackageFolder = getAbsolutePath(import.meta.url, '..', 'package-van
 
 const pkg = JSON.parse(String(readFileSync(getAbsolutePath(import.meta.url, '..', 'package.json'))))
 
-// We add svelte here: this is needed to export the TypeScript types
-const usedDependencyNames = [...getVanillaDependencies(), 'svelte']
+// We move peerDependencies to dependencies to make the package standalone.
+// This is necessary for the "svelte" dependency, which is needed to export the TypeScript types
+const usedDependencyNames = [
+  ...getVanillaDependencies(),
+  ...Object.keys(pkg.peerDependencies)
+].sort()
 
 const usedDependencies = usedDependencyNames.reduce((deps, name) => {
-  deps[name] = pkg.dependencies[name]
+  deps[name] = pkg.dependencies[name] || pkg.peerDependencies[name]
   return deps
 }, {})
 
@@ -21,7 +25,8 @@ const vanillaPackage = {
   ...pkg,
   name: 'vanilla-jsoneditor',
   scripts: {},
-  dependencies: usedDependencies, // needed for the TypeScript types
+  dependencies: usedDependencies,
+  peerDependencies: {}, // all peer dependencies are moved to dependencies
   devDependencies: {},
   svelte: undefined,
   browser: './standalone.js',

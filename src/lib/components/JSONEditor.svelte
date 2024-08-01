@@ -2,12 +2,6 @@
 
 <script lang="ts">
   import { createDebug } from '../utils/debug.js'
-  import Modal, { bind } from 'svelte-simple-modal'
-  import {
-    JSONEDITOR_MODAL_OPTIONS,
-    SORT_MODAL_OPTIONS,
-    TRANSFORM_MODAL_OPTIONS
-  } from '../constants.js'
   import { uniqueId } from '../utils/uniqueId.js'
   import {
     isEqualParser,
@@ -16,20 +10,22 @@
     validateContentType
   } from '../utils/jsonUtils.js'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
-  import { javascriptQueryLanguage } from '$lib/plugins/query/javascriptQueryLanguage.js'
+  import { jsonQueryLanguage } from '$lib/plugins/query/jsonQueryLanguage.js'
   import { renderValue } from '$lib/plugins/value/renderValue.js'
   import { tick } from 'svelte'
   import TransformModal from './modals/TransformModal.svelte'
-  import SortModal from './modals/SortModal.svelte'
   import type {
     Content,
     ContentErrors,
+    ContextMenuItem,
     JSONEditorModalCallback,
+    JSONEditorModalProps,
     JSONEditorPropsOptional,
     JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
     JSONPathParser,
+    MenuItem,
     OnBlur,
     OnChange,
     OnChangeMode,
@@ -46,8 +42,10 @@
     SortModalCallback,
     TransformModalCallback,
     TransformModalOptions,
+    TransformModalProps,
     Validator
   } from '$lib/types'
+  import type { OnRenderContextMenu } from '$lib/types.js'
   import { Mode } from '$lib/types.js'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { noop } from '../utils/noop.js'
@@ -55,16 +53,14 @@
   import JSONEditorRoot from './modes/JSONEditorRoot.svelte'
   import JSONEditorModal from './modals/JSONEditorModal.svelte'
   import memoizeOne from 'memoize-one'
-  import ModalRef from '../components/modals/ModalRef.svelte'
-  import type { Open, Callbacks, Component } from 'svelte-simple-modal'
-  import type { OnRenderContextMenu } from '$lib/types.js'
   import { cloneDeep } from 'lodash-es'
+  import SortModal from './modals/SortModal.svelte'
 
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:JSONEditor')
 
   export let content: Content = { text: '' }
-  export let selection: JSONEditorSelection | null = null
+  export let selection: JSONEditorSelection | undefined = undefined
 
   export let readOnly = false
   export let indentation: number | string = 2
@@ -78,19 +74,19 @@
   export let escapeUnicodeCharacters = false
   export let flattenColumns = true
   export let parser: JSONParser = JSON
-  export let validator: Validator | null = null
+  export let validator: Validator | undefined = undefined
   export let validationParser: JSONParser = JSON
   export let pathParser: JSONPathParser = {
     parse: parseJSONPath,
     stringify: stringifyJSONPath
   }
 
-  export let queryLanguages: QueryLanguage[] = [javascriptQueryLanguage]
+  export let queryLanguages: QueryLanguage[] = [jsonQueryLanguage]
   export let queryLanguageId: string = queryLanguages[0].id
 
   export let onChangeQueryLanguage: OnChangeQueryLanguage = noop
-  export let onChange: OnChange = null
-  export let onSelect: OnSelect | null = null
+  export let onChange: OnChange | undefined = undefined
+  export let onSelect: OnSelect | undefined = undefined
   export let onRenderValue: OnRenderValue = renderValue
   export let onClassName: OnClassName = () => undefined
   export let onRenderMenu: OnRenderMenu = noop
@@ -106,17 +102,20 @@
   let instanceId = uniqueId()
   let hasFocus = false
   let refJSONEditorRoot: JSONEditorRoot
-  let open: Open // svelte-simple-modal context open(...)
-  let jsoneditorModalState: {
-    component: Component
-    callbacks: Partial<Callbacks>
-  } | null = null
+  let jsonEditorModalProps: JSONEditorModalProps | undefined = undefined
+  let sortModalProps: SortModalCallback | undefined
+  let transformModalProps: TransformModalProps | undefined
 
   $: {
     const contentError = validateContentType(content)
     if (contentError) {
       console.error('Error: ' + contentError)
     }
+  }
+
+  // backward compatibility warning since v1.0.0
+  $: if (selection === null) {
+    console.warn('selection is invalid: it is null but should be undefined')
   }
 
   // We memoize the last parse result for the case when the content is text and very large.
@@ -198,14 +197,20 @@
     return result
   }
 
-  export async function select(newSelection: JSONEditorSelection | null) {
+  export async function select(newSelection: JSONEditorSelection | undefined) {
     selection = newSelection
 
     await tick() // await rerender
   }
 
-  export async function expand(callback?: OnExpand): Promise<void> {
-    refJSONEditorRoot.expand(callback)
+  export async function expand(path: JSONPath, callback?: OnExpand): Promise<void> {
+    refJSONEditorRoot.expand(path, callback)
+
+    await tick() // await rerender
+  }
+
+  export async function collapse(path: JSONPath, recursive = false): Promise<void> {
+    refJSONEditorRoot.collapse(path, recursive)
 
     await tick() // await rerender
   }
@@ -221,7 +226,7 @@
    * Validate the contents of the editor using the configured validator.
    * Returns a parse error or a list with validation warnings
    */
-  export function validate(): ContentErrors | null {
+  export function validate(): ContentErrors | undefined {
     return refJSONEditorRoot.validate()
   }
 
@@ -248,7 +253,7 @@
     await refJSONEditorRoot.scrollTo(path)
   }
 
-  export function findElement(path: JSONPath): Element | null {
+  export function findElement(path: JSONPath): Element | undefined {
     return refJSONEditorRoot.findElement(path)
   }
 
@@ -286,7 +291,7 @@
     }
   }
 
-  function handleSelect(updatedSelection: JSONEditorSelection | null) {
+  function handleSelect(updatedSelection: JSONEditorSelection | undefined) {
     selection = updatedSelection
 
     if (onSelect) {
@@ -334,54 +339,37 @@
       return
     }
 
-    open(
-      TransformModal,
-      {
-        id,
-        json,
-        rootPath,
-        indentation,
-        escapeControlCharacters,
-        escapeUnicodeCharacters,
-        parser,
-        parseMemoizeOne,
-        validationParser,
-        pathParser,
-        queryLanguages,
-        queryLanguageId,
-        onChangeQueryLanguage: handleChangeQueryLanguage,
-        onRenderValue,
-        onRenderMenu,
-        onRenderContextMenu,
-        onClassName,
-        onTransform
-      },
-      TRANSFORM_MODAL_OPTIONS,
-      {
-        onClose
-      }
-    )
+    transformModalProps = {
+      id,
+      json,
+      rootPath,
+      indentation,
+      escapeControlCharacters,
+      escapeUnicodeCharacters,
+      parser,
+      parseMemoizeOne,
+      validationParser,
+      pathParser,
+      queryLanguages,
+      queryLanguageId,
+      onChangeQueryLanguage: handleChangeQueryLanguage,
+      onRenderValue,
+      onRenderMenu: (items: MenuItem[]) => onRenderMenu(items, { mode, modal: true, readOnly }),
+      onRenderContextMenu: (items: ContextMenuItem[]) =>
+        onRenderContextMenu(items, { mode, modal: true, readOnly, selection }),
+      onClassName,
+      onTransform,
+      onClose
+    }
   }
 
   // The onSortModal is positioned here for consistency with TransformModal
-  function onSortModal({ id, json, rootPath, onSort, onClose }: SortModalCallback) {
+  function onSortModal(props: SortModalCallback) {
     if (readOnly) {
       return
     }
 
-    open(
-      SortModal,
-      {
-        id,
-        json,
-        rootPath,
-        onSort
-      },
-      SORT_MODAL_OPTIONS,
-      {
-        onClose
-      }
-    )
+    sortModalProps = props
   }
 
   // The onJSONEditorModal method is located in JSONEditor to prevent circular references:
@@ -389,107 +377,108 @@
   function onJSONEditorModal({ content, path, onPatch, onClose }: JSONEditorModalCallback) {
     debug('onJSONEditorModal', { content, path })
 
-    jsoneditorModalState = {
-      component: bind(JSONEditorModal, {
-        content,
-        path,
-        onPatch,
+    jsonEditorModalProps = {
+      content,
+      path,
+      onPatch,
 
-        readOnly,
-        indentation,
-        tabSize,
-        mainMenuBar,
-        navigationBar,
-        statusBar,
-        askToFormat,
-        escapeControlCharacters,
-        escapeUnicodeCharacters,
-        flattenColumns,
-        parser,
-        validator: undefined, // TODO: support partial JSON validation?
-        validationParser,
-        pathParser,
-        onRenderValue,
-        onClassName,
-        onRenderMenu,
-        onRenderContextMenu,
-        onSortModal,
-        onTransformModal
-      }),
-      callbacks: {
-        onClose
-      }
+      readOnly,
+      indentation,
+      tabSize,
+      mainMenuBar,
+      navigationBar,
+      statusBar,
+      askToFormat,
+      escapeControlCharacters,
+      escapeUnicodeCharacters,
+      flattenColumns,
+      parser,
+      validator: undefined, // TODO: support partial JSON validation?
+      validationParser,
+      pathParser,
+      onRenderValue,
+      onClassName,
+      onRenderMenu,
+      onRenderContextMenu,
+      onSortModal,
+      onTransformModal,
+      onClose
     }
   }
 
-  function closeJSONEditorModal() {
-    jsoneditorModalState?.callbacks?.onClose?.()
-    jsoneditorModalState = null
-  }
-
-  $: {
-    debug('mode changed to', mode)
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    if (mode === 'code') {
-      // check for 'code' is here for backward compatibility (deprecated since v0.4.0)
-      console.warn(
-        'Deprecation warning: "code" mode is renamed to "text". Please use mode="text" instead.'
-      )
-    }
-  }
+  $: debug('mode changed to', mode)
 </script>
 
 <AbsolutePopup>
-  <Modal
-    show={jsoneditorModalState?.component}
-    {...JSONEDITOR_MODAL_OPTIONS}
-    closeOnEsc={false}
-    on:close={closeJSONEditorModal}
-  >
-    <Modal closeOnEsc={false}>
-      <ModalRef bind:open />
-      <div class="jse-main" class:jse-focus={hasFocus}>
-        {#key instanceId}
-          <JSONEditorRoot
-            bind:this={refJSONEditorRoot}
-            {mode}
-            {content}
-            {selection}
-            {readOnly}
-            {indentation}
-            {tabSize}
-            {statusBar}
-            {askToFormat}
-            {mainMenuBar}
-            {navigationBar}
-            {escapeControlCharacters}
-            {escapeUnicodeCharacters}
-            {flattenColumns}
-            {parser}
-            {parseMemoizeOne}
-            {validator}
-            {validationParser}
-            {pathParser}
-            insideModal={false}
-            {onError}
-            onChange={handleChange}
-            onChangeMode={toggleMode}
-            onSelect={handleSelect}
-            {onRenderValue}
-            {onClassName}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            {onRenderMenu}
-            {onRenderContextMenu}
-            {onSortModal}
-            {onTransformModal}
-            {onJSONEditorModal}
-          />
-        {/key}
-      </div>
-    </Modal>
-  </Modal>
+  <div class="jse-main" class:jse-focus={hasFocus}>
+    {#key instanceId}
+      <JSONEditorRoot
+        bind:this={refJSONEditorRoot}
+        {mode}
+        {content}
+        {selection}
+        {readOnly}
+        {indentation}
+        {tabSize}
+        {statusBar}
+        {askToFormat}
+        {mainMenuBar}
+        {navigationBar}
+        {escapeControlCharacters}
+        {escapeUnicodeCharacters}
+        {flattenColumns}
+        {parser}
+        {parseMemoizeOne}
+        {validator}
+        {validationParser}
+        {pathParser}
+        insideModal={false}
+        {onError}
+        onChange={handleChange}
+        onChangeMode={toggleMode}
+        onSelect={handleSelect}
+        {onRenderValue}
+        {onClassName}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        {onRenderMenu}
+        {onRenderContextMenu}
+        {onSortModal}
+        {onTransformModal}
+        {onJSONEditorModal}
+      />
+    {/key}
+  </div>
+
+  {#if sortModalProps}
+    <SortModal
+      {...sortModalProps}
+      onClose={() => {
+        sortModalProps?.onClose()
+        sortModalProps = undefined
+      }}
+    />
+  {/if}
+
+  {#if transformModalProps}
+    <TransformModal
+      {...transformModalProps}
+      onClose={() => {
+        transformModalProps?.onClose()
+        transformModalProps = undefined
+      }}
+    />
+  {/if}
+
+  {#if jsonEditorModalProps}
+    <JSONEditorModal
+      {...jsonEditorModalProps}
+      onClose={() => {
+        jsonEditorModalProps?.onClose()
+        jsonEditorModalProps = undefined
+      }}
+    />
+  {/if}
 </AbsolutePopup>
 
 <style src="./JSONEditor.scss"></style>

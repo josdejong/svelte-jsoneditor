@@ -37,7 +37,7 @@
   import { cloneDeep } from 'lodash-es'
 
   export let content: Content
-  export let selection: JSONEditorSelection | null
+  export let selection: JSONEditorSelection | undefined
 
   export let readOnly: boolean
   export let indentation: number | string
@@ -52,7 +52,7 @@
   export let flattenColumns: boolean
   export let parser: JSONParser
   export let parseMemoizeOne: JSONParser['parse']
-  export let validator: Validator | null
+  export let validator: Validator | undefined
   export let validationParser: JSONParser
   export let pathParser: JSONPathParser
   export let insideModal: boolean
@@ -81,10 +81,7 @@
       type: 'button',
       text: 'text',
       title: `Switch to text mode (current mode: ${mode})`,
-      // check for 'code' mode is here for backward compatibility (deprecated since v0.4.0)
-      className:
-        'jse-group-button jse-first' +
-        (mode === Mode.text || (mode as string) === 'code' ? ' jse-selected' : ''),
+      className: 'jse-group-button jse-first' + (mode === Mode.text ? ' jse-selected' : ''),
       onClick: () => onChangeMode(Mode.text)
     },
     {
@@ -150,11 +147,19 @@
     throw new Error(`Method patch is not available in mode "${mode}"`)
   }
 
-  export function expand(callback?: OnExpand): void {
+  export function expand(path: JSONPath, callback?: OnExpand): void {
     if (refTreeMode) {
-      return refTreeMode.expand(callback)
+      return refTreeMode.expand(path, callback)
     } else {
       throw new Error(`Method expand is not available in mode "${mode}"`)
+    }
+  }
+
+  export function collapse(path: JSONPath, recursive: boolean): void {
+    if (refTreeMode) {
+      return refTreeMode.collapse(path, recursive)
+    } else {
+      throw new Error(`Method collapse is not available in mode "${mode}"`)
     }
   }
 
@@ -177,7 +182,7 @@
    * Validate the contents of the editor using the configured validator.
    * Returns a parse error or a list with validation warnings
    */
-  export function validate(): ContentErrors | null {
+  export function validate(): ContentErrors | undefined {
     if (refTextMode) {
       return refTextMode.validate()
     } else if (refTreeMode) {
@@ -219,7 +224,7 @@
     }
   }
 
-  export function findElement(path: JSONPath): Element | null {
+  export function findElement(path: JSONPath): Element | undefined {
     if (refTreeMode) {
       return refTreeMode.findElement(path)
     } else if (refTableMode) {

@@ -139,15 +139,17 @@ export function normalizeJsonParseError(jsonText: string, parseErrorMessage: str
   } else {
     // a message from Firefox, like "JSON.parse: expected property name or '}' at line 2 column 3 of the JSON data"
     const lineMatch = LINE_REGEX.exec(parseErrorMessage)
-    const lineOneBased = lineMatch ? int(lineMatch[1]) : null
-    const line = lineOneBased !== null ? lineOneBased - 1 : null
+    const lineOneBased = lineMatch ? int(lineMatch[1]) : undefined
+    const line = lineOneBased !== undefined ? lineOneBased - 1 : undefined
 
     const columnMatch = COLUMN_REGEX.exec(parseErrorMessage)
-    const columnOneBased = columnMatch ? int(columnMatch[1]) : null
-    const column = columnOneBased !== null ? columnOneBased - 1 : null
+    const columnOneBased = columnMatch ? int(columnMatch[1]) : undefined
+    const column = columnOneBased !== undefined ? columnOneBased - 1 : undefined
 
     const position =
-      line !== null && column !== null ? calculatePosition(jsonText, line, column) : null
+      line !== undefined && column !== undefined
+        ? calculatePosition(jsonText, line, column)
+        : undefined
 
     // line and column are one based in the message
     return {
@@ -165,7 +167,7 @@ export function normalizeJsonParseError(jsonText: string, parseErrorMessage: str
  * @param line     Zero-based line number
  * @param column   Zero-based column number
  */
-export function calculatePosition(text: string, line: number, column: number): number | null {
+export function calculatePosition(text: string, line: number, column: number): number | undefined {
   let index = text.indexOf('\n')
   let i = 1
 
@@ -176,7 +178,7 @@ export function calculatePosition(text: string, line: number, column: number): n
 
   return index !== -1
     ? index + column + 1 // +1 for the return character itself
-    : null
+    : undefined
 }
 
 export function countCharacterOccurrences(
@@ -319,7 +321,7 @@ export function convertValue(
  * Returns a string with validation error message when there is an issue,
  * or null otherwise
  */
-export function validateContentType(content: unknown): string | null {
+export function validateContentType(content: unknown): string | undefined {
   if (!isObject(content)) {
     return 'Content must be an object'
   }
@@ -328,7 +330,7 @@ export function validateContentType(content: unknown): string | null {
     if (content.text !== undefined) {
       return 'Content must contain either a property "json" or a property "text" but not both'
     } else {
-      return null
+      return undefined
     }
   } else {
     if (content.text === undefined) {
@@ -339,7 +341,7 @@ export function validateContentType(content: unknown): string | null {
         'Did you mean to use the "json" property instead?'
       )
     } else {
-      return null
+      return undefined
     }
   }
 }
@@ -428,7 +430,7 @@ export function estimateSerializedSize(content: Content, maxSize = Infinity): nu
       estimatedSize += 2 + (json.length - 1)
 
       if (estimatedSize > maxSize) {
-        return estimatedSize
+        return
       }
 
       for (let i = 0; i < json.length; i++) {
@@ -437,7 +439,7 @@ export function estimateSerializedSize(content: Content, maxSize = Infinity): nu
         recurse(item)
 
         if (estimatedSize > maxSize) {
-          return estimatedSize
+          return
         }
       }
     } else if (isObject(json)) {

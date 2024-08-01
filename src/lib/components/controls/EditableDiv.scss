@@ -19,10 +19,16 @@ div.jse-editable-div {
     overflow-wrap: normal;
   }
 
+  &.jse-table-cell {
+    overflow-wrap: normal;
+    white-space: nowrap;
+  }
+
   &[contenteditable='true'] {
     outline: $edit-outline;
-    background: inherit !important;
+    background: $background-color;
     position: relative;
+    display: inline-block;
     border-radius: 0;
     z-index: 3; // must be on top of hovering the entry below it
   }

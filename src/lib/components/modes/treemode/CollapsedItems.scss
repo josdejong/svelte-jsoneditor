@@ -39,6 +39,11 @@ div.jse-collapsed-items {
 
   display: flex;
 
+  &.jse-selected {
+    background-color: $selection-background-color;
+    --jse-collapsed-items-background-color: #{$collapsed-items-selected-background-color};
+  }
+
   div.jse-text,
   button.jse-expand-items {
     margin: 0 $padding-half;

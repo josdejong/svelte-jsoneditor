@@ -12,7 +12,7 @@
   import { truncate } from '$lib/utils/stringUtils.js'
 
   export let path: JSONPath
-  export let sortedColumn: SortedColumn | null
+  export let sortedColumn: SortedColumn | undefined
   export let readOnly: boolean
   export let onSort: (sortedColumn: SortedColumn) => void
 

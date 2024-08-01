@@ -10,8 +10,9 @@ declare global {
 
 export function isMac() {
   return (
-    navigator?.platform?.toUpperCase().includes('MAC') ??
-    navigator?.userAgentData?.platform?.toUpperCase().includes('MAC') ??
-    false
+    typeof navigator !== 'undefined' &&
+    (navigator?.platform?.toUpperCase().includes('MAC') ??
+      navigator?.userAgentData?.platform?.toUpperCase().includes('MAC') ??
+      false)
   )
 }

@@ -28,18 +28,19 @@
     OnTransformModal,
     ParseError,
     PastedJson,
-    SearchResult,
+    SearchResults,
+    SearchResultDetails,
     SortedColumn,
     TransformModalOptions,
     ValidationError,
     Validator,
-    ValueNormalization
+    ValueNormalization,
+    JSONRepairModalProps
   } from '$lib/types'
   import { Mode, SortDirection, ValidationSeverity } from '$lib/types.js'
   import TableMenu from './menu/TableMenu.svelte'
   import {
     compileJSONPointer,
-    compileJSONPointerProp,
     existsIn,
     getIn,
     immutableJSONPatch,
@@ -69,7 +70,6 @@
     toTableCellPosition
   } from '$lib/logic/table.js'
   import { isEmpty, isEqual, uniqueId } from 'lodash-es'
-  import JSONValueComponent from './JSONValue.svelte'
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
@@ -77,20 +77,23 @@
     findParentWithNodeName,
     getDataPathFromTarget,
     getWindow,
-    isEditableDivRef
+    isChildOf
   } from '$lib/utils/domUtils.js'
   import { createDebug } from '$lib/utils/debug.js'
   import {
     createDocumentState,
     documentStatePatch,
-    expandMinimal,
-    expandWithCallback,
     getEnforceString,
-    setEnforceString
+    getInRecursiveState,
+    setInDocumentState,
+    syncDocumentState
   } from '$lib/logic/documentState.js'
   import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils.js'
   import InlineValue from './tag/InlineValue.svelte'
-  import { revertJSONPatchWithMoveOperations } from '$lib/logic/operations.js'
+  import {
+    createNestedValueOperations,
+    revertJSONPatchWithMoveOperations
+  } from '$lib/logic/operations.js'
   import {
     createValueSelection,
     getAnchorPath,
@@ -119,8 +122,7 @@
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
     SCROLL_DURATION,
-    SEARCH_BOX_HEIGHT,
-    SIMPLE_MODAL_OPTIONS
+    SEARCH_BOX_HEIGHT
   } from '$lib/constants.js'
   import { noop } from '$lib/utils/noop.js'
   import { createJump } from '$lib/assets/jump.js/src/jump.js'
@@ -144,14 +146,12 @@
   import TableModeWelcome from './TableModeWelcome.svelte'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import RefreshColumnHeader from './RefreshColumnHeader.svelte'
-  import type { Context } from 'svelte-simple-modal'
   import createTableContextMenuItems from './contextmenu/createTableContextMenuItems'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
-  import { filterValueSearchResults } from '$lib/logic/search.js'
-  import { filterPointerOrUndefined } from 'svelte-jsoneditor/utils/jsonPointer'
+  import { flattenSearchResults, toRecursiveSearchResults } from '$lib/logic/search.js'
+  import JSONValue from '../treemode/JSONValue.svelte'
 
   const debug = createDebug('jsoneditor:TableMode')
-  const { open } = getContext<Context>('simple-modal')
   const { openAbsolutePopup, closeAbsolutePopup } =
     getContext<AbsolutePopupContext>('absolute-popup')
   const jump = createJump()
@@ -163,14 +163,14 @@
 
   export let readOnly: boolean
   export let externalContent: Content
-  export let externalSelection: JSONEditorSelection | null
+  export let externalSelection: JSONEditorSelection | undefined
   export let mainMenuBar: boolean
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
   export let flattenColumns: boolean
   export let parser: JSONParser
   export let parseMemoizeOne: JSONParser['parse']
-  export let validator: Validator | null
+  export let validator: Validator | undefined
   export let validationParser: JSONParser
   export let indentation: number | string
   export let onChange: OnChange
@@ -195,6 +195,8 @@
   let refContents: HTMLDivElement | undefined
   let refHiddenInput: HTMLInputElement
 
+  let jsonRepairModalProps: JSONRepairModalProps | undefined = undefined
+
   createFocusTracker({
     onMount,
     onDestroy,
@@ -218,9 +220,10 @@
   let text: string | undefined
   let parseError: ParseError | undefined = undefined
 
-  let pastedJson: PastedJson
+  let pastedJson: PastedJson | undefined
 
-  let searchResult: SearchResult | undefined
+  let searchResultDetails: SearchResultDetails | undefined
+  let searchResults: SearchResults | undefined
   let showSearch = false
   let showReplace = false
 
@@ -238,15 +241,15 @@
     })
   }
 
-  function handleSearch(result: SearchResult | undefined) {
-    searchResult = result
+  function handleSearch(result: SearchResultDetails | undefined) {
+    searchResultDetails = result
+    searchResults = searchResultDetails
+      ? toRecursiveSearchResults(json, searchResultDetails.items)
+      : undefined
   }
 
   async function handleFocusSearch(path: JSONPath) {
-    documentState = {
-      ...documentState,
-      selection: null // navigation path of current selection would be confusing
-    }
+    selection = undefined // navigation path of current selection would be confusing
     await scrollTo(path)
   }
 
@@ -274,6 +277,7 @@
   let modalOpen = false
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let hasFocus = false
+  let copyPasteModalOpen = false
 
   let itemHeightsCache: Record<number, number> = {}
 
@@ -306,56 +310,36 @@
     }
   }
 
-  function clearSortedColumn() {
-    if (documentState.sortedColumn) {
-      documentState = {
-        ...documentState,
-        sortedColumn: null
-      }
-    }
+  function handleSelect(updatedSelection: JSONSelection | undefined) {
+    selection = updatedSelection
   }
 
-  function updateSelection(
-    selection:
-      | JSONSelection
-      | null
-      | ((selection: JSONSelection | null) => JSONSelection | null | void | undefined)
-  ) {
-    debug('updateSelection', selection)
-
-    const updatedSelection =
-      typeof selection === 'function' ? selection(documentState.selection) || null : selection
-
-    if (!isEqual(updatedSelection, documentState.selection)) {
-      documentState = {
-        ...documentState,
-        selection: updatedSelection
-      }
-
+  function emitOnSelect(updatedSelection: JSONSelection | undefined) {
+    if (!isEqual(updatedSelection, externalSelection)) {
+      debug('onSelect', updatedSelection)
       onSelect(updatedSelection)
     }
   }
 
+  $: emitOnSelect(selection)
+
   function clearSelectionWhenNotExisting(json: unknown | undefined) {
-    if (!documentState.selection || json === undefined) {
+    if (!selection || json === undefined) {
       return
     }
 
-    if (
-      existsIn(json, getAnchorPath(documentState.selection)) &&
-      existsIn(json, getFocusPath(documentState.selection))
-    ) {
+    if (existsIn(json, getAnchorPath(selection)) && existsIn(json, getFocusPath(selection))) {
       return
     }
 
-    debug('clearing selection: path does not exist anymore', documentState.selection)
-    documentState = {
-      ...documentState,
-      selection: null // TODO: try find the closest cell that still exists (similar to getInitialSelection)
-    }
+    debug('clearing selection: path does not exist anymore', selection)
+    selection = undefined // TODO: try find the closest cell that still exists (similar to getInitialSelection)
   }
 
-  let documentState = createDocumentState()
+  let documentState: DocumentState | undefined =
+    json !== undefined ? createDocumentState({ json }) : undefined
+  let selection: JSONSelection | undefined
+  let sortedColumn: SortedColumn | undefined
   let textIsRepaired = false
 
   function onSortByHeader(newSortedColumn: SortedColumn) {
@@ -370,10 +354,8 @@
     const operations = sortJson(json, rootPath, newSortedColumn.path, direction)
     handlePatch(operations, (_, patchedState) => {
       return {
-        state: {
-          ...patchedState,
-          sortedColumn: newSortedColumn
-        }
+        state: patchedState,
+        sortedColumn: newSortedColumn
       }
     })
   }
@@ -387,6 +369,7 @@
 
   let context: JSONEditorContext
   $: context = {
+    mode: Mode.table,
     readOnly,
     parser,
     normalization,
@@ -395,9 +378,14 @@
     findElement,
     findNextInside,
     focus,
-    onPatch: handlePatch,
-    onSelect: updateSelection,
-    onFind: handleFind,
+    onPatch: (operations, afterPatch) => {
+      // When having flattened table columns and having inserted a new row, it is possible that
+      // we edit a nested value of which the parent object is not existing. Therefore, we call
+      // replaceNestedValue to create the parent object(s) first.
+      return handlePatch(createNestedValueOperations(operations, json), afterPatch)
+    },
+    onSelect: handleSelect,
+    onFind: openFind,
     onPasteJson: handlePasteJson,
     onRenderValue
   }
@@ -415,26 +403,26 @@
       return
     }
 
-    const previousJson = json
-    const previousState = documentState
-    const previousText = text
-    const previousTextIsRepaired = textIsRepaired
+    const previousState = { json, documentState, selection, sortedColumn, text, textIsRepaired }
 
     if (isTextContent(content)) {
       try {
         json = parseMemoizeOne(content.text)
+        documentState = syncDocumentState(json, documentState)
         text = content.text
         textIsRepaired = false
         parseError = undefined
       } catch (err) {
         try {
           json = parseMemoizeOne(jsonrepair(content.text))
+          documentState = syncDocumentState(json, documentState)
           text = content.text
           textIsRepaired = true
           parseError = undefined
         } catch (repairError) {
           // no valid JSON, will show empty document or invalid json
           json = undefined
+          documentState = undefined
           text = content.text
           textIsRepaired = false
           parseError =
@@ -445,6 +433,7 @@
       }
     } else {
       json = content.json
+      documentState = syncDocumentState(json, documentState)
       text = undefined
       textIsRepaired = false
       parseError = undefined
@@ -454,102 +443,60 @@
     clearSelectionWhenNotExisting(json)
 
     // reset the sorting order (we don't know...)
-    clearSortedColumn()
+    sortedColumn = undefined
 
-    addHistoryItem({
-      previousJson,
-      previousState,
-      previousText,
-      previousTextIsRepaired
-    })
+    addHistoryItem(previousState)
   }
 
-  function applyExternalSelection(externalSelection: JSONEditorSelection | null) {
-    if (!isEqual(documentState.selection, externalSelection)) {
-      debug('applyExternalSelection', externalSelection)
+  function applyExternalSelection(externalSelection: JSONEditorSelection | undefined) {
+    if (isEqual(selection, externalSelection)) {
+      return
+    }
 
-      if (isJSONSelection(externalSelection) || externalSelection === null) {
-        updateSelection(externalSelection)
-      }
+    debug('applyExternalSelection', { selection, externalSelection })
+
+    if (isJSONSelection(externalSelection)) {
+      selection = externalSelection
     }
   }
 
-  // TODO: addHistoryItem is a duplicate of addHistoryItem in TreeMode.svelte. Can we extract and reuse this logic?
-  function addHistoryItem({
-    previousJson,
-    previousState,
-    previousText,
-    previousTextIsRepaired
-  }: {
-    previousJson: unknown | undefined
-    previousText: string | undefined
-    previousState: DocumentState
-    previousTextIsRepaired: boolean
-  }) {
-    if (previousJson === undefined && previousText === undefined) {
+  interface PreviousState {
+    json: unknown | undefined
+    text: string | undefined
+    documentState: DocumentState | undefined
+    selection: JSONSelection | undefined
+    textIsRepaired: boolean
+    sortedColumn: SortedColumn | undefined
+  }
+
+  function addHistoryItem(previous: PreviousState) {
+    if (previous.json === undefined && previous.text === undefined) {
       // initialization -> do not create a history item
       return
     }
 
-    if (json !== undefined) {
-      if (previousJson !== undefined) {
-        // regular undo/redo with JSON patch
-        history.add({
-          undo: {
-            patch: [{ op: 'replace', path: '', value: previousJson }],
-            state: removeEditModeFromSelection(previousState),
-            json: undefined,
-            text: previousText,
-            textIsRepaired: previousTextIsRepaired
-          },
-          redo: {
-            patch: [{ op: 'replace', path: '', value: json }],
-            state: removeEditModeFromSelection(documentState),
-            json: undefined,
-            text,
-            textIsRepaired
-          }
-        })
-      } else {
-        history.add({
-          undo: {
-            patch: undefined,
-            json: undefined,
-            text: previousText,
-            state: removeEditModeFromSelection(previousState),
-            textIsRepaired: previousTextIsRepaired
-          },
-          redo: {
-            patch: undefined,
-            json,
-            state: removeEditModeFromSelection(documentState),
-            text,
-            textIsRepaired
-          }
-        })
+    const canPatch = json !== undefined && previous.json !== undefined
+
+    history.add({
+      undo: {
+        patch: canPatch ? [{ op: 'replace', path: '', value: previous.json }] : undefined,
+        json: previous.json,
+        text: previous.text,
+        documentState: previous.documentState,
+        textIsRepaired: previous.textIsRepaired,
+        selection: removeEditModeFromSelection(previous.selection),
+        sortedColumn: previous.sortedColumn
+      },
+      redo: {
+        patch: canPatch ? [{ op: 'replace', path: '', value: json }] : undefined,
+        json,
+        text,
+        documentState,
+        textIsRepaired,
+        selection: removeEditModeFromSelection(selection),
+        sortedColumn
       }
-    } else {
-      if (previousJson !== undefined) {
-        history.add({
-          undo: {
-            patch: undefined,
-            json: previousJson,
-            state: removeEditModeFromSelection(previousState),
-            text: previousText,
-            textIsRepaired: previousTextIsRepaired
-          },
-          redo: {
-            patch: undefined,
-            json: undefined,
-            text,
-            textIsRepaired,
-            state: removeEditModeFromSelection(documentState)
-          }
-        })
-      } else {
-        // this cannot happen. Nothing to do, no change
-      }
-    }
+    })
   }
 
   let validationErrors: ValidationError[] = []
@@ -562,7 +509,7 @@
 
   function updateValidationErrors(
     json: unknown,
-    validator: Validator | null,
+    validator: Validator | undefined,
     parser: JSONParser,
     validationParser: JSONParser
   ) {
@@ -590,7 +537,7 @@
     )
   }
 
-  export function validate(): ContentErrors | null {
+  export function validate(): ContentErrors | undefined {
     debug('validate')
 
     if (parseError) {
@@ -603,7 +550,7 @@
     // make sure the validation results are up-to-date
     // normally, they are only updated on the next tick after the json is changed
     updateValidationErrors(json, validator, parser, validationParser)
-    return !isEmpty(validationErrors) ? { validationErrors } : null
+    return !isEmpty(validationErrors) ? { validationErrors } : undefined
   }
 
   export function patch(
@@ -617,8 +564,14 @@
     }
 
     const previousJson = json
-    const previousState = documentState
-    const previousTextIsRepaired = textIsRepaired
+    const previousState: PreviousState = {
+      json: undefined, // not needed: we use patch to reconstruct the json
+      text,
+      documentState,
+      selection: removeEditModeFromSelection(selection),
+      sortedColumn,
+      textIsRepaired
+    }
 
     // execute the patch operations
     const undo: JSONPatchDocument = revertJSONPatchWithMoveOperations(
@@ -630,20 +583,22 @@
     // Clear the sorted column when needed. We need to do this before `afterPatch`,
     // else we clear any changed made in the callback. It is a bit odd that
     // afterPatch does not receive the actual previousDocumentState. Better ideas?
-    const patchedJson = patched.json
-    const patchedDocumentState = clearSortedColumnWhenAffectedByOperations(
-      documentState,
+    const patchedSortedColumn = clearSortedColumnWhenAffectedByOperations(
+      sortedColumn,
       operations,
       columns
     )
 
     const callback =
-      typeof afterPatch === 'function' ? afterPatch(patchedJson, patchedDocumentState) : undefined
+      typeof afterPatch === 'function'
+        ? afterPatch(patched.json, patched.documentState, selection)
+        : undefined
 
-    json = callback && callback.json !== undefined ? callback.json : patchedJson
-    const newState =
-      callback && callback.state !== undefined ? callback.state : patchedDocumentState
-    documentState = newState
+    json = callback?.json !== undefined ? callback.json : patched.json
+    documentState = callback?.state !== undefined ? callback.state : patched.documentState
+    selection = callback?.selection !== undefined ? callback.selection : selection
+    sortedColumn =
+      callback?.sortedColumn !== undefined ? callback.sortedColumn : patchedSortedColumn
     text = undefined
     textIsRepaired = false
     pastedJson = undefined
@@ -652,16 +607,15 @@
     history.add({
       undo: {
         patch: undo,
-        json: undefined,
-        text: undefined,
-        state: removeEditModeFromSelection(previousState),
-        textIsRepaired: previousTextIsRepaired
+        ...previousState
       },
       redo: {
         patch: operations,
-        json: undefined,
-        state: removeEditModeFromSelection(newState),
+        json: undefined, // not needed: we use patch to reconstruct the json
         text: undefined,
+        documentState,
+        selection: removeEditModeFromSelection(selection),
+        sortedColumn,
         textIsRepaired
       }
     })
@@ -688,7 +642,7 @@
     return patchResult
   }
 
-  function emitOnChange(previousContent: Content, patchResult: JSONPatchResult | null) {
+  function emitOnChange(previousContent: Content, patchResult: JSONPatchResult | undefined) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (previousContent.json === undefined && previousContent?.text === undefined) {
@@ -715,12 +669,6 @@
     }
   }
 
-  function handleFind(findAndReplace: boolean) {
-    debug('handleFind', findAndReplace)
-
-    // TODO: implement handleFind
-  }
-
   function handlePasteJson(newPastedJson: PastedJson) {
     debug('pasted json as text', newPastedJson)
 
@@ -731,9 +679,7 @@
     const index = parseInt(path[0], 10)
     const nextPath = [String(index + 1), ...path.slice(1)]
 
-    return existsIn(json, nextPath)
-      ? createValueSelection(nextPath, false)
-      : createValueSelection(path, false)
+    return existsIn(json, nextPath) ? createValueSelection(nextPath) : createValueSelection(path)
   }
 
   export function focus() {
@@ -744,6 +690,29 @@
     if (refHiddenInput) {
       refHiddenInput.focus()
       refHiddenInput.select()
+    }
+  }
+
+  function handleWindowMouseDown(event: MouseEvent & { currentTarget: EventTarget & Window }) {
+    const outsideEditor = !isChildOf(
+      event.target as Element,
+      (element) => element === refJsonEditor
+    )
+    if (outsideEditor) {
+      if (isEditingSelection(selection)) {
+        debug('click outside the editor, exit edit mode')
+        selection = removeEditModeFromSelection(selection)
+
+        if (hasFocus && refHiddenInput) {
+          refHiddenInput.focus()
+          refHiddenInput.blur()
+        }
+
+        debug('blur (outside editor)')
+        if (refHiddenInput) {
+          refHiddenInput.blur()
+        }
+      }
     }
   }
 
@@ -758,51 +727,44 @@
     }
 
     const target = event.target as HTMLElement
+    if (!target.isContentEditable) {
+      focus()
+    }
+
     const path = getDataPathFromTarget(target)
     if (path) {
       // when clicking inside the current selection, editing a value, do nothing
-      if (
-        isEditingSelection(documentState.selection) &&
-        pathInSelection(json, documentState.selection, path)
-      ) {
+      if (isEditingSelection(selection) && pathInSelection(json, selection, path)) {
         return
       }
 
-      updateSelection(createValueSelection(path, false))
+      selection = createValueSelection(path)
 
       event.preventDefault()
     }
-
-    // for example when clicking on the empty area in the main menu or on an InlineValue
-    if (!target.isContentEditable && !hasFocus) {
-      setTimeout(focus)
-    }
   }
 
-  function createDefaultSelection(): JSONSelection | null {
+  function createDefaultSelection(): JSONSelection | undefined {
     if (isJSONArray(json) && !isEmpty(json) && !isEmpty(columns)) {
       // Select the first row, first column
       const path = ['0', ...columns[0]]
 
-      return createValueSelection(path, false)
+      return createValueSelection(path)
     } else {
-      return null
+      return undefined
     }
   }
 
   function createDefaultSelectionWhenUndefined() {
-    if (!documentState.selection) {
-      updateSelection(createDefaultSelection())
+    if (!selection) {
+      selection = createDefaultSelection()
     }
   }
 
   export function acceptAutoRepair() {
     if (textIsRepaired && json !== undefined) {
-      const previousState = documentState
-      const previousJson = json
-      const previousText = text
       const previousContent = { json, text }
-      const previousTextIsRepaired = textIsRepaired
+      const previousState = { json, documentState, selection, sortedColumn, text, textIsRepaired }
 
       // json stays as is
       text = undefined
@@ -810,17 +772,12 @@
 
       clearSelectionWhenNotExisting(json)
 
-      addHistoryItem({
-        previousJson,
-        previousState,
-        previousText,
-        previousTextIsRepaired
-      })
+      addHistoryItem(previousState)
 
       // we could work out a patchResult, or use patch(), but only when the previous and new
       // contents are both json and not text. We go for simplicity and consistency here and
       // do _not_ return a patchResult ever.
-      const patchResult = null
+      const patchResult = undefined
 
       emitOnChange(previousContent, patchResult)
     }
@@ -941,14 +898,14 @@
    * Find the DOM element of a given path.
    * Note that the path can only be found when the node is expanded.
    */
-  export function findElement(path: JSONPath): Element | null {
+  export function findElement(path: JSONPath): Element | undefined {
     const column = columns.find((c) => pathStartsWith(path.slice(1), c))
 
     const resolvedPath = column ? path.slice(0, 1).concat(column) : path
 
-    return refContents
-      ? refContents.querySelector(`td[data-path="${encodeDataPath(resolvedPath)}"]`)
-      : null
+    return (
+      refContents?.querySelector(`td[data-path="${encodeDataPath(resolvedPath)}"]`) ?? undefined
+    )
   }
 
   function openContextMenu({
@@ -964,8 +921,8 @@
     const defaultItems: ContextMenuItem[] = createTableContextMenuItems({
       json,
       documentState,
+      selection,
       readOnly,
-      parser,
 
       onEditValue: handleEditValue,
       onEditRow: handleEditRow,
@@ -982,7 +939,7 @@
       onRemoveRow: handleRemoveRow
     })
 
-    const items = onRenderContextMenu(defaultItems)
+    const items = onRenderContextMenu(defaultItems) ?? defaultItems
 
     if (items === false) {
       return
@@ -1020,7 +977,7 @@
   }
 
   function handleContextMenu(event: Event) {
-    if (isEditingSelection(documentState.selection)) {
+    if (isEditingSelection(selection)) {
       return
     }
 
@@ -1064,8 +1021,6 @@
         }
       }
     }
-
-    return false
   }
 
   function handleContextMenuFromTableMenu(event: MouseEvent) {
@@ -1079,38 +1034,38 @@
   }
 
   function handleEditValue() {
-    if (readOnly || !documentState.selection) {
+    if (readOnly || !selection) {
       return
     }
 
-    const path = getFocusPath(documentState.selection)
+    const path = getFocusPath(selection)
     const value = getIn(json, path)
     if (isObjectOrArray(value)) {
       openJSONEditorModal(path)
     } else {
-      updateSelection(createValueSelection(path, true))
+      selection = createValueSelection(path)
     }
   }
 
   function handleEditRow() {
-    if (readOnly || !documentState.selection) {
+    if (readOnly || !selection) {
       return
     }
 
-    const path = getFocusPath(documentState.selection)
+    const path = getFocusPath(selection)
     const pathRow = path.slice(0, 1)
     openJSONEditorModal(pathRow)
   }
 
   function handleToggleEnforceString() {
-    if (readOnly || !isValueSelection(documentState.selection)) {
+    if (readOnly || !isValueSelection(selection)) {
       return
     }
 
-    const path = documentState.selection.path
+    const path = selection.path
     const pointer = compileJSONPointer(path)
     const value = getIn(json, path)
-    const enforceString = !getEnforceString(value, documentState.enforceStringMap, pointer, parser)
+    const enforceString = !getEnforceString(json, documentState, path)
     const updatedValue = enforceString ? String(value) : stringConvert(String(value), parser)
 
     debug('handleToggleEnforceString', { enforceString, value, updatedValue })
@@ -1125,7 +1080,7 @@
       ],
       (_, patchedState) => {
         return {
-          state: setEnforceString(patchedState, pointer, enforceString)
+          state: setInDocumentState(json, patchedState, path, { type: 'value', enforceString })
         }
       }
     )
@@ -1137,43 +1092,15 @@
       return
     }
 
-    const { path, contents } = pastedJson
-
-    // exit edit mode
-    const refEditableDiv = refContents?.querySelector('.jse-editable-div') || null
-    if (isEditableDivRef(refEditableDiv)) {
-      refEditableDiv.cancel()
-    }
-
-    // replace the value with the JSON object/array
-    const operations: JSONPatchDocument = [
-      {
-        op: 'replace',
-        path: compileJSONPointer(path),
-        value: contents
-      }
-    ]
-
-    handlePatch(operations)
+    const { onPasteAsJson } = pastedJson
+    onPasteAsJson()
 
     // TODO: get rid of the setTimeout here
     setTimeout(focus)
   }
 
   function handlePasteFromMenu() {
-    open(
-      CopyPasteModal,
-      {},
-      {
-        ...SIMPLE_MODAL_OPTIONS,
-        styleWindow: {
-          width: '450px'
-        }
-      },
-      {
-        onClose: () => focus()
-      }
-    )
+    copyPasteModalOpen = true
   }
 
   function handleClearPastedJson() {
@@ -1189,7 +1116,7 @@
   async function handleCut(indent: boolean) {
     await onCut({
       json,
-      documentState,
+      selection,
       indentation: indent ? indentation : undefined,
       readOnly,
       parser,
@@ -1204,7 +1131,7 @@
 
     await onCopy({
       json,
-      documentState,
+      selection,
       indentation: indent ? indentation : undefined,
       parser
     })
@@ -1214,7 +1141,7 @@
     onRemove({
       json,
       text,
-      documentState,
+      selection,
       keepSelection: true,
       readOnly,
       onChange,
@@ -1223,33 +1150,32 @@
   }
 
   function handleDuplicateRow() {
-    onDuplicateRow({ json, documentState, columns, readOnly, onPatch: handlePatch })
+    onDuplicateRow({ json, selection, columns, readOnly, onPatch: handlePatch })
   }
 
   function handleInsertBeforeRow() {
-    onInsertBeforeRow({ json, documentState, columns, readOnly, onPatch: handlePatch })
+    onInsertBeforeRow({ json, selection, columns, readOnly, onPatch: handlePatch })
   }
 
   function handleInsertAfterRow() {
-    onInsertAfterRow({ json, documentState, columns, readOnly, onPatch: handlePatch })
+    onInsertAfterRow({ json, selection, columns, readOnly, onPatch: handlePatch })
   }
 
   function handleRemoveRow() {
-    onRemoveRow({ json, documentState, columns, readOnly, onPatch: handlePatch })
+    onRemoveRow({ json, selection, columns, readOnly, onPatch: handlePatch })
   }
 
   async function handleInsertCharacter(char: string) {
     await onInsertCharacter({
       char,
       selectInside: false,
-      refJsonEditor,
       json,
-      selection: documentState.selection,
+      selection: selection,
       readOnly,
       parser,
       onPatch: handlePatch,
       onReplaceJson: handleReplaceJson,
-      onSelect: updateSelection
+      onSelect: handleSelect
     })
   }
 
@@ -1294,7 +1220,7 @@
     }
     if (combo === 'Ctrl+A') {
       event.preventDefault()
-      // updateSelection(selectAll())
+      // selection = selectAll()
       // TODO: implement select all
     }
 
@@ -1307,9 +1233,9 @@
 
       createDefaultSelectionWhenUndefined()
 
-      if (documentState.selection) {
-        const newSelection = selectPreviousColumn(columns, documentState.selection)
-        updateSelection(newSelection)
+      if (selection) {
+        const newSelection = selectPreviousColumn(columns, selection)
+        selection = newSelection
         scrollIntoView(getFocusPath(newSelection))
       }
     }
@@ -1319,9 +1245,9 @@
 
       createDefaultSelectionWhenUndefined()
 
-      if (documentState.selection) {
-        const newSelection = selectNextColumn(columns, documentState.selection)
-        updateSelection(newSelection)
+      if (selection) {
+        const newSelection = selectNextColumn(columns, selection)
+        selection = newSelection
         scrollIntoView(getFocusPath(newSelection))
       }
     }
@@ -1331,9 +1257,9 @@
 
       createDefaultSelectionWhenUndefined()
 
-      if (documentState.selection) {
-        const newSelection = selectPreviousRow(columns, documentState.selection)
-        updateSelection(newSelection)
+      if (selection) {
+        const newSelection = selectPreviousRow(columns, selection)
+        selection = newSelection
         scrollIntoView(getFocusPath(newSelection))
       }
     }
@@ -1343,18 +1269,18 @@
 
       createDefaultSelectionWhenUndefined()
 
-      if (documentState.selection) {
-        const newSelection = selectNextRow(json, columns, documentState.selection)
-        updateSelection(newSelection)
+      if (selection) {
+        const newSelection = selectNextRow(json, columns, selection)
+        selection = newSelection
         scrollIntoView(getFocusPath(newSelection))
       }
     }
 
-    if (combo === 'Enter' && documentState.selection) {
-      if (isValueSelection(documentState.selection)) {
+    if (combo === 'Enter' && selection) {
+      if (isValueSelection(selection)) {
         event.preventDefault()
 
-        const path = documentState.selection.path
+        const path = selection.path
         const value = getIn(json, path)
         if (isObjectOrArray(value)) {
           // edit nested object/array
@@ -1362,14 +1288,14 @@
         } else {
           if (!readOnly) {
             // go to value edit mode
-            updateSelection({ ...documentState.selection, edit: true })
+            selection = { ...selection, edit: true }
           }
         }
       }
     }
 
     const normalizedCombo = combo.replace(/^Shift\+/, '') // replace 'Shift+A' with 'A'
-    if (normalizedCombo.length === 1 && documentState.selection) {
+    if (normalizedCombo.length === 1 && selection) {
       // a regular key like a, A, _, etc is entered.
       // Replace selected contents with a new value having this first character as text
       event.preventDefault()
@@ -1377,8 +1303,8 @@
       return
     }
 
-    if (combo === 'Ctrl+Enter' && isValueSelection(documentState.selection)) {
-      const value = getIn(json, documentState.selection.path)
+    if (combo === 'Ctrl+Enter' && isValueSelection(selection)) {
+      const value = getIn(json, selection.path)
 
       if (isUrl(value)) {
         // open url in new page
@@ -1386,9 +1312,9 @@
       }
     }
 
-    if (combo === 'Escape' && documentState.selection) {
+    if (combo === 'Escape' && selection) {
       event.preventDefault()
-      updateSelection(null)
+      selection = undefined
     }
 
     if (combo === 'Ctrl+F') {
@@ -1425,7 +1351,7 @@
     onPaste({
       clipboardText,
       json,
-      selection: documentState.selection,
+      selection: selection,
       readOnly,
       parser,
       onPatch: handlePatch,
@@ -1436,19 +1362,20 @@
 
   // TODO: this function is duplicated from TreeMode. See if we can reuse the code instead
   function handleReplaceJson(updatedJson: unknown, afterPatch?: AfterPatchCallback) {
-    const previousState = documentState
-    const previousJson = json
-    const previousText = text
     const previousContent = { json, text }
-    const previousTextIsRepaired = textIsRepaired
+    const previousState = { json, documentState, selection, sortedColumn, text, textIsRepaired }
 
-    const updatedState = expandWithCallback(json, documentState, [], expandMinimal)
+    const updatedState = syncDocumentState(updatedJson, documentState)
 
     const callback =
-      typeof afterPatch === 'function' ? afterPatch(updatedJson, updatedState) : undefined
+      typeof afterPatch === 'function'
+        ? afterPatch(updatedJson, updatedState, selection)
+        : undefined
 
-    json = callback && callback.json !== undefined ? callback.json : updatedJson
-    documentState = callback && callback.state !== undefined ? callback.state : updatedState
+    json = callback?.json !== undefined ? callback.json : updatedJson
+    documentState = callback?.state !== undefined ? callback.state : updatedState
+    selection = callback?.selection !== undefined ? callback.selection : selection
+    sortedColumn = undefined // we can't know whether the new json is still sorted or not
     text = undefined
     textIsRepaired = false
     parseError = undefined
@@ -1456,17 +1383,12 @@
     // make sure the selection is valid
     clearSelectionWhenNotExisting(json)
 
-    addHistoryItem({
-      previousJson,
-      previousState,
-      previousText,
-      previousTextIsRepaired
-    })
+    addHistoryItem(previousState)
 
     // we could work out a patchResult, or use patch(), but only when the previous and new
     // contents are both json and not text. We go for simplicity and consistency here and
     // do _not_ return a patchResult ever.
-    const patchResult = null
+    const patchResult = undefined
 
     emitOnChange(previousContent, patchResult)
   }
@@ -1475,29 +1397,26 @@
   function handleChangeText(updatedText: string, afterPatch?: AfterPatchCallback) {
     debug('handleChangeText')
 
-    const previousState = documentState
-    const previousJson = json
-    const previousText = text
     const previousContent = { json, text }
-    const previousTextIsRepaired = textIsRepaired
+    const previousState = { json, documentState, selection, sortedColumn, text, textIsRepaired }
 
     try {
       json = parseMemoizeOne(updatedText)
-      documentState = expandWithCallback(json, documentState, [], expandMinimal)
+      documentState = syncDocumentState(json, documentState)
       text = undefined
       textIsRepaired = false
       parseError = undefined
     } catch (err) {
       try {
         json = parseMemoizeOne(jsonrepair(updatedText))
-        documentState = expandWithCallback(json, documentState, [], expandMinimal)
+        documentState = syncDocumentState(json, documentState)
         text = updatedText
         textIsRepaired = true
         parseError = undefined
       } catch (repairError) {
         // no valid JSON, will show empty document or invalid json
         json = undefined
-        documentState = createDocumentState({ json, expand: expandMinimal })
+        documentState = undefined
         text = updatedText
         textIsRepaired = false
         parseError =
@@ -1508,24 +1427,20 @@
     }
 
     if (typeof afterPatch === 'function') {
-      const callback = afterPatch(json, documentState)
+      const callback = afterPatch(json, documentState, selection)
 
-      json = callback && callback.json ? callback.json : json
-      documentState = callback && callback.state ? callback.state : documentState
+      json = callback?.json !== undefined ? callback.json : json
+      documentState = callback?.state !== undefined ? callback.state : documentState
+      selection = callback?.selection !== undefined ? callback.selection : selection
     }
 
     // ensure the selection is valid
     clearSelectionWhenNotExisting(json)
 
-    addHistoryItem({
-      previousJson,
-      previousState,
-      previousText,
-      previousTextIsRepaired
-    })
+    addHistoryItem(previousState)
 
     // no JSON patch actions available in text mode
-    const patchResult = null
+    const patchResult = undefined
 
     emitOnChange(previousContent, patchResult)
   }
@@ -1533,7 +1448,7 @@
   function handleSelectValidationError(error: ValidationError) {
     debug('select validation error', error)
 
-    updateSelection(createValueSelection(error.path, false))
+    selection = createValueSelection(error.path)
 
     scrollTo(error.path)
   }
@@ -1554,19 +1469,17 @@
 
         handlePatch(operations, (_, patchedState) => {
           return {
-            state: {
-              ...patchedState,
-              sortedColumn: {
-                path: itemPath,
-                sortDirection: direction === -1 ? SortDirection.desc : SortDirection.asc
-              }
+            state: patchedState,
+            sortedColumn: {
+              path: itemPath,
+              sortDirection: direction === -1 ? SortDirection.desc : SortDirection.asc
             }
           }
         })
       },
       onClose: () => {
         modalOpen = false
-        focus()
+        setTimeout(focus)
       }
     })
   }
@@ -1603,7 +1516,7 @@
       },
       onClose: () => {
         modalOpen = false
-        focus()
+        setTimeout(focus)
         if (onClose) {
           onClose()
         }
@@ -1622,38 +1535,22 @@
         json: getIn(json, path)
       },
       path,
-      onPatch: context.onPatch,
+      onPatch: handlePatch,
       onClose: () => {
         modalOpen = false
-        focus()
+        setTimeout(focus)
       }
     })
   }
 
   function openRepairModal(text: string, onApply: (repairedText: string) => void) {
-    open(
-      JSONRepairModal,
-      {
-        text,
-        onParse: (text: string) => parsePartialJson(text, (t) => parseAndRepair(t, parser)),
-        onRepair: repairPartialJson,
-        onApply
-      },
-      {
-        ...SIMPLE_MODAL_OPTIONS,
-        styleWindow: {
-          width: '600px',
-          height: '500px'
-        },
-        styleContent: {
-          padding: 0,
-          height: '100%'
-        }
-      },
-      {
-        onClose: () => focus()
-      }
-    )
+    jsonRepairModalProps = {
+      text,
+      onParse: (text) => parsePartialJson(text, (t) => parseAndRepair(t, parser)),
+      onRepair: repairPartialJson,
+      onApply,
+      onClose: focus
+    }
   }
 
   function handleSortAll() {
@@ -1697,7 +1594,9 @@
     const previousContent = { json, text }
 
     json = item.undo.patch ? immutableJSONPatch(json, item.undo.patch) : item.undo.json
-    documentState = item.undo.state
+    documentState = item.undo.documentState
+    selection = item.undo.selection
+    sortedColumn = item.undo.sortedColumn
     text = item.undo.text
     textIsRepaired = item.undo.textIsRepaired
     parseError = undefined
@@ -1712,13 +1611,13 @@
             redo: item.undo.patch,
             undo: item.redo.patch
           }
-        : null
+        : undefined
 
     emitOnChange(previousContent, patchResult)
 
     focus()
-    if (documentState.selection) {
-      scrollTo(getFocusPath(documentState.selection), false)
+    if (selection) {
+      scrollTo(getFocusPath(selection), false)
     }
   }
 
@@ -1739,7 +1638,9 @@
     const previousContent = { json, text }
 
     json = item.redo.patch ? immutableJSONPatch(json, item.redo.patch) : item.redo.json
-    documentState = item.redo.state
+    documentState = item.redo.documentState
+    selection = item.redo.selection
+    sortedColumn = item.redo.sortedColumn
     text = item.redo.text
     textIsRepaired = item.redo.textIsRepaired
     parseError = undefined
@@ -1754,13 +1655,13 @@
             redo: item.redo.patch,
             undo: item.undo.patch
           }
-        : null
+        : undefined
 
     emitOnChange(previousContent, patchResult)
 
     focus()
-    if (documentState.selection) {
-      scrollTo(getFocusPath(documentState.selection), false)
+    if (selection) {
+      scrollTo(getFocusPath(selection), false)
     }
   }
 
@@ -1772,6 +1673,8 @@
     itemHeightsCache[rowIndex] = element.getBoundingClientRect().height
   }
 </script>
+
+<svelte:window on:mousedown={handleWindowMouseDown} />
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <div
@@ -1849,12 +1752,7 @@
               </th>
               {#each columns as column}
                 <th class="jse-table-cell jse-table-cell-header">
-                  <ColumnHeader
-                    path={column}
-                    sortedColumn={documentState.sortedColumn}
-                    {readOnly}
-                    onSort={onSortByHeader}
-                  />
+                  <ColumnHeader path={column} {sortedColumn} {readOnly} onSort={onSortByHeader} />
                 </th>
               {/each}
               {#if showRefreshButton}
@@ -1867,7 +1765,10 @@
                 </th>
               {/if}
             </tr>
-            <tr class="jse-table-invisible-start-section">
+            <tr
+              class="jse-table-invisible-start-section"
+              class:jse-search-box-background={showSearch}
+            >
               <td style:height={visibleSection.startHeight + 'px'} colspan={columns.length} />
             </tr>
             {#each visibleSection.visibleItems as item, visibleIndex}
@@ -1877,9 +1778,9 @@
                 [String(rowIndex)],
                 validationErrorsByRow?.row
               )}
-              {@const searchResultItemsByRow = searchResult?.itemsMap
-                ? filterPointerOrUndefined(searchResult?.itemsMap, compileJSONPointerProp(rowIndex))
-                : undefined}
+              {@const searchResultByRow = getInRecursiveState(json, searchResults, [
+                String(rowIndex)
+              ])}
               <tr class="jse-table-row">
                 {#key rowIndex}
                   <th
@@ -1894,58 +1795,51 @@
                 {/key}
                 {#each columns as column, columnIndex}
                   {@const path = [String(rowIndex)].concat(column)}
-                  {@const pointer = compileJSONPointer(path)}
                   {@const value = getIn(item, column)}
                   {@const isSelected =
-                    isValueSelection(documentState.selection) &&
-                    pathStartsWith(documentState.selection.path, path)}
+                    isValueSelection(selection) && pathStartsWith(selection.path, path)}
                   {@const validationErrorsByColumn = validationErrorsByRow?.columns[columnIndex]}
                   {@const validationError = mergeValidationErrors(path, validationErrorsByColumn)}
-                  <td
-                    class="jse-table-cell"
-                    data-path={encodeDataPath(path)}
-                    class:jse-selected-value={isSelected}
-                  >
-                    {#if isObjectOrArray(value)}
-                      {@const searchResultItemsByCell = searchResultItemsByRow
-                        ? filterPointerOrUndefined(searchResultItemsByRow, pointer)
-                        : undefined}
-                      {@const containsActiveSearchResult = searchResultItemsByCell
-                        ? Object.values(searchResultItemsByCell).some((items) =>
-                            items.some((item) => item.active)
-                          )
-                        : false}
-
-                      <InlineValue
-                        {path}
-                        {value}
-                        {parser}
-                        {isSelected}
-                        containsSearchResult={!isEmpty(searchResultItemsByCell)}
-                        {containsActiveSearchResult}
-                        onEdit={openJSONEditorModal}
-                      />{:else}
-                      {@const searchResultItemsByCell = searchResult?.itemsMap
-                        ? filterValueSearchResults(searchResult?.itemsMap, pointer)
-                        : undefined}
-
-                      <JSONValueComponent
-                        {path}
-                        value={value !== undefined ? value : ''}
-                        enforceString={getEnforceString(
-                          value,
-                          documentState.enforceStringMap,
-                          pointer,
-                          context.parser
+                  <td class="jse-table-cell" data-path={encodeDataPath(path)}>
+                    <div class="jse-value-outer" class:jse-selected-value={isSelected}>
+                      {#if isObjectOrArray(value)}
+                        {@const searchResultsByCell = flattenSearchResults(
+                          getInRecursiveState(item, searchResultByRow, column)
                         )}
-                        selection={isSelected ? documentState.selection : null}
-                        searchResultItems={searchResultItemsByCell}
-                        {context}
-                      />{/if}{#if !readOnly && isSelected && !isEditingSelection(documentState.selection)}
-                      <div class="jse-context-menu-anchor">
-                        <ContextMenuPointer selected={true} onContextMenu={openContextMenu} />
-                      </div>
-                    {/if}{#if validationError}
+
+                        {@const containsActiveSearchResult = searchResultsByCell
+                          ? searchResultsByCell.some((item) => item.active)
+                          : false}
+
+                        <InlineValue
+                          {path}
+                          {value}
+                          {parser}
+                          {isSelected}
+                          containsSearchResult={!isEmpty(searchResultsByCell)}
+                          {containsActiveSearchResult}
+                          onEdit={openJSONEditorModal}
+                        />{:else}
+                        {@const searchResultItemsByCell = getInRecursiveState(
+                          json,
+                          searchResults,
+                          path
+                        )?.searchResults}
+
+                        <JSONValue
+                          {path}
+                          value={value !== undefined ? value : ''}
+                          enforceString={getEnforceString(json, documentState, path)}
+                          selection={isSelected ? selection : undefined}
+                          searchResultItems={searchResultItemsByCell}
+                          {context}
+                        />{/if}{#if !readOnly && isSelected && !isEditingSelection(selection)}
+                        <div class="jse-context-menu-anchor">
+                          <ContextMenuPointer selected={true} onContextMenu={openContextMenu} />
+                        </div>
+                      {/if}
+                    </div>
+                    {#if validationError}
                       <ValidationErrorIcon {validationError} onExpand={noop} />
                     {/if}
                   </td>
@@ -2052,5 +1946,19 @@
     </div>
   {/if}
 </div>
+
+{#if copyPasteModalOpen}
+  <CopyPasteModal onClose={() => (copyPasteModalOpen = false)} />
+{/if}
+
+{#if jsonRepairModalProps}
+  <JSONRepairModal
+    {...jsonRepairModalProps}
+    onClose={() => {
+      jsonRepairModalProps?.onClose()
+      jsonRepairModalProps = undefined
+    }}
+  />
+{/if}
 
 <style src="./TableMode.scss"></style>

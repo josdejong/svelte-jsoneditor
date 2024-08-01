@@ -12,13 +12,13 @@
   import Message from '../../controls/Message.svelte'
   import { normalizeJsonParseError } from '$lib/utils/jsonUtils.js'
   import Menu from '../../controls/Menu.svelte'
-  import type { MenuItem } from '$lib/types.js'
+  import type { MenuItem, ParseError } from '$lib/types.js'
 
   export let text = ''
   export let readOnly = false
   export let onParse: (text: string) => void
   export let onRepair: (text: string) => string
-  export let onChange: ((updatedText: string) => void) | null = null
+  export let onChange: ((updatedText: string) => void) | undefined = undefined
   export let onApply: (repairedText: string) => void
   export let onCancel: () => void
 
@@ -31,10 +31,10 @@
 
   $: debug('error', error)
 
-  function getErrorMessage(jsonText: string) {
+  function getErrorMessage(jsonText: string): ParseError | undefined {
     try {
       onParse(jsonText)
-      return null
+      return undefined
     } catch (err) {
       return normalizeJsonParseError(jsonText, (err as Error).message)
     }
@@ -51,7 +51,7 @@
 
   function goToError() {
     if (domTextArea && error) {
-      const position = error.position != null ? error.position : 0
+      const position = error.position !== undefined ? error.position : 0
       domTextArea.setSelectionRange(position, position)
       domTextArea.focus()
     }

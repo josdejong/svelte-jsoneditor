@@ -33,6 +33,8 @@
   function handleKeyDown(event: KeyboardEvent) {
     const combo = keyComboFromEvent(event)
     if (combo === 'Escape') {
+      event.preventDefault()
+      event.stopPropagation()
       closeAbsolutePopup(popup.id)
     }
   }

@@ -1,4 +1,4 @@
-import { isEmpty, memoize } from 'lodash-es'
+import { isEmpty } from 'lodash-es'
 import type { JSONPath } from 'immutable-json-patch'
 import type { PathOption } from '$lib/types.js'
 
@@ -159,11 +159,3 @@ export function createPropertySelector(path: JSONPath): string {
 // I'm too lazy to figure that out right now
 const javaScriptPropertyRegex = /^[a-zA-Z$_][a-zA-Z$_\d]*$/
 const integerNumberRegex = /^\d+$/
-
-/**
- * Create a memoized function that will memoize the input path, and return
- * the memoized instance of the path when the stringified version is the same.
- */
-export function createMemoizePath(): (path: JSONPath) => JSONPath {
-  return memoize((path) => path, stringifyJSONPath)
-}

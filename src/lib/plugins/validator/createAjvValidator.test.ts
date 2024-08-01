@@ -185,17 +185,6 @@ describe('createAjvValidator', () => {
     }, /schema is invalid: data\/type must be equal to one of the allowed values, data\/type must be array, data\/type must match a schema in anyOf/)
   })
 
-  test('should throw an error when using the deprecated API', () => {
-    // Deprecation error for the API of v0.9.2 and older
-    assert.throws(() => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      createAjvValidator(schema, schemaDefinitions, {
-        allErrors: false
-      })
-    }, /the signature of createAjvValidator is changed/)
-  })
-
   test('should support draft-07', () => {
     const schemaDraft07 = {
       $schema: 'http://json-schema.org/draft-07/schema#',

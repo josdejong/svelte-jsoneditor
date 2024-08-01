@@ -17,7 +17,7 @@
   const debug = createDebug('jsoneditor:NavigationBar')
 
   export let json: unknown
-  export let selection: JSONSelection | null
+  export let selection: JSONSelection | undefined
   export let onSelect: OnJSONSelect
   export let onError: OnError
   export let pathParser: JSONPathParser

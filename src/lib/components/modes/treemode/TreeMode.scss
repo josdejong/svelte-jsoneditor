@@ -67,5 +67,13 @@
       font-family: $font-family;
       font-size: $font-size;
     }
+
+    .jse-search-box-background {
+      $search-box-height: 100px;
+      border: calc($search-box-height / 2) solid $modal-background;
+      margin: -$contents-padding;
+      margin-bottom: $contents-padding;
+      display: inline-block;
+    }
   }
 }

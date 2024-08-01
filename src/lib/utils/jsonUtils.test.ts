@@ -105,8 +105,8 @@ describe('jsonUtils', () => {
   })
 
   test('should validate content type', () => {
-    deepStrictEqual(validateContentType({ json: [1, 2, 3] }), null)
-    deepStrictEqual(validateContentType({ text: '[1,2,3]' }), null)
+    deepStrictEqual(validateContentType({ json: [1, 2, 3] }), undefined)
+    deepStrictEqual(validateContentType({ text: '[1,2,3]' }), undefined)
 
     deepStrictEqual(
       validateContentType({ text: [1, 2, 3] }),

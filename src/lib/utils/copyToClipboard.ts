@@ -1,4 +1,4 @@
-export default function copyToClipBoard(text: string): Promise<void> | void {
+export default function copyToClipBoard(text: string): Promise<void> {
   if (navigator.clipboard) {
     return navigator.clipboard.writeText(text)
   }
@@ -22,7 +22,11 @@ export default function copyToClipBoard(text: string): Promise<void> | void {
     } finally {
       document.body.removeChild(textarea)
     }
+
+    return Promise.resolve()
   } else {
     console.error('Copy failed.')
+
+    return Promise.resolve()
   }
 }

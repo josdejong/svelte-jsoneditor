@@ -93,7 +93,7 @@
       ]
 
   let items: MenuItem[]
-  $: items = onRenderMenu(defaultItems)
+  $: items = onRenderMenu(defaultItems) || defaultItems
 </script>
 
 <Menu {items} />

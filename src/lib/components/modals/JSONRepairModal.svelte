@@ -1,29 +1,26 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { getContext } from 'svelte'
   import JSONRepairComponent from './repair/JSONRepairComponent.svelte'
-  import { onEscape } from '$lib/actions/onEscape.js'
-  import type { Context } from 'svelte-simple-modal'
+  import Modal from './Modal.svelte'
 
   export let text: string
   export let onParse: (text: string) => void
   export let onRepair: (text: string) => string
   export let onApply: (repairedText: string) => void
-
-  const { close } = getContext<Context>('simple-modal')
+  export let onClose: () => void
 
   function handleApply(repairedText: string) {
-    close()
     onApply(repairedText)
+    onClose()
   }
 
   function handleCancel() {
-    close()
+    onClose()
   }
 </script>
 
-<div class="jse-modal jse-repair" use:onEscape={close}>
+<Modal {onClose} className="jse-repair-modal">
   <JSONRepairComponent
     bind:text
     {onParse}
@@ -31,6 +28,4 @@
     onApply={handleApply}
     onCancel={handleCancel}
   />
-</div>
-
-<style src="./JSONRepairModal.scss"></style>
+</Modal>

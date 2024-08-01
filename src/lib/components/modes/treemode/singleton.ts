@@ -3,18 +3,18 @@ import type { JSONPath } from 'immutable-json-patch'
 
 export const singleton: Singleton = {
   selecting: false,
-  selectionAnchor: null, // Path
-  selectionAnchorType: null, // Selection type
-  selectionFocus: null, // Path
+  selectionAnchor: undefined, // Path
+  selectionAnchorType: undefined, // Selection type
+  selectionFocus: undefined, // Path
 
   dragging: false
 }
 
 interface Singleton {
   selecting: boolean
-  selectionAnchor: JSONPath | null
-  selectionAnchorType: string | null
-  selectionFocus: JSONPath | null
+  selectionAnchor: JSONPath | undefined
+  selectionAnchorType: string | undefined
+  selectionFocus: JSONPath | undefined
 
   dragging: boolean
 }

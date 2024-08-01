@@ -1,18 +1,19 @@
 @import '../../styles';
-@import 'Modal';
 
-.jse-modal.jse-copy-paste {
-  .jse-shortcuts {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    margin: $padding-double 0;
+.jse-modal-contents {
+  @include jse-modal-contents;
+}
 
-    .jse-shortcut {
-      .jse-key {
-        font-size: 200%;
-        color: $theme-color;
-      }
+.jse-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  margin: $padding-double 0;
+
+  .jse-shortcut {
+    .jse-key {
+      font-size: 200%;
+      color: $theme-color;
     }
   }
 }

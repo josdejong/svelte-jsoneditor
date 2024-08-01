@@ -9,19 +9,10 @@
   border-radius: 1px;
   vertical-align: top;
   color: $key-color;
-  cursor: $contents-cursor;
 
   word-break: normal;
   overflow-wrap: normal; // not anywhere as for JSONValue
   white-space: pre-wrap; // important for rendering multiple consecutive spaces
-
-  &:hover {
-    background: $hover-background-color;
-  }
-
-  &:hover {
-    background: $hover-background-color;
-  }
 
   &.jse-empty {
     min-width: 3em;

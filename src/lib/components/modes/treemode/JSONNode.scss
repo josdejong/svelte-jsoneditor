@@ -1,237 +1,5 @@
 @import '../../../styles';
 
-.jse-json-node {
-  position: relative;
-  color: $text-color;
-
-  &.jse-root {
-    min-height: 100%;
-    padding-bottom: $contents-padding;
-    box-sizing: border-box;
-
-    > .jse-header-outer :global(.jse-context-menu-pointer),
-    > .jse-contents-outer > .jse-contents :global(.jse-context-menu-pointer) {
-      top: 0;
-      right: calc(-2px - $context-menu-pointer-size);
-    }
-
-    > .jse-contents-outer > .jse-contents {
-      padding-left: 0;
-    }
-  }
-
-  $selector-height: 8px; // must be about half a line height
-
-  .jse-props,
-  .jse-items {
-    position: relative;
-  }
-
-  .jse-header-outer,
-  .jse-footer-outer {
-    display: flex;
-    margin-left: calc(var(--level) * $indent-size);
-  }
-
-  .jse-header {
-    position: relative;
-
-    .jse-meta {
-      > .jse-meta-inner {
-        display: flex;
-        justify-content: center;
-      }
-    }
-  }
-
-  .jse-contents-outer {
-    display: flex;
-    margin-left: calc(var(--level) * $indent-size);
-  }
-
-  .jse-header,
-  .jse-contents {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start; // important for the alignment of the context menu button and key in case of a multi line value
-  }
-
-  .jse-contents {
-    padding-left: $indent-size;
-  }
-
-  .jse-footer {
-    display: inline-flex;
-    padding-left: calc($indent-size + $input-padding);
-  }
-
-  .jse-header,
-  .jse-contents,
-  .jse-footer {
-    background: $contents-background-color;
-  }
-
-  .jse-insert-selection-area {
-    visibility: hidden;
-    padding: 0 $padding-half;
-    flex: 1; // must fill all left over space at the right side of the editor, so you can click there
-
-    &.jse-inside {
-      display: inline-flex;
-      align-items: center;
-    }
-
-    &.jse-after {
-      display: flex;
-      align-items: flex-end;
-    }
-  }
-
-  .jse-context-menu-pointer-anchor {
-    position: relative;
-  }
-
-  .jse-insert-area {
-    $height: 2px;
-    $height-half: 0.5 * $height;
-
-    display: flex;
-    position: relative;
-    z-index: 1; // prevent the next line half-overlapping the pointer
-    margin-left: calc(var(--level) * $indent-size);
-
-    max-width: 250px;
-    min-width: 100px;
-    height: 0;
-    margin-right: $padding-half;
-    outline: $height-half solid; // color depends on hovered/selected/inactive+selected
-
-    :global(.jse-context-menu-pointer) {
-      right: -$height-half;
-      background: $context-menu-pointer-hover-background;
-    }
-
-    &.jse-hovered {
-      outline-color: $context-menu-pointer-hover-background;
-    }
-  }
-
-  &:hover > .jse-contents-outer .jse-insert-selection-area:not(.jse-selected),
-  .jse-header-outer:hover > .jse-insert-selection-area:not(.jse-selected),
-  .jse-footer-outer:hover .jse-insert-selection-area:not(.jse-selected) {
-    visibility: visible;
-  }
-
-  &.jse-hovered {
-    > .jse-header-outer > .jse-header > .jse-meta,
-    .jse-props .jse-header,
-    .jse-items .jse-header,
-    .jse-props .jse-contents,
-    .jse-items .jse-contents,
-    .jse-footer {
-      background: $hover-background-color;
-    }
-  }
-
-  // TODO: simplify the styling for selected keys/values/multi (get rid of globals?)
-
-  // entry selected (key and value)
-  &.jse-selected {
-    > .jse-header-outer > .jse-header > .jse-meta,
-    .jse-props .jse-header,
-    .jse-items .jse-header,
-    .jse-props .jse-contents,
-    .jse-items .jse-contents,
-    .jse-header,
-    .jse-contents,
-    .jse-footer,
-    :global(.jse-key),
-    :global(.jse-value) {
-      background: $selection-background-color;
-      cursor: $contents-selected-cursor;
-    }
-
-    .jse-expand {
-      background: $selection-background-color;
-    }
-  }
-
-  // key selected
-  &.jse-selected-key {
-    > .jse-contents-outer > .jse-contents > :global(.jse-identifier) > :global(.jse-key),
-    > .jse-header-outer > .jse-header > :global(.jse-identifier) > :global(.jse-key) {
-      background: $selection-background-color;
-      cursor: $contents-selected-cursor;
-    }
-  }
-
-  // value selected (part 1)
-  &.jse-selected-value > .jse-contents-outer > .jse-contents > :global(.jse-value) {
-    background: $selection-background-color;
-    cursor: $contents-selected-cursor;
-  }
-
-  :global(.jse-collapsed-items.jse-selected),
-  &.jse-selected :global(.jse-collapsed-items),
-  &.jse-selected-value :global(.jse-collapsed-items) {
-    background-color: $selection-background-color;
-    --jse-collapsed-items-background-color: #{$collapsed-items-selected-background-color};
-  }
-
-  // value selected (part 2)
-  &.jse-selected-value {
-    .jse-meta,
-    > .jse-header-outer > .jse-header > .jse-meta,
-    > .jse-footer-outer > .jse-footer,
-    .jse-props .jse-contents,
-    .jse-props .jse-header,
-    .jse-props .jse-footer,
-    .jse-props .jse-expand,
-    .jse-items .jse-contents,
-    .jse-items .jse-header,
-    .jse-items .jse-footer,
-    .jse-items .jse-expand {
-      background: $selection-background-color;
-
-      :global(.jse-key),
-      :global(.jse-value) {
-        background: $selection-background-color;
-        cursor: $contents-selected-cursor;
-      }
-    }
-  }
-
-  &.jse-readonly {
-    --jse-contents-selected-cursor: pointer;
-  }
-
-  .jse-insert-area {
-    &.jse-selected {
-      outline-color: $context-menu-pointer-background;
-    }
-  }
-
-  .jse-insert-area {
-    &.jse-selected {
-      :global(.jse-context-menu-pointer) {
-        background: $context-menu-pointer-background;
-
-        &:hover {
-          background: $context-menu-pointer-background-highlight;
-        }
-      }
-    }
-  }
-}
-
-// lighter selection color when the editor doesn't have focus
-:global(.jse-main:not(.jse-focus)) {
-  .jse-json-node {
-    --jse-selection-background-color: #{$selection-background-inactive-color};
-    --jse-context-menu-pointer-background: #{$context-menu-pointer-hover-background};
-  }
-}
-
 .jse-expand {
   width: $indent-size;
   padding: 0;
@@ -295,4 +63,205 @@
 .jse-identifier {
   vertical-align: top;
   position: relative;
+}
+
+.jse-json-node {
+  position: relative;
+  color: $text-color;
+
+  &.jse-root {
+    min-height: 100%;
+    padding-bottom: $contents-padding;
+    box-sizing: border-box;
+
+    > .jse-contents-outer > .jse-contents {
+      padding-left: 0;
+    }
+  }
+
+  $selector-height: 8px; // must be about half a line height
+
+  .jse-props,
+  .jse-items {
+    position: relative;
+  }
+
+  .jse-header-outer,
+  .jse-footer-outer {
+    display: flex;
+    margin-left: calc(var(--level) * $indent-size);
+  }
+
+  .jse-header {
+    position: relative;
+
+    .jse-meta {
+      > .jse-meta-inner {
+        display: flex;
+        justify-content: center;
+      }
+    }
+  }
+
+  .jse-contents-outer {
+    display: flex;
+    margin-left: calc(var(--level) * $indent-size);
+  }
+
+  .jse-header,
+  .jse-contents {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start; // important for the alignment of the context menu button and key in case of a multi line value
+  }
+
+  .jse-contents {
+    padding-left: $indent-size;
+    cursor: $contents-cursor;
+
+    .jse-value-outer {
+      display: inline-flex;
+    }
+  }
+
+  .jse-footer {
+    display: inline-flex;
+    padding-left: calc($indent-size + $input-padding);
+  }
+
+  .jse-header,
+  .jse-contents,
+  .jse-footer {
+    background: $contents-background-color;
+  }
+
+  .jse-insert-selection-area {
+    padding: 0 $padding-half;
+    flex: 1; // must fill all left over space at the right side of the editor, so you can click there
+
+    &.jse-inside {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    &.jse-after {
+      display: flex;
+      align-items: flex-end;
+    }
+  }
+
+  .jse-context-menu-pointer-anchor {
+    position: relative;
+  }
+
+  .jse-insert-area {
+    $height: 2px;
+    $height-half: 0.5 * $height;
+
+    display: flex;
+    position: relative;
+    z-index: 1; // prevent the next line half-overlapping the pointer
+    margin-left: calc(var(--level) * $indent-size);
+
+    max-width: 250px;
+    min-width: 100px;
+    height: 0;
+    margin-right: $padding-half;
+    outline: $height-half solid; // color depends on hovered/selected/inactive+selected
+
+    &.jse-hovered {
+      outline-color: $context-menu-pointer-hover-background;
+    }
+  }
+
+  .jse-key-outer {
+    position: relative;
+  }
+
+  .jse-key-outer,
+  .jse-value-outer,
+  .jse-meta,
+  .jse-footer {
+    &:hover {
+      background: $hover-background-color;
+      cursor: $contents-cursor;
+    }
+  }
+
+  &.jse-hovered:not(.jse-selected):not(.jse-selected-value) {
+    .jse-value-outer,
+    .jse-meta,
+    .jse-items .jse-header,
+    .jse-items .jse-contents,
+    .jse-props .jse-header,
+    .jse-props .jse-contents,
+    .jse-footer {
+      background: $hover-background-color;
+      cursor: $contents-cursor;
+
+      .jse-value-outer,
+      .jse-meta {
+        // since the $hover-background-color is half transparent,
+        // we have to prevent it from being applied twice, else it gets a darker color
+        background: none;
+      }
+    }
+  }
+
+  // key and value selected
+  &.jse-selected {
+    .jse-header,
+    .jse-contents,
+    .jse-footer {
+      background: $selection-background-color;
+      cursor: $contents-selected-cursor;
+    }
+
+    .jse-key-outer,
+    .jse-value-outer,
+    .jse-meta,
+    .jse-footer {
+      &:hover {
+        background: inherit;
+        cursor: inherit;
+      }
+    }
+  }
+
+  // key selected
+  .jse-key-outer.jse-selected-key {
+    background: $selection-background-color;
+    cursor: $contents-selected-cursor;
+  }
+
+  // value selected
+  &.jse-selected-value {
+    .jse-value-outer,
+    .jse-meta,
+    .jse-items .jse-header,
+    .jse-items .jse-contents,
+    .jse-props .jse-header,
+    .jse-props .jse-contents,
+    .jse-footer {
+      background: $selection-background-color;
+      cursor: $contents-selected-cursor;
+
+      .jse-key-outer {
+        &:hover {
+          background: inherit;
+          cursor: inherit;
+        }
+      }
+    }
+  }
+
+  &.jse-readonly {
+    --jse-contents-selected-cursor: pointer;
+  }
+
+  .jse-insert-area {
+    &.jse-selected {
+      outline-color: $context-menu-pointer-background;
+    }
+  }
 }

@@ -29,18 +29,6 @@ export interface AjvValidatorOptions {
  * @return Returns a validation function
  */
 export function createAjvValidator(options: AjvValidatorOptions): Validator {
-  // Deprecation error for the API of v0.9.2 and older
-  if (options.schema === undefined) {
-    throw new Error(
-      'Deprecation warning: ' +
-        'the signature of createAjvValidator is changed from ' +
-        'createAjvValidator(schema, schemaDefinitions, ajvOptions) ' +
-        'to ' +
-        'createAjvValidator({ schema, schemaDefinitions, ajvOptions }). ' +
-        'Please pass the arguments as an object instead of unnamed arguments.'
-    )
-  }
-
   let ajv = createAjvInstance(options)
   if (options.onCreateAjv !== undefined) {
     ajv = options.onCreateAjv(ajv) || ajv
@@ -95,11 +83,10 @@ function normalizeAjvError(json: unknown, ajvError: ErrorObject): ValidationErro
 /**
  * Improve the error message of a JSON schema error,
  * for example list the available values of an enum.
- *
- * @param {Object} ajvError
- * @return {Object} Returns the error with improved message
  */
-function improveAjvError(ajvError: ErrorObject) {
+function improveAjvError(ajvError: ErrorObject): ErrorObject {
+  let message: string | undefined = undefined
+
   if (ajvError.keyword === 'enum' && Array.isArray(ajvError.schema)) {
     let enums = ajvError.schema
     if (enums) {
@@ -110,13 +97,13 @@ function improveAjvError(ajvError: ErrorObject) {
         enums = enums.slice(0, 5)
         enums.push(more)
       }
-      ajvError.message = 'should be equal to one of: ' + enums.join(', ')
+      message = 'should be equal to one of: ' + enums.join(', ')
     }
   }
 
   if (ajvError.keyword === 'additionalProperties') {
-    ajvError.message = 'should NOT have additional property: ' + ajvError.params.additionalProperty
+    message = 'should NOT have additional property: ' + ajvError.params.additionalProperty
   }
 
-  return ajvError
+  return message ? { ...ajvError, message } : ajvError
 }

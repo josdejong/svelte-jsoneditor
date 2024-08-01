@@ -22,6 +22,8 @@
     if (value === true || value === false) {
       return 'custom-class-boolean'
     }
+
+    return undefined
   }
 </script>
 
