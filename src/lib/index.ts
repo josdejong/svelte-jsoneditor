@@ -1,3 +1,4 @@
+import { mount } from 'svelte'
 import JSONEditor from './components/JSONEditor.svelte'
 import BooleanToggle from './plugins/value/components/BooleanToggle.svelte'
 import ColorPicker from './plugins/value/components/ColorPicker.svelte'
@@ -8,6 +9,11 @@ import TimestampTag from './plugins/value/components/TimestampTag.svelte'
 
 // editor
 export { JSONEditor }
+export function createJSONEditor({ target, props }: Parameters<typeof mount>[1]) {
+  return mount(JSONEditor, { target, props })
+}
+
+// types
 export * from './types.js'
 
 // value plugins

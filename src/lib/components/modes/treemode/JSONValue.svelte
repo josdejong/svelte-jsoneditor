@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import type { JSONEditorContext, JSONSelection, SearchResultItem } from '$lib/types.js'
   import type { JSONPath } from 'immutable-json-patch'
@@ -45,7 +43,7 @@
         class="jse-value"
         data-type="selectable-value"
         use:action={renderer.props}
-      />
+      ></div>
     {/key}
   {:else}
     {#key renderer.component}

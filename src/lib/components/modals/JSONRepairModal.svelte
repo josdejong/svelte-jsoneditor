@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import JSONRepairComponent from './repair/JSONRepairComponent.svelte'
   import Modal from './Modal.svelte'

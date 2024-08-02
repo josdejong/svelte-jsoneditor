@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import { getColorCSS } from '$lib/utils/typeUtils.js'
   import { getWindow } from '$lib/utils/domUtils.js'
@@ -74,6 +72,6 @@
   style="background: {color}"
   title={!readOnly ? 'Click to open a color picker' : `Color ${value}`}
   on:click={openColorPicker}
-/>
+></button>
 
 <style src="./ColorPicker.scss"></style>

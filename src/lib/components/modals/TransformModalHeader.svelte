@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import { getContext } from 'svelte'
   import Icon from 'svelte-awesome'

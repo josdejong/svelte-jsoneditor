@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import { isUrl } from '$lib/utils/typeUtils.js'
   import { createEditValueSelection } from '$lib/logic/selection.js'

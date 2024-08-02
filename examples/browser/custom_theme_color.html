@@ -27,9 +27,9 @@
     <div id="my-jsoneditor"></div>
 
     <script type="module">
-      import { JSONEditor } from '../../package-vanilla/standalone.js'
+      import { createJSONEditor } from '../../package-vanilla/standalone.js'
 
-      const editor = new JSONEditor({
+      const editor = createJSONEditor({
         target: document.getElementById('my-jsoneditor'),
         props: {
           content: {

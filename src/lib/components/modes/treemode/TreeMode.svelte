@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler.js'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
@@ -2007,7 +2005,7 @@
     {/if}
   {:else}
     <div class="jse-contents">
-      <div class="jse-loading-space" />
+      <div class="jse-loading-space"></div>
       <div class="jse-loading">loading...</div>
     </div>
   {/if}

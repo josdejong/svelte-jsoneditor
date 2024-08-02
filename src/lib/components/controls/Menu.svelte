@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import Icon from 'svelte-awesome'
   import type { MenuItem } from '$lib/types'
@@ -18,9 +16,9 @@
 
   {#each items as item}
     {#if isMenuSeparator(item)}
-      <div class="jse-separator" />
+      <div class="jse-separator"></div>
     {:else if isMenuSpace(item)}
-      <div class="jse-space" />
+      <div class="jse-space"></div>
     {:else if isMenuButton(item)}
       <button
         type="button"

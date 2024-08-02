@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import { initial, isEqual } from 'lodash-es'
   import {

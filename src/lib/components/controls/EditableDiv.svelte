@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
   import { addNewLineSuffix, removeNewLineSuffix, setCursorToEnd } from '$lib/utils/domUtils.js'
@@ -156,6 +154,6 @@
   on:paste={handleValuePaste}
   on:blur={handleBlur}
   bind:this={domValue}
-/>
+></div>
 
 <style src="./EditableDiv.scss"></style>

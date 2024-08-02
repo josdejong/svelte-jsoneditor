@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import { isMac } from '$lib/utils/navigatorUtils.js'
   import Header from './Header.svelte'

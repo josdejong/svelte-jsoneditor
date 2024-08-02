@@ -51,7 +51,7 @@
     <div id="jsoneditor"></div>
 
     <script type="module">
-      import { JSONEditor, renderValue, EnumValue } from '../../package-vanilla/standalone.js'
+      import { createJSONEditor, renderValue, EnumValue } from '../../package-vanilla/standalone.js'
       import { ReadonlyPasswordAction } from './components/ReadonlyPasswordAction.js'
       import { EvaluatorAction } from './components/EvaluatorAction.js'
 
@@ -111,7 +111,7 @@
       }
 
       // create the editor
-      const editor = new JSONEditor({
+      const editor = createJSONEditor({
         target: document.getElementById('jsoneditor'),
         props: {
           content,

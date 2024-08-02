@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script>
   import Icon from 'svelte-awesome'
   import { faLock } from '@fortawesome/free-solid-svg-icons'

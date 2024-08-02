@@ -7,6 +7,10 @@ const config = {
   // for more information about preprocessors
   preprocess: sveltePreprocess(),
 
+  compilerOptions: {
+    // runes: true // TODO: fully migrate to runes mode
+  },
+
   kit: {
     adapter: adapter(),
     alias: {

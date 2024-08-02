@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import {
     faAngleDown,
@@ -79,10 +77,10 @@
 
           {#if count > MAX_VALIDATION_ERRORS}
             <tr class="jse-validation-error">
-              <td />
-              <td />
+              <td></td>
+              <td></td>
               <td>(and {count - MAX_VALIDATION_ERRORS} more errors)</td>
-              <td />
+              <td></td>
             </tr>
           {/if}
         </tbody>
