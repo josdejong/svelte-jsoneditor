@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { unmount } from 'svelte'
   import { createDebug } from '../utils/debug.js'
   import { uniqueId } from '../utils/uniqueId.js'
   import {
@@ -268,15 +269,15 @@
   export async function updateProps(props: JSONEditorPropsOptional): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
+    // FIXME: get rid of the deprecated this.$set(props) which is only available in "componentApi: 4"
     this.$set(props)
 
     await tick() // await rerender
   }
 
   export async function destroy() {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    this.$destroy()
+    // @ts-expect-error TypeScript does not know the type of `this`
+    unmount(this)
 
     await tick() // await destroying
   }

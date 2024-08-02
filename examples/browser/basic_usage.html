@@ -20,10 +20,10 @@
     <div id="jsoneditor"></div>
 
     <script type="module">
-      import { JSONEditor } from '../../package-vanilla/standalone.js'
+      import { createJSONEditor } from '../../package-vanilla/standalone.js'
 
       // create the editor
-      const editor = new JSONEditor({
+      const editor = createJSONEditor({
         target: document.getElementById('jsoneditor')
       })
 

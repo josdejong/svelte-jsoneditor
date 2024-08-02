@@ -5,6 +5,7 @@ import typescript from '@rollup/plugin-typescript'
 import { getBabelOutputPlugin } from '@rollup/plugin-babel'
 import path from 'path'
 import svelte from 'rollup-plugin-svelte'
+import postcss from 'rollup-plugin-postcss'
 import terser from '@rollup/plugin-terser'
 import { sveltePreprocess } from 'svelte-preprocess'
 import { getVanillaDependencies } from './tools/getExternalDependencies.js'
@@ -14,7 +15,7 @@ const packageFolder = 'package-vanilla'
 const file = path.join(packageFolder, 'index.js')
 
 export default {
-  input: 'src/lib/index.ts',
+  input: 'src/lib/index-vanilla.ts',
   external: getVanillaDependencies(),
   output: [
     {
@@ -28,13 +29,21 @@ export default {
     svelte({
       compilerOptions: {
         // enable run-time checks when not in production
-        dev: !production
+        dev: !production,
+
+        // FIXME: remove the need for componentApi: 4 (requires refactoring `updateProps` etc)
+        compatibility: {
+          componentApi: 4
+        }
       },
 
-      // we want to embed the CSS in the generated JS bundle
-      emitCss: false,
+      emitCss: true,
 
       preprocess: sveltePreprocess()
+    }),
+
+    postcss({
+      plugins: []
     }),
 
     resolve({
