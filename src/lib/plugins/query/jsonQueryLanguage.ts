@@ -5,10 +5,10 @@ import type { JSONPath } from 'immutable-json-patch'
 
 const description = `
 <p>
-  Enter a <a href="https://github.com/josdejong/jsonquery" target="_blank" 
+  Enter a <a href="https://jsonquerylang.org" target="_blank" 
   rel="noopener noreferrer">jsonquery</a> function to filter, sort, or transform the data.
   You can use functions like <code>get</code>, <code>filter</code>,
-  <code>sort</code>, <code>pick</code>, <code>groupBy</code>, <code>uniq</code>, etcetera.
+  <code>sort</code>, <code>pick</code>, <code>groupBy</code>, <code>uniq</code>, etcetera. Example query: <code>["filter",["age",">=",18]]</code>
 </p>
 `
 
@@ -29,7 +29,7 @@ function createQuery(_json: unknown, queryOptions: QueryLanguageOptions): string
     const filterValueStr = JSON.stringify(filterValue)
 
     queryFunctions.push(
-      `  ["filter", ${pathToString(filter.path)}, "${filter.relation}", ${filterValueStr}]`
+      `  ["filter", [${pathToString(filter.path)}, "${filter.relation}", ${filterValueStr}]]`
     )
   }
 
@@ -46,7 +46,7 @@ function createQuery(_json: unknown, queryOptions: QueryLanguageOptions): string
       queryFunctions.push(`  ["pick", ${paths.join(', ')}]`)
     } else {
       const path = projection.paths[0]
-      queryFunctions.push(`  ["get", ${pathToString(path)}]`)
+      queryFunctions.push(`  ["map", ${pathToString(path)}]`)
     }
   }
 

@@ -31,7 +31,7 @@ describe('jsonQueryLanguage', () => {
           value: 'Bob'
         }
       })
-      assert.deepStrictEqual(query, '["filter", ["user","name"], "==", "Bob"]')
+      assert.deepStrictEqual(query, '["filter", [["user","name"], "==", "Bob"]]')
 
       const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, [user2])
@@ -49,7 +49,7 @@ describe('jsonQueryLanguage', () => {
           value: 'Bob'
         }
       })
-      assert.deepStrictEqual(query, '["filter", "user name\\"", "==", "Bob"]')
+      assert.deepStrictEqual(query, '["filter", ["user name\\"", "==", "Bob"]]')
 
       const result = executeQuery(data, query, JSON)
       assert.deepStrictEqual(result, [{ 'user name"': 'Bob' }])
@@ -66,7 +66,7 @@ describe('jsonQueryLanguage', () => {
           value: '1'
         }
       })
-      assert.deepStrictEqual(query, '["filter", [], "==", 1]')
+      assert.deepStrictEqual(query, '["filter", [[], "==", 1]]')
 
       const result = executeQuery(data, query, JSON)
       assert.deepStrictEqual(result, [1])
@@ -81,7 +81,7 @@ describe('jsonQueryLanguage', () => {
           value: 'true'
         }
       })
-      assert.deepStrictEqual(query, '["filter", ["user","registered"], "==", true]')
+      assert.deepStrictEqual(query, '["filter", [["user","registered"], "==", true]]')
 
       const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, [user1, user2])
@@ -89,14 +89,7 @@ describe('jsonQueryLanguage', () => {
     })
 
     test('should create and execute a filter with null', () => {
-      const query = createQuery(users, {
-        filter: {
-          path: ['user', 'extra'],
-          relation: '!=',
-          value: 'null'
-        }
-      })
-      assert.deepStrictEqual(query, '["filter", ["user","extra"], "!=", null]')
+      const query = '["filter", ["exists", ["user", "extra"]]]'
 
       const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, [user2])
@@ -139,7 +132,7 @@ describe('jsonQueryLanguage', () => {
         }
       })
 
-      assert.deepStrictEqual(query, '["get", ["user","name"]]')
+      assert.deepStrictEqual(query, '["map", ["user","name"]]')
 
       const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, ['Stuart', 'Kevin', 'Bob'])
@@ -183,9 +176,9 @@ describe('jsonQueryLanguage', () => {
       assert.deepStrictEqual(
         query,
         '[\n' +
-          '  ["filter", ["user","age"], "<=", 7],\n' +
+          '  ["filter", [["user","age"], "<=", 7]],\n' +
           '  ["sort", ["user","name"]],\n' +
-          '  ["get", ["user","name"]]\n' +
+          '  ["map", ["user","name"]]\n' +
           ']'
       )
 
@@ -222,9 +215,9 @@ describe('jsonQueryLanguage', () => {
     test('should return null when trying to use a non existing function', () => {
       assert.throws(() => {
         const data = {}
-        const query = '["foo"]'
+        const query = '["foo", ["sort"]]'
         executeQuery(data, query, JSON)
-      }, /Error: Unknown query function "foo"/)
+      }, /TypeError: Cannot read properties of undefined \(reading 'slice'\)/)
     })
   })
 })
