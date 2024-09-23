@@ -1,4 +1,4 @@
-import { jsonquery } from '@josdejong/jsonquery'
+import { jsonquery, type JSONQuery, parse, stringify } from '@jsonquerylang/jsonquery'
 import { parseString } from '$lib/utils/stringUtils.js'
 import type { QueryLanguage, QueryLanguageOptions } from '$lib/types.js'
 import type { JSONPath } from 'immutable-json-patch'
@@ -22,44 +22,43 @@ export const jsonQueryLanguage: QueryLanguage = {
 
 function createQuery(_json: unknown, queryOptions: QueryLanguageOptions): string {
   const { filter, sort, projection } = queryOptions
-  const queryFunctions = []
+  const queryFunctions: JSONQuery[] = []
 
   if (filter && filter.path && filter.relation && filter.value) {
-    const filterValue = parseString(filter.value)
-    const filterValueStr = JSON.stringify(filterValue)
-
-    queryFunctions.push(
-      `  ["filter", [${pathToString(filter.path)}, "${filter.relation}", ${filterValueStr}]]`
-    )
+    queryFunctions.push([
+      'filter',
+      [
+        getOperatorName(filter.relation),
+        getter(filter.path),
+        parseString(filter.value) as JSONQuery
+      ]
+    ])
   }
 
   if (sort && sort.path && sort.direction) {
-    queryFunctions.push(
-      `  ["sort", ${pathToString(sort.path)}${sort.direction === 'desc' ? ', "desc"' : ''}]`
-    )
+    queryFunctions.push(['sort', getter(sort.path), sort.direction === 'desc' ? 'desc' : 'asc'])
   }
 
   if (projection && projection.paths) {
     if (projection.paths.length > 1) {
-      const paths = projection.paths.map(pathToString)
-
-      queryFunctions.push(`  ["pick", ${paths.join(', ')}]`)
+      queryFunctions.push(['pick', ...projection.paths.map(getter)])
     } else {
-      const path = projection.paths[0]
-      queryFunctions.push(`  ["map", ${pathToString(path)}]`)
+      queryFunctions.push(['map', getter(projection.paths[0])])
     }
   }
 
-  return queryFunctions.length === 1
-    ? queryFunctions[0].trim()
-    : `[\n${queryFunctions.join(',\n')}\n]`
+  return stringify(['pipe', ...queryFunctions])
 }
 
-function pathToString(path: JSONPath): JSONPath | string {
-  return JSON.stringify(path.length === 1 ? path[0] : path)
+function getter(path: JSONPath): ['get', ...path: JSONPath] {
+  return ['get', ...path]
 }
 
 function executeQuery(json: unknown, query: string): unknown {
-  const output = jsonquery(json, JSON.parse(query))
-  return output !== undefined ? output : null
+  return query.trim() !== '' ? jsonquery(json, query) : json
+}
+
+function getOperatorName(operator: string): string {
+  // a trick to get the name of the operator by parsing the operator in a temporary query
+  return (parse(`1 ${operator} 1`) as [string, number, number])[0]
 }

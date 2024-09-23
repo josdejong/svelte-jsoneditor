@@ -18,7 +18,7 @@ describe('jsonQueryLanguage', () => {
     test('should create a and execute an empty query', () => {
       const query = createQuery(users, {})
       const result = executeQuery(users, query, JSON)
-      assert.deepStrictEqual(query, '[\n\n]')
+      assert.deepStrictEqual(query, '')
       assert.deepStrictEqual(result, users)
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
@@ -31,7 +31,7 @@ describe('jsonQueryLanguage', () => {
           value: 'Bob'
         }
       })
-      assert.deepStrictEqual(query, '["filter", [["user","name"], "==", "Bob"]]')
+      assert.deepStrictEqual(query, 'filter(.user.name == "Bob")')
 
       const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, [user2])
@@ -49,7 +49,7 @@ describe('jsonQueryLanguage', () => {
           value: 'Bob'
         }
       })
-      assert.deepStrictEqual(query, '["filter", ["user name\\"", "==", "Bob"]]')
+      assert.deepStrictEqual(query, 'filter(."user name\\"" == "Bob")')
 
       const result = executeQuery(data, query, JSON)
       assert.deepStrictEqual(result, [{ 'user name"': 'Bob' }])
@@ -66,7 +66,7 @@ describe('jsonQueryLanguage', () => {
           value: '1'
         }
       })
-      assert.deepStrictEqual(query, '["filter", [[], "==", 1]]')
+      assert.deepStrictEqual(query, 'filter(get() == 1)')
 
       const result = executeQuery(data, query, JSON)
       assert.deepStrictEqual(result, [1])
@@ -81,7 +81,7 @@ describe('jsonQueryLanguage', () => {
           value: 'true'
         }
       })
-      assert.deepStrictEqual(query, '["filter", [["user","registered"], "==", true]]')
+      assert.deepStrictEqual(query, 'filter(.user.registered == true)')
 
       const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, [user1, user2])
@@ -89,7 +89,7 @@ describe('jsonQueryLanguage', () => {
     })
 
     test('should create and execute a filter with null', () => {
-      const query = '["filter", ["exists", ["user", "extra"]]]'
+      const query = 'filter(exists(.user.extra))'
 
       const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, [user2])
@@ -103,7 +103,7 @@ describe('jsonQueryLanguage', () => {
           direction: 'asc'
         }
       })
-      assert.deepStrictEqual(query, '["sort", ["user","age"]]')
+      assert.deepStrictEqual(query, 'sort(.user.age, "asc")')
 
       const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, [user1, user2, user3])
@@ -118,7 +118,7 @@ describe('jsonQueryLanguage', () => {
         }
       })
 
-      assert.deepStrictEqual(query, '["sort", ["user","age"], "desc"]')
+      assert.deepStrictEqual(query, 'sort(.user.age, "desc")')
 
       const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, [user3, user2, user1])
@@ -132,7 +132,7 @@ describe('jsonQueryLanguage', () => {
         }
       })
 
-      assert.deepStrictEqual(query, '["map", ["user","name"]]')
+      assert.deepStrictEqual(query, 'map(.user.name)')
 
       const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, ['Stuart', 'Kevin', 'Bob'])
@@ -146,7 +146,7 @@ describe('jsonQueryLanguage', () => {
         }
       })
 
-      assert.deepStrictEqual(query, '["pick", ["user","name"], "_id"]')
+      assert.deepStrictEqual(query, 'pick(.user.name, ._id)')
 
       const result = executeQuery(users, query, JSON)
       assert.deepStrictEqual(result, [
@@ -175,11 +175,7 @@ describe('jsonQueryLanguage', () => {
 
       assert.deepStrictEqual(
         query,
-        '[\n' +
-          '  ["filter", [["user","age"], "<=", 7]],\n' +
-          '  ["sort", ["user","name"]],\n' +
-          '  ["map", ["user","name"]]\n' +
-          ']'
+        'filter(.user.age <= 7)\n  | sort(.user.name, "asc")\n  | map(.user.name)'
       )
 
       const result = executeQuery(users, query, JSON)
@@ -204,20 +200,20 @@ describe('jsonQueryLanguage', () => {
       ])
     })
 
-    test('should throw an exception the query is no valid JSON', () => {
+    test('should throw an exception the query is not valid', () => {
       assert.throws(() => {
         const data = {}
-        const query = '["filter'
+        const query = 'filter('
         executeQuery(data, query, JSON)
-      }, /SyntaxError: Unterminated string in JSON at position 8/)
+      }, /SyntaxError: Value expected \(pos: 7\)/)
     })
 
     test('should return null when trying to use a non existing function', () => {
       assert.throws(() => {
         const data = {}
-        const query = '["foo", ["sort"]]'
+        const query = 'foo(.bar)'
         executeQuery(data, query, JSON)
-      }, /TypeError: Cannot read properties of undefined \(reading 'slice'\)/)
+      }, /SyntaxError: Unknown function 'foo' \(pos: 4\)/)
     })
   })
 })
