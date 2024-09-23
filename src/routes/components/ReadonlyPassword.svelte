@@ -1,24 +1,25 @@
 <svelte:options immutable={true} />
 
-<script>
+<script lang="ts">
   import Icon from 'svelte-awesome'
   import { faLock } from '@fortawesome/free-solid-svg-icons'
-  import { createValueSelection } from 'svelte-jsoneditor'
+  import { createEditValueSelection, type OnSelect } from 'svelte-jsoneditor'
+  import type { JSONPath } from 'immutable-json-patch'
 
-  export let value
-  export let path
-  export let readOnly
-  export let onSelect
+  export let value: string
+  export let path: JSONPath
+  export let readOnly: boolean
+  export let onSelect: OnSelect
 
   $: hiddenValue = '*'.repeat(Math.max(String(value).length, 3))
 
-  function handleValueDoubleClick(event) {
+  function handleValueDoubleClick(event: Event) {
     if (!readOnly) {
       event.preventDefault()
       event.stopPropagation()
 
       // open in edit mode
-      onSelect(createValueSelection(path, true))
+      onSelect(createEditValueSelection(path))
     }
   }
 </script>
