@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.8...v1.0.0) (2024-09-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* -   The internal state is refactored. This should not give any issues except when 
+    relying on some internal or undocumented features.
+-   Changed the API to consistently use `undefined` instead of `null`. This involves 
+    properties `selection`, `onChange` (properties `contentErrors and `patchResult`), 
+	`onRenderContextMenu` (property `selection`), `onSelect`, and methods `validate`,
+	and `select`.
+-   Old deprecation messages are removed. 
+-   The API of the `expand` function is changed from `expand(callback)` to 
+    `expand(path, callback)`, and can't be used anymore for collapsing nodes. Instead, 
+	use the `collapse(path)` method for that.
+-   The property `edit` is removed from the types `KeySelection` and `ValueSelection`, 
+    and two new types `EditKeySelection` and `EditValueSelection` are added.
+-   The helper functions  `createKeySelection` and `createValueSelection` are changed,
+    argument `edit` is removed, and two new helper functions `createEditKeySelection` 
+    and `createEditValueSelection` are added.
+-   The API of the component `EditableValue` requires an additional property `selection`.
+-   Some of the class names related to selection highlighting are moved/changed.
+-   The default query language is changed to `jsonquery`.
+-   The vanilla editor needs to be instantiated using `createJSONEditor(...)` instead
+    of `new JSONEditor(...)` in preparation for the upgrade to Svelte 5.
+
+### Features
+
+* improve the expand and selection API's and the internal state, and add a new query language JSON Query ([3a65392](https://github.com/josdejong/svelte-jsoneditor/commit/3a653925f5e441864782b71fc1113055b3a720f6))
+
 ### [0.23.8](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.7...v0.23.8) (2024-07-26)
 
 
