@@ -8,7 +8,8 @@ const description = `
   Enter a <a href="https://jsonquerylang.org" target="_blank" 
   rel="noopener noreferrer">jsonquery</a> function to filter, sort, or transform the data.
   You can use functions like <code>get</code>, <code>filter</code>,
-  <code>sort</code>, <code>pick</code>, <code>groupBy</code>, <code>uniq</code>, etcetera. Example query: <code>["filter",["age",">=",18]]</code>
+  <code>sort</code>, <code>pick</code>, <code>groupBy</code>, <code>uniq</code>, etcetera. 
+  Example query: <code>filter(.age >= 18)</code>
 </p>
 `
 
