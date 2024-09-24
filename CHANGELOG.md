@@ -30,7 +30,24 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* improve the expand and selection API's and the internal state, and add a new query language JSON Query ([3a65392](https://github.com/josdejong/svelte-jsoneditor/commit/3a653925f5e441864782b71fc1113055b3a720f6))
+* change the constructor of the vanilla library from `new JSONEditor(...)` into `createJSONEditor(...)` in preparation 
+  for an upgrade to Svelte 5.
+* implemented a powerful API for `expand` and `collapse` ([#458](https://github.com/josdejong/svelte-jsoneditor/pull/458))
+* replace the default query language with a new query language [jsonquery](https://jsonquerylang.org/) ([#469](https://github.com/josdejong/svelte-jsoneditor/pull/469))
+* implement support for the query language JSONPath ([#470](https://github.com/josdejong/svelte-jsoneditor/pull/470))
+* export more utility functions ([#461](https://github.com/josdejong/svelte-jsoneditor/pull/461))
+* change the API to consistently use `undefined` instead of `null` ([#453](https://github.com/josdejong/svelte-jsoneditor/pull/453)).
+* replaced `svelte-simple-modal` with native HTML `<dialog />` ([#462](https://github.com/josdejong/svelte-jsoneditor/pull/462))
+* the property `edit` is removed from the types `KeySelection` and `ValueSelection`,
+  and two new types `EditKeySelection` and `EditValueSelection` are added.
+* internal refactor of the data structure holding state like expanded nodes and search results.
+
+### Bug Fixes
+
+* shortcut keys `Ctrl+F` and `Ctrl+H` not working in table mode whilst editing a value
+* the do you want to format message popped up after clicking the "Compact" button
+* define `svelte@4` as a peer dependency
+* a lot of small bugfixes.
 
 ### [0.23.8](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.7...v0.23.8) (2024-07-26)
 
