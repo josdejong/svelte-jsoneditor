@@ -11,7 +11,7 @@
     />
 
     <script type="module">
-      import { JSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor@0.17.0/index.js'
+      import { createJSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor@0.17.0/index.js'
 
       class JSONEditorElement extends HTMLElement {
         constructor() {
@@ -31,7 +31,7 @@
           target.className = 'shadow-dom-editor'
           shadow.append(target)
 
-          const editor = new JSONEditor({
+          const editor = createJSONEditor({
             target,
             props: {
               content: {

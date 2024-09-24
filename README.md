@@ -116,10 +116,10 @@ If you want to use the library straight in the browser, use the provided standal
 
 ```ts
 // for use directly in the browser
-import { JSONEditor } from 'vanilla-jsoneditor/standalone.js'
+import { createJSONEditor } from 'vanilla-jsoneditor/standalone.js'
 ```
 
-The standalone bundle contains all dependencies of `vanilla-jsoneditor`, for example `lodash-es` and `Ajv`. If you use some of these dependencies in your project too, it means that they will be bundled twice in your web application, leading to a needlessly large application size. In general, it is preferable to use the default `import { JSONEditor } from 'vanilla-jsoneditor'` so dependencies can be reused.
+The standalone bundle contains all dependencies of `vanilla-jsoneditor`, for example `lodash-es` and `Ajv`. If you use some of these dependencies in your project too, it means that they will be bundled twice in your web application, leading to a needlessly large application size. In general, it is preferable to use the default `import { createJSONEditor } from 'vanilla-jsoneditor'` instead of the standalone bundle so dependencies can be reused.
 
 Browser example loading the standalone ES module:
 
@@ -133,11 +133,11 @@ Browser example loading the standalone ES module:
     <div id="jsoneditor"></div>
 
     <script type="module">
-      import { JSONEditor } from 'vanilla-jsoneditor/standalone.js'
+      import { createJSONEditor } from 'vanilla-jsoneditor/standalone.js'
 
       // Or use it through a CDN (not recommended for use in production):
-      // import { JSONEditor } from 'https://unpkg.com/vanilla-jsoneditor/standalone.js'
-      // import { JSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor/standalone.js'
+      // import { createJSONEditor } from 'https://unpkg.com/vanilla-jsoneditor/standalone.js'
+      // import { createJSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor/standalone.js'
 
       let content = {
         text: undefined,
@@ -146,7 +146,7 @@ Browser example loading the standalone ES module:
         }
       }
 
-      const editor = new JSONEditor({
+      const editor = createJSONEditor({
         target: document.getElementById('jsoneditor'),
         props: {
           content,
@@ -196,11 +196,11 @@ Svelte component:
 JavasScript class:
 
 ```js
-import { JSONEditor } from 'vanilla-jsoneditor' // or 'vanilla-jsoneditor/standalone.js'
+import { createJSONEditor } from 'vanilla-jsoneditor' // or 'vanilla-jsoneditor/standalone.js'
 
 const content = { text: '[1,2,3]' }
 
-const editor = new JSONEditor({
+const editor = createJSONEditor({
   target: document.getElementById('jsoneditor'),
   props: {
     content,
@@ -214,7 +214,7 @@ const editor = new JSONEditor({
 
 ### properties
 
-Properties such as `content` and `mode` are either passed as attributes to the Svelte component, like `<JSONEditor {content} {mode} />`, or via the `props` in case of the vanilla JS constructor: `new JSONEditor({ target, props: { content, mode }`.
+Properties such as `content` and `mode` are either passed as attributes to the Svelte component, like `<JSONEditor {content} {mode} />`, or via the `props` in case of the vanilla JS factory function: `createJSONEditor({ target, props: { content, mode }`.
 
 #### content
 
@@ -662,10 +662,10 @@ Methods can be called on a JSONEditor instance. In Svelte, you can create a refe
 <JSONEditor bind:this={editor} />
 ```
 
-In the vanilla editor, the constructor returns an instance:
+In the vanilla editor, a factory function is used to create an editor instance:
 
 ```js
-const editor = new JSONEditor({ ... })
+const editor = createJSONEditor({ ... })
 
 function logContents() {
   const content = editor.get() // using a method

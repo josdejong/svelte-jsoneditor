@@ -8,7 +8,6 @@ import TimestampTag from './plugins/value/components/TimestampTag.svelte'
 
 // editor
 export { JSONEditor }
-export * from './types.js'
 
 // value plugins
 export { renderValue } from './plugins/value/renderValue.js'
@@ -86,6 +85,9 @@ export {
   isColor,
   isUrl
 } from './utils/typeUtils'
+
+// types
+export * from './types.js'
 
 // typeguards
 export * from './typeguards.js'
