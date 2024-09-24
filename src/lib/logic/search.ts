@@ -1,12 +1,7 @@
-import type {
-  JSONPatchDocument,
-  JSONPatchOperation,
-  JSONPath,
-  JSONPointer
-} from 'immutable-json-patch'
+import type { JSONPatchDocument, JSONPatchOperation, JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
-import { forEachRight, groupBy, initial, isEqual, last } from 'lodash-es'
-import { getEnforceString } from './documentState.js'
+import { forEachRight, initial, isEqual, last } from 'lodash-es'
+import { createRecursiveState, getEnforceString, updateInRecursiveState } from './documentState.js'
 import { createSelectionFromOperations } from './selection.js'
 import { rename } from './operations.js'
 import { stringConvert } from '../utils/typeUtils.js'
@@ -14,21 +9,26 @@ import type {
   DocumentState,
   ExtendedSearchResultItem,
   JSONParser,
-  JSONPointerMap,
   JSONSelection,
   SearchOptions,
-  SearchResult,
-  SearchResultItem
+  SearchResultDetails,
+  SearchResultItem,
+  SearchResults,
+  RecursiveStateFactory
 } from '$lib/types'
 import { SearchField } from '$lib/types.js'
+import {
+  hasSearchResults,
+  isArrayRecursiveState,
+  isObjectRecursiveState
+} from 'svelte-jsoneditor/typeguards.js'
 
 // TODO: comment
 // TODO: unit test
 export function updateSearchResult(
-  json: unknown,
   newResultItems: SearchResultItem[],
-  previousResult: SearchResult | undefined
-): SearchResult {
+  previousResult: SearchResultDetails | undefined
+): SearchResultDetails {
   const activePath = previousResult?.activeItem
     ? getSearchResultPath(previousResult.activeItem)
     : undefined
@@ -55,14 +55,13 @@ export function updateSearchResult(
 
   return {
     items,
-    itemsMap: groupBy(items, (item) => compileJSONPointer(item.path)),
     activeItem,
     activeIndex
   }
 }
 
 // TODO: unit test
-export function searchNext(searchResult: SearchResult): SearchResult {
+export function searchNext(searchResult: SearchResultDetails): SearchResultDetails {
   const nextActiveIndex =
     searchResult.activeIndex < searchResult.items.length - 1
       ? searchResult.activeIndex + 1
@@ -79,14 +78,13 @@ export function searchNext(searchResult: SearchResult): SearchResult {
   return {
     ...searchResult,
     items,
-    itemsMap: groupBy(items, (item) => compileJSONPointer(item.path)),
     activeItem: nextActiveItem,
     activeIndex: nextActiveIndex
   }
 }
 
 // TODO: unit test
-export function searchPrevious(searchResult: SearchResult): SearchResult {
+export function searchPrevious(searchResult: SearchResultDetails): SearchResultDetails {
   const previousActiveIndex =
     searchResult.activeIndex > 0 ? searchResult.activeIndex - 1 : searchResult.items.length - 1
 
@@ -99,7 +97,6 @@ export function searchPrevious(searchResult: SearchResult): SearchResult {
   return {
     ...searchResult,
     items,
-    itemsMap: groupBy(items, (item) => compileJSONPointer(item.path)),
     activeItem: previousActiveItem,
     activeIndex: previousActiveIndex
   }
@@ -276,11 +273,11 @@ export function replaceAllText(
 
 export function createSearchAndReplaceOperations(
   json: unknown,
-  documentState: DocumentState,
+  documentState: DocumentState | undefined,
   replacementText: string,
   searchResultItem: SearchResultItem,
   parser: JSONParser
-): { newSelection: JSONSelection | null; operations: JSONPatchDocument } {
+): { newSelection: JSONSelection | undefined; operations: JSONPatchDocument } {
   const { field, path, start, end } = searchResultItem
 
   if (field === SearchField.key) {
@@ -306,14 +303,7 @@ export function createSearchAndReplaceOperations(
     }
     const currentValueText = typeof currentValue === 'string' ? currentValue : String(currentValue)
 
-    const pointer = compileJSONPointer(path)
-    const enforceString = getEnforceString(
-      currentValue,
-      documentState.enforceStringMap,
-      pointer,
-      parser
-    )
-
+    const enforceString = getEnforceString(json, documentState, path)
     const value = replaceText(currentValueText, replacementText, start, end)
 
     const operations: JSONPatchOperation[] = [
@@ -337,11 +327,11 @@ export function createSearchAndReplaceOperations(
 
 export function createSearchAndReplaceAllOperations(
   json: unknown,
-  documentState: DocumentState,
+  documentState: DocumentState | undefined,
   searchText: string,
   replacementText: string,
   parser: JSONParser
-): { newSelection: JSONSelection | null; operations: JSONPatchDocument } {
+): { newSelection: JSONSelection | undefined; operations: JSONPatchDocument } {
   // TODO: to improve performance, we could reuse existing search results (except when hitting a maxResult limit)
   const searchResultItems = search(searchText, json, { maxResults: Infinity })
 
@@ -387,7 +377,7 @@ export function createSearchAndReplaceAllOperations(
 
   // step 3: call createSearchAndReplaceOperations for each of the matches
   let allOperations: JSONPatchDocument = []
-  let lastNewSelection: JSONSelection | null = null
+  let lastNewSelection: JSONSelection | undefined
   deduplicatedMatches.forEach((match) => {
     // TODO: there is overlap with the logic of createSearchAndReplaceOperations. Can we extract and reuse this logic?
     const { field, path, items } = match
@@ -412,15 +402,7 @@ export function createSearchAndReplaceAllOperations(
       }
       const currentValueText =
         typeof currentValue === 'string' ? currentValue : String(currentValue)
-
-      const pointer = compileJSONPointer(path)
-      const enforceString = getEnforceString(
-        currentValue,
-        documentState.enforceStringMap,
-        pointer,
-        parser
-      )
-
+      const enforceString = getEnforceString(json, documentState, path)
       const value = replaceAllText(currentValueText, replacementText, items)
 
       const operations: JSONPatchOperation[] = [
@@ -500,28 +482,69 @@ function getSearchResultPath(searchResultItem: SearchResultItem): JSONPath {
 
 // TODO: write unit tests
 export function filterKeySearchResults(
-  map: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
-  pointer: JSONPointer
+  searchResult: SearchResults | undefined
 ): ExtendedSearchResultItem[] | undefined {
-  const items = map?.[pointer]?.filter((item: SearchResultItem) => item.field === SearchField.key)
-
-  if (!items || items.length === 0) {
-    return undefined
-  }
-
-  return items
+  return hasSearchResults(searchResult)
+    ? searchResult.searchResults.filter((result) => result.field === SearchField.key)
+    : undefined
 }
 
 // TODO: write unit tests
 export function filterValueSearchResults(
-  map: JSONPointerMap<ExtendedSearchResultItem[]> | undefined,
-  pointer: JSONPointer
+  searchResult: SearchResults | undefined
 ): ExtendedSearchResultItem[] | undefined {
-  const items = map?.[pointer]?.filter((item: SearchResultItem) => item.field === SearchField.value)
+  return hasSearchResults(searchResult)
+    ? searchResult.searchResults.filter((result) => result.field === SearchField.value)
+    : undefined
+}
 
-  if (!items || items.length === 0) {
-    return undefined
-  }
+export function createSearchResults({ json }: { json: unknown }): SearchResults | undefined {
+  return createRecursiveState({
+    json,
+    factory: searchResultsFactory
+  }) as SearchResults
+}
 
-  return items
+export const searchResultsFactory: RecursiveStateFactory = {
+  createObjectDocumentState: () => ({ type: 'object', properties: {} }),
+  createArrayDocumentState: () => ({ type: 'array', items: [] }),
+  createValueDocumentState: () => ({ type: 'value' })
+}
+
+export function updateInSearchResults(
+  json: unknown,
+  searchResults: SearchResults | undefined,
+  path: JSONPath,
+  transform: (value: unknown, state: SearchResults) => SearchResults
+): SearchResults {
+  return updateInRecursiveState(json, searchResults, path, transform, searchResultsFactory)
+}
+
+export function toRecursiveSearchResults(
+  json: unknown,
+  searchResultItems: ExtendedSearchResultItem[]
+): SearchResults | undefined {
+  return searchResultItems.reduce(
+    (recursiveState, searchResult) => {
+      return updateInSearchResults(json, recursiveState, searchResult.path, (_, nestedState) => ({
+        ...nestedState,
+        searchResults: nestedState.searchResults
+          ? nestedState.searchResults.concat(searchResult)
+          : [searchResult]
+      }))
+    },
+    undefined as SearchResults | undefined
+  )
+}
+
+export function flattenSearchResults(node: SearchResults | undefined): ExtendedSearchResultItem[] {
+  const self = node?.searchResults ?? []
+
+  const nested = isObjectRecursiveState(node)
+    ? Object.values(node.properties).flatMap(flattenSearchResults)
+    : isArrayRecursiveState(node)
+      ? node.items.flatMap(flattenSearchResults)
+      : []
+
+  return self.concat(nested)
 }

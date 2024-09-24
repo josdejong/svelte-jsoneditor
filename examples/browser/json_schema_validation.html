@@ -36,7 +36,7 @@
     <div id="jsoneditor"></div>
 
     <script type="module">
-      import { JSONEditor, createAjvValidator } from '../../package-vanilla/standalone.js'
+      import { createJSONEditor, createAjvValidator } from '../../package-vanilla/standalone.js'
 
       const schema = {
         title: 'Employee',
@@ -122,7 +122,7 @@
 
       // create the editor
       const target = document.getElementById('jsoneditor')
-      const editor = new JSONEditor({
+      const editor = createJSONEditor({
         target: document.getElementById('jsoneditor'),
         props: {
           content,

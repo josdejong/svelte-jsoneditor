@@ -8,20 +8,25 @@ import TimestampTag from './plugins/value/components/TimestampTag.svelte'
 
 // editor
 export { JSONEditor }
-export * from './types.js'
 
 // value plugins
 export { renderValue } from './plugins/value/renderValue.js'
 export { renderJSONSchemaEnum } from './plugins/value/renderJSONSchemaEnum.js'
 export { BooleanToggle, ColorPicker, EditableValue, EnumValue, ReadonlyValue, TimestampTag }
 
+// HTML
+export { getValueClass } from './plugins/value/components/utils/getValueClass'
+export { keyComboFromEvent } from './utils/keyBindings'
+
 // validator plugins
 export * from './plugins/validator/createAjvValidator.js'
 
 // query plugins
+export { jsonQueryLanguage } from './plugins/query/jsonQueryLanguage.js'
+export { jmespathQueryLanguage } from './plugins/query/jmespathQueryLanguage.js'
+export { jsonpathQueryLanguage } from './plugins/query/jsonpathQueryLanguage.js'
 export { lodashQueryLanguage } from './plugins/query/lodashQueryLanguage.js'
 export { javascriptQueryLanguage } from './plugins/query/javascriptQueryLanguage.js'
-export { jmespathQueryLanguage } from './plugins/query/jmespathQueryLanguage.js'
 
 // content
 export {
@@ -34,6 +39,9 @@ export {
   estimateSerializedSize
 } from './utils/jsonUtils.js'
 
+// expand
+export { expandAll, expandMinimal, expandNone, expandSelf } from './logic/documentState'
+
 // selection
 export {
   isValueSelection,
@@ -43,10 +51,17 @@ export {
   isMultiSelection,
   isEditingSelection,
   createValueSelection,
+  createEditValueSelection,
   createKeySelection,
+  createEditKeySelection,
   createInsideSelection,
   createAfterSelection,
-  createMultiSelection
+  createMultiSelection,
+  getFocusPath,
+  getAnchorPath,
+  getStartPath,
+  getEndPath,
+  getSelectionPaths
 } from './logic/selection.js'
 
 // parser
@@ -58,6 +73,21 @@ export { parseJSONPath, stringifyJSONPath } from './utils/pathUtils.js'
 // actions
 export { resizeObserver } from './actions/resizeObserver.js'
 export { onEscape } from './actions/onEscape.js'
+
+// type checking
+export {
+  valueType,
+  stringConvert,
+  isObject,
+  isObjectOrArray,
+  isBoolean,
+  isTimestamp,
+  isColor,
+  isUrl
+} from './utils/typeUtils'
+
+// types
+export * from './types.js'
 
 // typeguards
 export * from './typeguards.js'

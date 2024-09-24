@@ -90,6 +90,10 @@ describe('table', () => {
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
+    deepStrictEqual(getColumns(undefined, false), [])
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     deepStrictEqual(getColumns('foo', false), [])
   })
 
@@ -168,49 +172,49 @@ describe('table', () => {
 
     test('selectPreviousRow', () => {
       deepStrictEqual(
-        selectPreviousRow(columns, createValueSelection(['2', 'id'], false)),
-        createValueSelection(['1', 'id'], false)
+        selectPreviousRow(columns, createValueSelection(['2', 'id'])),
+        createValueSelection(['1', 'id'])
       )
 
       deepStrictEqual(
-        selectPreviousRow(columns, createValueSelection(['0', 'id'], false)),
-        createValueSelection(['0', 'id'], false)
+        selectPreviousRow(columns, createValueSelection(['0', 'id'])),
+        createValueSelection(['0', 'id'])
       )
     })
 
     test('selectNextRow', () => {
       deepStrictEqual(
-        selectNextRow(json, columns, createValueSelection(['0', 'id'], false)),
-        createValueSelection(['1', 'id'], false)
+        selectNextRow(json, columns, createValueSelection(['0', 'id'])),
+        createValueSelection(['1', 'id'])
       )
 
       deepStrictEqual(
-        selectNextRow(json, columns, createValueSelection(['1', 'id'], false)),
-        createValueSelection(['1', 'id'], false)
+        selectNextRow(json, columns, createValueSelection(['1', 'id'])),
+        createValueSelection(['1', 'id'])
       )
     })
 
     test('selectPreviousColumn', () => {
       deepStrictEqual(
-        selectPreviousColumn(columns, createValueSelection(['2', 'name'], false)),
-        createValueSelection(['2', 'id'], false)
+        selectPreviousColumn(columns, createValueSelection(['2', 'name'])),
+        createValueSelection(['2', 'id'])
       )
 
       deepStrictEqual(
-        selectPreviousColumn(columns, createValueSelection(['2', 'id'], false)),
-        createValueSelection(['2', 'id'], false)
+        selectPreviousColumn(columns, createValueSelection(['2', 'id'])),
+        createValueSelection(['2', 'id'])
       )
     })
 
     test('selectNextColumn', () => {
       deepStrictEqual(
-        selectNextColumn(columns, createValueSelection(['2', 'id'], false)),
-        createValueSelection(['2', 'name'], false)
+        selectNextColumn(columns, createValueSelection(['2', 'id'])),
+        createValueSelection(['2', 'name'])
       )
 
       deepStrictEqual(
-        selectNextColumn(columns, createValueSelection(['2', 'other'], false)),
-        createValueSelection(['2', 'other'], false)
+        selectNextColumn(columns, createValueSelection(['2', 'other'])),
+        createValueSelection(['2', 'other'])
       )
     })
 

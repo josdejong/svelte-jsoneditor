@@ -2,9 +2,9 @@
 
 A web-based tool to view, edit, format, transform, and validate JSON.
 
-Try it out: https://jsoneditoronline.org
+Try it out: <https://jsoneditoronline.org>
 
-The library is written with Svelte, but can be used in plain JavaScript too and in any framework (SolidJS, React, Vue, Angular, etc).
+The library is written with Svelte, but can be used in plain JavaScript too and in any framework (SolidJS, React, Vue, Angular, etc.). It requires a browser from March 2022 or newer.
 
 ![JSONEditor tree mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_tree_mode_screenshot.png)
 ![JSONEditor text mode screenshot](https://raw.githubusercontent.com/josdejong/svelte-jsoneditor/main/misc/jsoneditor_text_mode_screenshot.png)
@@ -41,13 +41,13 @@ npm install vanilla-jsoneditor
 ### Examples
 
 - Svelte:
-  - Playground: https://www.sveltelab.dev/q1l38ztdys4at87
+  - Playground: <https://www.sveltelab.dev/q1l38ztdys4at87>
   - Examples: [/src/routes/examples](/src/routes/examples)
 - Plain JavaScript examples:
-  - Try it out: https://jsbin.com/gatibux/edit?html,output
+  - Try it out: <https://jsbin.com/gatibux/edit?html,output>
   - Examples: [/examples/browser](/examples/browser)
-- React example: https://codesandbox.io/s/svelte-jsoneditor-react-59wxz
-- Vue example: https://codesandbox.io/s/svelte-jsoneditor-vue-toln3w
+- React example: <https://codesandbox.io/s/svelte-jsoneditor-react-59wxz>
+- Vue example: <https://codesandbox.io/s/svelte-jsoneditor-vue-toln3w>
 
 ### Svelte usage
 
@@ -116,10 +116,10 @@ If you want to use the library straight in the browser, use the provided standal
 
 ```ts
 // for use directly in the browser
-import { JSONEditor } from 'vanilla-jsoneditor/standalone.js'
+import { createJSONEditor } from 'vanilla-jsoneditor/standalone.js'
 ```
 
-The standalone bundle contains all dependencies of `vanilla-jsoneditor`, for example `lodash-es` and `Ajv`. If you use some of these dependencies in your project too, it means that they will be bundled twice in your web application, leading to a needlessly large application size. In general, it is preferable to use the default `import { JSONEditor } from 'vanilla-jsoneditor'` so dependencies can be reused.
+The standalone bundle contains all dependencies of `vanilla-jsoneditor`, for example `lodash-es` and `Ajv`. If you use some of these dependencies in your project too, it means that they will be bundled twice in your web application, leading to a needlessly large application size. In general, it is preferable to use the default `import { createJSONEditor } from 'vanilla-jsoneditor'` instead of the standalone bundle so dependencies can be reused.
 
 Browser example loading the standalone ES module:
 
@@ -133,11 +133,11 @@ Browser example loading the standalone ES module:
     <div id="jsoneditor"></div>
 
     <script type="module">
-      import { JSONEditor } from 'vanilla-jsoneditor/standalone.js'
+      import { createJSONEditor } from 'vanilla-jsoneditor/standalone.js'
 
       // Or use it through a CDN (not recommended for use in production):
-      // import { JSONEditor } from 'https://unpkg.com/vanilla-jsoneditor/standalone.js'
-      // import { JSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor/standalone.js'
+      // import { createJSONEditor } from 'https://unpkg.com/vanilla-jsoneditor/standalone.js'
+      // import { createJSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor/standalone.js'
 
       let content = {
         text: undefined,
@@ -146,7 +146,7 @@ Browser example loading the standalone ES module:
         }
       }
 
-      const editor = new JSONEditor({
+      const editor = createJSONEditor({
         target: document.getElementById('jsoneditor'),
         props: {
           content,
@@ -196,11 +196,11 @@ Svelte component:
 JavasScript class:
 
 ```js
-import { JSONEditor } from 'vanilla-jsoneditor' // or 'vanilla-jsoneditor/standalone.js'
+import { createJSONEditor } from 'vanilla-jsoneditor' // or 'vanilla-jsoneditor/standalone.js'
 
 const content = { text: '[1,2,3]' }
 
-const editor = new JSONEditor({
+const editor = createJSONEditor({
   target: document.getElementById('jsoneditor'),
   props: {
     content,
@@ -214,7 +214,7 @@ const editor = new JSONEditor({
 
 ### properties
 
-Properties such as `content` and `mode` are either passed as attributes to the Svelte component, like `<JSONEditor {content} {mode} />`, or via the `props` in case of the vanilla JS constructor: `new JSONEditor({ target, props: { content, mode }`.
+Properties such as `content` and `mode` are either passed as attributes to the Svelte component, like `<JSONEditor {content} {mode} />`, or via the `props` in case of the vanilla JS factory function: `createJSONEditor({ target, props: { content, mode }`.
 
 #### content
 
@@ -229,10 +229,10 @@ Pass the JSON contents to be rendered in the JSONEditor. `Content` is an object 
 #### selection
 
 ```ts
-selection: JSONEditorSelection | null
+selection: JSONEditorSelection | undefined
 ```
 
-The current selected contents. You can use two-way binding using `bind:selection`. The `tree` mode supports `MultiSelection`, `KeySelection`, `ValueSelection`, `InsideSelection`, or `AfterSelection`. The `table` mode supports `ValueSelection`, and `text` mode supports `TextSelection.`.
+The current selected contents. You can use two-way binding using `bind:selection`. The `tree` mode supports `MultiSelection`, `KeySelection`, `EditKeySelection`, `ValueSelection`, `EditValueSelection`, `InsideSelection`, or `AfterSelection`. The `table` mode supports `ValueSelection`, and `text` mode supports `TextSelection.`.
 
 #### mode
 
@@ -386,7 +386,7 @@ Callback fired when an error occurs. Default implementation is to log an error i
 #### onChange
 
 ```ts
-onChange(content: Content, previousContent: Content, changeStatus: { contentErrors: ContentErrors | null, patchResult: JSONPatchResult | null })
+onChange(content: Content, previousContent: Content, changeStatus: { contentErrors: ContentErrors | undefined, patchResult: JSONPatchResult | undefined })
 ```
 
 The callback which is invoked on every change of the contents made by the user from within the editor. It will not trigger on changes that are applied programmatically via methods like `.set()`, `.update()`, or `.patch()`.
@@ -404,7 +404,7 @@ Invoked when the mode is changed.
 #### onClassName
 
 ```ts
-onClassName(path: Path, value: any): string | undefined
+onClassName(path: JSONPath, value: any): string | undefined
 ```
 
 Add a custom class name to specific nodes, based on their path and/or value. Note that in the custom class, you can override CSS variables like `--jse-contents-background-color` to change the styling of a node, like the background color. Relevant variables are:
@@ -519,7 +519,7 @@ A menu item `MenuItem` can be one of the following types:
 #### onRenderContextMenu
 
 ```ts
-onRenderContextMenu(items: ContextMenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean, readOnly: boolean, selection: JSONEditorSelection | null }) : ContextMenuItem[] | false | undefined
+onRenderContextMenu(items: ContextMenuItem[], context: { mode: 'tree' | 'text' | 'table', modal: boolean, readOnly: boolean, selection: JSONEditorSelection | undefined }) : ContextMenuItem[] | false | undefined
 ```
 
 Callback which can be used to make changes to the context menu items. New items can be added, or existing items can be removed or reorganized. When the function returns `undefined`, the original `items` will be applied and the context menu will be displayed when `readOnly` is `false`. When the function returns `false`, the context menu will never be displayed. The callback is triggered too when the editor is `readOnly`, and in most cases you want to return `false` then.
@@ -583,10 +583,10 @@ A menu item `ContextMenuItem` can be one of the following types:
 #### onSelect
 
 ```ts
-onSelect: (selection: JSONEditorSelection | null) => void
+onSelect: (selection: JSONEditorSelection | undefined) => void
 ```
 
-Callback invoked when the selection is changed. When the selection is removed, the callback is invoked with `undefined` as argument. In `text` mode, a `TextSelection` will be fired. In `tree` and `table` mode, a `JSONSelection` will be fired (which can be `MultiSelection`, `KeySelection`, `ValueSelection`, `InsideSelection`, or `AfterSelection`). Use typeguards like `isTextSelection` and `isValueSelection` to check what type the selection has.
+Callback invoked when the selection is changed. When the selection is removed, the callback is invoked with `undefined` as argument. In `text` mode, a `TextSelection` will be fired. In `tree` and `table` mode, a `JSONSelection` will be fired (which can be `MultiSelection`, `KeySelection`, `EditKeySelection`, `ValueSelection`, `EditValueSelection`, `InsideSelection`, or `AfterSelection`). Use typeguards like `isTextSelection` and `isValueSelection` to check what type the selection has.
 
 #### queryLanguages
 
@@ -594,19 +594,37 @@ Callback invoked when the selection is changed. When the selection is removed, t
 queryLanguages: QueryLanguage[]
 ```
 
-Configure one or multiple query language that can be used in the Transform modal. The library comes with three languages:
+Configure one or multiple query language that can be used in the Transform modal. The library comes with the following languages included:
+
+- [JSONQuery](https://github.com/josdejong/jsonquery)
+- [JMESPath](https://jmespath.org/)
+- [JSONPath](https://github.com/JSONPath-Plus/JSONPath)
+- JavaScript + [Lodash](https://lodash.com/)
+- JavaScript
+
+The languages can be loaded as follows:
 
 ```ts
 import {
+  jsonQueryLanguage,
   jmespathQueryLanguage,
+  jsonpathQueryLanguage,
   lodashQueryLanguage,
   javascriptQueryLanguage
 } from 'svelte-jsoneditor'
 
-const allQueryLanguages = [jmespathQueryLanguage, lodashQueryLanguage, javascriptQueryLanguage]
+const allQueryLanguages = [
+  jsonQueryLanguage,
+  jmespathQueryLanguage,
+  jsonpathQueryLanguage,
+  lodashQueryLanguage,
+  javascriptQueryLanguage
+]
 ```
 
-By default, only `javascriptQueryLanguage` is loaded.
+By default, only `jsonQueryLanguage` is loaded in the editor.
+
+Note that both `lodashQueryLanguage` and `javascriptQueryLanguage` can execute arbitrary JavaScript code and use `new Function(...)` to execute the code. Therefore, they are not suitable in general to store or share queries because of the security risks. In some environments, trying to use them will result in CSP (Content Security Policy) errors depending on the security policy.
 
 #### queryLanguageId
 
@@ -644,10 +662,10 @@ Methods can be called on a JSONEditor instance. In Svelte, you can create a refe
 <JSONEditor bind:this={editor} />
 ```
 
-In the vanilla editor, the constructor returns an instance:
+In the vanilla editor, a factory function is used to create an editor instance:
 
 ```js
-const editor = new JSONEditor({ ... })
+const editor = createJSONEditor({ ... })
 
 function logContents() {
   const content = editor.get() // using a method
@@ -712,14 +730,33 @@ editor.updateProps({
 #### expand
 
 ```ts
-JSONEditor.prototype.expand([callback: (path: Path) => boolean]): Promise<void>
+JSONEditor.prototype.expand(path: JSONPath, callback?: (relativePath: JSONPath) => boolean = expandSelf): Promise<void>
 ```
 
-Expand or collapse paths in the editor. The `callback` determines which paths will be expanded. If no `callback` is provided, all paths will be expanded. It is only possible to expand a path when all of its parent paths are expanded too. Examples:
+Expand or collapse paths in the editor. All nodes along the provided `path` will be expanded and become visible (rendered). So for example collapsed sections of an array will be expanded. Using the optional `callback`, the node itself and some or all of its nested child nodes can be expanded too. The `callback` function only iterates over the visible sections of an array and not over any of the collapsed sections. By default, the first 100 items of an array are visible and rendered.
 
-- `editor.expand(path => true)` expand all
-- `editor.expand(path => false)` collapse all
-- `editor.expand(path => path.length < 2)` expand all paths up to 2 levels deep
+Examples:
+
+- `editor.expand([], () => true)` expand all
+- `editor.expand([], relativePath => relativePath.length < 2)` expand all paths up to 2 levels deep
+- `editor.expand(['array', '204'])` expand the root object, the array in this object, and the 204th item in the array.
+- `editor.expand(['array', '204'], () => false)` expand the root object, the array in this object, but not the 204th item itself.
+- `editor.expand(['array', '204'], relativePath => relativePath.length < 2)` expand the root object, the array in this object, and expand the 204th array item and all of its child's up to a depth of max 2 levels.
+
+The library exports a couple of utility functions for commonly used `callback` functions:
+
+- `expandAll`: recursively expand all nested objects and arrays.
+- `expandNone`: expand nothing, also not the root object or array.
+- `expandSelf`: expand the root array or object. This is the default for the `callback` parameter.
+- `expandMinimal`: expand the root array or object, and in case of an array, expand the first array item.
+
+### collapse
+
+```ts
+JSONEditor.prototype.collapse(path: JSONPath, recursive?: boolean = false): Promise<void>
+```
+
+Collapse a path in the editor. When `recursive` is `true`, all nested objects and arrays will be collapsed too. The default value of `recursive` is `false`.
 
 #### transform
 
@@ -732,7 +769,7 @@ Programmatically trigger clicking of the transform button in the main menu, open
 #### scrollTo
 
 ```ts
-JSONEditor.prototype.scrollTo(path: Path): Promise<void>
+JSONEditor.prototype.scrollTo(path: JSONPath): Promise<void>
 ```
 
 Scroll the editor vertically such that the specified path comes into view. Only applicable to modes `tree` and `table`. The path will be expanded when needed. The returned Promise is resolved after scrolling is finished.
@@ -740,7 +777,7 @@ Scroll the editor vertically such that the specified path comes into view. Only 
 #### findElement
 
 ```ts
-JSONEditor.prototype.findElement(path: Path)
+JSONEditor.prototype.findElement(path: JSONPath)
 ```
 
 Find the DOM element of a given path. Returns `null` when not found.
@@ -764,7 +801,7 @@ Refresh rendering of the contents, for example after changing the font size. Thi
 #### validate
 
 ```ts
-JSONEditor.prototype.validate() : ContentErrors | null
+JSONEditor.prototype.validate() : ContentErrors | undefined
 ```
 
 Get all current parse errors and validation errors.
@@ -772,7 +809,7 @@ Get all current parse errors and validation errors.
 #### select
 
 ```ts
-JSONEditor.prototype.select(newSelection: JSONEditorSelection | null)
+JSONEditor.prototype.select(newSelection: JSONEditorSelection | undefined)
 ```
 
 Change the current selection. See also option `selection`.
@@ -807,12 +844,16 @@ The library exports a set of utility functions. The exact definitions of those f
     - `EnumValue`
     - `ReadonlyValue`
     - `TimestampTag`
+  - HTML:
+    - `getValueClass`
+    - `keyComboFromEvent`
 - Validation:
   - `createAjvValidator`
 - Query languages:
+  - `jsonQueryLanguage`
+  - `jmespathQueryLanguage`
   - `lodashQueryLanguage`
   - `javascriptQueryLanguage`
-  - `jmespathQueryLanguage`
 - Content:
   - `isContent`
   - `isTextContent`
@@ -821,6 +862,11 @@ The library exports a set of utility functions. The exact definitions of those f
   - `toTextContent`
   - `toJSONContent`
   - `estimateSerializedSize`
+- Expand:
+  - `expandAll`
+  - `expandMinimal`
+  - `expandNone`
+  - `expandSelf`
 - Selection:
   - `isValueSelection`
   - `isKeySelection`
@@ -829,10 +875,17 @@ The library exports a set of utility functions. The exact definitions of those f
   - `isMultiSelection`,
   - `isEditingSelection`
   - `createValueSelection`
+  - `createEditValueSelection`
   - `createKeySelection`
+  - `createEditKeySelection`
   - `createInsideSelection`,
   - `createAfterSelection`
   - `createMultiSelection`
+  - `getFocusPath`
+  - `getAnchorPath`
+  - `getStartPath`
+  - `getEndPath`
+  - `getSelectionPaths`
 - Parser:
   - `isEqualParser`
 - Path:
@@ -841,6 +894,15 @@ The library exports a set of utility functions. The exact definitions of those f
 - Actions:
   - `resizeObserver`
   - `onEscape`
+- Type checking:
+  - `valueType`
+  - `stringConvert`
+  - `isObject`
+  - `isObjectOrArray`
+  - `isBoolean`
+  - `isTimestamp`
+  - `isColor`
+  - `isUrl`
 - Typeguards:
   - `isContentParseError`
   - `isContentValidationErrors`
@@ -863,13 +925,13 @@ The library exports a set of utility functions. The exact definitions of those f
 
 The TypeScript types (like `Content`, `JSONSelection`, and `JSONPatchOperation`) are defined in the following source file:
 
-https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/types.ts
+<https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/types.ts>
 
 ## Styling
 
 The editor can be styled using the available CSS variables. A full list with all variables can be found here:
 
-https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/themes/defaults.scss
+<https://github.com/josdejong/svelte-jsoneditor/blob/main/src/lib/themes/defaults.scss>
 
 ### Custom theme color
 

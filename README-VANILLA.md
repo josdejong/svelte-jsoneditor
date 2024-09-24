@@ -2,7 +2,7 @@
 
 A web-based tool to view, edit, format, transform, and validate JSON.
 
-Try it out: https://jsoneditoronline.org
+Try it out: <https://jsoneditoronline.org>
 
 This is the vanilla variant of `svelte-jsoneditor`, which can be used in vanilla JavaScript or frameworks like SolidJS, React, Vue, Angular.
 
@@ -38,19 +38,19 @@ If you have a setup for your project with a bundler (like Vite, Rollup, or Webpa
 
 ```ts
 // for use in a React, Vue, or Angular project
-import { JSONEditor } from 'vanilla-jsoneditor'
+import { createJSONEditor } from 'vanilla-jsoneditor'
 ```
 
 If you want to use the library straight in the browser, use the provided standalone ES bundle:
 
 ```ts
 // for use directly in the browser
-import { JSONEditor } from 'vanilla-jsoneditor/standalone.js'
+import { createJSONEditor } from 'vanilla-jsoneditor/standalone.js'
 ```
 
-The standalone bundle contains all dependencies of `vanilla-jsoneditor`, for example `lodash-es` and `Ajv`. If you use some of these dependencies in your project too, it means that they will be bundled twice in your web application, leading to a needlessly large application size. In general, it is preferable to use the default `import { JSONEditor } from 'vanilla-jsoneditor'` so dependencies can be reused.
+The standalone bundle contains all dependencies of `vanilla-jsoneditor`, for example `lodash-es` and `Ajv`. If you use some of these dependencies in your project too, it means that they will be bundled twice in your web application, leading to a needlessly large application size. In general, it is preferable to use the default `import { createJSONEditor } from 'vanilla-jsoneditor'` so dependencies can be reused.
 
-## Use (Browser example loading the ES module):
+## Use (Browser example loading the ES module)
 
 ```html
 <!doctype html>
@@ -62,11 +62,11 @@ The standalone bundle contains all dependencies of `vanilla-jsoneditor`, for exa
     <div id="jsoneditor"></div>
 
     <script type="module">
-      import { JSONEditor } from 'vanilla-jsoneditor/standalone.js'
+      import { createJSONEditor } from 'vanilla-jsoneditor/standalone.js'
 
       // Or use it through a CDN (not recommended for use in production):
-      // import { JSONEditor } from 'https://unpkg.com/vanilla-jsoneditor/index.js'
-      // import { JSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor/index.js'
+      // import { createJSONEditor } from 'https://unpkg.com/vanilla-jsoneditor/index.js'
+      // import { createJSONEditor } from 'https://cdn.jsdelivr.net/npm/vanilla-jsoneditor/index.js'
 
       let content = {
         text: undefined,
@@ -75,7 +75,7 @@ The standalone bundle contains all dependencies of `vanilla-jsoneditor`, for exa
         }
       }
 
-      const editor = new JSONEditor({
+      const editor = createJSONEditor({
         target: document.getElementById('jsoneditor'),
         props: {
           content,
@@ -100,14 +100,14 @@ The standalone bundle contains all dependencies of `vanilla-jsoneditor`, for exa
 
 Depending on whether you are using JavaScript of TypeScript, create either a JSX or TSX file:
 
-### TypeScript:
+### TypeScript
 
 ```tsx
 //
 // JSONEditorReact.tsx
 //
 import { useEffect, useRef } from 'react'
-import { JSONEditor, JSONEditorPropsOptional } from 'vanilla-jsoneditor'
+import { createJSONEditor, JSONEditorPropsOptional } from 'vanilla-jsoneditor'
 
 const JSONEditorReact: React.FC<JSONEditorPropsOptional> = (props) => {
   const refContainer = useRef<HTMLDivElement>(null)
@@ -115,7 +115,7 @@ const JSONEditorReact: React.FC<JSONEditorPropsOptional> = (props) => {
 
   useEffect(() => {
     // create editor
-    refEditor.current = new JSONEditor({
+    refEditor.current = createJSONEditor({
       target: refContainer.current!,
       props: {}
     })
@@ -157,7 +157,7 @@ const JSONEditorReact = (props) => {
 
   useEffect(() => {
     // create editor
-    refEditor.current = new JSONEditor({
+    refEditor.current = createJSONEditor({
       target: refContainer.current,
       props: {}
     })

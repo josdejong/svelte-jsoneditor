@@ -53,6 +53,8 @@ describe('objectUtils', () => {
       }
 
       logs.push({ value, path: path.slice() })
+
+      return undefined
     })
 
     deepStrictEqual(logs, [

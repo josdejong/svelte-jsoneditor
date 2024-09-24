@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { getContext, tick } from 'svelte'
+  import { onMount, tick } from 'svelte'
   import Header from './Header.svelte'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, immutableJSONPatch, isJSONArray } from 'immutable-json-patch'
@@ -30,9 +30,9 @@
   import Icon from 'svelte-awesome'
   import { faCaretLeft } from '@fortawesome/free-solid-svg-icons'
   import memoizeOne from 'memoize-one'
-  import { onEscape } from '$lib/actions/onEscape.js'
   import { getFocusPath, isJSONSelection } from '$lib/logic/selection.js'
-  import type { Context } from 'svelte-simple-modal'
+  import Modal from './Modal.svelte'
+  import AbsolutePopup from './popup/AbsolutePopup.svelte'
 
   const debug = createDebug('jsoneditor:JSONEditorModal')
 
@@ -51,7 +51,7 @@
   export let escapeUnicodeCharacters: boolean
   export let flattenColumns: boolean
   export let parser: JSONParser
-  export let validator: Validator | null
+  export let validator: Validator | undefined
   export let validationParser: JSONParser
   export let pathParser: JSONPathParser
 
@@ -63,12 +63,12 @@
   export let onSortModal: OnSortModal
   export let onTransformModal: OnTransformModal
 
-  const { close } = getContext<Context>('simple-modal')
+  export let onClose: () => void
 
   interface ModalState {
     mode: Mode
     content: Content
-    selection: JSONEditorSelection | null
+    selection: JSONEditorSelection | undefined
     relativePath: JSONPath
   }
 
@@ -78,7 +78,7 @@
   const rootState: ModalState = {
     mode: determineMode(content),
     content,
-    selection: null,
+    selection: undefined,
     relativePath: path
   }
   let stack: ModalState[] = [rootState]
@@ -92,12 +92,16 @@
 
   let error: string | undefined = undefined
 
+  onMount(() => {
+    refEditor?.focus()
+  })
+
   function determineMode(content: Content): Mode {
     return isJSONContent(content) && isJSONArray(content.json) ? Mode.table : Mode.tree
   }
 
   function scrollToSelection() {
-    const selection: JSONEditorSelection | null = last(stack)?.selection || null
+    const selection: JSONEditorSelection | undefined = last(stack)?.selection
     if (isJSONSelection(selection)) {
       refEditor.scrollTo(getFocusPath(selection))
     }
@@ -138,7 +142,7 @@
       } else {
         onPatch(operations)
 
-        close()
+        onClose()
       }
     } catch (err) {
       error = String(err)
@@ -148,57 +152,43 @@
   function handleClose() {
     debug('handleClose')
 
-    if (stack.length > 1) {
+    if (fullscreen) {
+      // exit fullscreen
+      fullscreen = false
+    } else if (stack.length > 1) {
       // remove the last item from the stack
       stack = initial(stack)
-      tick().then(scrollToSelection)
+      tick().then(() => {
+        refEditor?.focus()
+        scrollToSelection()
+      })
 
       // clear any error from the just closed state
       error = undefined
     } else {
       // this is the first modal, the root state, close the modal
-      close()
-    }
-  }
-
-  function handleEscape() {
-    if (fullscreen) {
-      fullscreen = false
-    } else {
-      handleClose()
+      onClose()
     }
   }
 
   function handleChange(updatedContent: Content) {
     debug('handleChange', updatedContent)
-
-    const updatedState = {
-      ...currentState,
-      content: updatedContent
-    }
-
-    stack = [...initial(stack), updatedState]
+    updateState((state) => ({ ...state, content: updatedContent }))
   }
 
-  function handleChangeSelection(newSelection: JSONEditorSelection | null) {
+  function handleChangeSelection(newSelection: JSONEditorSelection | undefined) {
     debug('handleChangeSelection', newSelection)
-
-    const updatedState = {
-      ...currentState,
-      selection: newSelection
-    }
-
-    stack = [...initial(stack), updatedState]
+    updateState((state) => ({ ...state, selection: newSelection }))
   }
 
   function handleChangeMode(newMode: Mode) {
     debug('handleChangeMode', newMode)
+    updateState((state) => ({ ...state, mode: newMode }))
+  }
 
-    const updatedState = {
-      ...currentState,
-      mode: newMode
-    }
-
+  function updateState(callback: (state: ModalState) => ModalState) {
+    const state = last(stack) as ModalState
+    const updatedState = callback(state)
     stack = [...initial(stack), updatedState]
   }
 
@@ -213,10 +203,12 @@
     const nestedModalState = {
       mode: determineMode(content),
       content,
-      selection: null,
+      selection: undefined,
       relativePath: path
     }
     stack = [...stack, nestedModalState]
+
+    tick().then(() => refEditor?.focus())
   }
 
   function focus(element: HTMLElement) {
@@ -224,81 +216,93 @@
   }
 </script>
 
-<div class="jse-modal jse-jsoneditor-modal" class:fullscreen use:onEscape={handleEscape}>
-  <Header
-    title="Edit nested content {stack.length > 1 ? ` (${stack.length})` : ''}"
-    fullScreenButton={true}
-    bind:fullscreen
-    onClose={handleClose}
-  />
-
-  <div class="jse-modal-contents">
-    <div class="jse-label">
-      <div class="jse-label-inner">Path</div>
-    </div>
-    <input class="jse-path" type="text" readonly title="Selected path" value={pathDescription} />
-
-    <div class="jse-label">
-      <div class="jse-label-inner">Contents</div>
-    </div>
-
-    <div class="jse-modal-inline-editor">
-      <JSONEditorRoot
-        bind:this={refEditor}
-        mode={currentState.mode}
-        content={currentState.content}
-        selection={currentState.selection}
-        {readOnly}
-        {indentation}
-        {tabSize}
-        {statusBar}
-        {askToFormat}
-        {mainMenuBar}
-        {navigationBar}
-        {escapeControlCharacters}
-        {escapeUnicodeCharacters}
-        {flattenColumns}
-        {parser}
-        {parseMemoizeOne}
-        {validator}
-        {validationParser}
-        {pathParser}
-        insideModal={true}
-        onError={handleError}
-        onChange={handleChange}
-        onChangeMode={handleChangeMode}
-        onSelect={handleChangeSelection}
-        {onRenderValue}
-        {onClassName}
-        onFocus={noop}
-        onBlur={noop}
-        {onRenderMenu}
-        {onRenderContextMenu}
-        {onSortModal}
-        {onTransformModal}
-        onJSONEditorModal={handleJSONEditorModal}
+<Modal onClose={handleClose} className="jse-jsoneditor-modal" {fullscreen}>
+  <div class="jse-modal-wrapper">
+    <AbsolutePopup>
+      <Header
+        title="Edit nested content {stack.length > 1 ? ` (${stack.length})` : ''}"
+        fullScreenButton={true}
+        bind:fullscreen
+        onClose={handleClose}
       />
-    </div>
 
-    <div class="jse-actions">
-      {#if error}
-        <div class="jse-error">
-          {error}
+      <div class="jse-modal-contents">
+        <div class="jse-label">
+          <div class="jse-label-inner">Path</div>
         </div>
-      {/if}
+        <input
+          class="jse-path"
+          type="text"
+          readonly
+          title="Selected path"
+          value={pathDescription}
+        />
 
-      {#if stack.length > 1}
-        <button type="button" class="jse-secondary" on:click={handleClose}>
-          <Icon data={faCaretLeft} /> Back
-        </button>
-      {/if}
-      {#if !readOnly}
-        <button type="button" class="jse-primary" on:click={handleApply} use:focus> Apply </button>
-      {:else}
-        <button type="button" class="jse-primary" on:click={handleClose} use:focus> Close </button>
-      {/if}
-    </div>
+        <div class="jse-label">
+          <div class="jse-label-inner">Contents</div>
+        </div>
+
+        <div class="jse-modal-inline-editor">
+          <JSONEditorRoot
+            bind:this={refEditor}
+            mode={currentState.mode}
+            content={currentState.content}
+            selection={currentState.selection}
+            {readOnly}
+            {indentation}
+            {tabSize}
+            {statusBar}
+            {askToFormat}
+            {mainMenuBar}
+            {navigationBar}
+            {escapeControlCharacters}
+            {escapeUnicodeCharacters}
+            {flattenColumns}
+            {parser}
+            {parseMemoizeOne}
+            {validator}
+            {validationParser}
+            {pathParser}
+            insideModal={true}
+            onError={handleError}
+            onChange={handleChange}
+            onChangeMode={handleChangeMode}
+            onSelect={handleChangeSelection}
+            {onRenderValue}
+            {onClassName}
+            onFocus={noop}
+            onBlur={noop}
+            {onRenderMenu}
+            {onRenderContextMenu}
+            {onSortModal}
+            {onTransformModal}
+            onJSONEditorModal={handleJSONEditorModal}
+          />
+        </div>
+
+        <div class="jse-actions">
+          {#if error}
+            <div class="jse-error">
+              {error}
+            </div>
+          {/if}
+
+          {#if stack.length > 1}
+            <button type="button" class="jse-secondary" on:click={handleClose}>
+              <Icon data={faCaretLeft} /> Back
+            </button>
+          {/if}
+          {#if !readOnly}
+            <button type="button" class="jse-primary" on:click={handleApply} use:focus>
+              Apply
+            </button>
+          {:else}
+            <button type="button" class="jse-primary" on:click={handleClose}> Close </button>
+          {/if}
+        </div>
+      </div>
+    </AbsolutePopup>
   </div>
-</div>
+</Modal>
 
 <style src="./JSONEditorModal.scss"></style>

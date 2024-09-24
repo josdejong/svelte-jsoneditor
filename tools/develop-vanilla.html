@@ -108,7 +108,8 @@
 
     <script type="module">
       import {
-        JSONEditor,
+        createJSONEditor,
+        jsonQueryLanguage,
         lodashQueryLanguage,
         jmespathQueryLanguage
       } from '../package-vanilla/standalone.js'
@@ -192,9 +193,9 @@
 
           return []
         },
-        queryLanguages: [lodashQueryLanguage, jmespathQueryLanguage]
+        queryLanguages: [jsonQueryLanguage, lodashQueryLanguage, jmespathQueryLanguage]
       }
-      const testEditor = new JSONEditor({ target, props })
+      const testEditor = createJSONEditor({ target, props })
 
       window.testEditor = testEditor // expose to window for debugging
 
@@ -408,7 +409,7 @@
           '_blank',
           `location=no,toolbar=no,menubar=no,status=no,directories=no,width=${1000},height=${600},left=${0},top=${0},editorWind=yes`
         )
-        window['popupEditor'] = new JSONEditor({
+        window['popupEditor'] = createJSONEditor({
           target: popupWindow.document.body,
           props: {}
         })

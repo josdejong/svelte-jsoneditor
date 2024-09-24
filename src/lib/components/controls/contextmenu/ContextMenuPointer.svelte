@@ -10,11 +10,13 @@
   } from '$lib/constants.js'
   import type { OnContextMenu } from '$lib/types'
 
+  export let root: boolean = false
+  export let insert: boolean = false
   export let selected: boolean
   export let onContextMenu: OnContextMenu
 
   function handleClick(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
-    let buttonElem: Element | null = event.target as HTMLButtonElement
+    let buttonElem: Element | undefined = event.target as HTMLButtonElement
     while (buttonElem && buttonElem.nodeName !== 'BUTTON') {
       buttonElem = buttonElem.parentNode as Element
     }
@@ -37,6 +39,8 @@
 <button
   type="button"
   class="jse-context-menu-pointer"
+  class:jse-root={root}
+  class:jse-insert={insert}
   class:jse-selected={selected}
   title={CONTEXT_MENU_EXPLANATION}
   on:click={handleClick}

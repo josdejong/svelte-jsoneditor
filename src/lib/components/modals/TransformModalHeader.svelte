@@ -6,18 +6,17 @@
   import { faCog } from '@fortawesome/free-solid-svg-icons'
   import SelectQueryLanguage from '../controls/selectQueryLanguage/SelectQueryLanguage.svelte'
   import type { AbsolutePopupContext, OnChangeQueryLanguage, QueryLanguage } from '$lib/types.js'
-  import type { Context } from 'svelte-simple-modal'
   import Header from './Header.svelte'
 
   export let queryLanguages: QueryLanguage[]
   export let queryLanguageId: string
-  export let onChangeQueryLanguage: OnChangeQueryLanguage
   export let fullscreen: boolean
+  export let onChangeQueryLanguage: OnChangeQueryLanguage
+  export let onClose: () => void
 
   let refConfigButton: HTMLButtonElement | undefined
   let popupId: number | undefined
 
-  const { close } = getContext<Context>('simple-modal')
   const { openAbsolutePopup, closeAbsolutePopup } =
     getContext<AbsolutePopupContext>('absolute-popup')
 
@@ -40,7 +39,7 @@
   }
 </script>
 
-<Header title="Transform" fullScreenButton={true} bind:fullscreen onClose={close}>
+<Header title="Transform" fullScreenButton={true} bind:fullscreen {onClose}>
   <button
     slot="actions"
     type="button"

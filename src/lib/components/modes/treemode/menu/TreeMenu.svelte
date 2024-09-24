@@ -19,7 +19,7 @@
   import type { HistoryState } from '$lib/logic/history.js'
 
   export let json: unknown
-  export let selection: JSONSelection | null
+  export let selection: JSONSelection | undefined
 
   export let readOnly: boolean
   export let showSearch = false
@@ -152,7 +152,7 @@
         }
       ]
 
-  $: items = onRenderMenu(defaultItems)
+  $: items = onRenderMenu(defaultItems) || defaultItems
 </script>
 
 <Menu {items} />

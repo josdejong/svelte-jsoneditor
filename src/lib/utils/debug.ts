@@ -62,6 +62,8 @@ function tryReadLocalStorage(key: string): string | undefined {
   } catch (error) {
     // we do nothing with the error, not needed in this specific case
   }
+
+  return undefined
 }
 
 /**

@@ -13,7 +13,9 @@
   const debug = createDebug('jsoneditor:EditableDiv')
 
   export let value: string
+  export let initialValue: string | undefined
   export let shortText = false
+  export let label: string
   export let onChange: (newValue: string, updateSelection: UpdateSelectionAfterChange) => void
   export let onCancel: () => void
   export let onFind: OnFind
@@ -26,23 +28,12 @@
   let closed = false
 
   onMount(() => {
-    debug('onMount', { value })
-    setDomValue(value)
+    debug('onMount', { value, initialValue })
+    setDomValue(initialValue !== undefined ? initialValue : value)
 
     // focus
     if (domValue) {
       setCursorToEnd(domValue)
-
-      // The refresh method can be used to update the classnames for example
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      domValue.refresh = handleValueInput
-
-      // The cancel method can be used to cancel editing, without firing a change
-      // when the contents did change in the meantime. It is the same as pressing ESC
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      domValue.cancel = handleCancel
     }
   })
 
@@ -155,6 +146,7 @@
 
 <div
   role="textbox"
+  aria-label={label}
   tabindex="0"
   class={classnames('jse-editable-div', valueClass, { 'jse-short-text': shortText })}
   contenteditable="true"

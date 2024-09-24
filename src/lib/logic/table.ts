@@ -6,16 +6,10 @@ import {
   parseJSONPointer
 } from 'immutable-json-patch'
 import { groupBy, isEmpty, isEqual, mapValues, partition } from 'lodash-es'
-import type {
-  DocumentState,
-  JSONSelection,
-  SortedColumn,
-  TableCellIndex,
-  ValidationError
-} from '$lib/types.js'
+import type { JSONSelection, SortedColumn, TableCellIndex, ValidationError } from '$lib/types.js'
 import { ValidationSeverity } from '$lib/types.js'
 import { createValueSelection, getFocusPath, pathStartsWith } from './selection.js'
-import { isNumber } from '../utils/numberUtils.js'
+import { containsNumber } from '../utils/numberUtils.js'
 import type { Dictionary } from 'lodash'
 import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
 import { forEachSample } from '$lib/utils/arrayUtils.js'
@@ -275,7 +269,7 @@ export function selectPreviousRow(columns: JSONPath[], selection: JSONSelection)
   if (rowIndex > 0) {
     const previousPosition = { rowIndex: rowIndex - 1, columnIndex }
     const previousPath = fromTableCellPosition(previousPosition, columns)
-    return createValueSelection(previousPath, false)
+    return createValueSelection(previousPath)
   }
 
   return selection
@@ -291,7 +285,7 @@ export function selectNextRow(
   if (rowIndex < (json as Array<unknown>).length - 1) {
     const nextPosition = { rowIndex: rowIndex + 1, columnIndex }
     const nextPath = fromTableCellPosition(nextPosition, columns)
-    return createValueSelection(nextPath, false)
+    return createValueSelection(nextPath)
   }
 
   return selection
@@ -303,7 +297,7 @@ export function selectPreviousColumn(columns: JSONPath[], selection: JSONSelecti
   if (columnIndex > 0) {
     const previousPosition = { rowIndex, columnIndex: columnIndex - 1 }
     const previousPath = fromTableCellPosition(previousPosition, columns)
-    return createValueSelection(previousPath, false)
+    return createValueSelection(previousPath)
   }
 
   return selection
@@ -315,7 +309,7 @@ export function selectNextColumn(columns: JSONPath[], selection: JSONSelection):
   if (columnIndex < columns.length - 1) {
     const nextPosition = { rowIndex, columnIndex: columnIndex + 1 }
     const nextPath = fromTableCellPosition(nextPosition, columns)
-    return createValueSelection(nextPath, false)
+    return createValueSelection(nextPath)
   }
 
   return selection
@@ -362,7 +356,7 @@ export function groupValidationErrors(
   columns: JSONPath[]
 ): GroupedValidationErrors {
   const [arrayErrors, rootErrors] = partition(validationErrors, (validationError) =>
-    isNumber(validationError.path[0])
+    containsNumber(validationError.path[0])
   )
 
   const errorsByRow: Dictionary<ValidationError[]> = groupBy(arrayErrors, findRowIndex)
@@ -438,26 +432,19 @@ function findColumnIndex(error: ValidationError, columns: JSONPath[]): number {
  * Clear the sorted column from the documentState when it is affected by the operations
  */
 export function clearSortedColumnWhenAffectedByOperations(
-  documentState: DocumentState,
+  sortedColumn: SortedColumn | undefined,
   operations: JSONPatchOperation[],
   columms: JSONPath[]
-): DocumentState {
+): SortedColumn | undefined {
   const mustBeCleared = operations.some((operation) =>
-    operationAffectsSortedColumn(documentState.sortedColumn, operation, columms)
+    operationAffectsSortedColumn(sortedColumn, operation, columms)
   )
 
-  if (mustBeCleared) {
-    return {
-      ...documentState,
-      sortedColumn: null
-    }
-  }
-
-  return documentState
+  return mustBeCleared ? undefined : sortedColumn
 }
 
 export function operationAffectsSortedColumn(
-  sortedColumn: SortedColumn | null,
+  sortedColumn: SortedColumn | undefined,
   operation: JSONPatchOperation,
   columns: JSONPath[]
 ): boolean {

@@ -11,7 +11,13 @@ import type {
   ValidationError,
   NestedValidationError,
   SvelteActionRenderer,
-  SvelteComponentRenderer
+  SvelteComponentRenderer,
+  RecursiveState,
+  ArrayRecursiveState,
+  ObjectRecursiveState,
+  ValueRecursiveState,
+  SearchResults,
+  WithSearchResults
 } from './types.js'
 import { isObject } from '$lib/utils/typeUtils.js'
 
@@ -97,4 +103,35 @@ export function isSvelteComponentRenderer(value: unknown): value is SvelteCompon
 
 export function isSvelteActionRenderer(value: unknown): value is SvelteActionRenderer {
   return isObject(value) && typeof value.action === 'function' && isObject(value.props)
+}
+
+export function isObjectRecursiveState(
+  state: RecursiveState | undefined
+): state is ObjectRecursiveState {
+  return state !== undefined && state.type === 'object'
+}
+
+export function isArrayRecursiveState(
+  state: RecursiveState | undefined
+): state is ArrayRecursiveState {
+  return state !== undefined && state.type === 'array'
+}
+
+export function isValueRecursiveState(
+  state: RecursiveState | undefined
+): state is ValueRecursiveState {
+  return state !== undefined && state.type === 'value'
+}
+
+export function isExpandableState(
+  state: RecursiveState | undefined
+): state is ObjectRecursiveState | ArrayRecursiveState {
+  return isObjectRecursiveState(state) || isArrayRecursiveState(state)
+}
+
+export function hasSearchResults(state: SearchResults | undefined): state is WithSearchResults {
+  return (
+    state !== undefined &&
+    Array.isArray((state as unknown as Record<string, unknown>).searchResults)
+  )
 }

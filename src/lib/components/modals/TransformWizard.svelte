@@ -34,22 +34,22 @@
   ]
 
   // TODO: the binding with the select boxes is very cumbersome. Can we simplify this?
-  let filterPath = queryOptions?.filter?.path ? pathToOption(queryOptions.filter.path) : null
-  let filterRelation = queryOptions?.filter?.relation
-    ? filterRelationOptions.find((option) => option.value === queryOptions.filter?.relation)
-    : null
+  let filterPath = queryOptions?.filter?.path ? pathToOption(queryOptions.filter.path) : undefined
+  let filterRelation =
+    filterRelationOptions.find((option) => option.value === queryOptions.filter?.relation) ??
+    filterRelationOptions[0]
   let filterValue = queryOptions?.filter?.value || ''
-  let sortPath = queryOptions?.sort?.path ? pathToOption(queryOptions.sort.path) : null
-  let sortDirection = queryOptions?.sort?.direction
-    ? sortDirectionOptions.find((option) => option.value === queryOptions.sort?.direction)
-    : null
+  let sortPath = queryOptions?.sort?.path ? pathToOption(queryOptions.sort.path) : undefined
+  let sortDirection =
+    sortDirectionOptions.find((option) => option.value === queryOptions.sort?.direction) ??
+    sortDirectionOptions[0]
 
   $: projectionPaths =
     queryOptions?.projection?.paths && projectionOptions
       ? (queryOptions.projection.paths
           .map((path) => projectionOptions.find((option) => isEqual(option.value, path)))
           .filter((option) => !!option) as PathOption[])
-      : null
+      : undefined
 
   function changeFilterPath(path: JSONPath | undefined) {
     if (!isEqual(queryOptions?.filter?.path, path)) {
@@ -116,6 +116,7 @@
         <Select
           class="jse-filter-relation"
           showChevron
+          clearable={false}
           items={filterRelationOptions}
           bind:value={filterRelation}
         />
@@ -131,6 +132,7 @@
         <Select
           class="jse-sort-direction"
           showChevron
+          clearable={false}
           items={sortDirectionOptions}
           bind:value={sortDirection}
         />
