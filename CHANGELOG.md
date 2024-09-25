@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.1](https://github.com/josdejong/svelte-jsoneditor/compare/v1.0.0...v1.0.1) (2024-09-25)
+
+
+### Bug Fixes
+
+* handle `createQuery` throwing an exception in the TransformModal ([4b1f3f6](https://github.com/josdejong/svelte-jsoneditor/commit/4b1f3f6d08352002db62ddeaf6fc37207a7b7707))
+
 ## [1.0.0](https://github.com/josdejong/svelte-jsoneditor/compare/v0.23.8...v1.0.0) (2024-09-24)
 
 
