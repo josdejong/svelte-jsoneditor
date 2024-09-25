@@ -277,10 +277,10 @@
   $: queryLanguages = $multipleQueryLanguages
     ? [
         jsonQueryLanguage,
-        javascriptQueryLanguage,
+        jmespathQueryLanguage,
         jsonpathQueryLanguage,
-        lodashQueryLanguage,
-        jmespathQueryLanguage
+        javascriptQueryLanguage,
+        lodashQueryLanguage
       ]
     : [jsonQueryLanguage]
   let queryLanguageId = jsonQueryLanguage.id // TODO: store in local storage

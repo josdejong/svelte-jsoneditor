@@ -6,7 +6,7 @@ import type { JSONPath } from 'immutable-json-patch'
 const description = `
 <p>
   Enter a <a href="https://jsonquerylang.org" target="_blank" 
-  rel="noopener noreferrer">jsonquery</a> function to filter, sort, or transform the data.
+  rel="noopener noreferrer">JSON Query</a> function to filter, sort, or transform the data.
   You can use functions like <code>get</code>, <code>filter</code>,
   <code>sort</code>, <code>pick</code>, <code>groupBy</code>, <code>uniq</code>, etcetera. 
   Example query: <code>filter(.age >= 18)</code>
@@ -15,7 +15,7 @@ const description = `
 
 export const jsonQueryLanguage: QueryLanguage = {
   id: 'jsonquery',
-  name: 'jsonquery',
+  name: 'JSONQuery',
   description,
   createQuery,
   executeQuery
