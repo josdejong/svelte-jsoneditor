@@ -43,6 +43,7 @@
     padding: 0;
     display: flex;
     min-width: 0;
+    margin: auto;
     overflow: visible;
     transition:
       width 0.1s ease-in-out,
