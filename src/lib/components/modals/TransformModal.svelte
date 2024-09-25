@@ -83,6 +83,7 @@
           state.queryOptions || {}
         )
   let isManual = state.isManual || false
+  let queryError: string | undefined = undefined
 
   let previewError: string | undefined = undefined
   let previewContent: Content = { text: '' }
@@ -96,11 +97,17 @@
   }
 
   function updateQueryByWizard(newQueryOptions: QueryLanguageOptions) {
-    queryOptions = newQueryOptions
-    query = getSelectedQueryLanguage(queryLanguageId).createQuery(selectedJson, newQueryOptions)
-    isManual = false
+    try {
+      queryOptions = newQueryOptions
 
-    debug('updateQueryByWizard', { queryOptions, query, isManual })
+      query = getSelectedQueryLanguage(queryLanguageId).createQuery(selectedJson, newQueryOptions)
+      queryError = undefined
+      isManual = false
+
+      debug('updateQueryByWizard', { queryOptions, query, isManual })
+    } catch (err) {
+      queryError = String(err)
+    }
   }
 
   function handleChangeQuery(event: Event) {
@@ -271,6 +278,11 @@
                   json={selectedJson}
                   onChange={updateQueryByWizard}
                 />
+                {#if queryError}
+                  <div class="query-error">
+                    {queryError}
+                  </div>
+                {/if}
               {:else}
                 (Only available for arrays, not for objects)
               {/if}

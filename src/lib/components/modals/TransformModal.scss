@@ -47,6 +47,10 @@
         }
       }
 
+      .query-error {
+        color: $error-color;
+      }
+
       textarea.jse-query {
         flex: 1;
         outline: none;
