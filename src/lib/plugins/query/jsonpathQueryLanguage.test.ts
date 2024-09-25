@@ -106,7 +106,7 @@ describe('jsonpathQueryLanguage', () => {
       assert.deepStrictEqual(result, [user2])
     })
 
-    test('should throw an error when trying to sort (not supported by jsonpath)', () => {
+    test('should throw an error when trying to sort (not supported by JSONPath)', () => {
       assert.throws(() => {
         createQuery(users, {
           sort: {
@@ -114,7 +114,7 @@ describe('jsonpathQueryLanguage', () => {
             direction: 'asc'
           }
         })
-      }, /Sorting is not supported by jsonpath. Please clear the sorting fields/)
+      }, /Sorting is not supported by JSONPath. Please clear the sorting fields/)
     })
 
     test('should create and execute a project query for a single property', () => {
@@ -137,7 +137,7 @@ describe('jsonpathQueryLanguage', () => {
             paths: [['user', 'name'], ['_id']]
           }
         })
-      }, /Error: Picking multiple fields is not supported by jsonpath. Please select only one field/)
+      }, /Error: Picking multiple fields is not supported by JSONPath. Please select only one field/)
     })
 
     test('should create and execute a query with filter and project', () => {
@@ -158,7 +158,7 @@ describe('jsonpathQueryLanguage', () => {
       assert.deepStrictEqual(result, ['Stuart', 'Bob'])
     })
 
-    test('should throw an exception when the query is no valid jsonpath expression', () => {
+    test('should throw an exception when the query is no valid JSONPath expression', () => {
       assert.throws(() => {
         const data = {}
         const query = '@bla bla bla'

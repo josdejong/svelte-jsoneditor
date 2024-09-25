@@ -5,13 +5,13 @@ import type { JSONPath } from 'immutable-json-patch'
 
 const description = `
 <p>
-  Enter a <a href="https://github.com/dchester/jsonpath" target="_blank" 
-  rel="noopener noreferrer"><code>jsonpath</code></a> expression to filter, sort, or transform the data.
+  Enter a <a href="https://github.com/JSONPath-Plus/JSONPath" target="_blank" 
+  rel="noopener noreferrer"><code>JSONPath</code></a> expression to filter, sort, or transform the data.
 </p>`
 
 export const jsonpathQueryLanguage: QueryLanguage = {
   id: 'jsonpath',
-  name: 'jsonpath',
+  name: 'JSONPath',
   description,
   createQuery,
   executeQuery
@@ -29,13 +29,13 @@ function createQuery(_json: unknown, queryOptions: QueryLanguageOptions): string
   }
 
   if (sort && sort.path && sort.direction) {
-    throw new Error('Sorting is not supported by jsonpath. Please clear the sorting fields')
+    throw new Error('Sorting is not supported by JSONPath. Please clear the sorting fields')
   }
 
   if (projection && projection.paths) {
     if (projection.paths.length > 1) {
       throw new Error(
-        'Picking multiple fields is not supported by jsonpath. Please select only one field'
+        'Picking multiple fields is not supported by JSONPath. Please select only one field'
       )
     }
 
