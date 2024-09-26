@@ -68,32 +68,33 @@
   let fullscreen = false
 
   const stateId = `${id}:${compileJSONPointer(rootPath)}`
-  const state = transformModalStates[stateId] || {}
+  const state = transformModalStates[stateId] ?? {}
 
   // showWizard is not stored inside a stateId
   let showWizard = transformModalStateShared.showWizard !== false
   let showOriginal = transformModalStateShared.showOriginal !== false
 
-  let queryOptions = state.queryOptions || {}
+  let queryOptions = state.queryOptions ?? {}
   let query =
     queryLanguageId === state.queryLanguageId && state.query
       ? state.query
-      : getSelectedQueryLanguage(queryLanguageId).createQuery(
-          selectedJson,
-          state.queryOptions || {}
-        )
-  let isManual = state.isManual || false
+      : ''
+  let isManual = state.isManual ?? false
   let queryError: string | undefined = undefined
 
   let previewError: string | undefined = undefined
   let previewContent: Content = { text: '' }
+
+  if (!isManual) {
+    updateQueryByWizard(queryOptions)
+  }
 
   onMount(() => {
     refQueryInput?.focus()
   })
 
   function getSelectedQueryLanguage(queryLanguageId: string): QueryLanguage {
-    return queryLanguages.find((item) => item.id === queryLanguageId) || queryLanguages[0]
+    return queryLanguages.find((item) => item.id === queryLanguageId) ?? queryLanguages[0]
   }
 
   function updateQueryByWizard(newQueryOptions: QueryLanguageOptions) {
@@ -120,6 +121,11 @@
     if (previewJson === undefined) {
       previewContent = { text: '' }
       previewError = 'Error: No JSON'
+      return
+    }
+
+    if (query.trim() === '') {
+      previewContent = { json: previewJson }
       return
     }
 
@@ -217,9 +223,7 @@
     queryLanguageId = newQueryLanguageId
     onChangeQueryLanguage(newQueryLanguageId)
 
-    const newSelectedQueryLanguage = getSelectedQueryLanguage(queryLanguageId)
-    query = newSelectedQueryLanguage.createQuery(selectedJson, queryOptions)
-    isManual = false
+    updateQueryByWizard(queryOptions)
   }
 
   function handleEscape() {
