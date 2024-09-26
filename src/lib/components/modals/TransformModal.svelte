@@ -75,10 +75,7 @@
   let showOriginal = transformModalStateShared.showOriginal !== false
 
   let queryOptions = state.queryOptions ?? {}
-  let query =
-    queryLanguageId === state.queryLanguageId && state.query
-      ? state.query
-      : ''
+  let query = queryLanguageId === state.queryLanguageId && state.query ? state.query : ''
   let isManual = state.isManual ?? false
   let queryError: string | undefined = undefined
 
