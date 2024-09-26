@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.3](https://github.com/josdejong/svelte-jsoneditor/compare/v1.0.2...v1.0.3) (2024-09-26)
+
+
+### Bug Fixes
+
+* invalid JSONPath query options could crash the Transform Modal ([c90a54c](https://github.com/josdejong/svelte-jsoneditor/commit/c90a54c07006a30a404f522592419128135a1431))
+
 ### [1.0.2](https://github.com/josdejong/svelte-jsoneditor/compare/v1.0.1...v1.0.2) (2024-09-26)
 
 
