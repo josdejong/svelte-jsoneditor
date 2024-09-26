@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.2](https://github.com/josdejong/svelte-jsoneditor/compare/v1.0.1...v1.0.2) (2024-09-26)
+
+
+### Bug Fixes
+
+* more robust positioning of the modal by adding `margin: auto`, see [#384](https://github.com/josdejong/svelte-jsoneditor/issues/384) ([2302436](https://github.com/josdejong/svelte-jsoneditor/commit/2302436fbc8d65fe89b79646995c5e7e02bf38fe))
+
 ### [1.0.1](https://github.com/josdejong/svelte-jsoneditor/compare/v1.0.0...v1.0.1) (2024-09-25)
 
 
