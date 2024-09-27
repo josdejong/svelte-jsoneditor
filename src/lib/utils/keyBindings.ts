@@ -1,6 +1,6 @@
 // inspiration: https://github.com/andrepolischuk/keycomb
 
-import { isMac as _isMac } from './navigatorUtils.js'
+import { isMacDevice } from './navigatorUtils.js'
 
 // KeyComboEvent is a subset of KeyboardEvent
 export interface KeyComboEvent {
@@ -19,7 +19,11 @@ export interface KeyComboEvent {
  * meta keys "Ctrl" ("Command" on Mac), and "Alt" ("Alt" or "Option" on Mac)
  * So pressing "Command" and "A"on Mac will return "Ctrl+A"
  */
-export function keyComboFromEvent(event: KeyComboEvent, separator = '+', isMac = _isMac): string {
+export function keyComboFromEvent(
+  event: KeyComboEvent,
+  separator = '+',
+  isMac = isMacDevice
+): string {
   const combi = []
 
   if (isCtrlKeyDown(event, isMac)) {
@@ -48,7 +52,7 @@ export function keyComboFromEvent(event: KeyComboEvent, separator = '+', isMac =
  */
 export function isCtrlKeyDown(
   event: { ctrlKey: boolean; metaKey: boolean },
-  isMac = _isMac
+  isMac = isMacDevice
 ): boolean {
   // metaKey is the Command key ⌘ on a Mac (but the Windows Key ⊞ on Windows)
   return event.ctrlKey || (event.metaKey && isMac())

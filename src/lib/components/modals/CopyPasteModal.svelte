@@ -1,13 +1,13 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { isMac } from '$lib/utils/navigatorUtils.js'
+  import { isMacDevice } from '$lib/utils/navigatorUtils.js'
   import Header from './Header.svelte'
   import Modal from './Modal.svelte'
 
   export let onClose: () => void
 
-  const ctrl = isMac() ? '⌘' : 'Ctrl'
+  const ctrl = isMacDevice() ? '⌘' : 'Ctrl'
 </script>
 
 <Modal {onClose} className="jse-copy-paste">
