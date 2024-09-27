@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.4](https://github.com/josdejong/svelte-jsoneditor/compare/v1.0.3...v1.0.4) (2024-09-27)
+
+
+### Bug Fixes
+
+* [#486](https://github.com/josdejong/svelte-jsoneditor/issues/486) naming conflict for argument `isMac` in the type definitions ([9fac7a3](https://github.com/josdejong/svelte-jsoneditor/commit/9fac7a3e021c7d96c4914211e5faa86de083d9db))
+
 ### [1.0.3](https://github.com/josdejong/svelte-jsoneditor/compare/v1.0.2...v1.0.3) (2024-09-26)
 
 
