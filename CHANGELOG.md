@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.6](https://github.com/josdejong/svelte-jsoneditor/compare/v1.0.5...v1.0.6) (2024-09-30)
+
+
+### Bug Fixes
+
+* type definition of `createJSONEditor` not exported in the `vanilla-jsoneditor` library ([e0aee3e](https://github.com/josdejong/svelte-jsoneditor/commit/e0aee3e66f06f0ff208912f11ed888aa16adcaed))
+
 ### [1.0.5](https://github.com/josdejong/svelte-jsoneditor/compare/v1.0.4...v1.0.5) (2024-09-30)
 
 
