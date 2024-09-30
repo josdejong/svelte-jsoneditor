@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.5](https://github.com/josdejong/svelte-jsoneditor/compare/v1.0.4...v1.0.5) (2024-09-30)
+
+
+### Bug Fixes
+
+* key not rendered when the value contains search results and vice versa ([0c41c79](https://github.com/josdejong/svelte-jsoneditor/commit/0c41c7964d9cd04d147944d6d2afa84d60c85280))
+
 ### [1.0.4](https://github.com/josdejong/svelte-jsoneditor/compare/v1.0.3...v1.0.4) (2024-09-27)
 
 
