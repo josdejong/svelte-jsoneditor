@@ -6,6 +6,8 @@ import { createDocumentState } from './documentState.js'
 import {
   createSearchAndReplaceAllOperations,
   createSearchAndReplaceOperations,
+  filterKeySearchResults,
+  filterValueSearchResults,
   findCaseInsensitiveMatches,
   flattenSearchResults,
   replaceText,
@@ -17,7 +19,8 @@ import type {
   ExtendedSearchResultItem,
   SearchResults,
   SearchOptions,
-  SearchResultItem
+  SearchResultItem,
+  ObjectSearchResults
 } from '$lib/types.js'
 import { SearchField } from '$lib/types.js'
 import { createKeySelection, createValueSelection } from './selection.js'
@@ -596,6 +599,138 @@ describe('search', () => {
     const updatedJson = immutableJSONPatch(json, operations)
     assert.deepStrictEqual(updatedJson, {
       value: 4
+    })
+  })
+
+  describe('filterKeySearchResults', () => {
+    test('should filter key search results when not empty', () => {
+      const result1: ExtendedSearchResultItem = {
+        path: ['a'],
+        field: SearchField.value,
+        fieldIndex: 0,
+        start: 0,
+        end: 1,
+        active: false
+      }
+      const result2: ExtendedSearchResultItem = {
+        path: ['a'],
+        field: SearchField.key,
+        fieldIndex: 0,
+        start: 0,
+        end: 1,
+        active: true
+      }
+      const results: ObjectSearchResults = {
+        type: 'object',
+        properties: {},
+        searchResults: [result1, result2]
+      }
+
+      assert.deepStrictEqual(filterKeySearchResults(results), [result2])
+    })
+
+    test('should filter key search results when empty (1)', () => {
+      const result1: ExtendedSearchResultItem = {
+        path: ['a'],
+        field: SearchField.value,
+        fieldIndex: 0,
+        start: 0,
+        end: 1,
+        active: false
+      }
+      const results: ObjectSearchResults = {
+        type: 'object',
+        properties: {},
+        searchResults: [result1]
+      }
+
+      assert.deepStrictEqual(filterKeySearchResults(results), undefined)
+    })
+
+    test('should filter key search results when empty (2)', () => {
+      const results: ObjectSearchResults = {
+        type: 'object',
+        properties: {},
+        searchResults: []
+      }
+
+      assert.deepStrictEqual(filterKeySearchResults(results), undefined)
+    })
+
+    test('should filter key search results when undefined', () => {
+      const results: ObjectSearchResults = {
+        type: 'object',
+        properties: {},
+        searchResults: undefined
+      }
+
+      assert.deepStrictEqual(filterKeySearchResults(results), undefined)
+    })
+  })
+
+  describe('filterValueSearchResults', () => {
+    test('should filter value search results when not empty', () => {
+      const result1: ExtendedSearchResultItem = {
+        path: ['a'],
+        field: SearchField.value,
+        fieldIndex: 0,
+        start: 0,
+        end: 1,
+        active: false
+      }
+      const result2: ExtendedSearchResultItem = {
+        path: ['a'],
+        field: SearchField.key,
+        fieldIndex: 0,
+        start: 0,
+        end: 1,
+        active: true
+      }
+      const results: ObjectSearchResults = {
+        type: 'object',
+        properties: {},
+        searchResults: [result1, result2]
+      }
+
+      assert.deepStrictEqual(filterValueSearchResults(results), [result1])
+    })
+
+    test('should filter value search results when empty (1)', () => {
+      const result1: ExtendedSearchResultItem = {
+        path: ['a'],
+        field: SearchField.key,
+        fieldIndex: 0,
+        start: 0,
+        end: 1,
+        active: false
+      }
+      const results: ObjectSearchResults = {
+        type: 'object',
+        properties: {},
+        searchResults: [result1]
+      }
+
+      assert.deepStrictEqual(filterValueSearchResults(results), undefined)
+    })
+
+    test('should filter value search results when empty (2)', () => {
+      const results: ObjectSearchResults = {
+        type: 'object',
+        properties: {},
+        searchResults: []
+      }
+
+      assert.deepStrictEqual(filterValueSearchResults(results), undefined)
+    })
+
+    test('should filter value search results when undefined', () => {
+      const results: ObjectSearchResults = {
+        type: 'object',
+        properties: {},
+        searchResults: undefined
+      }
+
+      assert.deepStrictEqual(filterValueSearchResults(results), undefined)
     })
   })
 

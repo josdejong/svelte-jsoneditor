@@ -480,29 +480,32 @@ function getSearchResultPath(searchResultItem: SearchResultItem): JSONPath {
   return searchResultItem.path.concat(searchResultItem.field, String(searchResultItem.fieldIndex))
 }
 
-// TODO: write unit tests
+/**
+ * Filter key search results.
+ * Returns a non-empty array, or undefined if there are no key search results
+ */
 export function filterKeySearchResults(
   searchResult: SearchResults | undefined
 ): ExtendedSearchResultItem[] | undefined {
-  return hasSearchResults(searchResult)
+  const filtered = hasSearchResults(searchResult)
     ? searchResult.searchResults.filter((result) => result.field === SearchField.key)
     : undefined
+
+  return filtered && filtered.length > 0 ? filtered : undefined
 }
 
-// TODO: write unit tests
+/**
+ * Filter value search results.
+ * Returns a non-empty array, or undefined if there are no value search results
+ */
 export function filterValueSearchResults(
   searchResult: SearchResults | undefined
 ): ExtendedSearchResultItem[] | undefined {
-  return hasSearchResults(searchResult)
+  const filtered = hasSearchResults(searchResult)
     ? searchResult.searchResults.filter((result) => result.field === SearchField.value)
     : undefined
-}
 
-export function createSearchResults({ json }: { json: unknown }): SearchResults | undefined {
-  return createRecursiveState({
-    json,
-    factory: searchResultsFactory
-  }) as SearchResults
+  return filtered && filtered.length > 0 ? filtered : undefined
 }
 
 export const searchResultsFactory: RecursiveStateFactory = {
