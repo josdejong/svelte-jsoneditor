@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.7](https://github.com/josdejong/svelte-jsoneditor/compare/v1.0.6...v1.0.7) (2024-10-09)
+
+
+### Bug Fixes
+
+* [#488](https://github.com/josdejong/svelte-jsoneditor/issues/488) types `JsonEditor` and `CreateJSONEditorProps` not exported in `vanilla-jsoneditor` ([337c33b](https://github.com/josdejong/svelte-jsoneditor/commit/337c33b3dcf05a30b9a10815a19e49687ebb291a))
+* [#489](https://github.com/josdejong/svelte-jsoneditor/issues/489) anchor styling defined in the TransformModal affecting the global style ([a213583](https://github.com/josdejong/svelte-jsoneditor/commit/a213583c6473d70d4a2fcc1b6802762a5b11c934))
+
 ### [1.0.6](https://github.com/josdejong/svelte-jsoneditor/compare/v1.0.5...v1.0.6) (2024-09-30)
 
 
