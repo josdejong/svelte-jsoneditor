@@ -638,14 +638,14 @@
           class="jse-insert-selection-area jse-inside"
           data-type="insert-selection-area-inside"
           on:click={handleInsertInside}
-        />
+        ></div>
       {:else}
         <div
           role="none"
           class="jse-insert-selection-area jse-after"
           data-type="insert-selection-area-after"
           on:click={handleInsertAfter}
-        />
+        ></div>
       {/if}
     </div>
     {#if expanded}
@@ -718,7 +718,7 @@
             class="jse-insert-selection-area jse-after"
             data-type="insert-selection-area-after"
             on:click={handleInsertAfter}
-          />
+          ></div>
         {/if}
       </div>
     {/if}
@@ -770,14 +770,14 @@
           class="jse-insert-selection-area jse-inside"
           data-type="insert-selection-area-inside"
           on:click={handleInsertInside}
-        />
+        ></div>
       {:else if !root}
         <div
           role="none"
           class="jse-insert-selection-area jse-after"
           data-type="insert-selection-area-after"
           on:click={handleInsertAfter}
-        />
+        ></div>
       {/if}
     </div>
     {#if expanded}
@@ -855,7 +855,7 @@
             class="jse-insert-selection-area jse-after"
             data-type="insert-selection-area-after"
             on:click={handleInsertAfter}
-          />
+          ></div>
         {/if}
       </div>
     {/if}
@@ -891,7 +891,7 @@
           class="jse-insert-selection-area jse-after"
           data-type="insert-selection-area-after"
           on:click={handleInsertAfter}
-        />
+        ></div>
       {/if}
     </div>
   {/if}

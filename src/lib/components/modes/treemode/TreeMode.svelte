@@ -2007,7 +2007,7 @@
     {/if}
   {:else}
     <div class="jse-contents">
-      <div class="jse-loading-space" />
+      <div class="jse-loading-space"></div>
       <div class="jse-loading">loading...</div>
     </div>
   {/if}

@@ -156,6 +156,6 @@
   on:paste={handleValuePaste}
   on:blur={handleBlur}
   bind:this={domValue}
-/>
+></div>
 
 <style src="./EditableDiv.scss"></style>

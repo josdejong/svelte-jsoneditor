@@ -18,6 +18,7 @@
   export let focus: () => void
 
   $: color = getColorCSS(value)
+  $: title = !readOnly ? 'Click to open a color picker' : `Color ${value}`
 
   function onChange(color: string) {
     onPatch([
@@ -72,8 +73,9 @@
   class="jse-color-picker-button"
   class:jse-readonly={readOnly}
   style="background: {color}"
-  title={!readOnly ? 'Click to open a color picker' : `Color ${value}`}
+  {title}
+  aria-label={title}
   on:click={openColorPicker}
-/>
+></button>
 
 <style src="./ColorPicker.scss"></style>
