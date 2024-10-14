@@ -1,8 +1,9 @@
 import { beforeEach, afterEach, test, describe, expect, vi } from 'vitest'
 import '@testing-library/jest-dom'
-import { render, screen } from '@testing-library/svelte'
 import JSONEditor from './JSONEditor.svelte'
 import { type Content, Mode } from '$lib/types.js'
+import { mount, tick } from 'svelte'
+import { getByText } from '@testing-library/svelte'
 
 describe('JSONEditor', () => {
   const content: Content = {
@@ -26,44 +27,55 @@ describe('JSONEditor', () => {
   })
 
   test('render tree mode', () => {
-    const { container } = render(JSONEditor, {
+    const target = document.createElement('div')
+
+    mount(JSONEditor, {
+      target,
       props: {
         mode: Mode.tree,
         content
       }
     })
 
-    const main = container.getElementsByClassName('jse-main')[0]
-    expect(main.firstChild).toHaveClass('jse-tree-mode')
-    expect(screen.getByText('Joe')).toHaveClass('jse-value', 'jse-string')
-    expect(container).toMatchSnapshot()
+    const main = target.getElementsByClassName('jse-main')[0]
+    expect(main.children[0]).toHaveClass('jse-tree-mode')
+    expect(getByText(target, 'Joe')).toHaveClass('jse-value', 'jse-string')
+    expect(target).toMatchSnapshot()
   })
 
-  test('render text mode', () => {
-    const { container } = render(JSONEditor, {
+  test('render text mode', async () => {
+    const target = document.createElement('div')
+
+    mount(JSONEditor, {
+      target,
       props: {
         mode: Mode.text,
         content
       }
     })
 
-    const main = container.getElementsByClassName('jse-main')[0]
-    expect(main.firstChild).toHaveClass('jse-text-mode')
-    expect(screen.getByText('"Joe"').parentNode).toHaveClass('cm-line')
-    expect(container).toMatchSnapshot()
+    await tick() // wait until CodeMirror is rendered
+
+    const main = target.getElementsByClassName('jse-main')[0]
+    expect(main.children[0]).toHaveClass('jse-text-mode')
+    expect(getByText(target, '"Joe"').parentNode).toHaveClass('cm-line')
+    expect(target).toMatchSnapshot()
   })
 
   test('render table mode', () => {
-    const { container } = render(JSONEditor, {
+    const target = document.createElement('div')
+
+    mount(JSONEditor, {
+      target,
       props: {
         mode: Mode.table,
         content
       }
     })
 
-    const main = container.getElementsByClassName('jse-main')[0]
-    expect(main.firstChild).toHaveClass('jse-table-mode')
-    expect(screen.getByText('Joe')).toHaveClass('jse-value', 'jse-string')
-    expect(container).toMatchSnapshot()
+    const main = target.getElementsByClassName('jse-main')[0]
+    expect(main.children[0]).toHaveClass('jse-table-mode')
+    expect(getByText(target, 'Joe')).toHaveClass('jse-value', 'jse-string')
+    expect(target).toMatchSnapshot()
   })
 })
