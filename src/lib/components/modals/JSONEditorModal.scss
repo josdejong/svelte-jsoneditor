@@ -19,12 +19,6 @@
         margin-top: $padding-double;
         margin-bottom: $padding-half;
         box-sizing: border-box;
-
-        button {
-          @include jsoneditor-button;
-          font-weight: bold;
-          padding: 0;
-        }
       }
     }
 
