@@ -103,7 +103,7 @@
     font-size: inherit;
     color: inherit;
     border: none;
-    background: white important;
+    background: white !important;
     outline: 2px solid red;
   }
 
