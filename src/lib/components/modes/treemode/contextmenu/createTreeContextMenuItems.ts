@@ -29,7 +29,6 @@ import type {
   ConvertType,
   DocumentState,
   InsertType,
-  JSONParser,
   JSONSelection,
   ContextMenuItem
 } from '$lib/types'

@@ -1,7 +1,7 @@
 import type { JSONPatchDocument, JSONPatchOperation, JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
 import { forEachRight, initial, isEqual, last } from 'lodash-es'
-import { createRecursiveState, getEnforceString, updateInRecursiveState } from './documentState.js'
+import { getEnforceString, updateInRecursiveState } from './documentState.js'
 import { createSelectionFromOperations } from './selection.js'
 import { rename } from './operations.js'
 import { stringConvert } from '../utils/typeUtils.js'
