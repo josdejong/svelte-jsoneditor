@@ -891,6 +891,7 @@ See https://github.com/sveltejs/kit/issues/981
 {/if}
 
 <style lang="scss">
+  @use "sass:color";
   @import '../../lib/themes/jse-theme-dark.css';
   @import '../themes/jse-theme-big.css';
 
@@ -913,22 +914,16 @@ See https://github.com/sveltejs/kit/issues/981
       $background-color: hsl(76, 52%, 70%);
 
       --jse-contents-background-color: #{$background-color};
-      --jse-selection-background-color: #{desaturate(darken($background-color, 10%), 20%)};
-      --jse-selection-background-inactive-color: #{desaturate(darken($background-color, 5%), 10%)};
-      --jse-hover-background-color: #{desaturate(darken($background-color, 5%), 10%)};
+      --jse-selection-background-color: #{color.adjust($background-color, $lightness: -10%,  $saturation: -20%)};
+      --jse-selection-background-inactive-color: #{color.adjust($background-color, $lightness: -5%,  $saturation: -10%)};
+      --jse-hover-background-color: #{color.adjust($background-color, $lightness: -5%,  $saturation: -10%)};
 
-      --jse-context-menu-pointer-hover-background: #{desaturate(darken($background-color, 20%), 20%)};
-      --jse-context-menu-pointer-background-highlight: #{desaturate(
-          darken($background-color, 30%),
-          30%
-        )};
-      --jse-context-menu-pointer-background: #{desaturate(darken($background-color, 40%), 40%)};
+      --jse-context-menu-pointer-hover-background: #{color.adjust($background-color, $lightness: -20%,  $saturation: -20%)};
+      --jse-context-menu-pointer-background-highlight: #{color.adjust($background-color, $lightness: -30%,  $saturation: -30%)};
+      --jse-context-menu-pointer-background: #{color.adjust($background-color, $lightness: -40%,  $saturation: -40%)};
 
-      --jse-collapsed-items-background-color: #{desaturate(darken($background-color, 5%), 10%)};
-      --jse-collapsed-items-selected-background-color: #{desaturate(
-          darken($background-color, 20%),
-          20%
-        )};
+      --jse-collapsed-items-background-color: #{color.adjust($background-color, $lightness: -5%,  $saturation: -10%)};
+      --jse-collapsed-items-selected-background-color: #{color.adjust($background-color, $lightness: -20%,  $saturation: -20%)};
     }
   }
 
