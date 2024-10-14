@@ -136,7 +136,7 @@ const JSONEditorReact: React.FC<JSONEditorPropsOptional> = (props) => {
     }
   }, [props])
 
-  return <div ref={refContainer} />
+  return <div ref={refContainer}></div>
 }
 
 export default JSONEditorReact
@@ -178,7 +178,7 @@ const JSONEditorReact = (props) => {
     }
   }, [props])
 
-  return <div ref={refContainer} />
+  return <div ref={refContainer}></div>
 }
 
 export default JSONEditorReact

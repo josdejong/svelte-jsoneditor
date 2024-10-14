@@ -98,7 +98,7 @@
                 {:else if isMenuDropDownButton(columnItem)}
                   <ContextMenuDropDownButton className="left" item={columnItem} {onRequestClose} />
                 {:else if isMenuSeparator(columnItem)}
-                  <div class="jse-separator" />
+                  <div class="jse-separator"></div>
                 {:else if isMenuLabel(columnItem)}
                   <div class="jse-label">
                     {columnItem.text}
@@ -109,14 +109,14 @@
               {/each}
             </div>
           {:else if isMenuSeparator(rowItem)}
-            <div class="jse-separator" />
+            <div class="jse-separator"></div>
           {:else}
             {unknownMenuItem(rowItem)}
           {/if}
         {/each}
       </div>
     {:else if isMenuSeparator(item)}
-      <div class="jse-separator" />
+      <div class="jse-separator"></div>
     {:else}
       {unknownMenuItem(item)}
     {/if}

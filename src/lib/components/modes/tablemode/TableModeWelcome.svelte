@@ -45,7 +45,7 @@
 </script>
 
 <div class="jse-table-mode-welcome" on:click={() => onClick()} role="none">
-  <div class="jse-space jse-before" />
+  <div class="jse-space jse-before"></div>
 
   <div class="jse-nested-arrays">
     <div class="jse-nested-arrays-title">{documentType}</div>
@@ -79,7 +79,7 @@
     </button>
   </div>
 
-  <div class="jse-space jse-after" />
+  <div class="jse-space jse-after"></div>
 </div>
 
 <style src="./TableModeWelcome.scss"></style>

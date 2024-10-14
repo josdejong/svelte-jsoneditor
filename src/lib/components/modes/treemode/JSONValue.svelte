@@ -45,7 +45,7 @@
         class="jse-value"
         data-type="selectable-value"
         use:action={renderer.props}
-      />
+      ></div>
     {/key}
   {:else}
     {#key renderer.component}
