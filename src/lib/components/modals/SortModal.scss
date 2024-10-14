@@ -14,28 +14,25 @@
       vertical-align: middle;
       font-weight: normal;
       padding-bottom: $padding;
-
-      input.jse-path {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 6px 16px; // TODO: define variables for those props
-        border: $input-border;
-        border-radius: $input-radius;
-        font-family: inherit;
-        font-size: inherit;
-        background: inherit;
-        color: inherit;
-        outline: none;
-
-        &:read-only {
-          background: $input-background-readonly;
-        }
-      }
-
-      :global(.svelte-select input) {
-        box-sizing: border-box;
-      }
     }
+  }
+
+  input.jse-path {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 5px 10px; // TODO: define variables for those props
+    border: $input-border;
+    border-radius: $input-radius;
+    font-family: inherit;
+    font-size: inherit;
+    background: inherit;
+    background: $input-background-readonly;
+    color: inherit;
+    outline: none;
+  }
+
+  :global(.svelte-select input) {
+    box-sizing: border-box;
   }
 
   .jse-space {

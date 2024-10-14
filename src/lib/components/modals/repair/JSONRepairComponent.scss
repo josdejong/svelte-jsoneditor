@@ -7,13 +7,11 @@
   background: $background-color;
   color: $text-color;
 
-  .jse-menu {
-    .jse-info {
-      padding: $padding-half;
-      font-family: $font-family;
-      font-size: $font-size;
-      vertical-align: center;
-    }
+  .jse-info {
+    padding: $padding-half;
+    font-family: $font-family;
+    font-size: $font-size;
+    vertical-align: center;
   }
 
   .jse-json-text {
