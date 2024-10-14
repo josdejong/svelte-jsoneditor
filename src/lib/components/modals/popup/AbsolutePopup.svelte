@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import { createDebug } from '$lib/utils/debug.js'
-  import { setContext, SvelteComponent } from 'svelte'
+  import { setContext, type SvelteComponent } from 'svelte'
   import type { AbsolutePopupOptions, PopupEntry, AbsolutePopupContext } from '$lib/types'
   import { uniqueId } from '$lib/utils/uniqueId.js'
   import AbsolutePopupEntry from './AbsolutePopupEntry.svelte'
