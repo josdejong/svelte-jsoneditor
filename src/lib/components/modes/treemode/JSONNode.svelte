@@ -582,8 +582,6 @@
   on:mousemove={handleMouseMove}
   on:mouseover={handleMouseOver}
   on:mouseout={handleMouseOut}
-  on:focus={undefined}
-  on:blur={undefined}
 >
   {#if Array.isArray(value)}
     <div class="jse-header-outer">
