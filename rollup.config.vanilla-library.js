@@ -28,7 +28,21 @@ export default {
     svelte({
       compilerOptions: {
         // enable run-time checks when not in production
-        dev: !production
+        dev: !production,
+
+        warningFilter: (warning) => {
+          if (warning.code === 'reactive_declaration_non_reactive_property') {
+            // Disable the warning:
+            //     Properties of objects and arrays are not reactive unless in runes mode.
+            //     Changes to this property will not cause the reactive statement to update (svelte)
+            // These warnings are wrongfully thrown when using TypeScript enums like Mode.tree
+            // TODO: find a solution and remove this warningFilter again (possibly this is a bug in Svelte 5)
+
+            return false
+          }
+
+          return true
+        }
       },
 
       // we want to embed the CSS in the generated JS bundle
