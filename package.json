@@ -148,6 +148,7 @@
     "prettier-plugin-svelte": "3.2.7",
     "rollup": "4.24.0",
     "rollup-plugin-dts": "6.1.1",
+    "rollup-plugin-postcss": "4.0.2",
     "rollup-plugin-svelte": "7.2.2",
     "standard-version": "9.5.0",
     "svelte": "5.0.0-next.264",
