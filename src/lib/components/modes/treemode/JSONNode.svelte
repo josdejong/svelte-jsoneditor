@@ -562,6 +562,7 @@
   }
 </script>
 
+<!-- svelte-ignore a11y-mouse-events-have-key-events -->
 <div
   role="treeitem"
   tabindex="-1"
