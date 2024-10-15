@@ -189,18 +189,18 @@
   }
 
   &.jse-hovered:not(.jse-selected):not(.jse-selected-value) {
-    .jse-value-outer,
-    .jse-meta,
-    .jse-items .jse-header,
-    .jse-items .jse-contents,
-    .jse-props .jse-header,
-    .jse-props .jse-contents,
-    .jse-footer {
+    :global(.jse-value-outer),
+    :global(.jse-meta),
+    :global(.jse-items .jse-header),
+    :global(.jse-items .jse-contents),
+    :global(.jse-props .jse-header),
+    :global(.jse-props .jse-contents),
+    :global(.jse-footer) {
       background: $hover-background-color;
       cursor: $contents-cursor;
 
-      .jse-value-outer,
-      .jse-meta {
+      :global(.jse-value-outer),
+      :global(.jse-meta) {
         // since the $hover-background-color is half transparent,
         // we have to prevent it from being applied twice, else it gets a darker color
         background: none;
@@ -236,17 +236,17 @@
 
   // value selected
   &.jse-selected-value {
-    .jse-value-outer,
-    .jse-meta,
-    .jse-items .jse-header,
-    .jse-items .jse-contents,
-    .jse-props .jse-header,
-    .jse-props .jse-contents,
-    .jse-footer {
+    :global(.jse-value-outer),
+    :global(.jse-meta),
+    :global(.jse-items .jse-header),
+    :global(.jse-items .jse-contents),
+    :global(.jse-props .jse-header),
+    :global(.jse-props .jse-contents),
+    :global(.jse-footer) {
       background: $selection-background-color;
       cursor: $contents-selected-cursor;
 
-      .jse-key-outer {
+      :global(.jse-key-outer) {
         &:hover {
           background: inherit;
           cursor: inherit;
