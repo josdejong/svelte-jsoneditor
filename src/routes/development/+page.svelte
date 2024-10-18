@@ -28,7 +28,7 @@
   } from 'svelte-jsoneditor'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
-  import { tick } from 'svelte'
+  import { tick, mount } from 'svelte'
   import { parse, stringify } from 'lossless-json'
   import { truncate } from '$lib/utils/stringUtils.js'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils.js'
@@ -407,7 +407,7 @@
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    window.popupEditor = new JSONEditor({
+    window.popupEditor = mount(JSONEditor, {
       target: popupWindow.document.body,
       props: {}
     })

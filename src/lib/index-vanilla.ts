@@ -1,5 +1,6 @@
 import JSONEditorComponent from './components/JSONEditor.svelte'
 import type { JSONEditorPropsOptional } from '$lib/types'
+import { mount } from 'svelte'
 
 // Note: index.ts exports `JSONEditor`, but we will override this on purpose
 //  since we cannot use it in the vanilla environment starting in Svelte 5.
@@ -10,14 +11,8 @@ interface CreateJSONEditorProps {
   props: JSONEditorPropsOptional
 }
 
-export function createJSONEditor({ target, props }: CreateJSONEditorProps) {
-  // TODO: in Svelte 5, this needs to be changed to:
-  //
-  //     export function createJSONEditor({ target, props }: Parameters<typeof mount>[1]) {
-  //       return mount(JSONEditor, { target, props })
-  //     }
-  //
-  return new JSONEditorComponent({ target, props })
+export function createJSONEditor({ target, props }: Parameters<typeof mount>[1]) {
+  return mount(JSONEditorComponent, { target, props })
 }
 
 /**
