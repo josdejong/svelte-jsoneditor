@@ -182,7 +182,7 @@ function canAutoRepair(text: string, parser: JSONParser): boolean {
     parser.parse(jsonrepair(text))
 
     return true
-  } catch (err) {
+  } catch {
     return false
   }
 }

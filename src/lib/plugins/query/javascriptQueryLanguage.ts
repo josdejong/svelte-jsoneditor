@@ -84,10 +84,7 @@ function createQuery(json: unknown, queryOptions: QueryLanguageOptions): string 
 }
 
 function executeQuery(json: unknown, query: string): unknown {
-  // FIXME: replace unsafe new Function with a JS based query language
-  //  As long as we don't persist or fetch queries, there is no security risk.
   // TODO: only import the most relevant subset of lodash instead of the full library?
-  // eslint-disable-next-line no-new-func
   const queryFn = new Function(
     '"use strict";\n' +
       '\n' +

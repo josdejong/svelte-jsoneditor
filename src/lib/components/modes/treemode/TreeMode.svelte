@@ -478,7 +478,7 @@
         textIsRepaired = true
         parseError = undefined
         clearSelectionWhenNotExisting(json)
-      } catch (repairError) {
+      } catch {
         // no valid JSON, will show empty document or invalid json
         json = undefined
         documentState = undefined
@@ -1322,7 +1322,7 @@
         text = updatedText
         textIsRepaired = true
         parseError = undefined
-      } catch (repairError) {
+      } catch {
         // no valid JSON, will show empty document or invalid json
         json = undefined
         documentState = createDocumentState({ json, expand: expandMinimal })

@@ -16,7 +16,7 @@ function loadFromLocalStorage(key: string, defaultValue: unknown) {
     const value = localStorage[key]
 
     return value !== undefined ? JSON.parse(value) : defaultValue
-  } catch (err) {
+  } catch {
     return defaultValue
   }
 }

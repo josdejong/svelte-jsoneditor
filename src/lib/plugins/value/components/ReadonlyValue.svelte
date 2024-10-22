@@ -9,7 +9,7 @@
   import {
     type ExtendedSearchResultItem,
     type JSONParser,
-    Mode,
+    type Mode,
     type OnJSONSelect,
     type ValueNormalization
   } from '$lib/types.js'
