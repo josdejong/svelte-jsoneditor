@@ -100,7 +100,7 @@
     "memoize-one": "^6.0.0",
     "natural-compare-lite": "^1.4.0",
     "sass": "^1.80.3",
-    "svelte-awesome": "^3.3.4",
+    "svelte-awesome": "^3.3.5",
     "svelte-select": "^5.8.3",
     "vanilla-picker": "^2.12.3"
   },
