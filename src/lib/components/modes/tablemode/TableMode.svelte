@@ -1760,6 +1760,7 @@
                   <RefreshColumnHeader
                     count={Array.isArray(json) ? json.length : 0}
                     {maxSampleCount}
+                    {readOnly}
                     onRefresh={() => (maxSampleCount = Infinity)}
                   />
                 </th>
