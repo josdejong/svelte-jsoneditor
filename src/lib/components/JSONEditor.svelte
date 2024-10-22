@@ -276,11 +276,10 @@
   }
 
   export async function destroy() {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    this.$destroy()
-
-    await tick() // await destroying
+    throw new Error(
+      'class method destroy() is deprecated. ' +
+        'It is replaced with a method destroy() in the vanilla library.'
+    )
   }
 
   function handleChange(updatedContent: Content, previousContent: Content, status: OnChangeStatus) {
