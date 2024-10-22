@@ -58,13 +58,13 @@ export function parsePartialJson(partialJson: string, parse: (text: string) => u
   }
 
   try {
-    return parse('[' + partialJson + ']')
+    return parse('{' + partialJson + '}')
   } catch {
     // we ignore the error on purpose
   }
 
   try {
-    return parse('{' + partialJson + '}')
+    return parse('[' + partialJson + ']')
   } catch {
     // we ignore the error on purpose
   }
