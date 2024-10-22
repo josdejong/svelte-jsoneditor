@@ -1,4 +1,4 @@
-@import 'themes/defaults.scss';
+@use 'themes/defaults.scss';
 
 $pressed-button-margin: 2px;
 $input-padding: 5px;
@@ -7,8 +7,8 @@ $navigation-bar-height: 27px; // TODO: having this hardcoded is ugly
 $search-box-offset-navigation-bar: $search-box-offset + $navigation-bar-height;
 $border-radius: 3px;
 
-$padding-half: calc(0.5 * $padding);
-$padding-double: calc(2 * $padding);
+$padding-half: calc(0.5 * defaults.$padding);
+$padding-double: calc(2 * defaults.$padding);
 $menu-padding: 5px;
 $bottom-height: 5px;
 $contents-padding: 2px;
@@ -20,8 +20,8 @@ $errors-overview-max-height: 25%;
   background: transparent;
   color: inherit;
   cursor: pointer;
-  font-family: $font-family;
-  font-size: $font-size;
+  font-family: defaults.$font-family;
+  font-size: defaults.$font-size;
   padding: $menu-padding;
   margin: 0;
 }
@@ -31,20 +31,20 @@ $errors-overview-max-height: 25%;
 
   flex: 1;
   white-space: nowrap;
-  padding: $padding;
+  padding: defaults.$padding;
   color: inherit;
 
   &:hover {
-    background: $context-menu-background-highlight;
+    background: defaults.$context-menu-background-highlight;
   }
 
   &:focus {
-    background: $context-menu-background-highlight;
+    background: defaults.$context-menu-background-highlight;
     z-index: 1;
   }
 
   &:disabled {
-    color: $context-menu-color-disabled;
+    color: defaults.$context-menu-color-disabled;
     background: unset;
   }
 
@@ -60,53 +60,53 @@ $errors-overview-max-height: 25%;
 @mixin jsoneditor-button-primary {
   @include jsoneditor-button;
 
-  background: $button-primary-background;
-  color: $button-primary-color;
-  padding: $padding $padding-double;
+  background: defaults.$button-primary-background;
+  color: defaults.$button-primary-color;
+  padding: defaults.$padding $padding-double;
   border-radius: $border-radius;
 
   &:hover {
-    background: $button-primary-background-highlight;
+    background: defaults.$button-primary-background-highlight;
   }
 
   &:disabled {
-    background: $button-primary-background-disabled;
+    background: defaults.$button-primary-background-disabled;
   }
 }
 
 @mixin jsoneditor-button-secondary {
   @include jsoneditor-button;
 
-  background: $button-secondary-background;
-  color: $button-secondary-color;
-  padding: $padding $padding-double;
+  background: defaults.$button-secondary-background;
+  color: defaults.$button-secondary-color;
+  padding: defaults.$padding $padding-double;
   border-radius: $border-radius;
 
   &:hover {
-    background: $button-secondary-background-highlight;
+    background: defaults.$button-secondary-background-highlight;
   }
 
   &:disabled {
-    background: $button-secondary-background-disabled;
+    background: defaults.$button-secondary-background-disabled;
   }
 }
 
 @mixin modal-input-mixin {
-  border: $input-border;
+  border: defaults.$input-border;
   outline: none;
   box-sizing: border-box;
   padding: $padding-half;
-  font-family: $font-family-mono;
-  font-size: $font-size-mono;
+  font-family: defaults.$font-family-mono;
+  font-size: defaults.$font-size-mono;
   color: inherit;
-  background: $input-background;
+  background: defaults.$input-background;
 
   &:focus {
-    border: $input-border-focus;
+    border: defaults.$input-border-focus;
   }
 
   &:read-only {
-    background: $input-background-readonly;
+    background: defaults.$input-background-readonly;
   }
 }
 
@@ -129,12 +129,12 @@ $errors-overview-max-height: 25%;
   font-size: inherit;
   color: inherit;
   display: flex;
-  gap: $padding;
-  padding: $padding-half $padding $padding-half $padding-half;
+  gap: defaults.$padding;
+  padding: $padding-half defaults.$padding $padding-half $padding-half;
   width: 100%;
 
   &:hover {
-    background: $table-header-background-highlight;
+    background: defaults.$table-header-background-highlight;
   }
 
   &:not(&.jse-readonly) {
@@ -150,11 +150,11 @@ $errors-overview-max-height: 25%;
   min-height: 0;
   padding: 0;
 
-  font-family: $font-family;
-  font-size: $font-size;
+  font-family: defaults.$font-family;
+  font-size: defaults.$font-size;
   line-height: normal;
-  background: $modal-background;
-  color: $text-color;
+  background: defaults.$modal-background;
+  color: defaults.$text-color;
 }
 
 @mixin jse-modal-contents($modal-padding: 20px) {
@@ -171,7 +171,7 @@ $errors-overview-max-height: 25%;
     flex-direction: row;
     justify-content: flex-end;
 
-    padding-top: $padding;
+    padding-top: defaults.$padding;
 
     button {
       &.jse-primary {

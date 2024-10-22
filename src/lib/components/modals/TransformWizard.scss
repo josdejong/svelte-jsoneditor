@@ -1,4 +1,5 @@
-@import '../../styles';
+@use '../../styles';
+@use '../../themes/defaults';
 
 table.jse-transform-wizard {
   border-collapse: collapse;
@@ -22,7 +23,7 @@ table.jse-transform-wizard {
         width: 100%;
         display: flex;
         flex-direction: row;
-        margin-bottom: $padding-half;
+        margin-bottom: styles.$padding-half;
 
         // svelte-select
         // TODO: this styling should be configured globally
@@ -35,17 +36,17 @@ table.jse-transform-wizard {
 
         :global(.svelte-select.jse-filter-path) {
           flex: 4;
-          margin-right: $padding-half;
+          margin-right: styles.$padding-half;
         }
 
         :global(.svelte-select.jse-filter-relation) {
           flex: 1.5;
-          margin-right: $padding-half;
+          margin-right: styles.$padding-half;
         }
 
         :global(.svelte-select.jse-sort-path) {
           flex: 3;
-          margin-right: $padding-half;
+          margin-right: styles.$padding-half;
         }
 
         :global(.svelte-select.jse-sort-direction) {
@@ -63,14 +64,14 @@ table.jse-transform-wizard {
         .jse-filter-value {
           flex: 4;
           padding: 4px 8px;
-          border: $input-border;
-          border-radius: $input-radius;
+          border: defaults.$input-border;
+          border-radius: defaults.$input-radius;
           outline: none;
-          background: $input-background;
+          background: defaults.$input-background;
           color: inherit;
 
           &:focus {
-            border: $input-border-focus;
+            border: defaults.$input-border-focus;
           }
         }
       }

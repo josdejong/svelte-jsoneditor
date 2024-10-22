@@ -1,10 +1,11 @@
-@import '../../styles';
-@import './EditableDivShared';
+@use '../../styles';
+@use 'EditableDivShared';
+@use '../../themes/defaults';
 
 // for key and value
 div.jse-editable-div {
   min-width: 2em;
-  padding: 0 $input-padding;
+  padding: 0 styles.$input-padding;
   box-sizing: border-box;
   outline: none;
   border-radius: 1px;
@@ -25,8 +26,8 @@ div.jse-editable-div {
   }
 
   &[contenteditable='true'] {
-    outline: $edit-outline;
-    background: $background-color;
+    outline: defaults.$edit-outline;
+    background: defaults.$background-color;
     position: relative;
     display: inline-block;
     border-radius: 0;
@@ -35,13 +36,13 @@ div.jse-editable-div {
 
   &.jse-empty {
     &:not(:focus) {
-      outline: 1px dotted $tag-background;
+      outline: 1px dotted defaults.$tag-background;
       -moz-outline-radius: 2px;
     }
 
     &::after {
       pointer-events: none;
-      color: $tag-background;
+      color: defaults.$tag-background;
     }
   }
 }

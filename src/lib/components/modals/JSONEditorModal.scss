@@ -1,4 +1,5 @@
-@import '../../styles';
+@use '../../styles';
+@use '../../themes/defaults';
 
 .jse-modal-wrapper {
   flex: 1;
@@ -8,7 +9,7 @@
   flex-direction: column;
 
   .jse-modal-contents {
-    @include jse-modal-contents;
+    @include styles.jse-modal-contents;
 
     .jse-label {
       font-weight: bold;
@@ -16,8 +17,8 @@
       box-sizing: border-box;
 
       .jse-label-inner {
-        margin-top: $padding-double;
-        margin-bottom: $padding-half;
+        margin-top: styles.$padding-double;
+        margin-bottom: styles.$padding-half;
         box-sizing: border-box;
       }
     }
@@ -29,28 +30,28 @@
       max-width: 100%;
       display: flex;
 
-      --jse-theme-color: #{$modal-editor-theme-color};
-      --jse-theme-color-highlight: #{$modal-editor-theme-color-highlight};
+      --jse-theme-color: #{defaults.$modal-editor-theme-color};
+      --jse-theme-color-highlight: #{defaults.$modal-editor-theme-color-highlight};
     }
   }
 
   .jse-actions {
-    gap: $padding;
+    gap: defaults.$padding;
     align-items: center;
 
     .jse-error {
       flex: 1;
-      color: $error-color;
+      color: defaults.$error-color;
     }
 
     button {
       &.jse-secondary {
-        @include jsoneditor-button-secondary;
+        @include styles.jsoneditor-button-secondary;
       }
     }
   }
 
   input {
-    @include modal-input-mixin;
+    @include styles.modal-input-mixin;
   }
 }

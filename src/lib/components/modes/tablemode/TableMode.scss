@@ -1,28 +1,29 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 .jse-table-mode {
   flex: 1;
   display: flex;
   flex-direction: column;
   position: relative;
-  background: $background-color;
+  background: defaults.$background-color;
   min-width: 0;
   min-height: 0;
-  font-family: $font-family-mono;
-  font-size: $font-size-mono;
-  color: $text-color;
-  line-height: $line-height;
+  font-family: defaults.$font-family-mono;
+  font-size: defaults.$font-size-mono;
+  color: defaults.$text-color;
+  line-height: defaults.$line-height;
 
   &.no-main-menu {
-    border-top: $main-border;
+    border-top: defaults.$main-border;
   }
 
   .jse-search-box-container {
     position: relative;
     height: 0;
-    top: calc($line-height + 2 * $padding);
-    margin-right: calc($padding + 20px);
-    margin-left: $padding;
+    top: calc(defaults.$line-height + 2 * defaults.$padding);
+    margin-right: calc(defaults.$padding + 20px);
+    margin-left: defaults.$padding;
     text-align: right;
     z-index: 3; // must be above the ContextMenuButton
   }
@@ -52,11 +53,11 @@
     overflow-anchor: none; // important to prevent Chrome from adjusting the scrollTop based on changing contents (causing an infinite loop)
     scrollbar-gutter: stable;
 
-    border-left: $main-border;
-    border-right: $main-border;
+    border-left: defaults.$main-border;
+    border-right: defaults.$main-border;
 
     &:last-child {
-      border-bottom: $main-border;
+      border-bottom: defaults.$main-border;
     }
 
     table.jse-table-main {
@@ -72,32 +73,32 @@
       }
 
       .jse-search-box-background {
-        background: $table-header-background;
+        background: defaults.$table-header-background;
       }
 
       .jse-table-invisible-end-section {
         td {
-          padding-bottom: $padding;
+          padding-bottom: defaults.$padding;
         }
       }
 
       .jse-table-row {
         &:hover {
-          background-color: $table-row-odd-background;
+          background-color: defaults.$table-row-odd-background;
         }
 
         .jse-table-cell {
-          padding: 0 $padding 0 0;
+          padding: 0 defaults.$padding 0 0;
           vertical-align: top;
           white-space: nowrap;
-          height: $line-height;
+          height: defaults.$line-height;
 
           &.jse-table-cell-header,
           &.jse-table-cell-gutter {
             font-weight: normal;
             text-align: left;
-            color: $text-readonly;
-            background: $table-header-background;
+            color: defaults.$text-readonly;
+            background: defaults.$table-header-background;
           }
 
           &.jse-table-cell-header {
@@ -107,27 +108,28 @@
 
             .jse-table-root-error {
               // same padding as .jse-column-header
-              padding: $padding-half $padding $padding-half $padding-half;
+              padding: styles.$padding-half defaults.$padding styles.$padding-half
+                styles.$padding-half;
             }
 
             // FIXME: border and/or border shadow?
           }
 
           &.jse-table-cell-gutter {
-            padding: 0 $padding 0 $padding-half;
+            padding: 0 defaults.$padding 0 styles.$padding-half;
             // FIXME: border and/or border shadow?
           }
 
           .jse-value-outer {
             display: inline-block;
-            cursor: $contents-cursor;
+            cursor: defaults.$contents-cursor;
 
             &:hover {
-              background: $hover-background-color;
+              background: defaults.$hover-background-color;
             }
 
             &.jse-selected-value {
-              background: $selection-background-color;
+              background: defaults.$selection-background-color;
             }
           }
 
@@ -150,10 +152,10 @@
       .jse-loading {
         flex: 2;
         text-align: center;
-        color: $panel-color-readonly;
+        color: defaults.$panel-color-readonly;
         box-sizing: border-box;
-        font-family: $font-family;
-        font-size: $font-size;
+        font-family: defaults.$font-family;
+        font-size: defaults.$font-size;
       }
     }
   }

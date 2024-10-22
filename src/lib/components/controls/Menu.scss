@@ -1,10 +1,11 @@
-@import '../../styles';
+@use '../../styles';
+@use '../../themes/defaults';
 
 .jse-menu {
-  background: $theme-color;
-  font-family: $font-family;
-  font-size: $font-size-main-menu;
-  color: $menu-color;
+  background: defaults.$theme-color;
+  font-family: defaults.$font-family;
+  font-size: defaults.$font-size-main-menu;
+  color: defaults.$menu-color;
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
@@ -20,9 +21,9 @@
     color: inherit;
     cursor: pointer;
 
-    width: $menu-button-size;
-    height: $menu-button-size;
-    padding: $padding-half;
+    width: defaults.$menu-button-size;
+    height: defaults.$menu-button-size;
+    padding: styles.$padding-half;
     margin: 0;
     border-radius: 0;
 
@@ -33,23 +34,23 @@
 
     &:hover,
     &:focus {
-      background: $theme-color-highlight;
+      background: defaults.$theme-color-highlight;
     }
 
     &:disabled {
-      color: $menu-color;
+      color: defaults.$menu-color;
       opacity: 0.5;
 
       background: transparent;
     }
 
     &.jse-group-button {
-      $group-button-color: $menu-color;
+      $group-button-color: defaults.$menu-color;
 
       width: auto;
-      height: calc($menu-button-size - $padding);
-      margin: $padding-half 0;
-      padding: 0 $padding-half 1px; // 1px bottom padding for better center alignment (text baseline)
+      height: calc(defaults.$menu-button-size - defaults.$padding);
+      margin: styles.$padding-half 0;
+      padding: 0 styles.$padding-half 1px; // 1px bottom padding for better center alignment (text baseline)
       border: 1px solid $group-button-color;
 
       &:not(.jse-last) {
@@ -57,21 +58,21 @@
       }
 
       &.jse-first {
-        margin-left: $padding-half;
+        margin-left: styles.$padding-half;
       }
 
       &.jse-last {
-        margin-right: $padding-half;
+        margin-right: styles.$padding-half;
       }
 
       &:hover,
       &:focus {
-        background: $theme-color-highlight;
+        background: defaults.$theme-color-highlight;
       }
 
       &.jse-selected {
         background: $group-button-color;
-        color: $theme-color;
+        color: defaults.$theme-color;
       }
     }
   }
@@ -83,7 +84,7 @@
   .jse-separator {
     $margin: 3px;
 
-    background: $menu-color;
+    background: defaults.$menu-color;
     opacity: 0.3;
     width: 1px;
     margin: $margin;

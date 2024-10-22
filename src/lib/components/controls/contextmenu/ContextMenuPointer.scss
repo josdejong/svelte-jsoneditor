@@ -1,11 +1,12 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 .jse-context-menu-pointer {
   position: absolute;
-  top: calc(-0.5 * $context-menu-pointer-size);
-  right: calc(-0.5 * $context-menu-pointer-size);
-  width: $context-menu-pointer-size;
-  height: $context-menu-pointer-size;
+  top: calc(-0.5 * defaults.$context-menu-pointer-size);
+  right: calc(-0.5 * defaults.$context-menu-pointer-size);
+  width: defaults.$context-menu-pointer-size;
+  height: defaults.$context-menu-pointer-size;
   padding: 0;
   margin: 0;
 
@@ -13,14 +14,14 @@
   background: transparent;
 
   border-radius: 2px;
-  background: $context-menu-pointer-hover-background;
-  color: $context-menu-pointer-color;
+  background: defaults.$context-menu-pointer-hover-background;
+  color: defaults.$context-menu-pointer-color;
   border: none;
-  box-shadow: $controls-box-shadow;
+  box-shadow: defaults.$controls-box-shadow;
 
   &.jse-root {
     top: 0;
-    right: calc(-2px - $context-menu-pointer-size);
+    right: calc(-2px - defaults.$context-menu-pointer-size);
   }
 
   &.jse-insert {
@@ -28,14 +29,14 @@
   }
 
   &:hover {
-    background: $context-menu-pointer-background-highlight;
+    background: defaults.$context-menu-pointer-background-highlight;
   }
 
   &.jse-selected {
-    background: $context-menu-pointer-background;
+    background: defaults.$context-menu-pointer-background;
 
     &:hover {
-      background: $context-menu-pointer-background-highlight;
+      background: defaults.$context-menu-pointer-background-highlight;
     }
   }
 }

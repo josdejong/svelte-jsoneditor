@@ -302,7 +302,7 @@ exports[`JSONEditor > render table mode 1`] = `
                   class="jse-value-outer svelte-u14cgx"
                 >
                   <div
-                    class="jse-value jse-number jse-table-cell svelte-9ohlz8"
+                    class="jse-value jse-number jse-table-cell svelte-c0g9qz"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -325,7 +325,7 @@ exports[`JSONEditor > render table mode 1`] = `
                   class="jse-value-outer svelte-u14cgx"
                 >
                   <div
-                    class="jse-value jse-string jse-empty jse-table-cell svelte-9ohlz8"
+                    class="jse-value jse-string jse-empty jse-table-cell svelte-c0g9qz"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -360,7 +360,7 @@ exports[`JSONEditor > render table mode 1`] = `
                   class="jse-value-outer svelte-u14cgx"
                 >
                   <div
-                    class="jse-value jse-number jse-table-cell svelte-9ohlz8"
+                    class="jse-value jse-number jse-table-cell svelte-c0g9qz"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -383,7 +383,7 @@ exports[`JSONEditor > render table mode 1`] = `
                   class="jse-value-outer svelte-u14cgx"
                 >
                   <div
-                    class="jse-value jse-string jse-table-cell svelte-9ohlz8"
+                    class="jse-value jse-string jse-table-cell svelte-c0g9qz"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -418,7 +418,7 @@ exports[`JSONEditor > render table mode 1`] = `
                   class="jse-value-outer svelte-u14cgx"
                 >
                   <div
-                    class="jse-value jse-number jse-table-cell svelte-9ohlz8"
+                    class="jse-value jse-number jse-table-cell svelte-c0g9qz"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -441,7 +441,7 @@ exports[`JSONEditor > render table mode 1`] = `
                   class="jse-value-outer svelte-u14cgx"
                 >
                   <div
-                    class="jse-value jse-string jse-empty jse-table-cell svelte-9ohlz8"
+                    class="jse-value jse-string jse-empty jse-table-cell svelte-c0g9qz"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -1607,7 +1607,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                         class="jse-value-outer svelte-1n9xu6u"
                       >
                         <div
-                          class="jse-value jse-number svelte-9ohlz8"
+                          class="jse-value jse-number svelte-c0g9qz"
                           data-type="selectable-value"
                           role="button"
                           tabindex="-1"
@@ -1781,7 +1781,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                         class="jse-value-outer svelte-1n9xu6u"
                       >
                         <div
-                          class="jse-value jse-number svelte-9ohlz8"
+                          class="jse-value jse-number svelte-c0g9qz"
                           data-type="selectable-value"
                           role="button"
                           tabindex="-1"
@@ -1845,7 +1845,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                         class="jse-value-outer svelte-1n9xu6u"
                       >
                         <div
-                          class="jse-value jse-string svelte-9ohlz8"
+                          class="jse-value jse-string svelte-c0g9qz"
                           data-type="selectable-value"
                           role="button"
                           tabindex="-1"
@@ -2019,7 +2019,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                         class="jse-value-outer svelte-1n9xu6u"
                       >
                         <div
-                          class="jse-value jse-number svelte-9ohlz8"
+                          class="jse-value jse-number svelte-c0g9qz"
                           data-type="selectable-value"
                           role="button"
                           tabindex="-1"

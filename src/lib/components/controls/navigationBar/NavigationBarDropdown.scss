@@ -1,13 +1,14 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 .jse-navigation-bar-dropdown {
   position: absolute;
   top: 100%;
   left: 0;
   z-index: 3; // above the floating ContextMenuButton
-  background: $navigation-bar-background;
-  color: $navigation-bar-dropdown-color;
-  box-shadow: $controls-box-shadow;
+  background: defaults.$navigation-bar-background;
+  color: defaults.$navigation-bar-dropdown-color;
+  box-shadow: defaults.$controls-box-shadow;
   display: flex;
   flex-direction: column;
   max-height: 300px;
@@ -15,8 +16,8 @@
   min-width: 80px;
 
   button.jse-navigation-bar-dropdown-item {
-    font-family: $font-family-mono;
-    font-size: $font-size-mono;
+    font-family: defaults.$font-family-mono;
+    font-size: defaults.$font-size-mono;
     border: none;
     background: transparent;
     color: inherit;
@@ -26,16 +27,16 @@
     white-space: nowrap;
     box-sizing: border-box;
     // FIXME: must align exactly with the text in the navigation bar, how to ensure that?
-    padding: $padding-half 36px;
+    padding: styles.$padding-half 36px;
 
     &:focus,
     &:hover {
-      background: $navigation-bar-background-highlight;
+      background: defaults.$navigation-bar-background-highlight;
     }
 
     &.jse-selected {
-      background: $navigation-bar-dropdown-color;
-      color: $navigation-bar-background;
+      background: defaults.$navigation-bar-dropdown-color;
+      color: defaults.$navigation-bar-background;
     }
   }
 }

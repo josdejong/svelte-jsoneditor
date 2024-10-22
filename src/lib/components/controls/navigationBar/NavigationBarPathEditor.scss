@@ -1,25 +1,26 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 .jse-navigation-bar-path-editor {
   flex: 1;
   display: flex;
-  border: $edit-outline;
-  background: $background-color;
+  border: defaults.$edit-outline;
+  background: defaults.$background-color;
 
   input.jse-navigation-bar-text {
     flex: 1;
     font-family: inherit;
     font-size: inherit;
     padding: 0 5px 1px;
-    background: $background-color;
-    color: $text-color;
+    background: defaults.$background-color;
+    color: defaults.$text-color;
     border: none;
     outline: none;
   }
 
   button {
     border: none;
-    background: $background-color;
+    background: defaults.$background-color;
     cursor: pointer;
     font-family: inherit;
     font-size: 80%;
@@ -28,28 +29,28 @@
 
   button.jse-navigation-bar-copy {
     &.copied {
-      color: $message-success-background;
+      color: defaults.$message-success-background;
     }
   }
 
   button.jse-navigation-bar-validation-error {
-    color: $error-color;
+    color: defaults.$error-color;
   }
 
   &.error {
-    border-color: $error-color;
+    border-color: defaults.$error-color;
 
     input.jse-navigation-bar-text {
-      color: $error-color;
+      color: defaults.$error-color;
     }
   }
 
   .jse-copied-text {
-    background: $message-success-background;
-    color: $message-success-color;
+    background: defaults.$message-success-background;
+    color: defaults.$message-success-color;
     position: relative;
     margin: 2px;
     padding: 0 5px;
-    border-radius: $border-radius;
+    border-radius: styles.$border-radius;
   }
 }

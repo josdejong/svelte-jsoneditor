@@ -1,17 +1,18 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 .jse-tree-mode {
   flex: 1;
   display: flex;
   flex-direction: column;
   position: relative;
-  background: $background-color;
+  background: defaults.$background-color;
   min-width: 0;
   min-height: 0;
-  font-family: $font-family-mono;
-  font-size: $font-size-mono;
-  color: $text-color;
-  line-height: $line-height;
+  font-family: defaults.$font-family-mono;
+  font-size: defaults.$font-size-mono;
+  color: defaults.$text-color;
+  line-height: defaults.$line-height;
 
   .jse-hidden-input-label {
     .jse-hidden-input {
@@ -28,15 +29,15 @@
   }
 
   &.no-main-menu {
-    border-top: $main-border;
+    border-top: defaults.$main-border;
   }
 
   .jse-search-box-container {
     position: relative;
     height: 0;
-    top: $padding;
-    margin-right: calc($padding + 20px);
-    margin-left: $padding;
+    top: defaults.$padding;
+    margin-right: calc(defaults.$padding + 20px);
+    margin-left: defaults.$padding;
     text-align: right;
     z-index: 3; // must be above the ContextMenuButton
   }
@@ -45,14 +46,14 @@
     flex: 1;
     overflow: auto;
     position: relative;
-    padding: $contents-padding;
+    padding: styles.$contents-padding;
     display: flex;
     flex-direction: column;
-    border-left: $main-border;
-    border-right: $main-border;
+    border-left: defaults.$main-border;
+    border-right: defaults.$main-border;
 
     &:last-child {
-      border-bottom: $main-border;
+      border-bottom: defaults.$main-border;
     }
 
     .jse-loading-space {
@@ -62,17 +63,17 @@
     .jse-loading {
       flex: 2;
       text-align: center;
-      color: $panel-color-readonly;
+      color: defaults.$panel-color-readonly;
       box-sizing: border-box;
-      font-family: $font-family;
-      font-size: $font-size;
+      font-family: defaults.$font-family;
+      font-size: defaults.$font-size;
     }
 
     .jse-search-box-background {
       $search-box-height: 100px;
-      border: calc($search-box-height / 2) solid $modal-background;
-      margin: -$contents-padding;
-      margin-bottom: $contents-padding;
+      border: calc($search-box-height / 2) solid defaults.$modal-background;
+      margin: -(styles.$contents-padding);
+      margin-bottom: styles.$contents-padding;
       display: inline-block;
     }
   }

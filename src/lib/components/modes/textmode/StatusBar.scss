@@ -1,21 +1,22 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 .jse-status-bar {
-  background: $panel-background;
-  color: $panel-color-readonly;
-  font-family: $font-family-mono;
-  font-size: $font-size-mono;
+  background: defaults.$panel-background;
+  color: defaults.$panel-color-readonly;
+  font-family: defaults.$font-family-mono;
+  font-size: defaults.$font-size-mono;
   margin: 0;
 
-  border-top: $panel-border;
-  border-left: $main-border;
-  border-right: $main-border;
+  border-top: defaults.$panel-border;
+  border-left: defaults.$main-border;
+  border-right: defaults.$main-border;
 
   display: flex;
-  gap: $padding;
+  gap: defaults.$padding;
 
   &:last-child {
-    border-bottom: $main-border;
+    border-bottom: defaults.$main-border;
   }
 
   .jse-status-bar-info {

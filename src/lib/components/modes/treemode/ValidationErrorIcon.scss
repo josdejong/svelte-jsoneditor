@@ -1,35 +1,36 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 // TODO: create a class shared by .expand and .validation-error buttons
 button.jse-validation-error {
-  @include jsoneditor-button;
+  @include styles.jsoneditor-button;
 
   padding: 0;
   margin: 0;
   vertical-align: top;
   display: inline-flex;
 
-  color: $error-color;
+  color: defaults.$error-color;
 }
 
 button.jse-validation-info {
-  @include jsoneditor-button;
+  @include styles.jsoneditor-button;
 
   padding: 0;
   margin: 0;
   vertical-align: top;
   display: inline-flex;
 
-  color: $info-color;
+  color: defaults.$info-color;
 }
 
 button.jse-validation-warning {
-  @include jsoneditor-button;
+  @include styles.jsoneditor-button;
 
   padding: 0;
   margin: 0;
   vertical-align: top;
   display: inline-flex;
 
-  color: $warning-color;
+  color: defaults.$warning-color;
 }

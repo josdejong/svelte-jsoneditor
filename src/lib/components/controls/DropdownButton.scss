@@ -1,13 +1,14 @@
-@import '../../styles';
+@use '../../styles';
+@use '../../themes/defaults';
 
 .jse-dropdown-button {
   flex: 1;
   line-height: normal;
 
-  $background: $context-menu-background;
-  $background-highlight: $context-menu-background-highlight;
+  $background: defaults.$context-menu-background;
+  $background-highlight: defaults.$context-menu-background-highlight;
 
-  @include jsoneditor-button;
+  @include styles.jsoneditor-button;
   position: relative;
   padding: 0;
   display: flex;
@@ -24,11 +25,11 @@
   }
 
   button.jse-open-dropdown {
-    @include jsoneditor-button;
+    @include styles.jsoneditor-button;
 
     width: 2em;
-    background: $context-menu-background;
-    color: $context-menu-color;
+    background: defaults.$context-menu-background;
+    color: defaults.$context-menu-color;
     border-radius: 0;
 
     &.jse-visible {
@@ -36,7 +37,7 @@
     }
 
     &:hover {
-      background: $context-menu-background-highlight;
+      background: defaults.$context-menu-background-highlight;
     }
 
     &:focus {
@@ -44,7 +45,7 @@
     }
 
     &:disabled {
-      color: $context-menu-color-disabled;
+      color: defaults.$context-menu-color-disabled;
       background: unset;
     }
   }
@@ -56,19 +57,19 @@
     left: 0;
     z-index: 1;
     background: $background;
-    color: $context-menu-color;
-    box-shadow: $controls-box-shadow;
+    color: defaults.$context-menu-color;
+    box-shadow: defaults.$controls-box-shadow;
 
     &.jse-visible {
       display: block;
     }
 
     button {
-      @include jsoneditor-button;
+      @include styles.jsoneditor-button;
 
       width: 100%;
       text-align: left;
-      padding: $padding;
+      padding: defaults.$padding;
       margin: 0;
 
       &:hover {
@@ -76,7 +77,7 @@
       }
 
       &:disabled {
-        color: $context-menu-color-disabled;
+        color: defaults.$context-menu-color-disabled;
         background: unset;
       }
     }

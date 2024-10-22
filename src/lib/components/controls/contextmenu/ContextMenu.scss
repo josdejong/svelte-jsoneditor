@@ -1,12 +1,13 @@
-@import '../../../styles.scss';
+@use '../../../styles.scss';
+@use '../../../themes/defaults';
 
 .jse-contextmenu {
-  box-shadow: $controls-box-shadow;
+  box-shadow: defaults.$controls-box-shadow;
 
-  font-family: $font-family;
-  font-size: $font-size;
-  background: $context-menu-background;
-  color: $context-menu-color;
+  font-family: defaults.$font-family;
+  font-size: defaults.$font-size;
+  background: defaults.$context-menu-background;
+  color: defaults.$context-menu-color;
 
   .jse-row {
     display: flex;
@@ -17,28 +18,28 @@
     div.jse-label {
       flex: 1;
       white-space: nowrap;
-      padding: $padding;
-      color: $context-menu-color-disabled;
+      padding: defaults.$padding;
+      color: defaults.$context-menu-color-disabled;
       line-height: normal;
     }
 
     div.jse-tip {
       flex: 1;
-      background: $context-menu-tip-background;
-      color: $context-menu-tip-color;
-      margin: $padding-half;
-      padding: $padding-half $padding;
+      background: defaults.$context-menu-tip-background;
+      color: defaults.$context-menu-tip-color;
+      margin: styles.$padding-half;
+      padding: styles.$padding-half defaults.$padding;
       font-size: 80%;
       line-height: 1.3em;
 
       display: flex;
       flex-direction: row;
       align-items: flex-start;
-      gap: $padding;
-      border-radius: $border-radius;
+      gap: defaults.$padding;
+      border-radius: styles.$border-radius;
 
       div.jse-tip-icon {
-        padding-top: $padding-half;
+        padding-top: styles.$padding-half;
       }
     }
   }
@@ -50,13 +51,13 @@
     align-items: stretch;
 
     &:not(:last-child) {
-      border-right: 1px solid $context-menu-separator-color;
+      border-right: 1px solid defaults.$context-menu-separator-color;
     }
   }
 
   .jse-separator {
     width: 100%;
     height: 1px;
-    background: $context-menu-separator-color;
+    background: defaults.$context-menu-separator-color;
   }
 }

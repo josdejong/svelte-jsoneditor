@@ -1,4 +1,5 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 .jse-table-mode-welcome {
   flex: 1;
@@ -7,11 +8,11 @@
   overflow: auto;
   align-items: center;
 
-  border-left: $main-border;
-  border-right: $main-border;
+  border-left: defaults.$main-border;
+  border-right: defaults.$main-border;
 
   &:last-child {
-    border-bottom: $main-border;
+    border-bottom: defaults.$main-border;
   }
 
   .jse-space.jse-before {
@@ -21,24 +22,24 @@
   .jse-nested-arrays {
     display: flex;
     flex-direction: column;
-    gap: $padding;
+    gap: defaults.$padding;
     max-width: 300px;
-    margin: 2em $padding;
+    margin: 2em defaults.$padding;
 
-    font-family: $font-family;
-    font-size: $font-size;
+    font-family: defaults.$font-family;
+    font-size: defaults.$font-size;
 
     .jse-nested-arrays-title {
     }
 
     .jse-nested-arrays-info {
-      color: $panel-color-readonly;
+      color: defaults.$panel-color-readonly;
     }
 
     button.jse-nested-array-action {
       text-align: left;
 
-      @include jsoneditor-button-primary;
+      @include styles.jsoneditor-button-primary;
 
       .jse-nested-array-count {
         opacity: 0.5;

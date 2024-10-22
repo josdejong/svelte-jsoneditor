@@ -1,4 +1,5 @@
-@import '../../styles';
+@use '../../styles';
+@use '../../themes/defaults';
 
 .jse-transform-modal-inner {
   flex: 1;
@@ -10,16 +11,16 @@
   .jse-modal-contents {
     color: inherit;
 
-    @include jse-modal-contents($modal-padding: 0);
+    @include styles.jse-modal-contents($modal-padding: 0);
 
     .jse-main-contents {
       flex: 1;
       display: flex;
-      gap: $padding-double;
+      gap: styles.$padding-double;
       min-height: 0;
       box-sizing: border-box;
 
-      padding: 0 $padding-double $padding;
+      padding: 0 styles.$padding-double defaults.$padding;
 
       .jse-query-contents {
         flex: 1;
@@ -28,7 +29,7 @@
 
         .jse-description {
           :global(p) {
-            margin: $padding 0;
+            margin: defaults.$padding 0;
 
             &:first-child {
               margin-top: 0;
@@ -40,14 +41,14 @@
           }
 
           :global(code) {
-            background: $modal-code-background;
-            font-family: $font-family-mono;
-            font-size: $font-size-mono;
+            background: defaults.$modal-code-background;
+            font-family: defaults.$font-family-mono;
+            font-size: defaults.$font-size-mono;
           }
         }
 
         .query-error {
-          color: $error-color;
+          color: defaults.$error-color;
         }
 
         textarea.jse-query {
@@ -61,7 +62,7 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: $padding-double;
+        gap: styles.$padding-double;
 
         .jse-original-data {
           flex: 1;
@@ -92,7 +93,7 @@
     }
 
     .jse-actions {
-      padding: $padding $padding-double $padding-double;
+      padding: defaults.$padding styles.$padding-double styles.$padding-double;
     }
 
     @media screen and (max-width: 1200px) {
@@ -123,12 +124,12 @@
     box-sizing: border-box;
 
     .jse-label-inner {
-      margin-top: $padding-double;
-      margin-bottom: $padding-half;
+      margin-top: styles.$padding-double;
+      margin-bottom: styles.$padding-half;
       box-sizing: border-box;
 
       button {
-        @include jsoneditor-button;
+        @include styles.jsoneditor-button;
         font-weight: bold;
         padding: 0;
       }
@@ -137,31 +138,31 @@
 
   :global(.jse-tree-mode) {
     flex: 1;
-    background: $input-background-readonly;
+    background: defaults.$input-background-readonly;
     box-shadow: none;
     box-sizing: border-box;
 
-    --jse-main-border: #{$input-border};
+    --jse-main-border: #{defaults.$input-border};
   }
 
   input,
   textarea {
-    @include modal-input-mixin;
+    @include styles.modal-input-mixin;
   }
 
   .jse-preview.jse-error {
     flex: 1;
-    background: $input-background-readonly;
-    border: $input-border;
-    color: $error-color;
-    padding: $padding-half;
+    background: defaults.$input-background-readonly;
+    border: defaults.$input-border;
+    color: defaults.$error-color;
+    padding: styles.$padding-half;
   }
 
   :global(a) {
-    color: $a-color;
+    color: defaults.$a-color;
   }
 
   :global(a:hover) {
-    color: $a-color-highlight;
+    color: defaults.$a-color-highlight;
   }
 }

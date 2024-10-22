@@ -1,15 +1,16 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 .jse-expand {
-  width: $indent-size;
+  width: defaults.$indent-size;
   padding: 0;
   margin: 0;
   border: none;
   cursor: pointer;
   background: transparent;
-  color: $delimiter-color;
-  font-size: $font-size-mono;
-  height: $line-height;
+  color: defaults.$delimiter-color;
+  font-size: defaults.$font-size-mono;
+  height: defaults.$line-height;
 
   &:hover {
     opacity: 0.8;
@@ -21,27 +22,27 @@
 .jse-index,
 .jse-bracket {
   vertical-align: top;
-  color: $delimiter-color;
+  color: defaults.$delimiter-color;
 }
 
 .jse-index {
-  padding: 0 $padding-half;
+  padding: 0 styles.$padding-half;
 }
 
 .jse-bracket {
   padding: 0 2px;
 
   &.jse-expanded {
-    padding-right: $padding;
+    padding-right: defaults.$padding;
   }
 }
 
 .jse-tag {
   border: none;
   font-size: 80%;
-  font-family: $font-family;
-  color: $tag-color;
-  background: $tag-background;
+  font-family: defaults.$font-family;
+  color: defaults.$tag-color;
+  background: defaults.$tag-background;
   border-radius: 2px;
   cursor: pointer;
   //position: relative;
@@ -67,11 +68,11 @@
 
 .jse-json-node {
   position: relative;
-  color: $text-color;
+  color: defaults.$text-color;
 
   &.jse-root {
     min-height: 100%;
-    padding-bottom: $contents-padding;
+    padding-bottom: styles.$contents-padding;
     box-sizing: border-box;
 
     > .jse-contents-outer > .jse-contents {
@@ -89,7 +90,7 @@
   .jse-header-outer,
   .jse-footer-outer {
     display: flex;
-    margin-left: calc(var(--level) * $indent-size);
+    margin-left: calc(var(--level) * defaults.$indent-size);
   }
 
   .jse-header {
@@ -105,7 +106,7 @@
 
   .jse-contents-outer {
     display: flex;
-    margin-left: calc(var(--level) * $indent-size);
+    margin-left: calc(var(--level) * defaults.$indent-size);
   }
 
   .jse-header,
@@ -116,8 +117,8 @@
   }
 
   .jse-contents {
-    padding-left: $indent-size;
-    cursor: $contents-cursor;
+    padding-left: defaults.$indent-size;
+    cursor: defaults.$contents-cursor;
 
     .jse-value-outer {
       display: inline-flex;
@@ -126,17 +127,17 @@
 
   .jse-footer {
     display: inline-flex;
-    padding-left: calc($indent-size + $input-padding);
+    padding-left: calc(defaults.$indent-size + styles.$input-padding);
   }
 
   .jse-header,
   .jse-contents,
   .jse-footer {
-    background: $contents-background-color;
+    background: defaults.$contents-background-color;
   }
 
   .jse-insert-selection-area {
-    padding: 0 $padding-half;
+    padding: 0 styles.$padding-half;
     flex: 1; // must fill all left over space at the right side of the editor, so you can click there
 
     &.jse-inside {
@@ -161,16 +162,16 @@
     display: flex;
     position: relative;
     z-index: 1; // prevent the next line half-overlapping the pointer
-    margin-left: calc(var(--level) * $indent-size);
+    margin-left: calc(var(--level) * defaults.$indent-size);
 
     max-width: 250px;
     min-width: 100px;
     height: 0;
-    margin-right: $padding-half;
+    margin-right: styles.$padding-half;
     outline: $height-half solid; // color depends on hovered/selected/inactive+selected
 
     &.jse-hovered {
-      outline-color: $context-menu-pointer-hover-background;
+      outline-color: defaults.$context-menu-pointer-hover-background;
     }
   }
 
@@ -183,8 +184,8 @@
   .jse-meta,
   .jse-footer {
     &:hover {
-      background: $hover-background-color;
-      cursor: $contents-cursor;
+      background: defaults.$hover-background-color;
+      cursor: defaults.$contents-cursor;
     }
   }
 
@@ -196,8 +197,8 @@
     .jse-props .jse-header,
     .jse-props .jse-contents,
     .jse-footer {
-      background: $hover-background-color;
-      cursor: $contents-cursor;
+      background: defaults.$hover-background-color;
+      cursor: defaults.$contents-cursor;
 
       .jse-value-outer,
       .jse-meta {
@@ -213,8 +214,8 @@
     .jse-header,
     .jse-contents,
     .jse-footer {
-      background: $selection-background-color;
-      cursor: $contents-selected-cursor;
+      background: defaults.$selection-background-color;
+      cursor: defaults.$contents-selected-cursor;
     }
 
     .jse-key-outer,
@@ -230,8 +231,8 @@
 
   // key selected
   .jse-key-outer.jse-selected-key {
-    background: $selection-background-color;
-    cursor: $contents-selected-cursor;
+    background: defaults.$selection-background-color;
+    cursor: defaults.$contents-selected-cursor;
   }
 
   // value selected
@@ -243,8 +244,8 @@
     .jse-props .jse-header,
     .jse-props .jse-contents,
     .jse-footer {
-      background: $selection-background-color;
-      cursor: $contents-selected-cursor;
+      background: defaults.$selection-background-color;
+      cursor: defaults.$contents-selected-cursor;
 
       .jse-key-outer {
         &:hover {
@@ -261,7 +262,7 @@
 
   .jse-insert-area {
     &.jse-selected {
-      outline-color: $context-menu-pointer-background;
+      outline-color: defaults.$context-menu-pointer-background;
     }
   }
 }

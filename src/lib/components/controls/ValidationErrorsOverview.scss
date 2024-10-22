@@ -1,10 +1,11 @@
-@import '../../styles.scss';
+@use '../../styles.scss';
+@use '../../themes/defaults';
 
 .jse-validation-errors-overview {
-  font-family: $font-family-mono;
-  font-size: $font-size-mono;
+  font-family: defaults.$font-family-mono;
+  font-size: defaults.$font-size-mono;
   overflow: auto;
-  max-height: $errors-overview-max-height;
+  max-height: styles.$errors-overview-max-height;
 
   table {
     border-collapse: collapse;
@@ -14,21 +15,21 @@
       cursor: pointer;
 
       &.jse-validation-error {
-        background: $message-error-background;
-        color: $message-error-color;
+        background: defaults.$message-error-background;
+        color: defaults.$message-error-color;
       }
 
       &.jse-validation-warning {
-        background: $message-warning-background;
-        color: $message-warning-color;
+        background: defaults.$message-warning-background;
+        color: defaults.$message-warning-color;
         &:hover {
           filter: brightness(105%);
         }
       }
 
       &.jse-validation-info {
-        background: $message-info-background;
-        color: $message-info-color;
+        background: defaults.$message-info-background;
+        color: defaults.$message-info-color;
       }
 
       &:hover {
@@ -36,7 +37,7 @@
       }
 
       td {
-        padding: 4px $padding;
+        padding: 4px defaults.$padding;
         vertical-align: middle;
 
         &.jse-validation-error-icon {
@@ -50,7 +51,7 @@
           padding: 0;
 
           button.jse-validation-errors-collapse {
-            @include jsoneditor-button;
+            @include styles.jsoneditor-button;
 
             width: 36px;
             height: 26px;

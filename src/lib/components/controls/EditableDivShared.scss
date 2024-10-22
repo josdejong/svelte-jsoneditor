@@ -1,34 +1,35 @@
-@import '../../styles';
+@use '../../styles';
+@use '../../themes/defaults';
 
 .jse-value {
   &.jse-string {
-    color: $value-color-string;
+    color: defaults.$value-color-string;
   }
 
   &.jse-object,
   &.jse-array {
     min-width: 16px;
-    color: $delimiter-color;
+    color: defaults.$delimiter-color;
   }
 
   &.jse-number {
-    color: $value-color-number;
+    color: defaults.$value-color-number;
   }
 
   &.jse-boolean {
-    color: $value-color-boolean;
+    color: defaults.$value-color-boolean;
   }
 
   &.jse-null {
-    color: $value-color-null;
+    color: defaults.$value-color-null;
   }
 
   &.jse-invalid {
-    color: $text-color;
+    color: defaults.$text-color;
   }
 
   &.jse-url {
-    color: $value-color-url;
+    color: defaults.$value-color-url;
     text-decoration: underline;
   }
 }
