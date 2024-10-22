@@ -1,18 +1,19 @@
-@import '../../styles.scss';
+@use '../../styles.scss';
+@use '../../themes/defaults';
 
 .jse-message {
-  font-family: $font-family-mono;
-  font-size: $font-size-mono;
+  font-family: defaults.$font-family-mono;
+  font-size: defaults.$font-size-mono;
 
-  padding: $padding;
+  padding: defaults.$padding;
   display: flex;
-  gap: $padding;
+  gap: defaults.$padding;
   flex-wrap: wrap;
   align-items: stretch;
 
   &.jse-success {
-    background: $message-success-background;
-    color: $message-success-color;
+    background: defaults.$message-success-background;
+    color: defaults.$message-success-color;
   }
 
   .jse-text {
@@ -34,34 +35,34 @@
   }
 
   &.jse-error {
-    background: $message-error-background;
-    color: $message-error-color;
+    background: defaults.$message-error-background;
+    color: defaults.$message-error-color;
   }
 
   &.jse-warning {
-    background: $message-warning-background;
-    color: $message-warning-color;
+    background: defaults.$message-warning-background;
+    color: defaults.$message-warning-color;
   }
 
   &.jse-info {
-    background: $message-info-background;
-    color: $message-info-color;
+    background: defaults.$message-info-background;
+    color: defaults.$message-info-color;
   }
 
   .jse-actions {
     display: flex;
-    gap: $padding;
+    gap: defaults.$padding;
 
     button.jse-action {
-      @include jsoneditor-button;
+      @include styles.jsoneditor-button;
 
-      background: $message-action-background;
+      background: defaults.$message-action-background;
       color: inherit;
 
-      padding: $padding-half $padding;
+      padding: styles.$padding-half defaults.$padding;
 
       &:hover {
-        background: $message-action-background-highlight;
+        background: defaults.$message-action-background-highlight;
       }
     }
   }

@@ -1,4 +1,5 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 .jse-select-query-language {
   position: relative;
@@ -10,19 +11,19 @@
     right: 0;
     display: flex;
     flex-direction: column;
-    box-shadow: $controls-box-shadow;
+    box-shadow: defaults.$controls-box-shadow;
 
     .jse-query-language {
-      @include jsoneditor-button;
+      @include styles.jsoneditor-button;
 
       text-align: left;
-      padding: $padding $padding-double;
+      padding: defaults.$padding styles.$padding-double;
       white-space: nowrap;
-      color: $context-menu-color;
-      background: $context-menu-background;
+      color: defaults.$context-menu-color;
+      background: defaults.$context-menu-background;
 
       &:hover {
-        background: $context-menu-background-highlight;
+        background: defaults.$context-menu-background-highlight;
       }
     }
   }

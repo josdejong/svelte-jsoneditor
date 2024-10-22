@@ -1,4 +1,5 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 .jse-navigation-bar-item {
   position: relative;
@@ -7,7 +8,7 @@
   button.jse-navigation-bar-button {
     font-family: inherit;
     font-size: inherit;
-    padding: $padding-half 2px;
+    padding: styles.$padding-half 2px;
     border: none;
     background: transparent;
     color: inherit;
@@ -18,21 +19,21 @@
 
     &:focus,
     &:hover {
-      background: $panel-button-background-highlight;
-      color: $panel-button-color-highlight;
+      background: defaults.$panel-button-background-highlight;
+      color: defaults.$panel-button-color-highlight;
     }
 
     &.jse-navigation-bar-arrow {
-      padding: 2px $padding 0;
+      padding: 2px defaults.$padding 0;
 
       &.jse-open {
-        background: $navigation-bar-background;
-        color: $navigation-bar-dropdown-color;
+        background: defaults.$navigation-bar-background;
+        color: defaults.$navigation-bar-dropdown-color;
       }
     }
   }
 
   &:last-child {
-    padding-right: $padding;
+    padding-right: defaults.$padding;
   }
 }

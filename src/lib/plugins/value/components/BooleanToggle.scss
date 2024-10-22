@@ -1,4 +1,5 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 .jse-boolean-toggle {
   padding: 0;
@@ -6,7 +7,7 @@
   vertical-align: top;
   display: inline-flex;
 
-  color: $value-color-boolean;
+  color: defaults.$value-color-boolean;
 }
 
 .jse-boolean-toggle:not(.jse-readonly) {

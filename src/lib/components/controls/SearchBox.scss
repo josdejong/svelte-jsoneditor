@@ -1,4 +1,5 @@
-@import '../../styles';
+@use '../../styles';
+@use '../../themes/defaults';
 
 $search-size: 28px;
 $button-width: 20px;
@@ -6,14 +7,14 @@ $padding-section-left: 32px;
 $input-min-width: 50px;
 
 .jse-search-box {
-  border: $panel-border;
-  border-radius: $border-radius;
+  border: defaults.$panel-border;
+  border-radius: styles.$border-radius;
 
-  font-family: $font-family;
-  font-size: $font-size;
-  background: $panel-background;
-  color: $panel-color-readonly;
-  box-shadow: $controls-box-shadow;
+  font-family: defaults.$font-family;
+  font-size: defaults.$font-size;
+  background: defaults.$panel-background;
+  color: defaults.$panel-color-readonly;
+  box-shadow: defaults.$controls-box-shadow;
   display: inline-block;
   width: 400px;
   max-width: 100%;
@@ -33,26 +34,26 @@ $input-min-width: 50px;
       display: block;
       text-align: center;
       border: none;
-      padding: 0 $input-padding;
+      padding: 0 styles.$input-padding;
       margin: 0;
       cursor: pointer;
 
-      color: $panel-button-color;
-      background: $panel-button-background;
+      color: defaults.$panel-button-color;
+      background: defaults.$panel-button-background;
 
       &:hover {
-        color: $panel-button-color-highlight;
-        background: $panel-button-background-highlight;
+        color: defaults.$panel-button-color-highlight;
+        background: defaults.$panel-button-background-highlight;
       }
     }
 
     input {
-      color: $panel-color;
-      border: $input-border;
-      border-radius: $border-radius;
-      background: $input-background;
+      color: defaults.$panel-color;
+      border: defaults.$input-border;
+      border-radius: styles.$border-radius;
+      background: defaults.$input-background;
       height: $search-size;
-      padding: 0 $input-padding;
+      padding: 0 styles.$input-padding;
       margin: 0;
       flex: 1;
       width: 0;
@@ -61,17 +62,17 @@ $input-min-width: 50px;
     }
 
     .jse-replace-toggle {
-      padding: $padding $padding-half;
+      padding: defaults.$padding styles.$padding-half;
       min-width: 20px;
-      background: $panel-button-background-highlight;
+      background: defaults.$panel-button-background-highlight;
     }
 
     .jse-search-contents {
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: $padding-half;
-      gap: $padding-half;
+      padding: styles.$padding-half;
+      gap: styles.$padding-half;
 
       .jse-search-section {
         flex: 1;
@@ -96,7 +97,7 @@ $input-min-width: 50px;
           color: inherit;
           font-size: 80%;
           visibility: hidden;
-          padding: 0 $input-padding;
+          padding: 0 styles.$input-padding;
           min-width: 36px;
           text-align: center;
 

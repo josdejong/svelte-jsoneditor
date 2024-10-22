@@ -1,17 +1,18 @@
-@import '../../styles';
+@use '../../styles';
+@use '../../themes/defaults';
 
 .jse-header {
   display: flex;
-  background: $theme-color;
-  color: $menu-color;
+  background: defaults.$theme-color;
+  color: defaults.$menu-color;
 
   .jse-title {
     flex: 1;
-    padding: $input-padding;
+    padding: styles.$input-padding;
     vertical-align: middle;
   }
 
   button {
-    @include jse-modal-menu-button;
+    @include styles.jse-modal-menu-button;
   }
 }

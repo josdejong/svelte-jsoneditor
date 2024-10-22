@@ -1,11 +1,12 @@
-@import '../../../styles';
-@import '../../../components/controls/EditableDivShared';
+@use '../../../styles';
+@use '../../../components/controls/EditableDivShared';
+@use '../../../themes/defaults';
 
 // TODO: also share most of the following styling with EditableDiv
 .jse-value {
   display: inline-block;
   min-width: 2em;
-  padding: 0 $input-padding;
+  padding: 0 styles.$input-padding;
   box-sizing: border-box;
   outline: none;
   border-radius: 1px;
@@ -22,12 +23,12 @@
 
   &.jse-empty {
     min-width: 4em;
-    outline: 1px dotted $tag-background;
+    outline: 1px dotted defaults.$tag-background;
     -moz-outline-radius: 2px;
 
     &::after {
       pointer-events: none;
-      color: $tag-background;
+      color: defaults.$tag-background;
       content: 'value';
     }
   }

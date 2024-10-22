@@ -1,14 +1,15 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 .jse-key {
   display: inline-block;
   min-width: 2em;
-  padding: 0 $input-padding;
+  padding: 0 styles.$input-padding;
   box-sizing: border-box;
   outline: none;
   border-radius: 1px;
   vertical-align: top;
-  color: $key-color;
+  color: defaults.$key-color;
 
   word-break: normal;
   overflow-wrap: normal; // not anywhere as for JSONValue
@@ -16,12 +17,12 @@
 
   &.jse-empty {
     min-width: 3em;
-    outline: 1px dotted $tag-background;
+    outline: 1px dotted defaults.$tag-background;
     -moz-outline-radius: 2px;
 
     &::after {
       pointer-events: none;
-      color: $tag-background;
+      color: defaults.$tag-background;
       content: 'key';
     }
   }

@@ -1,7 +1,8 @@
-@import '../../styles';
+@use '../../styles';
+@use '../../themes/defaults';
 
 .jse-modal-contents {
-  @include jse-modal-contents;
+  @include styles.jse-modal-contents;
 
   table {
     width: 100%;
@@ -13,7 +14,7 @@
       text-align: left;
       vertical-align: middle;
       font-weight: normal;
-      padding-bottom: $padding;
+      padding-bottom: defaults.$padding;
     }
   }
 
@@ -21,12 +22,12 @@
     width: 100%;
     box-sizing: border-box;
     padding: 5px 10px; // TODO: define variables for those props
-    border: $input-border;
-    border-radius: $input-radius;
+    border: defaults.$input-border;
+    border-radius: defaults.$input-radius;
     font-family: inherit;
     font-size: inherit;
     background: inherit;
-    background: $input-background-readonly;
+    background: defaults.$input-background-readonly;
     color: inherit;
     outline: none;
   }
@@ -39,7 +40,7 @@
     height: 200px; // Trick for the property select box dropdown to be fully visible
 
     .jse-error {
-      color: $error-color;
+      color: defaults.$error-color;
     }
   }
 }

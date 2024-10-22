@@ -1,11 +1,12 @@
-@import '../../../../styles';
+@use '../../../../styles';
+@use '../../../../themes/defaults';
 
 .jse-highlight {
-  background-color: $search-match-color;
-  outline: $search-match-outline;
+  background-color: defaults.$search-match-color;
+  outline: defaults.$search-match-outline;
 
   &.jse-active {
-    background-color: $search-match-active-color;
-    outline: $search-match-active-outline;
+    background-color: defaults.$search-match-active-color;
+    outline: defaults.$search-match-active-outline;
   }
 }

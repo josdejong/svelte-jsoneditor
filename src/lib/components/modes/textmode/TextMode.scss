@@ -1,19 +1,20 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 .jse-text-mode {
-  --internal-key-color: #{$key-color};
-  --internal-value-color-number: #{$value-color-number};
-  --internal-value-color-boolean: #{$value-color-boolean};
-  --internal-value-color-string: #{$value-color-string};
-  --internal-value-color-null: #{$value-color-null};
+  --internal-key-color: #{defaults.$key-color};
+  --internal-value-color-number: #{defaults.$value-color-number};
+  --internal-value-color-boolean: #{defaults.$value-color-boolean};
+  --internal-value-color-string: #{defaults.$value-color-string};
+  --internal-value-color-null: #{defaults.$value-color-null};
   flex: 1;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  background: $background-color;
+  background: defaults.$background-color;
 
   &.no-main-menu {
-    border-top: $main-border;
+    border-top: defaults.$main-border;
   }
 
   .jse-contents {
@@ -25,11 +26,11 @@
     min-width: 0;
     min-height: 0;
 
-    border-left: $main-border;
-    border-right: $main-border;
+    border-left: defaults.$main-border;
+    border-right: defaults.$main-border;
 
     &:last-child {
-      border-bottom: $main-border;
+      border-bottom: defaults.$main-border;
     }
 
     &.jse-hidden {
@@ -47,104 +48,104 @@
       overflow: hidden;
 
       :global(.cm-scroller) {
-        font-family: $font-family-mono;
-        font-size: $font-size-mono;
-        line-height: $line-height;
-        color: $delimiter-color;
+        font-family: defaults.$font-family-mono;
+        font-size: defaults.$font-size-mono;
+        line-height: defaults.$line-height;
+        color: defaults.$delimiter-color;
       }
 
       :global(.cm-gutters) {
-        background: $panel-background;
-        color: $panel-color-readonly;
-        border-right: $panel-border;
+        background: defaults.$panel-background;
+        color: defaults.$panel-color-readonly;
+        border-right: defaults.$panel-border;
       }
 
       :global(.cm-activeLine),
       :global(.cm-activeLineGutter) {
-        background: $active-line-background-color;
+        background: defaults.$active-line-background-color;
       }
 
       :global(.cm-selectionBackground) {
-        background: $selection-background-color;
+        background: defaults.$selection-background-color;
       }
 
       :global(.cm-searchMatch) {
-        background-color: $search-match-color;
-        outline: $search-match-outline;
+        background-color: defaults.$search-match-color;
+        outline: defaults.$search-match-outline;
       }
 
       :global(.cm-searchMatch.cm-searchMatch-selected) {
-        background-color: $search-match-active-color;
-        outline: $search-match-active-outline;
+        background-color: defaults.$search-match-active-color;
+        outline: defaults.$search-match-active-outline;
       }
 
       :global(.cm-selectionMatch) {
-        background-color: $search-match-background-color;
+        background-color: defaults.$search-match-background-color;
       }
 
       :global(.cm-foldPlaceholder) {
-        background: $tag-background;
-        color: $tag-color;
+        background: defaults.$tag-background;
+        color: defaults.$tag-color;
         border: none;
-        padding: 0 $padding;
+        padding: 0 defaults.$padding;
       }
 
       :global(.cm-tooltip) {
-        font-size: $font-size;
-        font-family: $font-family;
-        color: $tooltip-color;
-        background: $tooltip-background;
-        border: $tooltip-border;
+        font-size: defaults.$font-size;
+        font-family: defaults.$font-family;
+        color: defaults.$tooltip-color;
+        background: defaults.$tooltip-background;
+        border: defaults.$tooltip-border;
       }
 
       :global(.cm-diagnosticAction) {
-        background: $tooltip-action-button-color;
-        background: $tooltip-action-button-background;
+        background: defaults.$tooltip-action-button-color;
+        background: defaults.$tooltip-action-button-background;
       }
 
       :global(.cm-panels) {
-        border-bottom: $panel-border;
+        border-bottom: defaults.$panel-border;
       }
 
       :global(.cm-search) {
-        background: $panel-background;
-        color: $panel-color;
-        font-family: $font-family;
-        font-size: $font-size;
+        background: defaults.$panel-background;
+        color: defaults.$panel-color;
+        font-family: defaults.$font-family;
+        font-size: defaults.$font-size;
       }
 
       :global(.cm-search input) {
-        font-family: $font-family;
-        font-size: $font-size-text-mode-search;
-        color: $input-color;
-        border: $input-border;
-        background: $input-background;
+        font-family: defaults.$font-family;
+        font-size: defaults.$font-size-text-mode-search;
+        color: defaults.$input-color;
+        border: defaults.$input-border;
+        background: defaults.$input-background;
         margin-right: 2px;
       }
 
       :global(.cm-search button) {
-        font-family: $font-family;
-        font-size: $font-size-text-mode-search;
+        font-family: defaults.$font-family;
+        font-size: defaults.$font-size-text-mode-search;
 
-        color: $panel-button-color;
-        background: $panel-button-background;
+        color: defaults.$panel-button-color;
+        background: defaults.$panel-button-background;
 
         border: none;
         cursor: pointer;
         text-transform: capitalize;
-        padding: $padding-half $padding;
+        padding: styles.$padding-half defaults.$padding;
         margin: 0;
 
         &:hover {
-          color: $panel-button-color-highlight;
-          background: $panel-button-background-highlight;
+          color: defaults.$panel-button-color-highlight;
+          background: defaults.$panel-button-background-highlight;
         }
       }
 
       :global(.cm-search label) {
-        font-family: $font-family;
-        font-size: $font-size-text-mode-search;
-        padding-left: $padding;
+        font-family: defaults.$font-family;
+        font-size: defaults.$font-size-text-mode-search;
+        padding-left: defaults.$padding;
       }
 
       :global(.cm-search label input) {
@@ -162,7 +163,7 @@
       }
 
       :global(.cm-cursor-primary) {
-        border-color: $text-color;
+        border-color: defaults.$text-color;
       }
     }
 
@@ -173,17 +174,17 @@
     .jse-loading {
       flex: 2;
       text-align: center;
-      color: $panel-color-readonly;
+      color: defaults.$panel-color-readonly;
       box-sizing: border-box;
-      font-family: $font-family;
-      font-size: $font-size;
+      font-family: defaults.$font-family;
+      font-size: defaults.$font-size;
     }
 
     &.jse-preview {
       flex: 1;
-      font-family: $font-family-mono;
-      font-size: $font-size-mono;
-      color: $panel-color-readonly;
+      font-family: defaults.$font-family-mono;
+      font-size: defaults.$font-size-mono;
+      color: defaults.$panel-color-readonly;
       overflow: auto;
       white-space: pre-wrap;
       word-break: break-word;

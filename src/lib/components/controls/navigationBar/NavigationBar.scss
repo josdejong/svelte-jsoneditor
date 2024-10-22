@@ -1,23 +1,24 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 .jse-navigation-bar {
-  font-family: $font-family-mono;
-  font-size: $font-size-mono;
-  background: $panel-background;
-  color: $panel-button-color;
+  font-family: defaults.$font-family-mono;
+  font-size: defaults.$font-size-mono;
+  background: defaults.$panel-background;
+  color: defaults.$panel-button-color;
   padding: 0;
   margin: 0;
   display: flex;
   overflow: auto;
 
-  border-left: $main-border;
-  border-right: $main-border;
+  border-left: defaults.$main-border;
+  border-right: defaults.$main-border;
 
   .jse-navigation-bar-edit {
-    font-family: $font-family-mono;
-    font-size: $font-size-mono;
-    padding: $padding-half $padding;
-    color: $panel-color-readonly;
+    font-family: defaults.$font-family-mono;
+    font-size: defaults.$font-size-mono;
+    padding: styles.$padding-half defaults.$padding;
+    color: defaults.$panel-color-readonly;
     background: transparent;
     border: none;
     display: flex;
@@ -32,8 +33,8 @@
     &:focus,
     &:hover,
     &.editing {
-      background: $panel-button-background-highlight;
-      color: $panel-button-color-highlight;
+      background: defaults.$panel-button-background-highlight;
+      color: defaults.$panel-button-color-highlight;
       transition:
         color 0.2s ease-in,
         background 0.2s ease-in;

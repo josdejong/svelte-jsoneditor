@@ -1,27 +1,28 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 .jse-json-repair-component {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: $background-color;
-  color: $text-color;
+  background: defaults.$background-color;
+  color: defaults.$text-color;
 
   .jse-info {
-    padding: $padding-half;
-    font-family: $font-family;
-    font-size: $font-size;
+    padding: styles.$padding-half;
+    font-family: defaults.$font-family;
+    font-size: defaults.$font-size;
     vertical-align: center;
   }
 
   .jse-json-text {
     flex: 1;
     border: none;
-    padding: $contents-padding;
-    font-family: $font-family-mono;
-    font-size: $font-size-mono;
-    background: $input-background;
-    color: $text-color;
+    padding: styles.$contents-padding;
+    font-family: defaults.$font-family-mono;
+    font-size: defaults.$font-size-mono;
+    background: defaults.$input-background;
+    color: defaults.$text-color;
 
     resize: none;
     outline: none;

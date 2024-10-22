@@ -34,11 +34,12 @@
 </dialog>
 
 <style lang="scss">
-  @import '../../styles.scss';
+  @use '../../themes/defaults.scss';
+  @use '../../styles.scss';
 
   dialog.jse-modal {
-    border-radius: $border-radius;
-    font-size: $padding; // for some reason that I don't understand, the font-size of the dialog is used as margin around the dialog
+    border-radius: styles.$border-radius;
+    font-size: defaults.$padding; // for some reason that I don't understand, the font-size of the dialog is used as margin around the dialog
     border: none;
     padding: 0;
     display: flex;
@@ -74,7 +75,7 @@
     }
 
     &::backdrop {
-      background: $modal-overlay-background;
+      background: defaults.$modal-overlay-background;
     }
 
     &[open] {
@@ -86,7 +87,7 @@
     }
 
     & .jse-modal-inner {
-      @include jse-modal-style;
+      @include styles.jse-modal-style;
     }
 
     @keyframes zoom {
@@ -110,13 +111,13 @@
     // styling for the select box, svelte-select
     // see docs: https://github.com/rob-balfre/svelte-select#css-custom-properties-variables
     :global(.svelte-select) {
-      --border: #{$svelte-select-border};
-      --item-is-active-bg: #{$svelte-select-item-is-active-bg};
-      --border-radius: #{$svelte-select-border-radius};
-      --background: #{$svelte-select-background};
-      --padding: #{$svelte-select-padding};
-      --multi-select-padding: #{$svelte-select-multi-select-padding};
-      --font-size: #{$svelte-select-font-size};
+      --border: #{defaults.$svelte-select-border};
+      --item-is-active-bg: #{defaults.$svelte-select-item-is-active-bg};
+      --border-radius: #{defaults.$svelte-select-border-radius};
+      --background: #{defaults.$svelte-select-background};
+      --padding: #{defaults.$svelte-select-padding};
+      --multi-select-padding: #{defaults.$svelte-select-multi-select-padding};
+      --font-size: #{defaults.$svelte-select-font-size};
       --height: 36px;
       --multi-item-height: 28px;
       --multi-item-margin: 2px;

@@ -1,13 +1,14 @@
-@import '../../../styles';
+@use '../../../styles';
+@use '../../../themes/defaults';
 
 .jse-tooltip {
-  font-family: $font-family;
-  font-size: $font-size;
+  font-family: defaults.$font-family;
+  font-size: defaults.$font-size;
   line-height: normal;
-  padding: $padding-half $padding;
-  border-radius: $border-radius;
-  background: $context-menu-background;
-  color: $context-menu-color;
+  padding: styles.$padding-half defaults.$padding;
+  border-radius: styles.$border-radius;
+  background: defaults.$context-menu-background;
+  color: defaults.$context-menu-color;
   white-space: nowrap;
-  box-shadow: $controls-box-shadow;
+  box-shadow: defaults.$controls-box-shadow;
 }
