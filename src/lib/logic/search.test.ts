@@ -20,7 +20,8 @@ import type {
   SearchResults,
   SearchOptions,
   SearchResultItem,
-  ObjectSearchResults
+  ObjectSearchResults,
+  ArraySearchResults
 } from '$lib/types.js'
 import { SearchField } from '$lib/types.js'
 import { createKeySelection, createValueSelection } from './selection.js'
@@ -783,6 +784,15 @@ describe('search', () => {
       }
     ]
 
+    const items: ArraySearchResults['items'] = []
+    items[0] = {
+      type: 'object',
+      properties: {
+        a: { type: 'value', searchResults: [expectedSearchResults[2]] },
+        c: { type: 'value', searchResults: [expectedSearchResults[3]] }
+      }
+    }
+    items[2] = { type: 'value', searchResults: [expectedSearchResults[4]] }
     const expectedRecursiveSearchResult: SearchResults = {
       type: 'object',
       properties: {
@@ -795,18 +805,7 @@ describe('search', () => {
         a: {
           type: 'array',
           searchResults: [expectedSearchResults[1]],
-          // eslint-disable-next-line no-sparse-arrays
-          items: [
-            {
-              type: 'object',
-              properties: {
-                a: { type: 'value', searchResults: [expectedSearchResults[2]] },
-                c: { type: 'value', searchResults: [expectedSearchResults[3]] }
-              }
-            },
-            ,
-            { type: 'value', searchResults: [expectedSearchResults[4]] }
-          ]
+          items
         }
       }
     }

@@ -59,7 +59,7 @@ function tryReadLocalStorage(key: string): string | undefined {
       // reading local storage can fail for example because of security restrictions
       return window.localStorage[key]
     }
-  } catch (error) {
+  } catch {
     // we do nothing with the error, not needed in this specific case
   }
 

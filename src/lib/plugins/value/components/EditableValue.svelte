@@ -103,7 +103,7 @@
           }
         })
       }
-    } catch (err) {
+    } catch {
       // silently ignore: thee pasted text is no valid JSON object or array,
       // no need to do anything
     }

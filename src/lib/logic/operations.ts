@@ -368,7 +368,7 @@ export function insert(
           value: parsePartialJson(clipboardText, (text) => parseAndRepair(text, parser))
         }
       ]
-    } catch (err) {
+    } catch {
       // parsing failed -> just paste the raw text as value
       return [
         {

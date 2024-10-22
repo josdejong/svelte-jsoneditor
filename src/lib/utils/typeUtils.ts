@@ -19,8 +19,7 @@ export function isObject(value: unknown): value is Record<string, unknown> {
 /**
  * Test whether a value is an Object or an Array (and not a Class)
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
-export function isObjectOrArray(value: unknown): value is Object | Array<unknown> {
+export function isObjectOrArray(value: unknown): value is object | Array<unknown> {
   // Note that we check constructor.name, not constructor === Object,
   // so we can use objects created in a different JS realm like an iframe.
   return (
@@ -67,7 +66,7 @@ export function isTimestamp(value: unknown): boolean {
     if (valueOf !== value) {
       return isTimestamp(valueOf)
     }
-  } catch (err) {
+  } catch {
     return false
   }
 

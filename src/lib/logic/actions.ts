@@ -178,7 +178,7 @@ export function onPaste({
 
   try {
     doPaste(clipboardText)
-  } catch (err) {
+  } catch {
     openRepairModal(clipboardText, (repairedText) => {
       debug('repaired pasted text: ', repairedText)
       doPaste(repairedText)

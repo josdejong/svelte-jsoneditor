@@ -56,9 +56,11 @@ export const createJump = () => {
   // scrollTo helper
 
   function scrollTo(top: number) {
-    container.scrollTo
-      ? container.scrollTo(container.scrollLeft, top) // window
-      : (container.scrollTop = top) // custom container
+    if (container.scrollTo) {
+      container.scrollTo(container.scrollLeft, top) // window
+    } else {
+      container.scrollTop = top // custom container
+    }
   }
 
   // rAF loop helper
@@ -81,9 +83,11 @@ export const createJump = () => {
     scrolling = true
 
     // check progress
-    timeElapsed < duration
-      ? requestAnimationFrame(loop) // continue scroll loop
-      : done() // scrolling is done
+    if (timeElapsed < duration) {
+      requestAnimationFrame(loop) // continue scroll loop
+    } else {
+      done() // scrolling is done
+    }
   }
 
   // scroll finished helper

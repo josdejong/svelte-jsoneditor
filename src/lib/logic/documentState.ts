@@ -510,7 +510,7 @@ export function getInRecursiveState<T extends RecursiveState>(
 ): T | undefined {
   try {
     return getIn(documentState, toRecursiveStatePath(json, path))
-  } catch (err) {
+  } catch {
     return undefined
   }
 }

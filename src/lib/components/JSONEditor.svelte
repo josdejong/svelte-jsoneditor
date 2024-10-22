@@ -183,7 +183,7 @@
           json: parser.parse(content.text),
           text: undefined
         }
-      } catch (err) {
+      } catch {
         throw new Error('Cannot apply patch: current document contains invalid JSON')
       }
     }

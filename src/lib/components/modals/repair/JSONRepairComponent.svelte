@@ -44,7 +44,7 @@
     try {
       onRepair(jsonText)
       return true
-    } catch (err) {
+    } catch {
       return false
     }
   }
@@ -85,7 +85,7 @@
       if (onChange) {
         onChange(text)
       }
-    } catch (err) {
+    } catch {
       // no need to do something with the error
     }
   }

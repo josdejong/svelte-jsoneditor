@@ -29,6 +29,17 @@ describe('validation', () => {
 
     const validationErrors = [error1, error2]
 
+    const items = []
+    items[2] = {
+      type: 'object',
+      validationError: childErrorC,
+      properties: {
+        age: {
+          type: 'value',
+          validationError: error1
+        }
+      }
+    }
     deepStrictEqual(toRecursiveValidationErrors(json, validationErrors), {
       type: 'object',
       validationError: childErrorA,
@@ -40,21 +51,7 @@ describe('validation', () => {
         pupils: {
           type: 'array',
           validationError: childErrorB,
-          // eslint-disable-next-line no-sparse-arrays
-          items: [
-            ,
-            ,
-            {
-              type: 'object',
-              validationError: childErrorC,
-              properties: {
-                age: {
-                  type: 'value',
-                  validationError: error1
-                }
-              }
-            }
-          ]
+          items
         }
       }
     })

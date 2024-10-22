@@ -23,7 +23,7 @@ import { int } from './numberUtils.js'
 export function parseAndRepair(jsonText: string, parser: JSONParser): unknown {
   try {
     return parser.parse(jsonText)
-  } catch (err) {
+  } catch {
     // this can also throw
     return parser.parse(jsonrepair(jsonText))
   }
@@ -39,7 +39,7 @@ export function parseAndRepairOrUndefined(
 ): unknown | undefined {
   try {
     return parseAndRepair(partialJson, parser)
-  } catch (err) {
+  } catch {
     return undefined
   }
 }
@@ -53,19 +53,19 @@ export function parsePartialJson(partialJson: string, parse: (text: string) => u
 
   try {
     return parse(partialJson)
-  } catch (err) {
+  } catch {
     // we ignore the error on purpose
   }
 
   try {
     return parse('[' + partialJson + ']')
-  } catch (err) {
+  } catch {
     // we ignore the error on purpose
   }
 
   try {
     return parse('{' + partialJson + '}')
-  } catch (err) {
+  } catch {
     // we ignore the error on purpose
   }
 
@@ -83,21 +83,21 @@ export function repairPartialJson(partialJson: string): string {
 
   try {
     return jsonrepair(partialJson)
-  } catch (err) {
+  } catch {
     // we ignore the error on purpose
   }
 
   try {
     const repaired = jsonrepair('[' + partialJson + ']')
     return repaired.substring(1, repaired.length - 1) // remove the outer [...] again
-  } catch (err) {
+  } catch {
     // we ignore the error on purpose
   }
 
   try {
     const repaired = jsonrepair('{' + partialJson + '}')
     return repaired.substring(1, repaired.length - 1) // remove the outer {...} again
-  } catch (err) {
+  } catch {
     // we ignore the error on purpose
   }
 
@@ -263,7 +263,7 @@ export function convertValue(
           // @ts-ignore
           return objectToArray(parsedValue)
         }
-      } catch (e) {
+      } catch {
         //we could not parse the string, so we return the string as the first key of the array
         return [value]
       }
@@ -294,7 +294,7 @@ export function convertValue(
         if (Array.isArray(parsedValue)) {
           return arrayToObject(parsedValue)
         }
-      } catch (e) {
+      } catch {
         //we could not parse the string, so we return the string as the first value of the object with key 'value'
         return { value: value }
       }

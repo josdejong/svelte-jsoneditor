@@ -72,7 +72,7 @@ export function jsonUnescapeUnicode(value: string): string {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       return controlCharacters[unescaped] || unescaped
-    } catch (err) {
+    } catch {
       return x
     }
   })
