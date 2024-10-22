@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/josdejong/svelte-jsoneditor/compare/v1.1.0...v1.1.1) (2024-10-22)
+
+
+### Bug Fixes
+
+* list svelte `^3.54.0` as compatible peerDependency alongside `4.0.0` ([ba2aee5](https://github.com/josdejong/svelte-jsoneditor/commit/ba2aee5d6dfe65d8e7d35e5fb69a89355e0fee67))
+* upgrade to svelte-awesome@3.3.5 ([5fe2588](https://github.com/josdejong/svelte-jsoneditor/commit/5fe2588ee1be275cc43d521c126eb78837158089))
+
 ## [1.1.0](https://github.com/josdejong/svelte-jsoneditor/compare/v1.0.8...v1.1.0) (2024-10-22)
 
 
