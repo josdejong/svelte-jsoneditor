@@ -81,6 +81,7 @@
       type: 'button',
       text: 'text',
       title: `Switch to text mode (current mode: ${mode})`,
+      // eslint-disable-next-line svelte/valid-compile
       className: 'jse-group-button jse-first' + (mode === Mode.text ? ' jse-selected' : ''),
       onClick: () => onChangeMode(Mode.text)
     },
@@ -88,6 +89,7 @@
       type: 'button',
       text: 'tree',
       title: `Switch to tree mode (current mode: ${mode})`,
+      // eslint-disable-next-line svelte/valid-compile
       className: 'jse-group-button ' + (mode === Mode.tree ? ' jse-selected' : ''),
       onClick: () => onChangeMode(Mode.tree)
     },
@@ -95,6 +97,7 @@
       type: 'button',
       text: 'table',
       title: `Switch to table mode (current mode: ${mode})`,
+      // eslint-disable-next-line svelte/valid-compile
       className: 'jse-group-button jse-last' + (mode === Mode.table ? ' jse-selected' : ''),
       onClick: () => onChangeMode(Mode.table)
     }

@@ -21,6 +21,8 @@
 
   $: sortDirection =
     sortedColumn && isEqual(path, sortedColumn?.path) ? sortedColumn.sortDirection : undefined
+
+  // eslint-disable-next-line svelte/valid-compile
   $: sortDirectionName = sortDirection ? SORT_DIRECTION_NAMES[sortDirection] : undefined
 
   function handleSort() {

@@ -390,7 +390,7 @@
 
         default:
           // We should never reach this default case
-          return exhaustiveGuard(name)
+          exhaustiveGuard(name)
       }
     }
 
