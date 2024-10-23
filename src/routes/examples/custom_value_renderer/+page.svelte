@@ -27,21 +27,9 @@
   ]
 
   function onRenderValue(props: RenderValueProps): RenderValueComponentDescription[] {
-    const { path, value, readOnly, parser, isEditing, selection, onSelect, onPatch } = props
-
     const key = props.path[props.path.length - 1]
-    if (key === 'password' && !isEditing) {
-      return [
-        {
-          component: ReadonlyPassword,
-          props: {
-            value,
-            path,
-            readOnly,
-            onSelect
-          }
-        }
-      ]
+    if (key === 'password' && !props.isEditing) {
+      return [{ component: ReadonlyPassword, props }]
     }
 
     if (key === 'gender') {
@@ -49,30 +37,15 @@
         {
           component: EnumValue,
           props: {
-            value,
-            path,
-            readOnly,
-            parser,
-            onPatch,
-            selection,
+            ...props,
             options: genderOptions
           }
         }
       ]
     }
 
-    if (key === 'evaluate' && !isEditing) {
-      return [
-        {
-          action: EvaluatorAction,
-          props: {
-            value,
-            path,
-            readOnly,
-            onSelect
-          }
-        }
-      ]
+    if (key === 'evaluate' && !props.isEditing) {
+      return [{ action: EvaluatorAction, props }]
     }
 
     // fallback on the default render components

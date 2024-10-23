@@ -294,49 +294,10 @@
   $: selectedValidator = $validate ? validator : $validateArray ? arrayValidator : undefined
 
   // only editable/readonly div, no color picker, boolean toggle, timestamp
-  function customRenderValue({
-    path,
-    value,
-    readOnly,
-    enforceString,
-    searchResultItems,
-    isEditing,
-    parser,
-    normalization,
-    onPatch,
-    onPasteJson,
-    onSelect,
-    onFind,
-    focus
-  }: RenderValuePropsOptional): RenderValueComponentDescription[] {
-    const renderers: RenderValueComponentDescription[] = []
-
-    if (isEditing) {
-      renderers.push({
-        component: EditableValue,
-        props: {
-          path,
-          value,
-          enforceString,
-          parser,
-          normalization,
-          onPatch,
-          onPasteJson,
-          onSelect,
-          onFind,
-          focus
-        }
-      })
-    }
-
-    if (!isEditing) {
-      renderers.push({
-        component: ReadonlyValue,
-        props: { path, value, readOnly, parser, normalization, searchResultItems, onSelect }
-      })
-    }
-
-    return renderers
+  function customRenderValue(props: RenderValuePropsOptional): RenderValueComponentDescription[] {
+    return props.isEditing
+      ? [{ component: EditableValue, props }]
+      : [{ component: ReadonlyValue, props }]
   }
 
   function onRenderMenu(items: MenuItem[], { mode }: RenderMenuContext) {
