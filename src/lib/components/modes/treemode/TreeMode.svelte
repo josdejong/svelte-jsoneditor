@@ -1810,6 +1810,8 @@
   // it should only change when a config option like readOnly or onClassName is changed
   let context: TreeModeContext
   $: context = {
+    // eslint-disable-next-line svelte/no-unused-svelte-ignore
+    // svelte-ignore reactive_declaration_non_reactive_property
     // eslint-disable-next-line svelte/valid-compile
     mode: Mode.tree,
     readOnly,

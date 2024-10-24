@@ -635,7 +635,7 @@ export interface TreeModeContext extends JSONEditorContext {
   onDragEnd: () => void
 }
 
-export interface RenderValueProps {
+export interface RenderValueProps extends Record<string, unknown> {
   path: JSONPath
   value: unknown
   mode: Mode

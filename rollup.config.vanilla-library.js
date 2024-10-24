@@ -2,6 +2,7 @@ import commonjs from '@rollup/plugin-commonjs'
 import json from '@rollup/plugin-json'
 import resolve from '@rollup/plugin-node-resolve'
 import typescript from '@rollup/plugin-typescript'
+import postcss from 'rollup-plugin-postcss'
 import { getBabelOutputPlugin } from '@rollup/plugin-babel'
 import path from 'path'
 import svelte from 'rollup-plugin-svelte'
@@ -31,10 +32,13 @@ export default {
         dev: !production
       },
 
-      // we want to embed the CSS in the generated JS bundle
-      emitCss: false,
+      emitCss: true,
 
       preprocess: sveltePreprocess()
+    }),
+
+    postcss({
+      plugins: []
     }),
 
     resolve({

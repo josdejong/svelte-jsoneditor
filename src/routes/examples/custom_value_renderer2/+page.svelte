@@ -21,43 +21,11 @@
   }
 
   function onRenderValue(props: RenderValueProps): RenderValueComponentDescription[] {
-    const {
-      path,
-      value,
-      parser,
-      readOnly,
-      enforceString,
-      isEditing,
-      normalization,
-      searchResultItems,
-      onSelect,
-      onPatch,
-      focus
-    } = props
-
-    if (isEditing && !readOnly) {
-      return [
-        {
-          component: EditableValueInput,
-          props: {
-            value,
-            path,
-            enforceString,
-            normalization,
-            onSelect,
-            onPatch,
-            focus
-          }
-        }
-      ]
+    if (props.isEditing && !props.readOnly) {
+      return [{ component: EditableValueInput, props }]
     }
 
-    return [
-      {
-        component: ReadonlyValue,
-        props: { path, value, readOnly, parser, normalization, searchResultItems, onSelect }
-      }
-    ]
+    return [{ component: ReadonlyValue, props }]
   }
 </script>
 

@@ -1,13 +1,20 @@
-import { render, screen } from '@testing-library/svelte'
+import { getByText } from '@testing-library/svelte'
 import '@testing-library/jest-dom'
 import { describe, expect, test } from 'vitest'
 import Tooltip from './Tooltip.svelte'
+import { mount } from 'svelte'
 
 describe('Tooltip', () => {
   test('render a tooltip', () => {
-    const props = { text: 'hello world' }
-    render(Tooltip, { props })
+    const target = document.createElement('div')
 
-    expect(screen.getByText(props.text)).toBeInTheDocument()
+    const props = { text: 'hello world' }
+
+    mount(Tooltip, {
+      target,
+      props: { text: 'hello world' }
+    })
+
+    expect(getByText(target, props.text)).toBeDefined()
   })
 })
