@@ -1,4 +1,4 @@
-import JSONEditorComponent from './components/JSONEditor.svelte'
+import JsonEditor from './components/JSONEditor.svelte'
 import type { JSONEditorPropsOptional } from '$lib/types'
 import { mount, unmount } from 'svelte'
 
@@ -6,13 +6,15 @@ import { mount, unmount } from 'svelte'
 //  since we cannot use it in the vanilla environment starting in Svelte 5.
 export * from './index'
 
-interface CreateJSONEditorProps {
+export interface CreateJSONEditorProps {
   target: HTMLDivElement
   props: JSONEditorPropsOptional
 }
 
-export function createJSONEditor({ target, props }: Parameters<typeof mount>[1]) {
-  const editor = mount(JSONEditorComponent, { target, props })
+export { JsonEditor }
+
+export function createJSONEditor({ target, props }: Parameters<typeof mount>[1]): JsonEditor {
+  const editor = mount(JsonEditor, { target, props })
 
   editor.destroy = async () => {
     unmount(editor)
@@ -20,12 +22,10 @@ export function createJSONEditor({ target, props }: Parameters<typeof mount>[1])
     return new Promise((resolve) => setTimeout(resolve))
   }
 
-  return editor
+  return editor as JsonEditor
 }
 
 /**
- * JSONEditor class
- * @constructor
  * @deprecated The constructor "new JSONEditor(...)" is deprecated. Please use "createJSONEditor(...)" instead.
  */
 export function JSONEditor({ target, props }: CreateJSONEditorProps) {
