@@ -350,7 +350,7 @@
       }
 
       document.getElementById('customClassNames').onclick = function (event) {
-        testEditor.$set({
+        testEditor.updateProps({
           onClassName: event.target.checked ? onClassName : undefined
         })
       }
