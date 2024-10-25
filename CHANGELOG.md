@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.2](https://github.com/josdejong/svelte-jsoneditor/compare/v1.1.1...v1.1.2) (2024-10-25)
+
+
+### Bug Fixes
+
+* method `patch` not working in `tree`  and table mode when the content is text ([5f1c8a5](https://github.com/josdejong/svelte-jsoneditor/commit/5f1c8a5170e8998e798f40d812a8dbcd464186f1))
+
 ### [1.1.1](https://github.com/josdejong/svelte-jsoneditor/compare/v1.1.0...v1.1.1) (2024-10-22)
 
 
