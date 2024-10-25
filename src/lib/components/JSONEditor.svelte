@@ -3,12 +3,7 @@
 <script lang="ts">
   import { createDebug } from '../utils/debug.js'
   import { uniqueId } from '../utils/uniqueId.js'
-  import {
-    isEqualParser,
-    isJSONContent,
-    isTextContent,
-    validateContentType
-  } from '../utils/jsonUtils.js'
+  import { isEqualParser, isJSONContent, validateContentType } from '../utils/jsonUtils.js'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import { jsonQueryLanguage } from '$lib/plugins/query/jsonQueryLanguage.js'
   import { renderValue } from '$lib/plugins/value/renderValue.js'
@@ -177,17 +172,6 @@
   }
 
   export async function patch(operations: JSONPatchDocument): Promise<JSONPatchResult> {
-    if (isTextContent(content)) {
-      try {
-        content = {
-          json: parser.parse(content.text),
-          text: undefined
-        }
-      } catch {
-        throw new Error('Cannot apply patch: current document contains invalid JSON')
-      }
-    }
-
     // Note that patch has an optional afterPatch callback.
     // right now we don's support this in the public API.
     const result = refJSONEditorRoot.patch(operations)
