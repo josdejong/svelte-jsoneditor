@@ -374,7 +374,7 @@
 
         default:
           // We should never reach this default case
-          exhaustiveGuard(name)
+          unknownProperty(name)
       }
     }
 
@@ -382,8 +382,8 @@
       queryLanguageId = queryLanguages[0].id
     }
 
-    function exhaustiveGuard(name: never): never {
-      throw new Error(`Unknown property "${name}"`)
+    function unknownProperty(name: never) {
+      debug(`Unknown property "${name}"`)
     }
 
     await tick() // await rerender
