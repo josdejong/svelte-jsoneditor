@@ -369,7 +369,6 @@
 
   let context: JSONEditorContext
   $: context = {
-    // eslint-disable-next-line svelte/valid-compile
     mode: Mode.table,
     readOnly,
     parser,

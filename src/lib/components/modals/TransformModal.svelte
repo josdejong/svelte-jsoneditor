@@ -154,7 +154,6 @@
   $: {
     // remember the selected values for the next time we open the SortModal
     // just in memory, not persisted
-    // eslint-disable-next-line svelte/valid-compile
     transformModalStates[stateId] = {
       queryOptions,
       query,

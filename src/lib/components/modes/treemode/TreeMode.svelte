@@ -1810,7 +1810,6 @@
   // it should only change when a config option like readOnly or onClassName is changed
   let context: TreeModeContext
   $: context = {
-    // eslint-disable-next-line svelte/valid-compile
     mode: Mode.tree,
     readOnly,
     parser,
