@@ -54,45 +54,73 @@
   // TODO: document how to enable debugging in the readme: localStorage.debug="jsoneditor:*", then reload
   const debug = createDebug('jsoneditor:JSONEditor')
 
-  export let content: Content = { text: '' }
-  export let selection: JSONEditorSelection | undefined = undefined
-
-  export let readOnly = false
-  export let indentation: number | string = 2
-  export let tabSize = 4
-  export let mode: Mode = Mode.tree
-  export let mainMenuBar = true
-  export let navigationBar = true
-  export let statusBar = true
-  export let askToFormat = true
-  export let escapeControlCharacters = false
-  export let escapeUnicodeCharacters = false
-  export let flattenColumns = true
-  export let parser: JSONParser = JSON
-  export let validator: Validator | undefined = undefined
-  export let validationParser: JSONParser = JSON
-  export let pathParser: JSONPathParser = {
+  const contentDefault = { text: '' }
+  const selectionDefault = undefined
+  const readOnlyDefault = false
+  const indentationDefault = 2
+  const tabSizeDefault = 4
+  const modeDefault = Mode.tree
+  const mainMenuBarDefault = true
+  const navigationBarDefault = true
+  const statusBarDefault = true
+  const askToFormatDefault = true
+  const escapeControlCharactersDefault = false
+  const escapeUnicodeCharactersDefault = false
+  const flattenColumnsDefault = true
+  const parserDefault = JSON
+  const validatorDefault = undefined
+  const validationParserDefault = JSON
+  const pathParserDefault = {
     parse: parseJSONPath,
     stringify: stringifyJSONPath
   }
-
-  export let queryLanguages: QueryLanguage[] = [jsonQueryLanguage]
-  export let queryLanguageId: string = queryLanguages[0].id
-
-  export let onChangeQueryLanguage: OnChangeQueryLanguage = noop
-  export let onChange: OnChange | undefined = undefined
-  export let onSelect: OnSelect | undefined = undefined
-  export let onRenderValue: OnRenderValue = renderValue
-  export let onClassName: OnClassName = () => undefined
-  export let onRenderMenu: OnRenderMenu = noop
-  export let onRenderContextMenu: OnRenderContextMenu = noop
-  export let onChangeMode: OnChangeMode = noop
-  export let onError: OnError = (err) => {
+  const queryLanguagesDefault = [jsonQueryLanguage]
+  const queryLanguageIdDefault = queryLanguagesDefault[0].id
+  const onChangeQueryLanguageDefault = noop
+  const onChangeDefault = undefined
+  const onSelectDefault = undefined
+  const onRenderValueDefault = renderValue
+  const onClassNameDefault = noop
+  const onRenderMenuDefault = noop
+  const onRenderContextMenuDefault = noop
+  const onChangeModeDefault = noop
+  const onErrorDefault: OnError = (err) => {
     console.error(err)
     alert(err.toString()) // TODO: create a nice alert modal
   }
-  export let onFocus: OnFocus = noop
-  export let onBlur: OnBlur = noop
+  const onFocusDefault = noop
+  const onBlurDefault = noop
+
+  export let content: Content = contentDefault
+  export let selection: JSONEditorSelection | undefined = selectionDefault
+  export let readOnly: boolean = readOnlyDefault
+  export let indentation: number | string = indentationDefault
+  export let tabSize: number = tabSizeDefault
+  export let mode: Mode = modeDefault
+  export let mainMenuBar: boolean = mainMenuBarDefault
+  export let navigationBar: boolean = navigationBarDefault
+  export let statusBar: boolean = statusBarDefault
+  export let askToFormat: boolean = askToFormatDefault
+  export let escapeControlCharacters: boolean = escapeControlCharactersDefault
+  export let escapeUnicodeCharacters: boolean = escapeUnicodeCharactersDefault
+  export let flattenColumns: boolean = flattenColumnsDefault
+  export let parser: JSONParser = parserDefault
+  export let validator: Validator | undefined = validatorDefault
+  export let validationParser: JSONParser = validationParserDefault
+  export let pathParser: JSONPathParser = pathParserDefault
+  export let queryLanguages: QueryLanguage[] = queryLanguagesDefault
+  export let queryLanguageId: string = queryLanguageIdDefault
+  export let onChangeQueryLanguage: OnChangeQueryLanguage = onChangeQueryLanguageDefault
+  export let onChange: OnChange | undefined = onChangeDefault
+  export let onSelect: OnSelect | undefined = onSelectDefault
+  export let onRenderValue: OnRenderValue = onRenderValueDefault
+  export let onClassName: OnClassName = onClassNameDefault
+  export let onRenderMenu: OnRenderMenu = onRenderMenuDefault
+  export let onRenderContextMenu: OnRenderContextMenu = onRenderContextMenuDefault
+  export let onChangeMode: OnChangeMode = onChangeModeDefault
+  export let onError: OnError = onErrorDefault
+  export let onFocus: OnFocus = onFocusDefault
+  export let onBlur: OnBlur = onBlurDefault
 
   let instanceId = uniqueId()
   let hasFocus = false
@@ -252,19 +280,120 @@
   }
 
   export async function updateProps(props: JSONEditorPropsOptional): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    this.$set(props)
+    const names = Object.keys(props) as (keyof JSONEditorPropsOptional)[]
+
+    for (const name of names) {
+      switch (name) {
+        case 'content':
+          content = props[name] ?? contentDefault
+          break
+        case 'readOnly':
+          readOnly = props[name] ?? readOnlyDefault
+          break
+        case 'indentation':
+          indentation = props[name] ?? indentationDefault
+          break
+        case 'tabSize':
+          tabSize = props[name] ?? tabSizeDefault
+          break
+        case 'mode':
+          mode = props[name] ?? modeDefault
+          break
+        case 'mainMenuBar':
+          mainMenuBar = props[name] ?? mainMenuBarDefault
+          break
+        case 'navigationBar':
+          navigationBar = props[name] ?? navigationBarDefault
+          break
+        case 'statusBar':
+          statusBar = props[name] ?? statusBarDefault
+          break
+        case 'askToFormat':
+          askToFormat = props[name] ?? askToFormatDefault
+          break
+        case 'escapeControlCharacters':
+          escapeControlCharacters = props[name] ?? escapeControlCharactersDefault
+          break
+        case 'escapeUnicodeCharacters':
+          escapeUnicodeCharacters = props[name] ?? escapeUnicodeCharactersDefault
+          break
+        case 'flattenColumns':
+          flattenColumns = props[name] ?? flattenColumnsDefault
+          break
+        case 'parser':
+          parser = props[name] ?? parserDefault
+          break
+        case 'validator':
+          validator = props[name] ?? validatorDefault
+          break
+        case 'validationParser':
+          validationParser = props[name] ?? validationParserDefault
+          break
+        case 'pathParser':
+          pathParser = props[name] ?? pathParserDefault
+          break
+        case 'queryLanguages':
+          queryLanguages = props[name] ?? queryLanguagesDefault
+          break
+        case 'queryLanguageId':
+          queryLanguageId = props[name] ?? queryLanguageIdDefault
+          break
+        case 'onChangeQueryLanguage':
+          onChangeQueryLanguage = props[name] ?? onChangeQueryLanguageDefault
+          break
+        case 'onChange':
+          onChange = props[name] ?? onChangeDefault
+          break
+        case 'onRenderValue':
+          onRenderValue = props[name] ?? onRenderValueDefault
+          break
+        case 'onClassName':
+          onClassName = props[name] ?? onClassNameDefault
+          break
+        case 'onRenderMenu':
+          onRenderMenu = props[name] ?? onRenderMenuDefault
+          break
+        case 'onRenderContextMenu':
+          onRenderContextMenu = props[name] ?? onRenderContextMenuDefault
+          break
+        case 'onChangeMode':
+          onChangeMode = props[name] ?? onChangeModeDefault
+          break
+        case 'onSelect':
+          onSelect = props[name] ?? onSelectDefault
+          break
+        case 'onError':
+          onError = props[name] ?? onErrorDefault
+          break
+        case 'onFocus':
+          onFocus = props[name] ?? onFocusDefault
+          break
+        case 'onBlur':
+          onBlur = props[name] ?? onBlurDefault
+          break
+
+        default:
+          // We should never reach this default case
+          unknownProperty(name)
+      }
+    }
+
+    if (!queryLanguages.some((queryLanguage) => queryLanguage.id === queryLanguageId)) {
+      queryLanguageId = queryLanguages[0].id
+    }
+
+    function unknownProperty(name: never) {
+      debug(`Unknown property "${name}"`)
+    }
 
     await tick() // await rerender
   }
 
   export async function destroy() {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    this.$destroy()
-
-    await tick() // await destroying
+    throw new Error(
+      'class method destroy() is deprecated. ' +
+        'It is replaced with a method destroy() in the vanilla library.'
+    )
   }
 
   function handleChange(updatedContent: Content, previousContent: Content, status: OnChangeStatus) {

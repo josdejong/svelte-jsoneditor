@@ -369,6 +369,9 @@
 
   let context: JSONEditorContext
   $: context = {
+    // eslint-disable-next-line svelte/no-unused-svelte-ignore
+    // svelte-ignore reactive_declaration_non_reactive_property
+    // eslint-disable-next-line svelte/valid-compile
     mode: Mode.table,
     readOnly,
     parser,

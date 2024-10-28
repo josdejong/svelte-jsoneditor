@@ -296,15 +296,15 @@
       }
 
       document.getElementById('expandAll').onclick = function () {
-        testEditor.expand(() => true)
+        testEditor.expand([], () => true)
       }
 
       document.getElementById('expand2').onclick = function () {
-        testEditor.expand((path) => path.length < 2)
+        testEditor.expand([], (path) => path.length < 2)
       }
 
       document.getElementById('collapseAll').onclick = function () {
-        testEditor.expand(() => false)
+        testEditor.collapse([], true)
       }
 
       document.getElementById('selectPath').onclick = function () {
@@ -350,7 +350,7 @@
       }
 
       document.getElementById('customClassNames').onclick = function (event) {
-        testEditor.$set({
+        testEditor.updateProps({
           onClassName: event.target.checked ? onClassName : undefined
         })
       }

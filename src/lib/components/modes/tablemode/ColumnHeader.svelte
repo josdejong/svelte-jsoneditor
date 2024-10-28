@@ -21,6 +21,8 @@
 
   $: sortDirection =
     sortedColumn && isEqual(path, sortedColumn?.path) ? sortedColumn.sortDirection : undefined
+
+  // svelte-ignore reactive_declaration_non_reactive_property
   $: sortDirectionName = sortDirection ? SORT_DIRECTION_NAMES[sortDirection] : undefined
 
   function handleSort() {

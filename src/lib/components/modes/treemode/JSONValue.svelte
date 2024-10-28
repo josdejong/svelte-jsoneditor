@@ -38,18 +38,14 @@
 {#each renderers as renderer}
   {#if isSvelteActionRenderer(renderer)}
     {@const action = renderer.action}
-    {#key renderer.action}
-      <div
-        role="button"
-        tabindex="-1"
-        class="jse-value"
-        data-type="selectable-value"
-        use:action={renderer.props}
-      ></div>
-    {/key}
+    <div
+      role="button"
+      tabindex="-1"
+      class="jse-value"
+      data-type="selectable-value"
+      use:action={renderer.props}
+    ></div>
   {:else}
-    {#key renderer.component}
-      <svelte:component this={renderer.component} {...renderer.props} />
-    {/key}
+    <svelte:component this={renderer.component} {...renderer.props} />
   {/if}
 {/each}
