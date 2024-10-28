@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/josdejong/svelte-jsoneditor/compare/v1.1.2...v2.0.0) (2024-10-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* The library is upgraded to Svelte 5. Everything is backward compatible and works in Svelte 3, 4, and 5. There may be subtle breaking changes in specific edge cases though, hence the release as a new major version.
+
+### Features
+
+* upgrade to Svelte 5 ([#490](https://github.com/josdejong/svelte-jsoneditor/issues/490)) ([588caa5](https://github.com/josdejong/svelte-jsoneditor/commit/588caa564e26e71a645dcec01f42e189feddd50f))
+
 ### [1.1.2](https://github.com/josdejong/svelte-jsoneditor/compare/v1.1.1...v1.1.2) (2024-10-25)
 
 
