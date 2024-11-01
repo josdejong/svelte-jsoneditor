@@ -86,11 +86,15 @@
     const combo = keyComboFromEvent(event)
 
     if (combo === 'Escape') {
+      event.preventDefault()
+
       handleCancel()
     }
 
     if (combo === 'Enter' || combo === 'Tab') {
       // apply changes
+      event.preventDefault()
+
       closed = true
 
       const newValue = getDomValue()

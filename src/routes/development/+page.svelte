@@ -726,35 +726,37 @@
       </p>
       <div class="tree-editor" style="height: {height}">
         {#if $showTreeEditor}
-          <JSONEditor
-            bind:this={refTreeEditor}
-            bind:content
-            bind:selection={selectionTree}
-            bind:mode={leftEditorMode}
-            mainMenuBar={$mainMenuBar}
-            navigationBar={$navigationBar}
-            statusBar={$statusBar}
-            askToFormat={$askToFormat}
-            escapeControlCharacters={$escapeControlCharacters}
-            escapeUnicodeCharacters={$escapeUnicodeCharacters}
-            flattenColumns={$flattenColumns}
-            readOnly={$readOnly}
-            indentation={$selectedIndentation}
-            tabSize={$tabSize}
-            parser={selectedParser}
-            pathParser={selectedPathParser}
-            validator={selectedValidator}
-            {queryLanguages}
-            bind:queryLanguageId
-            {onRenderMenu}
-            onChange={onChangeTree}
-            onSelect={onSelectTree}
-            onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
-            {onRenderContextMenu}
-            {onChangeMode}
-            onFocus={() => console.log('onFocus tree')}
-            onBlur={() => console.log('onBlur tree', { content: refTreeEditor?.get() })}
-          />
+          <form novalidate action="/">
+            <JSONEditor
+              bind:this={refTreeEditor}
+              bind:content
+              bind:selection={selectionTree}
+              bind:mode={leftEditorMode}
+              mainMenuBar={$mainMenuBar}
+              navigationBar={$navigationBar}
+              statusBar={$statusBar}
+              askToFormat={$askToFormat}
+              escapeControlCharacters={$escapeControlCharacters}
+              escapeUnicodeCharacters={$escapeUnicodeCharacters}
+              flattenColumns={$flattenColumns}
+              readOnly={$readOnly}
+              indentation={$selectedIndentation}
+              tabSize={$tabSize}
+              parser={selectedParser}
+              pathParser={selectedPathParser}
+              validator={selectedValidator}
+              {queryLanguages}
+              bind:queryLanguageId
+              {onRenderMenu}
+              onChange={onChangeTree}
+              onSelect={onSelectTree}
+              onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
+              {onRenderContextMenu}
+              {onChangeMode}
+              onFocus={() => console.log('onFocus tree')}
+              onBlur={() => console.log('onBlur tree', { content: refTreeEditor?.get() })}
+            />
+          </form>
         {/if}
       </div>
 
@@ -787,35 +789,37 @@
 
       <div class="text-editor" style="height: {height}">
         {#if $showTextEditor}
-          <JSONEditor
-            bind:this={refTextEditor}
-            mode={Mode.text}
-            bind:content
-            bind:selection={selectionText}
-            mainMenuBar={$mainMenuBar}
-            navigationBar={$navigationBar}
-            statusBar={$statusBar}
-            askToFormat={$askToFormat}
-            escapeControlCharacters={$escapeControlCharacters}
-            escapeUnicodeCharacters={$escapeUnicodeCharacters}
-            flattenColumns={$flattenColumns}
-            readOnly={$readOnly}
-            indentation={$selectedIndentation}
-            tabSize={$tabSize}
-            parser={selectedParser}
-            pathParser={selectedPathParser}
-            validator={selectedValidator}
-            {queryLanguages}
-            {queryLanguageId}
-            {onChangeQueryLanguage}
-            {onRenderMenu}
-            onChange={onChangeText}
-            onSelect={onSelectText}
-            onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
-            {onChangeMode}
-            onFocus={() => console.log('onFocus text')}
-            onBlur={() => console.log('onBlur text', { content: refTextEditor?.get() })}
-          />
+          <form novalidate action="/">
+            <JSONEditor
+              bind:this={refTextEditor}
+              mode={Mode.text}
+              bind:content
+              bind:selection={selectionText}
+              mainMenuBar={$mainMenuBar}
+              navigationBar={$navigationBar}
+              statusBar={$statusBar}
+              askToFormat={$askToFormat}
+              escapeControlCharacters={$escapeControlCharacters}
+              escapeUnicodeCharacters={$escapeUnicodeCharacters}
+              flattenColumns={$flattenColumns}
+              readOnly={$readOnly}
+              indentation={$selectedIndentation}
+              tabSize={$tabSize}
+              parser={selectedParser}
+              pathParser={selectedPathParser}
+              validator={selectedValidator}
+              {queryLanguages}
+              {queryLanguageId}
+              {onChangeQueryLanguage}
+              {onRenderMenu}
+              onChange={onChangeText}
+              onSelect={onSelectText}
+              onRenderValue={$useCustomValueRenderer ? customRenderValue : renderValue}
+              {onChangeMode}
+              onFocus={() => console.log('onFocus text')}
+              onBlur={() => console.log('onBlur text', { content: refTextEditor?.get() })}
+            />
+          </form>
         {/if}
       </div>
 
@@ -933,8 +937,15 @@ See https://github.com/sveltejs/kit/issues/981
     min-width: 0;
   }
 
+  form {
+    flex: 1;
+    display: flex;
+  }
+
   .tree-editor,
   .text-editor {
+    display: flex;
+
     // some styling to try out if it doesn't break the styling of the editor
     line-height: 72px;
     font-size: 72px;

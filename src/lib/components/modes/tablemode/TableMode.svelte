@@ -1307,6 +1307,8 @@
     }
 
     if (combo === 'Ctrl+Enter' && isValueSelection(selection)) {
+      event.preventDefault()
+
       const value = getIn(json, selection.path)
 
       if (isUrl(value)) {

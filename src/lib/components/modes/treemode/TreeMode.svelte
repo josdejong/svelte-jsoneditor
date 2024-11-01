@@ -1504,6 +1504,7 @@
         const parent = getIn(json, initial(path))
         if (Array.isArray(parent)) {
           // change into selection of the value
+          event.preventDefault()
           selection = createValueSelection(path)
         }
       }

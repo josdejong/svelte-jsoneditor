@@ -77,10 +77,12 @@
     event.stopPropagation()
 
     if (event.key === 'Enter') {
+      event.preventDefault()
       apply()
     }
 
     if (event.key === 'Escape') {
+      event.preventDefault()
       cancel()
     }
   }

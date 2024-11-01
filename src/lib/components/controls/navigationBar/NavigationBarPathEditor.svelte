@@ -72,10 +72,13 @@
     const combo = keyComboFromEvent(event)
 
     if (combo === 'Escape') {
+      event.preventDefault()
       onClose()
     }
 
     if (combo === 'Enter') {
+      event.preventDefault()
+
       validationActive = true
       const result = parseAndValidate(inputPath)
       if (result.path !== undefined) {
