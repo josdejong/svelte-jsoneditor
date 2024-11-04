@@ -33,7 +33,7 @@ describe('sort', () => {
       ])
     })
 
-    test('should sort object keys using a rootPath', () => {
+    test('should sort a nested object inside an object', () => {
       const object = {
         root: {
           path: { b: 1, c: 1, a: 1 }
@@ -44,6 +44,16 @@ describe('sort', () => {
         { op: 'move', from: '/root/path/a', path: '/root/path/a' },
         { op: 'move', from: '/root/path/b', path: '/root/path/b' },
         { op: 'move', from: '/root/path/c', path: '/root/path/c' }
+      ])
+    })
+
+    test('should sort a nested object inside an array', () => {
+      const object = [{ b: 1, c: 1, a: 1 }]
+
+      assert.deepStrictEqual(sortJson(object, ['0']), [
+        { op: 'move', from: '/0/a', path: '/0/a' },
+        { op: 'move', from: '/0/b', path: '/0/b' },
+        { op: 'move', from: '/0/c', path: '/0/c' }
       ])
     })
 

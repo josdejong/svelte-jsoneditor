@@ -38,7 +38,9 @@ export function sortJson(
   itemPath: JSONPath = [],
   direction: 1 | -1 = 1
 ): JSONPatchDocument {
-  if (isJSONArray(getIn(json, rootPath))) {
+  const value = getIn(json, rootPath)
+
+  if (isJSONArray(value)) {
     if (itemPath === undefined) {
       throw new Error('Cannot sort: no property selected by which to sort the array')
     }
@@ -46,7 +48,7 @@ export function sortJson(
     return sortArray(json, rootPath, itemPath, direction)
   }
 
-  if (isObject(json)) {
+  if (isObject(value)) {
     return sortObjectKeys(json, rootPath, direction)
   }
 
