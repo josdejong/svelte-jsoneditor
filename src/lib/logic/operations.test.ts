@@ -252,6 +252,34 @@ describe('operations', () => {
       assert.deepStrictEqual(Object.keys(revertedJson), ['a', 'b', 'c', 'nested'])
     })
 
+    test('should restore key order when sorting all keys of an object ', () => {
+      const json = {
+        b: 2,
+        a: 1,
+        c: 3
+      }
+      assert.deepStrictEqual(Object.keys(json), ['b', 'a', 'c'])
+
+      const operations: JSONPatchOperation[] = [
+        { op: 'move', from: '/a', path: '/a' },
+        { op: 'move', from: '/b', path: '/b' },
+        { op: 'move', from: '/c', path: '/c' }
+      ]
+      const updatedJson = immutableJSONPatch(json, operations)
+      assert.deepStrictEqual(Object.keys(updatedJson as Record<string, number>), ['a', 'b', 'c'])
+
+      const revertOperations = revertJSONPatchWithMoveOperations(json, operations)
+      assert.deepStrictEqual(revertOperations, [
+        { op: 'move', from: '/b', path: '/b' },
+        { op: 'move', from: '/a', path: '/a' },
+        { op: 'move', from: '/c', path: '/c' }
+      ])
+
+      const revertedJson = immutableJSONPatch(updatedJson, revertOperations)
+      assert.deepStrictEqual(revertedJson, json)
+      assert.deepStrictEqual(Object.keys(revertedJson), ['b', 'a', 'c'])
+    })
+
     test('should restore correctly revert multiple remove operations in an array', () => {
       const json = [0, 1, 2, 3, 4]
 

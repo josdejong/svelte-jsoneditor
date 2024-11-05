@@ -39,6 +39,7 @@ import {
 } from './selection.js'
 import type { ClipboardValues, DragInsideAction, JSONParser, JSONSelection } from '$lib/types'
 import { int } from '../utils/numberUtils.js'
+import { dedupeKeepLast } from '$lib/utils/arrayUtils'
 
 /**
  * Create a JSONPatch for an insert operation.
@@ -721,25 +722,30 @@ export function revertJSONPatchWithMoveOperations(
   json: unknown,
   operations: JSONPatchDocument
 ): JSONPatchDocument {
-  return revertJSONPatch(json, operations, {
-    before: (json, operation, revertOperations) => {
-      if (isJSONPatchRemove(operation)) {
-        const path = parseJSONPointer(operation.path)
-        return {
-          revertOperations: [...revertOperations, ...createRevertMoveOperations(json, path)]
+  return dedupeKeepLast(
+    revertJSONPatch(json, operations, {
+      before: (json, operation, revertOperations) => {
+        if (isJSONPatchRemove(operation)) {
+          const path = parseJSONPointer(operation.path)
+          return {
+            revertOperations: [...revertOperations, ...createRevertMoveOperations(json, path)]
+          }
         }
-      }
 
-      if (isJSONPatchMove(operation)) {
-        const from = parseJSONPointer(operation.from)
-        return {
-          revertOperations: [...revertOperations, ...createRevertMoveOperations(json, from)]
+        if (isJSONPatchMove(operation)) {
+          const from = parseJSONPointer(operation.from)
+          return {
+            revertOperations:
+              operation.from === operation.path
+                ? [operation, ...createRevertMoveOperations(json, from)] // move in-place (just for re-ordering object keys)
+                : [...revertOperations, ...createRevertMoveOperations(json, from)]
+          }
         }
-      }
 
-      return { document: json }
-    }
-  })
+        return { document: json }
+      }
+    })
+  )
 }
 
 function createRevertMoveOperations(json: unknown, path: JSONPath): JSONPatchOperation[] {
