@@ -33,6 +33,7 @@
     expandSection,
     expandSelf,
     expandSmart,
+    expandSmartIfCollapsed,
     getEnforceString,
     setInDocumentState,
     syncDocumentState
@@ -813,7 +814,7 @@
         // expand extracted object/array
         const path: JSONPath = []
         return {
-          state: expandSmart(patchedJson, patchedState, path)
+          state: expandSmartIfCollapsed(patchedJson, patchedState, path)
         }
       }
 
@@ -1042,8 +1043,8 @@
         debug('onSort', rootPath, operations)
 
         handlePatch(operations, (patchedJson, patchedState) => ({
-          // expand the newly replaced array and select it
-          state: expandSmart(patchedJson, patchedState, rootPath),
+          // expand the newly replaced array if needed, and select it
+          state: expandSmartIfCollapsed(patchedJson, patchedState, rootPath),
           selection: createValueSelection(rootPath)
         }))
       },
@@ -1096,8 +1097,8 @@
           debug('onTransform', rootPath, operations)
 
           handlePatch(operations, (patchedJson, patchedState) => ({
-            // expand the newly replaced array and select it
-            state: expandSmart(patchedJson, patchedState, rootPath),
+            // expand the newly replaced array if needed and select it
+            state: expandSmartIfCollapsed(patchedJson, patchedState, rootPath),
             selection: createValueSelection(rootPath)
           }))
         }

@@ -18,6 +18,7 @@ import {
   expandSection,
   expandSelf,
   expandSmart,
+  expandSmartIfCollapsed,
   forEachVisibleIndex,
   getEnforceString,
   getInRecursiveState,
@@ -38,7 +39,14 @@ import {
   type ValueDocumentState,
   type VisibleSection
 } from '$lib/types.js'
-import { deleteIn, getIn, type JSONPatchDocument, setIn, updateIn } from 'immutable-json-patch'
+import {
+  deleteIn,
+  getIn,
+  type JSONPatchDocument,
+  type JSONPath,
+  setIn,
+  updateIn
+} from 'immutable-json-patch'
 import { isArrayRecursiveState } from 'svelte-jsoneditor'
 
 const json3 = [{ id: 0 }, { id: 1 }, { id: 2 }]
@@ -1937,6 +1945,35 @@ describe('documentState', () => {
 
     test('delete non-existing state', () => {
       expect(deleteInDocumentState(json, documentState, ['foo'])).toEqual(documentState)
+    })
+  })
+
+  describe('expandSmartIfCollapsed', () => {
+    test('should only trigger expandSmart when the state is collapsed', () => {
+      const json = { nested: {} }
+      const stateCollapsed = createDocumentState({ json, expand: () => false })
+      const stateExpanded = createDocumentState({ json, expand: (path) => path.length === 0 })
+      const path: JSONPath = []
+
+      // will trigger smart expand, expanding all
+      expect(expandSmartIfCollapsed(json, stateCollapsed, path)).toEqual({
+        expanded: true,
+        properties: {
+          nested: {
+            expanded: true,
+            properties: {},
+            type: 'object'
+          }
+        },
+        type: 'object'
+      })
+
+      // will not trigger smart expand, leaving the nested object collapsed as it was
+      expect(expandSmartIfCollapsed(json, stateExpanded, path)).toEqual({
+        expanded: true,
+        properties: {},
+        type: 'object'
+      })
     })
   })
 })

@@ -82,16 +82,12 @@ export function createDocumentState({
   json,
   expand
 }: CreateDocumentStateProps): DocumentState | undefined {
-  let documentState: DocumentState | undefined = createRecursiveState({
+  const documentState: DocumentState | undefined = createRecursiveState({
     json,
     factory: documentStateFactory
   }) as DocumentState
 
-  if (expand && documentState) {
-    documentState = expandPath(json, documentState, [], expand)
-  }
-
-  return documentState
+  return expand && documentState ? expandPath(json, documentState, [], expand) : documentState
 }
 
 export function createArrayDocumentState({ expanded } = { expanded: false }): ArrayDocumentState {
@@ -877,6 +873,17 @@ export function expandSmart(
   const callback = isLargeContent({ json: nestedJson }, maxSize) ? expandMinimal : expandAll
 
   return expandPath(json, documentState, path, callback)
+}
+
+export function expandSmartIfCollapsed(
+  json: unknown | undefined,
+  documentState: DocumentState | undefined,
+  path: JSONPath
+) {
+  const nestedState = getInRecursiveState(json, documentState, path)
+  const isExpanded = isExpandableState(nestedState) ? nestedState.expanded : false
+
+  return isExpanded ? documentState : expandSmart(json, documentState, path)
 }
 
 /**
