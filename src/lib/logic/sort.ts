@@ -61,7 +61,7 @@ export function sortJson(
  *                       object to be sorted
  * @param [rootPath=[]]  Relative path when the array was located
  * @param [direction=1]  Pass 1 to sort ascending, -1 to sort descending
- * @return               Returns a JSONPatch document with move operation
+ * @return               Returns a JSONPatch document with operations
  *                       to get the array sorted.
  */
 export function sortObjectKeys(
@@ -69,7 +69,7 @@ export function sortObjectKeys(
   rootPath: JSONPath = [],
   direction: 1 | -1 = 1
 ): JSONPatchDocument {
-  const object = getIn(json, rootPath)
+  const object = getIn(json, rootPath) as Record<string, unknown>
   const keys = Object.keys(object as unknown as Record<string, unknown>)
   const sortedKeys = keys.slice()
 
@@ -77,19 +77,17 @@ export function sortObjectKeys(
     return direction * caseInsensitiveNaturalCompare(keyA, keyB)
   })
 
-  // TODO: can we make this more efficient? check if the first couple of keys are already in order and if so ignore them
-  const operations: JSONPatchDocument = []
-  for (let i = 0; i < sortedKeys.length; i++) {
-    const key = sortedKeys[i]
-    const path = compileJSONPointer(rootPath.concat(key))
-    operations.push({
-      op: 'move',
-      from: path,
-      path
-    })
-  }
+  // for performance reasons, do a full replace (we could also create a move operation for every key)
+  const sortedObject: Record<string, unknown> = {}
+  sortedKeys.forEach((key) => (sortedObject[key] = object[key]))
 
-  return operations
+  return [
+    {
+      op: 'replace',
+      path: compileJSONPointer(rootPath),
+      value: sortedObject
+    }
+  ]
 }
 
 /**

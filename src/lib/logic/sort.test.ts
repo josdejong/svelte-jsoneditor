@@ -17,9 +17,7 @@ describe('sort', () => {
       const object = { b: 1, c: 1, a: 1 }
 
       assert.deepStrictEqual(sortJson(object, undefined, undefined, 1), [
-        { op: 'move', from: '/a', path: '/a' },
-        { op: 'move', from: '/b', path: '/b' },
-        { op: 'move', from: '/c', path: '/c' }
+        { op: 'replace', path: '', value: { a: 1, b: 1, c: 1 } }
       ])
     })
 
@@ -27,9 +25,7 @@ describe('sort', () => {
       const object = { b: 1, c: 1, a: 1 }
 
       assert.deepStrictEqual(sortJson(object, undefined, undefined, -1), [
-        { op: 'move', from: '/c', path: '/c' },
-        { op: 'move', from: '/b', path: '/b' },
-        { op: 'move', from: '/a', path: '/a' }
+        { op: 'replace', path: '', value: { c: 1, b: 1, a: 1 } }
       ])
     })
 
@@ -41,9 +37,7 @@ describe('sort', () => {
       }
 
       assert.deepStrictEqual(sortJson(object, ['root', 'path']), [
-        { op: 'move', from: '/root/path/a', path: '/root/path/a' },
-        { op: 'move', from: '/root/path/b', path: '/root/path/b' },
-        { op: 'move', from: '/root/path/c', path: '/root/path/c' }
+        { op: 'replace', path: '/root/path', value: { a: 1, b: 1, c: 1 } }
       ])
     })
 
@@ -51,9 +45,7 @@ describe('sort', () => {
       const object = [{ b: 1, c: 1, a: 1 }]
 
       assert.deepStrictEqual(sortJson(object, ['0']), [
-        { op: 'move', from: '/0/a', path: '/0/a' },
-        { op: 'move', from: '/0/b', path: '/0/b' },
-        { op: 'move', from: '/0/c', path: '/0/c' }
+        { op: 'replace', path: '/0', value: { a: 1, b: 1, c: 1 } }
       ])
     })
 
@@ -97,21 +89,15 @@ describe('sort', () => {
     const object = { b: 1, c: 1, a: 1 }
 
     assert.deepStrictEqual(sortObjectKeys(object), [
-      { op: 'move', from: '/a', path: '/a' },
-      { op: 'move', from: '/b', path: '/b' },
-      { op: 'move', from: '/c', path: '/c' }
+      { op: 'replace', path: '', value: { a: 1, b: 1, c: 1 } }
     ])
 
     assert.deepStrictEqual(sortObjectKeys(object, undefined, 1), [
-      { op: 'move', from: '/a', path: '/a' },
-      { op: 'move', from: '/b', path: '/b' },
-      { op: 'move', from: '/c', path: '/c' }
+      { op: 'replace', path: '', value: { a: 1, b: 1, c: 1 } }
     ])
 
     assert.deepStrictEqual(sortObjectKeys(object, undefined, -1), [
-      { op: 'move', from: '/c', path: '/c' },
-      { op: 'move', from: '/b', path: '/b' },
-      { op: 'move', from: '/a', path: '/a' }
+      { op: 'replace', path: '', value: { c: 1, b: 1, a: 1 } }
     ])
   })
 
@@ -123,9 +109,7 @@ describe('sort', () => {
     }
 
     assert.deepStrictEqual(sortObjectKeys(object, ['root', 'path']), [
-      { op: 'move', from: '/root/path/a', path: '/root/path/a' },
-      { op: 'move', from: '/root/path/b', path: '/root/path/b' },
-      { op: 'move', from: '/root/path/c', path: '/root/path/c' }
+      { op: 'replace', path: '/root/path', value: { a: 1, b: 1, c: 1 } }
     ])
   })
 
@@ -133,8 +117,7 @@ describe('sort', () => {
     const object = { B: 1, a: 1 }
 
     assert.deepStrictEqual(sortObjectKeys(object), [
-      { op: 'move', from: '/a', path: '/a' },
-      { op: 'move', from: '/B', path: '/B' }
+      { op: 'replace', path: '', value: { a: 1, B: 1 } }
     ])
   })
 
