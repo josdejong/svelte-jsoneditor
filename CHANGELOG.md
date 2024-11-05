@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.2](https://github.com/josdejong/svelte-jsoneditor/compare/v2.0.1...v2.0.2) (2024-11-05)
+
+
+### Bug Fixes
+
+* cannot sort a nested object inside an array ([5ebe9fc](https://github.com/josdejong/svelte-jsoneditor/commit/5ebe9fc827e4d83f5694e9799bc71902f8ef0a39))
+* more efficient patch operation for the undo action of moving an item inside an object ([187e994](https://github.com/josdejong/svelte-jsoneditor/commit/187e994ba2eddf869a85b3bd2f6db70aed7e16ae))
+* only expand JSON after sort, transform and expand when isn't expanded already ([5d84af0](https://github.com/josdejong/svelte-jsoneditor/commit/5d84af035b8981cf51f1b4d7e66b5d90621f5692))
+* performance issue of sorting the keys of large objects ([3708998](https://github.com/josdejong/svelte-jsoneditor/commit/370899889b4bbf046aa765f25f428377eae36819))
+
 ### [2.0.1](https://github.com/josdejong/svelte-jsoneditor/compare/v2.0.0...v2.0.1) (2024-11-01)
 
 
