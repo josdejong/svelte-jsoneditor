@@ -1210,8 +1210,7 @@
 
     if (combo === 'Ctrl+D') {
       event.preventDefault()
-      // handleDuplicate()
-      // TODO: implement duplicate
+      handleDuplicateRow()
     }
     if (combo === 'Delete' || combo === 'Backspace') {
       event.preventDefault()

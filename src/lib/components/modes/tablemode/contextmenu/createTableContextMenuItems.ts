@@ -201,7 +201,7 @@ export default function ({
               onClick: () => onDuplicateRow(),
               icon: faClone,
               text: 'Duplicate row',
-              title: 'Duplicate the current row',
+              title: 'Duplicate the current row (Ctrl+D)',
               disabled: readOnly || !hasSelection || !hasJson
             },
             {
