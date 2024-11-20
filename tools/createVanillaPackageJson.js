@@ -9,6 +9,8 @@ const vanillaPackageFolder = getAbsolutePath(import.meta.url, '..', 'package-van
 
 const pkg = JSON.parse(String(readFileSync(getAbsolutePath(import.meta.url, '..', 'package.json'))))
 
+const excludedDependencies = ['sass']
+
 // We move peerDependencies to dependencies to make the package standalone.
 // This is necessary for the "svelte" dependency, which is needed to export the TypeScript types
 const usedDependencyNames = [
@@ -17,7 +19,12 @@ const usedDependencyNames = [
 ].sort()
 
 const usedDependencies = usedDependencyNames.reduce((deps, name) => {
+  if (excludedDependencies.includes(name)) {
+    return deps
+  }
+
   deps[name] = pkg.dependencies[name] || pkg.peerDependencies[name]
+
   return deps
 }, {})
 
