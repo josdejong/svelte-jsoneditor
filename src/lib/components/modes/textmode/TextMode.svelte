@@ -45,16 +45,7 @@
     lineNumbers,
     rectangularSelection
   } from '@codemirror/view'
-  import {
-    defaultKeymap,
-    history,
-    historyKeymap,
-    indentWithTab,
-    redo,
-    redoDepth,
-    undo,
-    undoDepth
-  } from '@codemirror/commands'
+  import { defaultKeymap, indentWithTab } from '@codemirror/commands'
   import type { Diagnostic } from '@codemirror/lint'
   import { linter, lintGutter, lintKeymap } from '@codemirror/lint'
   import { json as jsonLang } from '@codemirror/lang-json'
@@ -115,6 +106,7 @@
   import { indentationMarkers } from '@replit/codemirror-indentation-markers'
   import { isTextSelection } from '$lib/logic/selection.js'
   import { wrappedLineIndent } from 'codemirror-wrapped-line-indent'
+  import { createHistory } from '$lib/logic/history'
 
   export let readOnly: boolean
   export let mainMenuBar: boolean
@@ -168,6 +160,24 @@
 
   let content: Content = externalContent
   let text = getText(content, indentation, parser) // text is just a cached version of content.text or parsed content.json
+
+  interface TextHistoryItem {
+    undo: {
+      content: Content
+      selection: JSONEditorSelection | undefined
+    }
+    redo: {
+      content: Content
+      selection: JSONEditorSelection | undefined
+    }
+  }
+
+  const history = createHistory<TextHistoryItem>({
+    onChange: (state) => {
+      canUndo = state.canUndo
+      canRedo = state.canRedo
+    }
+  })
 
   $: normalization = createNormalizationFunctions({
     escapeControlCharacters: false,
@@ -437,26 +447,40 @@
     }
   }
 
-  function handleUndo() {
+  function handleUndo(): boolean {
     if (readOnly) {
-      return
+      return false
     }
 
-    if (codeMirrorView) {
-      undo(codeMirrorView)
-      focus()
+    const item = history.undo()
+    debug('undo', item)
+    if (!item) {
+      return false
     }
+
+    setCodeMirrorContent(item.undo.content, true, false)
+    applyExternalSelection(item.undo.selection)
+    // FIXME: restore selection and scroll location
+
+    return true
   }
 
-  function handleRedo() {
+  function handleRedo(): boolean {
     if (readOnly) {
-      return
+      return false
     }
 
-    if (codeMirrorView) {
-      redo(codeMirrorView)
-      focus()
+    const item = history.redo()
+    debug('redo', item)
+    if (!item) {
+      return false
     }
+
+    setCodeMirrorContent(item.redo.content, true, false)
+    applyExternalSelection(item.redo.selection)
+    // FIXME: restore selection and scroll location
+
+    return true
   }
 
   function handleAcceptTooLarge() {
@@ -570,7 +594,7 @@
         lineNumbers(),
         highlightActiveLineGutter(),
         highlightSpecialChars(),
-        history(),
+        // history(), // FIXME: cleanup
         foldGutter(),
         drawSelection(),
         dropCursor(),
@@ -588,7 +612,9 @@
           ...closeBracketsKeymap,
           ...defaultKeymap,
           ...searchKeymap,
-          ...historyKeymap,
+          { key: 'Mod-z', run: handleUndo, preventDefault: true },
+          { key: 'Mod-y', mac: 'Mod-Shift-z', run: handleRedo, preventDefault: true },
+          { key: 'Ctrl-Shift-z', run: handleRedo, preventDefault: true },
           ...foldKeymap,
           ...completionKeymap,
           ...lintKeymap
@@ -601,9 +627,13 @@
         EditorView.updateListener.of((update) => {
           editorState = update.state
 
+          debug('update', update.docChanged, update.selectionSet, update)
+
           if (update.docChanged) {
             onChangeCodeMirrorValueDebounced()
-          } else if (update.selectionSet) {
+          }
+
+          if (update.selectionSet) {
             // note that emitOnSelect is invoked in onChangeCodeMirrorValue too,
             // right after firing onChange. Hence, the else if here, we do not want to fire it twice.
             emitOnSelect()
@@ -722,8 +752,6 @@
       })
     }
 
-    updateCanUndoRedo()
-
     if (isChanged && emitChange) {
       emitOnChange(content, previousContent)
     }
@@ -792,7 +820,20 @@
     text = codeMirrorText
     content = { text }
 
-    updateCanUndoRedo()
+    history.add({
+      undo: {
+        content: previousContent,
+        selection: undefined // FIXME: restore last selection
+      },
+      redo: {
+        content,
+        selection: {
+          type: SelectionType.text,
+          ...editorState.selection.toJSON()
+        }
+      }
+    })
+
     emitOnChange(content, previousContent)
 
     // We emit OnSelect on the next tick to cater for the case where
@@ -868,13 +909,6 @@
     // We disable wrappedLineIndent in case of tabs to work around a bug:
     // https://github.com/fauzi9331/codemirror-wrapped-line-indent/issues/2
     return indentation === '\t' ? [indent] : [indent, wrappedLineIndent]
-  }
-
-  function updateCanUndoRedo() {
-    canUndo = undoDepth(codeMirrorView.state) > 0
-    canRedo = redoDepth(codeMirrorView.state) > 0
-
-    debug({ canUndo, canRedo })
   }
 
   // debounce the input: when pressing Enter at the end of a line, two change
