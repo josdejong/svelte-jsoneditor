@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/josdejong/svelte-jsoneditor/compare/v2.0.2...v2.1.0) (2024-11-20)
+
+
+### Features
+
+* implement quick key Ctrl+D to duplicate the current row in table mode ([deef105](https://github.com/josdejong/svelte-jsoneditor/commit/deef10559ccea536f8b4f0b3931d4a29b315181d))
+
+
+### Bug Fixes
+
+* exclude the `sass` dependency from the vanilla package ([e3bcddb](https://github.com/josdejong/svelte-jsoneditor/commit/e3bcddb16c6c6a16e3d0f1484f74404a41176429))
+* update dependencies (`jsonpath-plus`, `@jsonquerylang/jsonquery` and others) ([b69e9bf](https://github.com/josdejong/svelte-jsoneditor/commit/b69e9bf1c96af8473b0806f406f46dac73f975fc))
+
 ### [2.0.2](https://github.com/josdejong/svelte-jsoneditor/compare/v2.0.1...v2.0.2) (2024-11-05)
 
 
