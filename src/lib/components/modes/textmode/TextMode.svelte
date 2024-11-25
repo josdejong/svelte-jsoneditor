@@ -102,6 +102,7 @@
     ParseError,
     RichValidationError,
     TextHistoryItem,
+    TextSelection,
     TransformModalOptions,
     ValidationError,
     Validator
@@ -198,11 +199,11 @@
     const item: TextHistoryItem = {
       undo: {
         changes: inverseChanges.toJSON(),
-        selection: startState.selection.toJSON()
+        selection: toTextSelection(startState.selection)
       },
       redo: {
         changes: mergedChanges.toJSON(),
-        selection: endState.selection.toJSON()
+        selection: toTextSelection(endState.selection)
       }
     }
 
@@ -638,7 +639,7 @@
     const state = EditorState.create({
       doc: initialText,
       selection: isValidSelection(externalSelection, initialText)
-        ? toCodeMirrorSelection(externalSelection)
+        ? fromTextSelection(externalSelection)
         : undefined,
       extensions: [
         keymap.of([indentWithTab, formatCompactKeyBinding]),
@@ -823,7 +824,7 @@
       return
     }
 
-    const selection = toCodeMirrorSelection(externalSelection)
+    const selection = fromTextSelection(externalSelection)
     if (codeMirrorView && selection && (!editorState || !editorState.selection.eq(selection))) {
       debug('applyExternalSelection', selection)
 
@@ -832,7 +833,7 @@
     }
   }
 
-  function toCodeMirrorSelection(
+  function fromTextSelection(
     selection: JSONEditorSelection | undefined
   ): EditorSelection | undefined {
     return isTextSelection(selection) ? EditorSelection.fromJSON(selection) : undefined
@@ -985,10 +986,14 @@
   }
 
   function emitOnSelect() {
-    onSelect({
+    onSelect(toTextSelection(editorState.selection))
+  }
+
+  function toTextSelection(selection: EditorSelection): TextSelection {
+    return {
       type: SelectionType.text,
-      ...editorState.selection.toJSON()
-    })
+      ...selection.toJSON()
+    }
   }
 
   function disableTextEditor(text: string, acceptTooLarge: boolean): boolean {

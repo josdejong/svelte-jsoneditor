@@ -508,14 +508,16 @@ export interface HistoryItem {
   }
 }
 
+export type TextChanges = Array<number | [number, ...string[]]>
+
 export interface TextHistoryItem {
   undo: {
-    changes: unknown // FIXME: write out this type
-    selection: unknown // FIXME: change to JSONEditorSelection?
+    changes: TextChanges
+    selection: TextSelection
   }
   redo: {
-    changes: unknown // FIXME: write out this type
-    selection: unknown // FIXME: change to JSONEditorSelection?
+    changes: TextChanges
+    selection: TextSelection
   }
 }
 
