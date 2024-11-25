@@ -527,7 +527,7 @@
     {#key instanceId}
       <JSONEditorRoot
         bind:this={refJSONEditorRoot}
-        {mode}
+        externalMode={mode}
         {content}
         {selection}
         {readOnly}

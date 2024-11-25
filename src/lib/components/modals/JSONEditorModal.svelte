@@ -245,7 +245,7 @@
         <div class="jse-modal-inline-editor">
           <JSONEditorRoot
             bind:this={refEditor}
-            mode={currentState.mode}
+            externalMode={currentState.mode}
             content={currentState.content}
             selection={currentState.selection}
             {readOnly}

@@ -87,8 +87,8 @@
   import type {
     Content,
     ContentErrors,
-    HistoryItem,
     History,
+    HistoryItem,
     JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
@@ -97,10 +97,12 @@
     OnChangeMode,
     OnError,
     OnFocus,
+    OnRedo,
     OnRenderMenuInternal,
     OnSelect,
     OnSortModal,
     OnTransformModal,
+    OnUndo,
     ParseError,
     RichValidationError,
     TextHistoryItem,
@@ -139,6 +141,8 @@
   export let onChange: OnChange
   export let onChangeMode: OnChangeMode
   export let onSelect: OnSelect
+  export let onUndo: OnUndo
+  export let onRedo: OnRedo
   export let onError: OnError
   export let onFocus: OnFocus
   export let onBlur: OnBlur
@@ -494,6 +498,8 @@
     const item = history.undo()
     debug('undo', item)
     if (!isTextHistoryItem(item)) {
+      onUndo(item)
+
       return false
     }
 
@@ -521,6 +527,8 @@
     const item = history.redo()
     debug('redo', item)
     if (!isTextHistoryItem(item)) {
+      onRedo(item)
+
       return false
     }
 
@@ -633,11 +641,13 @@
   }): EditorView {
     debug('Create CodeMirror editor', { readOnly, indentation })
 
+    const selection = isValidSelection(externalSelection, initialText)
+      ? fromTextSelection(externalSelection)
+      : undefined
+
     const state = EditorState.create({
       doc: initialText,
-      selection: isValidSelection(externalSelection, initialText)
-        ? fromTextSelection(externalSelection)
-        : undefined,
+      selection,
       extensions: [
         keymap.of([indentWithTab, formatCompactKeyBinding]),
         linterCompartment.of(createLinter()),
@@ -709,7 +719,8 @@
 
     codeMirrorView = new EditorView({
       state,
-      parent: target
+      parent: target,
+      scrollTo: selection ? EditorView.scrollIntoView(selection.main) : undefined
     })
 
     return codeMirrorView

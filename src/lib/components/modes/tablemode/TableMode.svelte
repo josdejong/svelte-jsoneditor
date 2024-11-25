@@ -9,8 +9,8 @@
     ContentErrors,
     ContextMenuItem,
     DocumentState,
-    HistoryItem,
     History,
+    HistoryItem,
     JSONEditorContext,
     JSONEditorSelection,
     JSONParser,
@@ -22,12 +22,14 @@
     OnChangeMode,
     OnFocus,
     OnJSONEditorModal,
+    OnRedo,
     OnRenderContextMenuInternal,
     OnRenderMenuInternal,
     OnRenderValue,
     OnSelect,
     OnSortModal,
     OnTransformModal,
+    OnUndo,
     ParseError,
     PastedJson,
     SearchResultDetails,
@@ -178,6 +180,8 @@
   export let onChange: OnChange
   export let onChangeMode: OnChangeMode
   export let onSelect: OnSelect
+  export let onUndo: OnUndo
+  export let onRedo: OnRedo
   export let onRenderValue: OnRenderValue
   export let onRenderMenu: OnRenderMenuInternal
   export let onRenderContextMenu: OnRenderContextMenuInternal
@@ -340,9 +344,17 @@
 
   let documentState: DocumentState | undefined =
     json !== undefined ? createDocumentState({ json }) : undefined
-  let selection: JSONSelection | undefined
+  let selection: JSONSelection | undefined = isJSONSelection(externalSelection)
+    ? externalSelection
+    : undefined
   let sortedColumn: SortedColumn | undefined
   let textIsRepaired = false
+
+  onMount(() => {
+    if (selection) {
+      scrollIntoView(getFocusPath(selection))
+    }
+  })
 
   function onSortByHeader(newSortedColumn: SortedColumn) {
     if (readOnly) {
@@ -1589,6 +1601,7 @@
 
     const item = history.undo()
     if (!isTreeHistoryItem(item)) {
+      onUndo(item)
       return
     }
 
@@ -1633,6 +1646,7 @@
 
     const item = history.redo()
     if (!isTreeHistoryItem(item)) {
+      onRedo(item)
       return
     }
 

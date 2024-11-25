@@ -341,6 +341,8 @@
                   onChange={noop}
                   onChangeMode={noop}
                   onSelect={noop}
+                  onUndo={noop}
+                  onRedo={noop}
                   onFocus={noop}
                   onBlur={noop}
                   onSortModal={noop}
@@ -377,6 +379,8 @@
                   onChange={noop}
                   onChangeMode={noop}
                   onSelect={noop}
+                  onUndo={noop}
+                  onRedo={noop}
                   onFocus={noop}
                   onBlur={noop}
                   onSortModal={noop}

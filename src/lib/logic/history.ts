@@ -16,12 +16,12 @@ export function createHistoryInstance<T>(options: HistoryOptions<T> = {}): Histo
   /**
    * items in history are sorted from newest first to oldest last
    */
-  let items: T[] = []
+  let reverseItems: T[] = []
 
   let index = 0
 
   function canUndo(): boolean {
-    return index < items.length
+    return index < reverseItems.length
   }
 
   function canRedo(): boolean {
@@ -32,7 +32,7 @@ export function createHistoryInstance<T>(options: HistoryOptions<T> = {}): Histo
     return {
       canUndo: canUndo(),
       canRedo: canRedo(),
-      length: items.length,
+      items: () => reverseItems.slice().reverse(),
       add,
       undo,
       redo,
@@ -49,7 +49,7 @@ export function createHistoryInstance<T>(options: HistoryOptions<T> = {}): Histo
   function add(item: T) {
     debug('add', item)
 
-    items = [item].concat(items.slice(index)).slice(0, maxItems)
+    reverseItems = [item].concat(reverseItems.slice(index)).slice(0, maxItems)
 
     index = 0
 
@@ -59,7 +59,7 @@ export function createHistoryInstance<T>(options: HistoryOptions<T> = {}): Histo
   function clear() {
     debug('clear')
 
-    items = []
+    reverseItems = []
     index = 0
 
     handleChange()
@@ -67,7 +67,7 @@ export function createHistoryInstance<T>(options: HistoryOptions<T> = {}): Histo
 
   function undo(): T | undefined {
     if (canUndo()) {
-      const item = items[index]
+      const item = reverseItems[index]
       index += 1
 
       debug('undo', item)
@@ -84,11 +84,11 @@ export function createHistoryInstance<T>(options: HistoryOptions<T> = {}): Histo
     if (canRedo()) {
       index -= 1
 
-      debug('redo', items[index])
+      debug('redo', reverseItems[index])
 
       handleChange()
 
-      return items[index]
+      return reverseItems[index]
     }
 
     return undefined

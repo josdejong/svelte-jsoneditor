@@ -111,8 +111,8 @@
     ContextMenuItem,
     ConvertType,
     DocumentState,
-    HistoryItem,
     History,
+    HistoryItem,
     InsertType,
     JSONEditorSelection,
     JSONParser,
@@ -128,12 +128,14 @@
     OnExpand,
     OnFocus,
     OnJSONEditorModal,
+    OnRedo,
     OnRenderContextMenuInternal,
     OnRenderMenuInternal,
     OnRenderValue,
     OnSelect,
     OnSortModal,
     OnTransformModal,
+    OnUndo,
     ParseError,
     PastedJson,
     SearchResultDetails,
@@ -198,6 +200,8 @@
   export let onChange: OnChange
   export let onChangeMode: OnChangeMode
   export let onSelect: OnSelect
+  export let onUndo: OnUndo
+  export let onRedo: OnRedo
   export let onRenderValue: OnRenderValue
   export let onRenderMenu: OnRenderMenuInternal
   export let onRenderContextMenu: OnRenderContextMenuInternal
@@ -239,7 +243,15 @@
 
   let documentStateInitialized = false
   let documentState: DocumentState | undefined = createDocumentState({ json })
-  let selection: JSONSelection | undefined
+  let selection: JSONSelection | undefined = isJSONSelection(externalSelection)
+    ? externalSelection
+    : undefined
+
+  onMount(() => {
+    if (selection) {
+      scrollIntoView(getFocusPath(selection))
+    }
+  })
 
   function handleSelect(updatedSelection: JSONSelection | undefined) {
     selection = updatedSelection
@@ -950,6 +962,8 @@
 
     const item = history.undo()
     if (!isTreeHistoryItem(item)) {
+      onUndo(item)
+
       return
     }
 
@@ -993,6 +1007,8 @@
 
     const item = history.redo()
     if (!isTreeHistoryItem(item)) {
+      onRedo(item)
+
       return
     }
 

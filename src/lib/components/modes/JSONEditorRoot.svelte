@@ -28,16 +28,18 @@
     OnSortModal,
     OnTransformModal,
     TransformModalOptions,
-    Validator
+    Validator,
+    ModeHistoryItem
   } from '$lib/types'
   import { Mode } from '$lib/types.js'
   import TextMode from './textmode/TextMode.svelte'
   import TableMode from './tablemode/TableMode.svelte'
   import TreeMode from './treemode/TreeMode.svelte'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-  import { isMenuSpace } from '$lib/typeguards.js'
+  import { isMenuSpace, isModeHistoryItem } from '$lib/typeguards.js'
   import { cloneDeep } from 'lodash-es'
   import { createHistoryInstance } from '$lib/logic/history'
+  import { createDebug } from '$lib/utils/debug'
 
   export let content: Content
   export let selection: JSONEditorSelection | undefined
@@ -45,7 +47,7 @@
   export let readOnly: boolean
   export let indentation: number | string
   export let tabSize: number
-  export let mode: Mode
+  export let externalMode: Mode
   export let mainMenuBar: boolean
   export let navigationBar: boolean
   export let statusBar: boolean
@@ -78,11 +80,69 @@
   let refTableMode: TableMode | undefined
   let refTextMode: TextMode | undefined
 
+  const debug = createDebug('jsoneditor:JSONEditorRoot')
+
   const historyInstance = createHistoryInstance<HistoryItem>({
     onChange: (updatedHistory) => (history = updatedHistory)
   })
 
   let history: History<HistoryItem> = historyInstance.get()
+
+  let mode = externalMode
+
+  function applyExternalMode(externalMode: Mode) {
+    if (externalMode === mode) {
+      return
+    }
+
+    const item: ModeHistoryItem = {
+      type: 'mode',
+      undo: { mode, selection: undefined },
+      redo: { mode: externalMode, selection: undefined }
+    }
+
+    debug('add history item', item)
+    history.add(item)
+
+    mode = externalMode
+  }
+
+  $: applyExternalMode(externalMode)
+
+  function handleUndo(item: HistoryItem | undefined) {
+    if (isModeHistoryItem(item)) {
+      mode = item.undo.mode // important to prevent a new history item from being created
+
+      // find the selection of the previous history item (if any), and use that as initial selection
+      const items = history.items()
+      const index = items.findIndex((i) => i === item)
+      const prevItem = index !== -1 ? items[index - 1] : undefined
+      console.log('handleUndo', { index, item, items, prevItem })
+      if (prevItem) {
+        selection = prevItem.redo.selection
+      }
+
+      onChangeMode(mode)
+    }
+  }
+
+  function handleRedo(item: HistoryItem | undefined) {
+    if (isModeHistoryItem(item)) {
+      // prevent a new history item from being created
+      mode = item.redo.mode
+
+      // find the selection of the next history item (if any), and use that as initial selection
+      const items = history.items()
+      const index = items.findIndex((i) => i === item)
+      const nextItem = index !== -1 ? items[index + 1] : undefined
+      console.log('handleRedo', { index, item, items, nextItem })
+      if (nextItem) {
+        selection = nextItem.undo.selection
+      }
+
+      onChangeMode(mode)
+    }
+  }
 
   let modeMenuItems: MenuItem[]
   $: modeMenuItems = [
@@ -289,8 +349,10 @@
     {validator}
     {validationParser}
     {onChange}
-    {onSelect}
     {onChangeMode}
+    {onSelect}
+    onUndo={handleUndo}
+    onRedo={handleRedo}
     {onError}
     {onFocus}
     {onBlur}
@@ -317,6 +379,8 @@
     {onChange}
     {onChangeMode}
     {onSelect}
+    onUndo={handleUndo}
+    onRedo={handleRedo}
     {onRenderValue}
     {onFocus}
     {onBlur}
@@ -348,6 +412,8 @@
     {onChange}
     {onChangeMode}
     {onSelect}
+    onUndo={handleUndo}
+    onRedo={handleRedo}
     {onRenderValue}
     {onClassName}
     {onFocus}

@@ -384,6 +384,8 @@ export type OnChange =
   | undefined
 export type OnJSONSelect = (selection: JSONSelection) => void
 export type OnSelect = (selection: JSONEditorSelection | undefined) => void
+export type OnUndo = (item: HistoryItem | undefined) => void
+export type OnRedo = (item: HistoryItem | undefined) => void
 export type OnPatch = (
   operations: JSONPatchDocument,
   afterPatch?: AfterPatchCallback
@@ -523,7 +525,19 @@ export interface TextHistoryItem {
   }
 }
 
-export type HistoryItem = TreeHistoryItem | TextHistoryItem
+export interface ModeHistoryItem {
+  type: 'mode'
+  undo: {
+    mode: Mode
+    selection: undefined // selection can be restored used the corresponding sibling HistoryItem
+  }
+  redo: {
+    mode: Mode
+    selection: undefined // selection can be restored used the corresponding sibling HistoryItem
+  }
+}
+
+export type HistoryItem = TreeHistoryItem | TextHistoryItem | ModeHistoryItem
 
 export interface HistoryInstance<T> {
   get: () => History<T>
@@ -532,7 +546,7 @@ export interface HistoryInstance<T> {
 export interface History<T> {
   canUndo: boolean
   canRedo: boolean
-  length: number
+  items: () => T[]
   add: (item: T) => void
   clear: () => void
   undo: () => T | undefined

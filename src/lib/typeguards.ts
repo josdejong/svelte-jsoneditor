@@ -20,7 +20,8 @@ import type {
   WithSearchResults,
   TreeHistoryItem,
   HistoryItem,
-  TextHistoryItem
+  TextHistoryItem,
+  ModeHistoryItem
 } from './types.js'
 import { isObject } from '$lib/utils/typeUtils.js'
 
@@ -149,4 +150,10 @@ export function isTextHistoryItem(
   historyItem: HistoryItem | undefined
 ): historyItem is TextHistoryItem {
   return historyItem ? historyItem.type === 'text' : false
+}
+
+export function isModeHistoryItem(
+  historyItem: HistoryItem | undefined
+): historyItem is ModeHistoryItem {
+  return historyItem ? historyItem.type === 'mode' : false
 }
