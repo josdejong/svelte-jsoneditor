@@ -10,7 +10,7 @@
     ContextMenuItem,
     DocumentState,
     HistoryItem,
-    HistoryRoot,
+    History,
     JSONEditorContext,
     JSONEditorSelection,
     JSONParser,
@@ -165,7 +165,7 @@
   export let readOnly: boolean
   export let externalContent: Content
   export let externalSelection: JSONEditorSelection | undefined
-  export let history: HistoryRoot<HistoryItem>
+  export let history: History<HistoryItem>
   export let mainMenuBar: boolean
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean

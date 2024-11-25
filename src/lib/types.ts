@@ -525,27 +525,18 @@ export interface TextHistoryItem {
 
 export type HistoryItem = TreeHistoryItem | TextHistoryItem
 
-export interface HistoryState {
-  canUndo: boolean
-  canRedo: boolean
-  length: number
+export interface HistoryInstance<T> {
+  get: () => History<T>
 }
 
 export interface History<T> {
+  canUndo: boolean
+  canRedo: boolean
+  length: number
   add: (item: T) => void
   clear: () => void
-  getState: () => HistoryState
   undo: () => T | undefined
   redo: () => T | undefined
-}
-
-export interface HistoryRoot<T> extends HistoryState {
-  add: History<T>['add']
-  undo: History<T>['undo']
-  redo: History<T>['redo']
-  canUndo: HistoryState['canUndo']
-  canRedo: HistoryState['canRedo']
-  length: HistoryState['length']
 }
 
 export type ConvertType = 'value' | 'object' | 'array'

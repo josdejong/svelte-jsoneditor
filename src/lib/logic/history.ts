@@ -1,22 +1,16 @@
 import { createDebug } from '../utils/debug.js'
-import type { History, HistoryState } from 'svelte-jsoneditor'
+import type { HistoryInstance, History } from 'svelte-jsoneditor'
 
 const MAX_HISTORY_ITEMS = 1000
 
 const debug = createDebug('jsoneditor:History')
 
-/**
- * @typedef {*} HistoryItem
- * @property {Object} undo
- * @property {Object} redo
- */
-
-export interface HistoryOptions {
+export interface HistoryOptions<T> {
   maxItems?: number
-  onChange?: (props: { canUndo: boolean; canRedo: boolean; length: number }) => void
+  onChange?: (state: History<T>) => void
 }
 
-export function createHistory<T>(options: HistoryOptions = {}): History<T> {
+export function createHistoryInstance<T>(options: HistoryOptions<T> = {}): HistoryInstance<T> {
   const maxItems = options.maxItems || MAX_HISTORY_ITEMS
 
   /**
@@ -34,17 +28,21 @@ export function createHistory<T>(options: HistoryOptions = {}): History<T> {
     return index > 0
   }
 
-  function getState(): HistoryState {
+  function get(): History<T> {
     return {
       canUndo: canUndo(),
       canRedo: canRedo(),
-      length: items.length
+      length: items.length,
+      add,
+      undo,
+      redo,
+      clear
     }
   }
 
   function handleChange() {
     if (options.onChange) {
-      options.onChange(getState())
+      options.onChange(get())
     }
   }
 
@@ -97,10 +95,6 @@ export function createHistory<T>(options: HistoryOptions = {}): History<T> {
   }
 
   return {
-    add,
-    clear,
-    getState,
-    undo,
-    redo
+    get
   }
 }

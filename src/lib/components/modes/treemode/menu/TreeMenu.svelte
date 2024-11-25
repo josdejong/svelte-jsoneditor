@@ -16,7 +16,7 @@
   import Menu from '../../../controls/Menu.svelte'
   import type {
     HistoryItem,
-    HistoryRoot,
+    History,
     JSONSelection,
     MenuItem,
     OnRenderMenuInternal
@@ -28,7 +28,7 @@
 
   export let readOnly: boolean
   export let showSearch = false
-  export let history: HistoryRoot<HistoryItem>
+  export let history: History<HistoryItem>
 
   export let onExpandAll: () => void
   export let onCollapseAll: () => void

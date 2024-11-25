@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { HistoryItem, HistoryRoot, MenuItem, OnRenderMenuInternal } from '$lib/types'
+  import type { HistoryItem, History, MenuItem, OnRenderMenuInternal } from '$lib/types'
   import Menu from '../../../controls/Menu.svelte'
   import {
     faEllipsisV,
@@ -16,7 +16,7 @@
   export let containsValidArray: boolean
   export let readOnly: boolean
   export let showSearch = false
-  export let history: HistoryRoot<HistoryItem>
+  export let history: History<HistoryItem>
   export let onSort: () => void
   export let onTransform: () => void
   export let onContextMenu: (event: MouseEvent) => void

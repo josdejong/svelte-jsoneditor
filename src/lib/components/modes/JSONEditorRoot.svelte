@@ -4,7 +4,7 @@
     ContentErrors,
     ContextMenuItem,
     HistoryItem,
-    HistoryRoot,
+    History,
     JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
@@ -37,7 +37,7 @@
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { isMenuSpace } from '$lib/typeguards.js'
   import { cloneDeep } from 'lodash-es'
-  import { createHistory } from '$lib/logic/history'
+  import { createHistoryInstance } from '$lib/logic/history'
 
   export let content: Content
   export let selection: JSONEditorSelection | undefined
@@ -78,22 +78,11 @@
   let refTableMode: TableMode | undefined
   let refTextMode: TextMode | undefined
 
-  const historyInstance = createHistory<HistoryItem>({
-    onChange: () => {
-      history = updateHistoryRoot()
-    }
+  const historyInstance = createHistoryInstance<HistoryItem>({
+    onChange: (updatedHistory) => (history = updatedHistory)
   })
 
-  function updateHistoryRoot(): HistoryRoot<HistoryItem> {
-    return {
-      ...historyInstance.getState(),
-      add: historyInstance.add,
-      undo: historyInstance.undo,
-      redo: historyInstance.redo
-    }
-  }
-
-  let history: HistoryRoot<HistoryItem> = updateHistoryRoot()
+  let history: History<HistoryItem> = historyInstance.get()
 
   let modeMenuItems: MenuItem[]
   $: modeMenuItems = [

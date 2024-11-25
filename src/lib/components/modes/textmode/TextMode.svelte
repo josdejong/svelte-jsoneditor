@@ -88,7 +88,7 @@
     Content,
     ContentErrors,
     HistoryItem,
-    HistoryRoot,
+    History,
     JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
@@ -129,7 +129,7 @@
   export let askToFormat: boolean
   export let externalContent: Content
   export let externalSelection: JSONEditorSelection | undefined
-  export let history: HistoryRoot<HistoryItem>
+  export let history: History<HistoryItem>
   export let indentation: number | string
   export let tabSize: number
   export let escapeUnicodeCharacters: boolean

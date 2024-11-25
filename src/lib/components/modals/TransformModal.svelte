@@ -17,6 +17,8 @@
   import TreeMode from '../modes/treemode/TreeMode.svelte'
   import type {
     Content,
+    HistoryItem,
+    History,
     JSONParser,
     JSONPathParser,
     OnChangeQueryLanguage,
@@ -31,6 +33,7 @@
   import { readonlyProxy } from '$lib/utils/readonlyProxy.js'
   import Modal from './Modal.svelte'
   import { onMount } from 'svelte'
+  import { createHistoryInstance } from '$lib/logic/history'
 
   const debug = createDebug('jsoneditor:TransformModal')
 
@@ -59,6 +62,12 @@
   export let onClose: () => void
 
   let refQueryInput: HTMLTextAreaElement
+
+  const historyInstance = createHistoryInstance<HistoryItem>({
+    onChange: (updatedHistory) => (history = updatedHistory)
+  })
+
+  let history: History<HistoryItem> = historyInstance.get()
 
   let selectedJson: unknown | undefined
   $: selectedJson = readonlyProxy(getIn(json, rootPath))
@@ -316,6 +325,7 @@
                 <TreeMode
                   externalContent={selectedContent}
                   externalSelection={undefined}
+                  {history}
                   readOnly={true}
                   mainMenuBar={false}
                   navigationBar={false}
@@ -351,6 +361,7 @@
                 <TreeMode
                   externalContent={previewContent}
                   externalSelection={undefined}
+                  {history}
                   readOnly={true}
                   mainMenuBar={false}
                   navigationBar={false}
