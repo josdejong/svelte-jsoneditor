@@ -508,6 +508,17 @@ export interface HistoryItem {
   }
 }
 
+export interface TextHistoryItem {
+  undo: {
+    changes: unknown // FIXME: write out this type
+    selection: unknown // FIXME: change to JSONEditorSelection?
+  }
+  redo: {
+    changes: unknown // FIXME: write out this type
+    selection: unknown // FIXME: change to JSONEditorSelection?
+  }
+}
+
 export type ConvertType = 'value' | 'object' | 'array'
 export type InsertType = ConvertType | 'structure'
 

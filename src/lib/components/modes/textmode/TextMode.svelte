@@ -32,7 +32,14 @@
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import TextMenu from './menu/TextMenu.svelte'
-  import { Compartment, EditorSelection, EditorState, type Extension } from '@codemirror/state'
+  import {
+    Annotation,
+    ChangeSet,
+    Compartment,
+    EditorSelection,
+    EditorState,
+    type Extension
+  } from '@codemirror/state'
   import {
     crosshairCursor,
     drawSelection,
@@ -43,7 +50,8 @@
     highlightSpecialChars,
     keymap,
     lineNumbers,
-    rectangularSelection
+    rectangularSelection,
+    ViewUpdate
   } from '@codemirror/view'
   import { defaultKeymap, indentWithTab } from '@codemirror/commands'
   import type { Diagnostic } from '@codemirror/lint'
@@ -93,6 +101,7 @@
     OnTransformModal,
     ParseError,
     RichValidationError,
+    TextHistoryItem,
     TransformModalOptions,
     ValidationError,
     Validator
@@ -161,23 +170,49 @@
   let content: Content = externalContent
   let text = getText(content, indentation, parser) // text is just a cached version of content.text or parsed content.json
 
-  interface TextHistoryItem {
-    undo: {
-      content: Content
-      selection: JSONEditorSelection | undefined
-    }
-    redo: {
-      content: Content
-      selection: JSONEditorSelection | undefined
-    }
-  }
-
   const history = createHistory<TextHistoryItem>({
     onChange: (state) => {
       canUndo = state.canUndo
       canRedo = state.canRedo
     }
   })
+
+  let customHistoryAnnotation = Annotation.define()
+
+  let historyUpdatesQueue: ViewUpdate[] | null = null
+
+  function addHistoryItem(): boolean {
+    if (!historyUpdatesQueue || historyUpdatesQueue.length === 0) {
+      return false
+    }
+
+    // merge changes and create the inverse changes
+    const startState = historyUpdatesQueue[0].startState
+    const endState = historyUpdatesQueue[historyUpdatesQueue.length - 1].state
+    const mergedChanges = historyUpdatesQueue
+      .map((update) => update.changes)
+      .reduce((mergedChanges, change) => mergedChanges.compose(change))
+    const inverseChanges = mergedChanges.invert(startState.doc)
+
+    // create a history item with undo/redo actions
+    const item: TextHistoryItem = {
+      undo: {
+        changes: inverseChanges.toJSON(),
+        selection: startState.selection.toJSON()
+      },
+      redo: {
+        changes: mergedChanges.toJSON(),
+        selection: endState.selection.toJSON()
+      }
+    }
+
+    debug('add history item', item)
+
+    history.add(item)
+
+    historyUpdatesQueue = null
+    return true
+  }
 
   $: normalization = createNormalizationFunctions({
     escapeControlCharacters: false,
@@ -452,15 +487,24 @@
       return false
     }
 
+    // first undo any pending changes
+    const added = addHistoryItem()
+    if (added) {
+      handleUndo()
+    }
+
     const item = history.undo()
     debug('undo', item)
     if (!item) {
       return false
     }
 
-    setCodeMirrorContent(item.undo.content, true, false)
-    applyExternalSelection(item.undo.selection)
-    // FIXME: restore selection and scroll location
+    codeMirrorView.dispatch({
+      annotations: customHistoryAnnotation.of('undo'),
+      changes: ChangeSet.fromJSON(item.undo.changes),
+      selection: EditorSelection.fromJSON(item.undo.selection),
+      scrollIntoView: true
+    })
 
     return true
   }
@@ -470,15 +514,24 @@
       return false
     }
 
+    // first undo any pending changes
+    const added = addHistoryItem()
+    if (added) {
+      handleUndo()
+    }
+
     const item = history.redo()
     debug('redo', item)
     if (!item) {
       return false
     }
 
-    setCodeMirrorContent(item.redo.content, true, false)
-    applyExternalSelection(item.redo.selection)
-    // FIXME: restore selection and scroll location
+    codeMirrorView.dispatch({
+      annotations: customHistoryAnnotation.of('redo'),
+      changes: ChangeSet.fromJSON(item.redo.changes),
+      selection: EditorSelection.fromJSON(item.redo.selection),
+      scrollIntoView: true
+    })
 
     return true
   }
@@ -630,6 +683,14 @@
           debug('update', update.docChanged, update.selectionSet, update)
 
           if (update.docChanged) {
+            const isCustomHistoryEvent = update.transactions.some((transaction) => {
+              return !!transaction.annotation(customHistoryAnnotation)
+            })
+
+            if (!isCustomHistoryEvent) {
+              historyUpdatesQueue = [...(historyUpdatesQueue ?? []), update]
+            }
+
             onChangeCodeMirrorValueDebounced()
           }
 
@@ -820,19 +881,7 @@
     text = codeMirrorText
     content = { text }
 
-    history.add({
-      undo: {
-        content: previousContent,
-        selection: undefined // FIXME: restore last selection
-      },
-      redo: {
-        content,
-        selection: {
-          type: SelectionType.text,
-          ...editorState.selection.toJSON()
-        }
-      }
-    })
+    addHistoryItem()
 
     emitOnChange(content, previousContent)
 
