@@ -17,7 +17,10 @@ import type {
   ObjectRecursiveState,
   ValueRecursiveState,
   SearchResults,
-  WithSearchResults
+  WithSearchResults,
+  TreeHistoryItem,
+  HistoryItem,
+  TextHistoryItem
 } from './types.js'
 import { isObject } from '$lib/utils/typeUtils.js'
 
@@ -134,4 +137,16 @@ export function hasSearchResults(state: SearchResults | undefined): state is Wit
     state !== undefined &&
     Array.isArray((state as unknown as Record<string, unknown>).searchResults)
   )
+}
+
+export function isTreeHistoryItem(
+  historyItem: HistoryItem | undefined
+): historyItem is TreeHistoryItem {
+  return historyItem ? historyItem.type === 'tree' : false
+}
+
+export function isTextHistoryItem(
+  historyItem: HistoryItem | undefined
+): historyItem is TextHistoryItem {
+  return historyItem ? historyItem.type === 'text' : false
 }

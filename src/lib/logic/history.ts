@@ -1,4 +1,5 @@
 import { createDebug } from '../utils/debug.js'
+import type { History, HistoryState } from 'svelte-jsoneditor'
 
 const MAX_HISTORY_ITEMS = 1000
 
@@ -13,20 +14,6 @@ const debug = createDebug('jsoneditor:History')
 export interface HistoryOptions {
   maxItems?: number
   onChange?: (props: { canUndo: boolean; canRedo: boolean; length: number }) => void
-}
-
-export interface HistoryState {
-  canUndo: boolean
-  canRedo: boolean
-  length: number
-}
-
-export interface History<T> {
-  add: (item: T) => void
-  clear: () => void
-  getState: () => HistoryState
-  undo: () => T | undefined
-  redo: () => T | undefined
 }
 
 export function createHistory<T>(options: HistoryOptions = {}): History<T> {

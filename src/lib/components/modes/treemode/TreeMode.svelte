@@ -38,7 +38,6 @@
     setInDocumentState,
     syncDocumentState
   } from '$lib/logic/documentState.js'
-  import { createHistory } from '$lib/logic/history.js'
   import { duplicate, extract, revertJSONPatchWithMoveOperations } from '$lib/logic/operations.js'
   import {
     canConvert,
@@ -113,6 +112,7 @@
     ConvertType,
     DocumentState,
     HistoryItem,
+    HistoryRoot,
     InsertType,
     JSONEditorSelection,
     JSONParser,
@@ -161,6 +161,7 @@
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
   import createTreeContextMenuItems from './contextmenu/createTreeContextMenuItems'
   import { toRecursiveSearchResults as toRecursiveSearchResults } from 'svelte-jsoneditor/logic/search.js'
+  import { isTreeHistoryItem } from 'svelte-jsoneditor'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -182,6 +183,7 @@
   export let readOnly: boolean
   export let externalContent: Content
   export let externalSelection: JSONEditorSelection | undefined
+  export let history: HistoryRoot<HistoryItem>
   export let mainMenuBar: boolean
   export let navigationBar: boolean
   export let escapeControlCharacters: boolean
@@ -307,13 +309,6 @@
     selection = createValueSelection(error.path)
     scrollTo(error.path)
   }
-
-  const history = createHistory<HistoryItem>({
-    onChange: (state) => {
-      historyState = state
-    }
-  })
-  let historyState = history.getState()
 
   export function expand(path: JSONPath, callback: OnExpand = expandSelf) {
     debug('expand')
@@ -546,6 +541,7 @@
     const canPatch = json !== undefined && previous.json !== undefined
 
     history.add({
+      type: 'tree',
       undo: {
         patch: canPatch ? [{ op: 'replace', path: '', value: previous.json }] : undefined,
         json: previous.json,
@@ -620,6 +616,7 @@
     clearSelectionWhenNotExisting(json)
 
     history.add({
+      type: 'tree',
       undo: {
         patch: undo,
         ...previousState
@@ -947,12 +944,12 @@
       return
     }
 
-    if (!history.getState().canUndo) {
+    if (!history.canUndo) {
       return
     }
 
     const item = history.undo()
-    if (!item) {
+    if (!isTreeHistoryItem(item)) {
       return
     }
 
@@ -990,12 +987,12 @@
       return
     }
 
-    if (!history.getState().canRedo) {
+    if (!history.canRedo) {
       return
     }
 
     const item = history.redo()
-    if (!item) {
+    if (!isTreeHistoryItem(item)) {
       return
     }
 
@@ -1859,7 +1856,7 @@
       {json}
       {selection}
       {readOnly}
-      {historyState}
+      {history}
       bind:showSearch
       onExpandAll={handleExpandAll}
       onCollapseAll={handleCollapseAll}

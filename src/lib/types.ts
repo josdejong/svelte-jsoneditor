@@ -487,7 +487,8 @@ export interface RenderedItem {
   height: number
 }
 
-export interface HistoryItem {
+export interface TreeHistoryItem {
+  type: 'tree'
   undo: {
     patch: JSONPatchDocument | undefined
     json: unknown | undefined
@@ -511,6 +512,7 @@ export interface HistoryItem {
 export type TextChanges = Array<number | [number, ...string[]]>
 
 export interface TextHistoryItem {
+  type: 'text'
   undo: {
     changes: TextChanges
     selection: TextSelection
@@ -519,6 +521,31 @@ export interface TextHistoryItem {
     changes: TextChanges
     selection: TextSelection
   }
+}
+
+export type HistoryItem = TreeHistoryItem | TextHistoryItem
+
+export interface HistoryState {
+  canUndo: boolean
+  canRedo: boolean
+  length: number
+}
+
+export interface History<T> {
+  add: (item: T) => void
+  clear: () => void
+  getState: () => HistoryState
+  undo: () => T | undefined
+  redo: () => T | undefined
+}
+
+export interface HistoryRoot<T> extends HistoryState {
+  add: History<T>['add']
+  undo: History<T>['undo']
+  redo: History<T>['redo']
+  canUndo: HistoryState['canUndo']
+  canRedo: HistoryState['canRedo']
+  length: HistoryState['length']
 }
 
 export type ConvertType = 'value' | 'object' | 'array'

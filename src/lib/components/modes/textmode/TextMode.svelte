@@ -87,6 +87,8 @@
   import type {
     Content,
     ContentErrors,
+    HistoryItem,
+    HistoryRoot,
     JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
@@ -108,7 +110,11 @@
     Validator
   } from '$lib/types.js'
   import { Mode, SelectionType, ValidationSeverity } from '$lib/types.js'
-  import { isContentParseError, isContentValidationErrors } from '$lib/typeguards.js'
+  import {
+    isContentParseError,
+    isContentValidationErrors,
+    isTextHistoryItem
+  } from '$lib/typeguards.js'
   import memoizeOne from 'memoize-one'
   import { validateText } from '$lib/logic/validation.js'
   import { truncate } from '$lib/utils/stringUtils.js'
@@ -116,7 +122,6 @@
   import { indentationMarkers } from '@replit/codemirror-indentation-markers'
   import { isTextSelection } from '$lib/logic/selection.js'
   import { wrappedLineIndent } from 'codemirror-wrapped-line-indent'
-  import { createHistory } from '$lib/logic/history'
 
   export let readOnly: boolean
   export let mainMenuBar: boolean
@@ -124,6 +129,7 @@
   export let askToFormat: boolean
   export let externalContent: Content
   export let externalSelection: JSONEditorSelection | undefined
+  export let history: HistoryRoot<HistoryItem>
   export let indentation: number | string
   export let tabSize: number
   export let escapeUnicodeCharacters: boolean
@@ -171,13 +177,6 @@
   let content: Content = externalContent
   let text = getText(content, indentation, parser) // text is just a cached version of content.text or parsed content.json
 
-  const history = createHistory<TextHistoryItem>({
-    onChange: (state) => {
-      canUndo = state.canUndo
-      canRedo = state.canRedo
-    }
-  })
-
   let historyAnnotation = Annotation.define()
 
   let historyUpdatesQueue: ViewUpdate[] | null = null
@@ -197,6 +196,7 @@
 
     // create a history item with undo/redo actions
     const item: TextHistoryItem = {
+      type: 'text',
       undo: {
         changes: inverseChanges.toJSON(),
         selection: toTextSelection(startState.selection)
@@ -262,9 +262,6 @@
       codeMirrorView.destroy()
     }
   })
-
-  let canUndo = false
-  let canRedo = false
 
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
@@ -496,7 +493,7 @@
 
     const item = history.undo()
     debug('undo', item)
-    if (!item) {
+    if (!isTextHistoryItem(item)) {
       return false
     }
 
@@ -523,7 +520,7 @@
 
     const item = history.redo()
     debug('redo', item)
-    if (!item) {
+    if (!isTextHistoryItem(item)) {
       return false
     }
 
@@ -595,7 +592,7 @@
     }
   }
 
-  function handleDoubleClick(event: MouseEvent, view: EditorView) {
+  function handleDoubleClick(_event: MouseEvent, view: EditorView) {
     // When the user double-clicked right from a bracket [ or {,
     // select the contents of the array or object
     if (view.state.selection.ranges.length === 1) {
@@ -648,7 +645,6 @@
         lineNumbers(),
         highlightActiveLineGutter(),
         highlightSpecialChars(),
-        // history(), // FIXME: cleanup
         foldGutter(),
         drawSelection(),
         dropCursor(),
@@ -1098,8 +1094,8 @@
       canCompact={!isNewDocument}
       canSort={!isNewDocument}
       canTransform={!isNewDocument}
-      {canUndo}
-      {canRedo}
+      canUndo={history.canUndo}
+      canRedo={history.canRedo}
       {onRenderMenu}
     />
   {/if}
