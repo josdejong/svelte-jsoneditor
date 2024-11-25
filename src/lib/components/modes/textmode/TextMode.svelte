@@ -681,8 +681,6 @@
         EditorView.updateListener.of((update) => {
           editorState = update.state
 
-          debug('update', update.docChanged, update.selectionSet, update)
-
           if (update.docChanged) {
             const isCustomHistoryEvent = update.transactions.some((transaction) => {
               return !!transaction.annotation(customHistoryAnnotation)
