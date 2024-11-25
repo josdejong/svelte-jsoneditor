@@ -178,7 +178,7 @@
     }
   })
 
-  let customHistoryAnnotation = Annotation.define()
+  let historyAnnotation = Annotation.define()
 
   let historyUpdatesQueue: ViewUpdate[] | null = null
 
@@ -501,7 +501,7 @@
     }
 
     codeMirrorView.dispatch({
-      annotations: customHistoryAnnotation.of('undo'),
+      annotations: historyAnnotation.of('undo'),
       changes: ChangeSet.fromJSON(item.undo.changes),
       selection: EditorSelection.fromJSON(item.undo.selection),
       scrollIntoView: true
@@ -528,7 +528,7 @@
     }
 
     codeMirrorView.dispatch({
-      annotations: customHistoryAnnotation.of('redo'),
+      annotations: historyAnnotation.of('redo'),
       changes: ChangeSet.fromJSON(item.redo.changes),
       selection: EditorSelection.fromJSON(item.redo.selection),
       scrollIntoView: true
@@ -682,9 +682,9 @@
           editorState = update.state
 
           if (update.docChanged) {
-            const isCustomHistoryEvent = update.transactions.some((transaction) => {
-              return !!transaction.annotation(customHistoryAnnotation)
-            })
+            const isCustomHistoryEvent = update.transactions.some(
+              (transaction) => !!transaction.annotation(historyAnnotation)
+            )
 
             if (!isCustomHistoryEvent) {
               historyUpdatesQueue = [...(historyUpdatesQueue ?? []), update]
