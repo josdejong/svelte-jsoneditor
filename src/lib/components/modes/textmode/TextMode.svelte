@@ -726,7 +726,7 @@
       codeMirrorView.dispatch(
         codeMirrorView.state.update({
           selection: selection.main,
-          scrollIntoView: true
+          scrollIntoView: true // FIXME: scrollIntoView also affects scroll of the main page, possibly causing the main page to scroll when jsoneditor has an initial selection
         })
       )
     }
