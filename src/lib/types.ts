@@ -588,6 +588,7 @@ export interface AbsolutePopupContext {
 
 export interface JSONEditorPropsOptional {
   content?: Content
+  selection?: JSONEditorSelection
   readOnly?: boolean
   indentation?: number | string
   tabSize?: number

@@ -287,6 +287,9 @@
         case 'content':
           content = props[name] ?? contentDefault
           break
+        case 'selection':
+          selection = props[name] ?? selectionDefault
+          break
         case 'readOnly':
           readOnly = props[name] ?? readOnlyDefault
           break
