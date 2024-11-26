@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/josdejong/svelte-jsoneditor/compare/v2.1.0...v2.2.0) (2024-11-26)
+
+
+### Features
+
+* keep history when switching mode ([#504](https://github.com/josdejong/svelte-jsoneditor/issues/504)) ([b5f11ca](https://github.com/josdejong/svelte-jsoneditor/commit/b5f11ca25bd027eeda5f1147afa528f66fc41077))
+
 ## [2.1.0](https://github.com/josdejong/svelte-jsoneditor/compare/v2.0.2...v2.1.0) (2024-11-20)
 
 
