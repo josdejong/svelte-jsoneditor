@@ -249,7 +249,9 @@
 
   onMount(() => {
     if (selection) {
-      scrollIntoView(getFocusPath(selection))
+      const path = getFocusPath(selection)
+      documentState = expandPath(json, documentState, path, expandNone)
+      setTimeout(() => scrollIntoView(path))
     }
   })
 
