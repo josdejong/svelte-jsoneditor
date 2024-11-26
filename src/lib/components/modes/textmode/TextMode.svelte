@@ -261,6 +261,8 @@
   })
 
   onDestroy(() => {
+    flush()
+
     if (codeMirrorView) {
       debug('Destroy CodeMirror editor')
       codeMirrorView.destroy()
@@ -280,10 +282,6 @@
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
   let modalOpen = false
-
-  onDestroy(() => {
-    flush()
-  })
 
   createFocusTracker({
     onMount,
@@ -987,7 +985,7 @@
     TEXT_MODE_ONCHANGE_DELAY
   )
 
-  function flush() {
+  export function flush() {
     onChangeCodeMirrorValueDebounced.flush()
   }
 

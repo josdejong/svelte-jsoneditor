@@ -101,6 +101,11 @@
       redo: { mode: externalMode, selection: undefined }
     }
 
+    if (mode === 'text' && refTextMode) {
+      // flush pending changes before adding a new history item
+      refTextMode.flush()
+    }
+
     debug('add history item', item)
     history.add(item)
 
@@ -117,7 +122,7 @@
       const items = history.items()
       const index = items.findIndex((i) => i === item)
       const prevItem = index !== -1 ? items[index - 1] : undefined
-      console.log('handleUndo', { index, item, items, prevItem })
+      debug('handleUndo', { index, item, items, prevItem })
       if (prevItem) {
         selection = prevItem.redo.selection
       }
@@ -135,7 +140,7 @@
       const items = history.items()
       const index = items.findIndex((i) => i === item)
       const nextItem = index !== -1 ? items[index + 1] : undefined
-      console.log('handleRedo', { index, item, items, nextItem })
+      debug('handleRedo', { index, item, items, nextItem })
       if (nextItem) {
         selection = nextItem.undo.selection
       }
