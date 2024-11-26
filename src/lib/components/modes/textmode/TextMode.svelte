@@ -51,7 +51,7 @@
     keymap,
     lineNumbers,
     rectangularSelection,
-    ViewUpdate
+    type ViewUpdate
   } from '@codemirror/view'
   import { defaultKeymap, indentWithTab } from '@codemirror/commands'
   import type { Diagnostic } from '@codemirror/lint'
