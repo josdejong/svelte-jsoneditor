@@ -1,70 +1,55 @@
 import { createDebug } from '../utils/debug.js'
+import type { HistoryInstance, History } from 'svelte-jsoneditor'
 
 const MAX_HISTORY_ITEMS = 1000
 
 const debug = createDebug('jsoneditor:History')
 
-/**
- * @typedef {*} HistoryItem
- * @property {Object} undo
- * @property {Object} redo
- */
-
-export interface HistoryOptions {
+export interface HistoryOptions<T> {
   maxItems?: number
-  onChange?: (props: { canUndo: boolean; canRedo: boolean; length: number }) => void
+  onChange?: (state: History<T>) => void
 }
 
-export interface HistoryState {
-  canUndo: boolean
-  canRedo: boolean
-  length: number
-}
-
-export interface History<T> {
-  add: (item: T) => void
-  clear: () => void
-  getState: () => HistoryState
-  undo: () => T | undefined
-  redo: () => T | undefined
-}
-
-export function createHistory<T>(options: HistoryOptions = {}): History<T> {
+export function createHistoryInstance<T>(options: HistoryOptions<T> = {}): HistoryInstance<T> {
   const maxItems = options.maxItems || MAX_HISTORY_ITEMS
 
   /**
    * items in history are sorted from newest first to oldest last
    */
-  let items: T[] = []
+  let reverseItems: T[] = []
 
   let index = 0
 
   function canUndo(): boolean {
-    return index < items.length
+    return index < reverseItems.length
   }
 
   function canRedo(): boolean {
     return index > 0
   }
 
-  function getState(): HistoryState {
+  function get(): History<T> {
     return {
       canUndo: canUndo(),
       canRedo: canRedo(),
-      length: items.length
+      items: () => reverseItems.slice().reverse(),
+      add,
+      undo,
+      redo,
+      clear
     }
   }
 
   function handleChange() {
     if (options.onChange) {
-      options.onChange(getState())
+      options.onChange(get())
     }
   }
 
   function add(item: T) {
     debug('add', item)
 
-    items = [item].concat(items.slice(index)).slice(0, maxItems)
+    reverseItems = [item].concat(reverseItems.slice(index)).slice(0, maxItems)
 
     index = 0
 
@@ -74,7 +59,7 @@ export function createHistory<T>(options: HistoryOptions = {}): History<T> {
   function clear() {
     debug('clear')
 
-    items = []
+    reverseItems = []
     index = 0
 
     handleChange()
@@ -82,7 +67,7 @@ export function createHistory<T>(options: HistoryOptions = {}): History<T> {
 
   function undo(): T | undefined {
     if (canUndo()) {
-      const item = items[index]
+      const item = reverseItems[index]
       index += 1
 
       debug('undo', item)
@@ -99,21 +84,17 @@ export function createHistory<T>(options: HistoryOptions = {}): History<T> {
     if (canRedo()) {
       index -= 1
 
-      debug('redo', items[index])
+      debug('redo', reverseItems[index])
 
       handleChange()
 
-      return items[index]
+      return reverseItems[index]
     }
 
     return undefined
   }
 
   return {
-    add,
-    clear,
-    getState,
-    undo,
-    redo
+    get
   }
 }

@@ -32,7 +32,14 @@
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import TextMenu from './menu/TextMenu.svelte'
-  import { Compartment, EditorSelection, EditorState, type Extension } from '@codemirror/state'
+  import {
+    Annotation,
+    ChangeSet,
+    Compartment,
+    EditorSelection,
+    EditorState,
+    type Extension
+  } from '@codemirror/state'
   import {
     crosshairCursor,
     drawSelection,
@@ -43,18 +50,10 @@
     highlightSpecialChars,
     keymap,
     lineNumbers,
-    rectangularSelection
+    rectangularSelection,
+    type ViewUpdate
   } from '@codemirror/view'
-  import {
-    defaultKeymap,
-    history,
-    historyKeymap,
-    indentWithTab,
-    redo,
-    redoDepth,
-    undo,
-    undoDepth
-  } from '@codemirror/commands'
+  import { defaultKeymap, indentWithTab } from '@codemirror/commands'
   import type { Diagnostic } from '@codemirror/lint'
   import { linter, lintGutter, lintKeymap } from '@codemirror/lint'
   import { json as jsonLang } from '@codemirror/lang-json'
@@ -88,6 +87,8 @@
   import type {
     Content,
     ContentErrors,
+    History,
+    HistoryItem,
     JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
@@ -96,18 +97,26 @@
     OnChangeMode,
     OnError,
     OnFocus,
+    OnRedo,
     OnRenderMenuInternal,
     OnSelect,
     OnSortModal,
     OnTransformModal,
+    OnUndo,
     ParseError,
     RichValidationError,
+    TextHistoryItem,
+    TextSelection,
     TransformModalOptions,
     ValidationError,
     Validator
   } from '$lib/types.js'
   import { Mode, SelectionType, ValidationSeverity } from '$lib/types.js'
-  import { isContentParseError, isContentValidationErrors } from '$lib/typeguards.js'
+  import {
+    isContentParseError,
+    isContentValidationErrors,
+    isTextHistoryItem
+  } from '$lib/typeguards.js'
   import memoizeOne from 'memoize-one'
   import { validateText } from '$lib/logic/validation.js'
   import { truncate } from '$lib/utils/stringUtils.js'
@@ -122,6 +131,7 @@
   export let askToFormat: boolean
   export let externalContent: Content
   export let externalSelection: JSONEditorSelection | undefined
+  export let history: History<HistoryItem>
   export let indentation: number | string
   export let tabSize: number
   export let escapeUnicodeCharacters: boolean
@@ -131,6 +141,8 @@
   export let onChange: OnChange
   export let onChangeMode: OnChangeMode
   export let onSelect: OnSelect
+  export let onUndo: OnUndo
+  export let onRedo: OnRedo
   export let onError: OnError
   export let onFocus: OnFocus
   export let onBlur: OnBlur
@@ -168,6 +180,44 @@
 
   let content: Content = externalContent
   let text = getText(content, indentation, parser) // text is just a cached version of content.text or parsed content.json
+
+  let historyAnnotation = Annotation.define()
+
+  let historyUpdatesQueue: ViewUpdate[] | null = null
+
+  function addHistoryItem(): boolean {
+    if (!historyUpdatesQueue || historyUpdatesQueue.length === 0) {
+      return false
+    }
+
+    // merge changes and create the inverse changes
+    const startState = historyUpdatesQueue[0].startState
+    const endState = historyUpdatesQueue[historyUpdatesQueue.length - 1].state
+    const mergedChanges = historyUpdatesQueue
+      .map((update) => update.changes)
+      .reduce((mergedChanges, change) => mergedChanges.compose(change))
+    const inverseChanges = mergedChanges.invert(startState.doc)
+
+    // create a history item with undo/redo actions
+    const item: TextHistoryItem = {
+      type: 'text',
+      undo: {
+        changes: inverseChanges.toJSON(),
+        selection: toTextSelection(startState.selection)
+      },
+      redo: {
+        changes: mergedChanges.toJSON(),
+        selection: toTextSelection(endState.selection)
+      }
+    }
+
+    debug('add history item', item)
+
+    history.add(item)
+
+    historyUpdatesQueue = null
+    return true
+  }
 
   $: normalization = createNormalizationFunctions({
     escapeControlCharacters: false,
@@ -211,14 +261,13 @@
   })
 
   onDestroy(() => {
+    flush()
+
     if (codeMirrorView) {
       debug('Destroy CodeMirror editor')
       codeMirrorView.destroy()
     }
   })
-
-  let canUndo = false
-  let canRedo = false
 
   const sortModalId = uniqueId()
   const transformModalId = uniqueId()
@@ -233,10 +282,6 @@
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
   let modalOpen = false
-
-  onDestroy(() => {
-    flush()
-  })
 
   createFocusTracker({
     onMount,
@@ -437,26 +482,62 @@
     }
   }
 
-  function handleUndo() {
+  function handleUndo(): boolean {
     if (readOnly) {
-      return
+      return false
     }
 
-    if (codeMirrorView) {
-      undo(codeMirrorView)
-      focus()
+    // first undo any pending changes
+    const added = addHistoryItem()
+    if (added) {
+      handleUndo()
     }
+
+    const item = history.undo()
+    debug('undo', item)
+    if (!isTextHistoryItem(item)) {
+      onUndo(item)
+
+      return false
+    }
+
+    codeMirrorView.dispatch({
+      annotations: historyAnnotation.of('undo'),
+      changes: ChangeSet.fromJSON(item.undo.changes),
+      selection: EditorSelection.fromJSON(item.undo.selection),
+      scrollIntoView: true
+    })
+
+    return true
   }
 
-  function handleRedo() {
+  function handleRedo(): boolean {
     if (readOnly) {
-      return
+      return false
     }
 
-    if (codeMirrorView) {
-      redo(codeMirrorView)
-      focus()
+    // first undo any pending changes
+    const added = addHistoryItem()
+    if (added) {
+      handleUndo()
     }
+
+    const item = history.redo()
+    debug('redo', item)
+    if (!isTextHistoryItem(item)) {
+      onRedo(item)
+
+      return false
+    }
+
+    codeMirrorView.dispatch({
+      annotations: historyAnnotation.of('redo'),
+      changes: ChangeSet.fromJSON(item.redo.changes),
+      selection: EditorSelection.fromJSON(item.redo.selection),
+      scrollIntoView: true
+    })
+
+    return true
   }
 
   function handleAcceptTooLarge() {
@@ -517,7 +598,7 @@
     }
   }
 
-  function handleDoubleClick(event: MouseEvent, view: EditorView) {
+  function handleDoubleClick(_event: MouseEvent, view: EditorView) {
     // When the user double-clicked right from a bracket [ or {,
     // select the contents of the array or object
     if (view.state.selection.ranges.length === 1) {
@@ -558,11 +639,13 @@
   }): EditorView {
     debug('Create CodeMirror editor', { readOnly, indentation })
 
+    const selection = isValidSelection(externalSelection, initialText)
+      ? fromTextSelection(externalSelection)
+      : undefined
+
     const state = EditorState.create({
       doc: initialText,
-      selection: isValidSelection(externalSelection, initialText)
-        ? toCodeMirrorSelection(externalSelection)
-        : undefined,
+      selection,
       extensions: [
         keymap.of([indentWithTab, formatCompactKeyBinding]),
         linterCompartment.of(createLinter()),
@@ -570,7 +653,6 @@
         lineNumbers(),
         highlightActiveLineGutter(),
         highlightSpecialChars(),
-        history(),
         foldGutter(),
         drawSelection(),
         dropCursor(),
@@ -588,7 +670,9 @@
           ...closeBracketsKeymap,
           ...defaultKeymap,
           ...searchKeymap,
-          ...historyKeymap,
+          { key: 'Mod-z', run: handleUndo, preventDefault: true },
+          { key: 'Mod-y', mac: 'Mod-Shift-z', run: handleRedo, preventDefault: true },
+          { key: 'Ctrl-Shift-z', run: handleRedo, preventDefault: true },
           ...foldKeymap,
           ...completionKeymap,
           ...lintKeymap
@@ -602,8 +686,18 @@
           editorState = update.state
 
           if (update.docChanged) {
+            const isCustomHistoryEvent = update.transactions.some(
+              (transaction) => !!transaction.annotation(historyAnnotation)
+            )
+
+            if (!isCustomHistoryEvent) {
+              historyUpdatesQueue = [...(historyUpdatesQueue ?? []), update]
+            }
+
             onChangeCodeMirrorValueDebounced()
-          } else if (update.selectionSet) {
+          }
+
+          if (update.selectionSet) {
             // note that emitOnSelect is invoked in onChangeCodeMirrorValue too,
             // right after firing onChange. Hence, the else if here, we do not want to fire it twice.
             emitOnSelect()
@@ -625,6 +719,17 @@
       state,
       parent: target
     })
+
+    if (selection) {
+      // important to do via dispatch, since that is executed on the next tick.
+      // Otherwise, the editor is not scrolled down enough when the statusbar is rendered on the next tick
+      codeMirrorView.dispatch(
+        codeMirrorView.state.update({
+          selection: selection.main,
+          scrollIntoView: true // FIXME: scrollIntoView also affects scroll of the main page, possibly causing the main page to scroll when jsoneditor has an initial selection
+        })
+      )
+    }
 
     return codeMirrorView
   }
@@ -722,8 +827,6 @@
       })
     }
 
-    updateCanUndoRedo()
-
     if (isChanged && emitChange) {
       emitOnChange(content, previousContent)
     }
@@ -734,7 +837,7 @@
       return
     }
 
-    const selection = toCodeMirrorSelection(externalSelection)
+    const selection = fromTextSelection(externalSelection)
     if (codeMirrorView && selection && (!editorState || !editorState.selection.eq(selection))) {
       debug('applyExternalSelection', selection)
 
@@ -743,7 +846,7 @@
     }
   }
 
-  function toCodeMirrorSelection(
+  function fromTextSelection(
     selection: JSONEditorSelection | undefined
   ): EditorSelection | undefined {
     return isTextSelection(selection) ? EditorSelection.fromJSON(selection) : undefined
@@ -792,7 +895,8 @@
     text = codeMirrorText
     content = { text }
 
-    updateCanUndoRedo()
+    addHistoryItem()
+
     emitOnChange(content, previousContent)
 
     // We emit OnSelect on the next tick to cater for the case where
@@ -870,13 +974,6 @@
     return indentation === '\t' ? [indent] : [indent, wrappedLineIndent]
   }
 
-  function updateCanUndoRedo() {
-    canUndo = undoDepth(codeMirrorView.state) > 0
-    canRedo = redoDepth(codeMirrorView.state) > 0
-
-    debug({ canUndo, canRedo })
-  }
-
   // debounce the input: when pressing Enter at the end of a line, two change
   // events are fired: one with the new Return character, and a second with
   // indentation added on the new line. This causes a race condition when used
@@ -888,7 +985,7 @@
     TEXT_MODE_ONCHANGE_DELAY
   )
 
-  function flush() {
+  export function flush() {
     onChangeCodeMirrorValueDebounced.flush()
   }
 
@@ -902,10 +999,14 @@
   }
 
   function emitOnSelect() {
-    onSelect({
+    onSelect(toTextSelection(editorState.selection))
+  }
+
+  function toTextSelection(selection: EditorSelection): TextSelection {
+    return {
       type: SelectionType.text,
-      ...editorState.selection.toJSON()
-    })
+      ...selection.toJSON()
+    }
   }
 
   function disableTextEditor(text: string, acceptTooLarge: boolean): boolean {
@@ -1012,8 +1113,8 @@
       canCompact={!isNewDocument}
       canSort={!isNewDocument}
       canTransform={!isNewDocument}
-      {canUndo}
-      {canRedo}
+      canUndo={history.canUndo}
+      canRedo={history.canRedo}
       {onRenderMenu}
     />
   {/if}

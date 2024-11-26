@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { MenuItem, OnRenderMenuInternal } from '$lib/types'
+  import type { HistoryItem, History, MenuItem, OnRenderMenuInternal } from '$lib/types'
   import Menu from '../../../controls/Menu.svelte'
   import {
     faEllipsisV,
@@ -11,13 +11,12 @@
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
-  import type { HistoryState } from '$lib/logic/history'
   import { CONTEXT_MENU_EXPLANATION } from '$lib/constants.js'
 
   export let containsValidArray: boolean
   export let readOnly: boolean
   export let showSearch = false
-  export let historyState: HistoryState
+  export let history: History<HistoryItem>
   export let onSort: () => void
   export let onTransform: () => void
   export let onContextMenu: (event: MouseEvent) => void
@@ -72,7 +71,7 @@
           title: 'Undo (Ctrl+Z)',
           className: 'jse-undo',
           onClick: onUndo,
-          disabled: !historyState.canUndo
+          disabled: !history.canUndo
         },
         {
           type: 'button',
@@ -80,7 +79,7 @@
           title: 'Redo (Ctrl+Shift+Z)',
           className: 'jse-redo',
           onClick: onRedo,
-          disabled: !historyState.canRedo
+          disabled: !history.canRedo
         },
         {
           type: 'space'

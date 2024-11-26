@@ -9,33 +9,36 @@
     ContentErrors,
     ContextMenuItem,
     DocumentState,
+    History,
     HistoryItem,
     JSONEditorContext,
     JSONEditorSelection,
     JSONParser,
     JSONPatchResult,
+    JSONRepairModalProps,
     JSONSelection,
     OnBlur,
     OnChange,
     OnChangeMode,
     OnFocus,
     OnJSONEditorModal,
+    OnRedo,
     OnRenderContextMenuInternal,
     OnRenderMenuInternal,
     OnRenderValue,
     OnSelect,
     OnSortModal,
     OnTransformModal,
+    OnUndo,
     ParseError,
     PastedJson,
-    SearchResults,
     SearchResultDetails,
+    SearchResults,
     SortedColumn,
     TransformModalOptions,
     ValidationError,
     Validator,
-    ValueNormalization,
-    JSONRepairModalProps
+    ValueNormalization
   } from '$lib/types'
   import { Mode, SortDirection, ValidationSeverity } from '$lib/types.js'
   import TableMenu from './menu/TableMenu.svelte'
@@ -105,7 +108,6 @@
     pathStartsWith,
     removeEditModeFromSelection
   } from '$lib/logic/selection.js'
-  import { createHistory } from '$lib/logic/history.js'
   import ColumnHeader from './ColumnHeader.svelte'
   import { sortJson } from '$lib/logic/sort.js'
   import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
@@ -150,6 +152,7 @@
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
   import { flattenSearchResults, toRecursiveSearchResults } from '$lib/logic/search.js'
   import JSONValue from '../treemode/JSONValue.svelte'
+  import { isTreeHistoryItem } from 'svelte-jsoneditor'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { openAbsolutePopup, closeAbsolutePopup } =
@@ -164,6 +167,7 @@
   export let readOnly: boolean
   export let externalContent: Content
   export let externalSelection: JSONEditorSelection | undefined
+  export let history: History<HistoryItem>
   export let mainMenuBar: boolean
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
@@ -176,6 +180,8 @@
   export let onChange: OnChange
   export let onChangeMode: OnChangeMode
   export let onSelect: OnSelect
+  export let onUndo: OnUndo
+  export let onRedo: OnRedo
   export let onRenderValue: OnRenderValue
   export let onRenderMenu: OnRenderMenuInternal
   export let onRenderContextMenu: OnRenderContextMenuInternal
@@ -338,9 +344,17 @@
 
   let documentState: DocumentState | undefined =
     json !== undefined ? createDocumentState({ json }) : undefined
-  let selection: JSONSelection | undefined
+  let selection: JSONSelection | undefined = isJSONSelection(externalSelection)
+    ? externalSelection
+    : undefined
   let sortedColumn: SortedColumn | undefined
   let textIsRepaired = false
+
+  onMount(() => {
+    if (selection) {
+      scrollIntoView(getFocusPath(selection))
+    }
+  })
 
   function onSortByHeader(newSortedColumn: SortedColumn) {
     if (readOnly) {
@@ -359,13 +373,6 @@
       }
     })
   }
-
-  const history = createHistory<HistoryItem>({
-    onChange: (state) => {
-      historyState = state
-    }
-  })
-  let historyState = history.getState()
 
   let context: JSONEditorContext
   $: context = {
@@ -481,6 +488,7 @@
     const canPatch = json !== undefined && previous.json !== undefined
 
     history.add({
+      type: 'tree',
       undo: {
         patch: canPatch ? [{ op: 'replace', path: '', value: previous.json }] : undefined,
         json: previous.json,
@@ -608,6 +616,7 @@
     parseError = undefined
 
     history.add({
+      type: 'tree',
       undo: {
         patch: undo,
         ...previousState
@@ -1586,12 +1595,13 @@
       return
     }
 
-    if (!history.getState().canUndo) {
+    if (!history.canUndo) {
       return
     }
 
     const item = history.undo()
-    if (!item) {
+    if (!isTreeHistoryItem(item)) {
+      onUndo(item)
       return
     }
 
@@ -1630,12 +1640,13 @@
       return
     }
 
-    if (!history.getState().canRedo) {
+    if (!history.canRedo) {
       return
     }
 
     const item = history.redo()
-    if (!item) {
+    if (!isTreeHistoryItem(item)) {
+      onRedo(item)
       return
     }
 
@@ -1695,7 +1706,7 @@
       {containsValidArray}
       {readOnly}
       bind:showSearch
-      {historyState}
+      {history}
       onSort={handleSortAll}
       onTransform={handleTransformAll}
       onUndo={handleUndo}

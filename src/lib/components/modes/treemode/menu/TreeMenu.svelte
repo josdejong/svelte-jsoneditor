@@ -14,16 +14,21 @@
   import { faJSONEditorCollapse, faJSONEditorExpand } from '$lib/img/customFontawesomeIcons.js'
   import { isObjectOrArray } from '$lib/utils/typeUtils.js'
   import Menu from '../../../controls/Menu.svelte'
-  import type { JSONSelection, MenuItem, OnRenderMenuInternal } from '$lib/types'
+  import type {
+    HistoryItem,
+    History,
+    JSONSelection,
+    MenuItem,
+    OnRenderMenuInternal
+  } from '$lib/types'
   import { isKeySelection, isMultiSelection, isValueSelection } from '$lib/logic/selection.js'
-  import type { HistoryState } from '$lib/logic/history.js'
 
   export let json: unknown
   export let selection: JSONSelection | undefined
 
   export let readOnly: boolean
   export let showSearch = false
-  export let historyState: HistoryState
+  export let history: History<HistoryItem>
 
   export let onExpandAll: () => void
   export let onCollapseAll: () => void
@@ -115,7 +120,7 @@
           title: 'Undo (Ctrl+Z)',
           className: 'jse-undo',
           onClick: onUndo,
-          disabled: !historyState.canUndo
+          disabled: !history.canUndo
         },
         {
           type: 'button',
@@ -123,7 +128,7 @@
           title: 'Redo (Ctrl+Shift+Z)',
           className: 'jse-redo',
           onClick: onRedo,
-          disabled: !historyState.canRedo
+          disabled: !history.canRedo
         },
         {
           type: 'space'

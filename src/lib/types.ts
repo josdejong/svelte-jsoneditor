@@ -384,6 +384,8 @@ export type OnChange =
   | undefined
 export type OnJSONSelect = (selection: JSONSelection) => void
 export type OnSelect = (selection: JSONEditorSelection | undefined) => void
+export type OnUndo = (item: HistoryItem | undefined) => void
+export type OnRedo = (item: HistoryItem | undefined) => void
 export type OnPatch = (
   operations: JSONPatchDocument,
   afterPatch?: AfterPatchCallback
@@ -487,7 +489,8 @@ export interface RenderedItem {
   height: number
 }
 
-export interface HistoryItem {
+export interface TreeHistoryItem {
+  type: 'tree'
   undo: {
     patch: JSONPatchDocument | undefined
     json: unknown | undefined
@@ -506,6 +509,48 @@ export interface HistoryItem {
     sortedColumn: SortedColumn | undefined
     textIsRepaired: boolean
   }
+}
+
+export type TextChanges = Array<number | [number, ...string[]]>
+
+export interface TextHistoryItem {
+  type: 'text'
+  undo: {
+    changes: TextChanges
+    selection: TextSelection
+  }
+  redo: {
+    changes: TextChanges
+    selection: TextSelection
+  }
+}
+
+export interface ModeHistoryItem {
+  type: 'mode'
+  undo: {
+    mode: Mode
+    selection: undefined // selection can be restored used the corresponding sibling HistoryItem
+  }
+  redo: {
+    mode: Mode
+    selection: undefined // selection can be restored used the corresponding sibling HistoryItem
+  }
+}
+
+export type HistoryItem = TreeHistoryItem | TextHistoryItem | ModeHistoryItem
+
+export interface HistoryInstance<T> {
+  get: () => History<T>
+}
+
+export interface History<T> {
+  canUndo: boolean
+  canRedo: boolean
+  items: () => T[]
+  add: (item: T) => void
+  clear: () => void
+  undo: () => T | undefined
+  redo: () => T | undefined
 }
 
 export type ConvertType = 'value' | 'object' | 'array'
@@ -543,6 +588,7 @@ export interface AbsolutePopupContext {
 
 export interface JSONEditorPropsOptional {
   content?: Content
+  selection?: JSONEditorSelection
   readOnly?: boolean
   indentation?: number | string
   tabSize?: number

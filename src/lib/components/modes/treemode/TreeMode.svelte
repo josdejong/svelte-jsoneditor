@@ -38,7 +38,6 @@
     setInDocumentState,
     syncDocumentState
   } from '$lib/logic/documentState.js'
-  import { createHistory } from '$lib/logic/history.js'
   import { duplicate, extract, revertJSONPatchWithMoveOperations } from '$lib/logic/operations.js'
   import {
     canConvert,
@@ -112,6 +111,7 @@
     ContextMenuItem,
     ConvertType,
     DocumentState,
+    History,
     HistoryItem,
     InsertType,
     JSONEditorSelection,
@@ -128,12 +128,14 @@
     OnExpand,
     OnFocus,
     OnJSONEditorModal,
+    OnRedo,
     OnRenderContextMenuInternal,
     OnRenderMenuInternal,
     OnRenderValue,
     OnSelect,
     OnSortModal,
     OnTransformModal,
+    OnUndo,
     ParseError,
     PastedJson,
     SearchResultDetails,
@@ -161,6 +163,7 @@
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
   import createTreeContextMenuItems from './contextmenu/createTreeContextMenuItems'
   import { toRecursiveSearchResults as toRecursiveSearchResults } from 'svelte-jsoneditor/logic/search.js'
+  import { isTreeHistoryItem } from 'svelte-jsoneditor'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -182,6 +185,7 @@
   export let readOnly: boolean
   export let externalContent: Content
   export let externalSelection: JSONEditorSelection | undefined
+  export let history: History<HistoryItem>
   export let mainMenuBar: boolean
   export let navigationBar: boolean
   export let escapeControlCharacters: boolean
@@ -196,6 +200,8 @@
   export let onChange: OnChange
   export let onChangeMode: OnChangeMode
   export let onSelect: OnSelect
+  export let onUndo: OnUndo
+  export let onRedo: OnRedo
   export let onRenderValue: OnRenderValue
   export let onRenderMenu: OnRenderMenuInternal
   export let onRenderContextMenu: OnRenderContextMenuInternal
@@ -237,7 +243,17 @@
 
   let documentStateInitialized = false
   let documentState: DocumentState | undefined = createDocumentState({ json })
-  let selection: JSONSelection | undefined
+  let selection: JSONSelection | undefined = isJSONSelection(externalSelection)
+    ? externalSelection
+    : undefined
+
+  onMount(() => {
+    if (selection) {
+      const path = getFocusPath(selection)
+      documentState = expandPath(json, documentState, path, expandNone)
+      setTimeout(() => scrollIntoView(path))
+    }
+  })
 
   function handleSelect(updatedSelection: JSONSelection | undefined) {
     selection = updatedSelection
@@ -307,13 +323,6 @@
     selection = createValueSelection(error.path)
     scrollTo(error.path)
   }
-
-  const history = createHistory<HistoryItem>({
-    onChange: (state) => {
-      historyState = state
-    }
-  })
-  let historyState = history.getState()
 
   export function expand(path: JSONPath, callback: OnExpand = expandSelf) {
     debug('expand')
@@ -546,6 +555,7 @@
     const canPatch = json !== undefined && previous.json !== undefined
 
     history.add({
+      type: 'tree',
       undo: {
         patch: canPatch ? [{ op: 'replace', path: '', value: previous.json }] : undefined,
         json: previous.json,
@@ -620,6 +630,7 @@
     clearSelectionWhenNotExisting(json)
 
     history.add({
+      type: 'tree',
       undo: {
         patch: undo,
         ...previousState
@@ -947,12 +958,14 @@
       return
     }
 
-    if (!history.getState().canUndo) {
+    if (!history.canUndo) {
       return
     }
 
     const item = history.undo()
-    if (!item) {
+    if (!isTreeHistoryItem(item)) {
+      onUndo(item)
+
       return
     }
 
@@ -990,12 +1003,14 @@
       return
     }
 
-    if (!history.getState().canRedo) {
+    if (!history.canRedo) {
       return
     }
 
     const item = history.redo()
-    if (!item) {
+    if (!isTreeHistoryItem(item)) {
+      onRedo(item)
+
       return
     }
 
@@ -1859,7 +1874,7 @@
       {json}
       {selection}
       {readOnly}
-      {historyState}
+      {history}
       bind:showSearch
       onExpandAll={handleExpandAll}
       onCollapseAll={handleCollapseAll}
