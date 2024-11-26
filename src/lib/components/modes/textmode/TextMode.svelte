@@ -719,9 +719,19 @@
 
     codeMirrorView = new EditorView({
       state,
-      parent: target,
-      scrollTo: selection ? EditorView.scrollIntoView(selection.main) : undefined
+      parent: target
     })
+
+    if (selection) {
+      // important to do via dispatch, since that is executed on the next tick.
+      // Otherwise, the editor is not scrolled down enough when the statusbar is rendered on the next tick
+      codeMirrorView.dispatch(
+        codeMirrorView.state.update({
+          selection: selection.main,
+          scrollIntoView: true
+        })
+      )
+    }
 
     return codeMirrorView
   }
