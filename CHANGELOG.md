@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.1](https://github.com/josdejong/svelte-jsoneditor/compare/v2.3.0...v2.3.1) (2024-11-27)
+
+
+### Bug Fixes
+
+* no history being created when clicking action buttons such as format and compact ([a8c329c](https://github.com/josdejong/svelte-jsoneditor/commit/a8c329c95e59d8be1b3847ad4d65a46d99e6422a))
+
 ## [2.3.0](https://github.com/josdejong/svelte-jsoneditor/compare/v2.2.1...v2.3.0) (2024-11-27)
 
 
