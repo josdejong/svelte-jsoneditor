@@ -487,11 +487,8 @@
       return false
     }
 
-    // first undo any pending changes
-    const added = addHistoryItem()
-    if (added) {
-      handleUndo()
-    }
+    // first flush any pending changes
+    flush()
 
     const item = history.undo()
     debug('undo', item)
@@ -516,11 +513,8 @@
       return false
     }
 
-    // first undo any pending changes
-    const added = addHistoryItem()
-    if (added) {
-      handleUndo()
-    }
+    // first flush any pending changes
+    flush()
 
     const item = history.redo()
     debug('redo', item)
