@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/josdejong/svelte-jsoneditor/compare/v2.2.1...v2.3.0) (2024-11-27)
+
+
+### Features
+
+* update dependencies (most notably `jsonrepair`) ([d84c394](https://github.com/josdejong/svelte-jsoneditor/commit/d84c394d4851cc5ab0a6fecba4bcc502aba6b60e))
+
 ### [2.2.1](https://github.com/josdejong/svelte-jsoneditor/compare/v2.2.0...v2.2.1) (2024-11-27)
 
 
