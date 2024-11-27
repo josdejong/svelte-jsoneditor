@@ -167,7 +167,6 @@
   let codeMirrorView: EditorView
   let editorState: EditorState
 
-  let onChangeDisabled = false
   let acceptTooLarge = false
   let askToFormatApplied = askToFormat
 
@@ -873,7 +872,7 @@
   }
 
   function onChangeCodeMirrorValue() {
-    if (onChangeDisabled || !codeMirrorView) {
+    if (!codeMirrorView) {
       return
     }
 
