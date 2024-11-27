@@ -820,6 +820,8 @@
       })
     }
 
+    addHistoryItem()
+
     if (isChanged && emitChange) {
       emitOnChange(content, previousContent)
     }
