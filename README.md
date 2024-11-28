@@ -41,13 +41,13 @@ npm install vanilla-jsoneditor
 ### Examples
 
 - Svelte:
-  - Playground: <https://www.sveltelab.dev/q1l38ztdys4at87>
+  - Playground: [https://stackblitz.com/edit/svelte-jsoneditor-basic-usage](https://stackblitz.com/edit/svelte-jsoneditor-basic-usage?file=src%2FApp.svelte&terminal=dev)
   - Examples: [/src/routes/examples](/src/routes/examples)
 - Plain JavaScript examples:
-  - Try it out: <https://jsbin.com/gatibux/edit?html,output>
+  - Try it out: [https://stackblitz.com/edit/svelte-jsoneditor-plain-javascript](https://stackblitz.com/edit/svelte-jsoneditor-plain-javascript?file=index.html)
   - Examples: [/examples/browser](/examples/browser)
-- React example: <https://codesandbox.io/s/svelte-jsoneditor-react-59wxz>
-- Vue example: <https://codesandbox.io/s/svelte-jsoneditor-vue-toln3w>
+- React example: [https://stackblitz.com/edit/svelte-jsoneditor-in-react](https://stackblitz.com/edit/svelte-jsoneditor-in-react?file=src%2FVanillaJSONEditor.tsx,src%2FApp.tsx&terminal=dev)
+- Vue example: [https://stackblitz.com/edit/svelte-jsoneditor-in-vue](https://stackblitz.com/edit/svelte-jsoneditor-in-vue?file=src%2Fcomponents%2FVueJSONEditor.vue,src%2FApp.vue&terminal=dev)
 
 ### Svelte usage
 
