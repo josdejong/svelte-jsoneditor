@@ -18,11 +18,10 @@
   }
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
 <dialog
   bind:this={dialog}
   on:close={close}
-  on:click|self={close}
+  on:pointerdown|self={close}
   on:cancel|preventDefault
   use:onEscape={close}
   class={classnames('jse-modal', className)}
