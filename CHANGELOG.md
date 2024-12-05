@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.2](https://github.com/josdejong/svelte-jsoneditor/compare/v2.3.1...v2.3.2) (2024-12-05)
+
+
+### Bug Fixes
+
+* [#506](https://github.com/josdejong/svelte-jsoneditor/issues/506) modal closing when the mouse ends outside it after selecting text in Chrome ([bbb7d83](https://github.com/josdejong/svelte-jsoneditor/commit/bbb7d833e1a31dc7dbb16ea6ce33b0bc4f6439d6))
+* update dependencies ([1df771f](https://github.com/josdejong/svelte-jsoneditor/commit/1df771fddabcbdc5b68e335d1115ea00a6ad725a))
+
 ### [2.3.1](https://github.com/josdejong/svelte-jsoneditor/compare/v2.3.0...v2.3.1) (2024-11-27)
 
 
