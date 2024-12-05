@@ -121,10 +121,10 @@
     "@rollup/plugin-node-resolve": "15.3.0",
     "@rollup/plugin-terser": "0.4.4",
     "@rollup/plugin-typescript": "12.1.1",
-    "@sveltejs/adapter-auto": "3.3.1",
+    "@sveltejs/adapter-static": "3.0.6",
     "@sveltejs/kit": "2.9.0",
     "@sveltejs/package": "2.3.7",
-    "@sveltejs/vite-plugin-svelte": "4.0.2",
+    "@sveltejs/vite-plugin-svelte": "5.0.1",
     "@testing-library/jest-dom": "6.6.3",
     "@testing-library/svelte": "5.2.6",
     "@types/jmespath": "0.15.2",
@@ -156,7 +156,7 @@
     "svelte-eslint-parser": "0.43.0",
     "svelte-preprocess": "6.0.3",
     "typescript": "5.7.2",
-    "vite": "5.4.11",
+    "vite": "6.0.2",
     "vitest": "2.1.8"
   }
 }

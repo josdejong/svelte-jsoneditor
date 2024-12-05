@@ -43,7 +43,7 @@ export default {
 
     resolve({
       browser: true,
-      exportConditions: ['svelte']
+      exportConditions: ['svelte', 'module', 'production', 'browser']
     }),
     commonjs(),
     json(),
