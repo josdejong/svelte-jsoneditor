@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.3.3](https://github.com/josdejong/svelte-jsoneditor/compare/v2.3.2...v2.3.3) (2024-12-11)
+
+
+### Bug Fixes
+
+* esm-env warning in vanilla-jsoneditor bundle ([#507](https://github.com/josdejong/svelte-jsoneditor/issues/507)) ([11daf16](https://github.com/josdejong/svelte-jsoneditor/commit/11daf16b63715e068b7aad430f6c17a086608e06))
+* suppress `[svelte] reactive_declaration_non_reactive_property` warnings during development ([5e05768](https://github.com/josdejong/svelte-jsoneditor/commit/5e0576890fa7fd0b5b4c38e33c128a3c4a23ad8b))
+
 ### [2.3.2](https://github.com/josdejong/svelte-jsoneditor/compare/v2.3.1...v2.3.2) (2024-12-05)
 
 
