@@ -112,6 +112,8 @@
   $: validationError = validationErrors?.validationError
 
   let isNodeSelected: boolean
+  // eslint-disable-next-line svelte/no-unused-svelte-ignore
+  // svelte-ignore reactive_declaration_non_reactive_property
   $: isNodeSelected = pathInSelection(context.getJson(), selection, path)
 
   $: root = path.length === 0

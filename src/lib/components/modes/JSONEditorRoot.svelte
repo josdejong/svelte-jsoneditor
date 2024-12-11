@@ -112,6 +112,8 @@
     mode = externalMode
   }
 
+  // eslint-disable-next-line svelte/no-unused-svelte-ignore
+  // svelte-ignore reactive_declaration_non_reactive_property
   $: applyExternalMode(externalMode)
 
   function handleUndo(item: HistoryItem | undefined) {

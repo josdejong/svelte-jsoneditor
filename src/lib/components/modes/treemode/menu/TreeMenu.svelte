@@ -157,6 +157,8 @@
         }
       ]
 
+  // eslint-disable-next-line svelte/no-unused-svelte-ignore
+  // svelte-ignore reactive_declaration_non_reactive_property
   $: items = onRenderMenu(defaultItems) || defaultItems
 </script>
 

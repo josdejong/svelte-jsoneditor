@@ -266,6 +266,8 @@
     }
   }
 
+  // eslint-disable-next-line svelte/no-unused-svelte-ignore
+  // svelte-ignore reactive_declaration_non_reactive_property
   $: emitOnSelect(selection)
 
   let normalization: ValueNormalization
@@ -281,6 +283,8 @@
   let showSearch = false
   let showReplace = false
 
+  // eslint-disable-next-line svelte/no-unused-svelte-ignore
+  // svelte-ignore reactive_declaration_non_reactive_property
   $: applySearchBoxSpacing(showSearch)
 
   function applySearchBoxSpacing(showSearch: boolean) {
@@ -344,8 +348,12 @@
 
   // two-way binding of externalContent and internal json and text (
   // when receiving an updated prop, we have to update state for example
+  // eslint-disable-next-line svelte/no-unused-svelte-ignore
+  // svelte-ignore reactive_declaration_non_reactive_property
   $: applyExternalContent(externalContent)
 
+  // eslint-disable-next-line svelte/no-unused-svelte-ignore
+  // svelte-ignore reactive_declaration_non_reactive_property
   $: applyExternalSelection(externalSelection)
 
   let textIsRepaired = false
@@ -353,6 +361,8 @@
   let validationErrorList: ValidationError[] = []
   let validationErrors: ValidationErrors | undefined
 
+  // eslint-disable-next-line svelte/no-unused-svelte-ignore
+  // svelte-ignore reactive_declaration_non_reactive_property
   $: updateValidationErrors(json, validator, parser, validationParser)
 
   // because onChange returns the validation errors and there is also a separate listener,
@@ -653,11 +663,6 @@
       redo: operations
     }
   }
-
-  // TODO: cleanup logging
-  // $: debug('json', json)
-  // $: debug('state', state)
-  // $: debug('selection', selection)
 
   function handleEditKey() {
     if (readOnly || !selection) {
