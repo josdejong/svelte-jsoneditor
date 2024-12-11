@@ -1162,6 +1162,7 @@ exports[`JSONEditor > render text mode 1`] = `
               spellcheck="false"
               style="tab-size: 4;"
               translate="no"
+              writingsuggestions="false"
             >
               <div
                 class="cm-activeLine cm-line"
