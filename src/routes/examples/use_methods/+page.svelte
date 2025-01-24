@@ -17,11 +17,11 @@
   }
 
   function expandAll() {
-    refJsonEditor.expand(() => true)
+    refJsonEditor.expand([], () => true)
   }
 
   function collapseAll() {
-    refJsonEditor.expand(() => false)
+    refJsonEditor.collapse([], true)
   }
 </script>
 
