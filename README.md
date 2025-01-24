@@ -733,7 +733,9 @@ editor.updateProps({
 JSONEditor.prototype.expand(path: JSONPath, callback?: (relativePath: JSONPath) => boolean = expandSelf): Promise<void>
 ```
 
-Expand or collapse paths in the editor. All nodes along the provided `path` will be expanded and become visible (rendered). So for example collapsed sections of an array will be expanded. Using the optional `callback`, the node itself and some or all of its nested child nodes can be expanded too. The `callback` function only iterates over the visible sections of an array and not over any of the collapsed sections. By default, the first 100 items of an array are visible and rendered.
+Expand paths in the editor. All nodes along the provided `path` will be expanded and become visible (rendered). So for example collapsed sections of an array will be expanded. Using the optional `callback`, the node itself and some or all of its nested child nodes can be expanded too. The `callback` function only iterates over the visible sections of an array and not over any of the collapsed sections. By default, the first 100 items of an array are visible and rendered.
+
+The method `expand` will not collapse any nodes that are already expanded. For example, `editor.expand([], relativePath => relativePath.length < 2)` will not collapse any expanded nodes with a path length of 2 or larger. To achieve that, all nodes can be collapsed first using `editor.collapse([])`.
 
 Examples:
 
