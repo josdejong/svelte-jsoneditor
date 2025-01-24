@@ -779,10 +779,10 @@ Scroll the editor vertically such that the specified path comes into view. Only 
 #### findElement
 
 ```ts
-JSONEditor.prototype.findElement(path: JSONPath)
+JSONEditor.prototype.findElement(path: JSONPath): Element | undefined
 ```
 
-Find the DOM element of a given path. Returns `null` when not found.
+Find the DOM element of a given path. Returns `undefined` when not found.
 
 #### acceptAutoRepair
 
