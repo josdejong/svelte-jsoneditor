@@ -17,7 +17,8 @@ div.jse-collapsed-items {
   border: $size solid transparent;
   border-width: $size 0;
   background-color: defaults.$contents-background-color;
-  background-image: linear-gradient($background-color, $background-color),
+  background-image:
+    linear-gradient($background-color, $background-color),
     linear-gradient(to bottom right, $transparent-color 50.5%, $background-color 50.5%),
     linear-gradient(to bottom left, $transparent-color 50.5%, $background-color 50.5%),
     linear-gradient(to top right, $transparent-color 50.5%, $background-color 50.5%),

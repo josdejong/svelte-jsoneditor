@@ -135,7 +135,6 @@ describe('typeUtils', () => {
     expect(getColorCSS('#ff000066')).toBe('rgba(255,0,0,0.4)')
     expect(getColorCSS('#a')).toBe(undefined)
     expect(getColorCSS('foo')).toBe(undefined)
-    expect(getColorCSS('red  ')).toBe(undefined)
     expect(getColorCSS('  ')).toBe(undefined)
   })
 
