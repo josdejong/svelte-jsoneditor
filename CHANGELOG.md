@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.0](https://github.com/josdejong/svelte-jsoneditor/compare/v2.3.3...v2.4.0) (2025-02-13)
+
+
+### Features
+
+* enable pasting via the context menu in `tree` and `table` mode ([6c12e3b](https://github.com/josdejong/svelte-jsoneditor/commit/6c12e3beee568bf7091c1d31e024f68a17a078d6))
+
 ### [2.3.3](https://github.com/josdejong/svelte-jsoneditor/compare/v2.3.2...v2.3.3) (2024-12-11)
 
 
