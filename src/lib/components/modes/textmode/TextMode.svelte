@@ -123,7 +123,7 @@
   import { faJSONEditorFormat } from '$lib/img/customFontawesomeIcons.js'
   import { indentationMarkers } from '@replit/codemirror-indentation-markers'
   import { isTextSelection } from '$lib/logic/selection.js'
-  import { wrappedLineIndent } from 'codemirror-wrapped-line-indent'
+  import { wrappedLineIndent } from 'codemirror-wrapped-line-indent/dist/index.js' // ensure loading ESM, otherwise the vitest test fail
 
   export let readOnly: boolean
   export let mainMenuBar: boolean
