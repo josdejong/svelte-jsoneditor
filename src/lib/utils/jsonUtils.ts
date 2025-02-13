@@ -11,7 +11,6 @@ import type {
   JSONContent,
   JSONParser,
   JSONSelection,
-  MultiSelection,
   ParseError,
   TextContent,
   TextLocation
