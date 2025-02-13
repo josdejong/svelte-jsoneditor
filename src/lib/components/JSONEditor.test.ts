@@ -2,7 +2,7 @@ import { beforeEach, afterEach, test, describe, expect, vi } from 'vitest'
 import '@testing-library/jest-dom'
 import JSONEditor from './JSONEditor.svelte'
 import { type Content, Mode } from '$lib/types.js'
-import { mount, tick } from 'svelte'
+import { flushSync, mount } from 'svelte'
 import { getByText } from '@testing-library/svelte'
 
 describe('JSONEditor', () => {
@@ -54,7 +54,7 @@ describe('JSONEditor', () => {
       }
     })
 
-    await tick() // wait until CodeMirror is rendered
+    flushSync() // wait until CodeMirror is rendered during onMount
 
     const main = target.getElementsByClassName('jse-main')[0]
     expect(main.children[0]).toHaveClass('jse-text-mode')
