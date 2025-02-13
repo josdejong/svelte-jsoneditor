@@ -1108,8 +1108,16 @@
     setTimeout(focus)
   }
 
-  function handlePasteFromMenu() {
-    copyPasteModalOpen = true
+  async function handlePasteFromMenu() {
+    try {
+      const clipboardText = await navigator.clipboard.readText()
+
+      _paste(clipboardText)
+    } catch (err) {
+      console.error(err)
+
+      copyPasteModalOpen = true
+    }
   }
 
   function handleClearPastedJson() {
@@ -1353,7 +1361,12 @@
   function handlePaste(event: ClipboardEvent) {
     event.preventDefault()
 
-    const clipboardText = event.clipboardData?.getData('text/plain') as string | undefined
+    const clipboardText = event.clipboardData?.getData('text/plain')
+
+    _paste(clipboardText)
+  }
+
+  function _paste(clipboardText: string | undefined) {
     if (clipboardText === undefined) {
       return
     }
@@ -1361,7 +1374,7 @@
     onPaste({
       clipboardText,
       json,
-      selection: selection,
+      selection,
       readOnly,
       parser,
       onPatch: handlePatch,

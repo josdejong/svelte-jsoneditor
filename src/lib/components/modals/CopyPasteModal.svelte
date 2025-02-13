@@ -14,7 +14,7 @@
   <Header title="Copying and pasting" {onClose} />
 
   <div class="jse-modal-contents">
-    <div>These actions are unavailable via the menu. Please use:</div>
+    <div>Clipboard permission is disabled by your browser. You can use:</div>
 
     <div class="jse-shortcuts">
       <div class="jse-shortcut">

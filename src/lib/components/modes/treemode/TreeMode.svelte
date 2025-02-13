@@ -750,7 +750,24 @@
   function handlePaste(event: ClipboardEvent) {
     event.preventDefault()
 
-    const clipboardText = event.clipboardData?.getData('text/plain') as string | undefined
+    const clipboardText = event.clipboardData?.getData('text/plain')
+
+    _paste(clipboardText)
+  }
+
+  async function handlePasteFromMenu() {
+    try {
+      const clipboardText = await navigator.clipboard.readText()
+
+      _paste(clipboardText)
+    } catch (err) {
+      console.error(err)
+
+      copyPasteModalOpen = true
+    }
+  }
+
+  function _paste(clipboardText: string | undefined) {
     if (clipboardText === undefined) {
       return
     }
@@ -765,10 +782,6 @@
       onChangeText: handleChangeText,
       openRepairModal
     })
-  }
-
-  function handlePasteFromMenu() {
-    copyPasteModalOpen = true
   }
 
   function openRepairModal(text: string, onApply: (repairedText: string) => void) {
