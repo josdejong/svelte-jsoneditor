@@ -1,62 +1,84 @@
 import type Ajv from 'ajv'
-import type { Options, Schema, ErrorObject } from 'ajv'
+import type { Options, Schema, ErrorObject, ValidateFunction, AsyncSchema } from 'ajv'
 import AjvDist from 'ajv'
 import { parsePath } from 'immutable-json-patch'
 import type { JSONSchema, JSONSchemaDefinitions, ValidationError, Validator } from '$lib/types'
 import { ValidationSeverity } from '$lib/types.js'
 
 export interface AjvValidatorOptions {
+  /**
+   * The JSON schema to validate (required).
+   */
   schema: JSONSchema
+
+  /**
+   * An object containing JSON Schema definitions which can be referenced using $ref.
+   */
   schemaDefinitions?: JSONSchemaDefinitions
+
+  /**
+   * Optional extra options for Ajv.
+   */
   ajvOptions?: Options
+
+  /**
+   * An optional callback function allowing to apply additional configuration on the provided Ajv instance, or return
+   * your own Ajv instance and ignore the provided one.
+   */
   onCreateAjv?: (ajv: Ajv) => Ajv | void
+
+  /**
+   * The severity of the validation error.
+   *
+   * @default ValidationSeverity.warning
+   */
+  errorSeverity?: ValidationSeverity
 }
 
 /**
  * Create a JSON Schema validator powered by Ajv.
- * @param options
- * @property schema
- *                    The JSON schema to validate (required).
- * @property [schemaDefinitions=undefined]
- *                    An object containing JSON Schema definitions
- *                    which can be referenced using $ref
- * @property [ajvOptions=undefined]
- *                    Optional extra options for Ajv
- * @property [onCreateAjv=undefined]
- *                    An optional callback function allowing to apply additional
- *                    configuration on the provided Ajv instance, or return
- *                    your own Ajv instance and ignore the provided one.
- * @return Returns a validation function
  */
 export function createAjvValidator(options: AjvValidatorOptions): Validator {
-  let ajv = createAjvInstance(options)
-  if (options.onCreateAjv !== undefined) {
-    ajv = options.onCreateAjv(ajv) || ajv
-
-    // validate whether ajv is configured correctly (this is needed to enhance error messages)
-    if (ajv.opts.verbose === false) {
-      throw new Error('Ajv must be configured with the option verbose=true')
-    }
-  }
+  const ajv = createAjvInstance(options)
 
   const validateAjv = ajv.compile(options.schema as Schema)
 
-  if (validateAjv.errors) {
-    throw validateAjv.errors[0]
-  }
+  return createValidateFunction(validateAjv, options)
+}
 
-  return function validate(json: unknown): ValidationError[] {
-    validateAjv(json)
-    const ajvErrors = validateAjv.errors || []
+/**
+ * Create a JSON Schema validator powered by Ajv.
+ *
+ * Same as `createAjvValidator`, but allows for remote schema resolution through `ajvOptions`'s `loadSchema(uri)`
+ * function.
+ *
+ * Note that `ajvOptions.loadSchema` *must* be set, or Ajv throws an error on initialization!
+ *
+ * ### Example
+ *
+ *     const validate = await createAjvValidatorAsync({
+ *       schema: {
+ *         $ref: '/schema.json'
+ *       },
+ *       ajvOptions: {
+ *         loadSchema(uri) {
+ *           return fetch(uri).then((res) => res.json())
+ *         }
+ *       }
+ *     })
+ */
+export async function createAjvValidatorAsync(options: AjvValidatorOptions): Promise<Validator> {
+  const ajv = createAjvInstance(options)
 
-    return ajvErrors.map(improveAjvError).map((error) => normalizeAjvError(json, error))
-  }
+  const validateAjv = await ajv.compileAsync(options.schema as AsyncSchema)
+
+  return createValidateFunction(validateAjv, options)
 }
 
 function createAjvInstance(options: AjvValidatorOptions): Ajv {
   const { schemaDefinitions, ajvOptions } = options
 
-  const ajv = new AjvDist({
+  let ajv = new AjvDist({
     allErrors: true,
     verbose: true,
     $data: true,
@@ -69,14 +91,41 @@ function createAjvInstance(options: AjvValidatorOptions): Ajv {
     })
   }
 
+  ajv = options.onCreateAjv?.(ajv) ?? ajv
+
+  // validate whether ajv is configured correctly (this is needed to enhance error messages)
+  if (ajv.opts.verbose === false) {
+    throw new Error('Ajv must be configured with the option verbose=true')
+  }
+
   return ajv
 }
 
-function normalizeAjvError(json: unknown, ajvError: ErrorObject): ValidationError {
+function createValidateFunction(
+  ajvValidator: ValidateFunction<unknown>,
+  options: AjvValidatorOptions
+): Validator {
+  if (ajvValidator.errors) {
+    throw ajvValidator.errors[0]
+  }
+
+  return function validate(json: unknown): ValidationError[] {
+    ajvValidator(json)
+    const ajvErrors = ajvValidator.errors ?? []
+
+    return ajvErrors.map(improveAjvError).map((error) => normalizeAjvError(json, error, options))
+  }
+}
+
+function normalizeAjvError(
+  json: unknown,
+  ajvError: ErrorObject,
+  options: AjvValidatorOptions
+): ValidationError {
   return {
     path: parsePath(json, ajvError.instancePath),
-    message: ajvError.message || 'Unknown error',
-    severity: ValidationSeverity.warning
+    message: ajvError.message ?? 'Unknown error',
+    severity: options.errorSeverity ?? ValidationSeverity.warning
   }
 }
 
