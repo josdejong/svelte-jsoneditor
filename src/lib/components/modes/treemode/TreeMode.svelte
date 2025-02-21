@@ -14,7 +14,7 @@
   } from 'immutable-json-patch'
   import { jsonrepair } from 'jsonrepair'
   import { initial, isEmpty, isEqual, noop, uniqueId } from 'lodash-es'
-  import { getContext, onDestroy, onMount, tick } from 'svelte'
+  import { flushSync, getContext, onDestroy, onMount } from 'svelte'
   import { createJump } from '$lib/assets/jump.js/src/jump.js'
   import {
     CONTEXT_MENU_HEIGHT,
@@ -940,7 +940,8 @@
 
     debug('insert before', { selection, selectionBefore, parentPath })
 
-    tick().then(() => handleContextMenu())
+    flushSync()
+    handleContextMenu()
   }
 
   function handleInsertAfter() {
@@ -954,7 +955,8 @@
 
     selection = createAfterSelection(path)
 
-    tick().then(() => handleContextMenu())
+    flushSync()
+    handleContextMenu()
   }
 
   async function handleInsertCharacter(char: string) {
@@ -1188,7 +1190,6 @@
    */
   export async function scrollTo(path: JSONPath, scrollToWhenVisible = true): Promise<void> {
     documentState = expandPath(json, documentState, path, expandNone)
-    await tick() // await rerender (else the element we want to scroll to does not yet exist)
 
     const elem = findElement(path)
 
@@ -1224,6 +1225,8 @@
    * Note that the path can only be found when the node is expanded.
    */
   export function findElement(path: JSONPath): Element | undefined {
+    flushSync() // flush any changes, else the element we want to scroll to may not yet exist
+
     return refContents?.querySelector(`div[data-path="${encodeDataPath(path)}"]`) ?? undefined
   }
 
@@ -1421,11 +1424,11 @@
     showSearch = false
     showReplace = false
 
-    tick().then(() => {
-      // trick to make sure the focus goes to the search box
-      showSearch = true
-      showReplace = findAndReplace
-    })
+    flushSync()
+
+    // trick to make sure the focus goes to the search box
+    showSearch = true
+    showReplace = findAndReplace
   }
 
   function handleExpandSection(path: JSONPath, section: Section) {

@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { onMount, tick } from 'svelte'
+  import { flushSync, onMount } from 'svelte'
   import Header from './Header.svelte'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, immutableJSONPatch, isJSONArray } from 'immutable-json-patch'
@@ -138,7 +138,8 @@
         const parentState = stack[stack.length - 2] || rootState
         const updatedParentState: ModalState = { ...parentState, content: updatedParentContent }
         stack = [...stack.slice(0, stack.length - 2), updatedParentState]
-        tick().then(scrollToSelection)
+        flushSync()
+        scrollToSelection()
       } else {
         onPatch(operations)
 
@@ -158,10 +159,9 @@
     } else if (stack.length > 1) {
       // remove the last item from the stack
       stack = initial(stack)
-      tick().then(() => {
-        refEditor?.focus()
-        scrollToSelection()
-      })
+      flushSync()
+      refEditor?.focus()
+      scrollToSelection()
 
       // clear any error from the just closed state
       error = undefined
@@ -208,7 +208,8 @@
     }
     stack = [...stack, nestedModalState]
 
-    tick().then(() => refEditor?.focus())
+    flushSync()
+    refEditor?.focus()
   }
 
   function focus(element: HTMLElement) {
