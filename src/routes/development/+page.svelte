@@ -941,11 +941,14 @@ See https://github.com/sveltejs/kit/issues/981
   form {
     flex: 1;
     display: flex;
+    min-width: 0;
   }
 
   .tree-editor,
   .text-editor {
+    flex: 1;
     display: flex;
+    min-width: 0;
 
     // some styling to try out if it doesn't break the styling of the editor
     line-height: 72px;
