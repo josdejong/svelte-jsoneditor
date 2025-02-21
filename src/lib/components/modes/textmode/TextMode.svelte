@@ -961,7 +961,7 @@
       })
 
       // resolve on next tick, when code mirror rendering is updated
-      return new Promise(resolve => setTimeout(resolve))
+      return new Promise((resolve) => setTimeout(resolve))
     }
 
     return Promise.resolve()
