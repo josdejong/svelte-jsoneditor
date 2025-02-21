@@ -28,7 +28,7 @@
   } from 'svelte-jsoneditor'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
-  import { tick, mount } from 'svelte'
+  import { mount, flushSync } from 'svelte'
   import { parse, stringify } from 'lossless-json'
   import { truncate } from '$lib/utils/stringUtils.js'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils.js'
@@ -448,7 +448,8 @@
         json: undefined
       }
 
-      tick().then(() => console.timeEnd('parse and render'))
+      flushSync()
+      console.timeEnd('parse and render')
     }
     reader.readAsText(file)
   }

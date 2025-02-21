@@ -1,6 +1,6 @@
 import JsonEditor from './components/JSONEditor.svelte'
 import type { JSONEditorPropsOptional } from '$lib/types'
-import { mount, unmount } from 'svelte'
+import { flushSync, mount, unmount } from 'svelte'
 
 // Note: index.ts exports `JSONEditor`, but we will override this on purpose
 //  since we cannot use it in the vanilla environment starting in Svelte 5.
@@ -16,11 +16,9 @@ export { JsonEditor }
 export function createJSONEditor({ target, props }: Parameters<typeof mount>[1]): JsonEditor {
   const editor = mount(JsonEditor, { target, props })
 
-  editor.destroy = async () => {
-    unmount(editor)
+  editor.destroy = async () => unmount(editor)
 
-    return new Promise((resolve) => setTimeout(resolve))
-  }
+  flushSync()
 
   return editor as JsonEditor
 }

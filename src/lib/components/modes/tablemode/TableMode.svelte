@@ -112,7 +112,7 @@
   import { sortJson } from '$lib/logic/sort.js'
   import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
   import { createFocusTracker } from '$lib/components/controls/createFocusTracker.js'
-  import { getContext, onDestroy, onMount, tick } from 'svelte'
+  import { flushSync, getContext, onDestroy, onMount } from 'svelte'
   import { jsonrepair } from 'jsonrepair'
   import Message from '../../controls/Message.svelte'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
@@ -840,9 +840,9 @@
           container: refContents,
           offset,
           duration: SCROLL_DURATION,
-          callback: async () => {
+          callback: () => {
             // ensure the element is rendered now that it is scrolled into view
-            await tick()
+            flushSync()
 
             // TODO: improve horizontal scrolling: animate and integrate with the vertical scrolling (jump)
             scrollToHorizontal(path)
@@ -1593,11 +1593,11 @@
     showSearch = false
     showReplace = false
 
-    tick().then(() => {
-      // trick to make sure the focus goes to the search box
-      showSearch = true
-      showReplace = findAndReplace
-    })
+    flushSync()
+
+    // trick to make sure the focus goes to the search box
+    showSearch = true
+    showReplace = findAndReplace
   }
 
   function handleUndo() {

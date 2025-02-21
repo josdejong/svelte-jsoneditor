@@ -25,7 +25,7 @@
     updateSearchResult
   } from '$lib/logic/search.js'
   import type { JSONPath } from 'immutable-json-patch'
-  import { tick } from 'svelte'
+  import { flushSync } from 'svelte'
 
   const debug = createDebug('jsoneditor:SearchBox')
 
@@ -125,8 +125,8 @@
   }
 
   async function handlePaste() {
-    await tick()
-    setTimeout(() => applyChangedSearchTextDebounced.flush())
+    flushSync()
+    await applyChangedSearchTextDebounced.flush()
   }
 
   async function handleReplace() {
@@ -161,7 +161,7 @@
     }))
 
     // immediately trigger updating the search results
-    await tick()
+    flushSync()
     await applyChangedJsonDebounced.flush()
 
     // focus to the next search result
