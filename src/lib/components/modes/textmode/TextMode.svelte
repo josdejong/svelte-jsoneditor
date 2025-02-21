@@ -12,7 +12,7 @@
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import { jsonrepair } from 'jsonrepair'
   import { debounce, isEqual, uniqueId } from 'lodash-es'
-  import { onDestroy, onMount, tick } from 'svelte'
+  import { flushSync, onDestroy, onMount } from 'svelte'
   import {
     JSON_STATUS_INVALID,
     JSON_STATUS_REPAIRABLE,
@@ -901,7 +901,8 @@
     // This change will be dispatched by Svelte on the next tick. Before
     // that tick, emitOnSelect would be fired based on the "old" contents,
     // which may be out of range when the replacement by the user is shorter.
-    tick().then(emitOnSelect)
+    flushSync()
+    emitOnSelect()
   }
 
   function updateLinter(validator: Validator | undefined) {
@@ -949,7 +950,7 @@
   async function updateTheme(): Promise<void> {
     // we check the theme on the next tick, to make sure the page
     // is re-rendered with (possibly) changed CSS variables
-    await tick()
+    flushSync()
 
     if (codeMirrorView) {
       const dark = hasDarkTheme()
@@ -958,7 +959,12 @@
       codeMirrorView.dispatch({
         effects: [themeCompartment.reconfigure(EditorView.theme({}, { dark }))]
       })
+
+      // resolve on next tick, when code mirror rendering is updated
+      return new Promise((resolve) => setTimeout(resolve))
     }
+
+    return Promise.resolve()
   }
 
   function createIndent(indentation: number | string): Extension[] {

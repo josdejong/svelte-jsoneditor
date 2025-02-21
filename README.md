@@ -688,7 +688,7 @@ Get the current JSON document.
 #### set
 
 ```ts
-JSONEditor.prototype.set(content: Content): Promise<void>
+JSONEditor.prototype.set(content: Content): void
 ```
 
 Replace the current content. Will reset the state of the editor. See also method `update(content)`.
@@ -696,7 +696,7 @@ Replace the current content. Will reset the state of the editor. See also method
 #### update
 
 ```ts
-JSONEditor.prototype.update(content: Content): Promise<void>
+JSONEditor.prototype.update(content: Content): void
 ```
 
 Update the loaded content, keeping the state of the editor (like expanded objects). You can also call `editor.updateProps({ content })`. See also method `set(content)`.
@@ -706,7 +706,7 @@ Update the loaded content, keeping the state of the editor (like expanded object
 #### patch
 
 ```ts
-JSONEditor.prototype.patch(operations: JSONPatchDocument) : Promise<JSONPatchResult>
+JSONEditor.prototype.patch(operations: JSONPatchDocument) : JSONPatchResult
 ```
 
 Apply a JSON patch document to update the contents of the JSON document. A JSON patch document is a list with JSON Patch operations.
@@ -716,7 +716,7 @@ Apply a JSON patch document to update the contents of the JSON document. A JSON 
 #### updateProps
 
 ```ts
-JSONEditor.prototype.updateProps(props: Object): Promise<void>
+JSONEditor.prototype.updateProps(props: Object): void
 ```
 
 Tpdate some or all of the properties. Updated `content` can be passed too; this is equivalent to calling `update(content)`. Example:
@@ -730,7 +730,7 @@ editor.updateProps({
 #### expand
 
 ```ts
-JSONEditor.prototype.expand(path: JSONPath, callback?: (relativePath: JSONPath) => boolean = expandSelf): Promise<void>
+JSONEditor.prototype.expand(path: JSONPath, callback?: (relativePath: JSONPath) => boolean = expandSelf): void
 ```
 
 Expand paths in the editor. All nodes along the provided `path` will be expanded and become visible (rendered). So for example collapsed sections of an array will be expanded. Using the optional `callback`, the node itself and some or all of its nested child nodes can be expanded too. The `callback` function only iterates over the visible sections of an array and not over any of the collapsed sections. By default, the first 100 items of an array are visible and rendered.
@@ -755,7 +755,7 @@ The library exports a couple of utility functions for commonly used `callback` f
 ### collapse
 
 ```ts
-JSONEditor.prototype.collapse(path: JSONPath, recursive?: boolean = false): Promise<void>
+JSONEditor.prototype.collapse(path: JSONPath, recursive?: boolean = false): void
 ```
 
 Collapse a path in the editor. When `recursive` is `true`, all nested objects and arrays will be collapsed too. The default value of `recursive` is `false`.
@@ -763,7 +763,7 @@ Collapse a path in the editor. When `recursive` is `true`, all nested objects an
 #### transform
 
 ```ts
-JSONEditor.prototype.transform({ id?: string, rootPath?: [], onTransform: ({ operations: JSONPatchDocument, json: unknown, transformedJson: unknown }) => void, onClose: () => void })
+JSONEditor.prototype.transform(options?: { id?: string, rootPath?: [], onTransform: ({ operations: JSONPatchDocument, json: unknown, transformedJson: unknown }) => void, onClose: () => void })
 ```
 
 Programmatically trigger clicking of the transform button in the main menu, opening the transform model. If a callback `onTransform` is provided, it will replace the build-in logic to apply a transform, allowing you to process the transform operations in an alternative way. If provided, `onClose` callback will trigger when the transform modal closes, both after the user clicked apply or cancel. If an `id` is provided, the transform modal will load the previous status of this `id` instead of the status of the editors transform modal.
@@ -774,7 +774,7 @@ Programmatically trigger clicking of the transform button in the main menu, open
 JSONEditor.prototype.scrollTo(path: JSONPath): Promise<void>
 ```
 
-Scroll the editor vertically such that the specified path comes into view. Only applicable to modes `tree` and `table`. The path will be expanded when needed. The returned Promise is resolved after scrolling is finished.
+Scroll the editor vertically such that the specified path comes into view. Only applicable to modes `tree` and `table`. The path will be expanded when needed. The returned promise is resolved after scrolling is finished.
 
 #### findElement
 
@@ -787,7 +787,7 @@ Find the DOM element of a given path. Returns `undefined` when not found.
 #### acceptAutoRepair
 
 ```ts
-JSONEditor.prototype.acceptAutoRepair(): Promise<Content>
+JSONEditor.prototype.acceptAutoRepair(): Content
 ```
 
 In tree mode, invalid JSON is automatically repaired when loaded. When the repair was successful, the repaired contents are rendered but not yet applied to the document itself until the user clicks "Ok" or starts editing the data. Instead of accepting the repair, the user can also click "Repair manually instead". Invoking `.acceptAutoRepair()` will programmatically accept the repair. This will trigger an update, and the method itself also returns the updated contents. In case of `text` mode or when the editor is not in an "accept auto repair" status, nothing will happen, and the contents will be returned as is.
@@ -819,7 +819,7 @@ Change the current selection. See also option `selection`.
 #### focus
 
 ```ts
-JSONEditor.prototype.focus(): Promise<void>
+JSONEditor.prototype.focus(): void
 ```
 
 Give the editor focus.

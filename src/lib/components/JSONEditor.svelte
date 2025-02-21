@@ -7,7 +7,7 @@
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
   import { jsonQueryLanguage } from '$lib/plugins/query/jsonQueryLanguage.js'
   import { renderValue } from '$lib/plugins/value/renderValue.js'
-  import { tick } from 'svelte'
+  import { flushSync } from 'svelte'
   import TransformModal from './modals/TransformModal.svelte'
   import type {
     Content,
@@ -171,7 +171,7 @@
     return content
   }
 
-  export async function set(newContent: Content): Promise<void> {
+  export function set(newContent: Content): void {
     debug('set')
 
     const contentError = validateContentType(newContent)
@@ -184,9 +184,11 @@
 
     // update content *after* re-render, so that the new editor will trigger an onChange event
     content = newContent
+
+    flushSync()
   }
 
-  export async function update(updatedContent: Content): Promise<void> {
+  export function update(updatedContent: Content): void {
     debug('update')
 
     const contentError = validateContentType(updatedContent)
@@ -196,42 +198,44 @@
 
     content = updatedContent
 
-    await tick() // await rerender
+    flushSync()
   }
 
-  export async function patch(operations: JSONPatchDocument): Promise<JSONPatchResult> {
+  export function patch(operations: JSONPatchDocument): JSONPatchResult {
     // Note that patch has an optional afterPatch callback.
     // right now we don's support this in the public API.
     const result = refJSONEditorRoot.patch(operations)
 
-    await tick() // await rerender
+    flushSync()
 
     return result
   }
 
-  export async function select(newSelection: JSONEditorSelection | undefined) {
+  export function select(newSelection: JSONEditorSelection | undefined): void {
     selection = newSelection
 
-    await tick() // await rerender
+    flushSync()
   }
 
-  export async function expand(path: JSONPath, callback?: OnExpand): Promise<void> {
+  export function expand(path: JSONPath, callback?: OnExpand): void {
     refJSONEditorRoot.expand(path, callback)
 
-    await tick() // await rerender
+    flushSync()
   }
 
-  export async function collapse(path: JSONPath, recursive = false): Promise<void> {
+  export function collapse(path: JSONPath, recursive = false): void {
     refJSONEditorRoot.collapse(path, recursive)
 
-    await tick() // await rerender
+    flushSync()
   }
 
   /**
    * Open the transform modal
    */
-  export function transform(options: TransformModalOptions): void {
+  export function transform(options: TransformModalOptions = {}): void {
     refJSONEditorRoot.transform(options)
+
+    flushSync()
   }
 
   /**
@@ -253,10 +257,10 @@
    * mode or when the editor is not in an "accept auto repair" status, nothing
    * will happen, and the contents will be returned as is.
    */
-  export async function acceptAutoRepair(): Promise<Content> {
+  export function acceptAutoRepair(): Content {
     const content = refJSONEditorRoot.acceptAutoRepair()
 
-    await tick() // await rerender
+    flushSync()
 
     return content
   }
@@ -269,17 +273,17 @@
     return refJSONEditorRoot.findElement(path)
   }
 
-  export async function focus(): Promise<void> {
+  export function focus(): void {
     refJSONEditorRoot.focus()
 
-    await tick() // await rerender
+    flushSync()
   }
 
   export async function refresh(): Promise<void> {
     await refJSONEditorRoot.refresh()
   }
 
-  export async function updateProps(props: JSONEditorPropsOptional): Promise<void> {
+  export function updateProps(props: JSONEditorPropsOptional): void {
     const names = Object.keys(props) as (keyof JSONEditorPropsOptional)[]
 
     for (const name of names) {
@@ -389,7 +393,7 @@
       debug(`Unknown property "${name}"`)
     }
 
-    await tick() // await rerender
+    flushSync()
   }
 
   export async function destroy() {
@@ -436,8 +440,8 @@
 
     mode = newMode
 
-    await tick()
-    await focus()
+    flushSync()
+    focus()
 
     onChangeMode(newMode)
   }
