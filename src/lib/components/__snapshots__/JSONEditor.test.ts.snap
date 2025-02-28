@@ -7,6 +7,7 @@ exports[`JSONEditor > render table mode 1`] = `
    
   <div
     class="jse-main svelte-57bmz4"
+    role="none"
   >
     <!---->
     <!---->
@@ -647,6 +648,7 @@ exports[`JSONEditor > render text mode 1`] = `
    
   <div
     class="jse-main svelte-57bmz4"
+    role="none"
   >
     <!---->
     <div
@@ -1339,6 +1341,7 @@ exports[`JSONEditor > render tree mode 1`] = `
    
   <div
     class="jse-main svelte-57bmz4"
+    role="none"
   >
     <!---->
     <!---->
