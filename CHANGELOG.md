@@ -12,8 +12,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* change most methods like `set`, `update`, `expand`, and `collapse` to synchrounous, fixing [#499](https://github.com/josdejong/svelte-jsoneditor/issues/499) ([#524](https://github.com/josdejong/svelte-jsoneditor/issues/524)) ([6dd69cd](https://github.com/josdejong/svelte-jsoneditor/commit/6dd69cdd5e2d7e4b6591d8cd032f50cf89e83693))
-* change most methods like `set`, `update`, and `expand` to synchronous, fixing [#499](https://github.com/josdejong/svelte-jsoneditor/issues/499) ([#524](https://github.com/josdejong/svelte-jsoneditor/issues/524)) ([e070163](https://github.com/josdejong/svelte-jsoneditor/commit/e0701630f1d7d3ee8308277719f99afc1c45a3e2))
+* Change methods `set`, `update`, `patch`, `select`, `expand`, `collapse`, `acceptAutoRepair`, `focus`, `updateProps` from asynchronous to synchronous, fixing [#499](https://github.com/josdejong/svelte-jsoneditor/issues/499) ([#524](https://github.com/josdejong/svelte-jsoneditor/issues/524)) ([6dd69cd](https://github.com/josdejong/svelte-jsoneditor/commit/6dd69cdd5e2d7e4b6591d8cd032f50cf89e83693))
 
 
 ### Bug Fixes
