@@ -526,11 +526,17 @@
     }
   }
 
+  function handleKeyDown(event: KeyboardEvent) {
+    // prevent browser addons from reacting to keyboard inputs inside the editor
+    // see https://github.com/josdejong/svelte-jsoneditor/issues/512
+    event.stopPropagation()
+  }
+
   $: debug('mode changed to', mode)
 </script>
 
 <AbsolutePopup>
-  <div class="jse-main" class:jse-focus={hasFocus}>
+  <div class="jse-main" class:jse-focus={hasFocus} on:keydown={handleKeyDown} role="none">
     {#key instanceId}
       <JSONEditorRoot
         bind:this={refJSONEditorRoot}
