@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/josdejong/svelte-jsoneditor/compare/v2.4.0...v3.0.0) (2025-02-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* - Dropped support for `jsonpath-plus` v9.
+* - most public methods changed from asynchronous to synchronous.
+
+### Features
+
+* change most methods like `set`, `update`, `expand`, and `collapse` to synchrounous, fixing [#499](https://github.com/josdejong/svelte-jsoneditor/issues/499) ([#524](https://github.com/josdejong/svelte-jsoneditor/issues/524)) ([6dd69cd](https://github.com/josdejong/svelte-jsoneditor/commit/6dd69cdd5e2d7e4b6591d8cd032f50cf89e83693))
+* change most methods like `set`, `update`, and `expand` to synchronous, fixing [#499](https://github.com/josdejong/svelte-jsoneditor/issues/499) ([#524](https://github.com/josdejong/svelte-jsoneditor/issues/524)) ([e070163](https://github.com/josdejong/svelte-jsoneditor/commit/e0701630f1d7d3ee8308277719f99afc1c45a3e2))
+
+
+### Bug Fixes
+
+* [#512](https://github.com/josdejong/svelte-jsoneditor/issues/512) prevent browser addons from reacting to keydown events like shift+arrow down ([eef40ad](https://github.com/josdejong/svelte-jsoneditor/commit/eef40add45f58ac30641863891a82349d07ec600))
+* [#518](https://github.com/josdejong/svelte-jsoneditor/issues/518) convert all Svelte examples to Svelte 5 ([0c3f3ae](https://github.com/josdejong/svelte-jsoneditor/commit/0c3f3ae09a7744ede3e5d999ceb36fc92d56d934))
+* upgrade to the latest version of `jsonpath-plus`, fixing a security vulnerability ([#523](https://github.com/josdejong/svelte-jsoneditor/issues/523)) ([393c76b](https://github.com/josdejong/svelte-jsoneditor/commit/393c76b1dc96cfcc801a8f470a863bed7d866d54))
+
 ## [2.4.0](https://github.com/josdejong/svelte-jsoneditor/compare/v2.3.3...v2.4.0) (2025-02-13)
 
 
