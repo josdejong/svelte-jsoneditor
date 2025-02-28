@@ -9,7 +9,7 @@
   import { faCopy } from '@fortawesome/free-regular-svg-icons'
   import copyToClipboard from '$lib/utils/copyToClipboard.js'
 
-  let content = {
+  let content = $state({
     text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       array: [1, 2, 3],
@@ -20,7 +20,7 @@
       object: { a: 'b', c: 'd' },
       string: 'Hello World'
     }
-  }
+  })
 
   async function handleCopy() {
     console.log('Custom copy button clicked')

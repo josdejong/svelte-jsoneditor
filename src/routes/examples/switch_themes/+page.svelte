@@ -13,10 +13,10 @@
     { value: 'jse-font-large', label: 'large' }
   ]
 
-  let selectedTheme = themes[1].value
-  let selectedFontSize = fontSizes[1].value
+  let selectedTheme = $state(themes[1].value)
+  let selectedFontSize = $state(fontSizes[1].value)
 
-  let content = {
+  let content = $state({
     text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       array: [1, 2, 3],
@@ -27,7 +27,7 @@
       object: { a: 'b', c: 'd' },
       string: 'Hello World'
     }
-  }
+  })
 
   let editorRef
   function refresh() {
@@ -36,7 +36,7 @@
     editorRef?.refresh()
   }
 
-  $: console.log('contents changed:', content)
+  $inspect('content', content)
 </script>
 
 <svelte:head>
@@ -49,7 +49,7 @@
   <p>You can customize the styling of the editor using CSS variables</p>
 
   <p>
-    Theme: <select bind:value={selectedTheme} on:change={refresh}>
+    Theme: <select bind:value={selectedTheme} onchange={refresh}>
       {#each themes as theme}
         <option value={theme.value}>{theme.label}</option>
       {/each}
@@ -57,7 +57,7 @@
   </p>
   <p>
     Font size:
-    <select bind:value={selectedFontSize} on:change={refresh}>
+    <select bind:value={selectedFontSize} onchange={refresh}>
       {#each fontSizes as fontSize}
         <option value={fontSize.value}>{fontSize.label}</option>
       {/each}

@@ -7,7 +7,7 @@
   } from 'svelte-jsoneditor'
   import { faCalculator } from '@fortawesome/free-solid-svg-icons'
 
-  let content = {
+  let content = $state({
     text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       array: [1, 2, 3],
@@ -18,7 +18,7 @@
       object: { a: 'b', c: 'd' },
       string: 'Hello World'
     }
-  }
+  })
 
   function handleCalculateSize() {
     const size = toTextContent(content).text.length

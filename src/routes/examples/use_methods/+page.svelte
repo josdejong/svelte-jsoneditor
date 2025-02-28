@@ -3,7 +3,7 @@
 
   let refJsonEditor
 
-  let content = {
+  let content = $state({
     text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       array: [1, 2, 3],
@@ -14,7 +14,7 @@
       object: { a: 'b', c: 'd' },
       string: 'Hello World'
     }
-  }
+  })
 
   function expandAll() {
     refJsonEditor.expand([], () => true)
@@ -33,8 +33,8 @@
 <p>You can call methods on the editor by creating a reference to the editor instance.</p>
 
 <p>
-  <button type="button" on:click={expandAll}>Expand All</button>
-  <button type="button" on:click={collapseAll}>Collapse All</button>
+  <button type="button" onclick={expandAll}>Expand All</button>
+  <button type="button" onclick={collapseAll}>Collapse All</button>
 </p>
 
 <div class="editor">

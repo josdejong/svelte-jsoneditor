@@ -80,7 +80,7 @@
     return renderJSONSchemaEnum(props, schema, schemaDefinitions) || renderValue(props)
   }
 
-  let content = {
+  let content = $state({
     text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       firstName: 'John',
@@ -94,7 +94,7 @@
         salary: 100
       }
     }
-  }
+  })
 </script>
 
 <svelte:head>

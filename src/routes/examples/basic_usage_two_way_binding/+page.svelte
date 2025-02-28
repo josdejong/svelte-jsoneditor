@@ -1,7 +1,7 @@
 <script>
   import { JSONEditor } from 'svelte-jsoneditor'
 
-  let content = {
+  let content = $state({
     text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       array: [1, 2, 3],
@@ -12,9 +12,9 @@
       object: { a: 'b', c: 'd' },
       string: 'Hello World'
     }
-  }
+  })
 
-  $: console.log('contents changed:', content)
+  $inspect('content', content)
 </script>
 
 <svelte:head>

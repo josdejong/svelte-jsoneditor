@@ -81,7 +81,7 @@
     return errors
   }
 
-  let content = {
+  let content = $state({
     text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       team: [
@@ -98,7 +98,7 @@
         }
       ]
     }
-  }
+  })
 </script>
 
 <svelte:head>

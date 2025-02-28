@@ -1,12 +1,12 @@
 <script>
   import { JSONEditor } from 'svelte-jsoneditor'
 
-  let content = {
+  let content = $state({
     text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       string: 'Hello custom theme color :)'
     }
-  }
+  })
 </script>
 
 <svelte:head>

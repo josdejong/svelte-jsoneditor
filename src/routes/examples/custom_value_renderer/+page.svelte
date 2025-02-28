@@ -9,7 +9,7 @@
   import ReadonlyPassword from '../../components/ReadonlyPassword.svelte'
   import { EvaluatorAction } from '../../components/EvaluatorAction'
 
-  let content = {
+  let content = $state({
     text: undefined, // can be used to pass a stringified JSON document instead
     json: {
       username: 'John',
@@ -17,7 +17,7 @@
       gender: 'male',
       evaluate: '2 + 3'
     }
-  }
+  })
 
   const genderOptions = [
     { value: null, text: '-' },

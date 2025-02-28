@@ -4,7 +4,7 @@
 
   const LosslessJSONParser = { parse, stringify }
 
-  let content = {
+  let content = $state({
     text: `{
   "using": "Lossless JSON Parser",
   "formatted number": 4.0,
@@ -13,9 +13,9 @@
   "small": 1e-500
 }`,
     json: undefined
-  }
+  })
 
-  $: console.log('contents changed:', content)
+  $inspect('content', content)
 </script>
 
 <svelte:head>
