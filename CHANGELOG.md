@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.0](https://github.com/josdejong/svelte-jsoneditor/compare/v3.0.0...v3.1.0) (2025-03-12)
+
+
+### Features
+
+* implement `createAjvValidatorAsync` ([#522](https://github.com/josdejong/svelte-jsoneditor/issues/522)) ([24cea1a](https://github.com/josdejong/svelte-jsoneditor/commit/24cea1ad98c0943f69ba144f389235783c64397b))
+* update dependencies ([b267409](https://github.com/josdejong/svelte-jsoneditor/commit/b2674095672dda27baf00decbb785bb6aab55016))
+
 ## [3.0.0](https://github.com/josdejong/svelte-jsoneditor/compare/v2.4.0...v3.0.0) (2025-02-28)
 
 
