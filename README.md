@@ -328,13 +328,38 @@ True by default. Only applicable to `'table'` mode. When `true`, nested object p
 validator: function (json: unknown): ValidationError[]
 ```
 
-Validate the JSON document. For example use the built-in JSON Schema validator powered by Ajv:
+Validate the JSON document.
+
+##### Using Ajv for JSON Schema
+
+You can use the built-in JSON Schema validator powered by Ajv:
 
 ```js
 import { createAjvValidator } from 'svelte-jsoneditor'
 
 const validator = createAjvValidator({ schema, schemaDefinitions })
 ```
+
+##### Resolving Remote Schemas
+
+If you want Ajv to load remote schemas through its `loadSchema` function, use the async validator builder like this:
+
+```js
+import { createAjvValidatorAsync } from 'svelte-jsoneditor'
+
+const validator = await createAjvValidatorAsync({
+  schema: {
+    $ref: "/schema.json",
+  },
+  ajvOptions: {
+    loadSchema: function (uri: string) {
+      return fetch(uri).then((response) => response.json());
+    },
+  },
+});
+```
+
+`createAjvValidatorAsync` resolves only after Ajv has loaded and compiled all referenced schemas, or rejects on errors, e.g. if `loadSchema` returns a rejected promise.
 
 #### parser
 
@@ -851,6 +876,7 @@ The library exports a set of utility functions. The exact definitions of those f
     - `keyComboFromEvent`
 - Validation:
   - `createAjvValidator`
+  - `createAjvValidatorAsync`
 - Query languages:
   - `jsonQueryLanguage`
   - `jmespathQueryLanguage`
