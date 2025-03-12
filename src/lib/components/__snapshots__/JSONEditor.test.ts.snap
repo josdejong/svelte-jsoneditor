@@ -10,7 +10,6 @@ exports[`JSONEditor > render table mode 1`] = `
     role="none"
   >
     <!---->
-    <!---->
     <div
       class="jse-table-mode svelte-u14cgx"
       role="table"
@@ -20,8 +19,6 @@ exports[`JSONEditor > render table mode 1`] = `
       >
         <!---->
          
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-group-button jse-first svelte-pf7s2l"
@@ -34,10 +31,6 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-group-button  svelte-pf7s2l"
@@ -50,10 +43,6 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-group-button jse-last jse-selected svelte-pf7s2l"
@@ -66,15 +55,11 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
-        
-        
         <!---->
         <div
           class="jse-separator svelte-pf7s2l"
         />
         
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-sort svelte-pf7s2l"
@@ -107,10 +92,6 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-transform svelte-pf7s2l"
@@ -143,10 +124,6 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-search svelte-pf7s2l"
@@ -179,10 +156,6 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-contextmenu svelte-pf7s2l"
@@ -215,15 +188,11 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
-        
-        
         <!---->
         <div
           class="jse-separator svelte-pf7s2l"
         />
         
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-undo svelte-pf7s2l"
@@ -257,10 +226,6 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-redo svelte-pf7s2l"
@@ -294,14 +259,10 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
         <!---->
         <div
           class="jse-space svelte-pf7s2l"
         />
-        
         
         <!---->
          
@@ -627,7 +588,6 @@ exports[`JSONEditor > render table mode 1`] = `
      
     <!---->
     
-    
     <!---->
   </div>
    
@@ -660,8 +620,6 @@ exports[`JSONEditor > render text mode 1`] = `
         <!---->
          
         <!---->
-        <!---->
-        <!---->
         <button
           class="jse-button jse-group-button jse-first jse-selected svelte-pf7s2l"
           title="Switch to text mode (current mode: text)"
@@ -673,10 +631,6 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-group-button  svelte-pf7s2l"
@@ -689,10 +643,6 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-group-button jse-last svelte-pf7s2l"
@@ -705,15 +655,11 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
-        
-        
         <!---->
         <div
           class="jse-separator svelte-pf7s2l"
         />
         
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-format svelte-pf7s2l"
@@ -746,10 +692,6 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-compact svelte-pf7s2l"
@@ -782,15 +724,11 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
-        
-        
         <!---->
         <div
           class="jse-separator svelte-pf7s2l"
         />
         
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-sort svelte-pf7s2l"
@@ -823,10 +761,6 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-transform svelte-pf7s2l"
@@ -859,10 +793,6 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-search svelte-pf7s2l"
@@ -895,15 +825,11 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
-        
-        
         <!---->
         <div
           class="jse-separator svelte-pf7s2l"
         />
         
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-undo svelte-pf7s2l"
@@ -937,10 +863,6 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-redo svelte-pf7s2l"
@@ -974,14 +896,10 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
         <!---->
         <div
           class="jse-space svelte-pf7s2l"
         />
-        
         
         <!---->
          
@@ -1344,7 +1262,6 @@ exports[`JSONEditor > render tree mode 1`] = `
     role="none"
   >
     <!---->
-    <!---->
     <div
       class="jse-tree-mode svelte-vrx1dr"
       role="tree"
@@ -1355,8 +1272,6 @@ exports[`JSONEditor > render tree mode 1`] = `
       >
         <!---->
          
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-group-button jse-first svelte-pf7s2l"
@@ -1369,10 +1284,6 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-group-button  jse-selected svelte-pf7s2l"
@@ -1385,10 +1296,6 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-group-button jse-last svelte-pf7s2l"
@@ -1401,15 +1308,11 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
-        
-        
         <!---->
         <div
           class="jse-separator svelte-pf7s2l"
         />
         
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-expand-all svelte-pf7s2l"
@@ -1442,10 +1345,6 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-collapse-all svelte-pf7s2l"
@@ -1478,15 +1377,11 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
-        
-        
         <!---->
         <div
           class="jse-separator svelte-pf7s2l"
         />
         
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-sort svelte-pf7s2l"
@@ -1519,10 +1414,6 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-transform svelte-pf7s2l"
@@ -1555,10 +1446,6 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-search svelte-pf7s2l"
@@ -1591,10 +1478,6 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-contextmenu svelte-pf7s2l"
@@ -1627,15 +1510,11 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
-        
-        
         <!---->
         <div
           class="jse-separator svelte-pf7s2l"
         />
         
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-undo svelte-pf7s2l"
@@ -1669,10 +1548,6 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
-        <!---->
         <!---->
         <button
           class="jse-button jse-redo svelte-pf7s2l"
@@ -1706,14 +1581,10 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
-        
-        
-        <!---->
         <!---->
         <div
           class="jse-space svelte-pf7s2l"
         />
-        
         
         <!---->
          
@@ -1924,7 +1795,6 @@ exports[`JSONEditor > render tree mode 1`] = `
               style="--level: 1;"
               tabindex="-1"
             >
-              <!---->
               <div
                 class="jse-header-outer svelte-wovgt4"
               >
@@ -2022,7 +1892,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                   style="--level: 2;"
                   tabindex="-1"
                 >
-                  <!---->
                   <div
                     class="jse-contents-outer svelte-wovgt4"
                   >
@@ -2089,7 +1958,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                     />
                     <!---->
                   </div>
-                  
                   <!---->
                    
                   <!---->
@@ -2120,7 +1988,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                 <!---->
               </div>
               <!---->
-              
               <!---->
                
               <!---->
@@ -2135,7 +2002,6 @@ exports[`JSONEditor > render tree mode 1`] = `
               style="--level: 1;"
               tabindex="-1"
             >
-              <!---->
               <div
                 class="jse-header-outer svelte-wovgt4"
               >
@@ -2233,7 +2099,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                   style="--level: 2;"
                   tabindex="-1"
                 >
-                  <!---->
                   <div
                     class="jse-contents-outer svelte-wovgt4"
                   >
@@ -2300,7 +2165,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                     />
                     <!---->
                   </div>
-                  
                   <!---->
                    
                   <!---->
@@ -2315,7 +2179,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                   style="--level: 2;"
                   tabindex="-1"
                 >
-                  <!---->
                   <div
                     class="jse-contents-outer svelte-wovgt4"
                   >
@@ -2382,7 +2245,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                     />
                     <!---->
                   </div>
-                  
                   <!---->
                    
                   <!---->
@@ -2413,7 +2275,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                 <!---->
               </div>
               <!---->
-              
               <!---->
                
               <!---->
@@ -2428,7 +2289,6 @@ exports[`JSONEditor > render tree mode 1`] = `
               style="--level: 1;"
               tabindex="-1"
             >
-              <!---->
               <div
                 class="jse-header-outer svelte-wovgt4"
               >
@@ -2526,7 +2386,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                   style="--level: 2;"
                   tabindex="-1"
                 >
-                  <!---->
                   <div
                     class="jse-contents-outer svelte-wovgt4"
                   >
@@ -2593,7 +2452,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                     />
                     <!---->
                   </div>
-                  
                   <!---->
                    
                   <!---->
@@ -2624,7 +2482,6 @@ exports[`JSONEditor > render tree mode 1`] = `
                 <!---->
               </div>
               <!---->
-              
               <!---->
                
               <!---->
@@ -2674,7 +2531,6 @@ exports[`JSONEditor > render tree mode 1`] = `
     <!---->
      
     <!---->
-    
     
     <!---->
   </div>
