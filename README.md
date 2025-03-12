@@ -876,6 +876,7 @@ The library exports a set of utility functions. The exact definitions of those f
     - `keyComboFromEvent`
 - Validation:
   - `createAjvValidator`
+  - `createAjvValidatorAsync`
 - Query languages:
   - `jsonQueryLanguage`
   - `jmespathQueryLanguage`

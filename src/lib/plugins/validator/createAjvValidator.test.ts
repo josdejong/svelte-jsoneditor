@@ -258,8 +258,17 @@ describe.each([
     ])
   })
 
+  if (create === createAjvValidator) {
+    test('should return validator synchronously', () => {
+      const validate = createAjvValidator(options)
+
+      assert(typeof validate === 'function', 'validator is a function')
+      assert(Array.isArray(validate(invalidJson)), 'validator is callable and returns an array')
+    })
+  }
+
   if (create === createAjvValidatorAsync) {
-    test('resolves remote schema using loadSchema', async () => {
+    test('should resolve remote schema using loadSchema', async () => {
       let loadSchemaCalled = false
 
       const loadSchema = async (uri: string) => {
@@ -292,7 +301,7 @@ describe.each([
       assert.ok(loadSchemaCalled)
     })
 
-    test('rejects if loadSchema returns a rejected promise', async () => {
+    test('should reject if loadSchema returns a rejected promise', async () => {
       const loadSchema = async () => {
         throw new Error('Failed to load schema: Schema not found: /schema.json')
       }
