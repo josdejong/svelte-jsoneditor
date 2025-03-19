@@ -30,6 +30,8 @@ For usage in a Svelte project:
 npm install svelte-jsoneditor
 ```
 
+Note that `svelte-jsoneditor@3.x` requires Svelte 5. If you use Svelte 3 or 4, install `svelte-jsoneditor@2.x`.
+
 For usage in vanilla JavaScript or frameworks like SolidJS, React, Vue, Angular, etc:
 
 ```

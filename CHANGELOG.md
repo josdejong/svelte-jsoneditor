@@ -15,8 +15,9 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### ⚠ BREAKING CHANGES
 
-* - Dropped support for `jsonpath-plus` v9.
-* - most public methods changed from asynchronous to synchronous.
+* Dropped support for Svelte 3 and 4, the library requires Svelte 5 now.
+* Dropped support for `jsonpath-plus` v9.
+* most public methods changed from asynchronous to synchronous.
 
 ### Features
 
