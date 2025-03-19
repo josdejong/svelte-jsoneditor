@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [3.1.1](https://github.com/josdejong/svelte-jsoneditor/compare/v3.1.0...v3.1.1) (2025-03-19)
+
+
+### Bug Fixes
+
+* document that v3 requires Svelte 5 (see [#499](https://github.com/josdejong/svelte-jsoneditor/issues/499)) ([9158dbf](https://github.com/josdejong/svelte-jsoneditor/commit/9158dbf3bc1ff8fb6aa6c02a1a54bbbeb1c6acbe))
+
 ## [3.1.0](https://github.com/josdejong/svelte-jsoneditor/compare/v3.0.0...v3.1.0) (2025-03-12)
 
 
