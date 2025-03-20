@@ -1,0 +1,33 @@
+name: Continuous integration (release)
+on:
+  push:
+    branches:
+      - main
+jobs:
+  automated-releases:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          token: ${{ secrets.NPM_TOKEN }}
+          cache-dependency-path: "package-lock.json"
+      - run: npm run release:lint
+      - run: npm run release:test-ci
+      - run: npm run release:check
+      - run: npm run release:build
+      - run: >
+          npx
+          -p "@semantic-release/commit-analyzer"
+          -p "@semantic-release/release-notes-generator"
+          -p conventional-changelog-conventionalcommits
+          -p semantic-release
+          -- semantic-release
+permissions:
+  # packages: write # This is for pushing it to githubs package repository
+  contents: write
+  issues: write # This is for posting to issues that they are resolved in a release
+  pull-requests: write # This is for posting to PRs that they are part of a release
+  id-token: write # This is for provenance, see https://github.com/semantic-release/npm
