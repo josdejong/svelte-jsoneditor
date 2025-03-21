@@ -2,7 +2,12 @@
 
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
-  import { addNewLineSuffix, removeNewLineSuffix, setCursorToEnd } from '$lib/utils/domUtils.js'
+  import {
+    addNewLineSuffix,
+    removeNewLineSuffix,
+    setCursorToEnd,
+    supportsPlaintextOnlyContentEditable
+  } from '$lib/utils/domUtils.js'
   import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
   import { createDebug } from '$lib/utils/debug.js'
   import { noop } from 'lodash-es'
@@ -153,7 +158,7 @@
   aria-label={label}
   tabindex="0"
   class={classnames('jse-editable-div', valueClass, { 'jse-short-text': shortText })}
-  contenteditable="true"
+  contenteditable={supportsPlaintextOnlyContentEditable() ? 'plaintext-only' : 'true'}
   spellcheck="false"
   on:input={handleValueInput}
   on:keydown={handleValueKeyDown}

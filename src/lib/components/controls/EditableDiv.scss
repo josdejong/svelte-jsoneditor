@@ -25,6 +25,7 @@ div.jse-editable-div {
     white-space: nowrap;
   }
 
+  &[contenteditable='plaintext-only'],
   &[contenteditable='true'] {
     outline: defaults.$edit-outline;
     background: defaults.$background-color;

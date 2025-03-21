@@ -158,8 +158,26 @@ export function isChildOfAttribute(element: Element, name: string, value: string
 
 // test whether a DOM element is a content editable div
 export function isContentEditableDiv(element: HTMLElement): boolean {
-  return element.nodeName === 'DIV' && element.contentEditable === 'true'
+  return (
+    element.nodeName === 'DIV' &&
+    (element.contentEditable === 'plaintext-only' || element.contentEditable === 'true')
+  )
 }
+
+/**
+ * Test whether the current browser supports div.contentEditable='plaintext-only'
+ * Source: https://stackoverflow.com/a/18316972/1262753
+ */
+export function supportsPlaintextOnlyContentEditable() {
+  if (_supportsPlaintextOnlyContentEditable === undefined) {
+    const div = document.createElement('div')
+    div.setAttribute('contenteditable', 'plaintext-only')
+    _supportsPlaintextOnlyContentEditable = div.isContentEditable
+  }
+
+  return _supportsPlaintextOnlyContentEditable
+}
+let _supportsPlaintextOnlyContentEditable: boolean | undefined = undefined
 
 // test whether a DOM element is an "input" with type "text"
 export function isTextInput(element: HTMLInputElement): boolean {
