@@ -158,10 +158,7 @@ export function isChildOfAttribute(element: Element, name: string, value: string
 
 // test whether a DOM element is a content editable div
 export function isContentEditableDiv(element: HTMLElement): boolean {
-  return (
-    element.nodeName === 'DIV' &&
-    (element.contentEditable === 'plaintext-only' || element.contentEditable === 'true')
-  )
+  return element.nodeName === 'DIV' && element.isContentEditable
 }
 
 /**
