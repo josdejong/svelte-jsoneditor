@@ -747,10 +747,10 @@
               <div class="jse-bracket jse-expanded">&lbrace;</div>
             {:else}
               <div class="jse-bracket">&lbrace;</div>
-              <button type="button" class="jse-tag" on:click={handleExpand}>
+              <Tag onclick={handleExpand}>
                 {Object.keys(value).length}
                 {Object.keys(value).length === 1 ? 'prop' : 'props'}
-              </button>
+              </Tag>
               <div class="jse-bracket">&rbrace;</div>
             {/if}
           </div>
