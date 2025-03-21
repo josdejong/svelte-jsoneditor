@@ -162,19 +162,19 @@ export function isContentEditableDiv(element: HTMLElement): boolean {
 }
 
 /**
- * Test whether the current browser supports div.contentEditable='plaintext-only'
+ * Test whether the current browser supports <div contenteditable="plaintext-only"></div>
  * Source: https://stackoverflow.com/a/18316972/1262753
  */
-export function supportsPlaintextOnlyContentEditable() {
-  if (_supportsPlaintextOnlyContentEditable === undefined) {
+export function supportsPlaintextOnly() {
+  if (_supportsPlaintextOnly === undefined) {
     const div = document.createElement('div')
     div.setAttribute('contenteditable', 'plaintext-only')
-    _supportsPlaintextOnlyContentEditable = div.isContentEditable
+    _supportsPlaintextOnly = div.isContentEditable
   }
 
-  return _supportsPlaintextOnlyContentEditable
+  return _supportsPlaintextOnly
 }
-let _supportsPlaintextOnlyContentEditable: boolean | undefined = undefined
+let _supportsPlaintextOnly: boolean | undefined = undefined
 
 // test whether a DOM element is an "input" with type "text"
 export function isTextInput(element: HTMLInputElement): boolean {

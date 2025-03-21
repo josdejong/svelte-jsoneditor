@@ -6,7 +6,7 @@
     addNewLineSuffix,
     removeNewLineSuffix,
     setCursorToEnd,
-    supportsPlaintextOnlyContentEditable
+    supportsPlaintextOnly
   } from '$lib/utils/domUtils.js'
   import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
   import { createDebug } from '$lib/utils/debug.js'
@@ -158,7 +158,7 @@
   aria-label={label}
   tabindex="0"
   class={classnames('jse-editable-div', valueClass, { 'jse-short-text': shortText })}
-  contenteditable={supportsPlaintextOnlyContentEditable() ? 'plaintext-only' : 'true'}
+  contenteditable={supportsPlaintextOnly() ? 'plaintext-only' : 'true'}
   spellcheck="false"
   on:input={handleValueInput}
   on:keydown={handleValueKeyDown}
