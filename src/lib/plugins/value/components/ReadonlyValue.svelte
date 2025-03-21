@@ -15,6 +15,7 @@
   import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
   import { MAX_CHARACTERS_READONLY_VALUE } from '$lib/constants'
   import { formatSize } from '$lib/utils/fileUtils'
+  import Tag from '$lib/components/controls/Tag.svelte'
 
   interface Props {
     path: JSONPath
@@ -61,10 +62,7 @@
     }
   }
 
-  function handleShowMore(event: MouseEvent) {
-    event.preventDefault()
-    event.stopPropagation()
-
+  function handleShowMore() {
     doTruncate = false
   }
 </script>
@@ -85,7 +83,9 @@
     {addNewLineSuffix(normalization.escapeValue(truncatedValue))}
   {/if}
   {#if isTruncated && typeof value === 'string'}
-    <button onclick={handleShowMore}>Show more ({formatSize(value.length, 1024)})</button>
+    <Tag onclick={handleShowMore}>
+      Show more ({formatSize(value.length, 1024)})
+    </Tag>
   {/if}
 </div>
 

@@ -380,6 +380,8 @@ exports[`JSONEditor > render table mode 1`] = `
                   >
                     1
                     <!---->
+                     
+                    <!---->
                   </div>
                   
                   
@@ -407,6 +409,8 @@ exports[`JSONEditor > render table mode 1`] = `
                     tabindex="-1"
                   >
                     
+                    <!---->
+                     
                     <!---->
                   </div>
                   
@@ -449,6 +453,8 @@ exports[`JSONEditor > render table mode 1`] = `
                   >
                     2
                     <!---->
+                     
+                    <!---->
                   </div>
                   
                   
@@ -476,6 +482,8 @@ exports[`JSONEditor > render table mode 1`] = `
                     tabindex="-1"
                   >
                     Joe
+                    <!---->
+                     
                     <!---->
                   </div>
                   
@@ -518,6 +526,8 @@ exports[`JSONEditor > render table mode 1`] = `
                   >
                     3
                     <!---->
+                     
+                    <!---->
                   </div>
                   
                   
@@ -545,6 +555,8 @@ exports[`JSONEditor > render table mode 1`] = `
                     tabindex="-1"
                   >
                     
+                    <!---->
+                     
                     <!---->
                   </div>
                   
@@ -1756,12 +1768,16 @@ exports[`JSONEditor > render tree mode 1`] = `
                     [
                   </div>
                    
-                  <span
-                    class="jse-tag jse-expanded svelte-wovgt4"
+                  <button
+                    class="jse-tag svelte-tqwlgz"
+                    disabled=""
+                    type="button"
                   >
                     3
                 items
-                  </span>
+                    <!---->
+                  </button>
+                  <!---->
                     
                   <!---->
                 </div>
@@ -1938,6 +1954,8 @@ exports[`JSONEditor > render tree mode 1`] = `
                           tabindex="-1"
                         >
                           1
+                          <!---->
+                           
                           <!---->
                         </div>
                         
@@ -2146,6 +2164,8 @@ exports[`JSONEditor > render tree mode 1`] = `
                         >
                           2
                           <!---->
+                           
+                          <!---->
                         </div>
                         
                         
@@ -2225,6 +2245,8 @@ exports[`JSONEditor > render tree mode 1`] = `
                           tabindex="-1"
                         >
                           Joe
+                          <!---->
+                           
                           <!---->
                         </div>
                         
@@ -2432,6 +2454,8 @@ exports[`JSONEditor > render tree mode 1`] = `
                           tabindex="-1"
                         >
                           3
+                          <!---->
+                           
                           <!---->
                         </div>
                         
