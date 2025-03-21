@@ -32,7 +32,11 @@
 
   let doTruncate = $state(true)
   const isTruncated = $derived(
-    doTruncate && typeof value === 'string' && value.length > MAX_CHARACTERS_READONLY_VALUE
+    doTruncate &&
+      typeof value === 'string' &&
+      value.length > MAX_CHARACTERS_READONLY_VALUE &&
+      (!searchResultItems ||
+        !searchResultItems.some((item) => item.active && item.end > MAX_CHARACTERS_READONLY_VALUE))
   )
   const truncatedValue = $derived(
     isTruncated && typeof value === 'string'
@@ -81,9 +85,7 @@
     {addNewLineSuffix(normalization.escapeValue(truncatedValue))}
   {/if}
   {#if isTruncated && typeof value === 'string'}
-    <button onclick={handleShowMore}
-      >Show more ({formatSize(value.length, 1024)})</button
-    >
+    <button onclick={handleShowMore}>Show more ({formatSize(value.length, 1024)})</button>
   {/if}
 </div>
 
