@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import { isUrl } from '$lib/utils/typeUtils.js'
   import { createEditValueSelection } from '$lib/logic/selection.js'
@@ -15,18 +13,33 @@
   } from '$lib/types.js'
   import type { JSONPath } from 'immutable-json-patch'
   import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
+  import { MAX_CHARACTERS_READONLY_VALUE } from '$lib/constants'
+  import { formatSize } from '$lib/utils/fileUtils'
 
-  export let path: JSONPath
-  export let value: unknown
-  export let mode: Mode
-  export let readOnly: boolean
-  export let normalization: ValueNormalization
-  export let parser: JSONParser
-  export let onSelect: OnJSONSelect
+  interface Props {
+    path: JSONPath
+    value: unknown
+    mode: Mode
+    readOnly: boolean
+    normalization: ValueNormalization
+    parser: JSONParser
+    onSelect: OnJSONSelect
+    searchResultItems: ExtendedSearchResultItem[] | undefined
+  }
 
-  export let searchResultItems: ExtendedSearchResultItem[] | undefined
+  const { path, value, mode, readOnly, normalization, parser, onSelect, searchResultItems }: Props =
+    $props()
 
-  $: valueIsUrl = isUrl(value)
+  let doTruncate = $state(true)
+  const isTruncated = $derived(
+    doTruncate && typeof value === 'string' && value.length > MAX_CHARACTERS_READONLY_VALUE
+  )
+  const truncatedValue = $derived(
+    isTruncated && typeof value === 'string'
+      ? value.substring(0, MAX_CHARACTERS_READONLY_VALUE).trim()
+      : value
+  )
+  const valueIsUrl = $derived(isUrl(value))
 
   function handleValueClick(event: MouseEvent) {
     if (typeof value === 'string' && valueIsUrl && isCtrlKeyDown(event)) {
@@ -43,22 +56,34 @@
       onSelect(createEditValueSelection(path))
     }
   }
+
+  function handleShowMore(event: MouseEvent) {
+    event.preventDefault()
+    event.stopPropagation()
+
+    doTruncate = false
+  }
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
   role="button"
   tabindex="-1"
   data-type="selectable-value"
   class={getValueClass(value, mode, parser)}
-  on:click={handleValueClick}
-  on:dblclick={handleValueDoubleClick}
+  onclick={handleValueClick}
+  ondblclick={handleValueDoubleClick}
   title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : undefined}
 >
   {#if searchResultItems}
-    <SearchResultHighlighter text={normalization.escapeValue(value)} {searchResultItems} />
+    <SearchResultHighlighter text={normalization.escapeValue(truncatedValue)} {searchResultItems} />
   {:else}
-    {addNewLineSuffix(normalization.escapeValue(value))}
+    {addNewLineSuffix(normalization.escapeValue(truncatedValue))}
+  {/if}
+  {#if isTruncated && typeof value === 'string'}
+    <button onclick={handleShowMore}
+      >Show more ({formatSize(value.length, 1024)})</button
+    >
   {/if}
 </div>
 
