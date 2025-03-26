@@ -1,28 +1,30 @@
 /**
- * Return a human readable document size
+ * Return a human-readable document size
  * For example formatSize(7570718) outputs '7.6 MB'
+ * This function uses 1000 for kilo (not 1024)
  * @param size
- * @param kilo Is 1000 by default, you can specify 1024 if you
- *                             want the output in KiB
- * @return Returns a human readable size
+ * @return Returns a human-readable size
  */
-export function formatSize(size: number, kilo = 1000): string {
-  if (size < 0.9 * kilo) {
+export function formatSize(size: number): string {
+  const kilo = 1000
+  const factor = 0.9
+
+  if (size < factor * kilo) {
     return size.toFixed() + ' B'
   }
 
   const KB = size / kilo
-  if (KB < 0.9 * kilo) {
+  if (KB < factor * kilo) {
     return KB.toFixed(1) + ' KB'
   }
 
   const MB = KB / kilo
-  if (MB < 0.9 * kilo) {
+  if (MB < factor * kilo) {
     return MB.toFixed(1) + ' MB'
   }
 
   const GB = MB / kilo
-  if (GB < 0.9 * kilo) {
+  if (GB < factor * kilo) {
     return GB.toFixed(1) + ' GB'
   }
 

@@ -1131,14 +1131,8 @@
       <Message
         icon={faExclamationTriangle}
         type="error"
-        message={`The JSON document is larger than ${formatSize(
-          MAX_DOCUMENT_SIZE_TEXT_MODE,
-          1024
-        )}, ` +
-          `and may crash your browser when loading it in text mode. Actual size: ${formatSize(
-            text.length,
-            1024
-          )}.`}
+        message={`The JSON document is larger than ${formatSize(MAX_DOCUMENT_SIZE_TEXT_MODE)}, ` +
+          `and may crash your browser when loading it in text mode. Actual size: ${formatSize(text.length)}.`}
         actions={[
           {
             text: 'Open anyway',
