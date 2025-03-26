@@ -22,9 +22,9 @@
     type RenderMenuContext,
     renderValue,
     type RenderValueComponentDescription,
-    type RenderValuePropsOptional,
     SelectionType,
-    toJSONContent
+    toJSONContent,
+    type RenderValueProps
   } from 'svelte-jsoneditor'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
@@ -90,7 +90,7 @@
       "<button onclick=alert('oopsie!!!')>test xss</button>": "xss?"
     }
   ],
-  "long line": "longwordlongword longword2longword2longword2 longlinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelonglinelongline"
+  "large string": "[32] Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt, explicabo. Nemo enim ipsam voluptatem, quia voluptas sit, aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos, qui ratione voluptatem sequi nesciunt, neque porro quisquam est, qui dolorem ipsum, quia dolor sit amet consectetur adipisci[ng] velit, sed quia non numquam [do] eius modi tempora inci[di]dunt, ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum[d] exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? [D]Quis autem vel eum i[r]ure reprehenderit, qui in ea voluptate velit esse, quam nihil molestiae consequatur, vel illum, qui dolorem eum fugiat, quo voluptas nulla pariatur?\\n[33] At vero eos et accusamus et iusto odio dignissimos ducimus, qui blanditiis praesentium voluptatum deleniti atque corrupti, quos dolores et quas molestias excepturi sint, obcaecati cupiditate non provident, similique sunt in culpa, qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem reru[d]um facilis est e[r]t expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio, cumque nihil impedit, quo minus id, quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellend[a]us. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet, ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat."
 }`,
     json: undefined
   }
@@ -272,6 +272,7 @@
     pathParsers[0].id
   )
   const tabSize = useLocalStorage('svelte-jsoneditor-demo-tabSize', indentations[0].value)
+  const truncateTextSize = useLocalStorage('svelte-jsoneditor-demo-truncateTextSize', 1000)
   let leftEditorMode: Mode = Mode.tree
 
   $: queryLanguages = $multipleQueryLanguages
@@ -294,7 +295,7 @@
   $: selectedValidator = $validate ? validator : $validateArray ? arrayValidator : undefined
 
   // only editable/readonly div, no color picker, boolean toggle, timestamp
-  function customRenderValue(props: RenderValuePropsOptional): RenderValueComponentDescription[] {
+  function customRenderValue(props: RenderValueProps): RenderValueComponentDescription[] {
     return props.isEditing
       ? [{ component: EditableValue, props }]
       : [{ component: ReadonlyValue, props }]
@@ -471,6 +472,9 @@
     </label>
     <label>
       tabSize: <input type="number" bind:value={$tabSize} />
+    </label>
+    <label>
+      truncateTextSize: <input type="number" bind:value={$truncateTextSize} />
     </label>
     <label>
       Height: <input type="text" bind:value={height} />
@@ -743,6 +747,7 @@
               readOnly={$readOnly}
               indentation={$selectedIndentation}
               tabSize={$tabSize}
+              truncateTextSize={$truncateTextSize}
               parser={selectedParser}
               pathParser={selectedPathParser}
               validator={selectedValidator}
@@ -806,6 +811,7 @@
               readOnly={$readOnly}
               indentation={$selectedIndentation}
               tabSize={$tabSize}
+              truncateTextSize={$truncateTextSize}
               parser={selectedParser}
               pathParser={selectedPathParser}
               validator={selectedValidator}

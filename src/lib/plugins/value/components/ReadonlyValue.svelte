@@ -1,32 +1,38 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import { isUrl } from '$lib/utils/typeUtils.js'
   import { createEditValueSelection } from '$lib/logic/selection.js'
   import SearchResultHighlighter from '../../../components/modes/treemode/highlight/SearchResultHighlighter.svelte'
   import { getValueClass } from './utils/getValueClass.js'
   import { addNewLineSuffix } from '$lib/utils/domUtils.js'
-  import {
-    type ExtendedSearchResultItem,
-    type JSONParser,
-    type Mode,
-    type OnJSONSelect,
-    type ValueNormalization
-  } from '$lib/types.js'
-  import type { JSONPath } from 'immutable-json-patch'
+  import { type RenderValueProps } from '$lib/types.js'
   import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
+  import { formatSize } from '$lib/utils/fileUtils'
+  import Tag from '../../../components/controls/Tag.svelte'
 
-  export let path: JSONPath
-  export let value: unknown
-  export let mode: Mode
-  export let readOnly: boolean
-  export let normalization: ValueNormalization
-  export let parser: JSONParser
-  export let onSelect: OnJSONSelect
+  const {
+    path,
+    value,
+    mode,
+    truncateTextSize,
+    readOnly,
+    normalization,
+    parser,
+    onSelect,
+    searchResultItems
+  }: RenderValueProps = $props()
 
-  export let searchResultItems: ExtendedSearchResultItem[] | undefined
-
-  $: valueIsUrl = isUrl(value)
+  let doTruncate = $state(true)
+  const isTruncated = $derived(
+    doTruncate &&
+      typeof value === 'string' &&
+      value.length > truncateTextSize &&
+      (!searchResultItems ||
+        !searchResultItems.some((item) => item.active && item.end > truncateTextSize))
+  )
+  const truncatedValue = $derived(
+    isTruncated && typeof value === 'string' ? value.substring(0, truncateTextSize).trim() : value
+  )
+  const valueIsUrl = $derived(isUrl(value))
 
   function handleValueClick(event: MouseEvent) {
     if (typeof value === 'string' && valueIsUrl && isCtrlKeyDown(event)) {
@@ -43,22 +49,31 @@
       onSelect(createEditValueSelection(path))
     }
   }
+
+  function handleShowMore() {
+    doTruncate = false
+  }
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
   role="button"
   tabindex="-1"
   data-type="selectable-value"
   class={getValueClass(value, mode, parser)}
-  on:click={handleValueClick}
-  on:dblclick={handleValueDoubleClick}
+  onclick={handleValueClick}
+  ondblclick={handleValueDoubleClick}
   title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : undefined}
 >
   {#if searchResultItems}
-    <SearchResultHighlighter text={normalization.escapeValue(value)} {searchResultItems} />
+    <SearchResultHighlighter text={normalization.escapeValue(truncatedValue)} {searchResultItems} />
   {:else}
-    {addNewLineSuffix(normalization.escapeValue(value))}
+    {addNewLineSuffix(normalization.escapeValue(truncatedValue))}
+  {/if}
+  {#if isTruncated && typeof value === 'string'}
+    <Tag onclick={handleShowMore}>
+      Show more ({formatSize(value.length)})
+    </Tag>
   {/if}
 </div>
 

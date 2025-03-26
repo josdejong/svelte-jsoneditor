@@ -169,6 +169,7 @@
   export let externalContent: Content
   export let externalSelection: JSONEditorSelection | undefined
   export let history: History<HistoryItem>
+  export let truncateTextSize: number
   export let mainMenuBar: boolean
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
@@ -379,6 +380,7 @@
   $: context = {
     mode: Mode.table,
     readOnly,
+    truncateTextSize,
     parser,
     normalization,
     getJson: () => json,

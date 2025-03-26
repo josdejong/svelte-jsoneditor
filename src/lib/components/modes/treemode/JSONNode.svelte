@@ -74,6 +74,7 @@
   import { isObject } from '$lib/utils/typeUtils.js'
   import { classnames } from '$lib/utils/cssUtils.js'
   import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
+  import Tag from '../../../components/controls/Tag.svelte'
 
   // We pass `pointer` instead of `path` because pointer (a string) is immutable.
   // Without it, *all* nodes would re-render on *every* change in JSON or DocumentState,
@@ -171,9 +172,7 @@
     context.onExpand(path, !expanded, recursive)
   }
 
-  function handleExpand(event: MouseEvent) {
-    event.stopPropagation()
-
+  function handleExpand() {
     context.onExpand(path, true)
   }
 
@@ -609,17 +608,17 @@
           <div class="jse-meta-inner" data-type="selectable-value">
             {#if expanded}
               <div class="jse-bracket">[</div>
-              <span class="jse-tag jse-expanded">
+              <Tag>
                 {value.length}
                 {value.length === 1 ? 'item' : 'items'}
-              </span>
+              </Tag>
               &nbsp;
             {:else}
               <div class="jse-bracket">[</div>
-              <button type="button" class="jse-tag" on:click={handleExpand}>
+              <Tag onclick={handleExpand}>
                 {value.length}
                 {value.length === 1 ? 'item' : 'items'}
-              </button>
+              </Tag>
               <div class="jse-bracket">]</div>
             {/if}
           </div>
@@ -748,10 +747,10 @@
               <div class="jse-bracket jse-expanded">&lbrace;</div>
             {:else}
               <div class="jse-bracket">&lbrace;</div>
-              <button type="button" class="jse-tag" on:click={handleExpand}>
+              <Tag onclick={handleExpand}>
                 {Object.keys(value).length}
                 {Object.keys(value).length === 1 ? 'prop' : 'props'}
-              </button>
+              </Tag>
               <div class="jse-bracket">&rbrace;</div>
             {/if}
           </div>

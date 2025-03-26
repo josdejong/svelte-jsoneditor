@@ -59,6 +59,7 @@
   const readOnlyDefault = false
   const indentationDefault = 2
   const tabSizeDefault = 4
+  const truncateTextSizeDefault = 1000
   const modeDefault = Mode.tree
   const mainMenuBarDefault = true
   const navigationBarDefault = true
@@ -96,6 +97,7 @@
   export let readOnly: boolean = readOnlyDefault
   export let indentation: number | string = indentationDefault
   export let tabSize: number = tabSizeDefault
+  export let truncateTextSize: number = truncateTextSizeDefault
   export let mode: Mode = modeDefault
   export let mainMenuBar: boolean = mainMenuBarDefault
   export let navigationBar: boolean = navigationBarDefault
@@ -303,6 +305,9 @@
         case 'tabSize':
           tabSize = props[name] ?? tabSizeDefault
           break
+        case 'truncateTextSize':
+          truncateTextSize = props[name] ?? truncateTextSizeDefault
+          break
         case 'mode':
           mode = props[name] ?? modeDefault
           break
@@ -464,6 +469,7 @@
       json,
       rootPath,
       indentation,
+      truncateTextSize,
       escapeControlCharacters,
       escapeUnicodeCharacters,
       parser,
@@ -505,6 +511,7 @@
       readOnly,
       indentation,
       tabSize,
+      truncateTextSize,
       mainMenuBar,
       navigationBar,
       statusBar,
@@ -546,6 +553,7 @@
         {readOnly}
         {indentation}
         {tabSize}
+        {truncateTextSize}
         {statusBar}
         {askToFormat}
         {mainMenuBar}
