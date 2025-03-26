@@ -4,45 +4,33 @@
   import SearchResultHighlighter from '../../../components/modes/treemode/highlight/SearchResultHighlighter.svelte'
   import { getValueClass } from './utils/getValueClass.js'
   import { addNewLineSuffix } from '$lib/utils/domUtils.js'
-  import {
-    type ExtendedSearchResultItem,
-    type JSONParser,
-    type Mode,
-    type OnJSONSelect,
-    type ValueNormalization
-  } from '$lib/types.js'
-  import type { JSONPath } from 'immutable-json-patch'
+  import { type RenderValueProps } from '$lib/types.js'
   import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
-  import { MAX_CHARACTERS_READONLY_VALUE } from '$lib/constants'
   import { formatSize } from '$lib/utils/fileUtils'
   import Tag from '$lib/components/controls/Tag.svelte'
 
-  interface Props {
-    path: JSONPath
-    value: unknown
-    mode: Mode
-    readOnly: boolean
-    normalization: ValueNormalization
-    parser: JSONParser
-    onSelect: OnJSONSelect
-    searchResultItems: ExtendedSearchResultItem[] | undefined
-  }
-
-  const { path, value, mode, readOnly, normalization, parser, onSelect, searchResultItems }: Props =
-    $props()
+  const {
+    path,
+    value,
+    mode,
+    truncateTextSize,
+    readOnly,
+    normalization,
+    parser,
+    onSelect,
+    searchResultItems
+  }: RenderValueProps = $props()
 
   let doTruncate = $state(true)
   const isTruncated = $derived(
     doTruncate &&
       typeof value === 'string' &&
-      value.length > MAX_CHARACTERS_READONLY_VALUE &&
+      value.length > truncateTextSize &&
       (!searchResultItems ||
-        !searchResultItems.some((item) => item.active && item.end > MAX_CHARACTERS_READONLY_VALUE))
+        !searchResultItems.some((item) => item.active && item.end > truncateTextSize))
   )
   const truncatedValue = $derived(
-    isTruncated && typeof value === 'string'
-      ? value.substring(0, MAX_CHARACTERS_READONLY_VALUE).trim()
-      : value
+    isTruncated && typeof value === 'string' ? value.substring(0, truncateTextSize).trim() : value
   )
   const valueIsUrl = $derived(isUrl(value))
 
@@ -84,7 +72,7 @@
   {/if}
   {#if isTruncated && typeof value === 'string'}
     <Tag onclick={handleShowMore}>
-      Show more ({formatSize(value.length, 1024)})
+      Show more ({formatSize(value.length)})
     </Tag>
   {/if}
 </div>

@@ -43,6 +43,7 @@
   export let readOnly: boolean
   export let indentation: number | string
   export let tabSize: number
+  export let truncateTextSize: number
   export let mainMenuBar: boolean
   export let navigationBar: boolean
   export let statusBar: boolean
@@ -252,6 +253,7 @@
             {readOnly}
             {indentation}
             {tabSize}
+            {truncateTextSize}
             {statusBar}
             {askToFormat}
             {mainMenuBar}

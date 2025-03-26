@@ -38,6 +38,7 @@
     "build": "npm run build:svelte && npm run build:vanilla",
     "build:watch": "npm run build -- --watch",
     "build:svelte": "npm-run-all build:svelte:**",
+    "build:svelte:check": "npm run check",
     "build:svelte:clean": "del-cli package",
     "build:svelte:prepare": "svelte-kit sync",
     "build:svelte:package": "svelte-package -o package",

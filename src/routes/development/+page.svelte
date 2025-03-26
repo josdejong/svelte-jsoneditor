@@ -22,9 +22,9 @@
     type RenderMenuContext,
     renderValue,
     type RenderValueComponentDescription,
-    type RenderValuePropsOptional,
     SelectionType,
-    toJSONContent
+    toJSONContent,
+    type RenderValueProps
   } from 'svelte-jsoneditor'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
@@ -272,6 +272,7 @@
     pathParsers[0].id
   )
   const tabSize = useLocalStorage('svelte-jsoneditor-demo-tabSize', indentations[0].value)
+  const truncateTextSize = useLocalStorage('svelte-jsoneditor-demo-truncateTextSize', 1000)
   let leftEditorMode: Mode = Mode.tree
 
   $: queryLanguages = $multipleQueryLanguages
@@ -294,7 +295,7 @@
   $: selectedValidator = $validate ? validator : $validateArray ? arrayValidator : undefined
 
   // only editable/readonly div, no color picker, boolean toggle, timestamp
-  function customRenderValue(props: RenderValuePropsOptional): RenderValueComponentDescription[] {
+  function customRenderValue(props: RenderValueProps): RenderValueComponentDescription[] {
     return props.isEditing
       ? [{ component: EditableValue, props }]
       : [{ component: ReadonlyValue, props }]
@@ -471,6 +472,9 @@
     </label>
     <label>
       tabSize: <input type="number" bind:value={$tabSize} />
+    </label>
+    <label>
+      truncateTextSize: <input type="number" bind:value={$truncateTextSize} />
     </label>
     <label>
       Height: <input type="text" bind:value={height} />
@@ -743,6 +747,7 @@
               readOnly={$readOnly}
               indentation={$selectedIndentation}
               tabSize={$tabSize}
+              truncateTextSize={$truncateTextSize}
               parser={selectedParser}
               pathParser={selectedPathParser}
               validator={selectedValidator}
@@ -806,6 +811,7 @@
               readOnly={$readOnly}
               indentation={$selectedIndentation}
               tabSize={$tabSize}
+              truncateTextSize={$truncateTextSize}
               parser={selectedParser}
               pathParser={selectedPathParser}
               validator={selectedValidator}

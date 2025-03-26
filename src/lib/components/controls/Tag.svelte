@@ -1,7 +1,9 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte'
+
   interface Props {
     onclick?: () => void
-    children?: () => unknown
+    children?: Snippet
   }
 
   const { onclick, children }: Props = $props()

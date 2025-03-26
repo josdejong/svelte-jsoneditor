@@ -1,5 +1,5 @@
 import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-import type { SvelteComponent } from 'svelte'
+import type { Component, SvelteComponent } from 'svelte'
 import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import type { Action } from 'svelte/action'
 
@@ -592,6 +592,7 @@ export interface JSONEditorPropsOptional {
   readOnly?: boolean
   indentation?: number | string
   tabSize?: number
+  truncateTextSize?: number
   mode?: Mode
   mainMenuBar?: boolean
   navigationBar?: boolean
@@ -629,6 +630,7 @@ export interface JSONEditorModalProps {
   readOnly: boolean
   indentation: number | string
   tabSize: number
+  truncateTextSize: number
   mainMenuBar: boolean
   navigationBar: boolean
   statusBar: boolean
@@ -653,6 +655,7 @@ export interface JSONEditorModalProps {
 export interface JSONEditorContext {
   mode: Mode
   readOnly: boolean
+  truncateTextSize: number
   parser: JSONParser
   normalization: ValueNormalization
   getJson: () => unknown | undefined
@@ -685,10 +688,11 @@ export interface RenderValueProps extends Record<string, unknown> {
   path: JSONPath
   value: unknown
   mode: Mode
+  truncateTextSize: number
   readOnly: boolean
   enforceString: boolean
   selection: JSONSelection | undefined
-  searchResultItems: SearchResultItem[] | undefined
+  searchResultItems: ExtendedSearchResultItem[] | undefined
   isEditing: boolean
   parser: JSONParser
   normalization: ValueNormalization
@@ -716,8 +720,10 @@ export interface DraggingState {
 export type RenderValueComponentDescription = SvelteComponentRenderer | SvelteActionRenderer
 
 export interface SvelteComponentRenderer {
-  component: typeof SvelteComponent<RenderValuePropsOptional>
-  props: Record<string, unknown>
+  component:
+    | typeof SvelteComponent<RenderValuePropsOptional> // Classic Svelte component
+    | Component<RenderValueProps> // Runes
+  props: RenderValueProps
 }
 
 export interface SvelteActionRenderer {
@@ -749,6 +755,7 @@ export interface TransformModalProps extends TransformModalCallback {
   json: unknown
   rootPath: JSONPath
   indentation: number | string
+  truncateTextSize: number
   escapeControlCharacters: boolean
   escapeUnicodeCharacters: boolean
   parser: JSONParser

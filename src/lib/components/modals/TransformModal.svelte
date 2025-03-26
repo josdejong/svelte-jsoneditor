@@ -42,6 +42,7 @@
   export let rootPath: JSONPath = []
 
   export let indentation: number | string
+  export let truncateTextSize: number
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
   export let parser: JSONParser
@@ -324,6 +325,7 @@
                   externalSelection={undefined}
                   {history}
                   readOnly={true}
+                  {truncateTextSize}
                   mainMenuBar={false}
                   navigationBar={false}
                   {indentation}
@@ -362,6 +364,7 @@
                   externalSelection={undefined}
                   {history}
                   readOnly={true}
+                  {truncateTextSize}
                   mainMenuBar={false}
                   navigationBar={false}
                   {indentation}

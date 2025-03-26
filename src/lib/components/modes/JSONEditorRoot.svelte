@@ -47,6 +47,7 @@
   export let readOnly: boolean
   export let indentation: number | string
   export let tabSize: number
+  export let truncateTextSize: number
   export let externalMode: Mode
   export let mainMenuBar: boolean
   export let navigationBar: boolean
@@ -365,6 +366,7 @@
     externalSelection={selection}
     {history}
     {readOnly}
+    {truncateTextSize}
     {mainMenuBar}
     {escapeControlCharacters}
     {escapeUnicodeCharacters}
@@ -397,6 +399,7 @@
     {history}
     {readOnly}
     {indentation}
+    {truncateTextSize}
     {mainMenuBar}
     {navigationBar}
     {escapeControlCharacters}
