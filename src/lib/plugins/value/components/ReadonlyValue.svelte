@@ -7,7 +7,7 @@
   import { type RenderValueProps } from '$lib/types.js'
   import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
   import { formatSize } from '$lib/utils/fileUtils'
-  import Tag from '$lib/components/controls/Tag.svelte'
+  import Tag from '../../../components/controls/Tag.svelte'
 
   const {
     path,

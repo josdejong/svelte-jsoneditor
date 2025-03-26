@@ -74,7 +74,7 @@
   import { isObject } from '$lib/utils/typeUtils.js'
   import { classnames } from '$lib/utils/cssUtils.js'
   import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
-  import Tag from '$lib/components/controls/Tag.svelte'
+  import Tag from '../../../components/controls/Tag.svelte'
 
   // We pass `pointer` instead of `path` because pointer (a string) is immutable.
   // Without it, *all* nodes would re-render on *every* change in JSON or DocumentState,
