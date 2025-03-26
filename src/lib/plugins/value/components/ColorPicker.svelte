@@ -1,24 +1,17 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import { getColorCSS } from '$lib/utils/typeUtils.js'
   import { getWindow } from '$lib/utils/domUtils.js'
-  import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getContext } from 'svelte'
   import ColorPickerPopup from '../../../components/controls/ColorPickerPopup.svelte'
-  import type { AbsolutePopupContext, OnPatch } from '$lib/types.js'
+  import type { AbsolutePopupContext, RenderValueProps } from '$lib/types.js'
 
   const { openAbsolutePopup } = getContext<AbsolutePopupContext>('absolute-popup')
 
-  export let path: JSONPath
-  export let value: string
-  export let readOnly: boolean
-  export let onPatch: OnPatch
-  export let focus: () => void
+  const { path, value, readOnly, onPatch, focus }: RenderValueProps = $props()
 
-  $: color = getColorCSS(value)
-  $: title = !readOnly ? 'Click to open a color picker' : `Color ${value}`
+  const color = $derived(getColorCSS(String(value)))
+  const title = $derived(!readOnly ? 'Click to open a color picker' : `Color ${value}`)
 
   function onChange(color: string) {
     onPatch([
@@ -75,7 +68,7 @@
   style="background: {color}"
   {title}
   aria-label={title}
-  on:click={openColorPicker}
+  onclick={openColorPicker}
 ></button>
 
 <style src="./ColorPicker.scss"></style>

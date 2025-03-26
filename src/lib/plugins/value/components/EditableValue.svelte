@@ -1,40 +1,29 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
-  import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
+  import type { JSONPatchDocument } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils.js'
   import { createValueSelection, getFocusPath, isEditingSelection } from '$lib/logic/selection.js'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass.js'
   import EditableDiv from '../../../components/controls/EditableDiv.svelte'
-  import {
-    type FindNextInside,
-    type JSONParser,
-    type JSONSelection,
-    Mode,
-    type OnFind,
-    type OnJSONSelect,
-    type OnPasteJson,
-    type OnPatch,
-    UpdateSelectionAfterChange,
-    type ValueNormalization
-  } from '$lib/types.js'
+  import { type RenderValueProps, UpdateSelectionAfterChange } from '$lib/types.js'
   import { isEqual } from 'lodash-es'
   import { expandSmart } from '$lib/logic/documentState'
 
-  export let path: JSONPath
-  export let value: unknown
-  export let selection: JSONSelection | undefined
-  export let mode: Mode
-  export let parser: JSONParser
-  export let normalization: ValueNormalization
-  export let enforceString: boolean
-  export let onPatch: OnPatch
-  export let onPasteJson: OnPasteJson
-  export let onSelect: OnJSONSelect
-  export let onFind: OnFind
-  export let focus: () => void
-  export let findNextInside: FindNextInside
+  const {
+    path,
+    value,
+    selection,
+    mode,
+    parser,
+    normalization,
+    enforceString,
+    onPatch,
+    onPasteJson,
+    onSelect,
+    onFind,
+    focus,
+    findNextInside
+  }: RenderValueProps = $props()
 
   function convert(value: string): unknown {
     return enforceString ? value : stringConvert(value, parser)

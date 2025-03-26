@@ -1,26 +1,18 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
-  import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass.js'
-  import { type JSONParser, type JSONSelection, Mode, type OnPatch } from '$lib/types.js'
+  import { type EnumValueProps, type JSONSelection } from '$lib/types.js'
   import { isValueSelection } from '$lib/logic/selection.js'
 
-  export let path: JSONPath
-  export let value: unknown
-  export let mode: Mode
-  export let parser: JSONParser
-  export let readOnly: boolean
-  export let selection: JSONSelection | undefined
-  export let onPatch: OnPatch
-
-  export let options: Array<{ value: unknown; text: string }>
+  const { path, value, mode, parser, readOnly, selection, onPatch, options }: EnumValueProps =
+    $props()
 
   let refSelect: HTMLSelectElement | undefined
 
-  let bindValue: unknown = value
-  $: bindValue = value
+  let bindValue: unknown = $state(value)
+  $effect(() => {
+    bindValue = value
+  })
 
   function applyFocus(selection: JSONSelection | undefined) {
     if (selection) {
@@ -30,7 +22,9 @@
     }
   }
 
-  $: applyFocus(selection)
+  $effect(() => {
+    applyFocus(selection)
+  })
 
   function handleSelect(event: Event) {
     event.stopPropagation()
@@ -59,8 +53,8 @@
   class:jse-selected={isValueSelection(selection)}
   bind:value={bindValue}
   bind:this={refSelect}
-  on:change={handleSelect}
-  on:mousedown={handleMouseDown}
+  onchange={handleSelect}
+  onmousedown={handleMouseDown}
 >
   {#each options as option}
     <option value={option.value}>{option.text}</option>

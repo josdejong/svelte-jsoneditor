@@ -1,6 +1,8 @@
 import EnumValue from './components/EnumValue.svelte'
 import { getJSONSchemaOptions } from '$lib/utils/jsonSchemaUtils.js'
 import type {
+  EnumValueOption,
+  EnumValueProps,
   JSONSchema,
   JSONSchemaDefinitions,
   RenderValueComponentDescription,
@@ -16,20 +18,20 @@ export function renderJSONSchemaEnum(
   props: RenderValueProps,
   schema: JSONSchema,
   schemaDefinitions?: JSONSchemaDefinitions
-): RenderValueComponentDescription[] | undefined {
+): RenderValueComponentDescription<EnumValueProps>[] | undefined {
   const enumValues = getJSONSchemaOptions(schema, schemaDefinitions, props.path)
 
   if (enumValues) {
     const options = enumValues.map((enumValue) => ({
       value: enumValue,
-      text: enumValue
+      text: String(enumValue)
     }))
 
     // make sure the current value is also added as one of the options,
     // else it would look as if the first option is the current value
-    const optionsWithValue = enumValues.includes(props.value)
+    const optionsWithValue: EnumValueOption[] = enumValues.includes(props.value)
       ? options
-      : [{ value: props.value, text: props.value }].concat(options)
+      : [{ value: props.value, text: String(props.value) }].concat(options)
 
     return [
       {

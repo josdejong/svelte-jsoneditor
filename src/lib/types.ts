@@ -704,7 +704,19 @@ export interface RenderValueProps extends Record<string, unknown> {
   focus: () => void
 }
 
+/**
+ * @deprecated Use `Partial<RenderValueProps>` instead.
+ */
 export type RenderValuePropsOptional = Partial<RenderValueProps>
+
+export interface EnumValueOption {
+  value: unknown
+  text: string
+}
+
+export interface EnumValueProps extends RenderValueProps {
+  options: EnumValueOption[]
+}
 
 export interface DraggingState {
   initialTarget: Element
@@ -717,18 +729,20 @@ export interface DraggingState {
   didMoveItems: boolean
 }
 
-export type RenderValueComponentDescription = SvelteComponentRenderer | SvelteActionRenderer
+export type RenderValueComponentDescription<T extends RenderValueProps = RenderValueProps> =
+  | SvelteComponentRenderer<T>
+  | SvelteActionRenderer<T>
 
-export interface SvelteComponentRenderer {
+export interface SvelteComponentRenderer<T extends RenderValueProps = RenderValueProps> {
   component:
-    | typeof SvelteComponent<RenderValuePropsOptional> // Classic Svelte component
-    | Component<RenderValueProps> // Runes
-  props: RenderValueProps
+    | typeof SvelteComponent<Partial<T>> // Classic
+    | Component<T> // Runes
+  props: T
 }
 
-export interface SvelteActionRenderer {
-  action: Action<HTMLElement, Record<string, unknown>>
-  props: Record<string, unknown>
+export interface SvelteActionRenderer<T extends RenderValueProps = RenderValueProps> {
+  action: Action<HTMLElement, T>
+  props: T
 }
 
 export interface TransformModalOptions {

@@ -1,17 +1,15 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import Icon from 'svelte-awesome'
   import { faClock } from '@fortawesome/free-regular-svg-icons'
   import { getContext } from 'svelte'
   import { tooltip } from '$lib/components/controls/tooltip/tooltip.js'
-  import type { AbsolutePopupContext } from '$lib/types'
+  import type { AbsolutePopupContext, RenderValueProps } from '$lib/types'
 
   const absolutePopupContext = getContext<AbsolutePopupContext>('absolute-popup')
 
-  export let value: number
+  const { value }: RenderValueProps = $props()
 
-  $: text = `Time: ${new Date(value).toString()}`
+  const text = $derived(`Time: ${new Date(value as number).toString()}`)
 </script>
 
 <div class="jse-timestamp" use:tooltip={{ text, ...absolutePopupContext }}>

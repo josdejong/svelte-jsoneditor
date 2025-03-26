@@ -1,17 +1,10 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
-  import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import Icon from 'svelte-awesome'
-  import type { OnPatch } from '$lib/types.js'
+  import type { RenderValueProps } from '$lib/types.js'
 
-  export let path: JSONPath
-  export let value: unknown
-  export let readOnly: boolean
-  export let onPatch: OnPatch
-  export let focus: () => void
+  const { path, value, readOnly, onPatch, focus }: RenderValueProps = $props()
 
   function toggleBooleanValue(event: MouseEvent) {
     event.stopPropagation()
@@ -38,7 +31,7 @@
   aria-checked={value === true}
   class="jse-boolean-toggle"
   class:jse-readonly={readOnly}
-  on:mousedown={toggleBooleanValue}
+  onmousedown={toggleBooleanValue}
   title={!readOnly ? 'Click to toggle this boolean value' : `Boolean value ${value}`}
 >
   <Icon data={value === true ? faCheckSquare : faSquare} />
