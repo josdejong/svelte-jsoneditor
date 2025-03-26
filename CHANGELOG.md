@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.0](https://github.com/josdejong/svelte-jsoneditor/compare/v3.1.1...v3.2.0) (2025-03-26)
+
+
+### Features
+
+* [#529](https://github.com/josdejong/svelte-jsoneditor/issues/529) extract nested arrays in table mode ([592c6bc](https://github.com/josdejong/svelte-jsoneditor/commit/592c6bc3617fd30f98cc411f207c3308c7bf753a))
+* [#537](https://github.com/josdejong/svelte-jsoneditor/issues/537) truncate large strings ([#538](https://github.com/josdejong/svelte-jsoneditor/issues/538)) ([160a940](https://github.com/josdejong/svelte-jsoneditor/commit/160a94079b6bea2f5697902f927cd9a4c0fa1c64))
+
+
+### Bug Fixes
+
+* show the file sizes in KB (see [#537](https://github.com/josdejong/svelte-jsoneditor/issues/537)) ([216b709](https://github.com/josdejong/svelte-jsoneditor/commit/216b7091c583bcb0209d891a395db5e53707a29f))
+
 ### [3.1.1](https://github.com/josdejong/svelte-jsoneditor/compare/v3.1.0...v3.1.1) (2025-03-19)
 
 
