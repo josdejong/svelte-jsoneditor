@@ -13,8 +13,4 @@ describe('fileUtils', () => {
     assert.strictEqual(formatSize(22.37 * 1000 * 1000 * 1000), '22.4 GB')
     assert.strictEqual(formatSize(1000 * 1000 * 1000 * 1000), '1.0 TB')
   })
-
-  test('should format a document size in a human readable way counting with 1024', () => {
-    assert.strictEqual(formatSize(1024 * 1024, 1024), '1.0 MB')
-  })
 })

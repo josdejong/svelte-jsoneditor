@@ -15,10 +15,9 @@
   export let readOnly: boolean
   export let parser: JSONParser
   export let openJSONEditorModal: (path: JSONPath) => void
+  export let extractPath: (path: JSONPath) => void
   export let onChangeMode: OnChangeMode
   export let onClick: () => void
-
-  $: action = readOnly ? 'View' : 'Edit'
 
   let nestedArrayPaths: JSONPath[]
   $: nestedArrayPaths = json
@@ -53,29 +52,42 @@
       {#if hasNestedArrays}
         An object cannot be opened in table mode. You can open a nested array instead, or open the
         document in tree mode.
+      {:else if isEmptyDocument && !readOnly}
+        An empty document cannot be opened in table mode. You can go to tree mode instead, or paste
+        a JSON Array using <b>Ctrl+V</b>.
       {:else}
-        {documentType} cannot be opened in table mode.
-      {/if}
-      {#if isEmptyDocument && !readOnly}
-        You can open the document in tree mode instead, or paste a JSON Array using <b>Ctrl+V</b>.
-      {:else}
-        You can open the document in tree mode instead.
+        {documentType} cannot be opened in table mode. You can open the document in tree mode instead.
       {/if}
     </div>
     {#each nestedArrayPaths as nestedArrayPath}
       {@const count = countItems(nestedArrayPath)}
 
-      <button
-        type="button"
-        class="jse-nested-array-action"
-        on:click={() => openJSONEditorModal(nestedArrayPath)}
-      >
-        {action} "{stringifyJSONPath(nestedArrayPath)}"
-        <span class="jse-nested-array-count">({count} {count !== 1 ? 'items' : 'item'})</span>
-      </button>
+      <div class="jse-nested-property">
+        <div class="jse-nested-property-path">
+          "{stringifyJSONPath(nestedArrayPath)}"
+          <span class="jse-nested-property-count">({count} {count !== 1 ? 'items' : 'item'})</span>
+        </div>
+
+        <button
+          type="button"
+          class="jse-nested-array-action"
+          on:click={() => openJSONEditorModal(nestedArrayPath)}
+        >
+          {readOnly ? 'View' : 'Edit'}
+        </button>
+        {#if !readOnly}
+          <button
+            type="button"
+            class="jse-nested-array-action"
+            on:click={() => extractPath(nestedArrayPath)}
+          >
+            Extract
+          </button>
+        {/if}
+      </div>
     {/each}
     <button type="button" class="jse-nested-array-action" on:click={() => onChangeMode(Mode.tree)}>
-      {action} in tree mode
+      Switch to tree mode
     </button>
   </div>
 
