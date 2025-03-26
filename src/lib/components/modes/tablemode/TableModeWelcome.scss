@@ -23,7 +23,7 @@
     display: flex;
     flex-direction: column;
     gap: defaults.$padding;
-    max-width: 300px;
+    max-width: 400px;
     margin: 2em defaults.$padding;
 
     font-family: defaults.$font-family;
@@ -36,15 +36,25 @@
       color: defaults.$panel-color-readonly;
     }
 
+    .jse-nested-property {
+      display: flex;
+      align-items: center;
+      gap: defaults.$padding;
+
+      .jse-nested-property-path {
+        flex: 1;
+
+        .jse-nested-property-count {
+          opacity: 0.5;
+          white-space: nowrap;
+        }
+      }
+    }
+
     button.jse-nested-array-action {
       text-align: left;
 
       @include styles.jsoneditor-button-primary;
-
-      .jse-nested-array-count {
-        opacity: 0.5;
-        white-space: nowrap;
-      }
     }
   }
 

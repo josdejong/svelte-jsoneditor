@@ -95,6 +95,7 @@
   import InlineValue from './tag/InlineValue.svelte'
   import {
     createNestedValueOperations,
+    extract,
     revertJSONPatchWithMoveOperations
   } from '$lib/logic/operations.js'
   import {
@@ -1166,6 +1167,18 @@
     })
   }
 
+  function handleExtract(path: JSONPath) {
+    if (readOnly) {
+      return
+    }
+
+    debug('extract', { path })
+
+    const operations = extract(json, createValueSelection(path))
+
+    handlePatch(operations)
+  }
+
   function handleDuplicateRow() {
     onDuplicateRow({ json, selection, columns, readOnly, onPatch: handlePatch })
   }
@@ -1957,6 +1970,7 @@
         {readOnly}
         {parser}
         {openJSONEditorModal}
+        extractPath={handleExtract}
         {onChangeMode}
         onClick={() => {
           // FIXME: this is a workaround for the editor not putting the focus on refHiddenInput
