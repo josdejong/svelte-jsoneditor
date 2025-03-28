@@ -18,8 +18,8 @@ jobs:
           cache-dependency-path: 'package-lock.json'
       - run: npm ci
       - run: npm run release:lint
-      - run: npm run release:test
       - run: npm run release:check
+      - run: npm run release:test
       - run: npm run release:build
       - run: >
           npx
