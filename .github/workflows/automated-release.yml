@@ -19,7 +19,11 @@ jobs:
       - run: npm run release:check
       - run: npm run release:test
       - run: npm run release:build
-      - run: >
+      - name: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: >
           npx
           -p "@semantic-release/commit-analyzer"
           -p "@semantic-release/release-notes-generator"
