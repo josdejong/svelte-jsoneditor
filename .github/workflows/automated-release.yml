@@ -30,11 +30,6 @@ jobs:
           -p conventional-changelog-conventionalcommits
           -p semantic-release
           -- semantic-release
-      - name: Report the release
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-        run: npx changelogithub
-
 permissions:
   # packages: write # This is for pushing it to githubs package repository
   contents: write
