@@ -38,6 +38,8 @@ For usage in vanilla JavaScript or frameworks like SolidJS, React, Vue, Angular,
 npm install vanilla-jsoneditor
 ```
 
+For details on individual releases, see the changelog at https://github.com/josdejong/svelte-jsoneditor/releases.
+
 ## Use
 
 ### Examples
