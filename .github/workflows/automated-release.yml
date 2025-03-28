@@ -19,7 +19,7 @@ jobs:
       - run: npm run release:check
       - run: npm run release:test
       - run: npm run release:build
-      - name: release
+      - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
