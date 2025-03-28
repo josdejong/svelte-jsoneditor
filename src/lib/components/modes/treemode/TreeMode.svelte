@@ -138,6 +138,7 @@
     OnUndo,
     ParseError,
     PastedJson,
+    ScrollToOptions,
     SearchResultDetails,
     SearchResults,
     Section,
@@ -311,9 +312,12 @@
       : undefined
   }
 
-  async function handleFocusSearch(path: JSONPath) {
+  async function handleFocusSearch(path: JSONPath, resultIndex: number) {
     documentState = expandPath(json, documentState, path, expandNone)
-    await scrollTo(path)
+
+    const element = findSearchResult(resultIndex)
+
+    await scrollTo(path, { element })
   }
 
   function handleCloseSearch() {
@@ -1015,7 +1019,7 @@
 
     focus()
     if (selection) {
-      scrollTo(getFocusPath(selection), false)
+      scrollTo(getFocusPath(selection), { scrollToWhenVisible: false })
     }
   }
 
@@ -1060,7 +1064,7 @@
 
     focus()
     if (selection) {
-      scrollTo(getFocusPath(selection), false)
+      scrollTo(getFocusPath(selection), { scrollToWhenVisible: false })
     }
   }
 
@@ -1189,10 +1193,13 @@
    * Scroll the window vertically to the node with given path.
    * Expand the path when needed.
    */
-  export async function scrollTo(path: JSONPath, scrollToWhenVisible = true): Promise<void> {
+  export async function scrollTo(
+    path: JSONPath,
+    { scrollToWhenVisible = true, element }: ScrollToOptions = {}
+  ): Promise<void> {
     documentState = expandPath(json, documentState, path, expandNone)
 
-    const elem = findElement(path)
+    const elem = element ?? findElement(path)
 
     debug('scrollTo', { path, elem, refContents })
 
@@ -1229,6 +1236,18 @@
     flushSync() // flush any changes, else the element we want to scroll to may not yet exist
 
     return refContents?.querySelector(`div[data-path="${encodeDataPath(path)}"]`) ?? undefined
+  }
+
+  /**
+   * Find the DOM element of a given search result.
+   * Note that the path can only be found when the node is expanded.
+   */
+  export function findSearchResult(resultIndex: number): Element | undefined {
+    flushSync() // flush any changes, else the element we want to scroll to may not yet exist
+
+    return (
+      refContents?.querySelector(`span[data-search-result-index="${resultIndex}"]`) ?? undefined
+    )
   }
 
   /**

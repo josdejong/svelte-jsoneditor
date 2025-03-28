@@ -32,6 +32,7 @@
     OnUndo,
     ParseError,
     PastedJson,
+    ScrollToOptions,
     SearchResultDetails,
     SearchResults,
     SortedColumn,
@@ -801,7 +802,10 @@
    * Scroll the window vertically to the node with given path.
    * Expand the path when needed.
    */
-  export function scrollTo(path: JSONPath, scrollToWhenVisible = true): Promise<void> {
+  export function scrollTo(
+    path: JSONPath,
+    { scrollToWhenVisible = true }: ScrollToOptions = {}
+  ): Promise<void> {
     const searchBoxHeight = showSearch ? SEARCH_BOX_HEIGHT : 0
     const top = calculateAbsolutePosition(path, columns, itemHeightsCache, defaultItemHeight)
     const roughDistance = top - scrollTop + searchBoxHeight + defaultItemHeight
@@ -1656,7 +1660,7 @@
 
     focus()
     if (selection) {
-      scrollTo(getFocusPath(selection), false)
+      scrollTo(getFocusPath(selection), { scrollToWhenVisible: false })
     }
   }
 
@@ -1701,7 +1705,7 @@
 
     focus()
     if (selection) {
-      scrollTo(getFocusPath(selection), false)
+      scrollTo(getFocusPath(selection), { scrollToWhenVisible: false })
     }
   }
 

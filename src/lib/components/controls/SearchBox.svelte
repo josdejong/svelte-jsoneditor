@@ -37,7 +37,7 @@
   export let readOnly: boolean
   export let columns: JSONPath[] | undefined
   export let onSearch: (result: SearchResultDetails | undefined) => void
-  export let onFocus: (path: JSONPath) => Promise<void>
+  export let onFocus: (path: JSONPath, resultIndex: number) => Promise<void>
   export let onPatch: OnPatch
   export let onClose: () => void
 
@@ -212,7 +212,7 @@
 
     const activeItem = searchResult?.activeItem
     if (activeItem && json !== undefined) {
-      await onFocus(activeItem.path)
+      await onFocus(activeItem.path, activeItem.resultIndex)
     }
   }
 
