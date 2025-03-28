@@ -12,7 +12,7 @@
       {
         "pkgRoot": "package",
         "tarballDir": "tars",
-        "npmPublish": false
+        "npmPublish": true
       }
     ],
     [
@@ -20,7 +20,7 @@
       {
         "pkgRoot": "package-vanilla",
         "tarballDir": "tars",
-        "npmPublish": false
+        "npmPublish": true
       }
     ],
     [
