@@ -14,6 +14,7 @@ jobs:
           cache: npm
           token: ${{ secrets.NPM_TOKEN }}
           cache-dependency-path: 'package-lock.json'
+      - run: npm ci
       - run: npm run release:lint
       - run: npm run release:test-ci
       - run: npm run release:check
