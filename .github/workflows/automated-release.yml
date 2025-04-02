@@ -1,8 +1,9 @@
-name: Continuous integration (release)
+name: Automated release
 on:
   push:
     branches:
       - main
+
 jobs:
   automated-releases:
     runs-on: ubuntu-latest
@@ -15,21 +16,11 @@ jobs:
           token: ${{ secrets.NPM_TOKEN }}
           cache-dependency-path: 'package-lock.json'
       - run: npm ci
-      - run: npm run release:lint
-      - run: npm run release:check
-      - run: npm run release:test
-      - run: npm run release:build
-      - name: Run semantic-release
+      - run: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: >
-          npx
-          -p "@semantic-release/commit-analyzer"
-          -p "@semantic-release/release-notes-generator"
-          -p conventional-changelog-conventionalcommits
-          -p semantic-release
-          -- semantic-release
+
 permissions:
   # packages: write # This is for pushing it to githubs package repository
   contents: write
