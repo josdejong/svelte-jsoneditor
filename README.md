@@ -1192,7 +1192,7 @@ npm run release         # Publish the npm packages `svelte-jsoneditor` and `vani
                         # This will test, check, lint, build, create a version tag and publish
                         # to npm and GitHub releases. This script runs automatically via the GitHub
                         # Actions workflow "Automated release" after a push to the `main` branch.
-                        # note that the script requires environment variables NPM_TOKEN and
+                        # Note that the script requires environment variables NPM_TOKEN and
                         # GITHUB_TOKEN.
 ```
 
