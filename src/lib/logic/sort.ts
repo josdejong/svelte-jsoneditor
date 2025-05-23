@@ -13,7 +13,7 @@ import {
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import naturalCompare from 'natural-compare-lite'
 import { int } from '../utils/numberUtils.js'
-import { isObject } from '../utils/typeUtils.js'
+import { isObject, isObjectOrArray } from '../utils/typeUtils.js'
 
 export function caseInsensitiveNaturalCompare(a: unknown, b: unknown) {
   const aLower = typeof a === 'string' ? a.toLowerCase() : a
@@ -123,24 +123,34 @@ export function sortArray(
  * Create a comparator function to compare nested properties in an array
  */
 function createObjectComparator(propertyPath: JSONPath, direction: 1 | -1) {
+  const sortableTypes: Record<string, number> = { boolean: 0, number: 1, string: 2, undefined: 4 }
+  const otherTypes = 3
+
   return function comparator(a: unknown, b: unknown) {
     const valueA = getIn(a, propertyPath)
     const valueB = getIn(b, propertyPath)
 
-    if (valueA === undefined) {
-      return direction
-    }
-    if (valueB === undefined) {
-      return -direction
+    // Order mixed types
+    if (typeof valueA !== typeof valueB) {
+      const aIndex = sortableTypes[typeof valueA] ?? otherTypes
+      const bIndex = sortableTypes[typeof valueB] ?? otherTypes
+
+      return aIndex > bIndex ? direction : aIndex < bIndex ? -direction : 0
     }
 
-    if (typeof valueA !== 'string' && typeof valueB !== 'string') {
-      // both values are a number, boolean, or null -> use simple, fast sorting
+    // Order two numbers, two strings, or two booleans
+    if (typeof valueA === 'number' || typeof valueA === 'boolean') {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       return valueA > valueB ? direction : valueA < valueB ? -direction : 0
     }
 
+    // Leave objects and arrays unsorted
+    if (isObjectOrArray(valueA)) {
+      return 0
+    }
+
+    // sort strings and non-primitive types
     return direction * caseInsensitiveNaturalCompare(valueA, valueB)
   }
 }

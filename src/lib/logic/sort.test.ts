@@ -10,6 +10,7 @@ import {
   sortOperationsMove,
   sortOperationsMoveAdvanced
 } from './sort.js'
+import { LosslessNumber } from 'lossless-json'
 
 describe('sort', () => {
   describe('sortJson', () => {
@@ -147,6 +148,47 @@ describe('sort', () => {
 
     assert.deepStrictEqual(sortArray(json, ['root', 'path']), [
       { op: 'replace', path: '/root/path', value: [1, 2, 3] }
+    ])
+  })
+
+  test('should sort an array with mixed content', () => {
+    assert.deepStrictEqual(
+      sortArray([3, 'B', true, undefined, -1, false, { id: 2 }, 'A', [3], { id: 1 }, [2], 2]),
+      [
+        {
+          op: 'replace',
+          path: '',
+          value: [false, true, -1, 2, 3, 'A', 'B', { id: 2 }, [3], { id: 1 }, [2], undefined]
+        }
+      ]
+    )
+  })
+
+  test('should sort an array with non-primitive content', () => {
+    assert.deepStrictEqual(
+      sortArray([new LosslessNumber('5'), new LosslessNumber('3'), new LosslessNumber('7')]),
+      [
+        {
+          op: 'replace',
+          path: '',
+          value: [new LosslessNumber('3'), new LosslessNumber('5'), new LosslessNumber('7')]
+        }
+      ]
+    )
+  })
+
+  test('should sort an array with non-primitive large numbers', () => {
+    assert.deepStrictEqual(sortArray([new LosslessNumber('2e3'), new LosslessNumber('290')]), [
+      { op: 'replace', path: '', value: [new LosslessNumber('290'), new LosslessNumber('2e3')] }
+    ])
+  })
+
+  test.skip('should sort an array with non-primitive large numbers (2)', () => {
+    const twoE20 = new LosslessNumber('200000000000000000000')
+    const twoE20plus1 = new LosslessNumber('200000000000000000001')
+
+    assert.deepStrictEqual(sortArray([twoE20plus1, twoE20]), [
+      { op: 'replace', path: '', value: [twoE20, twoE20plus1] }
     ])
   })
 
