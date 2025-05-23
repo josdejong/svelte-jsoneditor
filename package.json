@@ -83,7 +83,7 @@
     "@codemirror/view": "^6.34.1",
     "@fortawesome/free-regular-svg-icons": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
-    "@jsonquerylang/jsonquery": "^3.1.1 || ^4.0.0",
+    "@jsonquerylang/jsonquery": "^3.1.1 || ^4.0.0 || ^5.0.0",
     "@lezer/highlight": "^1.2.1",
     "@replit/codemirror-indentation-markers": "^6.5.3",
     "ajv": "^8.17.1",
