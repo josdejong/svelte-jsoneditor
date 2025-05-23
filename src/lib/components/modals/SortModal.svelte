@@ -99,7 +99,7 @@
             />
           </td>
         </tr>
-        {#if jsonIsArray && ((properties && properties?.length > 1))}
+        {#if jsonIsArray && properties && properties?.length > 1}
           <tr>
             <th>Property</th>
             <td>
