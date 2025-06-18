@@ -10,11 +10,11 @@ import type {
   ExtendedSearchResultItem,
   JSONParser,
   JSONSelection,
+  RecursiveStateFactory,
   SearchOptions,
   SearchResultDetails,
   SearchResultItem,
-  SearchResults,
-  RecursiveStateFactory
+  SearchResults
 } from '$lib/types'
 import { SearchField } from '$lib/types.js'
 import {
@@ -47,8 +47,8 @@ export function updateSearchResult(
           ? 0
           : -1
 
-  const items: ExtendedSearchResultItem[] = newResultItems.map((item, index) => {
-    return { ...item, active: index === activeIndex }
+  const items: ExtendedSearchResultItem[] = newResultItems.map((item, resultIndex) => {
+    return { resultIndex, ...item, active: resultIndex === activeIndex }
   })
 
   const activeItem = items[activeIndex]
@@ -429,6 +429,7 @@ export function createSearchAndReplaceAllOperations(
 export interface SplitValuePart {
   text: string
   type: 'normal' | 'highlight'
+  resultIndex: number | undefined
   active: boolean
 }
 
@@ -445,6 +446,7 @@ export function splitValue(text: string, matches: ExtendedSearchResultItem[]): S
     const precedingText = text.slice(previousEnd, match.start)
     if (precedingText !== '') {
       parts.push({
+        resultIndex: undefined,
         type: 'normal',
         text: precedingText,
         active: false
@@ -453,6 +455,7 @@ export function splitValue(text: string, matches: ExtendedSearchResultItem[]): S
 
     const matchingText = text.slice(match.start, match.end)
     parts.push({
+      resultIndex: match.resultIndex,
       type: 'highlight',
       text: matchingText,
       active: match.active
@@ -466,6 +469,7 @@ export function splitValue(text: string, matches: ExtendedSearchResultItem[]): S
     parts.push({
       type: 'normal',
       text: text.slice(lastMatch.end),
+      resultIndex: undefined,
       active: false
     })
   }

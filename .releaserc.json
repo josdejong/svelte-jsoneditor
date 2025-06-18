@@ -1,0 +1,34 @@
+{
+  "branches": ["main"],
+  "plugins": [
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "preset": "conventionalcommits"
+      }
+    ],
+    [
+      "@semantic-release/npm",
+      {
+        "pkgRoot": "package",
+        "tarballDir": "tars",
+        "npmPublish": true
+      }
+    ],
+    [
+      "@semantic-release/npm",
+      {
+        "pkgRoot": "package-vanilla",
+        "tarballDir": "tars",
+        "npmPublish": true
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": "tars/*.tgz"
+      }
+    ],
+    "@semantic-release/release-notes-generator"
+  ]
+}

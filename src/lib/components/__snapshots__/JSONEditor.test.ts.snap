@@ -590,6 +590,8 @@ exports[`JSONEditor > render table mode 1`] = `
       <!---->
        
       <!---->
+       
+      <!---->
       
       <!---->
       <!---->
@@ -2540,6 +2542,8 @@ exports[`JSONEditor > render tree mode 1`] = `
         </div>
         <!---->
       </div>
+       
+      <!---->
        
       <!---->
        

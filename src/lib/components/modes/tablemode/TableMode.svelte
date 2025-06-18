@@ -32,6 +32,7 @@
     OnUndo,
     ParseError,
     PastedJson,
+    ScrollToOptions,
     SearchResultDetails,
     SearchResults,
     SortedColumn,
@@ -229,6 +230,7 @@
   let parseError: ParseError | undefined = undefined
 
   let pastedJson: PastedJson | undefined
+  let pastedMultilineText: string | undefined
 
   let searchResultDetails: SearchResultDetails | undefined
   let searchResults: SearchResults | undefined
@@ -613,6 +615,7 @@
     text = undefined
     textIsRepaired = false
     pastedJson = undefined
+    pastedMultilineText = undefined
     parseError = undefined
 
     history.add({
@@ -685,6 +688,12 @@
     debug('pasted json as text', newPastedJson)
 
     pastedJson = newPastedJson
+  }
+
+  function handlePasteMultilineText(pastedText: string) {
+    debug('pasted multiline text', { pastedText })
+
+    pastedMultilineText = pastedText
   }
 
   function findNextInside(path: JSONPath): JSONSelection {
@@ -801,7 +810,10 @@
    * Scroll the window vertically to the node with given path.
    * Expand the path when needed.
    */
-  export function scrollTo(path: JSONPath, scrollToWhenVisible = true): Promise<void> {
+  export function scrollTo(
+    path: JSONPath,
+    { scrollToWhenVisible = true }: ScrollToOptions = {}
+  ): Promise<void> {
     const searchBoxHeight = showSearch ? SEARCH_BOX_HEIGHT : 0
     const top = calculateAbsolutePosition(path, columns, itemHeightsCache, defaultItemHeight)
     const roughDistance = top - scrollTop + searchBoxHeight + defaultItemHeight
@@ -1123,9 +1135,27 @@
     }
   }
 
+  async function handleParsePastedMultilineText() {
+    debug('apply pasted multiline text', pastedMultilineText)
+    if (!pastedMultilineText) {
+      return
+    }
+
+    _paste(JSON.stringify(pastedMultilineText))
+
+    // TODO: get rid of the setTimeout here
+    setTimeout(focus)
+  }
+
   function handleClearPastedJson() {
     debug('clear pasted json')
     pastedJson = undefined
+    focus()
+  }
+
+  function handleClearPastedMultilineText() {
+    debug('clear pasted multiline text')
+    pastedMultilineText = undefined
     focus()
   }
 
@@ -1394,6 +1424,7 @@
       parser,
       onPatch: handlePatch,
       onChangeText: handleChangeText,
+      onPasteMultilineText: handlePasteMultilineText,
       openRepairModal
     })
   }
@@ -1656,7 +1687,7 @@
 
     focus()
     if (selection) {
-      scrollTo(getFocusPath(selection), false)
+      scrollTo(getFocusPath(selection), { scrollToWhenVisible: false })
     }
   }
 
@@ -1701,7 +1732,7 @@
 
     focus()
     if (selection) {
-      scrollTo(getFocusPath(selection), false)
+      scrollTo(getFocusPath(selection), { scrollToWhenVisible: false })
     }
   }
 
@@ -1919,6 +1950,26 @@
               text: 'Leave as is',
               title: 'Keep the pasted content as a single value',
               onClick: handleClearPastedJson
+            }
+          ]}
+        />
+      {/if}
+
+      {#if pastedMultilineText}
+        <Message
+          type="info"
+          message="Multiline text was pasted as array"
+          actions={[
+            {
+              icon: faWrench,
+              text: 'Paste as string instead',
+              title: 'Paste the clipboard data as a single string value instead of an array',
+              onClick: handleParsePastedMultilineText
+            },
+            {
+              text: 'Leave as is',
+              title: 'Keep the pasted array',
+              onClick: handleClearPastedMultilineText
             }
           ]}
         />

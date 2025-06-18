@@ -99,7 +99,7 @@
             />
           </td>
         </tr>
-        {#if jsonIsArray && ((properties && properties?.length > 1) || selectedProperty === undefined)}
+        {#if jsonIsArray && properties && properties?.length > 1}
           <tr>
             <th>Property</th>
             <td>

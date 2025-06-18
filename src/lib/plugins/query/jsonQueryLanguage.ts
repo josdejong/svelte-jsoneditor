@@ -1,7 +1,8 @@
 import { jsonquery, type JSONQuery, parse, stringify } from '@jsonquerylang/jsonquery'
 import { parseString } from '$lib/utils/stringUtils.js'
-import type { QueryLanguage, QueryLanguageOptions } from '$lib/types.js'
+import type { JSONParser, QueryLanguage, QueryLanguageOptions } from '$lib/types.js'
 import type { JSONPath } from 'immutable-json-patch'
+import { isEqualParser } from '$lib/utils/jsonUtils'
 
 const description = `
 <p>
@@ -55,8 +56,15 @@ function getter(path: JSONPath): ['get', ...path: JSONPath] {
   return ['get', ...path]
 }
 
-function executeQuery(json: unknown, query: string): unknown {
-  return query.trim() !== '' ? jsonquery(json, query) : json
+function executeQuery(json: unknown, query: string, parser: JSONParser): unknown {
+  function stringifyAndParse(json: unknown) {
+    const text = parser.stringify(json)
+    return text !== undefined ? JSON.parse(text) : undefined
+  }
+
+  const preprocessedJson = isEqualParser(parser, JSON) ? json : stringifyAndParse(json)
+
+  return query.trim() !== '' ? jsonquery(preprocessedJson, query) : preprocessedJson
 }
 
 function getOperatorName(operator: string): string {

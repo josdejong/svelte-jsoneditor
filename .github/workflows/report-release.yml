@@ -1,4 +1,4 @@
-name: Release
+name: Report release
 
 on:
   push:
@@ -17,6 +17,7 @@ jobs:
         with:
           node-version: latest
 
-      - run: npx changelogithub
+      - name: Report release
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        run: npx changelogithub

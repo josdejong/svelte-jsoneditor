@@ -272,12 +272,15 @@ describe('search', () => {
       path,
       field
     )
-    const extendedSearchResults: ExtendedSearchResultItem[] = searchResults.map((item, index) => {
-      return {
-        ...item,
-        active: index === 1
+    const extendedSearchResults: ExtendedSearchResultItem[] = searchResults.map(
+      (item, resultIndex) => {
+        return {
+          resultIndex,
+          ...item,
+          active: resultIndex === 1
+        }
       }
-    })
+    )
 
     const parts = splitValue(text, extendedSearchResults)
 
@@ -285,21 +288,25 @@ describe('search', () => {
       {
         type: 'highlight',
         text: 'hello',
+        resultIndex: 0,
         active: false
       },
       {
         type: 'normal',
         text: ' world, ',
+        resultIndex: undefined,
         active: false
       },
       {
         type: 'highlight',
         text: 'HELLO',
+        resultIndex: 1,
         active: true
       },
       {
         type: 'normal',
         text: '!',
+        resultIndex: undefined,
         active: false
       }
     ])
@@ -605,7 +612,8 @@ describe('search', () => {
 
   describe('filterKeySearchResults', () => {
     test('should filter key search results when not empty', () => {
-      const result1: ExtendedSearchResultItem = {
+      const result0: ExtendedSearchResultItem = {
+        resultIndex: 0,
         path: ['a'],
         field: SearchField.value,
         fieldIndex: 0,
@@ -613,7 +621,8 @@ describe('search', () => {
         end: 1,
         active: false
       }
-      const result2: ExtendedSearchResultItem = {
+      const result1: ExtendedSearchResultItem = {
+        resultIndex: 1,
         path: ['a'],
         field: SearchField.key,
         fieldIndex: 0,
@@ -624,14 +633,15 @@ describe('search', () => {
       const results: ObjectSearchResults = {
         type: 'object',
         properties: {},
-        searchResults: [result1, result2]
+        searchResults: [result0, result1]
       }
 
-      assert.deepStrictEqual(filterKeySearchResults(results), [result2])
+      assert.deepStrictEqual(filterKeySearchResults(results), [result1])
     })
 
     test('should filter key search results when empty (1)', () => {
-      const result1: ExtendedSearchResultItem = {
+      const result0: ExtendedSearchResultItem = {
+        resultIndex: 0,
         path: ['a'],
         field: SearchField.value,
         fieldIndex: 0,
@@ -642,7 +652,7 @@ describe('search', () => {
       const results: ObjectSearchResults = {
         type: 'object',
         properties: {},
-        searchResults: [result1]
+        searchResults: [result0]
       }
 
       assert.deepStrictEqual(filterKeySearchResults(results), undefined)
@@ -671,7 +681,8 @@ describe('search', () => {
 
   describe('filterValueSearchResults', () => {
     test('should filter value search results when not empty', () => {
-      const result1: ExtendedSearchResultItem = {
+      const result0: ExtendedSearchResultItem = {
+        resultIndex: 0,
         path: ['a'],
         field: SearchField.value,
         fieldIndex: 0,
@@ -679,7 +690,8 @@ describe('search', () => {
         end: 1,
         active: false
       }
-      const result2: ExtendedSearchResultItem = {
+      const result1: ExtendedSearchResultItem = {
+        resultIndex: 1,
         path: ['a'],
         field: SearchField.key,
         fieldIndex: 0,
@@ -690,14 +702,15 @@ describe('search', () => {
       const results: ObjectSearchResults = {
         type: 'object',
         properties: {},
-        searchResults: [result1, result2]
+        searchResults: [result0, result1]
       }
 
-      assert.deepStrictEqual(filterValueSearchResults(results), [result1])
+      assert.deepStrictEqual(filterValueSearchResults(results), [result0])
     })
 
     test('should filter value search results when empty (1)', () => {
-      const result1: ExtendedSearchResultItem = {
+      const result0: ExtendedSearchResultItem = {
+        resultIndex: 0,
         path: ['a'],
         field: SearchField.key,
         fieldIndex: 0,
@@ -708,7 +721,7 @@ describe('search', () => {
       const results: ObjectSearchResults = {
         type: 'object',
         properties: {},
-        searchResults: [result1]
+        searchResults: [result0]
       }
 
       assert.deepStrictEqual(filterValueSearchResults(results), undefined)
@@ -743,6 +756,7 @@ describe('search', () => {
 
     const expectedSearchResults: ExtendedSearchResultItem[] = [
       {
+        resultIndex: 0,
         path: ['b', 'c'],
         field: SearchField.value,
         fieldIndex: 0,
@@ -751,6 +765,7 @@ describe('search', () => {
         active: false
       },
       {
+        resultIndex: 1,
         path: ['a'],
         field: SearchField.key,
         fieldIndex: 0,
@@ -759,6 +774,7 @@ describe('search', () => {
         active: true
       },
       {
+        resultIndex: 2,
         path: ['a', '0', 'a'],
         field: SearchField.key,
         fieldIndex: 0,
@@ -767,6 +783,7 @@ describe('search', () => {
         active: false
       },
       {
+        resultIndex: 3,
         path: ['a', '0', 'c'],
         field: SearchField.value,
         fieldIndex: 0,
@@ -775,6 +792,7 @@ describe('search', () => {
         active: false
       },
       {
+        resultIndex: 4,
         path: ['a', '2'],
         field: SearchField.value,
         fieldIndex: 0,
@@ -812,9 +830,10 @@ describe('search', () => {
 
     test('should create recursive search result', () => {
       const activeIndex = 1
-      const results = search('a', json).map((item, index) => ({
+      const results = search('a', json).map((item, resultIndex) => ({
+        resultIndex,
         ...item,
-        active: index === activeIndex
+        active: resultIndex === activeIndex
       }))
 
       assert.deepStrictEqual(results, expectedSearchResults)
@@ -836,13 +855,15 @@ describe('search', () => {
       }
 
       const activeIndex = 1
-      const results = search('a', json).map((item, index) => ({
+      const results = search('a', json).map((item, resultIndex) => ({
+        resultIndex,
         ...item,
-        active: index === activeIndex
+        active: resultIndex === activeIndex
       }))
 
       const expected = [
         {
+          resultIndex: 0,
           path: ['a'],
           field: SearchField.key,
           fieldIndex: 0,
@@ -851,6 +872,7 @@ describe('search', () => {
           active: false
         },
         {
+          resultIndex: 1,
           path: ['a'],
           field: SearchField.value,
           fieldIndex: 0,
@@ -859,6 +881,7 @@ describe('search', () => {
           active: true
         },
         {
+          resultIndex: 2,
           path: ['a'],
           field: SearchField.value,
           fieldIndex: 1,

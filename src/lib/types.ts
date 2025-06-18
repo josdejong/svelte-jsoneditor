@@ -241,6 +241,11 @@ export interface TextSelection {
 
 export type JSONEditorSelection = JSONSelection | TextSelection
 
+export interface ScrollToOptions {
+  scrollToWhenVisible?: boolean
+  element?: Element
+}
+
 export type ClipboardValues = Array<{ key: string; value: unknown }>
 
 export interface MenuButton {
@@ -455,6 +460,7 @@ export interface SearchResultItem {
 }
 
 export interface ExtendedSearchResultItem extends SearchResultItem {
+  resultIndex: number
   active: boolean
 }
 

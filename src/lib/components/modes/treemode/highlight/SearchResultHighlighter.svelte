@@ -13,7 +13,11 @@
   {#if part.type === 'normal'}
     {part.text}
   {:else}
-    <span class="jse-highlight" class:jse-active={part.active}>{addNewLineSuffix(part.text)}</span>
+    <span
+      class="jse-highlight"
+      class:jse-active={part.active}
+      data-search-result-index={String(part.resultIndex)}>{addNewLineSuffix(part.text)}</span
+    >
   {/if}
 {/each}
 

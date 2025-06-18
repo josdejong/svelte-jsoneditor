@@ -38,6 +38,8 @@ For usage in vanilla JavaScript or frameworks like SolidJS, React, Vue, Angular,
 npm install vanilla-jsoneditor
 ```
 
+For details on individual releases, see the changelog at https://github.com/josdejong/svelte-jsoneditor/releases.
+
 ## Use
 
 ### Examples
@@ -1186,10 +1188,12 @@ npm run lint            # Run linter
 npm run format          # Automatically fix linting issues
 
 npm run release-dry-run # To run the build and see the change list without actually publishing
-npm run release         # Publish to npm (requires login). This will test, check, lint, build,
-                        # increase the version number, update the changelog, and publish to npm.
-                        # Note that it will publish two npm packages: `svelte-jsoneditor`
-                        # and `vanilla-jsoneditor`.
+npm run release         # Publish the npm packages `svelte-jsoneditor` and `vanilla-jsoneditor`.
+                        # This will test, check, lint, build, create a version tag and publish
+                        # to npm and GitHub releases. This script runs automatically via the GitHub
+                        # Actions workflow "Automated release" after a push to the `main` branch.
+                        # Note that the script requires environment variables NPM_TOKEN and
+                        # GITHUB_TOKEN.
 ```
 
 ## License

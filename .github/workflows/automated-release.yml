@@ -1,0 +1,29 @@
+name: Automated release
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  automated-releases:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          token: ${{ secrets.NPM_TOKEN }}
+          cache-dependency-path: 'package-lock.json'
+      - run: npm ci
+      - run: npm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+permissions:
+  # packages: write # This is for pushing it to githubs package repository
+  contents: write
+  issues: write # This is for posting to issues that they are resolved in a release
+  pull-requests: write # This is for posting to PRs that they are part of a release
+  id-token: write # This is for provenance, see https://github.com/semantic-release/npm

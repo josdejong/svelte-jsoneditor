@@ -1,8 +1,10 @@
 import { test, describe } from 'vitest'
 import assert from 'assert'
 import { cloneDeep } from 'lodash-es'
-import { LosslessNumber } from 'lossless-json'
+import { LosslessNumber, parse, stringify } from 'lossless-json'
 import { jsonQueryLanguage } from '$lib/plugins/query/jsonQueryLanguage'
+
+const LosslessJSON = { parse, stringify }
 
 const { createQuery, executeQuery } = jsonQueryLanguage
 
@@ -183,7 +185,7 @@ describe('jsonQueryLanguage', () => {
       assert.deepStrictEqual(users, originalUsers) // must not touch the original users
     })
 
-    test('should work with alternative parsers and non-native JSON data types', () => {
+    test('should convert alternative parsers into regular JSON', () => {
       const data = [new LosslessNumber('4'), new LosslessNumber('7'), new LosslessNumber('5')]
       const query = createQuery(data, {
         sort: {
@@ -192,12 +194,8 @@ describe('jsonQueryLanguage', () => {
         }
       })
 
-      const result = executeQuery(data, query, JSON)
-      assert.deepStrictEqual(result, [
-        new LosslessNumber('4'),
-        new LosslessNumber('5'),
-        new LosslessNumber('7')
-      ])
+      const result = executeQuery(data, query, LosslessJSON)
+      assert.deepStrictEqual(result, [4, 5, 7])
     })
 
     test('should throw an exception the query is not valid', () => {
@@ -208,12 +206,12 @@ describe('jsonQueryLanguage', () => {
       }, /SyntaxError: Value expected \(pos: 7\)/)
     })
 
-    test('should return null when trying to use a non existing function', () => {
+    test('should throw an exception when trying to use a non existing function', () => {
       assert.throws(() => {
         const data = {}
         const query = 'foo(.bar)'
         executeQuery(data, query, JSON)
-      }, /SyntaxError: Unknown function 'foo' \(pos: 4\)/)
+      }, /TypeError: Unknown function 'foo'/)
     })
   })
 })

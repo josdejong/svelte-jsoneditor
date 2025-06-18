@@ -1,5 +1,3 @@
-<svelte:options immutable={true} />
-
 <script lang="ts">
   import type { JSONPath } from 'immutable-json-patch'
   import { getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
@@ -10,40 +8,56 @@
   import { isEmpty } from 'lodash-es'
   import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
 
-  export let text: string | undefined
-  export let json: unknown | undefined
-  export let readOnly: boolean
-  export let parser: JSONParser
-  export let openJSONEditorModal: (path: JSONPath) => void
-  export let extractPath: (path: JSONPath) => void
-  export let onChangeMode: OnChangeMode
-  export let onClick: () => void
+  interface Props {
+    text: string | undefined
+    json: unknown | undefined
+    readOnly: boolean
+    parser: JSONParser
+    openJSONEditorModal: (path: JSONPath) => void
+    extractPath: (path: JSONPath) => void
+    onChangeMode: OnChangeMode
+    onClick: () => void
+  }
 
-  let nestedArrayPaths: JSONPath[]
-  $: nestedArrayPaths = json
-    ? findNestedArrays(json)
-        .slice(0, 99)
-        .filter((path) => path.length > 0)
-    : []
-  $: hasNestedArrays = !isEmpty(nestedArrayPaths)
-  $: isEmptyDocument = json === undefined && (text === '' || text === undefined)
+  const {
+    text,
+    json,
+    readOnly,
+    parser,
+    openJSONEditorModal,
+    extractPath,
+    onChangeMode,
+    onClick
+  }: Props = $props()
 
-  $: documentType = hasNestedArrays
-    ? 'Object with nested arrays'
-    : isEmptyDocument
-      ? 'An empty document'
-      : isJSONObject(json)
-        ? 'An object'
-        : isJSONArray(json)
-          ? 'An empty array' // note: can also be an array with objects but without properties
-          : `A ${valueType(json, parser)}`
+  const nestedArrayPaths: JSONPath[] = $derived(
+    json
+      ? findNestedArrays(json)
+          .slice(0, 99)
+          .filter((path) => path.length > 0)
+      : []
+  )
+  const hasNestedArrays = $derived(!isEmpty(nestedArrayPaths))
+  const isEmptyDocument = $derived(json === undefined && (text === '' || text === undefined))
+
+  const documentType = $derived(
+    hasNestedArrays
+      ? 'Object with nested arrays'
+      : isEmptyDocument
+        ? 'An empty document'
+        : isJSONObject(json)
+          ? 'An object'
+          : isJSONArray(json)
+            ? 'An empty array' // note: can also be an array with objects but without properties
+            : `A ${valueType(json, parser)}`
+  )
 
   function countItems(nestedArrayPath: JSONPath): number {
     return (getIn(json, nestedArrayPath) as JSONPath).length
   }
 </script>
 
-<div class="jse-table-mode-welcome" on:click={() => onClick()} role="none">
+<div class="jse-table-mode-welcome" onclick={() => onClick()} role="none">
   <div class="jse-space jse-before"></div>
 
   <div class="jse-nested-arrays">
@@ -71,7 +85,7 @@
         <button
           type="button"
           class="jse-nested-array-action"
-          on:click={() => openJSONEditorModal(nestedArrayPath)}
+          onclick={() => openJSONEditorModal(nestedArrayPath)}
         >
           {readOnly ? 'View' : 'Edit'}
         </button>
@@ -79,14 +93,14 @@
           <button
             type="button"
             class="jse-nested-array-action"
-            on:click={() => extractPath(nestedArrayPath)}
+            onclick={() => extractPath(nestedArrayPath)}
           >
             Extract
           </button>
         {/if}
       </div>
     {/each}
-    <button type="button" class="jse-nested-array-action" on:click={() => onChangeMode(Mode.tree)}>
+    <button type="button" class="jse-nested-array-action" onclick={() => onChangeMode(Mode.tree)}>
       Switch to tree mode
     </button>
   </div>
