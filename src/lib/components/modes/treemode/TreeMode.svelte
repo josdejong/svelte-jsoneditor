@@ -279,6 +279,7 @@
   })
 
   let pastedJson: PastedJson | undefined
+  let pastedMultilineText: string | undefined
 
   let searchResultDetails: SearchResultDetails | undefined
   let searchResults: SearchResults | undefined
@@ -639,6 +640,7 @@
     text = undefined
     textIsRepaired = false
     pastedJson = undefined
+    pastedMultilineText = undefined
     parseError = undefined
 
     // ensure the selection is valid
@@ -785,6 +787,7 @@
       parser,
       onPatch: handlePatch,
       onChangeText: handleChangeText,
+      onPasteMultilineText: handlePasteMultilineText,
       openRepairModal
     })
   }
@@ -1463,6 +1466,12 @@
     pastedJson = newPastedJson
   }
 
+  function handlePasteMultilineText(pastedText: string) {
+    debug('pasted multiline text', { pastedText })
+
+    pastedMultilineText = pastedText
+  }
+
   function handleKeyDown(event: KeyboardEvent) {
     const combo = keyComboFromEvent(event)
     const keepAnchorPath = event.shiftKey
@@ -1795,9 +1804,27 @@
     setTimeout(focus)
   }
 
+  async function handleParsePastedMultilineText() {
+    debug('apply pasted multiline text', pastedMultilineText)
+    if (!pastedMultilineText) {
+      return
+    }
+
+    _paste(JSON.stringify(pastedMultilineText))
+
+    // TODO: get rid of the setTimeout here
+    setTimeout(focus)
+  }
+
   function handleClearPastedJson() {
     debug('clear pasted json')
     pastedJson = undefined
+    focus()
+  }
+
+  function handleClearPastedMultilineText() {
+    debug('clear pasted multiline text')
+    pastedMultilineText = undefined
     focus()
   }
 
@@ -2030,6 +2057,26 @@
               text: 'Leave as is',
               title: 'Keep the JSON embedded in the value',
               onClick: handleClearPastedJson
+            }
+          ]}
+        />
+      {/if}
+
+      {#if pastedMultilineText}
+        <Message
+          type="info"
+          message="Multiline text was pasted as array"
+          actions={[
+            {
+              icon: faWrench,
+              text: 'Paste as string instead',
+              title: 'Paste the clipboard data as a single string value instead of an array',
+              onClick: handleParsePastedMultilineText
+            },
+            {
+              text: 'Leave as is',
+              title: 'Keep the pasted array',
+              onClick: handleClearPastedMultilineText
             }
           ]}
         />
