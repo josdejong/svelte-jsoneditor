@@ -36,6 +36,7 @@ import {
   isJSONObject,
   isJSONPatchAdd,
   isJSONPatchReplace,
+  type JSONPatchOperation,
   type JSONPath,
   parsePath
 } from 'immutable-json-patch'
@@ -43,6 +44,8 @@ import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
 import { expandAll, expandNone, expandPath, expandSmart } from '$lib/logic/documentState.js'
 import { initial, isEmpty, last } from 'lodash-es'
 import { fromTableCellPosition, toTableCellPosition } from '$lib/logic/table.js'
+import { parsePartialJson } from '$lib/utils/jsonUtils'
+import { MAX_MULTILINE_PASTE_SIZE } from '$lib/constants'
 
 const debug = createDebug('jsoneditor:actions')
 
@@ -114,6 +117,7 @@ interface OnPasteAction {
   parser: JSONParser
   onPatch: OnPatch
   onChangeText: OnChangeText
+  onPasteMultilineText: (pastedText: string) => void
   openRepairModal: RepairModalCallback
 }
 
@@ -126,6 +130,7 @@ export function onPaste({
   parser,
   onPatch,
   onChangeText,
+  onPasteMultilineText,
   openRepairModal
 }: OnPasteAction) {
   if (readOnly) {
@@ -138,7 +143,9 @@ export function onPaste({
 
       const operations = insert(json, ensureSelection, pastedText, parser)
 
-      debug('paste', { pastedText, operations, ensureSelection })
+      const pasteMultilineText = isMultilineTextPastedAsArray(clipboardText, operations, parser)
+
+      debug('paste', { pastedText, operations, ensureSelection, pasteMultilineText })
 
       onPatch(operations, (patchedJson, patchedState) => {
         let updatedState = patchedState
@@ -159,6 +166,10 @@ export function onPaste({
           state: updatedState
         }
       })
+
+      if (pasteMultilineText) {
+        onPasteMultilineText(pastedText)
+      }
     } else {
       // no json: empty document, or the contents is invalid text
       debug('paste text', { pastedText })
@@ -183,6 +194,48 @@ export function onPaste({
       debug('repaired pasted text: ', repairedText)
       doPaste(repairedText)
     })
+  }
+}
+
+/**
+ * When pasting text, we cannot always know how whether the text was intended as
+ * a list with items that should be parsed into a JSON Array (after jsonrepair),
+ * or a text with multiple lines that should be parsed into a single string.
+ *
+ * This function checks whether we're dealing with such a case, after which
+ * we can show a message to the user asking about the intended behavior.
+ */
+export function isMultilineTextPastedAsArray(
+  clipboardText: string,
+  operators: JSONPatchOperation[],
+  parser: JSONParser,
+  maxSize = MAX_MULTILINE_PASTE_SIZE
+): boolean {
+  if (clipboardText.length > maxSize) {
+    // we don't want this feature detecting multiline text to impact performance, hence this max
+    return false
+  }
+
+  const containsNewline = /\n/.test(clipboardText)
+  if (!containsNewline) {
+    return false
+  }
+
+  const replaceArrayOperation = operators.some(
+    (operator) => operator.op === 'replace' && Array.isArray(operator.value)
+  )
+  const multipleAddOperations = operators.filter((operator) => operator.op === 'add').length > 1
+  const pastingArray = replaceArrayOperation || multipleAddOperations
+  if (!pastingArray) {
+    return false
+  }
+
+  try {
+    parsePartialJson(clipboardText, parser.parse)
+
+    return false
+  } catch {
+    return true
   }
 }
 

@@ -17,6 +17,7 @@ export const MAX_HEADER_NAME_CHARACTERS = 50
 export const DEFAULT_VISIBLE_SECTIONS: Section[] = [{ start: 0, end: ARRAY_SECTION_SIZE }]
 export const MAX_VALIDATABLE_SIZE = 100 * 1024 * 1024 // 1 MB
 export const MAX_AUTO_REPAIRABLE_SIZE = 1024 * 1024 // 1 MB
+export const MAX_MULTILINE_PASTE_SIZE = 1024 * 1024 // 1 MB
 export const MAX_DOCUMENT_SIZE_TEXT_MODE = 10 * 1024 * 1024 // 10 MB
 export const MAX_DOCUMENT_SIZE_EXPAND_ALL = 10 * 1024 // 10 KB
 
