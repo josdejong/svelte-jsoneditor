@@ -143,7 +143,7 @@ export function onPaste({
 
       const operations = insert(json, ensureSelection, pastedText, parser)
 
-      const pasteMultilineText = isMultiLineTextPastedAsArray(clipboardText, operations, parser)
+      const pasteMultilineText = isMultilineTextPastedAsArray(clipboardText, operations, parser)
 
       debug('paste', { pastedText, operations, ensureSelection, pasteMultilineText })
 
@@ -197,14 +197,22 @@ export function onPaste({
   }
 }
 
-// TODO: write unit tests
-function isMultiLineTextPastedAsArray(
+/**
+ * When pasting text, we cannot always know how whether the text was intended as
+ * a list with items that should be parsed into a JSON Array (after jsonrepair),
+ * or a text with multiple lines that should be parsed into a single string.
+ *
+ * This function checks whether we're dealing with such a case, after which
+ * we can show a message to the user asking about the intended behavior.
+ */
+export function isMultilineTextPastedAsArray(
   clipboardText: string,
   operators: JSONPatchOperation[],
-  parser: JSONParser
+  parser: JSONParser,
+  maxSize = MAX_MULTILINE_PASTE_SIZE
 ): boolean {
-  if (clipboardText.length > MAX_MULTILINE_PASTE_SIZE) {
-    // we don't want this feature detecting multiline text to impact performance
+  if (clipboardText.length > maxSize) {
+    // we don't want this feature detecting multiline text to impact performance, hence this max
     return false
   }
 
@@ -223,7 +231,6 @@ function isMultiLineTextPastedAsArray(
   }
 
   try {
-    // TODO: this is parsing the clipboard twice (also in function `insert`), can we prevent that?
     parsePartialJson(clipboardText, parser.parse)
 
     return false
