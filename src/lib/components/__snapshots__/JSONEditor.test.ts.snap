@@ -1771,8 +1771,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                   </div>
                    
                   <button
-                    class="jse-tag svelte-tqwlgz"
-                    disabled=""
+                    class="jse-tag svelte-jlw0fj disabled"
                     type="button"
                   >
                     3
