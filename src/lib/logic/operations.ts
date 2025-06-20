@@ -39,7 +39,6 @@ import {
 } from './selection.js'
 import type { ClipboardValues, DragInsideAction, JSONParser, JSONSelection } from '$lib/types'
 import { int } from '../utils/numberUtils.js'
-import { dedupeKeepLast } from '$lib/utils/arrayUtils'
 
 /**
  * Create a JSONPatch for an insert operation.
@@ -722,29 +721,97 @@ export function revertJSONPatchWithMoveOperations(
   json: unknown,
   operations: JSONPatchDocument
 ): JSONPatchDocument {
-  return dedupeKeepLast(
-    revertJSONPatch(json, operations, {
-      before: (json, operation, revertOperations) => {
-        if (isJSONPatchRemove(operation)) {
-          const path = parseJSONPointer(operation.path)
-          return {
-            revertOperations: [...revertOperations, ...createRevertMoveOperations(json, path)]
-          }
-        }
+  // first, we merge series of move operations inside an object. These move operations are used
+  // to ensure a specific ordering of the keys in the object. Reverting those move events one by
+  // one would explode the amount of move operations in the revert operations and contain mostly
+  // duplicates.
+  const mergedOperations = _mergeReorderMoveOperations(json, operations)
 
-        if (isJSONPatchMove(operation)) {
-          const from = parseJSONPointer(operation.from)
-          return {
-            revertOperations:
-              operation.from === operation.path
-                ? [operation, ...createRevertMoveOperations(json, from)] // move in-place (just for re-ordering object keys)
-                : [...revertOperations, ...createRevertMoveOperations(json, from)]
-          }
+  return revertJSONPatch(json, mergedOperations, {
+    before: (json, operation, revertOperations) => {
+      if (isJSONPatchRemove(operation)) {
+        // we must restore the key order when reverting removing of an object key
+        const path = parseJSONPointer(operation.path)
+        return {
+          revertOperations: [...revertOperations, ...createRevertMoveOperations(json, path)]
         }
-
-        return { document: json }
       }
-    })
+
+      if (isJSONPatchMove(operation)) {
+        const from = parseJSONPointer(operation.from)
+        return {
+          revertOperations:
+            operation.from === operation.path
+              ? [operation, ...createRevertMoveOperations(json, from)] // move in-place (just for re-ordering object keys)
+              : [...revertOperations, ...createRevertMoveOperations(json, from)]
+        }
+      }
+
+      return { document: json }
+    }
+  })
+}
+
+/**
+ * Merge reordering move operations.
+ *
+ * This is a preprocessing step for creating the revert patch operations. For example, having
+ * json {b:2, a:1, c:3} and the following move operations (reordering the keys):
+ *
+ *     [
+ *       { op: 'move', from: '/a', path: '/a' },
+ *       { op: 'move', from: '/b', path: '/b' },
+ *       { op: 'move', from: '/c', path: '/c' }
+ *     ]
+ *
+ * This function will return only moving of b, since that is the first of all the moved keys:
+ *
+ *     [
+ *       { op: 'move', from: '/b', path: '/b' }
+ *     ]
+ *
+ * So, when creating the reverse operations, this single operation is enough to create the needed
+ * move operations for all lower down keys.
+ */
+function _mergeReorderMoveOperations(
+  json: unknown,
+  operations: JSONPatchOperation[]
+): JSONPatchOperation[] {
+  const mergedOperations = operations.slice()
+
+  let i = 0
+  while (i < mergedOperations.length) {
+    if (isReorderMoveOperation(json, operations[i])) {
+      let j = i + 1
+      while (isReorderMoveOperation(json, operations[j])) {
+        j++
+      }
+
+      const getPathKey = (operation: JSONPatchOperation) => last(parseJSONPointer(operation.path))
+
+      const parentPath = initial(parseJSONPointer(operations[i].path))
+      const parent = getIn(json, parentPath) as Record<string, unknown>
+      const movedKeys = new Set(operations.slice(i, j - i).map(getPathKey))
+      const allKeys = Object.keys(parent)
+      const firstMovedKey = allKeys.find((key) => movedKeys.has(key))
+
+      if (firstMovedKey !== undefined) {
+        const firstMoveOperation = moveDown(parentPath, firstMovedKey)
+        mergedOperations.splice(i, movedKeys.size, firstMoveOperation)
+      }
+    }
+
+    i++
+  }
+
+  return mergedOperations
+}
+
+function isReorderMoveOperation(json: unknown, operation: JSONPatchOperation): boolean {
+  return (
+    isJSONPatchMove(operation) &&
+    operation.path === operation.from &&
+    isJSONObject(getIn(json, initial(parseJSONPointer(operation.path)))) // parent is an object
   )
 }
 
