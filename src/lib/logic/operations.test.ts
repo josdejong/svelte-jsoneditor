@@ -357,7 +357,7 @@ describe('operations', () => {
       expect(revertOperations.length).toEqual(count)
       const revertedJson = immutableJSONPatch(updatedJson, revertOperations)
       expect(revertedJson).toEqual(json)
-    })
+    }, /* timeout */ 500)
 
     test('should restore correctly revert multiple remove operations in an array', () => {
       const json = [0, 1, 2, 3, 4]
