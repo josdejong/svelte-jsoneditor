@@ -1,10 +1,11 @@
-import { test, describe } from 'vitest'
+import { test, describe, expect } from 'vitest'
 import assert from 'assert'
 import {
   clipboardToValues,
   createNestedValueOperations,
   createNewValue,
   moveInsideParent,
+  rename,
   revertJSONPatchWithMoveOperations
 } from './operations.js'
 import { createMultiSelection } from './selection.js'
@@ -270,7 +271,6 @@ describe('operations', () => {
 
       const revertOperations = revertJSONPatchWithMoveOperations(json, operations)
       assert.deepStrictEqual(revertOperations, [
-        { op: 'move', from: '/b', path: '/b' },
         { op: 'move', from: '/a', path: '/a' },
         { op: 'move', from: '/c', path: '/c' }
       ])
@@ -278,6 +278,85 @@ describe('operations', () => {
       const revertedJson = immutableJSONPatch(updatedJson, revertOperations)
       assert.deepStrictEqual(revertedJson, json)
       assert.deepStrictEqual(Object.keys(revertedJson), ['b', 'a', 'c'])
+    })
+
+    test('should remove redundant move operations when renaming a key and maintaining order (1)', () => {
+      const json = {
+        a: 1,
+        b: 2,
+        c: 3
+      }
+
+      const operations: JSONPatchOperation[] = [
+        { op: 'move', from: '/b', path: '/b_renamed' },
+        { op: 'move', from: '/c', path: '/c' }
+      ]
+      const updatedJson = immutableJSONPatch(json, operations)
+      assert.deepStrictEqual(Object.keys(updatedJson as Record<string, number>), [
+        'a',
+        'b_renamed',
+        'c'
+      ])
+
+      const revertOperations = revertJSONPatchWithMoveOperations(json, operations)
+      assert.deepStrictEqual(revertOperations, [
+        { op: 'move', from: '/b_renamed', path: '/b' },
+        { op: 'move', from: '/c', path: '/c' }
+      ])
+
+      const revertedJson = immutableJSONPatch(updatedJson, revertOperations)
+      assert.deepStrictEqual(revertedJson, json)
+      assert.deepStrictEqual(Object.keys(revertedJson), ['a', 'b', 'c'])
+    })
+
+    test('should remove redundant move operations when renaming a key and maintaining order (2)', () => {
+      const json = {
+        a: 1,
+        b: 2,
+        c: 3
+      }
+
+      const operations: JSONPatchOperation[] = [
+        { op: 'move', from: '/c', path: '/c_renamed' },
+        { op: 'move', from: '/a', path: '/a' } // we move `a` to the end (different operation)
+      ]
+      const updatedJson = immutableJSONPatch(json, operations)
+      assert.deepStrictEqual(Object.keys(updatedJson as Record<string, number>), [
+        'b',
+        'c_renamed',
+        'a'
+      ])
+
+      // Note: there are optimizations possible in the following revert operations,
+      //  but this is a made up example, not a real world example, quite an edge case.
+      const revertOperations = revertJSONPatchWithMoveOperations(json, operations)
+      assert.deepStrictEqual(revertOperations, [
+        { from: '/a', op: 'move', path: '/a' },
+        { op: 'move', from: '/b', path: '/b' },
+        { from: '/c_renamed', op: 'move', path: '/c_renamed' },
+        { op: 'move', from: '/c_renamed', path: '/c' }
+      ])
+
+      const revertedJson = immutableJSONPatch(updatedJson, revertOperations)
+      assert.deepStrictEqual(revertedJson, json)
+      assert.deepStrictEqual(Object.keys(revertedJson), ['a', 'b', 'c'])
+    })
+
+    test('should perform well when creating the revert patch of renaming a key in a large object', () => {
+      const count = 200
+      const json: Record<string, number> = {}
+      for (let i = 0; i < count; i++) {
+        json['item ' + i] = i
+      }
+
+      const operations = rename([], Object.keys(json), 'item 0', 'item 0 (renamed)')
+      expect(operations.length).toEqual(count)
+      const updatedJson = immutableJSONPatch(json, operations)
+
+      const revertOperations = revertJSONPatchWithMoveOperations(json, operations)
+      expect(revertOperations.length).toEqual(count)
+      const revertedJson = immutableJSONPatch(updatedJson, revertOperations)
+      expect(revertedJson).toEqual(json)
     })
 
     test('should restore correctly revert multiple remove operations in an array', () => {
