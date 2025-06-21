@@ -75,6 +75,7 @@
   import { classnames } from '$lib/utils/cssUtils.js'
   import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
   import Tag from '../../../components/controls/Tag.svelte'
+  import { flushSync } from 'svelte'
 
   // We pass `pointer` instead of `path` because pointer (a string) is immutable.
   // Without it, *all* nodes would re-render on *every* change in JSON or DocumentState,
@@ -554,11 +555,19 @@
 
   function handleInsertInsideOpenContextMenu(contextMenuProps: AbsolutePopupOptions) {
     context.onSelect(createInsideSelection(path))
+
+    // ensure the updated selection is propagated to JSONEditorRoot
+    flushSync()
+
     context.onContextMenu(contextMenuProps)
   }
 
   function handleInsertAfterOpenContextMenu(contextMenuProps: AbsolutePopupOptions) {
     context.onSelect(createAfterSelection(path))
+
+    // ensure the updated selection is propagated to JSONEditorRoot
+    flushSync()
+
     context.onContextMenu(contextMenuProps)
   }
 </script>
