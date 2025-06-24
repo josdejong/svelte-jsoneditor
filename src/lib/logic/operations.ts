@@ -1,4 +1,4 @@
-import { cloneDeepWith, first, initial, isEmpty, last, times } from 'lodash-es'
+import { cloneDeepWith, first, initial, isEmpty, isEqual, last, times } from 'lodash-es'
 import {
   compileJSONPointer,
   existsIn,
@@ -11,6 +11,7 @@ import {
   type JSONPatchAdd,
   type JSONPatchCopy,
   type JSONPatchDocument,
+  type JSONPatchMove,
   type JSONPatchOperation,
   type JSONPath,
   parseJSONPointer,
@@ -39,7 +40,6 @@ import {
 } from './selection.js'
 import type { ClipboardValues, DragInsideAction, JSONParser, JSONSelection } from '$lib/types'
 import { int } from '../utils/numberUtils.js'
-import { dedupeKeepLast } from '$lib/utils/arrayUtils'
 
 /**
  * Create a JSONPatch for an insert operation.
@@ -722,30 +722,146 @@ export function revertJSONPatchWithMoveOperations(
   json: unknown,
   operations: JSONPatchDocument
 ): JSONPatchDocument {
-  return dedupeKeepLast(
-    revertJSONPatch(json, operations, {
-      before: (json, operation, revertOperations) => {
-        if (isJSONPatchRemove(operation)) {
-          const path = parseJSONPointer(operation.path)
-          return {
-            revertOperations: [...revertOperations, ...createRevertMoveOperations(json, path)]
-          }
-        }
+  // first, we merge series of move operations inside an object. These move operations are used
+  // to ensure a specific ordering of the keys in the object. Reverting those move events one by
+  // one would explode the amount of move operations in the revert operations and contain mostly
+  // duplicates.
+  const filteredOperations = _filterRedundantMoveOperations(json, operations)
 
-        if (isJSONPatchMove(operation)) {
-          const from = parseJSONPointer(operation.from)
-          return {
-            revertOperations:
-              operation.from === operation.path
-                ? [operation, ...createRevertMoveOperations(json, from)] // move in-place (just for re-ordering object keys)
-                : [...revertOperations, ...createRevertMoveOperations(json, from)]
-          }
+  return revertJSONPatch(json, filteredOperations, {
+    before: (json, operation, revertOperations) => {
+      if (isJSONPatchRemove(operation)) {
+        // we must restore the key order when reverting removing of an object key
+        const path = parseJSONPointer(operation.path)
+        return {
+          revertOperations: [...revertOperations, ...createRevertMoveOperations(json, path)]
         }
-
-        return { document: json }
       }
-    })
-  )
+
+      if (isJSONPatchMove(operation)) {
+        const from = parseJSONPointer(operation.from)
+        return {
+          revertOperations:
+            operation.from === operation.path
+              ? [operation, ...createRevertMoveOperations(json, from)] // move in-place (just for re-ordering object keys)
+              : [...revertOperations, ...createRevertMoveOperations(json, from)]
+        }
+      }
+
+      return { document: json }
+    }
+  })
+}
+
+/**
+ * Filter move operations which are redundant when creating the reverse patch operations.
+ *
+ * This is a preprocessing step for creating the revert patch operations. For example, having
+ * json {b:2, a:1, c:3} and the following move operations (this will reorder the keys):
+ *
+ *     [
+ *       { op: 'move', from: '/a', path: '/a' },
+ *       { op: 'move', from: '/b', path: '/b' },
+ *       { op: 'move', from: '/c', path: '/c' }
+ *     ]
+ *
+ * This function will return only moving of b, since that is the first of all the moved keys:
+ *
+ *     [
+ *       { op: 'move', from: '/b', path: '/b' }
+ *     ]
+ *
+ * So, when creating the reverse operations, this single operation is enough to create the needed
+ * move operations for all lower down keys to restore the original order of the keys.
+ */
+function _filterRedundantMoveOperations(
+  json: unknown,
+  operations: JSONPatchOperation[]
+): JSONPatchOperation[] {
+  // check whether this is a set of move operations (cheap check)
+  if (isEmpty(operations) || !operations.every(isJSONPatchMove)) {
+    return operations
+  }
+
+  // parse the JSON pointers once and split them in parent paths and keys
+  const processedOps: ProcessedOperation[] = []
+  for (const operation of operations) {
+    const from = splitParentKey(parseJSONPointer(operation.from))
+    const path = splitParentKey(parseJSONPointer(operation.path))
+    if (!from || !path) {
+      return operations
+    }
+    processedOps.push({ from, path, operation })
+  }
+
+  // check whether the first movement is inside an object (and not an array)
+  const parentPath = processedOps[0].path.parent
+  const parent = getIn(json, parentPath)
+  if (!isJSONObject(parent)) {
+    return operations
+  }
+
+  // check whether all movements are within the same parent object
+  if (!processedOps.every((op) => _equalParentPath(op, parentPath))) {
+    return operations
+  }
+
+  const firstKey = _findKeyWithLowestKeyIndex(processedOps, json)
+  const getOperation = (op: ProcessedOperation) => op.operation
+
+  // only return the operation moving the firstKey back, and all rename operations
+  const renameOps = processedOps.filter((op) => op.operation.from !== op.operation.path)
+  return renameOps.some((op) => op.path.key === firstKey)
+    ? renameOps.map(getOperation) // no need to add the firstKey move operation
+    : [moveDown(parentPath, firstKey), ...renameOps.map(getOperation)]
+}
+
+interface ParentKey {
+  parent: string[]
+  key: string
+}
+
+interface ProcessedOperation {
+  from: ParentKey
+  path: ParentKey
+  operation: JSONPatchMove
+}
+
+function splitParentKey(path: JSONPath): ParentKey | undefined {
+  return path.length > 0 ? { parent: initial(path), key: last(path) as string } : undefined
+}
+
+/**
+ * Test whether a move operation has a specific parent path for both `from` and `path`
+ */
+function _equalParentPath(
+  operation: ProcessedOperation,
+  parentPath: JSONPath | undefined
+): boolean {
+  return isEqual(operation.from.parent, parentPath) && isEqual(operation.path.parent, parentPath)
+}
+
+function _findKeyWithLowestKeyIndex(processedOps: ProcessedOperation[], json: unknown): string {
+  const keys = Object.keys(json as Record<string, unknown>)
+  const movedKeys = keys.slice()
+
+  // first execute all move operations on the list with keys
+  // here we assume all move operations have the same parent and are keys in an object
+  for (const op of processedOps) {
+    const index = movedKeys.indexOf(op.from.key)
+    if (index !== -1) {
+      movedKeys.splice(index, 1)
+      movedKeys.push(op.path.key)
+    }
+  }
+
+  // find the first changed key
+  let i = 0
+  while (i < keys.length && keys[i] === movedKeys[i]) {
+    i++
+  }
+
+  return movedKeys[i]
 }
 
 function createRevertMoveOperations(json: unknown, path: JSONPath): JSONPatchOperation[] {

@@ -4,7 +4,6 @@ import {
   arrayStartsWith,
   arrayToObject,
   compareArrays,
-  dedupeKeepLast,
   forEachSample,
   getNestedPaths,
   moveItems,
@@ -156,45 +155,6 @@ describe('arrayUtils', () => {
       expect(sample([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 4)).toEqual([0, 3, 6, 9])
 
       expect(sample([], 4)).toEqual([])
-    })
-  })
-
-  describe('dedupeKeepLast', () => {
-    test('should keep the last item in case of a duplicate', () => {
-      expect(dedupeKeepLast([3, 1, 3])).toEqual([1, 3])
-      expect(dedupeKeepLast([3, 1, 3, 3])).toEqual([1, 3])
-
-      expect(
-        dedupeKeepLast([
-          { id: 1, name: 'Joe' },
-          { id: 3, name: 'Sarah' },
-          { id: 1, name: 'Joe' }
-        ])
-      ).toEqual([
-        { id: 3, name: 'Sarah' },
-        { id: 1, name: 'Joe' }
-      ])
-
-      expect(
-        dedupeKeepLast([
-          { id: 1, name: 'Joe' },
-          { id: 3, name: 'Sarah' },
-          { id: 1, name: 'Joey' }
-        ])
-      ).toEqual([
-        { id: 1, name: 'Joe' },
-        { id: 3, name: 'Sarah' },
-        { id: 1, name: 'Joey' }
-      ])
-    })
-
-    test('should pass a custom comparator', () => {
-      const comparator = (a: Record<string, unknown>, b: Record<string, unknown>) => a.id === b.id
-
-      const input = [{ id: 1, name: 'Joe' }, { id: 3 }, { id: 1, name: 'Joey' }]
-      const expected = [{ id: 3 }, { id: 1, name: 'Joey' }]
-
-      expect(dedupeKeepLast(input, comparator)).toEqual(expected)
     })
   })
 })

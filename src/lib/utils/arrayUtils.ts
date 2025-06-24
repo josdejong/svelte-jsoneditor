@@ -189,19 +189,3 @@ export function forEachSample<T>(
 export function insertItemsAt<T>(array: T[], index: number, items: T[]): T[] {
   return array.slice(0, index).concat(items).concat(array.slice(index))
 }
-
-/**
- * Remove duplicate entries from an array, keeping the last item in case of a duplicate.
- * This is similar to the `uniqWith` function of Lodash, but that function keeps the *first* item in case of a duplicate.
- */
-export function dedupeKeepLast<T>(array: T[], comparator: (a: T, b: T) => boolean = isEqual): T[] {
-  return array.filter((item, index) => {
-    for (let i = index + 1; i < array.length; i++) {
-      if (comparator(item, array[i])) {
-        return false
-      }
-    }
-
-    return true
-  })
-}
