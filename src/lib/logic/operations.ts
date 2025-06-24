@@ -845,7 +845,8 @@ function _findKeyWithLowestKeyIndex(processedOps: ProcessedOperation[], json: un
   const keys = Object.keys(json as Record<string, unknown>)
   const movedKeys = keys.slice()
 
-  // first execute all move and rename operations on the list with keys
+  // first execute all move operations on the list with keys
+  // here we assume all move operations have the same parent and are keys in an object
   for (const op of processedOps) {
     const index = movedKeys.indexOf(op.from.key)
     if (index !== -1) {
