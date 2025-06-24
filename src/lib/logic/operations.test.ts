@@ -287,6 +287,33 @@ describe('operations', () => {
         c: 3
       }
 
+      const operations: JSONPatchOperation[] = [{ op: 'move', from: '/b', path: '/b_renamed' }]
+      const updatedJson = immutableJSONPatch(json, operations)
+      assert.deepStrictEqual(Object.keys(updatedJson as Record<string, number>), [
+        'a',
+        'c',
+        'b_renamed'
+      ])
+
+      const revertOperations = revertJSONPatchWithMoveOperations(json, operations)
+      assert.deepStrictEqual(revertOperations, [
+        { op: 'move', from: '/b_renamed', path: '/b' },
+        { op: 'move', from: '/c', path: '/c' },
+        { op: 'move', from: '/c', path: '/c' } // TODO: would be neat to remove the duplicate
+      ])
+
+      const revertedJson = immutableJSONPatch(updatedJson, revertOperations)
+      assert.deepStrictEqual(revertedJson, json)
+      assert.deepStrictEqual(Object.keys(revertedJson), ['a', 'b', 'c'])
+    })
+
+    test('should remove redundant move operations when renaming a key and maintaining order (2)', () => {
+      const json = {
+        a: 1,
+        b: 2,
+        c: 3
+      }
+
       const operations: JSONPatchOperation[] = [
         { op: 'move', from: '/b', path: '/b_renamed' },
         { op: 'move', from: '/c', path: '/c' }
@@ -309,7 +336,7 @@ describe('operations', () => {
       assert.deepStrictEqual(Object.keys(revertedJson), ['a', 'b', 'c'])
     })
 
-    test('should remove redundant move operations when renaming a key and maintaining order (2)', () => {
+    test('should remove redundant move operations when renaming a key and maintaining order (3)', () => {
       const json = {
         a: 1,
         b: 2,
@@ -333,7 +360,7 @@ describe('operations', () => {
       assert.deepStrictEqual(revertOperations, [
         { op: 'move', from: '/c_renamed', path: '/c' },
         { op: 'move', from: '/b', path: '/b' },
-        { op: 'move', from: '/b', path: '/b' },
+        { op: 'move', from: '/b', path: '/b' }, // TODO: would be neath to remove the duplicate
         { op: 'move', from: '/c', path: '/c' }
       ])
 
