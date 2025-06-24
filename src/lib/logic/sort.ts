@@ -19,6 +19,7 @@ export function caseInsensitiveNaturalCompare(a: unknown, b: unknown) {
   const aLower = typeof a === 'string' ? a.toLowerCase() : a
   const bLower = typeof b === 'string' ? b.toLowerCase() : b
 
+  // @ts-expect-error The type definition expects strings
   return naturalCompare(aLower, bLower)
 }
 
