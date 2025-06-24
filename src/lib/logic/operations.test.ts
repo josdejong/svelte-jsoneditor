@@ -331,10 +331,10 @@ describe('operations', () => {
       //  but this is a made up example, not a real world example, quite an edge case.
       const revertOperations = revertJSONPatchWithMoveOperations(json, operations)
       assert.deepStrictEqual(revertOperations, [
-        { from: '/a', op: 'move', path: '/a' },
+        { op: 'move', from: '/c_renamed', path: '/c' },
         { op: 'move', from: '/b', path: '/b' },
-        { from: '/c_renamed', op: 'move', path: '/c_renamed' },
-        { op: 'move', from: '/c_renamed', path: '/c' }
+        { op: 'move', from: '/b', path: '/b' },
+        { op: 'move', from: '/c', path: '/c' }
       ])
 
       const revertedJson = immutableJSONPatch(updatedJson, revertOperations)
@@ -343,7 +343,8 @@ describe('operations', () => {
     })
 
     test('should perform well when creating the revert patch of renaming a key in a large object', () => {
-      const count = 200
+      console.time('revert large patch')
+      const count = 100
       const json: Record<string, number> = {}
       for (let i = 0; i < count; i++) {
         json['item ' + i] = i
@@ -357,7 +358,8 @@ describe('operations', () => {
       expect(revertOperations.length).toEqual(count)
       const revertedJson = immutableJSONPatch(updatedJson, revertOperations)
       expect(revertedJson).toEqual(json)
-    }, /* timeout */ 500)
+      console.timeEnd('revert large patch')
+    }, /* timeout */ 200)
 
     test('should restore correctly revert multiple remove operations in an array', () => {
       const json = [0, 1, 2, 3, 4]
