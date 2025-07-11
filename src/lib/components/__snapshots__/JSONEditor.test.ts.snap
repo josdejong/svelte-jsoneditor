@@ -937,7 +937,7 @@ exports[`JSONEditor > render text mode 1`] = `
           >
             <div
               aria-hidden="true"
-              class="cm-gutters"
+              class="cm-gutters cm-gutters-before"
               style="min-height: 168px; position: sticky;"
             >
               <div
