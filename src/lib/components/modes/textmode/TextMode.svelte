@@ -28,6 +28,7 @@
   } from '$lib/utils/domUtils.js'
   import { formatSize } from '$lib/utils/fileUtils.js'
   import { findTextLocation, getText, needsFormatting } from '$lib/utils/jsonUtils.js'
+  import { expandSelf } from '$lib/logic/documentState.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
@@ -64,7 +65,11 @@
     foldKeymap,
     indentOnInput,
     indentUnit,
-    syntaxHighlighting
+    syntaxHighlighting,
+    foldCode,
+    unfoldCode,
+    foldAll,
+    unfoldAll
   } from '@codemirror/language'
   import {
     closeSearchPanel,
@@ -96,6 +101,7 @@
     OnChange,
     OnChangeMode,
     OnError,
+    OnExpand,
     OnFocus,
     OnRedo,
     OnRenderMenuInternal,
@@ -277,6 +283,60 @@
     if (codeMirrorView) {
       debug('focus')
       codeMirrorView.focus()
+    }
+  }
+
+  export function collapse(path: JSONPath) {
+    if (!codeMirrorView) {
+      return
+    }
+
+    try {
+      if (path && path.length > 0) {
+        // Find the text location of the given JSON path
+        const { from } = findTextLocation(normalization.escapeValue(text), path)
+
+        if (from !== undefined) {
+          // Set selection to the position we want to fold
+          codeMirrorView.dispatch({
+            selection: { anchor: from, head: from }
+          })
+          // Use CodeMirror's foldCode command for specific path
+          foldCode(codeMirrorView)
+        }
+      } else {
+        foldAll(codeMirrorView)
+      }
+    } catch (err) {
+      onError(err as Error)
+    }
+  }
+
+  export function expand(path: JSONPath, callback: OnExpand = expandSelf) {
+    if (!codeMirrorView) {
+      return
+    }
+
+    try {
+      if (path && path.length > 0) {
+        // Find the text location of the given JSON path
+        const { from } = findTextLocation(normalization.escapeValue(text), path)
+
+        if (from !== undefined) {
+          // Set selection to the position we want to unfold
+          codeMirrorView.dispatch({
+            selection: { anchor: from, head: from }
+          })
+          // Use CodeMirror's unfoldCode command for specific path
+          unfoldCode(codeMirrorView)
+        }
+      } else {
+        // When path is empty (expand all)
+        unfoldAll(codeMirrorView)
+      }
+      callback?.(path)
+    } catch (err) {
+      onError(err as Error)
     }
   }
 

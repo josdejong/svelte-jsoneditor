@@ -227,6 +227,8 @@
   export function expand(path: JSONPath, callback?: OnExpand): void {
     if (refTreeMode) {
       return refTreeMode.expand(path, callback)
+    } else if (refTextMode) {
+      return refTextMode.expand(path, callback)
     } else {
       throw new Error(`Method expand is not available in mode "${mode}"`)
     }
@@ -235,6 +237,8 @@
   export function collapse(path: JSONPath, recursive: boolean): void {
     if (refTreeMode) {
       return refTreeMode.collapse(path, recursive)
+    } else if (refTextMode) {
+      return refTextMode.collapse(path)
     } else {
       throw new Error(`Method collapse is not available in mode "${mode}"`)
     }
