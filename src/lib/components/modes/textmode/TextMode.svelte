@@ -286,7 +286,7 @@
     }
   }
 
-  export function collapse(path: JSONPath, recursive: boolean) {
+  export function collapse(path: JSONPath) {
     if (!codeMirrorView) {
       return
     }
