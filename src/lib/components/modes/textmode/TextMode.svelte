@@ -288,10 +288,8 @@
 
   export function collapse(path: JSONPath, recursive: boolean) {
     if (!codeMirrorView) {
-      debug('collapse: CodeMirror view not available')
+      return
     }
-
-    debug('collapse', path, recursive)
 
     try {
       if (path && path.length > 0) {
@@ -310,18 +308,14 @@
         foldAll(codeMirrorView)
       }
     } catch (err) {
-      debug('collapse error:', err)
       onError(err as Error)
     }
   }
 
   export function expand(path: JSONPath, callback: OnExpand = expandSelf) {
     if (!codeMirrorView) {
-      debug('expand: CodeMirror view not available')
       return
     }
-
-    debug('expand', path, callback)
 
     try {
       if (path && path.length > 0) {
@@ -342,7 +336,6 @@
       }
       callback?.(path)
     } catch (err) {
-      debug('expand error:', err)
       onError(err as Error)
     }
   }

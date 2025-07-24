@@ -18,6 +18,9 @@
       <a href="examples/use_methods">Use methods</a>
     </li>
     <li>
+      <a href="examples/expand_collapse">Expand/Collapse Specific Keys</a>
+    </li>
+    <li>
       <a href="examples/custom_dynamic_styling">Custom, dynamic styling</a>
     </li>
     <li>
