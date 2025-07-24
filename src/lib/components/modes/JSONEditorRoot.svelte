@@ -238,7 +238,7 @@
     if (refTreeMode) {
       return refTreeMode.collapse(path, recursive)
     } else if (refTextMode) {
-      return refTextMode.collapse(path, recursive)
+      return refTextMode.collapse(path)
     } else {
       throw new Error(`Method collapse is not available in mode "${mode}"`)
     }
