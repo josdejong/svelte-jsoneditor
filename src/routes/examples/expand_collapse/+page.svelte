@@ -32,7 +32,7 @@
   }
 
   function expandObjectNested() {
-     refJsonEditor.expand(['object', 'nested'])
+    refJsonEditor.expand(['object', 'nested'])
   }
 
   function collapseObjectNested() {

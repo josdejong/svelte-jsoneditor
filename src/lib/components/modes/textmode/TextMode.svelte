@@ -295,7 +295,7 @@
       if (path && path.length > 0) {
         // Find the text location of the given JSON path
         const { from } = findTextLocation(normalization.escapeValue(text), path)
-        
+
         if (from !== undefined) {
           // Set selection to the position we want to fold
           codeMirrorView.dispatch({
@@ -321,7 +321,7 @@
       if (path && path.length > 0) {
         // Find the text location of the given JSON path
         const { from } = findTextLocation(normalization.escapeValue(text), path)
-        
+
         if (from !== undefined) {
           // Set selection to the position we want to unfold
           codeMirrorView.dispatch({
