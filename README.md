@@ -789,7 +789,7 @@ The library exports a couple of utility functions for commonly used `callback` f
 - `expandSelf`: expand the root array or object. This is the default for the `callback` parameter.
 - `expandMinimal`: expand the root array or object, and in case of an array, expand the first array item.
 
-### collapse
+#### collapse
 
 ```ts
 JSONEditor.prototype.collapse(path: JSONPath, recursive?: boolean = false): void
