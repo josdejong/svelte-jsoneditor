@@ -286,27 +286,92 @@
     }
   }
 
-  export function collapse(path: JSONPath) {
+  export function collapse(path: JSONPath, recursive: boolean) {
     if (!codeMirrorView) {
       return
     }
 
     try {
       if (path && path.length > 0) {
-        // Find the text location of the given JSON path
-        const { from } = findTextLocation(normalization.escapeValue(text), path)
+        if (recursive) {
+          // Recursively fold all nested objects and arrays
+          collapseRecursively(path)
+        } else {
+          // Find the text location of the given JSON path
+          const { from } = findTextLocation(normalization.escapeValue(text), path)
 
-        if (from !== undefined) {
-          // Set selection to the position we want to fold
-          codeMirrorView.dispatch({
-            selection: { anchor: from, head: from }
-          })
-          // Use CodeMirror's foldCode command for specific path
-          foldCode(codeMirrorView)
+          if (from !== undefined && from !== 0) {
+            // Set selection to the position we want to fold
+            codeMirrorView.dispatch({
+              selection: { anchor: from, head: from }
+            })
+            // Use CodeMirror's foldCode command for specific path
+            foldCode(codeMirrorView)
+          }
         }
       } else {
         foldAll(codeMirrorView)
       }
+    } catch (err) {
+      onError(err as Error)
+    }
+  }
+  function findFoldableLocations(
+    foldableLocations: number[],
+    currentValue: unknown,
+    currentPath: JSONPath
+  ) {
+    if (currentValue && typeof currentValue === 'object' && currentValue !== null) {
+      const { from } = findTextLocation(normalization.escapeValue(text), currentPath)
+      if (from !== undefined && from !== 0) {
+        foldableLocations.push(from)
+      }
+
+      // Recursively check nested objects and arrays
+      if (Array.isArray(currentValue)) {
+        currentValue.forEach((item, index) => {
+          findFoldableLocations(foldableLocations, item, currentPath.concat(String(index)))
+        })
+      } else {
+        Object.keys(currentValue as Record<string, unknown>).forEach((key) => {
+          findFoldableLocations(
+            foldableLocations,
+            (currentValue as Record<string, unknown>)[key],
+            currentPath.concat(key)
+          )
+        })
+      }
+    }
+    return foldableLocations
+  }
+
+  function collapseRecursively(path: JSONPath) {
+    try {
+      const json = parser.parse(text)
+
+      // Get the value at the specified path
+      let value = json
+      for (const segment of path) {
+        if (value && typeof value === 'object' && value !== null && segment in value) {
+          value = (value as Record<string, unknown>)[segment]
+        } else {
+          return
+        }
+      }
+      // Find all foldable locations that need to be collapsed
+      const foldableLocations: number[] = []
+      findFoldableLocations(foldableLocations, value, path)
+      // Sort locations in reverse order to fold from deepest to shallowest
+      // This prevents issues with position changes after folding
+      foldableLocations.sort((a, b) => b - a)
+
+      // Fold each location
+      foldableLocations.forEach((location) => {
+        codeMirrorView.dispatch({
+          selection: { anchor: location, head: location }
+        })
+        foldCode(codeMirrorView)
+      })
     } catch (err) {
       onError(err as Error)
     }
