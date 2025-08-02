@@ -7,6 +7,7 @@
     faTimes,
     faWrench
   } from '@fortawesome/free-solid-svg-icons'
+  import { type SyntaxNode, type SyntaxNodeRef, type Tree, type NodeIterator } from '@lezer/common'
   import { createDebug } from '$lib/utils/debug.js'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
@@ -66,10 +67,13 @@
     indentOnInput,
     indentUnit,
     syntaxHighlighting,
-    foldCode,
+    foldable,
+    foldService,
+    ensureSyntaxTree,
+    foldEffect,
     unfoldCode,
-    foldAll,
-    unfoldAll
+    unfoldAll,
+    foldNodeProp
   } from '@codemirror/language'
   import {
     closeSearchPanel,
@@ -290,90 +294,112 @@
     if (!codeMirrorView) {
       return
     }
-
     try {
-      if (path && path.length > 0) {
-        if (recursive) {
-          // Recursively fold all nested objects and arrays
-          collapseRecursively(path)
-        } else {
-          // Find the text location of the given JSON path
-          const { from } = findTextLocation(normalization.escapeValue(text), path)
+      foldRecursive(path, recursive)
+    } catch (err) {
+      onError(err as Error)
+    }
+  }
+  // customFoldService CodeMirror foldable syntaxFolding use syntaxTree, Under large json, it will cause the tree to be incomplete
+  // so we use ensureSyntaxTree get the full tree
+  // https://github.com/codemirror/language/blob/ca8d6bec5463fa17eea0b893e4a2670e4df110d4/src/fold.ts#L31
+  function createCustomFoldService() {
+    return foldService.of((state, start, end) => {
+      const tree = ensureSyntaxTree(state, state.doc.length, Infinity)
+      if (!tree || tree.length < end) return null
 
-          if (from !== undefined && from !== 0) {
-            // Set selection to the position we want to fold
-            codeMirrorView.dispatch({
-              selection: { anchor: from, head: from }
-            })
-            // Use CodeMirror's foldCode command for specific path
-            foldCode(codeMirrorView)
+      let stack = tree.resolveStack(end, 1)
+      let found: null | { from: number; to: number } = null
+
+      for (let iter: NodeIterator | null = stack; iter; iter = iter.next) {
+        let cur = iter.node
+        if (cur.to <= end || cur.from > end) continue
+        if (found && cur.from < start) break
+
+        let prop = cur.type.prop(foldNodeProp)
+        if (
+          prop &&
+          (cur.to < tree.length - 50 || tree.length == state.doc.length || !isUnfinished(cur))
+        ) {
+          let value = prop(cur, state)
+          if (value && value.from <= end && value.from >= start && value.to > end) {
+            found = value
           }
         }
-      } else {
-        foldAll(codeMirrorView)
       }
-    } catch (err) {
-      onError(err as Error)
-    }
+      return found
+    })
   }
-  function findFoldableLocations(
-    foldableLocations: number[],
-    currentValue: unknown,
-    currentPath: JSONPath
+  function isUnfinished(node: SyntaxNode) {
+    let ch = node.lastChild
+    return ch && ch.to == node.to && ch.type.isError
+  }
+
+  function getFoldRanges(
+    tree: Tree,
+    state: EditorState,
+    startPos?: number,
+    recursive: boolean = true
   ) {
-    if (currentValue && typeof currentValue === 'object' && currentValue !== null) {
-      const { from } = findTextLocation(normalization.escapeValue(text), currentPath)
-      if (from !== undefined && from !== 0) {
-        foldableLocations.push(from)
-      }
+    const foldRanges: { from: number; to: number }[] = []
+    const processedRanges = new Set<string>()
 
-      // Recursively check nested objects and arrays
-      if (Array.isArray(currentValue)) {
-        currentValue.forEach((item, index) => {
-          findFoldableLocations(foldableLocations, item, currentPath.concat(String(index)))
-        })
-      } else {
-        Object.keys(currentValue as Record<string, unknown>).forEach((key) => {
-          findFoldableLocations(
-            foldableLocations,
-            (currentValue as Record<string, unknown>)[key],
-            currentPath.concat(key)
-          )
-        })
-      }
-    }
-    return foldableLocations
-  }
+    tree.iterate({
+      enter(node: SyntaxNodeRef) {
+        // If startPos is defined, only consider nodes after it
+        if (startPos === undefined || node.from >= startPos) {
+          const isFoldable = foldable(state, node.from, node.to)
+          if (isFoldable) {
+            const rangeKey = `${isFoldable.from}-${isFoldable.to}`
 
-  function collapseRecursively(path: JSONPath) {
-    try {
-      const json = parser.parse(text)
-
-      // Get the value at the specified path
-      let value = json
-      for (const segment of path) {
-        if (value && typeof value === 'object' && value !== null && segment in value) {
-          value = (value as Record<string, unknown>)[segment]
-        } else {
-          return
+            if (!processedRanges.has(rangeKey)) {
+              // If not recursive, only add top-level foldable nodes
+              if (!recursive) {
+                // Check if this node is not nested inside another foldable node we've already added
+                const isNested = foldRanges.some(
+                  (range) => range.from <= isFoldable.from && range.to >= isFoldable.to
+                )
+                if (!isNested) {
+                  foldRanges.push({ from: isFoldable.from, to: isFoldable.to })
+                  processedRanges.add(rangeKey)
+                }
+              } else {
+                // Recursive mode: add all foldable nodes
+                foldRanges.push({ from: isFoldable.from, to: isFoldable.to })
+                processedRanges.add(rangeKey)
+              }
+            }
+          }
         }
       }
-      // Find all foldable locations that need to be collapsed
-      const foldableLocations: number[] = []
-      findFoldableLocations(foldableLocations, value, path)
-      // Sort locations in reverse order to fold from deepest to shallowest
-      // This prevents issues with position changes after folding
-      foldableLocations.sort((a, b) => b - a)
+    })
 
-      // Fold each location
-      foldableLocations.forEach((location) => {
-        codeMirrorView.dispatch({
-          selection: { anchor: location, head: location }
-        })
-        foldCode(codeMirrorView)
+    return foldRanges
+  }
+
+  function foldRecursive(path: JSONPath = [], recursive: boolean = true) {
+    const state = codeMirrorView.state
+    const docLength = state.doc.length
+    const tree = ensureSyntaxTree(state, docLength, Infinity)
+    if (!tree) {
+      return
+    }
+
+    let foldRanges: { from: number; to: number }[] = []
+    if (path.length === 0) {
+      foldRanges = getFoldRanges(tree, state, undefined, recursive)
+    } else {
+      // If path is not empty, get the position of the specified path and fold content under it
+      const { from: pathStartPos } = findTextLocation(normalization.escapeValue(text), path)
+      if (pathStartPos !== undefined && pathStartPos !== 0) {
+        foldRanges = getFoldRanges(tree, state, pathStartPos, recursive)
+      }
+    }
+
+    if (foldRanges.length > 0) {
+      codeMirrorView.dispatch({
+        effects: foldRanges.map((range) => foldEffect.of({ from: range.from, to: range.to }))
       })
-    } catch (err) {
-      onError(err as Error)
     }
   }
 
@@ -774,6 +800,7 @@
         highlightActiveLineGutter(),
         highlightSpecialChars(),
         foldGutter(),
+        createCustomFoldService(), // custom fold service to handle folding
         drawSelection(),
         dropCursor(),
         EditorState.allowMultipleSelections.of(true),
