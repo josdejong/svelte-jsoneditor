@@ -181,6 +181,14 @@
   let askToFormatApplied = askToFormat
 
   let validationErrors: ValidationError[] = []
+
+  // collapse state
+  let isFolding = false
+  let foldProgress = 0
+  let foldTotal = 0
+  let foldCancelController: AbortController | null = null
+  const collapseBatchSize = 100 // number of ranges to collapse in one batch
+  const showCollapseProgressSize = 5000 // if the number of ranges is larger than this, show progress
   const linterCompartment = new Compartment()
   const readOnlyCompartment = new Compartment()
   const indentCompartment = new Compartment()
@@ -278,6 +286,7 @@
       debug('Destroy CodeMirror editor')
       codeMirrorView.destroy()
     }
+    handleCancelFolding()
   })
 
   const sortModalId = uniqueId()
@@ -376,6 +385,54 @@
 
     return foldRanges
   }
+  async function foldRangesAnimated(foldRanges: { from: number; to: number }[]) {
+    if (foldRanges.length === 0) return
+
+    // if the number of ranges is large, show progress
+    const shouldShowProgress = foldRanges.length > showCollapseProgressSize
+
+    if (shouldShowProgress) {
+      isFolding = true
+      foldProgress = 0
+      foldTotal = foldRanges.length
+      foldCancelController = new AbortController()
+    }
+
+    const processBatch = (startIndex: number): Promise<void> => {
+      return new Promise<void>((resolve) => {
+        // check if folding was cancelled
+        if (shouldShowProgress && foldCancelController?.signal.aborted) {
+          resolve()
+          return
+        }
+        requestAnimationFrame(() => {
+          const endIndex = Math.min(startIndex + collapseBatchSize, foldRanges.length)
+          const batch = foldRanges.slice(startIndex, endIndex)
+          codeMirrorView.dispatch({
+            effects: batch.map((range) => foldEffect.of({ from: range.from, to: range.to }))
+          })
+
+          if (shouldShowProgress) {
+            foldProgress = endIndex
+          }
+
+          if (endIndex < foldRanges.length) {
+            processBatch(endIndex).then(resolve)
+          } else {
+            resolve()
+          }
+        })
+      })
+    }
+
+    await processBatch(0)
+    if (shouldShowProgress) {
+      isFolding = false
+      foldProgress = 0
+      foldTotal = 0
+      foldCancelController = null
+    }
+  }
 
   function foldRecursive(path: JSONPath = [], recursive: boolean = true) {
     const state = codeMirrorView.state
@@ -397,9 +454,13 @@
     }
 
     if (foldRanges.length > 0) {
-      codeMirrorView.dispatch({
-        effects: foldRanges.map((range) => foldEffect.of({ from: range.from, to: range.to }))
-      })
+      foldRangesAnimated(foldRanges)
+    }
+  }
+
+  function handleCancelFolding() {
+    if (foldCancelController) {
+      foldCancelController.abort()
     }
   }
 
@@ -1273,7 +1334,24 @@
       {onRenderMenu}
     />
   {/if}
-
+  {#if isFolding}
+    <div class="jse-fold-progress">
+      <div class="jse-fold-progress-track">
+        <div
+          class="jse-fold-progress-fill"
+          style="width: {foldTotal > 0 ? (foldProgress / foldTotal) * 100 : 0}%"
+        ></div>
+      </div>
+      <button
+        class="jse-fold-cancel-button"
+        type="button"
+        title="Cancel folding"
+        on:click={handleCancelFolding}
+      >
+        Cancel
+      </button>
+    </div>
+  {/if}
   {#if !isSSR}
     {@const editorDisabled = disableTextEditor(text, acceptTooLarge)}
 
