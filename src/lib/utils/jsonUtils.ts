@@ -383,7 +383,7 @@ export function toTextContent(
 }
 
 /**
- * Convert Content into TextContent if it is JSONContent, else leave it as is
+ * Convert Content into JSONContent if it is TextContent, else leave it as is
  * @throws {SyntaxError} Will throw a parse error when the text contents does not contain valid JSON
  */
 export function toJSONContent(content: Content, parser: JSONParser = JSON): JSONContent {
