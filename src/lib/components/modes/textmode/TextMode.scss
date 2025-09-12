@@ -201,6 +201,11 @@
     border-top: defaults.$panel-border;
     border-bottom: defaults.$panel-border;
 
+    .jse-fold-tip {
+      font-family: defaults.$font-family;
+      font-size: defaults.$font-size-mono;
+      color: defaults.$panel-color-readonly;
+    }
     .jse-fold-progress-track {
       flex: 1;
       height: 6px;

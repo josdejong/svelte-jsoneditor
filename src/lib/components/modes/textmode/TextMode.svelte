@@ -1336,6 +1336,7 @@
   {/if}
   {#if isFolding}
     <div class="jse-fold-progress">
+      <span class="jse-fold-tip">Collapsing</span>
       <div class="jse-fold-progress-track">
         <div
           class="jse-fold-progress-fill"
