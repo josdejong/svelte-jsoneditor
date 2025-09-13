@@ -20,7 +20,7 @@
   }
 
   function collapseObject() {
-    refJsonEditor.collapse(['object'])
+    refJsonEditor.collapse(['object'], true)
   }
 
   function expandArray() {
@@ -49,7 +49,7 @@
 
 <p>
   <button type="button" onclick={expandObject}>Expand object</button>
-  <button type="button" onclick={collapseObject}>Collapse object</button>
+  <button type="button" onclick={collapseObject}>Collapse object recursive</button>
   <button type="button" onclick={expandArray}>Expand array</button>
   <button type="button" onclick={collapseArray}>Collapse array</button>
 </p>

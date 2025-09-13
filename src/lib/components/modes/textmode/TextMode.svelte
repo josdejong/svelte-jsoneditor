@@ -7,6 +7,7 @@
     faTimes,
     faWrench
   } from '@fortawesome/free-solid-svg-icons'
+  import { type SyntaxNode, type SyntaxNodeRef, type Tree, type NodeIterator } from '@lezer/common'
   import { createDebug } from '$lib/utils/debug.js'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
@@ -66,10 +67,13 @@
     indentOnInput,
     indentUnit,
     syntaxHighlighting,
-    foldCode,
+    foldable,
+    foldService,
+    ensureSyntaxTree,
+    foldEffect,
     unfoldCode,
-    foldAll,
-    unfoldAll
+    unfoldAll,
+    foldNodeProp
   } from '@codemirror/language'
   import {
     closeSearchPanel,
@@ -177,6 +181,14 @@
   let askToFormatApplied = askToFormat
 
   let validationErrors: ValidationError[] = []
+
+  // collapse state
+  let isFolding = false
+  let foldProgress = 0
+  let foldTotal = 0
+  let foldCancelController: AbortController | null = null
+  const collapseBatchSize = 100 // number of ranges to collapse in one batch
+  const showCollapseProgressSize = 5000 // if the number of ranges is larger than this, show progress
   const linterCompartment = new Compartment()
   const readOnlyCompartment = new Compartment()
   const indentCompartment = new Compartment()
@@ -274,6 +286,7 @@
       debug('Destroy CodeMirror editor')
       codeMirrorView.destroy()
     }
+    handleCancelFolding()
   })
 
   const sortModalId = uniqueId()
@@ -286,29 +299,168 @@
     }
   }
 
-  export function collapse(path: JSONPath) {
+  export function collapse(path: JSONPath, recursive: boolean) {
     if (!codeMirrorView) {
       return
     }
-
     try {
-      if (path && path.length > 0) {
-        // Find the text location of the given JSON path
-        const { from } = findTextLocation(normalization.escapeValue(text), path)
-
-        if (from !== undefined) {
-          // Set selection to the position we want to fold
-          codeMirrorView.dispatch({
-            selection: { anchor: from, head: from }
-          })
-          // Use CodeMirror's foldCode command for specific path
-          foldCode(codeMirrorView)
-        }
-      } else {
-        foldAll(codeMirrorView)
-      }
+      foldRecursive(path, recursive)
     } catch (err) {
       onError(err as Error)
+    }
+  }
+  // customFoldService CodeMirror foldable syntaxFolding use syntaxTree, Under large json, it will cause the tree to be incomplete
+  // so we use ensureSyntaxTree get the full tree
+  // https://github.com/codemirror/language/blob/ca8d6bec5463fa17eea0b893e4a2670e4df110d4/src/fold.ts#L31
+  function createCustomFoldService() {
+    return foldService.of((state, start, end) => {
+      const tree = ensureSyntaxTree(state, state.doc.length, Infinity)
+      if (!tree || tree.length < end) return null
+
+      let stack = tree.resolveStack(end, 1)
+      let found: null | { from: number; to: number } = null
+
+      for (let iter: NodeIterator | null = stack; iter; iter = iter.next) {
+        let cur = iter.node
+        if (cur.to <= end || cur.from > end) continue
+        if (found && cur.from < start) break
+
+        let prop = cur.type.prop(foldNodeProp)
+        if (
+          prop &&
+          (cur.to < tree.length - 50 || tree.length == state.doc.length || !isUnfinished(cur))
+        ) {
+          let value = prop(cur, state)
+          if (value && value.from <= end && value.from >= start && value.to > end) {
+            found = value
+          }
+        }
+      }
+      return found
+    })
+  }
+  function isUnfinished(node: SyntaxNode) {
+    let ch = node.lastChild
+    return ch && ch.to == node.to && ch.type.isError
+  }
+
+  function getFoldRanges(
+    tree: Tree,
+    state: EditorState,
+    startPos?: number,
+    recursive: boolean = true
+  ) {
+    const foldRanges: { from: number; to: number }[] = []
+    const processedRanges = new Set<string>()
+
+    tree.iterate({
+      enter(node: SyntaxNodeRef) {
+        // If startPos is defined, only consider nodes after it
+        if (startPos === undefined || node.from >= startPos) {
+          const isFoldable = foldable(state, node.from, node.to)
+          if (isFoldable) {
+            const rangeKey = `${isFoldable.from}-${isFoldable.to}`
+
+            if (!processedRanges.has(rangeKey)) {
+              // If not recursive, only add top-level foldable nodes
+              if (!recursive) {
+                // Check if this node is not nested inside another foldable node we've already added
+                const isNested = foldRanges.some(
+                  (range) => range.from <= isFoldable.from && range.to >= isFoldable.to
+                )
+                if (!isNested) {
+                  foldRanges.push({ from: isFoldable.from, to: isFoldable.to })
+                  processedRanges.add(rangeKey)
+                }
+              } else {
+                // Recursive mode: add all foldable nodes
+                foldRanges.push({ from: isFoldable.from, to: isFoldable.to })
+                processedRanges.add(rangeKey)
+              }
+            }
+          }
+        }
+      }
+    })
+
+    return foldRanges
+  }
+  async function foldRangesAnimated(foldRanges: { from: number; to: number }[]) {
+    if (foldRanges.length === 0) return
+
+    // if the number of ranges is large, show progress
+    const shouldShowProgress = foldRanges.length > showCollapseProgressSize
+
+    if (shouldShowProgress) {
+      isFolding = true
+      foldProgress = 0
+      foldTotal = foldRanges.length
+      foldCancelController = new AbortController()
+    }
+
+    const processBatch = (startIndex: number): Promise<void> => {
+      return new Promise<void>((resolve) => {
+        // check if folding was cancelled
+        if (shouldShowProgress && foldCancelController?.signal.aborted) {
+          resolve()
+          return
+        }
+        requestAnimationFrame(() => {
+          const endIndex = Math.min(startIndex + collapseBatchSize, foldRanges.length)
+          const batch = foldRanges.slice(startIndex, endIndex)
+          codeMirrorView.dispatch({
+            effects: batch.map((range) => foldEffect.of({ from: range.from, to: range.to }))
+          })
+
+          if (shouldShowProgress) {
+            foldProgress = endIndex
+          }
+
+          if (endIndex < foldRanges.length) {
+            processBatch(endIndex).then(resolve)
+          } else {
+            resolve()
+          }
+        })
+      })
+    }
+
+    await processBatch(0)
+    if (shouldShowProgress) {
+      isFolding = false
+      foldProgress = 0
+      foldTotal = 0
+      foldCancelController = null
+    }
+  }
+
+  function foldRecursive(path: JSONPath = [], recursive: boolean = true) {
+    const state = codeMirrorView.state
+    const docLength = state.doc.length
+    const tree = ensureSyntaxTree(state, docLength, Infinity)
+    if (!tree) {
+      return
+    }
+
+    let foldRanges: { from: number; to: number }[] = []
+    if (path.length === 0) {
+      foldRanges = getFoldRanges(tree, state, undefined, recursive)
+    } else {
+      // If path is not empty, get the position of the specified path and fold content under it
+      const { from: pathStartPos } = findTextLocation(normalization.escapeValue(text), path)
+      if (pathStartPos !== undefined && pathStartPos !== 0) {
+        foldRanges = getFoldRanges(tree, state, pathStartPos, recursive)
+      }
+    }
+
+    if (foldRanges.length > 0) {
+      foldRangesAnimated(foldRanges)
+    }
+  }
+
+  function handleCancelFolding() {
+    if (foldCancelController) {
+      foldCancelController.abort()
     }
   }
 
@@ -709,6 +861,7 @@
         highlightActiveLineGutter(),
         highlightSpecialChars(),
         foldGutter(),
+        createCustomFoldService(), // custom fold service to handle folding
         drawSelection(),
         dropCursor(),
         EditorState.allowMultipleSelections.of(true),
@@ -1181,7 +1334,25 @@
       {onRenderMenu}
     />
   {/if}
-
+  {#if isFolding}
+    <div class="jse-fold-progress">
+      <span class="jse-fold-tip">Collapsing</span>
+      <div class="jse-fold-progress-track">
+        <div
+          class="jse-fold-progress-fill"
+          style="width: {foldTotal > 0 ? (foldProgress / foldTotal) * 100 : 0}%"
+        ></div>
+      </div>
+      <button
+        class="jse-fold-cancel-button"
+        type="button"
+        title="Cancel folding"
+        on:click={handleCancelFolding}
+      >
+        Cancel
+      </button>
+    </div>
+  {/if}
   {#if !isSSR}
     {@const editorDisabled = disableTextEditor(text, acceptTooLarge)}
 
