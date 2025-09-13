@@ -191,4 +191,54 @@
       padding: 2px;
     }
   }
+
+  .jse-fold-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: defaults.$background-color;
+    border-top: defaults.$panel-border;
+    border-bottom: defaults.$panel-border;
+
+    .jse-fold-tip {
+      font-family: defaults.$font-family;
+      font-size: defaults.$font-size-mono;
+      color: defaults.$panel-color-readonly;
+    }
+    .jse-fold-progress-track {
+      flex: 1;
+      height: 6px;
+      background: defaults.$panel-background;
+      border-radius: 3px;
+      overflow: hidden;
+      border: 1px solid defaults.$panel-border;
+    }
+
+    .jse-fold-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, defaults.$theme-color, defaults.$theme-color-highlight);
+      border-radius: 2px;
+      transition: width 0.1s ease;
+      min-width: 2px;
+    }
+
+    .jse-fold-cancel-button {
+      padding: 4px 12px;
+      font-size: 12px;
+      font-family: defaults.$font-family;
+      background: defaults.$theme-color;
+      color: defaults.$white;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+      flex-shrink: 0;
+      border: 1px solid defaults.$main-border;
+
+      &:hover {
+        background: defaults.$theme-color-highlight;
+        color: defaults.$white;
+      }
+    }
+  }
 }

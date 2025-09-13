@@ -626,7 +626,7 @@ exports[`JSONEditor > render text mode 1`] = `
   >
     <!---->
     <div
-      class="jse-text-mode svelte-xt61xw"
+      class="jse-text-mode svelte-1pr65po"
     >
       <div
         class="jse-menu svelte-pf7s2l"
@@ -921,8 +921,10 @@ exports[`JSONEditor > render text mode 1`] = `
       </div>
       <!---->
        
+      <!---->
+       
       <div
-        class="jse-contents svelte-xt61xw"
+        class="jse-contents svelte-1pr65po"
       >
         <div
           class="cm-editor ͼ1 ͼ2 ͼ4 ͼt"
