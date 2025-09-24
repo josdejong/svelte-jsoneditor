@@ -8,11 +8,18 @@
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
-  import { faJSONEditorCompact, faJSONEditorFormat } from '$lib/img/customFontawesomeIcons.js'
+  import {
+    faJSONEditorCollapse,
+    faJSONEditorCompact,
+    faJSONEditorExpand,
+    faJSONEditorFormat
+  } from '$lib/img/customFontawesomeIcons.js'
   import Menu from '../../../controls/Menu.svelte'
   import type { MenuItem, OnRenderMenuInternal } from '$lib/types'
 
   export let readOnly = false
+  export let onExpandAll: () => void
+  export let onCollapseAll: () => void
   export let onFormat: () => boolean
   export let onCompact: () => boolean
   export let onSort: () => void
@@ -20,6 +27,8 @@
   export let onToggleSearch: () => void
   export let onUndo: () => void
   export let onRedo: () => void
+  export let canExpandAll: boolean
+  export let canCollapseAll: boolean
   export let canUndo: boolean
   export let canRedo: boolean
   export let canFormat: boolean
@@ -27,6 +36,26 @@
   export let canSort: boolean
   export let canTransform: boolean
   export let onRenderMenu: OnRenderMenuInternal
+
+  let expandMenuItem: MenuItem
+  $: expandMenuItem = {
+    type: 'button',
+    icon: faJSONEditorExpand,
+    title: 'Expand all',
+    className: 'jse-expand-all',
+    onClick: onExpandAll,
+    disabled: !canExpandAll
+  }
+
+  let collapseMenuItem: MenuItem
+  $: collapseMenuItem = {
+    type: 'button',
+    icon: faJSONEditorCollapse,
+    title: 'Collapse all',
+    className: 'jse-collapse-all',
+    onClick: onCollapseAll,
+    disabled: !canCollapseAll
+  }
 
   const searchItem: MenuItem = {
     type: 'button',
@@ -39,6 +68,11 @@
   let defaultItems: MenuItem[]
   $: defaultItems = !readOnly
     ? [
+        expandMenuItem,
+        collapseMenuItem,
+        {
+          type: 'separator'
+        },
         {
           type: 'button',
           icon: faJSONEditorFormat,
@@ -99,6 +133,11 @@
         }
       ]
     : [
+        expandMenuItem,
+        collapseMenuItem,
+        {
+          type: 'separator'
+        },
         searchItem,
         {
           type: 'space'

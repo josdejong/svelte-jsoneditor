@@ -6,22 +6,25 @@ exports[`JSONEditor > render table mode 1`] = `
   <!---->
    
   <div
-    class="jse-main svelte-57bmz4"
+    class="jse-main svelte-1l55585"
     role="none"
   >
     <!---->
+    <!---->
     <div
-      class="jse-table-mode svelte-u14cgx"
+      class="jse-table-mode svelte-1p86y3c"
       role="table"
     >
       <div
-        class="jse-menu svelte-pf7s2l"
+        class="jse-menu svelte-3erbu0"
       >
         <!---->
          
         <!---->
+        <!---->
+        <!---->
         <button
-          class="jse-button jse-group-button jse-first svelte-pf7s2l"
+          class="jse-button jse-group-button jse-first svelte-3erbu0"
           title="Switch to text mode (current mode: table)"
           type="button"
         >
@@ -31,9 +34,13 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-group-button  svelte-pf7s2l"
+          class="jse-button jse-group-button  svelte-3erbu0"
           title="Switch to tree mode (current mode: table)"
           type="button"
         >
@@ -43,9 +50,13 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-group-button jse-last jse-selected svelte-pf7s2l"
+          class="jse-button jse-group-button jse-last jse-selected svelte-3erbu0"
           title="Switch to table mode (current mode: table)"
           type="button"
         >
@@ -55,20 +66,24 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
+        
+        
         <!---->
         <div
-          class="jse-separator svelte-pf7s2l"
+          class="jse-separator svelte-3erbu0"
         />
         
         <!---->
+        <!---->
+        <!---->
         <button
-          class="jse-button jse-sort svelte-pf7s2l"
+          class="jse-button jse-sort svelte-3erbu0"
           title="Sort"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="14.222222222222221"
             role="presentation"
             style=""
@@ -79,7 +94,7 @@ exports[`JSONEditor > render table mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M151.6 469.6C145.5 476.2 137 480 128 480s-17.5-3.8-23.6-10.4l-88-96c-11.9-13-11.1-33.3 2-45.2s33.3-11.1 45.2 2L96 365.7 96 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 301.7 32.4-35.4c11.9-13 32.2-13.9 45.2-2s13.9 32.2 2 45.2l-88 96zM320 32l32 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-96 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l160 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-160 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l224 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-224 0c-17.7 0-32-14.3-32-32s14.3-32 32-32z"
+              d="M246.6 374.6l-96 96c-12.5 12.5-32.8 12.5-45.3 0l-96-96c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L96 370.7 96 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 306.7 41.4-41.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3zM320 32l32 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-96 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l160 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-160 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l224 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-224 0c-17.7 0-32-14.3-32-32s14.3-32 32-32z"
             />
             <!---->
             <!---->
@@ -92,15 +107,19 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-transform svelte-pf7s2l"
+          class="jse-button jse-transform svelte-3erbu0"
           title="Transform contents (filter, sort, project)"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -111,7 +130,7 @@ exports[`JSONEditor > render table mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M3.9 54.9C10.5 40.9 24.5 32 40 32l432 0c15.5 0 29.5 8.9 36.1 22.9s4.6 30.5-5.2 42.5L320 320.9 320 448c0 12.1-6.8 23.2-17.7 28.6s-23.8 4.3-33.5-3l-64-48c-8.1-6-12.8-15.5-12.8-25.6l0-79.1L9 97.3C-.7 85.4-2.8 68.8 3.9 54.9z"
+              d="M32 64C19.1 64 7.4 71.8 2.4 83.8S.2 109.5 9.4 118.6L192 301.3 192 416c0 8.5 3.4 16.6 9.4 22.6l64 64c9.2 9.2 22.9 11.9 34.9 6.9S320 492.9 320 480l0-178.7 182.6-182.6c9.2-9.2 11.9-22.9 6.9-34.9S492.9 64 480 64L32 64z"
             />
             <!---->
             <!---->
@@ -124,15 +143,19 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-search svelte-pf7s2l"
+          class="jse-button jse-search svelte-3erbu0"
           title="Search (Ctrl+F)"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -143,7 +166,7 @@ exports[`JSONEditor > render table mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
+              d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376C296.3 401.1 253.9 416 208 416 93.1 416 0 322.9 0 208S93.1 0 208 0 416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
             />
             <!---->
             <!---->
@@ -156,15 +179,19 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-contextmenu svelte-pf7s2l"
+          class="jse-button jse-contextmenu svelte-3erbu0"
           title="Open context menu (Click here, right click on the selection, or use the context menu button or Ctrl+Q)"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -175,7 +202,7 @@ exports[`JSONEditor > render table mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M64 360a56 56 0 1 0 0 112 56 56 0 1 0 0-112zm0-160a56 56 0 1 0 0 112 56 56 0 1 0 0-112zM120 96A56 56 0 1 0 8 96a56 56 0 1 0 112 0z"
+              d="M64 144a56 56 0 1 1 0-112 56 56 0 1 1 0 112zm0 224c30.9 0 56 25.1 56 56s-25.1 56-56 56-56-25.1-56-56 25.1-56 56-56zm56-112c0 30.9-25.1 56-56 56s-56-25.1-56-56 25.1-56 56-56 56 25.1 56 56z"
             />
             <!---->
             <!---->
@@ -188,21 +215,25 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
+        
+        
         <!---->
         <div
-          class="jse-separator svelte-pf7s2l"
+          class="jse-separator svelte-3erbu0"
         />
         
         <!---->
+        <!---->
+        <!---->
         <button
-          class="jse-button jse-undo svelte-pf7s2l"
+          class="jse-button jse-undo svelte-3erbu0"
           disabled=""
           title="Undo (Ctrl+Z)"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -213,7 +244,7 @@ exports[`JSONEditor > render table mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M125.7 160l50.3 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L48 224c-17.7 0-32-14.3-32-32L16 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"
+              d="M256 64c-56.8 0-107.9 24.7-143.1 64l47.1 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 192c-17.7 0-32-14.3-32-32L0 32C0 14.3 14.3 0 32 0S64 14.3 64 32l0 54.7C110.9 33.6 179.5 0 256 0 397.4 0 512 114.6 512 256S397.4 512 256 512c-87 0-163.9-43.4-210.1-109.7-10.1-14.5-6.6-34.4 7.9-44.6s34.4-6.6 44.6 7.9c34.8 49.8 92.4 82.3 157.6 82.3 106 0 192-86 192-192S362 64 256 64z"
             />
             <!---->
             <!---->
@@ -226,16 +257,20 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-redo svelte-pf7s2l"
+          class="jse-button jse-redo svelte-3erbu0"
           disabled=""
           title="Redo (Ctrl+Shift+Z)"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -246,7 +281,7 @@ exports[`JSONEditor > render table mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M386.3 160L336 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l128 0c17.7 0 32-14.3 32-32l0-128c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 51.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0s-87.5 229.3 0 316.8s229.3 87.5 316.8 0c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0c-62.5 62.5-163.8 62.5-226.3 0s-62.5-163.8 0-226.3s163.8-62.5 226.3 0L386.3 160z"
+              d="M436.7 74.7L448 85.4 448 32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 128c0 17.7-14.3 32-32 32l-128 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l47.9 0-7.6-7.2c-.2-.2-.4-.4-.6-.6-75-75-196.5-75-271.5 0s-75 196.5 0 271.5 196.5 75 271.5 0c8.2-8.2 15.5-16.9 21.9-26.1 10.1-14.5 30.1-18 44.6-7.9s18 30.1 7.9 44.6c-8.5 12.2-18.2 23.8-29.1 34.7-100 100-262.1 100-362 0S-25 175 75 75c99.9-99.9 261.7-100 361.7-.3z"
             />
             <!---->
             <!---->
@@ -259,10 +294,14 @@ exports[`JSONEditor > render table mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
         <!---->
         <div
-          class="jse-space svelte-pf7s2l"
+          class="jse-space svelte-3erbu0"
         />
+        
         
         <!---->
          
@@ -271,10 +310,10 @@ exports[`JSONEditor > render table mode 1`] = `
       <!---->
        
       <label
-        class="jse-hidden-input-label svelte-u14cgx"
+        class="jse-hidden-input-label svelte-1p86y3c"
       >
         <input
-          class="jse-hidden-input svelte-u14cgx"
+          class="jse-hidden-input svelte-1p86y3c"
           readonly=""
           tabindex="-1"
           type="text"
@@ -282,7 +321,7 @@ exports[`JSONEditor > render table mode 1`] = `
       </label>
        
       <div
-        class="jse-search-box-container svelte-u14cgx"
+        class="jse-search-box-container svelte-1p86y3c"
       >
         <!---->
         
@@ -290,25 +329,25 @@ exports[`JSONEditor > render table mode 1`] = `
       </div>
        
       <div
-        class="jse-contents svelte-u14cgx"
+        class="jse-contents svelte-1p86y3c"
       >
         <table
-          class="jse-table-main svelte-u14cgx"
+          class="jse-table-main svelte-1p86y3c"
         >
           <tbody>
             <tr
-              class="jse-table-row jse-table-row-header svelte-u14cgx"
+              class="jse-table-row jse-table-row-header svelte-1p86y3c"
             >
               <th
-                class="jse-table-cell jse-table-cell-header svelte-u14cgx"
+                class="jse-table-cell jse-table-cell-header svelte-1p86y3c"
               >
                 <!---->
               </th>
               <th
-                class="jse-table-cell jse-table-cell-header svelte-u14cgx"
+                class="jse-table-cell jse-table-cell-header svelte-1p86y3c"
               >
                 <button
-                  class="jse-column-header svelte-2i3vdx"
+                  class="jse-column-header svelte-5pxwfq"
                   title="id (Click to sort the data by this column)"
                   type="button"
                 >
@@ -323,10 +362,10 @@ exports[`JSONEditor > render table mode 1`] = `
                 <!---->
               </th>
               <th
-                class="jse-table-cell jse-table-cell-header svelte-u14cgx"
+                class="jse-table-cell jse-table-cell-header svelte-1p86y3c"
               >
                 <button
-                  class="jse-column-header svelte-2i3vdx"
+                  class="jse-column-header svelte-5pxwfq"
                   title="name (Click to sort the data by this column)"
                   type="button"
                 >
@@ -344,36 +383,36 @@ exports[`JSONEditor > render table mode 1`] = `
               <!---->
             </tr>
             <tr
-              class="jse-table-invisible-start-section svelte-u14cgx"
+              class="jse-table-invisible-start-section svelte-1p86y3c"
             >
               <td
-                class="svelte-u14cgx"
+                class="svelte-1p86y3c"
                 colspan="2"
                 style="height: 0px;"
               />
             </tr>
             <tr
-              class="jse-table-row svelte-u14cgx"
+              class="jse-table-row svelte-1p86y3c"
             >
               <th
-                class="jse-table-cell jse-table-cell-gutter svelte-u14cgx"
+                class="jse-table-cell jse-table-cell-gutter svelte-1p86y3c"
               >
                 0 
                 <!---->
               </th>
               <!---->
               <td
-                class="jse-table-cell svelte-u14cgx"
+                class="jse-table-cell svelte-1p86y3c"
                 data-path="%2F0%2Fid"
               >
                 <div
-                  class="jse-value-outer svelte-u14cgx"
+                  class="jse-value-outer svelte-1p86y3c"
                 >
                   <!---->
                   <!---->
                   <!---->
                   <div
-                    class="jse-value jse-number jse-table-cell svelte-c0g9qz"
+                    class="jse-value jse-number jse-table-cell svelte-1saqp8c"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -393,17 +432,17 @@ exports[`JSONEditor > render table mode 1`] = `
                 <!---->
               </td>
               <td
-                class="jse-table-cell svelte-u14cgx"
+                class="jse-table-cell svelte-1p86y3c"
                 data-path="%2F0%2Fname"
               >
                 <div
-                  class="jse-value-outer svelte-u14cgx"
+                  class="jse-value-outer svelte-1p86y3c"
                 >
                   <!---->
                   <!---->
                   <!---->
                   <div
-                    class="jse-value jse-string jse-empty jse-table-cell svelte-c0g9qz"
+                    class="jse-value jse-string jse-empty jse-table-cell svelte-1saqp8c"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -426,27 +465,27 @@ exports[`JSONEditor > render table mode 1`] = `
               <!---->
             </tr>
             <tr
-              class="jse-table-row svelte-u14cgx"
+              class="jse-table-row svelte-1p86y3c"
             >
               <th
-                class="jse-table-cell jse-table-cell-gutter svelte-u14cgx"
+                class="jse-table-cell jse-table-cell-gutter svelte-1p86y3c"
               >
                 1 
                 <!---->
               </th>
               <!---->
               <td
-                class="jse-table-cell svelte-u14cgx"
+                class="jse-table-cell svelte-1p86y3c"
                 data-path="%2F1%2Fid"
               >
                 <div
-                  class="jse-value-outer svelte-u14cgx"
+                  class="jse-value-outer svelte-1p86y3c"
                 >
                   <!---->
                   <!---->
                   <!---->
                   <div
-                    class="jse-value jse-number jse-table-cell svelte-c0g9qz"
+                    class="jse-value jse-number jse-table-cell svelte-1saqp8c"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -466,17 +505,17 @@ exports[`JSONEditor > render table mode 1`] = `
                 <!---->
               </td>
               <td
-                class="jse-table-cell svelte-u14cgx"
+                class="jse-table-cell svelte-1p86y3c"
                 data-path="%2F1%2Fname"
               >
                 <div
-                  class="jse-value-outer svelte-u14cgx"
+                  class="jse-value-outer svelte-1p86y3c"
                 >
                   <!---->
                   <!---->
                   <!---->
                   <div
-                    class="jse-value jse-string jse-table-cell svelte-c0g9qz"
+                    class="jse-value jse-string jse-table-cell svelte-1saqp8c"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -499,27 +538,27 @@ exports[`JSONEditor > render table mode 1`] = `
               <!---->
             </tr>
             <tr
-              class="jse-table-row svelte-u14cgx"
+              class="jse-table-row svelte-1p86y3c"
             >
               <th
-                class="jse-table-cell jse-table-cell-gutter svelte-u14cgx"
+                class="jse-table-cell jse-table-cell-gutter svelte-1p86y3c"
               >
                 2 
                 <!---->
               </th>
               <!---->
               <td
-                class="jse-table-cell svelte-u14cgx"
+                class="jse-table-cell svelte-1p86y3c"
                 data-path="%2F2%2Fid"
               >
                 <div
-                  class="jse-value-outer svelte-u14cgx"
+                  class="jse-value-outer svelte-1p86y3c"
                 >
                   <!---->
                   <!---->
                   <!---->
                   <div
-                    class="jse-value jse-number jse-table-cell svelte-c0g9qz"
+                    class="jse-value jse-number jse-table-cell svelte-1saqp8c"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -539,17 +578,17 @@ exports[`JSONEditor > render table mode 1`] = `
                 <!---->
               </td>
               <td
-                class="jse-table-cell svelte-u14cgx"
+                class="jse-table-cell svelte-1p86y3c"
                 data-path="%2F2%2Fname"
               >
                 <div
-                  class="jse-value-outer svelte-u14cgx"
+                  class="jse-value-outer svelte-1p86y3c"
                 >
                   <!---->
                   <!---->
                   <!---->
                   <div
-                    class="jse-value jse-string jse-empty jse-table-cell svelte-c0g9qz"
+                    class="jse-value jse-string jse-empty jse-table-cell svelte-1saqp8c"
                     data-type="selectable-value"
                     role="button"
                     tabindex="-1"
@@ -573,10 +612,10 @@ exports[`JSONEditor > render table mode 1`] = `
             </tr>
             <!---->
             <tr
-              class="jse-table-invisible-end-section svelte-u14cgx"
+              class="jse-table-invisible-end-section svelte-1p86y3c"
             >
               <td
-                class="svelte-u14cgx"
+                class="svelte-1p86y3c"
                 colspan="2"
                 style="height: 0px;"
               />
@@ -602,6 +641,7 @@ exports[`JSONEditor > render table mode 1`] = `
      
     <!---->
     
+    
     <!---->
   </div>
    
@@ -621,21 +661,23 @@ exports[`JSONEditor > render text mode 1`] = `
   <!---->
    
   <div
-    class="jse-main svelte-57bmz4"
+    class="jse-main svelte-1l55585"
     role="none"
   >
     <!---->
     <div
-      class="jse-text-mode svelte-1pr65po"
+      class="jse-text-mode svelte-k2b9e6"
     >
       <div
-        class="jse-menu svelte-pf7s2l"
+        class="jse-menu svelte-3erbu0"
       >
         <!---->
          
         <!---->
+        <!---->
+        <!---->
         <button
-          class="jse-button jse-group-button jse-first jse-selected svelte-pf7s2l"
+          class="jse-button jse-group-button jse-first jse-selected svelte-3erbu0"
           title="Switch to text mode (current mode: text)"
           type="button"
         >
@@ -645,9 +687,13 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-group-button  svelte-pf7s2l"
+          class="jse-button jse-group-button  svelte-3erbu0"
           title="Switch to tree mode (current mode: text)"
           type="button"
         >
@@ -657,9 +703,13 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-group-button jse-last svelte-pf7s2l"
+          class="jse-button jse-group-button jse-last svelte-3erbu0"
           title="Switch to table mode (current mode: text)"
           type="button"
         >
@@ -669,20 +719,101 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
+        
+        
         <!---->
         <div
-          class="jse-separator svelte-pf7s2l"
+          class="jse-separator svelte-3erbu0"
         />
         
         <!---->
+        <!---->
+        <!---->
         <button
-          class="jse-button jse-format svelte-pf7s2l"
+          class="jse-button jse-expand-all svelte-3erbu0"
+          title="Expand all"
+          type="button"
+        >
+          <svg
+            aria-label=""
+            class="fa-icon  svelte-v67cny"
+            height="16"
+            role="presentation"
+            style=""
+            version="1.1"
+            viewBox="0 0 512 512"
+            width="16"
+          >
+            <!---->
+            <!---->
+            <path
+              d="M 0,448 V 512 h 512 v -64 z M 0,0 V 64 H 512 V 0 Z M 256,96 128,224 h 256 z M 256,416 384,288 H 128 Z"
+            />
+            <!---->
+            <!---->
+            <!---->
+            
+            <!---->
+          </svg>
+          <!---->
+           
+          <!---->
+        </button>
+        
+        
+        
+        <!---->
+        <!---->
+        <!---->
+        <button
+          class="jse-button jse-collapse-all svelte-3erbu0"
+          title="Collapse all"
+          type="button"
+        >
+          <svg
+            aria-label=""
+            class="fa-icon  svelte-v67cny"
+            height="16"
+            role="presentation"
+            style=""
+            version="1.1"
+            viewBox="0 0 512 512"
+            width="16"
+          >
+            <!---->
+            <!---->
+            <path
+              d="m 0,224 v 64 h 512 v -64 z M 256,192 384,64 H 128 Z M 256,320 128,448 h 256 z"
+            />
+            <!---->
+            <!---->
+            <!---->
+            
+            <!---->
+          </svg>
+          <!---->
+           
+          <!---->
+        </button>
+        
+        
+        
+        <!---->
+        <div
+          class="jse-separator svelte-3erbu0"
+        />
+        
+        <!---->
+        <!---->
+        <!---->
+        <button
+          class="jse-button jse-format svelte-3erbu0"
           title="Format JSON: add proper indentation and new lines (Ctrl+I)"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -706,15 +837,19 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-compact svelte-pf7s2l"
+          class="jse-button jse-compact svelte-3erbu0"
           title="Compact JSON: remove all white spacing and new lines (Ctrl+Shift+I)"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -738,20 +873,24 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
+        
+        
         <!---->
         <div
-          class="jse-separator svelte-pf7s2l"
+          class="jse-separator svelte-3erbu0"
         />
         
         <!---->
+        <!---->
+        <!---->
         <button
-          class="jse-button jse-sort svelte-pf7s2l"
+          class="jse-button jse-sort svelte-3erbu0"
           title="Sort"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="14.222222222222221"
             role="presentation"
             style=""
@@ -762,7 +901,7 @@ exports[`JSONEditor > render text mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M151.6 469.6C145.5 476.2 137 480 128 480s-17.5-3.8-23.6-10.4l-88-96c-11.9-13-11.1-33.3 2-45.2s33.3-11.1 45.2 2L96 365.7 96 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 301.7 32.4-35.4c11.9-13 32.2-13.9 45.2-2s13.9 32.2 2 45.2l-88 96zM320 32l32 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-96 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l160 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-160 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l224 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-224 0c-17.7 0-32-14.3-32-32s14.3-32 32-32z"
+              d="M246.6 374.6l-96 96c-12.5 12.5-32.8 12.5-45.3 0l-96-96c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L96 370.7 96 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 306.7 41.4-41.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3zM320 32l32 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-96 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l160 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-160 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l224 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-224 0c-17.7 0-32-14.3-32-32s14.3-32 32-32z"
             />
             <!---->
             <!---->
@@ -775,15 +914,19 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-transform svelte-pf7s2l"
+          class="jse-button jse-transform svelte-3erbu0"
           title="Transform contents (filter, sort, project)"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -794,7 +937,7 @@ exports[`JSONEditor > render text mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M3.9 54.9C10.5 40.9 24.5 32 40 32l432 0c15.5 0 29.5 8.9 36.1 22.9s4.6 30.5-5.2 42.5L320 320.9 320 448c0 12.1-6.8 23.2-17.7 28.6s-23.8 4.3-33.5-3l-64-48c-8.1-6-12.8-15.5-12.8-25.6l0-79.1L9 97.3C-.7 85.4-2.8 68.8 3.9 54.9z"
+              d="M32 64C19.1 64 7.4 71.8 2.4 83.8S.2 109.5 9.4 118.6L192 301.3 192 416c0 8.5 3.4 16.6 9.4 22.6l64 64c9.2 9.2 22.9 11.9 34.9 6.9S320 492.9 320 480l0-178.7 182.6-182.6c9.2-9.2 11.9-22.9 6.9-34.9S492.9 64 480 64L32 64z"
             />
             <!---->
             <!---->
@@ -807,15 +950,19 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-search svelte-pf7s2l"
+          class="jse-button jse-search svelte-3erbu0"
           title="Search (Ctrl+F)"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -826,7 +973,7 @@ exports[`JSONEditor > render text mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
+              d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376C296.3 401.1 253.9 416 208 416 93.1 416 0 322.9 0 208S93.1 0 208 0 416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
             />
             <!---->
             <!---->
@@ -839,21 +986,25 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
+        
+        
         <!---->
         <div
-          class="jse-separator svelte-pf7s2l"
+          class="jse-separator svelte-3erbu0"
         />
         
         <!---->
+        <!---->
+        <!---->
         <button
-          class="jse-button jse-undo svelte-pf7s2l"
+          class="jse-button jse-undo svelte-3erbu0"
           disabled=""
           title="Undo (Ctrl+Z)"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -864,7 +1015,7 @@ exports[`JSONEditor > render text mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M125.7 160l50.3 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L48 224c-17.7 0-32-14.3-32-32L16 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"
+              d="M256 64c-56.8 0-107.9 24.7-143.1 64l47.1 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 192c-17.7 0-32-14.3-32-32L0 32C0 14.3 14.3 0 32 0S64 14.3 64 32l0 54.7C110.9 33.6 179.5 0 256 0 397.4 0 512 114.6 512 256S397.4 512 256 512c-87 0-163.9-43.4-210.1-109.7-10.1-14.5-6.6-34.4 7.9-44.6s34.4-6.6 44.6 7.9c34.8 49.8 92.4 82.3 157.6 82.3 106 0 192-86 192-192S362 64 256 64z"
             />
             <!---->
             <!---->
@@ -877,16 +1028,20 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-redo svelte-pf7s2l"
+          class="jse-button jse-redo svelte-3erbu0"
           disabled=""
           title="Redo (Ctrl+Shift+Z)"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -897,7 +1052,7 @@ exports[`JSONEditor > render text mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M386.3 160L336 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l128 0c17.7 0 32-14.3 32-32l0-128c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 51.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0s-87.5 229.3 0 316.8s229.3 87.5 316.8 0c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0c-62.5 62.5-163.8 62.5-226.3 0s-62.5-163.8 0-226.3s163.8-62.5 226.3 0L386.3 160z"
+              d="M436.7 74.7L448 85.4 448 32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 128c0 17.7-14.3 32-32 32l-128 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l47.9 0-7.6-7.2c-.2-.2-.4-.4-.6-.6-75-75-196.5-75-271.5 0s-75 196.5 0 271.5 196.5 75 271.5 0c8.2-8.2 15.5-16.9 21.9-26.1 10.1-14.5 30.1-18 44.6-7.9s18 30.1 7.9 44.6c-8.5 12.2-18.2 23.8-29.1 34.7-100 100-262.1 100-362 0S-25 175 75 75c99.9-99.9 261.7-100 361.7-.3z"
             />
             <!---->
             <!---->
@@ -910,10 +1065,14 @@ exports[`JSONEditor > render text mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
         <!---->
         <div
-          class="jse-space svelte-pf7s2l"
+          class="jse-space svelte-3erbu0"
         />
+        
         
         <!---->
          
@@ -924,7 +1083,7 @@ exports[`JSONEditor > render text mode 1`] = `
       <!---->
        
       <div
-        class="jse-contents svelte-1pr65po"
+        class="jse-contents svelte-k2b9e6"
       >
         <div
           class="cm-editor ͼ1 ͼ2 ͼ4 ͼt"
@@ -1234,7 +1393,7 @@ exports[`JSONEditor > render text mode 1`] = `
        
       <!---->
       <div
-        class="jse-status-bar svelte-1ulj7zd"
+        class="jse-status-bar svelte-1pmgv9j"
       >
         <!---->
          
@@ -1274,23 +1433,26 @@ exports[`JSONEditor > render tree mode 1`] = `
   <!---->
    
   <div
-    class="jse-main svelte-57bmz4"
+    class="jse-main svelte-1l55585"
     role="none"
   >
     <!---->
+    <!---->
     <div
-      class="jse-tree-mode svelte-vrx1dr"
+      class="jse-tree-mode svelte-10mlrw4"
       role="tree"
       tabindex="-1"
     >
       <div
-        class="jse-menu svelte-pf7s2l"
+        class="jse-menu svelte-3erbu0"
       >
         <!---->
          
         <!---->
+        <!---->
+        <!---->
         <button
-          class="jse-button jse-group-button jse-first svelte-pf7s2l"
+          class="jse-button jse-group-button jse-first svelte-3erbu0"
           title="Switch to text mode (current mode: tree)"
           type="button"
         >
@@ -1300,9 +1462,13 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-group-button  jse-selected svelte-pf7s2l"
+          class="jse-button jse-group-button  jse-selected svelte-3erbu0"
           title="Switch to tree mode (current mode: tree)"
           type="button"
         >
@@ -1312,9 +1478,13 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-group-button jse-last svelte-pf7s2l"
+          class="jse-button jse-group-button jse-last svelte-3erbu0"
           title="Switch to table mode (current mode: tree)"
           type="button"
         >
@@ -1324,20 +1494,24 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
+        
+        
         <!---->
         <div
-          class="jse-separator svelte-pf7s2l"
+          class="jse-separator svelte-3erbu0"
         />
         
         <!---->
+        <!---->
+        <!---->
         <button
-          class="jse-button jse-expand-all svelte-pf7s2l"
+          class="jse-button jse-expand-all svelte-3erbu0"
           title="Expand all"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -1361,15 +1535,19 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-collapse-all svelte-pf7s2l"
+          class="jse-button jse-collapse-all svelte-3erbu0"
           title="Collapse all"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -1393,20 +1571,24 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
+        
+        
         <!---->
         <div
-          class="jse-separator svelte-pf7s2l"
+          class="jse-separator svelte-3erbu0"
         />
         
         <!---->
+        <!---->
+        <!---->
         <button
-          class="jse-button jse-sort svelte-pf7s2l"
+          class="jse-button jse-sort svelte-3erbu0"
           title="Sort"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="14.222222222222221"
             role="presentation"
             style=""
@@ -1417,7 +1599,7 @@ exports[`JSONEditor > render tree mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M151.6 469.6C145.5 476.2 137 480 128 480s-17.5-3.8-23.6-10.4l-88-96c-11.9-13-11.1-33.3 2-45.2s33.3-11.1 45.2 2L96 365.7 96 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 301.7 32.4-35.4c11.9-13 32.2-13.9 45.2-2s13.9 32.2 2 45.2l-88 96zM320 32l32 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-96 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l160 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-160 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l224 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-224 0c-17.7 0-32-14.3-32-32s14.3-32 32-32z"
+              d="M246.6 374.6l-96 96c-12.5 12.5-32.8 12.5-45.3 0l-96-96c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L96 370.7 96 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 306.7 41.4-41.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3zM320 32l32 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l96 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-96 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l160 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-160 0c-17.7 0-32-14.3-32-32s14.3-32 32-32zm0 128l224 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-224 0c-17.7 0-32-14.3-32-32s14.3-32 32-32z"
             />
             <!---->
             <!---->
@@ -1430,15 +1612,19 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-transform svelte-pf7s2l"
+          class="jse-button jse-transform svelte-3erbu0"
           title="Transform contents (filter, sort, project)"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -1449,7 +1635,7 @@ exports[`JSONEditor > render tree mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M3.9 54.9C10.5 40.9 24.5 32 40 32l432 0c15.5 0 29.5 8.9 36.1 22.9s4.6 30.5-5.2 42.5L320 320.9 320 448c0 12.1-6.8 23.2-17.7 28.6s-23.8 4.3-33.5-3l-64-48c-8.1-6-12.8-15.5-12.8-25.6l0-79.1L9 97.3C-.7 85.4-2.8 68.8 3.9 54.9z"
+              d="M32 64C19.1 64 7.4 71.8 2.4 83.8S.2 109.5 9.4 118.6L192 301.3 192 416c0 8.5 3.4 16.6 9.4 22.6l64 64c9.2 9.2 22.9 11.9 34.9 6.9S320 492.9 320 480l0-178.7 182.6-182.6c9.2-9.2 11.9-22.9 6.9-34.9S492.9 64 480 64L32 64z"
             />
             <!---->
             <!---->
@@ -1462,15 +1648,19 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-search svelte-pf7s2l"
+          class="jse-button jse-search svelte-3erbu0"
           title="Search (Ctrl+F)"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -1481,7 +1671,7 @@ exports[`JSONEditor > render tree mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
+              d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376C296.3 401.1 253.9 416 208 416 93.1 416 0 322.9 0 208S93.1 0 208 0 416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
             />
             <!---->
             <!---->
@@ -1494,15 +1684,19 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-contextmenu svelte-pf7s2l"
+          class="jse-button jse-contextmenu svelte-3erbu0"
           title="Open context menu (Click here, right click on the selection, or use the context menu button or Ctrl+Q)"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -1513,7 +1707,7 @@ exports[`JSONEditor > render tree mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M64 360a56 56 0 1 0 0 112 56 56 0 1 0 0-112zm0-160a56 56 0 1 0 0 112 56 56 0 1 0 0-112zM120 96A56 56 0 1 0 8 96a56 56 0 1 0 112 0z"
+              d="M64 144a56 56 0 1 1 0-112 56 56 0 1 1 0 112zm0 224c30.9 0 56 25.1 56 56s-25.1 56-56 56-56-25.1-56-56 25.1-56 56-56zm56-112c0 30.9-25.1 56-56 56s-56-25.1-56-56 25.1-56 56-56 56 25.1 56 56z"
             />
             <!---->
             <!---->
@@ -1526,21 +1720,25 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
+        
+        
         <!---->
         <div
-          class="jse-separator svelte-pf7s2l"
+          class="jse-separator svelte-3erbu0"
         />
         
         <!---->
+        <!---->
+        <!---->
         <button
-          class="jse-button jse-undo svelte-pf7s2l"
+          class="jse-button jse-undo svelte-3erbu0"
           disabled=""
           title="Undo (Ctrl+Z)"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -1551,7 +1749,7 @@ exports[`JSONEditor > render tree mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M125.7 160l50.3 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L48 224c-17.7 0-32-14.3-32-32L16 64c0-17.7 14.3-32 32-32s32 14.3 32 32l0 51.2L97.6 97.6c87.5-87.5 229.3-87.5 316.8 0s87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3s-163.8-62.5-226.3 0L125.7 160z"
+              d="M256 64c-56.8 0-107.9 24.7-143.1 64l47.1 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 192c-17.7 0-32-14.3-32-32L0 32C0 14.3 14.3 0 32 0S64 14.3 64 32l0 54.7C110.9 33.6 179.5 0 256 0 397.4 0 512 114.6 512 256S397.4 512 256 512c-87 0-163.9-43.4-210.1-109.7-10.1-14.5-6.6-34.4 7.9-44.6s34.4-6.6 44.6 7.9c34.8 49.8 92.4 82.3 157.6 82.3 106 0 192-86 192-192S362 64 256 64z"
             />
             <!---->
             <!---->
@@ -1564,16 +1762,20 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
+        <!---->
         <!---->
         <button
-          class="jse-button jse-redo svelte-pf7s2l"
+          class="jse-button jse-redo svelte-3erbu0"
           disabled=""
           title="Redo (Ctrl+Shift+Z)"
           type="button"
         >
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -1584,7 +1786,7 @@ exports[`JSONEditor > render tree mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M386.3 160L336 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l128 0c17.7 0 32-14.3 32-32l0-128c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 51.2L414.4 97.6c-87.5-87.5-229.3-87.5-316.8 0s-87.5 229.3 0 316.8s229.3 87.5 316.8 0c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0c-62.5 62.5-163.8 62.5-226.3 0s-62.5-163.8 0-226.3s163.8-62.5 226.3 0L386.3 160z"
+              d="M436.7 74.7L448 85.4 448 32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 128c0 17.7-14.3 32-32 32l-128 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l47.9 0-7.6-7.2c-.2-.2-.4-.4-.6-.6-75-75-196.5-75-271.5 0s-75 196.5 0 271.5 196.5 75 271.5 0c8.2-8.2 15.5-16.9 21.9-26.1 10.1-14.5 30.1-18 44.6-7.9s18 30.1 7.9 44.6c-8.5 12.2-18.2 23.8-29.1 34.7-100 100-262.1 100-362 0S-25 175 75 75c99.9-99.9 261.7-100 361.7-.3z"
             />
             <!---->
             <!---->
@@ -1597,10 +1799,14 @@ exports[`JSONEditor > render tree mode 1`] = `
           <!---->
         </button>
         
+        
+        
+        <!---->
         <!---->
         <div
-          class="jse-space svelte-pf7s2l"
+          class="jse-space svelte-3erbu0"
         />
+        
         
         <!---->
          
@@ -1609,32 +1815,32 @@ exports[`JSONEditor > render tree mode 1`] = `
       <!---->
        
       <div
-        class="jse-navigation-bar svelte-xs03gj"
+        class="jse-navigation-bar svelte-hjhal6"
       >
         <!---->
         <!---->
          
         <div
-          class="jse-navigation-bar-item svelte-752ro1"
+          class="jse-navigation-bar-item svelte-13sijxb"
         >
           <button
-            class="jse-navigation-bar-button jse-navigation-bar-arrow svelte-752ro1"
+            class="jse-navigation-bar-button jse-navigation-bar-arrow svelte-13sijxb"
             type="button"
           >
             <svg
               aria-label=""
-              class="fa-icon  svelte-1mc5hvj"
+              class="fa-icon  svelte-v67cny"
               height="16"
               role="presentation"
               style=""
               version="1.1"
-              viewBox="0 0 320 512"
-              width="10"
+              viewBox="0 0 256 512"
+              width="8"
             >
               <!---->
               <!---->
               <path
-                d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"
+                d="M247.1 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L179.2 256 41.9 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"
               />
               <!---->
               <!---->
@@ -1651,19 +1857,19 @@ exports[`JSONEditor > render tree mode 1`] = `
         <!---->
          
         <button
-          class="jse-navigation-bar-edit svelte-xs03gj flex"
+          class="jse-navigation-bar-edit svelte-hjhal6 flex"
           title="Edit the selected path"
           type="button"
         >
           <span
-            class="jse-navigation-bar-space svelte-xs03gj"
+            class="jse-navigation-bar-space svelte-hjhal6"
           >
              
           </span>
            
           <svg
             aria-label=""
-            class="fa-icon  svelte-1mc5hvj"
+            class="fa-icon  svelte-v67cny"
             height="16"
             role="presentation"
             style=""
@@ -1674,7 +1880,7 @@ exports[`JSONEditor > render tree mode 1`] = `
             <!---->
             <!---->
             <path
-              d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L362.3 51.7l97.9 97.9 30.1-30.1c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L437.7 172.3 339.7 74.3 172.4 241.7zM96 64C43 64 0 107 0 160L0 416c0 53 43 96 96 96l256 0c53 0 96-43 96-96l0-96c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7-14.3 32-32 32L96 448c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 64z"
+              d="M471.6 21.7c-21.9-21.9-57.3-21.9-79.2 0L368 46.1 465.9 144 490.3 119.6c21.9-21.9 21.9-57.3 0-79.2L471.6 21.7zm-299.2 220c-6.1 6.1-10.8 13.6-13.5 21.9l-29.6 88.8c-2.9 8.6-.6 18.1 5.8 24.6s15.9 8.7 24.6 5.8l88.8-29.6c8.2-2.7 15.7-7.4 21.9-13.5L432 177.9 334.1 80 172.4 241.7zM96 64C43 64 0 107 0 160L0 416c0 53 43 96 96 96l256 0c53 0 96-43 96-96l0-96c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 96c0 17.7-14.3 32-32 32L96 448c-17.7 0-32-14.3-32-32l0-256c0-17.7 14.3-32 32-32l96 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L96 64z"
             />
             <!---->
             <!---->
@@ -1688,10 +1894,10 @@ exports[`JSONEditor > render tree mode 1`] = `
       <!---->
        
       <label
-        class="jse-hidden-input-label svelte-vrx1dr"
+        class="jse-hidden-input-label svelte-10mlrw4"
       >
         <input
-          class="jse-hidden-input svelte-vrx1dr"
+          class="jse-hidden-input svelte-10mlrw4"
           readonly=""
           tabindex="-1"
           type="text"
@@ -1699,7 +1905,7 @@ exports[`JSONEditor > render tree mode 1`] = `
       </label>
        
       <div
-        class="jse-search-box-container svelte-vrx1dr"
+        class="jse-search-box-container svelte-10mlrw4"
       >
         <!---->
         
@@ -1707,44 +1913,44 @@ exports[`JSONEditor > render tree mode 1`] = `
       </div>
        
       <div
-        class="jse-contents svelte-vrx1dr"
+        class="jse-contents svelte-10mlrw4"
         data-jsoneditor-scrollable-contents="true"
       >
         <!---->
          
         <div
           aria-selected="false"
-          class="jse-json-node jse-expanded svelte-oawf7x jse-root"
+          class="jse-json-node jse-expanded svelte-1qi6rc1 jse-root"
           data-path=""
           role="treeitem"
           style="--level: 0;"
           tabindex="-1"
         >
           <div
-            class="jse-header-outer svelte-oawf7x"
+            class="jse-header-outer svelte-1qi6rc1"
           >
             <div
-              class="jse-header svelte-oawf7x"
+              class="jse-header svelte-1qi6rc1"
             >
               <button
-                class="jse-expand svelte-oawf7x"
+                class="jse-expand svelte-1qi6rc1"
                 title="Expand or collapse this array (Ctrl+Click to expand/collapse recursively)"
                 type="button"
               >
                 <svg
                   aria-label=""
-                  class="fa-icon  svelte-1mc5hvj"
+                  class="fa-icon  svelte-v67cny"
                   height="16"
                   role="presentation"
                   style=""
                   version="1.1"
-                  viewBox="0 0 320 512"
-                  width="10"
+                  viewBox="0 0 384 512"
+                  width="12"
                 >
                   <!---->
                   <!---->
                   <path
-                    d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"
+                    d="M352 160c12.9 0 24.6 7.8 29.6 19.8s2.2 25.7-6.9 34.9l-160 160c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-9.2-9.2-11.9-22.9-6.9-34.9S19.1 160 32 160l320 0z"
                   />
                   <!---->
                   <!---->
@@ -1760,20 +1966,20 @@ exports[`JSONEditor > render tree mode 1`] = `
               <!---->
                
               <div
-                class="jse-meta svelte-oawf7x"
+                class="jse-meta svelte-1qi6rc1"
               >
                 <div
-                  class="jse-meta-inner svelte-oawf7x"
+                  class="jse-meta-inner svelte-1qi6rc1"
                   data-type="selectable-value"
                 >
                   <div
-                    class="jse-bracket svelte-oawf7x"
+                    class="jse-bracket svelte-1qi6rc1"
                   >
                     [
                   </div>
                    
                   <button
-                    class="jse-tag svelte-jlw0fj disabled"
+                    class="jse-tag svelte-ubve9r disabled"
                     type="button"
                   >
                     3
@@ -1792,7 +1998,7 @@ exports[`JSONEditor > render tree mode 1`] = `
             <!---->
              
             <div
-              class="jse-insert-selection-area jse-inside svelte-oawf7x"
+              class="jse-insert-selection-area jse-inside svelte-1qi6rc1"
               data-type="insert-selection-area-inside"
               role="none"
             />
@@ -1800,7 +2006,7 @@ exports[`JSONEditor > render tree mode 1`] = `
           </div>
            
           <div
-            class="jse-items svelte-oawf7x"
+            class="jse-items svelte-1qi6rc1"
           >
             <!---->
              
@@ -1808,37 +2014,38 @@ exports[`JSONEditor > render tree mode 1`] = `
             <!---->
             <div
               aria-selected="false"
-              class="jse-json-node jse-expanded svelte-oawf7x"
+              class="jse-json-node jse-expanded svelte-1qi6rc1"
               data-path="%2F0"
               role="treeitem"
               style="--level: 1;"
               tabindex="-1"
             >
+              <!---->
               <div
-                class="jse-header-outer svelte-oawf7x"
+                class="jse-header-outer svelte-1qi6rc1"
               >
                 <div
-                  class="jse-header svelte-oawf7x"
+                  class="jse-header svelte-1qi6rc1"
                 >
                   <button
-                    class="jse-expand svelte-oawf7x"
+                    class="jse-expand svelte-1qi6rc1"
                     title="Expand or collapse this object (Ctrl+Click to expand/collapse recursively)"
                     type="button"
                   >
                     <svg
                       aria-label=""
-                      class="fa-icon  svelte-1mc5hvj"
+                      class="fa-icon  svelte-v67cny"
                       height="16"
                       role="presentation"
                       style=""
                       version="1.1"
-                      viewBox="0 0 320 512"
-                      width="10"
+                      viewBox="0 0 384 512"
+                      width="12"
                     >
                       <!---->
                       <!---->
                       <path
-                        d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"
+                        d="M352 160c12.9 0 24.6 7.8 29.6 19.8s2.2 25.7-6.9 34.9l-160 160c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-9.2-9.2-11.9-22.9-6.9-34.9S19.1 160 32 160l320 0z"
                       />
                       <!---->
                       <!---->
@@ -1850,11 +2057,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                   </button>
                    
                   <div
-                    class="jse-identifier svelte-oawf7x"
+                    class="jse-identifier svelte-1qi6rc1"
                     slot="identifier"
                   >
                     <div
-                      class="jse-index svelte-oawf7x"
+                      class="jse-index svelte-1qi6rc1"
                     >
                       0
                     </div>
@@ -1862,21 +2069,21 @@ exports[`JSONEditor > render tree mode 1`] = `
                   <!---->
                    
                   <div
-                    class="jse-separator svelte-oawf7x"
+                    class="jse-separator svelte-1qi6rc1"
                   >
                     :
                   </div>
                   <!---->
                    
                   <div
-                    class="jse-meta svelte-oawf7x"
+                    class="jse-meta svelte-1qi6rc1"
                     data-type="selectable-value"
                   >
                     <div
-                      class="jse-meta-inner svelte-oawf7x"
+                      class="jse-meta-inner svelte-1qi6rc1"
                     >
                       <div
-                        class="jse-bracket jse-expanded svelte-oawf7x"
+                        class="jse-bracket jse-expanded svelte-1qi6rc1"
                       >
                         {
                       </div>
@@ -1890,7 +2097,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                 <!---->
                  
                 <div
-                  class="jse-insert-selection-area jse-inside svelte-oawf7x"
+                  class="jse-insert-selection-area jse-inside svelte-1qi6rc1"
                   data-type="insert-selection-area-inside"
                   role="none"
                 />
@@ -1898,32 +2105,33 @@ exports[`JSONEditor > render tree mode 1`] = `
               </div>
                
               <div
-                class="jse-props svelte-oawf7x"
+                class="jse-props svelte-1qi6rc1"
               >
                 <!---->
                  
                 <!---->
                 <div
                   aria-selected="false"
-                  class="jse-json-node svelte-oawf7x"
+                  class="jse-json-node svelte-1qi6rc1"
                   data-path="%2F0%2Fid"
                   role="treeitem"
                   style="--level: 2;"
                   tabindex="-1"
                 >
+                  <!---->
                   <div
-                    class="jse-contents-outer svelte-oawf7x"
+                    class="jse-contents-outer svelte-1qi6rc1"
                   >
                     <div
-                      class="jse-contents svelte-oawf7x"
+                      class="jse-contents svelte-1qi6rc1"
                     >
                       <div
-                        class="jse-key-outer svelte-oawf7x"
+                        class="jse-key-outer svelte-1qi6rc1"
                         slot="identifier"
                       >
                         <!---->
                         <div
-                          class="jse-key svelte-2iqnqn"
+                          class="jse-key svelte-1n4cez4"
                           data-type="selectable-key"
                           role="none"
                         >
@@ -1938,20 +2146,20 @@ exports[`JSONEditor > render tree mode 1`] = `
                       <!---->
                        
                       <div
-                        class="jse-separator svelte-oawf7x"
+                        class="jse-separator svelte-1qi6rc1"
                       >
                         :
                       </div>
                       <!---->
                        
                       <div
-                        class="jse-value-outer svelte-oawf7x"
+                        class="jse-value-outer svelte-1qi6rc1"
                       >
                         <!---->
                         <!---->
                         <!---->
                         <div
-                          class="jse-value jse-number svelte-c0g9qz"
+                          class="jse-value jse-number svelte-1saqp8c"
                           data-type="selectable-value"
                           role="button"
                           tabindex="-1"
@@ -1973,12 +2181,13 @@ exports[`JSONEditor > render tree mode 1`] = `
                     <!---->
                      
                     <div
-                      class="jse-insert-selection-area jse-after svelte-oawf7x"
+                      class="jse-insert-selection-area jse-after svelte-1qi6rc1"
                       data-type="insert-selection-area-after"
                       role="none"
                     />
                     <!---->
                   </div>
+                  
                   <!---->
                    
                   <!---->
@@ -1988,27 +2197,28 @@ exports[`JSONEditor > render tree mode 1`] = `
               </div>
                
               <div
-                class="jse-footer-outer svelte-oawf7x"
+                class="jse-footer-outer svelte-1qi6rc1"
               >
                 <div
-                  class="jse-footer svelte-oawf7x"
+                  class="jse-footer svelte-1qi6rc1"
                   data-type="selectable-value"
                 >
                   <div
-                    class="jse-bracket svelte-oawf7x"
+                    class="jse-bracket svelte-1qi6rc1"
                   >
                     }
                   </div>
                 </div>
                  
                 <div
-                  class="jse-insert-selection-area jse-after svelte-oawf7x"
+                  class="jse-insert-selection-area jse-after svelte-1qi6rc1"
                   data-type="insert-selection-area-after"
                   role="none"
                 />
                 <!---->
               </div>
               <!---->
+              
               <!---->
                
               <!---->
@@ -2017,37 +2227,38 @@ exports[`JSONEditor > render tree mode 1`] = `
             <!---->
             <div
               aria-selected="false"
-              class="jse-json-node jse-expanded svelte-oawf7x"
+              class="jse-json-node jse-expanded svelte-1qi6rc1"
               data-path="%2F1"
               role="treeitem"
               style="--level: 1;"
               tabindex="-1"
             >
+              <!---->
               <div
-                class="jse-header-outer svelte-oawf7x"
+                class="jse-header-outer svelte-1qi6rc1"
               >
                 <div
-                  class="jse-header svelte-oawf7x"
+                  class="jse-header svelte-1qi6rc1"
                 >
                   <button
-                    class="jse-expand svelte-oawf7x"
+                    class="jse-expand svelte-1qi6rc1"
                     title="Expand or collapse this object (Ctrl+Click to expand/collapse recursively)"
                     type="button"
                   >
                     <svg
                       aria-label=""
-                      class="fa-icon  svelte-1mc5hvj"
+                      class="fa-icon  svelte-v67cny"
                       height="16"
                       role="presentation"
                       style=""
                       version="1.1"
-                      viewBox="0 0 320 512"
-                      width="10"
+                      viewBox="0 0 384 512"
+                      width="12"
                     >
                       <!---->
                       <!---->
                       <path
-                        d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"
+                        d="M352 160c12.9 0 24.6 7.8 29.6 19.8s2.2 25.7-6.9 34.9l-160 160c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-9.2-9.2-11.9-22.9-6.9-34.9S19.1 160 32 160l320 0z"
                       />
                       <!---->
                       <!---->
@@ -2059,11 +2270,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                   </button>
                    
                   <div
-                    class="jse-identifier svelte-oawf7x"
+                    class="jse-identifier svelte-1qi6rc1"
                     slot="identifier"
                   >
                     <div
-                      class="jse-index svelte-oawf7x"
+                      class="jse-index svelte-1qi6rc1"
                     >
                       1
                     </div>
@@ -2071,21 +2282,21 @@ exports[`JSONEditor > render tree mode 1`] = `
                   <!---->
                    
                   <div
-                    class="jse-separator svelte-oawf7x"
+                    class="jse-separator svelte-1qi6rc1"
                   >
                     :
                   </div>
                   <!---->
                    
                   <div
-                    class="jse-meta svelte-oawf7x"
+                    class="jse-meta svelte-1qi6rc1"
                     data-type="selectable-value"
                   >
                     <div
-                      class="jse-meta-inner svelte-oawf7x"
+                      class="jse-meta-inner svelte-1qi6rc1"
                     >
                       <div
-                        class="jse-bracket jse-expanded svelte-oawf7x"
+                        class="jse-bracket jse-expanded svelte-1qi6rc1"
                       >
                         {
                       </div>
@@ -2099,7 +2310,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                 <!---->
                  
                 <div
-                  class="jse-insert-selection-area jse-inside svelte-oawf7x"
+                  class="jse-insert-selection-area jse-inside svelte-1qi6rc1"
                   data-type="insert-selection-area-inside"
                   role="none"
                 />
@@ -2107,32 +2318,33 @@ exports[`JSONEditor > render tree mode 1`] = `
               </div>
                
               <div
-                class="jse-props svelte-oawf7x"
+                class="jse-props svelte-1qi6rc1"
               >
                 <!---->
                  
                 <!---->
                 <div
                   aria-selected="false"
-                  class="jse-json-node svelte-oawf7x"
+                  class="jse-json-node svelte-1qi6rc1"
                   data-path="%2F1%2Fid"
                   role="treeitem"
                   style="--level: 2;"
                   tabindex="-1"
                 >
+                  <!---->
                   <div
-                    class="jse-contents-outer svelte-oawf7x"
+                    class="jse-contents-outer svelte-1qi6rc1"
                   >
                     <div
-                      class="jse-contents svelte-oawf7x"
+                      class="jse-contents svelte-1qi6rc1"
                     >
                       <div
-                        class="jse-key-outer svelte-oawf7x"
+                        class="jse-key-outer svelte-1qi6rc1"
                         slot="identifier"
                       >
                         <!---->
                         <div
-                          class="jse-key svelte-2iqnqn"
+                          class="jse-key svelte-1n4cez4"
                           data-type="selectable-key"
                           role="none"
                         >
@@ -2147,20 +2359,20 @@ exports[`JSONEditor > render tree mode 1`] = `
                       <!---->
                        
                       <div
-                        class="jse-separator svelte-oawf7x"
+                        class="jse-separator svelte-1qi6rc1"
                       >
                         :
                       </div>
                       <!---->
                        
                       <div
-                        class="jse-value-outer svelte-oawf7x"
+                        class="jse-value-outer svelte-1qi6rc1"
                       >
                         <!---->
                         <!---->
                         <!---->
                         <div
-                          class="jse-value jse-number svelte-c0g9qz"
+                          class="jse-value jse-number svelte-1saqp8c"
                           data-type="selectable-value"
                           role="button"
                           tabindex="-1"
@@ -2182,12 +2394,13 @@ exports[`JSONEditor > render tree mode 1`] = `
                     <!---->
                      
                     <div
-                      class="jse-insert-selection-area jse-after svelte-oawf7x"
+                      class="jse-insert-selection-area jse-after svelte-1qi6rc1"
                       data-type="insert-selection-area-after"
                       role="none"
                     />
                     <!---->
                   </div>
+                  
                   <!---->
                    
                   <!---->
@@ -2196,25 +2409,26 @@ exports[`JSONEditor > render tree mode 1`] = `
                 <!---->
                 <div
                   aria-selected="false"
-                  class="jse-json-node svelte-oawf7x"
+                  class="jse-json-node svelte-1qi6rc1"
                   data-path="%2F1%2Fname"
                   role="treeitem"
                   style="--level: 2;"
                   tabindex="-1"
                 >
+                  <!---->
                   <div
-                    class="jse-contents-outer svelte-oawf7x"
+                    class="jse-contents-outer svelte-1qi6rc1"
                   >
                     <div
-                      class="jse-contents svelte-oawf7x"
+                      class="jse-contents svelte-1qi6rc1"
                     >
                       <div
-                        class="jse-key-outer svelte-oawf7x"
+                        class="jse-key-outer svelte-1qi6rc1"
                         slot="identifier"
                       >
                         <!---->
                         <div
-                          class="jse-key svelte-2iqnqn"
+                          class="jse-key svelte-1n4cez4"
                           data-type="selectable-key"
                           role="none"
                         >
@@ -2229,20 +2443,20 @@ exports[`JSONEditor > render tree mode 1`] = `
                       <!---->
                        
                       <div
-                        class="jse-separator svelte-oawf7x"
+                        class="jse-separator svelte-1qi6rc1"
                       >
                         :
                       </div>
                       <!---->
                        
                       <div
-                        class="jse-value-outer svelte-oawf7x"
+                        class="jse-value-outer svelte-1qi6rc1"
                       >
                         <!---->
                         <!---->
                         <!---->
                         <div
-                          class="jse-value jse-string svelte-c0g9qz"
+                          class="jse-value jse-string svelte-1saqp8c"
                           data-type="selectable-value"
                           role="button"
                           tabindex="-1"
@@ -2264,12 +2478,13 @@ exports[`JSONEditor > render tree mode 1`] = `
                     <!---->
                      
                     <div
-                      class="jse-insert-selection-area jse-after svelte-oawf7x"
+                      class="jse-insert-selection-area jse-after svelte-1qi6rc1"
                       data-type="insert-selection-area-after"
                       role="none"
                     />
                     <!---->
                   </div>
+                  
                   <!---->
                    
                   <!---->
@@ -2279,27 +2494,28 @@ exports[`JSONEditor > render tree mode 1`] = `
               </div>
                
               <div
-                class="jse-footer-outer svelte-oawf7x"
+                class="jse-footer-outer svelte-1qi6rc1"
               >
                 <div
-                  class="jse-footer svelte-oawf7x"
+                  class="jse-footer svelte-1qi6rc1"
                   data-type="selectable-value"
                 >
                   <div
-                    class="jse-bracket svelte-oawf7x"
+                    class="jse-bracket svelte-1qi6rc1"
                   >
                     }
                   </div>
                 </div>
                  
                 <div
-                  class="jse-insert-selection-area jse-after svelte-oawf7x"
+                  class="jse-insert-selection-area jse-after svelte-1qi6rc1"
                   data-type="insert-selection-area-after"
                   role="none"
                 />
                 <!---->
               </div>
               <!---->
+              
               <!---->
                
               <!---->
@@ -2308,37 +2524,38 @@ exports[`JSONEditor > render tree mode 1`] = `
             <!---->
             <div
               aria-selected="false"
-              class="jse-json-node jse-expanded svelte-oawf7x"
+              class="jse-json-node jse-expanded svelte-1qi6rc1"
               data-path="%2F2"
               role="treeitem"
               style="--level: 1;"
               tabindex="-1"
             >
+              <!---->
               <div
-                class="jse-header-outer svelte-oawf7x"
+                class="jse-header-outer svelte-1qi6rc1"
               >
                 <div
-                  class="jse-header svelte-oawf7x"
+                  class="jse-header svelte-1qi6rc1"
                 >
                   <button
-                    class="jse-expand svelte-oawf7x"
+                    class="jse-expand svelte-1qi6rc1"
                     title="Expand or collapse this object (Ctrl+Click to expand/collapse recursively)"
                     type="button"
                   >
                     <svg
                       aria-label=""
-                      class="fa-icon  svelte-1mc5hvj"
+                      class="fa-icon  svelte-v67cny"
                       height="16"
                       role="presentation"
                       style=""
                       version="1.1"
-                      viewBox="0 0 320 512"
-                      width="10"
+                      viewBox="0 0 384 512"
+                      width="12"
                     >
                       <!---->
                       <!---->
                       <path
-                        d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"
+                        d="M352 160c12.9 0 24.6 7.8 29.6 19.8s2.2 25.7-6.9 34.9l-160 160c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-9.2-9.2-11.9-22.9-6.9-34.9S19.1 160 32 160l320 0z"
                       />
                       <!---->
                       <!---->
@@ -2350,11 +2567,11 @@ exports[`JSONEditor > render tree mode 1`] = `
                   </button>
                    
                   <div
-                    class="jse-identifier svelte-oawf7x"
+                    class="jse-identifier svelte-1qi6rc1"
                     slot="identifier"
                   >
                     <div
-                      class="jse-index svelte-oawf7x"
+                      class="jse-index svelte-1qi6rc1"
                     >
                       2
                     </div>
@@ -2362,21 +2579,21 @@ exports[`JSONEditor > render tree mode 1`] = `
                   <!---->
                    
                   <div
-                    class="jse-separator svelte-oawf7x"
+                    class="jse-separator svelte-1qi6rc1"
                   >
                     :
                   </div>
                   <!---->
                    
                   <div
-                    class="jse-meta svelte-oawf7x"
+                    class="jse-meta svelte-1qi6rc1"
                     data-type="selectable-value"
                   >
                     <div
-                      class="jse-meta-inner svelte-oawf7x"
+                      class="jse-meta-inner svelte-1qi6rc1"
                     >
                       <div
-                        class="jse-bracket jse-expanded svelte-oawf7x"
+                        class="jse-bracket jse-expanded svelte-1qi6rc1"
                       >
                         {
                       </div>
@@ -2390,7 +2607,7 @@ exports[`JSONEditor > render tree mode 1`] = `
                 <!---->
                  
                 <div
-                  class="jse-insert-selection-area jse-inside svelte-oawf7x"
+                  class="jse-insert-selection-area jse-inside svelte-1qi6rc1"
                   data-type="insert-selection-area-inside"
                   role="none"
                 />
@@ -2398,32 +2615,33 @@ exports[`JSONEditor > render tree mode 1`] = `
               </div>
                
               <div
-                class="jse-props svelte-oawf7x"
+                class="jse-props svelte-1qi6rc1"
               >
                 <!---->
                  
                 <!---->
                 <div
                   aria-selected="false"
-                  class="jse-json-node svelte-oawf7x"
+                  class="jse-json-node svelte-1qi6rc1"
                   data-path="%2F2%2Fid"
                   role="treeitem"
                   style="--level: 2;"
                   tabindex="-1"
                 >
+                  <!---->
                   <div
-                    class="jse-contents-outer svelte-oawf7x"
+                    class="jse-contents-outer svelte-1qi6rc1"
                   >
                     <div
-                      class="jse-contents svelte-oawf7x"
+                      class="jse-contents svelte-1qi6rc1"
                     >
                       <div
-                        class="jse-key-outer svelte-oawf7x"
+                        class="jse-key-outer svelte-1qi6rc1"
                         slot="identifier"
                       >
                         <!---->
                         <div
-                          class="jse-key svelte-2iqnqn"
+                          class="jse-key svelte-1n4cez4"
                           data-type="selectable-key"
                           role="none"
                         >
@@ -2438,20 +2656,20 @@ exports[`JSONEditor > render tree mode 1`] = `
                       <!---->
                        
                       <div
-                        class="jse-separator svelte-oawf7x"
+                        class="jse-separator svelte-1qi6rc1"
                       >
                         :
                       </div>
                       <!---->
                        
                       <div
-                        class="jse-value-outer svelte-oawf7x"
+                        class="jse-value-outer svelte-1qi6rc1"
                       >
                         <!---->
                         <!---->
                         <!---->
                         <div
-                          class="jse-value jse-number svelte-c0g9qz"
+                          class="jse-value jse-number svelte-1saqp8c"
                           data-type="selectable-value"
                           role="button"
                           tabindex="-1"
@@ -2473,12 +2691,13 @@ exports[`JSONEditor > render tree mode 1`] = `
                     <!---->
                      
                     <div
-                      class="jse-insert-selection-area jse-after svelte-oawf7x"
+                      class="jse-insert-selection-area jse-after svelte-1qi6rc1"
                       data-type="insert-selection-area-after"
                       role="none"
                     />
                     <!---->
                   </div>
+                  
                   <!---->
                    
                   <!---->
@@ -2488,27 +2707,28 @@ exports[`JSONEditor > render tree mode 1`] = `
               </div>
                
               <div
-                class="jse-footer-outer svelte-oawf7x"
+                class="jse-footer-outer svelte-1qi6rc1"
               >
                 <div
-                  class="jse-footer svelte-oawf7x"
+                  class="jse-footer svelte-1qi6rc1"
                   data-type="selectable-value"
                 >
                   <div
-                    class="jse-bracket svelte-oawf7x"
+                    class="jse-bracket svelte-1qi6rc1"
                   >
                     }
                   </div>
                 </div>
                  
                 <div
-                  class="jse-insert-selection-area jse-after svelte-oawf7x"
+                  class="jse-insert-selection-area jse-after svelte-1qi6rc1"
                   data-type="insert-selection-area-after"
                   role="none"
                 />
                 <!---->
               </div>
               <!---->
+              
               <!---->
                
               <!---->
@@ -2521,14 +2741,14 @@ exports[`JSONEditor > render tree mode 1`] = `
           </div>
            
           <div
-            class="jse-footer-outer svelte-oawf7x"
+            class="jse-footer-outer svelte-1qi6rc1"
           >
             <div
-              class="jse-footer svelte-oawf7x"
+              class="jse-footer svelte-1qi6rc1"
               data-type="selectable-value"
             >
               <span
-                class="jse-bracket svelte-oawf7x"
+                class="jse-bracket svelte-1qi6rc1"
               >
                 ]
               </span>
@@ -2560,6 +2780,7 @@ exports[`JSONEditor > render tree mode 1`] = `
     <!---->
      
     <!---->
+    
     
     <!---->
   </div>
