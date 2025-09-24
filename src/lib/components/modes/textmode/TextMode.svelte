@@ -492,6 +492,14 @@
     }
   }
 
+  function handleExpandAll() {
+    expand([], () => true)
+  }
+
+  function handleCollapseAll() {
+    collapse([], true)
+  }
+
   // modalOpen is true when one of the modals is open.
   // This is used to track whether the editor still has focus
   let modalOpen = false
@@ -1318,6 +1326,8 @@
 
     <TextMenu
       {readOnly}
+      onExpandAll={handleExpandAll}
+      onCollapseAll={handleCollapseAll}
       onFormat={handleFormat}
       onCompact={handleCompact}
       onSort={handleSort}
@@ -1325,6 +1335,8 @@
       onToggleSearch={handleToggleSearch}
       onUndo={handleUndo}
       onRedo={handleRedo}
+      canExpandAll={!isNewDocument}
+      canCollapseAll={!isNewDocument}
       canFormat={!isNewDocument}
       canCompact={!isNewDocument}
       canSort={!isNewDocument}
