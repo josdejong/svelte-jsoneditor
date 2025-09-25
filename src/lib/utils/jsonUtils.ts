@@ -1,4 +1,4 @@
-import type { JSONPath } from 'immutable-json-patch'
+import { type JSONPath, parseJSONPointer } from 'immutable-json-patch'
 import { compileJSONPointer } from 'immutable-json-patch'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -10,11 +10,13 @@ import type {
   Content,
   JSONContent,
   JSONParser,
+  JSONSelection,
   ParseError,
   TextContent,
   TextLocation
 } from '../types'
 import { int } from './numberUtils.js'
+import { createMultiSelection } from '$lib/logic/selection'
 
 /**
  * Parse the JSON. if this fails, try to repair and parse.
@@ -201,7 +203,6 @@ export function countCharacterOccurrences(
 /**
  * Find the text location of a JSON path
  */
-// TODO: write unit tests
 export function findTextLocation(text: string, path: JSONPath): TextLocation {
   try {
     const jsmap = jsonSourceMap.parse(text)
@@ -227,6 +228,43 @@ export function findTextLocation(text: string, path: JSONPath): TextLocation {
     column: 0,
     from: 0,
     to: 0
+  }
+}
+
+/**
+ * Find the text location from a JSON path
+ * Returns null when not found (either not exists, or the document cannot be parsed)
+ */
+export function findSelectionFromTextLocation(
+  text: string,
+  anchor: number,
+  head: number
+): JSONSelection | null {
+  try {
+    const jsmap = jsonSourceMap.parse(text)
+    const pointers = Object.keys(jsmap.pointers)
+
+    let anchorPath: JSONPath = []
+    let focusPath: JSONPath = []
+
+    for (const pointer of pointers) {
+      const state = jsmap.pointers[pointer]
+
+      // TODO: work out creating a KeySelection, ValueSelection,
+      //  AfterSelection, InsideSelection, and MultiSelection
+
+      if (state?.key?.pos <= anchor && state?.valueEnd?.pos >= anchor) {
+        anchorPath = parseJSONPointer(pointer)
+      }
+
+      if (state?.key?.pos <= head && state?.valueEnd?.pos >= head) {
+        focusPath = parseJSONPointer(pointer)
+      }
+    }
+
+    return createMultiSelection(anchorPath, focusPath)
+  } catch {
+    return null
   }
 }
 
