@@ -11,7 +11,7 @@
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
-  import { CONTEXT_MENU_EXPLANATION } from '$lib/constants.js'
+  import { t } from '$lib/i18n'
 
   export let containsValidArray: boolean
   export let readOnly: boolean
@@ -58,7 +58,7 @@
         {
           type: 'button',
           icon: faEllipsisV,
-          title: CONTEXT_MENU_EXPLANATION,
+          title: t('contextMenuExplanation'),
           className: 'jse-contextmenu',
           onClick: onContextMenu
         },

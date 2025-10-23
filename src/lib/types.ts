@@ -626,6 +626,7 @@ export interface JSONEditorPropsOptional {
   onError?: OnError
   onFocus?: OnFocus
   onBlur?: OnBlur
+  language?: Language
 }
 
 export interface JSONEditorModalProps {
@@ -831,3 +832,183 @@ export interface SortedColumn {
 export type JSONSchema = Record<string, unknown>
 export type JSONSchemaDefinitions = Record<string, JSONSchema>
 export type JSONSchemaEnum = Array<unknown>
+
+export type Language = {
+  landCode: string
+  values: Locale
+}
+
+export type TranslationKey = {
+  // Common
+  Ok: string
+  loading: string
+  Extract: string
+  View: string
+  Edit: string
+  sort: string
+  anObject: string
+  insertExplanation: string
+  showMe: string
+  moveToTheParseErrorLocation: string
+  autoRepair: string
+  autoRepairJson: string
+  item: string
+  items: string
+  editNestedContent: string
+  contents: string
+  back: string
+  apply: string
+
+  // textMode
+  cancel: string
+  cancelFolding: string
+  openAnyWay: string
+  openTextModeWarning: string
+  openTreeMode: string
+  openTreeModeDescription: string
+  cancelLargeDocument: string
+  confirmFormatJson: string
+  format: string
+  formatJsonDescription: string
+  noThanks: string
+  closeMessage: string
+  jsonTooLargeWarning: string
+
+  // TreeMode messages
+  invalidJsonNotRepairable: string
+  repairManually: string
+  repairManuallyTitle: string
+  pastedJsonAsText: string
+  pastedJsonArray: string
+  pastedJsonObject: string
+  pasteAsJson: string
+  pasteAsJsonTitle: string
+  leaveAsIs: string
+  leaveAsIsTitle: string
+  multilinePastedAsArray: string
+  pasteAsStrInstead: string
+  pasteAsStrInsteadTitle: string
+  autoRepairSuccess: string
+  acceptRepair: string
+  acceptRepairTitle: string
+  repairManuallyInstead: string
+  repairManuallyInsteadTitle: string
+
+  // Menu titles
+  expandAll: string
+  collapseAll: string
+  searchCtrlF: string
+  transformContents: string
+  contextMenuExplanation: string
+  undo: string
+  redo: string
+  copy: string
+  formatJson: string
+  compactJson: string
+
+  // SearchBox messages
+  toggleReplaceOptions: string
+  enterTextSearch: string
+  findPlaceholder: string
+  nextResult: string
+  prevResult: string
+  closeSearch: string
+  enterReplaceText: string
+  replace: string
+  replaceAll: string
+  replaceCtrlEnter: string
+  replaceAllTitle: string
+
+  // Sort direction names
+  sortAscending: string
+  sortDescending: string
+
+  // Mode switching messages
+  modeText: string
+  modeTree: string
+  modeTable: string
+  switchToTextMode: string
+  switchToTreeMode: string
+  switchToTableMode: string
+  currentMode: string
+
+  // Table mode
+  failedToValidate: string
+  tipContextMenu: string
+  YouPastedAJsonMessage: string
+  multilineTextPastedMessage: string
+  pasteAsStringInstead: string
+  pastTheClipboardDataAsStingeStringValue: string
+  keepThePastedArray: string
+  textRepairedSuccessMessage: string
+  acceptRepairedDocument: string
+  leaveTheDocUnchanged: string
+  manuallyRepairWithCodeModeText: string
+
+  // Table mode welcome
+  objectWithNestedArrays: string
+  emptyDocument: string
+  object: string
+  emptyArray: string
+  withValueType: string
+  messageObjectCannotBeOpenedInTableMode: string
+  messageEmptyDocCannotBeOpenedInTableMode: string
+  messageDocTypeCannotBeOpenedInTableMode: string
+
+  // Context menu
+  editKey: string
+  paste: string
+  remove: string
+  editRow: string
+  editCurrentRow: string
+  duplicateRow: string
+  duplicateCurrentRow: string
+  insertBefore: string
+  insertRowBeforeCurrentRow: string
+  insertAfter: string
+  insertRowAfterCurrentRow: string
+  removeRow: string
+  removeCurrentRow: string
+  cut: string
+  cutSelectedContentFormattedWithIndentation: string
+  cutSelectedContentWithoutIndent: string
+  copySelectedContendWithIndent: string
+  copySelectedContendWithoutIndent: string
+  pastClipboardContent: string
+  removeSelected: string
+  copyFormatted: string
+  copyCompacted: string
+  enforceString: string
+  enforceKeepingTheValue: string
+  editValue: string
+  cutFormatted: string
+  cutCompacted: string
+  extractSelectedContent: string
+  duplicate: string
+  duplicateSelectedContents: string
+  editArray: string
+  editObject: string
+  convertTo: string
+  insert: string
+  editTheKey: string
+  sortArrayOrObjectContents: string
+  transform: string
+  transformArrayOrObject: string
+  structure: string
+  structureTitle: string
+  array: string
+  value: string
+  selectAreaBeforeCurrentEntry: string
+  selectAreaAfterCurrentEntry: string
+
+  sortObjectKeys: string
+  sortArrayItems: string
+  selectedPath: string
+  direction: string
+  property: string
+  path: string
+}
+
+export type Locale = {
+  [key in keyof TranslationKey]: string
+}

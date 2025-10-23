@@ -20,6 +20,7 @@
     JSONParser,
     JSONPatchResult,
     JSONPathParser,
+    Language,
     MenuItem,
     OnBlur,
     OnChange,
@@ -45,6 +46,7 @@
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { noop } from '../utils/noop.js'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils.js'
+  import { setI18nContext, english } from '$lib/i18n'
   import JSONEditorRoot from './modes/JSONEditorRoot.svelte'
   import JSONEditorModal from './modals/JSONEditorModal.svelte'
   import memoizeOne from 'memoize-one'
@@ -91,6 +93,7 @@
   }
   const onFocusDefault = noop
   const onBlurDefault = noop
+  const languageDefault: Language = english
 
   export let content: Content = contentDefault
   export let selection: JSONEditorSelection | undefined = selectionDefault
@@ -123,6 +126,7 @@
   export let onError: OnError = onErrorDefault
   export let onFocus: OnFocus = onFocusDefault
   export let onBlur: OnBlur = onBlurDefault
+  export let language: Language = languageDefault
 
   let instanceId = uniqueId()
   let hasFocus = false
@@ -130,6 +134,11 @@
   let jsonEditorModalProps: JSONEditorModalProps | undefined = undefined
   let sortModalProps: SortModalCallback | undefined
   let transformModalProps: TransformModalProps | undefined
+
+  $: if (language) {
+    setI18nContext(language)
+    instanceId = uniqueId()
+  }
 
   $: {
     const contentError = validateContentType(content)
@@ -287,7 +296,6 @@
 
   export function updateProps(props: JSONEditorPropsOptional): void {
     const names = Object.keys(props) as (keyof JSONEditorPropsOptional)[]
-
     for (const name of names) {
       switch (name) {
         case 'content':
@@ -382,6 +390,9 @@
           break
         case 'onBlur':
           onBlur = props[name] ?? onBlurDefault
+          break
+        case 'language':
+          language = props[name] ?? languageDefault
           break
 
         default:

@@ -11,6 +11,7 @@ import {
   faTrashCan
 } from '@fortawesome/free-solid-svg-icons'
 import { isKeySelection, isMultiSelection, isValueSelection } from '$lib/logic/selection'
+import { t } from '$lib/i18n'
 import { getIn } from 'immutable-json-patch'
 import { getFocusPath, singleItemSelected } from '$lib/logic/selection'
 import { isObjectOrArray } from '$lib/utils/typeUtils'
@@ -82,8 +83,8 @@ export default function ({
                 type: 'button',
                 onClick: () => onEditValue(),
                 icon: faPen,
-                text: 'Edit',
-                title: 'Edit the value (Double-click on the value)',
+                text: t('Edit'),
+                title: t('editValue') + ' (Double-click on the value)',
                 disabled: !canEditValue
               },
               width: '11em',
@@ -91,16 +92,16 @@ export default function ({
                 {
                   type: 'button',
                   icon: faPen,
-                  text: 'Edit',
-                  title: 'Edit the value (Double-click on the value)',
+                  text: t('Edit'),
+                  title: t('editValue') + ' (Double-click on the value)',
                   onClick: () => onEditValue(),
                   disabled: !canEditValue
                 },
                 {
                   type: 'button',
                   icon: enforceString ? faCheckSquare : faSquare,
-                  text: 'Enforce string',
-                  title: 'Enforce keeping the value as string when it contains a numeric value',
+                  text: t('enforceString'),
+                  title: t('enforceKeepingTheValue'),
                   onClick: () => onToggleEnforceString(),
                   disabled: !canEnforceString
                 }
@@ -112,8 +113,8 @@ export default function ({
                 type: 'button',
                 onClick: () => onCut(true),
                 icon: faCut,
-                text: 'Cut',
-                title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
+                text: t('cut'),
+                title: t('cutSelectedContentFormattedWithIndentation') + ' (Ctrl+X)',
                 disabled: !canCut
               },
               width: '10em',
@@ -121,16 +122,16 @@ export default function ({
                 {
                   type: 'button',
                   icon: faCut,
-                  text: 'Cut formatted',
-                  title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
+                  text: t('cutFormatted'),
+                  title: t('cutSelectedContentFormattedWithIndentation') + ' (Ctrl+X)',
                   onClick: () => onCut(true),
                   disabled: readOnly || !hasSelectionContents
                 },
                 {
                   type: 'button',
                   icon: faCut,
-                  text: 'Cut compacted',
-                  title: 'Cut selected contents, without indentation (Ctrl+Shift+X)',
+                  text: t('cutCompacted'),
+                  title: t('cutSelectedContentWithoutIndent') + ' (Ctrl+Shift+X)',
                   onClick: () => onCut(false),
                   disabled: readOnly || !hasSelectionContents
                 }
@@ -142,8 +143,8 @@ export default function ({
                 type: 'button',
                 onClick: () => onCopy(true),
                 icon: faCopy,
-                text: 'Copy',
-                title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
+                text: t('copy'),
+                title: t('copySelectedContendWithIndent') + ' (Ctrl+C)',
                 disabled: !hasSelectionContents
               },
               width: '12em',
@@ -151,16 +152,16 @@ export default function ({
                 {
                   type: 'button',
                   icon: faCopy,
-                  text: 'Copy formatted',
-                  title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
+                  text: t('copyFormatted'),
+                  title: t('copySelectedContendWithIndent') + '(Ctrl+C)',
                   onClick: () => onCopy(false),
                   disabled: !hasSelectionContents
                 },
                 {
                   type: 'button',
                   icon: faCopy,
-                  text: 'Copy compacted',
-                  title: 'Copy selected contents, without indentation (Ctrl+Shift+C)',
+                  text: t('copyCompacted'),
+                  title: t('copySelectedContendWithoutIndent') + '(Ctrl+Shift+C)',
                   onClick: () => onCopy(false),
                   disabled: !hasSelectionContents
                 }
@@ -170,16 +171,16 @@ export default function ({
               type: 'button',
               onClick: () => onPaste(),
               icon: faPaste,
-              text: 'Paste',
-              title: 'Paste clipboard contents (Ctrl+V)',
+              text: t('paste'),
+              title: t('pastClipboardContent') + ' (Ctrl+V)',
               disabled: readOnly || !hasSelection
             },
             {
               type: 'button',
               onClick: () => onRemove(),
               icon: faTrashCan,
-              text: 'Remove',
-              title: 'Remove selected contents (Delete)',
+              text: t('remove'),
+              title: t('removeSelected') + ' (Delete)',
               disabled: readOnly || !hasSelectionContents
             }
           ]
@@ -192,40 +193,40 @@ export default function ({
               type: 'button',
               onClick: () => onEditRow(),
               icon: faPen,
-              text: 'Edit row',
-              title: 'Edit the current row',
+              text: t('editRow'),
+              title: t('editCurrentRow'),
               disabled: readOnly || !hasSelection || !hasJson
             },
             {
               type: 'button',
               onClick: () => onDuplicateRow(),
               icon: faClone,
-              text: 'Duplicate row',
-              title: 'Duplicate the current row (Ctrl+D)',
+              text: t('duplicateRow'),
+              title: t('Duplicate the current row') + ' (Ctrl+D)',
               disabled: readOnly || !hasSelection || !hasJson
             },
             {
               type: 'button',
               onClick: () => onInsertBeforeRow(),
               icon: faPlus,
-              text: 'Insert before',
-              title: 'Insert a row before the current row',
+              text: t('insertBefore'),
+              title: t('insertRowBeforeCurrentRow'),
               disabled: readOnly || !hasSelection || !hasJson
             },
             {
               type: 'button',
               onClick: () => onInsertAfterRow(),
               icon: faPlus,
-              text: 'Insert after',
-              title: 'Insert a row after the current row',
+              text: t('insertAfter'),
+              title: t('insertRowAfterCurrentRow'),
               disabled: readOnly || !hasSelection || !hasJson
             },
             {
               type: 'button',
               onClick: () => onRemoveRow(),
               icon: faTrashCan,
-              text: 'Remove row',
-              title: 'Remove current row',
+              text: t('removeRow'),
+              title: t('removeCurrentRow'),
               disabled: readOnly || !hasSelection || !hasJson
             }
           ]
