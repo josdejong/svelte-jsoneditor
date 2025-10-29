@@ -25,6 +25,7 @@
   import JSONEditorRoot from '../modes/JSONEditorRoot.svelte'
   import { noop } from '$lib/utils/noop.js'
   import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
+  import { t } from '$lib/i18n'
   import { initial, isEmpty, last } from 'lodash-es'
   import { isJSONContent, toJSONContent } from '$lib/utils/jsonUtils.js'
   import Icon from 'svelte-awesome'
@@ -222,7 +223,7 @@
   <div class="jse-modal-wrapper">
     <AbsolutePopup>
       <Header
-        title="Edit nested content {stack.length > 1 ? ` (${stack.length})` : ''}"
+        title="${t('editNestedContent')} {stack.length > 1 ? ` (${stack.length})` : ''}"
         fullScreenButton={true}
         bind:fullscreen
         onClose={handleClose}
@@ -230,18 +231,18 @@
 
       <div class="jse-modal-contents">
         <div class="jse-label">
-          <div class="jse-label-inner">Path</div>
+          <div class="jse-label-inner">{t('path')}</div>
         </div>
         <input
           class="jse-path"
           type="text"
           readonly
-          title="Selected path"
+          title={t('selectedPath')}
           value={pathDescription}
         />
 
         <div class="jse-label">
-          <div class="jse-label-inner">Contents</div>
+          <div class="jse-label-inner">{t('contents')}</div>
         </div>
 
         <div class="jse-modal-inline-editor">
@@ -292,7 +293,7 @@
 
           {#if stack.length > 1}
             <button type="button" class="jse-secondary" on:click={handleClose}>
-              <Icon data={faCaretLeft} /> Back
+              <Icon data={faCaretLeft} /> {t('back')}
             </button>
           {/if}
           {#if !readOnly}
