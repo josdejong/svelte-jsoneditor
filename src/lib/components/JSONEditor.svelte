@@ -130,6 +130,7 @@
   let jsonEditorModalProps: JSONEditorModalProps | undefined = undefined
   let sortModalProps: SortModalCallback | undefined
   let transformModalProps: TransformModalProps | undefined
+  let ariaLabelMain: string | undefined = undefined
 
   $: {
     const contentError = validateContentType(content)
@@ -279,6 +280,9 @@
     refJSONEditorRoot.focus()
 
     flushSync()
+  }
+  export function setAriaLabel(label: string) {
+    ariaLabelMain = label
   }
 
   export async function refresh(): Promise<void> {
@@ -543,7 +547,7 @@
 </script>
 
 <AbsolutePopup>
-  <div class="jse-main" class:jse-focus={hasFocus} on:keydown={handleKeyDown} role="none">
+  <div class="jse-main" class:jse-focus={hasFocus} on:keydown={handleKeyDown} role="none" aria-label={ariaLabelMain}>
     {#key instanceId}
       <JSONEditorRoot
         bind:this={refJSONEditorRoot}

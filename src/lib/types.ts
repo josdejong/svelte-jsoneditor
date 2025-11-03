@@ -708,6 +708,7 @@ export interface RenderValueProps extends Record<string, unknown> {
   onFind: OnFind
   findNextInside: FindNextInside
   focus: () => void
+  setAriaLabel: (label: string) => void
 }
 
 export type RenderValuePropsOptional = Partial<RenderValueProps>
