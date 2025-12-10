@@ -1,3 +1,4 @@
+import { t } from '$lib/i18n'
 import type { Section } from './types'
 import { SortDirection } from './types.js'
 
@@ -20,18 +21,6 @@ export const MAX_AUTO_REPAIRABLE_SIZE = 1024 * 1024 // 1 MB
 export const MAX_MULTILINE_PASTE_SIZE = 1024 * 1024 // 1 MB
 export const MAX_DOCUMENT_SIZE_TEXT_MODE = 10 * 1024 * 1024 // 10 MB
 export const MAX_DOCUMENT_SIZE_EXPAND_ALL = 10 * 1024 // 10 KB
-
-export const INSERT_EXPLANATION =
-  'Insert or paste contents, ' +
-  'enter [ insert a new array, ' +
-  'enter { to insert a new object, ' +
-  'or start typing to insert a new value'
-
-export const CONTEXT_MENU_EXPLANATION =
-  'Open context menu ' +
-  '(Click here, ' +
-  'right click on the selection, ' +
-  'or use the context menu button or Ctrl+Q)'
 
 export const HOVER_INSERT_INSIDE = 'hover-insert-inside'
 export const HOVER_INSERT_AFTER = 'hover-insert-after'

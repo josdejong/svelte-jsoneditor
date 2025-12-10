@@ -24,7 +24,10 @@
     type RenderValueComponentDescription,
     SelectionType,
     toJSONContent,
-    type RenderValueProps
+    type RenderValueProps,
+    russia,
+    english,
+    type Language
   } from 'svelte-jsoneditor'
   import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
@@ -286,6 +289,10 @@
     : [jsonQueryLanguage]
   let queryLanguageId = jsonQueryLanguage.id // TODO: store in local storage
 
+  $: translatedText = [english, russia]
+
+  let selectedLanguage: Language
+
   let selectedParser: JSONParser
   $: selectedParser =
     parsers.find((parser) => parser.id === $selectedParserId)?.value || parsers[0].value
@@ -535,7 +542,16 @@
       </select>
     {/if}
   </p>
-
+  <p>
+    <span>i18n</span>
+    {#if translatedText}
+      <select bind:value={selectedLanguage}>
+        {#each translatedText as lang}
+          <option value={lang}>{lang.landCode}</option>
+        {/each}
+      </select>
+    {/if}
+  </p>
   <p>
     JSON Parser: <select bind:value={$selectedParserId}>
       {#each parsers as parser}
@@ -737,6 +753,7 @@
               bind:content
               bind:selection={selectionTree}
               bind:mode={leftEditorMode}
+              language={selectedLanguage}
               mainMenuBar={$mainMenuBar}
               navigationBar={$navigationBar}
               statusBar={$statusBar}
