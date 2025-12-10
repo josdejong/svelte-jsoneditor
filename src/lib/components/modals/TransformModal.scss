@@ -113,6 +113,11 @@
             height: 300px;
             flex: none;
           }
+
+          .jse-original-data,
+          .jse-preview-data {
+            flex: unset;
+          }
         }
       }
     }

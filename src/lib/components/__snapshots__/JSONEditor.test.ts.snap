@@ -652,6 +652,7 @@ exports[`JSONEditor > render table mode 1`] = `
   <!---->
   <!---->
   
+  
 </div>
 `;
 
@@ -1260,18 +1261,18 @@ exports[`JSONEditor > render text mode 1`] = `
               writingsuggestions="false"
             >
               <div
-                class="cm-activeLine cm-line"
+                class="cm-line cm-activeLine"
               >
                 [
               </div>
               <div
-                class="cm-indent-markers cm-line"
+                class="cm-line cm-indent-markers"
                 style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat;"
               >
                   {
               </div>
               <div
-                class="cm-indent-markers cm-line"
+                class="cm-line cm-indent-markers"
                 style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat,repeating-linear-gradient(to right, var(--indent-marker-bg-color) 0 1px, transparent 1px 2ch) 2.5ch/calc(2ch - 1px) no-repeat;"
               >
                     
@@ -1288,19 +1289,19 @@ exports[`JSONEditor > render text mode 1`] = `
                 </span>
               </div>
               <div
-                class="cm-indent-markers cm-line"
+                class="cm-line cm-indent-markers"
                 style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat;"
               >
                   },
               </div>
               <div
-                class="cm-indent-markers cm-line"
+                class="cm-line cm-indent-markers"
                 style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat;"
               >
                   {
               </div>
               <div
-                class="cm-indent-markers cm-line"
+                class="cm-line cm-indent-markers"
                 style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat,repeating-linear-gradient(to right, var(--indent-marker-bg-color) 0 1px, transparent 1px 2ch) 2.5ch/calc(2ch - 1px) no-repeat;"
               >
                     
@@ -1318,7 +1319,7 @@ exports[`JSONEditor > render text mode 1`] = `
                 ,
               </div>
               <div
-                class="cm-indent-markers cm-line"
+                class="cm-line cm-indent-markers"
                 style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat,repeating-linear-gradient(to right, var(--indent-marker-bg-color) 0 1px, transparent 1px 2ch) 2.5ch/calc(2ch - 1px) no-repeat;"
               >
                     
@@ -1335,19 +1336,19 @@ exports[`JSONEditor > render text mode 1`] = `
                 </span>
               </div>
               <div
-                class="cm-indent-markers cm-line"
+                class="cm-line cm-indent-markers"
                 style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat;"
               >
                   },
               </div>
               <div
-                class="cm-indent-markers cm-line"
+                class="cm-line cm-indent-markers"
                 style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat;"
               >
                   {
               </div>
               <div
-                class="cm-indent-markers cm-line"
+                class="cm-line cm-indent-markers"
                 style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat,repeating-linear-gradient(to right, var(--indent-marker-bg-color) 0 1px, transparent 1px 2ch) 2.5ch/calc(2ch - 1px) no-repeat;"
               >
                     
@@ -1364,7 +1365,7 @@ exports[`JSONEditor > render text mode 1`] = `
                 </span>
               </div>
               <div
-                class="cm-indent-markers cm-line"
+                class="cm-line cm-indent-markers"
                 style="--indent-markers: repeating-linear-gradient(to right, var(--indent-marker-active-bg-color) 0 1px, transparent 1px 2ch) 0.5ch/calc(2ch - 1px) no-repeat;"
               >
                   }
@@ -1423,6 +1424,7 @@ exports[`JSONEditor > render text mode 1`] = `
    
   <!---->
   <!---->
+  
   
 </div>
 `;
@@ -1944,13 +1946,13 @@ exports[`JSONEditor > render tree mode 1`] = `
                   role="presentation"
                   style=""
                   version="1.1"
-                  viewBox="0 0 384 512"
-                  width="12"
+                  viewBox="0 0 320 512"
+                  width="10"
                 >
                   <!---->
                   <!---->
                   <path
-                    d="M352 160c12.9 0 24.6 7.8 29.6 19.8s2.2 25.7-6.9 34.9l-160 160c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-9.2-9.2-11.9-22.9-6.9-34.9S19.1 160 32 160l320 0z"
+                    d="M140.3 376.8c12.6 10.2 31.1 9.5 42.8-2.2l128-128c9.2-9.2 11.9-22.9 6.9-34.9S301.4 192 288.5 192l-256 0c-12.9 0-24.6 7.8-29.6 19.8S.7 237.5 9.9 246.6l128 128 2.4 2.2z"
                   />
                   <!---->
                   <!---->
@@ -2039,13 +2041,13 @@ exports[`JSONEditor > render tree mode 1`] = `
                       role="presentation"
                       style=""
                       version="1.1"
-                      viewBox="0 0 384 512"
-                      width="12"
+                      viewBox="0 0 320 512"
+                      width="10"
                     >
                       <!---->
                       <!---->
                       <path
-                        d="M352 160c12.9 0 24.6 7.8 29.6 19.8s2.2 25.7-6.9 34.9l-160 160c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-9.2-9.2-11.9-22.9-6.9-34.9S19.1 160 32 160l320 0z"
+                        d="M140.3 376.8c12.6 10.2 31.1 9.5 42.8-2.2l128-128c9.2-9.2 11.9-22.9 6.9-34.9S301.4 192 288.5 192l-256 0c-12.9 0-24.6 7.8-29.6 19.8S.7 237.5 9.9 246.6l128 128 2.4 2.2z"
                       />
                       <!---->
                       <!---->
@@ -2252,13 +2254,13 @@ exports[`JSONEditor > render tree mode 1`] = `
                       role="presentation"
                       style=""
                       version="1.1"
-                      viewBox="0 0 384 512"
-                      width="12"
+                      viewBox="0 0 320 512"
+                      width="10"
                     >
                       <!---->
                       <!---->
                       <path
-                        d="M352 160c12.9 0 24.6 7.8 29.6 19.8s2.2 25.7-6.9 34.9l-160 160c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-9.2-9.2-11.9-22.9-6.9-34.9S19.1 160 32 160l320 0z"
+                        d="M140.3 376.8c12.6 10.2 31.1 9.5 42.8-2.2l128-128c9.2-9.2 11.9-22.9 6.9-34.9S301.4 192 288.5 192l-256 0c-12.9 0-24.6 7.8-29.6 19.8S.7 237.5 9.9 246.6l128 128 2.4 2.2z"
                       />
                       <!---->
                       <!---->
@@ -2549,13 +2551,13 @@ exports[`JSONEditor > render tree mode 1`] = `
                       role="presentation"
                       style=""
                       version="1.1"
-                      viewBox="0 0 384 512"
-                      width="12"
+                      viewBox="0 0 320 512"
+                      width="10"
                     >
                       <!---->
                       <!---->
                       <path
-                        d="M352 160c12.9 0 24.6 7.8 29.6 19.8s2.2 25.7-6.9 34.9l-160 160c-12.5 12.5-32.8 12.5-45.3 0l-160-160c-9.2-9.2-11.9-22.9-6.9-34.9S19.1 160 32 160l320 0z"
+                        d="M140.3 376.8c12.6 10.2 31.1 9.5 42.8-2.2l128-128c9.2-9.2 11.9-22.9 6.9-34.9S301.4 192 288.5 192l-256 0c-12.9 0-24.6 7.8-29.6 19.8S.7 237.5 9.9 246.6l128 128 2.4 2.2z"
                       />
                       <!---->
                       <!---->
@@ -2791,6 +2793,7 @@ exports[`JSONEditor > render tree mode 1`] = `
    
   <!---->
   <!---->
+  
   
 </div>
 `;
