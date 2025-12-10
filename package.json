@@ -152,7 +152,7 @@
     "rollup-plugin-dts": "6.3.0",
     "rollup-plugin-postcss": "4.0.2",
     "rollup-plugin-svelte": "7.2.3",
-    "semantic-release": "24.2.9",
+    "semantic-release": "25.0.2",
     "svelte": "5.45.8",
     "svelte-check": "4.3.4",
     "svelte-eslint-parser": "1.4.1",
