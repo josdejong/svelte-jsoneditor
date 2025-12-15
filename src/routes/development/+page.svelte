@@ -25,7 +25,7 @@
     SelectionType,
     toJSONContent,
     type RenderValueProps,
-    russia,
+    russian,
     english,
     type Language
   } from 'svelte-jsoneditor'
@@ -289,7 +289,7 @@
     : [jsonQueryLanguage]
   let queryLanguageId = jsonQueryLanguage.id // TODO: store in local storage
 
-  $: translatedText = [english, russia]
+  $: translatedText = [english, russian]
 
   let selectedLanguage: Language
 

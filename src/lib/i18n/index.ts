@@ -1,42 +1,35 @@
-import { getContext, hasContext, setContext } from 'svelte'
-import type { Language, TranslationKey } from '$lib/types'
-import { get, type Writable, writable } from 'svelte/store'
+import type { Language, Locale, TranslationKey } from '$lib/types'
+import { derived, get, type Writable, writable } from 'svelte/store'
+import { stringReplaceAll } from 'svelte-jsoneditor/utils/stringUtils'
+import { english } from './locales';
 
-export const I18N_CONTEXT_KEY = Symbol('i18n')
-type I18nContext = {
-  landCode: Writable<string>
-  values: Writable<Record<string, string>>
+export const i18nLandCode: Writable<string> = writable(english.landCode)
+export const i18nValues: Writable<Locale> = writable({ ...english.values })
+
+export function setI18nData(lang: Language) {
+  i18nLandCode.set(lang.landCode)
+  i18nValues.set({ ...lang.values })
 }
-export function setI18nContext(language: Language) {
-  if (hasContext(I18N_CONTEXT_KEY)) {
-    const ctx = getContext<I18nContext>(I18N_CONTEXT_KEY)
-    ctx.landCode.set(language.landCode)
-    ctx.values.set({ ...language.values })
-    return ctx
+
+function applyParams(template: string, params?: Record<string, string>) {
+  if (!params) return template
+  let out = template
+  for (const p in params) out = stringReplaceAll(out, `{{${p}}}`, params[p])
+  return out
+}
+
+export function tString(key: keyof TranslationKey, params?: Record<string, string>): string {
+  const translation = get(i18nValues)[key] ?? english.values?.[key] ?? key
+  return applyParams(translation, params)
+}
+
+const $t = derived(i18nValues, ($values) => {
+  return (key: keyof TranslationKey, params?: Record<string, string>) => {
+    const base = $values[key] ?? english.values?.[key] ?? key
+    return applyParams(base, params)
   }
+})
 
-  const ctx: I18nContext = {
-    landCode: writable(language.landCode),
-    values: writable({ ...language.values })
-  }
-  return setContext(I18N_CONTEXT_KEY, ctx)
+export {
+  $t as t,
 }
-
-export function getI18nContext() {
-  return getContext<I18nContext>(I18N_CONTEXT_KEY)
-}
-
-export function t(key: keyof TranslationKey, params?: Record<string, string>): string {
-  const ctx = getI18nContext()
-  let translation: string = get(ctx.values)?.[key] ?? key
-
-  if (params) {
-    for (const param in params) {
-      translation = translation.replace(new RegExp(`{{${param}}}`, 'g'), params[param])
-    }
-  }
-
-  return translation
-}
-
-export * from './locales'

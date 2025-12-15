@@ -53,7 +53,7 @@
   $: expandMenuItem = {
     type: 'button',
     icon: faJSONEditorExpand,
-    title: t('expandAll'),
+    title: $t('expandAll'),
     className: 'jse-expand-all',
     onClick: onExpandAll,
     disabled: !isObjectOrArray(json)
@@ -63,7 +63,7 @@
   $: collapseMenuItem = {
     type: 'button',
     icon: faJSONEditorCollapse,
-    title: t('collapseAll'),
+    title: $t('collapseAll'),
     className: 'jse-collapse-all',
     onClick: onCollapseAll,
     disabled: !isObjectOrArray(json)
@@ -73,7 +73,7 @@
   $: searchMenuItem = {
     type: 'button',
     icon: faSearch,
-    title: t('searchCtrlF'),
+    title: `${$t('search')} (Ctrl+F)`,
     className: 'jse-search',
     onClick: handleToggleSearch,
     disabled: json === undefined
@@ -90,7 +90,7 @@
         {
           type: 'button',
           icon: faSortAmountDownAlt,
-          title: t('sort'),
+          title: $t('sort'),
           className: 'jse-sort',
           onClick: onSort,
           disabled: readOnly || json === undefined
@@ -98,7 +98,7 @@
         {
           type: 'button',
           icon: faFilter,
-          title: t('transformContents'),
+          title: $t('transformContents'),
           className: 'jse-transform',
           onClick: onTransform,
           disabled: readOnly || json === undefined
@@ -107,7 +107,7 @@
         {
           type: 'button',
           icon: faEllipsisV,
-          title: t('contextMenuExplanation'),
+          title: $t('contextMenuExplanation'),
           className: 'jse-contextmenu',
           onClick: onContextMenu
         },
@@ -117,7 +117,7 @@
         {
           type: 'button',
           icon: faUndo,
-          title: t('undo') + ' (Ctrl+Z)',
+          title: $t('undo') + ' (Ctrl+Z)',
           className: 'jse-undo',
           onClick: onUndo,
           disabled: !history.canUndo
@@ -125,7 +125,7 @@
         {
           type: 'button',
           icon: faRedo,
-          title: t('redo') + ' (Ctrl+Shift+Z)',
+          title: $t('redo') + ' (Ctrl+Shift+Z)',
           className: 'jse-redo',
           onClick: onRedo,
           disabled: !history.canRedo
@@ -143,7 +143,7 @@
         {
           type: 'button',
           icon: faCopy,
-          title: t('copy') + ' (Ctrl+C)',
+          title: `${$t('copy')} (Ctrl+C)`,
           className: 'jse-copy',
           onClick: onCopy,
           disabled: !hasSelectionContents

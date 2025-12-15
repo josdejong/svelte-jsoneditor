@@ -30,11 +30,11 @@
 
   const asc = {
     value: 1,
-    label: t('sortAscending')
+    label: $t('sortAscending')
   }
   const desc = {
     value: -1,
-    label: t('sortDescending')
+    label: $t('sortDescending')
   }
   const directions = [asc, desc]
 
@@ -77,7 +77,7 @@
 </script>
 
 <Modal {onClose} className="jse-sort-modal">
-  <Header title={jsonIsArray ? t('sortArrayItems') : t('sortObjectKeys')} {onClose} />
+  <Header title={jsonIsArray ? $t('sortArrayItems') : $t('sortObjectKeys')} {onClose} />
 
   <div class="jse-modal-contents">
     <table>
@@ -87,7 +87,7 @@
       </colgroup>
       <tbody>
         <tr>
-          <th>{t('path')}</th>
+          <th>{$t('path')}</th>
           <td>
             <input
               class="jse-path"
@@ -96,20 +96,20 @@
               title="Selected path"
               value={rootPath && !isEmpty(rootPath)
                 ? stringifyJSONPath(rootPath)
-                : '(document root)'}
+                : `(${$t('docRoot')})`}
             />
           </td>
         </tr>
         {#if jsonIsArray && properties && properties?.length > 1}
           <tr>
-            <th>{t('Property')}</th>
+            <th>{$t('property')}</th>
             <td>
               <Select showChevron items={properties} bind:value={selectedProperty} />
             </td>
           </tr>
         {/if}
         <tr>
-          <th>{t('direction')}</th>
+          <th>{$t('direction')}</th>
           <td>
             <Select
               showChevron
@@ -138,7 +138,7 @@
         use:focus
         disabled={jsonIsArray && properties && properties?.length > 1 ? !selectedProperty : false}
       >
-        {t('sort')}
+        {$t('sort')}
       </button>
     </div>
   </div>

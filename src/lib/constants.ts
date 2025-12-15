@@ -1,4 +1,3 @@
-import { t } from '$lib/i18n'
 import type { Section } from './types'
 import { SortDirection } from './types.js'
 

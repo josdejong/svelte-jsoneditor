@@ -285,7 +285,7 @@
         <button
           type="button"
           class="jse-replace-toggle"
-          title={t('toggleReplaceOptions')}
+          title={$t('toggleReplaceOptions')}
           on:click={toggleShowReplace}
         >
           <Icon data={showReplace ? faCaretDown : faCaretRight} />
@@ -303,9 +303,9 @@
           <label class="jse-search-input-label" about="jse-search input">
             <input
               class="jse-search-input"
-              title={t('enterTextSearch')}
+              title={$t('enterTextSearch')}
               type="text"
-              placeholder={t('findPlaceholder')}
+              placeholder={$t('findPlaceholder')}
               bind:value={text}
               use:initSearchInput
               on:paste={handlePaste}
@@ -319,7 +319,7 @@
           <button
             type="button"
             class="jse-search-next"
-            title={t('nextResult')}
+            title={$t('nextResult')}
             on:click={handleNext}
           >
             <Icon data={faChevronDown} />
@@ -327,7 +327,7 @@
           <button
             type="button"
             class="jse-search-previous"
-            title={t('prevResult')}
+            title={$t('prevResult')}
             on:click={handlePrevious}
           >
             <Icon data={faChevronUp} />
@@ -335,7 +335,7 @@
           <button
             type="button"
             class="jse-search-clear"
-            title={t('closeSearch')}
+            title={$t('closeSearch')}
             on:click={handleClose}
           >
             <Icon data={faTimes} />
@@ -345,17 +345,17 @@
           <div class="jse-replace-section">
             <input
               class="jse-replace-input"
-              title={t('enterReplaceText')}
+              title={$t('enterReplaceText')}
               type="text"
-              placeholder={t('replace')}
+              placeholder={$t('replace')}
               bind:value={replaceText}
               on:keydown={handleReplaceKeyDown}
             />
-            <button type="button" title={t('replaceCtrlEnter')} on:click={handleReplace}
-              >{t('replace')}</button
+            <button type="button" title={$t('replaceCtrlEnter')} on:click={handleReplace}
+              >{$t('replace')}</button
             >
-            <button type="button" title={t('replaceAllTitle')} on:click={handleReplaceAll}
-              >{t('replaceAll')}</button
+            <button type="button" title={$t('replaceAllTitle')} on:click={handleReplaceAll}
+              >{$t('replaceAll')}</button
             >
           </div>
         {/if}

@@ -6,7 +6,8 @@ import {
   findUniqueName,
   parseString,
   toCapital,
-  truncate
+  truncate,
+  stringReplaceAll,
 } from './stringUtils.js'
 
 describe('stringUtils', () => {
@@ -75,5 +76,33 @@ describe('stringUtils', () => {
     assert.strictEqual(parseString('"foo"'), '"foo"')
     assert.strictEqual(parseString('"2"'), '"2"')
     assert.strictEqual(parseString("'foo'"), "'foo'")
+  })
+
+  test('stringReplaceAll', () => {
+    assert.strictEqual(
+      stringReplaceAll('Hello world', 'world', 'there'),
+      'Hello there'
+    )
+    let template = 'text text {{name}} {{name}} {{total}} {{name}} {{total}} {{total}}'
+    template = stringReplaceAll(template,  '{{name}}', 'Alice')
+    assert.strictEqual(
+      template,
+      'text text Alice Alice {{total}} Alice {{total}} {{total}}'
+    )
+    template = stringReplaceAll(template, "{{total}}", '3')
+    assert.strictEqual(
+      template,
+      'text text Alice Alice 3 Alice 3 3'
+    )
+
+    assert.deepStrictEqual(
+      stringReplaceAll('abc', '', 'x'),
+      'abc'
+    );
+
+    assert.deepStrictEqual(
+      stringReplaceAll('aaaa', 'a', ''),
+      ''
+    );
   })
 })

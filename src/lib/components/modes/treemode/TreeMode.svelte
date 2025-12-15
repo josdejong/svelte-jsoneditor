@@ -165,7 +165,7 @@
   import createTreeContextMenuItems from './contextmenu/createTreeContextMenuItems'
   import { toRecursiveSearchResults as toRecursiveSearchResults } from 'svelte-jsoneditor/logic/search.js'
   import { isTreeHistoryItem } from 'svelte-jsoneditor'
-  import { t } from '$lib/i18n/index.js'
+  import { t } from '$lib/i18n/index'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -1706,7 +1706,7 @@
     }
 
     const props = {
-      tip: showTip ? t('tipContextMenu') : undefined,
+      tip: showTip ? $t('tipContextMenu') : undefined,
       items,
       onRequestClose: () => closeAbsolutePopup(popupId)
     }
@@ -1989,13 +1989,13 @@
       {:else}
         <Message
           type="error"
-          message={t('invalidJsonNotRepairable')}
+          message={$t('invalidJsonNotRepairable')}
           actions={!readOnly
             ? [
                 {
                   icon: faCode,
-                  text: t('repairManually'),
-                  title: t('repairManuallyTitle'),
+                  text: $t('repairManually'),
+                  title: $t('repairManuallyTitle'),
                   onClick: handleRequestRepair
                 }
               ]
@@ -2044,8 +2044,8 @@
           actions={[
             {
               icon: faWrench,
-              text: 'Paste as JSON instead',
-              title: 'Replace the value with the pasted JSON',
+              text: $t('pasteAsJson'),
+              title: $t('replaceValueWithJson'),
               // We use mousedown here instead of click: this message pops up
               // whilst the user is editing a value. When clicking this button,
               // the actual value is applied and the event is not propagated
@@ -2064,17 +2064,17 @@
       {#if pastedMultilineText}
         <Message
           type="info"
-          message={t('multilinePastedAsArray')}
+          message={$t('multilinePastedAsArray')}
           actions={[
             {
               icon: faWrench,
-              text: t('pasteAsStrInstead'),
-              title: t('pasteAsStrInsteadTitle'),
+              text: $t('pasteAsStrInstead'),
+              title: $t('pasteAsStrInsteadTitle'),
               onClick: handleParsePastedMultilineText
             },
             {
-              text: t('leaveAsIs'),
-              title: t('leaveAsIsTitle'),
+              text: $t('leaveAsIs'),
+              title: $t('leaveAsIsTitle'),
               onClick: handleClearPastedMultilineText
             }
           ]}
@@ -2084,19 +2084,19 @@
       {#if textIsRepaired}
         <Message
           type="success"
-          message={t('autoRepairSuccess')}
+          message={$t('autoRepairSuccess')}
           actions={!readOnly
             ? [
                 {
                   icon: faCheck,
-                  text: t('acceptRepair'),
-                  title: t('acceptRepairTitle'),
+                  text: $t('acceptRepair'),
+                  title: $t('acceptRepairTitle'),
                   onClick: acceptAutoRepair
                 },
                 {
                   icon: faCode,
-                  text: t('repairManuallyInstead'),
-                  title: t('repairManuallyInsteadTitle'),
+                  text: $t('repairManually'),
+                  title: $t('repairManuallyInsteadTitle'),
                   onClick: handleRequestRepair
                 }
               ]

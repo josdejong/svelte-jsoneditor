@@ -223,7 +223,7 @@
   <div class="jse-modal-wrapper">
     <AbsolutePopup>
       <Header
-        title="${t('editNestedContent')} {stack.length > 1 ? ` (${stack.length})` : ''}"
+        title="${$t('editNestedContent')} {stack.length > 1 ? ` (${stack.length})` : ''}"
         fullScreenButton={true}
         bind:fullscreen
         onClose={handleClose}
@@ -231,18 +231,18 @@
 
       <div class="jse-modal-contents">
         <div class="jse-label">
-          <div class="jse-label-inner">{t('path')}</div>
+          <div class="jse-label-inner">{$t('path')}</div>
         </div>
         <input
           class="jse-path"
           type="text"
           readonly
-          title={t('selectedPath')}
+          title={$t('selectedPath')}
           value={pathDescription}
         />
 
         <div class="jse-label">
-          <div class="jse-label-inner">{t('contents')}</div>
+          <div class="jse-label-inner">{$t('contents')}</div>
         </div>
 
         <div class="jse-modal-inline-editor">
@@ -293,7 +293,7 @@
 
           {#if stack.length > 1}
             <button type="button" class="jse-secondary" on:click={handleClose}>
-              <Icon data={faCaretLeft} /> {t('back')}
+              <Icon data={faCaretLeft} /> {$t('back')}
             </button>
           {/if}
           {#if !readOnly}

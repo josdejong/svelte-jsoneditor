@@ -46,7 +46,8 @@
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { noop } from '../utils/noop.js'
   import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils.js'
-  import { setI18nContext, english } from '$lib/i18n'
+  import { setI18nData } from '$lib/i18n'
+  import { english } from 'svelte-jsoneditor/index-vanilla'
   import JSONEditorRoot from './modes/JSONEditorRoot.svelte'
   import JSONEditorModal from './modals/JSONEditorModal.svelte'
   import memoizeOne from 'memoize-one'
@@ -136,8 +137,7 @@
   let transformModalProps: TransformModalProps | undefined
 
   $: if (language) {
-    setI18nContext(language)
-    instanceId = uniqueId()
+    setI18nData(language)
   }
 
   $: {

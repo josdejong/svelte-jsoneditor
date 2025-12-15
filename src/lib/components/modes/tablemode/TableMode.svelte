@@ -536,7 +536,7 @@
           newValidationErrors = [
             {
               path: [],
-              message: t('failedToValidate') + (err as Error).message,
+              message: $t('failedToValidate') + (err as Error).message,
               severity: ValidationSeverity.warning
             }
           ]
@@ -971,7 +971,7 @@
     }
 
     const props = {
-      tip: showTip ? t('tipContextMenu') : undefined,
+      tip: showTip ? $t('tipContextMenu') : undefined,
       items,
       onRequestClose: function () {
         closeAbsolutePopup(popupId)
@@ -1931,14 +1931,14 @@
       {#if pastedJson}
         <Message
           type="info"
-          message={t('YouPastedAJsonMessage', {
+          message={$t('YouPastedAJsonMessage', {
             content: Array.isArray(pastedJson.contents) ? 'array' : 'object'
           })}
           actions={[
             {
               icon: faWrench,
-              text: 'Paste as JSON instead',
-              title: 'Paste the text as JSON instead of a single value',
+              text: $t('pasteAsJson'),
+              title: $t('pastTextAsJson'),
               // We use mousedown here instead of click: this message pops up
               // whilst the user is editing a value. When clicking this button,
               // the actual value is applied and the event is not propagated
@@ -1946,8 +1946,8 @@
               onMouseDown: handleParsePastedJson
             },
             {
-              text: 'Leave as is',
-              title: 'Keep the pasted content as a single value',
+              text: $t('leaveAsIs'),
+              title: $t('keepAsSingleValue'),
               onClick: handleClearPastedJson
             }
           ]}
@@ -1957,17 +1957,17 @@
       {#if pastedMultilineText}
         <Message
           type="info"
-          message={t('multilineTextPastedMessage')}
+          message={$t('multilineTextPastedMessage')}
           actions={[
             {
               icon: faWrench,
-              text: t('pasteAsStringInstead'),
-              title: t('pastTheClipboardDataAsStingeStringValue'),
+              text: $t('pasteAsStringInstead'),
+              title: $t('pastSingleString'),
               onClick: handleParsePastedMultilineText
             },
             {
-              text: t('leaveAsIs'),
-              title: t('Keep the pasted array'),
+              text: $t('leaveAsIs'),
+              title: $t('keepThePastedArray'),
               onClick: handleClearPastedMultilineText
             }
           ]}
@@ -1977,19 +1977,19 @@
       {#if textIsRepaired}
         <Message
           type="success"
-          message={t('textRepairedSuccessMessage')}
+          message={$t('textRepairedSuccessMessage')}
           actions={!readOnly
             ? [
                 {
                   icon: faCheck,
-                  text: t('Ok'),
-                  title: t('acceptRepairedDocument'),
+                  text: $t('Ok'),
+                  title: $t('acceptRepairedDocument'),
                   onClick: acceptAutoRepair
                 },
                 {
                   icon: faCode,
-                  text: t('Repair manually'),
-                  title: t('leaveTheDocUnchanged'),
+                  text: $t('repairManually'),
+                  title: $t('leaveTheDocUnchanged'),
                   onClick: handleRequestRepair
                 }
               ]
@@ -2002,13 +2002,13 @@
     {:else if parseError && text !== undefined && text !== ''}
       <Message
         type="error"
-        message={t('invalidJsonNotRepairable')}
+        message={$t('invalidJsonNotRepairable')}
         actions={!readOnly
           ? [
               {
                 icon: faCode,
-                text: t('repairManually'),
-                title: t('manuallyRepairWithCodeModeText'),
+                text: $t('repairManually'),
+                title: $t('manuallyRepairWithCodeModeText'),
                 onClick: handleRequestRepair
               }
             ]

@@ -40,7 +40,7 @@
   import { cloneDeep } from 'lodash-es'
   import { createHistoryInstance } from '$lib/logic/history'
   import { createDebug } from '$lib/utils/debug'
-  import { t } from '$lib/i18n/index.js'
+  import { t } from '$lib/i18n/index'
 
   export let content: Content
   export let selection: JSONEditorSelection | undefined
@@ -157,22 +157,22 @@
   $: modeMenuItems = [
     {
       type: 'button',
-      text: t('modeText'),
-      title: `${t('switchToTextMode')} ${t('currentMode', { mode })}`,
+      text: $t('modeText'),
+      title: `${$t('switchToTextMode')} ${$t('currentMode', { mode })}`,
       className: 'jse-group-button jse-first' + (mode === Mode.text ? ' jse-selected' : ''),
       onClick: () => onChangeMode(Mode.text)
     },
     {
       type: 'button',
-      text: t('modeTree'),
-      title: `${t('switchToTreeMode')} ${t('currentMode', { mode })}`,
+      text: $t('modeTree'),
+      title: `${$t('switchToTreeMode')} ${$t('currentMode', { mode })}`,
       className: 'jse-group-button ' + (mode === Mode.tree ? ' jse-selected' : ''),
       onClick: () => onChangeMode(Mode.tree)
     },
     {
       type: 'button',
-      text: t('modeTable'),
-      title: `${t('switchToTableMode')} ${t('currentMode', { mode })}`,
+      text: $t('modeTable'),
+      title: `${$t('switchToTableMode')} ${$t('currentMode', { mode })}`,
       className: 'jse-group-button jse-last' + (mode === Mode.table ? ' jse-selected' : ''),
       onClick: () => onChangeMode(Mode.table)
     }

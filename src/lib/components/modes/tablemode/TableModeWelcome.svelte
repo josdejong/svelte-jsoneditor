@@ -43,14 +43,14 @@
 
   const documentType = $derived(
     hasNestedArrays
-      ? t('objectWithNestedArrays')
+      ? $t('objectWithNestedArrays')
       : isEmptyDocument
-        ? t('emptyDocument')
+        ? $t('emptyDocument')
         : isJSONObject(json)
-          ? t('anObject')
+          ? $t('anObject')
           : isJSONArray(json)
-            ? t('emptyArray') // note: can also be an array with objects but without properties
-            : t('withValueType', { valueType: valueType(json, parser) })
+            ? $t('emptyArray') // note: can also be an array with objects but without properties
+            : $t('withValueType', { valueType: valueType(json, parser) })
   )
 
   function countItems(nestedArrayPath: JSONPath): number {
@@ -65,11 +65,11 @@
     <div class="jse-nested-arrays-title">{documentType}</div>
     <div class="jse-nested-arrays-info">
       {#if hasNestedArrays}
-        {t('messageObjectCannotBeOpenedInTableMode')}
+        {$t('objectCannotBeOpened')}
       {:else if isEmptyDocument && !readOnly}
-        {t('messageEmptyDocCannotBeOpenedInTableMode')} <b>Ctrl+V</b>.
+        {$t('emptyDocCannotBeOpened')} <b>Ctrl+V</b>.
       {:else}
-        {t('messageDocTypeCannotBeOpenedInTableMode', { doc: documentType })}
+        {$t('docCannotBeOpened', { doc: documentType })}
       {/if}
     </div>
     {#each nestedArrayPaths as nestedArrayPath}
@@ -86,7 +86,7 @@
           class="jse-nested-array-action"
           onclick={() => openJSONEditorModal(nestedArrayPath)}
         >
-          {readOnly ? t('View') : t('Edit')}
+          {readOnly ? $t('View') : $t('Edit')}
         </button>
         {#if !readOnly}
           <button
@@ -94,13 +94,13 @@
             class="jse-nested-array-action"
             onclick={() => extractPath(nestedArrayPath)}
           >
-            {t('Extract')}
+            {$t('Extract')}
           </button>
         {/if}
       </div>
     {/each}
     <button type="button" class="jse-nested-array-action" onclick={() => onChangeMode(Mode.tree)}>
-      {t('switchToTextMode')}
+      {$t('switchToTextMode')}
     </button>
   </div>
 

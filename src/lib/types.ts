@@ -842,6 +842,7 @@ export type TranslationKey = {
   // Common
   Ok: string
   loading: string
+  filter: string
   Extract: string
   View: string
   Edit: string
@@ -849,7 +850,7 @@ export type TranslationKey = {
   anObject: string
   insertExplanation: string
   showMe: string
-  moveToTheParseErrorLocation: string
+  moveToError: string
   autoRepair: string
   autoRepairJson: string
   item: string
@@ -858,6 +859,11 @@ export type TranslationKey = {
   contents: string
   back: string
   apply: string
+  selectQueryLanguage: string
+  pick: string
+  language: string
+  query: string
+  docRoot: string
 
   // textMode
   cancel: string
@@ -869,7 +875,6 @@ export type TranslationKey = {
   cancelLargeDocument: string
   confirmFormatJson: string
   format: string
-  formatJsonDescription: string
   noThanks: string
   closeMessage: string
   jsonTooLargeWarning: string
@@ -879,10 +884,10 @@ export type TranslationKey = {
   repairManually: string
   repairManuallyTitle: string
   pastedJsonAsText: string
-  pastedJsonArray: string
-  pastedJsonObject: string
   pasteAsJson: string
-  pasteAsJsonTitle: string
+  replaceValueWithJson: string
+  pastTextAsJson: string
+  keepAsSingleValue: string
   leaveAsIs: string
   leaveAsIsTitle: string
   multilinePastedAsArray: string
@@ -891,13 +896,12 @@ export type TranslationKey = {
   autoRepairSuccess: string
   acceptRepair: string
   acceptRepairTitle: string
-  repairManuallyInstead: string
   repairManuallyInsteadTitle: string
 
   // Menu titles
   expandAll: string
   collapseAll: string
-  searchCtrlF: string
+  search: string
   transformContents: string
   contextMenuExplanation: string
   undo: string
@@ -938,7 +942,7 @@ export type TranslationKey = {
   YouPastedAJsonMessage: string
   multilineTextPastedMessage: string
   pasteAsStringInstead: string
-  pastTheClipboardDataAsStingeStringValue: string
+  pastSingleString: string
   keepThePastedArray: string
   textRepairedSuccessMessage: string
   acceptRepairedDocument: string
@@ -951,9 +955,11 @@ export type TranslationKey = {
   object: string
   emptyArray: string
   withValueType: string
-  messageObjectCannotBeOpenedInTableMode: string
-  messageEmptyDocCannotBeOpenedInTableMode: string
-  messageDocTypeCannotBeOpenedInTableMode: string
+  objectCannotBeOpened: string
+  emptyDocCannotBeOpened: string
+  docCannotBeOpened: string
+  tableCell: string
+  tableRow: string
 
   // Context menu
   editKey: string
@@ -970,11 +976,11 @@ export type TranslationKey = {
   removeRow: string
   removeCurrentRow: string
   cut: string
-  cutSelectedContentFormattedWithIndentation: string
-  cutSelectedContentWithoutIndent: string
-  copySelectedContendWithIndent: string
-  copySelectedContendWithoutIndent: string
-  pastClipboardContent: string
+  cutFormattedTitle: string
+  cutCompactedTitle: string
+  copyWithIndent: string
+  copyWithoutIndent: string
+  pasteTitle: string
   removeSelected: string
   copyFormatted: string
   copyCompacted: string
@@ -991,7 +997,7 @@ export type TranslationKey = {
   convertTo: string
   insert: string
   editTheKey: string
-  sortArrayOrObjectContents: string
+  sortArrayOrObject: string
   transform: string
   transformArrayOrObject: string
   structure: string
@@ -1007,6 +1013,10 @@ export type TranslationKey = {
   direction: string
   property: string
   path: string
+  wizard: string
+  wizardInfo: string
+  original: string
+  preview: string
 }
 
 export type Locale = {

@@ -4,6 +4,7 @@ export const english: Language = {
   landCode: 'en-US',
   values: {
     Ok: 'Ok',
+    filter: 'Filter',
     loading: 'loading',
     Extract: 'Extract',
     View: 'View',
@@ -11,7 +12,7 @@ export const english: Language = {
     sort: 'Sort',
     showMe: 'Show me',
     cancel: 'Cancel',
-    moveToTheParseErrorLocation: 'Move to the parse error location',
+    moveToError: 'Move to the parse error location',
     autoRepair: 'Auto repair',
     autoRepairJson: 'Automatically repair JSON',
     // TextMode
@@ -24,7 +25,6 @@ export const english: Language = {
     cancelLargeDocument: 'Cancel opening this large document.',
     confirmFormatJson: 'Do you want to format the JSON?',
     format: 'Format',
-    formatJsonDescription: 'Format JSON: add proper indentation and new lines (Ctrl+I)',
     noThanks: 'No thanks',
     closeMessage: 'Close this message',
     jsonTooLargeWarning:
@@ -35,6 +35,13 @@ export const english: Language = {
     contents: 'Contents',
     back: 'Back',
     apply: 'Apply',
+    selectQueryLanguage: 'Select a query language',
+    pick: 'Pick',
+    language: 'Language',
+    wizard: 'Wizard',
+    wizardInfo: 'Only available for arrays, not for objects',
+    query: 'Query',
+    docRoot: 'document root',
 
     // TreeMode messages
     invalidJsonNotRepairable:
@@ -42,10 +49,10 @@ export const english: Language = {
     repairManually: 'Repair manually',
     repairManuallyTitle: 'Open the document in "code" mode and repair it manually',
     pastedJsonAsText: 'You pasted a JSON {{type}} as text',
-    pastedJsonArray: 'array',
-    pastedJsonObject: 'object',
     pasteAsJson: 'Paste as JSON instead',
-    pasteAsJsonTitle: 'Replace the value with the pasted JSON',
+    pastTextAsJson: 'Paste the text as JSON instead of a single value',
+    keepAsSingleValue: 'Keep the pasted content as a single value',
+    replaceValueWithJson: 'Replace the value with the pasted JSON',
     leaveAsIsTitle: 'Keep the JSON embedded in the value',
     multilinePastedAsArray: 'Multiline text was pasted as array',
     pasteAsStrInstead: 'Paste as string instead',
@@ -53,7 +60,6 @@ export const english: Language = {
     autoRepairSuccess: 'The loaded JSON document was invalid but is successfully repaired.',
     acceptRepair: 'Ok',
     acceptRepairTitle: 'Accept the repaired document',
-    repairManuallyInstead: 'Repair manually instead',
     repairManuallyInsteadTitle: 'Leave the document unchanged and repair it manually instead',
     insertExplanation:
       'Insert or paste contents, enter [ insert a new array, enter { to insert a new object, or start typing to insert a new value',
@@ -61,10 +67,10 @@ export const english: Language = {
     // Menu titles
     expandAll: 'Expand all',
     collapseAll: 'Collapse all',
-    searchCtrlF: 'Search (Ctrl+F)',
+    search: 'Search',
     transformContents: 'Transform contents (filter, sort, project)',
     contextMenuExplanation:
-      'Open context menu (Click here, right-click on the selection, or use the context menu button or Ctrl+Q)',
+      'Open context menu (Click here, right click on the selection, or use the context menu button or Ctrl+Q)',
 
     undo: 'Undo',
     redo: 'Redo',
@@ -105,7 +111,7 @@ export const english: Language = {
     YouPastedAJsonMessage: 'You pasted a JSON {{content}} as text',
     multilineTextPastedMessage: 'Multiline text was pasted as array',
     pasteAsStringInstead: 'Paste as string instead',
-    pastTheClipboardDataAsStingeStringValue:
+    pastSingleString:
       'Paste the clipboard data as a single string value instead of an array',
     leaveAsIs: 'Leave as is',
     keepThePastedArray: 'Keep the pasted array',
@@ -114,6 +120,8 @@ export const english: Language = {
     acceptRepairedDocument: 'Accept the repaired document',
     leaveTheDocUnchanged: 'Leave the document unchanged and repair it manually instead',
     manuallyRepairWithCodeModeText: 'Open the document in "code" mode and repair it manually',
+    tableCell: 'Table cell',
+    tableRow: 'Table row',
 
     // Table mode welcome
     objectWithNestedArrays: 'Object with nested arrays',
@@ -121,11 +129,11 @@ export const english: Language = {
     anObject: 'An object',
     emptyArray: 'An empty array',
     withValueType: 'A {{valueType}}',
-    messageObjectCannotBeOpenedInTableMode:
+    objectCannotBeOpened:
       'An object cannot be opened in table mode. You can open a nested array instead, or open the document in tree mode.',
-    messageEmptyDocCannotBeOpenedInTableMode:
+    emptyDocCannotBeOpened:
       'An empty document cannot be opened in table mode. You can go to tree mode instead, or paste a JSON Array using',
-    messageDocTypeCannotBeOpenedInTableMode:
+    docCannotBeOpened:
       '{{doc}} cannot be opened in table mode. You can open the document in tree mode instead.',
 
     // Context menu
@@ -143,11 +151,11 @@ export const english: Language = {
     removeRow: 'Remove row',
     removeCurrentRow: 'Remove current row',
     cut: 'Cut',
-    cutSelectedContentFormattedWithIndentation: 'Cut selected contents, formatted with indentation',
-    cutSelectedContentWithoutIndent: 'Cut selected contents, without indentation',
-    copySelectedContendWithIndent: 'Copy selected contents, formatted with indentation',
-    copySelectedContendWithoutIndent: 'Copy selected contents, without indentation',
-    pastClipboardContent: 'Paste clipboard contents',
+    cutFormattedTitle: 'Cut selected contents, formatted with indentation',
+    cutCompactedTitle: 'Cut selected contents, without indentation',
+    copyWithIndent: 'Copy selected contents, formatted with indentation',
+    copyWithoutIndent: 'Copy selected contents, without indentation',
+    pasteTitle: 'Paste clipboard contents',
     removeSelected: 'Remove selected contents',
     copyFormatted: 'Copy formatted',
     copyCompacted: 'Copy compacted',
@@ -164,7 +172,7 @@ export const english: Language = {
     convertTo: 'Convert to',
     insert: 'Insert',
     editTheKey: 'Edit the key',
-    sortArrayOrObjectContents: 'Sort array or object contents',
+    sortArrayOrObject: 'Sort array or object contents',
     transform: 'Transform',
     transformArrayOrObject: 'Transform array or object contents (filter, sort, project)',
     structure: 'Structure',
@@ -181,11 +189,13 @@ export const english: Language = {
     sortArrayItems: 'Sort array items',
     selectedPath: 'Selected path',
     direction: 'Direction',
-    property: 'Property'
+    property: 'Property',
+    original: 'Original',
+    preview: 'Preview',
   }
 }
 
-export const russia: Language = {
+export const russian: Language = {
   landCode: 'ru-RU',
   values: {
     Ok: 'Ок',
@@ -196,11 +206,11 @@ export const russia: Language = {
     sort: 'Сортировать',
     anObject: 'Объект',
     insertExplanation:
-      'Вставьте или вставьте содержимое, введите [, чтобы вставить новый массив, введите {, чтобы вставить новый объект, или начните вводить для вставки нового значения',
-    showMe: 'Show me',
-    moveToTheParseErrorLocation: 'Move to the parse error location',
-    autoRepair: 'Auto repair',
-    autoRepairJson: 'Automatically repair JSON',
+      'Введите или вставьте содержимое, используйте [, чтобы вставить новый массив, используйте {, чтобы вставить новый объект, или начните печатать для вставки нового значения',
+    showMe: 'Показать',
+    moveToError: 'Перейти к месту синтаксической ошибки',
+    autoRepair: 'Автоматическое исправление',
+    autoRepairJson: 'Автоматически исправить JSON',
     cancel: 'Отмена',
     // TextMode
     cancelFolding: 'Отменить сворачивание',
@@ -213,8 +223,6 @@ export const russia: Language = {
     cancelLargeDocument: 'Отменить открытие этого большого документа.',
     confirmFormatJson: 'Вы хотите отформатировать JSON?',
     format: 'Форматировать',
-    formatJsonDescription:
-      'Форматировать JSON: добавить правильные отступы и переносы строк (Ctrl+I)',
     noThanks: 'Нет, спасибо',
     closeMessage: 'Закрыть это сообщение',
     jsonTooLargeWarning:
@@ -225,6 +233,12 @@ export const russia: Language = {
     contents: 'Содержание',
     back: 'Вернуться',
     apply: 'Подтвердить',
+    selectQueryLanguage: 'Выберите язык запроса',
+    filter: 'Фильтр',
+    pick: 'Выбрать',
+    language: 'Язык',
+    query: 'Запрос',
+    docRoot: 'Корень документа',
 
     // TreeMode messages
     invalidJsonNotRepairable:
@@ -232,10 +246,10 @@ export const russia: Language = {
     repairManually: 'Исправить вручную',
     repairManuallyTitle: 'Откройте документ в режиме «код» и исправьте его вручную',
     pastedJsonAsText: 'Вы вставили JSON {{type}} как текст',
-    pastedJsonArray: 'массив',
-    pastedJsonObject: 'объект',
     pasteAsJson: 'Вставить как JSON',
-    pasteAsJsonTitle: 'Заменить значение вставленным JSON',
+    pastTextAsJson: 'Вставить текст как JSON',
+    keepAsSingleValue: 'Оставить вставленный контент как единое значение',
+    replaceValueWithJson: 'Заменить значение вставленным JSON',
     leaveAsIs: 'Оставить как есть',
     leaveAsIsTitle: 'Сохранить JSON встроенным в значение',
     multilinePastedAsArray: 'Многострочный текст был вставлен как массив',
@@ -244,13 +258,12 @@ export const russia: Language = {
     autoRepairSuccess: 'Загруженный JSON-документ был некорректным, но успешно восстановлен.',
     acceptRepair: 'Ок',
     acceptRepairTitle: 'Принять восстановленный документ',
-    repairManuallyInstead: 'Исправить вручную',
     repairManuallyInsteadTitle: 'Оставить документ без изменений и исправить вручную',
 
     // Menu titles
     expandAll: 'Развернуть всё',
     collapseAll: 'Свернуть всё',
-    searchCtrlF: 'Поиск (Ctrl+F)',
+    search: 'Поиск',
     transformContents: 'Преобразовать содержимое (фильтр, сортировка, проекция)',
     contextMenuExplanation:
       'Открыть контекстное меню (нажмите здесь, щёлкните правой кнопкой по выделению или используйте Ctrl+Q)',
@@ -293,8 +306,7 @@ export const russia: Language = {
     YouPastedAJsonMessage: 'Вы вставили JSON {{content}} как текст',
     multilineTextPastedMessage: 'Многострочный текст был вставлен как массив',
     pasteAsStringInstead: 'Вставить как строку',
-    pastTheClipboardDataAsStingeStringValue:
-      'Вставить данные буфера обмена как одну строку вместо массива',
+    pastSingleString: 'Вставить данные буфера обмена как одну строку вместо массива',
     keepThePastedArray: 'Сохранить вставленный массив',
     textRepairedSuccessMessage:
       'Загруженный JSON-документ был некорректным, но успешно восстановлен.',
@@ -308,11 +320,11 @@ export const russia: Language = {
     object: 'Объект',
     emptyArray: 'Пустой массив',
     withValueType: '{{valueType}}',
-    messageObjectCannotBeOpenedInTableMode:
+    objectCannotBeOpened:
       'Объект нельзя открыть в табличном режиме. Вы можете открыть вложенный массив или переключиться в режим дерева.',
-    messageEmptyDocCannotBeOpenedInTableMode:
+    emptyDocCannotBeOpened:
       'Пустой документ нельзя открыть в табличном режиме. Перейдите в режим дерева или вставьте JSON-массив с помощью',
-    messageDocTypeCannotBeOpenedInTableMode:
+    docCannotBeOpened:
       '{{doc}} нельзя открыть в табличном режиме. Вы можете открыть документ в режиме дерева.',
 
     // Context menu
@@ -330,11 +342,11 @@ export const russia: Language = {
     removeRow: 'Удалить строку',
     removeCurrentRow: 'Удалить текущую строку',
     cut: 'Вырезать',
-    cutSelectedContentFormattedWithIndentation: 'Вырезать выделенное с сохранением отступов',
-    cutSelectedContentWithoutIndent: 'Вырезать выделенное без отступов',
-    copySelectedContendWithIndent: 'Копировать выделенное с отступами',
-    copySelectedContendWithoutIndent: 'Копировать выделенное без отступов',
-    pastClipboardContent: 'Вставить содержимое из буфера обмена',
+    cutFormattedTitle: 'Вырезать выделенное с сохранением отступов',
+    cutCompactedTitle: 'Вырезать выделенное без отступов',
+    copyWithIndent: 'Копировать выделенное с отступами',
+    copyWithoutIndent: 'Копировать выделенное без отступов',
+    pasteTitle: 'Вставить содержимое из буфера обмена',
     removeSelected: 'Удалить выделенное',
     copyFormatted: 'Копировать с форматированием',
     copyCompacted: 'Копировать в компактном виде',
@@ -351,7 +363,7 @@ export const russia: Language = {
     convertTo: 'Преобразовать в',
     insert: 'Вставить',
     editTheKey: 'Редактировать ключ',
-    sortArrayOrObjectContents: 'Сортировать содержимое массива или объекта',
+    sortArrayOrObject: 'Сортировать содержимое массива или объекта',
     transform: 'Преобразовать',
     transformArrayOrObject:
       'Преобразовать содержимое массива или объекта (фильтр, сортировка, проекция)',
@@ -370,6 +382,14 @@ export const russia: Language = {
     sortArrayItems: 'Сортировать элементы массива',
     selectedPath: 'Выбранный путь',
     direction: 'Направление',
-    property: 'Свойство'
+    property: 'Свойство',
+    wizard: 'Wizard',
+    wizardInfo: 'Доступно только для массивов, не для объектов',
+    original: 'Текущий',
+    preview: 'Предпросмотр',
+
+    // Пример запроса:
+    tableCell: 'Ячейка таблицы',
+    tableRow: 'Строка таблицы'
   }
 }

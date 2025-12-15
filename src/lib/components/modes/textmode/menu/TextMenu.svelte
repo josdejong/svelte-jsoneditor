@@ -42,7 +42,7 @@
   $: expandMenuItem = {
     type: 'button',
     icon: faJSONEditorExpand,
-    title: t('expandAll'),
+    title: $t('expandAll'),
     className: 'jse-expand-all',
     onClick: onExpandAll,
     disabled: !canExpandAll
@@ -52,7 +52,7 @@
   $: collapseMenuItem = {
     type: 'button',
     icon: faJSONEditorCollapse,
-    title: t('collapseAll'),
+    title: $t('collapseAll'),
     className: 'jse-collapse-all',
     onClick: onCollapseAll,
     disabled: !canCollapseAll
@@ -61,7 +61,7 @@
   const searchItem: MenuItem = {
     type: 'button',
     icon: faSearch,
-    title: t('searchCtrlF'),
+    title: `${$t('search')} (Ctrl+F)`,
     className: 'jse-search',
     onClick: onToggleSearch
   }
@@ -77,7 +77,7 @@
         {
           type: 'button',
           icon: faJSONEditorFormat,
-          title: t('formatJson') + ' (Ctrl+I)',
+          title: $t('formatJson') + ' (Ctrl+I)',
           className: 'jse-format',
           onClick: onFormat,
           disabled: readOnly || !canFormat
@@ -85,7 +85,7 @@
         {
           type: 'button',
           icon: faJSONEditorCompact,
-          title: t('compactJson') + ' (Ctrl+Shift+I)',
+          title: $t('compactJson') + ' (Ctrl+Shift+I)',
           className: 'jse-compact',
           onClick: onCompact,
           disabled: readOnly || !canCompact
@@ -96,7 +96,7 @@
         {
           type: 'button',
           icon: faSortAmountDownAlt,
-          title: t('sort'),
+          title: $t('sort'),
           className: 'jse-sort',
           onClick: onSort,
           disabled: readOnly || !canSort
@@ -104,7 +104,7 @@
         {
           type: 'button',
           icon: faFilter,
-          title: t('transformContents'),
+          title: $t('transformContents'),
           className: 'jse-transform',
           onClick: onTransform,
           disabled: readOnly || !canTransform
@@ -116,7 +116,7 @@
         {
           type: 'button',
           icon: faUndo,
-          title: t('undo') + ' (Ctrl+Z)',
+          title: $t('undo') + ' (Ctrl+Z)',
           className: 'jse-undo',
           onClick: onUndo,
           disabled: !canUndo
@@ -124,7 +124,7 @@
         {
           type: 'button',
           icon: faRedo,
-          title: t('redo') + ' (Ctrl+Shift+Z)',
+          title: $t('redo') + ' (Ctrl+Shift+Z)',
           className: 'jse-redo',
           onClick: onRedo,
           disabled: !canRedo

@@ -1302,8 +1302,8 @@
 
   const repairActionShowMe = {
     icon: faEye,
-    text: t('showMe'),
-    title: t('moveToTheParseErrorLocation'),
+    text: $t('showMe'),
+    title: $t('moveToError'),
     onClick: handleShowMe
   }
 
@@ -1312,8 +1312,8 @@
       ? [
           {
             icon: faWrench,
-            text: t('Auto repair'),
-            title: t('autoRepairJson'),
+            text: $t('autoRepair'),
+            title: $t('autoRepairJson'),
             onClick: handleRepair
           },
           repairActionShowMe
@@ -1359,10 +1359,10 @@
       <button
         class="jse-fold-cancel-button"
         type="button"
-        title={t('cancelFolding')}
+        title={$t('cancelFolding')}
         on:click={handleCancelFolding}
       >
-        {t('cancel')}
+        {$t('cancel')}
       </button>
     </div>
   {/if}
@@ -1375,25 +1375,25 @@
       <Message
         icon={faExclamationTriangle}
         type="error"
-        message={ t('jsonTooLargeWarning', {
+        message={ $t('jsonTooLargeWarning', {
           maxSize: formatSize(MAX_DOCUMENT_SIZE_TEXT_MODE),
           actualSize: formatSize(text.length)
         })
         }
         actions={[
           {
-            text: t('openAnyWay'),
-            title: t('openTextModeWarning'),
+            text: $t('openAnyWay'),
+            title: $t('openTextModeWarning'),
             onClick: handleAcceptTooLarge
           },
           {
-            text: t('openTreeMode'),
-            title: t('openTreeModeDescription'),
+            text: $t('openTreeMode'),
+            title: $t('openTreeModeDescription'),
             onClick: handleSwitchToTreeMode
           },
           {
-            text: t('cancel'),
-            title: t('cancelLargeDocument'),
+            text: $t('cancel'),
+            title: $t('cancelLargeDocument'),
             onClick: cancelLoadTooLarge
           }
         ]}
@@ -1424,18 +1424,18 @@
       {#if !jsonParseError && askToFormatApplied && needsFormatting(text)}
         <Message
           type="success"
-          message={t('confirmFormatJson')}
+          message={$t('confirmFormatJson')}
           actions={[
             {
               icon: faJSONEditorFormat,
-              text: t('format'),
-              title: t('formatJsonDescription'),
+              text: $t('format'),
+              title: `${$t('formatJson')} (Ctrl+I)`,
               onClick: handleFormat
             },
             {
               icon: faTimes,
-              text: t('noThanks'),
-              title: t('closeMessage'),
+              text: $t('noThanks'),
+              title: $t('closeMessage'),
               onClick: () => (askToFormatApplied = false)
             }
           ]}
@@ -1448,7 +1448,7 @@
   {:else}
     <div class="jse-contents">
       <div class="jse-loading-space"></div>
-      <div class="jse-loading">{t('loading')}...</div>
+      <div class="jse-loading">{$t('loading')}...</div>
     </div>
   {/if}
 </div>

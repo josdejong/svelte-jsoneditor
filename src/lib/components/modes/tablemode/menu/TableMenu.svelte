@@ -34,7 +34,7 @@
         {
           type: 'button',
           icon: faSortAmountDownAlt,
-          title: 'Sort',
+          title: $t('sort'),
           className: 'jse-sort',
           onClick: onSort,
           disabled: readOnly || !containsValidArray
@@ -42,7 +42,7 @@
         {
           type: 'button',
           icon: faFilter,
-          title: 'Transform contents (filter, sort, project)',
+          title: $t('transformContents'),
           className: 'jse-transform',
           onClick: onTransform,
           disabled: readOnly || !containsValidArray
@@ -50,7 +50,7 @@
         {
           type: 'button',
           icon: faSearch,
-          title: 'Search (Ctrl+F)',
+          title: `${$t('search')} (Ctrl+F)`,
           className: 'jse-search',
           onClick: handleToggleSearch,
           disabled: !containsValidArray
@@ -58,7 +58,7 @@
         {
           type: 'button',
           icon: faEllipsisV,
-          title: t('contextMenuExplanation'),
+          title: $t('contextMenuExplanation'),
           className: 'jse-contextmenu',
           onClick: onContextMenu
         },
@@ -68,7 +68,7 @@
         {
           type: 'button',
           icon: faUndo,
-          title: 'Undo (Ctrl+Z)',
+          title: `${$t('undo')} (Ctrl+Z)`,
           className: 'jse-undo',
           onClick: onUndo,
           disabled: !history.canUndo
@@ -76,7 +76,7 @@
         {
           type: 'button',
           icon: faRedo,
-          title: 'Redo (Ctrl+Shift+Z)',
+          title: `${$t('redo')} (Ctrl+Shift+Z)`,
           className: 'jse-redo',
           onClick: onRedo,
           disabled: !history.canRedo

@@ -42,7 +42,7 @@
   class:jse-root={root}
   class:jse-insert={insert}
   class:jse-selected={selected}
-  title={t('contextMenuExplanation')}
+  title={$t('contextMenuExplanation')}
   on:click={handleClick}
 >
   <Icon data={faCaretDown} />
