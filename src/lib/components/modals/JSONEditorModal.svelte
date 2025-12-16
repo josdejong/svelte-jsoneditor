@@ -154,10 +154,7 @@
   function handleClose() {
     debug('handleClose')
 
-    if (fullscreen) {
-      // exit fullscreen
-      fullscreen = false
-    } else if (stack.length > 1) {
+    if (stack.length > 1) {
       // remove the last item from the stack
       stack = initial(stack)
       flushSync()
