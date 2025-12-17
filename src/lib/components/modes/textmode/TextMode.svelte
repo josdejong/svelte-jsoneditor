@@ -30,6 +30,7 @@
   import { formatSize } from '$lib/utils/fileUtils.js'
   import { findTextLocation, getText, needsFormatting } from '$lib/utils/jsonUtils.js'
   import { expandSelf } from '$lib/logic/documentState.js'
+  import { t } from '$lib/i18n'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
@@ -1301,8 +1302,8 @@
 
   const repairActionShowMe = {
     icon: faEye,
-    text: 'Show me',
-    title: 'Move to the parse error location',
+    text: $t('showMe'),
+    title: $t('moveToError'),
     onClick: handleShowMe
   }
 
@@ -1311,8 +1312,8 @@
       ? [
           {
             icon: faWrench,
-            text: 'Auto repair',
-            title: 'Automatically repair JSON',
+            text: $t('autoRepair'),
+            title: $t('autoRepairJson'),
             onClick: handleRepair
           },
           repairActionShowMe
@@ -1358,10 +1359,10 @@
       <button
         class="jse-fold-cancel-button"
         type="button"
-        title="Cancel folding"
+        title={$t('cancelFolding')}
         on:click={handleCancelFolding}
       >
-        Cancel
+        {$t('cancel')}
       </button>
     </div>
   {/if}
@@ -1374,22 +1375,25 @@
       <Message
         icon={faExclamationTriangle}
         type="error"
-        message={`The JSON document is larger than ${formatSize(MAX_DOCUMENT_SIZE_TEXT_MODE)}, ` +
-          `and may crash your browser when loading it in text mode. Actual size: ${formatSize(text.length)}.`}
+        message={ $t('jsonTooLargeWarning', {
+          maxSize: formatSize(MAX_DOCUMENT_SIZE_TEXT_MODE),
+          actualSize: formatSize(text.length)
+        })
+        }
         actions={[
           {
-            text: 'Open anyway',
-            title: 'Open the document in text mode. This may freeze or crash your browser.',
+            text: $t('openAnyWay'),
+            title: $t('openTextModeWarning'),
             onClick: handleAcceptTooLarge
           },
           {
-            text: 'Open in tree mode',
-            title: 'Open the document in tree mode. Tree mode can handle large documents.',
+            text: $t('openTreeMode'),
+            title: $t('openTreeModeDescription'),
             onClick: handleSwitchToTreeMode
           },
           {
-            text: 'Cancel',
-            title: 'Cancel opening this large document.',
+            text: $t('cancel'),
+            title: $t('cancelLargeDocument'),
             onClick: cancelLoadTooLarge
           }
         ]}
@@ -1420,18 +1424,18 @@
       {#if !jsonParseError && askToFormatApplied && needsFormatting(text)}
         <Message
           type="success"
-          message="Do you want to format the JSON?"
+          message={$t('confirmFormatJson')}
           actions={[
             {
               icon: faJSONEditorFormat,
-              text: 'Format',
-              title: 'Format JSON: add proper indentation and new lines (Ctrl+I)',
+              text: $t('format'),
+              title: `${$t('formatJson')} (Ctrl+I)`,
               onClick: handleFormat
             },
             {
               icon: faTimes,
-              text: 'No thanks',
-              title: 'Close this message',
+              text: $t('noThanks'),
+              title: $t('closeMessage'),
               onClick: () => (askToFormatApplied = false)
             }
           ]}
@@ -1444,7 +1448,7 @@
   {:else}
     <div class="jse-contents">
       <div class="jse-loading-space"></div>
-      <div class="jse-loading">loading...</div>
+      <div class="jse-loading">{$t('loading')}...</div>
     </div>
   {/if}
 </div>

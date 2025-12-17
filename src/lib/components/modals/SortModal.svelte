@@ -12,6 +12,7 @@
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { createDebug } from '$lib/utils/debug.js'
   import type { OnSort } from '$lib/types.js'
+  import { t } from '$lib/i18n'
   import Modal from './Modal.svelte'
 
   const debug = createDebug('jsoneditor:SortModal')
@@ -29,11 +30,11 @@
 
   const asc = {
     value: 1,
-    label: 'ascending'
+    label: $t('sortAscending')
   }
   const desc = {
     value: -1,
-    label: 'descending'
+    label: $t('sortDescending')
   }
   const directions = [asc, desc]
 
@@ -76,7 +77,7 @@
 </script>
 
 <Modal {onClose} className="jse-sort-modal">
-  <Header title={jsonIsArray ? 'Sort array items' : 'Sort object keys'} {onClose} />
+  <Header title={jsonIsArray ? $t('sortArrayItems') : $t('sortObjectKeys')} {onClose} />
 
   <div class="jse-modal-contents">
     <table>
@@ -86,7 +87,7 @@
       </colgroup>
       <tbody>
         <tr>
-          <th>Path</th>
+          <th>{$t('path')}</th>
           <td>
             <input
               class="jse-path"
@@ -95,20 +96,20 @@
               title="Selected path"
               value={rootPath && !isEmpty(rootPath)
                 ? stringifyJSONPath(rootPath)
-                : '(document root)'}
+                : `(${$t('docRoot')})`}
             />
           </td>
         </tr>
         {#if jsonIsArray && properties && properties?.length > 1}
           <tr>
-            <th>Property</th>
+            <th>{$t('property')}</th>
             <td>
               <Select showChevron items={properties} bind:value={selectedProperty} />
             </td>
           </tr>
         {/if}
         <tr>
-          <th>Direction</th>
+          <th>{$t('direction')}</th>
           <td>
             <Select
               showChevron
@@ -137,7 +138,7 @@
         use:focus
         disabled={jsonIsArray && properties && properties?.length > 1 ? !selectedProperty : false}
       >
-        Sort
+        {$t('sort')}
       </button>
     </div>
   </div>

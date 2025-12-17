@@ -93,3 +93,33 @@ export function parseString(str: string): string | number | boolean | null | und
 
   return str
 }
+
+/**
+ * Replaces **all** occurrences of `needle` in the given string `str` with the provided `replacement`.
+ *
+ * This implementation avoids regular expressions and reliably handles cases where
+ * `needle` appears multiple times in a row or in overlapping regions.
+ *
+ * @param str - The source string to search within.
+ * @param needle - The substring to replace. If empty, the original string is returned unchanged.
+ * @param replacement - The string that replaces each occurrence of `needle`.
+ * @returns A new string with all occurrences of `needle` replaced by `replacement`.
+ */
+export function stringReplaceAll(str: string, needle: string, replacement: string): string {
+  if (needle === '') return str;
+
+  const res = [];
+  let start = 0;
+
+  while(true) {
+    const index = str.indexOf(needle, start)
+    if (index === -1 ) {
+      res.push(str.slice(start))
+      break;
+    }
+
+    res.push(str.slice(start, index), replacement);
+    start = index + needle.length;
+  }
+  return res.join('');
+}

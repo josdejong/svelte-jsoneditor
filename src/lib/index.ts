@@ -91,3 +91,6 @@ export * from './types.js'
 
 // typeguards
 export * from './typeguards.js'
+
+// languages
+export * from './i18n/locales'
