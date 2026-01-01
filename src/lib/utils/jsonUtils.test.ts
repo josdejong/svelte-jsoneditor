@@ -17,8 +17,11 @@ import {
   toJSONContent,
   toTextContent,
   validateContentType,
-  parseAndRepairOrUndefined
+  parseAndRepairOrUndefined,
+  findTextLocation,
+  findSelectionFromTextLocation
 } from './jsonUtils.js'
+import { createMultiSelection } from 'svelte-jsoneditor'
 
 const LosslessJSONParser = { parse, stringify }
 
@@ -437,6 +440,36 @@ describe('jsonUtils', () => {
       expect(parseAndRepairOrUndefined('[1,2][]', JSON)).toEqual(undefined)
       expect(parseAndRepairOrUndefined('hello world', JSON)).toEqual('hello world')
       // expect(parseAndRepairOrUndefined('0123', JSON)).toEqual('0123') // FIXME
+    })
+  })
+
+  describe('findTextLocation', () => {
+    // TODO: write more unit tests for findTextLocation
+    test('find a text location', () => {
+      const text = `{\n  "object": {\n    "a":2  \n}\n}`
+      const path = ['object', 'a']
+      expect(findTextLocation(text, path)).toEqual({
+        path,
+        line: 2,
+        column: 4,
+        from: 20,
+        to: 23
+      })
+    })
+  })
+
+  describe('findSelectionFromTextLocation', () => {
+    // TODO: write more unit tests for findSelectionFromTextLocation
+    test('find the path', () => {
+      const text = `{\n  "object": {\n    "a":2  \n}\n}`
+
+      expect(findSelectionFromTextLocation(text, 20, 20)).toEqual(
+        createMultiSelection(['object', 'a'], ['object', 'a'])
+      )
+
+      expect(findSelectionFromTextLocation(text, 23, 24)).toEqual(
+        createMultiSelection(['object', 'a'], ['object', 'a'])
+      )
     })
   })
 })
