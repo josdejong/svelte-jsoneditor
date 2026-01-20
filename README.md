@@ -302,13 +302,13 @@ tabSize: number
 
 When indentation is configured as a tab character (`indentation: '\t'`), `tabSize` configures how large a tab character is rendered. Default value is `4`. Only applicable to `text` mode.
 
-#### truncateNumberSize
+#### truncateTextSize
 
 ```ts
-truncateNumberSize: number
+truncateTextSize: number
 ```
 
-JSON values containing a string with a length greater than `truncateNumberSize` bytes will be truncated in `tree` mode and `table` mode. The text can be expanded by clicking the button "Show more" at the end of the string. The default value is `1000` bytes.
+JSON values containing a string with a length greater than `truncateTextSize` bytes will be truncated in `tree` mode and `table` mode. The text can be expanded by clicking the button "Show more" at the end of the string. The default value is `1000` bytes.
 
 #### escapeControlCharacters
 
