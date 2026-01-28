@@ -10,7 +10,6 @@
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
-  import { CONTEXT_MENU_EXPLANATION } from '$lib/constants.js'
   import { faJSONEditorCollapse, faJSONEditorExpand } from '$lib/img/customFontawesomeIcons.js'
   import { isObjectOrArray } from '$lib/utils/typeUtils.js'
   import Menu from '../../../controls/Menu.svelte'
@@ -22,6 +21,7 @@
     OnRenderMenuInternal
   } from '$lib/types'
   import { isKeySelection, isMultiSelection, isValueSelection } from '$lib/logic/selection.js'
+  import { t } from '$lib/i18n/index.js'
 
   export let json: unknown
   export let selection: JSONSelection | undefined
@@ -53,7 +53,7 @@
   $: expandMenuItem = {
     type: 'button',
     icon: faJSONEditorExpand,
-    title: 'Expand all',
+    title: $t('expandAll'),
     className: 'jse-expand-all',
     onClick: onExpandAll,
     disabled: !isObjectOrArray(json)
@@ -63,7 +63,7 @@
   $: collapseMenuItem = {
     type: 'button',
     icon: faJSONEditorCollapse,
-    title: 'Collapse all',
+    title: $t('collapseAll'),
     className: 'jse-collapse-all',
     onClick: onCollapseAll,
     disabled: !isObjectOrArray(json)
@@ -73,7 +73,7 @@
   $: searchMenuItem = {
     type: 'button',
     icon: faSearch,
-    title: 'Search (Ctrl+F)',
+    title: `${$t('search')} (Ctrl+F)`,
     className: 'jse-search',
     onClick: handleToggleSearch,
     disabled: json === undefined
@@ -90,7 +90,7 @@
         {
           type: 'button',
           icon: faSortAmountDownAlt,
-          title: 'Sort',
+          title: $t('sort'),
           className: 'jse-sort',
           onClick: onSort,
           disabled: readOnly || json === undefined
@@ -98,7 +98,7 @@
         {
           type: 'button',
           icon: faFilter,
-          title: 'Transform contents (filter, sort, project)',
+          title: $t('transformContents'),
           className: 'jse-transform',
           onClick: onTransform,
           disabled: readOnly || json === undefined
@@ -107,7 +107,7 @@
         {
           type: 'button',
           icon: faEllipsisV,
-          title: CONTEXT_MENU_EXPLANATION,
+          title: $t('contextMenuExplanation'),
           className: 'jse-contextmenu',
           onClick: onContextMenu
         },
@@ -117,7 +117,7 @@
         {
           type: 'button',
           icon: faUndo,
-          title: 'Undo (Ctrl+Z)',
+          title: $t('undo') + ' (Ctrl+Z)',
           className: 'jse-undo',
           onClick: onUndo,
           disabled: !history.canUndo
@@ -125,7 +125,7 @@
         {
           type: 'button',
           icon: faRedo,
-          title: 'Redo (Ctrl+Shift+Z)',
+          title: $t('redo') + ' (Ctrl+Shift+Z)',
           className: 'jse-redo',
           onClick: onRedo,
           disabled: !history.canRedo
@@ -143,7 +143,7 @@
         {
           type: 'button',
           icon: faCopy,
-          title: 'Copy (Ctrl+C)',
+          title: `${$t('copy')} (Ctrl+C)`,
           className: 'jse-copy',
           onClick: onCopy,
           disabled: !hasSelectionContents

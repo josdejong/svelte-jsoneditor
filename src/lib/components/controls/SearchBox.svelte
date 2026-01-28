@@ -24,6 +24,7 @@
     searchPrevious,
     updateSearchResult
   } from '$lib/logic/search.js'
+  import { t } from '$lib/i18n/index.js'
   import type { JSONPath } from 'immutable-json-patch'
   import { flushSync } from 'svelte'
 
@@ -284,7 +285,7 @@
         <button
           type="button"
           class="jse-replace-toggle"
-          title="Toggle visibility of replace options (Ctrl+H)"
+          title={$t('toggleReplaceOptions')}
           on:click={toggleShowReplace}
         >
           <Icon data={showReplace ? faCaretDown : faCaretRight} />
@@ -302,9 +303,9 @@
           <label class="jse-search-input-label" about="jse-search input">
             <input
               class="jse-search-input"
-              title="Enter text to search"
+              title={$t('enterTextSearch')}
               type="text"
-              placeholder="Find"
+              placeholder={$t('findPlaceholder')}
               bind:value={text}
               use:initSearchInput
               on:paste={handlePaste}
@@ -318,7 +319,7 @@
           <button
             type="button"
             class="jse-search-next"
-            title="Go to next search result (Enter)"
+            title={$t('nextResult')}
             on:click={handleNext}
           >
             <Icon data={faChevronDown} />
@@ -326,7 +327,7 @@
           <button
             type="button"
             class="jse-search-previous"
-            title="Go to previous search result (Shift+Enter)"
+            title={$t('prevResult')}
             on:click={handlePrevious}
           >
             <Icon data={faChevronUp} />
@@ -334,7 +335,7 @@
           <button
             type="button"
             class="jse-search-clear"
-            title="Close search box (Esc)"
+            title={$t('closeSearch')}
             on:click={handleClose}
           >
             <Icon data={faTimes} />
@@ -344,19 +345,17 @@
           <div class="jse-replace-section">
             <input
               class="jse-replace-input"
-              title="Enter replacement text"
+              title={$t('enterReplaceText')}
               type="text"
-              placeholder="Replace"
+              placeholder={$t('replace')}
               bind:value={replaceText}
               on:keydown={handleReplaceKeyDown}
             />
-            <button
-              type="button"
-              title="Replace current occurrence (Ctrl+Enter)"
-              on:click={handleReplace}>Replace</button
+            <button type="button" title={$t('replaceCtrlEnter')} on:click={handleReplace}
+              >{$t('replace')}</button
             >
-            <button type="button" title="Replace all occurrences" on:click={handleReplaceAll}
-              >All</button
+            <button type="button" title={$t('replaceAllTitle')} on:click={handleReplaceAll}
+              >{$t('replaceAll')}</button
             >
           </div>
         {/if}

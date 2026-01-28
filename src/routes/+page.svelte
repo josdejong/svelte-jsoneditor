@@ -50,6 +50,9 @@
     <li>
       <a href="examples/switch_themes">Switch themes (dark theme) and font size</a>
     </li>
+    <li>
+      <a href="examples/switch_language">Switch language (i18n)</a>
+    </li>
   </ul>
 
   <h2>Development</h2>

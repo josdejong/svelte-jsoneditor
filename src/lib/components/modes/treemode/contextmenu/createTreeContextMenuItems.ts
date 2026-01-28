@@ -32,6 +32,7 @@ import type {
   JSONSelection,
   ContextMenuItem
 } from '$lib/types'
+import { tString } from '$lib/i18n'
 import { initial, isEmpty } from 'lodash-es'
 import { getIn } from 'immutable-json-patch'
 import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
@@ -83,10 +84,10 @@ export default function ({
   const rootSelected = selection ? isEmpty(getFocusPath(selection)) : false
   const focusValue = selection ? getIn(json, getFocusPath(selection)) : undefined
   const editValueText = Array.isArray(focusValue)
-    ? 'Edit array'
+    ? tString('editArray')
     : isObject(focusValue)
-      ? 'Edit object'
-      : 'Edit value'
+      ? tString('editObject')
+      : tString('editValue')
 
   const hasSelectionContents =
     hasJson &&
@@ -114,7 +115,7 @@ export default function ({
     !rootSelected // must not be root
 
   const convertMode = hasSelectionContents
-  const insertOrConvertText = convertMode ? 'Convert to:' : 'Insert:'
+  const insertOrConvertText = convertMode ? `${tString('convertTo')}:` : `${tString('insert')}:`
 
   const canInsertOrConvertStructure =
     !readOnly &&
@@ -148,8 +149,8 @@ export default function ({
           type: 'button',
           onClick: () => onEditKey(),
           icon: faPen,
-          text: 'Edit key',
-          title: 'Edit the key (Double-click on the key)',
+          text: tString('editKey'),
+          title: `${tString('editTheKey')} (Double-click on the key)`,
           disabled: !canEditKey
         },
         {
@@ -159,7 +160,7 @@ export default function ({
             onClick: () => onEditValue(),
             icon: faPen,
             text: editValueText,
-            title: 'Edit the value (Double-click on the value)',
+            title: `${tString('editValue')} (Double-click on the value)`,
             disabled: !canEditValue
           },
           width: '11em',
@@ -168,15 +169,15 @@ export default function ({
               type: 'button',
               icon: faPen,
               text: editValueText,
-              title: 'Edit the value (Double-click on the value)',
+              title: `${tString('editValue')} (Double-click on the value)`,
               onClick: () => onEditValue(),
               disabled: !canEditValue
             },
             {
               type: 'button',
               icon: enforceString ? faCheckSquare : faSquare,
-              text: 'Enforce string',
-              title: 'Enforce keeping the value as string when it contains a numeric value',
+              text: tString('enforceString'),
+              title: tString('enforceKeepingTheValue'),
               onClick: () => onToggleEnforceString(),
               disabled: !canEnforceString
             }
@@ -194,8 +195,8 @@ export default function ({
             type: 'button',
             onClick: () => onCut(true),
             icon: faCut,
-            text: 'Cut',
-            title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
+            text: tString('cut'),
+            title: `${tString('cutFormattedTitle')} (Ctrl+X)`,
             disabled: !canCut
           },
           width: '10em',
@@ -203,16 +204,16 @@ export default function ({
             {
               type: 'button',
               icon: faCut,
-              text: 'Cut formatted',
-              title: 'Cut selected contents, formatted with indentation (Ctrl+X)',
+              text: tString('cutFormatted'),
+              title: `${tString('cutFormattedTitle')} (Ctrl+X)`,
               onClick: () => onCut(true),
               disabled: !canCut
             },
             {
               type: 'button',
               icon: faCut,
-              text: 'Cut compacted',
-              title: 'Cut selected contents, without indentation (Ctrl+Shift+X)',
+              text: tString('copyCompacted'),
+              title: `${tString('cutCompactedTitle')} (Ctrl+Shift+X)`,
               onClick: () => onCut(false),
               disabled: !canCut
             }
@@ -224,8 +225,8 @@ export default function ({
             type: 'button',
             onClick: () => onCopy(true),
             icon: faCopy,
-            text: 'Copy',
-            title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
+            text: tString('copy'),
+            title: `${tString('copyWithIndent')} (Ctrl+C)`,
             disabled: !canCopy
           },
           width: '12em',
@@ -233,16 +234,16 @@ export default function ({
             {
               type: 'button',
               icon: faCopy,
-              text: 'Copy formatted',
-              title: 'Copy selected contents, formatted with indentation (Ctrl+C)',
+              text: tString('copyCompacted'),
+              title: `${tString('copyWithIndent')} (Ctrl+C)`,
               onClick: () => onCopy(true),
               disabled: !canCopy
             },
             {
               type: 'button',
               icon: faCopy,
-              text: 'Copy compacted',
-              title: 'Copy selected contents, without indentation (Ctrl+Shift+C)',
+              text: tString('copyCompacted'),
+              title: `${tString('copyWithoutIndent')} (Ctrl+Shift+C)`,
               onClick: () => onCopy(false),
               disabled: !canCopy
             }
@@ -252,8 +253,8 @@ export default function ({
           type: 'button',
           onClick: () => onPaste(),
           icon: faPaste,
-          text: 'Paste',
-          title: 'Paste clipboard contents (Ctrl+V)',
+          text: tString('paste'),
+          title: `${tString('pasteTitle')} (Ctrl+V)`,
           disabled: !canPaste
         }
       ]
@@ -269,40 +270,40 @@ export default function ({
               type: 'button',
               onClick: () => onDuplicate(),
               icon: faClone,
-              text: 'Duplicate',
-              title: 'Duplicate selected contents (Ctrl+D)',
+              text: tString('duplicate'),
+              title: tString('duplicateSelectedContents') + '(Ctrl+D)',
               disabled: !canDuplicate
             },
             {
               type: 'button',
               onClick: () => onExtract(),
               icon: faCropAlt,
-              text: 'Extract',
-              title: 'Extract selected contents',
+              text: tString('Extract'),
+              title: tString('extractSelectedContent'),
               disabled: !canExtract
             },
             {
               type: 'button',
               onClick: () => onSort(),
               icon: faSortAmountDownAlt,
-              text: 'Sort',
-              title: 'Sort array or object contents',
+              text: tString('sort'),
+              title: tString('sortArrayOrObject'),
               disabled: readOnly || !hasSelectionContents
             },
             {
               type: 'button',
               onClick: () => onTransform(),
               icon: faFilter,
-              text: 'Transform',
-              title: 'Transform array or object contents (filter, sort, project)',
+              text: tString('transform'),
+              title: tString('transformArrayOrObject'),
               disabled: readOnly || !hasSelectionContents
             },
             {
               type: 'button',
               onClick: () => onRemove(),
               icon: faTrashCan,
-              text: 'Remove',
-              title: 'Remove selected contents (Delete)',
+              text: tString('remove'),
+              title: `${tString('removeSelected')} (Delete)`,
               disabled: readOnly || !hasSelectionContents
             }
           ]
@@ -315,32 +316,32 @@ export default function ({
               type: 'button',
               onClick: () => handleInsertOrConvert('structure'),
               icon: convertMode ? faArrowRightArrowLeft : faPlus,
-              text: 'Structure',
-              title: insertOrConvertText + ' structure like the first item in the array',
+              text: tString('structure'),
+              title: insertOrConvertText + tString('structureTitle'),
               disabled: !canInsertOrConvertStructure
             },
             {
               type: 'button',
               onClick: () => handleInsertOrConvert('object'),
               icon: convertMode ? faArrowRightArrowLeft : faPlus,
-              text: 'Object',
-              title: insertOrConvertText + ' object',
+              text: tString('object'),
+              title: insertOrConvertText + ` ${tString('object').toLowerCase()}`,
               disabled: !canInsertOrConvertObject
             },
             {
               type: 'button',
               onClick: () => handleInsertOrConvert('array'),
               icon: convertMode ? faArrowRightArrowLeft : faPlus,
-              text: 'Array',
-              title: insertOrConvertText + ' array',
+              text: tString('array'),
+              title: insertOrConvertText + ` ${tString('array').toLowerCase()}`,
               disabled: !canInsertOrConvertArray
             },
             {
               type: 'button',
               onClick: () => handleInsertOrConvert('value'),
               icon: convertMode ? faArrowRightArrowLeft : faPlus,
-              text: 'Value',
-              title: insertOrConvertText + ' value',
+              text: tString('value'),
+              title: insertOrConvertText + ` ${tString('value').toLowerCase()}`,
               disabled: !canInsertOrConvertValue
             }
           ]
@@ -357,16 +358,16 @@ export default function ({
           type: 'button',
           onClick: () => onInsertBefore(),
           icon: faCaretSquareUp,
-          text: 'Insert before',
-          title: 'Select area before current entry to insert or paste contents',
+          text: tString('insertBefore'),
+          title: tString('selectAreaBeforeCurrentEntry'),
           disabled: readOnly || !hasSelectionContents || rootSelected
         },
         {
           type: 'button',
           onClick: () => onInsertAfter(),
           icon: faCaretSquareDown,
-          text: 'Insert after',
-          title: 'Select area after current entry to insert or paste contents',
+          text: tString('insertAfter'),
+          title: tString('selectAreaAfterCurrentEntry'),
           disabled: readOnly || !hasSelectionContents || rootSelected
         }
       ]

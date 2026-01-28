@@ -5,6 +5,7 @@
   import { Mode } from '$lib/types.js'
   import { valueType } from '$lib/utils/typeUtils.js'
   import { findNestedArrays } from '$lib/logic/table.js'
+  import { t } from '$lib/i18n'
   import { isEmpty } from 'lodash-es'
   import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
 
@@ -42,14 +43,14 @@
 
   const documentType = $derived(
     hasNestedArrays
-      ? 'Object with nested arrays'
+      ? $t('objectWithNestedArrays')
       : isEmptyDocument
-        ? 'An empty document'
+        ? $t('emptyDocument')
         : isJSONObject(json)
-          ? 'An object'
+          ? $t('anObject')
           : isJSONArray(json)
-            ? 'An empty array' // note: can also be an array with objects but without properties
-            : `A ${valueType(json, parser)}`
+            ? $t('emptyArray') // note: can also be an array with objects but without properties
+            : $t('withValueType', { valueType: valueType(json, parser) })
   )
 
   function countItems(nestedArrayPath: JSONPath): number {
@@ -64,13 +65,11 @@
     <div class="jse-nested-arrays-title">{documentType}</div>
     <div class="jse-nested-arrays-info">
       {#if hasNestedArrays}
-        An object cannot be opened in table mode. You can open a nested array instead, or open the
-        document in tree mode.
+        {$t('objectCannotBeOpened')}
       {:else if isEmptyDocument && !readOnly}
-        An empty document cannot be opened in table mode. You can go to tree mode instead, or paste
-        a JSON Array using <b>Ctrl+V</b>.
+        {$t('emptyDocCannotBeOpened')} <b>Ctrl+V</b>.
       {:else}
-        {documentType} cannot be opened in table mode. You can open the document in tree mode instead.
+        {$t('docCannotBeOpened', { doc: documentType })}
       {/if}
     </div>
     {#each nestedArrayPaths as nestedArrayPath}
@@ -87,7 +86,7 @@
           class="jse-nested-array-action"
           onclick={() => openJSONEditorModal(nestedArrayPath)}
         >
-          {readOnly ? 'View' : 'Edit'}
+          {readOnly ? $t('View') : $t('Edit')}
         </button>
         {#if !readOnly}
           <button
@@ -95,13 +94,13 @@
             class="jse-nested-array-action"
             onclick={() => extractPath(nestedArrayPath)}
           >
-            Extract
+            {$t('Extract')}
           </button>
         {/if}
       </div>
     {/each}
     <button type="button" class="jse-nested-array-action" onclick={() => onChangeMode(Mode.tree)}>
-      Switch to tree mode
+      {$t('switchToTextMode')}
     </button>
   </div>
 

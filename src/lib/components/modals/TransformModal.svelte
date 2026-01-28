@@ -34,6 +34,7 @@
   import Modal from './Modal.svelte'
   import { onMount } from 'svelte'
   import { createHistoryInstance } from '$lib/logic/history'
+  import { t } from '$lib/i18n'
 
   const debug = createDebug('jsoneditor:TransformModal')
 
@@ -256,7 +257,7 @@
         <div class="jse-main-contents">
           <div class="jse-query-contents">
             <div class="jse-label">
-              <div class="jse-label-inner">Language</div>
+              <div class="jse-label-inner">{$t('language')}</div>
             </div>
             <div class="jse-description">
               <!-- eslint-disable-next-line svelte/no-at-html-tags -->
@@ -264,21 +265,21 @@
             </div>
 
             <div class="jse-label">
-              <div class="jse-label-inner">Path</div>
+              <div class="jse-label-inner">{$t('path')}</div>
             </div>
             <input
               class="jse-path"
               type="text"
               readonly
-              title="Selected path"
-              value={!isEmpty(rootPath) ? stringifyJSONPath(rootPath) : '(document root)'}
+              title={$t('selectedPath')}
+              value={!isEmpty(rootPath) ? stringifyJSONPath(rootPath) : `(${$t('docRoot')})`}
             />
 
             <div class="jse-label">
               <div class="jse-label-inner">
                 <button type="button" on:click={toggleShowWizard}>
                   <Icon data={showWizard ? faCaretDown : faCaretRight} />
-                  Wizard
+                  {$t('wizard')}
                 </button>
               </div>
             </div>
@@ -295,12 +296,12 @@
                   </div>
                 {/if}
               {:else}
-                (Only available for arrays, not for objects)
+                ({$t('wizardInfo')})
               {/if}
             {/if}
 
             <div class="jse-label">
-              <div class="jse-label-inner">Query</div>
+              <div class="jse-label-inner">{$t('query')}</div>
             </div>
             <textarea
               bind:this={refQueryInput}
@@ -315,7 +316,7 @@
                 <div class="jse-label-inner">
                   <button type="button" on:click={toggleShowOriginal}>
                     <Icon data={showOriginal ? faCaretDown : faCaretRight} />
-                    Original
+                    {$t('original')}
                   </button>
                 </div>
               </div>
@@ -356,7 +357,7 @@
             </div>
             <div class="jse-preview-data">
               <div class="jse-label">
-                <div class="jse-label-inner">Preview</div>
+                <div class="jse-label-inner">{$t('preview')}</div>
               </div>
               {#if !previewError}
                 <TreeMode
@@ -408,7 +409,7 @@
             use:focus
             disabled={!!previewError}
           >
-            Transform
+            {$t('transform')}
           </button>
         </div>
       </div>

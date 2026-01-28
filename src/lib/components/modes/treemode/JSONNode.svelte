@@ -11,8 +11,8 @@
     HOVER_COLLECTION,
     HOVER_INSERT_AFTER,
     HOVER_INSERT_INSIDE,
-    INSERT_EXPLANATION
   } from '$lib/constants.js'
+  import { t } from '$lib/i18n'
   import { getEnforceString, getVisibleCaretPositions } from '$lib/logic/documentState.js'
   import { rename } from '$lib/logic/operations.js'
   import {
@@ -619,14 +619,14 @@
               <div class="jse-bracket">[</div>
               <Tag>
                 {value.length}
-                {value.length === 1 ? 'item' : 'items'}
+                {value.length === 1 ? $t('item') : $t('items')}
               </Tag>
               &nbsp;
             {:else}
               <div class="jse-bracket">[</div>
               <Tag onclick={handleExpand}>
                 {value.length}
-                {value.length === 1 ? 'item' : 'items'}
+                {value.length === 1 ? $t('item') : $t('items')}
               </Tag>
               <div class="jse-bracket">]</div>
             {/if}
@@ -666,7 +666,7 @@
             class:jse-selected={isNodeSelected && isInsideSelection(selection)}
             data-type="insert-selection-area-inside"
             style:--level={path.length + 1}
-            title={INSERT_EXPLANATION}
+            title={$t('insertExplanation')}
           >
             <ContextMenuPointer
               insert={true}
@@ -798,7 +798,7 @@
             class:jse-selected={isNodeSelected && isInsideSelection(selection)}
             data-type="insert-selection-area-inside"
             style:--level={path.length + 1}
-            title={INSERT_EXPLANATION}
+            title={$t('insertExplanation')}
           >
             <ContextMenuPointer
               insert={true}
@@ -910,7 +910,7 @@
       class:jse-hovered={hover === HOVER_INSERT_AFTER}
       class:jse-selected={isNodeSelected && isAfterSelection(selection)}
       data-type="insert-selection-area-after"
-      title={INSERT_EXPLANATION}
+      title={$t('insertExplanation')}
     >
       <ContextMenuPointer
         insert={true}
