@@ -19,7 +19,6 @@
     JSON_STATUS_REPAIRABLE,
     JSON_STATUS_VALID,
     MAX_CHARACTERS_TEXT_PREVIEW,
-    MAX_DOCUMENT_SIZE_TEXT_MODE,
     TEXT_MODE_ONCHANGE_DELAY
   } from '$lib/constants.js'
   import {
@@ -145,6 +144,7 @@
   export let indentation: number | string
   export let tabSize: number
   export let escapeUnicodeCharacters: boolean
+  export let maxDocumentSize: number
   export let parser: JSONParser
   export let validator: Validator | undefined
   export let validationParser: JSONParser
@@ -1234,7 +1234,7 @@
   }
 
   function disableTextEditor(text: string, acceptTooLarge: boolean): boolean {
-    const tooLarge = text ? text.length > MAX_DOCUMENT_SIZE_TEXT_MODE : false
+    const tooLarge = text ? text.length > maxDocumentSize : false
     return tooLarge && !acceptTooLarge
   }
 
@@ -1374,7 +1374,7 @@
       <Message
         icon={faExclamationTriangle}
         type="error"
-        message={`The JSON document is larger than ${formatSize(MAX_DOCUMENT_SIZE_TEXT_MODE)}, ` +
+        message={`The JSON document is larger than ${formatSize(maxDocumentSize)}, ` +
           `and may crash your browser when loading it in text mode. Actual size: ${formatSize(text.length)}.`}
         actions={[
           {

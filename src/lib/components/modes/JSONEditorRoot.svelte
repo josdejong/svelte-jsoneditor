@@ -55,6 +55,7 @@
   export let askToFormat: boolean
   export let escapeControlCharacters: boolean
   export let escapeUnicodeCharacters: boolean
+  export let maxDocumentSizeTextMode: number
   export let flattenColumns: boolean
   export let parser: JSONParser
   export let parseMemoizeOne: JSONParser['parse']
@@ -348,6 +349,7 @@
     {statusBar}
     {askToFormat}
     {escapeUnicodeCharacters}
+    maxDocumentSize={maxDocumentSizeTextMode}
     {parser}
     {validator}
     {validationParser}
