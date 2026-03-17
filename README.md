@@ -412,6 +412,14 @@ pathParser: JSONPathParser
 
 An optional object with a parse and stringify method to parse and stringify a `JSONPath`, which is an array with property names. The `pathParser` is used in the path editor in the navigation bar, which is opened by clicking the edit button on the right side of the navigation bar. The `pathParser.parse` function is allowed to throw an Error when the input is invalid. By default, a JSON Path notation is used, which looks like `$.data[2].nested.property`. Alternatively, it is possible to use for example a JSON Pointer notation like `/data/2/nested/property` or something custom-made. Related helper functions: `parseJSONPath` and `stringifyJSONPath`, `parseJSONPointer` and `compileJSONPointer`.
 
+#### maxDocumentSizeTextMode
+
+```ts
+maxDocumentSizeTextMode: number
+```
+
+In `text` mode, JSON documents with a total length greater than `maxDocumentSizeTextMode` will not be shown. Instead, a warning will be displayed indicating that the browser may crash if it attempts to load the document. The user can then choose to override the warning and open the document anyway, open the document in the lighter `tree` mode instead, or cancel. The default value is `10 * 1024 * 1024` bytes (10MB).
+
 #### onError
 
 ```ts
