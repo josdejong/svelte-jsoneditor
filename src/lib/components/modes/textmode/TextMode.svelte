@@ -267,7 +267,7 @@
     try {
       codeMirrorView = createCodeMirrorView({
         target: codeMirrorRef,
-        initialText: !disableTextEditor(text, acceptTooLarge)
+        initialText: !disableTextEditor(text, maxDocumentSize, acceptTooLarge)
           ? normalization.escapeValue(text)
           : '',
         readOnly,
@@ -1031,7 +1031,7 @@
     content = newContent
     text = newText
 
-    if (!disableTextEditor(text, acceptTooLarge)) {
+    if (!disableTextEditor(text, maxDocumentSize, acceptTooLarge)) {
       // keep state
       // to reset state: codeMirrorView.setState(EditorState.create({doc: text, extensions: ...}))
       codeMirrorView.dispatch({
@@ -1233,7 +1233,7 @@
     }
   }
 
-  function disableTextEditor(text: string, acceptTooLarge: boolean): boolean {
+  function disableTextEditor(text: string, maxDocumentSize: number, acceptTooLarge: boolean): boolean {
     const tooLarge = text ? text.length > maxDocumentSize : false
     return tooLarge && !acceptTooLarge
   }
@@ -1243,7 +1243,7 @@
   let jsonParseError: ParseError | undefined
 
   function linterCallback(): Diagnostic[] {
-    if (disableTextEditor(text, acceptTooLarge)) {
+    if (disableTextEditor(text, maxDocumentSize, acceptTooLarge)) {
       return []
     }
 
@@ -1366,7 +1366,7 @@
     </div>
   {/if}
   {#if !isSSR}
-    {@const editorDisabled = disableTextEditor(text, acceptTooLarge)}
+    {@const editorDisabled = disableTextEditor(text, maxDocumentSize, acceptTooLarge)}
 
     <div class="jse-contents" class:jse-hidden={editorDisabled} bind:this={codeMirrorRef}></div>
 
