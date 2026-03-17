@@ -3,8 +3,7 @@
 
   const maxDocumentSizeTextMode = 10 * 1024 * 1024
 
-  let content = $state({
-    text:
+  let text = $state(
       '{\n' +
       '  "array": [1, 2, 3],\n' +
       '  "boolean": true,\n' +
@@ -14,7 +13,7 @@
       '  "object": { "a": "b", "c": "d" },\n' +
       '  "string": "Hello World"\n' +
       '}'
-  })
+  )
 </script>
 
 <svelte:head>
@@ -26,11 +25,11 @@
 <p>Use JSONEditor in read-only mode, content in this example is supplied by a separate textarea:</p>
 
 <div>
-  <textarea bind:value={content.text} style="width: 700px; height: 200px"></textarea>
+  <textarea bind:value={text} style="width: 700px; height: 200px"></textarea>
 </div>
 
 <div class="editor">
-  <JSONEditor {content} readOnly="true" mode="text" {maxDocumentSizeTextMode} />
+  <JSONEditor content={{ text }} readOnly="true" mode="text" {maxDocumentSizeTextMode} />
 </div>
 
 <style>
