@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { computeJsonDiff } from '../../logic/diff.js'
+  import {
+    computeJsonDiff,
+    pruneToChanges,
+    getKeyDiffSummary,
+    type KeyInfo
+  } from '../../logic/diff.js'
   import DiffPanel from './DiffPanel.svelte'
   import DiffControls from './DiffControls.svelte'
   import JSONEditor from '../JSONEditor.svelte'
@@ -15,11 +20,83 @@
   let { leftJson, rightJson, leftLabel = 'Left', rightLabel = 'Right' }: Props = $props()
 
   let activeTab: 'diff' | 'tree' = $state('diff')
-  let changesOnly = $state(false)
+  let changesOnly = $state(true)
+  let selectedKey = $state('__all__')
   let activeChangeIndex = $state(0)
 
-  // Reactive diff computation
-  let diff = $derived(computeJsonDiff(leftJson, rightJson))
+  // Key summary for the selector
+  let keyInfos: KeyInfo[] = $derived.by(() => {
+    if (
+      leftJson &&
+      typeof leftJson === 'object' &&
+      !Array.isArray(leftJson) &&
+      rightJson &&
+      typeof rightJson === 'object' &&
+      !Array.isArray(rightJson)
+    ) {
+      return getKeyDiffSummary(
+        leftJson as Record<string, unknown>,
+        rightJson as Record<string, unknown>
+      )
+    }
+    return []
+  })
+
+  // Effective data: filter by key, then optionally prune
+  let effectiveLeft = $derived.by(() => {
+    let data = leftJson
+    if (
+      selectedKey !== '__all__' &&
+      data &&
+      typeof data === 'object' &&
+      !Array.isArray(data)
+    ) {
+      const obj = data as Record<string, unknown>
+      data = selectedKey in obj ? { [selectedKey]: obj[selectedKey] } : {}
+    }
+    if (changesOnly && data && typeof data === 'object' && !Array.isArray(data)) {
+      const right =
+        selectedKey !== '__all__' && rightJson && typeof rightJson === 'object' && !Array.isArray(rightJson)
+          ? (selectedKey in (rightJson as Record<string, unknown>)
+              ? { [selectedKey]: (rightJson as Record<string, unknown>)[selectedKey] }
+              : {})
+          : rightJson
+      return pruneToChanges(
+        data as Record<string, unknown>,
+        (right ?? {}) as Record<string, unknown>
+      )[0]
+    }
+    return data
+  })
+
+  let effectiveRight = $derived.by(() => {
+    let data = rightJson
+    if (
+      selectedKey !== '__all__' &&
+      data &&
+      typeof data === 'object' &&
+      !Array.isArray(data)
+    ) {
+      const obj = data as Record<string, unknown>
+      data = selectedKey in obj ? { [selectedKey]: obj[selectedKey] } : {}
+    }
+    if (changesOnly && data && typeof data === 'object' && !Array.isArray(data)) {
+      const left =
+        selectedKey !== '__all__' && leftJson && typeof leftJson === 'object' && !Array.isArray(leftJson)
+          ? (selectedKey in (leftJson as Record<string, unknown>)
+              ? { [selectedKey]: (leftJson as Record<string, unknown>)[selectedKey] }
+              : {})
+          : leftJson
+      return pruneToChanges(
+        (left ?? {}) as Record<string, unknown>,
+        data as Record<string, unknown>
+      )[1]
+    }
+    return data
+  })
+
+  // Reactive diff on the effective (possibly pruned) data
+  let diff = $derived(computeJsonDiff(effectiveLeft, effectiveRight))
 
   // Indices of change lines (non-equal) in the aligned arrays
   let changeIndices = $derived.by(() => {
@@ -82,12 +159,11 @@
 
   // Reset navigation when diff changes
   $effect(() => {
-    // Access diff to track it
     diff
     activeChangeIndex = 0
   })
 
-  // Content for tree mode
+  // Content for tree mode (always full data, not pruned)
   let leftContent = $derived({ json: leftJson })
   let rightContent = $derived({ json: rightJson })
 </script>
@@ -110,6 +186,20 @@
         Tree
       </button>
     </div>
+
+    {#if keyInfos.length > 0}
+      <div class="key-selector">
+        <label for="key-select">Key:</label>
+        <select id="key-select" bind:value={selectedKey}>
+          <option value="__all__">All keys</option>
+          {#each keyInfos as ki}
+            <option value={ki.key}>
+              {ki.key}{ki.status === 'added' ? ' [NEW]' : ki.status === 'removed' ? ' [REMOVED]' : ki.status === 'modified' ? ' *' : ''}
+            </option>
+          {/each}
+        </select>
+      </div>
+    {/if}
   </div>
 
   {#if activeTab === 'diff'}
@@ -121,7 +211,7 @@
         side="left"
         currentChangeIndex={activeChangeIndex}
         {changeIndices}
-        {changesOnly}
+        changesOnly={false}
         onscroll={handleLeftScroll}
       />
 
@@ -141,7 +231,7 @@
         side="right"
         currentChangeIndex={activeChangeIndex}
         {changeIndices}
-        {changesOnly}
+        changesOnly={false}
         onscroll={handleRightScroll}
       />
     </div>
@@ -175,6 +265,7 @@
   .diff-toolbar {
     display: flex;
     align-items: center;
+    gap: 16px;
     padding: 8px 12px;
     border-bottom: 1px solid var(--jse-diff-border-color, #d1d9e0);
     background: var(--jse-diff-toolbar-bg, #f6f8fa);
@@ -208,6 +299,27 @@
     background: var(--jse-diff-tab-active-bg, #ffffff);
     color: var(--jse-diff-tab-active-color, #1f2328);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  }
+
+  .key-selector {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+
+  .key-selector label {
+    font-size: 13px;
+    color: var(--jse-diff-label-color, #636c76);
+  }
+
+  .key-selector select {
+    padding: 4px 8px;
+    border: 1px solid var(--jse-diff-border-color, #d1d9e0);
+    border-radius: 4px;
+    font-size: 13px;
+    background: #fff;
+    color: var(--jse-diff-tab-active-color, #1f2328);
   }
 
   .diff-container {

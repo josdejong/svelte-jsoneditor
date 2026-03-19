@@ -1,5 +1,9 @@
 import diffSequence from '../generated/diffSequence.js'
 
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
 export type DiffLineType = 'equal' | 'added' | 'removed' | 'modified'
 
 export interface WordDiff {
@@ -19,6 +23,142 @@ export interface DiffResult {
   rightLines: DiffLine[]
   changeCount: number
 }
+
+// ---------------------------------------------------------------------------
+// Pruning — strip unchanged entries so the diff only processes what changed
+// ---------------------------------------------------------------------------
+
+/**
+ * Deep equality check for arbitrary JSON values.
+ */
+export function deepEqual(a: unknown, b: unknown): boolean {
+  if (a === b) return true
+  if (a == null || b == null) return false
+  if (typeof a !== typeof b) return false
+  if (typeof a !== 'object') return false
+
+  if (Array.isArray(a)) {
+    if (!Array.isArray(b) || a.length !== b.length) return false
+    return a.every((v, i) => deepEqual(v, (b as unknown[])[i]))
+  }
+
+  if (Array.isArray(b)) return false
+
+  const aObj = a as Record<string, unknown>
+  const bObj = b as Record<string, unknown>
+  const aKeys = Object.keys(aObj).sort()
+  const bKeys = Object.keys(bObj).sort()
+  if (aKeys.length !== bKeys.length) return false
+  return aKeys.every((k, i) => k === bKeys[i] && deepEqual(aObj[k], bObj[k]))
+}
+
+/**
+ * For arrays of objects with `id` fields, keep only entries that differ.
+ */
+function pruneIdArray(
+  baseArr: Array<Record<string, unknown>>,
+  headArr: Array<Record<string, unknown>>
+): [Array<Record<string, unknown>>, Array<Record<string, unknown>>] {
+  const baseIdx = new Map<unknown, Record<string, unknown>>()
+  const headIdx = new Map<unknown, Record<string, unknown>>()
+  for (const e of baseArr) if (e && typeof e === 'object' && 'id' in e) baseIdx.set(e.id, e)
+  for (const e of headArr) if (e && typeof e === 'object' && 'id' in e) headIdx.set(e.id, e)
+
+  const allIds = [...new Set([...baseIdx.keys(), ...headIdx.keys()])].sort()
+  const prunedBase: Array<Record<string, unknown>> = []
+  const prunedHead: Array<Record<string, unknown>> = []
+
+  for (const id of allIds) {
+    const bv = baseIdx.get(id)
+    const hv = headIdx.get(id)
+    if (!bv) {
+      prunedHead.push(hv!)
+    } else if (!hv) {
+      prunedBase.push(bv)
+    } else if (!deepEqual(bv, hv)) {
+      prunedBase.push(bv)
+      prunedHead.push(hv)
+    }
+  }
+
+  return [prunedBase, prunedHead]
+}
+
+/**
+ * Return pruned copies of two objects containing only changed top-level keys.
+ * For array values with id-bearing objects, prunes at the entry level too.
+ */
+export function pruneToChanges(
+  base: Record<string, unknown> | null | undefined,
+  head: Record<string, unknown> | null | undefined
+): [Record<string, unknown>, Record<string, unknown>] {
+  const b = base ?? {}
+  const h = head ?? {}
+  const allKeys = [...new Set([...Object.keys(b), ...Object.keys(h)])].sort()
+
+  const prunedBase: Record<string, unknown> = {}
+  const prunedHead: Record<string, unknown> = {}
+
+  for (const key of allKeys) {
+    const bv = b[key]
+    const hv = h[key]
+
+    if (deepEqual(bv, hv)) continue
+
+    if (!(key in b)) {
+      prunedHead[key] = hv
+    } else if (!(key in h)) {
+      prunedBase[key] = bv
+    } else if (
+      Array.isArray(bv) &&
+      Array.isArray(hv) &&
+      bv.length > 0 &&
+      typeof bv[0] === 'object' &&
+      bv[0] !== null &&
+      'id' in bv[0]
+    ) {
+      const [pb, ph] = pruneIdArray(
+        bv as Array<Record<string, unknown>>,
+        hv as Array<Record<string, unknown>>
+      )
+      prunedBase[key] = pb
+      prunedHead[key] = ph
+    } else {
+      prunedBase[key] = bv
+      prunedHead[key] = hv
+    }
+  }
+
+  return [prunedBase, prunedHead]
+}
+
+/**
+ * List all top-level keys with their change status.
+ */
+export interface KeyInfo {
+  key: string
+  status: 'equal' | 'added' | 'removed' | 'modified'
+}
+
+export function getKeyDiffSummary(
+  base: Record<string, unknown> | null | undefined,
+  head: Record<string, unknown> | null | undefined
+): KeyInfo[] {
+  const b = base ?? {}
+  const h = head ?? {}
+  const allKeys = [...new Set([...Object.keys(b), ...Object.keys(h)])].sort()
+
+  return allKeys.map((key) => {
+    if (!(key in b)) return { key, status: 'added' as const }
+    if (!(key in h)) return { key, status: 'removed' as const }
+    if (!deepEqual(b[key], h[key])) return { key, status: 'modified' as const }
+    return { key, status: 'equal' as const }
+  })
+}
+
+// ---------------------------------------------------------------------------
+// Diff computation
+// ---------------------------------------------------------------------------
 
 /**
  * Compute a side-by-side diff of two JSON values.

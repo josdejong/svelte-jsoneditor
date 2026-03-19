@@ -121,7 +121,7 @@
 
 <p>{subtitle}</p>
 
-{#if fileEntries.length > 1}
+{#if fileEntries.length > 0}
   <div class="file-tabs">
     {#each fileEntries as entry, i}
       <button

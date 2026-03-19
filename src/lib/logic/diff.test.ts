@@ -1,6 +1,13 @@
 import { test, describe } from 'vitest'
 import assert from 'assert'
-import { computeJsonDiff, computeWordDiff, tokenize } from './diff.js'
+import {
+  computeJsonDiff,
+  computeWordDiff,
+  deepEqual,
+  getKeyDiffSummary,
+  pruneToChanges,
+  tokenize
+} from './diff.js'
 
 describe('diff', () => {
   describe('computeJsonDiff', () => {
@@ -147,6 +154,117 @@ describe('diff', () => {
     test('should return all equal for identical lines', () => {
       const diffs = computeWordDiff('  "name": "Alice"', '  "name": "Alice"', 'removed')
       assert.ok(diffs.every((d) => d.type === 'equal'))
+    })
+  })
+
+  describe('deepEqual', () => {
+    test('should return true for identical primitives', () => {
+      assert.ok(deepEqual(1, 1))
+      assert.ok(deepEqual('a', 'a'))
+      assert.ok(deepEqual(null, null))
+      assert.ok(deepEqual(true, true))
+    })
+
+    test('should return false for different primitives', () => {
+      assert.ok(!deepEqual(1, 2))
+      assert.ok(!deepEqual('a', 'b'))
+      assert.ok(!deepEqual(null, undefined))
+    })
+
+    test('should compare objects deeply', () => {
+      assert.ok(deepEqual({ a: 1, b: { c: 2 } }, { a: 1, b: { c: 2 } }))
+      assert.ok(!deepEqual({ a: 1, b: { c: 2 } }, { a: 1, b: { c: 3 } }))
+    })
+
+    test('should compare arrays deeply', () => {
+      assert.ok(deepEqual([1, 2, [3]], [1, 2, [3]]))
+      assert.ok(!deepEqual([1, 2], [1, 3]))
+      assert.ok(!deepEqual([1, 2], [1, 2, 3]))
+    })
+  })
+
+  describe('pruneToChanges', () => {
+    test('should remove unchanged keys', () => {
+      const base = { a: 1, b: 2, c: 3 }
+      const head = { a: 1, b: 99, c: 3 }
+      const [pb, ph] = pruneToChanges(base, head)
+
+      assert.deepStrictEqual(pb, { b: 2 })
+      assert.deepStrictEqual(ph, { b: 99 })
+    })
+
+    test('should detect added keys', () => {
+      const base = { a: 1 }
+      const head = { a: 1, b: 2 }
+      const [pb, ph] = pruneToChanges(base, head)
+
+      assert.deepStrictEqual(pb, {})
+      assert.deepStrictEqual(ph, { b: 2 })
+    })
+
+    test('should detect removed keys', () => {
+      const base = { a: 1, b: 2 }
+      const head = { a: 1 }
+      const [pb, ph] = pruneToChanges(base, head)
+
+      assert.deepStrictEqual(pb, { b: 2 })
+      assert.deepStrictEqual(ph, {})
+    })
+
+    test('should prune id-based arrays to only changed entries', () => {
+      const base = {
+        items: [
+          { id: 1, name: 'sword' },
+          { id: 2, name: 'shield' },
+          { id: 3, name: 'potion' }
+        ]
+      }
+      const head = {
+        items: [
+          { id: 1, name: 'sword' },
+          { id: 2, name: 'armor' },
+          { id: 3, name: 'potion' },
+          { id: 4, name: 'bow' }
+        ]
+      }
+      const [pb, ph] = pruneToChanges(base, head)
+
+      // Only id:2 (modified) and id:4 (added) should appear
+      assert.deepStrictEqual(pb, { items: [{ id: 2, name: 'shield' }] })
+      assert.deepStrictEqual(ph, {
+        items: [
+          { id: 2, name: 'armor' },
+          { id: 4, name: 'bow' }
+        ]
+      })
+    })
+
+    test('should return empty objects when everything is equal', () => {
+      const data = { a: 1, b: [1, 2], c: { d: 3 } }
+      const [pb, ph] = pruneToChanges(data, data)
+
+      assert.deepStrictEqual(pb, {})
+      assert.deepStrictEqual(ph, {})
+    })
+
+    test('should handle null/undefined inputs', () => {
+      const [pb, ph] = pruneToChanges(null, { a: 1 })
+      assert.deepStrictEqual(pb, {})
+      assert.deepStrictEqual(ph, { a: 1 })
+    })
+  })
+
+  describe('getKeyDiffSummary', () => {
+    test('should classify keys correctly', () => {
+      const base = { a: 1, b: 2, c: 3 }
+      const head = { a: 1, b: 99, d: 4 }
+      const summary = getKeyDiffSummary(base, head)
+
+      const byKey = Object.fromEntries(summary.map((s) => [s.key, s.status]))
+      assert.strictEqual(byKey['a'], 'equal')
+      assert.strictEqual(byKey['b'], 'modified')
+      assert.strictEqual(byKey['c'], 'removed')
+      assert.strictEqual(byKey['d'], 'added')
     })
   })
 })
