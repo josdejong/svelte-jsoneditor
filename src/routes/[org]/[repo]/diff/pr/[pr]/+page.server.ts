@@ -15,6 +15,8 @@ interface PrInfo {
   title: string
   baseRefName: string
   headRefName: string
+  baseRefOid: string
+  headRefOid: string
   files: PrFile[]
 }
 
@@ -31,7 +33,7 @@ export const load: PageServerLoad = async ({ params }) => {
   let prInfo: PrInfo
   try {
     const raw = exec(
-      `gh pr view ${prNumber} --repo "${ghRepo}" --json baseRefName,headRefName,files,title,number`
+      `gh pr view ${prNumber} --repo "${ghRepo}" --json baseRefName,headRefName,baseRefOid,headRefOid,files,title,number`
     )
     prInfo = JSON.parse(raw)
   } catch (e) {
@@ -46,16 +48,15 @@ export const load: PageServerLoad = async ({ params }) => {
     error(500, `Could not resolve repo ${ghRepo}: ${e}`)
   }
 
-  // Fetch remote refs
+  // Fetch PR ref to ensure commits are available locally (even if head branch was deleted)
   try {
-    exec(`git fetch origin "${prInfo.baseRefName}" --quiet`, { cwd: repoDir })
-  } catch { /* ignore */ }
-  try {
-    exec(`git fetch origin "${prInfo.headRefName}" --quiet`, { cwd: repoDir })
+    exec(`git fetch origin "refs/pull/${prNumber}/head" --quiet`, { cwd: repoDir })
   } catch { /* ignore */ }
 
-  const baseRef = `origin/${prInfo.baseRefName}`
-  const headRef = `origin/${prInfo.headRefName}`
+  // Use immutable commit SHAs instead of branch names —
+  // branch names point to wrong content after a PR is merged
+  const baseRef = prInfo.baseRefOid
+  const headRef = prInfo.headRefOid
 
   // Process ALL changed files — smart parse determines if they're JSON-parseable
   const files: Array<{ path: string; key: string; baseJson: unknown; headJson: unknown }> = []
@@ -81,8 +82,8 @@ export const load: PageServerLoad = async ({ params }) => {
   return {
     prNumber: prInfo.number,
     prTitle: prInfo.title,
-    baseRef,
-    headRef,
+    baseRef: prInfo.baseRefName,
+    headRef: prInfo.headRefName,
     files
   }
 }
