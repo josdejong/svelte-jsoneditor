@@ -48,9 +48,13 @@ if [[ -z "$METADATA_REPO" ]]; then
   METADATA_REPO="$DEFAULT_METADATA_REPO"
 fi
 
-PARSER=""
-if [[ -n "$METADATA_REPO" && -f "$METADATA_REPO/tools/hset_to_json.py" ]]; then
-  PARSER="$METADATA_REPO/tools/hset_to_json.py"
+# Prefer local enhanced parser (handles both HSET and SET commands)
+PARSER="$SCRIPT_DIR/tools/hset_to_json.py"
+if [[ ! -f "$PARSER" ]]; then
+  PARSER=""
+  if [[ -n "$METADATA_REPO" && -f "$METADATA_REPO/tools/hset_to_json.py" ]]; then
+    PARSER="$METADATA_REPO/tools/hset_to_json.py"
+  fi
 fi
 
 # --- Parse PR reference ---

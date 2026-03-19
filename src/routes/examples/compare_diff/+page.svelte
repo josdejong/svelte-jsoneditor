@@ -61,8 +61,9 @@
   let fileEntries = $state([])
   let selectedIndex = $state(0)
   let loading = $state(false)
-  let leftJson = $state(sampleLeft)
-  let rightJson = $state(sampleRight)
+  let ready = $state(false)
+  let leftJson = $state(null)
+  let rightJson = $state(null)
   let leftLabel = $state('v2.5.0 (before)')
   let rightLabel = $state('v2.6.0 (after)')
   let title = $state('Compare / Diff Viewer')
@@ -80,8 +81,12 @@
         fetch(`/pr-diff/${entry.key}.base.json`),
         fetch(`/pr-diff/${entry.key}.head.json`)
       ])
-      leftJson = baseRes.ok ? await baseRes.json() : {}
-      rightJson = headRes.ok ? await headRes.json() : {}
+      const [baseData, headData] = await Promise.all([
+        baseRes.ok ? baseRes.json() : Promise.resolve({}),
+        headRes.ok ? headRes.json() : Promise.resolve({})
+      ])
+      leftJson = baseData
+      rightJson = headData
     } catch {
       leftJson = {}
       rightJson = {}
@@ -93,7 +98,13 @@
   onMount(async () => {
     try {
       const res = await fetch('/pr-diff/manifest.json')
-      if (!res.ok) return
+      if (!res.ok) {
+        // No PR data available, use sample data
+        leftJson = sampleLeft
+        rightJson = sampleRight
+        ready = true
+        return
+      }
 
       const data = await res.json()
       manifest = data
@@ -107,8 +118,12 @@
       if (fileEntries.length > 0) {
         await selectFile(0)
       }
+      ready = true
     } catch {
-      // No PR data available, keep sample data
+      // No PR data available, use sample data
+      leftJson = sampleLeft
+      rightJson = sampleRight
+      ready = true
     }
   })
 </script>
@@ -135,13 +150,17 @@
   </div>
 {/if}
 
-{#if loading}
+{#if !ready}
   <div class="loading">Loading...</div>
-{/if}
+{:else}
+  {#if loading}
+    <div class="loading">Loading...</div>
+  {/if}
 
-<div class="viewer">
-  <JSONDiffViewer {leftJson} {rightJson} {leftLabel} {rightLabel} />
-</div>
+  <div class="viewer">
+    <JSONDiffViewer {leftJson} {rightJson} {leftLabel} {rightLabel} />
+  </div>
+{/if}
 
 <style>
   .viewer {

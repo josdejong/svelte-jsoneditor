@@ -5,10 +5,10 @@
     getKeyDiffSummary,
     type KeyInfo
   } from '../../logic/diff.js'
+  import { computeStructuralDiff } from '../../logic/structuralDiff.js'
   import DiffPanel from './DiffPanel.svelte'
+  import DiffTreePanel from './DiffTreePanel.svelte'
   import DiffControls from './DiffControls.svelte'
-  import JSONEditor from '../JSONEditor.svelte'
-  import { Mode } from '../../types.js'
 
   interface Props {
     leftJson: unknown
@@ -19,7 +19,7 @@
 
   let { leftJson, rightJson, leftLabel = 'Left', rightLabel = 'Right' }: Props = $props()
 
-  let activeTab: 'diff' | 'tree' = $state('diff')
+  let activeTab: 'tree' | 'text' = $state('tree')
   let changesOnly = $state(true)
   let selectedKey = $state('__all__')
   let activeChangeIndex = $state(0)
@@ -95,29 +95,73 @@
     return data
   })
 
-  // Reactive diff on the effective (possibly pruned) data
-  let diff = $derived(computeJsonDiff(effectiveLeft, effectiveRight))
+  // ── Structural diff (tree mode) ──────────────────────────────────
+  let structuralDiff = $derived(computeStructuralDiff(effectiveLeft, effectiveRight))
 
-  // Indices of change lines (non-equal) in the aligned arrays
-  let changeIndices = $derived.by(() => {
+  // Shared expand state for both tree panels
+  let expandedPaths: Set<string> = $state(new Set(['']))
+
+  // Auto-expand root when data changes
+  $effect(() => {
+    // Reset expand state when data changes
+    effectiveLeft
+    effectiveRight
+    expandedPaths = new Set([''])
+  })
+
+  function handleToggleExpand(path: string) {
+    const next = new Set(expandedPaths)
+    if (next.has(path)) {
+      next.delete(path)
+    } else {
+      next.add(path)
+    }
+    expandedPaths = next
+  }
+
+  // Active change path for tree navigation
+  let activeChangePath = $derived(
+    structuralDiff.changedPaths[activeChangeIndex] ?? null
+  )
+
+  // ── Text diff (text mode) ────────────────────────────────────────
+  let textDiff = $derived(computeJsonDiff(effectiveLeft, effectiveRight))
+
+  let textChangeIndices = $derived.by(() => {
     const indices: number[] = []
-    for (let i = 0; i < diff.leftLines.length; i++) {
-      if (diff.leftLines[i].type !== 'equal') {
+    for (let i = 0; i < textDiff.leftLines.length; i++) {
+      if (textDiff.leftLines[i].type !== 'equal') {
         indices.push(i)
       }
     }
     return indices
   })
 
-  // Synced scrolling
+  // ── Shared state ─────────────────────────────────────────────────
+
+  // Use structural diff for change count/navigation in tree mode,
+  // text diff for text mode
+  let changeCount = $derived(
+    activeTab === 'tree' ? structuralDiff.changeCount : textDiff.changeCount
+  )
+
+  // Synced scrolling — deliberately NOT $state to avoid reactivity on a reentrancy guard
   let scrollGuard = false
-  let leftPanel: DiffPanel | undefined = $state(undefined)
-  let rightPanel: DiffPanel | undefined = $state(undefined)
+  let leftTreePanel: DiffTreePanel | undefined = $state(undefined)
+  let rightTreePanel: DiffTreePanel | undefined = $state(undefined)
+
+  // Synced scrolling (text panels)
+  let leftTextPanel: DiffPanel | undefined = $state(undefined)
+  let rightTextPanel: DiffPanel | undefined = $state(undefined)
 
   function handleLeftScroll(scrollTop: number) {
     if (scrollGuard) return
     scrollGuard = true
-    rightPanel?.setScrollTop(scrollTop)
+    if (activeTab === 'tree') {
+      rightTreePanel?.setScrollTop(scrollTop)
+    } else {
+      rightTextPanel?.setScrollTop(scrollTop)
+    }
     requestAnimationFrame(() => {
       scrollGuard = false
     })
@@ -126,29 +170,72 @@
   function handleRightScroll(scrollTop: number) {
     if (scrollGuard) return
     scrollGuard = true
-    leftPanel?.setScrollTop(scrollTop)
+    if (activeTab === 'tree') {
+      leftTreePanel?.setScrollTop(scrollTop)
+    } else {
+      leftTextPanel?.setScrollTop(scrollTop)
+    }
     requestAnimationFrame(() => {
       scrollGuard = false
     })
   }
 
   function navigatePrev() {
-    if (changeIndices.length === 0) return
-    activeChangeIndex = (activeChangeIndex - 1 + changeIndices.length) % changeIndices.length
-    scrollToCurrentChange()
+    if (activeTab === 'tree') {
+      if (structuralDiff.changedPaths.length === 0) return
+      activeChangeIndex =
+        (activeChangeIndex - 1 + structuralDiff.changedPaths.length) %
+        structuralDiff.changedPaths.length
+      expandToChange()
+    } else {
+      if (textChangeIndices.length === 0) return
+      activeChangeIndex =
+        (activeChangeIndex - 1 + textChangeIndices.length) % textChangeIndices.length
+      scrollToTextChange()
+    }
   }
 
   function navigateNext() {
-    if (changeIndices.length === 0) return
-    activeChangeIndex = (activeChangeIndex + 1) % changeIndices.length
-    scrollToCurrentChange()
+    if (activeTab === 'tree') {
+      if (structuralDiff.changedPaths.length === 0) return
+      activeChangeIndex =
+        (activeChangeIndex + 1) % structuralDiff.changedPaths.length
+      expandToChange()
+    } else {
+      if (textChangeIndices.length === 0) return
+      activeChangeIndex = (activeChangeIndex + 1) % textChangeIndices.length
+      scrollToTextChange()
+    }
   }
 
-  function scrollToCurrentChange() {
-    const lineIndex = changeIndices[activeChangeIndex]
+  function expandToChange() {
+    const path = structuralDiff.changedPaths[activeChangeIndex]
+    if (!path) return
+
+    // Expand all ancestor paths so the change is visible
+    const next = new Set(expandedPaths)
+    let pos = 0
+    next.add('')
+    while (true) {
+      const nextSlash = path.indexOf('/', pos + 1)
+      if (nextSlash === -1) break
+      next.add(path.substring(0, nextSlash))
+      pos = nextSlash
+    }
+    expandedPaths = next
+
+    // Scroll to the change after DOM update
+    requestAnimationFrame(() => {
+      leftTreePanel?.scrollToPath(path)
+      rightTreePanel?.scrollToPath(path)
+    })
+  }
+
+  function scrollToTextChange() {
+    const lineIndex = textChangeIndices[activeChangeIndex]
     if (lineIndex !== undefined) {
-      leftPanel?.scrollToLine(lineIndex)
-      rightPanel?.scrollToLine(lineIndex)
+      leftTextPanel?.scrollToLine(lineIndex)
+      rightTextPanel?.scrollToLine(lineIndex)
     }
   }
 
@@ -159,13 +246,10 @@
 
   // Reset navigation when diff changes
   $effect(() => {
-    diff
+    structuralDiff
+    textDiff
     activeChangeIndex = 0
   })
-
-  // Content for tree mode (always full data, not pruned)
-  let leftContent = $derived({ json: leftJson })
-  let rightContent = $derived({ json: rightJson })
 </script>
 
 <div class="jse-diff-viewer">
@@ -173,17 +257,17 @@
     <div class="diff-tabs">
       <button
         class="diff-tab"
-        class:active={activeTab === 'diff'}
-        onclick={() => (activeTab = 'diff')}
+        class:active={activeTab === 'tree'}
+        onclick={() => { activeTab = 'tree'; activeChangeIndex = 0 }}
       >
-        Diff
+        Tree
       </button>
       <button
         class="diff-tab"
-        class:active={activeTab === 'tree'}
-        onclick={() => (activeTab = 'tree')}
+        class:active={activeTab === 'text'}
+        onclick={() => { activeTab = 'text'; activeChangeIndex = 0 }}
       >
-        Tree
+        Text
       </button>
     </div>
 
@@ -202,21 +286,56 @@
     {/if}
   </div>
 
-  {#if activeTab === 'diff'}
+  {#if activeTab === 'tree'}
+    <div class="diff-container">
+      <DiffTreePanel
+        bind:this={leftTreePanel}
+        value={effectiveLeft}
+        label={leftLabel}
+        diffMap={structuralDiff.changes}
+        changedAncestors={structuralDiff.changedAncestors}
+        {expandedPaths}
+        onToggleExpand={handleToggleExpand}
+        activePath={activeChangePath}
+        onscroll={handleLeftScroll}
+      />
+
+      <DiffControls
+        {changeCount}
+        currentIndex={activeChangeIndex}
+        {changesOnly}
+        onprev={navigatePrev}
+        onnext={navigateNext}
+        ontogglechangesonly={toggleChangesOnly}
+      />
+
+      <DiffTreePanel
+        bind:this={rightTreePanel}
+        value={effectiveRight}
+        label={rightLabel}
+        diffMap={structuralDiff.changes}
+        changedAncestors={structuralDiff.changedAncestors}
+        {expandedPaths}
+        onToggleExpand={handleToggleExpand}
+        activePath={activeChangePath}
+        onscroll={handleRightScroll}
+      />
+    </div>
+  {:else}
     <div class="diff-container">
       <DiffPanel
-        bind:this={leftPanel}
-        lines={diff.leftLines}
+        bind:this={leftTextPanel}
+        lines={textDiff.leftLines}
         label={leftLabel}
         side="left"
         currentChangeIndex={activeChangeIndex}
-        {changeIndices}
+        changeIndices={textChangeIndices}
         changesOnly={false}
         onscroll={handleLeftScroll}
       />
 
       <DiffControls
-        changeCount={diff.changeCount}
+        changeCount={textDiff.changeCount}
         currentIndex={activeChangeIndex}
         {changesOnly}
         onprev={navigatePrev}
@@ -225,30 +344,15 @@
       />
 
       <DiffPanel
-        bind:this={rightPanel}
-        lines={diff.rightLines}
+        bind:this={rightTextPanel}
+        lines={textDiff.rightLines}
         label={rightLabel}
         side="right"
         currentChangeIndex={activeChangeIndex}
-        {changeIndices}
+        changeIndices={textChangeIndices}
         changesOnly={false}
         onscroll={handleRightScroll}
       />
-    </div>
-  {:else}
-    <div class="tree-container">
-      <div class="tree-panel">
-        <div class="tree-panel-header">{leftLabel}</div>
-        <div class="tree-editor">
-          <JSONEditor content={leftContent} readOnly={true} mode={Mode.tree} />
-        </div>
-      </div>
-      <div class="tree-panel">
-        <div class="tree-panel-header">{rightLabel}</div>
-        <div class="tree-editor">
-          <JSONEditor content={rightContent} readOnly={true} mode={Mode.tree} />
-        </div>
-      </div>
     </div>
   {/if}
 </div>
@@ -327,36 +431,6 @@
     display: flex;
     gap: 0;
     padding: 12px;
-    overflow: hidden;
-  }
-
-  .tree-container {
-    flex: 1;
-    display: flex;
-    gap: 12px;
-    padding: 12px;
-    overflow: hidden;
-  }
-
-  .tree-panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    border: 1px solid var(--jse-diff-border-color, #d1d9e0);
-    border-radius: 6px;
-    overflow: hidden;
-  }
-
-  .tree-panel-header {
-    padding: 8px 12px;
-    background: var(--jse-diff-header-bg, #f6f8fa);
-    border-bottom: 1px solid var(--jse-diff-border-color, #d1d9e0);
-    font-weight: 600;
-    font-size: 13px;
-  }
-
-  .tree-editor {
-    flex: 1;
     overflow: hidden;
   }
 </style>
