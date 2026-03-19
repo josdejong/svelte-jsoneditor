@@ -24,6 +24,55 @@
 
   let scrollContainer: HTMLDivElement | undefined = $state(undefined)
 
+  // ── Search ──────────────────────────────────────────────────────────
+  let searchQuery = $state('')
+  let searchIndex = $state(0)
+
+  let searchLineMatches: number[] = $derived.by(() => {
+    if (!searchQuery) return []
+    const lq = searchQuery.toLowerCase()
+    const matches: number[] = []
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].content.toLowerCase().includes(lq)) matches.push(i)
+    }
+    return matches
+  })
+
+  $effect(() => {
+    if (searchIndex >= searchLineMatches.length) searchIndex = Math.max(0, searchLineMatches.length - 1)
+  })
+
+  $effect(() => {
+    if (searchLineMatches.length > 0 && scrollContainer) {
+      const lineIdx = searchLineMatches[searchIndex]
+      if (lineIdx !== undefined) {
+        requestAnimationFrame(() => {
+          scrollToLine(lineIdx)
+          handleScroll() // explicitly sync the other panel
+        })
+      }
+    }
+  })
+
+  function searchPrev() {
+    if (searchLineMatches.length === 0) return
+    searchIndex = (searchIndex - 1 + searchLineMatches.length) % searchLineMatches.length
+  }
+
+  function searchNext() {
+    if (searchLineMatches.length === 0) return
+    searchIndex = (searchIndex + 1) % searchLineMatches.length
+  }
+
+  function handleSearchKeydown(e: KeyboardEvent) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      if (e.shiftKey) searchPrev(); else searchNext()
+    }
+    if (e.key === 'Escape') searchQuery = ''
+  }
+  // ── End search ──────────────────────────────────────────────────────
+
   // Filter to changes only with context lines
   let visibleLines = $derived.by(() => {
     if (!changesOnly) return lines
@@ -73,6 +122,22 @@
 <div class="diff-panel">
   <div class="diff-panel-header">
     <span class="diff-panel-label">{label}</span>
+    <span class="search-box">
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Search…"
+        bind:value={searchQuery}
+        onkeydown={handleSearchKeydown}
+      />
+      {#if searchQuery}
+        <span class="search-count">
+          {searchLineMatches.length > 0 ? `${searchIndex + 1}/${searchLineMatches.length}` : '0'}
+        </span>
+        <button class="search-nav" onclick={searchPrev} title="Previous (Shift+Enter)">&#x25B2;</button>
+        <button class="search-nav" onclick={searchNext} title="Next (Enter)">&#x25BC;</button>
+      {/if}
+    </span>
   </div>
   <div class="diff-panel-scroll" bind:this={scrollContainer} onscroll={handleScroll}>
     <table class="diff-table">
@@ -81,6 +146,7 @@
           <DiffLineComponent
             {line}
             {side}
+            {searchQuery}
             isCurrent={changeIndices[currentChangeIndex] === (changesOnly ? i : i)}
           />
         {/each}
@@ -101,6 +167,9 @@
   }
 
   .diff-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 8px 12px;
     background: var(--jse-diff-header-bg, #f6f8fa);
     border-bottom: 1px solid var(--jse-diff-border-color, #d1d9e0);
@@ -109,6 +178,56 @@
   }
 
   .diff-panel-label {
+    color: var(--jse-diff-header-color, #1f2328);
+  }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .search-input {
+    width: 120px;
+    padding: 2px 6px;
+    border: 1px solid var(--jse-diff-border-color, #d1d9e0);
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: normal;
+    outline: none;
+  }
+
+  .search-input:focus {
+    border-color: var(--jse-diff-current-outline, #0969da);
+    box-shadow: 0 0 0 1px var(--jse-diff-current-outline, #0969da);
+  }
+
+  .search-count {
+    font-size: 11px;
+    font-weight: normal;
+    color: var(--jse-diff-label-color, #636c76);
+    white-space: nowrap;
+    min-width: 28px;
+    text-align: center;
+  }
+
+  .search-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 1px solid var(--jse-diff-border-color, #d1d9e0);
+    border-radius: 3px;
+    background: #fff;
+    font-size: 8px;
+    cursor: pointer;
+    color: var(--jse-diff-label-color, #636c76);
+  }
+
+  .search-nav:hover {
+    background: var(--jse-diff-nav-hover-bg, #f3f4f6);
     color: var(--jse-diff-header-color, #1f2328);
   }
 

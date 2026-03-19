@@ -12,6 +12,8 @@
     expandedPaths: Set<string>
     onToggleExpand: (path: string) => void
     activePath?: string | null
+    searchQuery?: string
+    activeSearchPath?: string | null
   }
 
   let {
@@ -23,8 +25,12 @@
     changedAncestors,
     expandedPaths,
     onToggleExpand,
-    activePath = null
+    activePath = null,
+    searchQuery = '',
+    activeSearchPath = null
   }: Props = $props()
+
+  let isSearchHit = $derived(activeSearchPath === path)
 
   let isObject = $derived(
     value !== null && value !== undefined && typeof value === 'object' && !Array.isArray(value)
@@ -59,6 +65,23 @@
     return ''
   }
 
+  function highlightSegments(text: string): Array<{ text: string; match: boolean }> {
+    if (!searchQuery) return [{ text, match: false }]
+    const lower = text.toLowerCase()
+    const lq = searchQuery.toLowerCase()
+    const segs: Array<{ text: string; match: boolean }> = []
+    let last = 0
+    let idx = lower.indexOf(lq)
+    while (idx !== -1) {
+      if (idx > last) segs.push({ text: text.slice(last, idx), match: false })
+      segs.push({ text: text.slice(idx, idx + searchQuery.length), match: true })
+      last = idx + searchQuery.length
+      idx = lower.indexOf(lq, last)
+    }
+    if (last < text.length) segs.push({ text: text.slice(last), match: false })
+    return segs.length > 0 ? segs : [{ text, match: false }]
+  }
+
   function getDiffClass(): string {
     if (diffType === 'added') return 'diff-added'
     if (diffType === 'removed') return 'diff-removed'
@@ -76,6 +99,7 @@
 <div
   class="diff-tree-node {getDiffClass()}"
   class:diff-active={isActive}
+  class:search-hit={isSearchHit}
   style:--level={level}
   data-path={path}
 >
@@ -93,7 +117,7 @@
           {#if typeof keyName === 'number'}
             <span class="node-index">{keyName}</span>
           {:else}
-            <span class="node-prop">{keyName}</span>
+            <span class="node-prop">{#each highlightSegments(String(keyName)) as seg}{#if seg.match}<mark class="search-mark">{seg.text}</mark>{:else}{seg.text}{/if}{/each}</span>
           {/if}
           <span class="node-separator">:</span>
         </span>
@@ -129,6 +153,8 @@
               {expandedPaths}
               {onToggleExpand}
               {activePath}
+              {searchQuery}
+              {activeSearchPath}
             />
           {/each}
         {:else}
@@ -143,6 +169,8 @@
               {expandedPaths}
               {onToggleExpand}
               {activePath}
+              {searchQuery}
+              {activeSearchPath}
             />
           {/each}
         {/if}
@@ -161,12 +189,12 @@
           {#if typeof keyName === 'number'}
             <span class="node-index">{keyName}</span>
           {:else}
-            <span class="node-prop">{keyName}</span>
+            <span class="node-prop">{#each highlightSegments(String(keyName)) as seg}{#if seg.match}<mark class="search-mark">{seg.text}</mark>{:else}{seg.text}{/if}{/each}</span>
           {/if}
           <span class="node-separator">:</span>
         </span>
       {/if}
-      <span class="node-value {getValueTypeClass(value)}">{formatValue(value)}</span>
+      <span class="node-value {getValueTypeClass(value)}">{#each highlightSegments(formatValue(value)) as seg}{#if seg.match}<mark class="search-mark">{seg.text}</mark>{:else}{seg.text}{/if}{/each}</span>
     </div>
   {/if}
 </div>
@@ -317,5 +345,19 @@
   .diff-active > .node-leaf {
     outline: 2px solid var(--jse-diff-current-outline, #0969da);
     outline-offset: -1px;
+  }
+
+  .search-hit > .node-header,
+  .search-hit > .node-leaf {
+    outline: 2px solid #bf8700;
+    outline-offset: -1px;
+    background-color: #fff8c5;
+  }
+
+  :global(.search-mark) {
+    background: #fff2a8;
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 1px;
   }
 </style>

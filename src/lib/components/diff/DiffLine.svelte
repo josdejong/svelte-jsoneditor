@@ -5,9 +5,10 @@
     line: DiffLine
     side: 'left' | 'right'
     isCurrent?: boolean
+    searchQuery?: string
   }
 
-  let { line, side, isCurrent = false }: Props = $props()
+  let { line, side, isCurrent = false, searchQuery = '' }: Props = $props()
 
   let rowClass = $derived(
     [
@@ -18,6 +19,23 @@
       .filter(Boolean)
       .join(' ')
   )
+
+  function highlightSegments(text: string): Array<{ text: string; match: boolean }> {
+    if (!searchQuery) return [{ text, match: false }]
+    const lower = text.toLowerCase()
+    const lq = searchQuery.toLowerCase()
+    const segs: Array<{ text: string; match: boolean }> = []
+    let last = 0
+    let idx = lower.indexOf(lq)
+    while (idx !== -1) {
+      if (idx > last) segs.push({ text: text.slice(last, idx), match: false })
+      segs.push({ text: text.slice(idx, idx + searchQuery.length), match: true })
+      last = idx + searchQuery.length
+      idx = lower.indexOf(lq, last)
+    }
+    if (last < text.length) segs.push({ text: text.slice(last), match: false })
+    return segs.length > 0 ? segs : [{ text, match: false }]
+  }
 </script>
 
 <tr class={rowClass}>
@@ -30,15 +48,15 @@
     {#if line.type === 'modified' && line.wordDiffs}
       {#each line.wordDiffs as wd}
         {#if wd.type === 'equal'}
-          <span>{wd.value}</span>
+          <span>{#each highlightSegments(wd.value) as seg}{#if seg.match}<mark class="search-mark">{seg.text}</mark>{:else}{seg.text}{/if}{/each}</span>
         {:else if wd.type === 'added' && side === 'right'}
-          <span class="word-added">{wd.value}</span>
+          <span class="word-added">{#each highlightSegments(wd.value) as seg}{#if seg.match}<mark class="search-mark">{seg.text}</mark>{:else}{seg.text}{/if}{/each}</span>
         {:else if wd.type === 'removed' && side === 'left'}
-          <span class="word-removed">{wd.value}</span>
+          <span class="word-removed">{#each highlightSegments(wd.value) as seg}{#if seg.match}<mark class="search-mark">{seg.text}</mark>{:else}{seg.text}{/if}{/each}</span>
         {/if}
       {/each}
     {:else if line.lineNumber !== null}
-      {line.content}
+      {#each highlightSegments(line.content) as seg}{#if seg.match}<mark class="search-mark">{seg.text}</mark>{:else}{seg.text}{/if}{/each}
     {/if}
   </td>
 </tr>
@@ -105,5 +123,12 @@
   .word-removed {
     background: var(--jse-diff-word-removed-bg, #ff8182);
     border-radius: 2px;
+  }
+
+  :global(.search-mark) {
+    background: #fff2a8;
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 1px;
   }
 </style>
