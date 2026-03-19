@@ -57,7 +57,6 @@ fi
 GH_REPO="$DEFAULT_REPO"
 
 if [[ "$PR_REF" =~ ^([^/]+/[^/]+)/pull/([0-9]+)$ ]]; then
-  # Full reference: owner/repo/pull/123
   GH_REPO="${BASH_REMATCH[1]}"
   PR_NUMBER="${BASH_REMATCH[2]}"
 elif [[ "$PR_REF" =~ ^[0-9]+$ ]]; then
@@ -70,7 +69,7 @@ fi
 
 echo "Fetching PR #$PR_NUMBER from $GH_REPO..."
 
-# --- Get PR info ---
+# --- Get PR info (small JSON, jq is fine here) ---
 PR_INFO=$(gh pr view "$PR_NUMBER" --repo "$GH_REPO" \
   --json baseRefName,headRefName,files,title,number)
 
@@ -83,10 +82,8 @@ echo "  Title: $PR_TITLE"
 echo "  Base:  $BASE_REF_NAME"
 echo "  Head:  $HEAD_REF_NAME"
 
-# --- Find the metadata-scripts git dir (need it for git show) ---
-# We need a clone/worktree of the metadata-scripts repo to run git show
+# --- Find the metadata-scripts git dir ---
 if [[ -z "$METADATA_REPO" || ! -d "$METADATA_REPO/.git" ]] && [[ -z "$METADATA_REPO" || ! -f "$METADATA_REPO/.git" ]]; then
-  # Try to find it relative to script dir
   for candidate in \
     "$SCRIPT_DIR/../metadata-scripts/main" \
     "$SCRIPT_DIR/../metadata-scripts" \
@@ -129,45 +126,48 @@ fi
 echo "Changed files:"
 echo "$CHANGED_FILES" | sed 's/^/  /'
 
-# --- Build JSON data ---
-FILE_DATA="{}"
+# --- Write individual JSON files to static/pr-diff/ ---
+# No jq on large data — just pipe git show through the hset parser straight to files.
+PR_DATA_DIR="$SCRIPT_DIR/static/pr-diff"
+rm -rf "$PR_DATA_DIR"
+mkdir -p "$PR_DATA_DIR"
+
+FILE_LIST=""
 
 while IFS= read -r filepath; do
   echo "  Parsing $filepath..."
 
-  # Get raw content at each ref
-  BASE_RAW=$(git -C "$METADATA_REPO" show "${BASE_REF}:${filepath}" 2>/dev/null || echo "")
-  HEAD_RAW=$(git -C "$METADATA_REPO" show "${HEAD_REF}:${filepath}" 2>/dev/null || echo "")
+  # Sanitize filename: scripts/metadata_items -> metadata_items
+  SAFE_NAME=$(echo "$filepath" | tr '/' '_')
 
-  # Parse hset format to JSON if parser is available, otherwise treat as plain text
   if [[ -n "$PARSER" ]]; then
-    BASE_JSON=$(echo "$BASE_RAW" | python3 "$PARSER" 2>/dev/null || echo "{}")
-    HEAD_JSON=$(echo "$HEAD_RAW" | python3 "$PARSER" 2>/dev/null || echo "{}")
+    git -C "$METADATA_REPO" show "${BASE_REF}:${filepath}" 2>/dev/null \
+      | python3 "$PARSER" > "$PR_DATA_DIR/${SAFE_NAME}.base.json" 2>/dev/null || echo "{}" > "$PR_DATA_DIR/${SAFE_NAME}.base.json"
+    git -C "$METADATA_REPO" show "${HEAD_REF}:${filepath}" 2>/dev/null \
+      | python3 "$PARSER" > "$PR_DATA_DIR/${SAFE_NAME}.head.json" 2>/dev/null || echo "{}" > "$PR_DATA_DIR/${SAFE_NAME}.head.json"
   else
-    # Fallback: try to extract JSON directly (for non-hset files)
-    BASE_JSON=$(echo "$BASE_RAW" | python3 -c "import sys,json; json.dump(sys.stdin.read(), sys.stdout)" 2>/dev/null || echo '""')
-    HEAD_JSON=$(echo "$HEAD_RAW" | python3 -c "import sys,json; json.dump(sys.stdin.read(), sys.stdout)" 2>/dev/null || echo '""')
+    git -C "$METADATA_REPO" show "${BASE_REF}:${filepath}" > "$PR_DATA_DIR/${SAFE_NAME}.base.json" 2>/dev/null || echo "{}" > "$PR_DATA_DIR/${SAFE_NAME}.base.json"
+    git -C "$METADATA_REPO" show "${HEAD_REF}:${filepath}" > "$PR_DATA_DIR/${SAFE_NAME}.head.json" 2>/dev/null || echo "{}" > "$PR_DATA_DIR/${SAFE_NAME}.head.json"
   fi
 
-  FILE_DATA=$(echo "$FILE_DATA" | jq \
-    --arg path "$filepath" \
-    --argjson base "$BASE_JSON" \
-    --argjson head "$HEAD_JSON" \
-    '. + {($path): {"base": $base, "head": $head}}')
+  # Append to file list (newline-separated "path|safename" pairs)
+  FILE_LIST="${FILE_LIST}${filepath}|${SAFE_NAME}\n"
 done <<< "$CHANGED_FILES"
 
-# --- Assemble final data ---
-DATA=$(jq -n \
-  --argjson num "$PR_NUM" \
-  --arg title "$PR_TITLE" \
-  --arg base "$BASE_REF" \
-  --arg head "$HEAD_REF" \
-  --argjson files "$FILE_DATA" \
-  '{prNumber: $num, prTitle: $title, baseRef: $base, headRef: $head, files: $files}')
-
-# --- Write to svelte-jsoneditor static dir ---
-mkdir -p "$SCRIPT_DIR/static"
-echo "$DATA" > "$SCRIPT_DIR/static/pr-diff-data.json"
+# --- Write a small manifest (only scalar metadata, no large JSON) ---
+cat > "$PR_DATA_DIR/manifest.json" <<MANIFEST
+{
+  "prNumber": $PR_NUM,
+  "prTitle": $(python3 -c "import json; print(json.dumps('$PR_TITLE'))"),
+  "baseRef": "$BASE_REF",
+  "headRef": "$HEAD_REF",
+  "files": [
+$(echo -e "$FILE_LIST" | sed '/^$/d' | while IFS='|' read -r path safe; do
+  echo "    {\"path\": \"$path\", \"key\": \"$safe\"},"
+done | sed '$ s/,$//')
+  ]
+}
+MANIFEST
 
 TOTAL_FILES=$(echo "$CHANGED_FILES" | wc -l | tr -d ' ')
 echo ""
@@ -178,9 +178,9 @@ echo "Starting diff viewer at http://localhost:$PORT/examples/compare_diff"
 echo "Press Ctrl+C to stop."
 echo ""
 
-# --- Clean up pr-diff-data.json on exit ---
+# --- Clean up on exit ---
 cleanup() {
-  rm -f "$SCRIPT_DIR/static/pr-diff-data.json"
+  rm -rf "$SCRIPT_DIR/static/pr-diff"
 }
 trap cleanup EXIT
 

@@ -57,9 +57,10 @@
   }
 
   // PR data state
-  let prData = $state(null)
-  let fileNames = $state([])
-  let selectedFile = $state('')
+  let manifest = $state(null)
+  let fileEntries = $state([])
+  let selectedIndex = $state(0)
+  let loading = $state(false)
   let leftJson = $state(sampleLeft)
   let rightJson = $state(sampleRight)
   let leftLabel = $state('v2.5.0 (before)')
@@ -69,29 +70,42 @@
     'Side-by-side JSON comparison with line-level and word-level diff highlighting. Navigate between changes, toggle to show only changes, or switch to tree mode for exploration.'
   )
 
-  function selectFile(fileName) {
-    selectedFile = fileName
-    const file = prData.files[fileName]
-    leftJson = file.base
-    rightJson = file.head
+  async function selectFile(index) {
+    selectedIndex = index
+    const entry = fileEntries[index]
+    loading = true
+
+    try {
+      const [baseRes, headRes] = await Promise.all([
+        fetch(`/pr-diff/${entry.key}.base.json`),
+        fetch(`/pr-diff/${entry.key}.head.json`)
+      ])
+      leftJson = baseRes.ok ? await baseRes.json() : {}
+      rightJson = headRes.ok ? await headRes.json() : {}
+    } catch {
+      leftJson = {}
+      rightJson = {}
+    }
+
+    loading = false
   }
 
   onMount(async () => {
     try {
-      const res = await fetch('/pr-diff-data.json')
+      const res = await fetch('/pr-diff/manifest.json')
       if (!res.ok) return
 
       const data = await res.json()
-      prData = data
-      fileNames = Object.keys(data.files)
+      manifest = data
+      fileEntries = data.files
 
       title = `PR #${data.prNumber} — ${data.prTitle}`
       subtitle = `Comparing ${data.baseRef} → ${data.headRef}`
       leftLabel = data.baseRef
       rightLabel = data.headRef
 
-      if (fileNames.length > 0) {
-        selectFile(fileNames[0])
+      if (fileEntries.length > 0) {
+        await selectFile(0)
       }
     } catch {
       // No PR data available, keep sample data
@@ -107,18 +121,22 @@
 
 <p>{subtitle}</p>
 
-{#if fileNames.length > 1}
+{#if fileEntries.length > 1}
   <div class="file-tabs">
-    {#each fileNames as fileName}
+    {#each fileEntries as entry, i}
       <button
         class="file-tab"
-        class:active={selectedFile === fileName}
-        onclick={() => selectFile(fileName)}
+        class:active={selectedIndex === i}
+        onclick={() => selectFile(i)}
       >
-        {fileName.replace('scripts/', '')}
+        {entry.path.replace('scripts/', '')}
       </button>
     {/each}
   </div>
+{/if}
+
+{#if loading}
+  <div class="loading">Loading...</div>
 {/if}
 
 <div class="viewer">
@@ -140,6 +158,12 @@
     margin: 0 0 12px;
     color: #636c76;
     font-size: 14px;
+  }
+
+  .loading {
+    padding: 8px 0;
+    color: #636c76;
+    font-size: 13px;
   }
 
   .file-tabs {
