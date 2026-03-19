@@ -39,7 +39,7 @@
 
     <div class="diff-toggle">
       <label>
-        <input type="checkbox" checked={changesOnly} onchange={ontogglechangesonly} />
+        <input type="checkbox" checked={changesOnly} onclick={ontogglechangesonly} />
         Changes only
       </label>
     </div>
