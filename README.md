@@ -20,10 +20,12 @@ The app runs at `http://localhost:5173`.
 
 ## Routes
 
+All diff routes live under `/{org}/{repo}/diff/`.
+
 ### PR Diff
 
 ```
-/{org}/{repo}/{pr_number}
+/{org}/{repo}/diff/pr/{pr_number}
 ```
 
 Compare the base and head branches of a GitHub pull request. Files are fetched via `gh pr view` and only parseable files (JSON, HSET/SET) are shown.
@@ -31,7 +33,7 @@ Compare the base and head branches of a GitHub pull request. Files are fetched v
 **Example:**
 
 ```
-/boddle-learning/metadata-scripts/42
+/boddle-learning/metadata-scripts/diff/pr/42
 ```
 
 ### Branch Diff
