@@ -50,18 +50,27 @@ function resolveRepo(org: string, repo: string): string {
     }
   }
 
-  // No local clone found — create a cached shallow clone
+  // No local clone found — create a cached clone
   const cacheDir = resolve(tmpdir(), 'jsonator-repos', `${org}_${repo}`)
-  if (existsSync(resolve(cacheDir, '.git'))) {
-    // Already cloned — just fetch
+
+  // Check if already a valid git repo
+  try {
+    execSync('git rev-parse --git-dir', { cwd: cacheDir, stdio: 'pipe' })
+    // Valid repo — just fetch latest
     try {
       exec('git fetch origin --quiet', { cwd: cacheDir })
     } catch { /* ignore fetch errors */ }
     return cacheDir
+  } catch {
+    // Not a valid repo — remove stale dir and re-clone
+  }
+
+  if (existsSync(cacheDir)) {
+    execSync(`rm -rf "${cacheDir}"`)
   }
 
   mkdirSync(resolve(tmpdir(), 'jsonator-repos'), { recursive: true })
-  exec(`gh repo clone "${org}/${repo}" "${cacheDir}" -- --bare --quiet`)
+  exec(`gh repo clone "${org}/${repo}" "${cacheDir}" -- --quiet`)
   return cacheDir
 }
 
