@@ -18,19 +18,17 @@
 
 <p>Comparing {data.baseRef} &rarr; {data.headRef}</p>
 
-{#if data.files.length > 1}
-  <div class="file-tabs">
-    {#each data.files as file, i}
-      <button
-        class="file-tab"
-        class:active={selectedIndex === i}
-        onclick={() => (selectedIndex = i)}
-      >
-        {file.path.replace('scripts/', '')}
-      </button>
-    {/each}
-  </div>
-{/if}
+<div class="file-tabs">
+  {#each data.files as file, i}
+    <button
+      class="file-tab"
+      class:active={selectedIndex === i}
+      onclick={() => (selectedIndex = i)}
+    >
+      {file.path}
+    </button>
+  {/each}
+</div>
 
 {#if data.files.length === 0}
   <p class="empty">No script files changed in this PR.</p>
