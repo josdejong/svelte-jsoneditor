@@ -3,7 +3,7 @@
   import JSONDiffViewer from '$lib/components/diff/JSONDiffViewer.svelte'
 
   const sampleLeft = {
-    name: 'Boddle Math Game',
+    name: 'Sample App',
     version: '2.5.0',
     settings: {
       difficulty: 'medium',
@@ -28,7 +28,7 @@
   }
 
   const sampleRight = {
-    name: 'Boddle Math Game',
+    name: 'Sample App',
     version: '2.6.0',
     settings: {
       difficulty: 'hard',

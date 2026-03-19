@@ -1,79 +1,67 @@
 #!/bin/bash
-# Interactive JSON diff viewer for metadata-scripts PRs.
-#
-# Fetches base/head metadata from a GitHub PR, parses hset files to JSON,
-# and launches the svelte-jsoneditor compare/diff viewer.
+# Interactive JSON diff viewer for PRs with Redis hset/set or JSON files.
 #
 # Usage:
-#   ./jsoneditor.sh --pr boddle-learning/metadata-scripts/pull/244
-#   ./jsoneditor.sh --pr 244                                         # defaults to boddle-learning/metadata-scripts
-#   ./jsoneditor.sh --pr 244 --port 5174
-#   ./jsoneditor.sh --pr 244 --metadata-repo /path/to/metadata-scripts/main
+#   ./jsoneditor.sh --pr owner/repo/pull/244
+#   ./jsoneditor.sh --pr 244 --repo owner/repo
+#   ./jsoneditor.sh --pr 244 --repo owner/repo --port 5174
+#   ./jsoneditor.sh --pr 244 --repo owner/repo --local-repo /path/to/clone
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-DEFAULT_REPO="boddle-learning/metadata-scripts"
-DEFAULT_METADATA_REPO="$(cd "$SCRIPT_DIR/../metadata-scripts/main" 2>/dev/null && pwd || echo "")"
 
 # --- Parse arguments ---
 PR_REF=""
+GH_REPO=""
 PORT=5173
-METADATA_REPO=""
+LOCAL_REPO=""
 
 usage() {
-  echo "Usage: $0 --pr <PR_NUMBER|PR_URL> [--port PORT] [--metadata-repo PATH]"
+  echo "Usage: $0 --pr <PR_NUMBER|PR_URL> [--repo OWNER/REPO] [--port PORT] [--local-repo PATH]"
   echo ""
   echo "Options:"
-  echo "  --pr             PR number or full URL (e.g. 244 or boddle-learning/metadata-scripts/pull/244)"
+  echo "  --pr             PR number or full URL (e.g. 244 or owner/repo/pull/244)"
+  echo "  --repo           GitHub repo (e.g. owner/repo). Required if --pr is just a number."
   echo "  --port           Dev server port (default: 5173)"
-  echo "  --metadata-repo  Path to metadata-scripts working tree (for hset_to_json.py)"
+  echo "  --local-repo     Path to local git clone (auto-discovered if not specified)"
   exit 1
 }
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --pr)      PR_REF="${2:?--pr requires a value}"; shift 2 ;;
-    --port)    PORT="${2:?--port requires a value}"; shift 2 ;;
-    --metadata-repo) METADATA_REPO="${2:?--metadata-repo requires a value}"; shift 2 ;;
-    -h|--help) usage ;;
-    *)         echo "Unknown argument: $1"; usage ;;
+    --pr)         PR_REF="${2:?--pr requires a value}"; shift 2 ;;
+    --repo)       GH_REPO="${2:?--repo requires a value}"; shift 2 ;;
+    --port)       PORT="${2:?--port requires a value}"; shift 2 ;;
+    --local-repo) LOCAL_REPO="${2:?--local-repo requires a value}"; shift 2 ;;
+    -h|--help)    usage ;;
+    *)            echo "Unknown argument: $1"; usage ;;
   esac
 done
 
 [[ -z "$PR_REF" ]] && usage
 
-# --- Resolve metadata-scripts repo and parser ---
-if [[ -z "$METADATA_REPO" ]]; then
-  METADATA_REPO="$DEFAULT_METADATA_REPO"
-fi
-
-# Prefer local enhanced parser (handles both HSET and SET commands)
-PARSER="$SCRIPT_DIR/tools/hset_to_json.py"
-if [[ ! -f "$PARSER" ]]; then
-  PARSER=""
-  if [[ -n "$METADATA_REPO" && -f "$METADATA_REPO/tools/hset_to_json.py" ]]; then
-    PARSER="$METADATA_REPO/tools/hset_to_json.py"
-  fi
-fi
-
 # --- Parse PR reference ---
-GH_REPO="$DEFAULT_REPO"
-
 if [[ "$PR_REF" =~ ^([^/]+/[^/]+)/pull/([0-9]+)$ ]]; then
   GH_REPO="${BASH_REMATCH[1]}"
   PR_NUMBER="${BASH_REMATCH[2]}"
 elif [[ "$PR_REF" =~ ^[0-9]+$ ]]; then
   PR_NUMBER="$PR_REF"
+  if [[ -z "$GH_REPO" ]]; then
+    echo "Error: --repo is required when --pr is just a number"
+    usage
+  fi
 else
   echo "Error: Cannot parse PR reference: $PR_REF"
   echo "Expected: PR number (e.g. 244) or owner/repo/pull/NUMBER"
   exit 1
 fi
 
+REPO_NAME="${GH_REPO#*/}"
+
 echo "Fetching PR #$PR_NUMBER from $GH_REPO..."
 
-# --- Get PR info (small JSON, jq is fine here) ---
+# --- Get PR info ---
 PR_INFO=$(gh pr view "$PR_NUMBER" --repo "$GH_REPO" \
   --json baseRefName,headRefName,files,title,number)
 
@@ -86,44 +74,48 @@ echo "  Title: $PR_TITLE"
 echo "  Base:  $BASE_REF_NAME"
 echo "  Head:  $HEAD_REF_NAME"
 
-# --- Find the metadata-scripts git dir ---
-if [[ -z "$METADATA_REPO" || ! -d "$METADATA_REPO/.git" ]] && [[ -z "$METADATA_REPO" || ! -f "$METADATA_REPO/.git" ]]; then
+# --- Find the local repo ---
+if [[ -z "$LOCAL_REPO" ]]; then
   for candidate in \
-    "$SCRIPT_DIR/../metadata-scripts/main" \
-    "$SCRIPT_DIR/../metadata-scripts" \
-    "$HOME/Work/boddle-projects/metadata-scripts/main"; do
+    "$SCRIPT_DIR/../${REPO_NAME}/main" \
+    "$SCRIPT_DIR/../${REPO_NAME}"; do
     if [[ -d "$candidate" ]] && git -C "$candidate" rev-parse --git-dir &>/dev/null; then
-      METADATA_REPO="$candidate"
+      LOCAL_REPO="$candidate"
       break
     fi
   done
 fi
 
-if [[ -z "$METADATA_REPO" ]] || ! git -C "$METADATA_REPO" rev-parse --git-dir &>/dev/null; then
-  echo "Error: Could not find metadata-scripts git repo."
-  echo "Specify with --metadata-repo /path/to/metadata-scripts/main"
+if [[ -z "$LOCAL_REPO" ]] || ! git -C "$LOCAL_REPO" rev-parse --git-dir &>/dev/null; then
+  echo "Error: Could not find a local git clone for $GH_REPO."
+  echo "Specify with --local-repo /path/to/repo"
   exit 1
 fi
 
-if [[ -z "$PARSER" && -f "$METADATA_REPO/tools/hset_to_json.py" ]]; then
-  PARSER="$METADATA_REPO/tools/hset_to_json.py"
+# --- Resolve parser ---
+PARSER="$SCRIPT_DIR/tools/hset_to_json.py"
+if [[ ! -f "$PARSER" ]]; then
+  PARSER=""
+  if [[ -n "$LOCAL_REPO" && -f "$LOCAL_REPO/tools/hset_to_json.py" ]]; then
+    PARSER="$LOCAL_REPO/tools/hset_to_json.py"
+  fi
 fi
 
-echo "  Using repo: $METADATA_REPO"
+echo "  Using repo: $LOCAL_REPO"
 
 # --- Fetch refs ---
 echo "Fetching refs..."
-git -C "$METADATA_REPO" fetch origin "$BASE_REF_NAME" --quiet 2>/dev/null || true
-git -C "$METADATA_REPO" fetch origin "$HEAD_REF_NAME" --quiet 2>/dev/null || true
+git -C "$LOCAL_REPO" fetch origin "$BASE_REF_NAME" --quiet 2>/dev/null || true
+git -C "$LOCAL_REPO" fetch origin "$HEAD_REF_NAME" --quiet 2>/dev/null || true
 
 BASE_REF="origin/$BASE_REF_NAME"
 HEAD_REF="origin/$HEAD_REF_NAME"
 
 # --- Get changed files ---
-CHANGED_FILES=$(echo "$PR_INFO" | jq -r '.files[].path' | grep '^scripts/' || true)
+CHANGED_FILES=$(echo "$PR_INFO" | jq -r '.files[].path')
 
 if [[ -z "$CHANGED_FILES" ]]; then
-  echo "No script files changed in this PR."
+  echo "No files changed in this PR."
   exit 0
 fi
 
@@ -131,7 +123,6 @@ echo "Changed files:"
 echo "$CHANGED_FILES" | sed 's/^/  /'
 
 # --- Write individual JSON files to static/pr-diff/ ---
-# No jq on large data — just pipe git show through the hset parser straight to files.
 PR_DATA_DIR="$SCRIPT_DIR/static/pr-diff"
 rm -rf "$PR_DATA_DIR"
 mkdir -p "$PR_DATA_DIR"
@@ -140,25 +131,22 @@ FILE_LIST=""
 
 while IFS= read -r filepath; do
   echo "  Parsing $filepath..."
-
-  # Sanitize filename: scripts/metadata_items -> metadata_items
   SAFE_NAME=$(echo "$filepath" | tr '/' '_')
 
   if [[ -n "$PARSER" ]]; then
-    git -C "$METADATA_REPO" show "${BASE_REF}:${filepath}" 2>/dev/null \
+    git -C "$LOCAL_REPO" show "${BASE_REF}:${filepath}" 2>/dev/null \
       | python3 "$PARSER" > "$PR_DATA_DIR/${SAFE_NAME}.base.json" 2>/dev/null || echo "{}" > "$PR_DATA_DIR/${SAFE_NAME}.base.json"
-    git -C "$METADATA_REPO" show "${HEAD_REF}:${filepath}" 2>/dev/null \
+    git -C "$LOCAL_REPO" show "${HEAD_REF}:${filepath}" 2>/dev/null \
       | python3 "$PARSER" > "$PR_DATA_DIR/${SAFE_NAME}.head.json" 2>/dev/null || echo "{}" > "$PR_DATA_DIR/${SAFE_NAME}.head.json"
   else
-    git -C "$METADATA_REPO" show "${BASE_REF}:${filepath}" > "$PR_DATA_DIR/${SAFE_NAME}.base.json" 2>/dev/null || echo "{}" > "$PR_DATA_DIR/${SAFE_NAME}.base.json"
-    git -C "$METADATA_REPO" show "${HEAD_REF}:${filepath}" > "$PR_DATA_DIR/${SAFE_NAME}.head.json" 2>/dev/null || echo "{}" > "$PR_DATA_DIR/${SAFE_NAME}.head.json"
+    git -C "$LOCAL_REPO" show "${BASE_REF}:${filepath}" > "$PR_DATA_DIR/${SAFE_NAME}.base.json" 2>/dev/null || echo "{}" > "$PR_DATA_DIR/${SAFE_NAME}.base.json"
+    git -C "$LOCAL_REPO" show "${HEAD_REF}:${filepath}" > "$PR_DATA_DIR/${SAFE_NAME}.head.json" 2>/dev/null || echo "{}" > "$PR_DATA_DIR/${SAFE_NAME}.head.json"
   fi
 
-  # Append to file list (newline-separated "path|safename" pairs)
   FILE_LIST="${FILE_LIST}${filepath}|${SAFE_NAME}\n"
 done <<< "$CHANGED_FILES"
 
-# --- Write a small manifest (only scalar metadata, no large JSON) ---
+# --- Write manifest ---
 cat > "$PR_DATA_DIR/manifest.json" <<MANIFEST
 {
   "prNumber": $PR_NUM,

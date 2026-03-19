@@ -1,6 +1,7 @@
 import { execSync } from 'node:child_process'
-import { existsSync } from 'node:fs'
+import { existsSync, mkdirSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { tmpdir } from 'node:os'
 import { error } from '@sveltejs/kit'
 import { parseHsetFile } from '$lib/logic/hsetParser.js'
 import type { PageServerLoad } from './$types.js'
@@ -21,12 +22,22 @@ interface PrInfo {
   files: PrFile[]
 }
 
-function findMetadataRepo(): string | null {
+function exec(cmd: string, options?: { cwd?: string }): string {
+  return execSync(cmd, { ...options, stdio: 'pipe', encoding: 'utf-8', timeout: 60000 }).trim()
+}
+
+/**
+ * Resolve or clone the repo locally.
+ * Checks common worktree locations first, falls back to a cached shallow clone.
+ */
+function resolveRepo(org: string, repo: string): string {
   const cwd = process.cwd()
+  const home = process.env.HOME ?? ''
+
+  // Check common local worktree locations (siblings of this project)
   const candidates = [
-    resolve(cwd, '../metadata-scripts/main'),
-    resolve(cwd, '../metadata-scripts'),
-    resolve(process.env.HOME ?? '', 'Work/boddle-projects/metadata-scripts/main')
+    resolve(cwd, `../${repo}/main`),
+    resolve(cwd, `../${repo}`)
   ]
 
   for (const dir of candidates) {
@@ -38,11 +49,20 @@ function findMetadataRepo(): string | null {
       // not a git repo
     }
   }
-  return null
-}
 
-function exec(cmd: string, options?: { cwd?: string }): string {
-  return execSync(cmd, { ...options, stdio: 'pipe', encoding: 'utf-8', timeout: 30000 }).trim()
+  // No local clone found — create a cached shallow clone
+  const cacheDir = resolve(tmpdir(), 'jsonator-repos', `${org}_${repo}`)
+  if (existsSync(resolve(cacheDir, '.git'))) {
+    // Already cloned — just fetch
+    try {
+      exec('git fetch origin --quiet', { cwd: cacheDir })
+    } catch { /* ignore fetch errors */ }
+    return cacheDir
+  }
+
+  mkdirSync(resolve(tmpdir(), 'jsonator-repos'), { recursive: true })
+  exec(`gh repo clone "${org}/${repo}" "${cacheDir}" -- --bare --quiet`)
+  return cacheDir
 }
 
 function gitShow(repoDir: string, ref: string, filepath: string): string | null {
@@ -51,6 +71,27 @@ function gitShow(repoDir: string, ref: string, filepath: string): string | null 
   } catch {
     return null
   }
+}
+
+/**
+ * Try to parse file content as JSON. If it fails, try the hset/set parser.
+ * Returns the parsed object, or null if unparseable.
+ */
+function smartParse(content: string): unknown | null {
+  // Try plain JSON first
+  try {
+    return JSON.parse(content)
+  } catch {
+    // not JSON
+  }
+
+  // Try hset/set Redis format
+  const parsed = parseHsetFile(content)
+  if (Object.keys(parsed).length > 0) {
+    return parsed
+  }
+
+  return null
 }
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -73,41 +114,45 @@ export const load: PageServerLoad = async ({ params }) => {
     error(502, `Failed to fetch PR #${prNumber} from ${ghRepo}: ${e}`)
   }
 
-  // Find the metadata-scripts repo
-  const metadataRepo = findMetadataRepo()
-  if (!metadataRepo) {
-    error(500, 'Could not find metadata-scripts git repo')
+  // Resolve or clone the repo
+  let repoDir: string
+  try {
+    repoDir = resolveRepo(org, repo)
+  } catch (e) {
+    error(500, `Could not resolve repo ${ghRepo}: ${e}`)
   }
 
   // Fetch remote refs
   try {
-    exec(`git fetch origin "${prInfo.baseRefName}" --quiet`, { cwd: metadataRepo })
+    exec(`git fetch origin "${prInfo.baseRefName}" --quiet`, { cwd: repoDir })
   } catch { /* ignore */ }
   try {
-    exec(`git fetch origin "${prInfo.headRefName}" --quiet`, { cwd: metadataRepo })
+    exec(`git fetch origin "${prInfo.headRefName}" --quiet`, { cwd: repoDir })
   } catch { /* ignore */ }
 
   const baseRef = `origin/${prInfo.baseRefName}`
   const headRef = `origin/${prInfo.headRefName}`
 
-  // Get changed script files
-  const scriptFiles = prInfo.files.filter((f) => f.path.startsWith('scripts/'))
+  // Process ALL changed files — smart parse determines if they're JSON-parseable
+  const files: Array<{ path: string; key: string; baseJson: unknown; headJson: unknown }> = []
 
-  // Parse each file
-  const files = scriptFiles.map((f) => {
-    const baseContent = gitShow(metadataRepo, baseRef, f.path)
-    const headContent = gitShow(metadataRepo, headRef, f.path)
+  for (const f of prInfo.files) {
+    const baseContent = gitShow(repoDir, baseRef, f.path)
+    const headContent = gitShow(repoDir, headRef, f.path)
 
-    const baseJson = baseContent ? parseHsetFile(baseContent) : {}
-    const headJson = headContent ? parseHsetFile(headContent) : {}
+    const baseJson = baseContent ? smartParse(baseContent) : null
+    const headJson = headContent ? smartParse(headContent) : null
 
-    return {
+    // Skip files that aren't JSON-parseable on either side
+    if (baseJson === null && headJson === null) continue
+
+    files.push({
       path: f.path,
       key: f.path.replace(/\//g, '_'),
-      baseJson,
-      headJson
-    }
-  })
+      baseJson: baseJson ?? {},
+      headJson: headJson ?? {}
+    })
+  }
 
   return {
     prNumber: prInfo.number,
