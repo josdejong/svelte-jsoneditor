@@ -1233,7 +1233,11 @@
     }
   }
 
-  function disableTextEditor(text: string, maxDocumentSize: number, acceptTooLarge: boolean): boolean {
+  function disableTextEditor(
+    text: string,
+    maxDocumentSize: number,
+    acceptTooLarge: boolean
+  ): boolean {
     const tooLarge = text ? text.length > maxDocumentSize : false
     return tooLarge && !acceptTooLarge
   }

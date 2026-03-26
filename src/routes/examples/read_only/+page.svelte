@@ -4,7 +4,7 @@
   const maxDocumentSizeTextMode = 10 * 1024 * 1024
 
   let text = $state(
-      '{\n' +
+    '{\n' +
       '  "array": [1, 2, 3],\n' +
       '  "boolean": true,\n' +
       '  "color": "#82b92c",\n' +
