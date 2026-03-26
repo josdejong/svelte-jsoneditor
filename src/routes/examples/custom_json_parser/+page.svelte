@@ -1,21 +1,21 @@
 <script>
-  import { JSONEditor } from 'svelte-jsoneditor'
-  import { parse, stringify } from 'lossless-json'
+import { parse, stringify } from 'lossless-json'
+import { JSONEditor } from 'svelte-jsoneditor'
 
-  const LosslessJSONParser = { parse, stringify }
+const LosslessJSONParser = { parse, stringify }
 
-  let content = $state({
-    text: `{
+let content = $state({
+  text: `{
   "using": "Lossless JSON Parser",
   "formatted number": 4.0,
   "long": 9123372036854000123,
   "large": 1e500,
   "small": 1e-500
 }`,
-    json: undefined
-  })
+  json: undefined
+})
 
-  $inspect('content', content)
+$inspect('content', content)
 </script>
 
 <svelte:head>

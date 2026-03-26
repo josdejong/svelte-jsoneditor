@@ -1,74 +1,74 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { onMount } from 'svelte'
-  import Icon from 'svelte-awesome'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
-  import { faLightbulb } from '@fortawesome/free-regular-svg-icons'
-  import { findNearestElement } from '$lib/utils/domUtils.js'
-  import type { ContextMenuItem, MenuItem } from '$lib/types.js'
-  import {
-    isContextMenuColumn,
-    isContextMenuRow,
-    isMenuButton,
-    isMenuDropDownButton,
-    isMenuLabel,
-    isMenuSeparator
-  } from '$lib/typeguards.js'
-  import ContextMenuButton from './ContextMenuButton.svelte'
-  import ContextMenuDropDownButton from './ContextMenuDropDownButton.svelte'
+import { faLightbulb } from '@fortawesome/free-regular-svg-icons'
+import { onMount } from 'svelte'
+import Icon from 'svelte-awesome'
+import {
+  isContextMenuColumn,
+  isContextMenuRow,
+  isMenuButton,
+  isMenuDropDownButton,
+  isMenuLabel,
+  isMenuSeparator
+} from '$lib/typeguards.js'
+import type { ContextMenuItem, MenuItem } from '$lib/types.js'
+import { findNearestElement } from '$lib/utils/domUtils.js'
+import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
+import ContextMenuButton from './ContextMenuButton.svelte'
+import ContextMenuDropDownButton from './ContextMenuDropDownButton.svelte'
 
-  export let items: ContextMenuItem[]
-  export let onRequestClose: () => void
-  export let tip: string | undefined
+export let items: ContextMenuItem[]
+export let onRequestClose: () => void
+export let tip: string | undefined
 
-  let refContextMenu: HTMLDivElement
+let refContextMenu: HTMLDivElement
 
-  onMount(() => {
-    const firstEnabledButton = Array.from(refContextMenu.querySelectorAll('button')).find(
-      (button) => !button.disabled
+onMount(() => {
+  const firstEnabledButton = Array.from(refContextMenu.querySelectorAll('button')).find(
+    (button) => !button.disabled
+  )
+
+  if (firstEnabledButton) {
+    firstEnabledButton.focus()
+  }
+})
+
+const directionByCombo: Record<string, 'Up' | 'Down' | 'Left' | 'Right'> = {
+  ArrowUp: 'Up',
+  ArrowDown: 'Down',
+  ArrowLeft: 'Left',
+  ArrowRight: 'Right'
+}
+
+function handleKeyDown(event: KeyboardEvent & { currentTarget: EventTarget & HTMLDivElement }) {
+  const combo = keyComboFromEvent(event)
+  const direction: 'Up' | 'Down' | 'Left' | 'Right' | undefined = directionByCombo[combo]
+
+  if (direction && event.target) {
+    event.preventDefault()
+
+    const buttons: HTMLButtonElement[] = Array.from(
+      refContextMenu.querySelectorAll('button:not([disabled])')
     )
-
-    if (firstEnabledButton) {
-      firstEnabledButton.focus()
-    }
-  })
-
-  const directionByCombo: Record<string, 'Up' | 'Down' | 'Left' | 'Right'> = {
-    ArrowUp: 'Up',
-    ArrowDown: 'Down',
-    ArrowLeft: 'Left',
-    ArrowRight: 'Right'
-  }
-
-  function handleKeyDown(event: KeyboardEvent & { currentTarget: EventTarget & HTMLDivElement }) {
-    const combo = keyComboFromEvent(event)
-    const direction: 'Up' | 'Down' | 'Left' | 'Right' | undefined = directionByCombo[combo]
-
-    if (direction && event.target) {
-      event.preventDefault()
-
-      const buttons: HTMLButtonElement[] = Array.from(
-        refContextMenu.querySelectorAll('button:not([disabled])')
-      )
-      const nearest = findNearestElement<HTMLButtonElement>({
-        allElements: buttons,
-        currentElement: event.target as unknown as HTMLButtonElement,
-        direction,
-        hasPrio: (element: HTMLButtonElement) => {
-          return element.getAttribute('data-type') !== 'jse-open-dropdown'
-        }
-      })
-      if (nearest) {
-        nearest.focus()
+    const nearest = findNearestElement<HTMLButtonElement>({
+      allElements: buttons,
+      currentElement: event.target as unknown as HTMLButtonElement,
+      direction,
+      hasPrio: (element: HTMLButtonElement) => {
+        return element.getAttribute('data-type') !== 'jse-open-dropdown'
       }
+    })
+    if (nearest) {
+      nearest.focus()
     }
   }
+}
 
-  function unknownMenuItem(item: MenuItem): string {
-    console.error('Unknown type of context menu item', item)
-    return '???'
-  }
+function unknownMenuItem(item: MenuItem): string {
+  console.error('Unknown type of context menu item', item)
+  return '???'
+}
 </script>
 
 <div

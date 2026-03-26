@@ -1,8 +1,8 @@
-import type { ValueNormalization } from '$lib/types.js'
-import { SelectionType } from '$lib/types.js'
 import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 import { map, minBy } from 'lodash-es'
+import type { ValueNormalization } from '$lib/types.js'
+import { SelectionType } from '$lib/types.js'
 
 /**
  * Create serialization functions to escape and stringify text,
@@ -18,16 +18,13 @@ export function createNormalizationFunctions({
   if (escapeControlCharacters) {
     if (escapeUnicodeCharacters) {
       return normalizeControlAndUnicode
-    } else {
-      return normalizeControl
     }
-  } else {
-    if (escapeUnicodeCharacters) {
-      return normalizeUnicode
-    } else {
-      return normalizeNothing
-    }
+    return normalizeControl
   }
+  if (escapeUnicodeCharacters) {
+    return normalizeUnicode
+  }
+  return normalizeNothing
 }
 
 const normalizeControlAndUnicode = {
@@ -69,8 +66,7 @@ export function jsonUnescapeUnicode(value: string): string {
       const unescaped: string = JSON.parse('"' + x + '"')
       // the resolved character can be a control character like " or \n,
       // that would result in invalid JSON, so we need to keep that escaped
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error
       return controlCharacters[unescaped] || unescaped
     } catch {
       return x
@@ -105,16 +101,14 @@ const escapedControlCharacters = {
 
 export function jsonEscapeControl(value: string): string {
   return value.replace(/["\b\f\n\r\t\\]/g, (x) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    // @ts-expect-error
     return controlCharacters[x] || x
   })
 }
 
 export function jsonUnescapeControl(value: string): string {
   return value.replace(/\\["bfnrt\\]/g, (x) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    // @ts-expect-error
     return escapedControlCharacters[x] || x
   })
 }

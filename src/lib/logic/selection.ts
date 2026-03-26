@@ -10,14 +10,9 @@ import {
   parsePath
 } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
+import { CaretType, SelectionType } from '$lib/types.js'
+import { int } from '$lib/utils/numberUtils.js'
 import { isObjectOrArray } from '$lib/utils/typeUtils.js'
-import {
-  collapsePath,
-  getNextVisiblePath,
-  getPreviousVisiblePath,
-  getVisibleCaretPositions,
-  getVisiblePaths
-} from './documentState.js'
 import type {
   AfterSelection,
   CaretPosition,
@@ -33,8 +28,13 @@ import type {
   TextSelection,
   ValueSelection
 } from '../types.js'
-import { CaretType, SelectionType } from '$lib/types.js'
-import { int } from '$lib/utils/numberUtils.js'
+import {
+  collapsePath,
+  getNextVisiblePath,
+  getPreviousVisiblePath,
+  getVisibleCaretPositions,
+  getVisiblePaths
+} from './documentState.js'
 
 export function isAfterSelection(
   selection: JSONEditorSelection | undefined
@@ -129,55 +129,54 @@ export function iterateOverSelection<T>(
   if (isEqual(anchorPath, focusPath)) {
     // just a single node
     return callback(anchorPath)
-  } else {
-    // multiple nodes
-    if (json === undefined) {
-      return undefined
-    }
+  }
+  // multiple nodes
+  if (json === undefined) {
+    return undefined
+  }
 
-    const sharedPath = findSharedPath(anchorPath, focusPath)
+  const sharedPath = findSharedPath(anchorPath, focusPath)
 
-    if (anchorPath.length === sharedPath.length || focusPath.length === sharedPath.length) {
-      // a parent and a child, like ['arr', 1] and ['arr']
-      return callback(sharedPath)
-    }
+  if (anchorPath.length === sharedPath.length || focusPath.length === sharedPath.length) {
+    // a parent and a child, like ['arr', 1] and ['arr']
+    return callback(sharedPath)
+  }
 
-    const selection = createMultiSelection(anchorPath, focusPath)
-    const startPath = getStartPath(json, selection)
-    const endPath = getEndPath(json, selection)
+  const multiSelection = createMultiSelection(anchorPath, focusPath)
+  const startPath = getStartPath(json, multiSelection)
+  const endPath = getEndPath(json, multiSelection)
 
-    const startIndex = getChildIndex(json, selection, startPath)
-    const endIndex = getChildIndex(json, selection, endPath)
+  const startIndex = getChildIndex(json, multiSelection, startPath)
+  const endIndex = getChildIndex(json, multiSelection, endPath)
 
-    if (startIndex === -1 || endIndex === -1) {
-      return undefined
-    }
+  if (startIndex === -1 || endIndex === -1) {
+    return undefined
+  }
 
-    const value = getIn(json, sharedPath)
+  const value = getIn(json, sharedPath)
 
-    if (isJSONObject(value)) {
-      const keys = Object.keys(value)
+  if (isJSONObject(value)) {
+    const keys = Object.keys(value)
 
-      for (let i = startIndex; i <= endIndex; i++) {
-        const value = callback(sharedPath.concat(keys[i]))
-        if (value !== undefined) {
-          return value
-        }
+    for (let i = startIndex; i <= endIndex; i++) {
+      const value = callback(sharedPath.concat(keys[i]))
+      if (value !== undefined) {
+        return value
       }
-
-      return undefined
     }
 
-    if (isJSONArray(value)) {
-      for (let i = startIndex; i <= endIndex; i++) {
-        const value = callback(sharedPath.concat(String(i)))
-        if (value !== undefined) {
-          return value
-        }
+    return undefined
+  }
+
+  if (isJSONArray(value)) {
+    for (let i = startIndex; i <= endIndex; i++) {
+      const value = callback(sharedPath.concat(String(i)))
+      if (value !== undefined) {
+        return value
       }
-
-      return undefined
     }
+
+    return undefined
   }
 
   throw new Error('Failed to create selection')
@@ -186,9 +185,8 @@ export function iterateOverSelection<T>(
 export function getParentPath(selection: JSONSelection): JSONPath {
   if (isInsideSelection(selection)) {
     return selection.path
-  } else {
-    return initial(getFocusPath(selection))
   }
+  return initial(getFocusPath(selection))
 }
 
 export function getStartPath(json: unknown, selection: JSONSelection): JSONPath {
@@ -266,9 +264,8 @@ export function getSelectionUp(
     if (Array.isArray(parent) || isEmpty(previousPath)) {
       // switch to value selection: array has no keys, and root object also not
       return createValueSelection(previousPath)
-    } else {
-      return createKeySelection(previousPath)
     }
+    return createKeySelection(previousPath)
   }
 
   if (isValueSelection(selection)) {
@@ -341,9 +338,8 @@ export function getSelectionDown(
     if (Array.isArray(parent)) {
       // switch to value selection: array has no keys
       return createValueSelection(nextPath)
-    } else {
-      return createKeySelection(nextPath)
     }
+    return createKeySelection(nextPath)
   }
 
   if (isMultiSelection(selection)) {
@@ -376,9 +372,8 @@ export function getSelectionNextInside(
 
   if (nextPathInside) {
     return createValueSelection(parentPath.concat(nextPathInside))
-  } else {
-    return createAfterSelection(path)
   }
+  return createAfterSelection(path)
 }
 
 /**
@@ -698,24 +693,22 @@ export function selectionToPartialJson(
         // do not suffix a single selected array item with a comma
         const item = getIn(json, selection.focusPath)
         return parser.stringify(item, null, indentation)
-      } else {
-        return getSelectionPaths(json, selection)
-          .map((path) => {
-            const item = getIn(json, path)
-            return `${parser.stringify(item, null, indentation)},`
-          })
-          .join('\n')
       }
-    } else {
-      // parent is Object
       return getSelectionPaths(json, selection)
         .map((path) => {
-          const key = last(path)
-          const value = getIn(json, path)
-          return `${parser.stringify(key)}: ${parser.stringify(value, null, indentation)},`
+          const item = getIn(json, path)
+          return `${parser.stringify(item, null, indentation)},`
         })
         .join('\n')
     }
+    // parent is Object
+    return getSelectionPaths(json, selection)
+      .map((path) => {
+        const key = last(path)
+        const value = getIn(json, path)
+        return `${parser.stringify(key)}: ${parser.stringify(value, null, indentation)},`
+      })
+      .join('\n')
   }
 
   return undefined
@@ -756,7 +749,6 @@ export function canConvert(selection: JSONSelection | undefined): boolean {
 }
 
 // TODO: unit test
-// eslint-disable-next-line consistent-return
 export function fromCaretPosition(caretPosition: CaretPosition): JSONSelection {
   switch (caretPosition.type) {
     case CaretType.key:
@@ -771,7 +763,6 @@ export function fromCaretPosition(caretPosition: CaretPosition): JSONSelection {
 }
 
 // TODO: unit test
-// eslint-disable-next-line consistent-return
 export function fromSelectionType(selectionType: SelectionType, path: JSONPath): JSONSelection {
   switch (selectionType) {
     case SelectionType.key:

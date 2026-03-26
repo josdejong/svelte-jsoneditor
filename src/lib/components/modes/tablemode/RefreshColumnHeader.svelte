@@ -1,13 +1,13 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import Icon from 'svelte-awesome'
-  import { faRotate } from '@fortawesome/free-solid-svg-icons'
+import { faRotate } from '@fortawesome/free-solid-svg-icons'
+import Icon from 'svelte-awesome'
 
-  export let count: number
-  export let maxSampleCount: number
-  export let readOnly: boolean
-  export let onRefresh: () => void
+export let count: number
+export let maxSampleCount: number
+export let readOnly: boolean
+export let onRefresh: () => void
 </script>
 
 <button

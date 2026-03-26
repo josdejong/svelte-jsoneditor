@@ -5,18 +5,17 @@ import {
   isJSONObject,
   parseJSONPointer
 } from 'immutable-json-patch'
+import type { Dictionary } from 'lodash'
 import { groupBy, isEmpty, isEqual, mapValues, partition } from 'lodash-es'
 import type { JSONSelection, SortedColumn, TableCellIndex, ValidationError } from '$lib/types.js'
 import { ValidationSeverity } from '$lib/types.js'
-import { createValueSelection, getFocusPath, pathStartsWith } from './selection.js'
-import { containsNumber } from '../utils/numberUtils.js'
-import type { Dictionary } from 'lodash'
-import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
 import { forEachSample } from '$lib/utils/arrayUtils.js'
+import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
 import { isObject } from '$lib/utils/typeUtils.js'
+import { containsNumber } from '../utils/numberUtils.js'
+import { createValueSelection, getFocusPath, pathStartsWith } from './selection.js'
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
+// @ts-expect-error
 type NestedObject = Record<string, NestedObject>
 
 const endOfPath = Symbol('path')
@@ -24,7 +23,7 @@ const endOfPath = Symbol('path')
 export function getColumns(
   array: Array<unknown>,
   flatten: boolean,
-  maxSampleCount = Infinity
+  maxSampleCount = Number.POSITIVE_INFINITY
 ): JSONPath[] {
   const merged: NestedObject = {}
 
@@ -282,7 +281,9 @@ export function selectNextRow(
 ): JSONSelection {
   const { rowIndex, columnIndex } = toTableCellPosition(getFocusPath(selection), columns)
 
-  if (rowIndex < (json as Array<unknown>).length - 1) {
+  if (rowIndex < (json as Array<unknown>)
+  .length - 1)
+  {
     const nextPosition = { rowIndex: rowIndex + 1, columnIndex }
     const nextPath = fromTableCellPosition(nextPosition, columns)
     return createValueSelection(nextPath)
@@ -318,7 +319,7 @@ export function selectNextColumn(columns: JSONPath[], selection: JSONSelection):
 export function toTableCellPosition(path: JSONPath, columns: JSONPath[]): TableCellIndex {
   const [index, ...column] = path
 
-  const rowIndex = parseInt(index, 10)
+  const rowIndex = Number.parseInt(index, 10)
 
   return {
     rowIndex: !isNaN(rowIndex) ? rowIndex : -1,
@@ -415,7 +416,7 @@ export function mergeValidationErrors(
 }
 
 function findRowIndex(error: ValidationError): number {
-  return parseInt(error.path[0], 10)
+  return Number.parseInt(error.path[0], 10)
 }
 
 function findColumnIndex(error: ValidationError, columns: JSONPath[]): number {

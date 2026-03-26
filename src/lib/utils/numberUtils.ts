@@ -1,5 +1,5 @@
 export function int(value: string): number {
-  return parseInt(value, 10)
+  return Number.parseInt(value, 10)
 }
 
 export function isDigit(char: string): boolean {

@@ -1,11 +1,11 @@
-import { test, describe } from 'vitest'
-import { createMultiSelection } from './selection.js'
-import { onMoveSelection } from './dragging.js'
-import type { MoveSelectionResult } from './dragging.js'
 import { deepStrictEqual, strictEqual } from 'assert'
-import { isEqual } from 'lodash-es'
-import type { RenderedItem } from '../types'
 import { immutableJSONPatch } from 'immutable-json-patch'
+import { isEqual } from 'lodash-es'
+import { describe, test } from 'vitest'
+import type { RenderedItem } from '../types'
+import type { MoveSelectionResult } from './dragging.js'
+import { onMoveSelection } from './dragging.js'
+import { createMultiSelection } from './selection.js'
 
 describe('dragging', () => {
   describe('onMoveSelection: array', () => {

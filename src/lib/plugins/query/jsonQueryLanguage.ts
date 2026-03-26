@@ -1,8 +1,8 @@
-import { jsonquery, type JSONQuery, parse, stringify } from '@jsonquerylang/jsonquery'
-import { parseString } from '$lib/utils/stringUtils.js'
-import type { JSONParser, QueryLanguage, QueryLanguageOptions } from '$lib/types.js'
+import { type JSONQuery, jsonquery, parse, stringify } from '@jsonquerylang/jsonquery'
 import type { JSONPath } from 'immutable-json-patch'
+import type { JSONParser, QueryLanguage, QueryLanguageOptions } from '$lib/types.js'
 import { isEqualParser } from '$lib/utils/jsonUtils'
+import { parseString } from '$lib/utils/stringUtils.js'
 
 const description = `
 <p>

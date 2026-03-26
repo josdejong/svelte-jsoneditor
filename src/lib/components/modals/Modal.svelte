@@ -1,21 +1,22 @@
 <script lang="ts">
-  // code based on: https://svelte.dev/examples/modal
-  import { onEscape } from '$lib/actions/onEscape.js'
-  import { onDestroy, onMount } from 'svelte'
-  import { classnames } from '$lib/utils/cssUtils.js'
+// code based on: https://svelte.dev/examples/modal
 
-  export let className: string | undefined = undefined
-  export let fullscreen = false
-  export let onClose: () => void
+import { onDestroy, onMount } from 'svelte'
+import { onEscape } from '$lib/actions/onEscape.js'
+import { classnames } from '$lib/utils/cssUtils.js'
 
-  let dialog: HTMLDialogElement
+export let className: string | undefined = undefined
+export let fullscreen = false
+export let onClose: () => void
 
-  onMount(() => dialog.showModal())
-  onDestroy(() => dialog.close())
+let dialog: HTMLDialogElement
 
-  function close() {
-    onClose()
-  }
+onMount(() => dialog.showModal())
+onDestroy(() => dialog.close())
+
+function close() {
+  onClose()
+}
 </script>
 
 <dialog

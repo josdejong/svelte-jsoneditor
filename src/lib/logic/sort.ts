@@ -1,4 +1,3 @@
-import diffSequence from '../generated/diffSequence.js'
 import type { JSONPatchDocument, JSONPatchOperation, JSONPath } from 'immutable-json-patch'
 import {
   compileJSONPointer,
@@ -12,6 +11,7 @@ import {
 } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
 import naturalCompare from 'natural-compare-lite'
+import diffSequence from '../generated/diffSequence.js'
 import { int } from '../utils/numberUtils.js'
 import { isObject, isObjectOrArray } from '../utils/typeUtils.js'
 
@@ -141,8 +141,7 @@ function createObjectComparator(propertyPath: JSONPath, direction: 1 | -1) {
 
     // Order two numbers, two strings, or two booleans
     if (typeof valueA === 'number' || typeof valueA === 'boolean') {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error
       return valueA > valueB ? direction : valueA < valueB ? -direction : 0
     }
 

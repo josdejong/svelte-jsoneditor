@@ -1,20 +1,20 @@
 <script lang="ts">
-  import type { MenuDropDownButton } from '$lib/types'
-  import DropdownButton from '../DropdownButton.svelte'
-  import Icon from 'svelte-awesome'
-  import { classnames } from '$lib/utils/cssUtils.js'
+import Icon from 'svelte-awesome'
+import type { MenuDropDownButton } from '$lib/types'
+import { classnames } from '$lib/utils/cssUtils.js'
+import DropdownButton from '../DropdownButton.svelte'
 
-  export let item: MenuDropDownButton
-  export let className: string | undefined = undefined
-  export let onRequestClose: () => void
+export let item: MenuDropDownButton
+export let className: string | undefined = undefined
+export let onRequestClose: () => void
 
-  $: items = item.items.map((item) => ({
-    ...item,
-    onClick: (event: MouseEvent) => {
-      onRequestClose()
-      item.onClick(event)
-    }
-  }))
+$: items = item.items.map((item) => ({
+  ...item,
+  onClick: (event: MouseEvent) => {
+    onRequestClose()
+    item.onClick(event)
+  }
+}))
 </script>
 
 <DropdownButton width={item.width} {items}>

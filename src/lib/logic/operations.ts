@@ -1,4 +1,3 @@
-import { cloneDeepWith, first, initial, isEmpty, isEqual, last, times } from 'lodash-es'
 import {
   compileJSONPointer,
   existsIn,
@@ -17,7 +16,10 @@ import {
   parseJSONPointer,
   revertJSONPatch
 } from 'immutable-json-patch'
+import { cloneDeepWith, first, initial, isEmpty, isEqual, last, times } from 'lodash-es'
+import type { ClipboardValues, DragInsideAction, JSONParser, JSONSelection } from '$lib/types'
 import { parseAndRepair, parseAndRepairOrUndefined, parsePartialJson } from '../utils/jsonUtils.js'
+import { int } from '../utils/numberUtils.js'
 import { findUniqueName } from '../utils/stringUtils.js'
 import { isObject, isObjectOrArray } from '../utils/typeUtils.js'
 import { getNextKeys } from './documentState.js'
@@ -38,8 +40,6 @@ import {
   isValueSelection,
   pathStartsWith
 } from './selection.js'
-import type { ClipboardValues, DragInsideAction, JSONParser, JSONSelection } from '$lib/types'
-import { int } from '../utils/numberUtils.js'
 
 /**
  * Create a JSONPatch for an insert operation.
@@ -66,7 +66,8 @@ export function insertBefore(
       path: compileJSONPointer(parentPath.concat(String(offset + index))),
       value: entry.value
     }))
-  } else if (isJSONObject(parent)) {
+  }
+  if (isJSONObject(parent)) {
     // 'object'
     const afterKey = last(path)
     const keys = Object.keys(parent)
@@ -86,9 +87,8 @@ export function insertBefore(
       // move all lower down keys so the inserted key will maintain its position
       ...nextKeys.map((key) => moveDown(parentPath, key))
     ]
-  } else {
-    throw new Error('Cannot create insert operations: parent must be an Object or Array')
   }
+  throw new Error('Cannot create insert operations: parent must be an Object or Array')
 }
 
 /**
@@ -109,17 +109,16 @@ export function append(json: unknown, path: JSONPath, values: ClipboardValues): 
       path: compileJSONPointer(path.concat(String(offset + index))),
       value: entry.value
     }))
-  } else {
-    // 'object'
-    return values.map((entry) => {
-      const newProp = findUniqueName(entry.key, Object.keys(parent as Record<string, unknown>))
-      return {
-        op: 'add',
-        path: compileJSONPointer(path.concat(newProp)),
-        value: entry.value
-      }
-    })
   }
+  // 'object'
+  return values.map((entry) => {
+    const newProp = findUniqueName(entry.key, Object.keys(parent as Record<string, unknown>))
+    return {
+      op: 'add',
+      path: compileJSONPointer(path.concat(newProp)),
+      value: entry.value
+    }
+  })
 }
 
 /**
@@ -184,7 +183,8 @@ export function replace(
         return operation
       })
     ]
-  } else if (isJSONObject(parent)) {
+  }
+  if (isJSONObject(parent)) {
     // parent is Object
     // if we're going to replace an existing object with key "a" with a new
     // key "a", we must not create a new unique name "a (copy)".
@@ -214,9 +214,8 @@ export function replace(
       // move all lower down keys so the renamed key will maintain its position
       ...nextKeys.map((key) => moveDown(parentPath, key))
     ]
-  } else {
-    throw new Error('Cannot create replace operations: parent must be an Object or Array')
   }
+  throw new Error('Cannot create replace operations: parent must be an Object or Array')
 }
 
 /**
@@ -254,7 +253,8 @@ export function duplicate(json: unknown, paths: JSONPath[]): JSONPatchDocument {
         return operation
       })
     ]
-  } else if (isJSONObject(parent)) {
+  }
+  if (isJSONObject(parent)) {
     // 'object'
     const keys = Object.keys(parent)
     const nextKeys = beforeKey !== undefined ? getNextKeys(keys, beforeKey, false) : []
@@ -276,9 +276,8 @@ export function duplicate(json: unknown, paths: JSONPath[]): JSONPatchDocument {
       // move all lower down keys so the renamed key will maintain it's position
       ...nextKeys.map((key) => moveDown(parentPath, key))
     ]
-  } else {
-    throw new Error('Cannot create duplicate operations: parent must be an Object or Array')
   }
+  throw new Error('Cannot create duplicate operations: parent must be an Object or Array')
 }
 
 /**
@@ -313,7 +312,8 @@ export function extract(json: unknown, selection: JSONSelection): JSONPatchDocum
           value
         }
       ]
-    } else if (isJSONObject(parent)) {
+    }
+    if (isJSONObject(parent)) {
       // object
       const value: Record<string, unknown> = {}
       getSelectionPaths(json, selection).forEach((path) => {
@@ -398,22 +398,21 @@ export function insert(
       const nextItemPath = parentPath.concat(String(index + 1))
 
       return insertBefore(json, nextItemPath, newValues)
-    } else if (isJSONObject(parent)) {
+    }
+    if (isJSONObject(parent)) {
       // value is an Object
       const key = String(last(path))
       const keys: string[] = Object.keys(parent)
       if (isEmpty(keys) || last(keys) === key) {
         return append(json, parentPath, newValues)
-      } else {
-        const index = keys.indexOf(key)
-        const nextKey = keys[index + 1]
-        const nextKeyPath = parentPath.concat(nextKey)
-
-        return insertBefore(json, nextKeyPath, newValues)
       }
-    } else {
-      throw new Error('Cannot create insert operations: parent must be an Object or Array')
+      const index = keys.indexOf(key)
+      const nextKey = keys[index + 1]
+      const nextKeyPath = parentPath.concat(nextKey)
+
+      return insertBefore(json, nextKeyPath, newValues)
     }
+    throw new Error('Cannot create insert operations: parent must be an Object or Array')
   }
 
   if (isInsideSelection(selection)) {
@@ -424,20 +423,19 @@ export function insert(
     if (isJSONArray(value)) {
       const firstItemPath = path.concat('0')
       return insertBefore(json, firstItemPath, newValues)
-    } else if (isJSONObject(value)) {
+    }
+    if (isJSONObject(value)) {
       // value is an Object
       const keys = Object.keys(value)
       if (isEmpty(keys)) {
         return append(json, path, newValues)
-      } else {
-        const firstKey = first(keys) as string
-        const firstKeyPath = path.concat(firstKey)
-
-        return insertBefore(json, firstKeyPath, newValues)
       }
-    } else {
-      throw new Error('Cannot create insert operations: parent must be an Object or Array')
+      const firstKey = first(keys) as string
+      const firstKeyPath = path.concat(firstKey)
+
+      return insertBefore(json, firstKeyPath, newValues)
     }
+    throw new Error('Cannot create insert operations: parent must be an Object or Array')
   }
 
   // this should never happen
@@ -481,19 +479,16 @@ export function moveInsideParent(
     if (startIndex !== -1 && endIndex !== -1 && toIndex !== -1) {
       if (toIndex > startIndex) {
         // moving down
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
+        // @ts-expect-error
         return [...keys.slice(startIndex, endIndex + 1), ...keys.slice(toIndex, keys.length)].map(
           (key) => moveDown(parentPath, key)
         )
-      } else {
-        // moving up
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        return [...keys.slice(toIndex, startIndex), ...keys.slice(endIndex + 1, keys.length)].map(
-          (key) => moveDown(parentPath, key)
-        )
       }
+      // moving up
+      // @ts-expect-error
+      return [...keys.slice(toIndex, startIndex), ...keys.slice(endIndex + 1, keys.length)].map(
+        (key) => moveDown(parentPath, key)
+      )
     }
   } else if (isJSONArray(parent)) {
     // array
@@ -511,16 +506,15 @@ export function moveInsideParent(
           path: compileJSONPointer(parentPath.concat(String(toIndex + offset)))
         }
       })
-    } else {
-      // move down
-      return times(count, () => {
-        return {
-          op: 'move',
-          from: compileJSONPointer(parentPath.concat(String(startIndex))),
-          path: compileJSONPointer(parentPath.concat(String(toIndex)))
-        }
-      })
     }
+    // move down
+    return times(count, () => {
+      return {
+        op: 'move',
+        from: compileJSONPointer(parentPath.concat(String(startIndex))),
+        path: compileJSONPointer(parentPath.concat(String(toIndex)))
+      }
+    })
   } else {
     throw new Error('Cannot create move operations: parent must be an Object or Array')
   }
@@ -555,10 +549,9 @@ export function createNewValue(
               ? undefined // leave object as is, will recurse into it
               : ''
         })
-      } else {
-        // just a primitive value
-        return ''
       }
+      // just a primitive value
+      return ''
     }
   }
 
@@ -696,7 +689,8 @@ export function createRemoveOperations(
           : createAfterSelection(parentPath.concat(String(index - 1)))
 
       return { operations, newSelection }
-    } else if (isJSONObject(parent)) {
+    }
+    if (isJSONObject(parent)) {
       // parent is object
       const keys = Object.keys(parent)
       const firstPath = first(paths)
@@ -709,9 +703,8 @@ export function createRemoveOperations(
           : createAfterSelection(parentPath.concat(previousKey))
 
       return { operations, newSelection }
-    } else {
-      throw new Error('Cannot create remove operations: parent must be an Object or Array')
     }
+    throw new Error('Cannot create remove operations: parent must be an Object or Array')
   }
 
   // this should never happen

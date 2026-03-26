@@ -1,5 +1,5 @@
-import { test, describe } from 'vitest'
 import assert from 'assert'
+import { describe, test } from 'vitest'
 import { ARRAY_SECTION_SIZE } from '../constants.js'
 import {
   currentRoundNumber,

@@ -1,8 +1,8 @@
 import assert from 'assert'
-import { describe, test } from 'vitest'
-import { jmespathQueryLanguage } from './jmespathQueryLanguage.js'
 import { cloneDeep } from 'lodash-es'
 import { LosslessNumber, parse, stringify } from 'lossless-json'
+import { describe, test } from 'vitest'
+import { jmespathQueryLanguage } from './jmespathQueryLanguage.js'
 
 const { createQuery, executeQuery } = jmespathQueryLanguage
 

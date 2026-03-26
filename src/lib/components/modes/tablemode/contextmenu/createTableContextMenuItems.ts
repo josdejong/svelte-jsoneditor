@@ -1,4 +1,3 @@
-import type { ContextMenuItem, DocumentState, JSONSelection } from 'svelte-jsoneditor'
 import {
   faCheckSquare,
   faClone,
@@ -10,11 +9,17 @@ import {
   faSquare,
   faTrashCan
 } from '@fortawesome/free-solid-svg-icons'
-import { isKeySelection, isMultiSelection, isValueSelection } from '$lib/logic/selection'
 import { getIn } from 'immutable-json-patch'
-import { getFocusPath, singleItemSelected } from '$lib/logic/selection'
-import { isObjectOrArray } from '$lib/utils/typeUtils'
+import type { ContextMenuItem, DocumentState, JSONSelection } from 'svelte-jsoneditor'
 import { getEnforceString } from '$lib/logic/documentState'
+import {
+  getFocusPath,
+  isKeySelection,
+  isMultiSelection,
+  isValueSelection,
+  singleItemSelected
+} from '$lib/logic/selection'
+import { isObjectOrArray } from '$lib/utils/typeUtils'
 
 export default function ({
   json,

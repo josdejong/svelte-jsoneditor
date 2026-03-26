@@ -1,7 +1,16 @@
-import { describe, test } from 'vitest'
 import assert from 'assert'
 import type { JSONPath } from 'immutable-json-patch'
 import { immutableJSONPatch } from 'immutable-json-patch'
+import { describe, test } from 'vitest'
+import type {
+  ArraySearchResults,
+  ExtendedSearchResultItem,
+  ObjectSearchResults,
+  SearchOptions,
+  SearchResultItem,
+  SearchResults
+} from '$lib/types.js'
+import { SearchField } from '$lib/types.js'
 import { createDocumentState } from './documentState.js'
 import {
   createSearchAndReplaceAllOperations,
@@ -15,15 +24,6 @@ import {
   splitValue,
   toRecursiveSearchResults
 } from './search.js'
-import type {
-  ExtendedSearchResultItem,
-  SearchResults,
-  SearchOptions,
-  SearchResultItem,
-  ObjectSearchResults,
-  ArraySearchResults
-} from '$lib/types.js'
-import { SearchField } from '$lib/types.js'
 import { createKeySelection, createValueSelection } from './selection.js'
 
 describe('search', () => {

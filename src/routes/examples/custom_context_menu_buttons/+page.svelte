@@ -1,55 +1,55 @@
 <script lang="ts">
-  import {
-    type ContextMenuItem,
-    JSONEditor,
-    type RenderMenuContext,
-    toTextContent
-  } from 'svelte-jsoneditor'
-  import { faCalculator } from '@fortawesome/free-solid-svg-icons'
+import { faCalculator } from '@fortawesome/free-solid-svg-icons'
+import {
+  type ContextMenuItem,
+  JSONEditor,
+  type RenderMenuContext,
+  toTextContent
+} from 'svelte-jsoneditor'
 
-  let content = $state({
-    text: undefined, // can be used to pass a stringified JSON document instead
-    json: {
-      array: [1, 2, 3],
-      boolean: true,
-      color: '#82b92c',
-      null: null,
-      number: 123,
-      object: { a: 'b', c: 'd' },
-      string: 'Hello World'
+let content = $state({
+  text: undefined, // can be used to pass a stringified JSON document instead
+  json: {
+    array: [1, 2, 3],
+    boolean: true,
+    color: '#82b92c',
+    null: null,
+    number: 123,
+    object: { a: 'b', c: 'd' },
+    string: 'Hello World'
+  }
+})
+
+function handleCalculateSize() {
+  const size = toTextContent(content).text.length
+
+  alert(`The document size is ${size} bytes`)
+}
+
+function handleRenderContextMenu(
+  items: ContextMenuItem[],
+  context: RenderMenuContext
+): ContextMenuItem[] | undefined {
+  console.log('handleRenderContextMenu', { items, context })
+
+  return [
+    ...items,
+    { type: 'separator' },
+    {
+      type: 'row',
+      items: [
+        {
+          type: 'button',
+          onClick: handleCalculateSize,
+          icon: faCalculator,
+          text: 'Calculate size',
+          title: 'Calculate the size of the document and report that in an alert',
+          disabled: false
+        }
+      ]
     }
-  })
-
-  function handleCalculateSize() {
-    const size = toTextContent(content).text.length
-
-    alert(`The document size is ${size} bytes`)
-  }
-
-  function handleRenderContextMenu(
-    items: ContextMenuItem[],
-    context: RenderMenuContext
-  ): ContextMenuItem[] | undefined {
-    console.log('handleRenderContextMenu', { items, context })
-
-    return [
-      ...items,
-      { type: 'separator' },
-      {
-        type: 'row',
-        items: [
-          {
-            type: 'button',
-            onClick: handleCalculateSize,
-            icon: faCalculator,
-            text: 'Calculate size',
-            title: 'Calculate the size of the document and report that in an alert',
-            disabled: false
-          }
-        ]
-      }
-    ]
-  }
+  ]
+}
 </script>
 
 <svelte:head>

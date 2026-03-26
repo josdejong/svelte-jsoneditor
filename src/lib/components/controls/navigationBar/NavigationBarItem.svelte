@@ -1,52 +1,51 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import Icon from 'svelte-awesome'
-  import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
-  import NavigationBarDropdown from '../../../components/controls/navigationBar/NavigationBarDropdown.svelte'
-  import { getContext } from 'svelte'
-  import type { JSONPath } from 'immutable-json-patch'
-  import type { AbsolutePopupContext } from '$lib/types'
+import { faAngleRight } from '@fortawesome/free-solid-svg-icons'
+import type { JSONPath } from 'immutable-json-patch'
+import { getContext } from 'svelte'
+import Icon from 'svelte-awesome'
+import type { AbsolutePopupContext } from '$lib/types'
+import NavigationBarDropdown from '../../../components/controls/navigationBar/NavigationBarDropdown.svelte'
 
-  const { openAbsolutePopup, closeAbsolutePopup } =
-    getContext<AbsolutePopupContext>('absolute-popup')
+const { openAbsolutePopup, closeAbsolutePopup } = getContext<AbsolutePopupContext>('absolute-popup')
 
-  export let path: JSONPath
-  export let index: number
-  export let onSelect: (path: JSONPath) => void
-  export let getItems: (path: JSONPath) => string[]
+export let path: JSONPath
+export let index: number
+export let onSelect: (path: JSONPath) => void
+export let getItems: (path: JSONPath) => string[]
 
-  let refNavigationBarItem: Element | undefined
-  let open = false
-  let popupId: number | undefined
+let refNavigationBarItem: Element | undefined
+let open = false
+let popupId: number | undefined
 
-  $: itemPath = path.slice(0, index)
-  $: selectedItem = path[index]
+$: itemPath = path.slice(0, index)
+$: selectedItem = path[index]
 
-  function handleSelectItem(item: string) {
-    closeAbsolutePopup(popupId)
-    onSelect(itemPath.concat(item))
-  }
+function handleSelectItem(item: string) {
+  closeAbsolutePopup(popupId)
+  onSelect(itemPath.concat(item))
+}
 
-  function openDropdown() {
-    if (refNavigationBarItem) {
-      open = true
+function openDropdown() {
+  if (refNavigationBarItem) {
+    open = true
 
-      const props = {
-        items: getItems(itemPath),
-        selectedItem,
-        onSelect: handleSelectItem
-      }
-
-      popupId = openAbsolutePopup(NavigationBarDropdown, props, {
-        anchor: refNavigationBarItem,
-        closeOnOuterClick: true,
-        onClose: () => {
-          open = false
-        }
-      })
+    const props = {
+      items: getItems(itemPath),
+      selectedItem,
+      onSelect: handleSelectItem
     }
+
+    popupId = openAbsolutePopup(NavigationBarDropdown, props, {
+      anchor: refNavigationBarItem,
+      closeOnOuterClick: true,
+      onClose: () => {
+        open = false
+      }
+    })
   }
+}
 </script>
 
 <div class="jse-navigation-bar-item" bind:this={refNavigationBarItem}>

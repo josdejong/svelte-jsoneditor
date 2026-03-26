@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { MenuButton } from '$lib/types'
-  import Icon from 'svelte-awesome'
-  import { classnames } from '$lib/utils/cssUtils.js'
+import Icon from 'svelte-awesome'
+import type { MenuButton } from '$lib/types'
+import { classnames } from '$lib/utils/cssUtils.js'
 
-  export let item: MenuButton
-  export let className: string | undefined = undefined
-  export let onRequestClose: () => void
+export let item: MenuButton
+export let className: string | undefined = undefined
+export let onRequestClose: () => void
 </script>
 
 <button

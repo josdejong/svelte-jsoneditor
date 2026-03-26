@@ -1,11 +1,8 @@
 import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer } from 'immutable-json-patch'
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
+// @ts-expect-error
 import jsonSourceMap from 'json-source-map'
 import { jsonrepair } from 'jsonrepair'
-import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
-import { arrayToObject, objectToArray } from './arrayUtils.js'
 import type {
   Content,
   JSONContent,
@@ -14,7 +11,9 @@ import type {
   TextContent,
   TextLocation
 } from '../types'
+import { arrayToObject, objectToArray } from './arrayUtils.js'
 import { int } from './numberUtils.js'
+import { isObject, isObjectOrArray, valueType } from './typeUtils.js'
 
 /**
  * Parse the JSON. if this fails, try to repair and parse.
@@ -136,28 +135,27 @@ export function normalizeJsonParseError(jsonText: string, parseErrorMessage: str
         return `line ${line + 1} column ${column + 1}`
       })
     }
-  } else {
-    // a message from Firefox, like "JSON.parse: expected property name or '}' at line 2 column 3 of the JSON data"
-    const lineMatch = LINE_REGEX.exec(parseErrorMessage)
-    const lineOneBased = lineMatch ? int(lineMatch[1]) : undefined
-    const line = lineOneBased !== undefined ? lineOneBased - 1 : undefined
+  }
+  // a message from Firefox, like "JSON.parse: expected property name or '}' at line 2 column 3 of the JSON data"
+  const lineMatch = LINE_REGEX.exec(parseErrorMessage)
+  const lineOneBased = lineMatch ? int(lineMatch[1]) : undefined
+  const line = lineOneBased !== undefined ? lineOneBased - 1 : undefined
 
-    const columnMatch = COLUMN_REGEX.exec(parseErrorMessage)
-    const columnOneBased = columnMatch ? int(columnMatch[1]) : undefined
-    const column = columnOneBased !== undefined ? columnOneBased - 1 : undefined
+  const columnMatch = COLUMN_REGEX.exec(parseErrorMessage)
+  const columnOneBased = columnMatch ? int(columnMatch[1]) : undefined
+  const column = columnOneBased !== undefined ? columnOneBased - 1 : undefined
 
-    const position =
-      line !== undefined && column !== undefined
-        ? calculatePosition(jsonText, line, column)
-        : undefined
+  const position =
+    line !== undefined && column !== undefined
+      ? calculatePosition(jsonText, line, column)
+      : undefined
 
-    // line and column are one based in the message
-    return {
-      position,
-      line,
-      column,
-      message: parseErrorMessage.replace(/^JSON.parse: /, '').replace(/ of the JSON data$/, '')
-    }
+  // line and column are one based in the message
+  return {
+    position,
+    line,
+    column,
+    message: parseErrorMessage.replace(/^JSON.parse: /, '').replace(/ of the JSON data$/, '')
   }
 }
 
@@ -259,8 +257,7 @@ export function convertValue(
         }
 
         if (isObject(parsedValue)) {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
+          // @ts-expect-error
           return objectToArray(parsedValue)
         }
       } catch {
@@ -329,21 +326,19 @@ export function validateContentType(content: unknown): string | undefined {
   if (content.json !== undefined) {
     if (content.text !== undefined) {
       return 'Content must contain either a property "json" or a property "text" but not both'
-    } else {
-      return undefined
     }
-  } else {
-    if (content.text === undefined) {
-      return 'Content must contain either a property "json" or a property "text"'
-    } else if (typeof content.text !== 'string') {
-      return (
-        'Content "text" property must be a string containing a JSON document. ' +
-        'Did you mean to use the "json" property instead?'
-      )
-    } else {
-      return undefined
-    }
+    return undefined
   }
+  if (content.text === undefined) {
+    return 'Content must contain either a property "json" or a property "text"'
+  }
+  if (typeof content.text !== 'string') {
+    return (
+      'Content "text" property must be a string containing a JSON document. ' +
+      'Did you mean to use the "json" property instead?'
+    )
+  }
+  return undefined
 }
 
 /**
@@ -415,7 +410,10 @@ export function isLargeContent(content: Content, maxSize: number): boolean {
  * be cancelled. This is useful when you're only interested in knowing whether
  * the size exceeds a certain maximum size.
  */
-export function estimateSerializedSize(content: Content, maxSize = Infinity): number {
+export function estimateSerializedSize(
+  content: Content,
+  maxSize = Number.POSITIVE_INFINITY
+): number {
   if (isTextContent(content)) {
     return content.text.length
   }

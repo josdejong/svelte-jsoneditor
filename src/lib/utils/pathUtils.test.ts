@@ -1,5 +1,5 @@
-import { describe, test } from 'vitest'
 import { deepStrictEqual, strictEqual, throws } from 'assert'
+import { describe, test } from 'vitest'
 import {
   createLodashPropertySelector,
   createPropertySelector,

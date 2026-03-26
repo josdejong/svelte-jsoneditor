@@ -1,5 +1,5 @@
-import { test, describe } from 'vitest'
 import assert from 'assert'
+import { describe, test } from 'vitest'
 import { jsonpathQueryLanguage } from '$lib/plugins/query/jsonpathQueryLanguage'
 
 const { createQuery, executeQuery } = jsonpathQueryLanguage

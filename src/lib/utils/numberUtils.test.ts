@@ -1,5 +1,5 @@
-import { test, describe } from 'vitest'
 import { strictEqual } from 'assert'
+import { describe, test } from 'vitest'
 import { isDigit } from './numberUtils.js'
 
 describe('numberUtils', () => {

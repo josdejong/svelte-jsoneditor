@@ -86,7 +86,7 @@ export function parseString(str: string): string | number | boolean | null | und
   }
 
   const num = Number(str) // will nicely fail with '123ab'
-  const numFloat = parseFloat(str) // will nicely fail with '  '
+  const numFloat = Number.parseFloat(str) // will nicely fail with '  '
   if (!isNaN(num) && !isNaN(numFloat)) {
     return num
   }

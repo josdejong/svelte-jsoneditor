@@ -1,5 +1,5 @@
-import { isBoolean, isColor, isTimestamp } from '$lib/utils/typeUtils.js'
 import type { RenderValueComponentDescription, RenderValueProps } from '$lib/types'
+import { isBoolean, isColor, isTimestamp } from '$lib/utils/typeUtils.js'
 import BooleanToggle from './components/BooleanToggle.svelte'
 import ColorPicker from './components/ColorPicker.svelte'
 import EditableValue from './components/EditableValue.svelte'

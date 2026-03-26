@@ -1,27 +1,27 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import Icon from 'svelte-awesome'
-  import type { MessageAction } from '$lib/types'
-  import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
-  import { onDestroy } from 'svelte'
+import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
+import { onDestroy } from 'svelte'
+import Icon from 'svelte-awesome'
+import type { MessageAction } from '$lib/types'
 
-  export let type: 'success' | 'error' | 'warning' | 'info' = 'success'
-  export let icon: IconDefinition | undefined = undefined
-  export let message: string | undefined = undefined
-  export let actions: MessageAction[] = []
-  export let onClick: (() => void) | undefined = undefined
-  export let onClose: (() => void) | undefined = undefined
+export let type: 'success' | 'error' | 'warning' | 'info' = 'success'
+export let icon: IconDefinition | undefined = undefined
+export let message: string | undefined = undefined
+export let actions: MessageAction[] = []
+export let onClick: (() => void) | undefined = undefined
+export let onClose: (() => void) | undefined = undefined
 
-  if (onClose) {
-    onDestroy(onClose)
+if (onClose) {
+  onDestroy(onClose)
+}
+
+function handleClick() {
+  if (onClick) {
+    onClick()
   }
-
-  function handleClick() {
-    if (onClick) {
-      onClick()
-    }
-  }
+}
 </script>
 
 <div class="jse-message jse-{type}">

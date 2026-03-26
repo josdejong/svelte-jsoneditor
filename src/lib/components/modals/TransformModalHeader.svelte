@@ -1,42 +1,41 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { getContext } from 'svelte'
-  import Icon from 'svelte-awesome'
-  import { faCog } from '@fortawesome/free-solid-svg-icons'
-  import SelectQueryLanguage from '../controls/selectQueryLanguage/SelectQueryLanguage.svelte'
-  import type { AbsolutePopupContext, OnChangeQueryLanguage, QueryLanguage } from '$lib/types.js'
-  import Header from './Header.svelte'
+import { faCog } from '@fortawesome/free-solid-svg-icons'
+import { getContext } from 'svelte'
+import Icon from 'svelte-awesome'
+import type { AbsolutePopupContext, OnChangeQueryLanguage, QueryLanguage } from '$lib/types.js'
+import SelectQueryLanguage from '../controls/selectQueryLanguage/SelectQueryLanguage.svelte'
+import Header from './Header.svelte'
 
-  export let queryLanguages: QueryLanguage[]
-  export let queryLanguageId: string
-  export let fullscreen: boolean
-  export let onChangeQueryLanguage: OnChangeQueryLanguage
-  export let onClose: () => void
+export let queryLanguages: QueryLanguage[]
+export let queryLanguageId: string
+export let fullscreen: boolean
+export let onChangeQueryLanguage: OnChangeQueryLanguage
+export let onClose: () => void
 
-  let refConfigButton: HTMLButtonElement | undefined
-  let popupId: number | undefined
+let refConfigButton: HTMLButtonElement | undefined
+let popupId: number | undefined
 
-  const { openAbsolutePopup, closeAbsolutePopup } =
-    getContext<AbsolutePopupContext>('absolute-popup')
+const { openAbsolutePopup, closeAbsolutePopup } = getContext<AbsolutePopupContext>('absolute-popup')
 
-  function openConfig() {
-    const props = {
-      queryLanguages,
-      queryLanguageId,
-      onChangeQueryLanguage: (queryLanguageId: string) => {
-        closeAbsolutePopup(popupId)
-        onChangeQueryLanguage(queryLanguageId)
-      }
+function openConfig() {
+  const props = {
+    queryLanguages,
+    queryLanguageId,
+    onChangeQueryLanguage: (queryLanguageId: string) => {
+      closeAbsolutePopup(popupId)
+      onChangeQueryLanguage(queryLanguageId)
     }
-
-    popupId = openAbsolutePopup(SelectQueryLanguage, props, {
-      offsetTop: -2,
-      offsetLeft: 0,
-      anchor: refConfigButton,
-      closeOnOuterClick: true
-    })
   }
+
+  popupId = openAbsolutePopup(SelectQueryLanguage, props, {
+    offsetTop: -2,
+    offsetLeft: 0,
+    anchor: refConfigButton,
+    closeOnOuterClick: true
+  })
+}
 </script>
 
 <Header title="Transform" fullScreenButton={true} bind:fullscreen {onClose}>

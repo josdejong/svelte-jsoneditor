@@ -1,7 +1,7 @@
-import { JSONPath as JSONPathPlus } from 'jsonpath-plus'
-import { parseString } from '$lib/utils/stringUtils'
-import type { QueryLanguage, QueryLanguageOptions } from '$lib/types'
 import type { JSONPath } from 'immutable-json-patch'
+import { JSONPath as JSONPathPlus } from 'jsonpath-plus'
+import type { QueryLanguage, QueryLanguageOptions } from '$lib/types'
+import { parseString } from '$lib/utils/stringUtils'
 
 const description = `
 <p>

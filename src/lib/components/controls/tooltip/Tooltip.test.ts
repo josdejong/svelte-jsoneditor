@@ -1,8 +1,8 @@
 import { getByText } from '@testing-library/svelte'
 import '@testing-library/jest-dom'
+import { mount } from 'svelte'
 import { describe, expect, test } from 'vitest'
 import Tooltip from './Tooltip.svelte'
-import { mount } from 'svelte'
 
 describe('Tooltip', () => {
   test('render a tooltip', () => {

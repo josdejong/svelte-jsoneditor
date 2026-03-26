@@ -1,22 +1,22 @@
 <script lang="ts">
-  interface Props {
-    readOnly: boolean
-    onCreateArray: () => void
-    onCreateObject: () => void
-    onClick: () => void
-  }
+interface Props {
+  readOnly: boolean
+  onCreateArray: () => void
+  onCreateObject: () => void
+  onClick: () => void
+}
 
-  const { readOnly, onCreateArray, onCreateObject, onClick }: Props = $props()
+const { readOnly, onCreateArray, onCreateObject, onClick }: Props = $props()
 
-  function handleCreateObject(event: MouseEvent) {
-    event.stopPropagation()
-    onCreateObject()
-  }
+function handleCreateObject(event: MouseEvent) {
+  event.stopPropagation()
+  onCreateObject()
+}
 
-  function handleCreateArray(event: MouseEvent) {
-    event.stopPropagation()
-    onCreateArray()
-  }
+function handleCreateArray(event: MouseEvent) {
+  event.stopPropagation()
+  onCreateArray()
+}
 </script>
 
 <div class="jse-welcome" onclick={() => onClick()} role="none">

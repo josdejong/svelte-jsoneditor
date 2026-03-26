@@ -1,42 +1,42 @@
 <script>
-  import { JSONEditor } from 'svelte-jsoneditor'
+import { JSONEditor } from 'svelte-jsoneditor'
 
-  const themes = [
-    { value: 'jse-theme-default', label: 'default' },
-    { value: 'jse-theme-dark', label: 'dark' },
-    { value: 'jse-theme-big', label: 'big' }
-  ]
+const themes = [
+  { value: 'jse-theme-default', label: 'default' },
+  { value: 'jse-theme-dark', label: 'dark' },
+  { value: 'jse-theme-big', label: 'big' }
+]
 
-  const fontSizes = [
-    { value: 'jse-font-small', label: 'small' },
-    { value: 'jse-font-normal', label: 'normal' },
-    { value: 'jse-font-large', label: 'large' }
-  ]
+const fontSizes = [
+  { value: 'jse-font-small', label: 'small' },
+  { value: 'jse-font-normal', label: 'normal' },
+  { value: 'jse-font-large', label: 'large' }
+]
 
-  let selectedTheme = $state(themes[1].value)
-  let selectedFontSize = $state(fontSizes[1].value)
+let selectedTheme = $state(themes[1].value)
+let selectedFontSize = $state(fontSizes[1].value)
 
-  let content = $state({
-    text: undefined, // can be used to pass a stringified JSON document instead
-    json: {
-      array: [1, 2, 3],
-      boolean: true,
-      color: '#82b92c',
-      null: null,
-      number: 123,
-      object: { a: 'b', c: 'd' },
-      string: 'Hello World'
-    }
-  })
-
-  let editorRef
-  function refresh() {
-    // call refresh to make sure the line numbers in the gutter are resized too,
-    // and the color of the indentation markers is updated
-    editorRef?.refresh()
+let content = $state({
+  text: undefined, // can be used to pass a stringified JSON document instead
+  json: {
+    array: [1, 2, 3],
+    boolean: true,
+    color: '#82b92c',
+    null: null,
+    number: 123,
+    object: { a: 'b', c: 'd' },
+    string: 'Hello World'
   }
+})
 
-  $inspect('content', content)
+let editorRef
+function refresh() {
+  // call refresh to make sure the line numbers in the gutter are resized too,
+  // and the color of the indentation markers is updated
+  editorRef?.refresh()
+}
+
+$inspect('content', content)
 </script>
 
 <svelte:head>

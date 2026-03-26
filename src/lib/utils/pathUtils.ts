@@ -1,5 +1,5 @@
-import { isEmpty } from 'lodash-es'
 import type { JSONPath } from 'immutable-json-patch'
+import { isEmpty } from 'lodash-es'
 import type { PathOption } from '$lib/types.js'
 
 /**
@@ -114,14 +114,14 @@ export function createLodashPropertySelector(path: JSONPath): string {
 function stringifyLodashProperty(prop: string): string {
   if (integerNumberRegex.test(prop)) {
     return '[' + prop + ']'
-  } else if (javaScriptPropertyRegex.test(prop)) {
-    return '.' + prop
-  } else {
-    const propStr = JSON.stringify(prop)
-    // remove enclosing double quotes, and unescape escaped double quotes \"
-    const jsonPathStr = propStr.substring(1, propStr.length - 1).replace(/\\"/g, '"')
-    return "['" + jsonPathStr + "']"
   }
+  if (javaScriptPropertyRegex.test(prop)) {
+    return '.' + prop
+  }
+  const propStr = JSON.stringify(prop)
+  // remove enclosing double quotes, and unescape escaped double quotes \"
+  const jsonPathStr = propStr.substring(1, propStr.length - 1).replace(/\\"/g, '"')
+  return "['" + jsonPathStr + "']"
 }
 
 /**
@@ -143,13 +143,13 @@ export function createPropertySelector(path: JSONPath): string {
       if (integerNumberRegex.test(prop)) {
         // an index
         return `?.[${prop}]`
-      } else if (javaScriptPropertyRegex.test(prop)) {
+      }
+      if (javaScriptPropertyRegex.test(prop)) {
         // a key without special characters
         return `?.${prop}`
-      } else {
-        // a key that may have special characters (like spaces or so)
-        return `?.[${JSON.stringify(prop)}]`
       }
+      // a key that may have special characters (like spaces or so)
+      return `?.[${JSON.stringify(prop)}]`
     })
     .join('')
 }

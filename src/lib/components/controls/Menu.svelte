@@ -1,16 +1,16 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import Icon from 'svelte-awesome'
-  import type { MenuItem } from '$lib/types'
-  import { isMenuButton, isMenuSeparator, isMenuSpace } from '$lib/typeguards.js'
+import Icon from 'svelte-awesome'
+import { isMenuButton, isMenuSeparator, isMenuSpace } from '$lib/typeguards.js'
+import type { MenuItem } from '$lib/types'
 
-  export let items: MenuItem[] = []
+export let items: MenuItem[] = []
 
-  function unknownMenuItem(item: MenuItem): string {
-    console.error('Unknown type of menu item', item)
-    return '???'
-  }
+function unknownMenuItem(item: MenuItem): string {
+  console.error('Unknown type of menu item', item)
+  return '???'
+}
 </script>
 
 <div class="jse-menu">

@@ -1,10 +1,9 @@
-import { test, describe } from 'vitest'
 import { deepStrictEqual } from 'assert'
-import { toRecursiveValidationErrors, validateJSON, validateText } from './validation.js'
+import { isLosslessNumber, LosslessNumber, parse, stringify } from 'lossless-json'
+import { describe, test } from 'vitest'
 import type { ValidationError } from '$lib/types'
 import { ValidationSeverity } from '$lib/types.js'
-import { stringify, parse, isLosslessNumber } from 'lossless-json'
-import { LosslessNumber } from 'lossless-json'
+import { toRecursiveValidationErrors, validateJSON, validateText } from './validation.js'
 
 const LosslessJSONParser = { parse, stringify }
 
@@ -71,8 +70,7 @@ describe('validation', () => {
     }
 
     function myValidator(json: unknown): ValidationError[] {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error
       if (!json || typeof json.count !== 'number' || json.count <= 0) {
         return [countValidationError]
       }
@@ -81,8 +79,7 @@ describe('validation', () => {
     }
 
     function myLosslessValidator(json: unknown): ValidationError[] {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error
       if (!json || !isLosslessNumber(json.count) || json.count <= 0) {
         return [countLosslessValidationError]
       }
@@ -147,8 +144,7 @@ describe('validation', () => {
     }
 
     function myValidator(json: unknown): ValidationError[] {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error
       if (!json || typeof json.count !== 'number' || json.count <= 0) {
         return [countValidationError]
       }
@@ -157,8 +153,7 @@ describe('validation', () => {
     }
 
     function myLosslessValidator(json: unknown): ValidationError[] {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error
       if (!json || !isLosslessNumber(json.count) || json.count <= 0) {
         return [countLosslessValidationError]
       }

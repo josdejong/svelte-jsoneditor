@@ -1,10 +1,11 @@
 import type { JSONPatchDocument, JSONPatchOperation, JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
 import { forEachRight, initial, isEqual, last } from 'lodash-es'
-import { getEnforceString, updateInRecursiveState } from './documentState.js'
-import { createSelectionFromOperations } from './selection.js'
-import { rename } from './operations.js'
-import { stringConvert } from '../utils/typeUtils.js'
+import {
+  hasSearchResults,
+  isArrayRecursiveState,
+  isObjectRecursiveState
+} from 'svelte-jsoneditor/typeguards.js'
 import type {
   DocumentState,
   ExtendedSearchResultItem,
@@ -17,11 +18,10 @@ import type {
   SearchResults
 } from '$lib/types'
 import { SearchField } from '$lib/types.js'
-import {
-  hasSearchResults,
-  isArrayRecursiveState,
-  isObjectRecursiveState
-} from 'svelte-jsoneditor/typeguards.js'
+import { stringConvert } from '../utils/typeUtils.js'
+import { getEnforceString, updateInRecursiveState } from './documentState.js'
+import { rename } from './operations.js'
+import { createSelectionFromOperations } from './selection.js'
 
 // TODO: comment
 // TODO: unit test
@@ -109,7 +109,7 @@ export function search(
   options: SearchOptions = {}
 ): SearchResultItem[] {
   const searchTextLowerCase = searchText.toLowerCase()
-  const maxResults = options?.maxResults ?? Infinity
+  const maxResults = options?.maxResults ?? Number.POSITIVE_INFINITY
   const columns = options?.columns
   const results: SearchResultItem[] = []
   const path: JSONPath = [] // we reuse the same Array recursively, this is *much* faster than creating a new path every time
@@ -171,7 +171,8 @@ export function search(
 
   if (searchText === '') {
     return []
-  } else if (columns) {
+  }
+  if (columns) {
     if (!Array.isArray(json)) {
       throw new Error('json must be an Array when option columns is defined')
     }
@@ -206,10 +207,9 @@ export function search(
     }
 
     return results
-  } else {
-    searchRecursive(searchTextLowerCase, json)
-    return results
   }
+  searchRecursive(searchTextLowerCase, json)
+  return results
 }
 
 /**
@@ -295,7 +295,8 @@ export function createSearchAndReplaceOperations(
       newSelection,
       operations
     }
-  } else if (field === SearchField.value) {
+  }
+  if (field === SearchField.value) {
     // replace a value
     const currentValue: unknown | undefined = getIn(json, path)
     if (currentValue === undefined) {
@@ -320,9 +321,8 @@ export function createSearchAndReplaceOperations(
       newSelection,
       operations
     }
-  } else {
-    throw new Error(`Cannot replace: unknown type of search result field ${field}`)
   }
+  throw new Error(`Cannot replace: unknown type of search result field ${field}`)
 }
 
 export function createSearchAndReplaceAllOperations(
@@ -333,7 +333,7 @@ export function createSearchAndReplaceAllOperations(
   parser: JSONParser
 ): { newSelection: JSONSelection | undefined; operations: JSONPatchDocument } {
   // TODO: to improve performance, we could reuse existing search results (except when hitting a maxResult limit)
-  const searchResultItems = search(searchText, json, { maxResults: Infinity })
+  const searchResultItems = search(searchText, json, { maxResults: Number.POSITIVE_INFINITY })
 
   interface Match {
     path: JSONPath
@@ -366,9 +366,8 @@ export function createSearchAndReplaceAllOperations(
     if (a.field !== b.field) {
       if (a.field === SearchField.key) {
         return 1
-      } else {
-        return -1
       }
+      return -1
     }
 
     // sort longest paths first, shortest last

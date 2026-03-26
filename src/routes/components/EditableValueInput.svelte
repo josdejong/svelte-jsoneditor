@@ -1,91 +1,91 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { compileJSONPointer, type JSONPath } from 'immutable-json-patch'
-  import {
-    createValueSelection,
-    type OnPatch,
-    type OnSelect,
-    type ValueNormalization
-  } from 'svelte-jsoneditor'
+import { compileJSONPointer, type JSONPath } from 'immutable-json-patch'
+import {
+  createValueSelection,
+  type OnPatch,
+  type OnSelect,
+  type ValueNormalization
+} from 'svelte-jsoneditor'
 
-  export let value: unknown
-  export let path: JSONPath
-  export let enforceString: boolean
-  export let normalization: ValueNormalization
-  export let onSelect: OnSelect
-  export let onPatch: OnPatch
-  export let focus: () => void
+export let value: unknown
+export let path: JSONPath
+export let enforceString: boolean
+export let normalization: ValueNormalization
+export let onSelect: OnSelect
+export let onPatch: OnPatch
+export let focus: () => void
 
-  export let inputValue: string = normalization.escapeValue(value)
+export let inputValue: string = normalization.escapeValue(value)
 
-  function convert(value: string): unknown {
-    if (enforceString) {
-      return value
-    }
-
-    if (value === '') {
-      return ''
-    }
-
-    const valueTrim = value.trim()
-
-    if (valueTrim === 'null') {
-      return null
-    }
-
-    if (valueTrim === 'true') {
-      return true
-    }
-
-    if (valueTrim === 'false') {
-      return false
-    }
-
-    const number = Number(value)
-    if (!isNaN(number)) {
-      return number
-    }
-
+function convert(value: string): unknown {
+  if (enforceString) {
     return value
   }
 
-  function apply() {
-    console.log('apply')
-    onPatch([
-      {
-        op: 'replace',
-        path: compileJSONPointer(path),
-        value: convert(normalization.unescapeValue(inputValue))
-      }
-    ])
-
-    focus()
+  if (value === '') {
+    return ''
   }
 
-  function cancel() {
-    onSelect(createValueSelection(path))
+  const valueTrim = value.trim()
 
-    focus()
+  if (valueTrim === 'null') {
+    return null
   }
 
-  function handleMouseDown(event: MouseEvent) {
-    event.stopPropagation()
+  if (valueTrim === 'true') {
+    return true
   }
 
-  function handleKeyDown(event: KeyboardEvent) {
-    event.stopPropagation()
+  if (valueTrim === 'false') {
+    return false
+  }
 
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      apply()
+  const number = Number(value)
+  if (!isNaN(number)) {
+    return number
+  }
+
+  return value
+}
+
+function apply() {
+  console.log('apply')
+  onPatch([
+    {
+      op: 'replace',
+      path: compileJSONPointer(path),
+      value: convert(normalization.unescapeValue(inputValue))
     }
+  ])
 
-    if (event.key === 'Escape') {
-      event.preventDefault()
-      cancel()
-    }
+  focus()
+}
+
+function cancel() {
+  onSelect(createValueSelection(path))
+
+  focus()
+}
+
+function handleMouseDown(event: MouseEvent) {
+  event.stopPropagation()
+}
+
+function handleKeyDown(event: KeyboardEvent) {
+  event.stopPropagation()
+
+  if (event.key === 'Enter') {
+    event.preventDefault()
+    apply()
   }
+
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    cancel()
+  }
+}
 </script>
 
 <!-- svelte-ignore a11y-autofocus -->

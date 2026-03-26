@@ -1,43 +1,43 @@
 <script>
-  import { JSONEditor } from 'svelte-jsoneditor'
+import { JSONEditor } from 'svelte-jsoneditor'
 
-  let refJsonEditor
+let refJsonEditor
 
-  let content = $state({
-    text: undefined, // can be used to pass a stringified JSON document instead
-    json: {
-      array: [1, 2, 3],
-      boolean: true,
-      color: '#82b92c',
-      null: null,
-      number: 123,
-      object: { a: 'b', c: 'd', nested: { x: 'y', z: 'w' } },
-      string: 'Hello World'
-    }
-  })
-  function expandObject() {
-    refJsonEditor.expand(['object'])
+let content = $state({
+  text: undefined, // can be used to pass a stringified JSON document instead
+  json: {
+    array: [1, 2, 3],
+    boolean: true,
+    color: '#82b92c',
+    null: null,
+    number: 123,
+    object: { a: 'b', c: 'd', nested: { x: 'y', z: 'w' } },
+    string: 'Hello World'
   }
+})
+function expandObject() {
+  refJsonEditor.expand(['object'])
+}
 
-  function collapseObject() {
-    refJsonEditor.collapse(['object'], true)
-  }
+function collapseObject() {
+  refJsonEditor.collapse(['object'], true)
+}
 
-  function expandArray() {
-    refJsonEditor.expand(['array'])
-  }
+function expandArray() {
+  refJsonEditor.expand(['array'])
+}
 
-  function collapseArray() {
-    refJsonEditor.collapse(['array'])
-  }
+function collapseArray() {
+  refJsonEditor.collapse(['array'])
+}
 
-  function expandObjectNested() {
-    refJsonEditor.expand(['object', 'nested'])
-  }
+function expandObjectNested() {
+  refJsonEditor.expand(['object', 'nested'])
+}
 
-  function collapseObjectNested() {
-    refJsonEditor.collapse(['object', 'nested'])
-  }
+function collapseObjectNested() {
+  refJsonEditor.collapse(['object', 'nested'])
+}
 </script>
 
 <svelte:head>

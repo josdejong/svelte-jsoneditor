@@ -1,7 +1,7 @@
-import { isObject } from './typeUtils.js'
 import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 import { isEqual } from 'lodash-es'
+import { isObject } from './typeUtils.js'
 
 const MAX_ITEM_PATHS_COLLECTION = 10000
 const ROOT_PATH: JSONPath = []
@@ -161,8 +161,7 @@ export function moveItems<T>(array: T[], index: number, count: number, offset: n
   // TODO: check boundaries: index+offset >= 0, index+offset+count<array.length, index+count<array.length, etc
   const copy = array.slice(0)
   const moving: T[] = copy.splice(index, count)
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
+  // @ts-expect-error
   copy.splice.apply(copy, [index + offset, 0, ...moving])
   return copy
 }

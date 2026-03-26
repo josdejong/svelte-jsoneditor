@@ -1,17 +1,17 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import Icon from 'svelte-awesome'
-  import {
-    faDownLeftAndUpRightToCenter,
-    faTimes,
-    faUpRightAndDownLeftFromCenter
-  } from '@fortawesome/free-solid-svg-icons'
+import {
+  faDownLeftAndUpRightToCenter,
+  faTimes,
+  faUpRightAndDownLeftFromCenter
+} from '@fortawesome/free-solid-svg-icons'
+import Icon from 'svelte-awesome'
 
-  export let title = 'Modal'
-  export let fullScreenButton: boolean = false
-  export let fullscreen: boolean = false
-  export let onClose: (() => void) | undefined = undefined
+export let title = 'Modal'
+export let fullScreenButton = false
+export let fullscreen = false
+export let onClose: (() => void) | undefined = undefined
 </script>
 
 <div class="jse-header">

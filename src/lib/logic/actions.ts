@@ -1,4 +1,25 @@
 import {
+  getIn,
+  isJSONObject,
+  isJSONPatchAdd,
+  isJSONPatchReplace,
+  type JSONPatchOperation,
+  type JSONPath,
+  parsePath
+} from 'immutable-json-patch'
+import { initial, isEmpty, last } from 'lodash-es'
+import { MAX_MULTILINE_PASTE_SIZE } from '$lib/constants'
+import { expandAll, expandNone, expandPath, expandSmart } from '$lib/logic/documentState.js'
+import {
+  append,
+  createNewValue,
+  createRemoveOperations,
+  duplicate,
+  insert,
+  insertBefore,
+  removeAll
+} from '$lib/logic/operations.js'
+import {
   createEditKeySelection,
   createEditValueSelection,
   createInsideSelection,
@@ -10,16 +31,7 @@ import {
   isValueSelection,
   selectionToPartialJson
 } from '$lib/logic/selection.js'
-import copyToClipboard from '$lib/utils/copyToClipboard.js'
-import {
-  append,
-  createNewValue,
-  createRemoveOperations,
-  duplicate,
-  insert,
-  insertBefore,
-  removeAll
-} from '$lib/logic/operations.js'
+import { fromTableCellPosition, toTableCellPosition } from '$lib/logic/table.js'
 import type {
   AfterPatchCallback,
   InsertType,
@@ -30,22 +42,10 @@ import type {
   OnJSONSelect,
   OnPatch
 } from '$lib/types'
+import copyToClipboard from '$lib/utils/copyToClipboard.js'
 import { createDebug } from '$lib/utils/debug.js'
-import {
-  getIn,
-  isJSONObject,
-  isJSONPatchAdd,
-  isJSONPatchReplace,
-  type JSONPatchOperation,
-  type JSONPath,
-  parsePath
-} from 'immutable-json-patch'
-import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
-import { expandAll, expandNone, expandPath, expandSmart } from '$lib/logic/documentState.js'
-import { initial, isEmpty, last } from 'lodash-es'
-import { fromTableCellPosition, toTableCellPosition } from '$lib/logic/table.js'
 import { parsePartialJson } from '$lib/utils/jsonUtils'
-import { MAX_MULTILINE_PASTE_SIZE } from '$lib/constants'
+import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
 
 const debug = createDebug('jsoneditor:actions')
 
@@ -331,7 +331,8 @@ export function onDuplicateRow({
   const operations = duplicate(json, [rowPath])
 
   onPatch(operations, (_, patchedState) => {
-    const newRowIndex = rowIndex < (json as Array<unknown>).length ? rowIndex + 1 : rowIndex
+    const newRowIndex = rowIndex < (json as Array<unknown>
+    ).length ? rowIndex + 1 : rowIndex
     const newPath = fromTableCellPosition({ rowIndex: newRowIndex, columnIndex }, columns)
     const newSelection = createValueSelection(newPath)
 
@@ -412,11 +413,13 @@ export function onInsertAfterRow({
   const values = [{ key: '', value: newValue }]
 
   const operations =
-    nextRowIndex < (json as Array<unknown>).length
+    nextRowIndex < (json as Array<unknown>
+  ).length
       ? insertBefore(json, nextRowPath, values)
       : append(json, [], values)
 
-  onPatch(operations, (_, patchedState) => {
+  onPatch(operations, (_, patchedState) =>
+  {
     const nextPath = fromTableCellPosition({ rowIndex: nextRowIndex, columnIndex }, columns)
     const newSelection = createValueSelection(nextPath)
 
@@ -424,7 +427,8 @@ export function onInsertAfterRow({
       state: patchedState,
       selection: newSelection
     }
-  })
+  }
+  )
 }
 
 export interface OnRemoveRowAction {
@@ -454,7 +458,8 @@ export function onRemoveRow({ json, selection, columns, readOnly, onPatch }: OnR
 
   onPatch(operations, (patchedJson, patchedState) => {
     const newRowIndex =
-      rowIndex < (patchedJson as Array<unknown>).length
+      rowIndex < (patchedJson as Array<unknown>
+    ).length
         ? rowIndex
         : rowIndex > 0
           ? rowIndex - 1

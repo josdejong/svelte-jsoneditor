@@ -1,16 +1,16 @@
 <script lang="ts">
-  import Icon from 'svelte-awesome'
-  import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
-  import type { QueryLanguage, OnChangeQueryLanguage } from '$lib/types.js'
+import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons'
+import Icon from 'svelte-awesome'
+import type { OnChangeQueryLanguage, QueryLanguage } from '$lib/types.js'
 
-  export let queryLanguages: QueryLanguage[]
-  export let queryLanguageId: string
-  export let onChangeQueryLanguage: OnChangeQueryLanguage
+export let queryLanguages: QueryLanguage[]
+export let queryLanguageId: string
+export let onChangeQueryLanguage: OnChangeQueryLanguage
 
-  function handleChangeQueryLanguage(newQueryLanguageId: string) {
-    queryLanguageId = newQueryLanguageId
-    onChangeQueryLanguage(newQueryLanguageId)
-  }
+function handleChangeQueryLanguage(newQueryLanguageId: string) {
+  queryLanguageId = newQueryLanguageId
+  onChangeQueryLanguage(newQueryLanguageId)
+}
 </script>
 
 <div class="jse-select-query-language">

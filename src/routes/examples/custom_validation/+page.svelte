@@ -1,104 +1,102 @@
 <script>
-  import { JSONEditor } from 'svelte-jsoneditor'
+import { JSONEditor } from 'svelte-jsoneditor'
 
-  /**
-   * rules:
-   * - team, names, and ages must be filled in and be of correct type
-   * - a team must have 4 members
-   * - at lease one member of the team must be adult
-   */
-  function customValidator(json) {
-    const errors = []
+/**
+ * rules:
+ * - team, names, and ages must be filled in and be of correct type
+ * - a team must have 4 members
+ * - at lease one member of the team must be adult
+ */
+function customValidator(json) {
+  const errors = []
 
-    if (json && Array.isArray(json.team)) {
-      // check whether each team member has name and age filled in correctly
-      json.team.forEach(function (member, index) {
-        if (member && typeof member === 'object') {
-          if ('name' in member) {
-            if (typeof member.name !== 'string') {
-              errors.push({
-                path: ['team', index, 'name'],
-                message: 'Name must be a string',
-                severity: 'warning'
-              })
-            }
-          } else {
+  if (json && Array.isArray(json.team)) {
+    // check whether each team member has name and age filled in correctly
+    json.team.forEach((member, index) => {
+      if (member && typeof member === 'object') {
+        if ('name' in member) {
+          if (typeof member.name !== 'string') {
             errors.push({
-              path: ['team', index],
-              message: 'Required property "name"" missing',
-              severity: 'warning'
-            })
-          }
-
-          if ('age' in member) {
-            if (typeof member.age !== 'number') {
-              errors.push({
-                path: ['team', index, 'age'],
-                message: 'Age must be a number',
-                severity: 'warning'
-              })
-            }
-          } else {
-            errors.push({
-              path: ['team', index],
-              message: 'Required property "age" missing',
+              path: ['team', index, 'name'],
+              message: 'Name must be a string',
               severity: 'warning'
             })
           }
         } else {
           errors.push({
             path: ['team', index],
-            message: 'Member must be an object with properties "name" and "age"',
+            message: 'Required property "name"" missing',
             severity: 'warning'
           })
         }
-      })
 
-      // check whether the team consists of exactly four members
-      if (json.team.length !== 4) {
-        errors.push({ path: ['team'], message: 'A team must have 4 members', severity: 'error' })
-      }
-
-      // check whether there is at least one adult member in the team
-      const adults = json.team.filter(function (member) {
-        return member ? member.age >= 18 : false
-      })
-      if (adults.length === 0) {
+        if ('age' in member) {
+          if (typeof member.age !== 'number') {
+            errors.push({
+              path: ['team', index, 'age'],
+              message: 'Age must be a number',
+              severity: 'warning'
+            })
+          }
+        } else {
+          errors.push({
+            path: ['team', index],
+            message: 'Required property "age" missing',
+            severity: 'warning'
+          })
+        }
+      } else {
         errors.push({
-          path: ['team'],
-          message: 'A team must have at least one adult person (age >= 18)',
-          severity: 'info'
+          path: ['team', index],
+          message: 'Member must be an object with properties "name" and "age"',
+          severity: 'warning'
         })
       }
-    } else {
+    })
+
+    // check whether the team consists of exactly four members
+    if (json.team.length !== 4) {
+      errors.push({ path: ['team'], message: 'A team must have 4 members', severity: 'error' })
+    }
+
+    // check whether there is at least one adult member in the team
+    const adults = json.team.filter((member) => (member ? member.age >= 18 : false))
+    if (adults.length === 0) {
       errors.push({
-        path: [],
-        message: 'Required property "team" missing or not an Array',
-        severity: 'warning'
+        path: ['team'],
+        message: 'A team must have at least one adult person (age >= 18)',
+        severity: 'info'
       })
     }
-
-    return errors
+  } else {
+    errors.push({
+      path: [],
+      message: 'Required property "team" missing or not an Array',
+      severity: 'warning'
+    })
   }
 
-  let content = $state({
-    text: undefined, // can be used to pass a stringified JSON document instead
-    json: {
-      team: [
-        {
-          name: 'Joe',
-          age: 17
-        },
-        {
-          name: 'Sarah',
-          age: 13
-        },
-        {
-          name: 'Jack'
-        }
-      ]
-    }
-  })
+  return errors
+}
+
+let content = $state({
+  text: undefined, // can be used to pass a stringified JSON document instead
+  json: {
+    team: [
+      {
+        name: 'Joe',
+        age: 17
+      },
+      {
+        name: 'Sarah',
+        age: 13
+      },
+      {
+        name: 'Jack'
+      }
+    ]
+  }
+})
 </script>
 
 <svelte:head>

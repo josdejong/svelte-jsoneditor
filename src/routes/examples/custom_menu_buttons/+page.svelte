@@ -1,56 +1,55 @@
 <script lang="ts">
-  import {
-    JSONEditor,
-    type MenuButton,
-    type MenuItem,
-    type MenuSeparator,
-    type RenderMenuContext
-  } from 'svelte-jsoneditor'
-  import { faCopy } from '@fortawesome/free-regular-svg-icons'
-  import copyToClipboard from '$lib/utils/copyToClipboard.js'
+import { faCopy } from '@fortawesome/free-regular-svg-icons'
+import {
+  JSONEditor,
+  type MenuButton,
+  type MenuItem,
+  type MenuSeparator,
+  type RenderMenuContext
+} from 'svelte-jsoneditor'
+import copyToClipboard from '$lib/utils/copyToClipboard.js'
 
-  let content = $state({
-    text: undefined, // can be used to pass a stringified JSON document instead
-    json: {
-      array: [1, 2, 3],
-      boolean: true,
-      color: '#82b92c',
-      null: null,
-      number: 123,
-      object: { a: 'b', c: 'd' },
-      string: 'Hello World'
-    }
-  })
+let content = $state({
+  text: undefined, // can be used to pass a stringified JSON document instead
+  json: {
+    array: [1, 2, 3],
+    boolean: true,
+    color: '#82b92c',
+    null: null,
+    number: 123,
+    object: { a: 'b', c: 'd' },
+    string: 'Hello World'
+  }
+})
 
-  async function handleCopy() {
-    console.log('Custom copy button clicked')
+async function handleCopy() {
+  console.log('Custom copy button clicked')
 
-    const contents =
-      content.text !== undefined ? content.text : JSON.stringify(content.json, null, 2)
+  const contents = content.text !== undefined ? content.text : JSON.stringify(content.json, null, 2)
 
-    await copyToClipboard(contents)
+  await copyToClipboard(contents)
+}
+
+function handleRenderMenu(items: MenuItem[], context: RenderMenuContext): MenuItem[] | undefined {
+  console.log('handleRenderMenu', { items, context })
+
+  const separator: MenuSeparator = {
+    type: 'separator'
   }
 
-  function handleRenderMenu(items: MenuItem[], context: RenderMenuContext): MenuItem[] | undefined {
-    console.log('handleRenderMenu', { items, context })
-
-    const separator: MenuSeparator = {
-      type: 'separator'
-    }
-
-    const customCopyButton: MenuButton = {
-      type: 'button',
-      onClick: handleCopy,
-      icon: faCopy,
-      title: 'Copy document to clipboard',
-      className: 'custom-copy-button'
-    }
-
-    const head = items.slice(0, items.length - 1)
-    const tail = items.slice(items.length - 1) // the tail contains space
-
-    return head.concat(separator, customCopyButton, tail)
+  const customCopyButton: MenuButton = {
+    type: 'button',
+    onClick: handleCopy,
+    icon: faCopy,
+    title: 'Copy document to clipboard',
+    className: 'custom-copy-button'
   }
+
+  const head = items.slice(0, items.length - 1)
+  const tail = items.slice(items.length - 1) // the tail contains space
+
+  return head.concat(separator, customCopyButton, tail)
+}
 </script>
 
 <svelte:head>

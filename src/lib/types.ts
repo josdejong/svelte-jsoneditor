@@ -1,6 +1,6 @@
+import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
 import type { Component, SvelteComponent } from 'svelte'
-import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import type { Action } from 'svelte/action'
 
 export type TextContent = { text: string }

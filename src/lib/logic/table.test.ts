@@ -1,4 +1,9 @@
-import { test, describe, expect } from 'vitest'
+import { deepStrictEqual } from 'assert'
+import type { JSONPath } from 'immutable-json-patch'
+import { describe, expect, test } from 'vitest'
+import type { SortedColumn, ValidationError } from '$lib/types.js'
+import { SortDirection, ValidationSeverity } from '$lib/types.js'
+import { createValueSelection } from './selection.js'
 import {
   findNestedArrays,
   fromTableCellPosition,
@@ -16,11 +21,6 @@ import {
   stringifyTableCellPosition,
   toTableCellPosition
 } from './table.js'
-import { deepStrictEqual } from 'assert'
-import type { JSONPath } from 'immutable-json-patch'
-import { createValueSelection } from './selection.js'
-import type { SortedColumn, ValidationError } from '$lib/types.js'
-import { SortDirection, ValidationSeverity } from '$lib/types.js'
 
 describe('table', () => {
   const json: unknown[] = [
@@ -84,16 +84,13 @@ describe('table', () => {
   test('should return an empty array on non-array input', () => {
     deepStrictEqual(getColumns({} as unknown[], false), [])
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    // @ts-expect-error
     deepStrictEqual(getColumns(null, false), [])
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    // @ts-expect-error
     deepStrictEqual(getColumns(undefined, false), [])
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    // @ts-expect-error
     deepStrictEqual(getColumns('foo', false), [])
   })
 

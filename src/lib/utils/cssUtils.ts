@@ -16,7 +16,7 @@ export function classnames(...args: Array<string | Record<string, boolean> | und
 
     if (arg && typeof arg === 'object') {
       for (const key in arg) {
-        if (Object.hasOwnProperty.call(arg, key) && arg[key]) {
+        if (Object.hasOwn(arg, key) && arg[key]) {
           classes.push(key)
         }
       }

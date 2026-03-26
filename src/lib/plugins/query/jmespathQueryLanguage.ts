@@ -1,9 +1,9 @@
-import jmespath from 'jmespath'
 import type { JSONPath } from 'immutable-json-patch'
 import { getIn } from 'immutable-json-patch'
-import { parseString } from '$lib/utils/stringUtils.js'
+import jmespath from 'jmespath'
 import type { JSONParser, QueryLanguage, QueryLanguageOptions } from '$lib/types'
 import { isEqualParser } from '$lib/utils/jsonUtils.js'
+import { parseString } from '$lib/utils/stringUtils.js'
 
 const description = `
 <p>
@@ -122,9 +122,8 @@ export function stringifyPathForJmespath(path: JSONPath): string {
     .map((prop) => {
       if (typeof prop === 'number') {
         return '[' + prop + ']'
-      } else {
-        return '.' + stringifyProp(String(prop))
       }
+      return '.' + stringifyProp(String(prop))
     })
     .join('')
 

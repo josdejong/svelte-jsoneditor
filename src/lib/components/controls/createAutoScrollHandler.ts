@@ -1,10 +1,10 @@
-import { createDebug } from '$lib/utils/debug.js'
 import {
   AUTO_SCROLL_INTERVAL,
   AUTO_SCROLL_SPEED_FAST,
   AUTO_SCROLL_SPEED_NORMAL,
   AUTO_SCROLL_SPEED_SLOW
 } from '$lib/constants.js'
+import { createDebug } from '$lib/utils/debug.js'
 
 const debug = createDebug('jsoneditor:AutoScrollHandler')
 

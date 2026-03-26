@@ -1,6 +1,24 @@
 import assert from 'assert'
-import { describe, expect, test } from 'vitest'
+import {
+  deleteIn,
+  getIn,
+  type JSONPatchDocument,
+  type JSONPath,
+  setIn,
+  updateIn
+} from 'immutable-json-patch'
 import { flatMap, isEqual, range, times } from 'lodash-es'
+import { isArrayRecursiveState } from 'svelte-jsoneditor'
+import { describe, expect, test } from 'vitest'
+import {
+  type ArrayDocumentState,
+  CaretType,
+  type DocumentState,
+  type ObjectDocumentState,
+  type OnExpand,
+  type ValueDocumentState,
+  type VisibleSection
+} from '$lib/types.js'
 import { ARRAY_SECTION_SIZE, DEFAULT_VISIBLE_SECTIONS } from '../constants.js'
 import {
   collapsePath,
@@ -30,24 +48,6 @@ import {
   toRecursiveStatePath,
   updateInDocumentState
 } from './documentState.js'
-import {
-  type ArrayDocumentState,
-  CaretType,
-  type DocumentState,
-  type ObjectDocumentState,
-  type OnExpand,
-  type ValueDocumentState,
-  type VisibleSection
-} from '$lib/types.js'
-import {
-  deleteIn,
-  getIn,
-  type JSONPatchDocument,
-  type JSONPath,
-  setIn,
-  updateIn
-} from 'immutable-json-patch'
-import { isArrayRecursiveState } from 'svelte-jsoneditor'
 
 const json3 = [{ id: 0 }, { id: 1 }, { id: 2 }]
 const documentState3: DocumentState = {

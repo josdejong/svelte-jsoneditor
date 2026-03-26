@@ -1,5 +1,6 @@
-import { test, describe, expect } from 'vitest'
 import { strictEqual } from 'assert'
+import { LosslessNumber, parse, stringify } from 'lossless-json'
+import { describe, expect, test } from 'vitest'
 import {
   getColorCSS,
   isColor,
@@ -11,7 +12,6 @@ import {
   stringConvert,
   valueType
 } from './typeUtils.js'
-import { LosslessNumber, parse, stringify } from 'lossless-json'
 
 const LosslessJSONParser = { parse, stringify }
 
@@ -65,7 +65,7 @@ describe('typeUtils', () => {
       }
 
       valueOf() {
-        return parseFloat(this.value)
+        return Number.parseFloat(this.value)
       }
     }
 

@@ -1,5 +1,5 @@
 import type Ajv from 'ajv'
-import type { Options, Schema, ErrorObject, ValidateFunction, AsyncSchema } from 'ajv'
+import type { AsyncSchema, ErrorObject, Options, Schema, ValidateFunction } from 'ajv'
 import AjvDist from 'ajv'
 import { parsePath } from 'immutable-json-patch'
 import type { JSONSchema, JSONSchemaDefinitions, ValidationError, Validator } from '$lib/types'
@@ -134,7 +134,7 @@ function normalizeAjvError(
  * for example list the available values of an enum.
  */
 function improveAjvError(ajvError: ErrorObject): ErrorObject {
-  let message: string | undefined = undefined
+  let message: string | undefined
 
   if (ajvError.keyword === 'enum' && Array.isArray(ajvError.schema)) {
     let enums = ajvError.schema

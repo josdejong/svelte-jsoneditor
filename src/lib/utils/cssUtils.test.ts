@@ -1,5 +1,5 @@
-import { test, describe } from 'vitest'
 import { strictEqual } from 'assert'
+import { describe, test } from 'vitest'
 import { classnames } from './cssUtils.js'
 
 describe('cssUtils', () => {

@@ -1,15 +1,15 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { limit } from '$lib/utils/arrayUtils.js'
-  import { truncate } from '$lib/utils/stringUtils.js'
+import { limit } from '$lib/utils/arrayUtils.js'
+import { truncate } from '$lib/utils/stringUtils.js'
 
-  export let items: (string | number)[]
-  export let selectedItem: string | number
-  export let onSelect: (item: string | number) => void
+export let items: (string | number)[]
+export let selectedItem: string | number
+export let onSelect: (item: string | number) => void
 
-  const MAX_ITEMS = 100
-  const MAX_ITEM_CHARACTERS = 30
+const MAX_ITEMS = 100
+const MAX_ITEM_CHARACTERS = 30
 </script>
 
 <div class="jse-navigation-bar-dropdown">

@@ -85,9 +85,8 @@ export function findSchema(
             auxNextPath.push(...nextPath)
           }
           return findSchema(referencedSchema, schemaDefinitions, auxNextPath, reference)
-        } else {
-          throw Error(`Unable to resolve reference ${ref}`)
         }
+        throw Error(`Unable to resolve reference ${ref}`)
       } else {
         throw Error(`Unable to resolve reference ${ref}`)
       }

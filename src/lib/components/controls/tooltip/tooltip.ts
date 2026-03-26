@@ -1,6 +1,6 @@
-import Tooltip from './Tooltip.svelte'
 import type { SvelteComponent } from 'svelte'
 import type { AbsolutePopupOptions } from '$lib/types'
+import Tooltip from './Tooltip.svelte'
 
 export interface TooltipOptions {
   text: string

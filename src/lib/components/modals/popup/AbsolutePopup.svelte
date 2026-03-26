@@ -1,51 +1,51 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { createDebug } from '$lib/utils/debug.js'
-  import { setContext, type SvelteComponent } from 'svelte'
-  import type { AbsolutePopupOptions, PopupEntry, AbsolutePopupContext } from '$lib/types'
-  import { uniqueId } from '$lib/utils/uniqueId.js'
-  import AbsolutePopupEntry from './AbsolutePopupEntry.svelte'
+import { type SvelteComponent, setContext } from 'svelte'
+import type { AbsolutePopupContext, AbsolutePopupOptions, PopupEntry } from '$lib/types'
+import { createDebug } from '$lib/utils/debug.js'
+import { uniqueId } from '$lib/utils/uniqueId.js'
+import AbsolutePopupEntry from './AbsolutePopupEntry.svelte'
 
-  const debug = createDebug('jsoneditor:AbsolutePopup')
+const debug = createDebug('jsoneditor:AbsolutePopup')
 
-  let popups: PopupEntry[] = []
+let popups: PopupEntry[] = []
 
-  function openAbsolutePopup(
-    component: typeof SvelteComponent<Record<string, unknown>>,
-    props: Record<string, unknown>,
-    options: AbsolutePopupOptions
-  ): number {
-    debug('open...', props, options)
+function openAbsolutePopup(
+  component: typeof SvelteComponent<Record<string, unknown>>,
+  props: Record<string, unknown>,
+  options: AbsolutePopupOptions
+): number {
+  debug('open...', props, options)
 
-    const popup: PopupEntry = {
-      id: uniqueId(),
-      component: component,
-      props: props || {},
-      options: options || {}
-    }
-
-    popups = [...popups, popup]
-
-    return popup.id
+  const popup: PopupEntry = {
+    id: uniqueId(),
+    component: component,
+    props: props || {},
+    options: options || {}
   }
 
-  function closeAbsolutePopup(popupId: number | undefined) {
-    const popupIndex = popups.findIndex((popup) => popup.id === popupId)
+  popups = [...popups, popup]
 
-    if (popupIndex !== -1) {
-      const popup = popups[popupIndex]
-      if (popup.options.onClose) {
-        popup.options.onClose()
-      }
+  return popup.id
+}
 
-      popups = popups.filter((popup) => popup.id !== popupId)
+function closeAbsolutePopup(popupId: number | undefined) {
+  const popupIndex = popups.findIndex((popup) => popup.id === popupId)
+
+  if (popupIndex !== -1) {
+    const popup = popups[popupIndex]
+    if (popup.options.onClose) {
+      popup.options.onClose()
     }
+
+    popups = popups.filter((popup) => popup.id !== popupId)
   }
+}
 
-  $: debug('popups', popups)
+$: debug('popups', popups)
 
-  setContext<AbsolutePopupContext>('absolute-popup', { openAbsolutePopup, closeAbsolutePopup })
+setContext<AbsolutePopupContext>('absolute-popup', { openAbsolutePopup, closeAbsolutePopup })
 </script>
 
 {#each popups as popup}

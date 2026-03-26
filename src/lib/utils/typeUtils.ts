@@ -1,7 +1,7 @@
 // TODO: unit test typeUtils.js
 
-import { containsNumber } from './numberUtils.js'
 import type { JSONParser } from '../types.js'
+import { containsNumber } from './numberUtils.js'
 
 /**
  * Test whether a value is an Object (and not an Array or Class)
@@ -92,7 +92,7 @@ export function getColorCSS(color: string): string | undefined {
   const applied = colorTestDiv.style.color
   return applied !== '' ? applied.replace(/\s+/g, '').toLowerCase() : undefined
 }
-let colorTestDiv: HTMLDivElement | undefined = undefined
+let colorTestDiv: HTMLDivElement | undefined
 
 /**
  * Test if a string contains a valid color name or code.

@@ -4,7 +4,7 @@ export default function copyToClipBoard(text: string): Promise<void> {
   }
   // Compatible with old browsers such as Chrome <=65, Edge <=18 & IE
   // Compatible with HTTP
-  else if (document.queryCommandSupported?.('copy')) {
+  if (document.queryCommandSupported?.('copy')) {
     const textarea = document.createElement('textarea')
     textarea.value = text
 
@@ -24,9 +24,8 @@ export default function copyToClipBoard(text: string): Promise<void> {
     }
 
     return Promise.resolve()
-  } else {
-    console.error('Copy failed.')
-
-    return Promise.resolve()
   }
+  console.error('Copy failed.')
+
+  return Promise.resolve()
 }

@@ -34,7 +34,7 @@ export const EvaluatorAction = (node, initialProps) => {
 function evaluate(expr) {
   const result = expr
     .split('+')
-    .map((value) => parseFloat(value.trim()))
+    .map((value) => Number.parseFloat(value.trim()))
     .reduce((a, b) => a + b)
 
   return `The result of "${expr}" is "${result}" (double-click to edit)`

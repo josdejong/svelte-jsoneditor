@@ -1,60 +1,60 @@
 <script lang="ts">
-  import type { JSONPath } from 'immutable-json-patch'
-  import { getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
-  import type { JSONParser, OnChangeMode } from '$lib/types.js'
-  import { Mode } from '$lib/types.js'
-  import { valueType } from '$lib/utils/typeUtils.js'
-  import { findNestedArrays } from '$lib/logic/table.js'
-  import { isEmpty } from 'lodash-es'
-  import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
+import type { JSONPath } from 'immutable-json-patch'
+import { getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
+import { isEmpty } from 'lodash-es'
+import { findNestedArrays } from '$lib/logic/table.js'
+import type { JSONParser, OnChangeMode } from '$lib/types.js'
+import { Mode } from '$lib/types.js'
+import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
+import { valueType } from '$lib/utils/typeUtils.js'
 
-  interface Props {
-    text: string | undefined
-    json: unknown | undefined
-    readOnly: boolean
-    parser: JSONParser
-    openJSONEditorModal: (path: JSONPath) => void
-    extractPath: (path: JSONPath) => void
-    onChangeMode: OnChangeMode
-    onClick: () => void
-  }
+interface Props {
+  text: string | undefined
+  json: unknown | undefined
+  readOnly: boolean
+  parser: JSONParser
+  openJSONEditorModal: (path: JSONPath) => void
+  extractPath: (path: JSONPath) => void
+  onChangeMode: OnChangeMode
+  onClick: () => void
+}
 
-  const {
-    text,
-    json,
-    readOnly,
-    parser,
-    openJSONEditorModal,
-    extractPath,
-    onChangeMode,
-    onClick
-  }: Props = $props()
+const {
+  text,
+  json,
+  readOnly,
+  parser,
+  openJSONEditorModal,
+  extractPath,
+  onChangeMode,
+  onClick
+}: Props = $props()
 
-  const nestedArrayPaths: JSONPath[] = $derived(
-    json
-      ? findNestedArrays(json)
-          .slice(0, 99)
-          .filter((path) => path.length > 0)
-      : []
-  )
-  const hasNestedArrays = $derived(!isEmpty(nestedArrayPaths))
-  const isEmptyDocument = $derived(json === undefined && (text === '' || text === undefined))
+const nestedArrayPaths: JSONPath[] = $derived(
+  json
+    ? findNestedArrays(json)
+        .slice(0, 99)
+        .filter((path) => path.length > 0)
+    : []
+)
+const hasNestedArrays = $derived(!isEmpty(nestedArrayPaths))
+const isEmptyDocument = $derived(json === undefined && (text === '' || text === undefined))
 
-  const documentType = $derived(
-    hasNestedArrays
-      ? 'Object with nested arrays'
-      : isEmptyDocument
-        ? 'An empty document'
-        : isJSONObject(json)
-          ? 'An object'
-          : isJSONArray(json)
-            ? 'An empty array' // note: can also be an array with objects but without properties
-            : `A ${valueType(json, parser)}`
-  )
+const documentType = $derived(
+  hasNestedArrays
+    ? 'Object with nested arrays'
+    : isEmptyDocument
+      ? 'An empty document'
+      : isJSONObject(json)
+        ? 'An object'
+        : isJSONArray(json)
+          ? 'An empty array' // note: can also be an array with objects but without properties
+          : `A ${valueType(json, parser)}`
+)
 
-  function countItems(nestedArrayPath: JSONPath): number {
-    return (getIn(json, nestedArrayPath) as JSONPath).length
-  }
+function countItems(nestedArrayPath: JSONPath): number {
+  return (getIn(json, nestedArrayPath) as JSONPath).length
+}
 </script>
 
 <div class="jse-table-mode-welcome" onclick={() => onClick()} role="none">

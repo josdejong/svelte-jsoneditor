@@ -28,7 +28,7 @@
       })
 
       // set json
-      document.getElementById('setContent').onclick = function () {
+      document.getElementById('setContent').onclick = () => {
         const content = {
           text: undefined, // used in text mode
           json: {
@@ -47,7 +47,7 @@
       }
 
       // get json
-      document.getElementById('getContent').onclick = function () {
+      document.getElementById('getContent').onclick = () => {
         const content = editor.get()
         alert(JSON.stringify(content, null, 2))
       }

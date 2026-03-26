@@ -1,7 +1,8 @@
-import { test, describe } from 'vitest'
 import assert from 'assert'
 import { immutableJSONPatch } from 'immutable-json-patch'
 import { sortBy } from 'lodash-es'
+import { LosslessNumber } from 'lossless-json'
+import { describe, test } from 'vitest'
 import {
   fastPatchSort,
   sortArray,
@@ -10,7 +11,6 @@ import {
   sortOperationsMove,
   sortOperationsMoveAdvanced
 } from './sort.js'
-import { LosslessNumber } from 'lossless-json'
 
 describe('sort', () => {
   describe('sortJson', () => {

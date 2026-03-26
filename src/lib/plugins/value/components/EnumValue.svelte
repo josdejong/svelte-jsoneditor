@@ -1,57 +1,57 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONPath } from 'immutable-json-patch'
-  import { compileJSONPointer } from 'immutable-json-patch'
-  import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass.js'
-  import { type JSONParser, type JSONSelection, Mode, type OnPatch } from '$lib/types.js'
-  import { isValueSelection } from '$lib/logic/selection.js'
+import type { JSONPath } from 'immutable-json-patch'
+import { compileJSONPointer } from 'immutable-json-patch'
+import { isValueSelection } from '$lib/logic/selection.js'
+import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass.js'
+import { type JSONParser, type JSONSelection, Mode, type OnPatch } from '$lib/types.js'
 
-  export let path: JSONPath
-  export let value: unknown
-  export let mode: Mode
-  export let parser: JSONParser
-  export let readOnly: boolean
-  export let selection: JSONSelection | undefined
-  export let onPatch: OnPatch
+export let path: JSONPath
+export let value: unknown
+export let mode: Mode
+export let parser: JSONParser
+export let readOnly: boolean
+export let selection: JSONSelection | undefined
+export let onPatch: OnPatch
 
-  export let options: Array<{ value: unknown; text: string }>
+export let options: Array<{ value: unknown; text: string }>
 
-  let refSelect: HTMLSelectElement | undefined
+let refSelect: HTMLSelectElement | undefined
 
-  let bindValue: unknown = value
-  $: bindValue = value
+let bindValue: unknown = value
+$: bindValue = value
 
-  function applyFocus(selection: JSONSelection | undefined) {
-    if (selection) {
-      if (refSelect) {
-        refSelect.focus()
-      }
+function applyFocus(selection: JSONSelection | undefined) {
+  if (selection) {
+    if (refSelect) {
+      refSelect.focus()
     }
   }
+}
 
-  $: applyFocus(selection)
+$: applyFocus(selection)
 
-  function handleSelect(event: Event) {
-    event.stopPropagation()
+function handleSelect(event: Event) {
+  event.stopPropagation()
 
-    if (readOnly) {
-      return
+  if (readOnly) {
+    return
+  }
+
+  onPatch([
+    {
+      op: 'replace',
+      path: compileJSONPointer(path),
+      value: bindValue
     }
+  ])
+}
 
-    onPatch([
-      {
-        op: 'replace',
-        path: compileJSONPointer(path),
-        value: bindValue
-      }
-    ])
-  }
-
-  function handleMouseDown(event: MouseEvent) {
-    // stop propagation to prevent selecting the whole line
-    event.stopPropagation()
-  }
+function handleMouseDown(event: MouseEvent) {
+  // stop propagation to prevent selecting the whole line
+  event.stopPropagation()
+}
 </script>
 
 <select

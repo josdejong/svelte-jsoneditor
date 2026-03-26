@@ -1,8 +1,8 @@
-import { describe, test } from 'vitest'
 import assert from 'assert'
-import { lodashQueryLanguage } from './lodashQueryLanguage.js'
 import { cloneDeep } from 'lodash-es'
 import { LosslessNumber, parse, stringify } from 'lossless-json'
+import { describe, test } from 'vitest'
+import { lodashQueryLanguage } from './lodashQueryLanguage.js'
 
 const { createQuery, executeQuery } = lodashQueryLanguage
 

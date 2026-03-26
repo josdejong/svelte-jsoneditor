@@ -1,5 +1,5 @@
-import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import type { IconName } from '@fortawesome/fontawesome-common-types'
+import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 
 export const faJSONEditorExpand: IconDefinition = {
   prefix: 'fas',

@@ -1,32 +1,32 @@
 <script lang="ts">
-  import {
-    JSONEditor,
-    ReadonlyValue,
-    type RenderValueComponentDescription,
-    type RenderValueProps
-  } from 'svelte-jsoneditor'
-  import EditableValueInput from '../../components/EditableValueInput.svelte'
+import {
+  JSONEditor,
+  ReadonlyValue,
+  type RenderValueComponentDescription,
+  type RenderValueProps
+} from 'svelte-jsoneditor'
+import EditableValueInput from '../../components/EditableValueInput.svelte'
 
-  let content = $state({
-    text: undefined, // can be used to pass a stringified JSON document instead
-    json: {
-      array: [1, 2, 3],
-      boolean: true,
-      color: '#82b92c',
-      null: null,
-      number: 123,
-      object: { a: 'b', c: 'd' },
-      string: 'Hello World'
-    }
-  })
-
-  function onRenderValue(props: RenderValueProps): RenderValueComponentDescription[] {
-    if (props.isEditing && !props.readOnly) {
-      return [{ component: EditableValueInput, props }]
-    }
-
-    return [{ component: ReadonlyValue, props }]
+let content = $state({
+  text: undefined, // can be used to pass a stringified JSON document instead
+  json: {
+    array: [1, 2, 3],
+    boolean: true,
+    color: '#82b92c',
+    null: null,
+    number: 123,
+    object: { a: 'b', c: 'd' },
+    string: 'Hello World'
   }
+})
+
+function onRenderValue(props: RenderValueProps): RenderValueComponentDescription[] {
+  if (props.isEditing && !props.readOnly) {
+    return [{ component: EditableValueInput, props }]
+  }
+
+  return [{ component: ReadonlyValue, props }]
+}
 </script>
 
 <svelte:head>

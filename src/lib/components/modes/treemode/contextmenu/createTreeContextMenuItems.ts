@@ -15,6 +15,9 @@ import {
   faSquare,
   faTrashCan
 } from '@fortawesome/free-solid-svg-icons'
+import { getIn } from 'immutable-json-patch'
+import { initial, isEmpty } from 'lodash-es'
+import { getEnforceString } from '$lib/logic/documentState'
 import {
   canConvert,
   getFocusPath,
@@ -26,16 +29,13 @@ import {
   singleItemSelected
 } from '$lib/logic/selection'
 import type {
+  ContextMenuItem,
   ConvertType,
   DocumentState,
   InsertType,
-  JSONSelection,
-  ContextMenuItem
+  JSONSelection
 } from '$lib/types'
-import { initial, isEmpty } from 'lodash-es'
-import { getIn } from 'immutable-json-patch'
 import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
-import { getEnforceString } from '$lib/logic/documentState'
 
 export default function ({
   json,

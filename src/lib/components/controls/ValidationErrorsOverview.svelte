@@ -1,42 +1,34 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import {
-    faAngleDown,
-    faAngleRight,
-    faExclamationTriangle
-  } from '@fortawesome/free-solid-svg-icons'
-  import { isEmpty } from 'lodash-es'
-  import Icon from 'svelte-awesome'
-  import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
-  import { ValidationSeverity, type ValidationError } from '$lib/types.js'
-  import { MAX_VALIDATION_ERRORS } from '$lib/constants.js'
-  import { limit } from '$lib/utils/arrayUtils.js'
+import { faAngleDown, faAngleRight, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
+import { isEmpty } from 'lodash-es'
+import Icon from 'svelte-awesome'
+import { MAX_VALIDATION_ERRORS } from '$lib/constants.js'
+import { type ValidationError, ValidationSeverity } from '$lib/types.js'
+import { limit } from '$lib/utils/arrayUtils.js'
+import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
 
-  export let validationErrors: ValidationError[]
-  export let selectError: (error: ValidationError) => void
+export let validationErrors: ValidationError[]
+export let selectError: (error: ValidationError) => void
 
-  $: count = validationErrors.length
+$: count = validationErrors.length
 
-  let expanded = true
+let expanded = true
 
-  function collapse() {
-    expanded = false
-  }
+function collapse() {
+  expanded = false
+}
 
-  function expand() {
-    expanded = true
-  }
+function expand() {
+  expanded = true
+}
 
-  function getMaxSeverity(errors: ValidationError[]): ValidationSeverity | undefined {
-    const severities = [
-      ValidationSeverity.error,
-      ValidationSeverity.warning,
-      ValidationSeverity.info
-    ]
+function getMaxSeverity(errors: ValidationError[]): ValidationSeverity | undefined {
+  const severities = [ValidationSeverity.error, ValidationSeverity.warning, ValidationSeverity.info]
 
-    return severities.find((severity) => errors.some((error) => error.severity === severity))
-  }
+  return severities.find((severity) => errors.some((error) => error.severity === severity))
+}
 </script>
 
 {#if !isEmpty(validationErrors)}

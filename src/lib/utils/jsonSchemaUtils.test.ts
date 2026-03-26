@@ -1,7 +1,7 @@
-import { test, describe } from 'vitest'
 import assert from 'assert'
-import { findEnum, findSchema, getJSONSchemaOptions } from './jsonSchemaUtils.js'
 import type { JSONPath } from 'immutable-json-patch'
+import { describe, test } from 'vitest'
+import { findEnum, findSchema, getJSONSchemaOptions } from './jsonSchemaUtils.js'
 
 describe('jsonSchemaUtils', () => {
   describe('getJSONSchemaOptions', () => {

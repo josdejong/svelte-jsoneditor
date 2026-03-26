@@ -1,48 +1,48 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import Icon from 'svelte-awesome'
-  import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
-  import { onDestroy, onMount } from 'svelte'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
-  import type { MenuButton } from '$lib/types.js'
+import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
+import { onDestroy, onMount } from 'svelte'
+import Icon from 'svelte-awesome'
+import type { MenuButton } from '$lib/types.js'
+import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
 
-  export let items: MenuButton[] = []
-  export let title: string | undefined = undefined
-  export let width = '120px'
+export let items: MenuButton[] = []
+export let title: string | undefined = undefined
+export let width = '120px'
 
-  let visible = false
+let visible = false
 
-  $: allItemsDisabled = items.every((item) => item.disabled === true)
+$: allItemsDisabled = items.every((item) => item.disabled === true)
 
-  function toggleShow() {
-    const wasVisible = visible
+function toggleShow() {
+  const wasVisible = visible
 
-    // trigger *after* the handleClick which changes visibility to false
-    setTimeout(() => (visible = !wasVisible))
-  }
+  // trigger *after* the handleClick which changes visibility to false
+  setTimeout(() => (visible = !wasVisible))
+}
 
-  function handleClick() {
+function handleClick() {
+  visible = false
+}
+
+function handleKeyDown(event: KeyboardEvent) {
+  const combo = keyComboFromEvent(event)
+  if (combo === 'Escape') {
+    event.preventDefault()
     visible = false
   }
+}
 
-  function handleKeyDown(event: KeyboardEvent) {
-    const combo = keyComboFromEvent(event)
-    if (combo === 'Escape') {
-      event.preventDefault()
-      visible = false
-    }
-  }
+onMount(() => {
+  document.addEventListener('click', handleClick)
+  document.addEventListener('keydown', handleKeyDown)
+})
 
-  onMount(() => {
-    document.addEventListener('click', handleClick)
-    document.addEventListener('keydown', handleKeyDown)
-  })
-
-  onDestroy(() => {
-    document.removeEventListener('click', handleClick)
-    document.removeEventListener('keydown', handleKeyDown)
-  })
+onDestroy(() => {
+  document.removeEventListener('click', handleClick)
+  document.removeEventListener('keydown', handleKeyDown)
+})
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->

@@ -1,30 +1,30 @@
 <script>
-  import { JSONEditor } from 'svelte-jsoneditor'
+import { JSONEditor } from 'svelte-jsoneditor'
 
-  let content = $state({
-    text: undefined, // can be used to pass a stringified JSON document instead
-    json: {
-      array: [1, 2, 3],
-      boolean: true,
-      color: '#82b92c',
-      null: null,
-      number: 123,
-      object: { a: 'b', c: 'd' },
-      string: 'Hello World'
-    }
-  })
-
-  function handleClassName(path, value) {
-    if (JSON.stringify(path) === '["object","c"]' || JSON.stringify(path) === '["string"]') {
-      return 'custom-class-highlight'
-    }
-
-    if (value === true || value === false) {
-      return 'custom-class-boolean'
-    }
-
-    return undefined
+let content = $state({
+  text: undefined, // can be used to pass a stringified JSON document instead
+  json: {
+    array: [1, 2, 3],
+    boolean: true,
+    color: '#82b92c',
+    null: null,
+    number: 123,
+    object: { a: 'b', c: 'd' },
+    string: 'Hello World'
   }
+})
+
+function handleClassName(path, value) {
+  if (JSON.stringify(path) === '["object","c"]' || JSON.stringify(path) === '["string"]') {
+    return 'custom-class-highlight'
+  }
+
+  if (value === true || value === false) {
+    return 'custom-class-boolean'
+  }
+
+  return undefined
+}
 </script>
 
 <svelte:head>

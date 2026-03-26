@@ -1,22 +1,22 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte'
+import type { Snippet } from 'svelte'
 
-  interface Props {
-    onclick?: () => void
-    children?: Snippet
-  }
+interface Props {
+  onclick?: () => void
+  children?: Snippet
+}
 
-  const { onclick, children }: Props = $props()
+const { onclick, children }: Props = $props()
 
-  const handleClick = $derived.by(() => {
-    return onclick
-      ? (event: MouseEvent) => {
-          event.preventDefault()
-          event.stopPropagation()
-          onclick()
-        }
-      : undefined
-  })
+const handleClick = $derived.by(() => {
+  return onclick
+    ? (event: MouseEvent) => {
+        event.preventDefault()
+        event.stopPropagation()
+        onclick()
+      }
+    : undefined
+})
 </script>
 
 <button type="button" class="jse-tag" class:disabled={!onclick} onclick={handleClick}>

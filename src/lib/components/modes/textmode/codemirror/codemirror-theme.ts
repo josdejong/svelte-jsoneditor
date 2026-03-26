@@ -20,7 +20,6 @@ export const highlighter = syntaxHighlighting(highlightStyle)
 //
 // See https://discuss.codemirror.net/t/highlighting-that-seems-ignored-in-cm6/4320/15
 const originalStyle = highlightStyle.style
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
+// @ts-expect-error
 // noinspection JSConstantReassignment
 highlightStyle.style = (tags) => originalStyle(tags || [])

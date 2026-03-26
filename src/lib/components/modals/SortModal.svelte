@@ -1,78 +1,78 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { isEmpty } from 'lodash-es'
-  import Select from 'svelte-select'
-  import Header from './Header.svelte'
-  import { getNestedPaths } from '$lib/utils/arrayUtils.js'
-  import { pathToOption, stringifyJSONPath } from '$lib/utils/pathUtils.js'
-  import { sortJson } from '$lib/logic/sort.js'
-  import { sortModalStates } from './sortModalStates'
-  import type { JSONPath } from 'immutable-json-patch'
-  import { compileJSONPointer, getIn } from 'immutable-json-patch'
-  import { createDebug } from '$lib/utils/debug.js'
-  import type { OnSort } from '$lib/types.js'
-  import Modal from './Modal.svelte'
+import type { JSONPath } from 'immutable-json-patch'
+import { compileJSONPointer, getIn } from 'immutable-json-patch'
+import { isEmpty } from 'lodash-es'
+import Select from 'svelte-select'
+import { sortJson } from '$lib/logic/sort.js'
+import type { OnSort } from '$lib/types.js'
+import { getNestedPaths } from '$lib/utils/arrayUtils.js'
+import { createDebug } from '$lib/utils/debug.js'
+import { pathToOption, stringifyJSONPath } from '$lib/utils/pathUtils.js'
+import Header from './Header.svelte'
+import Modal from './Modal.svelte'
+import { sortModalStates } from './sortModalStates'
 
-  const debug = createDebug('jsoneditor:SortModal')
+const debug = createDebug('jsoneditor:SortModal')
 
-  export let id: string
-  export let json: unknown // the whole document
-  export let rootPath: JSONPath
-  export let onSort: OnSort
-  export let onClose: () => void
+export let id: string
+export let json: unknown // the whole document
+export let rootPath: JSONPath
+export let onSort: OnSort
+export let onClose: () => void
 
-  $: selectedJson = getIn(json, rootPath)
-  $: jsonIsArray = Array.isArray(selectedJson)
-  $: paths = jsonIsArray ? getNestedPaths(selectedJson) : undefined
-  $: properties = paths ? paths.map(pathToOption) : undefined
+$: selectedJson = getIn(json, rootPath)
+$: jsonIsArray = Array.isArray(selectedJson)
+$: paths = jsonIsArray ? getNestedPaths(selectedJson) : undefined
+$: properties = paths ? paths.map(pathToOption) : undefined
 
-  const asc = {
-    value: 1,
-    label: 'ascending'
+const asc = {
+  value: 1,
+  label: 'ascending'
+}
+const desc = {
+  value: -1,
+  label: 'descending'
+}
+const directions = [asc, desc]
+
+const stateId = `${id}:${compileJSONPointer(rootPath)}`
+let selectedProperty = sortModalStates[stateId]?.selectedProperty
+let selectedDirection = sortModalStates[stateId]?.selectedDirection || asc
+let sortError: string | undefined
+
+$: {
+  // remember the selected values for the next time we open the SortModal
+  // just in memory, not persisted
+  sortModalStates[stateId] = {
+    selectedProperty,
+    selectedDirection
   }
-  const desc = {
-    value: -1,
-    label: 'descending'
-  }
-  const directions = [asc, desc]
 
-  const stateId = `${id}:${compileJSONPointer(rootPath)}`
-  let selectedProperty = sortModalStates[stateId]?.selectedProperty
-  let selectedDirection = sortModalStates[stateId]?.selectedDirection || asc
-  let sortError: string | undefined = undefined
+  debug('store state in memory', stateId, sortModalStates[stateId])
+}
 
-  $: {
-    // remember the selected values for the next time we open the SortModal
-    // just in memory, not persisted
-    sortModalStates[stateId] = {
-      selectedProperty,
-      selectedDirection
+function handleSort() {
+  try {
+    sortError = undefined
+
+    const itemPath: JSONPath = selectedProperty?.value || properties?.[0]?.value || []
+    const direction = selectedDirection?.value
+    const operations = sortJson(json, rootPath, itemPath, direction)
+    if (onSort !== undefined && rootPath !== undefined) {
+      onSort({ operations, rootPath, itemPath, direction })
     }
 
-    debug('store state in memory', stateId, sortModalStates[stateId])
+    onClose()
+  } catch (err) {
+    sortError = String(err)
   }
+}
 
-  function handleSort() {
-    try {
-      sortError = undefined
-
-      const itemPath: JSONPath = selectedProperty?.value || properties?.[0]?.value || []
-      const direction = selectedDirection?.value
-      const operations = sortJson(json, rootPath, itemPath, direction)
-      if (onSort !== undefined && rootPath !== undefined) {
-        onSort({ operations, rootPath, itemPath, direction })
-      }
-
-      onClose()
-    } catch (err) {
-      sortError = String(err)
-    }
-  }
-
-  function focus(element: HTMLElement) {
-    element.focus()
-  }
+function focus(element: HTMLElement) {
+  element.focus()
+}
 </script>
 
 <Modal {onClose} className="jse-sort-modal">

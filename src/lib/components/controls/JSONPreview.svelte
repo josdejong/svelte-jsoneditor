@@ -1,16 +1,16 @@
 <script lang="ts">
-  import type { JSONParser } from '$lib/types'
-  import { truncate } from '$lib/utils/stringUtils.js'
-  import { getText } from '$lib/utils/jsonUtils.js'
-  import { MAX_CHARACTERS_TEXT_PREVIEW } from '$lib/constants.js'
+import { MAX_CHARACTERS_TEXT_PREVIEW } from '$lib/constants.js'
+import type { JSONParser } from '$lib/types'
+import { getText } from '$lib/utils/jsonUtils.js'
+import { truncate } from '$lib/utils/stringUtils.js'
 
-  export let text: string | undefined
-  export let json: unknown | undefined
-  export let indentation: number | string
-  export let parser: JSONParser
+export let text: string | undefined
+export let json: unknown | undefined
+export let indentation: number | string
+export let parser: JSONParser
 
-  $: content = json !== undefined ? { json } : { text: text || '' }
-  $: truncated = truncate(getText(content, indentation, parser), MAX_CHARACTERS_TEXT_PREVIEW)
+$: content = json !== undefined ? { json } : { text: text || '' }
+$: truncated = truncate(getText(content, indentation, parser), MAX_CHARACTERS_TEXT_PREVIEW)
 </script>
 
 <div class="jse-json-preview">

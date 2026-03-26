@@ -1,28 +1,28 @@
 <script>
-  import { JSONEditor } from 'svelte-jsoneditor'
+import { JSONEditor } from 'svelte-jsoneditor'
 
-  let refJsonEditor
+let refJsonEditor
 
-  let content = $state({
-    text: undefined, // can be used to pass a stringified JSON document instead
-    json: {
-      array: [1, 2, 3],
-      boolean: true,
-      color: '#82b92c',
-      null: null,
-      number: 123,
-      object: { a: 'b', c: 'd' },
-      string: 'Hello World'
-    }
-  })
-
-  function expandAll() {
-    refJsonEditor.expand([], () => true)
+let content = $state({
+  text: undefined, // can be used to pass a stringified JSON document instead
+  json: {
+    array: [1, 2, 3],
+    boolean: true,
+    color: '#82b92c',
+    null: null,
+    number: 123,
+    object: { a: 'b', c: 'd' },
+    string: 'Hello World'
   }
+})
 
-  function collapseAll() {
-    refJsonEditor.collapse([], true)
-  }
+function expandAll() {
+  refJsonEditor.expand([], () => true)
+}
+
+function collapseAll() {
+  refJsonEditor.collapse([], true)
+}
 </script>
 
 <svelte:head>

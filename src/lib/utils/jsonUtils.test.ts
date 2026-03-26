@@ -1,6 +1,6 @@
-import { test, describe, expect } from 'vitest'
-import { deepStrictEqual, strictEqual, deepEqual, throws } from 'assert'
+import { deepEqual, deepStrictEqual, strictEqual, throws } from 'assert'
 import { LosslessNumber, parse, stringify } from 'lossless-json'
+import { describe, expect, test } from 'vitest'
 import {
   calculatePosition,
   convertValue,
@@ -10,14 +10,14 @@ import {
   isEqualParser,
   isJSONContent,
   isLargeContent,
-  needsFormatting,
   isTextContent,
+  needsFormatting,
   normalizeJsonParseError,
+  parseAndRepairOrUndefined,
   parsePartialJson,
   toJSONContent,
   toTextContent,
-  validateContentType,
-  parseAndRepairOrUndefined
+  validateContentType
 } from './jsonUtils.js'
 
 const LosslessJSONParser = { parse, stringify }
@@ -195,8 +195,7 @@ describe('jsonUtils', () => {
     strictEqual(isContent(f), false)
 
     class C {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error
       text: '[]'
     }
     const c = new C()
@@ -215,8 +214,7 @@ describe('jsonUtils', () => {
     strictEqual(isTextContent(f), false)
 
     class C {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error
       text: '[]'
     }
     const c = new C()
@@ -231,14 +229,12 @@ describe('jsonUtils', () => {
     strictEqual(isJSONContent({}), false)
 
     const f = () => null
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    // @ts-expect-error
     f.json = []
     strictEqual(isJSONContent(f), false)
 
     class C {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error
       json: []
     }
     const c = new C()
@@ -253,8 +249,7 @@ describe('jsonUtils', () => {
 
     deepStrictEqual(
       toTextContent(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
+        // @ts-expect-error
         { json: [new LosslessNumber('1'), new LosslessNumber('2'), new LosslessNumber('3')] },
         2,
         LosslessJSONParser

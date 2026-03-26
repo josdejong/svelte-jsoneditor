@@ -1,92 +1,91 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { JSONPath } from 'immutable-json-patch'
-  import { existsIn, getIn } from 'immutable-json-patch'
-  import { range } from 'lodash-es'
-  import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
-  import { createMultiSelection, getFocusPath } from '$lib/logic/selection.js'
-  import { createDebug } from '$lib/utils/debug.js'
-  import { caseInsensitiveNaturalCompare } from '$lib/logic/sort.js'
-  import type { JSONPathParser, JSONSelection, OnError, OnJSONSelect } from '$lib/types.js'
-  import Icon from 'svelte-awesome'
-  import { faClose, faEdit } from '@fortawesome/free-solid-svg-icons'
-  import NavigationBarItem from './NavigationBarItem.svelte'
-  import NavigationBarPathEditor from './NavigationBarPathEditor.svelte'
+import { faClose, faEdit } from '@fortawesome/free-solid-svg-icons'
+import type { JSONPath } from 'immutable-json-patch'
+import { existsIn, getIn } from 'immutable-json-patch'
+import { range } from 'lodash-es'
+import Icon from 'svelte-awesome'
+import { createMultiSelection, getFocusPath } from '$lib/logic/selection.js'
+import { caseInsensitiveNaturalCompare } from '$lib/logic/sort.js'
+import type { JSONPathParser, JSONSelection, OnError, OnJSONSelect } from '$lib/types.js'
+import { createDebug } from '$lib/utils/debug.js'
+import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
+import NavigationBarItem from './NavigationBarItem.svelte'
+import NavigationBarPathEditor from './NavigationBarPathEditor.svelte'
 
-  const debug = createDebug('jsoneditor:NavigationBar')
+const debug = createDebug('jsoneditor:NavigationBar')
 
-  export let json: unknown
-  export let selection: JSONSelection | undefined
-  export let onSelect: OnJSONSelect
-  export let onError: OnError
-  export let pathParser: JSONPathParser
+export let json: unknown
+export let selection: JSONSelection | undefined
+export let onSelect: OnJSONSelect
+export let onError: OnError
+export let pathParser: JSONPathParser
 
-  let refNavigationBar: Element | undefined
-  let editing = false
+let refNavigationBar: Element | undefined
+let editing = false
 
-  $: path = selection ? getFocusPath(selection) : []
-  $: hasNextItem = isObjectOrArray(getIn(json, path))
+$: path = selection ? getFocusPath(selection) : []
+$: hasNextItem = isObjectOrArray(getIn(json, path))
 
-  // we have an unused parameter path to trigger scrollToLastItem when path changes,
-  // see $: scrollToLastItem(path)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  function scrollToLastItem(path: JSONPath) {
-    setTimeout(() => {
-      if (refNavigationBar && refNavigationBar.scrollTo) {
-        const left = refNavigationBar.scrollWidth - refNavigationBar.clientWidth
-        if (left > 0) {
-          debug('scrollTo ', left)
-          refNavigationBar.scrollTo({ left, behavior: 'smooth' })
-        }
+// we have an unused parameter path to trigger scrollToLastItem when path changes,
+// see $: scrollToLastItem(path)
+function scrollToLastItem(path: JSONPath) {
+  setTimeout(() => {
+    if (refNavigationBar && refNavigationBar.scrollTo) {
+      const left = refNavigationBar.scrollWidth - refNavigationBar.clientWidth
+      if (left > 0) {
+        debug('scrollTo ', left)
+        refNavigationBar.scrollTo({ left, behavior: 'smooth' })
       }
-    })
-  }
-
-  // trigger scrollToLastItem when path changes
-  $: scrollToLastItem(path)
-
-  function getItems(path: JSONPath): string[] {
-    debug('get items for path', path)
-
-    const node = getIn(json, path)
-    if (Array.isArray(node)) {
-      return range(0, node.length).map(String)
-    } else if (isObject(node)) {
-      const keys = Object.keys(node)
-
-      const sortedKeys = keys.slice(0)
-      sortedKeys.sort(caseInsensitiveNaturalCompare)
-
-      return sortedKeys
-    } else {
-      // never happens but just for robustness...
-      return []
     }
-  }
+  })
+}
 
-  function pathExists(path: JSONPath): boolean {
-    return existsIn(json, path)
-  }
+// trigger scrollToLastItem when path changes
+$: scrollToLastItem(path)
 
-  function handleSelect(path: JSONPath) {
-    debug('select path', JSON.stringify(path))
+function getItems(path: JSONPath): string[] {
+  debug('get items for path', path)
 
-    onSelect(createMultiSelection(path, path))
+  const node = getIn(json, path)
+  if (Array.isArray(node)) {
+    return range(0, node.length).map(String)
   }
+  if (isObject(node)) {
+    const keys = Object.keys(node)
 
-  function toggleEditing() {
-    editing = !editing
-  }
+    const sortedKeys = keys.slice(0)
+    sortedKeys.sort(caseInsensitiveNaturalCompare)
 
-  function handleCloseEditor() {
-    editing = false
+    return sortedKeys
   }
+  // never happens but just for robustness...
+  return []
+}
 
-  function handleChangePath(path: JSONPath) {
-    handleCloseEditor()
-    handleSelect(path)
-  }
+function pathExists(path: JSONPath): boolean {
+  return existsIn(json, path)
+}
+
+function handleSelect(path: JSONPath) {
+  debug('select path', JSON.stringify(path))
+
+  onSelect(createMultiSelection(path, path))
+}
+
+function toggleEditing() {
+  editing = !editing
+}
+
+function handleCloseEditor() {
+  editing = false
+}
+
+function handleChangePath(path: JSONPath) {
+  handleCloseEditor()
+  handleSelect(path)
+}
 </script>
 
 <div class="jse-navigation-bar" bind:this={refNavigationBar}>

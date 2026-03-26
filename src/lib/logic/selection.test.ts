@@ -1,5 +1,7 @@
-import { describe, test } from 'vitest'
 import assert from 'assert'
+import { describe, test } from 'vitest'
+import { SelectionType } from '$lib/types.js'
+import { createDocumentState } from './documentState.js'
 import {
   createAfterSelection,
   createInsideSelection,
@@ -20,8 +22,6 @@ import {
   selectionIfOverlapping,
   selectionToPartialJson
 } from './selection.js'
-import { createDocumentState } from './documentState.js'
-import { SelectionType } from '$lib/types.js'
 
 describe('selection', () => {
   const json = {

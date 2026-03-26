@@ -23,22 +23,19 @@ import {
   updateIn
 } from 'immutable-json-patch'
 import { initial, last } from 'lodash-es'
-import { DEFAULT_VISIBLE_SECTIONS, MAX_DOCUMENT_SIZE_EXPAND_ALL } from '../constants.js'
-import { forEachIndex, insertItemsAt, strictShallowEqual } from '../utils/arrayUtils.js'
-import { isObject, isStringContainingPrimitiveValue } from '../utils/typeUtils.js'
 import {
-  currentRoundNumber,
-  inVisibleSection,
-  mergeSections,
-  nextRoundNumber
-} from './expandItemsSections.js'
+  isArrayRecursiveState,
+  isExpandableState,
+  isObjectRecursiveState,
+  isValueRecursiveState
+} from '$lib/typeguards.js'
 import type {
   ArrayDocumentState,
+  ArrayRecursiveState,
   CaretPosition,
   DocumentState,
   ObjectDocumentState,
   OnExpand,
-  ArrayRecursiveState,
   RecursiveState,
   RecursiveStateFactory,
   Section,
@@ -46,14 +43,17 @@ import type {
   VisibleSection
 } from '$lib/types'
 import { CaretType } from '$lib/types.js'
-import { int } from '../utils/numberUtils.js'
 import { isLargeContent } from '$lib/utils/jsonUtils.js'
+import { DEFAULT_VISIBLE_SECTIONS, MAX_DOCUMENT_SIZE_EXPAND_ALL } from '../constants.js'
+import { forEachIndex, insertItemsAt, strictShallowEqual } from '../utils/arrayUtils.js'
+import { int } from '../utils/numberUtils.js'
+import { isObject, isStringContainingPrimitiveValue } from '../utils/typeUtils.js'
 import {
-  isArrayRecursiveState,
-  isExpandableState,
-  isObjectRecursiveState,
-  isValueRecursiveState
-} from '$lib/typeguards.js'
+  currentRoundNumber,
+  inVisibleSection,
+  mergeSections,
+  nextRoundNumber
+} from './expandItemsSections.js'
 
 export type CreateRecursiveStateProps = {
   json: unknown | undefined
@@ -721,10 +721,9 @@ export function getNextKeys(keys: string[], key: string, includeKey = false): st
   const index = keys.indexOf(key)
   if (index !== -1) {
     return includeKey ? keys.slice(index) : keys.slice(index + 1)
-  } else {
-    // a new key, that doesn't have next keys
-    return []
   }
+  // a new key, that doesn't have next keys
+  return []
 }
 
 /**

@@ -1,8 +1,8 @@
-import { test, describe } from 'vitest'
-import assert from 'assert'
 import Ajv from 'ajv'
+import assert from 'assert'
+import { describe, test } from 'vitest'
+import { type JSONSchemaDefinitions, ValidationSeverity } from '$lib/types'
 import { createAjvValidator, createAjvValidatorAsync } from './createAjvValidator.js'
-import { ValidationSeverity, type JSONSchemaDefinitions } from '$lib/types'
 
 const schema = {
   title: 'Employee',

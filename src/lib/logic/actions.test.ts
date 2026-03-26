@@ -1,7 +1,7 @@
+import { createValueSelection } from 'svelte-jsoneditor'
 import { describe, expect, test } from 'vitest'
 import { isMultilineTextPastedAsArray } from '$lib/logic/actions'
 import { insert } from '$lib/logic/operations'
-import { createValueSelection } from 'svelte-jsoneditor'
 
 describe('actions', () => {
   describe('isMultiLineTextPastedAsArray', () => {

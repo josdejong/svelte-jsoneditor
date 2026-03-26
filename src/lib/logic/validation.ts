@@ -1,20 +1,20 @@
+import type { JSONPath } from 'immutable-json-patch'
+import { jsonrepair } from 'jsonrepair'
 import { initial, isEmpty } from 'lodash-es'
 import type {
   ContentErrors,
   JSONParser,
   RecursiveStateFactory,
-  ValidationErrors,
   ValidationError,
+  ValidationErrors,
   Validator
 } from '$lib/types.js'
 import { ValidationSeverity } from '$lib/types.js'
 import { MAX_AUTO_REPAIRABLE_SIZE, MAX_VALIDATABLE_SIZE } from '../constants.js'
-import { measure } from '../utils/timeUtils.js'
-import { normalizeJsonParseError } from '../utils/jsonUtils.js'
 import { createDebug } from '../utils/debug.js'
-import { jsonrepair } from 'jsonrepair'
+import { normalizeJsonParseError } from '../utils/jsonUtils.js'
+import { measure } from '../utils/timeUtils.js'
 import { updateInRecursiveState } from './documentState.js'
-import type { JSONPath } from 'immutable-json-patch'
 
 const debug = createDebug('validation')
 
@@ -97,9 +97,8 @@ export function validateJSON(
     const text = parser.stringify(json)
     const convertedJSON = text !== undefined ? validationParser.parse(text) : undefined
     return validator(convertedJSON)
-  } else {
-    return validator(json)
   }
+  return validator(json)
 }
 
 export function validateText(

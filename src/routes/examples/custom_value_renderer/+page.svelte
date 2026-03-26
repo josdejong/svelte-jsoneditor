@@ -1,56 +1,56 @@
 <script lang="ts">
-  import {
-    EnumValue,
-    JSONEditor,
-    renderValue,
-    type RenderValueComponentDescription,
-    type RenderValueProps
-  } from 'svelte-jsoneditor'
-  import ReadonlyPassword from '../../components/ReadonlyPassword.svelte'
-  import { EvaluatorAction } from '../../components/EvaluatorAction'
+import {
+  EnumValue,
+  JSONEditor,
+  type RenderValueComponentDescription,
+  type RenderValueProps,
+  renderValue
+} from 'svelte-jsoneditor'
+import { EvaluatorAction } from '../../components/EvaluatorAction'
+import ReadonlyPassword from '../../components/ReadonlyPassword.svelte'
 
-  let content = $state({
-    text: undefined, // can be used to pass a stringified JSON document instead
-    json: {
-      username: 'John',
-      password: 'secret...',
-      gender: 'male',
-      evaluate: '2 + 3'
-    }
-  })
-
-  const genderOptions = [
-    { value: null, text: '-' },
-    { value: 'male', text: 'Male' },
-    { value: 'female', text: 'Female' },
-    { value: 'other', text: 'Other' }
-  ]
-
-  function onRenderValue(props: RenderValueProps): RenderValueComponentDescription[] {
-    const key = props.path[props.path.length - 1]
-    if (key === 'password' && !props.isEditing) {
-      return [{ component: ReadonlyPassword, props }]
-    }
-
-    if (key === 'gender') {
-      return [
-        {
-          component: EnumValue,
-          props: {
-            ...props,
-            options: genderOptions
-          }
-        }
-      ]
-    }
-
-    if (key === 'evaluate' && !props.isEditing) {
-      return [{ action: EvaluatorAction, props }]
-    }
-
-    // fallback on the default render components
-    return renderValue(props)
+let content = $state({
+  text: undefined, // can be used to pass a stringified JSON document instead
+  json: {
+    username: 'John',
+    password: 'secret...',
+    gender: 'male',
+    evaluate: '2 + 3'
   }
+})
+
+const genderOptions = [
+  { value: null, text: '-' },
+  { value: 'male', text: 'Male' },
+  { value: 'female', text: 'Female' },
+  { value: 'other', text: 'Other' }
+]
+
+function onRenderValue(props: RenderValueProps): RenderValueComponentDescription[] {
+  const key = props.path[props.path.length - 1]
+  if (key === 'password' && !props.isEditing) {
+    return [{ component: ReadonlyPassword, props }]
+  }
+
+  if (key === 'gender') {
+    return [
+      {
+        component: EnumValue,
+        props: {
+          ...props,
+          options: genderOptions
+        }
+      }
+    ]
+  }
+
+  if (key === 'evaluate' && !props.isEditing) {
+    return [{ action: EvaluatorAction, props }]
+  }
+
+  // fallback on the default render components
+  return renderValue(props)
+}
 </script>
 
 <svelte:head>

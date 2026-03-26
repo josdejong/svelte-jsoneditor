@@ -1,6 +1,6 @@
-import JsonEditor from './components/JSONEditor.svelte'
-import type { JSONEditorPropsOptional } from '$lib/types'
 import { flushSync, mount, unmount } from 'svelte'
+import type { JSONEditorPropsOptional } from '$lib/types'
+import JsonEditor from './components/JSONEditor.svelte'
 
 // Note: index.ts exports `JSONEditor`, but we will override this on purpose
 //  since we cannot use it in the vanilla environment starting in Svelte 5.

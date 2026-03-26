@@ -1,19 +1,19 @@
 <script>
-  import { JSONEditor } from 'svelte-jsoneditor'
+import { JSONEditor } from 'svelte-jsoneditor'
 
-  const maxDocumentSizeTextMode = 10 * 1024 * 1024
+const maxDocumentSizeTextMode = 10 * 1024 * 1024
 
-  let text = $state(
-    '{\n' +
-      '  "array": [1, 2, 3],\n' +
-      '  "boolean": true,\n' +
-      '  "color": "#82b92c",\n' +
-      '  "null": null,\n' +
-      '  "number": 123,\n' +
-      '  "object": { "a": "b", "c": "d" },\n' +
-      '  "string": "Hello World"\n' +
-      '}'
-  )
+let text = $state(
+  '{\n' +
+    '  "array": [1, 2, 3],\n' +
+    '  "boolean": true,\n' +
+    '  "color": "#82b92c",\n' +
+    '  "null": null,\n' +
+    '  "number": 123,\n' +
+    '  "object": { "a": "b", "c": "d" },\n' +
+    '  "string": "Hello World"\n' +
+    '}'
+)
 </script>
 
 <svelte:head>

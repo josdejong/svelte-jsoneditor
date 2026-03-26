@@ -1,5 +1,5 @@
-import { test, describe } from 'vitest'
 import { deepStrictEqual, strictEqual } from 'assert'
+import { describe, test } from 'vitest'
 import {
   createNormalizationFunctions,
   decodeDataPath,

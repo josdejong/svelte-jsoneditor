@@ -9,7 +9,7 @@ import path from 'path'
 export function getFilesRecursively(dirPath) {
   let filenames = []
 
-  fs.readdirSync(dirPath).forEach(function (file) {
+  fs.readdirSync(dirPath).forEach((file) => {
     if (fs.statSync(dirPath + '/' + file).isDirectory()) {
       const nestedFiles = getFilesRecursively(dirPath + '/' + file)
       filenames = filenames.concat(nestedFiles)

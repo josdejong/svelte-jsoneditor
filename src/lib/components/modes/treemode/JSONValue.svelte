@@ -1,43 +1,43 @@
 <script lang="ts">
-  import type { ExtendedSearchResultItem, JSONEditorContext, JSONSelection } from '$lib/types.js'
-  import type { JSONPath } from 'immutable-json-patch'
-  import { isEditingSelection, isValueSelection } from '$lib/logic/selection.js'
-  import { isSvelteActionRenderer } from '$lib/typeguards.js'
+import type { JSONPath } from 'immutable-json-patch'
+import { isEditingSelection, isValueSelection } from '$lib/logic/selection.js'
+import { isSvelteActionRenderer } from '$lib/typeguards.js'
+import type { ExtendedSearchResultItem, JSONEditorContext, JSONSelection } from '$lib/types.js'
 
-  interface Props {
-    path: JSONPath
-    value: unknown
-    context: JSONEditorContext
-    enforceString: boolean
-    selection: JSONSelection | undefined
-    searchResultItems: ExtendedSearchResultItem[] | undefined
-  }
+interface Props {
+  path: JSONPath
+  value: unknown
+  context: JSONEditorContext
+  enforceString: boolean
+  selection: JSONSelection | undefined
+  searchResultItems: ExtendedSearchResultItem[] | undefined
+}
 
-  const { path, value, context, enforceString, selection, searchResultItems }: Props = $props()
+const { path, value, context, enforceString, selection, searchResultItems }: Props = $props()
 
-  const isEditing = $derived(isValueSelection(selection) && isEditingSelection(selection))
+const isEditing = $derived(isValueSelection(selection) && isEditingSelection(selection))
 
-  const renderers = $derived(
-    context.onRenderValue({
-      path,
-      value,
-      mode: context.mode,
-      truncateTextSize: context.truncateTextSize,
-      readOnly: context.readOnly,
-      enforceString,
-      isEditing,
-      parser: context.parser,
-      normalization: context.normalization,
-      selection,
-      searchResultItems,
-      onPatch: context.onPatch,
-      onPasteJson: context.onPasteJson,
-      onSelect: context.onSelect,
-      onFind: context.onFind,
-      findNextInside: context.findNextInside,
-      focus: context.focus
-    })
-  )
+const renderers = $derived(
+  context.onRenderValue({
+    path,
+    value,
+    mode: context.mode,
+    truncateTextSize: context.truncateTextSize,
+    readOnly: context.readOnly,
+    enforceString,
+    isEditing,
+    parser: context.parser,
+    normalization: context.normalization,
+    selection,
+    searchResultItems,
+    onPatch: context.onPatch,
+    onPasteJson: context.onPasteJson,
+    onSelect: context.onSelect,
+    onFind: context.onFind,
+    findNextInside: context.findNextInside,
+    focus: context.focus
+  })
+)
 </script>
 
 {#each renderers as renderer}

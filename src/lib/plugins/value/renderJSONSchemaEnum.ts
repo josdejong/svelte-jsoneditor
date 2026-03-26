@@ -1,11 +1,11 @@
-import EnumValue from './components/EnumValue.svelte'
-import { getJSONSchemaOptions } from '$lib/utils/jsonSchemaUtils.js'
 import type {
   JSONSchema,
   JSONSchemaDefinitions,
   RenderValueComponentDescription,
   RenderValueProps
 } from '$lib/types'
+import { getJSONSchemaOptions } from '$lib/utils/jsonSchemaUtils.js'
+import EnumValue from './components/EnumValue.svelte'
 
 /**
  * Search the JSON schema for enums defined at given props.path. If found,

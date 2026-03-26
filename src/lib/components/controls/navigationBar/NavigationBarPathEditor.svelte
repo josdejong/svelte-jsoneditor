@@ -1,100 +1,100 @@
 <script lang="ts">
-  import type { JSONPath } from 'immutable-json-patch'
-  import { getContext, onDestroy, onMount } from 'svelte'
-  import copyToClipBoard from '$lib/utils/copyToClipboard.js'
-  import { faCopy, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
-  import Icon from 'svelte-awesome'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
-  import { tooltip } from '../../controls/tooltip/tooltip.js'
-  import type { AbsolutePopupContext, JSONPathParser, OnError } from '$lib/types.js'
+import { faCopy, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
+import type { JSONPath } from 'immutable-json-patch'
+import { getContext, onDestroy, onMount } from 'svelte'
+import Icon from 'svelte-awesome'
+import type { AbsolutePopupContext, JSONPathParser, OnError } from '$lib/types.js'
+import copyToClipBoard from '$lib/utils/copyToClipboard.js'
+import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
+import { tooltip } from '../../controls/tooltip/tooltip.js'
 
-  const absolutePopupContext = getContext<AbsolutePopupContext>('absolute-popup')
+const absolutePopupContext = getContext<AbsolutePopupContext>('absolute-popup')
 
-  export let path: JSONPath
-  export let pathParser: JSONPathParser
-  export let onChange: (updatedPath: JSONPath) => void
-  export let onClose: () => void
-  export let onError: OnError
-  export let pathExists: (path: JSONPath) => boolean
+export let path: JSONPath
+export let pathParser: JSONPathParser
+export let onChange: (updatedPath: JSONPath) => void
+export let onClose: () => void
+export let onError: OnError
+export let pathExists: (path: JSONPath) => boolean
 
-  let inputRef: HTMLInputElement
-  let inputPath: string
-  let validationActive = false
-  $: inputPath = pathParser.stringify(path)
-  $: inputValidationError = validationActive ? parseAndValidate(inputPath).error : undefined
+let inputRef: HTMLInputElement
+let inputPath: string
+let validationActive = false
+$: inputPath = pathParser.stringify(path)
+$: inputValidationError = validationActive ? parseAndValidate(inputPath).error : undefined
 
-  let copiedTimer: number | undefined = undefined
-  let copied = false
-  const copiedDelay = 1000 // ms
+let copiedTimer: number | undefined
+let copied = false
+const copiedDelay = 1000 // ms
 
-  onMount(() => {
-    focus()
-  })
+onMount(() => {
+  focus()
+})
 
-  onDestroy(() => {
-    clearTimeout(copiedTimer)
-  })
+onDestroy(() => {
+  clearTimeout(copiedTimer)
+})
 
-  function focus() {
-    inputRef.focus()
-  }
+function focus() {
+  inputRef.focus()
+}
 
-  function parseAndValidate(pathStr: string): {
-    path: JSONPath | undefined
-    error: Error | undefined
-  } {
-    try {
-      const path = pathParser.parse(pathStr)
-      validatePathExists(path)
-      return {
-        path,
-        error: undefined
-      }
-    } catch (error) {
-      return {
-        path: undefined,
-        error: error as Error
-      }
+function parseAndValidate(pathStr: string): {
+  path: JSONPath | undefined
+  error: Error | undefined
+} {
+  try {
+    const path = pathParser.parse(pathStr)
+    validatePathExists(path)
+    return {
+      path,
+      error: undefined
+    }
+  } catch (error) {
+    return {
+      path: undefined,
+      error: error as Error
     }
   }
+}
 
-  function validatePathExists(path: JSONPath) {
-    if (!pathExists(path)) {
-      throw new Error('Path does not exist in current document')
+function validatePathExists(path: JSONPath) {
+  if (!pathExists(path)) {
+    throw new Error('Path does not exist in current document')
+  }
+}
+
+function handleInput(event: Event & { currentTarget: EventTarget & HTMLInputElement }) {
+  inputPath = event.currentTarget.value
+}
+
+function handleKeyDown(event: KeyboardEvent) {
+  const combo = keyComboFromEvent(event)
+
+  if (combo === 'Escape') {
+    event.preventDefault()
+    onClose()
+  }
+
+  if (combo === 'Enter') {
+    event.preventDefault()
+
+    validationActive = true
+    const result = parseAndValidate(inputPath)
+    if (result.path !== undefined) {
+      onChange(result.path)
+    } else {
+      onError(result.error as Error)
     }
   }
+}
 
-  function handleInput(event: Event & { currentTarget: EventTarget & HTMLInputElement }) {
-    inputPath = event.currentTarget.value
-  }
-
-  function handleKeyDown(event: KeyboardEvent) {
-    const combo = keyComboFromEvent(event)
-
-    if (combo === 'Escape') {
-      event.preventDefault()
-      onClose()
-    }
-
-    if (combo === 'Enter') {
-      event.preventDefault()
-
-      validationActive = true
-      const result = parseAndValidate(inputPath)
-      if (result.path !== undefined) {
-        onChange(result.path)
-      } else {
-        onError(result.error as Error)
-      }
-    }
-  }
-
-  function handleCopy() {
-    copyToClipBoard(inputPath)
-    copied = true
-    copiedTimer = window.setTimeout(() => (copied = false), copiedDelay)
-    focus()
-  }
+function handleCopy() {
+  copyToClipBoard(inputPath)
+  copied = true
+  copiedTimer = window.setTimeout(() => (copied = false), copiedDelay)
+  focus()
+}
 </script>
 
 <div class="jse-navigation-bar-path-editor" class:error={inputValidationError}>

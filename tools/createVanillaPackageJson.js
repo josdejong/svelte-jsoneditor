@@ -1,9 +1,9 @@
 // create package.json and copy files like LICENSE.md to package-vanilla
 
-import path from 'path'
 import { readFileSync, writeFileSync } from 'fs'
-import { getAbsolutePath } from './utils/getAbsolutePath.mjs'
+import path from 'path'
 import { getVanillaDependencies } from './getExternalDependencies.js'
+import { getAbsolutePath } from './utils/getAbsolutePath.mjs'
 
 const vanillaPackageFolder = getAbsolutePath(import.meta.url, '..', 'package-vanilla')
 

@@ -1,5 +1,8 @@
-import { test, describe, expect } from 'vitest'
 import assert from 'assert'
+import type { JSONPatchOperation } from 'immutable-json-patch'
+import { immutableJSONPatch } from 'immutable-json-patch'
+import { describe, expect, test } from 'vitest'
+import { createDocumentState, documentStatePatch } from './documentState.js'
 import {
   clipboardToValues,
   createNestedValueOperations,
@@ -9,9 +12,6 @@ import {
   revertJSONPatchWithMoveOperations
 } from './operations.js'
 import { createMultiSelection } from './selection.js'
-import { createDocumentState, documentStatePatch } from './documentState.js'
-import type { JSONPatchOperation } from 'immutable-json-patch'
-import { immutableJSONPatch } from 'immutable-json-patch'
 
 describe('operations', () => {
   describe('createNewValue', () => {

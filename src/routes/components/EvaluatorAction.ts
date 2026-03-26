@@ -1,6 +1,6 @@
-import { type OnJSONSelect } from 'svelte-jsoneditor'
+import type { JSONPath } from 'immutable-json-patch'
 import type { Action } from 'svelte/action'
-import { type JSONPath } from 'immutable-json-patch'
+import type { OnJSONSelect } from 'svelte-jsoneditor'
 import { createEditValueSelection } from '$lib/logic/selection'
 
 export interface EvaluatorActionProps {
@@ -47,7 +47,7 @@ export const EvaluatorAction: Action<HTMLDivElement, Record<string, unknown>> = 
 function evaluate(expr: string) {
   const result = expr
     .split('+')
-    .map((value) => parseFloat(value.trim()))
+    .map((value) => Number.parseFloat(value.trim()))
     .reduce((a, b) => a + b)
 
   return `The result of "${expr}" is "${result}" (double-click to edit)`

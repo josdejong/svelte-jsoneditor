@@ -1,6 +1,6 @@
+import type { QueryLanguage, QueryLanguageOptions } from '$lib/types.js'
 import { createPropertySelector } from '$lib/utils/pathUtils.js'
 import { parseString } from '$lib/utils/stringUtils.js'
-import type { QueryLanguage, QueryLanguageOptions } from '$lib/types.js'
 import { isInteger } from '$lib/utils/typeUtils.js'
 
 const description = `
@@ -40,24 +40,24 @@ function createQuery(json: unknown, queryOptions: QueryLanguageOptions): string 
   if (sort && sort.path && sort.direction) {
     if (sort.direction === 'desc') {
       queryParts.push(
-        `    .slice()\n` +
-          `    .sort((a, b) => {\n` +
-          `      // sort descending\n` +
+        '    .slice()\n' +
+          '    .sort((a, b) => {\n' +
+          '      // sort descending\n' +
           `      const valueA = a${createPropertySelector(sort.path)}\n` +
           `      const valueB = b${createPropertySelector(sort.path)}\n` +
-          `      return valueA > valueB ? -1 : valueA < valueB ? 1 : 0\n` +
-          `    })\n`
+          '      return valueA > valueB ? -1 : valueA < valueB ? 1 : 0\n' +
+          '    })\n'
       )
     } else {
       // sort direction 'asc'
       queryParts.push(
-        `    .slice()\n` +
-          `    .sort((a, b) => {\n` +
-          `      // sort ascending\n` +
+        '    .slice()\n' +
+          '    .sort((a, b) => {\n' +
+          '      // sort ascending\n' +
           `      const valueA = a${createPropertySelector(sort.path)}\n` +
           `      const valueB = b${createPropertySelector(sort.path)}\n` +
-          `      return valueA > valueB ? 1 : valueA < valueB ? -1 : 0\n` +
-          `    })\n`
+          '      return valueA > valueB ? 1 : valueA < valueB ? -1 : 0\n' +
+          '    })\n'
       )
     }
   }

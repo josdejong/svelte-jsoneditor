@@ -1,5 +1,5 @@
-import { describe, test, expect } from 'vitest'
 import assert from 'assert'
+import { describe, expect, test } from 'vitest'
 import {
   arrayStartsWith,
   arrayToObject,
@@ -142,7 +142,7 @@ describe('arrayUtils', () => {
     }
 
     test('should sample an array', () => {
-      expect(sample([0, 1, 2, 3], Infinity)).toEqual([0, 1, 2, 3])
+      expect(sample([0, 1, 2, 3], Number.POSITIVE_INFINITY)).toEqual([0, 1, 2, 3])
       expect(sample([0, 1, 2, 3], 100)).toEqual([0, 1, 2, 3])
       expect(sample([0, 1, 2, 3], 2)).toEqual([0, 3])
       expect(sample([0, 1, 2, 3], 1)).toEqual([0])
