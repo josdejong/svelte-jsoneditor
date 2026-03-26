@@ -611,6 +611,7 @@ export interface JSONEditorPropsOptional {
   validator?: Validator | undefined
   validationParser?: JSONParser
   pathParser?: JSONPathParser
+  maxDocumentSizeTextMode?: number
 
   queryLanguages?: QueryLanguage[]
   queryLanguageId?: string
@@ -643,6 +644,7 @@ export interface JSONEditorModalProps {
   askToFormat: boolean
   escapeControlCharacters: boolean
   escapeUnicodeCharacters: boolean
+  maxDocumentSizeTextMode: number
   flattenColumns: boolean
   parser: JSONParser
   validator: Validator | undefined

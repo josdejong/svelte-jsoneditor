@@ -67,6 +67,7 @@
   const askToFormatDefault = true
   const escapeControlCharactersDefault = false
   const escapeUnicodeCharactersDefault = false
+  const maxDocumentSizeTextModeDefault = 10 * 1024 * 1024 // 10MB
   const flattenColumnsDefault = true
   const parserDefault = JSON
   const validatorDefault = undefined
@@ -105,6 +106,7 @@
   export let askToFormat: boolean = askToFormatDefault
   export let escapeControlCharacters: boolean = escapeControlCharactersDefault
   export let escapeUnicodeCharacters: boolean = escapeUnicodeCharactersDefault
+  export let maxDocumentSizeTextMode: number = maxDocumentSizeTextModeDefault
   export let flattenColumns: boolean = flattenColumnsDefault
   export let parser: JSONParser = parserDefault
   export let validator: Validator | undefined = validatorDefault
@@ -329,6 +331,9 @@
         case 'escapeUnicodeCharacters':
           escapeUnicodeCharacters = props[name] ?? escapeUnicodeCharactersDefault
           break
+        case 'maxDocumentSizeTextMode':
+          maxDocumentSizeTextMode = props[name] ?? maxDocumentSizeTextModeDefault
+          break
         case 'flattenColumns':
           flattenColumns = props[name] ?? flattenColumnsDefault
           break
@@ -518,6 +523,7 @@
       askToFormat,
       escapeControlCharacters,
       escapeUnicodeCharacters,
+      maxDocumentSizeTextMode,
       flattenColumns,
       parser,
       validator: undefined, // TODO: support partial JSON validation?
@@ -558,6 +564,7 @@
         {askToFormat}
         {mainMenuBar}
         {navigationBar}
+        {maxDocumentSizeTextMode}
         {escapeControlCharacters}
         {escapeUnicodeCharacters}
         {flattenColumns}
