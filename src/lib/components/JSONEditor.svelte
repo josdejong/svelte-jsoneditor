@@ -136,7 +136,7 @@ let transformModalProps: TransformModalProps | undefined
 $: {
   const contentError = validateContentType(content)
   if (contentError) {
-    console.error('Error: ' + contentError)
+    console.error(`Error: ${contentError}`)
   }
 }
 

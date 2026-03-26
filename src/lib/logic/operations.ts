@@ -334,7 +334,7 @@ export function extract(json: unknown, selection: JSONSelection): JSONPatchDocum
   }
 
   // this should never happen
-  throw new Error('Cannot extract: unsupported type of selection ' + JSON.stringify(selection))
+  throw new Error(`Cannot extract: unsupported type of selection ${JSON.stringify(selection)}`)
 }
 
 // TODO: write unit tests
@@ -439,7 +439,7 @@ export function insert(
   }
 
   // this should never happen
-  throw new Error('Cannot insert: unsupported type of selection ' + JSON.stringify(selection))
+  throw new Error(`Cannot insert: unsupported type of selection ${JSON.stringify(selection)}`)
 }
 
 export function moveInsideParent(
@@ -451,8 +451,8 @@ export function moveInsideParent(
     return []
   }
 
-  const beforePath = 'beforePath' in dragInsideAction ? dragInsideAction['beforePath'] : undefined
-  const append = 'append' in dragInsideAction ? dragInsideAction['append'] : undefined
+  const beforePath = 'beforePath' in dragInsideAction ? dragInsideAction.beforePath : undefined
+  const append = 'append' in dragInsideAction ? dragInsideAction.append : undefined
 
   const parentPath = initial(getFocusPath(selection))
   const parent = getIn(json, parentPath)
@@ -618,7 +618,7 @@ export function clipboardToValues(clipboardText: string, parser: JSONParser): Cl
 
   if (Array.isArray(clipboardRepaired)) {
     return clipboardRepaired.map((value, index) => {
-      return { key: 'New item ' + index, value }
+      return { key: `New item ${index}`, value }
     })
   }
 
@@ -708,7 +708,7 @@ export function createRemoveOperations(
   }
 
   // this should never happen
-  throw new Error('Cannot remove: unsupported type of selection ' + JSON.stringify(selection))
+  throw new Error(`Cannot remove: unsupported type of selection ${JSON.stringify(selection)}`)
 }
 
 export function revertJSONPatchWithMoveOperations(

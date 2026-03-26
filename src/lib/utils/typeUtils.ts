@@ -50,9 +50,9 @@ export function isTimestamp(value: unknown): boolean {
   if (typeof value === 'number') {
     return (
       value > YEAR_2000 &&
-      isFinite(value) &&
+      Number.isFinite(value) &&
       Math.floor(value) === value &&
-      !isNaN(new Date(value).valueOf())
+      !Number.isNaN(new Date(value).valueOf())
     )
   }
 

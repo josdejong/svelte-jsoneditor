@@ -1,4 +1,4 @@
-import assert from 'assert'
+import assert from 'node:assert'
 import type { JSONPath } from 'immutable-json-patch'
 import { immutableJSONPatch } from 'immutable-json-patch'
 import { describe, test } from 'vitest'

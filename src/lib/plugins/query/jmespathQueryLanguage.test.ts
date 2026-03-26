@@ -1,4 +1,4 @@
-import assert from 'assert'
+import assert from 'node:assert'
 import { cloneDeep } from 'lodash-es'
 import { LosslessNumber, parse, stringify } from 'lossless-json'
 import { describe, test } from 'vitest'

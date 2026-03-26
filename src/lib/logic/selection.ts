@@ -117,8 +117,8 @@ export function getSelectionPaths(json: unknown, selection: JSONSelection): JSON
 export function iterateOverSelection<T>(
   json: unknown | undefined,
   selection: JSONSelection | undefined,
-  callback: (path: JSONPath) => void | undefined | T
-): void | undefined | T {
+  callback: (path: JSONPath) => undefined | undefined | T
+): undefined | undefined | T {
   if (!selection) {
     return undefined
   }

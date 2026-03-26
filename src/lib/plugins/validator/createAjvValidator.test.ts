@@ -1,5 +1,5 @@
+import assert from 'node:assert'
 import Ajv from 'ajv'
-import assert from 'assert'
 import { describe, test } from 'vitest'
 import { type JSONSchemaDefinitions, ValidationSeverity } from '$lib/types'
 import { createAjvValidator, createAjvValidatorAsync } from './createAjvValidator.js'

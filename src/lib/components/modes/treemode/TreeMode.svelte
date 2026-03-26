@@ -384,7 +384,7 @@ function updateValidationErrors(
         newValidationErrorList = [
           {
             path: [],
-            message: 'Failed to validate: ' + (err as Error).message,
+            message: `Failed to validate: ${(err as Error).message}`,
             severity: ValidationSeverity.warning
           }
         ]
@@ -502,7 +502,7 @@ function applyExternalText(updatedText: string | undefined) {
       // no valid JSON, will show empty document or invalid json
       json = undefined
       documentState = undefined
-      text = externalContent['text']
+      text = externalContent.text
       textIsRepaired = false
       parseError =
         text !== undefined && text !== ''

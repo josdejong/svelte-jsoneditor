@@ -1,4 +1,4 @@
-import { deepEqual, deepStrictEqual, strictEqual, throws } from 'assert'
+import { deepEqual, deepStrictEqual, strictEqual, throws } from 'node:assert'
 import { LosslessNumber, parse, stringify } from 'lossless-json'
 import { describe, expect, test } from 'vitest'
 import {
@@ -101,7 +101,7 @@ describe('jsonUtils', () => {
       bool: false
     }
     deepStrictEqual(parsePartialJson(partialJson, JSON.parse), expected)
-    deepStrictEqual(parsePartialJson(partialJson + ',', JSON.parse), expected)
+    deepStrictEqual(parsePartialJson(`${partialJson},`, JSON.parse), expected)
   })
 
   test('should validate content type', () => {
@@ -162,7 +162,7 @@ describe('jsonUtils', () => {
       for (let i = 0; i < 100; i++) {
         doc.push({
           id: i,
-          name: 'Item ' + i,
+          name: `Item ${i}`,
           stuff: [true, false, null, 123.2]
         })
       }

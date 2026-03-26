@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs'
+import { readFileSync } from 'node:fs'
 import { getAbsolutePath } from './utils/getAbsolutePath.mjs'
 
 // Get all dependencies for the vanilla package: dependencies that do not start with "svelte*"

@@ -1,4 +1,4 @@
-import { strictEqual } from 'assert'
+import { strictEqual } from 'node:assert'
 import { LosslessNumber, parse, stringify } from 'lossless-json'
 import { describe, expect, test } from 'vitest'
 import {

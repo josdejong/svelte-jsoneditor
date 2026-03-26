@@ -30,9 +30,9 @@ $: hasNextItem = isObjectOrArray(getIn(json, path))
 
 // we have an unused parameter path to trigger scrollToLastItem when path changes,
 // see $: scrollToLastItem(path)
-function scrollToLastItem(path: JSONPath) {
+function scrollToLastItem(_path: JSONPath) {
   setTimeout(() => {
-    if (refNavigationBar && refNavigationBar.scrollTo) {
+    if (refNavigationBar?.scrollTo) {
       const left = refNavigationBar.scrollWidth - refNavigationBar.clientWidth
       if (left > 0) {
         debug('scrollTo ', left)

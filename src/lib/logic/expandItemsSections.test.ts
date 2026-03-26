@@ -1,4 +1,4 @@
-import assert from 'assert'
+import assert from 'node:assert'
 import { describe, test } from 'vitest'
 import { ARRAY_SECTION_SIZE } from '../constants.js'
 import {

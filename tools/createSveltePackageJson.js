@@ -1,7 +1,7 @@
 // create package.json and copy files like LICENSE.md to package-vanilla
 
-import { readFileSync, writeFileSync } from 'fs'
-import path from 'path'
+import { readFileSync, writeFileSync } from 'node:fs'
+import path from 'node:path'
 import { getAbsolutePath } from './utils/getAbsolutePath.mjs'
 
 const sveltePackageFolder = getAbsolutePath(import.meta.url, '..', 'package')

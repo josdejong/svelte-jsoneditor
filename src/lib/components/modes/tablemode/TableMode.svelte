@@ -533,7 +533,7 @@ function updateValidationErrors(
         newValidationErrors = [
           {
             path: [],
-            message: 'Failed to validate: ' + (err as Error).message,
+            message: `Failed to validate: ${(err as Error).message}`,
             severity: ValidationSeverity.warning
           }
         ]
@@ -731,7 +731,7 @@ function handleWindowMouseDown(event: MouseEvent & { currentTarget: EventTarget 
 }
 
 function handleScroll(event: Event) {
-  scrollTop = (event.target as HTMLElement)['scrollTop']
+  scrollTop = (event.target as HTMLElement).scrollTop
 }
 
 function handleMouseDown(event: MouseEvent) {

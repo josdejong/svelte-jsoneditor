@@ -33,7 +33,7 @@ function createQuery(json: unknown, queryOptions: QueryLanguageOptions): string 
   const { sort, filter, projection } = queryOptions
   let query = ''
 
-  if (filter && filter.path && filter.relation && filter.value) {
+  if (filter?.path && filter.relation && filter.value) {
     const examplePath = ['0'].concat(filter.path)
     const exampleValue = getIn(json, examplePath)
     const filterValue = parseString(filter.value)
@@ -56,15 +56,15 @@ function createQuery(json: unknown, queryOptions: QueryLanguageOptions): string 
     query += Array.isArray(json) ? '[*]' : '@'
   }
 
-  if (sort && sort.path && sort.direction) {
+  if (sort?.path && sort.direction) {
     if (sort.direction === 'desc') {
-      query += ' | reverse(sort_by(@, &' + stringifyPathForJmespath(sort.path) + '))'
+      query += ` | reverse(sort_by(@, &${stringifyPathForJmespath(sort.path)}))`
     } else {
-      query += ' | sort_by(@, &' + stringifyPathForJmespath(sort.path) + ')'
+      query += ` | sort_by(@, &${stringifyPathForJmespath(sort.path)})`
     }
   }
 
-  if (projection && projection.paths) {
+  if (projection?.paths) {
     if (query[query.length - 1] !== ']') {
       query += ' | [*]'
     }
@@ -75,14 +75,14 @@ function createQuery(json: unknown, queryOptions: QueryLanguageOptions): string 
       query +=
         path.length === 0
           ? '' // edge case, selecting projection of the item root
-          : '.' + stringifyPathForJmespath(path)
+          : `.${stringifyPathForJmespath(path)}`
     } else if (projection.paths.length > 1) {
       query +=
         '.{' +
         projection.paths
           .map((path) => {
             const name = path[path.length - 1]
-            return stringifyProp(name) + ': ' + stringifyPathForJmespath(path)
+            return `${stringifyProp(name)}: ${stringifyPathForJmespath(path)}`
           })
           .join(', ') +
         '}'
@@ -121,9 +121,9 @@ export function stringifyPathForJmespath(path: JSONPath): string {
   const str = path
     .map((prop) => {
       if (typeof prop === 'number') {
-        return '[' + prop + ']'
+        return `[${prop}]`
       }
-      return '.' + stringifyProp(String(prop))
+      return `.${stringifyProp(String(prop))}`
     })
     .join('')
 

@@ -11,7 +11,6 @@ import { initial, isEmpty, last } from 'lodash-es'
 import { MAX_MULTILINE_PASTE_SIZE } from '$lib/constants'
 import { expandAll, expandNone, expandPath, expandSmart } from '$lib/logic/documentState.js'
 import {
-  append,
   createNewValue,
   createRemoveOperations,
   duplicate,
@@ -408,11 +407,11 @@ export function onInsertAfterRow({
   debug('insert after row', { rowIndex })
 
   const nextRowIndex = rowIndex + 1
-  const nextRowPath = [String(nextRowIndex)]
+  const _nextRowPath = [String(nextRowIndex)]
   const newValue = isJSONObject((json as Array<unknown>)[0]) ? {} : ''
-  const values = [{ key: '', value: newValue }]
+  const _values = [{ key: '', value: newValue }]
 
-  const operations =
+  const _operations =
     nextRowIndex < (json as Array<unknown>
   ).length
       ? insertBefore(json, nextRowPath, values)
@@ -456,7 +455,7 @@ export function onRemoveRow({ json, selection, columns, readOnly, onPatch }: OnR
   const rowPath = [String(rowIndex)]
   const operations = removeAll([rowPath])
 
-  onPatch(operations, (patchedJson, patchedState) => {
+  onPatch(operations, (_patchedJson, patchedState) => {
     const newRowIndex =
       rowIndex < (patchedJson as Array<unknown>
     ).length

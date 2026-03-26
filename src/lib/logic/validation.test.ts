@@ -1,4 +1,4 @@
-import { deepStrictEqual } from 'assert'
+import { deepStrictEqual } from 'node:assert'
 import { isLosslessNumber, LosslessNumber, parse, stringify } from 'lossless-json'
 import { describe, test } from 'vitest'
 import type { ValidationError } from '$lib/types'

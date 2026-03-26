@@ -12,9 +12,9 @@ export function stringifyJSONPath(path: JSONPath): string {
   return path
     .map((p, index) => {
       return integerNumberRegex.test(p)
-        ? '[' + p + ']'
+        ? `[${p}]`
         : /[.[\]]/.test(p) || p === '' // match any character . or [ or ] and handle an empty string
-          ? '["' + escapeQuotes(p) + '"]'
+          ? `["${escapeQuotes(p)}"]`
           : (index > 0 ? '.' : '') + p
     })
     .join('')
@@ -104,7 +104,7 @@ export function createLodashPropertySelector(path: JSONPath): string {
   return path.length === 0
     ? ''
     : path.every((prop) => integerNumberRegex.test(prop) || javaScriptPropertyRegex.test(prop))
-      ? "'" + path.map(stringifyLodashProperty).join('').replace(/^\./, '') + "'"
+      ? `'${path.map(stringifyLodashProperty).join('').replace(/^\./, '')}'`
       : JSON.stringify(path)
 }
 
@@ -113,15 +113,15 @@ export function createLodashPropertySelector(path: JSONPath): string {
  */
 function stringifyLodashProperty(prop: string): string {
   if (integerNumberRegex.test(prop)) {
-    return '[' + prop + ']'
+    return `[${prop}]`
   }
   if (javaScriptPropertyRegex.test(prop)) {
-    return '.' + prop
+    return `.${prop}`
   }
   const propStr = JSON.stringify(prop)
   // remove enclosing double quotes, and unescape escaped double quotes \"
   const jsonPathStr = propStr.substring(1, propStr.length - 1).replace(/\\"/g, '"')
-  return "['" + jsonPathStr + "']"
+  return `['${jsonPathStr}']`
 }
 
 /**

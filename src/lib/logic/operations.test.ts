@@ -1,4 +1,4 @@
-import assert from 'assert'
+import assert from 'node:assert'
 import type { JSONPatchOperation } from 'immutable-json-patch'
 import { immutableJSONPatch } from 'immutable-json-patch'
 import { describe, expect, test } from 'vitest'
@@ -374,7 +374,7 @@ describe('operations', () => {
       const count = 100
       const json: Record<string, number> = {}
       for (let i = 0; i < count; i++) {
-        json['item ' + i] = i
+        json[`item ${i}`] = i
       }
 
       const operations = rename([], Object.keys(json), 'item 0', 'item 0 (renamed)')

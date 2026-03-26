@@ -23,11 +23,11 @@ export const lodashQueryLanguage: QueryLanguage = {
   executeQuery
 }
 
-function createQuery(json: unknown, queryOptions: QueryLanguageOptions): string {
+function createQuery(_json: unknown, queryOptions: QueryLanguageOptions): string {
   const { filter, sort, projection } = queryOptions
   const queryParts = ['  return _.chain(data)\n']
 
-  if (filter && filter.path && filter.relation && filter.value) {
+  if (filter?.path && filter.relation && filter.value) {
     // Note that the comparisons embrace type coercion,
     // so a filter value like '5' (text) will match numbers like 5 too.
     const actualValueGetter = `item => item${createPropertySelector(filter.path)}`
@@ -43,13 +43,13 @@ function createQuery(json: unknown, queryOptions: QueryLanguageOptions): string 
     queryParts.push(`    .filter(${actualValueGetter} ${filter.relation} ${filterValueStr})\n`)
   }
 
-  if (sort && sort.path && sort.direction) {
+  if (sort?.path && sort.direction) {
     queryParts.push(
       `    .orderBy([${createLodashPropertySelector(sort.path)}], ['${sort.direction}'])\n`
     )
   }
 
-  if (projection && projection.paths) {
+  if (projection?.paths) {
     // It is possible to make a util function "pickFlat"
     // and use that when building the query to make it more readable.
     if (projection.paths.length > 1) {
