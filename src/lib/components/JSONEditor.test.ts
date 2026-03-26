@@ -10,20 +10,18 @@ describe('JSONEditor', () => {
     json: [{ id: 1 }, { id: 2, name: 'Joe' }, { id: 3 }]
   }
 
-  const originalResizeObserver = window.ResizeObserver
-
   beforeEach(() => {
-    window.ResizeObserver =
-      window.ResizeObserver ||
-      vi.fn().mockImplementation(() => ({
-        disconnect: vi.fn(),
-        observe: vi.fn(),
-        unobserve: vi.fn()
-      }))
+    const ResizeObserverMock = class {
+      observe(): void {}
+      unobserve(): void {}
+      disconnect(): void {}
+    }
+
+    vi.stubGlobal('ResizeObserver', ResizeObserverMock)
   })
 
   afterEach(() => {
-    window.ResizeObserver = originalResizeObserver
+    vi.unstubAllGlobals()
   })
 
   test('render tree mode', () => {

@@ -124,7 +124,7 @@
     "@sveltejs/adapter-static": "3.0.10",
     "@sveltejs/kit": "2.55.0",
     "@sveltejs/package": "2.5.7",
-    "@sveltejs/vite-plugin-svelte": "6.2.4",
+    "@sveltejs/vite-plugin-svelte": "7.0.0",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/svelte": "5.3.1",
     "@types/jmespath": "0.15.2",
@@ -133,7 +133,7 @@
     "@types/natural-compare-lite": "1.4.2",
     "@typescript-eslint/eslint-plugin": "8.57.2",
     "@typescript-eslint/parser": "8.57.2",
-    "@vitest/coverage-v8": "3.2.4",
+    "@vitest/coverage-v8": "4.1.2",
     "conventional-changelog-conventionalcommits": "9.3.0",
     "cpy-cli": "7.0.0",
     "del-cli": "7.0.0",
@@ -159,7 +159,7 @@
     "svelte-preprocess": "6.0.3",
     "tslib": "2.8.1",
     "typescript": "5.9.3",
-    "vite": "7.3.1",
-    "vitest": "3.2.4"
+    "vite": "8.0.3",
+    "vitest": "4.1.2"
   }
 }
