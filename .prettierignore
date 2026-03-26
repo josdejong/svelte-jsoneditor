@@ -1,8 +1,0 @@
-.svelte-kit/**
-coverage/**
-static/**
-package/**
-package-vanilla/**
-node_modules/**
-src/lib/generated/**
-CHANGELOG.md
