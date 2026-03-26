@@ -1,4 +1,4 @@
-import { strictEqual } from 'node:assert'
+import { strictEqual } from 'assert'
 import { describe, test } from 'vitest'
 import { keyComboFromEvent } from './keyBindings.js'
 

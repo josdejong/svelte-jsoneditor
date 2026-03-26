@@ -57,13 +57,13 @@ export function parsePartialJson(partialJson: string, parse: (text: string) => u
   }
 
   try {
-    return parse(`{${partialJson}}`)
+    return parse('{' + partialJson + '}')
   } catch {
     // we ignore the error on purpose
   }
 
   try {
-    return parse(`[${partialJson}]`)
+    return parse('[' + partialJson + ']')
   } catch {
     // we ignore the error on purpose
   }
@@ -87,14 +87,14 @@ export function repairPartialJson(partialJson: string): string {
   }
 
   try {
-    const repaired = jsonrepair(`[${partialJson}]`)
+    const repaired = jsonrepair('[' + partialJson + ']')
     return repaired.substring(1, repaired.length - 1) // remove the outer [...] again
   } catch {
     // we ignore the error on purpose
   }
 
   try {
-    const repaired = jsonrepair(`{${partialJson}}`)
+    const repaired = jsonrepair('{' + partialJson + '}')
     return repaired.substring(1, repaired.length - 1) // remove the outer {...} again
   } catch {
     // we ignore the error on purpose

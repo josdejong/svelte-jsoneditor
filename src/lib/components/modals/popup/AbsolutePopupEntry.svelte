@@ -14,7 +14,8 @@ onMount(focus)
 
 function closeWhenOutside(event: Event) {
   if (
-    popup.options?.closeOnOuterClick &&
+    popup.options &&
+    popup.options.closeOnOuterClick &&
     !isChildOf(event.target as HTMLElement, (e) => e === refRootPopup)
   ) {
     closeAbsolutePopup(popup.id)

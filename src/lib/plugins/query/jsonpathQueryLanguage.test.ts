@@ -1,4 +1,4 @@
-import assert from 'node:assert'
+import assert from 'assert'
 import { describe, test } from 'vitest'
 import { jsonpathQueryLanguage } from '$lib/plugins/query/jsonpathQueryLanguage'
 

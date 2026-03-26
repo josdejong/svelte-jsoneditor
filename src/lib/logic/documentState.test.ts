@@ -1,4 +1,4 @@
-import assert from 'node:assert'
+import assert from 'assert'
 import {
   deleteIn,
   getIn,
@@ -967,7 +967,7 @@ describe('documentState', () => {
         { op: 'add', path: '/members/1', value: { id: 42, name: 'Julia' } }
       ])
 
-      assert.deepStrictEqual((res.json as Record<string, unknown>)?.members, [
+      assert.deepStrictEqual((res.json as Record<string, unknown>)?.['members'], [
         { id: 1, name: 'Joe' },
         { id: 42, name: 'Julia' },
         { id: 2, name: 'Sarah' },
@@ -1007,7 +1007,7 @@ describe('documentState', () => {
         { op: 'add', path: '/members/-', value: { id: 4, name: 'John' } }
       ])
 
-      assert.deepStrictEqual((res.json as Record<string, unknown>).members, [
+      assert.deepStrictEqual((res.json as Record<string, unknown>)['members'], [
         { id: 1, name: 'Joe' },
         { id: 2, name: 'Sarah' },
         { id: 3, name: 'Mark' },
@@ -1265,7 +1265,7 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, {
-        members: (json as Record<string, unknown>).members,
+        members: (json as Record<string, unknown>)['members'],
         group: {
           name: 'Group 1',
           location: 'Block C'
@@ -1310,7 +1310,7 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, {
-        group: (json as Record<string, unknown>).group,
+        group: (json as Record<string, unknown>)['group'],
         members: [
           getIn(json, ['members', '1']),
           getIn(json, ['members', '0']),
@@ -1346,7 +1346,7 @@ describe('documentState', () => {
       ])
 
       assert.deepStrictEqual(res.json, {
-        group: (json as Record<string, unknown>).group,
+        group: (json as Record<string, unknown>)['group'],
         members: [
           getIn(json, ['members', '1']),
           getIn(json, ['members', '0']),

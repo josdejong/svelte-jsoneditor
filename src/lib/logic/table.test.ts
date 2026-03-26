@@ -1,4 +1,4 @@
-import { deepStrictEqual } from 'node:assert'
+import { deepStrictEqual } from 'assert'
 import type { JSONPath } from 'immutable-json-patch'
 import { describe, expect, test } from 'vitest'
 import type { SortedColumn, ValidationError } from '$lib/types.js'

@@ -37,7 +37,7 @@ import { transformModalStateShared, transformModalStates } from './transformModa
 
 const debug = createDebug('jsoneditor:TransformModal')
 
-export let id = `transform-modal-${uniqueId()}`
+export let id = 'transform-modal-' + uniqueId()
 export let json: unknown
 export let rootPath: JSONPath = []
 

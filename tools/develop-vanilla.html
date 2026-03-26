@@ -120,7 +120,7 @@
           2,
           3,
           {
-            name: `Item ${2}`,
+            name: 'Item ' + 2,
             id: String(2),
             index: 2,
             time: new Date().toISOString(),
@@ -140,7 +140,7 @@
           a: 'b',
           c: 'd',
           nested: {
-            name: `Item ${2}`,
+            name: 'Item ' + 2,
             id: String(2),
             index: 2,
             time: new Date().toISOString(),
@@ -215,7 +215,7 @@
           largeJson.numbers.push(i)
           largeJson.randomNumbers.push(Math.round(Math.random() * 1000))
           largeJson.array.push({
-            name: `Item ${i}`,
+            name: 'Item ' + i,
             id: String(i),
             index: i,
             time: new Date().toISOString(),
@@ -380,7 +380,7 @@
       document.getElementById('setTextInvalid').onclick = () => {
         const str = JSON.stringify(json, null, 2)
         const index = str.lastIndexOf('}')
-        const invalidStr = `${str.slice(0, index)}]${str.slice(index + 1)}`
+        const invalidStr = str.slice(0, index) + ']' + str.slice(index + 1)
         testEditor.set({ text: invalidStr })
       }
 
@@ -390,7 +390,7 @@
           updated: ':)'
         }
         const str = JSON.stringify(updatedJson, null, 2)
-        const invalidStr = `${str}[`
+        const invalidStr = str + '['
         testEditor.update({ text: invalidStr })
       }
 
@@ -409,7 +409,7 @@
           '_blank',
           `location=no,toolbar=no,menubar=no,status=no,directories=no,width=${1000},height=${600},left=${0},top=${0},editorWind=yes`
         )
-        window.popupEditor = createJSONEditor({
+        window['popupEditor'] = createJSONEditor({
           target: popupWindow.document.body,
           props: {}
         })

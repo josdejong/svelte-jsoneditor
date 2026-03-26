@@ -21,18 +21,18 @@ function createQuery(_json: unknown, queryOptions: QueryLanguageOptions): string
   const { filter, sort, projection } = queryOptions
   let expression = '$'
 
-  if (filter?.path && filter.relation && filter.value) {
+  if (filter && filter.path && filter.relation && filter.value) {
     const filterValue = parseString(filter.value)
     const filterValueStr = JSON.stringify(filterValue)
 
     expression += `[?(@${pathToString(filter.path)} ${filter.relation} ${filterValueStr})]`
   }
 
-  if (sort?.path && sort.direction) {
+  if (sort && sort.path && sort.direction) {
     throw new Error('Sorting is not supported by JSONPath. Please clear the sorting fields')
   }
 
-  if (projection?.paths) {
+  if (projection && projection.paths) {
     if (projection.paths.length > 1) {
       throw new Error(
         'Picking multiple fields is not supported by JSONPath. Please select only one field'

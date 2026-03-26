@@ -178,8 +178,8 @@ export function sortOperationsMove<T>(
 
       operations.push({
         op: 'move',
-        from: `/${i}`,
-        path: `/${j}`
+        from: '/' + i,
+        path: '/' + j
       })
 
       sorted.splice(j, 0, item)
@@ -257,8 +257,8 @@ export function sortOperationsMoveAdvanced<T>(
   return moves.map(({ from, to }) => {
     return {
       op: 'move',
-      from: `/${from}`,
-      path: `/${to}`
+      from: '/' + from,
+      path: '/' + to
     }
   })
 }
@@ -305,7 +305,9 @@ export function fastPatchSort(json: unknown, operations: JSONPatchDocument): unk
   const arrayPath = initial(first(parsedOperations)?.path)
   const array = getIn(json, arrayPath)
   if (!Array.isArray(array)) {
-    throw new Error(`Cannot apply fastPatchSort: not an Array (path: ${JSON.stringify(arrayPath)})`)
+    throw new Error(
+      'Cannot apply fastPatchSort: not an Array ' + '(path: ' + JSON.stringify(arrayPath) + ')'
+    )
   }
 
   // validate whether all paths are in the same array

@@ -275,7 +275,7 @@ export function selectPreviousRow(columns: JSONPath[], selection: JSONSelection)
 }
 
 export function selectNextRow(
-  _json: unknown,
+  json: unknown,
   columns: JSONPath[],
   selection: JSONSelection
 ): JSONSelection {
@@ -322,7 +322,7 @@ export function toTableCellPosition(path: JSONPath, columns: JSONPath[]): TableC
   const rowIndex = Number.parseInt(index, 10)
 
   return {
-    rowIndex: !Number.isNaN(rowIndex) ? rowIndex : -1,
+    rowIndex: !isNaN(rowIndex) ? rowIndex : -1,
     columnIndex: columns.findIndex((c) => pathStartsWith(column, c))
   }
 }
@@ -408,7 +408,7 @@ export function mergeValidationErrors(
       'Multiple validation issues: ' +
       validationErrors
         .map((error) => {
-          return `${stringifyJSONPath(error.path)} ${error.message}`
+          return stringifyJSONPath(error.path) + ' ' + error.message
         })
         .join(', '),
     severity: ValidationSeverity.warning

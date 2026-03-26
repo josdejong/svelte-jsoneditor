@@ -1,4 +1,4 @@
-import { deepStrictEqual, strictEqual, throws } from 'node:assert'
+import { deepStrictEqual, strictEqual, throws } from 'assert'
 import { describe, test } from 'vitest'
 import {
   createLodashPropertySelector,

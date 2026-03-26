@@ -1,4 +1,4 @@
-import assert from 'node:assert'
+import assert from 'assert'
 import { immutableJSONPatch } from 'immutable-json-patch'
 import { sortBy } from 'lodash-es'
 import { LosslessNumber } from 'lossless-json'

@@ -1,4 +1,4 @@
-import assert from 'node:assert'
+import assert from 'assert'
 import { describe, test } from 'vitest'
 import { SelectionType } from '$lib/types.js'
 import { createDocumentState } from './documentState.js'
@@ -592,7 +592,7 @@ describe('selection', () => {
 
     assert.deepStrictEqual(
       selectionToPartialJson(json, createMultiSelection(['obj'], ['obj']), 2, JSON),
-      `"obj": ${JSON.stringify(json.obj, null, 2)},`
+      '"obj": ' + JSON.stringify(json.obj, null, 2) + ','
     )
   })
 
@@ -625,12 +625,12 @@ describe('selection', () => {
 
     assert.deepStrictEqual(
       selectionToPartialJson(json, createMultiSelection(['obj'], ['obj']), 2, JSON),
-      `"obj": ${JSON.stringify(json.obj, null, 2)},`
+      '"obj": ' + JSON.stringify(json.obj, null, 2) + ','
     )
 
     assert.deepStrictEqual(
       selectionToPartialJson(json, createMultiSelection(['obj'], ['obj']), indentation, JSON),
-      `"obj": ${JSON.stringify(json.obj, null, indentation)},`
+      '"obj": ' + JSON.stringify(json.obj, null, indentation) + ','
     )
   })
 

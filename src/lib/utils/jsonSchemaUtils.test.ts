@@ -1,4 +1,4 @@
-import assert from 'node:assert'
+import assert from 'assert'
 import type { JSONPath } from 'immutable-json-patch'
 import { describe, test } from 'vitest'
 import { findEnum, findSchema, getJSONSchemaOptions } from './jsonSchemaUtils.js'

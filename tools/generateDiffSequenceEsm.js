@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'fs'
 
 // The original file contains an export that doesn't play nice with Vite
 // This script copies the source code and turns it into a regular ES module

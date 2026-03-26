@@ -1,4 +1,4 @@
-import { deepStrictEqual, strictEqual } from 'node:assert'
+import { deepStrictEqual, strictEqual } from 'assert'
 import { describe, test } from 'vitest'
 import {
   createNormalizationFunctions,

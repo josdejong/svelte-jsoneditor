@@ -316,7 +316,7 @@ export default function ({
               onClick: () => handleInsertOrConvert('structure'),
               icon: convertMode ? faArrowRightArrowLeft : faPlus,
               text: 'Structure',
-              title: `${insertOrConvertText} structure like the first item in the array`,
+              title: insertOrConvertText + ' structure like the first item in the array',
               disabled: !canInsertOrConvertStructure
             },
             {
@@ -324,7 +324,7 @@ export default function ({
               onClick: () => handleInsertOrConvert('object'),
               icon: convertMode ? faArrowRightArrowLeft : faPlus,
               text: 'Object',
-              title: `${insertOrConvertText} object`,
+              title: insertOrConvertText + ' object',
               disabled: !canInsertOrConvertObject
             },
             {
@@ -332,7 +332,7 @@ export default function ({
               onClick: () => handleInsertOrConvert('array'),
               icon: convertMode ? faArrowRightArrowLeft : faPlus,
               text: 'Array',
-              title: `${insertOrConvertText} array`,
+              title: insertOrConvertText + ' array',
               disabled: !canInsertOrConvertArray
             },
             {
@@ -340,7 +340,7 @@ export default function ({
               onClick: () => handleInsertOrConvert('value'),
               icon: convertMode ? faArrowRightArrowLeft : faPlus,
               text: 'Value',
-              title: `${insertOrConvertText} value`,
+              title: insertOrConvertText + ' value',
               disabled: !canInsertOrConvertValue
             }
           ]

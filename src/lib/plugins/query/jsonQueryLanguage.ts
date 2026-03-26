@@ -26,7 +26,7 @@ function createQuery(_json: unknown, queryOptions: QueryLanguageOptions): string
   const { filter, sort, projection } = queryOptions
   const queryFunctions: JSONQuery[] = []
 
-  if (filter?.path && filter.relation && filter.value) {
+  if (filter && filter.path && filter.relation && filter.value) {
     queryFunctions.push([
       'filter',
       [
@@ -37,11 +37,11 @@ function createQuery(_json: unknown, queryOptions: QueryLanguageOptions): string
     ])
   }
 
-  if (sort?.path && sort.direction) {
+  if (sort && sort.path && sort.direction) {
     queryFunctions.push(['sort', getter(sort.path), sort.direction === 'desc' ? 'desc' : 'asc'])
   }
 
-  if (projection?.paths) {
+  if (projection && projection.paths) {
     if (projection.paths.length > 1) {
       queryFunctions.push(['pick', ...projection.paths.map(getter)])
     } else {

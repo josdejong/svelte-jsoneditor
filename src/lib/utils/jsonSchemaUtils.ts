@@ -21,11 +21,11 @@ export function getJSONSchemaOptions(
  * Source: https://github.com/josdejong/jsoneditor/blob/develop/src/js/Node.js
  */
 export function findEnum(schema: JSONSchema): JSONSchemaEnum | undefined {
-  if (Array.isArray(schema.enum)) {
-    return schema.enum
+  if (Array.isArray(schema['enum'])) {
+    return schema['enum']
   }
 
-  const composite = schema.oneOf || schema.anyOf || schema.allOf
+  const composite = schema['oneOf'] || schema['anyOf'] || schema['allOf']
   if (Array.isArray(composite)) {
     const match = composite.filter((entry) => entry.enum)
     if (match.length > 0) {

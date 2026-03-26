@@ -1,5 +1,5 @@
-import fs from 'node:fs'
-import path from 'node:path'
+import fs from 'fs'
+import path from 'path'
 
 /**
  * source: https://coderrocketfuel.com/article/recursively-list-all-the-files-in-a-directory-using-node-js
@@ -10,8 +10,8 @@ export function getFilesRecursively(dirPath) {
   let filenames = []
 
   fs.readdirSync(dirPath).forEach((file) => {
-    if (fs.statSync(`${dirPath}/${file}`).isDirectory()) {
-      const nestedFiles = getFilesRecursively(`${dirPath}/${file}`)
+    if (fs.statSync(dirPath + '/' + file).isDirectory()) {
+      const nestedFiles = getFilesRecursively(dirPath + '/' + file)
       filenames = filenames.concat(nestedFiles)
     } else {
       filenames.push(path.join(dirPath, '/', file))

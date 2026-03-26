@@ -1,4 +1,4 @@
-import { deepStrictEqual, strictEqual } from 'node:assert'
+import { deepStrictEqual, strictEqual } from 'assert'
 import type { JSONPath } from 'immutable-json-patch'
 import { isEqual } from 'lodash-es'
 import { describe, test } from 'vitest'

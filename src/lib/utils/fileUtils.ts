@@ -10,24 +10,24 @@ export function formatSize(size: number): string {
   const factor = 0.9
 
   if (size < factor * kilo) {
-    return `${size.toFixed()} B`
+    return size.toFixed() + ' B'
   }
 
   const KB = size / kilo
   if (KB < factor * kilo) {
-    return `${KB.toFixed(1)} KB`
+    return KB.toFixed(1) + ' KB'
   }
 
   const MB = KB / kilo
   if (MB < factor * kilo) {
-    return `${MB.toFixed(1)} MB`
+    return MB.toFixed(1) + ' MB'
   }
 
   const GB = MB / kilo
   if (GB < factor * kilo) {
-    return `${GB.toFixed(1)} GB`
+    return GB.toFixed(1) + ' GB'
   }
 
   const TB = GB / kilo
-  return `${TB.toFixed(1)} TB`
+  return TB.toFixed(1) + ' TB'
 }

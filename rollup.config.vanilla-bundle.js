@@ -1,4 +1,4 @@
-import path from 'node:path'
+import path from 'path'
 import config from './rollup.config.vanilla-library.js'
 
 const packageFolder = 'package-vanilla'

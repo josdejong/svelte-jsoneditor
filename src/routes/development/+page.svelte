@@ -382,11 +382,11 @@ function refresh() {
 }
 
 function generateLongArray() {
-  return [...new Array(1000)].map((_value, index) => {
+  return [...new Array(1000)].map((value, index) => {
     const random = Math.round(Math.random() * 1000)
     const item: Record<string, unknown> = {
       id: index,
-      name: `Item ${index}`,
+      name: 'Item ' + index,
       random,
       'nested object': {
         value: random
@@ -403,7 +403,7 @@ function generateLongArray() {
       const array = item.array as Array<string | null>
       array[2] = 'oopsie'
       array[3] = null
-      delete item.id
+      delete item['id']
     }
     if (index === 4) {
       item.random = -1

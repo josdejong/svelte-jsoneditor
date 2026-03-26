@@ -56,14 +56,14 @@ export function jsonEscapeUnicode(value: string): string {
       return x
     }
 
-    return `\\u${(`000${x.codePointAt(0)?.toString(16)}`).slice(-4)}`
+    return '\\u' + ('000' + x.codePointAt(0)?.toString(16)).slice(-4)
   })
 }
 
 export function jsonUnescapeUnicode(value: string): string {
   return value.replace(/\\u[a-fA-F0-9]{4}/g, (x) => {
     try {
-      const unescaped: string = JSON.parse(`"${x}"`)
+      const unescaped: string = JSON.parse('"' + x + '"')
       // the resolved character can be a control character like " or \n,
       // that would result in invalid JSON, so we need to keep that escaped
       // @ts-expect-error
@@ -120,7 +120,7 @@ export function addNewLineSuffix(value: unknown): string {
 
   if (value.endsWith('\n')) {
     // DOM innerText strips the last \n, therefore we add an extra \n here
-    return `${value}\n`
+    return value + '\n'
   }
 
   return value

@@ -26,7 +26,8 @@ const isTruncated = $derived(
   doTruncate &&
     typeof value === 'string' &&
     value.length > truncateTextSize &&
-    !searchResultItems?.some((item) => item.active && item.end > truncateTextSize)
+    (!searchResultItems ||
+      !searchResultItems.some((item) => item.active && item.end > truncateTextSize))
 )
 const truncatedValue = $derived(
   isTruncated && typeof value === 'string' ? value.substring(0, truncateTextSize).trim() : value

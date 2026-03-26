@@ -43,7 +43,7 @@ function convert(value: string): unknown {
   }
 
   const number = Number(value)
-  if (!Number.isNaN(number)) {
+  if (!isNaN(number)) {
     return number
   }
 

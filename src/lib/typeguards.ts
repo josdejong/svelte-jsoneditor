@@ -28,55 +28,55 @@ import type {
 export function isMenuSpace(item: unknown): item is MenuSpace {
   // checking the .space property is for backward compatibility
   // @ts-expect-error
-  return item ? item.type === 'space' || item.space === true : false
+  return item ? item['type'] === 'space' || item['space'] === true : false
 }
 
 export function isMenuSeparator(item: unknown): item is MenuSeparator {
   // checking the .separator property is for backward compatibility
   // @ts-expect-error
-  return item ? item.type === 'separator' || item.separator === true : false
+  return item ? item['type'] === 'separator' || item['separator'] === true : false
 }
 
 export function isMenuLabel(item: unknown): item is MenuLabel {
   // @ts-expect-error
-  return item ? item.type === 'label' && typeof item.text === 'string' : false
+  return item ? item['type'] === 'label' && typeof item['text'] === 'string' : false
 }
 
 export function isMenuButton(item: unknown): item is MenuButton {
   // for backward compatibility, we only check .onClick here and not item['type'] === 'button'
   // @ts-expect-error
-  return item ? typeof item.onClick === 'function' : false
+  return item ? typeof item['onClick'] === 'function' : false
 }
 
 export function isMenuDropDownButton(item: unknown): item is MenuDropDownButton {
   return item
     ? // @ts-ignore
-      item.type === 'dropdown-button' &&
+      item['type'] === 'dropdown-button' &&
         // @ts-expect-error
-        isMenuButton(item.main) &&
+        isMenuButton(item['main']) &&
         // @ts-expect-error
-        Array.isArray(item.items)
+        Array.isArray(item['items'])
     : false
 }
 
 export function isContextMenuRow(item: unknown): item is ContextMenuRow {
   // @ts-expect-error
-  return item ? item.type === 'row' && Array.isArray(item.items) : false
+  return item ? item['type'] === 'row' && Array.isArray(item['items']) : false
 }
 
 export function isContextMenuColumn(item: unknown): item is ContextMenuColumn {
   // @ts-expect-error
-  return item ? item.type === 'column' && Array.isArray(item.items) : false
+  return item ? item['type'] === 'column' && Array.isArray(item['items']) : false
 }
 
 export function isContentParseError(contentErrors: unknown): contentErrors is ContentParseError {
-  return isObject(contentErrors) && isObject(contentErrors.parseError)
+  return isObject(contentErrors) && isObject(contentErrors['parseError'])
 }
 
 export function isContentValidationErrors(
   contentErrors: unknown
 ): contentErrors is ContentValidationErrors {
-  return isObject(contentErrors) && Array.isArray(contentErrors.validationErrors)
+  return isObject(contentErrors) && Array.isArray(contentErrors['validationErrors'])
 }
 
 export function isValidationError(value: unknown): value is ValidationError {

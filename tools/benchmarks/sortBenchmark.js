@@ -1,6 +1,6 @@
 // benchmark different mechanisms to sort an array using JSONPatch
 
-import assert from 'node:assert'
+import assert from 'assert'
 import { immutableJSONPatch } from 'immutable-json-patch'
 import { sortBy, times } from 'lodash-es'
 import {
@@ -10,7 +10,7 @@ import {
 } from '../../src/lib/logic/sort.js'
 
 function generateArray(size, changes) {
-  const array = times(size).map((_item, index) => index)
+  const array = times(size).map((item, index) => index)
 
   for (let i = 0; i < changes; i++) {
     const fromIndex = Math.floor(Math.random() * size)
@@ -65,12 +65,12 @@ function sortBenchmark(size, changes) {
     changes,
     operationsSimple: operationsSimple.length,
     operationsAdvanced: operationsAdvanced.length,
-    createPatchSimple: `${createPatchSimple} ms`,
-    createPatchAdvanced: `${createPatchAdvanced} ms`,
-    applySimple: `${applySimple} ms`,
-    applyAdvanced: `${applyAdvanced} ms`,
-    fastApplySimple: `${fastApplySimple} ms`,
-    fastApplyAdvanced: `${fastApplyAdvanced} ms`
+    createPatchSimple: createPatchSimple + ' ms',
+    createPatchAdvanced: createPatchAdvanced + ' ms',
+    applySimple: applySimple + ' ms',
+    applyAdvanced: applyAdvanced + ' ms',
+    fastApplySimple: fastApplySimple + ' ms',
+    fastApplyAdvanced: fastApplyAdvanced + ' ms'
   }
 }
 

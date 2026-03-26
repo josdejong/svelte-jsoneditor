@@ -3,7 +3,7 @@ import { isObject } from './typeUtils.js'
 
 export function traverse(
   json: unknown,
-  callback: (value: unknown, path: JSONPath, json: unknown) => boolean | undefined
+  callback: (value: unknown, path: JSONPath, json: unknown) => boolean | void
 ) {
   const currentPath: JSONPath = []
 

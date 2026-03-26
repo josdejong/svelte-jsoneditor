@@ -123,7 +123,7 @@ function handleUndo(item: HistoryItem | undefined) {
 
     // find the selection of the previous history item (if any), and use that as initial selection
     const items = history.items()
-    const index = items.indexOf(item)
+    const index = items.findIndex((i) => i === item)
     const prevItem = index !== -1 ? items[index - 1] : undefined
     debug('handleUndo', { index, item, items, prevItem })
     if (prevItem) {
@@ -141,7 +141,7 @@ function handleRedo(item: HistoryItem | undefined) {
 
     // find the selection of the next history item (if any), and use that as initial selection
     const items = history.items()
-    const index = items.indexOf(item)
+    const index = items.findIndex((i) => i === item)
     const nextItem = index !== -1 ? items[index + 1] : undefined
     debug('handleRedo', { index, item, items, nextItem })
     if (nextItem) {
@@ -158,21 +158,21 @@ $: modeMenuItems = [
     type: 'button',
     text: 'text',
     title: `Switch to text mode (current mode: ${mode})`,
-    className: `jse-group-button jse-first${mode === Mode.text ? ' jse-selected' : ''}`,
+    className: 'jse-group-button jse-first' + (mode === Mode.text ? ' jse-selected' : ''),
     onClick: () => onChangeMode(Mode.text)
   },
   {
     type: 'button',
     text: 'tree',
     title: `Switch to tree mode (current mode: ${mode})`,
-    className: `jse-group-button ${mode === Mode.tree ? ' jse-selected' : ''}`,
+    className: 'jse-group-button ' + (mode === Mode.tree ? ' jse-selected' : ''),
     onClick: () => onChangeMode(Mode.tree)
   },
   {
     type: 'button',
     text: 'table',
     title: `Switch to table mode (current mode: ${mode})`,
-    className: `jse-group-button jse-last${mode === Mode.table ? ' jse-selected' : ''}`,
+    className: 'jse-group-button jse-last' + (mode === Mode.table ? ' jse-selected' : ''),
     onClick: () => onChangeMode(Mode.table)
   }
 ]

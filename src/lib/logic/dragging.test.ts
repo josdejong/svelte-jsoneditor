@@ -1,4 +1,4 @@
-import { deepStrictEqual, strictEqual } from 'node:assert'
+import { deepStrictEqual, strictEqual } from 'assert'
 import { immutableJSONPatch } from 'immutable-json-patch'
 import { isEqual } from 'lodash-es'
 import { describe, test } from 'vitest'
@@ -15,7 +15,7 @@ describe('dragging', () => {
     }
     const selection = createMultiSelection(['array', '3'], ['array', '5'])
 
-    const allItems: RenderedItem[] = json.array.map((_item, index) => ({
+    const allItems: RenderedItem[] = json.array.map((item, index) => ({
       path: ['array', String(index)],
       height: itemHeight
     }))

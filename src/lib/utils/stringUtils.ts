@@ -14,7 +14,7 @@ export function findUniqueName(name: string, keys: string[]): string {
   let i = 1
 
   while (keysSet.has(validName)) {
-    const copy = `copy${i > 1 ? ` ${i}` : ''}`
+    const copy = 'copy' + (i > 1 ? ' ' + i : '')
     validName = `${nameWithoutCopySuffix} (${copy})`
     i++
   }
@@ -87,7 +87,7 @@ export function parseString(str: string): string | number | boolean | null | und
 
   const num = Number(str) // will nicely fail with '123ab'
   const numFloat = Number.parseFloat(str) // will nicely fail with '  '
-  if (!Number.isNaN(num) && !Number.isNaN(numFloat)) {
+  if (!isNaN(num) && !isNaN(numFloat)) {
     return num
   }
 

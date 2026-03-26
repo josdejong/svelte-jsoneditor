@@ -1,4 +1,4 @@
-import assert from 'node:assert'
+import assert from 'assert'
 import { describe, expect, test } from 'vitest'
 import {
   arrayStartsWith,

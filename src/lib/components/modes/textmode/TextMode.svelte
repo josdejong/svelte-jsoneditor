@@ -321,7 +321,7 @@ function createCustomFoldService() {
       let prop = cur.type.prop(foldNodeProp)
       if (
         prop &&
-        (cur.to < tree.length - 50 || tree.length === state.doc.length || !isUnfinished(cur))
+        (cur.to < tree.length - 50 || tree.length == state.doc.length || !isUnfinished(cur))
       ) {
         let value = prop(cur, state)
         if (value && value.from <= end && value.from >= start && value.to > end) {
@@ -334,7 +334,7 @@ function createCustomFoldService() {
 }
 function isUnfinished(node: SyntaxNode) {
   let ch = node.lastChild
-  return ch && ch.to === node.to && ch.type.isError
+  return ch && ch.to == node.to && ch.type.isError
 }
 
 function getFoldRanges(tree: Tree, state: EditorState, startPos?: number, recursive = true) {
@@ -678,7 +678,7 @@ function handleTransform() {
 function handleToggleSearch() {
   if (codeMirrorView) {
     // TODO: figure out the proper way to detect whether the search panel is open
-    if (codeMirrorRef?.querySelector('.cm-search')) {
+    if (codeMirrorRef && codeMirrorRef.querySelector('.cm-search')) {
       closeSearchPanel(codeMirrorView)
     } else {
       openSearchPanel(codeMirrorView)
@@ -810,7 +810,7 @@ function handleDoubleClick(_event: MouseEvent, view: EditorView) {
       })
       const pointer = jsmap.pointers[path]
 
-      if (path && pointer?.value && pointer.valueEnd) {
+      if (path && pointer && pointer.value && pointer.valueEnd) {
         debug('pointer found, selecting inner contents of path:', path, pointer)
         const anchor = pointer.value.pos + 1
         const head = pointer.valueEnd.pos - 1
@@ -1039,7 +1039,7 @@ function applyExternalSelection(externalSelection: JSONEditorSelection | undefin
   }
 
   const selection = fromTextSelection(externalSelection)
-  if (codeMirrorView && selection && !editorState?.selection.eq(selection)) {
+  if (codeMirrorView && selection && (!editorState || !editorState.selection.eq(selection))) {
     debug('applyExternalSelection', selection)
 
     // note that we cannot clear the selection (we could maybe set the cursor to 0 but that's not really what we want)
