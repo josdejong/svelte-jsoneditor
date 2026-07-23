@@ -134,7 +134,11 @@ $collapsed-items-link-color-highlight: var(--jse-collapsed-items-link-color-high
 $search-match-color: var(--jse-search-match-color, #ffe665);
 $search-match-outline: var(--jse-search-match-outline, none);
 $search-match-active-color: var(--jse-search-match-active-color, $search-match-color);
-$search-match-active-outline: var(--jse-search-match-outline, (2px solid #e0be00));
+// falling back to the outline of the non-active search matches for backward compatibility
+$search-match-active-outline: var(
+  --jse-search-match-active-outline,
+  var(--jse-search-match-outline, (2px solid #e0be00))
+);
 
 /* contents: inline tags inside the JSON document */
 $tag-background: var(--jse-tag-background, rgba(0, 0, 0, 0.2));
