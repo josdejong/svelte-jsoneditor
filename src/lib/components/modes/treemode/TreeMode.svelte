@@ -1844,8 +1844,10 @@
     // with just .focus(), sometimes the input doesn't react on onpaste events
     // in Chrome when having a large document open and then doing cut/paste.
     // Calling both .focus() and .select() did solve this issue.
+    // the input is positioned outside of the editor, so revealing it would
+    // scroll a scrollable ancestor away from the contents the user clicked
     if (refHiddenInput) {
-      refHiddenInput.focus()
+      refHiddenInput.focus({ preventScroll: true })
       refHiddenInput.select()
     }
   }
@@ -1861,7 +1863,7 @@
         selection = removeEditModeFromSelection(selection)
 
         if (hasFocus && refHiddenInput) {
-          refHiddenInput.focus()
+          refHiddenInput.focus({ preventScroll: true })
           refHiddenInput.blur()
         }
 
