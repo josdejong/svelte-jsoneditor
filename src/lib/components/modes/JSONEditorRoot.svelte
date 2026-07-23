@@ -49,6 +49,7 @@
   export let tabSize: number
   export let truncateTextSize: number
   export let externalMode: Mode
+  export let ariaLabel: string | undefined = undefined
   export let mainMenuBar: boolean
   export let navigationBar: boolean
   export let statusBar: boolean
@@ -341,6 +342,7 @@
     bind:this={refTextMode}
     externalContent={content}
     externalSelection={selection}
+    {ariaLabel}
     {history}
     {readOnly}
     {indentation}
@@ -370,6 +372,7 @@
     bind:this={refTableMode}
     externalContent={content}
     externalSelection={selection}
+    {ariaLabel}
     {history}
     {readOnly}
     {truncateTextSize}
@@ -402,6 +405,7 @@
     bind:this={refTreeMode}
     externalContent={content}
     externalSelection={selection}
+    {ariaLabel}
     {history}
     {readOnly}
     {indentation}

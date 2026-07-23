@@ -60,6 +60,27 @@ describe('JSONEditor', () => {
     expect(target).toMatchSnapshot()
   })
 
+  test('render a custom aria-label in all modes', () => {
+    const ariaLabel = 'Custom label'
+
+    const labelOf = (mode: Mode, selector: string): string | null | undefined => {
+      const target = document.createElement('div')
+
+      mount(JSONEditor, {
+        target,
+        props: { mode, content, ariaLabel }
+      })
+
+      flushSync() // wait until CodeMirror is rendered during onMount
+
+      return target.querySelector(selector)?.getAttribute('aria-label')
+    }
+
+    expect(labelOf(Mode.tree, '[role="tree"]')).toBe(ariaLabel)
+    expect(labelOf(Mode.table, '[role="table"]')).toBe(ariaLabel)
+    expect(labelOf(Mode.text, '.cm-content')).toBe(ariaLabel)
+  })
+
   test('render table mode', () => {
     const target = document.createElement('div')
 

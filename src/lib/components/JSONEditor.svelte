@@ -61,6 +61,7 @@
   const tabSizeDefault = 4
   const truncateTextSizeDefault = 1000
   const modeDefault = Mode.tree
+  const ariaLabelDefault = 'JSON editor'
   const mainMenuBarDefault = true
   const navigationBarDefault = true
   const statusBarDefault = true
@@ -100,6 +101,7 @@
   export let tabSize: number = tabSizeDefault
   export let truncateTextSize: number = truncateTextSizeDefault
   export let mode: Mode = modeDefault
+  export let ariaLabel: string = ariaLabelDefault
   export let mainMenuBar: boolean = mainMenuBarDefault
   export let navigationBar: boolean = navigationBarDefault
   export let statusBar: boolean = statusBarDefault
@@ -312,6 +314,9 @@
           break
         case 'mode':
           mode = props[name] ?? modeDefault
+          break
+        case 'ariaLabel':
+          ariaLabel = props[name] ?? ariaLabelDefault
           break
         case 'mainMenuBar':
           mainMenuBar = props[name] ?? mainMenuBarDefault
@@ -560,6 +565,7 @@
         {indentation}
         {tabSize}
         {truncateTextSize}
+        {ariaLabel}
         {statusBar}
         {askToFormat}
         {mainMenuBar}

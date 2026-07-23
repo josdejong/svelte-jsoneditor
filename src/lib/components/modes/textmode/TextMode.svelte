@@ -135,6 +135,7 @@
   import { wrappedLineIndent } from 'codemirror-wrapped-line-indent/dist/index.js' // ensure loading ESM, otherwise the vitest test fail
 
   export let readOnly: boolean
+  export let ariaLabel: string | undefined = undefined
   export let mainMenuBar: boolean
   export let statusBar: boolean
   export let askToFormat: boolean
@@ -194,6 +195,7 @@
   const indentCompartment = new Compartment()
   const tabSizeCompartment = new Compartment()
   const themeCompartment = new Compartment()
+  const ariaLabelCompartment = new Compartment()
 
   let content: Content = externalContent
   let text = getText(content, indentation, parser) // text is just a cached version of content.text or parsed content.json
@@ -249,6 +251,7 @@
   $: updateIndentation(indentation)
   $: updateTabSize(tabSize)
   $: updateReadOnly(readOnly)
+  $: updateAriaLabel(ariaLabel)
 
   // force updating the text when escapeUnicodeCharacters changes
   let previousEscapeUnicodeCharacters = escapeUnicodeCharacters
@@ -927,7 +930,8 @@
         readOnlyCompartment.of(EditorState.readOnly.of(readOnly)),
         tabSizeCompartment.of(EditorState.tabSize.of(tabSize)),
         indentCompartment.of(createIndent(indentation)),
-        themeCompartment.of(EditorView.theme({}, { dark: hasDarkTheme() }))
+        themeCompartment.of(EditorView.theme({}, { dark: hasDarkTheme() })),
+        ariaLabelCompartment.of(createAriaLabel(ariaLabel))
       ]
     })
 
@@ -1154,6 +1158,20 @@
 
       codeMirrorView.dispatch({
         effects: tabSizeCompartment.reconfigure(EditorState.tabSize.of(tabSize))
+      })
+    }
+  }
+
+  function createAriaLabel(ariaLabel: string | undefined) {
+    return EditorView.contentAttributes.of(ariaLabel ? { 'aria-label': ariaLabel } : {})
+  }
+
+  function updateAriaLabel(ariaLabel: string | undefined) {
+    if (codeMirrorView) {
+      debug('updateAriaLabel', ariaLabel)
+
+      codeMirrorView.dispatch({
+        effects: [ariaLabelCompartment.reconfigure(createAriaLabel(ariaLabel))]
       })
     }
   }

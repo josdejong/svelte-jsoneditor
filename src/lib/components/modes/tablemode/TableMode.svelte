@@ -167,6 +167,7 @@
   debug('isSSR:', isSSR)
 
   export let readOnly: boolean
+  export let ariaLabel: string | undefined = undefined
   export let externalContent: Content
   export let externalSelection: JSONEditorSelection | undefined
   export let history: History<HistoryItem>
@@ -1750,6 +1751,7 @@
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <div
   role="table"
+  aria-label={ariaLabel}
   class="jse-table-mode"
   class:no-main-menu={!mainMenuBar}
   on:mousedown={handleMouseDown}

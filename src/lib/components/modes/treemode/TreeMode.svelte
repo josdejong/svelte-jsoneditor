@@ -184,6 +184,7 @@
   const jump = createJump()
 
   export let readOnly: boolean
+  export let ariaLabel: string | undefined = undefined
   export let externalContent: Content
   export let externalSelection: JSONEditorSelection | undefined
   export let history: History<HistoryItem>
@@ -1928,6 +1929,7 @@
 <div
   role="tree"
   tabindex="-1"
+  aria-label={ariaLabel}
   class="jse-tree-mode"
   class:no-main-menu={!mainMenuBar}
   on:keydown={handleKeyDown}

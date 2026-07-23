@@ -596,6 +596,7 @@ export interface JSONEditorPropsOptional {
   content?: Content
   selection?: JSONEditorSelection
   readOnly?: boolean
+  ariaLabel?: string
   indentation?: number | string
   tabSize?: number
   truncateTextSize?: number

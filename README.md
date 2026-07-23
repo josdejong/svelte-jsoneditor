@@ -246,6 +246,14 @@ mode: 'tree' | 'text' | 'table'
 
 Open the editor in `'tree'` mode (default), `'table'` mode, or `'text'` mode (formerly: `code` mode).
 
+#### ariaLabel
+
+```ts
+ariaLabel: string
+```
+
+The accessible name of the editor, applied to the contents of all three modes. Default value is `'JSON editor'`. Give each editor a name of its own when a page contains more than one, so screen reader users can tell them apart.
+
 #### mainMenuBar
 
 ```ts
