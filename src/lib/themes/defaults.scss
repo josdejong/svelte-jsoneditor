@@ -71,7 +71,11 @@ $panel-border: var(--jse-panel-border, $main-border);
 
 $panel-button-color: var(--jse-panel-button-color, inherit);
 $panel-button-background: var(--jse-panel-button-background, transparent);
-$panel-button-color-highlight: var(--panel-button-color-highlight, $text-color);
+// the variable without `jse` prefix is deprecated, it is kept for backward compatibility
+$panel-button-color-highlight: var(
+  --jse-panel-button-color-highlight,
+  var(--panel-button-color-highlight, $text-color)
+);
 $panel-button-background-highlight: var(--jse-panel-button-background-highlight, #e0e0e0);
 
 /* navigation-bar */
@@ -98,7 +102,8 @@ $context-menu-pointer-color: var(--jse-context-menu-pointer-color, $context-menu
 $context-menu-pointer-size: var(--jse-context-menu-pointer-size, calc(1em + 4px));
 $context-menu-tip-background: var(--jse-context-menu-tip-background, rgba(255, 255, 255, 0.2));
 
-$context-menu-tip-color: var(--context-menu-tip-color, inherit);
+// the variable without `jse` prefix is deprecated, it is kept for backward compatibility
+$context-menu-tip-color: var(--jse-context-menu-tip-color, var(--context-menu-tip-color, inherit));
 
 /* contents: json key and values */
 $key-color: var(--jse-key-color, #1a1a1a);
@@ -178,7 +183,11 @@ $message-error-background: var(--jse-message-error-background, $error-color);
 $message-error-color: var(--jse-message-error-color, $white);
 $message-warning-background: var(--jse-message-warning-background, #ffde5c);
 $message-warning-color: var(--jse-message-warning-color, $black);
-$message-success-background: var(--message-success-background, #9ac45d);
+// the variable without `jse` prefix is deprecated, it is kept for backward compatibility
+$message-success-background: var(
+  --jse-message-success-background,
+  var(--message-success-background, #9ac45d)
+);
 $message-success-color: var(--jse-message-success-color, $white);
 $message-info-background: var(--jse-message-info-background, #4f91ff);
 $message-info-color: var(--jse-message-info-color, $white);
