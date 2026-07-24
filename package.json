@@ -158,7 +158,7 @@
     "svelte-eslint-parser": "1.8.0",
     "svelte-preprocess": "6.0.5",
     "tslib": "2.8.1",
-    "typescript": "5.9.3",
+    "typescript": "6.0.3",
     "vite": "8.1.5",
     "vitest": "4.1.10"
   }
