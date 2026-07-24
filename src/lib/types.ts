@@ -21,9 +21,7 @@ export interface JSONParser {
   stringify(
     value: unknown,
     replacer?:
-      | ((this: unknown, key: string, value: unknown) => unknown)
-      | Array<number | string>
-      | null,
+      ((this: unknown, key: string, value: unknown) => unknown) | Array<number | string> | null,
     space?: string | number
   ): string | undefined
 }
@@ -158,9 +156,7 @@ export interface ValueValidationErrors extends ValueRecursiveState {
 }
 
 export type ValidationErrors =
-  | ObjectValidationErrors
-  | ArrayValidationErrors
-  | ValueValidationErrors
+  ObjectValidationErrors | ArrayValidationErrors | ValueValidationErrors
 
 export interface JSONPatchResult {
   json: unknown
@@ -385,8 +381,7 @@ export interface OnChangeStatus {
   patchResult: JSONPatchResult | undefined
 }
 export type OnChange =
-  | ((content: Content, previousContent: Content, status: OnChangeStatus) => void)
-  | undefined
+  ((content: Content, previousContent: Content, status: OnChangeStatus) => void) | undefined
 export type OnJSONSelect = (selection: JSONSelection) => void
 export type OnSelect = (selection: JSONEditorSelection | undefined) => void
 export type OnUndo = (item: HistoryItem | undefined) => void
@@ -487,8 +482,7 @@ export interface DragInsideProps {
 }
 
 export type DragInsideAction =
-  | { beforePath: JSONPath; offset: number }
-  | { append: true; offset: number }
+  { beforePath: JSONPath; offset: number } | { append: true; offset: number }
 
 export interface RenderedItem {
   path: JSONPath
