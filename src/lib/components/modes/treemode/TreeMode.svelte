@@ -1962,10 +1962,13 @@
 
   {#if !isSSR}
     <label class="jse-hidden-input-label">
+      <!-- an off-screen input to capture paste and hold focus; it carries no
+           content of its own, so hide it from assistive technologies -->
       <input
         type="text"
         readonly={true}
         tabindex="-1"
+        aria-hidden="true"
         class="jse-hidden-input"
         bind:this={refHiddenInput}
         on:paste={handlePaste}

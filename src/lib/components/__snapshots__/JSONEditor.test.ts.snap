@@ -275,6 +275,7 @@ exports[`JSONEditor > render table mode 1`] = `
         class="jse-hidden-input-label svelte-1p86y3c"
       >
         <input
+          aria-hidden="true"
           class="jse-hidden-input svelte-1p86y3c"
           readonly=""
           tabindex="-1"
@@ -1771,6 +1772,7 @@ exports[`JSONEditor > render tree mode 1`] = `
         class="jse-hidden-input-label svelte-10mlrw4"
       >
         <input
+          aria-hidden="true"
           class="jse-hidden-input svelte-10mlrw4"
           readonly=""
           tabindex="-1"
