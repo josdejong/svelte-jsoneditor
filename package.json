@@ -20,8 +20,15 @@
       "module": "./index.js",
       "types": "./index.d.ts"
     },
+    "./locales": {
+      "svelte": "./locales.js",
+      "module": "./locales.js",
+      "types": "./locales.d.ts"
+    },
     "./index.d.ts": "./index.d.ts",
     "./index.js": "./index.js",
+    "./locales.js": "./locales.js",
+    "./locales.d.ts": "./locales.d.ts",
     "./themes/jse-theme-dark.css": "./themes/jse-theme-dark.css",
     "./themes/jse-theme-default.css": "./themes/jse-theme-default.css",
     "./CHANGELOG.md": "./CHANGELOG.md",
@@ -47,6 +54,7 @@
     "build:vanilla": "npm-run-all build:vanilla:**",
     "build:vanilla:clean": "del-cli package-vanilla",
     "build:vanilla:library": "rollup --config rollup.config.vanilla-library.js",
+    "build:vanilla:locales": "rollup --config rollup.config.vanilla-locales.js",
     "build:vanilla:bundle": "rollup --config rollup.config.vanilla-bundle.js",
     "build:vanilla:types": "rollup --config rollup.config.vanilla-types.js",
     "build:vanilla:copy:files": "cpy CHANGELOG.md LICENSE.md SECURITY.md package-vanilla",

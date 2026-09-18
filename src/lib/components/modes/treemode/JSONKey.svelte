@@ -12,6 +12,7 @@
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
   import { addNewLineSuffix } from '$lib/utils/domUtils.js'
+  import { t } from '$lib/i18n/index.js'
   import type { ExtendedSearchResultItem, JSONSelection, TreeModeContext } from '$lib/types.js'
   import { UpdateSelectionAfterChange } from '$lib/types.js'
   import { type JSONPath, type JSONPointer, parseJSONPointer } from 'immutable-json-patch'
@@ -65,7 +66,7 @@
   <EditableDiv
     value={context.normalization.escapeValue(key)}
     initialValue={isEditingSelection(selection) ? selection.initialValue : undefined}
-    label="Edit key"
+    label={$t('editKey')}
     shortText
     onChange={handleChangeValue}
     onCancel={handleCancelChange}

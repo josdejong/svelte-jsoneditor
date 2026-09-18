@@ -12,6 +12,7 @@ import { MAX_AUTO_REPAIRABLE_SIZE, MAX_VALIDATABLE_SIZE } from '../constants.js'
 import { measure } from '../utils/timeUtils.js'
 import { normalizeJsonParseError } from '../utils/jsonUtils.js'
 import { createDebug } from '../utils/debug.js'
+import { tString } from '$lib/i18n/index.js'
 import { jsonrepair } from 'jsonrepair'
 import { updateInRecursiveState } from './documentState.js'
 import type { JSONPath } from 'immutable-json-patch'
@@ -68,7 +69,7 @@ export function toRecursiveValidationErrors(
               validationError: {
                 isChildError: true,
                 path: parentPath,
-                message: 'Contains invalid data',
+                message: tString('containsInvalidData'),
                 severity: ValidationSeverity.warning
               }
             }
@@ -113,7 +114,7 @@ export function validateText(
   if (text.length > MAX_VALIDATABLE_SIZE) {
     const validationError: ValidationError = {
       path: [],
-      message: 'Validation turned off: the document is too large',
+      message: tString('validationTurnedOff'),
       severity: ValidationSeverity.info
     }
 

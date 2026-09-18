@@ -3,6 +3,7 @@
 <script lang="ts">
   import { limit } from '$lib/utils/arrayUtils.js'
   import { truncate } from '$lib/utils/stringUtils.js'
+  import { t } from '$lib/i18n/index.js'
 
   export let items: (string | number)[]
   export let selectedItem: string | number
@@ -28,7 +29,7 @@
     <button
       type="button"
       class="jse-navigation-bar-dropdown-item"
-      title="Limited to {MAX_ITEMS} items"
+      title={$t('limitedToItems', { count: String(MAX_ITEMS) })}
     >
       ...
     </button>

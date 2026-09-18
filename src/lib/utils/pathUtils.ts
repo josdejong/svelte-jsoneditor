@@ -83,10 +83,10 @@ export function parseJSONPath(pathStr: string): JSONPath {
 /**
  * Convert a JSONPath into an option for use in a select box
  */
-export function pathToOption(path: JSONPath): PathOption {
+export function pathToOption(path: JSONPath, itemRoot = 'item root'): PathOption {
   return {
     value: path,
-    label: isEmpty(path) ? '(item root)' : stringifyJSONPath(path)
+    label: isEmpty(path) ? `(${itemRoot})` : stringifyJSONPath(path)
   }
 }
 

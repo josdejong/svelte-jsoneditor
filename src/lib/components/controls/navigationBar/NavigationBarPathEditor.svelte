@@ -7,6 +7,7 @@
   import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
   import { tooltip } from '../../controls/tooltip/tooltip.js'
   import type { AbsolutePopupContext, JSONPathParser, OnError } from '$lib/types.js'
+  import { t } from '$lib/i18n/index.js'
 
   const absolutePopupContext = getContext<AbsolutePopupContext>('absolute-popup')
 
@@ -125,7 +126,7 @@
     type="button"
     class="jse-navigation-bar-copy"
     class:copied
-    title="Copy selected path to the clipboard"
+    title={$t('copyPathToClipboard')}
     on:click={handleCopy}
   >
     <Icon data={faCopy} />

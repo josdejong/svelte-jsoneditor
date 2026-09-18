@@ -8,6 +8,7 @@
   import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
   import { formatSize } from '$lib/utils/fileUtils'
   import Tag from '../../../components/controls/Tag.svelte'
+  import { t } from '$lib/i18n/index.js'
 
   const {
     path,
@@ -63,7 +64,7 @@
   class={getValueClass(value, mode, parser)}
   onclick={handleValueClick}
   ondblclick={handleValueDoubleClick}
-  title={valueIsUrl ? 'Ctrl+Click or Ctrl+Enter to open url in new window' : undefined}
+  title={valueIsUrl ? $t('ctrlClickToOpenUrl') : undefined}
 >
   {#if searchResultItems}
     <SearchResultHighlighter text={normalization.escapeValue(truncatedValue)} {searchResultItems} />

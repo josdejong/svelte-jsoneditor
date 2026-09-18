@@ -7,6 +7,7 @@
   import { createValueSelection, getFocusPath, isEditingSelection } from '$lib/logic/selection.js'
   import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass.js'
   import EditableDiv from '../../../components/controls/EditableDiv.svelte'
+  import { t } from '$lib/i18n/index.js'
   import {
     type FindNextInside,
     type JSONParser,
@@ -117,7 +118,7 @@
 <EditableDiv
   value={normalization.escapeValue(value)}
   initialValue={isEditingSelection(selection) ? selection.initialValue : undefined}
-  label="Edit value"
+  label={$t('editValue')}
   onChange={handleChangeValue}
   onCancel={handleCancelChange}
   onPaste={handlePaste}

@@ -53,6 +53,9 @@
     <li>
       <a href="examples/read_only">Read only</a>
     </li>
+    <li>
+      <a href="examples/switch_language">Switch language (i18n)</a>
+    </li>
   </ul>
 
   <h2>Development</h2>

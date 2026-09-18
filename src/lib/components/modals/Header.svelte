@@ -7,6 +7,7 @@
     faTimes,
     faUpRightAndDownLeftFromCenter
   } from '@fortawesome/free-solid-svg-icons'
+  import { t } from '$lib/i18n/index.js'
 
   export let title = 'Modal'
   export let fullScreenButton: boolean = false
@@ -23,7 +24,7 @@
     <button
       type="button"
       class="jse-fullscreen"
-      title="Toggle full screen"
+      title={$t('toggleFullScreen')}
       on:click={() => (fullscreen = !fullscreen)}
     >
       <Icon data={fullscreen ? faDownLeftAndUpRightToCenter : faUpRightAndDownLeftFromCenter} />

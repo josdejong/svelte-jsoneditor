@@ -9,6 +9,7 @@
   import type { JSONPath } from 'immutable-json-patch'
   import { setIn } from 'immutable-json-patch'
   import type { PathOption, QueryLanguageOptions } from '$lib/types.js'
+  import { t } from '$lib/i18n/index.js'
 
   const debug = createDebug('jsoneditor:TransformWizard')
 
@@ -20,28 +21,37 @@
   $: jsonIsArray = Array.isArray(json)
   $: paths = jsonIsArray ? getNestedPaths(json) : []
   $: pathsIncludingObjects = jsonIsArray ? getNestedPaths(json, true) : []
-  $: fieldOptions = paths.map(pathToOption)
-  $: projectionOptions = pathsIncludingObjects ? pathsIncludingObjects.map(pathToOption) : []
+  $: fieldOptions = paths.map((path) => pathToOption(path, $t('itemRoot')))
+  $: projectionOptions = pathsIncludingObjects
+    ? pathsIncludingObjects.map((path) => pathToOption(path, $t('itemRoot')))
+    : []
 
   const filterRelationOptions = ['==', '!=', '<', '<=', '>', '>='].map((relation) => ({
     value: relation,
     label: relation
   }))
 
-  const sortDirectionOptions = [
-    { value: 'asc', label: 'ascending' },
-    { value: 'desc', label: 'descending' }
+  $: sortDirectionOptions = [
+    { value: 'asc', label: $t('sortAscending') },
+    { value: 'desc', label: $t('sortDescending') }
   ]
 
   // TODO: the binding with the select boxes is very cumbersome. Can we simplify this?
-  let filterPath = queryOptions?.filter?.path ? pathToOption(queryOptions.filter.path) : undefined
+  let filterPath = queryOptions?.filter?.path
+    ? pathToOption(queryOptions.filter.path, $t('itemRoot'))
+    : undefined
   let filterRelation =
     filterRelationOptions.find((option) => option.value === queryOptions.filter?.relation) ??
     filterRelationOptions[0]
   let filterValue = queryOptions?.filter?.value || ''
-  let sortPath = queryOptions?.sort?.path ? pathToOption(queryOptions.sort.path) : undefined
-  let sortDirection =
-    sortDirectionOptions.find((option) => option.value === queryOptions.sort?.direction) ??
+  let sortPath = queryOptions?.sort?.path
+    ? pathToOption(queryOptions.sort.path, $t('itemRoot'))
+    : undefined
+  // the sort direction is kept as a plain value and not as the option of the
+  // select box, so that the labels of the options follow the language
+  let sortDirectionValue = queryOptions.sort?.direction ?? 'asc'
+  $: sortDirection =
+    sortDirectionOptions.find((option) => option.value === sortDirectionValue) ??
     sortDirectionOptions[0]
 
   $: projectionPaths =
@@ -110,12 +120,13 @@
 <table class="jse-transform-wizard">
   <tbody>
     <tr>
-      <th>Filter</th>
+      <th>{$t('filter')}</th>
       <td>
         <div class="jse-horizontal">
           <Select
             class="jse-filter-path"
             showChevron
+            placeholder={$t('pleaseSelect')}
             items={fieldOptions}
             bind:value={filterPath}
           />
@@ -131,28 +142,36 @@
       </td>
     </tr>
     <tr>
-      <th>Sort</th>
+      <th>{$t('sort')}</th>
       <td>
         <div class="jse-horizontal">
-          <Select class="jse-sort-path" showChevron items={fieldOptions} bind:value={sortPath} />
+          <Select
+            class="jse-sort-path"
+            showChevron
+            placeholder={$t('pleaseSelect')}
+            items={fieldOptions}
+            bind:value={sortPath}
+          />
           <Select
             class="jse-sort-direction"
             showChevron
             clearable={false}
             items={sortDirectionOptions}
-            bind:value={sortDirection}
+            value={sortDirection}
+            on:input={(event) => (sortDirectionValue = event.detail?.value)}
           />
         </div>
       </td>
     </tr>
     <tr>
-      <th>Pick</th>
+      <th>{$t('pick')}</th>
       <td>
         <div class="jse-horizontal">
           <Select
             class="jse-projection-paths"
             multiple
             showChevron
+            placeholder={$t('pleaseSelect')}
             items={projectionOptions}
             bind:value={projectionPaths}
           />

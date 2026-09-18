@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '$lib/i18n/index.js'
   import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
   import Icon from 'svelte-awesome'
   import { getContext } from 'svelte'
@@ -13,7 +14,7 @@
 
   $: text =
     isNestedValidationError(validationError) && validationError.isChildError
-      ? 'Contains invalid data'
+      ? $t('containsInvalidData')
       : validationError.message
 </script>
 

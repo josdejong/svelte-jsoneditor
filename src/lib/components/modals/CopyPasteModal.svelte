@@ -4,6 +4,7 @@
   import { isMacDevice } from '$lib/utils/navigatorUtils.js'
   import Header from './Header.svelte'
   import Modal from './Modal.svelte'
+  import { t } from '$lib/i18n/index.js'
 
   export let onClose: () => void
 
@@ -11,7 +12,7 @@
 </script>
 
 <Modal {onClose} className="jse-copy-paste">
-  <Header title="Copying and pasting" {onClose} />
+  <Header title={$t('copyingAndPasting')} {onClose} />
 
   <div class="jse-modal-contents">
     <div>Clipboard permission is disabled by your browser. You can use:</div>

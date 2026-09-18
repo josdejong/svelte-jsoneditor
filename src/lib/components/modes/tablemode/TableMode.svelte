@@ -42,6 +42,7 @@
     ValueNormalization
   } from '$lib/types'
   import { Mode, SortDirection, ValidationSeverity } from '$lib/types.js'
+  import { t } from '$lib/i18n/index.js'
   import TableMenu from './menu/TableMenu.svelte'
   import {
     compileJSONPointer,
@@ -536,7 +537,7 @@
           newValidationErrors = [
             {
               path: [],
-              message: 'Failed to validate: ' + (err as Error).message,
+              message: $t('failedToValidate') + (err as Error).message,
               severity: ValidationSeverity.warning
             }
           ]
@@ -973,9 +974,7 @@
     }
 
     const props = {
-      tip: showTip
-        ? 'Tip: you can open this context menu via right-click or with Ctrl+Q'
-        : undefined,
+      tip: showTip ? $t('tipContextMenu') : undefined,
       items,
       onRequestClose: function () {
         closeAbsolutePopup(popupId)
@@ -1939,14 +1938,14 @@
       {#if pastedJson}
         <Message
           type="info"
-          message={`You pasted a JSON ${
-            Array.isArray(pastedJson.contents) ? 'array' : 'object'
-          } as text`}
+          message={$t('YouPastedAJsonMessage', {
+            content: Array.isArray(pastedJson.contents) ? 'array' : 'object'
+          })}
           actions={[
             {
               icon: faWrench,
-              text: 'Paste as JSON instead',
-              title: 'Paste the text as JSON instead of a single value',
+              text: $t('pasteAsJson'),
+              title: $t('pastTextAsJson'),
               // We use mousedown here instead of click: this message pops up
               // whilst the user is editing a value. When clicking this button,
               // the actual value is applied and the event is not propagated
@@ -1954,8 +1953,8 @@
               onMouseDown: handleParsePastedJson
             },
             {
-              text: 'Leave as is',
-              title: 'Keep the pasted content as a single value',
+              text: $t('leaveAsIs'),
+              title: $t('keepAsSingleValue'),
               onClick: handleClearPastedJson
             }
           ]}
@@ -1965,17 +1964,17 @@
       {#if pastedMultilineText}
         <Message
           type="info"
-          message="Multiline text was pasted as array"
+          message={$t('multilineTextPastedMessage')}
           actions={[
             {
               icon: faWrench,
-              text: 'Paste as string instead',
-              title: 'Paste the clipboard data as a single string value instead of an array',
+              text: $t('pasteAsStringInstead'),
+              title: $t('pastSingleString'),
               onClick: handleParsePastedMultilineText
             },
             {
-              text: 'Leave as is',
-              title: 'Keep the pasted array',
+              text: $t('leaveAsIs'),
+              title: $t('keepThePastedArray'),
               onClick: handleClearPastedMultilineText
             }
           ]}
@@ -1985,19 +1984,19 @@
       {#if textIsRepaired}
         <Message
           type="success"
-          message="The loaded JSON document was invalid but is successfully repaired."
+          message={$t('textRepairedSuccessMessage')}
           actions={!readOnly
             ? [
                 {
                   icon: faCheck,
-                  text: 'Ok',
-                  title: 'Accept the repaired document',
+                  text: $t('Ok'),
+                  title: $t('acceptRepairedDocument'),
                   onClick: acceptAutoRepair
                 },
                 {
                   icon: faCode,
-                  text: 'Repair manually instead',
-                  title: 'Leave the document unchanged and repair it manually instead',
+                  text: $t('repairManually'),
+                  title: $t('leaveTheDocUnchanged'),
                   onClick: handleRequestRepair
                 }
               ]
@@ -2010,13 +2009,13 @@
     {:else if parseError && text !== undefined && text !== ''}
       <Message
         type="error"
-        message="The loaded JSON document is invalid and could not be repaired automatically."
+        message={$t('invalidJsonNotRepairable')}
         actions={!readOnly
           ? [
               {
                 icon: faCode,
-                text: 'Repair manually',
-                title: 'Open the document in "code" mode and repair it manually',
+                text: $t('repairManually'),
+                title: $t('manuallyRepairWithCodeModeText'),
                 onClick: handleRequestRepair
               }
             ]

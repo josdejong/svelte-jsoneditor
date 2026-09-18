@@ -1,6 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
+  import { t } from '$lib/i18n/index.js'
   import type { JSONPath } from 'immutable-json-patch'
   import { existsIn, getIn } from 'immutable-json-patch'
   import { range } from 'lodash-es'
@@ -114,12 +115,12 @@
     class="jse-navigation-bar-edit"
     class:flex={!editing}
     class:editing
-    title={editing ? 'Cancel editing the selected path' : 'Edit the selected path'}
+    title={editing ? $t('cancelEditingPath') : $t('editSelectedPath')}
     on:click={toggleEditing}
   >
     <span class="jse-navigation-bar-space">
       <!-- ensure the right height (arrows have less height than the text) -->
-      {!isObjectOrArray(json) && !editing ? 'Navigation bar' : '\u00A0'}
+      {!isObjectOrArray(json) && !editing ? $t('navigationBar') : '\u00A0'}
     </span>
 
     <Icon data={editing ? faClose : faEdit} />

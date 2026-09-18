@@ -20,6 +20,7 @@ The library is written with Svelte, but can be used in plain JavaScript too and 
 - JSON schema validation and pluggable custom validation
 - Color highlighting, undo/redo, search and replace
 - Utilities like a color picker and timestamp tag
+- Translatable user interface (i18n)
 - Handles large JSON documents up to 512 MB
 
 ## Install
@@ -427,6 +428,14 @@ maxDocumentSizeTextMode: number
 ```
 
 In `text` mode, JSON documents with a total length greater than `maxDocumentSizeTextMode` will not be shown. Instead, a warning will be displayed indicating that the browser may crash if it attempts to load the document. The user can then choose to override the warning and open the document anyway, open the document in the lighter `tree` mode instead, or cancel. The default value is `10 * 1024 * 1024` bytes (10MB).
+
+#### language
+
+```ts
+language: Language
+```
+
+The language used for all texts in the user interface, like menus, tooltips, and messages. The default is `english`. See section [Language (i18n)](#language-i18n).
 
 #### onError
 
@@ -1066,6 +1075,59 @@ When updating CSS variables dynamically, it is necessary to refresh the via `edi
 </script>
 <JSONEditor bind:this="{editorRef}" ... />
 ```
+
+## Language (i18n)
+
+All texts of the user interface can be translated. The library ships with the languages `english` (default), `french`, `russian`, and `simplifiedChinese`. They are published in a separate entry point so your application only bundles the languages that it imports:
+
+```js
+import { JSONEditor } from 'svelte-jsoneditor'
+import { russian } from 'svelte-jsoneditor/locales'
+
+const editor = new JSONEditor({
+  target: document.getElementById('jsoneditor'),
+  props: {
+    language: russian
+  }
+})
+```
+
+In Svelte:
+
+```svelte
+<script>
+  import { JSONEditor } from 'svelte-jsoneditor'
+  import { russian } from 'svelte-jsoneditor/locales'
+
+  let content = { text: '{}' }
+</script>
+
+<JSONEditor bind:content language={russian} />
+```
+
+The `language` property can be changed at any time to switch the language of the editor.
+
+### Custom language
+
+A language is a plain object holding a `langCode` and the translated `values`. You can create your own language, or adjust an existing one:
+
+```js
+import { english } from 'svelte-jsoneditor/locales'
+
+const pirate = {
+  langCode: 'en-PI',
+  values: {
+    ...english.values,
+    cut: 'Plunder',
+    copy: 'Loot',
+    paste: 'Bury'
+  }
+}
+```
+
+The type `Language` and the full list of keys (`TranslationKey`) are defined in [/src/lib/types.ts](/src/lib/types.ts), and the built-in languages in [/src/lib/i18n/locales](/src/lib/i18n/locales) (one file per language). Keys that are missing in a language fall back to `english`, so a custom or outdated language never shows an empty text.
+
+Contributions of new languages are welcome: add a file to [/src/lib/i18n/locales](/src/lib/i18n/locales) and export it from `index.ts` there. TypeScript will tell you if a key is missing.
 
 ## Immutability
 

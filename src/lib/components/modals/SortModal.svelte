@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { isEmpty } from 'lodash-es'
+  import { isEmpty, isEqual } from 'lodash-es'
   import Select from 'svelte-select'
   import Header from './Header.svelte'
   import { getNestedPaths } from '$lib/utils/arrayUtils.js'
@@ -12,6 +12,7 @@
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
   import { createDebug } from '$lib/utils/debug.js'
   import type { OnSort } from '$lib/types.js'
+  import { t } from '$lib/i18n/index.js'
   import Modal from './Modal.svelte'
 
   const debug = createDebug('jsoneditor:SortModal')
@@ -25,29 +26,31 @@
   $: selectedJson = getIn(json, rootPath)
   $: jsonIsArray = Array.isArray(selectedJson)
   $: paths = jsonIsArray ? getNestedPaths(selectedJson) : undefined
-  $: properties = paths ? paths.map(pathToOption) : undefined
+  $: properties = paths ? paths.map((path) => pathToOption(path, $t('itemRoot'))) : undefined
 
-  const asc = {
-    value: 1,
-    label: 'ascending'
-  }
-  const desc = {
-    value: -1,
-    label: 'descending'
-  }
-  const directions = [asc, desc]
+  $: directions = [
+    { value: 1 as const, label: $t('sortAscending') },
+    { value: -1 as const, label: $t('sortDescending') }
+  ]
 
   const stateId = `${id}:${compileJSONPointer(rootPath)}`
-  let selectedProperty = sortModalStates[stateId]?.selectedProperty
-  let selectedDirection = sortModalStates[stateId]?.selectedDirection || asc
+
+  // the selected values are kept as plain values and not as the options of the
+  // select boxes, so that the labels of the options follow the language
+  let selectedPath: JSONPath | undefined = sortModalStates[stateId]?.selectedPath
+  let selectedDirectionValue: 1 | -1 = sortModalStates[stateId]?.selectedDirection ?? 1
   let sortError: string | undefined = undefined
+
+  $: selectedProperty = properties?.find((option) => isEqual(option.value, selectedPath))
+  $: selectedDirection =
+    directions.find((option) => option.value === selectedDirectionValue) ?? directions[0]
 
   $: {
     // remember the selected values for the next time we open the SortModal
     // just in memory, not persisted
     sortModalStates[stateId] = {
-      selectedProperty,
-      selectedDirection
+      selectedPath,
+      selectedDirection: selectedDirectionValue
     }
 
     debug('store state in memory', stateId, sortModalStates[stateId])
@@ -76,7 +79,7 @@
 </script>
 
 <Modal {onClose} className="jse-sort-modal">
-  <Header title={jsonIsArray ? 'Sort array items' : 'Sort object keys'} {onClose} />
+  <Header title={jsonIsArray ? $t('sortArrayItems') : $t('sortObjectKeys')} {onClose} />
 
   <div class="jse-modal-contents">
     <table>
@@ -86,35 +89,43 @@
       </colgroup>
       <tbody>
         <tr>
-          <th>Path</th>
+          <th>{$t('path')}</th>
           <td>
             <input
               class="jse-path"
               type="text"
               readonly
-              title="Selected path"
+              title={$t('selectedPath')}
               value={rootPath && !isEmpty(rootPath)
                 ? stringifyJSONPath(rootPath)
-                : '(document root)'}
+                : `(${$t('docRoot')})`}
             />
           </td>
         </tr>
         {#if jsonIsArray && properties && properties?.length > 1}
           <tr>
-            <th>Property</th>
+            <th>{$t('property')}</th>
             <td>
-              <Select showChevron items={properties} bind:value={selectedProperty} />
+              <Select
+                showChevron
+                placeholder={$t('pleaseSelect')}
+                items={properties}
+                value={selectedProperty}
+                on:input={(event) => (selectedPath = event.detail?.value)}
+                on:clear={() => (selectedPath = undefined)}
+              />
             </td>
           </tr>
         {/if}
         <tr>
-          <th>Direction</th>
+          <th>{$t('direction')}</th>
           <td>
             <Select
               showChevron
               clearable={false}
               items={directions}
-              bind:value={selectedDirection}
+              value={selectedDirection}
+              on:input={(event) => (selectedDirectionValue = event.detail?.value)}
             />
           </td>
         </tr>
@@ -137,7 +148,7 @@
         use:focus
         disabled={jsonIsArray && properties && properties?.length > 1 ? !selectedProperty : false}
       >
-        Sort
+        {$t('sort')}
       </button>
     </div>
   </div>

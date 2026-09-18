@@ -1,8 +1,8 @@
-import type { NumberOption, PathOption } from '$lib/types.js'
+import type { JSONPath } from 'immutable-json-patch'
 
 export interface SortModalState {
-  selectedProperty: PathOption
-  selectedDirection: NumberOption
+  selectedPath: JSONPath | undefined
+  selectedDirection: 1 | -1
 }
 
 export const sortModalStates: Record<string, SortModalState> = {}

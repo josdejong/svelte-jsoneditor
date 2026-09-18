@@ -165,6 +165,7 @@
   import createTreeContextMenuItems from './contextmenu/createTreeContextMenuItems'
   import { toRecursiveSearchResults as toRecursiveSearchResults } from 'svelte-jsoneditor/logic/search.js'
   import { isTreeHistoryItem } from 'svelte-jsoneditor'
+  import { t } from '$lib/i18n/index.js'
 
   const debug = createDebug('jsoneditor:TreeMode')
 
@@ -391,7 +392,7 @@
           newValidationErrorList = [
             {
               path: [],
-              message: 'Failed to validate: ' + (err as Error).message,
+              message: $t('failedToValidate') + (err as Error).message,
               severity: ValidationSeverity.warning
             }
           ]
@@ -1706,9 +1707,7 @@
     }
 
     const props = {
-      tip: showTip
-        ? 'Tip: you can open this context menu via right-click or with Ctrl+Q'
-        : undefined,
+      tip: showTip ? $t('tipContextMenu') : undefined,
       items,
       onRequestClose: () => closeAbsolutePopup(popupId)
     }
@@ -1997,13 +1996,13 @@
       {:else}
         <Message
           type="error"
-          message="The loaded JSON document is invalid and could not be repaired automatically."
+          message={$t('invalidJsonNotRepairable')}
           actions={!readOnly
             ? [
                 {
                   icon: faCode,
-                  text: 'Repair manually',
-                  title: 'Open the document in "code" mode and repair it manually',
+                  text: $t('repairManually'),
+                  title: $t('repairManuallyTitle'),
                   onClick: handleRequestRepair
                 }
               ]
@@ -2052,8 +2051,8 @@
           actions={[
             {
               icon: faWrench,
-              text: 'Paste as JSON instead',
-              title: 'Replace the value with the pasted JSON',
+              text: $t('pasteAsJson'),
+              title: $t('replaceValueWithJson'),
               // We use mousedown here instead of click: this message pops up
               // whilst the user is editing a value. When clicking this button,
               // the actual value is applied and the event is not propagated
@@ -2061,8 +2060,8 @@
               onMouseDown: handleParsePastedJson
             },
             {
-              text: 'Leave as is',
-              title: 'Keep the JSON embedded in the value',
+              text: $t('leaveAsIs'),
+              title: $t('leaveAsIsTitle'),
               onClick: handleClearPastedJson
             }
           ]}
@@ -2072,17 +2071,17 @@
       {#if pastedMultilineText}
         <Message
           type="info"
-          message="Multiline text was pasted as array"
+          message={$t('multilinePastedAsArray')}
           actions={[
             {
               icon: faWrench,
-              text: 'Paste as string instead',
-              title: 'Paste the clipboard data as a single string value instead of an array',
+              text: $t('pasteAsStrInstead'),
+              title: $t('pasteAsStrInsteadTitle'),
               onClick: handleParsePastedMultilineText
             },
             {
-              text: 'Leave as is',
-              title: 'Keep the pasted array',
+              text: $t('leaveAsIs'),
+              title: $t('leaveAsIsTitle'),
               onClick: handleClearPastedMultilineText
             }
           ]}
@@ -2092,19 +2091,19 @@
       {#if textIsRepaired}
         <Message
           type="success"
-          message="The loaded JSON document was invalid but is successfully repaired."
+          message={$t('autoRepairSuccess')}
           actions={!readOnly
             ? [
                 {
                   icon: faCheck,
-                  text: 'Ok',
-                  title: 'Accept the repaired document',
+                  text: $t('acceptRepair'),
+                  title: $t('acceptRepairTitle'),
                   onClick: acceptAutoRepair
                 },
                 {
                   icon: faCode,
-                  text: 'Repair manually instead',
-                  title: 'Leave the document unchanged and repair it manually instead',
+                  text: $t('repairManually'),
+                  title: $t('repairManuallyInsteadTitle'),
                   onClick: handleRequestRepair
                 }
               ]

@@ -8,6 +8,7 @@
   import { getContext } from 'svelte'
   import ColorPickerPopup from '../../../components/controls/ColorPickerPopup.svelte'
   import type { AbsolutePopupContext, OnPatch } from '$lib/types.js'
+  import { t } from '$lib/i18n/index.js'
 
   const { openAbsolutePopup } = getContext<AbsolutePopupContext>('absolute-popup')
 
@@ -18,7 +19,7 @@
   export let focus: () => void
 
   $: color = getColorCSS(value)
-  $: title = !readOnly ? 'Click to open a color picker' : `Color ${value}`
+  $: title = !readOnly ? $t('openColorPicker') : $t('colorValue', { value })
 
   function onChange(color: string) {
     onPatch([

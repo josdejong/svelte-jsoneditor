@@ -13,6 +13,7 @@
   import { normalizeJsonParseError } from '$lib/utils/jsonUtils.js'
   import Menu from '../../controls/Menu.svelte'
   import type { MenuItem, ParseError } from '$lib/types.js'
+  import { t } from '$lib/i18n/index.js'
 
   export let text = ''
   export let readOnly = false
@@ -98,7 +99,7 @@
     {
       type: 'button',
       icon: faTimes,
-      title: 'Cancel repair',
+      title: $t('cancelRepair'),
       className: 'jse-cancel',
       onClick: onCancel
     }
@@ -106,15 +107,15 @@
 
   $: gotoAction = {
     icon: faArrowDown,
-    text: 'Show me',
-    title: 'Scroll to the error location',
+    text: $t('showMe'),
+    title: $t('scrollToError'),
     onClick: goToError
   }
 
   $: repairAction = {
     icon: faWrench,
-    text: 'Auto repair',
-    title: 'Automatically repair JSON',
+    text: $t('autoRepair'),
+    title: $t('autoRepairJson'),
     onClick: handleRepair
   }
 
@@ -123,8 +124,8 @@
   $: successActions = [
     {
       icon: faCheck,
-      text: 'Apply',
-      title: 'Apply fixed JSON',
+      text: $t('apply'),
+      title: $t('applyFixedJson'),
       disabled: readOnly,
       onClick: handleApply
     }
@@ -133,22 +134,18 @@
 
 <div class="jse-json-repair-component">
   <Menu {items}>
-    <div slot="left" class="jse-info">Repair invalid JSON, then click apply</div>
+    <div slot="left" class="jse-info">{$t('repairInvalidJson')}</div>
   </Menu>
 
   {#if error}
     <Message
       type="error"
       icon={faExclamationTriangle}
-      message={`Cannot parse JSON: ${error.message}`}
+      message={`${$t('cannotParseJson')}: ${error.message}`}
       actions={errorActions}
     />
   {:else}
-    <Message
-      type="success"
-      message="JSON is valid now and can be parsed."
-      actions={successActions}
-    />
+    <Message type="success" message={$t('jsonIsValidNow')} actions={successActions} />
   {/if}
   <textarea
     bind:this={domTextArea}

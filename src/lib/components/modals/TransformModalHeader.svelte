@@ -6,6 +6,7 @@
   import { faCog } from '@fortawesome/free-solid-svg-icons'
   import SelectQueryLanguage from '../controls/selectQueryLanguage/SelectQueryLanguage.svelte'
   import type { AbsolutePopupContext, OnChangeQueryLanguage, QueryLanguage } from '$lib/types.js'
+  import { t } from '$lib/i18n/index.js'
   import Header from './Header.svelte'
 
   export let queryLanguages: QueryLanguage[]
@@ -39,7 +40,7 @@
   }
 </script>
 
-<Header title="Transform" fullScreenButton={true} bind:fullscreen {onClose}>
+<Header title={$t('transform')} fullScreenButton={true} bind:fullscreen {onClose}>
   <button
     slot="actions"
     type="button"
@@ -47,7 +48,7 @@
     class="jse-config"
     class:hide={queryLanguages.length <= 1}
     on:click={openConfig}
-    title="Select a query language"
+    title={$t('selectQueryLanguage')}
   >
     <Icon data={faCog} />
   </button>

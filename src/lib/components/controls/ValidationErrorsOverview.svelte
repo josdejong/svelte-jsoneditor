@@ -12,6 +12,7 @@
   import { ValidationSeverity, type ValidationError } from '$lib/types.js'
   import { MAX_VALIDATION_ERRORS } from '$lib/constants.js'
   import { limit } from '$lib/utils/arrayUtils.js'
+  import { t } from '$lib/i18n/index.js'
 
   export let validationErrors: ValidationError[]
   export let selectError: (error: ValidationError) => void
@@ -68,7 +69,7 @@
                     type="button"
                     class="jse-validation-errors-collapse"
                     on:click|stopPropagation={collapse}
-                    title="Collapse validation errors"
+                    title={$t('collapseValidationErrors')}
                   >
                     <Icon data={faAngleDown} />
                   </button>
