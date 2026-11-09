@@ -2,7 +2,7 @@
 
 <script lang="ts">
   import Icon from 'svelte-awesome'
-  import type { MessageAction } from '$lib/types'
+  import type { MessageAction } from '#lib/types.js'
   import type { IconDefinition } from '@fortawesome/free-solid-svg-icons'
   import { onDestroy } from 'svelte'
 

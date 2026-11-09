@@ -6,7 +6,7 @@
   import NavigationBarDropdown from '../../../components/controls/navigationBar/NavigationBarDropdown.svelte'
   import { getContext } from 'svelte'
   import type { JSONPath } from 'immutable-json-patch'
-  import type { AbsolutePopupContext } from '$lib/types'
+  import type { AbsolutePopupContext } from '#lib/types.js'
 
   const { openAbsolutePopup, closeAbsolutePopup } =
     getContext<AbsolutePopupContext>('absolute-popup')

@@ -38,7 +38,7 @@ import {
   type OnExpand,
   type ValueDocumentState,
   type VisibleSection
-} from '$lib/types.js'
+} from '#lib/types.js'
 import {
   deleteIn,
   getIn,
@@ -47,7 +47,7 @@ import {
   setIn,
   updateIn
 } from 'immutable-json-patch'
-import { isArrayRecursiveState } from 'svelte-jsoneditor'
+import { isArrayRecursiveState } from '#lib/typeguards.js'
 
 const json3 = [{ id: 0 }, { id: 1 }, { id: 2 }]
 const documentState3: DocumentState = {

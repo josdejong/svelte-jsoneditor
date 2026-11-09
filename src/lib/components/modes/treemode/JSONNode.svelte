@@ -12,9 +12,9 @@
     HOVER_INSERT_AFTER,
     HOVER_INSERT_INSIDE,
     INSERT_EXPLANATION
-  } from '$lib/constants.js'
-  import { getEnforceString, getVisibleCaretPositions } from '$lib/logic/documentState.js'
-  import { rename } from '$lib/logic/operations.js'
+  } from '#lib/constants.js'
+  import { getEnforceString, getVisibleCaretPositions } from '#lib/logic/documentState.js'
+  import { rename } from '#lib/logic/operations.js'
   import {
     createAfterSelection,
     createInsideSelection,
@@ -34,22 +34,22 @@
     isValueSelection,
     pathInSelection,
     selectionIfOverlapping
-  } from '$lib/logic/selection.js'
+  } from '#lib/logic/selection.js'
   import {
     getDataPathFromTarget,
     getSelectionTypeFromTarget,
     isChildOfAttribute,
     isChildOfNodeName,
     isContentEditableDiv
-  } from '$lib/utils/domUtils.js'
+  } from '#lib/utils/domUtils.js'
   import CollapsedItems from './CollapsedItems.svelte'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
   import JSONKey from './JSONKey.svelte'
   import JSONValue from './JSONValue.svelte'
   import { singleton } from './singleton.js'
-  import { createDebug } from '$lib/utils/debug.js'
-  import { onMoveSelection } from '$lib/logic/dragging.js'
-  import { forEachIndex, moveItems } from '$lib/utils/arrayUtils.js'
+  import { createDebug } from '#lib/utils/debug.js'
+  import { onMoveSelection } from '#lib/logic/dragging.js'
+  import { forEachIndex, moveItems } from '#lib/utils/arrayUtils.js'
   import type {
     AbsolutePopupOptions,
     CaretPosition,
@@ -62,19 +62,19 @@
     RenderedItem,
     TreeModeContext,
     VisibleSection
-  } from '$lib/types'
-  import { SelectionType } from '$lib/types.js'
+  } from '#lib/types.js'
+  import { SelectionType } from '#lib/types.js'
   import {
     isArrayRecursiveState,
     isExpandableState,
     isObjectRecursiveState
-  } from '$lib/typeguards.js'
-  import { filterKeySearchResults, filterValueSearchResults } from '$lib/logic/search.js'
+  } from '#lib/typeguards.js'
+  import { filterKeySearchResults, filterValueSearchResults } from '#lib/logic/search.js'
   import ValidationErrorIcon from './ValidationErrorIcon.svelte'
-  import { isObject } from '$lib/utils/typeUtils.js'
-  import { classnames } from '$lib/utils/cssUtils.js'
-  import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
-  import Tag from '../../../components/controls/Tag.svelte'
+  import { isObject } from '#lib/utils/typeUtils.js'
+  import { classnames } from '#lib/utils/cssUtils.js'
+  import { isCtrlKeyDown } from '#lib/utils/keyBindings.js'
+  import Tag from '#lib/components/controls/Tag.svelte'
   import { flushSync } from 'svelte'
 
   // We pass `pointer` instead of `path` because pointer (a string) is immutable.

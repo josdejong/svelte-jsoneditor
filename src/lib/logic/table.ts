@@ -6,14 +6,14 @@ import {
   parseJSONPointer
 } from 'immutable-json-patch'
 import { groupBy, isEmpty, isEqual, mapValues, partition } from 'lodash-es'
-import type { JSONSelection, SortedColumn, TableCellIndex, ValidationError } from '$lib/types.js'
-import { ValidationSeverity } from '$lib/types.js'
+import type { JSONSelection, SortedColumn, TableCellIndex, ValidationError } from '#lib/types.js'
+import { ValidationSeverity } from '#lib/types.js'
 import { createValueSelection, getFocusPath, pathStartsWith } from './selection.js'
 import { containsNumber } from '../utils/numberUtils.js'
 import type { Dictionary } from 'lodash'
-import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
-import { forEachSample } from '$lib/utils/arrayUtils.js'
-import { isObject } from '$lib/utils/typeUtils.js'
+import { stringifyJSONPath } from '#lib/utils/pathUtils.js'
+import { forEachSample } from '#lib/utils/arrayUtils.js'
+import { isObject } from '#lib/utils/typeUtils.js'
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore

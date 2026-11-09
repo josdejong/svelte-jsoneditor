@@ -22,9 +22,9 @@ import type {
   SearchResultItem,
   ObjectSearchResults,
   ArraySearchResults
-} from '$lib/types.js'
-import { SearchField } from '$lib/types.js'
-import { createKeySelection, createValueSelection } from './selection.js'
+} from '#lib/types.js'
+import { SearchField } from '#lib/types.js'
+import { createKeySelection, createValueSelection } from '#lib/logic/selection.js'
 
 describe('search', () => {
   test('search in JSON', () => {

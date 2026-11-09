@@ -2,13 +2,13 @@
 
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
-  import { addNewLineSuffix, removeNewLineSuffix, setCursorToEnd } from '$lib/utils/domUtils.js'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
-  import { createDebug } from '$lib/utils/debug.js'
+  import { addNewLineSuffix, removeNewLineSuffix, setCursorToEnd } from '#lib/utils/domUtils.js'
+  import { keyComboFromEvent } from '#lib/utils/keyBindings.js'
+  import { createDebug } from '#lib/utils/debug.js'
   import { noop } from 'lodash-es'
-  import type { OnFind, OnPaste } from '$lib/types'
-  import { UpdateSelectionAfterChange } from '$lib/types'
-  import { classnames } from '$lib/utils/cssUtils.js'
+  import type { OnFind, OnPaste } from '#lib/types.js'
+  import { UpdateSelectionAfterChange } from '#lib/types.js'
+  import { classnames } from '#lib/utils/cssUtils.js'
 
   const debug = createDebug('jsoneditor:EditableDiv')
 

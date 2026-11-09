@@ -2,14 +2,14 @@
 
 <script lang="ts">
   import type { JSONPath } from 'immutable-json-patch'
-  import type { SortedColumn } from '$lib/types.js'
-  import { SortDirection } from '$lib/types.js'
-  import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
+  import type { SortedColumn } from '#lib/types.js'
+  import { SortDirection } from '#lib/types.js'
+  import { stringifyJSONPath } from '#lib/utils/pathUtils.js'
   import Icon from 'svelte-awesome'
   import { faCaretDown, faCaretUp } from '@fortawesome/free-solid-svg-icons'
   import { isEmpty, isEqual } from 'lodash-es'
-  import { MAX_HEADER_NAME_CHARACTERS, SORT_DIRECTION_NAMES } from '$lib/constants.js'
-  import { truncate } from '$lib/utils/stringUtils.js'
+  import { MAX_HEADER_NAME_CHARACTERS, SORT_DIRECTION_NAMES } from '#lib/constants.js'
+  import { truncate } from '#lib/utils/stringUtils.js'
 
   export let path: JSONPath
   export let sortedColumn: SortedColumn | undefined

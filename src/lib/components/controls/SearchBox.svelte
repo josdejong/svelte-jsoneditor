@@ -12,10 +12,10 @@
     faSearch,
     faTimes
   } from '@fortawesome/free-solid-svg-icons'
-  import { DEBOUNCE_DELAY, MAX_SEARCH_RESULTS } from '$lib/constants.js'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
-  import { createDebug } from '$lib/utils/debug.js'
-  import type { DocumentState, JSONParser, OnPatch, SearchResultDetails } from '$lib/types.js'
+  import { DEBOUNCE_DELAY, MAX_SEARCH_RESULTS } from '#lib/constants.js'
+  import { keyComboFromEvent } from '#lib/utils/keyBindings.js'
+  import { createDebug } from '#lib/utils/debug.js'
+  import type { DocumentState, JSONParser, OnPatch, SearchResultDetails } from '#lib/types.js'
   import {
     createSearchAndReplaceAllOperations,
     createSearchAndReplaceOperations,
@@ -23,7 +23,7 @@
     searchNext,
     searchPrevious,
     updateSearchResult
-  } from '$lib/logic/search.js'
+  } from '#lib/logic/search.js'
   import type { JSONPath } from 'immutable-json-patch'
   import { flushSync } from 'svelte'
 

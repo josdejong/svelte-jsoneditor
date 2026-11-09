@@ -121,9 +121,9 @@
     "@rollup/plugin-typescript": "12.3.0",
     "@semantic-release/commit-analyzer": "13.0.1",
     "@semantic-release/release-notes-generator": "14.1.1",
-    "@sveltejs/adapter-static": "3.0.10",
-    "@sveltejs/kit": "2.70.1",
-    "@sveltejs/package": "2.5.8",
+    "@sveltejs/adapter-static": "4.0.1",
+    "@sveltejs/kit": "3.1.1",
+    "@sveltejs/package": "3.0.2",
     "@sveltejs/vite-plugin-svelte": "7.2.0",
     "@testing-library/jest-dom": "7.0.0",
     "@testing-library/svelte": "5.4.2",
@@ -153,13 +153,17 @@
     "rollup-plugin-postcss": "4.0.2",
     "rollup-plugin-svelte": "7.2.3",
     "semantic-release": "25.0.8",
-    "svelte": "5.56.7",
-    "svelte-check": "4.7.3",
+    "svelte": "5.57.3",
+    "svelte-check": "4.7.8",
     "svelte-eslint-parser": "1.8.0",
     "svelte-preprocess": "6.0.5",
     "tslib": "2.8.1",
     "typescript": "6.0.3",
     "vite": "8.1.5",
     "vitest": "4.1.10"
+  },
+  "imports": {
+    "#lib": "./src/lib/index.js",
+    "#lib/*": "./src/lib/*"
   }
 }

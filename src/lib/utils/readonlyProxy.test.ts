@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { readonlyProxy } from '$lib/utils/readonlyProxy.js'
+import { readonlyProxy } from '#lib/utils/readonlyProxy.js'
 
 describe('readonlyProxy', () => {
   const objOriginal = createNestedObject()

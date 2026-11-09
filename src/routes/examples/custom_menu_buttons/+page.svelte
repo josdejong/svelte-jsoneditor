@@ -7,7 +7,7 @@
     type RenderMenuContext
   } from 'svelte-jsoneditor'
   import { faCopy } from '@fortawesome/free-regular-svg-icons'
-  import copyToClipboard from '$lib/utils/copyToClipboard.js'
+  import copyToClipboard from '#lib/utils/copyToClipboard.js'
 
   let content = $state({
     text: undefined, // can be used to pass a stringified JSON document instead

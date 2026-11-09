@@ -5,7 +5,7 @@
   import Icon from 'svelte-awesome'
   import { faCog } from '@fortawesome/free-solid-svg-icons'
   import SelectQueryLanguage from '../controls/selectQueryLanguage/SelectQueryLanguage.svelte'
-  import type { AbsolutePopupContext, OnChangeQueryLanguage, QueryLanguage } from '$lib/types.js'
+  import type { AbsolutePopupContext, OnChangeQueryLanguage, QueryLanguage } from '#lib/types.js'
   import Header from './Header.svelte'
 
   export let queryLanguages: QueryLanguage[]

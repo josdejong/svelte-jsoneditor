@@ -24,18 +24,18 @@ import {
   isMultiSelection,
   isValueSelection,
   singleItemSelected
-} from '$lib/logic/selection'
+} from '#lib/logic/selection.js'
 import type {
   ConvertType,
   DocumentState,
   InsertType,
   JSONSelection,
   ContextMenuItem
-} from '$lib/types'
+} from '#lib/types.js'
 import { initial, isEmpty } from 'lodash-es'
 import { getIn } from 'immutable-json-patch'
-import { isObject, isObjectOrArray } from '$lib/utils/typeUtils'
-import { getEnforceString } from '$lib/logic/documentState'
+import { isObject, isObjectOrArray } from '#lib/utils/typeUtils.js'
+import { getEnforceString } from '#lib/logic/documentState.js'
 
 export default function ({
   json,

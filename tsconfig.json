@@ -1,20 +1,17 @@
 {
-  "extends": "./.svelte-kit/tsconfig.json",
+  "extends": "$app/tsconfig",
   "compilerOptions": {
-    "moduleResolution": "bundler",
     "module": "es2020",
     "lib": ["es2020", "dom"],
     "target": "es2020",
-    "isolatedModules": true,
-    "resolveJsonModule": true,
-    "sourceMap": true, // To have warnings/errors of the Svelte compiler at the correct position, enable source maps
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "sourceMap": true,
     "strict": true,
     "noImplicitAny": true,
     "allowJs": false,
-    "checkJs": false
+    "checkJs": false,
+    "paths": {
+      "svelte-jsoneditor": ["./src/lib"]
+    }
   },
   "include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.ts", "src/**/*.svelte"]
 }

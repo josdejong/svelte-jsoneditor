@@ -1,19 +1,19 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { uniqueId } from '$lib/utils/uniqueId.js'
+  import { uniqueId } from '#lib/utils/uniqueId.js'
   import { faCaretDown, faCaretRight } from '@fortawesome/free-solid-svg-icons'
   import { debounce, isEmpty, noop } from 'lodash-es'
   import Icon from 'svelte-awesome'
-  import { DEBOUNCE_DELAY } from '$lib/constants.js'
+  import { DEBOUNCE_DELAY } from '#lib/constants.js'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, getIn } from 'immutable-json-patch'
-  import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
+  import { stringifyJSONPath } from '#lib/utils/pathUtils.js'
   import { transformModalStates, transformModalStateShared } from './transformModalStates.js'
   import TransformWizard from './TransformWizard.svelte'
   import TransformModalHeader from './TransformModalHeader.svelte'
   import AbsolutePopup from './popup/AbsolutePopup.svelte'
-  import { createDebug } from '$lib/utils/debug.js'
+  import { createDebug } from '#lib/utils/debug.js'
   import TreeMode from '../modes/treemode/TreeMode.svelte'
   import type {
     Content,
@@ -28,12 +28,12 @@
     OnRenderValue,
     QueryLanguage,
     QueryLanguageOptions
-  } from '$lib/types.js'
-  import { onEscape } from '$lib/actions/onEscape.js'
-  import { readonlyProxy } from '$lib/utils/readonlyProxy.js'
+  } from '#lib/types.js'
+  import { onEscape } from '#lib/actions/onEscape.js'
+  import { readonlyProxy } from '#lib/utils/readonlyProxy.js'
   import Modal from './Modal.svelte'
   import { onMount } from 'svelte'
-  import { createHistoryInstance } from '$lib/logic/history'
+  import { createHistoryInstance } from '#lib/logic/history.js'
 
   const debug = createDebug('jsoneditor:TransformModal')
 

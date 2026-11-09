@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash-es'
 import type { JSONPath } from 'immutable-json-patch'
-import type { PathOption } from '$lib/types.js'
+import type { PathOption } from '#lib/types.js'
 
 /**
  **

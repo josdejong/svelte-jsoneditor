@@ -21,7 +21,7 @@ import {
   selectionToPartialJson
 } from './selection.js'
 import { createDocumentState } from './documentState.js'
-import { SelectionType } from '$lib/types.js'
+import { SelectionType } from '#lib/types.js'
 
 describe('selection', () => {
   const json = {

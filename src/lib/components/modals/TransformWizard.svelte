@@ -2,13 +2,13 @@
 
 <script lang="ts">
   import Select from 'svelte-select'
-  import { getNestedPaths } from '$lib/utils/arrayUtils.js'
-  import { pathToOption } from '$lib/utils/pathUtils.js'
-  import { createDebug } from '$lib/utils/debug.js'
+  import { getNestedPaths } from '#lib/utils/arrayUtils.js'
+  import { pathToOption } from '#lib/utils/pathUtils.js'
+  import { createDebug } from '#lib/utils/debug.js'
   import { isEqual } from 'lodash-es'
   import type { JSONPath } from 'immutable-json-patch'
   import { setIn } from 'immutable-json-patch'
-  import type { PathOption, QueryLanguageOptions } from '$lib/types.js'
+  import type { PathOption, QueryLanguageOptions } from '#lib/types.js'
 
   const debug = createDebug('jsoneditor:TransformWizard')
 

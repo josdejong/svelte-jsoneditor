@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { MenuDropDownButton } from '$lib/types'
+  import type { MenuDropDownButton } from '#lib/types.js'
   import DropdownButton from '../DropdownButton.svelte'
   import Icon from 'svelte-awesome'
-  import { classnames } from '$lib/utils/cssUtils.js'
+  import { classnames } from '#lib/utils/cssUtils.js'
 
   export let item: MenuDropDownButton
   export let className: string | undefined = undefined

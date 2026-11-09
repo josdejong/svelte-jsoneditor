@@ -44,16 +44,16 @@ import type {
   Section,
   ValueDocumentState,
   VisibleSection
-} from '$lib/types'
-import { CaretType } from '$lib/types.js'
+} from '#lib/types.js'
+import { CaretType } from '#lib/types.js'
 import { int } from '../utils/numberUtils.js'
-import { isLargeContent } from '$lib/utils/jsonUtils.js'
+import { isLargeContent } from '#lib/utils/jsonUtils.js'
 import {
   isArrayRecursiveState,
   isExpandableState,
   isObjectRecursiveState,
   isValueRecursiveState
-} from '$lib/typeguards.js'
+} from '#lib/typeguards.js'
 
 export type CreateRecursiveStateProps = {
   json: unknown | undefined

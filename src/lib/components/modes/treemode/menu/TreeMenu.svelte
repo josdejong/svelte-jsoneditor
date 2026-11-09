@@ -10,9 +10,9 @@
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
-  import { CONTEXT_MENU_EXPLANATION } from '$lib/constants.js'
-  import { faJSONEditorCollapse, faJSONEditorExpand } from '$lib/img/customFontawesomeIcons.js'
-  import { isObjectOrArray } from '$lib/utils/typeUtils.js'
+  import { CONTEXT_MENU_EXPLANATION } from '#lib/constants.js'
+  import { faJSONEditorCollapse, faJSONEditorExpand } from '#lib/img/customFontawesomeIcons.js'
+  import { isObjectOrArray } from '#lib/utils/typeUtils.js'
   import Menu from '../../../controls/Menu.svelte'
   import type {
     HistoryItem,
@@ -20,8 +20,8 @@
     JSONSelection,
     MenuItem,
     OnRenderMenuInternal
-  } from '$lib/types'
-  import { isKeySelection, isMultiSelection, isValueSelection } from '$lib/logic/selection.js'
+  } from '#lib/types.js'
+  import { isKeySelection, isMultiSelection, isValueSelection } from '#lib/logic/selection.js'
 
   export let json: unknown
   export let selection: JSONSelection | undefined

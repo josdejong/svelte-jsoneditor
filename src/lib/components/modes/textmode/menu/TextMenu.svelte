@@ -13,9 +13,9 @@
     faJSONEditorCompact,
     faJSONEditorExpand,
     faJSONEditorFormat
-  } from '$lib/img/customFontawesomeIcons.js'
+  } from '#lib/img/customFontawesomeIcons.js'
   import Menu from '../../../controls/Menu.svelte'
-  import type { MenuItem, OnRenderMenuInternal } from '$lib/types'
+  import type { MenuItem, OnRenderMenuInternal } from '#lib/types.js'
 
   export let readOnly = false
   export let onExpandAll: () => void

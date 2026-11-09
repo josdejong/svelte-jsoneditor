@@ -1,7 +1,7 @@
 import { type OnJSONSelect } from 'svelte-jsoneditor'
 import type { Action } from 'svelte/action'
 import { type JSONPath } from 'immutable-json-patch'
-import { createEditValueSelection } from '$lib/logic/selection'
+import { createEditValueSelection } from '#lib/logic/selection.js'
 
 export interface EvaluatorActionProps {
   value: unknown

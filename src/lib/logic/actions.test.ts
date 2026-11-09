@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
-import { isMultilineTextPastedAsArray } from '$lib/logic/actions'
-import { insert } from '$lib/logic/operations'
-import { createValueSelection } from 'svelte-jsoneditor'
+import { isMultilineTextPastedAsArray } from '#lib/logic/actions.js'
+import { insert } from '#lib/logic/operations.js'
+import { createValueSelection } from '#lib/logic/selection.js'
 
 describe('actions', () => {
   describe('isMultiLineTextPastedAsArray', () => {

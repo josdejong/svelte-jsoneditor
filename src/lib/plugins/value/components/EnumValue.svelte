@@ -3,9 +3,9 @@
 <script lang="ts">
   import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
-  import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass.js'
-  import { type JSONParser, type JSONSelection, Mode, type OnPatch } from '$lib/types.js'
-  import { isValueSelection } from '$lib/logic/selection.js'
+  import { getValueClass } from '#lib/plugins/value/components/utils/getValueClass.js'
+  import { type JSONParser, type JSONSelection, Mode, type OnPatch } from '#lib/types.js'
+  import { isValueSelection } from '#lib/logic/selection.js'
 
   export let path: JSONPath
   export let value: unknown

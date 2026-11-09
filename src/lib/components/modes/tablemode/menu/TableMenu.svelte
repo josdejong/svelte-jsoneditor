@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import type { HistoryItem, History, MenuItem, OnRenderMenuInternal } from '$lib/types'
+  import type { HistoryItem, History, MenuItem, OnRenderMenuInternal } from '#lib/types.js'
   import Menu from '../../../controls/Menu.svelte'
   import {
     faEllipsisV,
@@ -11,7 +11,7 @@
     faSortAmountDownAlt,
     faUndo
   } from '@fortawesome/free-solid-svg-icons'
-  import { CONTEXT_MENU_EXPLANATION } from '$lib/constants.js'
+  import { CONTEXT_MENU_EXPLANATION } from '#lib/constants.js'
 
   export let containsValidArray: boolean
   export let readOnly: boolean

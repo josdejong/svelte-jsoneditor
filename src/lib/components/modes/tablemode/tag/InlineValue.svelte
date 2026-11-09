@@ -2,9 +2,9 @@
 
 <script lang="ts">
   import type { JSONPath } from 'immutable-json-patch'
-  import type { JSONParser } from '$lib/types'
-  import { truncate } from '$lib/utils/stringUtils.js'
-  import { MAX_INLINE_OBJECT_CHARS } from '$lib/constants.js'
+  import type { JSONParser } from '#lib/types.js'
+  import { truncate } from '#lib/utils/stringUtils.js'
+  import { MAX_INLINE_OBJECT_CHARS } from '#lib/constants.js'
 
   export let path: JSONPath
   export let value: unknown

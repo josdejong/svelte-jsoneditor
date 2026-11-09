@@ -6,8 +6,8 @@ import type {
   ValidationErrors,
   ValidationError,
   Validator
-} from '$lib/types.js'
-import { ValidationSeverity } from '$lib/types.js'
+} from '#lib/types.js'
+import { ValidationSeverity } from '#lib/types.js'
 import { MAX_AUTO_REPAIRABLE_SIZE, MAX_VALIDATABLE_SIZE } from '../constants.js'
 import { measure } from '../utils/timeUtils.js'
 import { normalizeJsonParseError } from '../utils/jsonUtils.js'

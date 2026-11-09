@@ -19,8 +19,8 @@ import {
 import { deepStrictEqual } from 'assert'
 import type { JSONPath } from 'immutable-json-patch'
 import { createValueSelection } from './selection.js'
-import type { SortedColumn, ValidationError } from '$lib/types.js'
-import { SortDirection, ValidationSeverity } from '$lib/types.js'
+import type { SortedColumn, ValidationError } from '#lib/types.js'
+import { SortDirection, ValidationSeverity } from '#lib/types.js'
 
 describe('table', () => {
   const json: unknown[] = [

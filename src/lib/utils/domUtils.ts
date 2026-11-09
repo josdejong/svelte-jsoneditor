@@ -1,5 +1,5 @@
-import type { ValueNormalization } from '$lib/types.js'
-import { SelectionType } from '$lib/types.js'
+import type { ValueNormalization } from '#lib/types.js'
+import { SelectionType } from '#lib/types.js'
 import type { JSONPath } from 'immutable-json-patch'
 import { compileJSONPointer, parseJSONPointer } from 'immutable-json-patch'
 import { map, minBy } from 'lodash-es'

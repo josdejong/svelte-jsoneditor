@@ -1,10 +1,10 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { getExpandItemsSections } from '$lib/logic/expandItemsSections.js'
-  import type { JSONSelection, Section, VisibleSection, JSONEditorContext } from '$lib/types.js'
+  import { getExpandItemsSections } from '#lib/logic/expandItemsSections.js'
+  import type { JSONSelection, Section, VisibleSection, JSONEditorContext } from '#lib/types.js'
   import type { JSONPath } from 'immutable-json-patch'
-  import { pathInSelection } from '$lib/logic/selection.js'
+  import { pathInSelection } from '#lib/logic/selection.js'
 
   export let visibleSections: VisibleSection[]
   export let sectionIndex: number

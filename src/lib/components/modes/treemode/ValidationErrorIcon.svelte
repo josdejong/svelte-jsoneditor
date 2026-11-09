@@ -3,8 +3,8 @@
   import Icon from 'svelte-awesome'
   import { getContext } from 'svelte'
   import { tooltip } from '../../controls/tooltip/tooltip.js'
-  import type { AbsolutePopupContext, NestedValidationError, ValidationError } from '$lib/types.js'
-  import { isNestedValidationError } from '$lib/typeguards.js'
+  import type { AbsolutePopupContext, NestedValidationError, ValidationError } from '#lib/types.js'
+  import { isNestedValidationError } from '#lib/typeguards.js'
 
   const absolutePopupContext = getContext<AbsolutePopupContext>('absolute-popup')
 

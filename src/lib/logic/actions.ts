@@ -9,8 +9,8 @@ import {
   isKeySelection,
   isValueSelection,
   selectionToPartialJson
-} from '$lib/logic/selection.js'
-import copyToClipboard from '$lib/utils/copyToClipboard.js'
+} from '#lib/logic/selection.js'
+import copyToClipboard from '#lib/utils/copyToClipboard.js'
 import {
   append,
   createNewValue,
@@ -19,7 +19,7 @@ import {
   insert,
   insertBefore,
   removeAll
-} from '$lib/logic/operations.js'
+} from '#lib/logic/operations.js'
 import type {
   AfterPatchCallback,
   InsertType,
@@ -29,8 +29,8 @@ import type {
   OnChangeText,
   OnJSONSelect,
   OnPatch
-} from '$lib/types'
-import { createDebug } from '$lib/utils/debug.js'
+} from '#lib/types.js'
+import { createDebug } from '#lib/utils/debug.js'
 import {
   getIn,
   isJSONObject,
@@ -40,12 +40,12 @@ import {
   type JSONPath,
   parsePath
 } from 'immutable-json-patch'
-import { isObject, isObjectOrArray } from '$lib/utils/typeUtils.js'
-import { expandAll, expandNone, expandPath, expandSmart } from '$lib/logic/documentState.js'
+import { isObject, isObjectOrArray } from '#lib/utils/typeUtils.js'
+import { expandAll, expandNone, expandPath, expandSmart } from '#lib/logic/documentState.js'
 import { initial, isEmpty, last } from 'lodash-es'
-import { fromTableCellPosition, toTableCellPosition } from '$lib/logic/table.js'
-import { parsePartialJson } from '$lib/utils/jsonUtils'
-import { MAX_MULTILINE_PASTE_SIZE } from '$lib/constants'
+import { fromTableCellPosition, toTableCellPosition } from '#lib/logic/table.js'
+import { parsePartialJson } from '#lib/utils/jsonUtils.js'
+import { MAX_MULTILINE_PASTE_SIZE } from '#lib/constants.js'
 
 const debug = createDebug('jsoneditor:actions')
 

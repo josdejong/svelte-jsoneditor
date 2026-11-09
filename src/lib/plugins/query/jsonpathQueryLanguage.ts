@@ -1,6 +1,6 @@
 import { JSONPath as JSONPathPlus } from 'jsonpath-plus'
-import { parseString } from '$lib/utils/stringUtils'
-import type { QueryLanguage, QueryLanguageOptions } from '$lib/types'
+import { parseString } from '#lib/utils/stringUtils.js'
+import type { QueryLanguage, QueryLanguageOptions } from '#lib/types.js'
 import type { JSONPath } from 'immutable-json-patch'
 
 const description = `

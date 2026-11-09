@@ -15,8 +15,8 @@ export { renderJSONSchemaEnum } from './plugins/value/renderJSONSchemaEnum.js'
 export { BooleanToggle, ColorPicker, EditableValue, EnumValue, ReadonlyValue, TimestampTag }
 
 // HTML
-export { getValueClass } from './plugins/value/components/utils/getValueClass'
-export { keyComboFromEvent } from './utils/keyBindings'
+export { getValueClass } from './plugins/value/components/utils/getValueClass.js'
+export { keyComboFromEvent } from './utils/keyBindings.js'
 
 // validator plugins
 export * from './plugins/validator/createAjvValidator.js'

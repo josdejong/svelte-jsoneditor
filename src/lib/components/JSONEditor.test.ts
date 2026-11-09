@@ -1,7 +1,7 @@
 import { beforeEach, afterEach, test, describe, expect, vi } from 'vitest'
 import '@testing-library/jest-dom'
 import JSONEditor from './JSONEditor.svelte'
-import { type Content, Mode } from '$lib/types.js'
+import { type Content, Mode } from '#lib/types.js'
 import { flushSync, mount } from 'svelte'
 import { getByText } from '@testing-library/svelte'
 

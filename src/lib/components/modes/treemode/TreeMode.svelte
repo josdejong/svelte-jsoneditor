@@ -3,7 +3,7 @@
 <script lang="ts">
   import { createAutoScrollHandler } from '../../controls/createAutoScrollHandler.js'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
-  import { createDebug } from '$lib/utils/debug.js'
+  import { createDebug } from '#lib/utils/debug.js'
   import {
     compileJSONPointer,
     existsIn,
@@ -15,13 +15,13 @@
   import { jsonrepair } from 'jsonrepair'
   import { initial, isEmpty, isEqual, noop, uniqueId } from 'lodash-es'
   import { flushSync, getContext, onDestroy, onMount } from 'svelte'
-  import { createJump } from '$lib/assets/jump.js/src/jump.js'
+  import { createJump } from '#lib/assets/jump.js/src/jump.js'
   import {
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
     SCROLL_DURATION,
     SEARCH_BOX_HEIGHT
-  } from '$lib/constants.js'
+  } from '#lib/constants.js'
   import {
     collapsePath,
     createDocumentState,
@@ -37,8 +37,8 @@
     getEnforceString,
     setInDocumentState,
     syncDocumentState
-  } from '$lib/logic/documentState.js'
-  import { duplicate, extract, revertJSONPatchWithMoveOperations } from '$lib/logic/operations.js'
+  } from '#lib/logic/documentState.js'
+  import { duplicate, extract, revertJSONPatchWithMoveOperations } from '#lib/logic/operations.js'
   import {
     canConvert,
     createAfterSelection,
@@ -70,8 +70,8 @@
     isValueSelection,
     removeEditModeFromSelection,
     selectAll
-  } from '$lib/logic/selection.js'
-  import { toRecursiveValidationErrors, validateJSON } from '$lib/logic/validation.js'
+  } from '#lib/logic/selection.js'
+  import { toRecursiveValidationErrors, validateJSON } from '#lib/logic/validation.js'
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
@@ -80,7 +80,7 @@
     getWindow,
     isChildOf,
     isChildOfNodeName
-  } from '$lib/utils/domUtils.js'
+  } from '#lib/utils/domUtils.js'
   import {
     convertValue,
     isJSONContent,
@@ -89,9 +89,9 @@
     parseAndRepair,
     parsePartialJson,
     repairPartialJson
-  } from '$lib/utils/jsonUtils.js'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
-  import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils.js'
+  } from '#lib/utils/jsonUtils.js'
+  import { keyComboFromEvent } from '#lib/utils/keyBindings.js'
+  import { isObjectOrArray, isUrl, stringConvert } from '#lib/utils/typeUtils.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
@@ -148,10 +148,10 @@
     ValidationErrors,
     Validator,
     ValueNormalization
-  } from '$lib/types'
-  import { Mode, ValidationSeverity } from '$lib/types.js'
+  } from '#lib/types.js'
+  import { Mode, ValidationSeverity } from '#lib/types.js'
   import memoizeOne from 'memoize-one'
-  import { measure } from '$lib/utils/timeUtils.js'
+  import { measure } from '#lib/utils/timeUtils.js'
   import {
     onCopy,
     onCut,
@@ -159,12 +159,12 @@
     onInsertCharacter,
     onPaste,
     onRemove
-  } from '$lib/logic/actions.js'
+  } from '#lib/logic/actions.js'
   import JSONPreview from '../../controls/JSONPreview.svelte'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
   import createTreeContextMenuItems from './contextmenu/createTreeContextMenuItems'
-  import { toRecursiveSearchResults as toRecursiveSearchResults } from 'svelte-jsoneditor/logic/search.js'
-  import { isTreeHistoryItem } from 'svelte-jsoneditor'
+  import { toRecursiveSearchResults } from '#lib/logic/search.js'
+  import { isTreeHistoryItem } from '#lib/typeguards.js'
 
   const debug = createDebug('jsoneditor:TreeMode')
 

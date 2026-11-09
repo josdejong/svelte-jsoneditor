@@ -3,9 +3,9 @@
 <script lang="ts">
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
-  import { isObjectOrArray, stringConvert } from '$lib/utils/typeUtils.js'
-  import { createValueSelection, getFocusPath, isEditingSelection } from '$lib/logic/selection.js'
-  import { getValueClass } from '$lib/plugins/value/components/utils/getValueClass.js'
+  import { isObjectOrArray, stringConvert } from '#lib/utils/typeUtils.js'
+  import { createValueSelection, getFocusPath, isEditingSelection } from '#lib/logic/selection.js'
+  import { getValueClass } from '#lib/plugins/value/components/utils/getValueClass.js'
   import EditableDiv from '../../../components/controls/EditableDiv.svelte'
   import {
     type FindNextInside,
@@ -18,9 +18,9 @@
     type OnPatch,
     UpdateSelectionAfterChange,
     type ValueNormalization
-  } from '$lib/types.js'
+  } from '#lib/types.js'
   import { isEqual } from 'lodash-es'
-  import { expandSmart } from '$lib/logic/documentState'
+  import { expandSmart } from '#lib/logic/documentState.js'
 
   export let path: JSONPath
   export let value: unknown

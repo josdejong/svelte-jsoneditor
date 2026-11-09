@@ -5,7 +5,7 @@
   import Header from './Header.svelte'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer, immutableJSONPatch, isJSONArray } from 'immutable-json-patch'
-  import { createDebug } from '$lib/utils/debug.js'
+  import { createDebug } from '#lib/utils/debug.js'
   import type {
     Content,
     JSONEditorModalCallback,
@@ -20,17 +20,17 @@
     OnSortModal,
     OnTransformModal,
     Validator
-  } from '$lib/types'
-  import { Mode } from '$lib/types.js'
+  } from '#lib/types.js'
+  import { Mode } from '#lib/types.js'
   import JSONEditorRoot from '../modes/JSONEditorRoot.svelte'
-  import { noop } from '$lib/utils/noop.js'
-  import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
+  import { noop } from '#lib/utils/noop.js'
+  import { stringifyJSONPath } from '#lib/utils/pathUtils.js'
   import { initial, isEmpty, last } from 'lodash-es'
-  import { isJSONContent, toJSONContent } from '$lib/utils/jsonUtils.js'
+  import { isJSONContent, toJSONContent } from '#lib/utils/jsonUtils.js'
   import Icon from 'svelte-awesome'
   import { faCaretLeft } from '@fortawesome/free-solid-svg-icons'
   import memoizeOne from 'memoize-one'
-  import { getFocusPath, isJSONSelection } from '$lib/logic/selection.js'
+  import { getFocusPath, isJSONSelection } from '#lib/logic/selection.js'
   import Modal from './Modal.svelte'
   import AbsolutePopup from './popup/AbsolutePopup.svelte'
 

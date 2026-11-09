@@ -15,13 +15,9 @@ import type {
   SearchResultDetails,
   SearchResultItem,
   SearchResults
-} from '$lib/types'
-import { SearchField } from '$lib/types.js'
-import {
-  hasSearchResults,
-  isArrayRecursiveState,
-  isObjectRecursiveState
-} from 'svelte-jsoneditor/typeguards.js'
+} from '#lib/types.js'
+import { SearchField } from '#lib/types.js'
+import { hasSearchResults, isArrayRecursiveState, isObjectRecursiveState } from '#lib/typeguards.js'
 
 // TODO: comment
 // TODO: unit test

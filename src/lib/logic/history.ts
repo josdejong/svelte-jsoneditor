@@ -1,5 +1,5 @@
 import { createDebug } from '../utils/debug.js'
-import type { HistoryInstance, History } from 'svelte-jsoneditor'
+import type { HistoryInstance, History } from '#lib/types.js'
 
 const MAX_HISTORY_ITEMS = 1000
 

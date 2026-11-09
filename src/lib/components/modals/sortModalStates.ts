@@ -1,4 +1,4 @@
-import type { NumberOption, PathOption } from '$lib/types.js'
+import type { NumberOption, PathOption } from '#lib/types.js'
 
 export interface SortModalState {
   selectedProperty: PathOption

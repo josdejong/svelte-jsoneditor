@@ -23,7 +23,7 @@ import type {
   TextHistoryItem,
   ModeHistoryItem
 } from './types.js'
-import { isObject } from '$lib/utils/typeUtils.js'
+import { isObject } from '#lib/utils/typeUtils.js'
 
 export function isMenuSpace(item: unknown): item is MenuSpace {
   // checking the .space property is for backward compatibility

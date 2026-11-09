@@ -1,10 +1,10 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { createDebug } from '$lib/utils/debug.js'
+  import { createDebug } from '#lib/utils/debug.js'
   import { setContext, type SvelteComponent } from 'svelte'
-  import type { AbsolutePopupOptions, PopupEntry, AbsolutePopupContext } from '$lib/types'
-  import { uniqueId } from '$lib/utils/uniqueId.js'
+  import type { AbsolutePopupOptions, PopupEntry, AbsolutePopupContext } from '#lib/types.js'
+  import { uniqueId } from '#lib/utils/uniqueId.js'
   import AbsolutePopupEntry from './AbsolutePopupEntry.svelte'
 
   const debug = createDebug('jsoneditor:AbsolutePopup')

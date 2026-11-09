@@ -3,10 +3,10 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import Icon from 'svelte-awesome'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
+  import { keyComboFromEvent } from '#lib/utils/keyBindings.js'
   import { faLightbulb } from '@fortawesome/free-regular-svg-icons'
-  import { findNearestElement } from '$lib/utils/domUtils.js'
-  import type { ContextMenuItem, MenuItem } from '$lib/types.js'
+  import { findNearestElement } from '#lib/utils/domUtils.js'
+  import type { ContextMenuItem, MenuItem } from '#lib/types.js'
   import {
     isContextMenuColumn,
     isContextMenuRow,
@@ -14,7 +14,7 @@
     isMenuDropDownButton,
     isMenuLabel,
     isMenuSeparator
-  } from '$lib/typeguards.js'
+  } from '#lib/typeguards.js'
   import ContextMenuButton from './ContextMenuButton.svelte'
   import ContextMenuDropDownButton from './ContextMenuDropDownButton.svelte'
 

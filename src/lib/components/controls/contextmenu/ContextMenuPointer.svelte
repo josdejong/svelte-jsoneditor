@@ -7,8 +7,8 @@
     CONTEXT_MENU_EXPLANATION,
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH
-  } from '$lib/constants.js'
-  import type { OnContextMenu } from '$lib/types'
+  } from '#lib/constants.js'
+  import type { OnContextMenu } from '#lib/types.js'
 
   export let root: boolean = false
   export let insert: boolean = false

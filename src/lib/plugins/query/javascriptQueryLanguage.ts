@@ -1,7 +1,7 @@
-import { createPropertySelector } from '$lib/utils/pathUtils.js'
-import { parseString } from '$lib/utils/stringUtils.js'
-import type { QueryLanguage, QueryLanguageOptions } from '$lib/types.js'
-import { isInteger } from '$lib/utils/typeUtils.js'
+import { createPropertySelector } from '#lib/utils/pathUtils.js'
+import { parseString } from '#lib/utils/stringUtils.js'
+import type { QueryLanguage, QueryLanguageOptions } from '#lib/types.js'
+import { isInteger } from '#lib/utils/typeUtils.js'
 
 const description = `
 <p>

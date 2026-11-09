@@ -1,8 +1,8 @@
 import { test, describe } from 'vitest'
 import { deepStrictEqual } from 'assert'
 import { toRecursiveValidationErrors, validateJSON, validateText } from './validation.js'
-import type { ValidationError } from '$lib/types'
-import { ValidationSeverity } from '$lib/types.js'
+import type { ValidationError } from '#lib/types.js'
+import { ValidationSeverity } from '#lib/types.js'
 import { stringify, parse, isLosslessNumber } from 'lossless-json'
 import { LosslessNumber } from 'lossless-json'
 

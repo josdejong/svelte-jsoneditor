@@ -30,16 +30,16 @@
     TransformModalOptions,
     Validator,
     ModeHistoryItem
-  } from '$lib/types'
-  import { Mode } from '$lib/types.js'
+  } from '#lib/types.js'
+  import { Mode } from '#lib/types.js'
   import TextMode from './textmode/TextMode.svelte'
   import TableMode from './tablemode/TableMode.svelte'
   import TreeMode from './treemode/TreeMode.svelte'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
-  import { isMenuSpace, isModeHistoryItem } from '$lib/typeguards.js'
+  import { isMenuSpace, isModeHistoryItem } from '#lib/typeguards.js'
   import { cloneDeep } from 'lodash-es'
-  import { createHistoryInstance } from '$lib/logic/history'
-  import { createDebug } from '$lib/utils/debug'
+  import { createHistoryInstance } from '#lib/logic/history.js'
+  import { createDebug } from '#lib/utils/debug.js'
 
   export let content: Content
   export let selection: JSONEditorSelection | undefined

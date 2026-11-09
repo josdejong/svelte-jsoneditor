@@ -1,9 +1,9 @@
 import * as _ from 'lodash-es'
 import { last } from 'lodash-es'
-import { createLodashPropertySelector, createPropertySelector } from '$lib/utils/pathUtils.js'
-import { parseString } from '$lib/utils/stringUtils.js'
-import type { QueryLanguage, QueryLanguageOptions } from '$lib/types.js'
-import { isInteger } from '$lib/utils/typeUtils.js'
+import { createLodashPropertySelector, createPropertySelector } from '#lib/utils/pathUtils.js'
+import { parseString } from '#lib/utils/stringUtils.js'
+import type { QueryLanguage, QueryLanguageOptions } from '#lib/types.js'
+import { isInteger } from '#lib/utils/typeUtils.js'
 
 const description = `
 <p>

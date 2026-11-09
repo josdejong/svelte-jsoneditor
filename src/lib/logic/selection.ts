@@ -10,7 +10,7 @@ import {
   parsePath
 } from 'immutable-json-patch'
 import { first, initial, isEmpty, isEqual, last } from 'lodash-es'
-import { isObjectOrArray } from '$lib/utils/typeUtils.js'
+import { isObjectOrArray } from '#lib/utils/typeUtils.js'
 import {
   collapsePath,
   getNextVisiblePath,
@@ -33,8 +33,8 @@ import type {
   TextSelection,
   ValueSelection
 } from '../types.js'
-import { CaretType, SelectionType } from '$lib/types.js'
-import { int } from '$lib/utils/numberUtils.js'
+import { CaretType, SelectionType } from '#lib/types.js'
+import { int } from '#lib/utils/numberUtils.js'
 
 export function isAfterSelection(
   selection: JSONEditorSelection | undefined

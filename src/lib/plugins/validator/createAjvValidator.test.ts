@@ -2,7 +2,7 @@ import { test, describe } from 'vitest'
 import assert from 'assert'
 import Ajv from 'ajv'
 import { createAjvValidator, createAjvValidatorAsync } from './createAjvValidator.js'
-import { ValidationSeverity, type JSONSchemaDefinitions } from '$lib/types'
+import { ValidationSeverity, type JSONSchemaDefinitions } from '#lib/types.js'
 
 const schema = {
   title: 'Employee',

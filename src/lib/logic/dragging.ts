@@ -9,7 +9,7 @@ import type {
   JSONSelection,
   MultiSelection,
   RenderedItem
-} from '$lib/types'
+} from '#lib/types.js'
 
 export interface MoveSelectionProps {
   json: unknown

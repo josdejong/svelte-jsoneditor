@@ -26,12 +26,12 @@
     toJSONContent,
     type RenderValueProps
   } from 'svelte-jsoneditor'
-  import { useLocalStorage } from '$lib/utils/localStorageUtils.js'
+  import { useLocalStorage } from '#lib/utils/localStorageUtils.js'
   import { range } from 'lodash-es'
   import { mount, flushSync } from 'svelte'
   import { parse, stringify } from 'lossless-json'
-  import { truncate } from '$lib/utils/stringUtils.js'
-  import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils.js'
+  import { truncate } from '#lib/utils/stringUtils.js'
+  import { parseJSONPath, stringifyJSONPath } from '#lib/utils/pathUtils.js'
   import { compileJSONPointer, isJSONObject, parseJSONPointer } from 'immutable-json-patch'
 
   const LosslessJSON = {

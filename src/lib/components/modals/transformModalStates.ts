@@ -1,4 +1,4 @@
-import type { QueryLanguageOptions } from '$lib/types.js'
+import type { QueryLanguageOptions } from '#lib/types.js'
 
 export interface TransformModalState {
   queryLanguageId: string

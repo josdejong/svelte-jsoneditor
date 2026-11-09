@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { MenuButton } from '$lib/types'
+  import type { MenuButton } from '#lib/types.js'
   import Icon from 'svelte-awesome'
-  import { classnames } from '$lib/utils/cssUtils.js'
+  import { classnames } from '#lib/utils/cssUtils.js'
 
   export let item: MenuButton
   export let className: string | undefined = undefined

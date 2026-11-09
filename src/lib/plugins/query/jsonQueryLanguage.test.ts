@@ -2,7 +2,7 @@ import { test, describe } from 'vitest'
 import assert from 'assert'
 import { cloneDeep } from 'lodash-es'
 import { LosslessNumber, parse, stringify } from 'lossless-json'
-import { jsonQueryLanguage } from '$lib/plugins/query/jsonQueryLanguage'
+import { jsonQueryLanguage } from '#lib/plugins/query/jsonQueryLanguage.js'
 
 const LosslessJSON = { parse, stringify }
 

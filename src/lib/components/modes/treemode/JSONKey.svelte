@@ -8,12 +8,12 @@
     createValueSelection,
     isEditingSelection,
     isKeySelection
-  } from '$lib/logic/selection.js'
+  } from '#lib/logic/selection.js'
   import SearchResultHighlighter from './highlight/SearchResultHighlighter.svelte'
   import EditableDiv from '../../controls/EditableDiv.svelte'
-  import { addNewLineSuffix } from '$lib/utils/domUtils.js'
-  import type { ExtendedSearchResultItem, JSONSelection, TreeModeContext } from '$lib/types.js'
-  import { UpdateSelectionAfterChange } from '$lib/types.js'
+  import { addNewLineSuffix } from '#lib/utils/domUtils.js'
+  import type { ExtendedSearchResultItem, JSONSelection, TreeModeContext } from '#lib/types.js'
+  import { UpdateSelectionAfterChange } from '#lib/types.js'
   import { type JSONPath, type JSONPointer, parseJSONPointer } from 'immutable-json-patch'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
 

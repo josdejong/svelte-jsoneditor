@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { JSONParser } from '$lib/types'
-  import { truncate } from '$lib/utils/stringUtils.js'
-  import { getText } from '$lib/utils/jsonUtils.js'
-  import { MAX_CHARACTERS_TEXT_PREVIEW } from '$lib/constants.js'
+  import type { JSONParser } from '#lib/types.js'
+  import { truncate } from '#lib/utils/stringUtils.js'
+  import { getText } from '#lib/utils/jsonUtils.js'
+  import { MAX_CHARACTERS_TEXT_PREVIEW } from '#lib/constants.js'
 
   export let text: string | undefined
   export let json: unknown | undefined

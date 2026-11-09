@@ -1,12 +1,12 @@
 <script lang="ts">
   import type { JSONPath } from 'immutable-json-patch'
   import { getIn, isJSONArray, isJSONObject } from 'immutable-json-patch'
-  import type { JSONParser, OnChangeMode } from '$lib/types.js'
-  import { Mode } from '$lib/types.js'
-  import { valueType } from '$lib/utils/typeUtils.js'
-  import { findNestedArrays } from '$lib/logic/table.js'
+  import type { JSONParser, OnChangeMode } from '#lib/types.js'
+  import { Mode } from '#lib/types.js'
+  import { valueType } from '#lib/utils/typeUtils.js'
+  import { findNestedArrays } from '#lib/logic/table.js'
   import { isEmpty } from 'lodash-es'
-  import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
+  import { stringifyJSONPath } from '#lib/utils/pathUtils.js'
 
   interface Props {
     text: string | undefined

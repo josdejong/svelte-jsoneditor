@@ -1,7 +1,7 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { isMacDevice } from '$lib/utils/navigatorUtils.js'
+  import { isMacDevice } from '#lib/utils/navigatorUtils.js'
   import Header from './Header.svelte'
   import Modal from './Modal.svelte'
 

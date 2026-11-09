@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { isUrl } from '$lib/utils/typeUtils.js'
-  import { createEditValueSelection } from '$lib/logic/selection.js'
+  import { isUrl } from '#lib/utils/typeUtils.js'
+  import { createEditValueSelection } from '#lib/logic/selection.js'
   import SearchResultHighlighter from '../../../components/modes/treemode/highlight/SearchResultHighlighter.svelte'
-  import { getValueClass } from './utils/getValueClass.js'
-  import { addNewLineSuffix } from '$lib/utils/domUtils.js'
-  import { type RenderValueProps } from '$lib/types.js'
-  import { isCtrlKeyDown } from 'svelte-jsoneditor/utils/keyBindings'
-  import { formatSize } from '$lib/utils/fileUtils'
+  import { getValueClass } from '#lib/plugins/value/components/utils/getValueClass.js'
+  import { addNewLineSuffix } from '#lib/utils/domUtils.js'
+  import { type RenderValueProps } from '#lib/types.js'
+  import { isCtrlKeyDown } from '#lib/utils/keyBindings.js'
+  import { formatSize } from '#lib/utils/fileUtils.js'
   import Tag from '../../../components/controls/Tag.svelte'
 
   const {

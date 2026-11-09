@@ -1,13 +1,13 @@
 <svelte:options immutable={true} />
 
 <script lang="ts">
-  import { getColorCSS } from '$lib/utils/typeUtils.js'
-  import { getWindow } from '$lib/utils/domUtils.js'
+  import { getColorCSS } from '#lib/utils/typeUtils.js'
+  import { getWindow } from '#lib/utils/domUtils.js'
   import type { JSONPath } from 'immutable-json-patch'
   import { compileJSONPointer } from 'immutable-json-patch'
   import { getContext } from 'svelte'
   import ColorPickerPopup from '../../../components/controls/ColorPickerPopup.svelte'
-  import type { AbsolutePopupContext, OnPatch } from '$lib/types.js'
+  import type { AbsolutePopupContext, OnPatch } from '#lib/types.js'
 
   const { openAbsolutePopup } = getContext<AbsolutePopupContext>('absolute-popup')
 

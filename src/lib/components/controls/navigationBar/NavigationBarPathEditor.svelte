@@ -1,12 +1,12 @@
 <script lang="ts">
   import type { JSONPath } from 'immutable-json-patch'
   import { getContext, onDestroy, onMount } from 'svelte'
-  import copyToClipBoard from '$lib/utils/copyToClipboard.js'
+  import copyToClipBoard from '#lib/utils/copyToClipboard.js'
   import { faCopy, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
   import Icon from 'svelte-awesome'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
+  import { keyComboFromEvent } from '#lib/utils/keyBindings.js'
   import { tooltip } from '../../controls/tooltip/tooltip.js'
-  import type { AbsolutePopupContext, JSONPathParser, OnError } from '$lib/types.js'
+  import type { AbsolutePopupContext, JSONPathParser, OnError } from '#lib/types.js'
 
   const absolutePopupContext = getContext<AbsolutePopupContext>('absolute-popup')
 

@@ -5,8 +5,8 @@
   import { uniqueId } from '../utils/uniqueId.js'
   import { isEqualParser, isJSONContent, validateContentType } from '../utils/jsonUtils.js'
   import AbsolutePopup from './modals/popup/AbsolutePopup.svelte'
-  import { jsonQueryLanguage } from '$lib/plugins/query/jsonQueryLanguage.js'
-  import { renderValue } from '$lib/plugins/value/renderValue.js'
+  import { jsonQueryLanguage } from '#lib/plugins/query/jsonQueryLanguage.js'
+  import { renderValue } from '#lib/plugins/value/renderValue.js'
   import { flushSync } from 'svelte'
   import TransformModal from './modals/TransformModal.svelte'
   import type {
@@ -39,12 +39,12 @@
     TransformModalOptions,
     TransformModalProps,
     Validator
-  } from '$lib/types'
-  import type { OnRenderContextMenu } from '$lib/types.js'
-  import { Mode } from '$lib/types.js'
+  } from '#lib/types.js'
+  import type { OnRenderContextMenu } from '#lib/types.js'
+  import { Mode } from '#lib/types.js'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { noop } from '../utils/noop.js'
-  import { parseJSONPath, stringifyJSONPath } from '$lib/utils/pathUtils.js'
+  import { parseJSONPath, stringifyJSONPath } from '#lib/utils/pathUtils.js'
   import JSONEditorRoot from './modes/JSONEditorRoot.svelte'
   import JSONEditorModal from './modals/JSONEditorModal.svelte'
   import memoizeOne from 'memoize-one'

@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { ExtendedSearchResultItem, JSONEditorContext, JSONSelection } from '$lib/types.js'
+  import type { ExtendedSearchResultItem, JSONEditorContext, JSONSelection } from '#lib/types.js'
   import type { JSONPath } from 'immutable-json-patch'
-  import { isEditingSelection, isValueSelection } from '$lib/logic/selection.js'
-  import { isSvelteActionRenderer } from '$lib/typeguards.js'
+  import { isEditingSelection, isValueSelection } from '#lib/logic/selection.js'
+  import { isSvelteActionRenderer } from '#lib/typeguards.js'
 
   interface Props {
     path: JSONPath

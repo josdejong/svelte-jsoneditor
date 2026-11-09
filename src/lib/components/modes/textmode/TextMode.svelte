@@ -8,7 +8,7 @@
     faWrench
   } from '@fortawesome/free-solid-svg-icons'
   import { type SyntaxNode, type SyntaxNodeRef, type Tree, type NodeIterator } from '@lezer/common'
-  import { createDebug } from '$lib/utils/debug.js'
+  import { createDebug } from '#lib/utils/debug.js'
   import type { JSONPatchDocument, JSONPath } from 'immutable-json-patch'
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import { jsonrepair } from 'jsonrepair'
@@ -20,15 +20,15 @@
     JSON_STATUS_VALID,
     MAX_CHARACTERS_TEXT_PREVIEW,
     TEXT_MODE_ONCHANGE_DELAY
-  } from '$lib/constants.js'
+  } from '#lib/constants.js'
   import {
     activeElementIsChildOf,
     createNormalizationFunctions,
     getWindow
-  } from '$lib/utils/domUtils.js'
-  import { formatSize } from '$lib/utils/fileUtils.js'
-  import { findTextLocation, getText, needsFormatting } from '$lib/utils/jsonUtils.js'
-  import { expandSelf } from '$lib/logic/documentState.js'
+  } from '#lib/utils/domUtils.js'
+  import { formatSize } from '#lib/utils/fileUtils.js'
+  import { findTextLocation, getText, needsFormatting } from '#lib/utils/jsonUtils.js'
+  import { expandSelf } from '#lib/logic/documentState.js'
   import { createFocusTracker } from '../../controls/createFocusTracker.js'
   import Message from '../../controls/Message.svelte'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
@@ -119,19 +119,19 @@
     TransformModalOptions,
     ValidationError,
     Validator
-  } from '$lib/types.js'
-  import { Mode, SelectionType, ValidationSeverity } from '$lib/types.js'
+  } from '#lib/types.js'
+  import { Mode, SelectionType, ValidationSeverity } from '#lib/types.js'
   import {
     isContentParseError,
     isContentValidationErrors,
     isTextHistoryItem
-  } from '$lib/typeguards.js'
+  } from '#lib/typeguards.js'
   import memoizeOne from 'memoize-one'
-  import { validateText } from '$lib/logic/validation.js'
-  import { truncate } from '$lib/utils/stringUtils.js'
-  import { faJSONEditorFormat } from '$lib/img/customFontawesomeIcons.js'
+  import { validateText } from '#lib/logic/validation.js'
+  import { truncate } from '#lib/utils/stringUtils.js'
+  import { faJSONEditorFormat } from '#lib/img/customFontawesomeIcons.js'
   import { indentationMarkers } from '@replit/codemirror-indentation-markers'
-  import { isTextSelection } from '$lib/logic/selection.js'
+  import { isTextSelection } from '#lib/logic/selection.js'
   import { wrappedLineIndent } from 'codemirror-wrapped-line-indent/dist/index.js' // ensure loading ESM, otherwise the vitest test fail
 
   export let readOnly: boolean

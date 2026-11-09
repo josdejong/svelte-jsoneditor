@@ -1,5 +1,5 @@
 import type { JSONPath } from 'immutable-json-patch'
-import type { JSONSchema, JSONSchemaDefinitions, JSONSchemaEnum } from '$lib/types'
+import type { JSONSchema, JSONSchemaDefinitions, JSONSchemaEnum } from '#lib/types.js'
 
 /**
  * Find enum options for given path in a JSONSchema

@@ -8,10 +8,10 @@
   } from '@fortawesome/free-solid-svg-icons'
   import { isEmpty } from 'lodash-es'
   import Icon from 'svelte-awesome'
-  import { stringifyJSONPath } from '$lib/utils/pathUtils.js'
-  import { ValidationSeverity, type ValidationError } from '$lib/types.js'
-  import { MAX_VALIDATION_ERRORS } from '$lib/constants.js'
-  import { limit } from '$lib/utils/arrayUtils.js'
+  import { stringifyJSONPath } from '#lib/utils/pathUtils.js'
+  import { ValidationSeverity, type ValidationError } from '#lib/types.js'
+  import { MAX_VALIDATION_ERRORS } from '#lib/constants.js'
+  import { limit } from '#lib/utils/arrayUtils.js'
 
   export let validationErrors: ValidationError[]
   export let selectError: (error: ValidationError) => void

@@ -40,8 +40,8 @@
     ValidationError,
     Validator,
     ValueNormalization
-  } from '$lib/types'
-  import { Mode, SortDirection, ValidationSeverity } from '$lib/types.js'
+  } from '#lib/types.js'
+  import { Mode, SortDirection, ValidationSeverity } from '#lib/types.js'
   import TableMenu from './menu/TableMenu.svelte'
   import {
     compileJSONPointer,
@@ -72,7 +72,7 @@
     selectPreviousColumn,
     selectPreviousRow,
     toTableCellPosition
-  } from '$lib/logic/table.js'
+  } from '#lib/logic/table.js'
   import { isEmpty, isEqual, uniqueId } from 'lodash-es'
   import {
     activeElementIsChildOf,
@@ -82,8 +82,8 @@
     getDataPathFromTarget,
     getWindow,
     isChildOf
-  } from '$lib/utils/domUtils.js'
-  import { createDebug } from '$lib/utils/debug.js'
+  } from '#lib/utils/domUtils.js'
+  import { createDebug } from '#lib/utils/debug.js'
   import {
     createDocumentState,
     documentStatePatch,
@@ -91,14 +91,14 @@
     getInRecursiveState,
     setInDocumentState,
     syncDocumentState
-  } from '$lib/logic/documentState.js'
-  import { isObjectOrArray, isUrl, stringConvert } from '$lib/utils/typeUtils.js'
+  } from '#lib/logic/documentState.js'
+  import { isObjectOrArray, isUrl, stringConvert } from '#lib/utils/typeUtils.js'
   import InlineValue from './tag/InlineValue.svelte'
   import {
     createNestedValueOperations,
     extract,
     revertJSONPatchWithMoveOperations
-  } from '$lib/logic/operations.js'
+  } from '#lib/logic/operations.js'
   import {
     createValueSelection,
     getAnchorPath,
@@ -109,27 +109,27 @@
     pathInSelection,
     pathStartsWith,
     removeEditModeFromSelection
-  } from '$lib/logic/selection.js'
+  } from '#lib/logic/selection.js'
   import ColumnHeader from './ColumnHeader.svelte'
-  import { sortJson } from '$lib/logic/sort.js'
-  import { keyComboFromEvent } from '$lib/utils/keyBindings.js'
-  import { createFocusTracker } from '$lib/components/controls/createFocusTracker.js'
+  import { sortJson } from '#lib/logic/sort.js'
+  import { keyComboFromEvent } from '#lib/utils/keyBindings.js'
+  import { createFocusTracker } from '#lib/components/controls/createFocusTracker.js'
   import { flushSync, getContext, onDestroy, onMount } from 'svelte'
   import { jsonrepair } from 'jsonrepair'
   import Message from '../../controls/Message.svelte'
   import { faCheck, faCode, faWrench } from '@fortawesome/free-solid-svg-icons'
-  import { measure } from '$lib/utils/timeUtils.js'
+  import { measure } from '#lib/utils/timeUtils.js'
   import memoizeOne from 'memoize-one'
-  import { validateJSON } from '$lib/logic/validation.js'
+  import { validateJSON } from '#lib/logic/validation.js'
   import ValidationErrorsOverview from '../../controls/ValidationErrorsOverview.svelte'
   import {
     CONTEXT_MENU_HEIGHT,
     CONTEXT_MENU_WIDTH,
     SCROLL_DURATION,
     SEARCH_BOX_HEIGHT
-  } from '$lib/constants.js'
-  import { noop } from '$lib/utils/noop.js'
-  import { createJump } from '$lib/assets/jump.js/src/jump.js'
+  } from '#lib/constants.js'
+  import { noop } from '#lib/utils/noop.js'
+  import { createJump } from '#lib/assets/jump.js/src/jump.js'
   import ValidationErrorIcon from '../treemode/ValidationErrorIcon.svelte'
   import {
     onCopy,
@@ -141,9 +141,9 @@
     onPaste,
     onRemove,
     onRemoveRow
-  } from '$lib/logic/actions.js'
+  } from '#lib/logic/actions.js'
   import JSONRepairModal from '../../modals/JSONRepairModal.svelte'
-  import { resizeObserver } from '$lib/actions/resizeObserver.js'
+  import { resizeObserver } from '#lib/actions/resizeObserver.js'
   import CopyPasteModal from '../../../components/modals/CopyPasteModal.svelte'
   import ContextMenuPointer from '../../../components/controls/contextmenu/ContextMenuPointer.svelte'
   import SearchBox from '../../controls/SearchBox.svelte'
@@ -152,9 +152,9 @@
   import RefreshColumnHeader from './RefreshColumnHeader.svelte'
   import createTableContextMenuItems from './contextmenu/createTableContextMenuItems'
   import ContextMenu from '../../controls/contextmenu/ContextMenu.svelte'
-  import { flattenSearchResults, toRecursiveSearchResults } from '$lib/logic/search.js'
+  import { flattenSearchResults, toRecursiveSearchResults } from '#lib/logic/search.js'
   import JSONValue from '../treemode/JSONValue.svelte'
-  import { isTreeHistoryItem } from 'svelte-jsoneditor'
+  import { isTreeHistoryItem } from '#lib/typeguards.js'
 
   const debug = createDebug('jsoneditor:TableMode')
   const { openAbsolutePopup, closeAbsolutePopup } =
