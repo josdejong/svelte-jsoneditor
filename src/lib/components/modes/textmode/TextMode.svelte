@@ -13,7 +13,7 @@
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import { jsonrepair } from 'jsonrepair'
   import { debounce, isEqual, uniqueId } from 'lodash-es'
-  import { flushSync, onDestroy, onMount } from 'svelte'
+  import { flushSync, onDestroy, onMount, tick } from 'svelte'
   import {
     JSON_STATUS_INVALID,
     JSON_STATUS_REPAIRABLE,
@@ -282,7 +282,10 @@
     }
   })
 
+  let destroyed = false
+
   onDestroy(() => {
+    destroyed = true
     flush()
 
     if (codeMirrorView) {
@@ -1126,8 +1129,11 @@
     // This change will be dispatched by Svelte on the next tick. Before
     // that tick, emitOnSelect would be fired based on the "old" contents,
     // which may be out of range when the replacement by the user is shorter.
-    flushSync()
-    emitOnSelect()
+    tick().then(() => {
+      if (!destroyed) {
+        emitOnSelect()
+      }
+    })
   }
 
   function updateLinter(validator: Validator | undefined) {
