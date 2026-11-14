@@ -39,7 +39,7 @@ function createQuery(json: unknown, queryOptions: QueryLanguageOptions): string 
     const filterValue = parseString(filter.value)
     const filterValueStr =
       typeof exampleValue === 'string' && filterValue !== null && filterValue !== undefined
-        ? `"${filter.value}"`
+        ? JSON.stringify(filter.value).replace(/`/g, '\\`')
         : filterValue
 
     query +=
@@ -134,5 +134,5 @@ export function stringifyPathForJmespath(path: JSONPath): string {
 }
 
 function stringifyProp(prop: string): string {
-  return prop.match(/^[A-Za-z\d_$]+$/) ? prop : JSON.stringify(prop)
+  return prop.match(/^[A-Za-z_][A-Za-z\d_]*$/) ? prop : JSON.stringify(prop)
 }
