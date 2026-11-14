@@ -39,7 +39,7 @@ function createQuery(json: unknown, queryOptions: QueryLanguageOptions): string 
     const filterValue = parseString(filter.value)
     const filterValueStr =
       typeof exampleValue === 'string' && filterValue !== null && filterValue !== undefined
-        ? JSON.stringify(filter.value).replace(/`/g, '\\`')
+        ? JSON.stringify(filter.value).replace(/`/g, '\\u0060')
         : filterValue
 
     query +=

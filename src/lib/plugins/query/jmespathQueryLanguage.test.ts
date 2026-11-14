@@ -8,17 +8,22 @@ const { createQuery, executeQuery } = jmespathQueryLanguage
 
 describe('jmespathQueryLanguage', () => {
   describe('createQuery and executeQuery', () => {
-    test.each(['say "hi"', 'C:\\Users\\Bob', 'line one\nline two', 'a`b', 'a\\`b'])(
-      'should filter strings containing special characters: %j',
-      (value) => {
-        const data = [{ name: value }, { name: 'other' }]
-        const query = createQuery(data, {
-          filter: { path: ['name'], relation: '==', value }
-        })
+    test.each([
+      'say "hi"',
+      'C:\\Users\\Bob',
+      'line one\nline two',
+      'a`b',
+      'a\\`b',
+      'a`b`c',
+      'a\\`b`c'
+    ])('should filter strings containing special characters: %j', (value) => {
+      const data = [{ name: value }, { name: 'other' }]
+      const query = createQuery(data, {
+        filter: { path: ['name'], relation: '==', value }
+      })
 
-        assert.deepStrictEqual(executeQuery(data, query, JSON), [data[0]])
-      }
-    )
+      assert.deepStrictEqual(executeQuery(data, query, JSON), [data[0]])
+    })
 
     test.each(['1', '1name', '$value'])(
       'should filter, sort and project a property requiring quotes: %j',
