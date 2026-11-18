@@ -1,9 +1,12 @@
 import { beforeEach, afterEach, test, describe, expect, vi } from 'vitest'
 import '@testing-library/jest-dom'
 import JSONEditor from './JSONEditor.svelte'
-import { type Content, Mode } from '$lib/types.js'
-import { flushSync, mount } from 'svelte'
-import { getByText } from '@testing-library/svelte'
+import { type Content, Mode, SelectionType, type TextSelection } from '$lib/types.js'
+import { flushSync, mount, tick, unmount } from 'svelte'
+import { fromStore, writable } from 'svelte/store'
+import { getByText, getByTitle } from '@testing-library/svelte'
+import { EditorSelection } from '@codemirror/state'
+import { EditorView } from '@codemirror/view'
 
 describe('JSONEditor', () => {
   const content: Content = {
@@ -96,5 +99,200 @@ describe('JSONEditor', () => {
     expect(main.children[0]).toHaveClass('jse-table-mode')
     expect(getByText(target, 'Joe')).toHaveClass('jse-value', 'jse-string')
     expect(target).toMatchSnapshot()
+  })
+
+  test('open the context menu after switching modes with a pending text change', async () => {
+    const target = document.createElement('div')
+    const text = '{"country":"Switzerland"}'
+    const onChange = vi.fn()
+    const editor = mount(JSONEditor, {
+      target,
+      props: { mode: Mode.text, content: { text }, onChange }
+    })
+
+    try {
+      flushSync()
+      const view = EditorView.findFromDOM(target.querySelector('.cm-content')!)!
+      view.dispatch({ changes: { from: text.length, insert: ' ' } })
+
+      // Switch before the debounced text change runs.
+      editor.updateProps({ mode: Mode.tree })
+      await tick()
+
+      expect(editor.get()).toEqual({ text: text + ' ' })
+      expect(onChange).toHaveBeenCalledTimes(1)
+
+      getByText(target, 'Switzerland').dispatchEvent(
+        new MouseEvent('contextmenu', { bubbles: true, cancelable: true })
+      )
+      await tick()
+
+      expect(target.querySelector('[role="menu"]')).toHaveTextContent('Copy')
+    } finally {
+      await unmount(editor)
+    }
+  })
+
+  test('report the pending selection and restore it when undoing a mode switch', async () => {
+    const target = document.createElement('div')
+    const text = '{"country":"Switzerland"}'
+    const onSelect = vi.fn()
+    const editor = mount(JSONEditor, {
+      target,
+      props: { mode: Mode.text, content: { text }, onSelect }
+    })
+
+    try {
+      flushSync()
+      const view = EditorView.findFromDOM(target.querySelector('.cm-content')!)!
+      view.dispatch({
+        selection: EditorSelection.create(
+          [EditorSelection.range(7, 4), EditorSelection.cursor(text.length)],
+          1
+        )
+      })
+      onSelect.mockClear()
+      // Inserting before both ranges moves them without explicitly setting a selection.
+      view.dispatch({ changes: { from: 1, insert: ' ' } })
+      const selection = view.state.selection.toJSON()
+
+      getByTitle(target, 'Switch to tree mode (current mode: text)').click()
+      expect(onSelect).toHaveBeenCalledWith({ type: SelectionType.text, ...selection })
+
+      getByTitle(target, 'Undo (Ctrl+Z)').click()
+      await tick()
+      const restored = EditorView.findFromDOM(target.querySelector('.cm-content')!)!
+      expect(restored.state.selection.toJSON()).toEqual(selection)
+    } finally {
+      await unmount(editor)
+    }
+  })
+
+  test('keep the new text selection when switching away and back with a pending change', async () => {
+    const target = document.createElement('div')
+    const text = '{"country":"Switzerland"}'
+    const onSelect = vi.fn()
+    const editor = mount(JSONEditor, {
+      target,
+      props: { mode: Mode.text, content: { text }, onSelect }
+    })
+
+    try {
+      flushSync()
+      const view = EditorView.findFromDOM(target.querySelector('.cm-content')!)!
+      view.dispatch({
+        changes: { from: text.length, insert: ' ' },
+        selection: { anchor: text.length + 1 }
+      })
+
+      editor.updateProps({ mode: Mode.tree })
+      const selection: TextSelection = {
+        type: SelectionType.text,
+        ranges: [{ anchor: 0, head: 0 }],
+        main: 0
+      }
+      editor.updateProps({ mode: Mode.text, selection })
+      await tick()
+
+      const newView = EditorView.findFromDOM(target.querySelector('.cm-content')!)!
+      expect(newView.state.selection.main.anchor).toBe(0)
+      expect(onSelect).toHaveBeenLastCalledWith(selection)
+    } finally {
+      await unmount(editor)
+    }
+  })
+
+  test('report a pending text change and selection before validate returns', async () => {
+    const target = document.createElement('div')
+    const events: string[] = []
+    const editor = mount(JSONEditor, {
+      target,
+      props: {
+        mode: Mode.text,
+        content: { text: '{}' },
+        onChange: () => events.push('change'),
+        onSelect: () => events.push('select')
+      }
+    })
+
+    try {
+      flushSync()
+      const view = EditorView.findFromDOM(target.querySelector('.cm-content')!)!
+      view.dispatch({ changes: { from: 2, insert: ' ' } })
+      events.length = 0
+
+      editor.validate()
+      expect(events).toEqual(['change', 'select'])
+    } finally {
+      await unmount(editor)
+    }
+  })
+
+  test('update the text selection after onChange replaces the document with shorter JSON', async () => {
+    const target = document.createElement('div')
+    const onSelect = vi.fn()
+    const boundContent = fromStore(writable<Content>({ text: '{}' }))
+    const editor = mount(JSONEditor, {
+      target,
+      props: {
+        mode: Mode.text,
+        get content() {
+          return boundContent.current
+        },
+        set content(updatedContent) {
+          boundContent.current = updatedContent
+        },
+        onChange: (updatedContent: Content) => {
+          if ('text' in updatedContent) {
+            boundContent.current = { json: JSON.parse(updatedContent.text) }
+          }
+        },
+        onSelect
+      }
+    })
+
+    try {
+      flushSync()
+      const view = EditorView.findFromDOM(target.querySelector('.cm-content')!)!
+      const text = '{"a":"a", "a":"b"}'
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: text },
+        selection: { anchor: text.length }
+      })
+      onSelect.mockClear()
+      editor.validate()
+
+      expect(view.state.doc.toString()).toBe(JSON.stringify({ a: 'b' }, null, 2))
+      expect(onSelect).toHaveBeenLastCalledWith({
+        type: SelectionType.text,
+        ...view.state.selection.toJSON()
+      })
+    } finally {
+      await unmount(editor)
+    }
+  })
+
+  test('flush the pending change and its selection when destroyed', async () => {
+    const target = document.createElement('div')
+    const onChange = vi.fn()
+    const onSelect = vi.fn()
+    const editor = mount(JSONEditor, {
+      target,
+      props: { mode: Mode.text, content: { text: '{}' }, onChange, onSelect }
+    })
+
+    flushSync()
+    const view = EditorView.findFromDOM(target.querySelector('.cm-content')!)!
+    view.dispatch({ changes: { from: 2, insert: ' ' } })
+    await unmount(editor)
+    await tick()
+
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(onChange.mock.lastCall?.[0]).toEqual({ text: '{} ' })
+    expect(onSelect).toHaveBeenCalledExactlyOnceWith({
+      type: SelectionType.text,
+      ranges: [{ anchor: 0, head: 0 }],
+      main: 0
+    })
   })
 })
