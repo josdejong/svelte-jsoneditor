@@ -141,7 +141,6 @@
   export let askToFormat: boolean
   export let externalContent: Content
   export let externalSelection: JSONEditorSelection | undefined
-  export let isActive: () => boolean
   export let history: History<HistoryItem>
   export let indentation: number | string
   export let tabSize: number
@@ -283,10 +282,7 @@
     }
   })
 
-  let destroyed = false
-
   onDestroy(() => {
-    destroyed = true
     flush()
 
     if (codeMirrorView) {
@@ -518,7 +514,7 @@
     hasFocus: () => (modalOpen && document.hasFocus()) || activeElementIsChildOf(domTextMode),
     onFocus,
     onBlur: () => {
-      flush()
+      onChangeCodeMirrorValueDebounced.flush()
       onBlur()
     }
   })
@@ -716,7 +712,7 @@
     }
 
     // first flush any pending changes
-    flush()
+    onChangeCodeMirrorValueDebounced.flush()
 
     const item = history.undo()
     debug('undo', item)
@@ -742,7 +738,7 @@
     }
 
     // first flush any pending changes
-    flush()
+    onChangeCodeMirrorValueDebounced.flush()
 
     const item = history.redo()
     debug('redo', item)
@@ -921,9 +917,8 @@
           }
 
           if (update.selectionSet) {
-            // note that emitOnSelect is invoked in onChangeCodeMirrorValue too,
-            // right after firing onChange. Hence, the else if here, we do not want to fire it twice.
-            emitOnSelect()
+            // Report explicit selection changes even when a debounced text change is pending.
+            emitOnSelect(update.state.selection)
           }
         }),
         jsonLang(),
@@ -949,7 +944,7 @@
       // Otherwise, the editor is not scrolled down enough when the statusbar is rendered on the next tick
       codeMirrorView.dispatch(
         codeMirrorView.state.update({
-          selection: selection.main,
+          selection,
           scrollIntoView: true // FIXME: scrollIntoView also affects scroll of the main page, possibly causing the main page to scroll when jsoneditor has an initial selection
         })
       )
@@ -973,7 +968,9 @@
       return false
     }
 
-    return selection.ranges.every((range) => range.anchor < text.length && range.head < text.length)
+    return selection.ranges.every(
+      (range) => range.anchor <= text.length && range.head <= text.length
+    )
   }
 
   function toRichValidationError(validationError: ValidationError): RichValidationError {
@@ -1118,22 +1115,20 @@
     }
 
     const previousContent = content
+    const updatedContent = { text: codeMirrorText }
     text = codeMirrorText
-    content = { text }
+    content = updatedContent
 
     addHistoryItem()
 
-    emitOnChange(content, previousContent)
-
-    if (!canEmitSelection()) {
-      return
+    const notifyChange = () => emitOnChange(updatedContent, previousContent)
+    if (leavingTextMode) {
+      notifyChange()
+    } else {
+      // onChange can replace the document. Read the selection after that update.
+      flushSync(notifyChange)
     }
-
-    // onChange can replace the document. Read the selection from the updated editor.
-    flushSync()
-    if (canEmitSelection()) {
-      emitOnSelect()
-    }
+    emitOnSelect(codeMirrorView.state.selection)
   }
 
   function updateLinter(validator: Validator | undefined) {
@@ -1233,8 +1228,17 @@
     TEXT_MODE_ONCHANGE_DELAY
   )
 
+  // The parent flushes pending input while switching modes, before onDestroy runs.
+  // Publish the final selection without re-entering that Svelte update.
+  let leavingTextMode = false
   export function flush() {
-    onChangeCodeMirrorValueDebounced.flush()
+    const wasLeavingTextMode = leavingTextMode
+    leavingTextMode = true
+    try {
+      onChangeCodeMirrorValueDebounced.flush()
+    } finally {
+      leavingTextMode = wasLeavingTextMode
+    }
   }
 
   function emitOnChange(content: Content, previousContent: Content) {
@@ -1246,12 +1250,8 @@
     }
   }
 
-  function canEmitSelection() {
-    return !destroyed && isActive()
-  }
-
-  function emitOnSelect() {
-    onSelect(toTextSelection(editorState.selection))
+  function emitOnSelect(selection: EditorSelection) {
+    onSelect(toTextSelection(selection))
   }
 
   function toTextSelection(selection: EditorSelection): TextSelection {
@@ -1297,7 +1297,7 @@
   export function validate(): ContentErrors | undefined {
     debug('validate:start')
 
-    flush()
+    onChangeCodeMirrorValueDebounced.flush()
 
     const contentErrors = memoizedValidateText(
       normalization.escapeValue(text),

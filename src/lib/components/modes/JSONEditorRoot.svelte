@@ -93,10 +93,6 @@
 
   let mode = externalMode
 
-  function isTextMode(mode: Mode) {
-    return mode === Mode.text || String(mode) === 'code'
-  }
-
   function applyExternalMode(externalMode: Mode) {
     if (externalMode === mode) {
       return
@@ -341,10 +337,9 @@
   }
 </script>
 
-{#if isTextMode(mode)}
+{#if mode === Mode.text || String(mode) === 'code'}
   <TextMode
     bind:this={refTextMode}
-    isActive={() => isTextMode(externalMode)}
     externalContent={content}
     externalSelection={selection}
     {ariaLabel}

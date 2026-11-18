@@ -3,9 +3,10 @@ import '@testing-library/jest-dom'
 import JSONEditor from './JSONEditor.svelte'
 import { type Content, Mode, SelectionType, type TextSelection } from '$lib/types.js'
 import { flushSync, mount, tick, unmount } from 'svelte'
-import { getByText } from '@testing-library/svelte'
+import { fromStore, writable } from 'svelte/store'
+import { getByText, getByTitle } from '@testing-library/svelte'
+import { EditorSelection } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
-import { TEXT_MODE_ONCHANGE_DELAY } from '$lib/constants.js'
 
 describe('JSONEditor', () => {
   const content: Content = {
@@ -132,6 +133,41 @@ describe('JSONEditor', () => {
     }
   })
 
+  test('report the pending selection and restore it when undoing a mode switch', async () => {
+    const target = document.createElement('div')
+    const text = '{"country":"Switzerland"}'
+    const onSelect = vi.fn()
+    const editor = mount(JSONEditor, {
+      target,
+      props: { mode: Mode.text, content: { text }, onSelect }
+    })
+
+    try {
+      flushSync()
+      const view = EditorView.findFromDOM(target.querySelector('.cm-content')!)!
+      view.dispatch({
+        selection: EditorSelection.create(
+          [EditorSelection.range(7, 4), EditorSelection.cursor(text.length)],
+          1
+        )
+      })
+      onSelect.mockClear()
+      // Inserting before both ranges moves them without explicitly setting a selection.
+      view.dispatch({ changes: { from: 1, insert: ' ' } })
+      const selection = view.state.selection.toJSON()
+
+      getByTitle(target, 'Switch to tree mode (current mode: text)').click()
+      expect(onSelect).toHaveBeenCalledWith({ type: SelectionType.text, ...selection })
+
+      getByTitle(target, 'Undo (Ctrl+Z)').click()
+      await tick()
+      const restored = EditorView.findFromDOM(target.querySelector('.cm-content')!)!
+      expect(restored.state.selection.toJSON()).toEqual(selection)
+    } finally {
+      await unmount(editor)
+    }
+  })
+
   test('keep the new text selection when switching away and back with a pending change', async () => {
     const target = document.createElement('div')
     const text = '{"country":"Switzerland"}'
@@ -193,17 +229,22 @@ describe('JSONEditor', () => {
   })
 
   test('update the text selection after onChange replaces the document with shorter JSON', async () => {
-    vi.useFakeTimers()
     const target = document.createElement('div')
     const onSelect = vi.fn()
+    const boundContent = fromStore(writable<Content>({ text: '{}' }))
     const editor = mount(JSONEditor, {
       target,
       props: {
         mode: Mode.text,
-        content: { text: '{}' },
+        get content() {
+          return boundContent.current
+        },
+        set content(updatedContent) {
+          boundContent.current = updatedContent
+        },
         onChange: (updatedContent: Content) => {
           if ('text' in updatedContent) {
-            editor.update({ json: JSON.parse(updatedContent.text) })
+            boundContent.current = { json: JSON.parse(updatedContent.text) }
           }
         },
         onSelect
@@ -218,19 +259,20 @@ describe('JSONEditor', () => {
         changes: { from: 0, to: view.state.doc.length, insert: text },
         selection: { anchor: text.length }
       })
-      await vi.advanceTimersByTimeAsync(TEXT_MODE_ONCHANGE_DELAY)
-      await tick()
+      onSelect.mockClear()
+      editor.validate()
 
       expect(view.state.doc.toString()).toBe(JSON.stringify({ a: 'b' }, null, 2))
-      const selection = onSelect.mock.lastCall?.[0]
-      expect(selection.ranges[0].anchor).toBeLessThanOrEqual(view.state.doc.length)
+      expect(onSelect).toHaveBeenLastCalledWith({
+        type: SelectionType.text,
+        ...view.state.selection.toJSON()
+      })
     } finally {
       await unmount(editor)
-      vi.useRealTimers()
     }
   })
 
-  test('flush pending text when destroyed without emitting a selection afterwards', async () => {
+  test('flush the pending change and its selection when destroyed', async () => {
     const target = document.createElement('div')
     const onChange = vi.fn()
     const onSelect = vi.fn()
@@ -247,6 +289,10 @@ describe('JSONEditor', () => {
 
     expect(onChange).toHaveBeenCalledTimes(1)
     expect(onChange.mock.lastCall?.[0]).toEqual({ text: '{} ' })
-    expect(onSelect).not.toHaveBeenCalled()
+    expect(onSelect).toHaveBeenCalledExactlyOnceWith({
+      type: SelectionType.text,
+      ranges: [{ anchor: 0, head: 0 }],
+      main: 0
+    })
   })
 })
