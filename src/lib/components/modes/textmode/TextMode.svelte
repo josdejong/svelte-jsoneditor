@@ -13,7 +13,7 @@
   import { immutableJSONPatch, revertJSONPatch } from 'immutable-json-patch'
   import { jsonrepair } from 'jsonrepair'
   import { debounce, isEqual, uniqueId } from 'lodash-es'
-  import { flushSync, onDestroy, onMount, tick } from 'svelte'
+  import { flushSync, onDestroy, onMount } from 'svelte'
   import {
     JSON_STATUS_INVALID,
     JSON_STATUS_REPAIRABLE,
@@ -141,6 +141,7 @@
   export let askToFormat: boolean
   export let externalContent: Content
   export let externalSelection: JSONEditorSelection | undefined
+  export let isActive: () => boolean
   export let history: History<HistoryItem>
   export let indentation: number | string
   export let tabSize: number
@@ -1124,16 +1125,15 @@
 
     emitOnChange(content, previousContent)
 
-    // We emit OnSelect on the next tick to cater for the case where
-    // the user changes the content directly inside the OnChange callback.
-    // This change will be dispatched by Svelte on the next tick. Before
-    // that tick, emitOnSelect would be fired based on the "old" contents,
-    // which may be out of range when the replacement by the user is shorter.
-    tick().then(() => {
-      if (!destroyed) {
-        emitOnSelect()
-      }
-    })
+    if (!canEmitSelection()) {
+      return
+    }
+
+    // onChange can replace the document. Read the selection from the updated editor.
+    flushSync()
+    if (canEmitSelection()) {
+      emitOnSelect()
+    }
   }
 
   function updateLinter(validator: Validator | undefined) {
@@ -1244,6 +1244,10 @@
         patchResult: undefined
       })
     }
+  }
+
+  function canEmitSelection() {
+    return !destroyed && isActive()
   }
 
   function emitOnSelect() {

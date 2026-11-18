@@ -166,6 +166,32 @@ describe('JSONEditor', () => {
     }
   })
 
+  test('report a pending text change and selection before validate returns', async () => {
+    const target = document.createElement('div')
+    const events: string[] = []
+    const editor = mount(JSONEditor, {
+      target,
+      props: {
+        mode: Mode.text,
+        content: { text: '{}' },
+        onChange: () => events.push('change'),
+        onSelect: () => events.push('select')
+      }
+    })
+
+    try {
+      flushSync()
+      const view = EditorView.findFromDOM(target.querySelector('.cm-content')!)!
+      view.dispatch({ changes: { from: 2, insert: ' ' } })
+      events.length = 0
+
+      editor.validate()
+      expect(events).toEqual(['change', 'select'])
+    } finally {
+      await unmount(editor)
+    }
+  })
+
   test('update the text selection after onChange replaces the document with shorter JSON', async () => {
     vi.useFakeTimers()
     const target = document.createElement('div')
@@ -175,7 +201,7 @@ describe('JSONEditor', () => {
       props: {
         mode: Mode.text,
         content: { text: '{}' },
-        onChange: (updatedContent) => {
+        onChange: (updatedContent: Content) => {
           if ('text' in updatedContent) {
             editor.update({ json: JSON.parse(updatedContent.text) })
           }
