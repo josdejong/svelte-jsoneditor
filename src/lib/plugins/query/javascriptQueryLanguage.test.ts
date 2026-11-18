@@ -15,6 +15,27 @@ const originalUsers = cloneDeep([user1, user3, user2])
 
 describe('javascriptQueryLanguage', () => {
   describe('createQuery and executeQuery', () => {
+    test.each(["O'Brien", 'say "hi"', 'C:\\Users\\Bob', 'line one\nline two'])(
+      'should filter strings containing special characters: %j',
+      (value) => {
+        const data = [{ name: value }, { name: 'other' }]
+        const query = createQuery(data, {
+          filter: { path: ['name'], relation: '==', value }
+        })
+
+        assert.deepStrictEqual(executeQuery(data, query, JSON), [data[0]])
+      }
+    )
+
+    test('should preserve bigint filter values', () => {
+      const data = [{ value: 9007199254740992n }, { value: 9007199254740993n }]
+      const query = createQuery(data, {
+        filter: { path: ['value'], relation: '==', value: '9007199254740993' }
+      })
+
+      assert.deepStrictEqual(executeQuery(data, query, JSON), [data[1]])
+    })
+
     test('should create a and execute an empty query', () => {
       const query = createQuery(users, {})
       const result = executeQuery(users, query, JSON)
@@ -35,7 +56,7 @@ describe('javascriptQueryLanguage', () => {
         query,
         'function query (data) {\n' +
           '  return data\n' +
-          "    .filter(item => item?.user?.name == 'Bob')\n" +
+          '    .filter(item => item?.user?.name == "Bob")\n' +
           '}'
       )
 
@@ -59,7 +80,7 @@ describe('javascriptQueryLanguage', () => {
         query,
         'function query (data) {\n' +
           '  return data\n' +
-          '    .filter(item => item?.["user name!"] == \'Bob\')\n' +
+          '    .filter(item => item?.["user name!"] == "Bob")\n' +
           '}'
       )
 

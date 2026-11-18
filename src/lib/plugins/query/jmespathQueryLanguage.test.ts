@@ -8,6 +8,54 @@ const { createQuery, executeQuery } = jmespathQueryLanguage
 
 describe('jmespathQueryLanguage', () => {
   describe('createQuery and executeQuery', () => {
+    test.each([
+      'say "hi"',
+      'C:\\Users\\Bob',
+      'line one\nline two',
+      'a`b',
+      'a\\`b',
+      'a`b`c',
+      'a\\`b`c'
+    ])('should filter strings containing special characters: %j', (value) => {
+      const data = [{ name: value }, { name: 'other' }]
+      const query = createQuery(data, {
+        filter: { path: ['name'], relation: '==', value }
+      })
+
+      assert.deepStrictEqual(executeQuery(data, query, JSON), [data[0]])
+    })
+
+    test.each(['1', '1name', '$value'])(
+      'should filter, sort and project a property requiring quotes: %j',
+      (key) => {
+        const data = [
+          { [key]: 7, label: 'seven' },
+          { [key]: 2, label: 'two' },
+          { [key]: 5, label: 'five' }
+        ]
+        const query = createQuery(data, {
+          filter: { path: [key], relation: '>', value: '3' },
+          sort: { path: [key], direction: 'asc' },
+          projection: { paths: [[key], ['label']] }
+        })
+
+        assert.deepStrictEqual(executeQuery(data, query, JSON), [data[2], data[0]])
+      }
+    )
+
+    test('should preserve numeric string and null filter values', () => {
+      const data = [{ name: '5' }, { name: 5 }, { name: null }]
+      const stringQuery = createQuery(data, {
+        filter: { path: ['name'], relation: '==', value: '5' }
+      })
+      const nullQuery = createQuery(data, {
+        filter: { path: ['name'], relation: '==', value: 'null' }
+      })
+
+      assert.deepStrictEqual(executeQuery(data, stringQuery, JSON), [data[0]])
+      assert.deepStrictEqual(executeQuery(data, nullQuery, JSON), [data[2]])
+    })
+
     const user1 = { _id: '1', user: { name: 'Stuart', age: 6, registered: true } }
     const user3 = { _id: '3', user: { name: 'Kevin', age: 8, registered: false } }
     const user2 = { _id: '2', user: { name: 'Bob', age: 7, registered: true, extra: true } }

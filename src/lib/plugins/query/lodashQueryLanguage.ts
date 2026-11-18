@@ -35,7 +35,7 @@ function createQuery(json: unknown, queryOptions: QueryLanguageOptions): string 
     const filterValue = parseString(filter.value)
     const filterValueStr =
       typeof filterValue === 'string'
-        ? `'${filter.value}'`
+        ? JSON.stringify(filter.value)
         : isInteger(filter.value) && !Number.isSafeInteger(filterValue)
           ? `${filter.value}n` // bigint
           : filter.value
